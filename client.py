@@ -85,7 +85,7 @@ class Client:
         self.model.eval()
 
         # Create optimizer
-        self.optimizer = model.optimizer(self.model)
+        self.optimizer = model.get_optimizer(self.model)
 
 
     def run(self):
@@ -107,8 +107,8 @@ class Client:
         logging.info('Training on client #%s', self.client_id)
 
         # Perform model training
-        train_loader = model.train_loader(self.trainset, self.batch_size)
-        model.train(self.model, train_loader,
+        trainloader = model.get_trainloader(self.trainset, self.batch_size)
+        model.train(self.model, trainloader,
                        self.optimizer, self.epochs)
 
         # Extract model weights and biases
@@ -120,8 +120,13 @@ class Client:
 
         # Perform model testing if applicable
         if self.do_test:
-            testloader = model.testloader(self.testset, 1000)
+            testloader = model.get_testloader(self.testset, 1000)
             self.report.accuracy = model.test(self.model, testloader)
+
+
+    def test(self):
+        # Perform model testing
+        raise NotImplementedError
 
 
 class Report(object):
