@@ -227,6 +227,7 @@ class Server:
         logging.info('Average accuracy: {:.2f}%\n'.format(100 * accuracy))
         return accuracy
 
+
     # Federated learning phases
 
     def selection(self):
@@ -237,6 +238,7 @@ class Server:
         sample_clients = list(random.sample(self.clients, clients_per_round))
 
         return sample_clients
+
 
     def configuration(self, sample_clients):
         ''' Configure the data distribution across clients. '''
@@ -259,6 +261,7 @@ class Server:
             # Continue configuraion on client
             selected_client.configure(config)
 
+
     def reporting(self, sample_clients):
         ''' Recieve the reports from selected clients. '''
 
@@ -268,6 +271,7 @@ class Server:
         assert len(reports) == len(sample_clients)
 
         return reports
+
 
     def aggregation(self, reports):
         ''' Aggregate the reported weight updates from the selected clients. '''
@@ -379,6 +383,7 @@ class Server:
         # Send data to client
         current_client.set_data(data, self.config)
 
+
     @staticmethod
     def save_model(model, path):
         ''' Save the model in a file. '''
@@ -386,9 +391,10 @@ class Server:
         torch.save(model.state_dict(), path)
         logging.info('Saved the global model: %s', path)
 
+
     def save_reports(self, current_round, reports):
         '''
-        Save the reports in a local data structure, which will be saved to a pickle file. 
+        Save the reports in a local data structure, which will be saved to a pickle file.
         '''
 
         import model

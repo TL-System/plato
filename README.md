@@ -35,12 +35,13 @@ $ conda install pytorch torchvision -c pytorch
 To start a simulation, run [`run.py`](run.py) from the repository's root directory:
 
 ```shell
+cp configs/MNIST/mnist.conf config.conf
 python run.py
   --config=config.conf
   --log=INFO
 ```
 
-* `--config` (`-c`): the path to the configuration file to be used.
+* `--config` (`-c`): the path to the configuration file to be used. The default is `config.conf` in the project's home directory.
 * `--log` (`-l`): the level of logging information to be written to the console, defaults to `INFO`.
 
 *Plato* uses a standard configuration file, parsed by Python's standard configuration parser, to manage the runtime configuration parameters. Example configuration files have been provided in the `configs` directory.
