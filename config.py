@@ -1,11 +1,16 @@
+"""
+Reading runtime parameters from a standard configuration file (which is easier
+to work on than JSON).
+"""
+
 from collections import namedtuple
 import configparser
 
 
-class Config(object):
-    """ 
-    Retrieving configuration parameters by parsing a configuration file 
-    using the standard Python config parser. 
+class Config:
+    """
+    Retrieving configuration parameters by parsing a configuration file
+    using the standard Python config parser.
     """
 
     def __init__(self, config):
@@ -14,7 +19,9 @@ class Config(object):
 
         self.extract()
 
-    def __extract_section(self, section, fields, defaults):
+    def extract_section(self, section, fields, defaults):
+        ''' Extract the parameters from one section in a configuration file. '''
+
         config = self.config
         params = []
 
@@ -25,9 +32,9 @@ class Config(object):
                 params.append(config[section].getfloat(field, defaults[i]))
             elif type(defaults[i]) is bool:
                 params.append(config[section].getboolean(field, defaults[i]))
-            else: # the parameter is a string
+            else: # assuming that the parameter is a string
                 params.append(config[section].get(field, defaults[i]))
-        
+
         return params
 
 
@@ -35,17 +42,17 @@ class Config(object):
         ''' Extract the parameters from a configuration file. '''
 
         # Parameters for the federated learning clients
-        fields = ['total', 'per_round']
-        defaults = (0, 0, 'uniform')
-        params = self.__extract_section('clients', fields, defaults)
+        fields = ['total', 'per_round', 'label_distribution', 'do_test', 'test_partition']
+        defaults = (0, 0, 'uniform', False, 0.2)
+        params = self.extract_section('clients', fields, defaults)
         self.clients = namedtuple('clients', fields)(*params)
 
         assert self.clients.per_round <= self.clients.total
 
         # Parameters for the data distribution
-        fields = ['loading', 'partition', 'IID', 'bias', 'shard']
+        fields = ['loading', 'partition_size', 'IID', 'bias', 'shard']
         defaults = ('static', 0, True, None, None)
-        params = self.__extract_section('data', fields, defaults)
+        params = self.extract_section('data', fields, defaults)
         self.data = namedtuple('data', fields)(*params)
 
         # Determine the correct data loader
@@ -58,9 +65,9 @@ class Config(object):
             self.loader = 'shard'
 
         # Parameters in general for federated learning
-        fields = ['rounds', 'target_accuracy', 'task', 'epochs', 'batch_size', 
-        'model', 'data_path', 'model_path', 'server']
-        defaults = (0, None, 'train', 0, 0, 'MNIST', './data', './models', 'basic')
-        params = self.__extract_section('general', fields, defaults)
+        fields = ['rounds', 'target_accuracy', 'task', 'epochs', 'batch_size',
+                  'model', 'data_path', 'model_path', 'report_path', 'server']
+        defaults = (0, 0.9, 'train', 0, 0, 'MNIST', './data', './models', 'report.pkl', 'basic')
+        params = self.extract_section('general', fields, defaults)
 
         self.general = namedtuple('general', fields)(*params)
