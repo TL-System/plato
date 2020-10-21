@@ -5,10 +5,10 @@ A simple federated learning server using federated averaging.
 import logging
 import sys
 import random
-import numpy as np
-import torch
 import pickle
 from threading import Thread
+import numpy as np
+import torch
 
 import client
 from utils import dists
@@ -19,7 +19,11 @@ class Server:
 
     def __init__(self, config):
         self.config = config
-
+        self.model = None
+        self.model_path = '{}/{}'.format(config.general.model_path, config.general.model)
+        self.loader = None
+        self.clients = None # selected clients in a round
+        self.saved_reports = None
 
     def boot(self):
         '''
@@ -28,7 +32,6 @@ class Server:
         '''
 
         config = self.config
-        self.model_path = '{}/{}'.format(config.general.model_path, config.general.model)
         total_clients = config.clients.total
 
         logging.info('Booting the %s server...', config.general.server)
@@ -36,14 +39,14 @@ class Server:
         # Adding the federated learning model to the import path
         sys.path.append(self.model_path)
 
-        # Setting up a simulated server
+        # Setting up the federated learning training workload
         self.load_data()
         self.load_model()
         self.make_clients(total_clients)
 
 
     def load_data(self):
-        ''' Generating data and loading them at the clients. '''
+        ''' Generating data and loading them onto the clients. '''
         import model
 
         # Extract configurations for loaders
@@ -72,15 +75,14 @@ class Server:
 
 
     def load_model(self):
+        ''' Setting up the global model to be trained via federated learning. '''
+
         import model
 
         config = self.config
-
         model_type = config.general.model
-
         logging.info('Model: %s', model_type)
 
-        # Set up global model
         self.model = model.Net()
         self.save_model(self.model, self.model_path)
 
@@ -90,35 +92,35 @@ class Server:
             self.save_reports(0, []) # Save the initial model
 
     def make_clients(self, num_clients):
-        import utils.dists as dists
+        ''' Generate the clients for federated learning. '''
 
-        IID = self.config.data.IID
+        iid = self.config.data.IID
         labels = self.loader.labels
         loader = self.config.loader
         loading = self.config.data.loading
 
-        if not IID:  # Create distribution for label preferences if non-IID
+        if not iid:  # Create distribution for label preferences if non-IID
             dist = {
                 "uniform": dists.uniform(num_clients, len(labels)),
                 "normal": dists.normal(num_clients, len(labels))
             }[self.config.clients.label_distribution]
-            random.shuffle(dist)  # Shuffle distribution
+            random.shuffle(dist)  # Shuffle the distribution
 
         # Creating emulated clients
         clients = []
-        for client_id in range(num_clients):
 
-            # Create a new client
+        for client_id in range(num_clients):
+            # Creating a new client
             new_client = client.Client(client_id)
 
-            if not IID:  # Configure clients for non-IID data
+            if not iid: # Configure this client for non-IID data
                 if self.config.data.bias:
                     # Bias data partitions
                     bias = self.config.data.bias
                     # Choose weighted random preference
                     pref = random.choices(labels, dist)[0]
 
-                    # Assign preference, bias config
+                    # Assign (preference, bias) configuration
                     new_client.set_bias(pref, bias)
                 elif self.config.data.shard:
                     # Shard data partitions
@@ -140,28 +142,29 @@ class Server:
                 self.loader.create_shards()
 
             # Send data partition to all clients
-            [self.set_client_data(client) for client in clients]
+            for next_client in clients:
+                self.set_client_data(next_client)
 
         self.clients = clients
 
-    # Run federated learning
     def run(self):
+        ''' Run the federated learning training workload. '''
         rounds = self.config.general.rounds
         target_accuracy = self.config.general.target_accuracy
         reports_path = self.config.general.report_path
 
         if target_accuracy:
-            logging.info('Training: {} rounds or {}% accuracy\n'.format(
-                rounds, 100 * target_accuracy))
+            logging.info('Training: %s rounds or %s%% accuracy\n',
+                rounds, 100 * target_accuracy)
         else:
-            logging.info('Training: {} rounds\n'.format(rounds))
+            logging.info('Training: %s rounds\n', rounds)
 
         # Perform rounds of federated learning
-        for round in range(1, rounds + 1):
-            logging.info('**** Round {}/{} ****'.format(round, rounds))
+        for current_round in range(1, rounds + 1):
+            logging.info('**** Round %s/%s ****', current_round, rounds)
 
             # Run the federated learning round
-            accuracy = self.round()
+            accuracy = self.round(current_round)
 
             # Break loop when target accuracy is met
             if target_accuracy and (accuracy >= target_accuracy):
@@ -169,14 +172,18 @@ class Server:
                 break
 
         if reports_path:
-            with open(reports_path, 'wb') as f:
-                pickle.dump(self.saved_reports, f)
-            logging.info('Saved reports: {}'.format(reports_path))
+            with open(reports_path, 'wb') as opened_file:
+                pickle.dump(self.saved_reports, opened_file)
+            logging.info('Saved reports: %s', reports_path)
 
-    def round(self):
+    def round(self, current_round):
+        '''
+        Selecting some clients to participate in the current round,
+        and run them for one round.
+        '''
+
         import model
 
-        # Select clients to participate in the round
         sample_clients = self.selection()
 
         # Configure sample clients
@@ -184,14 +191,18 @@ class Server:
 
         # Run clients using multithreading for better parallelism
         threads = [Thread(target=client.run) for client in sample_clients]
-        [t.start() for t in threads]
-        [t.join() for t in threads]
 
-        # Recieve client updates
+        for current_thread in threads:
+            current_thread.start()
+
+        for current_thread in threads:
+            current_thread.join()
+
+        # Receiving client updates
         reports = self.reporting(sample_clients)
 
-        # Perform weight aggregation
-        logging.info('Aggregating updates...')
+        # Aggregating weight updates from the selected clients
+        logging.info('Aggregating weight updates...')
         updated_weights = self.aggregation(reports)
 
         # Load updated weights
@@ -199,7 +210,7 @@ class Server:
 
         # Extract flattened weights (if applicable)
         if self.config.general.report_path:
-            self.save_reports(round, reports)
+            self.save_reports(current_round, reports)
 
         # Save the updated global model
         self.save_model(self.model, self.model_path)
@@ -210,7 +221,7 @@ class Server:
         else: # Test the updated model on the server
             testset = self.loader.get_testset()
             batch_size = self.config.general.batch_size
-            testloader = model.test_loader(testset, batch_size)
+            testloader = model.get_testloader(testset, batch_size)
             accuracy = model.test(self.model, testloader)
 
         logging.info('Average accuracy: {:.2f}%\n'.format(100 * accuracy))
@@ -219,16 +230,16 @@ class Server:
     # Federated learning phases
 
     def selection(self):
-        # Select devices to participate in round
+        ''' Select devices to participate in round. '''
         clients_per_round = self.config.clients.per_round
 
         # Select clients randomly
-        sample_clients = [client for client in random.sample(
-            self.clients, clients_per_round)]
+        sample_clients = list(random.sample(self.clients, clients_per_round))
 
         return sample_clients
 
     def configuration(self, sample_clients):
+        ''' Configure the data distribution across clients. '''
         loader_type = self.config.loader
         loading = self.config.data.loading
 
@@ -238,30 +249,33 @@ class Server:
                 self.loader.create_shards()
 
         # Configure selected clients for federated learning task
-        for client in sample_clients:
+        for selected_client in sample_clients:
             if loading == 'dynamic':
-                self.set_client_data(client)  # Send data partition to client
+                self.set_client_data(selected_client)  # Send data partition to client
 
             # Extract config for client
             config = self.config
 
             # Continue configuraion on client
-            client.configure(config)
+            selected_client.configure(config)
 
     def reporting(self, sample_clients):
-        # Recieve reports from sample clients
+        ''' Recieve the reports from selected clients. '''
+
         reports = [client.get_report() for client in sample_clients]
 
-        logging.info('Reports recieved: {}'.format(len(reports)))
+        logging.info('Reports recieved: %s', len(reports))
         assert len(reports) == len(sample_clients)
 
         return reports
 
     def aggregation(self, reports):
+        ''' Aggregate the reported weight updates from the selected clients. '''
         return self.federated_averaging(reports)
 
-    # Report aggregation
+
     def extract_client_updates(self, reports):
+        ''' Extract the model weight updates from a client's report. '''
         import model
 
         # Extract baseline model weights
@@ -274,14 +288,14 @@ class Server:
         updates = []
         for weight in weights:
             update = []
-            for i, (name, weight) in enumerate(weight):
+            for i, (name, current_weight) in enumerate(weight):
                 bl_name, baseline = baseline_weights[i]
 
                 # Ensure correct weight is being updated
                 assert name == bl_name
 
                 # Calculate update
-                delta = weight - baseline
+                delta = current_weight - baseline
                 update.append((name, delta))
             updates.append(update)
 
@@ -289,6 +303,7 @@ class Server:
 
 
     def federated_averaging(self, reports):
+        ''' Aggregate weight updates from the clients using federated averaging. '''
         import model
 
         # Extract updates from reports
@@ -316,7 +331,11 @@ class Server:
 
         return updated_weights
 
-    def accuracy_averaging(self, reports):
+
+    @staticmethod
+    def accuracy_averaging(reports):
+        ''' Compute the average accuracy across clients. '''
+
         # Get total number of samples
         total_samples = sum([report.num_samples for report in reports])
 
@@ -327,17 +346,19 @@ class Server:
 
         return accuracy
 
-    # Server operations
+
     @staticmethod
     def flatten_weights(weights):
-        # Flatten weights into vectors
+        ''' Flatten weights into vectors. '''
         weight_vecs = []
         for _, weight in weights:
             weight_vecs.extend(weight.flatten().tolist())
 
         return np.array(weight_vecs)
 
-    def set_client_data(self, client):
+    def set_client_data(self, current_client):
+        ''' set the data for a client. '''
+
         loader = self.config.loader
 
         # Get data partition size
@@ -349,27 +370,33 @@ class Server:
         if loader == 'basic':
             data = self.loader.get_partition(partition_size)
         elif loader == 'bias':
-            data = self.loader.get_partition(partition_size, client.pref)
+            data = self.loader.get_partition(partition_size, current_client.pref)
         elif loader == 'shard':
             data = self.loader.get_partition()
         else:
             logging.critical('Unknown data loader type')
 
         # Send data to client
-        client.set_data(data, self.config)
+        current_client.set_data(data, self.config)
 
-    def save_model(self, model, path):
+    @staticmethod
+    def save_model(model, path):
+        ''' Save the model in a file. '''
         path += '/global_model'
         torch.save(model.state_dict(), path)
-        logging.info('Saved the global model: {}'.format(path))
+        logging.info('Saved the global model: %s', path)
 
-    def save_reports(self, round, reports):
+    def save_reports(self, current_round, reports):
+        '''
+        Save the reports in a local data structure, which will be saved to a pickle file. 
+        '''
+
         import model
 
         if reports:
-            self.saved_reports['round{}'.format(round)] = [(report.client_id, 
+            self.saved_reports['round{}'.format(current_round)] = [(report.client_id,
                 self.flatten_weights(report.weights)) for report in reports]
 
         # Extract global weights
-        self.saved_reports['w{}'.format(round)] = self.flatten_weights(
+        self.saved_reports['w{}'.format(current_round)] = self.flatten_weights(
             model.extract_weights(self.model))

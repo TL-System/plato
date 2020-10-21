@@ -1,5 +1,6 @@
 [MASTER]
 extension-pkg-whitelist=numpy,torch
+disable=import-error,import-outside-toplevel
 
 [TYPECHECK]
 ignored-modules=numpy,torch

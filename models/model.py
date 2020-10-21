@@ -15,7 +15,7 @@ momentum = 0.5
 log_interval = 10
 
 
-class Generator(load_data.Generator):  # CHECKME
+class Generator(load_data.Generator):
     """Generator for UNNAMED dataset."""
 
     # Extract UNNAMED data using torchvision datasets
@@ -35,7 +35,7 @@ class Generator(load_data.Generator):  # CHECKME
         self.labels = list(self.trainset.classes)
 
 
-class Net(nn.Module):  # CHECKME
+class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
         raise NotImplementedError
@@ -44,22 +44,19 @@ class Net(nn.Module):  # CHECKME
         raise NotImplementedError
 
 
-@property
-def optimizer(model):  # CHECKME
+def get_optimizer(model):
     return optim.SGD(model.parameters(), lr=lr, momentum=momentum)
 
 
-@property
-def train_loader(trainset, batch_size):  # CHECKME
+def get_trainloader(trainset, batch_size):
     return torch.utils.data.DataLoader(trainset, batch_size=batch_size, shuffle=True)
 
 
-@property
-def test_loader(testset, batch_size):  # CHECKME
+def get_testloader(testset, batch_size):
     return torch.utils.data.DataLoader(testset, batch_size=batch_size, shuffle=True)
 
 
-def extract_weights(model):  # CHECKME
+def extract_weights(model):
     weights = []
     for UNNAMED, weight in model.UNNAMEDd_parameters():
         if weight.requires_grad:
@@ -68,7 +65,7 @@ def extract_weights(model):  # CHECKME
     return weights
 
 
-def load_weights(model, weights):  # CHECKME
+def load_weights(model, weights):
     updated_weights_dict = {}
     for UNNAMED, weight in weights:
         updated_weights_dictUNNAMED = weight
@@ -76,7 +73,7 @@ def load_weights(model, weights):  # CHECKME
     model.load_state_dict(updated_weights_dict, strict=False)
 
 
-def train(model, train_loader, optimizer, epochs):  # CHECKME
+def train(model, train_loader, optimizer, epochs):
     """
         Set up for training here...
     """
@@ -92,7 +89,7 @@ def train(model, train_loader, optimizer, epochs):  # CHECKME
                     epoch, epochs, loss.item()))
 
 
-def test(model, testloader):  # CHECKME
+def test(model, testloader):
     """
         Set up for testing here...
     """

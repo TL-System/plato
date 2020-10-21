@@ -1,3 +1,7 @@
+'''
+The MNIST model and data generator.
+'''
+
 import logging
 import torch
 import torch.nn as nn
@@ -57,21 +61,21 @@ class Net(nn.Module):
         return F.log_softmax(x, dim=1)
 
 
-def optimizer(model):
+def get_optimizer(model):
     return optim.SGD(model.parameters(), lr=lr, momentum=momentum)
 
 
-def train_loader(trainset, batch_size):
+def get_trainloader(trainset, batch_size):
     return torch.utils.data.DataLoader(trainset, batch_size=batch_size, shuffle=True)
 
 
-def test_loader(testset, batch_size):
+def get_testloader(testset, batch_size):
     return torch.utils.data.DataLoader(testset, batch_size=batch_size, shuffle=True)
 
 
 def extract_weights(model):
     weights = []
-    for name, weight in model.to(torch.device('cpu')).named_parameters():  # pylint: disable=no-member
+    for name, weight in model.to(torch.device('cpu')).named_parameters():
         if weight.requires_grad:
             weights.append((name, weight.data))
 
@@ -112,7 +116,7 @@ def test(model, testloader):
         for image, label in testloader:
             image, label = image.to(device), label.to(device)
             output = model(image)
-            # sum up batch loss
+            # sum up the batch loss
             test_loss += F.nll_loss(output, label, reduction='sum').item()
             # get the index of the max log-probability
             pred = output.argmax(dim=1, keepdim=True)
