@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Plato configuration files
+config.conf
+
+# Global model files
+**/global
