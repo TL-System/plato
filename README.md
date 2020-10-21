@@ -45,12 +45,13 @@ python run.py
 
 *Plato* uses a standard configuration file, parsed by Python's standard configuration parser, to manage the runtime configuration parameters. Example configuration files have been provided in the `configs` directory.
 
-### Uninstalling
+### Uninstalling Plato
 
-Remove the conda environment first, and then remove the directory that contains *Plato*'s git repository.
+Remove the `conda` environment used to run *Plato* first, and then remove the directory containing *Plato*'s git repository.
 
 ```shell
 conda-env remove -n federated
+rm -rf plato/
 ```
 
 where `federated` is the name of the `conda` environment that *Plato* runs in.
