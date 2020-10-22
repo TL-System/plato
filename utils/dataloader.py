@@ -31,7 +31,7 @@ class Generator:
 
         # Populate the grouped data dict
         for datapoint in self.trainset:
-            _, label = datapoint  # Extract the label
+            __, label = datapoint  # Extract the label
             label = self.labels[label]
 
             grouped_data[label].append(datapoint)
@@ -143,6 +143,8 @@ class ShardLoader(Loader):
     Load data partitions with sharding, which means data is to be horizontally partitioned (in
     database terminologies).
     """
+    def __init__(self):
+        self.shards = None
 
     def create_shards(self):
         """Create all the shards (partitions) from the data."""
@@ -154,7 +156,7 @@ class ShardLoader(Loader):
         shard_size = int(self.trainset_size / total)
 
         data = []
-        for _, items in self.trainset.items():
+        for __, items in self.trainset.items():
             data.extend(items)
 
         shards = [data[(i * shard_size):((i + 1) * shard_size)]

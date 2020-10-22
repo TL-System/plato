@@ -49,7 +49,7 @@ class Config:
         assert self.clients.per_round <= self.clients.total
 
         # Parameters for the data distribution
-        fields = ['loading', 'partition_size', 'iid', 'bias', 'shard', 
+        fields = ['loading', 'partition_size', 'iid', 'bias', 'shard',
                   'bias_primary_percentage', 'bias_secondary_focus', 'shard_per_client']
         defaults = ('static', 0, True, False, False, 0.8, False, 2)
         params = self.__extract_section('data', fields, defaults)
@@ -66,8 +66,8 @@ class Config:
 
         # Parameters in general for federated learning
         fields = ['rounds', 'target_accuracy', 'task', 'epochs', 'batch_size',
-                  'model', 'data_path', 'model_path', 'report_path', 'server']
-        defaults = (0, 0.9, 'train', 0, 0, 'MNIST', './data', './models', 'report.pkl', 'basic')
+                  'model', 'data_path', 'model_path', 'server']
+        defaults = (0, 0.9, 'train', 0, 0, 'MNIST', './data', './models', 'fedavg')
         params = self.__extract_section('general', fields, defaults)
 
         self.general = namedtuple('general', fields)(*params)

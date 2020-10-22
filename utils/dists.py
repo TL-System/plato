@@ -20,17 +20,9 @@ def uniform(N, k):
 
 
 def normal(N, k):
-    """Returns a normal distribution of 'N' items into 'k' groups."""
-    dist = []
-
-    # Make distribution
-    for i in range(k):
-        x = i - (k - 1) / 2
-        dist.append(int(N * (np.exp(-x) / (np.exp(-x) + 1)**2)))
-
-    # Add the remaining items
-    remainder = N - sum(dist)
-    dist = list(np.add(dist, uniform(remainder, k)))
-
-    # Return a non-shuffled distribution
-    return dist
+    """
+    Generates a histogram for a normal distribution, partitioning 'N' items into 'k' groups.
+    """
+    samples = np.random.normal(0, 1, N)
+    dist, __ = np.histogram(samples, bins=k)
+    return dist, samples

@@ -7,7 +7,7 @@ import torch
 
 from models import model
 
-class Client:
+class SimpleClient:
     """A basic federated learning client who sends simple weight updates."""
 
     def __init__(self, client_id):
@@ -28,7 +28,7 @@ class Client:
 
     def __repr__(self):
         return 'Client #{}: {} samples in labels: {}'.format(
-            self.client_id, len(self.data), set([label for _, label in self.data]))
+            self.client_id, len(self.data), set([label for __, label in self.data]))
 
 
     def set_bias(self, pref, bias):
