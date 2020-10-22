@@ -5,6 +5,8 @@ A basic federated learning client who sends weight updates to the server.
 import logging
 import torch
 
+from models import model
+
 class Client:
     """ A basic federated learning client who sends simple weight updates. """
 
@@ -20,7 +22,10 @@ class Client:
         self.model = None # Machine learning model
         self.epochs = None # The number of epochs in each local training round
         self.batch_size = None # The batch size used for local training
-
+        self.pref = None
+        self.bias = None
+        self.shard = None
+        self.optimizer = None
 
     def __repr__(self):
         return 'Client #{}: {} samples in labels: {}'.format(
@@ -55,7 +60,7 @@ class Client:
     # Federated learning phases
     def set_data(self, data, config):
         '''
-        Obtaining and deploying the data from the server. For emulation purposes, all the data 
+        Obtaining and deploying the data from the server. For emulation purposes, all the data
         is to be downloaded from the server.
         '''
 
@@ -76,7 +81,7 @@ class Client:
 
 
     def configure(self, config):
-        import model
+        ''' Prepare this client for training. '''
 
         # Download from server
         config = self.download(config)
@@ -97,7 +102,7 @@ class Client:
 
 
     def run(self):
-        # Perform the federated learning training workload
+        ''' Perform the federated learning training workload. '''
         {
             "train": self.train,
             "test": self.test
@@ -111,7 +116,6 @@ class Client:
 
     def train(self):
         ''' The machine learning training workload on a client. '''
-        import model
 
         logging.info('Training on client #%s', self.client_id)
 
@@ -133,7 +137,6 @@ class Client:
 
     def test(self):
         ''' Perform model testing. '''
-        import model
 
         testloader = model.get_testloader(self.testset, 1000)
         self.report.set_accuracy(model.test(self.model, testloader))
