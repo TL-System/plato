@@ -39,7 +39,7 @@ class Generator:
         return self.trainset
 
 
-class Loader(object):
+class Loader:
     """ Load and pass IID data partitions. """
 
     def __init__(self, config, generator):

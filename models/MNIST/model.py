@@ -66,14 +66,17 @@ def get_optimizer(model):
 
 
 def get_trainloader(trainset, batch_size):
+    ''' Obtain the data loader for the training dataset. '''
     return torch.utils.data.DataLoader(trainset, batch_size=batch_size, shuffle=True)
 
 
 def get_testloader(testset, batch_size):
+    ''' Obtain the data loader for the testing dataset. '''
     return torch.utils.data.DataLoader(testset, batch_size=batch_size, shuffle=True)
 
 
 def extract_weights(model):
+    ''' Extract weights from the model. '''
     weights = []
     for name, weight in model.to(torch.device('cpu')).named_parameters():
         if weight.requires_grad:

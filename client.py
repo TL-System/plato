@@ -1,16 +1,25 @@
 '''
-A federated learning client.
+A basic federated learning client who sends weight updates to the server.
 '''
 
 import logging
 import torch
 
-
 class Client:
-    """ A federated learning client. """
+    """ A basic federated learning client who sends simple weight updates. """
 
     def __init__(self, client_id):
         self.client_id = client_id
+        self.do_test = None # Should the client test the trained model?
+        self.test_partition = None # Percentage of the dataset reserved for testing
+        self.data = None # The dataset to be used for local training
+        self.trainset = None # Training dataset
+        self.testset = None # Testing dataset
+        self.report = None # Report to the server
+        self.task = None # Local computation task: 'train' or 'test'
+        self.model = None # Machine learning model
+        self.epochs = None # The number of epochs in each local training round
+        self.batch_size = None # The batch size used for local training
 
 
     def __repr__(self):
@@ -18,7 +27,6 @@ class Client:
             self.client_id, len(self.data), set([label for _, label in self.data]))
 
 
-    # Set non-IID data configurations
     def set_bias(self, pref, bias):
         self.pref = pref
         self.bias = bias
@@ -28,9 +36,8 @@ class Client:
         self.shard = shard
 
 
-    # Server interactions
     def download(self, argv):
-        # Download from the server
+        ''' Downloading data from the server. '''
         try:
             return argv.copy()
         except:
@@ -38,7 +45,7 @@ class Client:
 
 
     def upload(self, argv):
-        # Upload to the server
+        ''' Uploading updates to the server. '''
         try:
             return argv.copy()
         except:
@@ -47,8 +54,12 @@ class Client:
 
     # Federated learning phases
     def set_data(self, data, config):
-        
-        # Extract from config
+        '''
+        Obtaining and deploying the data from the server. For emulation purposes, all the data 
+        is to be downloaded from the server.
+        '''
+
+        # Extract test parameter settings from the configuration
         do_test = self.do_test = config.clients.do_test
         test_partition = self.test_partition = config.clients.test_partition
 
@@ -67,9 +78,6 @@ class Client:
     def configure(self, config):
         import model
 
-        # Extract the path from config
-        model_path = self.model_path = config.general.model_path + '/' + config.general.model
-
         # Download from server
         config = self.download(config)
 
@@ -78,10 +86,10 @@ class Client:
         self.epochs = config.general.epochs
         self.batch_size = config.general.batch_size
 
-        # Download the most recent global model
-        path = model_path + '/global_model'
+        # Download the most recent global model from the server
+        model_path = '{}/{}/global_model'.format(config.general.model_path, config.general.model)
         self.model = model.Net()
-        self.model.load_state_dict(torch.load(path))
+        self.model.load_state_dict(torch.load(model_path))
         self.model.eval()
 
         # Create optimizer
@@ -91,12 +99,13 @@ class Client:
     def run(self):
         # Perform the federated learning training workload
         {
-            "train": self.train()
-        }[self.task]
+            "train": self.train,
+            "test": self.test
+        }[self.task]()
 
 
     def get_report(self):
-        # Report results to the server.
+        ''' Report results to the server. '''
         return self.upload(self.report)
 
 
@@ -114,24 +123,31 @@ class Client:
         # Extract model weights and biases
         weights = model.extract_weights(self.model)
 
-        # Generate report for server
-        self.report = Report(self)
-        self.report.weights = weights
+        # Generate a report for the server
+        self.report = Report(self, weights)
 
         # Perform model testing if applicable
         if self.do_test:
-            testloader = model.get_testloader(self.testset, 1000)
-            self.report.accuracy = model.test(self.model, testloader)
+            self.test()
 
 
     def test(self):
-        # Perform model testing
-        raise NotImplementedError
+        ''' Perform model testing. '''
+        import model
+
+        testloader = model.get_testloader(self.testset, 1000)
+        self.report.set_accuracy(model.test(self.model, testloader))
 
 
-class Report(object):
-    """ Federated learning client report. """
+class Report:
+    ''' Federated learning client report. '''
 
-    def __init__(self, client):
+    def __init__(self, client, weights):
         self.client_id = client.client_id
         self.num_samples = len(client.data)
+        self.weights = weights
+        self.accuracy = 0
+
+    def set_accuracy(self, accuracy):
+        ''' Include the test accuracy computed at a client in the report. '''
+        self.accuracy = accuracy
