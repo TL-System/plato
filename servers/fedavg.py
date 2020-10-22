@@ -83,7 +83,7 @@ class Server:
         loading = self.config.data.loading
 
         if not iid:  # Create a non-IID distribution for label preferences
-            dist = {
+            dist, __ = {
                 "uniform": dists.uniform,
                 "normal": dists.normal
             }[self.config.clients.label_distribution](num_clients, len(labels))

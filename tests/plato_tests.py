@@ -17,15 +17,15 @@ from utils import dists
 
 class DistsTest(unittest.TestCase):
     def test_uniform_dist(self):
-        dist = dists.uniform(1000, 5)
+        dist, __ = dists.uniform(1000, 5)
         self.assertSequenceEqual(dist, [200] * 5)
 
-        dist = dists.uniform(101, 3)
+        dist, __ = dists.uniform(101, 3)
         # The ordering of elements does not matter
         self.assertTrue(collections.Counter(dist) == collections.Counter([34, 34, 33]))
 
     def test_normal_dist(self):
-        dist, samples = dists.normal(1000, 10)
+        dist, samples = dists.normal(100, 10)
         print('The distribution is {}'.format(dist))
         print('p-value from the Shapiro Wilk Test for normality is {0:.2f}'.format(shapiro(samples).pvalue))
         self.assertTrue(shapiro(samples).pvalue > 0.05)
