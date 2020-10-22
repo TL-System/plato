@@ -8,7 +8,7 @@ import torch
 from models import model
 
 class Client:
-    """ A basic federated learning client who sends simple weight updates. """
+    """A basic federated learning client who sends simple weight updates."""
 
     def __init__(self, client_id):
         self.client_id = client_id
@@ -22,10 +22,9 @@ class Client:
         self.model = None # Machine learning model
         self.epochs = None # The number of epochs in each local training round
         self.batch_size = None # The batch size used for local training
-        self.pref = None
-        self.bias = None
-        self.shard = None
-        self.optimizer = None
+        self.pref = None # Preferred label on this client in biased data distribution
+        self.bias = None # Percentage of bias
+        self.optimizer = None # Optimizer for model training
 
     def __repr__(self):
         return 'Client #{}: {} samples in labels: {}'.format(
@@ -33,16 +32,13 @@ class Client:
 
 
     def set_bias(self, pref, bias):
+        """Set the preferred label and the bias percentage."""
         self.pref = pref
         self.bias = bias
 
 
-    def set_shard(self, shard):
-        self.shard = shard
-
-
     def download(self, argv):
-        """ Downloading data from the server. """
+        """Downloading data from the server."""
         try:
             return argv.copy()
         except:
@@ -50,7 +46,7 @@ class Client:
 
 
     def upload(self, argv):
-        """ Uploading updates to the server. """
+        """Uploading updates to the server."""
         try:
             return argv.copy()
         except:
@@ -63,7 +59,6 @@ class Client:
         Obtaining and deploying the data from the server. For emulation purposes, all the data
         is to be downloaded from the server.
         """
-
         # Extract test parameter settings from the configuration
         do_test = self.do_test = config.clients.do_test
         test_partition = self.test_partition = config.clients.test_partition
@@ -71,9 +66,9 @@ class Client:
         # Download data
         self.data = self.download(data)
 
-        # Extract trainset, testset (if applicable)
+        # Extract the trainset and testset if local testing is needed
         data = self.data
-        if do_test:  # Partition for testset if applicable
+        if do_test:
             self.trainset = data[:int(len(data) * (1 - test_partition))]
             self.testset = data[int(len(data) * (1 - test_partition)):]
         else:
@@ -81,8 +76,7 @@ class Client:
 
 
     def configure(self, config):
-        """ Prepare this client for training. """
-
+        """Prepare this client for training."""
         # Download from server
         config = self.download(config)
 
@@ -102,7 +96,7 @@ class Client:
 
 
     def run(self):
-        """ Perform the federated learning training workload. """
+        """Perform the federated learning training workload."""
         {
             "train": self.train,
             "test": self.test
@@ -110,13 +104,12 @@ class Client:
 
 
     def get_report(self):
-        """ Report results to the server. """
+        """Report results to the server."""
         return self.upload(self.report)
 
 
     def train(self):
-        """ The machine learning training workload on a client. """
-
+        """The machine learning training workload on a client."""
         logging.info('Training on client #%s', self.client_id)
 
         # Perform model training
@@ -136,14 +129,13 @@ class Client:
 
 
     def test(self):
-        """ Perform model testing. """
-
+        """Perform model testing."""
         testloader = model.get_testloader(self.testset, 1000)
         self.report.set_accuracy(model.test(self.model, testloader))
 
 
 class Report:
-    """ Federated learning client report. """
+    """Federated learning client report."""
 
     def __init__(self, client, weights):
         self.client_id = client.client_id
@@ -151,6 +143,7 @@ class Report:
         self.weights = weights
         self.accuracy = 0
 
+
     def set_accuracy(self, accuracy):
-        """ Include the test accuracy computed at a client in the report. """
+        """Include the test accuracy computed at a client in the report."""
         self.accuracy = accuracy

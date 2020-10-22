@@ -25,7 +25,6 @@ class Generator:
 
     def group(self):
         """Group the data by label."""
-
         # Create empty dict of labels
         grouped_data = {label: []
                         for label in self.labels}
@@ -50,7 +49,7 @@ class Generator:
 
 
 class Loader:
-    """Load and pass IID data partitions."""
+    """Load IID data partitions."""
 
     def __init__(self, config, generator):
         """Get data from the generator."""
@@ -85,7 +84,6 @@ class Loader:
 
     def get_partition(self, partition_size):
         """Get a partition that is uniform across all the labels."""
-
         # Use uniform distribution
         dist = dists.uniform(partition_size, len(self.labels))
 
@@ -107,13 +105,12 @@ class BiasLoader(Loader):
     """Load and pass 'preference bias' data partitions."""
 
     def get_partition(self, partition_size, pref):
-        # Get a non-uniform partition with a preference bias
-
+        """Get a non-uniform partition with a preference bias."""
         # Extract bias configuration from config
         bias = self.config.data.bias_primary_percentage
         secondary = self.config.data.bias_secondary_focus
 
-       # Calculate sizes of majorty and minority portions
+        # Calculate sizes of majorty and minority portions
         majority = int(partition_size * bias)
         minority = partition_size - majority
 
@@ -142,10 +139,13 @@ class BiasLoader(Loader):
 
 
 class ShardLoader(Loader):
-    """Load and pass 'shard' data partitions."""
+    """
+    Load data partitions with sharding, which means data is to be horizontally partitioned (in
+    database terminologies).
+    """
 
     def create_shards(self):
-        """Create a shard."""
+        """Create all the shards (partitions) from the data."""
         # Extract the number of shards per client from the configuration
         per_client = self.config.data.shard_per_client
 
@@ -153,7 +153,7 @@ class ShardLoader(Loader):
         total = self.config.clients.total * per_client
         shard_size = int(self.trainset_size / total)
 
-        data = []  # Flatten data
+        data = []
         for _, items in self.trainset.items():
             data.extend(items)
 
@@ -176,7 +176,7 @@ class ShardLoader(Loader):
 
 
     def get_partition(self):
-        """Get a partition shard."""
+        """Get a partition for a client."""
         # Extract the number of shards per client
         per_client = self.config.data.shard_per_client
 
