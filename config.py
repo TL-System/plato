@@ -20,7 +20,7 @@ class Config:
         self.extract()
 
     def __extract_section(self, section, fields, defaults):
-        ''' Extract the parameters from one section in a configuration file. '''
+        """ Extract the parameters from one section in a configuration file. """
 
         config = self.config
         params = []
@@ -39,7 +39,7 @@ class Config:
 
 
     def extract(self):
-        ''' Extract the parameters from a configuration file. '''
+        """ Extract the parameters from a configuration file. """
 
         # Parameters for the federated learning clients
         fields = ['total', 'per_round', 'label_distribution', 'do_test', 'test_partition']
@@ -50,13 +50,14 @@ class Config:
         assert self.clients.per_round <= self.clients.total
 
         # Parameters for the data distribution
-        fields = ['loading', 'partition_size', 'iid', 'bias', 'shard']
-        defaults = ('static', 0, True, None, None)
+        fields = ['loading', 'partition_size', 'iid', 'bias', 'shard', 
+                  'bias_primary_percentage', 'bias_secondary_focus', 'shard_per_client']
+        defaults = ('static', 0, True, False, False, 0.8, False, 2)
         params = self.__extract_section('data', fields, defaults)
         self.data = namedtuple('data', fields)(*params)
 
         # Determine the correct data loader
-        assert self.data.iid ^ bool(self.data.bias) ^ bool(self.data.shard)
+        assert self.data.iid ^ self.data.bias ^ self.data.shard
         if self.data.iid:
             self.loader = 'iid'
         elif self.data.bias:

@@ -24,10 +24,10 @@ class Server:
 
 
     def boot(self):
-        '''
+        """
         Booting the federated learning server by setting up the data, model, and
         creating the clients.
-        '''
+        """
 
         config = self.config
         total_clients = config.clients.total
@@ -41,7 +41,7 @@ class Server:
 
 
     def load_data(self):
-        ''' Generating data and loading them onto the clients. '''
+        """ Generating data and loading them onto the clients. """
 
         # Extract configurations for loaders
         config = self.config
@@ -69,7 +69,7 @@ class Server:
 
 
     def load_model(self):
-        ''' Setting up the global model to be trained via federated learning. '''
+        """ Setting up the global model to be trained via federated learning. """
         model_type = self.config.general.model
         logging.info('Model: %s', model_type)
 
@@ -78,7 +78,7 @@ class Server:
 
 
     def make_clients(self, num_clients):
-        ''' Generate the clients for federated learning. '''
+        """ Generate the clients for federated learning. """
 
         iid = self.config.data.iid
         labels = self.loader.labels
@@ -136,7 +136,7 @@ class Server:
 
 
     def run(self):
-        ''' Run the federated learning training workload. '''
+        """ Run the federated learning training workload. """
         rounds = self.config.general.rounds
         target_accuracy = self.config.general.target_accuracy
 
@@ -160,10 +160,10 @@ class Server:
 
 
     def round(self):
-        '''
+        """
         Selecting some clients to participate in the current round,
         and run them for one round.
-        '''
+        """
         sample_clients = self.select_clients()
 
         # Configure sample clients
@@ -208,7 +208,7 @@ class Server:
     # Federated learning phases
 
     def select_clients(self):
-        ''' Select devices to participate in round. '''
+        """ Select devices to participate in round. """
         clients_per_round = self.config.clients.per_round
 
         # Select clients randomly
@@ -218,7 +218,7 @@ class Server:
 
 
     def configure_clients(self, sample_clients):
-        ''' Configure the data distribution across clients. '''
+        """ Configure the data distribution across clients. """
         loader_type = self.config.loader
         loading = self.config.data.loading
 
@@ -240,7 +240,7 @@ class Server:
 
 
     def receive_reports(self, sample_clients):
-        ''' Recieve the reports from selected clients. '''
+        """ Recieve the reports from selected clients. """
 
         reports = [client.get_report() for client in sample_clients]
 
@@ -251,12 +251,12 @@ class Server:
 
 
     def aggregate_weights(self, reports):
-        ''' Aggregate the reported weight updates from the selected clients. '''
+        """ Aggregate the reported weight updates from the selected clients. """
         return self.federated_averaging(reports)
 
 
     def extract_client_updates(self, reports):
-        ''' Extract the model weight updates from a client's report. '''
+        """ Extract the model weight updates from a client's report. """
 
         # Extract baseline model weights
         baseline_weights = model.extract_weights(self.model)
@@ -283,7 +283,7 @@ class Server:
 
 
     def federated_averaging(self, reports):
-        ''' Aggregate weight updates from the clients using federated averaging. '''
+        """ Aggregate weight updates from the clients using federated averaging. """
 
         # Extract updates from reports
         updates = self.extract_client_updates(reports)
@@ -313,7 +313,7 @@ class Server:
 
     @staticmethod
     def accuracy_averaging(reports):
-        ''' Compute the average accuracy across clients. '''
+        """ Compute the average accuracy across clients. """
 
         # Get total number of samples
         total_samples = sum([report.num_samples for report in reports])
@@ -326,7 +326,7 @@ class Server:
         return accuracy
 
     def set_client_data(self, current_client):
-        ''' set the data for a client. '''
+        """ set the data for a client. """
 
         loader = self.config.loader
 
@@ -351,7 +351,7 @@ class Server:
 
     @staticmethod
     def save_model(model_to_save, path):
-        ''' Save the model in a file. '''
+        """ Save the model in a file. """
         path += '/global_model'
         torch.save(model_to_save.state_dict(), path)
         logging.info('Saved the global model: %s', path)

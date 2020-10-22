@@ -1,9 +1,12 @@
-import numpy as np
-import random
+"""
+Functions that generate a variety of data distributions.
+"""
 
+import random
+import numpy as np
 
 def uniform(N, k):
-    """ Uniform distribution of 'N' items into 'k' groups. """
+    """Returns a uniform distribution of 'N' items into 'k' groups."""
     dist = []
     avg = N / k
 
@@ -17,7 +20,7 @@ def uniform(N, k):
 
 
 def normal(N, k):
-    """ Normal distribution of 'N' items into 'k' groups. """
+    """Returns a normal distribution of 'N' items into 'k' groups."""
     dist = []
 
     # Make distribution
