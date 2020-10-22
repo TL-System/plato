@@ -137,8 +137,5 @@ config.conf
 # Data files
 data/
 
-# Reports
-**/reports.pkl
-
 # Global model files
 **/global_model

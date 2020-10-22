@@ -5,9 +5,7 @@ A simple federated learning server using federated averaging.
 import logging
 import sys
 import random
-import pickle
 from threading import Thread
-import numpy as np
 import torch
 
 import client
@@ -23,7 +21,6 @@ class Server:
         self.model_path = '{}/{}'.format(config.general.model_path, config.general.model)
         self.loader = None
         self.clients = None # selected clients in a round
-        self.saved_reports = None
 
 
     def boot(self):
@@ -80,17 +77,11 @@ class Server:
 
         import model
 
-        config = self.config
-        model_type = config.general.model
+        model_type = self.config.general.model
         logging.info('Model: %s', model_type)
 
         self.model = model.Net()
         self.save_model(self.model, self.model_path)
-
-        # Extract flattened weights (if applicable)
-        if self.config.general.report_path:
-            self.saved_reports = {}
-            self.save_reports(0, []) # Save the initial model
 
 
     def make_clients(self, num_clients):
@@ -154,7 +145,6 @@ class Server:
         ''' Run the federated learning training workload. '''
         rounds = self.config.general.rounds
         target_accuracy = self.config.general.target_accuracy
-        reports_path = self.config.general.report_path
 
         if target_accuracy:
             logging.info('Training: %s rounds or %s%% accuracy\n',
@@ -173,11 +163,6 @@ class Server:
             if target_accuracy and (accuracy >= target_accuracy):
                 logging.info('Target accuracy reached.')
                 break
-
-        if reports_path:
-            with open(reports_path, 'wb') as f:
-                pickle.dump(self.saved_reports, f)
-            logging.info('Saved reports: %s', reports_path)
 
 
     def round(self, current_round):
@@ -212,23 +197,20 @@ class Server:
         # Load updated weights
         model.load_weights(self.model, updated_weights)
 
-        # Extract flattened weights (if applicable)
-        if self.config.general.report_path:
-            self.save_reports(current_round, reports)
-
         # Save the updated global model
         self.save_model(self.model, self.model_path)
 
         # Test the global model accuracy
         if self.config.clients.do_test:  # Get average accuracy from client reports
             accuracy = self.accuracy_averaging(reports)
+            logging.info('Average client accuracy: {:.2f}%\n'.format(100 * accuracy))
         else: # Test the updated model on the server
             testset = self.loader.get_testset()
             batch_size = self.config.general.batch_size
             testloader = model.get_testloader(testset, batch_size)
             accuracy = model.test(self.model, testloader)
+            logging.info('Global model accuracy: {:.2f}%\n'.format(100 * accuracy))
 
-        logging.info('Average accuracy: {:.2f}%\n'.format(100 * accuracy))
         return accuracy
 
 
@@ -354,17 +336,6 @@ class Server:
 
         return accuracy
 
-
-    @staticmethod
-    def flatten_weights(weights):
-        ''' Flatten weights into vectors. '''
-        weight_vecs = []
-        for _, weight in weights:
-            weight_vecs.extend(weight.flatten().tolist())
-
-        return np.array(weight_vecs)
-
-
     def set_client_data(self, current_client):
         ''' set the data for a client. '''
 
@@ -395,19 +366,3 @@ class Server:
         path += '/global_model'
         torch.save(model.state_dict(), path)
         logging.info('Saved the global model: %s', path)
-
-
-    def save_reports(self, current_round, reports):
-        '''
-        Save the reports in a local data structure, which will be saved to a pickle file.
-        '''
-
-        import model
-
-        if reports:
-            self.saved_reports['round{}'.format(current_round)] = [(report.client_id,
-                self.flatten_weights(report.weights)) for report in reports]
-
-        # Extract global weights
-        self.saved_reports['w{}'.format(current_round)] = self.flatten_weights(
-            model.extract_weights(self.model))
