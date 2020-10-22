@@ -1,0 +1,1 @@
+from .MNIST import model

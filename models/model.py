@@ -7,7 +7,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
 
-import utils.load_data as load_data
+from utils import load_data
 
 # Training settings
 lr = 0.01

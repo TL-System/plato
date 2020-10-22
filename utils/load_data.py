@@ -8,14 +8,14 @@ from utils import dists
 class Generator:
     """ Generate federated learning training and testing data. """
 
-    # Abstract read function
     def read(self, path):
-        # Read the dataset, set: trainset, testset, labels
+        ''' Abstract function to read the dataset (should never be called). '''
         raise NotImplementedError
 
 
-    # Group the data by label
     def group(self):
+        ''' Group the data by label. '''
+
         # Create empty dict of labels
         grouped_data = {label: []
                         for label in self.labels}

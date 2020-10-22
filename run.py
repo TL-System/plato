@@ -6,7 +6,7 @@ import argparse
 import logging
 import config
 
-from servers import fedavg
+import servers
 
 # Set up the parser
 parser = argparse.ArgumentParser()
@@ -31,8 +31,8 @@ def main():
 
     # Initialize the federated learning server
     fl_server = {
-        "fedavg": fedavg.Server(fl_config)
-    }[fl_config.general.server]
+        "fedavg": servers.fedavg.Server
+    }[fl_config.general.server](fl_config)
     fl_server.boot()
 
     # Run federated learning

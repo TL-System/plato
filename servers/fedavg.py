@@ -3,12 +3,12 @@ A simple federated learning server using federated averaging.
 """
 
 import logging
-import sys
 import random
 from threading import Thread
 import torch
 
 import client
+from models import model
 from utils import dists
 from utils import load_data
 
@@ -34,9 +34,6 @@ class Server:
 
         logging.info('Booting the %s server...', config.general.server)
 
-        # Adding the federated learning model to the import path
-        sys.path.append(self.model_path)
-
         # Setting up the federated learning training workload
         self.load_data()
         self.load_model()
@@ -45,7 +42,6 @@ class Server:
 
     def load_data(self):
         ''' Generating data and loading them onto the clients. '''
-        import model
 
         # Extract configurations for loaders
         config = self.config
@@ -64,19 +60,16 @@ class Server:
 
         # Setting up the data loader
         self.loader = {
-            'basic': load_data.Loader(config, generator),
-            'bias': load_data.BiasLoader(config, generator),
-            'shard': load_data.ShardLoader(config, generator)
-        }[config.loader]
+            'iid': load_data.Loader,
+            'bias': load_data.BiasLoader,
+            'shard': load_data.ShardLoader
+        }[config.loader](config, generator)
 
-        logging.info('Loader: %s, IID: %s', config.loader, config.data.IID)
+        logging.info('Data distribution: %s', config.loader)
 
 
     def load_model(self):
         ''' Setting up the global model to be trained via federated learning. '''
-
-        import model
-
         model_type = self.config.general.model
         logging.info('Model: %s', model_type)
 
@@ -87,16 +80,16 @@ class Server:
     def make_clients(self, num_clients):
         ''' Generate the clients for federated learning. '''
 
-        iid = self.config.data.IID
+        iid = self.config.data.iid
         labels = self.loader.labels
         loader = self.config.loader
         loading = self.config.data.loading
 
-        if not iid:  # Create distribution for label preferences if non-IID
+        if not iid:  # Create a non-IID distribution for label preferences
             dist = {
-                "uniform": dists.uniform(num_clients, len(labels)),
-                "normal": dists.normal(num_clients, len(labels))
-            }[self.config.clients.label_distribution]
+                "uniform": dists.uniform,
+                "normal": dists.normal
+            }[self.config.clients.label_distribution](num_clients, len(labels))
             random.shuffle(dist)  # Shuffle the distribution
 
         # Creating emulated clients
@@ -115,6 +108,7 @@ class Server:
 
                     # Assign (preference, bias) configuration to the client
                     new_client.set_bias(pref, bias)
+
                 elif self.config.data.shard:
                     # Shard data partitions
                     shard = self.config.data.shard
@@ -157,7 +151,7 @@ class Server:
             logging.info('**** Round %s/%s ****', current_round, rounds)
 
             # Run the federated learning round
-            accuracy = self.round(current_round)
+            accuracy = self.round()
 
             # Break loop when target accuracy is met
             if target_accuracy and (accuracy >= target_accuracy):
@@ -165,14 +159,11 @@ class Server:
                 break
 
 
-    def round(self, current_round):
+    def round(self):
         '''
         Selecting some clients to participate in the current round,
         and run them for one round.
         '''
-
-        import model
-
         sample_clients = self.select_clients()
 
         # Configure sample clients
@@ -266,7 +257,6 @@ class Server:
 
     def extract_client_updates(self, reports):
         ''' Extract the model weight updates from a client's report. '''
-        import model
 
         # Extract baseline model weights
         baseline_weights = model.extract_weights(self.model)
@@ -294,7 +284,6 @@ class Server:
 
     def federated_averaging(self, reports):
         ''' Aggregate weight updates from the clients using federated averaging. '''
-        import model
 
         # Extract updates from reports
         updates = self.extract_client_updates(reports)
@@ -347,7 +336,7 @@ class Server:
                 partition_size = self.config.data.partition_size
 
         # Extract data partition for client
-        if loader == 'basic':
+        if loader == 'iid':
             data = self.loader.get_partition(partition_size)
         elif loader == 'bias':
             data = self.loader.get_partition(partition_size, current_client.pref)
@@ -361,8 +350,8 @@ class Server:
 
 
     @staticmethod
-    def save_model(model, path):
+    def save_model(model_to_save, path):
         ''' Save the model in a file. '''
         path += '/global_model'
-        torch.save(model.state_dict(), path)
+        torch.save(model_to_save.state_dict(), path)
         logging.info('Saved the global model: %s', path)

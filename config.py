@@ -50,15 +50,15 @@ class Config:
         assert self.clients.per_round <= self.clients.total
 
         # Parameters for the data distribution
-        fields = ['loading', 'partition_size', 'IID', 'bias', 'shard']
+        fields = ['loading', 'partition_size', 'iid', 'bias', 'shard']
         defaults = ('static', 0, True, None, None)
         params = self.__extract_section('data', fields, defaults)
         self.data = namedtuple('data', fields)(*params)
 
         # Determine the correct data loader
-        assert self.data.IID ^ bool(self.data.bias) ^ bool(self.data.shard)
-        if self.data.IID:
-            self.loader = 'basic'
+        assert self.data.iid ^ bool(self.data.bias) ^ bool(self.data.shard)
+        if self.data.iid:
+            self.loader = 'iid'
         elif self.data.bias:
             self.loader = 'bias'
         elif self.data.shard:
