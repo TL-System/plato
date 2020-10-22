@@ -15,8 +15,9 @@ def uniform(N, k):
         dist.append(int((i + 1) * avg) - int(i * avg))
 
     # Return shuffled distribution
+    samples = np.random.uniform(N)
     random.shuffle(dist)
-    return dist
+    return dist, samples
 
 
 def normal(N, k):

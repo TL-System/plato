@@ -85,7 +85,7 @@ class Loader:
     def get_partition(self, partition_size):
         """Get a partition that is uniform across all the labels."""
         # Use uniform distribution
-        dist = dists.uniform(partition_size, len(self.labels))
+        dist, __ = dists.uniform(partition_size, len(self.labels))
 
         partition = []  # Extract data according to distribution
         for i, label in enumerate(self.labels):
@@ -123,7 +123,7 @@ class BiasLoader(Loader):
             dist[random.randint(0, len_minor_labels - 1)] = minority
         else:
             # Distribute among all minority labels
-            dist = dists.uniform(minority, len_minor_labels)
+            dist, __ = dists.uniform(minority, len_minor_labels)
 
         # Add majority data to distribution
         dist.insert(self.labels.index(pref), majority)
