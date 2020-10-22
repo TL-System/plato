@@ -94,6 +94,7 @@ def load_weights(model, weights):
 
 
 def train(model, train_loader, optimizer, epochs):
+    ''' Training the model. '''
     model.to(device)
     model.train()
     for epoch in range(1, epochs + 1):
@@ -110,6 +111,7 @@ def train(model, train_loader, optimizer, epochs):
 
 
 def test(model, testloader):
+    ''' Testing the model. '''
     model.to(device)
     model.eval()
     test_loss = 0
