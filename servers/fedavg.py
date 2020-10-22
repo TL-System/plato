@@ -7,7 +7,7 @@ import random
 from threading import Thread
 import torch
 
-import client
+from clients import SimpleClient
 from models import model
 from utils import dists
 from utils import dataloader
@@ -94,7 +94,7 @@ class Server:
 
         for client_id in range(num_clients):
             # Creating a new client
-            new_client = client.Client(client_id)
+            new_client = SimpleClient(client_id)
 
             if not iid: # Configure this client for non-IID data
                 if self.config.data.bias:
@@ -280,10 +280,10 @@ class Server:
 
         # Perform weighted averaging
         avg_update = [torch.zeros(x.size())
-                      for _, x in updates[0]]
+                      for __, x in updates[0]]
         for i, update in enumerate(updates):
             num_samples = reports[i].num_samples
-            for j, (_, delta) in enumerate(update):
+            for j, (__, delta) in enumerate(update):
                 # Use weighted average by number of samples
                 avg_update[j] += delta * (num_samples / total_samples)
 
