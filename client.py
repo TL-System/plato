@@ -1,6 +1,6 @@
-'''
+"""
 A basic federated learning client who sends weight updates to the server.
-'''
+"""
 
 import logging
 import torch
@@ -42,7 +42,7 @@ class Client:
 
 
     def download(self, argv):
-        ''' Downloading data from the server. '''
+        """ Downloading data from the server. """
         try:
             return argv.copy()
         except:
@@ -50,7 +50,7 @@ class Client:
 
 
     def upload(self, argv):
-        ''' Uploading updates to the server. '''
+        """ Uploading updates to the server. """
         try:
             return argv.copy()
         except:
@@ -59,10 +59,10 @@ class Client:
 
     # Federated learning phases
     def set_data(self, data, config):
-        '''
+        """
         Obtaining and deploying the data from the server. For emulation purposes, all the data
         is to be downloaded from the server.
-        '''
+        """
 
         # Extract test parameter settings from the configuration
         do_test = self.do_test = config.clients.do_test
@@ -81,7 +81,7 @@ class Client:
 
 
     def configure(self, config):
-        ''' Prepare this client for training. '''
+        """ Prepare this client for training. """
 
         # Download from server
         config = self.download(config)
@@ -102,7 +102,7 @@ class Client:
 
 
     def run(self):
-        ''' Perform the federated learning training workload. '''
+        """ Perform the federated learning training workload. """
         {
             "train": self.train,
             "test": self.test
@@ -110,12 +110,12 @@ class Client:
 
 
     def get_report(self):
-        ''' Report results to the server. '''
+        """ Report results to the server. """
         return self.upload(self.report)
 
 
     def train(self):
-        ''' The machine learning training workload on a client. '''
+        """ The machine learning training workload on a client. """
 
         logging.info('Training on client #%s', self.client_id)
 
@@ -136,14 +136,14 @@ class Client:
 
 
     def test(self):
-        ''' Perform model testing. '''
+        """ Perform model testing. """
 
         testloader = model.get_testloader(self.testset, 1000)
         self.report.set_accuracy(model.test(self.model, testloader))
 
 
 class Report:
-    ''' Federated learning client report. '''
+    """ Federated learning client report. """
 
     def __init__(self, client, weights):
         self.client_id = client.client_id
@@ -152,5 +152,5 @@ class Report:
         self.accuracy = 0
 
     def set_accuracy(self, accuracy):
-        ''' Include the test accuracy computed at a client in the report. '''
+        """ Include the test accuracy computed at a client in the report. """
         self.accuracy = accuracy

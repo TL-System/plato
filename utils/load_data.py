@@ -1,20 +1,30 @@
+"""
+Parent class for data loaders.
+"""
+
 import logging
 import random
-from torchvision import datasets, transforms
 
 from utils import dists
 
 
 class Generator:
-    """ Generate federated learning training and testing data. """
+    """Generate federated learning training and testing data."""
+
+    def __init__(self):
+        self.labels = None
+        self.trainset = None
+        self.trainset_size = None
+        self.shards = None
+
 
     def read(self, path):
-        ''' Abstract function to read the dataset (should never be called). '''
+        """Abstract function to read the dataset (should never be called)."""
         raise NotImplementedError
 
 
     def group(self):
-        ''' Group the data by label. '''
+        """Group the data by label."""
 
         # Create empty dict of labels
         grouped_data = {label: []
@@ -30,8 +40,8 @@ class Generator:
         self.trainset = grouped_data  # Overwrite the trainset with grouped data by label
 
 
-    # Run the data generation process
     def generate(self, path):
+        """Run the data generation process."""
         self.read(path)
         self.trainset_size = len(self.trainset)  # Extract the trainset size
         self.group()
@@ -40,10 +50,10 @@ class Generator:
 
 
 class Loader:
-    """ Load and pass IID data partitions. """
+    """Load and pass IID data partitions."""
 
     def __init__(self, config, generator):
-        # Get data from generator
+        """Get data from the generator."""
         self.config = config
         self.trainset = generator.trainset
         self.testset = generator.testset
@@ -55,13 +65,14 @@ class Loader:
         self.used['testset'] = []
 
     def extract(self, label, n):
+        """Extract the data for a particular label."""
         if len(self.trainset[label]) > n:
             extracted = self.trainset[label][:n]  # Extract the data
             self.used[label].extend(extracted)  # Move data to used
             del self.trainset[label][:n]  # Remove from the trainset
             return extracted
         else:
-            logging.warning('Insufficient data in label: {}'.format(label))
+            logging.warning('Insufficient data in label: %s', label)
             logging.warning('Dumping used data for reuse')
 
             # Unmark data as used
@@ -73,7 +84,7 @@ class Loader:
             return self.extract(label, n)
 
     def get_partition(self, partition_size):
-        # Get an partition uniform across all labels
+        """Get a partition that is uniform across all the labels."""
 
         # Use uniform distribution
         dist = dists.uniform(partition_size, len(self.labels))
@@ -88,7 +99,7 @@ class Loader:
         return partition
 
     def get_testset(self):
-        # Return the entire testset
+        """Return the entire testset."""
         return self.testset
 
 
@@ -99,18 +110,18 @@ class BiasLoader(Loader):
         # Get a non-uniform partition with a preference bias
 
         # Extract bias configuration from config
-        bias = self.config.data.bias['primary']
-        secondary = self.config.data.bias['secondary']
+        bias = self.config.data.bias_primary_percentage
+        secondary = self.config.data.bias_secondary_focus
 
        # Calculate sizes of majorty and minority portions
         majority = int(partition_size * bias)
         minority = partition_size - majority
 
-        # Calculate number of minor labels
+        # Calculate the number of minor labels
         len_minor_labels = len(self.labels) - 1
 
         if secondary:
-                # Distribute to random secondary label
+            # Distribute to random secondary label
             dist = [0] * len_minor_labels
             dist[random.randint(0, len_minor_labels - 1)] = minority
         else:
@@ -134,10 +145,11 @@ class ShardLoader(Loader):
     """Load and pass 'shard' data partitions."""
 
     def create_shards(self):
-        # Extract shard configuration from config
-        per_client = self.config.data.shard['per_client']
+        """Create a shard."""
+        # Extract the number of shards per client from the configuration
+        per_client = self.config.data.shard_per_client
 
-        # Determine correct total shards, shard size
+        # Determine the correct total number of shards and the size of each shard
         total = self.config.clients.total * per_client
         shard_size = int(self.trainset_size / total)
 
@@ -152,24 +164,25 @@ class ShardLoader(Loader):
         self.shards = shards
         self.used = []
 
-        logging.info('Created {} shards of size {}'.format(
-            len(shards), shard_size))
+        logging.info('Created %s shards of size %s', len(shards), shard_size)
+
 
     def extract_shard(self):
+        """Extract a shard from a list of shards."""
         shard = self.shards[0]
         self.used.append(shard)
         del self.shards[0]
         return shard
 
-    def get_partition(self):
-        # Get a partition shard
 
-        # Extract number of shards per client
-        per_client = self.config.data.shard['per_client']
+    def get_partition(self):
+        """Get a partition shard."""
+        # Extract the number of shards per client
+        per_client = self.config.data.shard_per_client
 
         # Create data partition
         partition = []
-        for i in range(per_client):
+        for _ in range(per_client):
             partition.extend(self.extract_shard())
 
         # Shuffle data partition
