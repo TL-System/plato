@@ -6,9 +6,7 @@ import argparse
 import logging
 import config
 
-#import client
 from servers import fedavg
-from utils import dists
 
 # Set up the parser
 parser = argparse.ArgumentParser()

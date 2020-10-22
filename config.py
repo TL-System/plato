@@ -19,7 +19,7 @@ class Config:
 
         self.extract()
 
-    def extract_section(self, section, fields, defaults):
+    def __extract_section(self, section, fields, defaults):
         ''' Extract the parameters from one section in a configuration file. '''
 
         config = self.config
@@ -44,7 +44,7 @@ class Config:
         # Parameters for the federated learning clients
         fields = ['total', 'per_round', 'label_distribution', 'do_test', 'test_partition']
         defaults = (0, 0, 'uniform', False, 0.2)
-        params = self.extract_section('clients', fields, defaults)
+        params = self.__extract_section('clients', fields, defaults)
         self.clients = namedtuple('clients', fields)(*params)
 
         assert self.clients.per_round <= self.clients.total
@@ -52,7 +52,7 @@ class Config:
         # Parameters for the data distribution
         fields = ['loading', 'partition_size', 'IID', 'bias', 'shard']
         defaults = ('static', 0, True, None, None)
-        params = self.extract_section('data', fields, defaults)
+        params = self.__extract_section('data', fields, defaults)
         self.data = namedtuple('data', fields)(*params)
 
         # Determine the correct data loader
@@ -68,6 +68,6 @@ class Config:
         fields = ['rounds', 'target_accuracy', 'task', 'epochs', 'batch_size',
                   'model', 'data_path', 'model_path', 'report_path', 'server']
         defaults = (0, 0.9, 'train', 0, 0, 'MNIST', './data', './models', 'report.pkl', 'basic')
-        params = self.extract_section('general', fields, defaults)
+        params = self.__extract_section('general', fields, defaults)
 
         self.general = namedtuple('general', fields)(*params)

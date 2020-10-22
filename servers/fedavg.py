@@ -25,6 +25,7 @@ class Server:
         self.clients = None # selected clients in a round
         self.saved_reports = None
 
+
     def boot(self):
         '''
         Booting the federated learning server by setting up the data, model, and
@@ -91,6 +92,7 @@ class Server:
             self.saved_reports = {}
             self.save_reports(0, []) # Save the initial model
 
+
     def make_clients(self, num_clients):
         ''' Generate the clients for federated learning. '''
 
@@ -120,13 +122,13 @@ class Server:
                     # Choose weighted random preference
                     pref = random.choices(labels, dist)[0]
 
-                    # Assign (preference, bias) configuration
+                    # Assign (preference, bias) configuration to the client
                     new_client.set_bias(pref, bias)
                 elif self.config.data.shard:
                     # Shard data partitions
                     shard = self.config.data.shard
 
-                    # Assign shard config
+                    # Assign shard configuration to the client
                     new_client.set_shard(shard)
 
             clients.append(new_client)
@@ -146,6 +148,7 @@ class Server:
                 self.set_client_data(next_client)
 
         self.clients = clients
+
 
     def run(self):
         ''' Run the federated learning training workload. '''
@@ -172,9 +175,10 @@ class Server:
                 break
 
         if reports_path:
-            with open(reports_path, 'wb') as opened_file:
-                pickle.dump(self.saved_reports, opened_file)
+            with open(reports_path, 'wb') as f:
+                pickle.dump(self.saved_reports, f)
             logging.info('Saved reports: %s', reports_path)
+
 
     def round(self, current_round):
         '''
@@ -184,10 +188,10 @@ class Server:
 
         import model
 
-        sample_clients = self.selection()
+        sample_clients = self.select_clients()
 
         # Configure sample clients
-        self.configuration(sample_clients)
+        self.configure_clients(sample_clients)
 
         # Run clients using multithreading for better parallelism
         threads = [Thread(target=client.run) for client in sample_clients]
@@ -199,11 +203,11 @@ class Server:
             current_thread.join()
 
         # Receiving client updates
-        reports = self.reporting(sample_clients)
+        reports = self.receive_reports(sample_clients)
 
         # Aggregating weight updates from the selected clients
         logging.info('Aggregating weight updates...')
-        updated_weights = self.aggregation(reports)
+        updated_weights = self.aggregate_weights(reports)
 
         # Load updated weights
         model.load_weights(self.model, updated_weights)
@@ -230,7 +234,7 @@ class Server:
 
     # Federated learning phases
 
-    def selection(self):
+    def select_clients(self):
         ''' Select devices to participate in round. '''
         clients_per_round = self.config.clients.per_round
 
@@ -240,7 +244,7 @@ class Server:
         return sample_clients
 
 
-    def configuration(self, sample_clients):
+    def configure_clients(self, sample_clients):
         ''' Configure the data distribution across clients. '''
         loader_type = self.config.loader
         loading = self.config.data.loading
@@ -262,7 +266,7 @@ class Server:
             selected_client.configure(config)
 
 
-    def reporting(self, sample_clients):
+    def receive_reports(self, sample_clients):
         ''' Recieve the reports from selected clients. '''
 
         reports = [client.get_report() for client in sample_clients]
@@ -273,7 +277,7 @@ class Server:
         return reports
 
 
-    def aggregation(self, reports):
+    def aggregate_weights(self, reports):
         ''' Aggregate the reported weight updates from the selected clients. '''
         return self.federated_averaging(reports)
 
@@ -359,6 +363,7 @@ class Server:
             weight_vecs.extend(weight.flatten().tolist())
 
         return np.array(weight_vecs)
+
 
     def set_client_data(self, current_client):
         ''' set the data for a client. '''
