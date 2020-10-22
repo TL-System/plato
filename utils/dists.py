@@ -28,7 +28,7 @@ def normal(N, k):
         x = i - (k - 1) / 2
         dist.append(int(N * (np.exp(-x) / (np.exp(-x) + 1)**2)))
 
-    # Add remainders
+    # Add the remaining items
     remainder = N - sum(dist)
     dist = list(np.add(dist, uniform(remainder, k)))
 

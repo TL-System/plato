@@ -10,10 +10,10 @@ import torch
 import client
 from models import model
 from utils import dists
-from utils import load_data
+from utils import dataloader
 
 class Server:
-    """ Federated learning server using federated averaging. """
+    """Federated learning server using federated averaging."""
 
     def __init__(self, config):
         self.config = config
@@ -28,7 +28,6 @@ class Server:
         Booting the federated learning server by setting up the data, model, and
         creating the clients.
         """
-
         config = self.config
         total_clients = config.clients.total
 
@@ -41,8 +40,7 @@ class Server:
 
 
     def load_data(self):
-        """ Generating data and loading them onto the clients. """
-
+        """Generating data and loading them onto the clients."""
         # Extract configurations for loaders
         config = self.config
 
@@ -60,16 +58,16 @@ class Server:
 
         # Setting up the data loader
         self.loader = {
-            'iid': load_data.Loader,
-            'bias': load_data.BiasLoader,
-            'shard': load_data.ShardLoader
+            'iid': dataloader.Loader,
+            'bias': dataloader.BiasLoader,
+            'shard': dataloader.ShardLoader
         }[config.loader](config, generator)
 
         logging.info('Data distribution: %s', config.loader)
 
 
     def load_model(self):
-        """ Setting up the global model to be trained via federated learning. """
+        """Setting up the global model to be trained via federated learning."""
         model_type = self.config.general.model
         logging.info('Model: %s', model_type)
 
@@ -78,8 +76,7 @@ class Server:
 
 
     def make_clients(self, num_clients):
-        """ Generate the clients for federated learning. """
-
+        """Generate the clients for federated learning."""
         iid = self.config.data.iid
         labels = self.loader.labels
         loader = self.config.loader
@@ -109,13 +106,6 @@ class Server:
                     # Assign (preference, bias) configuration to the client
                     new_client.set_bias(pref, bias)
 
-                elif self.config.data.shard:
-                    # Shard data partitions
-                    shard = self.config.data.shard
-
-                    # Assign shard configuration to the client
-                    new_client.set_shard(shard)
-
             clients.append(new_client)
 
         logging.info('Total number of clients: %s', len(clients))
@@ -136,7 +126,7 @@ class Server:
 
 
     def run(self):
-        """ Run the federated learning training workload. """
+        """Run the federated learning training workload."""
         rounds = self.config.general.rounds
         target_accuracy = self.config.general.target_accuracy
 
@@ -208,7 +198,7 @@ class Server:
     # Federated learning phases
 
     def select_clients(self):
-        """ Select devices to participate in round. """
+        """Select devices to participate in round."""
         clients_per_round = self.config.clients.per_round
 
         # Select clients randomly
@@ -218,7 +208,7 @@ class Server:
 
 
     def configure_clients(self, sample_clients):
-        """ Configure the data distribution across clients. """
+        """Configure the data distribution across clients."""
         loader_type = self.config.loader
         loading = self.config.data.loading
 
@@ -240,8 +230,7 @@ class Server:
 
 
     def receive_reports(self, sample_clients):
-        """ Recieve the reports from selected clients. """
-
+        """Recieve the reports from selected clients."""
         reports = [client.get_report() for client in sample_clients]
 
         logging.info('Reports recieved: %s', len(reports))
@@ -251,13 +240,12 @@ class Server:
 
 
     def aggregate_weights(self, reports):
-        """ Aggregate the reported weight updates from the selected clients. """
+        """Aggregate the reported weight updates from the selected clients."""
         return self.federated_averaging(reports)
 
 
     def extract_client_updates(self, reports):
-        """ Extract the model weight updates from a client's report. """
-
+        """Extract the model weight updates from a client's report."""
         # Extract baseline model weights
         baseline_weights = model.extract_weights(self.model)
 
@@ -283,8 +271,7 @@ class Server:
 
 
     def federated_averaging(self, reports):
-        """ Aggregate weight updates from the clients using federated averaging. """
-
+        """Aggregate weight updates from the clients using federated averaging."""
         # Extract updates from reports
         updates = self.extract_client_updates(reports)
 
@@ -313,8 +300,7 @@ class Server:
 
     @staticmethod
     def accuracy_averaging(reports):
-        """ Compute the average accuracy across clients. """
-
+        """Compute the average accuracy across clients."""
         # Get total number of samples
         total_samples = sum([report.num_samples for report in reports])
 
@@ -326,8 +312,7 @@ class Server:
         return accuracy
 
     def set_client_data(self, current_client):
-        """ set the data for a client. """
-
+        """set the data for a client."""
         loader = self.config.loader
 
         # Get data partition size
@@ -351,7 +336,7 @@ class Server:
 
     @staticmethod
     def save_model(model_to_save, path):
-        """ Save the model in a file. """
+        """Save the model in a file."""
         path += '/global_model'
         torch.save(model_to_save.state_dict(), path)
         logging.info('Saved the global model: %s', path)

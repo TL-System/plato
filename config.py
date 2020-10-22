@@ -20,8 +20,7 @@ class Config:
         self.extract()
 
     def __extract_section(self, section, fields, defaults):
-        """ Extract the parameters from one section in a configuration file. """
-
+        """Extract the parameters from one section in a configuration file."""
         config = self.config
         params = []
 
@@ -39,7 +38,7 @@ class Config:
 
 
     def extract(self):
-        """ Extract the parameters from a configuration file. """
+        """Extract the parameters from a configuration file."""
 
         # Parameters for the federated learning clients
         fields = ['total', 'per_round', 'label_distribution', 'do_test', 'test_partition']

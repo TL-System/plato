@@ -1,2 +1,2 @@
-from .load_data import Generator
-from .load_data import Loader 
+from .dataloader import Generator
+from .dataloader import Loader 

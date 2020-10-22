@@ -9,7 +9,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
 
-import utils.load_data as load_data
+from utils import dataloader
 
 # Training settings
 lr = 0.01
@@ -21,8 +21,13 @@ use_cuda = torch.cuda.is_available()
 device = torch.device('cuda' if use_cuda else 'cpu')
 
 
-class Generator(load_data.Generator):
-    """ A generator for the MNIST dataset. """
+class Generator(dataloader.Generator):
+    """A generator for the MNIST dataset."""
+
+    def __init__(self):
+        super().__init__()
+        self.testset = None
+
 
     # Extract MNIST data using torchvision datasets
     def read(self, path):
@@ -42,8 +47,10 @@ class Generator(load_data.Generator):
 
 
 class Net(nn.Module):
+    """A feedforward neural network."""
+
     def __init__(self):
-        super(Net, self).__init__()
+        super().__init__()
         self.conv1 = nn.Conv2d(1, 20, 5, 1)
         self.conv2 = nn.Conv2d(20, 50, 5, 1)
         self.fc1 = nn.Linear(4 * 4 * 50, 500)
@@ -51,6 +58,7 @@ class Net(nn.Module):
 
 
     def forward(self, x):
+        """Defining the feedforward neural network."""
         x = F.relu(self.conv1(x))
         x = F.max_pool2d(x, 2, 2)
         x = F.relu(self.conv2(x))
@@ -62,21 +70,22 @@ class Net(nn.Module):
 
 
 def get_optimizer(model):
+    """Obtain the optimizer used for training the model."""
     return optim.SGD(model.parameters(), lr=lr, momentum=momentum)
 
 
 def get_trainloader(trainset, batch_size):
-    """ Obtain the data loader for the training dataset. """
+    """Obtain the data loader for the training dataset."""
     return torch.utils.data.DataLoader(trainset, batch_size=batch_size, shuffle=True)
 
 
 def get_testloader(testset, batch_size):
-    """ Obtain the data loader for the testing dataset. """
+    """Obtain the data loader for the testing dataset."""
     return torch.utils.data.DataLoader(testset, batch_size=batch_size, shuffle=True)
 
 
 def extract_weights(model):
-    """ Extract weights from the model. """
+    """Extract weights from a model passed in as a parameter."""
     weights = []
     for name, weight in model.to(torch.device('cpu')).named_parameters():
         if weight.requires_grad:
@@ -86,6 +95,7 @@ def extract_weights(model):
 
 
 def load_weights(model, weights):
+    """Load the model weights passed in as a parameter."""
     updated_state_dict = {}
     for name, weight in weights:
         updated_state_dict[name] = weight
@@ -94,7 +104,7 @@ def load_weights(model, weights):
 
 
 def train(model, train_loader, optimizer, epochs):
-    """ Training the model. """
+    """Train the model."""
     model.to(device)
     model.train()
     for epoch in range(1, epochs + 1):
@@ -111,12 +121,15 @@ def train(model, train_loader, optimizer, epochs):
 
 
 def test(model, testloader):
-    """ Testing the model. """
+    """Test the model."""
     model.to(device)
+    # We should set the model to evaluation mode to accommodate Dropouts
     model.eval()
+
     test_loss = 0
     correct = 0
     total = len(testloader.dataset)
+
     with torch.no_grad():
         for image, label in testloader:
             image, label = image.to(device), label.to(device)
