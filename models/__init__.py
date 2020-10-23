@@ -1,1 +1,1 @@
-from .MNIST import model
+from .CIFAR10.ResNet import model
