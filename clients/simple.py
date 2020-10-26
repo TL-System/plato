@@ -86,9 +86,9 @@ class SimpleClient:
         self.batch_size = config.general.batch_size
 
         # Download the most recent global model from the server
-        model_path = '{}/{}/global_model'.format(config.general.model_path, config.general.model)
-        self.model = model.Net()
-        self.model.load_state_dict(torch.load(model_path))
+        dataset_path = '{}/{}/global_model'.format(config.general.dataset_path, config.general.dataset)
+        self.model = model.Model.get_model_from_name(config.general.model)
+        self.model.load_state_dict(torch.load(dataset_path))
         self.model.eval()
 
         # Create optimizer
