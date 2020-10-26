@@ -19,7 +19,8 @@ class FedAvgServer(Server):
     def __init__(self, config):
         self.config = config
         self.model = None
-        self.model_path = '{}/{}'.format(config.general.model_path, config.general.model)
+        self.dataset_type = config.general.dataset
+        self.dataset_path = '{}/{}'.format(config.general.dataset_path, config.general.dataset)
         self.loader = None
         self.clients = None # selected clients in a round
 
@@ -49,8 +50,8 @@ class FedAvgServer(Server):
         generator = model.Generator()
 
         # Generate the data
-        data_path = config.general.data_path
-        data = generator.generate(data_path)
+        dataset_path = config.general.dataset_path
+        data = generator.generate(dataset_path)
         labels = generator.labels
 
         logging.info('Dataset size: %s',
@@ -69,11 +70,14 @@ class FedAvgServer(Server):
 
     def load_model(self):
         """Setting up the global model to be trained via federated learning."""
+        logging.info('Dataset: %s', self.dataset_type)
         model_type = self.config.general.model
         logging.info('Model: %s', model_type)
 
-        self.model = model.Net()
-        self.save_model(self.model, self.model_path)
+        self.model = model.Model.get_model_from_name(model_type)
+        logging.info('Dataset_path: %s', self.dataset_path)
+
+        self.save_model(self.model, self.dataset_path)
 
 
     def make_clients(self, num_clients):
@@ -156,7 +160,7 @@ class FedAvgServer(Server):
         model.load_weights(self.model, updated_weights)
 
         # Save the updated global model
-        self.save_model(self.model, self.model_path)
+        self.save_model(self.model, self.dataset_path)
 
         # Test the global model accuracy
         if self.config.clients.do_test:  # Get average accuracy from client reports

@@ -135,7 +135,7 @@ dmypy.json
 config.conf
 
 # Data files
-data/
+datasets/
 
 # Global model files
 **/global_model
