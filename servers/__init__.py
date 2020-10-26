@@ -1,1 +1,2 @@
-from .fedavg import Server
+from .base import Server
+from .fedavg import FedAvgServer

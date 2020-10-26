@@ -8,11 +8,12 @@ from threading import Thread
 import torch
 
 from clients import SimpleClient
+from servers import Server
 from models import model
 from utils import dists
 from utils import dataloader
 
-class Server:
+class FedAvgServer(Server):
     """Federated learning server using federated averaging."""
 
     def __init__(self, config):
@@ -125,30 +126,6 @@ class Server:
         self.clients = clients
 
 
-    def run(self):
-        """Run the federated learning training workload."""
-        rounds = self.config.general.rounds
-        target_accuracy = self.config.general.target_accuracy
-
-        if target_accuracy:
-            logging.info('Training: %s rounds or %s%% accuracy\n',
-                rounds, 100 * target_accuracy)
-        else:
-            logging.info('Training: %s rounds\n', rounds)
-
-        # Perform rounds of federated learning
-        for current_round in range(1, rounds + 1):
-            logging.info('**** Round %s/%s ****', current_round, rounds)
-
-            # Run the federated learning round
-            accuracy = self.round()
-
-            # Break loop when target accuracy is met
-            if target_accuracy and (accuracy >= target_accuracy):
-                logging.info('Target accuracy reached.')
-                break
-
-
     def round(self):
         """
         Selecting some clients to participate in the current round,
@@ -230,7 +207,7 @@ class Server:
 
 
     def receive_reports(self, sample_clients):
-        """Recieve the reports from selected clients."""
+        """Receive reports from selected clients."""
         reports = [client.get_report() for client in sample_clients]
 
         logging.info('Reports recieved: %s', len(reports))

@@ -31,7 +31,7 @@ def main():
 
     # Initialize the federated learning server
     fl_server = {
-        "fedavg": servers.fedavg.Server
+        "fedavg": servers.fedavg.FedAvgServer
     }[fl_config.general.server](fl_config)
     fl_server.boot()
 
