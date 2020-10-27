@@ -11,7 +11,7 @@ class Server():
     def __init__(self, config):
         self.config = config
         self.dataset_type = config.general.dataset
-        self.dataset_path = '{}/{}'.format(config.general.dataset_path, config.general.dataset)
+        self.data_path = '{}/{}'.format(config.general.data_path, config.general.dataset)
 
 
     def run(self):

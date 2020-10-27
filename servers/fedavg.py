@@ -6,11 +6,15 @@ import logging
 import random
 import torch
 
+import models
+import models.registry as models_registry
 from clients import SimpleClient
-from models import model
+import datasets
+from datasets import registry as datasets_registry
+from training import trainer
 from utils import dists
-from utils import dataloader
 from servers import Server
+
 
 class FedAvgServer(Server):
     """Federated learning server using federated averaging."""
@@ -40,16 +44,16 @@ class FedAvgServer(Server):
 
     def load_data(self):
         """Generating data and loading them onto the clients."""
-        # Extract configurations for loaders
+        # Extract configurations for the datasets
         config = self.config
 
-        # Set up the data generator
-        generator = model.Generator()
+        # Set up the training and testing datasets
+        dataset = datasets_registry.get(config.general.dataset)
 
         # Generate the data
-        dataset_path = config.general.dataset_path
-        data = generator.generate(dataset_path)
-        labels = generator.labels
+        data_path = config.general.data_path
+        data = dataset.generate(data_path)
+        labels = dataset.labels
 
         logging.info('Dataset size: %s',
             sum([len(x) for x in [data[label] for label in labels]]))
@@ -57,10 +61,10 @@ class FedAvgServer(Server):
 
         # Setting up the data loader
         self.loader = {
-            'iid': dataloader.Loader,
-            'bias': dataloader.BiasLoader,
-            'shard': dataloader.ShardLoader
-        }[config.loader](config, generator)
+            'iid': datasets.base.Loader,
+            'bias': datasets.base.BiasLoader,
+            'shard': datasets.base.ShardLoader
+        }[config.loader](config, dataset)
 
         logging.info('Data distribution: %s', config.loader)
 
@@ -71,10 +75,10 @@ class FedAvgServer(Server):
         model_type = self.config.general.model
         logging.info('Model: %s', model_type)
 
-        self.model = model.Model.get_model_from_name(model_type)
-        logging.info('Dataset_path: %s', self.dataset_path)
+        self.model = models_registry.get(model_type)
+        logging.info('Dataset_path: %s', self.data_path)
 
-        self.save_model(self.model, self.dataset_path)
+        self.save_model(self.model, self.data_path)
 
 
     def make_clients(self, num_clients):
@@ -150,10 +154,10 @@ class FedAvgServer(Server):
         updated_weights = self.aggregate_weights(reports)
 
         # Load updated weights
-        model.load_weights(self.model, updated_weights)
+        trainer.load_weights(self.model, updated_weights)
 
         # Save the updated global model
-        self.save_model(self.model, self.dataset_path)
+        self.save_model(self.model, self.data_path)
 
         # Test the global model accuracy
         if self.config.clients.do_test:  # Get average accuracy from client reports
@@ -162,8 +166,8 @@ class FedAvgServer(Server):
         else: # Test the updated model on the server
             testset = self.loader.get_testset()
             batch_size = self.config.general.batch_size
-            testloader = model.get_testloader(testset, batch_size)
-            accuracy = model.test(self.model, testloader)
+            testloader = trainer.get_testloader(testset, batch_size)
+            accuracy = trainer.test(self.model, testloader)
             logging.info('Global model accuracy: {:.2f}%\n'.format(100 * accuracy))
 
         return accuracy
@@ -211,7 +215,7 @@ class FedAvgServer(Server):
     def extract_client_updates(self, reports):
         """Extract the model weight updates from a client's report."""
         # Extract baseline model weights
-        baseline_weights = model.extract_weights(self.model)
+        baseline_weights = trainer.extract_weights(self.model)
 
         # Extract weights from reports
         weights = [report.weights for report in reports]
@@ -252,7 +256,7 @@ class FedAvgServer(Server):
                 avg_update[j] += delta * (num_samples / total_samples)
 
         # Extract baseline model weights
-        baseline_weights = model.extract_weights(self.model)
+        baseline_weights = trainer.extract_weights(self.model)
 
         # Load updated weights into model
         updated_weights = []

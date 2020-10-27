@@ -1,5 +1,5 @@
 """
-Parent class for data loaders.
+Parent class for datasets and data loaders.
 """
 
 import logging
@@ -8,7 +8,7 @@ import random
 from utils import dists
 
 
-class Generator:
+class Dataset:
     """Generate federated learning training and testing data."""
 
     def __init__(self):
@@ -62,6 +62,7 @@ class Loader:
         # Store used data seperately
         self.used = {label: [] for label in self.labels}
         self.used['testset'] = []
+
 
     def extract(self, label, n):
         """Extract the data for a particular label."""
