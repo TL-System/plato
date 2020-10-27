@@ -6,6 +6,7 @@ import argparse
 import logging
 import os
 import config
+import torch
 
 import servers
 
@@ -43,4 +44,5 @@ def main():
         fl_config.general.dataset_path, fl_config.general.dataset))
 
 if __name__ == "__main__":
+    torch.multiprocessing.set_start_method("spawn")
     main()
