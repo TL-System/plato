@@ -4,23 +4,20 @@ A simple federated learning server using federated averaging.
 
 import logging
 import random
-from threading import Thread
 import torch
 
 from clients import SimpleClient
-from servers import Server
 from models import model
 from utils import dists
 from utils import dataloader
+from servers import Server
 
 class FedAvgServer(Server):
     """Federated learning server using federated averaging."""
 
     def __init__(self, config):
-        self.config = config
+        super().__init__(config)
         self.model = None
-        self.dataset_type = config.general.dataset
-        self.dataset_path = '{}/{}'.format(config.general.dataset_path, config.general.dataset)
         self.loader = None
         self.clients = None # selected clients in a round
 
@@ -81,7 +78,7 @@ class FedAvgServer(Server):
 
 
     def make_clients(self, num_clients):
-        """Generate the clients for federated learning."""
+        """Produce the clients for federated learning."""
         iid = self.config.data.iid
         labels = self.loader.labels
         loader = self.config.loader
@@ -94,11 +91,10 @@ class FedAvgServer(Server):
             }[self.config.clients.label_distribution](num_clients, len(labels))
             random.shuffle(dist)  # Shuffle the distribution
 
-        # Creating emulated clients
+        logging.info('Initializing clients...')
         clients = []
 
         for client_id in range(num_clients):
-            # Creating a new client
             new_client = SimpleClient(client_id)
 
             if not iid: # Configure this client for non-IID data
@@ -112,6 +108,7 @@ class FedAvgServer(Server):
                     new_client.set_bias(pref, bias)
 
             clients.append(new_client)
+
 
         logging.info('Total number of clients: %s', len(clients))
 
@@ -140,17 +137,13 @@ class FedAvgServer(Server):
         # Configure sample clients
         self.configure_clients(sample_clients)
 
-        # Run clients using multithreading for better parallelism
-        threads = [Thread(target=client.run) for client in sample_clients]
+        # Run clients using multiprocessing for better parallelism on GPUs
+        with torch.multiprocessing.Pool() as pool:
+            processes = [pool.apply_async(client.run, ()) for client in sample_clients]
+            reports = [proc.get() for proc in processes]
 
-        for current_thread in threads:
-            current_thread.start()
-
-        for current_thread in threads:
-            current_thread.join()
-
-        # Receiving client updates
-        reports = self.receive_reports(sample_clients)
+        logging.info('Reports received: %s', len(reports))
+        assert len(reports) == len(sample_clients)
 
         # Aggregating weight updates from the selected clients
         logging.info('Aggregating weight updates...')
@@ -208,16 +201,6 @@ class FedAvgServer(Server):
 
             # Continue configuraion on client
             selected_client.configure(config)
-
-
-    def receive_reports(self, sample_clients):
-        """Receive reports from selected clients."""
-        reports = [client.get_report() for client in sample_clients]
-
-        logging.info('Reports recieved: %s', len(reports))
-        assert len(reports) == len(sample_clients)
-
-        return reports
 
 
     def aggregate_weights(self, reports):

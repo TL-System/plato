@@ -10,7 +10,8 @@ class Server():
 
     def __init__(self, config):
         self.config = config
-        self.model_path = '{}/{}'.format(config.general.model_path, config.general.model)
+        self.dataset_type = config.general.dataset
+        self.dataset_path = '{}/{}'.format(config.general.dataset_path, config.general.dataset)
 
 
     def run(self):

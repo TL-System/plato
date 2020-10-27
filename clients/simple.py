@@ -45,14 +45,6 @@ class SimpleClient:
             return argv
 
 
-    def upload(self, argv):
-        """Uploading updates to the server."""
-        try:
-            return argv.copy()
-        except:
-            return argv
-
-
     # Federated learning phases
     def set_data(self, data, config):
         """
@@ -97,15 +89,10 @@ class SimpleClient:
 
     def run(self):
         """Perform the federated learning training workload."""
-        {
+        return {
             "train": self.train,
             "test": self.test
         }[self.task]()
-
-
-    def get_report(self):
-        """Report results to the server."""
-        return self.upload(self.report)
 
 
     def train(self):
@@ -127,11 +114,14 @@ class SimpleClient:
         if self.do_test:
             self.test()
 
+        return self.report
+
 
     def test(self):
         """Perform model testing."""
         testloader = model.get_testloader(self.testset, 1000)
         self.report.set_accuracy(model.test(self.model, testloader))
+        return self.report
 
 
 class Report:
