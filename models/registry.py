@@ -3,10 +3,10 @@ Having a registry of all available classes is convenient for retrieving an insta
 based on a configuration at run-time.
 """
 
-from models import mnist_cnn, fashion_cnn
+from models import mnist_cnn, fashion_cnn, cifar_resnet, cifar_wideresnet
 
 registered_models = [
-    mnist_cnn.Model, fashion_cnn.Model
+    mnist_cnn.Model, fashion_cnn.Model, cifar_resnet.Model, cifar_wideresnet.Model
 ]
 
 
