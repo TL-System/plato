@@ -86,7 +86,7 @@ class SimpleClient:
         self.model.eval()
 
         # Create an optimizer
-        self.optimizer = optimizers.get_optimizer(self.model)
+        self.optimizer = optimizers.get_optimizer(config.general.optimizer, self.model)
 
 
     def run(self):

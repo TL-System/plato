@@ -69,24 +69,17 @@ def train(model, train_loader, optimizer, epochs):
 def test(model, test_loader):
     """Test the model."""
     model.to(device)
-    # We should set the model to evaluation mode to accommodate Dropouts
     model.eval()
-
-    criterion = model.loss_criterion
-
-    test_loss = 0
     correct = 0
-    total = len(test_loader.dataset)
-
+    total = 0
     with torch.no_grad():
-        for image, label in test_loader:
-            image, label = image.to(device), label.to(device)
-            output = model(image)
-            # sum up the batch loss
-            test_loss += criterion(output, label).item()
-            # get the index of the max log-probability
-            pred = output.argmax(dim=1, keepdim=True)
-            correct += pred.eq(label.view_as(pred)).sum().item()
+        for data in test_loader:
+            images, labels = data
+            images, labels = images.to(device), labels.to(device)
+            outputs = model(images)
+            _, predicted = torch.max(outputs.data, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
 
     accuracy = correct / total
     logging.debug('Accuracy: {:.2f}%'.format(100 * accuracy))
