@@ -5,7 +5,8 @@ A basic federated learning client who sends weight updates to the server.
 import logging
 import torch
 
-from models import model
+from models import registry as models_registry
+from training import optimizers, trainer
 
 class SimpleClient:
     """A basic federated learning client who sends simple weight updates."""
@@ -78,13 +79,14 @@ class SimpleClient:
         self.batch_size = config.general.batch_size
 
         # Download the most recent global model from the server
-        dataset_path = '{}/{}/global_model'.format(config.general.dataset_path, config.general.dataset)
-        self.model = model.Model.get_model_from_name(config.general.model)
-        self.model.load_state_dict(torch.load(dataset_path))
+        data_path = '{}/{}/global_model'.format(config.general.data_path, config.general.dataset)
+        model_name = config.general.model
+        self.model = models_registry.get(model_name)
+        self.model.load_state_dict(torch.load(data_path))
         self.model.eval()
 
-        # Create optimizer
-        self.optimizer = model.get_optimizer(self.model)
+        # Create an optimizer
+        self.optimizer = optimizers.get_optimizer(self.model)
 
 
     def run(self):
@@ -100,12 +102,12 @@ class SimpleClient:
         logging.info('Training on client #%s', self.client_id)
 
         # Perform model training
-        trainloader = model.get_trainloader(self.trainset, self.batch_size)
-        model.train(self.model, trainloader,
+        trainloader = trainer.get_trainloader(self.trainset, self.batch_size)
+        trainer.train(self.model, trainloader,
                        self.optimizer, self.epochs)
 
         # Extract model weights and biases
-        weights = model.extract_weights(self.model)
+        weights = trainer.extract_weights(self.model)
 
         # Generate a report for the server
         self.report = Report(self, weights)
@@ -119,8 +121,8 @@ class SimpleClient:
 
     def test(self):
         """Perform model testing."""
-        testloader = model.get_testloader(self.testset, 1000)
-        self.report.set_accuracy(model.test(self.model, testloader))
+        testloader = trainer.get_testloader(self.testset, 1000)
+        self.report.set_accuracy(trainer.test(self.model, testloader))
         return self.report
 
 

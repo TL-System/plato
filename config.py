@@ -66,8 +66,8 @@ class Config:
 
         # Parameters in general for federated learning
         fields = ['rounds', 'target_accuracy', 'task', 'epochs', 'batch_size', 'dataset',
-                  'dataset_path', 'model', 'server']
-        defaults = (0, 0.9, 'train', 0, 0, 'MNIST', './datasets', 'mnist_cnn', 'fedavg')
+                  'data_path', 'model', 'server']
+        defaults = (0, 0.9, 'train', 0, 0, 'MNIST', './data', 'mnist_cnn', 'fedavg')
         params = self.__extract_section('general', fields, defaults)
 
         self.general = namedtuple('general', fields)(*params)

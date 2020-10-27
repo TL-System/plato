@@ -41,7 +41,8 @@ def main():
 
     # Remove the global model as it is used for client-server communication
     os.remove('{}/{}/global_model'.format(
-        fl_config.general.dataset_path, fl_config.general.dataset))
+        fl_config.general.data_path, fl_config.general.dataset))
+
 
 if __name__ == "__main__":
     torch.multiprocessing.set_start_method("spawn")
