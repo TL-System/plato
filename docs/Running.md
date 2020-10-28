@@ -63,7 +63,7 @@ Then add your configuration parameters in the job script. The following is an ex
 
 ```
 #!/bin/bash
-#SBATCH --time=10:00:00       # Request a job to be executed for 10 minutes
+#SBATCH --time=00:15:00       # Request a job to be executed for 10 minutes
 #SBATCH --nodes=1 
 #SBATCH --gres=gpu:p100l:4   
 #SBATCH --ntasks=1
@@ -105,7 +105,7 @@ where `./cifar_wideresnet.out` is the output file that needs to be monitored, an
 If there is a need to start an interactive session (for debugging purposes, for example), it is also supported by Compute Canada using the `salloc` command:
 
 ```shell
-$ salloc --time=0:10:0 --ntasks=1 --cpus-per-task=24 --mem=0 --gres=gpu:p100l:4 --account=def-baochun
+$ salloc --time=0:15:0 --ntasks=1 --cpus-per-task=2 --mem=0 --account=def-baochun
 ```
 
 The job will then be queued and waiting for resources:
