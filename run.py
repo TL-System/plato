@@ -33,7 +33,7 @@ def main():
     # Initialize the federated learning server
     fl_server = {
         "fedavg": servers.fedavg.FedAvgServer
-    }[fl_config.general.server](fl_config)
+    }[fl_config.training.server](fl_config)
     fl_server.boot()
 
     # Run federated learning
@@ -41,7 +41,7 @@ def main():
 
     # Remove the global model as it is used for client-server communication
     os.remove('{}/{}/global_model'.format(
-        fl_config.general.data_path, fl_config.general.dataset))
+        fl_config.training.data_path, fl_config.training.dataset))
 
 
 if __name__ == "__main__":

@@ -64,10 +64,10 @@ class Config:
         elif self.data.shard:
             self.loader = 'shard'
 
-        # Parameters in general for federated learning
+        # Training parameters for federated learning
         fields = ['rounds', 'target_accuracy', 'task', 'epochs', 'batch_size', 'dataset',
-                  'data_path', 'model', 'optimizer', 'server']
-        defaults = (0, 0.9, 'train', 0, 0, 'MNIST', './data', 'mnist_cnn', 'SGD', 'fedavg')
-        params = self.__extract_section('general', fields, defaults)
+                  'data_path', 'num_layers', 'num_classes', 'model', 'optimizer', 'server']
+        defaults = (0, 0.9, 'train', 0, 0, 'MNIST', './data', 40, 10, 'mnist_cnn', 'SGD', 'fedavg')
+        params = self.__extract_section('training', fields, defaults)
 
-        self.general = namedtuple('general', fields)(*params)
+        self.training = namedtuple('training', fields)(*params)

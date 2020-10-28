@@ -10,12 +10,12 @@ registered_models = [
 ]
 
 
-def get(model_name):
+def get(model_name, config):
     """Get the model with the provided name."""
     model = None
     for registered_model in registered_models:
         if registered_model.is_valid_model_name(model_name):
-            model = registered_model.get_model_from_name(model_name)
+            model = registered_model.get_model_from_name(model_name, config)
             break
 
     if model is None:

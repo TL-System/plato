@@ -102,12 +102,12 @@ class Model(base.Model):
 
 
     @staticmethod
-    def get_model_from_name(model_name, num_layers=40, num_classes=10):
+    def get_model_from_name(model_name, config):
         if not Model.is_valid_model_name(model_name):
             raise ValueError('Invalid model name: {}'.format(model_name))
 
         # 40 layers
-        return Model(num_layers, num_classes)
+        return Model(config.training.num_layers, config.training.num_classes)
 
 
     @property

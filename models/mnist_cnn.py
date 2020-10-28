@@ -41,7 +41,7 @@ class Model(base.Model):
 
 
     @staticmethod
-    def get_model_from_name(model_name):
+    def get_model_from_name(model_name, config):
         """Obtaining an instance of this model provided that the name is valid."""
 
         if not Model.is_valid_model_name(model_name):
