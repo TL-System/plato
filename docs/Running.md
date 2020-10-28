@@ -78,7 +78,7 @@ python run.py --config=configs/CIFAR10/cifar_wideresnet.conf --log=INFO
 
 **Note:** the GPU resources requested in this example is a special group of GPU nodes on Compute Canada's `cedar` cluster. You may only request these nodes as whole nodes, therefore you must specify `--gres=gpu:p100l:4`. NVIDIA P100L GPU jobs up to 28 days can be run on the `cedar` cluster.
 
-You may use any type of GPU available on Compute Canada, but in most cases using the NVIDIA P100L GPU requires less waiting time for jobs requiring long running times.
+You may use any type of GPU available on Compute Canada, but in most cases using the NVIDIA P100L GPU requires shorter waiting times, especially for jobs requiring long running times.
 
 Submit the job:
 
@@ -92,7 +92,7 @@ For example:
 $ sbatch cifar_wideresnet.sh
 ```
 
-To check the status of a submitted job, use the `sq` command. Refer to [official Computer Canada documentation](https://docs.computecanada.ca/wiki/Running_jobs#Use_sbatch_to_submit_jobs) for more details.
+To check the status of a submitted job, use the `sq` command. Refer to the [official Computer Canada documentation](https://docs.computecanada.ca/wiki/Running_jobs#Use_sbatch_to_submit_jobs) for more details.
 
 To monitor the output as it is generated live, use the command:
 
@@ -101,6 +101,21 @@ $ watch -n 1 tail -n 50 ./cifar_wideresnet.out
 ```
 
 where `./cifar_wideresnet.out` is the output file that needs to be monitored, and the `-n` parameter for `watch` specifies the monitoring frequency in seconds (the default value is 2 seconds), and the `-n` parameter for `tail` specifies the number of lines at the end of the file to be shown. Type `Control + C` to exit the `watch` session.
+
+If there is a need to start an interactive session (for debugging purposes, for example), it is also supported by Compute Canada using the `salloc` command:
+
+```shell
+$ salloc --time=0:10:0 --ntasks=1 --cpus-per-task=24 --mem=0 --gres=gpu:p100l:4 --account=def-baochun
+```
+
+The job will then be queued and waiting for resources:
+
+```
+salloc: Pending job allocation 53923456
+salloc: job 53923456 queued and waiting for resources
+```
+
+After the job is done, use `exit` at the command to relinquish the job allocation.
 
 ### Removing the Python virtual environment
 

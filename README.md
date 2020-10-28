@@ -30,9 +30,9 @@ In macOS (without GPU support), the typical command would be:
 $ conda install pytorch torchvision -c pytorch
 ```
 
-### Simulation
+### Running Plato
 
-To start a simulation, run [`run.py`](run.py) from the repository's root directory:
+To start a federated learning training workload, run [`run.py`](run.py) from the repository's root directory. For example:
 
 ```shell
 cp configs/MNIST/mnist.conf config.conf
@@ -56,6 +56,8 @@ rm -rf plato/
 ```
 
 where `federated` is the name of the `conda` environment that *Plato* runs in.
+
+For more specific documentation on how Plato can be run on GPU cluster environments such as Lambda Labs' GPU cloud or Compute Canada, refer to `docs/Running.md`.
 
 ### Technical support
 
