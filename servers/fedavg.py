@@ -143,6 +143,7 @@ class FedAvgServer(Server):
         self.configure_clients(sample_clients)
 
         # Run clients using multiprocessing for better parallelism on GPUs
+        logging.info('Launching %s clients...', len(sample_clients))
         client_executor = executor.Executor(len(sample_clients))
         for client in sample_clients:
             client_executor.schedule(client.run, args=())

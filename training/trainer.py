@@ -1,4 +1,3 @@
-log_interval = 10
 """
 The training and testing loop.
 """
@@ -52,6 +51,7 @@ def train(model, train_loader, optimizer, epochs):
     model.train()
 
     criterion = model.loss_criterion
+    log_interval = 10
 
     for epoch in range(1, epochs + 1):
         for batch_id, (image, label) in enumerate(train_loader):
