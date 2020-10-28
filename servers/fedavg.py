@@ -152,7 +152,8 @@ class FedAvgServer(Server):
         reports = client_executor.reports
 
         logging.info('Reports received: %s', len(reports))
-        assert len(reports) == len(sample_clients)
+        if len(reports) != len(sample_clients):
+            logging.debug('Fewer reports have been received than the number of clients launched.')
 
         # Aggregating weight updates from the selected clients
         logging.info('Aggregating weight updates...')
@@ -301,7 +302,7 @@ class FedAvgServer(Server):
         elif loader == 'shard':
             data = self.loader.get_partition()
         else:
-            logging.critical('Unknown data loader type')
+            logging.critical('Unknown data loader type.')
 
         # Send data to client
         current_client.set_data(data, self.config)
