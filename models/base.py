@@ -16,7 +16,7 @@ class Model(ABC, nn.Module):
 
 
     @abstractstaticmethod
-    def get_model_from_name(model_name: str) -> 'Model':
+    def get_model_from_name(model_name: str, config) -> 'Model':
         """Returns an instance of this class as described by the model_name string."""
 
 

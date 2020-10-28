@@ -74,19 +74,19 @@ class SimpleClient:
         config = self.download(config)
 
         # Extract the machine learning task from the current configuration
-        self.task = config.general.task
-        self.epochs = config.general.epochs
-        self.batch_size = config.general.batch_size
+        self.task = config.training.task
+        self.epochs = config.training.epochs
+        self.batch_size = config.training.batch_size
 
         # Download the most recent global model from the server
-        data_path = '{}/{}/global_model'.format(config.general.data_path, config.general.dataset)
-        model_name = config.general.model
-        self.model = models_registry.get(model_name)
+        data_path = '{}/{}/global_model'.format(config.training.data_path, config.training.dataset)
+        model_name = config.training.model
+        self.model = models_registry.get(model_name, config)
         self.model.load_state_dict(torch.load(data_path))
         self.model.eval()
 
         # Create an optimizer
-        self.optimizer = optimizers.get_optimizer(config.general.optimizer, self.model)
+        self.optimizer = optimizers.get_optimizer(config.training.optimizer, self.model)
 
 
     def run(self):

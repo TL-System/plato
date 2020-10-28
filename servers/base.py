@@ -10,14 +10,14 @@ class Server():
 
     def __init__(self, config):
         self.config = config
-        self.dataset_type = config.general.dataset
-        self.data_path = '{}/{}'.format(config.general.data_path, config.general.dataset)
+        self.dataset_type = config.training.dataset
+        self.data_path = '{}/{}'.format(config.training.data_path, config.training.dataset)
 
 
     def run(self):
         """Perform consecutive rounds of federated learning training."""
-        rounds = self.config.general.rounds
-        target_accuracy = self.config.general.target_accuracy
+        rounds = self.config.training.rounds
+        target_accuracy = self.config.training.target_accuracy
 
         if target_accuracy:
             logging.info('Training: %s rounds or %s%% accuracy\n',

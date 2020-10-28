@@ -20,8 +20,10 @@ class Executor:
             self.reports.append(report)
 
     def schedule(self, function, args):
+        """Schedule a function to run in a separate process."""
         self.pool.apply_async(function, args=args, callback=self.prompt)
 
     def wait(self):
+        """Wait for all processes in the pool to finish."""
         self.pool.close()
         self.pool.join()

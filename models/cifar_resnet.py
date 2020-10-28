@@ -112,7 +112,7 @@ class Model(base.Model):
 
 
     @staticmethod
-    def get_model_from_name(model_name):
+    def get_model_from_name(model_name, config):
         if not Model.is_valid_model_name(model_name):
             raise ValueError('Invalid model name: {}'.format(model_name))
 

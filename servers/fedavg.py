@@ -35,7 +35,7 @@ class FedAvgServer(Server):
         config = self.config
         total_clients = config.clients.total
 
-        logging.info('Booting the %s server...', config.general.server)
+        logging.info('Booting the %s server...', config.training.server)
 
         # Setting up the federated learning training workload
         self.load_data()
@@ -49,10 +49,10 @@ class FedAvgServer(Server):
         config = self.config
 
         # Set up the training and testing datasets
-        dataset = datasets_registry.get(config.general.dataset)
+        dataset = datasets_registry.get(config.training.dataset)
 
         # Generate the data
-        data_path = config.general.data_path
+        data_path = config.training.data_path
         data = dataset.generate(data_path)
         labels = dataset.labels
 
@@ -73,10 +73,10 @@ class FedAvgServer(Server):
     def load_model(self):
         """Setting up the global model to be trained via federated learning."""
         logging.info('Dataset: %s', self.dataset_type)
-        model_type = self.config.general.model
+        model_type = self.config.training.model
         logging.info('Model: %s', model_type)
 
-        self.model = models_registry.get(model_type)
+        self.model = models_registry.get(model_type, self.config)
         logging.info('Dataset_path: %s', self.data_path)
 
         self.save_model(self.model, self.data_path)
@@ -169,7 +169,7 @@ class FedAvgServer(Server):
             logging.info('Average client accuracy: {:.2f}%\n'.format(100 * accuracy))
         else: # Test the updated model on the server
             testset = self.loader.get_testset()
-            batch_size = self.config.general.batch_size
+            batch_size = self.config.training.batch_size
             testloader = trainer.get_testloader(testset, batch_size)
             accuracy = trainer.test(self.model, testloader)
             logging.info('Global model accuracy: {:.2f}%\n'.format(100 * accuracy))
