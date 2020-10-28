@@ -9,9 +9,10 @@ import torch
 class Executor:
     """Launches multiple processes."""
 
-    def __init__(self, process_num):
+    def __init__(self, num_processes):
         self.reports = []
-        self.pool = torch.multiprocessing.Pool(process_num)
+        self.pool = torch.multiprocessing.Pool(processes=num_processes)
+
 
     def prompt(self, report):
         """Callback function, called when the process finishes."""
@@ -19,9 +20,11 @@ class Executor:
         if report:
             self.reports.append(report)
 
+
     def schedule(self, function, args):
         """Schedule a function to run in a separate process."""
         self.pool.apply_async(function, args=args, callback=self.prompt)
+
 
     def wait(self):
         """Wait for all processes in the pool to finish."""

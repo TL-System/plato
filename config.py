@@ -66,8 +66,10 @@ class Config:
 
         # Training parameters for federated learning
         fields = ['rounds', 'target_accuracy', 'task', 'epochs', 'batch_size', 'dataset',
-                  'data_path', 'num_layers', 'num_classes', 'model', 'optimizer', 'server']
-        defaults = (0, 0.9, 'train', 0, 0, 'MNIST', './data', 40, 10, 'mnist_cnn', 'SGD', 'fedavg')
+                  'data_path', 'num_layers', 'num_classes', 'model',
+                  'optimizer', 'learning_rate', 'momentum', 'server']
+        defaults = (0, 0.9, 'train', 0, 0, 'MNIST', './data', 40, 10, 'mnist_cnn', 
+                    'SGD', 0.01, 0.5, 'fedavg')
         params = self.__extract_section('training', fields, defaults)
 
         self.training = namedtuple('training', fields)(*params)
