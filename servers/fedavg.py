@@ -12,8 +12,9 @@ from clients import SimpleClient
 import datasets
 from datasets import registry as datasets_registry
 from training import trainer
-from utils import dists
+from utils import dists, executor
 from servers import Server
+
 
 
 class FedAvgServer(Server):
@@ -142,9 +143,12 @@ class FedAvgServer(Server):
         self.configure_clients(sample_clients)
 
         # Run clients using multiprocessing for better parallelism on GPUs
-        with torch.multiprocessing.Pool() as pool:
-            processes = [pool.apply_async(client.run, ()) for client in sample_clients]
-            reports = [proc.get() for proc in processes]
+        client_executor = executor.Executor(len(sample_clients))
+        for client in sample_clients:
+            client_executor.schedule(client.run, args=())
+        client_executor.wait()
+
+        reports = client_executor.reports
 
         logging.info('Reports received: %s', len(reports))
         assert len(reports) == len(sample_clients)
