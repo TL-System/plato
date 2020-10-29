@@ -30,6 +30,12 @@ In macOS (without GPU support), the typical command would be:
 $ conda install pytorch torchvision -c pytorch
 ```
 
+In case unit tests in the `tests` directory need to be run, `scipy` should also be installed:
+
+```shell
+$ conda install scipy
+```
+
 ### Running Plato
 
 To start a federated learning training workload, run [`run.py`](run.py) from the repository's root directory. For example:
