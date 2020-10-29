@@ -4,12 +4,6 @@ The training and testing loop.
 
 import logging
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
-from torchvision import datasets, transforms
-
-from models import base
 
 # CUDA settings
 use_cuda = torch.cuda.is_available()

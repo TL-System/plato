@@ -6,7 +6,6 @@ import logging
 import random
 import torch
 
-import models
 import models.registry as models_registry
 from clients import SimpleClient
 import datasets
@@ -113,7 +112,6 @@ class FedAvgServer(Server):
                     new_client.set_bias(pref, bias)
 
             clients.append(new_client)
-
 
         logging.info('Total number of clients: %s', len(clients))
 
