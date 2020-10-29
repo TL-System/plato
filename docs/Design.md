@@ -1,15 +1,15 @@
 
-## <a name=internals></a>Design principles from a software engineering perspective
+## Design principles from a software engineering perspective
 
 This framework is designed to be extensible, making it easy to add new datasets, models, optimizers, hyperparameters, and other customizations. This document discusses the current design of the framework from a software engineering perspective.
 
-This framework makes extensive use of object oriented subclassing with the help of Python 3's [ABC library](https://docs.python.org/3/library/abc.html). It is a good idea to review Python 3's base classes with abstract methods before proceeding.
+This framework makes extensive use of object oriented subclassing with the help of Python 3's [ABC library](https://docs.python.org/3/library/abc.html). It is a good idea to review Python 3's support for base classes with abstract methods before proceeding.
 
 ### Hyperparameters
 
 For simplicity, all hyperpameters in the framework are read from a configuration file at the beginning, and stored in a simple `config` object of the `Config` class (found in `config.py`). This includes hyperparameters specific to the dataset, data distribution, and the training process. The command-line arguments are only used to specify the location of the configuration file and the logging level.
 
-### Modules for Datasets, Models, Training, and Pruning
+### Modules for Datasets, Models, Training
 
 This framework breaks commonly shared components in a federated learning training workload into distinct modules that are as independent as possible.
 

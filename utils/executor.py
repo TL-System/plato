@@ -1,5 +1,5 @@
 """
-This class uses torch.multiprocessing to launch multiple processes, each with its 
+This class uses torch.multiprocessing to launch multiple processes, each with its
 own Python interpreter and starts from the starting function provided.
 """
 
