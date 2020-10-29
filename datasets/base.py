@@ -4,12 +4,14 @@ Parent class for datasets and data loaders.
 
 import logging
 import random
+from abc import ABC, abstractmethod, abstractstaticmethod
+import torch
 
 from utils import dists
 
 
-class Dataset:
-    """Generate federated learning training and testing data."""
+class Dataset(ABC):
+    """Generate the training and testing data for federated learning."""
 
     def __init__(self):
         self.labels = None
@@ -18,20 +20,35 @@ class Dataset:
         self.shards = None
 
 
+    @abstractstaticmethod
+    def num_test_examples() -> int:
+        pass
+
+
+    @abstractstaticmethod
+    def num_train_examples() -> int:
+        pass
+
+
+    @abstractstaticmethod
+    def num_classes() -> int:
+        pass
+
+
+    @abstractmethod
     def read(self, path):
         """Abstract function to read the dataset (should never be called)."""
-        raise NotImplementedError
 
 
     def group(self):
         """Group the data by label."""
-        # Create empty dict of labels
+        # Create an empty dictionary of labels
         grouped_data = {label: []
                         for label in self.labels}
 
-        # Populate the grouped data dict
+        # Populate the dictionary
         for datapoint in self.trainset:
-            __, label = datapoint  # Extract the label
+            __, label = datapoint
             label = self.labels[label]
 
             grouped_data[label].append(datapoint)
@@ -51,13 +68,13 @@ class Dataset:
 class Loader:
     """Load IID data partitions."""
 
-    def __init__(self, config, generator):
-        """Get data from the generator."""
+    def __init__(self, config, dataset):
+        """Get data from the dataset."""
         self.config = config
-        self.trainset = generator.trainset
-        self.testset = generator.testset
-        self.labels = generator.labels
-        self.trainset_size = generator.trainset_size
+        self.trainset = dataset.trainset
+        self.testset = dataset.testset
+        self.labels = dataset.labels
+        self.trainset_size = dataset.trainset_size
 
         # Store used data seperately
         self.used = {label: [] for label in self.labels}
@@ -73,7 +90,7 @@ class Loader:
             return extracted
         else:
             logging.warning('Insufficient data in label: %s', label)
-            logging.warning('Dumping used data for reuse')
+            logging.warning('Reusing used data.')
 
             # Unmark data as used
             for label in self.labels:

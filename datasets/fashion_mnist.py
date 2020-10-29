@@ -15,18 +15,32 @@ class Dataset(base.Dataset):
         super().__init__()
         self.testset = None
 
+
+    @staticmethod
+    def num_train_examples():
+        return 60000
+
+
+    @staticmethod
+    def num_test_examples():
+        return 10000
+
+
+    @staticmethod
+    def num_classes():
+        return 10
+
+
     def read(self, path):
         """Extract the FashionMNIST data using torchvision datasets."""
-        self.trainset = datasets.FashionMNIST(
-            path, train=True, download=True, transform=transforms.Compose([
+        transform = transforms.Compose([
                 transforms.ToTensor(),
                 transforms.Normalize(
                     (0.1307,), (0.3081,))
-            ]))
-        self.testset = datasets.FashionMNIST(
-            path, train=False, transform=transforms.Compose([
-                transforms.ToTensor(),
-                transforms.Normalize(
-                    (0.1307,), (0.3081,))
-            ]))
+        ])
+
+        self.trainset = datasets.FashionMNIST(root=path, train=True, 
+                            download=True, transform=transform)
+        self.testset = datasets.FashionMNIST(root=path, train=False, 
+                            transform=transform)
         self.labels = list(self.trainset.classes)
