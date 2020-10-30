@@ -1,18 +1,22 @@
 """
 The MNIST dataset.
 """
-
+import logging
 from torchvision import datasets, transforms
 
 from datasets import base
 
-
 class Dataset(base.Dataset):
     """The MNIST dataset."""
 
-    def __init__(self):
-        super().__init__()
-        self.testset = None
+    def __init__(self, path):
+        super().__init__(path)
+
+        self._transform = transforms.Compose([
+                transforms.ToTensor(),
+                transforms.Normalize(
+                    (0.1307,), (0.3081,))
+        ])
 
 
     @staticmethod
@@ -30,16 +34,11 @@ class Dataset(base.Dataset):
         return 10
 
 
-    def read(self, path):
-        """Extract the MNIST data using torchvision datasets."""
-        transform = transforms.Compose([
-                transforms.ToTensor(),
-                transforms.Normalize(
-                    (0.1307,), (0.3081,))
-        ])
+    def get_train_set(self):
+        return datasets.MNIST(root=self._path, train=True,
+                   download=True, transform=self._transform)
 
-        self.trainset = datasets.FashionMNIST(root=path, train=True, 
-                            download=True, transform=transform)
-        self.testset = datasets.FashionMNIST(root=path, train=False, 
-                            transform=transform)
-        self.labels = list(self.trainset.classes)
+
+    def get_test_set(self):
+        return datasets.MNIST(root=self._path, train=False,
+                   download=True, transform=self._transform)
