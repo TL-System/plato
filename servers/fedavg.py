@@ -10,6 +10,7 @@ import models.registry as models_registry
 from clients import SimpleClient
 import datasets
 from datasets import registry as datasets_registry
+from dividers import iid, biased, sharded
 from training import trainer
 from utils import dists, executor
 from servers import Server
@@ -48,22 +49,17 @@ class FedAvgServer(Server):
         config = self.config
 
         # Set up the training and testing datasets
-        dataset = datasets_registry.get(config.training.dataset)
-
-        # Generate the data
         data_path = config.training.data_path
-        data = dataset.generate(data_path)
-        labels = dataset.labels
+        dataset = datasets_registry.get(config.training.dataset, data_path)
 
-        logging.info('Dataset size: %s',
-            sum([len(x) for x in [data[label] for label in labels]]))
-        logging.debug('Labels (%s): %s', len(labels), labels)
+        logging.info('Dataset size: %s', dataset.num_train_examples())
+        logging.info('Number of classes: %s', dataset.num_classes())
 
         # Setting up the data loader
         self.loader = {
-            'iid': datasets.base.Loader,
-            'bias': datasets.base.BiasLoader,
-            'shard': datasets.base.ShardLoader
+            'iid': iid.IIDDivider,
+            'bias': biased.BiasedDivider,
+            'shard': sharded.ShardedDivider
         }[config.loader](config, dataset)
 
         logging.info('Data distribution: %s', config.loader)

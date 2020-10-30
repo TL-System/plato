@@ -11,10 +11,10 @@ registered_datasets = {'MNIST': mnist,
                       }
 
 
-def get(dataset_name):
+def get(dataset_name, data_path):
     """Get the dataset with the provided name."""
     if dataset_name in registered_datasets:
-        dataset = registered_datasets[dataset_name].Dataset()
+        dataset = registered_datasets[dataset_name].Dataset(data_path)
     else:
         raise ValueError('No such dataset: {}'.format(dataset_name))
 
