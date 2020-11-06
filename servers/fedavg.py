@@ -24,7 +24,6 @@ class FedAvgServer(Server):
         super().__init__(config)
         self.model = None
         self.loader = None
-        self.clients = None # selected clients in a round
 
 
     def configure(self):
@@ -33,14 +32,13 @@ class FedAvgServer(Server):
         creating the clients.
         """
         config = self.config
-        total_clients = config.clients.total
 
-        logging.info('Booting the %s server...', config.training.server)
+        logging.info('Configuring the %s server...', config.training.server)
 
         # Setting up the federated learning training workload
-        self.load_data()
+        # self.load_data()
         self.load_model()
-        self.make_clients(total_clients)
+        #self.make_clients(total_clients)
 
 
     def load_data(self):
@@ -73,8 +71,6 @@ class FedAvgServer(Server):
 
         self.model = models_registry.get(model_type, self.config)
         logging.info('Dataset_path: %s', self.data_path)
-
-        self.save_model(self.model, self.data_path)
 
 
     def make_clients(self, num_clients):

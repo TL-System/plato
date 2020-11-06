@@ -3,16 +3,21 @@ A basic federated learning client who sends weight updates to the server.
 """
 
 import logging
+import json
 import torch
+import uuid
+import websockets
 
+import config
 from models import registry as models_registry
 from training import optimizers, trainer
 
 class SimpleClient:
     """A basic federated learning client who sends simple weight updates."""
 
-    def __init__(self, client_id):
-        self.client_id = client_id
+    def __init__(self, config):
+        self.config = config
+        self.client_id = uuid.uuid1().int
         self.do_test = None # Should the client test the trained model?
         self.test_partition = None # Percentage of the dataset reserved for testing
         self.data = None # The dataset to be used for local training
@@ -26,6 +31,18 @@ class SimpleClient:
         self.pref = None # Preferred label on this client in biased data distribution
         self.bias = None # Percentage of bias
         self.optimizer = None # Optimizer for model training
+
+    async def start_client(self):
+        uri = 'ws://{}:{}'.format(self.config.server.address, self.config.server.port)
+
+        async with websockets.connect(uri) as websocket:
+            await websocket.send(json.dumps({'id': self.client_id}))
+            print(f"> {self.client_id}")
+
+            response = await websocket.recv()
+            data = json.loads(response)
+            print(f"< {data['id']}")
+
 
     def __repr__(self):
         return 'Client #{}: {} samples in labels: {}'.format(
