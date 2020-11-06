@@ -1,14 +1,9 @@
-"""
-Running the Plato federated learning emulator.
-"""
-
 import asyncio
 import logging
 import argparse
-import websockets
 
 import config
-import servers
+from clients import SimpleClient
 
 # Setting up the parser
 parser = argparse.ArgumentParser()
@@ -25,24 +20,16 @@ logging.basicConfig(
 
 
 def main():
-    """Run a federated learning server."""
+    """Run a federated learning client."""
     # Read runtime parameters from a configuration file
     fl_config = config.Config(args.config)
 
-    # Initialize the federated learning server
-    server = {
-        "fedavg": servers.fedavg.FedAvgServer
-    }[fl_config.training.server](fl_config)
-
-    server.configure()
-
-    logging.info("Starting the federated learning server...")
-    start_server = websockets.serve(server.serve,
-                     fl_config.server.address, fl_config.server.port)
+    client = SimpleClient(fl_config)
 
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(start_server)
+    loop.run_until_complete(client.start_client())
     loop.run_forever()
+
 
 if __name__ == "__main__":
     main()

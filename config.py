@@ -73,3 +73,10 @@ class Config:
         params = self.__extract_section('training', fields, defaults)
 
         self.training = namedtuple('training', fields)(*params)
+
+        # Parameters for the federated learning server
+        fields = ['address', 'port']
+        defaults = ('localhost', 8000)
+        params = self.__extract_section('server', fields, defaults)
+
+        self.server = namedtuple('server', fields)(*params)

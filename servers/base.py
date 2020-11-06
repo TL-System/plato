@@ -3,6 +3,7 @@ The base class for federated learning servers.
 """
 
 from abc import abstractmethod
+import json
 import logging
 
 class Server():
@@ -10,8 +11,38 @@ class Server():
 
     def __init__(self, config):
         self.config = config
+        self.clients = {}
         self.dataset_type = config.training.dataset
         self.data_path = '{}/{}'.format(config.training.data_path, config.training.dataset)
+
+
+    async def register_client(self, client_id, websocket):
+        if not client_id in self.clients:
+            self.clients[client_id] = websocket
+
+        logging.info("clients: %s", self.clients)
+
+
+    async def unregister_client(self, websocket):
+        for key, value in dict(self.clients).items():
+            if value == websocket:
+                del self.clients[key]
+
+        logging.info("clients: %s", self.clients)
+
+
+    async def serve(self, websocket, path):
+        try:
+            async for message in websocket:
+                data = json.loads(message)
+                client_id = data["id"]
+                await self.register_client(client_id, websocket)
+                logging.info("client received with ID: %s", client_id)
+
+                response = {'id': client_id}
+                await websocket.send(json.dumps(response))
+        finally:
+            await self.unregister_client(websocket)
 
 
     def run(self):
