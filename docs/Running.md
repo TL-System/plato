@@ -48,6 +48,19 @@ Install PyTorch:
 $ pip install torch torchvision
 ```
 
+We will need to install the `websockets` package for client-server communication:
+
+```shell
+$ pip install websockets==8.1
+```
+
+In case unit tests in the `tests` directory need to be run, `scipy` should also be installed:
+
+```shell
+$ pip install scipy
+```
+
+
 ### Running Plato
 
 To start a federated learning training workload with Plato, create a job script:
@@ -67,7 +80,7 @@ Then add your configuration parameters in the job script. The following is an ex
 
 ```
 #!/bin/bash
-#SBATCH --time=00:15:00       # Request a job to be executed for 10 minutes
+#SBATCH --time=00:15:00       # Request a job to be executed for 15 minutes
 #SBATCH --nodes=1 
 #SBATCH --gres=gpu:p100l:4   
 #SBATCH --ntasks=1
