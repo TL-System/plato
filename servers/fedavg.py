@@ -36,31 +36,7 @@ class FedAvgServer(Server):
         logging.info('Configuring the %s server...', config.training.server)
 
         # Setting up the federated learning training workload
-        # self.load_data()
         self.load_model()
-        #self.make_clients(total_clients)
-
-
-    def load_data(self):
-        """Generating data and loading them onto the clients."""
-        # Extract configurations for the datasets
-        config = self.config
-
-        # Set up the training and testing datasets
-        data_path = config.training.data_path
-        dataset = datasets_registry.get(config.training.dataset, data_path)
-
-        logging.info('Dataset size: %s', dataset.num_train_examples())
-        logging.info('Number of classes: %s', dataset.num_classes())
-
-        # Setting up the data loader
-        self.loader = {
-            'iid': iid.IIDDivider,
-            'bias': biased.BiasedDivider,
-            'shard': sharded.ShardedDivider
-        }[config.loader](config, dataset)
-
-        logging.info('Data distribution: %s', config.loader)
 
 
     def load_model(self):
@@ -71,55 +47,6 @@ class FedAvgServer(Server):
 
         self.model = models_registry.get(model_type, self.config)
         logging.info('Dataset_path: %s', self.data_path)
-
-
-    def make_clients(self, num_clients):
-        """Produce the clients for federated learning."""
-        iid = self.config.data.iid
-        labels = self.loader.labels
-        loader = self.config.loader
-        loading = self.config.data.loading
-
-        if not iid:  # Create a non-IID distribution for label preferences
-            dist, __ = {
-                "uniform": dists.uniform,
-                "normal": dists.normal
-            }[self.config.clients.label_distribution](num_clients, len(labels))
-            random.shuffle(dist)  # Shuffle the distribution
-
-        logging.info('Initializing clients...')
-        clients = []
-
-        for client_id in range(num_clients):
-            new_client = SimpleClient(client_id)
-
-            if not iid: # Configure this client for non-IID data
-                if self.config.data.bias:
-                    # Bias data partitions
-                    bias = self.config.data.bias
-                    # Choose weighted random preference
-                    pref = random.choices(labels, dist)[0]
-
-                    # Assign (preference, bias) configuration to the client
-                    new_client.set_bias(pref, bias)
-
-            clients.append(new_client)
-
-        logging.info('Total number of clients: %s', len(clients))
-
-        if loader == 'bias':
-            logging.info('Label distribution: %s',
-                [[client.pref for client in clients].count(label) for label in labels])
-
-        if loading == 'static':
-            if loader == 'shard': # Create data shards
-                self.loader.create_shards()
-
-            # Send data partition to all clients
-            for next_client in clients:
-                self.set_client_data(next_client)
-
-        self.clients = clients
 
 
     def round(self):
@@ -274,28 +201,6 @@ class FedAvgServer(Server):
             accuracy += report.accuracy * (report.num_samples / total_samples)
 
         return accuracy
-
-    def set_client_data(self, current_client):
-        """set the data for a client."""
-        loader = self.config.loader
-
-        # Get data partition size
-        if loader != 'shard':
-            if self.config.data.partition_size:
-                partition_size = self.config.data.partition_size
-
-        # Extract data partition for client
-        if loader == 'iid':
-            data = self.loader.get_partition(partition_size)
-        elif loader == 'bias':
-            data = self.loader.get_partition(partition_size, current_client.pref)
-        elif loader == 'shard':
-            data = self.loader.get_partition()
-        else:
-            logging.critical('Unknown data loader type.')
-
-        # Send data to client
-        current_client.set_data(data, self.config)
 
 
     @staticmethod

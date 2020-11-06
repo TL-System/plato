@@ -5,6 +5,7 @@ The base class for federated learning servers.
 from abc import abstractmethod
 import json
 import logging
+import pickle
 
 class Server():
     """The base class for federated learning servers."""
@@ -41,6 +42,9 @@ class Server():
 
                 response = {'id': client_id}
                 await websocket.send(json.dumps(response))
+                response = await websocket.recv()
+                report = pickle.loads(response)
+                logging.info("Report received. Accuracy = %s", report.accuracy)
         finally:
             await self.unregister_client(websocket)
 

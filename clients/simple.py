@@ -4,13 +4,18 @@ A basic federated learning client who sends weight updates to the server.
 
 import logging
 import json
-import torch
+import random
 import uuid
+import pickle
+import torch
 import websockets
 
-import config
 from models import registry as models_registry
+from datasets import registry as datasets_registry
 from training import optimizers, trainer
+from dividers import iid, biased, sharded
+from utils import dists
+
 
 class SimpleClient:
     """A basic federated learning client who sends simple weight updates."""
@@ -31,17 +36,7 @@ class SimpleClient:
         self.pref = None # Preferred label on this client in biased data distribution
         self.bias = None # Percentage of bias
         self.optimizer = None # Optimizer for model training
-
-    async def start_client(self):
-        uri = 'ws://{}:{}'.format(self.config.server.address, self.config.server.port)
-
-        async with websockets.connect(uri) as websocket:
-            await websocket.send(json.dumps({'id': self.client_id}))
-            print(f"> {self.client_id}")
-
-            response = await websocket.recv()
-            data = json.loads(response)
-            print(f"< {data['id']}")
+        self.loader = None
 
 
     def __repr__(self):
@@ -49,69 +44,129 @@ class SimpleClient:
             self.client_id, len(self.data), set([label for __, label in self.data]))
 
 
-    def set_bias(self, pref, bias):
-        """Set the preferred label and the bias percentage."""
-        self.pref = pref
-        self.bias = bias
+    async def start_client(self):
+        uri = 'ws://{}:{}'.format(self.config.server.address, self.config.server.port)
+
+        async with websockets.connect(uri) as websocket:
+            await websocket.send(json.dumps({'id': self.client_id}))
+            print(f"Client ID sent to server: client ID = {self.client_id}")
+
+            response = await websocket.recv()
+            data = json.loads(response)
+            print(f"Selected by the server: client ID = {data['id']}")
+
+            self.train()
+            await websocket.send(pickle.dumps(self.report))
+            response = await websocket.recv()
+            model = json.loads(response)
 
 
-    def download(self, argv):
-        """Downloading data from the server."""
-        try:
-            return argv.copy()
-        except:
-            return argv
-
-
-    # Federated learning phases
-    def set_data(self, data, config):
-        """
-        Obtaining and deploying the data from the server. For emulation purposes, all the data
-        is to be downloaded from the server.
-        """
-        # Extract test parameter settings from the configuration
-        do_test = self.do_test = config.clients.do_test
-        test_partition = self.test_partition = config.clients.test_partition
-
-        # Download data
-        self.data = self.download(data)
-
-        # Extract the trainset and testset if local testing is needed
-        data = self.data
-        if do_test:
-            self.trainset = data[:int(len(data) * (1 - test_partition))]
-            self.testset = data[int(len(data) * (1 - test_partition)):]
-        else:
-            self.trainset = data
-
-
-    def configure(self, config):
+    def configure(self):
         """Prepare this client for training."""
-        # Download from server
-        config = self.download(config)
 
         # Extract the machine learning task from the current configuration
-        self.task = config.training.task
-        self.epochs = config.training.epochs
-        self.batch_size = config.training.batch_size
+        self.task = self.config.training.task
+        self.epochs = self.config.training.epochs
+        self.batch_size = self.config.training.batch_size
 
         # Download the most recent global model from the server
-        data_path = '{}/{}/global_model'.format(config.training.data_path, config.training.dataset)
-        model_name = config.training.model
-        self.model = models_registry.get(model_name, config)
+        data_path = '{}/{}/global_model'.format(self.config.training.data_path, self.config.training.dataset)
+        model_name = self.config.training.model
+        self.model = models_registry.get(model_name, self.config)
         self.model.load_state_dict(torch.load(data_path))
         self.model.eval()
 
         # Create an optimizer
-        self.optimizer = optimizers.get_optimizer(config, self.model)
+        self.optimizer = optimizers.get_optimizer(self.config, self.model)
+
+        self.load_data()
 
 
-    def run(self):
-        """Perform the federated learning training workload."""
-        return {
-            "train": self.train,
-            "test": self.test
-        }[self.task]()
+    def load_data(self):
+        """Generating data and loading them onto this client."""
+        # Extract configurations for the datasets
+        config = self.config
+
+        # Set up the training and testing datasets
+        data_path = config.training.data_path
+        dataset = datasets_registry.get(config.training.dataset, data_path)
+
+        logging.info('Dataset size: %s', dataset.num_train_examples())
+        logging.info('Number of classes: %s', dataset.num_classes())
+
+        # Setting up the data loader
+        self.loader = {
+            'iid': iid.IIDDivider,
+            'bias': biased.BiasedDivider,
+            'shard': sharded.ShardedDivider
+        }[config.loader](config, dataset)
+
+        logging.info('Data distribution: %s', config.loader)
+
+        is_iid = self.config.data.iid
+        labels = self.loader.labels
+        loader = self.config.loader
+        loading = self.config.data.loading
+        num_clients = self.config.clients.total
+
+        if not is_iid:  # Create a non-IID distribution for label preferences
+            dist, __ = {
+                "uniform": dists.uniform,
+                "normal": dists.normal
+            }[self.config.clients.label_distribution](num_clients, len(labels))
+            random.shuffle(dist)  # Shuffle the distribution
+
+        logging.info('Initializing the client data...')
+
+        if not is_iid: # Configure this client for non-IID data
+            if self.config.data.bias:
+                # Bias data partitions
+                bias = self.config.data.bias
+                # Choose weighted random preference
+                pref = random.choices(labels, dist)[0]
+
+                # Assign (preference, bias) configuration to the client
+                self.set_bias(pref, bias)
+
+        logging.info('Total number of clients: %s', num_clients)
+
+        if loading == 'static':
+            if loader == 'shard': # Create data shards
+                self.loader.create_shards()
+
+        loader = self.config.loader
+
+        # Get data partition size
+        if loader != 'shard':
+            if self.config.data.partition_size:
+                partition_size = self.config.data.partition_size
+
+        # Extract data partition for client
+        if loader == 'iid':
+            self.data = self.loader.get_partition(partition_size)
+        elif loader == 'bias':
+            self.data = self.loader.get_partition(partition_size, self.pref)
+        elif loader == 'shard':
+            self.data = self.loader.get_partition()
+        else:
+            logging.critical('Unknown data loader type.')
+
+        # Extract test parameter settings from the configuration
+        do_test = self.do_test = self.config.clients.do_test
+        test_partition = self.test_partition = self.config.clients.test_partition
+
+        # Extract the trainset and testset if local testing is needed
+        if do_test:
+            self.trainset = self.data[:int(len(self.data) * (1 - test_partition))]
+            self.testset = self.data[int(len(self.data) * (1 - test_partition)):]
+        else:
+            self.trainset = self.data
+
+
+    def set_bias(self, pref, bias):
+        """Set the preferred label and the bias percentage."""
+        self.pref = pref
+        self.bias = bias
 
 
     def train(self):
@@ -133,13 +188,12 @@ class SimpleClient:
         if self.do_test:
             self.test()
 
-        return self.report
-
 
     def test(self):
         """Perform model testing."""
         testloader = trainer.get_testloader(self.testset, 1000)
         self.report.set_accuracy(trainer.test(self.model, testloader))
+        logging.info("Accuracy: %s", self.report.accuracy)
         return self.report
 
 
