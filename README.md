@@ -30,6 +30,12 @@ In macOS (without GPU support), the typical command would be:
 $ conda install pytorch torchvision -c pytorch
 ```
 
+We will need to install the `websockets` package for client-server communication:
+
+```shell
+$ pip install websockets
+```
+
 In case unit tests in the `tests` directory need to be run, `scipy` should also be installed:
 
 ```shell
