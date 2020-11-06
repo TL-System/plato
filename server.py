@@ -38,7 +38,8 @@ def main():
 
     logging.info("Starting the federated learning server...")
     start_server = websockets.serve(server.serve,
-                     fl_config.server.address, fl_config.server.port)
+                     fl_config.server.address, fl_config.server.port,
+                     max_size=2 ** 30)
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(start_server)

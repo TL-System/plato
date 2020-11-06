@@ -25,6 +25,7 @@ def main():
     fl_config = config.Config(args.config)
 
     client = SimpleClient(fl_config)
+    client.configure()
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(client.start_client())
