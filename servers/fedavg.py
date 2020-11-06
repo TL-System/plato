@@ -27,7 +27,7 @@ class FedAvgServer(Server):
         self.clients = None # selected clients in a round
 
 
-    def boot(self):
+    def configure(self):
         """
         Booting the federated learning server by setting up the data, model, and
         creating the clients.
