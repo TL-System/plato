@@ -13,18 +13,19 @@ class Server():
     def __init__(self, config):
         self.config = config
         self.clients = {}
+        self.model = None
         self.dataset_type = config.training.dataset
         self.data_path = '{}/{}'.format(config.training.data_path, config.training.dataset)
 
 
-    async def register_client(self, client_id, websocket):
+    def register_client(self, client_id, websocket):
         if not client_id in self.clients:
             self.clients[client_id] = websocket
 
         logging.info("clients: %s", self.clients)
 
 
-    async def unregister_client(self, websocket):
+    def unregister_client(self, websocket):
         for key, value in dict(self.clients).items():
             if value == websocket:
                 del self.clients[key]
@@ -36,17 +37,31 @@ class Server():
         try:
             async for message in websocket:
                 data = json.loads(message)
-                client_id = data["id"]
-                await self.register_client(client_id, websocket)
-                logging.info("client received with ID: %s", client_id)
+                client_id = data['id']
+                self.register_client(client_id, websocket)
+                logging.info("client data received with ID: %s", client_id)
 
-                response = {'id': client_id}
-                await websocket.send(json.dumps(response))
-                response = await websocket.recv()
-                report = pickle.loads(response)
-                logging.info("Report received. Accuracy = %s", report.accuracy)
+                if 'payload' in data:
+                    client_update = await websocket.recv()
+                    report = pickle.loads(client_update)
+                    logging.info("Client update received. Accuracy = %s", report.accuracy)
+
+                    # Aggregate client reports
+                    reports = []
+                    reports.append(report)
+                    self.aggregate_weights(reports)
+            
+                # Select a client with a particular client ID
+                logging.info("Selecting client with ID %s...", client_id)
+                server_response = {'id': client_id, 'payload': True}
+                await websocket.send(json.dumps(server_response))
+
+                logging.info("Sending the current model after a round of aggregation...")
+                # Send the current model after a round of aggregation, as payload
+                await websocket.send(pickle.dumps(self.model.state_dict()))
         finally:
-            await self.unregister_client(websocket)
+            logging.info("Closing client connection...")
+            # self.unregister_client(websocket)
 
 
     def run(self):
@@ -74,6 +89,14 @@ class Server():
 
     @abstractmethod
     def round(self):
+        """
+        Selecting some clients to participate in the current round,
+        and run them for one round.
+        """
+        pass
+
+    @abstractmethod
+    def aggregate_weights(self, reports):
         """
         Selecting some clients to participate in the current round,
         and run them for one round.

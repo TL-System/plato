@@ -47,18 +47,28 @@ class SimpleClient:
     async def start_client(self):
         uri = 'ws://{}:{}'.format(self.config.server.address, self.config.server.port)
 
-        async with websockets.connect(uri) as websocket:
+        async with websockets.connect(uri, max_size=2 ** 30) as websocket:
+            logging.info("Signing in at the server with client ID %s...", self.client_id)
             await websocket.send(json.dumps({'id': self.client_id}))
-            print(f"Client ID sent to server: client ID = {self.client_id}")
 
-            response = await websocket.recv()
-            data = json.loads(response)
-            print(f"Selected by the server: client ID = {data['id']}")
+            logging.info("Waiting to be selected by the server for training...")
+            server_response = await websocket.recv()
+            data = json.loads(server_response)
 
-            self.train()
-            await websocket.send(pickle.dumps(self.report))
-            response = await websocket.recv()
-            model = json.loads(response)
+            if data['id'] == self.client_id and 'payload' in data:
+                logging.info("Selected by the server for training -- receiving the model...")
+                server_model = await websocket.recv()
+                self.model.load_state_dict(pickle.loads(server_model))
+                
+                self.train()
+                
+                logging.info("Model trained on client with client ID %s...", self.client_id)
+                # Sending client ID as metadata to the server (payload to follow)
+                client_update = {'id': self.client_id, 'payload': True}
+                await websocket.send(json.dumps(client_update))
+
+                # Sending the client training report to the server as payload
+                await websocket.send(pickle.dumps(self.report))
 
 
     def configure(self):
@@ -69,14 +79,8 @@ class SimpleClient:
         self.epochs = self.config.training.epochs
         self.batch_size = self.config.training.batch_size
 
-        # Download the most recent global model from the server
-        data_path = '{}/{}/global_model'.format(self.config.training.data_path, self.config.training.dataset)
         model_name = self.config.training.model
         self.model = models_registry.get(model_name, self.config)
-        self.model.load_state_dict(torch.load(data_path))
-        self.model.eval()
-
-        # Create an optimizer
         self.optimizer = optimizers.get_optimizer(self.config, self.model)
 
         self.load_data()
