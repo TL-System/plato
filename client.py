@@ -21,7 +21,6 @@ logging.basicConfig(
 
 def main():
     """Run a federated learning client."""
-    # Read runtime parameters from a configuration file
     fl_config = config.Config(args.config)
 
     client = SimpleClient(fl_config)

@@ -26,10 +26,8 @@ logging.basicConfig(
 
 def main():
     """Run a federated learning server."""
-    # Read runtime parameters from a configuration file
     fl_config = config.Config(args.config)
 
-    # Initialize the federated learning server
     server = {
         "fedavg": servers.fedavg.FedAvgServer
     }[fl_config.training.server](fl_config)

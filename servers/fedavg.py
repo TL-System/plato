@@ -22,7 +22,6 @@ class FedAvgServer(Server):
 
     def __init__(self, config):
         super().__init__(config)
-        self.model = None
         self.loader = None
 
 
@@ -42,11 +41,12 @@ class FedAvgServer(Server):
     def load_model(self):
         """Setting up the global model to be trained via federated learning."""
         logging.info('Dataset: %s', self.dataset_type)
+        logging.info('Dataset path: %s', self.data_path)
+
         model_type = self.config.training.model
         logging.info('Model: %s', model_type)
 
         self.model = models_registry.get(model_type, self.config)
-        logging.info('Dataset_path: %s', self.data_path)
 
 
     def round(self):
