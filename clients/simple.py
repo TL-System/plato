@@ -5,9 +5,7 @@ A basic federated learning client who sends weight updates to the server.
 import logging
 import json
 import random
-import uuid
 import pickle
-import torch
 import websockets
 
 from models import registry as models_registry
@@ -20,9 +18,9 @@ from utils import dists
 class SimpleClient:
     """A basic federated learning client who sends simple weight updates."""
 
-    def __init__(self, config):
+    def __init__(self, config, client_id):
         self.config = config
-        self.client_id = uuid.uuid1().int
+        self.client_id = client_id
         self.do_test = None # Should the client test the trained model?
         self.test_partition = None # Percentage of the dataset reserved for testing
         self.data = None # The dataset to be used for local training
