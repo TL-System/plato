@@ -7,6 +7,8 @@ from clients import SimpleClient
 
 # Setting up the parser
 parser = argparse.ArgumentParser()
+parser.add_argument('-i', '--id', type=str,
+                    help='Unique client ID.')
 parser.add_argument('-c', '--config', type=str, default='./config.conf',
                     help='Federated learning configuration file.')
 parser.add_argument('-l', '--log', type=str, default='INFO',
@@ -23,7 +25,7 @@ def main():
     """Run a federated learning client."""
     fl_config = config.Config(args.config)
 
-    client = SimpleClient(fl_config)
+    client = SimpleClient(fl_config, args.id)
     client.configure()
 
     loop = asyncio.get_event_loop()

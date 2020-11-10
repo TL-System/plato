@@ -5,8 +5,9 @@ The base class for federated learning servers.
 from abc import abstractmethod
 import json
 import logging
+import subprocess
+import sys
 import pickle
-from training import trainer
 
 
 class Server():
@@ -34,6 +35,14 @@ class Server():
                 del self.clients[key]
 
         logging.info("clients: %s", self.clients)
+
+
+    def start_clients(self):
+        """Starting all the clients as separate processes."""
+        for client_id in range(1, self.config.clients.total + 1):
+            logging.info("Starting client #%s...", client_id)
+            command = "python client.py -i {}".format(client_id)
+            subprocess.Popen(command, shell=True)
 
 
     async def wait_for_clients(self, websocket):

@@ -33,6 +33,7 @@ def main():
     }[fl_config.training.server](fl_config)
 
     server.configure()
+    server.start_clients()
 
     logging.info("Waiting for %s clients to arrive...", fl_config.clients.total)
     start_server = websockets.serve(server.serve,
