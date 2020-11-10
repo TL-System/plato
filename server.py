@@ -34,7 +34,7 @@ def main():
 
     server.configure()
 
-    logging.info("Starting the federated learning server...")
+    logging.info("Waiting for %s clients to arrive...", fl_config.clients.total)
     start_server = websockets.serve(server.serve,
                      fl_config.server.address, fl_config.server.port,
                      max_size=2 ** 30)

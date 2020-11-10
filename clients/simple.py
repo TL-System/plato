@@ -51,30 +51,29 @@ class SimpleClient:
             logging.info("Signing in at the server with client ID %s...", self.client_id)
             await websocket.send(json.dumps({'id': self.client_id}))
 
-            logging.info("Waiting to be selected by the server for training...")
-            server_response = await websocket.recv()
-            data = json.loads(server_response)
+            while True:
+                logging.info("Waiting to be selected by the server for training...")
+                server_response = await websocket.recv()
+                data = json.loads(server_response)
 
-            if data['id'] == self.client_id and 'payload' in data:
-                logging.info("Selected by the server for training -- receiving the model...")
-                server_model = await websocket.recv()
-                self.model.load_state_dict(pickle.loads(server_model))
-                
-                self.train()
-                
-                logging.info("Model trained on client with client ID %s...", self.client_id)
-                # Sending client ID as metadata to the server (payload to follow)
-                client_update = {'id': self.client_id, 'payload': True}
-                await websocket.send(json.dumps(client_update))
+                if data['id'] == self.client_id and 'payload' in data:
+                    logging.info("Selected by the server for training -- receiving the model...")
+                    server_model = await websocket.recv()
+                    self.model.load_state_dict(pickle.loads(server_model))
 
-                # Sending the client training report to the server as payload
-                await websocket.send(pickle.dumps(self.report))
+                    self.train()
+
+                    logging.info("Model trained on client with client ID %s...", self.client_id)
+                    # Sending client ID as metadata to the server (payload to follow)
+                    client_update = {'id': self.client_id, 'payload': True}
+                    await websocket.send(json.dumps(client_update))
+
+                    # Sending the client training report to the server as payload
+                    await websocket.send(pickle.dumps(self.report))
 
 
     def configure(self):
         """Prepare this client for training."""
-
-        # Extract the machine learning task from the current configuration
         self.task = self.config.training.task
         self.epochs = self.config.training.epochs
         self.batch_size = self.config.training.batch_size
@@ -110,7 +109,6 @@ class SimpleClient:
         is_iid = self.config.data.iid
         labels = self.loader.labels
         loader = self.config.loader
-        loading = self.config.data.loading
         num_clients = self.config.clients.total
 
         if not is_iid:  # Create a non-IID distribution for label preferences
@@ -125,18 +123,14 @@ class SimpleClient:
         if not is_iid: # Configure this client for non-IID data
             if self.config.data.bias:
                 # Bias data partitions
-                bias = self.config.data.bias
+                self.bias = self.config.data.bias
                 # Choose weighted random preference
-                pref = random.choices(labels, dist)[0]
-
-                # Assign (preference, bias) configuration to the client
-                self.set_bias(pref, bias)
+                self.pref = random.choices(labels, dist)[0]
 
         logging.info('Total number of clients: %s', num_clients)
 
-        if loading == 'static':
-            if loader == 'shard': # Create data shards
-                self.loader.create_shards()
+        if loader == 'shard': # Create data shards
+            self.loader.create_shards()
 
         loader = self.config.loader
 
@@ -165,12 +159,6 @@ class SimpleClient:
             self.testset = self.data[int(len(self.data) * (1 - test_partition)):]
         else:
             self.trainset = self.data
-
-
-    def set_bias(self, pref, bias):
-        """Set the preferred label and the bias percentage."""
-        self.pref = pref
-        self.bias = bias
 
 
     def train(self):

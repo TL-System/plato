@@ -16,7 +16,6 @@ from utils import dists, executor
 from servers import Server
 
 
-
 class FedAvgServer(Server):
     """Federated learning server using federated averaging."""
 
@@ -34,7 +33,6 @@ class FedAvgServer(Server):
 
         logging.info('Configuring the %s server...', config.training.server)
 
-        # Setting up the federated learning training workload
         self.load_model()
 
 
@@ -49,85 +47,18 @@ class FedAvgServer(Server):
         self.model = models_registry.get(model_type, self.config)
 
 
-    def round(self):
-        """
-        Selecting some clients to participate in the current round,
-        and run them for one round.
-        """
-        sample_clients = self.select_clients()
-
-        # Configure sample clients
-        self.configure_clients(sample_clients)
-
-        # Run clients using multiprocessing for better parallelism on GPUs
-        logging.info('Launching %s clients...', len(sample_clients))
-        client_executor = executor.Executor(len(sample_clients))
-        for client in sample_clients:
-            client_executor.schedule(client.run, args=())
-        client_executor.wait()
-
-        reports = client_executor.reports
-
-        logging.info('Reports received: %s', len(reports))
-        if len(reports) != len(sample_clients):
-            logging.debug('Fewer reports have been received than the number of clients launched.')
-
-        # Aggregating weight updates from the selected clients
-        logging.info('Aggregating weight updates...')
-        updated_weights = self.aggregate_weights(reports)
-
-        # Load updated weights
-        trainer.load_weights(self.model, updated_weights)
-
-        # Save the updated global model
-        self.save_model(self.model, self.data_path)
-
-        # Test the global model accuracy
-        if self.config.clients.do_test:  # Get average accuracy from client reports
-            accuracy = self.accuracy_averaging(reports)
-            logging.info('Average client accuracy: {:.2f}%\n'.format(100 * accuracy))
-        else: # Test the updated model on the server
-            testset = self.loader.get_testset()
-            batch_size = self.config.training.batch_size
-            testloader = trainer.get_testloader(testset, batch_size)
-            accuracy = trainer.test(self.model, testloader)
-            logging.info('Global model accuracy: {:.2f}%\n'.format(100 * accuracy))
-
-        return accuracy
-
-
-    # Federated learning phases
-
     def select_clients(self):
         """Select devices to participate in round."""
         clients_per_round = self.config.clients.per_round
 
         # Select clients randomly
-        sample_clients = list(random.sample(self.clients, clients_per_round))
+        print(clients_per_round)
+        print(len(self.clients))
+        assert clients_per_round <= len(self.clients)
 
-        return sample_clients
-
-
-    def configure_clients(self, sample_clients):
-        """Configure the data distribution across clients."""
-        loader_type = self.config.loader
-        loading = self.config.data.loading
-
-        if loading == 'dynamic':
-            # Create shards if applicable
-            if loader_type == 'shard':
-                self.loader.create_shards()
-
-        # Configure selected clients for federated learning task
-        for selected_client in sample_clients:
-            if loading == 'dynamic':
-                self.set_client_data(selected_client)  # Send data partition to client
-
-            # Extract config for client
-            config = self.config
-
-            # Continue configuraion on client
-            selected_client.configure(config)
+        selected_clients = random.sample(list(self.clients), clients_per_round)
+        print(selected_clients)
+        return selected_clients
 
 
     def aggregate_weights(self, reports):
@@ -187,6 +118,24 @@ class FedAvgServer(Server):
             updated_weights.append((name, weight + avg_update[i]))
 
         return updated_weights
+
+
+    def process_report(self):
+        updated_weights = self.aggregate_weights(self.reports)
+        trainer.load_weights(self.model, updated_weights)
+
+        # Test the global model accuracy
+        if self.config.clients.do_test:  # Get average accuracy from client reports
+            accuracy = self.accuracy_averaging(self.reports)
+            logging.info('Average client accuracy: {:.2f}%\n'.format(100 * accuracy))
+        else: # Test the updated model on the server
+            testset = self.loader.get_testset()
+            batch_size = self.config.training.batch_size
+            testloader = trainer.get_testloader(testset, batch_size)
+            accuracy = trainer.test(self.model, testloader)
+            logging.info('Global model accuracy: {:.2f}%\n'.format(100 * accuracy))
+
+        return accuracy
 
 
     @staticmethod

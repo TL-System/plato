@@ -48,7 +48,7 @@ To start a federated learning training workload, run [`run.py`](run.py) from the
 
 ```shell
 cp configs/MNIST/mnist.conf config.conf
-python run.py
+python server.py
   --config=config.conf
   --log=INFO
 ```
