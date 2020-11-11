@@ -31,6 +31,7 @@ class SimpleClient:
         self.model = None # Machine learning model
         self.pref = None # Preferred label on this client in biased data distribution
         self.bias = None # Percentage of bias
+        self.data_loaded = False # is training data already loaded from the disk?
         self.loader = None
 
 
@@ -58,6 +59,9 @@ class SimpleClient:
                     server_model = await websocket.recv()
                     self.model.load_state_dict(pickle.loads(server_model))
 
+                    if not self.data_loaded:
+                        self.load_data()
+
                     self.train()
 
                     logging.info("Model trained on client with client ID %s.", self.client_id)
@@ -75,13 +79,12 @@ class SimpleClient:
         model_name = self.config.training.model
         self.model = models_registry.get(model_name, self.config)
 
-        self.load_data()
-
 
     def load_data(self):
         """Generating data and loading them onto this client."""
         # Extract configurations for the datasets
         config = self.config
+        self.data_loaded = True
 
         # Set up the training and testing datasets
         data_path = config.training.data_path
