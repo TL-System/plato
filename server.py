@@ -29,11 +29,16 @@ def main():
     fl_config = config.Config(args.config)
 
     server = {
-        "fedavg": servers.fedavg.FedAvgServer
+        "fedavg": servers.fedavg.FedAvgServer,
+        "fedcc": servers.fedcc.CrossSiloServer
     }[fl_config.training.server](fl_config)
 
     server.configure()
     server.start_clients()
+
+    if fl_config.training.server == 'fedcc':
+        server.start_institutions()
+        logging.info("Waiting for %s institutions to arrive...", fl_config.institutions.total)
 
     logging.info("Waiting for %s clients to arrive...", fl_config.clients.total)
     start_server = websockets.serve(server.serve,

@@ -80,3 +80,15 @@ class Config:
         params = self.__extract_section('server', fields, defaults)
 
         self.server = namedtuple('server', fields)(*params)
+
+        # Determine if institutions are involved
+        if self.training.server == 'fedcc':
+
+            # Parameters for the federated learning institutions
+            fields = ['total', 'aggregations', 'do_test']
+            defaults = (0, 0, False)
+            params = self.__extract_section('institutions', fields, defaults)
+
+            self.institutions = namedtuple('institutions', fields)(*params)
+
+
