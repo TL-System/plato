@@ -15,6 +15,8 @@ class Server():
     def __init__(self, config):
         self.config = config
         self.clients = {}
+        self.selected_clients = None
+        self.current_round = 0
         self.model = None
         self.reports = []
         self.dataset_type = config.training.dataset
@@ -26,16 +28,12 @@ class Server():
         if not client_id in self.clients:
             self.clients[client_id] = websocket
 
-        logging.info("clients: %s", self.clients)
-
 
     def unregister_client(self, websocket):
         """Removing an existing client from the list of clients."""
         for key, value in dict(self.clients).items():
             if value == websocket:
                 del self.clients[key]
-
-        logging.info("clients: %s", self.clients)
 
 
     def start_clients(self):
@@ -46,40 +44,36 @@ class Server():
             subprocess.Popen(command, shell=True)
 
 
-    async def wait_for_clients(self, websocket):
-        """Waiting for clients to arrive."""
-        async for message in websocket:
-            data = json.loads(message)
-            client_id = data['id']
-            logging.info("New client arrived with ID: %s", client_id)
-
-            # a new client arrives
-            assert 'payload' not in data
-            self.register_client(client_id, websocket)
-
-            if len(self.clients) == self.config.clients.total:
-                return
-
-
-    async def one_round(self, websocket):
-        """
-        Selecting some clients to participate in the current round,
-        and run them for one round.
-        """
-        selected_clients = self.select_clients()
+    async def select_clients(self):
+        """Select a subset of the clients and send messages to them to start training."""
         self.reports = []
+        self.current_round += 1
+        logging.info('**** Round %s/%s ****', self.current_round, self.config.training.rounds)
 
-        assert len(selected_clients) > 0
+        self.choose_clients()
+        if len(self.selected_clients) > 0:
+            for client_id in self.selected_clients:
+                socket = self.clients[client_id]
+                logging.info("Selecting client with ID %s for training...", client_id)
+                server_response = {'id': client_id, 'payload': True}
+                await socket.send(json.dumps(server_response))
 
-        # If the list of selected_clients is not empty
-        for client_id in selected_clients:
-            socket = self.clients[client_id]
-            logging.info("Selecting client with ID %s...", client_id)
-            server_response = {'id': client_id, 'payload': True}
-            await socket.send(json.dumps(server_response))
+                logging.info("Sending the current model...")
+                await socket.send(pickle.dumps(self.model.state_dict()))
 
-            logging.info("Sending the current model...")
-            await socket.send(pickle.dumps(self.model.state_dict()))
+
+    async def serve(self, websocket, path):
+        """Perform consecutive rounds of federated learning training."""
+
+        total_rounds = self.config.training.rounds
+        target_accuracy = self.config.training.target_accuracy
+        logging.info("Starting training on %s clients...", self.config.clients.per_round)
+
+        if target_accuracy:
+            logging.info('Training: %s rounds or %s%% accuracy\n',
+                total_rounds, 100 * target_accuracy)
+        else:
+            logging.info('Training: %s rounds\n', total_rounds)
 
         async for message in websocket:
             data = json.loads(message)
@@ -95,48 +89,28 @@ class Server():
 
                 self.reports.append(report)
 
-                if len(self.reports) == len(selected_clients):
-                    return self.process_report()
+                if len(self.reports) == len(self.selected_clients):
+                    accuracy = self.process_report()
+
+                    # Break loop when target accuracy is met
+                    if target_accuracy and (accuracy >= target_accuracy):
+                        logging.info('Target accuracy reached.')
+                        return
+
+                    await self.select_clients()
+
             else:
                 # a new client arrives
                 self.register_client(client_id, websocket)
 
-
-    async def serve(self, websocket, path):
-        """Perform consecutive rounds of federated learning training."""
-        rounds = self.config.training.rounds
-        target_accuracy = self.config.training.target_accuracy
-
-        await self.wait_for_clients(websocket)
-
-        logging.info("Starting training on %s clients...", self.config.clients.per_round)
-
-        if target_accuracy:
-            logging.info('Training: %s rounds or %s%% accuracy\n',
-                rounds, 100 * target_accuracy)
-        else:
-            logging.info('Training: %s rounds\n', rounds)
-
-        for current_round in range(1, rounds + 1):
-            logging.info('**** Round %s/%s ****', current_round, rounds)
-
-            # Run one federated learning round
-            accuracy = await self.one_round(websocket)
-
-            # Break loop when target accuracy is met
-            if target_accuracy and (accuracy >= target_accuracy):
-                logging.info('Target accuracy reached.')
-                break
+                if self.current_round == 0 and len(self.clients) >= self.config.clients.total:
+                    logging.info('Starting FL training...')
+                    await self.select_clients()
 
 
     @abstractmethod
-    def select_clients(self):
-        """Select devices to participate in round."""
-
-
-    @abstractmethod
-    def aggregate_weights(self, reports):
-        """Aggregate the reported weight updates from the selected clients."""
+    def choose_clients(self):
+        """Choose a subset of the clients to participate in each round."""
 
 
     @abstractmethod

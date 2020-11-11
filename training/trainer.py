@@ -4,6 +4,7 @@ The training and testing loop.
 
 import logging
 import torch
+from training import optimizers
 
 # CUDA settings
 use_cuda = torch.cuda.is_available()
@@ -39,22 +40,31 @@ def get_testloader(testset, batch_size):
     return torch.utils.data.DataLoader(testset, batch_size=batch_size, shuffle=True)
 
 
-def train(model, train_loader, optimizer, epochs):
-    """Train the model."""
+def train(model, trainset, config):
+    """The main training loop for each client in a federated learning workload.
+
+    Arguments:
+      * model: The model to train. Must be a models.base.Model subclass.
+      * config: Training hyperparameters.
+      * trainset: The training dataset.
+    """
     model.to(device)
     model.train()
 
-    criterion = model.loss_criterion
     log_interval = 10
+    batch_size = config.training.batch_size
+    train_loader = torch.utils.data.DataLoader(trainset, batch_size=batch_size, shuffle=True)
+    epochs = config.training.epochs
+    optimizer = optimizers.get_optimizer(config, model)
 
     for epoch in range(1, epochs + 1):
-        for batch_id, (image, label) in enumerate(train_loader):
-            image, label = image.to(device), label.to(device)
+        for batch_id, (examples, labels) in enumerate(train_loader):
+            examples, labels = examples.to(device), labels.to(device)
             optimizer.zero_grad()
-            output = model(image)
-            loss = criterion(output, label)
+            loss = model.loss_criterion(model(examples), labels)
             loss.backward()
             optimizer.step()
+
             if batch_id % log_interval == 0:
                 logging.debug('Epoch: [{}/{}]\tLoss: {:.6f}'.format(
                     epoch, epochs, loss.item()))

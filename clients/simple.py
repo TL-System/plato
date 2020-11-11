@@ -29,11 +29,8 @@ class SimpleClient:
         self.report = None # Report to the server
         self.task = None # Local computation task: 'train' or 'test'
         self.model = None # Machine learning model
-        self.epochs = None # The number of epochs in each local training round
-        self.batch_size = None # The batch size used for local training
         self.pref = None # Preferred label on this client in biased data distribution
         self.bias = None # Percentage of bias
-        self.optimizer = None # Optimizer for model training
         self.loader = None
 
 
@@ -51,18 +48,19 @@ class SimpleClient:
             await websocket.send(json.dumps({'id': self.client_id}))
 
             while True:
-                logging.info("Waiting to be selected by the server for training...")
+                logging.info("Client %s is waiting to be selected for training...", self.client_id)
                 server_response = await websocket.recv()
                 data = json.loads(server_response)
 
                 if data['id'] == self.client_id and 'payload' in data:
-                    logging.info("Selected by the server for training -- receiving the model...")
+                    logging.info("Client %s has been selected and receiving the model...",
+                                 self.client_id)
                     server_model = await websocket.recv()
                     self.model.load_state_dict(pickle.loads(server_model))
 
                     self.train()
 
-                    logging.info("Model trained on client with client ID %s...", self.client_id)
+                    logging.info("Model trained on client with client ID %s.", self.client_id)
                     # Sending client ID as metadata to the server (payload to follow)
                     client_update = {'id': self.client_id, 'payload': True}
                     await websocket.send(json.dumps(client_update))
@@ -74,12 +72,8 @@ class SimpleClient:
     def configure(self):
         """Prepare this client for training."""
         self.task = self.config.training.task
-        self.epochs = self.config.training.epochs
-        self.batch_size = self.config.training.batch_size
-
         model_name = self.config.training.model
         self.model = models_registry.get(model_name, self.config)
-        self.optimizer = optimizers.get_optimizer(self.config, self.model)
 
         self.load_data()
 
@@ -117,7 +111,7 @@ class SimpleClient:
             }[self.config.clients.label_distribution](num_clients, len(labels))
             random.shuffle(dist)  # Shuffle the distribution
 
-        logging.info('Initializing the client data...')
+        logging.info('Initializing client data...')
 
         if not is_iid: # Configure this client for non-IID data
             if self.config.data.bias:
@@ -165,9 +159,7 @@ class SimpleClient:
         logging.info('Training on client #%s', self.client_id)
 
         # Perform model training
-        trainloader = trainer.get_trainloader(self.trainset, self.batch_size)
-        trainer.train(self.model, trainloader,
-                       self.optimizer, self.epochs)
+        trainer.train(self.model, self.trainset, self.config)
 
         # Extract model weights and biases
         weights = trainer.extract_weights(self.model)
