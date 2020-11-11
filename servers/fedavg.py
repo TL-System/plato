@@ -42,18 +42,13 @@ class FedAvgServer(Server):
         self.model = models_registry.get(model_type, self.config)
 
 
-    def select_clients(self):
-        """Select devices to participate in round."""
+    def choose_clients(self):
+        """Choose a subset of the clients to participate in each round."""
         clients_per_round = self.config.clients.per_round
 
         # Select clients randomly
-        print(clients_per_round)
-        print(len(self.clients))
         assert clients_per_round <= len(self.clients)
-
-        selected_clients = random.sample(list(self.clients), clients_per_round)
-        print(selected_clients)
-        return selected_clients
+        self.selected_clients = random.sample(list(self.clients), clients_per_round)
 
 
     def aggregate_weights(self, reports):
