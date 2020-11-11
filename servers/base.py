@@ -6,7 +6,6 @@ from abc import abstractmethod
 import json
 import logging
 import subprocess
-import sys
 import pickle
 
 
@@ -23,6 +22,7 @@ class Server():
 
 
     def register_client(self, client_id, websocket):
+        """Adding a newly arrived client to the list of clients."""
         if not client_id in self.clients:
             self.clients[client_id] = websocket
 
@@ -30,6 +30,7 @@ class Server():
 
 
     def unregister_client(self, websocket):
+        """Removing an existing client from the list of clients."""
         for key, value in dict(self.clients).items():
             if value == websocket:
                 del self.clients[key]
@@ -131,16 +132,13 @@ class Server():
     @abstractmethod
     def select_clients(self):
         """Select devices to participate in round."""
-        pass
 
 
     @abstractmethod
     def aggregate_weights(self, reports):
         """Aggregate the reported weight updates from the selected clients."""
-        pass
 
 
     @abstractmethod
     def process_report(self):
         """Process the reports after all clients have sent them to the server."""
-        pass
