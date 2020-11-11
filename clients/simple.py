@@ -177,8 +177,7 @@ class SimpleClient:
 
     def test(self):
         """Perform model testing."""
-        testloader = trainer.get_testloader(self.testset, 1000)
-        self.report.set_accuracy(trainer.test(self.model, testloader))
+        self.report.set_accuracy(trainer.test(self.model, self.testset, 1000))
         logging.info("Accuracy: %s", self.report.accuracy)
         return self.report
 

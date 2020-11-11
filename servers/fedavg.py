@@ -7,6 +7,7 @@ import random
 import torch
 
 import models.registry as models_registry
+from datasets import registry as datasets_registry
 from training import trainer
 from servers import Server
 
@@ -16,7 +17,7 @@ class FedAvgServer(Server):
 
     def __init__(self, config):
         super().__init__(config)
-        self.loader = None
+        self.testset = None
 
 
     def configure(self):
@@ -28,13 +29,22 @@ class FedAvgServer(Server):
 
         logging.info('Configuring the %s server...', config.training.server)
 
+        self.load_test_data()
         self.load_model()
+
+
+    def load_test_data(self):
+        """Loading the test dataset."""
+        if not self.config.clients.do_test:
+            data_path = self.config.training.data_path
+            logging.info('Dataset: %s', self.config.training.dataset)
+            logging.info('Dataset path: %s', data_path)
+            dataset = datasets_registry.get(self.config.training.dataset, data_path)
+            self.testset = dataset.get_test_set()
 
 
     def load_model(self):
         """Setting up the global model to be trained via federated learning."""
-        logging.info('Dataset: %s', self.dataset_type)
-        logging.info('Dataset path: %s', self.data_path)
 
         model_type = self.config.training.model
         logging.info('Model: %s', model_type)
@@ -115,14 +125,13 @@ class FedAvgServer(Server):
         trainer.load_weights(self.model, updated_weights)
 
         # Test the global model accuracy
-        if self.config.clients.do_test:  # Get average accuracy from client reports
+        if self.config.clients.do_test:  
+            # Compute the average accuracy from client reports
             accuracy = self.accuracy_averaging(self.reports)
             logging.info('Average client accuracy: {:.2f}%\n'.format(100 * accuracy))
-        else: # Test the updated model on the server
-            testset = self.loader.get_testset()
-            batch_size = self.config.training.batch_size
-            testloader = trainer.get_testloader(testset, batch_size)
-            accuracy = trainer.test(self.model, testloader)
+        else: 
+            # Test the updated model directly at the server
+            accuracy = trainer.test(self.model, self.testset, self.config)
             logging.info('Global model accuracy: {:.2f}%\n'.format(100 * accuracy))
 
         return accuracy

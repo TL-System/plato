@@ -20,8 +20,6 @@ class Server():
         self.current_round = 0
         self.model = None
         self.reports = []
-        self.dataset_type = config.training.dataset
-        self.data_path = '{}/{}'.format(config.training.data_path, config.training.dataset)
 
 
     def register_client(self, client_id, websocket):
