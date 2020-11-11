@@ -30,23 +30,13 @@ def load_weights(model, weights):
     model.load_state_dict(updated_state_dict, strict=False)
 
 
-def get_trainloader(trainset, batch_size):
-    """Obtain the data loader for the training dataset."""
-    return torch.utils.data.DataLoader(trainset, batch_size=batch_size, shuffle=True)
-
-
-def get_testloader(testset, batch_size):
-    """Obtain the data loader for the testing dataset."""
-    return torch.utils.data.DataLoader(testset, batch_size=batch_size, shuffle=True)
-
-
 def train(model, trainset, config):
     """The main training loop for each client in a federated learning workload.
 
     Arguments:
-      * model: The model to train. Must be a models.base.Model subclass.
-      * config: Training hyperparameters.
-      * trainset: The training dataset.
+      model: The model to train. Must be a models.base.Model subclass.
+      trainset: The training dataset.
+      config: Training hyperparameters.
     """
     model.to(device)
     model.train()
@@ -70,17 +60,20 @@ def train(model, trainset, config):
                     epoch, epochs, loss.item()))
 
 
-def test(model, test_loader):
-    """Test the model."""
+def test(model, testset, batch_size):
+    """Testing the model using the provided test dataset."""
     model.to(device)
     model.eval()
+    test_loader = torch.utils.data.DataLoader(testset, batch_size=batch_size, shuffle=True)
+
     correct = 0
     total = 0
+
     with torch.no_grad():
         for data in test_loader:
-            images, labels = data
-            images, labels = images.to(device), labels.to(device)
-            outputs = model(images)
+            examples, labels = data
+            examples, labels = examples.to(device), labels.to(device)
+            outputs = model(examples)
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
