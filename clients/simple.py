@@ -43,6 +43,7 @@ class SimpleClient:
 
 
     async def start_client(self):
+        """Startup function for a client."""
         uri = 'ws://{}:{}'.format(self.config.server.address, self.config.server.port)
 
         async with websockets.connect(uri, max_size=2 ** 30) as websocket:

@@ -7,12 +7,7 @@ import random
 import torch
 
 import models.registry as models_registry
-from clients import SimpleClient
-import datasets
-from datasets import registry as datasets_registry
-from dividers import iid, biased, sharded
 from training import trainer
-from utils import dists, executor
 from servers import Server
 
 
