@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import argparse
+import websockets
 
 import config
 from clients import SimpleClient
@@ -29,8 +30,11 @@ def main():
     client.configure()
 
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(client.start_client())
-    loop.run_forever()
+    try:
+        loop.run_until_complete(client.start_client())
+    except websockets.ConnectionClosed:
+        logging.info("Client #%s: connection to the server is closed.", 
+            client.client_id)
 
 
 if __name__ == "__main__":

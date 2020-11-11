@@ -4,6 +4,7 @@ The base class for federated learning servers.
 
 from abc import abstractmethod
 import json
+import sys
 import logging
 import subprocess
 import pickle
@@ -44,6 +45,12 @@ class Server():
             subprocess.Popen(command, shell=True)
 
 
+    async def close_connections(self):
+        """Closing all WebSocket connections after training completes."""
+        for _, client_socket in dict(self.clients).items():
+            await client_socket.close()
+
+
     async def select_clients(self):
         """Select a subset of the clients and send messages to them to start training."""
         self.reports = []
@@ -51,6 +58,7 @@ class Server():
         logging.info('**** Round %s/%s ****', self.current_round, self.config.training.rounds)
 
         self.choose_clients()
+
         if len(self.selected_clients) > 0:
             for client_id in self.selected_clients:
                 socket = self.clients[client_id]
@@ -95,7 +103,8 @@ class Server():
                     # Break loop when target accuracy is met
                     if target_accuracy and (accuracy >= target_accuracy):
                         logging.info('Target accuracy reached.')
-                        return
+                        await self.close_connections()
+                        sys.exit()
 
                     await self.select_clients()
 
