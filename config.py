@@ -41,28 +41,19 @@ class Config:
         """Extract the parameters from a configuration file."""
 
         # Parameters for the federated learning clients
-        fields = ['total', 'per_round', 'label_distribution', 'do_test', 'test_partition']
-        defaults = (0, 0, 'uniform', False, 0.2)
+        fields = ['total', 'per_round', 'do_test', 'test_partition']
+        defaults = (0, 0, False, 0.2)
         params = self.__extract_section('clients', fields, defaults)
         self.clients = namedtuple('clients', fields)(*params)
 
         assert self.clients.per_round <= self.clients.total
 
         # Parameters for the data distribution
-        fields = ['loading', 'partition_size', 'iid', 'bias', 'shard',
+        fields = ['partition_size', 'divider', 'label_distribution', 
                   'bias_primary_percentage', 'bias_secondary_focus', 'shard_per_client']
-        defaults = ('static', 0, True, False, False, 0.8, False, 2)
+        defaults = (0, 'iid', 'uniform', 0.8, False, 2)
         params = self.__extract_section('data', fields, defaults)
         self.data = namedtuple('data', fields)(*params)
-
-        # Determine the correct data loader
-        assert self.data.iid ^ self.data.bias ^ self.data.shard
-        if self.data.iid:
-            self.loader = 'iid'
-        elif self.data.bias:
-            self.loader = 'bias'
-        elif self.data.shard:
-            self.loader = 'shard'
 
         # Training parameters for federated learning
         fields = ['rounds', 'target_accuracy', 'task', 'epochs', 'batch_size', 'dataset',

@@ -7,6 +7,8 @@ import numpy as np
 
 def uniform(N, k):
     """Returns a uniform distribution of 'N' items into 'k' groups."""
+    random.seed()
+
     dist = []
     avg = N / k
 
@@ -24,6 +26,8 @@ def normal(N, k):
     """
     Generates a histogram for a normal distribution, partitioning 'N' items into 'k' groups.
     """
+    random.seed()
+
     samples = np.random.normal(0, 1, N)
     dist, __ = np.histogram(samples, bins=k)
     return dist, samples
