@@ -50,11 +50,11 @@ To start a federated learning training workload, run [`run.py`](run.py) from the
 cp configs/MNIST/mnist.conf config.conf
 python server.py
   --config=config.conf
-  --log=INFO
+  --log=info
 ```
 
 * `--config` (`-c`): the path to the configuration file to be used. The default is `config.conf` in the project's home directory.
-* `--log` (`-l`): the level of logging information to be written to the console, defaults to `INFO`.
+* `--log` (`-l`): the level of logging information to be written to the console. Possible values are `critical`, `error`, `warn`, `info`, and `debug`, and the default is `info`.
 
 *Plato* uses a standard configuration file, parsed by Python's standard configuration parser, to manage the runtime configuration parameters. Example configuration files have been provided in the `configs` directory.
 

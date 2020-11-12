@@ -23,11 +23,11 @@ def main():
 
     try:
         log_level = {
-            'CRITICAL': logging.CRITICAL,
-            'ERROR': logging.ERROR,
-            'WARN': logging.WARN,
-            'INFO': logging.INFO,
-            'DEBUG': logging.DEBUG
+            'critical': logging.CRITICAL,
+            'error': logging.ERROR,
+            'warn': logging.WARN,
+            'info': logging.INFO,
+            'debug': logging.DEBUG
         }[args.log]
     except KeyError:
         log_level = logging.INFO
@@ -42,7 +42,6 @@ def main():
         "fedavg": servers.fedavg.FedAvgServer
     }[fl_config.training.server](fl_config)
 
-    server.configure()
     server.start_clients()
 
     logging.info("Waiting for %s clients to arrive...", fl_config.clients.total)

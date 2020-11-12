@@ -26,11 +26,11 @@ def main():
 
     try:
         log_level = {
-            'CRITICAL': logging.CRITICAL,
-            'ERROR': logging.ERROR,
-            'WARN': logging.WARN,
-            'INFO': logging.INFO,
-            'DEBUG': logging.DEBUG
+            'critical': logging.CRITICAL,
+            'error': logging.ERROR,
+            'warn': logging.WARN,
+            'info': logging.INFO,
+            'debug': logging.DEBUG
         }[args.log]
     except KeyError:
         log_level = logging.INFO
