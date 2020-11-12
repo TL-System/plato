@@ -18,6 +18,7 @@ class FedAvgServer(Server):
     def __init__(self, config):
         super().__init__(config)
         self.testset = None
+        random.seed()
 
 
     def configure(self):

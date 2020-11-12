@@ -37,6 +37,8 @@ class SimpleClient:
         self.model = None # Machine learning model
         self.data_loaded = False # is training data already loaded from the disk?
 
+        random.seed()
+
 
     def __repr__(self):
         return 'Client #{}: {} samples in labels: {}'.format(
@@ -95,51 +97,44 @@ class SimpleClient:
         logging.info('Dataset size: %s', dataset.num_train_examples())
         logging.info('Number of classes: %s', dataset.num_classes())
 
-        # Setting up the data loader
-        loader = {
+        # Setting up the data divider
+        assert config.data.divider in ('iid', 'bias', 'shard')
+
+        logging.info('Data distribution: %s', config.data.divider)
+
+        divider = {
             'iid': iid.IIDDivider,
             'bias': biased.BiasedDivider,
             'shard': sharded.ShardedDivider
-        }[config.loader](config, dataset)
+        }[config.data.divider](config, dataset)
 
-        logging.info('Data distribution: %s', config.loader)
-
-        is_iid = config.data.iid
         num_clients = config.clients.total
-        labels = loader.labels
+        logging.info('Total number of clients: %s', num_clients)
 
-        if not is_iid:
+        # Extract data partition for client
+        if config.data.divider == 'iid':
+            assert config.data.partition_size
+            partition_size = config.data.partition_size
+            self.data = divider.get_partition(partition_size)
+
+        elif config.data.divider == 'bias':
+            assert config.data.label_distribution in ('uniform', 'normal')
+
             dist, __ = {
                 "uniform": dists.uniform,
                 "normal": dists.normal
-            }[self.config.clients.label_distribution](num_clients, len(labels))
+            }[config.data.label_distribution](num_clients, len(divider.labels))
             random.shuffle(dist)
 
-        logging.info('Initializing client data...')
+            pref = random.choices(divider.labels, dist)[0]
 
-        if not is_iid:
-            if self.config.data.bias:
-                pref = random.choices(labels, dist)[0]
+            assert config.data.partition_size
+            partition_size = config.data.partition_size
+            self.data = divider.get_partition(partition_size, pref)
 
-        logging.info('Total number of clients: %s', num_clients)
-
-        if config.loader == 'shard':
-            loader.create_shards()
-
-        # Get data partition size
-        if config.loader != 'shard':
-            if self.config.data.partition_size:
-                partition_size = self.config.data.partition_size
-
-        # Extract data partition for client
-        if config.loader == 'iid':
-            self.data = loader.get_partition(partition_size)
-        elif loader == 'bias':
-            self.data = loader.get_partition(partition_size, pref)
-        elif loader == 'shard':
-            self.data = loader.get_partition()
-        else:
-            logging.critical('Unknown data loader type.')
+        elif config.data.divider == 'shard':
+            divider.create_shards()
+            self.data = divider.get_partition()
 
         # Extract test parameter settings from the configuration
         test_partition = config.clients.test_partition

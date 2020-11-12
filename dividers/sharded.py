@@ -1,3 +1,6 @@
+import random
+import logging
+
 from dividers import base
 
 class ShardedDivider(base.Divider):
@@ -8,7 +11,7 @@ class ShardedDivider(base.Divider):
     def __init__(self, config, dataset):
         super().__init__(config, dataset)
         self.shards = None
-
+        random.seed()
 
     def create_shards(self):
         """Create all the shards (partitions) from the data."""
