@@ -1,3 +1,7 @@
+"""
+Starting point for a Plato federated learning client.
+"""
+
 import asyncio
 import logging
 import argparse
@@ -6,24 +10,36 @@ import websockets
 import config
 from clients import SimpleClient
 
-# Setting up the parser
-parser = argparse.ArgumentParser()
-parser.add_argument('-i', '--id', type=str,
-                    help='Unique client ID.')
-parser.add_argument('-c', '--config', type=str, default='./config.conf',
-                    help='Federated learning configuration file.')
-parser.add_argument('-l', '--log', type=str, default='INFO',
-                    help='Log messages level.')
-
-args = parser.parse_args()
-
-logging.basicConfig(
-    format='[%(levelname)s][%(asctime)s]: %(message)s',
-    level='INFO', datefmt='%H:%M:%S')
-
 
 def main():
-    """Run a federated learning client."""
+    """Starting a client to connect to the server via WebSockets."""
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-i', '--id', type=str,
+                        help='Unique client ID.')
+    parser.add_argument('-c', '--config', type=str, default='./config.conf',
+                        help='Federated learning configuration file.')
+    parser.add_argument('-l', '--log', type=str, default='INFO',
+                        help='Log messages level.')
+
+    args = parser.parse_args()
+
+    try:
+        log_level = {
+            'CRITICAL': logging.CRITICAL,
+            'ERROR': logging.ERROR,
+            'WARN': logging.WARN,
+            'INFO': logging.INFO,
+            'DEBUG': logging.DEBUG
+        }[args.log]
+    except KeyError:
+        log_level = logging.INFO
+
+    logging.basicConfig(
+        format='[%(levelname)s][%(asctime)s]: %(message)s',
+        level=log_level, datefmt='%H:%M:%S')
+    logging.info("Log level: %s", args.log)
+
     fl_config = config.Config(args.config)
 
     client = SimpleClient(fl_config, args.id)
