@@ -19,7 +19,7 @@ def main():
                         help='Unique client ID.')
     parser.add_argument('-c', '--config', type=str, default='./config.conf',
                         help='Federated learning configuration file.')
-    parser.add_argument('-l', '--log', type=str, default='INFO',
+    parser.add_argument('-l', '--log', type=str, default='info',
                         help='Log messages level.')
 
     args = parser.parse_args()
@@ -38,7 +38,6 @@ def main():
     logging.basicConfig(
         format='[%(levelname)s][%(asctime)s]: %(message)s',
         level=log_level, datefmt='%H:%M:%S')
-    logging.info("Log level: %s", args.log)
 
     fl_config = config.Config(args.config)
 
