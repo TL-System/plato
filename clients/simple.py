@@ -43,34 +43,37 @@ class SimpleClient:
     async def start_client(self):
         """Startup function for a client."""
         uri = 'ws://{}:{}'.format(self.config.server.address, self.config.server.port)
+        try:
+            async with websockets.connect(uri, max_size=2 ** 30) as websocket:
+                logging.info("Signing in at the server with client ID %s...", self.client_id)
+                await websocket.send(json.dumps({'id': self.client_id}))
 
-        async with websockets.connect(uri, max_size=2 ** 30) as websocket:
-            logging.info("Signing in at the server with client ID %s...", self.client_id)
-            await websocket.send(json.dumps({'id': self.client_id}))
+                while True:
+                    logging.info("Client %s is waiting to be selected for training...", self.client_id)
+                    server_response = await websocket.recv()
+                    data = json.loads(server_response)
 
-            while True:
-                logging.info("Client %s is waiting to be selected for training...", self.client_id)
-                server_response = await websocket.recv()
-                data = json.loads(server_response)
+                    if data['id'] == self.client_id and 'payload' in data:
+                        logging.info("Client %s has been selected and receiving the model...",
+                                    self.client_id)
+                        server_model = await websocket.recv()
+                        self.model.load_state_dict(pickle.loads(server_model))
 
-                if data['id'] == self.client_id and 'payload' in data:
-                    logging.info("Client %s has been selected and receiving the model...",
-                                 self.client_id)
-                    server_model = await websocket.recv()
-                    self.model.load_state_dict(pickle.loads(server_model))
+                        if not self.data_loaded:
+                            self.load_data()
 
-                    if not self.data_loaded:
-                        self.load_data()
+                        self.train()
 
-                    self.train()
+                        logging.info("Model trained on client with client ID %s.", self.client_id)
+                        # Sending client ID as metadata to the server (payload to follow)
+                        client_update = {'id': self.client_id, 'payload': True}
+                        await websocket.send(json.dumps(client_update))
 
-                    logging.info("Model trained on client with client ID %s.", self.client_id)
-                    # Sending client ID as metadata to the server (payload to follow)
-                    client_update = {'id': self.client_id, 'payload': True}
-                    await websocket.send(json.dumps(client_update))
-
-                    # Sending the client training report to the server as payload
-                    await websocket.send(pickle.dumps(self.report))
+                        # Sending the client training report to the server as payload
+                        await websocket.send(pickle.dumps(self.report))
+        except OSError:
+            logging.info("Client #%s: connection to the server failed.",
+                self.client_id)
 
 
     def configure(self):
