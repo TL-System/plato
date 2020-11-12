@@ -90,7 +90,7 @@ Then add your configuration parameters in the job script. The following is an ex
 #SBATCH --output=cifar_wideresnet.out # The name of the output file
 module load python/3.8
 source ~/.federated/bin/activate
-python server.py --config=configs/CIFAR10/cifar_wideresnet.conf --log=INFO
+python server.py --config=configs/CIFAR10/cifar_wideresnet.conf --log=info
 ```
 
 **Note:** the GPU resources requested in this example is a special group of GPU nodes on Compute Canada's `cedar` cluster. You may only request these nodes as whole nodes, therefore you must specify `--gres=gpu:p100l:4`. NVIDIA P100L GPU jobs up to 28 days can be run on the `cedar` cluster.

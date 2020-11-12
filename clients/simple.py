@@ -6,13 +6,23 @@ import logging
 import json
 import random
 import pickle
+from dataclasses import dataclass
 import websockets
 
 from models import registry as models_registry
 from datasets import registry as datasets_registry
-from training import optimizers, trainer
 from dividers import iid, biased, sharded
 from utils import dists
+from training import trainer
+
+
+@dataclass
+class Report:
+    """Client report sent to the federated learning server."""
+    client_id: str
+    num_samples: int
+    weights: list
+    accuracy: float
 
 
 class SimpleClient:
@@ -21,18 +31,11 @@ class SimpleClient:
     def __init__(self, config, client_id):
         self.config = config
         self.client_id = client_id
-        self.do_test = None # Should the client test the trained model?
-        self.test_partition = None # Percentage of the dataset reserved for testing
         self.data = None # The dataset to be used for local training
         self.trainset = None # Training dataset
         self.testset = None # Testing dataset
-        self.report = None # Report to the server
-        self.task = None # Local computation task: 'train' or 'test'
         self.model = None # Machine learning model
-        self.pref = None # Preferred label on this client in biased data distribution
-        self.bias = None # Percentage of bias
         self.data_loaded = False # is training data already loaded from the disk?
-        self.loader = None
 
 
     def __repr__(self):
@@ -49,7 +52,7 @@ class SimpleClient:
                 await websocket.send(json.dumps({'id': self.client_id}))
 
                 while True:
-                    logging.info("Client %s is waiting to be selected for training...", self.client_id)
+                    logging.info("Client %s is waiting to be selected...", self.client_id)
                     server_response = await websocket.recv()
                     data = json.loads(server_response)
 
@@ -62,7 +65,7 @@ class SimpleClient:
                         if not self.data_loaded:
                             self.load_data()
 
-                        self.train()
+                        report = self.train()
 
                         logging.info("Model trained on client with client ID %s.", self.client_id)
                         # Sending client ID as metadata to the server (payload to follow)
@@ -70,7 +73,7 @@ class SimpleClient:
                         await websocket.send(json.dumps(client_update))
 
                         # Sending the client training report to the server as payload
-                        await websocket.send(pickle.dumps(self.report))
+                        await websocket.send(pickle.dumps(report))
         except OSError:
             logging.info("Client #%s: connection to the server failed.",
                 self.client_id)
@@ -78,7 +81,6 @@ class SimpleClient:
 
     def configure(self):
         """Prepare this client for training."""
-        self.task = self.config.training.task
         model_name = self.config.training.model
         self.model = models_registry.get(model_name, self.config)
 
@@ -97,7 +99,7 @@ class SimpleClient:
         logging.info('Number of classes: %s', dataset.num_classes())
 
         # Setting up the data loader
-        self.loader = {
+        loader = {
             'iid': iid.IIDDivider,
             'bias': biased.BiasedDivider,
             'shard': sharded.ShardedDivider
@@ -105,10 +107,9 @@ class SimpleClient:
 
         logging.info('Data distribution: %s', config.loader)
 
-        is_iid = self.config.data.iid
-        labels = self.loader.labels
-        loader = self.config.loader
-        num_clients = self.config.clients.total
+        is_iid = config.data.iid
+        num_clients = config.clients.total
+        labels = loader.labels
 
         if not is_iid:  # Create a non-IID distribution for label preferences
             dist, __ = {
@@ -121,39 +122,34 @@ class SimpleClient:
 
         if not is_iid: # Configure this client for non-IID data
             if self.config.data.bias:
-                # Bias data partitions
-                self.bias = self.config.data.bias
                 # Choose weighted random preference
-                self.pref = random.choices(labels, dist)[0]
+                pref = random.choices(labels, dist)[0]
 
         logging.info('Total number of clients: %s', num_clients)
 
-        if loader == 'shard': # Create data shards
-            self.loader.create_shards()
-
-        loader = self.config.loader
+        if config.loader == 'shard': # Create data shards
+            loader.create_shards()
 
         # Get data partition size
-        if loader != 'shard':
+        if config.loader != 'shard':
             if self.config.data.partition_size:
                 partition_size = self.config.data.partition_size
 
         # Extract data partition for client
-        if loader == 'iid':
-            self.data = self.loader.get_partition(partition_size)
+        if config.loader == 'iid':
+            self.data = loader.get_partition(partition_size)
         elif loader == 'bias':
-            self.data = self.loader.get_partition(partition_size, self.pref)
+            self.data = loader.get_partition(partition_size, pref)
         elif loader == 'shard':
-            self.data = self.loader.get_partition()
+            self.data = loader.get_partition()
         else:
             logging.critical('Unknown data loader type.')
 
         # Extract test parameter settings from the configuration
-        do_test = self.do_test = self.config.clients.do_test
-        test_partition = self.test_partition = self.config.clients.test_partition
+        test_partition = config.clients.test_partition
 
         # Extract the trainset and testset if local testing is needed
-        if do_test:
+        if self.config.clients.do_test:
             self.trainset = self.data[:int(len(self.data) * (1 - test_partition))]
             self.testset = self.data[int(len(self.data) * (1 - test_partition)):]
         else:
@@ -170,31 +166,13 @@ class SimpleClient:
         # Extract model weights and biases
         weights = trainer.extract_weights(self.model)
 
-        # Generate a report for the server
-        self.report = Report(self, weights)
+        # Generate a report for the server, performing model testing if applicable
+        if self.config.clients.do_test:
+            accuracy = trainer.test(self.model, self.testset, 1000)
+        else:
+            accuracy = 0
 
-        # Perform model testing if applicable
-        if self.do_test:
-            self.test()
+        self.report = Report(self.client_id, len(self.data), weights, accuracy)
 
-
-    def test(self):
-        """Perform model testing."""
-        self.report.set_accuracy(trainer.test(self.model, self.testset, 1000))
-        logging.info("Accuracy: %s", self.report.accuracy)
         return self.report
 
-
-class Report:
-    """Federated learning client report."""
-
-    def __init__(self, client, weights):
-        self.client_id = client.client_id
-        self.num_samples = len(client.data)
-        self.weights = weights
-        self.accuracy = 0
-
-
-    def set_accuracy(self, accuracy):
-        """Include the test accuracy computed at a client in the report."""
-        self.accuracy = accuracy

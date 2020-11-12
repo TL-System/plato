@@ -29,6 +29,17 @@ class FedAvgServer(Server):
 
         logging.info('Configuring the %s server...', config.training.server)
 
+        total_rounds = self.config.training.rounds
+        target_accuracy = self.config.training.target_accuracy
+
+        if target_accuracy:
+            logging.info('Training: %s rounds or %s%% accuracy\n',
+                total_rounds, 100 * target_accuracy)
+        else:
+            logging.info('Training: %s rounds\n', total_rounds)
+
+        logging.info("Starting training on %s clients...", self.config.clients.per_round)
+
         self.load_test_data()
         self.load_model()
 
