@@ -114,6 +114,7 @@ class FedAvgServer(Server):
         # Perform weighted averaging
         avg_update = [torch.zeros(x.size())
                       for __, x in updates[0]]
+
         for i, update in enumerate(updates):
             num_samples = reports[i].num_samples
             for j, (__, delta) in enumerate(update):
@@ -135,12 +136,12 @@ class FedAvgServer(Server):
         updated_weights = self.aggregate_weights(self.reports)
         trainer.load_weights(self.model, updated_weights)
 
-        # Test the global model accuracy
-        if self.config.clients.do_test:  
+        # Testing the global model accuracy
+        if self.config.clients.do_test:
             # Compute the average accuracy from client reports
             accuracy = self.accuracy_averaging(self.reports)
             logging.info('Average client accuracy: {:.2f}%\n'.format(100 * accuracy))
-        else: 
+        else:
             # Test the updated model directly at the server
             accuracy = trainer.test(self.model, self.testset, self.config)
             logging.info('Global model accuracy: {:.2f}%\n'.format(100 * accuracy))

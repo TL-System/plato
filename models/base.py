@@ -7,6 +7,7 @@ class Model(ABC, nn.Module):
 
     @abstractmethod
     def forward(self, x):
+        """The forward pass."""
         pass
 
 

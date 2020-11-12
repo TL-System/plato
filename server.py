@@ -16,7 +16,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--config', type=str, default='./config.conf',
                         help='Federated learning configuration file.')
-    parser.add_argument('-l', '--log', type=str, default='INFO',
+    parser.add_argument('-l', '--log', type=str, default='info',
                         help='Log messages level.')
 
     args = parser.parse_args()
@@ -44,7 +44,6 @@ def main():
 
     server.start_clients()
 
-    logging.info("Waiting for %s clients to arrive...", fl_config.clients.total)
     start_server = websockets.serve(server.serve,
                      fl_config.server.address, fl_config.server.port,
                      max_size=2 ** 30)

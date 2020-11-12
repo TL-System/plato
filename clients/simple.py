@@ -87,13 +87,10 @@ class SimpleClient:
 
     def load_data(self):
         """Generating data and loading them onto this client."""
-        # Extract configurations for the datasets
         config = self.config
-        self.data_loaded = True
-
-        # Set up the training and testing datasets
         data_path = config.training.data_path
         dataset = datasets_registry.get(config.training.dataset, data_path)
+        self.data_loaded = True
 
         logging.info('Dataset size: %s', dataset.num_train_examples())
         logging.info('Number of classes: %s', dataset.num_classes())
@@ -111,23 +108,22 @@ class SimpleClient:
         num_clients = config.clients.total
         labels = loader.labels
 
-        if not is_iid:  # Create a non-IID distribution for label preferences
+        if not is_iid:
             dist, __ = {
                 "uniform": dists.uniform,
                 "normal": dists.normal
             }[self.config.clients.label_distribution](num_clients, len(labels))
-            random.shuffle(dist)  # Shuffle the distribution
+            random.shuffle(dist)
 
         logging.info('Initializing client data...')
 
-        if not is_iid: # Configure this client for non-IID data
+        if not is_iid:
             if self.config.data.bias:
-                # Choose weighted random preference
                 pref = random.choices(labels, dist)[0]
 
         logging.info('Total number of clients: %s', num_clients)
 
-        if config.loader == 'shard': # Create data shards
+        if config.loader == 'shard':
             loader.create_shards()
 
         # Get data partition size
@@ -172,7 +168,4 @@ class SimpleClient:
         else:
             accuracy = 0
 
-        self.report = Report(self.client_id, len(self.data), weights, accuracy)
-
-        return self.report
-
+        return Report(self.client_id, len(self.data), weights, accuracy)

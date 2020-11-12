@@ -69,7 +69,11 @@ class Server():
 
 
     async def serve(self, websocket, path):
-        """Perform consecutive rounds of federated learning training."""
+        """Running a federated learning server."""
+
+        logging.info("Waiting for %s clients to arrive...", self.config.clients.total)
+        logging.info("Path: %s", path)
+
         self.configure()
 
         async for message in websocket:
@@ -89,7 +93,7 @@ class Server():
                 if len(self.reports) == len(self.selected_clients):
                     accuracy = self.process_report()
 
-                    # Break loop when the target accuracy is achieved
+                    # Break the loop when the target accuracy is achieved
                     target_accuracy = self.config.training.target_accuracy
 
                     if target_accuracy and (accuracy >= target_accuracy):
@@ -106,6 +110,7 @@ class Server():
                 if self.current_round == 0 and len(self.clients) >= self.config.clients.total:
                     logging.info('Starting FL training...')
                     await self.select_clients()
+
 
     @abstractmethod
     def configure(self):
