@@ -8,6 +8,7 @@ import sys
 import logging
 import subprocess
 import pickle
+import websockets
 
 from config import Config
 
@@ -77,40 +78,44 @@ class Server():
 
         self.configure()
 
-        async for message in websocket:
-            data = json.loads(message)
-            client_id = data['id']
-            logging.info("client data received with ID: %s", client_id)
+        try:
+            async for message in websocket:
+                data = json.loads(message)
+                client_id = data['id']
+                logging.info("client data received with ID: %s", client_id)
 
-            if 'payload' in data:
-                # an existing client reports new updates from local training
-                client_update = await websocket.recv()
-                report = pickle.loads(client_update)
-                logging.info("Client update received. Accuracy = {:.2f}%\n"
-                    .format(100 * report.accuracy))
+                if 'payload' in data:
+                    # an existing client reports new updates from local training
+                    client_update = await websocket.recv()
+                    report = pickle.loads(client_update)
+                    logging.info("Client update received. Accuracy = {:.2f}%\n"
+                        .format(100 * report.accuracy))
 
-                self.reports.append(report)
+                    self.reports.append(report)
 
-                if len(self.reports) == len(self.selected_clients):
-                    accuracy = self.process_report()
+                    if len(self.reports) == len(self.selected_clients):
+                        accuracy = self.process_report()
 
-                    # Break the loop when the target accuracy is achieved
-                    target_accuracy = Config().training.target_accuracy
+                        # Break the loop when the target accuracy is achieved
+                        target_accuracy = Config().training.target_accuracy
 
-                    if target_accuracy and (accuracy >= target_accuracy):
-                        logging.info('Target accuracy reached.')
-                        await self.close_connections()
-                        sys.exit()
+                        if target_accuracy and (accuracy >= target_accuracy):
+                            logging.info('Target accuracy reached.')
+                            await self.close_connections()
+                            sys.exit()
 
-                    await self.select_clients()
+                        await self.select_clients()
 
-            else:
-                # a new client arrives
-                self.register_client(client_id, websocket)
+                else:
+                    # a new client arrives
+                    self.register_client(client_id, websocket)
 
-                if self.current_round == 0 and len(self.clients) >= Config().clients.total:
-                    logging.info('Starting FL training...')
-                    await self.select_clients()
+                    if self.current_round == 0 and len(self.clients) >= Config().clients.total:
+                        logging.info('Starting FL training...')
+                        await self.select_clients()
+        except websockets.ConnectionClosed as exception:
+            logging.info("Server WebSockets connection closed abnormally.")
+            logging.info(exception)
 
 
     @abstractmethod

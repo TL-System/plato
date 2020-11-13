@@ -131,6 +131,7 @@ class Model(base.Model):
         else:
             raise ValueError('Invalid model name: {}'.format(model_name))
 
+
     @property
     def loss_criterion(self):
         return self.criterion

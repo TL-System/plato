@@ -29,8 +29,8 @@ class Report:
 class SimpleClient:
     """A basic federated learning client who sends simple weight updates."""
 
-    def __init__(self, client_id):
-        self.client_id = client_id
+    def __init__(self):
+        self.client_id = Config().args.id
         self.data = None # The dataset to be used for local training
         self.trainset = None # Training dataset
         self.testset = None # Testing dataset
@@ -64,11 +64,14 @@ class SimpleClient:
                         server_model = await websocket.recv()
                         self.model.load_state_dict(pickle.loads(server_model))
 
+                        logging.info("Data loading started...")
                         if not self.data_loaded:
                             self.load_data()
+                        logging.info("Data loading ended...")
 
+                        logging.info("Training started...")
                         report = self.train()
-
+     
                         logging.info("Model trained on client with client ID %s.", self.client_id)
                         # Sending client ID as metadata to the server (payload to follow)
                         client_update = {'id': self.client_id, 'payload': True}
@@ -76,9 +79,10 @@ class SimpleClient:
 
                         # Sending the client training report to the server as payload
                         await websocket.send(pickle.dumps(report))
-        except OSError:
+        except OSError as exception:
             logging.info("Client #%s: connection to the server failed.",
                 self.client_id)
+            logging.error(exception)
 
 
     def configure(self):

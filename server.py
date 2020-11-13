@@ -3,9 +3,8 @@ Starting point for a Plato federated learning server.
 """
 
 import asyncio
-import logging
-import argparse
 import websockets
+import logging
 
 from config import Config
 import servers
@@ -21,8 +20,8 @@ def main():
     server.start_clients()
 
     start_server = websockets.serve(server.serve,
-                     Config().server.address, Config().server.port,
-                     max_size=2 ** 30)
+                    Config().server.address, Config().server.port,
+                    max_size=2 ** 30)
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(start_server)
