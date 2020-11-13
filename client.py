@@ -4,7 +4,6 @@ Starting point for a Plato federated learning client.
 
 import asyncio
 import logging
-import argparse
 import websockets
 
 from config import Config
@@ -14,7 +13,7 @@ from clients import SimpleClient
 def main():
     """Starting a client to connect to the server via WebSockets."""
     __ = Config()
-    client = SimpleClient(Config().args.id)
+    client = SimpleClient()
     client.configure()
 
     loop = asyncio.get_event_loop()

@@ -144,7 +144,7 @@ class FedAvgServer(Server):
             logging.info('Average client accuracy: {:.2f}%\n'.format(100 * accuracy))
         else:
             # Test the updated model directly at the server
-            accuracy = trainer.test(self.model, self.testset)
+            accuracy = trainer.test(self.model, self.testset, Config().training.batch_size)
             logging.info('Global model accuracy: {:.2f}%\n'.format(100 * accuracy))
 
         return accuracy
