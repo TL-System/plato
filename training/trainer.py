@@ -7,10 +7,6 @@ import torch
 from training import optimizers
 from config import Config
 
-# CUDA settings
-use_cuda = torch.cuda.is_available()
-device = torch.device('cuda' if use_cuda else 'cpu')
-
 
 def extract_weights(model):
     """Extract weights from a model passed in as a parameter."""
@@ -38,6 +34,8 @@ def train(model, trainset):
       model: The model to train. Must be a models.base.Model subclass.
       trainset: The training dataset.
     """
+    device = Config().device()
+
     model.to(device)
     model.train()
 
@@ -62,6 +60,8 @@ def train(model, trainset):
 
 def test(model, testset, batch_size):
     """Testing the model using the provided test dataset."""
+    device = Config().device()
+
     model.to(device)
     model.eval()
     test_loader = torch.utils.data.DataLoader(testset, batch_size=batch_size, shuffle=True)
