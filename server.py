@@ -21,7 +21,7 @@ def main():
 
     start_server = websockets.serve(server.serve,
                     Config().server.address, Config().server.port,
-                    max_size=2 ** 30)
+                    ping_interval=None, max_size=2 ** 30)
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(start_server)

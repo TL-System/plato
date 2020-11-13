@@ -115,7 +115,7 @@ class Server():
                         await self.select_clients()
         except websockets.ConnectionClosed as exception:
             logging.info("Server WebSockets connection closed abnormally.")
-            logging.info(exception)
+            logging.error(exception)
 
 
     @abstractmethod

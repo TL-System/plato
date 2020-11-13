@@ -49,7 +49,7 @@ class SimpleClient:
         """Startup function for a client."""
         uri = 'ws://{}:{}'.format(Config().server.address, Config().server.port)
         try:
-            async with websockets.connect(uri, max_size=2 ** 30) as websocket:
+            async with websockets.connect(uri, ping_interval=None, max_size=2 ** 30) as websocket:
                 logging.info("Signing in at the server with client ID %s...", self.client_id)
                 await websocket.send(json.dumps({'id': self.client_id}))
 
@@ -64,12 +64,9 @@ class SimpleClient:
                         server_model = await websocket.recv()
                         self.model.load_state_dict(pickle.loads(server_model))
 
-                        logging.info("Data loading started...")
                         if not self.data_loaded:
                             self.load_data()
-                        logging.info("Data loading ended...")
 
-                        logging.info("Training started...")
                         report = self.train()
      
                         logging.info("Model trained on client with client ID %s.", self.client_id)
@@ -79,9 +76,9 @@ class SimpleClient:
 
                         # Sending the client training report to the server as payload
                         await websocket.send(pickle.dumps(report))
+
         except OSError as exception:
-            logging.info("Client #%s: connection to the server failed.",
-                self.client_id)
+            logging.info("Client #%s: connection to the server failed.", self.client_id)
             logging.error(exception)
 
 
