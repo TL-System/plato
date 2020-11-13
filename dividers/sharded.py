@@ -1,25 +1,31 @@
+"""
+Divide data into partitions with sharding, where data is to be horizontally partitioned.
+"""
+
 import random
 import logging
 
 from dividers import base
+from config import Config
 
 class ShardedDivider(base.Divider):
     """
-    Load data partitions with sharding, which means data is to be horizontally partitioned (in
-    database terminologies).
+    Divide data into partitions with sharding, where data is to be horizontally partitioned.
     """
-    def __init__(self, config, dataset):
-        super().__init__(config, dataset)
+    def __init__(self, dataset):
+        super().__init__(dataset)
         self.shards = None
         random.seed()
+        self.__create_shards()
 
-    def create_shards(self):
+
+    def __create_shards(self):
         """Create all the shards (partitions) from the data."""
         # Extract the number of shards per client from the configuration
-        per_client = self.config.data.shard_per_client
+        per_client = Config().data.shard_per_client
 
         # Determine the correct total number of shards and the size of each shard
-        total = self.config.clients.total * per_client
+        total = Config().clients.total * per_client
         shard_size = int(self.trainset_size / total)
 
         data = []
@@ -47,7 +53,7 @@ class ShardedDivider(base.Divider):
     def get_partition(self):
         """Get a partition for a client."""
         # Extract the number of shards per client
-        per_client = self.config.data.shard_per_client
+        per_client = Config().data.shard_per_client
 
         # Create data partition
         partition = []

@@ -4,19 +4,20 @@ Optimizers for training workloads.
 from torch import optim
 
 from models.base import Model
+from config import Config
 
-def get_optimizer(config, model: Model) -> optim.Optimizer:
+def get_optimizer(model: Model) -> optim.Optimizer:
     """Obtain the optimizer used for training the model."""
-    if config.training.optimizer == 'SGD':
+    if Config().training.optimizer == 'SGD':
         return optim.SGD(
             model.parameters(),
-            lr=config.training.learning_rate,
-            momentum=config.training.momentum
+            lr=Config().training.learning_rate,
+            momentum=Config().training.momentum
         )
-    elif config.training.optimizer == 'Adam':
+    elif Config().training.optimizer == 'Adam':
         return optim.Adam(
             model.parameters(),
-            lr=config.training.learning_rate
+            lr=Config().training.learning_rate
         )
 
-    raise ValueError('No such optimizer: {}'.format(config.training.optimizer))
+    raise ValueError('No such optimizer: {}'.format(Config().training.optimizer))

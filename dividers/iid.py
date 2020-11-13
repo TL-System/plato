@@ -7,8 +7,8 @@ from utils import dists
 class IIDDivider(base.Divider):
     """Load IID data partitions."""
 
-    def __init__(self, config, dataset):
-        super().__init__(config, dataset)
+    def __init__(self, dataset):
+        super().__init__(dataset)
         random.seed()
 
 

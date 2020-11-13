@@ -5,6 +5,7 @@ The training and testing loop.
 import logging
 import torch
 from training import optimizers
+from config import Config
 
 # CUDA settings
 use_cuda = torch.cuda.is_available()
@@ -30,22 +31,21 @@ def load_weights(model, weights):
     model.load_state_dict(updated_state_dict, strict=False)
 
 
-def train(model, trainset, config):
+def train(model, trainset):
     """The main training loop for each client in a federated learning workload.
 
     Arguments:
       model: The model to train. Must be a models.base.Model subclass.
       trainset: The training dataset.
-      config: Training hyperparameters.
     """
     model.to(device)
     model.train()
 
     log_interval = 10
-    batch_size = config.training.batch_size
+    batch_size = Config().training.batch_size
     train_loader = torch.utils.data.DataLoader(trainset, batch_size=batch_size, shuffle=True)
-    epochs = config.training.epochs
-    optimizer = optimizers.get_optimizer(config, model)
+    epochs = Config().training.epochs
+    optimizer = optimizers.get_optimizer(model)
 
     for epoch in range(1, epochs + 1):
         for batch_id, (examples, labels) in enumerate(train_loader):

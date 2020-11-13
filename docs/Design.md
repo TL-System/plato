@@ -7,7 +7,7 @@ This framework makes extensive use of object oriented subclassing with the help 
 
 ### Hyperparameters
 
-For simplicity, all hyperpameters in the framework are read from a configuration file at the beginning, and stored in a simple `config` object of the `Config` class (found in `config.py`). This includes hyperparameters specific to the dataset, data distribution, and the training process. The command-line arguments are only used to specify the location of the configuration file and the logging level.
+For simplicity, all hyperpameters in the framework are read from a configuration file at the beginning, and stored in a global Singleton `Config` class (found in `config.py`). This includes hyperparameters specific to the dataset, data distribution, server configuration, and the training process. The command-line arguments are only used to specify the location of the configuration file, the logging level, and the client ID (on the client side).
 
 ### Modules for Datasets, Models, Training
 
