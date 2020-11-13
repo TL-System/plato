@@ -7,6 +7,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from models import base
+from config import Config
 
 
 class BasicBlock(nn.Module):
@@ -102,12 +103,12 @@ class Model(base.Model):
 
 
     @staticmethod
-    def get_model_from_name(model_name, config):
+    def get_model_from_name(model_name):
         if not Model.is_valid_model_name(model_name):
             raise ValueError('Invalid model name: {}'.format(model_name))
 
         # 40 layers
-        return Model(config.training.num_layers, config.training.num_classes)
+        return Model(Config().training.num_layers, Config().training.num_classes)
 
 
     @property

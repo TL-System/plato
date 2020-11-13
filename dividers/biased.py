@@ -2,19 +2,20 @@ import random
 
 from dividers import base
 from utils import dists
+from config import Config
 
 class BiasedDivider(base.Divider):
     """Load and pass 'preference bias' data partitions."""
-    def __init__(self, config, dataset):
-        super().__init__(config, dataset)
+    def __init__(self, dataset):
+        super().__init__(dataset)
         self.shards = None
 
 
     def get_partition(self, partition_size, pref):
         """Get a non-uniform partition with a preference bias."""
         # Extract bias configuration from config
-        bias = self.config.data.bias_primary_percentage
-        secondary = self.config.data.bias_secondary_focus
+        bias = Config().data.bias_primary_percentage
+        secondary = Config().data.bias_secondary_focus
 
         # Calculate sizes of majorty and minority portions
         majority = int(partition_size * bias)

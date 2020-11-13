@@ -10,14 +10,17 @@ import models.registry as models_registry
 from datasets import registry as datasets_registry
 from training import trainer
 from servers import Server
+from config import Config
 
 
 class FedAvgServer(Server):
     """Federated learning server using federated averaging."""
 
-    def __init__(self, config):
-        super().__init__(config)
+    def __init__(self):
+        super().__init__()
         self.testset = None
+        self.model = None
+        self.selected_clients = None
         random.seed()
 
 
@@ -26,12 +29,11 @@ class FedAvgServer(Server):
         Booting the federated learning server by setting up the data, model, and
         creating the clients.
         """
-        config = self.config
 
-        logging.info('Configuring the %s server...', config.training.server)
+        logging.info('Configuring the %s server...', Config().training.server)
 
-        total_rounds = self.config.training.rounds
-        target_accuracy = self.config.training.target_accuracy
+        total_rounds = Config().training.rounds
+        target_accuracy = Config().training.target_accuracy
 
         if target_accuracy:
             logging.info('Training: %s rounds or %s%% accuracy\n',
@@ -39,7 +41,7 @@ class FedAvgServer(Server):
         else:
             logging.info('Training: %s rounds\n', total_rounds)
 
-        logging.info("Starting training on %s clients...", self.config.clients.per_round)
+        logging.info("Starting training on %s clients...", Config().clients.per_round)
 
         self.load_test_data()
         self.load_model()
@@ -47,26 +49,23 @@ class FedAvgServer(Server):
 
     def load_test_data(self):
         """Loading the test dataset."""
-        if not self.config.clients.do_test:
-            data_path = self.config.training.data_path
-            logging.info('Dataset: %s', self.config.training.dataset)
-            logging.info('Dataset path: %s', data_path)
-            dataset = datasets_registry.get(self.config.training.dataset, data_path)
+        if not Config().clients.do_test:
+            dataset = datasets_registry.get()
             self.testset = dataset.get_test_set()
 
 
     def load_model(self):
         """Setting up the global model to be trained via federated learning."""
 
-        model_type = self.config.training.model
+        model_type = Config().training.model
         logging.info('Model: %s', model_type)
 
-        self.model = models_registry.get(model_type, self.config)
+        self.model = models_registry.get(model_type)
 
 
     def choose_clients(self):
         """Choose a subset of the clients to participate in each round."""
-        clients_per_round = self.config.clients.per_round
+        clients_per_round = Config().clients.per_round
 
         # Select clients randomly
         assert clients_per_round <= len(self.clients)
@@ -134,17 +133,18 @@ class FedAvgServer(Server):
 
 
     def process_report(self):
+        """Process the client reports by aggregating their weights."""
         updated_weights = self.aggregate_weights(self.reports)
         trainer.load_weights(self.model, updated_weights)
 
         # Testing the global model accuracy
-        if self.config.clients.do_test:
+        if Config().clients.do_test:
             # Compute the average accuracy from client reports
             accuracy = self.accuracy_averaging(self.reports)
             logging.info('Average client accuracy: {:.2f}%\n'.format(100 * accuracy))
         else:
             # Test the updated model directly at the server
-            accuracy = trainer.test(self.model, self.testset, self.config)
+            accuracy = trainer.test(self.model, self.testset)
             logging.info('Global model accuracy: {:.2f}%\n'.format(100 * accuracy))
 
         return accuracy

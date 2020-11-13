@@ -6,9 +6,8 @@ import logging
 class Divider:
     """Base class for dividing data into partitions across the clients."""
 
-    def __init__(self, config, dataset):
+    def __init__(self, dataset):
         """Get data from the dataset."""
-        self.config = config
         self.trainset = dataset.get_train_set()
         self.testset = dataset.get_test_set()
         self.labels = list(self.trainset.classes)

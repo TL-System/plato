@@ -7,41 +7,14 @@ import logging
 import argparse
 import websockets
 
-import config
+from config import Config
 from clients import SimpleClient
 
 
 def main():
     """Starting a client to connect to the server via WebSockets."""
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-i', '--id', type=str,
-                        help='Unique client ID.')
-    parser.add_argument('-c', '--config', type=str, default='./config.conf',
-                        help='Federated learning configuration file.')
-    parser.add_argument('-l', '--log', type=str, default='info',
-                        help='Log messages level.')
-
-    args = parser.parse_args()
-
-    try:
-        log_level = {
-            'critical': logging.CRITICAL,
-            'error': logging.ERROR,
-            'warn': logging.WARN,
-            'info': logging.INFO,
-            'debug': logging.DEBUG
-        }[args.log]
-    except KeyError:
-        log_level = logging.INFO
-
-    logging.basicConfig(
-        format='[%(levelname)s][%(asctime)s]: %(message)s',
-        level=log_level, datefmt='%H:%M:%S')
-
-    fl_config = config.Config(args.config)
-
-    client = SimpleClient(fl_config, args.id)
+    __ = Config()
+    client = SimpleClient(Config().args.id)
     client.configure()
 
     loop = asyncio.get_event_loop()

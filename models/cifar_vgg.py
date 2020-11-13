@@ -2,7 +2,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from models import base
-
+from config import Config
 
 class Model(base.Model):
     """A VGG-style neural network designed for CIFAR-10."""
@@ -53,11 +53,11 @@ class Model(base.Model):
 
 
     @staticmethod
-    def get_model_from_name(model_name, config):
+    def get_model_from_name(model_name):
         if not Model.is_valid_model_name(model_name):
             raise ValueError('Invalid model name: {}'.format(model_name))
 
-        outputs = config.training.num_classes or 10
+        outputs = Config().training.num_classes or 10
 
         num = int(model_name.split('_')[2])
         if num == 11:

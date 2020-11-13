@@ -2,7 +2,6 @@
 The convolutional neural network model for the MNIST dataset.
 """
 
-import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -41,7 +40,7 @@ class Model(base.Model):
 
 
     @staticmethod
-    def get_model_from_name(model_name, config):
+    def get_model_from_name(model_name):
         """Obtaining an instance of this model provided that the name is valid."""
 
         if not Model.is_valid_model_name(model_name):

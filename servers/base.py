@@ -9,12 +9,13 @@ import logging
 import subprocess
 import pickle
 
+from config import Config
+
 
 class Server():
     """The base class for federated learning servers."""
 
-    def __init__(self, config):
-        self.config = config
+    def __init__(self):
         self.clients = {}
         self.selected_clients = None
         self.current_round = 0
@@ -37,7 +38,7 @@ class Server():
 
     def start_clients(self):
         """Starting all the clients as separate processes."""
-        for client_id in range(1, self.config.clients.total + 1):
+        for client_id in range(1, Config().clients.total + 1):
             logging.info("Starting client #%s...", client_id)
             command = "python client.py -i {}".format(client_id)
             subprocess.Popen(command, shell=True)
@@ -53,7 +54,7 @@ class Server():
         """Select a subset of the clients and send messages to them to start training."""
         self.reports = []
         self.current_round += 1
-        logging.info('**** Round %s/%s ****', self.current_round, self.config.training.rounds)
+        logging.info('**** Round %s/%s ****', self.current_round, Config().training.rounds)
 
         self.choose_clients()
 
@@ -71,7 +72,7 @@ class Server():
     async def serve(self, websocket, path):
         """Running a federated learning server."""
 
-        logging.info("Waiting for %s clients to arrive...", self.config.clients.total)
+        logging.info("Waiting for %s clients to arrive...", Config().clients.total)
         logging.info("Path: %s", path)
 
         self.configure()
@@ -94,7 +95,7 @@ class Server():
                     accuracy = self.process_report()
 
                     # Break the loop when the target accuracy is achieved
-                    target_accuracy = self.config.training.target_accuracy
+                    target_accuracy = Config().training.target_accuracy
 
                     if target_accuracy and (accuracy >= target_accuracy):
                         logging.info('Target accuracy reached.')
@@ -107,7 +108,7 @@ class Server():
                 # a new client arrives
                 self.register_client(client_id, websocket)
 
-                if self.current_round == 0 and len(self.clients) >= self.config.clients.total:
+                if self.current_round == 0 and len(self.clients) >= Config().clients.total:
                     logging.info('Starting FL training...')
                     await self.select_clients()
 
