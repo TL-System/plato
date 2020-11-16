@@ -4,7 +4,6 @@ Starting point for a Plato federated learning server.
 
 import asyncio
 import websockets
-import logging
 
 from config import Config
 import servers
@@ -14,8 +13,12 @@ def main():
     __ = Config()
 
     server = {
-        "fedavg": servers.fedavg.FedAvgServer
+        "fedavg": servers.fedavg.FedAvgServer,
+        "fedcs": servers.fedcs.CrossSiloServer
     }[Config().training.server]()
+
+    if Config().training.hierarchy:
+        server.start_edge_servers()
 
     server.start_clients()
 

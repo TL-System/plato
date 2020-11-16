@@ -24,6 +24,8 @@ class Config:
             parser = argparse.ArgumentParser()
             parser.add_argument('-i', '--id', type=str,
                                 help='Unique client ID.')
+            parser.add_argument('-e', '--edgeid', type=str,
+                                help='Unique edge server ID.')
             parser.add_argument('-c', '--config', type=str, default='./config.conf',
                                 help='Federated learning configuration file.')
             parser.add_argument('-l', '--log', type=str, default='info',
@@ -76,11 +78,11 @@ class Config:
         params = []
 
         for i, field in enumerate(fields):
-            if type(defaults[i]) is int:
+            if isinstance(defaults[i], int):
                 params.append(Config.config[section].getint(field, defaults[i]))
-            elif type(defaults[i]) is float:
+            elif isinstance(defaults[i], float):
                 params.append(Config.config[section].getfloat(field, defaults[i]))
-            elif type(defaults[i]) is bool:
+            elif isinstance(defaults[i], bool):
                 params.append(Config.config[section].getboolean(field, defaults[i]))
             else: # assuming that the parameter is a string
                 params.append(Config.config[section].get(field, defaults[i]))
@@ -110,9 +112,9 @@ class Config:
         # Training parameters for federated learning
         fields = ['rounds', 'target_accuracy', 'task', 'epochs', 'batch_size', 'dataset',
                   'data_path', 'num_layers', 'num_classes', 'model',
-                  'optimizer', 'learning_rate', 'momentum', 'server']
+                  'optimizer', 'learning_rate', 'momentum', 'server', 'hierarchy']
         defaults = (0, 0.9, 'train', 0, 0, 'MNIST', './data', 40, 10, 'mnist_cnn',
-                    'SGD', 0.01, 0.5, 'fedavg')
+                    'SGD', 0.01, 0.5, 'fedavg', False)
         params = Config.extract_section('training', fields, defaults)
 
         Config.training = namedtuple('training', fields)(*params)
@@ -123,3 +125,12 @@ class Config:
         params = Config.extract_section('server', fields, defaults)
 
         Config.server = namedtuple('server', fields)(*params)
+
+        # If the topology is hierarchy
+        if Config.training.hierarchy:
+            # Parameters for the federated learning edge servers
+            fields = ['total', 'aggregations', 'do_test']
+            defaults = (0, 0, False)
+            params = Config.extract_section('edges', fields, defaults)
+
+            Config.edges = namedtuple('edges', fields)(*params)
