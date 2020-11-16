@@ -104,6 +104,11 @@ class Server():
                             await self.close_connections()
                             sys.exit()
 
+                        if self.current_round == Config().training.rounds:
+                            logging.info('Target number of training rounds reached.')
+                            await self.close_connections()
+                            sys.exit()
+
                         await self.select_clients()
 
                 else:

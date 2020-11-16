@@ -48,6 +48,12 @@ class SimpleClient:
     async def start_client(self):
         """Startup function for a client."""
         uri = 'ws://{}:{}'.format(Config().server.address, Config().server.port)
+
+        if Config().training.hierarchy:
+            # Use the uri of the client's edge server
+            # Haven't thought through how to implement this
+            uri = 'ws://{}:{}'.format(Config().server.address, Config().server.port)
+
         try:
             async with websockets.connect(uri, ping_interval=None, max_size=2 ** 30) as websocket:
                 logging.info("Signing in at the server with client ID %s...", self.client_id)
@@ -68,7 +74,7 @@ class SimpleClient:
                             self.load_data()
 
                         report = self.train()
-     
+
                         logging.info("Model trained on client with client ID %s.", self.client_id)
                         # Sending client ID as metadata to the server (payload to follow)
                         client_update = {'id': self.client_id, 'payload': True}
