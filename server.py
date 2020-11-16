@@ -17,7 +17,7 @@ def main():
         "fedcs": servers.fedcs.CrossSiloServer
     }[Config().training.server]()
 
-    if Config().training.hierarchy:
+    if Config().edges is not None:
         server.start_edge_servers()
 
     server.start_clients()
