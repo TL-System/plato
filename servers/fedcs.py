@@ -103,7 +103,7 @@ class CrossSiloServer(FedAvgServer):
         creating the edge servers and clients.
         """
 
-        logging.info('Configuring the %s server...', Config().training.server)
+        logging.info('Configuring the %s server...', Config().server.type)
 
         total_rounds = Config().training.rounds
         target_accuracy = Config().training.target_accuracy
