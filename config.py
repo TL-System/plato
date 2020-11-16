@@ -78,12 +78,12 @@ class Config:
         params = []
 
         for i, field in enumerate(fields):
-            if isinstance(defaults[i], int):
+            if isinstance(defaults[i], bool):
+                params.append(Config.config[section].getboolean(field, defaults[i]))
+            elif isinstance(defaults[i], int):
                 params.append(Config.config[section].getint(field, defaults[i]))
             elif isinstance(defaults[i], float):
                 params.append(Config.config[section].getfloat(field, defaults[i]))
-            elif isinstance(defaults[i], bool):
-                params.append(Config.config[section].getboolean(field, defaults[i]))
             else: # assuming that the parameter is a string
                 params.append(Config.config[section].get(field, defaults[i]))
 
@@ -123,10 +123,9 @@ class Config:
         fields = ['address', 'port']
         defaults = ('localhost', 8000)
         params = Config.extract_section('server', fields, defaults)
-
         Config.server = namedtuple('server', fields)(*params)
 
-        # If the topology is hierarchy
+        # If the topology is hierarchical (cross-silo FL training)
         if Config.training.hierarchy:
             # Parameters for the federated learning edge servers
             fields = ['total', 'aggregations', 'do_test']
