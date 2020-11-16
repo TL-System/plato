@@ -73,9 +73,12 @@ class Config:
 
 
     @staticmethod
-    def extract_section(section, fields, defaults):
+    def extract_section(section, fields, defaults, optional=False):
         """Extract the parameters from one section in a configuration file."""
         params = []
+
+        if optional and section not in Config.config:
+            return None
 
         for i, field in enumerate(fields):
             if isinstance(defaults[i], bool):
@@ -112,9 +115,9 @@ class Config:
         # Training parameters for federated learning
         fields = ['rounds', 'target_accuracy', 'task', 'epochs', 'batch_size', 'dataset',
                   'data_path', 'num_layers', 'num_classes', 'model',
-                  'optimizer', 'learning_rate', 'momentum', 'server', 'hierarchy']
+                  'optimizer', 'learning_rate', 'momentum', 'server']
         defaults = (0, 0.9, 'train', 0, 0, 'MNIST', './data', 40, 10, 'mnist_cnn',
-                    'SGD', 0.01, 0.5, 'fedavg', False)
+                    'SGD', 0.01, 0.5, 'fedavg')
         params = Config.extract_section('training', fields, defaults)
 
         Config.training = namedtuple('training', fields)(*params)
@@ -126,10 +129,10 @@ class Config:
         Config.server = namedtuple('server', fields)(*params)
 
         # If the topology is hierarchical (cross-silo FL training)
-        if Config.training.hierarchy:
-            # Parameters for the federated learning edge servers
-            fields = ['total', 'aggregations', 'do_test']
-            defaults = (0, 0, False)
-            params = Config.extract_section('edges', fields, defaults)
-
+        fields = ['total', 'aggregations', 'do_test']
+        defaults = (0, 0, False)
+        params = Config.extract_section('edges', fields, defaults, optional=True)
+        if params is not None:
             Config.edges = namedtuple('edges', fields)(*params)
+        else:
+            Config.edges = None

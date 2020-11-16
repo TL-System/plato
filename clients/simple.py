@@ -49,7 +49,7 @@ class SimpleClient:
         """Startup function for a client."""
         uri = 'ws://{}:{}'.format(Config().server.address, Config().server.port)
 
-        if Config().training.hierarchy:
+        if Config().edges is not None:
             # Use the uri of the client's edge server
             # Haven't thought through how to implement this
             uri = 'ws://{}:{}'.format(Config().server.address, Config().server.port)
