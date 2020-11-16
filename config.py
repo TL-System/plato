@@ -115,16 +115,16 @@ class Config:
         # Training parameters for federated learning
         fields = ['rounds', 'target_accuracy', 'task', 'epochs', 'batch_size', 'dataset',
                   'data_path', 'num_layers', 'num_classes', 'model',
-                  'optimizer', 'learning_rate', 'momentum', 'server']
+                  'optimizer', 'learning_rate', 'momentum']
         defaults = (0, 0.9, 'train', 0, 0, 'MNIST', './data', 40, 10, 'mnist_cnn',
-                    'SGD', 0.01, 0.5, 'fedavg')
+                    'SGD', 0.01, 0.5)
         params = Config.extract_section('training', fields, defaults)
 
         Config.training = namedtuple('training', fields)(*params)
 
         # Parameters for the federated learning server
-        fields = ['address', 'port']
-        defaults = ('localhost', 8000)
+        fields = ['type', 'address', 'port']
+        defaults = ('fedavg', 'localhost', 8000)
         params = Config.extract_section('server', fields, defaults)
         Config.server = namedtuple('server', fields)(*params)
 

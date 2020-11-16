@@ -15,7 +15,7 @@ def main():
     server = {
         "fedavg": servers.fedavg.FedAvgServer,
         "fedcs": servers.fedcs.CrossSiloServer
-    }[Config().training.server]()
+    }[Config().server.type]()
 
     if Config().edges is not None:
         server.start_edge_servers()
