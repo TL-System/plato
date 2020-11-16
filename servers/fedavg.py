@@ -30,7 +30,7 @@ class FedAvgServer(Server):
         creating the clients.
         """
 
-        logging.info('Configuring the %s server...', Config().training.server)
+        logging.info('Configuring the %s server...', Config().server.type)
 
         total_rounds = Config().training.rounds
         target_accuracy = Config().training.target_accuracy
