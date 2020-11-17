@@ -48,16 +48,16 @@ class Client:
 
         try:
             async with websockets.connect(uri, ping_interval=None, max_size=2 ** 30) as websocket:
-                logging.info("Signing in at the server with client ID %s...", self.client_id)
+                logging.info("Signing in at the server from client #%s...", self.client_id)
                 await websocket.send(json.dumps({'id': self.client_id}))
 
                 while True:
-                    logging.info("Client %s is waiting to be selected...", self.client_id)
+                    logging.info("Client #%s is waiting to be selected...", self.client_id)
                     server_response = await websocket.recv()
                     data = json.loads(server_response)
 
                     if data['id'] == self.client_id and 'payload' in data:
-                        logging.info("Client %s has been selected and receiving the model...",
+                        logging.info("Client #%s has been selected and receiving the model...",
                                     self.client_id)
                         server_model = await websocket.recv()
 
@@ -68,7 +68,7 @@ class Client:
 
                         report = await self.train()
 
-                        logging.info("Model trained on client with client ID %s.", self.client_id)
+                        logging.info("Model trained on client #%s.", self.client_id)
                         # Sending client ID as metadata to the server (payload to follow)
                         client_update = {'id': self.client_id, 'payload': True}
                         await websocket.send(json.dumps(client_update))

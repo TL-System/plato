@@ -5,6 +5,7 @@ The base class for federated learning servers.
 from abc import abstractmethod
 import json
 import sys
+import os
 import logging
 import subprocess
 import pickle
@@ -91,14 +92,14 @@ class Server:
             async for message in websocket:
                 data = json.loads(message)
                 client_id = data['id']
-                logging.info("client data received with ID: %s", client_id)
+                logging.info("Server %s: Data received from client #%s",  os.getpid(), client_id)
 
                 if 'payload' in data:
                     # an existing client reports new updates from local training
                     client_update = await websocket.recv()
                     report = pickle.loads(client_update)
-                    logging.info("Client update received. Accuracy = {:.2f}%\n"
-                        .format(100 * report.accuracy))
+                    logging.info("Server {}: Update from client #{} received. Accuracy = {:.2f}%\n"
+                        .format(os.getpid(), client_id, 100 * report.accuracy))
 
                     self.reports.append(report)
 
@@ -108,15 +109,16 @@ class Server:
                         # Break the loop when the target accuracy is achieved
                         target_accuracy = Config().training.target_accuracy
 
-                        if target_accuracy and self.accuracy >= target_accuracy:
-                            logging.info('Target accuracy reached.')
-                            await self.close_connections()
-                            sys.exit()
+                        if not Config().args.port:
+                            if target_accuracy and self.accuracy >= target_accuracy:
+                                logging.info('Target accuracy reached.')
+                                await self.close_connections()
+                                sys.exit()
 
-                        if self.current_round >= Config().training.rounds:
-                            logging.info('Target number of training rounds reached.')
-                            await self.close_connections()
-                            sys.exit()
+                            if self.current_round >= Config().training.rounds:
+                                logging.info('Target number of training rounds reached.')
+                                await self.close_connections()
+                                sys.exit()
 
                         await self.select_clients()
 
@@ -125,10 +127,10 @@ class Server:
                     self.register_client(client_id, websocket)
 
                     if self.current_round == 0 and len(self.clients) >= self.total_clients:
-                        logging.info('Starting FL training...')
+                        logging.info('Server %s: starting FL training...', os.getpid())
                         await self.select_clients()
         except websockets.ConnectionClosed as exception:
-            logging.info("Server WebSockets connection closed abnormally.")
+            logging.info("Server %s: WebSockets connection closed abnormally.", os.getpid())
             logging.error(exception)
             sys.exit()
 
