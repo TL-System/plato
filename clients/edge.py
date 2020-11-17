@@ -37,14 +37,11 @@ class EdgeClient(Client):
         """The aggregation workload on an edge client."""
         logging.info('Training on edge client #%s', self.client_id)
 
-        current_round = self.server.current_round
-
         # Wait for a certain number of aggregation rounds on the edge server
-        logging.info("Edge server %s: current round = %s", self.client_id, current_round)
-        while current_round == 0 or current_round % Config().cross_silo.rounds != 0:
+        logging.info("Edge server #%s: current round = %s",
+            self.client_id, self.server.current_round)
+        while self.server.current_round == 0 or self.server.current_round % Config().cross_silo.rounds != 0:
             await asyncio.sleep(1)
-
-        logging.info("Edge server %s: after while", self.client_id)
 
         # Extract model weights and biases
         weights = trainer.extract_weights(self.server.model)

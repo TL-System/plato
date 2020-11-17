@@ -33,7 +33,7 @@ class FedAvgServer(Server):
         else:
             # Compute the number of clients for the central server
             if Config().cross_silo:
-                self.clients_per_round = Config().cross_silo.total_silos
+                self.total_clients = self.clients_per_round = Config().cross_silo.total_silos
             else:
                 self.clients_per_round = Config().clients.per_round
 
