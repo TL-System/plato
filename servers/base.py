@@ -87,8 +87,6 @@ class Server:
     async def serve(self, websocket, path):
         """Running a federated learning server."""
 
-        logging.info("Waiting for %s clients to arrive...", self.total_clients)
-
         try:
             async for message in websocket:
                 data = json.loads(message)

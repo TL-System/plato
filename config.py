@@ -128,8 +128,8 @@ class Config:
         Config.server = namedtuple('server', fields)(*params)
 
         # If the topology is hierarchical (cross-silo FL training)
-        fields = ['total_silos', 'clients_per_round', 'rounds']
-        defaults = (1, 1, 1)
+        fields = ['total_silos', 'rounds']
+        defaults = (1, 1)
         params = Config.extract_section('cross_silo', fields, defaults, optional=True)
         if params is not None:
             Config.cross_silo = namedtuple('cross_silo', fields)(*params)

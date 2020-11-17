@@ -97,7 +97,7 @@ class SimpleClient(Client):
         self.model.load_state_dict(server_model)
 
 
-    def train(self):
+    async def train(self):
         """The machine learning training workload on a client."""
         logging.info('Training on client #%s', self.client_id)
 

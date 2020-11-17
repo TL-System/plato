@@ -38,10 +38,12 @@ class Client:
 
         if Config().cross_silo and not Config().args.port:
             # Contact one of the edge servers
+            logging.info("Client #%s is contacting one of the edge servers...", self.client_id)
             uri = 'ws://{}:{}'.format(Config().server.address,
                 Config().server.port + Config().clients.total_clients
                 + int(self.client_id) % Config().cross_silo.total_silos + 1)
         else:
+            logging.info("Client #%s is contacting the central server...", self.client_id)
             uri = 'ws://{}:{}'.format(Config().server.address, Config().server.port)
 
         try:
@@ -64,7 +66,7 @@ class Client:
                         if not self.data_loaded:
                             self.load_data()
 
-                        report = self.train()
+                        report = await self.train()
 
                         logging.info("Model trained on client with client ID %s.", self.client_id)
                         # Sending client ID as metadata to the server (payload to follow)
@@ -95,5 +97,5 @@ class Client:
 
 
     @abstractmethod
-    def train(self):
+    async def train(self):
         """The machine learning training workload on a client."""
