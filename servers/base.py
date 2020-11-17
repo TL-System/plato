@@ -18,6 +18,7 @@ class Server:
 
     def __init__(self):
         self.clients = {}
+        self.total_clients = 0
         self.selected_clients = None
         self.current_round = 0
         self.model = None
@@ -86,8 +87,7 @@ class Server:
     async def serve(self, websocket, path):
         """Running a federated learning server."""
 
-        logging.info("Waiting for %s clients to arrive...", Config().clients.total_clients)
-        logging.info("Path: %s", path)
+        logging.info("Waiting for %s clients to arrive...", self.total_clients)
 
         try:
             async for message in websocket:
@@ -110,7 +110,7 @@ class Server:
                         # Break the loop when the target accuracy is achieved
                         target_accuracy = Config().training.target_accuracy
 
-                        if target_accuracy and (self.accuracy >= target_accuracy):
+                        if target_accuracy and self.accuracy >= target_accuracy:
                             logging.info('Target accuracy reached.')
                             await self.close_connections()
                             sys.exit()
@@ -126,12 +126,13 @@ class Server:
                     # a new client arrives
                     self.register_client(client_id, websocket)
 
-                    if self.current_round == 0 and len(self.clients) >= Config().clients.total_clients:
+                    if self.current_round == 0 and len(self.clients) >= self.total_clients:
                         logging.info('Starting FL training...')
                         await self.select_clients()
         except websockets.ConnectionClosed as exception:
             logging.info("Server WebSockets connection closed abnormally.")
             logging.error(exception)
+            sys.exit()
 
 
     @abstractmethod

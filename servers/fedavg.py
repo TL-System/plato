@@ -21,8 +21,24 @@ class FedAvgServer(Server):
         self.testset = None
         self.model = None
         self.selected_clients = None
-        self.rounds = 0
         self.total_samples = 0
+
+        self.total_clients = Config().clients.total_clients
+
+        if Config().args.port:
+            # Compute the number of clients in each silo for edge servers
+            self.total_clients = int(self.total_clients / Config().cross_silo.total_silos)
+            self.clients_per_round = Config().cross_silo.clients_per_round
+        else:
+            # Compute the number of clients for the central server
+            if Config().cross_silo:
+                self.clients_per_round = Config().cross_silo.total_silos
+            else:
+                self.clients_per_round = Config().clients.per_round
+
+        logging.info("Started training on %s clients and %s per round...",
+            self.total_clients, self.clients_per_round)
+
         random.seed()
 
 
@@ -42,8 +58,6 @@ class FedAvgServer(Server):
                 total_rounds, 100 * target_accuracy)
         else:
             logging.info('Training: %s rounds\n', total_rounds)
-
-        logging.info("Starting training on %s clients...", Config().clients.per_round)
 
         self.load_test_data()
         self.load_model()
@@ -67,11 +81,11 @@ class FedAvgServer(Server):
 
     def choose_clients(self):
         """Choose a subset of the clients to participate in each round."""
-        clients_per_round = Config().clients.per_round
+        
 
         # Select clients randomly
-        assert clients_per_round <= len(self.clients)
-        self.selected_clients = random.sample(list(self.clients), clients_per_round)
+        assert self.clients_per_round <= len(self.clients)
+        self.selected_clients = random.sample(list(self.clients), self.clients_per_round)
 
 
     def aggregate_weights(self, reports):
@@ -148,8 +162,6 @@ class FedAvgServer(Server):
             # Test the updated model directly at the server
             accuracy = trainer.test(self.model, self.testset, Config().training.batch_size)
             logging.info('Global model accuracy: {:.2f}%\n'.format(100 * accuracy))
-
-        self.rounds += 1
 
         return accuracy
 
