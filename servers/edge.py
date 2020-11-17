@@ -37,7 +37,7 @@ class EdgeServer(FedAvgServer):
         self.testset = None # Testing dataset
         self.report = None # Report to the central server
         self.model = None # Machine learning model
-        self.aggregations = Config().edges.aggregations # Aggregation number on edge servers in one global training round
+        self.aggregations = Config().cross_silo.aggregations # Aggregation number on edge servers in one global training round
         self.current_agg_round = 0
 
         self.clients_id = CrossSiloServer().assign_clients_to_edge_servers()[self.edge_id]
@@ -77,7 +77,7 @@ class EdgeServer(FedAvgServer):
         self.client_reports = []
         self.current_agg_round += 1
         logging.info('**** Aggreagtion round %s/%s ****',
-                    self.current_agg_round, Config().edges.aggregations)
+                    self.current_agg_round, Config().cross_silo.aggregations)
 
         self.choose_clients()
 
@@ -182,7 +182,7 @@ class EdgeServer(FedAvgServer):
             # Compute the average accuracy from client reports
             accuracy = self.accuracy_averaging(self.client_reports)
             logging.info('Average client accuracy: {:.2f}%\n'.format(100 * accuracy))
-        elif Config().edges.do_test:
+        elif Config().cross_silo.do_test:
             # Test the updated model directly at the edge server
             accuracy = trainer.test(self.model, self.testset, Config().training.batch_size)
             logging.info('Aggregated model accuracy: {:.2f}%\n'.format(100 * accuracy))

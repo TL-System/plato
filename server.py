@@ -17,8 +17,8 @@ def main():
         "fedcs": servers.fedcs.CrossSiloServer
     }[Config().server.type]()
 
-    if Config().edges is not None:
-        server.start_edge_servers()
+    if Config().cross_silo:
+        server.start_clients(as_server=True)
 
     server.start_clients()
 

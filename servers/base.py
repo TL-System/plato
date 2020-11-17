@@ -37,11 +37,18 @@ class Server():
                 del self.clients[key]
 
 
-    def start_clients(self):
+    def start_clients(self, as_server=False):
         """Starting all the clients as separate processes."""
-        for client_id in range(1, Config().clients.total + 1):
+        if as_server:
+            total_processes = Config().cross_silo.total_silos
+            arg = '-e'
+        else:
+            total_processes = Config().clients.total_clients
+            arg = '-i'
+
+        for client_id in range(1, total_processes + 1):
             logging.info("Starting client #%s...", client_id)
-            command = "python client.py -i {}".format(client_id)
+            command = "python client.py {} {}".format(arg, client_id)
             subprocess.Popen(command, shell=True)
 
 
@@ -73,7 +80,7 @@ class Server():
     async def serve(self, websocket, path):
         """Running a federated learning server."""
 
-        logging.info("Waiting for %s clients to arrive...", Config().clients.total)
+        logging.info("Waiting for %s clients to arrive...", Config().clients.total_clients)
         logging.info("Path: %s", path)
 
         self.configure()
@@ -104,7 +111,7 @@ class Server():
                             await self.close_connections()
                             sys.exit()
 
-                        if self.current_round == Config().training.rounds:
+                        if self.current_round >= Config().training.rounds:
                             logging.info('Target number of training rounds reached.')
                             await self.close_connections()
                             sys.exit()
@@ -115,7 +122,7 @@ class Server():
                     # a new client arrives
                     self.register_client(client_id, websocket)
 
-                    if self.current_round == 0 and len(self.clients) >= Config().clients.total:
+                    if self.current_round == 0 and len(self.clients) >= Config().clients.total_clients:
                         logging.info('Starting FL training...')
                         await self.select_clients()
         except websockets.ConnectionClosed as exception:

@@ -20,33 +20,25 @@ class CrossSiloServer(FedAvgServer):
 
     def __init__(self):
         super().__init__()
-        self.edges = {}
+        self.silos = {}
 
 
     def register_edge_servers(self, edge_id, websocket):
         """Adding a newly arrived client to the list of edge_servers."""
-        if not edge_id in self.edges:
-            self.edges[edge_id] = websocket
+        if not edge_id in self.silos:
+            self.silos[edge_id] = websocket
 
 
     def unregister_edge_servers(self, websocket):
         """Removing an existing client from the list of edge_servers."""
-        for key, value in dict(self.edges).items():
+        for key, value in dict(self.silos).items():
             if value == websocket:
-                del self.edges[key]
-
-
-    def start_edge_servers(self):
-        """Starting all the edge servers as separate processes."""
-        for edge_id in range(1, Config().edges.total + 1):
-            logging.info("Starting edge server #%s...", edge_id)
-            command = "python edge_server.py -e {}".format(edge_id)
-            subprocess.Popen(command, shell=True)
+                del self.silos[key]
 
 
     async def close_connections(self):
         """Closing all WebSocket connections after training completes."""
-        for _, edge_socket in dict(self.edges).items():
+        for _, edge_socket in dict(self.silos).items():
             await edge_socket.close()
         for _, client_socket in dict(self.clients).items():
             await client_socket.close()
@@ -56,8 +48,8 @@ class CrossSiloServer(FedAvgServer):
         """Assign clients to edge servers."""
         clients_id_list = {}
 
-        edges_num = Config().edges.total
-        clients_num = Config().clients.total
+        edges_num = Config().cross_silo.total_silos
+        clients_num = Config().clients.total_clients
         per_clients_num = int(clients_num / edges_num)
         residual_clients_num = int(clients_num % edges_num)
 
@@ -79,7 +71,7 @@ class CrossSiloServer(FedAvgServer):
         """Determine the number of clients attending each round for each edge server."""
         clients_per_round_list = {}
 
-        edges_num = Config().edges.total
+        edges_num = Config().cross_silo.total_silos
         clients_per_round_num = Config().clients.per_round
         per_clients_num = int(clients_per_round_num / edges_num)
         residual_clients_num = int(clients_per_round_num % edges_num)
@@ -115,7 +107,7 @@ class CrossSiloServer(FedAvgServer):
             logging.info('Training: %s rounds\n', total_rounds)
 
         logging.info("Starting training on %s edge servers and %s clients in total...",
-            Config().edges.total, Config().clients.per_round)
+            Config().cross_silo.total_silos, Config().clients.per_round)
 
         self.load_test_data()
         self.load_model()
@@ -124,8 +116,8 @@ class CrossSiloServer(FedAvgServer):
     async def serve(self, websocket, path):
         """Running a cross-silo federated learning server."""
 
-        logging.info("Waiting for %s edge servers to arrive...", Config().edges.total)
-        logging.info("Waiting for %s clients to arrive...", Config().clients.total)
+        logging.info("Waiting for %s edge servers to arrive...", Config().cross_silo.total_silos)
+        logging.info("Waiting for %s clients to arrive...", Config().clients.total_clients)
         logging.info("Path: %s", path)
 
         self.configure()
@@ -145,7 +137,7 @@ class CrossSiloServer(FedAvgServer):
 
                     self.reports.append(report)
 
-                    if len(self.reports) == len(self.edges):
+                    if len(self.reports) == len(self.silos):
                         accuracy = self.process_report()
 
                         # Break the loop when the target accuracy is achieved
@@ -167,7 +159,7 @@ class CrossSiloServer(FedAvgServer):
                     # a new edge server arrives
                     self.register_edge_servers(edge_id, websocket)
 
-                    if self.current_round == 0 and len(self.edges) >= Config().edges.total:
+                    if self.current_round == 0 and len(self.silos) >= Config().cross_silo.total_silos:
                         logging.info('Starting cross-silo FL training...')
 
         except websockets.ConnectionClosed as exception:
