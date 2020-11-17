@@ -24,11 +24,12 @@ class FedAvgServer(Server):
         self.total_samples = 0
 
         self.total_clients = Config().clients.total_clients
+        self.clients_per_round = Config().clients.per_round
 
         if Config().args.port:
             # Compute the number of clients in each silo for edge servers
             self.total_clients = int(self.total_clients / Config().cross_silo.total_silos)
-            self.clients_per_round = Config().cross_silo.clients_per_round
+            self.clients_per_round = int(self.clients_per_round / Config().cross_silo.total_silos)
         else:
             # Compute the number of clients for the central server
             if Config().cross_silo:

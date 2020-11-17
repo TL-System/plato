@@ -33,7 +33,6 @@ def main():
         time.sleep(5)
 
     server.start_clients()
-
     loop.run_forever()
 
 
