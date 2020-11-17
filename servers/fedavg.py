@@ -21,6 +21,8 @@ class FedAvgServer(Server):
         self.testset = None
         self.model = None
         self.selected_clients = None
+        self.rounds = 0
+        self.total_samples = 0
         random.seed()
 
 
@@ -109,7 +111,7 @@ class FedAvgServer(Server):
         updates = self.extract_client_updates(reports)
 
         # Extract total number of samples
-        total_samples = sum([report.num_samples for report in reports])
+        self.total_samples = sum([report.num_samples for report in reports])
 
         # Perform weighted averaging
         avg_update = [torch.zeros(x.size())
@@ -118,8 +120,8 @@ class FedAvgServer(Server):
         for i, update in enumerate(updates):
             num_samples = reports[i].num_samples
             for j, (__, delta) in enumerate(update):
-                # Use weighted average by number of samples
-                avg_update[j] += delta * (num_samples / total_samples)
+                # Use weighted average by the number of samples
+                avg_update[j] += delta * (num_samples / self.total_samples)
 
         # Extract baseline model weights
         baseline_weights = trainer.extract_weights(self.model)
@@ -146,6 +148,8 @@ class FedAvgServer(Server):
             # Test the updated model directly at the server
             accuracy = trainer.test(self.model, self.testset, Config().training.batch_size)
             logging.info('Global model accuracy: {:.2f}%\n'.format(100 * accuracy))
+
+        self.rounds += 1
 
         return accuracy
 

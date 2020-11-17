@@ -24,8 +24,8 @@ class Config:
             parser = argparse.ArgumentParser()
             parser.add_argument('-i', '--id', type=str,
                                 help='Unique client ID.')
-            parser.add_argument('-e', '--edge', type=str,
-                                help='Unique edge server ID.')
+            parser.add_argument('-p', '--port', type=str,
+                                help='The port number for running a server.')
             parser.add_argument('-c', '--config', type=str, default='./config.conf',
                                 help='Federated learning configuration file.')
             parser.add_argument('-l', '--log', type=str, default='info',
@@ -129,8 +129,8 @@ class Config:
         Config.server = namedtuple('server', fields)(*params)
 
         # If the topology is hierarchical (cross-silo FL training)
-        fields = ['total_silos', 'aggregations', 'do_test']
-        defaults = (0, 0, False)
+        fields = ['total_silos', 'rounds']
+        defaults = (0, 0)
         params = Config.extract_section('cross_silo', fields, defaults, optional=True)
         if params is not None:
             Config.cross_silo = namedtuple('cross_silo', fields)(*params)

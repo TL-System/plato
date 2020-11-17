@@ -13,7 +13,7 @@ import websockets
 from config import Config
 
 
-class Server():
+class Server:
     """The base class for federated learning servers."""
 
     def __init__(self):
@@ -21,6 +21,7 @@ class Server():
         self.selected_clients = None
         self.current_round = 0
         self.model = None
+        self.accuracy = 0
         self.reports = []
 
 
@@ -39,16 +40,21 @@ class Server():
 
     def start_clients(self, as_server=False):
         """Starting all the clients as separate processes."""
+        starting_id = 1
+
         if as_server:
             total_processes = Config().cross_silo.total_silos
-            arg = '-e'
+            starting_id += Config().clients.total_clients
         else:
             total_processes = Config().clients.total_clients
-            arg = '-i'
 
-        for client_id in range(1, total_processes + 1):
+        for client_id in range(starting_id, total_processes + starting_id):
             logging.info("Starting client #%s...", client_id)
-            command = "python client.py {} {}".format(arg, client_id)
+            command = "python client.py -i {}".format(client_id)
+
+            if as_server:
+                command += " -p {}".format(Config().server.port + client_id)
+
             subprocess.Popen(command, shell=True)
 
 
@@ -83,8 +89,6 @@ class Server():
         logging.info("Waiting for %s clients to arrive...", Config().clients.total_clients)
         logging.info("Path: %s", path)
 
-        self.configure()
-
         try:
             async for message in websocket:
                 data = json.loads(message)
@@ -101,12 +105,12 @@ class Server():
                     self.reports.append(report)
 
                     if len(self.reports) == len(self.selected_clients):
-                        accuracy = self.process_report()
+                        self.accuracy = self.process_report()
 
                         # Break the loop when the target accuracy is achieved
                         target_accuracy = Config().training.target_accuracy
 
-                        if target_accuracy and (accuracy >= target_accuracy):
+                        if target_accuracy and (self.accuracy >= target_accuracy):
                             logging.info('Target accuracy reached.')
                             await self.close_connections()
                             sys.exit()
