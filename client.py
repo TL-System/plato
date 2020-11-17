@@ -4,6 +4,7 @@ Starting point for a Plato federated learning client.
 
 import asyncio
 import logging
+import sys
 import websockets
 
 from config import Config
@@ -25,7 +26,7 @@ def main():
                 "fedavg": servers.fedavg.FedAvgServer
             }[Config().server.type]()
             server.configure()
-            
+
             client = EdgeClient(server)
             coroutines.append(client.start_client())
 
@@ -45,6 +46,7 @@ def main():
     except websockets.ConnectionClosed:
         logging.info("Client #%s: connection to the server is closed.",
             client.client_id)
+        sys.exit()
 
 
 if __name__ == "__main__":
