@@ -3,11 +3,7 @@ A basic federated learning client who sends weight updates to the server.
 """
 
 import logging
-import json
 import random
-import pickle
-from dataclasses import dataclass
-import websockets
 
 from models import registry as models_registry
 from datasets import registry as datasets_registry
@@ -15,77 +11,22 @@ from dividers import iid, biased, sharded
 from utils import dists
 from training import trainer
 from config import Config
+from clients import Client, Report
 
 
-@dataclass
-class Report:
-    """Client report sent to the federated learning server."""
-    client_id: str
-    num_samples: int
-    weights: list
-    accuracy: float
-
-
-class SimpleClient:
+class SimpleClient(Client):
     """A basic federated learning client who sends simple weight updates."""
 
     def __init__(self):
-        self.client_id = Config().args.id
+        super().__init__()
         self.data = None # The dataset to be used for local training
         self.trainset = None # Training dataset
         self.testset = None # Testing dataset
-        self.model = None # Machine learning model
-        self.data_loaded = False # is training data already loaded from the disk?
-
-        random.seed()
 
 
     def __repr__(self):
         return 'Client #{}: {} samples in labels: {}'.format(
             self.client_id, len(self.data), set([label for __, label in self.data]))
-
-
-    async def start_client(self):
-        """Startup function for a client."""
-        uri = 'ws://{}:{}'.format(Config().server.address, Config().server.port)
-
-        if Config().cross_silo:
-            # Use the uri of the client's edge server
-            # Haven't thought through how to implement this
-            uri = 'ws://{}:{}'.format(Config().server.address, Config().server.port)
-
-        try:
-            async with websockets.connect(uri, ping_interval=None, max_size=2 ** 30) as websocket:
-                logging.info("Signing in at the server with client ID %s...", self.client_id)
-                await websocket.send(json.dumps({'id': self.client_id}))
-
-                while True:
-                    logging.info("Client %s is waiting to be selected...", self.client_id)
-                    server_response = await websocket.recv()
-                    data = json.loads(server_response)
-
-                    if data['id'] == self.client_id and 'payload' in data:
-                        logging.info("Client %s has been selected and receiving the model...",
-                                    self.client_id)
-                        server_model = await websocket.recv()
-                        self.model.load_state_dict(pickle.loads(server_model))
-
-                        if not self.data_loaded:
-                            self.load_data()
-
-                        report = self.train()
-
-                        logging.info("Model trained on client with client ID %s.", self.client_id)
-                        # Sending client ID as metadata to the server (payload to follow)
-                        client_update = {'id': self.client_id, 'payload': True}
-                        await websocket.send(json.dumps(client_update))
-
-                        # Sending the client training report to the server as payload
-                        await websocket.send(pickle.dumps(report))
-
-        except OSError as exception:
-            logging.info("Client #%s: connection to the server failed.", self.client_id)
-            logging.error(exception)
 
 
     def configure(self):
@@ -149,6 +90,11 @@ class SimpleClient:
             self.testset = self.data[int(len(self.data) * (1 - test_partition)):]
         else:
             self.trainset = self.data
+
+
+    def load_model(self, server_model):
+        """Loading the model onto this client."""
+        self.model.load_state_dict(server_model)
 
 
     def train(self):
