@@ -49,7 +49,7 @@ class SimpleClient:
         """Startup function for a client."""
         uri = 'ws://{}:{}'.format(Config().server.address, Config().server.port)
 
-        if Config().edges is not None:
+        if Config().cross_silo:
             # Use the uri of the client's edge server
             # Haven't thought through how to implement this
             uri = 'ws://{}:{}'.format(Config().server.address, Config().server.port)
@@ -113,7 +113,7 @@ class SimpleClient:
             'shard': sharded.ShardedDivider
         }[Config().data.divider](dataset)
 
-        num_clients = Config().clients.total
+        num_clients = Config().clients.total_clients
         logging.info('Total number of clients: %s', num_clients)
 
         # Extract data partition for client

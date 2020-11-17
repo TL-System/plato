@@ -25,7 +25,7 @@ class ShardedDivider(base.Divider):
         per_client = Config().data.shard_per_client
 
         # Determine the correct total number of shards and the size of each shard
-        total = Config().clients.total * per_client
+        total = Config().clients.total_clients * per_client
         shard_size = int(self.trainset_size / total)
 
         data = []
