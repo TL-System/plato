@@ -11,12 +11,14 @@ class Model(base.Model):
         """A single convolutional module in a VGG network."""
 
         def __init__(self, in_filters, out_filters):
-            super(Model.ConvModule, self).__init__()
+            super().__init__()
             self.conv = nn.Conv2d(in_filters, out_filters, kernel_size=3, padding=1)
             self.bn = nn.BatchNorm2d(out_filters)
 
+
         def forward(self, x):
             return F.relu(self.bn(self.conv(x)))
+
 
     def __init__(self, plan, outputs=10):
         super().__init__()
