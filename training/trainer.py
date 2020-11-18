@@ -37,12 +37,8 @@ def train(model: Model, trainset):
       model: The model to train. Must be a models.base.Model subclass.
       trainset: The training dataset.
     """
-    device = Config().device()
 
-    model.to(device)
-    model.train()
-
-    # Handle data parallelism if applicable.
+    # Use distributed data parallelism if multiple GPUs are available.
     if Config().is_distributed():
         logging.info("Turning on Distributed Data Parallelism...")
         
@@ -53,6 +49,10 @@ def train(model: Model, trainset):
         # DistributedDataParallel divides and allocate a batch of data to all
         # available GPUs since device_ids are not set
         model = torch.nn.parallel.DistributedDataParallel(module=model)
+    else:
+        device = Config().device()
+        model.to(device)
+        model.train()
 
     log_interval = 10
     batch_size = Config().training.batch_size
@@ -69,7 +69,7 @@ def train(model: Model, trainset):
             optimizer.step()
 
             if batch_id % log_interval == 0:
-                logging.debug('Epoch: [{}/{}]\tLoss: {:.6f}'.format(
+                logging.info('Epoch: [{}/{}]\tLoss: {:.6f}'.format(
                     epoch, epochs, loss.item()))
 
 

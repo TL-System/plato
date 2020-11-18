@@ -80,7 +80,7 @@ class Config:
     @staticmethod
     def DDP_port():
         """The port number used for distributed data parallel training."""
-        return 29500
+        return str(20000 + int(Config.args.id))
 
 
     @staticmethod
