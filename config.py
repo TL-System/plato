@@ -57,8 +57,7 @@ class Config:
     def device():
         """Returns the device to be used for training."""
         if torch.cuda.is_available() and torch.cuda.device_count() > 0:
-            device_ids = ','.join([str(x) for x in range(torch.cuda.device_count())])
-            device = f'cuda:{device_ids}'
+            device = 'cuda:0'
         else:
             device = 'cpu'
 
