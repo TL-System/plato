@@ -1,3 +1,5 @@
+"""Base classes for the model."""
+
 from abc import ABC, abstractmethod, abstractstaticmethod
 import torch.nn as nn
 
@@ -8,7 +10,6 @@ class Model(ABC, nn.Module):
     @abstractmethod
     def forward(self, x):
         """The forward pass."""
-        pass
 
 
     @abstractstaticmethod
@@ -17,7 +18,7 @@ class Model(ABC, nn.Module):
 
 
     @abstractstaticmethod
-    def get_model_from_name(model_name: str, config) -> 'Model':
+    def get_model_from_name(model_name: str) -> 'Model':
         """Returns an instance of this class as described by the model_name string."""
 
 
