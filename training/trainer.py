@@ -5,6 +5,7 @@ The training and testing loop.
 import logging
 import os
 import torch
+import numpy as np
 
 from models.base import Model
 from config import Config
@@ -57,8 +58,10 @@ def train(model: Model, trainset):
     log_interval = 10
     batch_size = Config().training.batch_size
     train_loader = torch.utils.data.DataLoader(trainset, batch_size=batch_size, shuffle=True)
+    iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
     epochs = Config().training.epochs
     optimizer = optimizers.get_optimizer(model)
+    lr_schedule = optimizers.get_lr_schedule(optimizer, iterations_per_epoch)
 
     for epoch in range(1, epochs + 1):
         for batch_id, (examples, labels) in enumerate(train_loader):
@@ -67,6 +70,7 @@ def train(model: Model, trainset):
             loss = model.loss_criterion(model(examples), labels)
             loss.backward()
             optimizer.step()
+            lr_schedule.step()
 
             if batch_id % log_interval == 0:
                 logging.debug('Epoch: [{}/{}]\tLoss: {:.6f}'.format(

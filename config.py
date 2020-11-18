@@ -123,11 +123,16 @@ class Config:
         Config.data = namedtuple('data', fields)(*params)
 
         # Training parameters for federated learning
-        fields = ['rounds', 'target_accuracy', 'task', 'epochs', 'batch_size', 'dataset',
-                  'data_path', 'num_layers', 'num_classes', 'model',
-                  'optimizer', 'learning_rate', 'momentum']
-        defaults = (0, 0.9, 'train', 0, 0, 'MNIST', './data', 40, 10, 'mnist_cnn',
-                    'SGD', 0.01, 0.5)
+        fields = ['rounds', 'target_accuracy', 'epochs', 'batch_size', 
+                  'dataset', 'data_path', 'model',
+                  'optimizer', 'learning_rate', 'weight_decay',
+                  'momentum', 'num_layers', 'num_classes',
+                  'lr_gamma', 'lr_milestone_steps', 'lr_warmup_steps']
+        defaults = (0, 0.9, 0, 128,
+                    'MNIST', './data', 'mnist_cnn',
+                    'SGD', 0.01, 0.0,
+                    0.9, 40, 10,
+                    0.0, '80ep,120ep', '5ep')
         params = Config.extract_section('training', fields, defaults)
 
         Config.training = namedtuple('training', fields)(*params)
