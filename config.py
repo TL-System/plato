@@ -66,9 +66,21 @@ class Config:
 
 
     @staticmethod
-    def is_parallel():
-        """Check if the hardware supports data parallelism."""
-        return torch.cuda.is_available() and torch.cuda.device_count() > 1
+    def is_distributed():
+        """Check if the hardware and OS support data parallelism."""
+        return torch.cuda.is_available() and torch.distributed.is_available() and torch.cuda.device_count() > 1
+
+
+    @staticmethod
+    def world_size():
+        """The world size in distributed training is the number of GPUs on the machine."""
+        return torch.cuda.device_count()
+
+
+    @staticmethod
+    def DDP_port():
+        """The port number used for distributed data parallel training."""
+        return 29500
 
 
     @staticmethod

@@ -3,12 +3,15 @@ The training and testing loop.
 """
 
 import logging
+import os
 import torch
-from training import optimizers
+
+from models.base import Model
 from config import Config
+from training import optimizers
 
 
-def extract_weights(model):
+def extract_weights(model: Model):
     """Extract weights from a model passed in as a parameter."""
     weights = []
     for name, weight in model.to(torch.device('cpu')).named_parameters():
@@ -18,7 +21,7 @@ def extract_weights(model):
     return weights
 
 
-def load_weights(model, weights):
+def load_weights(model: Model, weights):
     """Load the model weights passed in as a parameter."""
     updated_state_dict = {}
     for name, weight in weights:
@@ -27,7 +30,7 @@ def load_weights(model, weights):
     model.load_state_dict(updated_state_dict, strict=False)
 
 
-def train(model, trainset):
+def train(model: Model, trainset):
     """The main training loop for each client in a federated learning workload.
 
     Arguments:
@@ -38,6 +41,18 @@ def train(model, trainset):
 
     model.to(device)
     model.train()
+
+    # Handle data parallelism if applicable.
+    if Config().is_distributed():
+        logging.info("Turning on Distributed Data Parallelism...")
+        
+        os.environ['MASTER_ADDR'] = 'localhost'
+        os.environ['MASTER_PORT'] = Config().DDP_port()
+        torch.distributed.init_process_group('nccl', rank=0, world_size=Config().world_size())
+
+        # DistributedDataParallel divides and allocate a batch of data to all
+        # available GPUs since device_ids are not set
+        model = torch.nn.parallel.DistributedDataParallel(module=model)
 
     log_interval = 10
     batch_size = Config().training.batch_size
@@ -58,7 +73,7 @@ def train(model, trainset):
                     epoch, epochs, loss.item()))
 
 
-def test(model, testset, batch_size):
+def test(model: Model, testset, batch_size):
     """Testing the model using the provided test dataset."""
     device = Config().device()
 
