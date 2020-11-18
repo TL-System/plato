@@ -1,13 +1,13 @@
 
-## Design principles from a software engineering perspective
+## Design
 
-This framework is designed to be extensible, making it easy to add new datasets, models, optimizers, hyperparameters, and other customizations. This document discusses the current design of the framework from a software engineering perspective.
+The Plato framework is designed to be extensible, hopefully making it easy to add new datasets, models, optimizers, hyperparameters, and other customizations. This document discusses the current design of the framework from a software engineering perspective.
 
-This framework makes extensive use of object oriented subclassing with the help of Python 3's [ABC library](https://docs.python.org/3/library/abc.html). It is a good idea to review Python 3's support for base classes with abstract methods before proceeding.
+This framework makes extensive use of object oriented subclassing with the help of Python 3's [ABC library](https://docs.python.org/3/library/abc.html). It is a good idea to review Python 3's support for base classes with abstract methods before proceeding. It also makes sporadic use of Python 3's [Data Classes](https://docs.python.org/3/library/dataclasses.html).
 
 ### Hyperparameters
 
-For simplicity, all hyperpameters in the framework are read from a configuration file at the beginning, and stored in a global Singleton `Config` class (found in `config.py`). This includes hyperparameters specific to the dataset, data distribution, server configuration, and the training process. The command-line arguments are only used to specify the location of the configuration file, the logging level, and the client ID (on the client side).
+For simplicity, all hyperpameters in the framework are read from a configuration file at the beginning, and stored in a global Singleton `Config` class (found in `config.py`). This includes hyperparameters specific to the dataset, data distribution, the training process, server configuration, and cross-silo training. The command-line arguments are only used to specify the location of the configuration file, the logging level, the client ID (on the client side), and the port number (for edge servers in cross-silo training). Use `Config()` anywhere in the framework to access these hyperparameters.
 
 ### Modules for Datasets, Models, Training
 
@@ -37,7 +37,7 @@ Alternatively, rather than writing our own custom registry, it is conceivable to
 
 ### The Training Module
 
-The training module centers on a single function: the `train()` function in `training/train.py`. This function takes a `Model`, a `DataSet`, and a `config` as its arguments (*to be completed*). It then trains the `Model` on the dataset, as specified in the training hyperparameters in `config`.
+The training module centers on a single function: the `train()` function in `training/train.py`. This function takes a `Model` and a `DataSet` as its arguments. It then trains the `Model` on the dataset.
 
 The training module would use callbacks for customization (*to be completed*).
 

@@ -122,7 +122,7 @@ where `./cifar_wideresnet.out` is the output file that needs to be monitored, an
 If there is a need to start an interactive session (for debugging purposes, for example), it is also supported by Compute Canada using the `salloc` command:
 
 ```shell
-$ salloc --time=0:15:0 --ntasks=1 --cpus-per-task=2 --gres=gpu:p100l:4 --account=def-baochun
+$ salloc --time=0:15:0 --ntasks=1 --cpus-per-task=4 --gres=gpu:p100l:4 --mem=32G --account=def-baochun
 ```
 
 The job will then be queued and waiting for resources:
