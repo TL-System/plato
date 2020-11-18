@@ -41,7 +41,7 @@ def train(model: Model, trainset):
     # Use distributed data parallelism if multiple GPUs are available.
     if Config().is_distributed():
         logging.info("Turning on Distributed Data Parallelism...")
-        
+
         os.environ['MASTER_ADDR'] = 'localhost'
         os.environ['MASTER_PORT'] = Config().DDP_port()
         torch.distributed.init_process_group('nccl', rank=0, world_size=Config().world_size())
@@ -69,7 +69,7 @@ def train(model: Model, trainset):
             optimizer.step()
 
             if batch_id % log_interval == 0:
-                logging.info('Epoch: [{}/{}]\tLoss: {:.6f}'.format(
+                logging.debug('Epoch: [{}/{}]\tLoss: {:.6f}'.format(
                     epoch, epochs, loss.item()))
 
 
