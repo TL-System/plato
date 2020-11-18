@@ -15,29 +15,20 @@ class Divider:
 
         self.group()
 
-        # Store used data seperately
-        self.used = {label: [] for label in self.labels}
-        self.used['testset'] = []
 
 
     def extract(self, label, n):
-        """Extract the data for a particular label."""
+        """Extract 'n' examples of the data for a particular label."""
         if len(self.trainset[label]) > n:
-            extracted = self.trainset[label][:n]  # Extract the data
-            self.used[label].extend(extracted)  # Move data to used
-            del self.trainset[label][:n]  # Remove from the trainset
-            return extracted
+            extracted = self.trainset[label][:n]
         else:
             logging.warning('Insufficient data in label: %s', label)
-            logging.warning('Reusing used data.')
+            logging.warning('%s examples available, %s examples needed.', len(self.trainset[label]), n)
 
-            # Unmark data as used
-            for label in self.labels:
-                self.trainset[label].extend(self.used[label])
-                self.used[label] = []
+            extracted = self.trainset[label]
 
-            # Extract replenished data
-            return self.extract(label, n)
+        del self.trainset[label][:n]  # Remove from the trainset
+        return extracted
 
 
     def group(self):
