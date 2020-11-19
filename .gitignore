@@ -132,13 +132,10 @@ dmypy.json
 .vscode/
 
 # Configuration files
-config.conf
+/config.conf
 
 # Data files
 data/
-
-# Global model files
-**/global_model
 
 # macOS
 .DS_Store
