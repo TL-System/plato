@@ -1,9 +1,7 @@
 import os
 import sys
-import copy
 import unittest
 import numpy as np
-import torch
 import warnings
 from collections import namedtuple
 
@@ -12,10 +10,7 @@ currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
-from models.base import Model
 from training import optimizers
-from clients import simple
-from servers import fedavg
 import models.registry as models_registry
 from config import Config
 
@@ -23,7 +18,7 @@ from config import Config
 class LrSchedulerTest(unittest.TestCase):
     def setUp(self):
         super().setUp()
-        config = Config()
+        __ = Config()
 
         fields = ['optimizer', 'learning_rate', 'momentum', 'weight_decay',
                     'lr_gamma', 'lr_milestone_steps', 'lr_warmup_steps']
