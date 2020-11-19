@@ -61,7 +61,8 @@ def train(model: Model, trainset):
     iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
     epochs = Config().training.epochs
     optimizer = optimizers.get_optimizer(model)
-    lr_schedule = optimizers.get_lr_schedule(optimizer, iterations_per_epoch)
+    if Config().training.lr_gamma == 0.0 or Config().training.lr_milestone_steps == '':
+        lr_schedule = optimizers.get_lr_schedule(optimizer, iterations_per_epoch)
 
     for epoch in range(1, epochs + 1):
         for batch_id, (examples, labels) in enumerate(train_loader):

@@ -132,7 +132,7 @@ class Config:
                     'MNIST', './data', 'mnist_cnn',
                     'SGD', 0.01, 0.0,
                     0.9, 40, 10,
-                    0.0, '80ep,120ep', '5ep')
+                    0.0, '', '')
         params = Config.extract_section('training', fields, defaults)
 
         Config.training = namedtuple('training', fields)(*params)
