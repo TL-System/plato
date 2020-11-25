@@ -123,7 +123,7 @@ class Config:
         Config.data = namedtuple('data', fields)(*params)
 
         # Training parameters for federated learning
-        fields = ['rounds', 'target_accuracy', 'epochs', 'batch_size', 
+        fields = ['rounds', 'target_accuracy', 'epochs', 'batch_size',
                   'dataset', 'data_path', 'model',
                   'optimizer', 'learning_rate', 'weight_decay',
                   'momentum', 'num_layers', 'num_classes',
