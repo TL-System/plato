@@ -38,7 +38,7 @@ class EdgeClient(Client):
         logging.info('Training on edge client #%s', self.client_id)
 
         # Wait for a certain number of aggregation rounds on the edge server
-        logging.info("Edge server #%s: current round = %s",
+        logging.info("Edge server #%s: current local aggregation round = %s",
             self.client_id, self.server.current_round)
         while self.server.current_round == 0 or self.server.current_round % Config().cross_silo.rounds != 0:
             await asyncio.sleep(1)
