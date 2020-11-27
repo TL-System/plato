@@ -13,7 +13,7 @@ SSH into `cedar.computecanada.ca` (the main server for Compute Canada) and clone
 ```shell
 $ ssh <CCDB username>@cedar.computecanada.ca
 $ cd projects/def-baochun/<CCDB username>
-$ git clone https://github.com/baochunli/plato.git
+$ git clone https://github.com/TL-System/plato.git
 ```
 
 Your CCDB username can be located after signing into the [CCDB portal](https://ccdb.computecanada.ca/). Contact Baochun Li (`bli@ece.toronto.edu`) for a new account on Compute Canada.

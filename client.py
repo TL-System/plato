@@ -30,7 +30,8 @@ def main():
             client = EdgeClient(server)
             coroutines.append(client.start_client())
 
-            logging.info("Starting a server on port %s", Config().args.port)
+            logging.info("Starting an edge server (client #%s) on port %s",
+                Config().args.id, Config().args.port)
             start_server = websockets.serve(server.serve,
                         Config().server.address, Config().args.port,
                         ping_interval=None, max_size=2 ** 30)
