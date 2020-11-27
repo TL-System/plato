@@ -53,9 +53,11 @@ class Server:
         for client_id in range(starting_id, total_processes + starting_id):
             logging.info("Starting client #%s...", client_id)
             command = "python client.py -i {}".format(client_id)
+            command += " -c {}".format(Config.args.config)
 
             if as_server:
                 command += " -p {}".format(Config().server.port + client_id)
+                logging.info("This client #%s is an edge server.", client_id)
 
             subprocess.Popen(command, shell=True)
 
@@ -70,14 +72,18 @@ class Server:
         """Select a subset of the clients and send messages to them to start training."""
         self.reports = []
         self.current_round += 1
-        logging.info('**** Round %s/%s ****', self.current_round, Config().training.rounds)
+        if Config().args.id:
+            logging.info('**** Local aggregation round %s/%s on edge server #%s ****',
+            self.current_round, Config().cross_silo.rounds, Config().args.id)
+        else:
+            logging.info('**** Round %s/%s ****', self.current_round, Config().training.rounds)
 
         self.choose_clients()
 
         if len(self.selected_clients) > 0:
             for client_id in self.selected_clients:
                 socket = self.clients[client_id]
-                logging.info("Selecting client with ID %s for training...", client_id)
+                logging.info("Selecting client #%s for training...", client_id)
                 server_response = {'id': client_id, 'payload': True}
                 await socket.send(json.dumps(server_response))
 
