@@ -12,6 +12,7 @@ import pickle
 import websockets
 
 from config import Config
+import utils.plot_figures as plot_figures
 
 
 class Server:
@@ -24,7 +25,11 @@ class Server:
         self.current_round = 0
         self.model = None
         self.accuracy = 0
+        self.accuracy_list = []
         self.reports = []
+
+        # Directory of results (figures etc.)
+        self.result_dir = './results/' + Config().training.dataset + '/' + Config().training.model + '/'
 
 
     def register_client(self, client_id, websocket):
@@ -111,6 +116,7 @@ class Server:
 
                     if len(self.reports) == len(self.selected_clients):
                         self.accuracy = self.process_report()
+                        self.accuracy_list.append(self.accuracy*100)
 
                         # Break the loop when the target accuracy is achieved
                         target_accuracy = Config().training.target_accuracy
@@ -118,11 +124,13 @@ class Server:
                         if not Config().args.port:
                             if target_accuracy and self.accuracy >= target_accuracy:
                                 logging.info('Target accuracy reached.')
+                                plot_figures.plot_global_round_vs_accuracy(self.accuracy_list, self.result_dir)
                                 await self.close_connections()
                                 sys.exit()
 
                             if self.current_round >= Config().training.rounds:
                                 logging.info('Target number of training rounds reached.')
+                                plot_figures.plot_global_round_vs_accuracy(self.accuracy_list, self.result_dir)
                                 await self.close_connections()
                                 sys.exit()
 

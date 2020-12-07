@@ -54,6 +54,12 @@ We will need to install the `websockets` package for client-server communication
 $ pip install websockets==8.1
 ```
 
+Install `matplotlib` package for plotting figures of results:
+
+```shell
+$ pip install matplotlib
+```
+
 In case unit tests in the `tests` directory need to be run, `scipy` should also be installed:
 
 ```shell
