@@ -48,6 +48,12 @@ In case unit tests in the `tests` directory need to be run, `scipy` should also 
 $ conda install scipy
 ```
 
+In case it is needed to format Python code during development, install `yapf`:
+
+```shell
+$ pip install yapf
+```
+
 ### Running Plato
 
 To start a federated learning training workload, run [`run.py`](run.py) from the repository's root directory. For example:
@@ -63,6 +69,10 @@ python server.py
 * `--log` (`-l`): the level of logging information to be written to the console. Possible values are `critical`, `error`, `warn`, `info`, and `debug`, and the default is `info`.
 
 *Plato* uses a standard configuration file, parsed by Python's standard configuration parser, to manage the runtime configuration parameters. Example configuration files have been provided in the `configs` directory.
+
+### Running Unit Tests
+
+All unit tests are in the `tests/` directory. These tests are designed to be standalone and executed separately. For example, the command `python lr_schedule_tests.py` runs the unit tests for learning rate schedules.
 
 ### Uninstalling Plato
 

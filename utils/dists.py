@@ -5,6 +5,7 @@ Functions that generate a variety of data distributions.
 import random
 import numpy as np
 
+
 def uniform(N, k):
     """Returns a uniform distribution of 'N' items into 'k' groups."""
     random.seed()

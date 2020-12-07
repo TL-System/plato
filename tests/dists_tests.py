@@ -13,6 +13,7 @@ sys.path.append(parentdir)
 
 from utils import dists
 
+
 class DistsTest(unittest.TestCase):
     """Tests for distribution generators."""
     def test_uniform_dist(self):
@@ -22,16 +23,17 @@ class DistsTest(unittest.TestCase):
 
         dist, __ = dists.uniform(101, 3)
         # The ordering of elements does not matter
-        self.assertTrue(collections.Counter(dist) == collections.Counter([34, 34, 33]))
+        self.assertTrue(
+            collections.Counter(dist) == collections.Counter([34, 34, 33]))
 
     def test_normal_dist(self):
         """Test the normal distribution generator."""
         dist, samples = dists.normal(100, 10)
         print('The distribution is {}'.format(dist))
-        print('p-value from the Shapiro Wilk Test for normality is {0:.2f}'
-            .format(shapiro(samples).pvalue))
+        print('p-value from the Shapiro Wilk Test for normality is {0:.2f}'.
+              format(shapiro(samples).pvalue))
         self.assertTrue(shapiro(samples).pvalue > 0.05)
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     unittest.main()

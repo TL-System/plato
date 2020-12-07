@@ -8,6 +8,7 @@ import logging
 from dividers import base
 from config import Config
 
+
 class ShardedDivider(base.Divider):
     """
     Divide data into partitions with sharding, where data is to be horizontally partitioned.
@@ -17,7 +18,6 @@ class ShardedDivider(base.Divider):
         self.shards = None
         random.seed()
         self.__create_shards()
-
 
     def __create_shards(self):
         """Create all the shards (partitions) from the data."""
@@ -32,8 +32,9 @@ class ShardedDivider(base.Divider):
         for __, items in self.trainset.items():
             data.extend(items)
 
-        shards = [data[(i * shard_size):((i + 1) * shard_size)]
-                  for i in range(total)]
+        shards = [
+            data[(i * shard_size):((i + 1) * shard_size)] for i in range(total)
+        ]
         random.shuffle(shards)
 
         self.shards = shards
@@ -41,14 +42,12 @@ class ShardedDivider(base.Divider):
 
         logging.info('Created %s shards of size %s', len(shards), shard_size)
 
-
     def extract_shard(self):
         """Extract a shard from a list of shards."""
         shard = self.shards[0]
         self.used.append(shard)
         del self.shards[0]
         return shard
-
 
     def get_partition(self):
         """Get a partition for a client."""

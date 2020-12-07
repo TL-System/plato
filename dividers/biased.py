@@ -4,12 +4,12 @@ from dividers import base
 from utils import dists
 from config import Config
 
+
 class BiasedDivider(base.Divider):
     """Load and pass 'preference bias' data partitions."""
     def __init__(self, dataset):
         super().__init__(dataset)
         self.shards = None
-
 
     def get_partition(self, partition_size, pref):
         """Get a non-uniform partition with a preference bias."""

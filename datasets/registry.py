@@ -8,10 +8,11 @@ import logging
 from datasets import mnist, fashion_mnist, cifar10
 from config import Config
 
-registered_datasets = {'MNIST': mnist,
-                       'FashionMNIST': fashion_mnist,
-                       'CIFAR10': cifar10
-                      }
+registered_datasets = {
+    'MNIST': mnist,
+    'FashionMNIST': fashion_mnist,
+    'CIFAR10': cifar10
+}
 
 
 def get():
