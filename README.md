@@ -36,6 +36,12 @@ We will need to install the `websockets` package for client-server communication
 $ pip install websockets
 ```
 
+Install `matplotlib` package for plotting figures of results:
+
+```shell
+$ conda install matplotlib
+```
+
 In case unit tests in the `tests` directory need to be run, `scipy` should also be installed:
 
 ```shell
