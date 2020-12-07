@@ -16,24 +16,21 @@ from clients import Client, Report
 
 class SimpleClient(Client):
     """A basic federated learning client who sends simple weight updates."""
-
     def __init__(self):
         super().__init__()
-        self.data = None # The dataset to be used for local training
-        self.trainset = None # Training dataset
-        self.testset = None # Testing dataset
-
+        self.data = None  # The dataset to be used for local training
+        self.trainset = None  # Training dataset
+        self.testset = None  # Testing dataset
 
     def __repr__(self):
         return 'Client #{}: {} samples in labels: {}'.format(
-            self.client_id, len(self.data), set([label for __, label in self.data]))
-
+            self.client_id, len(self.data),
+            set([label for __, label in self.data]))
 
     def configure(self):
         """Prepare this client for training."""
         model_name = Config().training.model
         self.model = models_registry.get(model_name)
-
 
     def load_data(self):
         """Generating data and loading them onto this client."""
@@ -69,7 +66,8 @@ class SimpleClient(Client):
             dist, __ = {
                 "uniform": dists.uniform,
                 "normal": dists.normal
-            }[Config().data.label_distribution](num_clients, len(divider.labels))
+            }[Config().data.label_distribution](num_clients,
+                                                len(divider.labels))
             random.shuffle(dist)
 
             pref = random.choices(divider.labels, dist)[0]
@@ -86,16 +84,16 @@ class SimpleClient(Client):
 
         # Extract the trainset and testset if local testing is needed
         if Config().clients.do_test:
-            self.trainset = self.data[:int(len(self.data) * (1 - test_partition))]
-            self.testset = self.data[int(len(self.data) * (1 - test_partition)):]
+            self.trainset = self.data[:int(
+                len(self.data) * (1 - test_partition))]
+            self.testset = self.data[
+                int(len(self.data) * (1 - test_partition)):]
         else:
             self.trainset = self.data
-
 
     def load_model(self, server_model):
         """Loading the model onto this client."""
         self.model.load_state_dict(server_model)
-
 
     async def train(self):
         """The machine learning training workload on a client."""

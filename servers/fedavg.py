@@ -15,7 +15,6 @@ from config import Config
 
 class FedAvgServer(Server):
     """Federated learning server using federated averaging."""
-
     def __init__(self):
         super().__init__()
         self.testset = None
@@ -28,23 +27,28 @@ class FedAvgServer(Server):
 
         if Config().args.port:
             # Compute the number of clients in each silo for edge servers
-            self.total_clients = int(self.total_clients / Config().cross_silo.total_silos)
-            self.clients_per_round = int(self.clients_per_round / Config().cross_silo.total_silos)
-            logging.info("Edge server #%s starts training with %s clients and %s per round...",
+            self.total_clients = int(self.total_clients /
+                                     Config().cross_silo.total_silos)
+            self.clients_per_round = int(self.clients_per_round /
+                                         Config().cross_silo.total_silos)
+            logging.info(
+                "Edge server #%s starts training with %s clients and %s per round...",
                 Config().args.id, self.total_clients, self.clients_per_round)
         else:
             # Compute the number of clients for the central server
             if Config().cross_silo:
-                self.total_clients = self.clients_per_round = Config().cross_silo.total_silos
-                logging.info("The central server starts training with %s edge servers...",
+                self.total_clients = self.clients_per_round = Config(
+                ).cross_silo.total_silos
+                logging.info(
+                    "The central server starts training with %s edge servers...",
                     self.total_clients)
             else:
                 self.clients_per_round = Config().clients.per_round
-                logging.info("Started training on %s clients and %s per round...",
+                logging.info(
+                    "Started training on %s clients and %s per round...",
                     self.total_clients, self.clients_per_round)
 
         random.seed()
-
 
     def configure(self):
         """
@@ -53,8 +57,10 @@ class FedAvgServer(Server):
         """
         if Config().args.id:
             logging.info('Configuring edge server #%s as a %s server...',
-                Config().args.id, Config().server.type)
-            logging.info('Training: %s local aggregation rounds\n', Config().cross_silo.rounds)
+                         Config().args.id,
+                         Config().server.type)
+            logging.info('Training: %s local aggregation rounds\n',
+                         Config().cross_silo.rounds)
 
         else:
             logging.info('Configuring the %s server...', Config().server.type)
@@ -64,20 +70,18 @@ class FedAvgServer(Server):
 
             if target_accuracy:
                 logging.info('Training: %s rounds or %s%% accuracy\n',
-                    total_rounds, 100 * target_accuracy)
+                             total_rounds, 100 * target_accuracy)
             else:
                 logging.info('Training: %s rounds\n', total_rounds)
 
         self.load_test_data()
         self.load_model()
 
-
     def load_test_data(self):
         """Loading the test dataset."""
         if not Config().clients.do_test:
             dataset = datasets_registry.get()
             self.testset = dataset.get_test_set()
-
 
     def load_model(self):
         """Setting up the global model to be trained via federated learning."""
@@ -87,20 +91,17 @@ class FedAvgServer(Server):
 
         self.model = models_registry.get(model_type)
 
-
     def choose_clients(self):
         """Choose a subset of the clients to participate in each round."""
 
-
         # Select clients randomly
         assert self.clients_per_round <= len(self.clients)
-        self.selected_clients = random.sample(list(self.clients), self.clients_per_round)
-
+        self.selected_clients = random.sample(list(self.clients),
+                                              self.clients_per_round)
 
     def aggregate_weights(self, reports):
         """Aggregate the reported weight updates from the selected clients."""
         return self.federated_averaging(reports)
-
 
     def extract_client_updates(self, reports):
         """Extract the model weight updates from a client's report."""
@@ -127,7 +128,6 @@ class FedAvgServer(Server):
 
         return updates
 
-
     def federated_averaging(self, reports):
         """Aggregate weight updates from the clients using federated averaging."""
         # Extract updates from reports
@@ -137,8 +137,7 @@ class FedAvgServer(Server):
         self.total_samples = sum([report.num_samples for report in reports])
 
         # Perform weighted averaging
-        avg_update = [torch.zeros(x.size())
-                      for __, x in updates[0]]
+        avg_update = [torch.zeros(x.size()) for __, x in updates[0]]
 
         for i, update in enumerate(updates):
             num_samples = reports[i].num_samples
@@ -156,7 +155,6 @@ class FedAvgServer(Server):
 
         return updated_weights
 
-
     def process_report(self):
         """Process the client reports by aggregating their weights."""
         updated_weights = self.aggregate_weights(self.reports)
@@ -166,14 +164,16 @@ class FedAvgServer(Server):
         if Config().clients.do_test:
             # Compute the average accuracy from client reports
             accuracy = self.accuracy_averaging(self.reports)
-            logging.info('Average client accuracy: {:.2f}%\n'.format(100 * accuracy))
+            logging.info('Average client accuracy: {:.2f}%\n'.format(100 *
+                                                                     accuracy))
         else:
             # Test the updated model directly at the server
-            accuracy = trainer.test(self.model, self.testset, Config().training.batch_size)
-            logging.info('Global model accuracy: {:.2f}%\n'.format(100 * accuracy))
+            accuracy = trainer.test(self.model, self.testset,
+                                    Config().training.batch_size)
+            logging.info('Global model accuracy: {:.2f}%\n'.format(100 *
+                                                                   accuracy))
 
         return accuracy
-
 
     @staticmethod
     def accuracy_averaging(reports):
@@ -187,7 +187,6 @@ class FedAvgServer(Server):
             accuracy += report.accuracy * (report.num_samples / total_samples)
 
         return accuracy
-
 
     @staticmethod
     def save_model(model_to_save, path):

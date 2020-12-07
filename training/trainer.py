@@ -45,7 +45,9 @@ def train(model: Model, trainset):
 
         os.environ['MASTER_ADDR'] = 'localhost'
         os.environ['MASTER_PORT'] = Config().DDP_port()
-        torch.distributed.init_process_group('nccl', rank=0, world_size=Config().world_size())
+        torch.distributed.init_process_group('nccl',
+                                             rank=0,
+                                             world_size=Config().world_size())
 
         # DistributedDataParallel divides and allocate a batch of data to all
         # available GPUs since device_ids are not set
@@ -57,12 +59,16 @@ def train(model: Model, trainset):
 
     log_interval = 10
     batch_size = Config().training.batch_size
-    train_loader = torch.utils.data.DataLoader(trainset, batch_size=batch_size, shuffle=True)
+    train_loader = torch.utils.data.DataLoader(trainset,
+                                               batch_size=batch_size,
+                                               shuffle=True)
     iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
     epochs = Config().training.epochs
     optimizer = optimizers.get_optimizer(model)
-    if Config().training.lr_gamma == 0.0 or Config().training.lr_milestone_steps == '':
-        lr_schedule = optimizers.get_lr_schedule(optimizer, iterations_per_epoch)
+    if Config().training.lr_gamma == 0.0 or Config(
+    ).training.lr_milestone_steps == '':
+        lr_schedule = optimizers.get_lr_schedule(optimizer,
+                                                 iterations_per_epoch)
 
     for epoch in range(1, epochs + 1):
         for batch_id, (examples, labels) in enumerate(train_loader):
@@ -84,7 +90,9 @@ def test(model: Model, testset, batch_size):
 
     model.to(device)
     model.eval()
-    test_loader = torch.utils.data.DataLoader(testset, batch_size=batch_size, shuffle=True)
+    test_loader = torch.utils.data.DataLoader(testset,
+                                              batch_size=batch_size,
+                                              shuffle=True)
 
     correct = 0
     total = 0

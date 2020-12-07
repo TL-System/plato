@@ -10,7 +10,6 @@ from models import base
 
 class Model(base.Model):
     '''A convolutional neural network model for MNIST.'''
-
     def __init__(self):
         super().__init__()
 
@@ -19,7 +18,6 @@ class Model(base.Model):
         self.conv2 = nn.Conv2d(20, 50, 5, 1)
         self.fc1 = nn.Linear(4 * 4 * 50, 500)
         self.fc2 = nn.Linear(500, 10)
-
 
     def forward(self, x):
         """Defining the convolutional neural network."""
@@ -33,11 +31,9 @@ class Model(base.Model):
 
         return F.log_softmax(x, dim=1)
 
-
     @staticmethod
     def is_valid_model_name(model_name):
         return model_name.startswith('mnist_cnn')
-
 
     @staticmethod
     def get_model_from_name(model_name):
@@ -47,7 +43,6 @@ class Model(base.Model):
             raise ValueError('Invalid model name: {}'.format(model_name))
 
         return Model()
-
 
     @property
     def loss_criterion(self):

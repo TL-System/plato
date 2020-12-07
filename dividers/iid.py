@@ -4,13 +4,12 @@ import random
 from dividers import base
 from utils import dists
 
+
 class IIDDivider(base.Divider):
     """Load IID data partitions."""
-
     def __init__(self, dataset):
         super().__init__(dataset)
         random.seed()
-
 
     def get_partition(self, partition_size):
         """Get a partition that is uniform across all the labels."""
@@ -25,7 +24,6 @@ class IIDDivider(base.Divider):
         random.shuffle(partition)
 
         return partition
-
 
     def get_testset(self):
         """Return the entire testset."""

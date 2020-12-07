@@ -6,7 +6,8 @@ based on a configuration at run-time.
 from models import mnist_cnn, fashion_cnn, cifar_resnet, cifar_wideresnet, cifar_vgg
 
 registered_models = [
-    mnist_cnn.Model, fashion_cnn.Model, cifar_resnet.Model, cifar_wideresnet.Model, cifar_vgg.Model
+    mnist_cnn.Model, fashion_cnn.Model, cifar_resnet.Model,
+    cifar_wideresnet.Model, cifar_vgg.Model
 ]
 
 
