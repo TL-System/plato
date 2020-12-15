@@ -54,6 +54,22 @@ In case it is needed to format Python code during development, install `yapf`:
 $ pip install yapf
 ```
 
+If you use Visual Studio Code, to use `yapf`:
+
+```shell
+$ vi ~/Library/Application\ Support/Code/user/settings.json
+```
+
+And add the following:
+
+```shell
+    “python.linting.enabled": true,
+    "python.linting.pylintPath": "pylint",
+    "editor.formatOnSave": true,
+    "python.formatting.provider": "yapf", 
+    "python.linting.pylintEnabled": true
+```
+
 ### Running Plato
 
 To start a federated learning training workload, run [`run.py`](run.py) from the repository's root directory. For example:

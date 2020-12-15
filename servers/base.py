@@ -9,6 +9,7 @@ import os
 import logging
 import subprocess
 import pickle
+import time
 import websockets
 
 from config import Config
@@ -26,6 +27,10 @@ class Server:
         self.accuracy = 0
         self.accuracy_list = []
         self.reports = []
+        self.round_start_time = 0  # starting time of a gloabl training round
+        self.training_time_list = []  # training time of each round
+        self.edge_agg_num_list = [
+        ]  # number of local aggregation rounds on edge servers of each global training round
 
         # Directory of results (figures etc.)
         self.result_dir = './results/' + Config(
@@ -82,6 +87,8 @@ class Server:
             logging.info('**** Round %s/%s ****', self.current_round,
                          Config().training.rounds)
 
+        self.round_start_time = time.time()
+
         self.choose_clients()
 
         if len(self.selected_clients) > 0:
@@ -118,14 +125,19 @@ class Server:
                         self.accuracy = self.process_report()
                         self.accuracy_list.append(self.accuracy * 100)
 
+                        self.training_time_list.append(time.time() -
+                                                       self.round_start_time)
+
                         # Break the loop when the target accuracy is achieved
                         target_accuracy = Config().training.target_accuracy
 
                         if not Config().args.port:
+                            self.edge_agg_num_list.append(
+                                Config().cross_silo.rounds)
+
                             if target_accuracy and self.accuracy >= target_accuracy:
                                 logging.info('Target accuracy reached.')
-                                plot_figures.plot_global_round_vs_accuracy(
-                                    self.accuracy_list, self.result_dir)
+                                self.plot_figures_of_results()
                                 await self.close_connections()
                                 sys.exit()
 
@@ -133,8 +145,7 @@ class Server:
                                 logging.info(
                                     'Target number of training rounds reached.'
                                 )
-                                plot_figures.plot_global_round_vs_accuracy(
-                                    self.accuracy_list, self.result_dir)
+                                self.plot_figures_of_results()
                                 await self.close_connections()
                                 sys.exit()
 
@@ -154,6 +165,19 @@ class Server:
                          os.getpid())
             logging.error(exception)
             sys.exit()
+
+    def plot_figures_of_results(self):
+        """Plot figures of results."""
+        plot_figures.plot_global_round_vs_accuracy(self.accuracy_list,
+                                                   self.result_dir)
+        plot_figures.plot_training_time_vs_accuracy(self.accuracy_list,
+                                                    self.training_time_list,
+                                                    self.result_dir)
+
+        if Config().cross_silo:
+            plot_figures.plot_edge_agg_num_vs_accuracy(self.accuracy_list,
+                                                       self.edge_agg_num_list,
+                                                       self.result_dir)
 
     @abstractmethod
     def configure(self):
