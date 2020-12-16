@@ -63,6 +63,11 @@ class Client:
                     data = json.loads(server_response)
 
                     if data['id'] == self.client_id and 'payload' in data:
+                        # Load parameters of reinforcement learning
+                        if Config().rl:
+                            rl_tuned_para_name = data['rl_tuned_para_name']
+                            rl_tuned_para_value = data['rl_tuned_para_value']
+
                         logging.info(
                             "Client #%s has been selected and receiving the model...",
                             self.client_id)
@@ -73,7 +78,15 @@ class Client:
                         if not self.data_loaded:
                             self.load_data()
 
-                        report = await self.train()
+                        logging.info(
+                            "Client #%s has received the model and loaded data...",
+                            self.client_id)
+
+                        if Config().rl:
+                            report = await self.train(rl_tuned_para_name,
+                                                      rl_tuned_para_value)
+                        else:
+                            report = await self.train()
 
                         logging.info("Model trained on client #%s.",
                                      self.client_id)
@@ -102,5 +115,5 @@ class Client:
         """Loading the model onto this client."""
 
     @abstractmethod
-    async def train(self):
+    async def train(self, rl_tuned_para_name=None, rl_tuned_para_value=None):
         """The machine learning training workload on a client."""

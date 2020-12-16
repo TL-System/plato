@@ -9,6 +9,7 @@ import configparser
 import argparse
 import torch
 
+
 class Config:
     """
     Retrieving configuration parameters by parsing a configuration file
@@ -21,14 +22,29 @@ class Config:
     def __new__(cls):
         if cls._instance is None:
             parser = argparse.ArgumentParser()
-            parser.add_argument('-i', '--id', type=str,
+            parser.add_argument('-i',
+                                '--id',
+                                type=str,
                                 help='Unique client ID.')
-            parser.add_argument('-p', '--port', type=str,
+            parser.add_argument('-p',
+                                '--port',
+                                type=str,
                                 help='The port number for running a server.')
-            parser.add_argument('-c', '--config', type=str, default='./config.conf',
+            parser.add_argument('-c',
+                                '--config',
+                                type=str,
+                                default='./config.conf',
                                 help='Federated learning configuration file.')
-            parser.add_argument('-l', '--log', type=str, default='info',
+            parser.add_argument('-l',
+                                '--log',
+                                type=str,
+                                default='info',
                                 help='Log messages level.')
+            parser.add_argument(
+                '-r',
+                '--rl_config',
+                type=str,
+                help='Reinforcement learning configuration file.')
 
             Config.args = parser.parse_args()
 
@@ -45,13 +61,16 @@ class Config:
 
             logging.basicConfig(
                 format='[%(levelname)s][%(asctime)s]: %(message)s',
-                level=log_level, datefmt='%H:%M:%S')
+                level=log_level,
+                datefmt='%H:%M:%S')
 
             cls._instance = super(Config, cls).__new__(cls)
             cls.config.read(Config.args.config)
+            if Config.args.rl_config:
+                cls.config.read(Config.args.rl_config)
             cls.extract()
-        return cls._instance
 
+        return cls._instance
 
     @staticmethod
     def device():
@@ -63,24 +82,21 @@ class Config:
 
         return device
 
-
     @staticmethod
     def is_distributed():
         """Check if the hardware and OS support data parallelism."""
-        return torch.cuda.is_available() and torch.distributed.is_available() and torch.cuda.device_count() > 1
-
+        return torch.cuda.is_available() and torch.distributed.is_available(
+        ) and torch.cuda.device_count() > 1
 
     @staticmethod
     def world_size():
         """The world size in distributed training is the number of GPUs on the machine."""
         return torch.cuda.device_count()
 
-
     @staticmethod
     def DDP_port():
         """The port number used for distributed data parallel training."""
         return str(20000 + int(Config.args.id))
-
 
     @staticmethod
     def extract_section(section, fields, defaults, optional=False):
@@ -92,16 +108,18 @@ class Config:
 
         for i, field in enumerate(fields):
             if isinstance(defaults[i], bool):
-                params.append(Config.config[section].getboolean(field, defaults[i]))
+                params.append(Config.config[section].getboolean(
+                    field, defaults[i]))
             elif isinstance(defaults[i], int):
-                params.append(Config.config[section].getint(field, defaults[i]))
+                params.append(Config.config[section].getint(
+                    field, defaults[i]))
             elif isinstance(defaults[i], float):
-                params.append(Config.config[section].getfloat(field, defaults[i]))
-            else: # assuming that the parameter is a string
+                params.append(Config.config[section].getfloat(
+                    field, defaults[i]))
+            else:  # assuming that the parameter is a string
                 params.append(Config.config[section].get(field, defaults[i]))
 
         return params
-
 
     @staticmethod
     def extract():
@@ -116,23 +134,24 @@ class Config:
         assert Config.clients.per_round <= Config.clients.total_clients
 
         # Parameters for the data distribution
-        fields = ['partition_size', 'divider', 'label_distribution',
-                  'bias_primary_percentage', 'bias_secondary_focus', 'shard_per_client']
+        fields = [
+            'partition_size', 'divider', 'label_distribution',
+            'bias_primary_percentage', 'bias_secondary_focus',
+            'shard_per_client'
+        ]
         defaults = (0, 'iid', 'uniform', 0.8, False, 2)
         params = Config.extract_section('data', fields, defaults)
         Config.data = namedtuple('data', fields)(*params)
 
         # Training parameters for federated learning
-        fields = ['rounds', 'target_accuracy', 'epochs', 'batch_size',
-                  'dataset', 'data_path', 'model',
-                  'optimizer', 'learning_rate', 'weight_decay',
-                  'momentum', 'num_layers', 'num_classes',
-                  'lr_gamma', 'lr_milestone_steps', 'lr_warmup_steps']
-        defaults = (0, 0.9, 0, 128,
-                    'MNIST', './data', 'mnist_cnn',
-                    'SGD', 0.01, 0.0,
-                    0.9, 40, 10,
-                    0.0, '', '')
+        fields = [
+            'rounds', 'target_accuracy', 'epochs', 'batch_size', 'dataset',
+            'data_path', 'model', 'optimizer', 'learning_rate', 'weight_decay',
+            'momentum', 'num_layers', 'num_classes', 'lr_gamma',
+            'lr_milestone_steps', 'lr_warmup_steps'
+        ]
+        defaults = (0, 0.9, 0, 128, 'MNIST', './data', 'mnist_cnn', 'SGD',
+                    0.01, 0.0, 0.9, 40, 10, 0.0, '', '')
         params = Config.extract_section('training', fields, defaults)
 
         Config.training = namedtuple('training', fields)(*params)
@@ -146,8 +165,20 @@ class Config:
         # If the topology is hierarchical (cross-silo FL training)
         fields = ['total_silos', 'rounds']
         defaults = (1, 1)
-        params = Config.extract_section('cross_silo', fields, defaults, optional=True)
+        params = Config.extract_section('cross_silo',
+                                        fields,
+                                        defaults,
+                                        optional=True)
         if params is not None:
             Config.cross_silo = namedtuple('cross_silo', fields)(*params)
         else:
             Config.cross_silo = None
+
+        # Parameters for reinforcement learning
+        Config.rl = None
+        if Config.args.rl_config:
+            fields = ['tuned_para', 'episodes', 'target_reward']
+            defaults = (None, 0, None)
+            params = Config.extract_section('rl', fields, defaults)
+            if params is not None:
+                Config.rl = namedtuple('rl', fields)(*params)

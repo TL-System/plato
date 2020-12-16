@@ -59,7 +59,7 @@ class FedAvgServer(Server):
             logging.info('Configuring edge server #%s as a %s server...',
                          Config().args.id,
                          Config().server.type)
-            logging.info('Training: %s local aggregation rounds\n',
+            logging.info('Training: %s local aggregation rounds',
                          Config().cross_silo.rounds)
 
         else:
@@ -69,10 +69,10 @@ class FedAvgServer(Server):
             target_accuracy = Config().training.target_accuracy
 
             if target_accuracy:
-                logging.info('Training: %s rounds or %s%% accuracy\n',
+                logging.info('Training: %s rounds or %s%% accuracy',
                              total_rounds, 100 * target_accuracy)
             else:
-                logging.info('Training: %s rounds\n', total_rounds)
+                logging.info('Training: %s rounds', total_rounds)
 
         self.load_test_data()
         self.load_model()
@@ -87,7 +87,7 @@ class FedAvgServer(Server):
         """Setting up the global model to be trained via federated learning."""
 
         model_type = Config().training.model
-        logging.info('Model: %s', model_type)
+        logging.info('Model: %s\n', model_type)
 
         self.model = models_registry.get(model_type)
 

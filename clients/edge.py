@@ -28,15 +28,19 @@ class EdgeClient(Client):
         """Loading the model onto this client."""
         self.server.model.load_state_dict(server_model)
 
-    async def train(self):
+    async def train(self, rl_tuned_para_name=None, rl_tuned_para_value=None):
         """The aggregation workload on an edge client."""
         logging.info('Training on edge client #%s', self.client_id)
 
         # Wait for a certain number of aggregation rounds on the edge server
         logging.info("Edge server #%s: current local aggregation round = %s",
                      self.client_id, self.server.current_round)
-        while self.server.current_round == 0 or self.server.current_round % Config(
-        ).cross_silo.rounds != 0:
+
+        edge_agg_num = Config().cross_silo.rounds
+        if rl_tuned_para_name == 'edge_agg_num':
+            edge_agg_num = rl_tuned_para_value
+
+        while self.server.current_round == 0 or self.server.current_round % edge_agg_num != 0:
             await asyncio.sleep(1)
 
         # Extract model weights and biases
