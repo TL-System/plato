@@ -14,5 +14,7 @@ RUN apt-get update \
     && bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3 \
     && rm -rf ~/miniconda3/miniconda.sh \
     && ~/miniconda3/bin/conda init bash \
-    && ~/miniconda3/bin/conda create -n federated python=3.8
-
+    && ~/miniconda3/bin/conda create -n federated python=3.8 \
+    && ~/miniconda3/bin/conda install pytorch torchvision -c pytorch -n federated \
+    && ~/miniconda3/bin/conda install matplotlib scipy -n federated \
+    && ~/miniconda3/bin/conda install -c conda-forge websockets -n federated

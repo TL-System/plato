@@ -54,16 +54,16 @@ In case it is needed to format Python code during development, install `yapf`:
 $ pip install yapf
 ```
 
-If you use Visual Studio Code, to use `yapf`:
+If you use Visual Studio Code, to use `yapf` there are a few recommended settings:
 
 ```shell
-$ vi ~/Library/Application\ Support/Code/user/settings.json
+$ vi ~/Library/Application\ Support/Code/User/settings.json
 ```
 
 And add the following:
 
 ```shell
-    “python.linting.enabled": true,
+    "python.linting.enabled": true,
     "python.linting.pylintPath": "pylint",
     "editor.formatOnSave": true,
     "python.formatting.provider": "yapf", 
@@ -89,6 +89,32 @@ python server.py
 ### Running Unit Tests
 
 All unit tests are in the `tests/` directory. These tests are designed to be standalone and executed separately. For example, the command `python lr_schedule_tests.py` runs the unit tests for learning rate schedules.
+
+### Building a Docker container for running Plato
+
+Sometimes it may be beneficial to run Plato in a Docker container running Ubuntu Linux 20.04. To build such a Docker container, use the provided `Dockerfile` in `docker/`:
+
+```shell
+cd docker; docker build -t plato .
+```
+
+To run the docker image that was just built, use the command:
+
+```shell
+docker run -it plato
+```
+
+To remove all the containers after they are run, use the command:
+
+```shell
+docker rm $(docker ps -a -q)
+```
+
+To remove the `plato` Docker image, use the command:
+
+```shell
+docker rmi plato
+```
 
 ### Uninstalling Plato
 
