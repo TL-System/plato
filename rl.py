@@ -1,13 +1,15 @@
 """
-Testing the environment of reinforcement learning.
+Starting point of a reinforcement learning agent.
+This agent will tune a parameter of federated learning.
 """
+# pylint: disable=E1101
 
 import asyncio
-import logging
-import websockets
 from stable_baselines3.common.env_checker import check_env
 
 from config import Config
+import server as start_fl
+import servers
 from rl_agent import RLAgent
 from rl_envs import FLEnv
 
@@ -16,29 +18,27 @@ def main():
     """Check the custom environment of federated learning."""
     __ = Config()
 
-    rl_port = Config().server.port + Config().clients.total_clients + 1
-    if Config().cross_silo:
-        rl_port += Config().cross_silo.total_silos
-
-    rl_agent = RLAgent(rl_port)
+    rl_agent = RLAgent()
     rl_env = FLEnv(rl_agent)
-    rl_agent.configure(rl_env)
 
-    logging.info("Starting a RL agent on port %s...", rl_port)
+    fl_server = {"fedavg": servers.fedavg.FedAvgServer}[Config().server.type]()
+    rl_agent.configure(rl_env, fl_server)
+    fl_server.register_rl_agent(rl_agent)
+    fl_server.configure()
 
-    start_rl_agent = websockets.serve(rl_agent.serve,
-                                      Config().server.address,
-                                      rl_port,
-                                      ping_interval=None,
-                                      max_size=2**30)
+    start_fl.start_server_and_clients(fl_server)
+
+    # Run the RL agent as a coroutine of FL central server
+    coroutines = []
+    #coroutines.append(rl_agent.wait_until_central_server_start())
+    coroutines.append(rl_agent.serve())
+    asyncio.gather(*coroutines)
+
+    # Test the environment of reinforcement learning.
+    check_with_sb3_env_checker(rl_env)
+    #try_a_random_agent(rl_env)
 
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(start_rl_agent)
-
-    check_with_sb3_env_checker(rl_env)
-
-    try_a_random_agent(rl_env)
-
     loop.run_forever()
 
 

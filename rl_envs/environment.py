@@ -7,6 +7,7 @@ https://github.com/DLR-RM/stable-baselines3.
 To create and use other custom environments, check out:
 https://stable-baselines3.readthedocs.io/en/master/guide/custom_env.html.
 """
+# pylint: disable=E1101
 
 import logging
 import asyncio
@@ -22,21 +23,13 @@ class FLEnv(gym.Env):
     metadata = {'render.modes': ['fl']}
 
     def __init__(self, rl_agent):
-
         super(FLEnv, self).__init__()
 
         self.rl_agent = rl_agent
-        self.rl_state = None
+        self.state = None
         self.is_done = False
         self.rl_tuned_para_value = 0
         self.is_state_got = False
-
-        self.edge_server_num = Config().cross_silo.total_silos
-        self.client_num = Config().clients.total_clients
-
-        self.initial_edge_agg_num = Config().cross_silo.rounds
-
-        self.time_of_previous_global_round = 0
         """
         Normalize action space and make it symmetric when continuous.
         The reasons behind:
@@ -59,16 +52,12 @@ class FLEnv(gym.Env):
         self.state = [0 for i in range(self.n_states)]
 
     def reset(self):
-        self.time_of_previous_global_round = 0
+        logging.info("Reseting RL environment...")
 
-        logging.info("Reset RL environment...")
-
-        current_loop = asyncio.get_event_loop()
-        # Wait for the RL agent restart FL training
-        current_loop.run_until_complete(self.rl_agent.reset_env())
+        # Let the RL agent restart FL training
+        self.rl_agent.reset_env()
 
         self.state = [0 for i in range(self.n_states)]
-
         return np.array(self.state)
 
     def step(self, action):
@@ -81,10 +70,9 @@ class FLEnv(gym.Env):
         # Rescale the action from [-1, 1] to [1, 2, ... , 9]
         # The action is to choose the number of aggregations on edge servers
         #current_edge_agg_num = int((action + 2) * (action + 2))
-        current_edge_agg_num = int((action + 3) / 2 + 1)
+        current_edge_agg_num = int((action + 3) / 2)
 
-        print('Current number of aggregations on edge servers:',
-              current_edge_agg_num)
+        #print('Current number of aggregations on edge servers:',current_edge_agg_num)
 
         self.rl_tuned_para_value = current_edge_agg_num
 
@@ -96,13 +84,13 @@ class FLEnv(gym.Env):
         current_loop.run_until_complete(get_state_task_obj)
         self.is_state_got = False
 
-        print('State:', self.state)
+        #print('State:', self.state)
         self.normalize_state()
-        print('Normalized state:', self.state)
+        #print('Normalized state:', self.state)
 
         reward = self.get_reward()
         info = {}
-        return np.array(self.state), reward, self.is_done, info
+        return np.array([self.state]), reward, self.is_done, info
 
     def start_rl_agent(self):
         """Startup function for a RL agent."""
@@ -117,12 +105,12 @@ class FLEnv(gym.Env):
         while not self.is_state_got:
             await asyncio.sleep(1)
 
-    def get_state_from_rl_agent(self, rl_state, is_done):
+    def get_state_from_rl_agent(self, state, is_done):
         """
         Get transitted state from RL agent.
         This function is called by RL agent.
         """
-        self.rl_state = rl_state
+        self.state = state
         self.is_done = is_done
         self.is_state_got = True
 

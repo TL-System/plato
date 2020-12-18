@@ -2,8 +2,9 @@
 The base class for federated learning servers.
 """
 
+# pylint: disable=E1101
+
 from abc import abstractmethod
-from dataclasses import dataclass
 import json
 import sys
 import os
@@ -16,13 +17,6 @@ import websockets
 
 from config import Config
 import utils.plot_figures as plot_figures
-
-
-@dataclass
-class RLReport:
-    """RL report sent to the RL agent."""
-    rl_state: list
-    is_rl_episode_done: bool
 
 
 class Server:
@@ -38,19 +32,30 @@ class Server:
         self.reports = []
         self.round_start_time = 0  # starting time of a gloabl training round
         self.training_time_list = []  # training time of each round
-        self.edge_agg_num_list = [
-        ]  # number of local aggregation rounds on edge servers of each global training round
+
+        if Config().cross_silo:
+            # Parameters used by cross-silo FL
+            # number of local aggregation rounds on edge servers of the current global training round
+            self.edge_agg_num = Config().cross_silo.rounds
+            # number of local aggregation rounds on edge servers of each global training round
+            self.edge_agg_num_list = []
+
+            if Config().args.port:
+                self.current_global_round = 0
+                self.all_local_agg_rounds_done = False
+                # To ensure edge server does not reuse the global model of last RL episode
+                self.is_global_model_got = False
 
         if Config().rl:
             # Parameters used by RL
+            self.rl_agent = None
             self.rl_state = None
             # Parameter of federated learning that is tuned by a RL agent
             self.rl_tuned_para_name = Config().rl.tuned_para
             self.rl_tuned_para_value = None
             self.rl_time_step = 1
-            self.get_rl_tuned_para = False
+            self.is_rl_tuned_para_got = False
             self.is_rl_episode_done = False
-            self.is_rl_step_done = False
 
         # Directory of results (figures etc.)
         self.result_dir = './results/' + Config(
@@ -100,15 +105,18 @@ class Server:
         """Select a subset of the clients and send messages to them to start training."""
         self.reports = []
         self.current_round += 1
+
         if Config().args.id:
             logging.info(
-                '**** Local aggregation round %s/%s on edge server #%s ****',
-                self.current_round,
-                Config().cross_silo.rounds,
-                Config().args.id)
+                '\n**** Edge server #%s: Local aggregation round %s/%s ****',
+                Config().args.id, self.current_round, self.edge_agg_num)
         else:
-            logging.info('**** Round %s/%s ****', self.current_round,
+            logging.info('\n**** Round %s/%s ****', self.current_round,
                          Config().training.rounds)
+            if Config().cross_silo:
+                logging.info(
+                    'Each edge server will run %s local aggregation rounds.',
+                    self.edge_agg_num)
 
         self.round_start_time = time.time()
 
@@ -144,12 +152,15 @@ class Server:
                     client_update = await websocket.recv()
                     report = pickle.loads(client_update)
                     logging.info(
-                        "Server {}: Update from client #{} received. Accuracy = {:.2f}%\n"
+                        "Server {}: Update from client #{} received. Accuracy = {:.2f}%"
                         .format(os.getpid(), client_id, 100 * report.accuracy))
 
                     self.reports.append(report)
 
                     if len(self.reports) == len(self.selected_clients):
+                        if Config().args.port:
+                            if self.current_round >= self.edge_agg_num:
+                                self.all_local_agg_rounds_done = True
 
                         self.accuracy = self.process_report()
                         self.accuracy_list.append(self.accuracy * 100)
@@ -164,16 +175,19 @@ class Server:
                         target_accuracy = Config().training.target_accuracy
 
                         if not Config().args.port:
-                            self.edge_agg_num_list.append(
-                                Config().cross_silo.rounds)
+
+                            if Config().cross_silo:
+                                self.edge_agg_num_list.append(
+                                    self.edge_agg_num)
 
                             if target_accuracy and self.accuracy >= target_accuracy:
                                 logging.info('Target accuracy reached.')
                                 self.plot_figures_of_results()
-                                await self.close_connections()
+
                                 if Config().rl:
                                     self.is_rl_episode_done = True
                                 else:
+                                    await self.close_connections()
                                     sys.exit()
 
                             if self.current_round >= Config().training.rounds:
@@ -181,18 +195,48 @@ class Server:
                                     'Target number of training rounds reached.'
                                 )
                                 self.plot_figures_of_results()
-                                await self.close_connections()
+
                                 if Config().rl:
                                     self.is_rl_episode_done = True
                                 else:
+                                    await self.close_connections()
                                     sys.exit()
 
                         if Config().rl and not Config().args.port:
-                            self.is_rl_step_done = True
+                            # One RL time step is done
+                            # Send the state to the RL agent
+                            self.rl_agent.get_state(self.rl_state,
+                                                    self.is_rl_episode_done,
+                                                    self.rl_time_step)
 
-                            while not self.get_rl_tuned_para:
+                            self.rl_time_step += 1
+
+                            # Wait until get tuned parameter from RL agent
+                            while not self.is_rl_tuned_para_got:
                                 await asyncio.sleep(1)
-                            self.get_rl_tuned_para = False
+                            self.is_rl_tuned_para_got = False
+
+                        if Config().args.port:
+                            if self.current_round == self.edge_agg_num:
+                                self.current_global_round += 1
+
+                            # Edge server will wait for a while just in case
+                            # 1) its EdgeClient object hasn't received
+                            # self.server.all_local_agg_rounds_done = True;
+                            # 2) it hasn't close connection with clients when
+                            # global training is done
+                            while self.current_round == self.edge_agg_num or (
+                                    not Config().rl
+                                    and self.current_global_round >=
+                                    Config().training.rounds):
+                                await asyncio.sleep(1)
+
+                            # For a new episode of RL training
+                            self.current_global_round = 0
+
+                        if Config().args.port:
+                            while not self.is_global_model_got:
+                                await asyncio.sleep(1)
 
                         await self.select_clients()
 
@@ -202,12 +246,18 @@ class Server:
 
                     if self.current_round == 0 and len(
                             self.clients) >= self.total_clients:
+                        if Config().args.port:
+                            while not self.is_global_model_got:
+                                await asyncio.sleep(1)
                         logging.info('Server %s: starting FL training...',
                                      os.getpid())
+
                         if Config().rl and not Config().args.port:
-                            while not self.get_rl_tuned_para:
+                            # Wait until get tuned parameter from RL agent
+                            while not self.is_rl_tuned_para_got:
+                                print("CENTRAL SERVER HASN'T GOT TUNED PARA")
                                 await asyncio.sleep(1)
-                            self.get_rl_tuned_para = False
+                            self.is_rl_tuned_para_got = False
 
                         await self.select_clients()
 
@@ -217,62 +267,47 @@ class Server:
             logging.error(exception)
             sys.exit()
 
-    async def start_server_by_rl(self, rl_port):
-        """Start the FL central server by RL agent."""
+    def register_rl_agent(self, rl_agent):
+        """Register RL agent."""
+        self.rl_agent = rl_agent
 
-        logging.info("FL central server is contacting the RL agent...")
-        uri = 'ws://{}:{}'.format(Config().server.address, rl_port)
+    def reconfigure(self):
+        """
+        Reconfigure the federated learning server
+        at begining of each episode of RL training.
+        """
+        self.current_round = 0
+        self.model = None
+        self.accuracy_list = []
+        self.training_time_list = []  # training time of each round
 
-        try:
-            async with websockets.connect(uri,
-                                          ping_interval=None,
-                                          max_size=2**30) as websocket:
-                logging.info("Central Server: Signing in at the RL agent...")
-                await websocket.send(json.dumps({'greeting': 'Hi'}))
+        if Config().cross_silo:
+            # number of local aggregation rounds on edge servers of the current global training round
+            self.edge_agg_num = Config().cross_silo.rounds
+            # number of local aggregation rounds on edge servers of each global training round
+            self.edge_agg_num_list = []
 
-                while True:
-                    logging.info(
-                        "Central server is waiting for the tuned parameter of time step %s...",
-                        self.rl_time_step)
-                    rl_agent_response = await websocket.recv()
-                    data = json.loads(rl_agent_response)
+        self.rl_time_step = 1
+        self.is_rl_tuned_para_got = False
+        self.is_rl_episode_done = False
 
-                    if data['rl_time_step'] == self.rl_time_step and 'rl_tuned_para_value' in data:
-                        logging.info(
-                            "Central server has received the tuned parameter of time step %s.",
-                            self.rl_time_step)
+        self.configure()
 
-                        self.rl_tuned_para_value = data['rl_tuned_para_value']
+    def get_tuned_para(self, rl_time_step, rl_tuned_para_value):
+        """
+        Get tuned parameter from RL agent.
+        This function is called by RL agent.
+        """
+        assert self.rl_time_step == rl_time_step
+        self.rl_tuned_para_value = rl_tuned_para_value
 
-                        # The central server gets the tuned parameter,
-                        # and it is ready to start this global training round.
-                        self.get_rl_tuned_para = True
+        if self.rl_tuned_para_name == 'edge_agg_num':
+            self.edge_agg_num = self.rl_tuned_para_value
 
-                        # Wait until this time step (round of global training) is done
-                        while not self.is_rl_step_done:
-                            await asyncio.sleep(1)
-
-                        rl_report = RLReport(self.rl_state,
-                                             self.is_rl_episode_done)
-                        self.is_rl_step_done = False
-
-                        # Send the state to the RL agent when one time step is done
-                        logging.info(
-                            "Central server is ready to send the state to the RL agent..."
-                        )
-
-                        # Sending time step as metadata to the server (state to follow)
-                        server_update = {'rl_time_step': self.rl_time_step}
-                        await websocket.send(json.dumps(server_update))
-                        self.rl_time_step += 1
-
-                        # Sending the current state to the RL agent
-                        await websocket.send(pickle.dumps(rl_report))
-
-        except OSError as exception:
-            logging.info(
-                "FL central server: connection to the RL agent failed.")
-            logging.error(exception)
+        self.is_rl_tuned_para_got = True
+        logging.info(
+            "Central server has received the tuned parameter of time step %s.",
+            self.rl_time_step)
 
     def plot_figures_of_results(self):
         """Plot figures of results."""

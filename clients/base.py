@@ -31,7 +31,7 @@ class Client:
 
         random.seed()
 
-    async def start_client(self):
+    async def start_client(self, edge_server=None):
         """Startup function for a client."""
 
         if Config().cross_silo and not Config().args.port:
@@ -82,14 +82,25 @@ class Client:
                             "Client #%s has received the model and loaded data...",
                             self.client_id)
 
+                        if edge_server:
+                            edge_server.is_global_model_got = True
+                            edge_server.all_local_agg_rounds_done = False
+
                         if Config().rl:
                             report = await self.train(rl_tuned_para_name,
                                                       rl_tuned_para_value)
                         else:
                             report = await self.train()
 
-                        logging.info("Model trained on client #%s.",
-                                     self.client_id)
+                        if edge_server:
+                            logging.info(
+                                "Model aggregated on edge server (client #%s).",
+                                self.client_id)
+                            edge_server.is_global_model_got = False
+                        else:
+                            logging.info("Model trained on client #%s.",
+                                         self.client_id)
+
                         # Sending client ID as metadata to the server (payload to follow)
                         client_update = {'id': self.client_id, 'payload': True}
                         await websocket.send(json.dumps(client_update))

@@ -59,8 +59,7 @@ class FedAvgServer(Server):
             logging.info('Configuring edge server #%s as a %s server...',
                          Config().args.id,
                          Config().server.type)
-            logging.info('Training: %s local aggregation rounds',
-                         Config().cross_silo.rounds)
+            #logging.info('Training: %s local aggregation rounds',Config().cross_silo.rounds)
 
         else:
             logging.info('Configuring the %s server...', Config().server.type)

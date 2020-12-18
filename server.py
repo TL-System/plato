@@ -11,12 +11,8 @@ from config import Config
 import servers
 
 
-def main():
-    """Starting a WebSockets server."""
-    __ = Config()
-
-    server = {"fedavg": servers.fedavg.FedAvgServer}[Config().server.type]()
-    server.configure()
+def start_server_and_clients(server):
+    """Starting a WebSockets server and its clients."""
 
     logging.info("Starting a server on port %s...", Config().server.port)
     start_server = websockets.serve(server.serve,
@@ -34,6 +30,18 @@ def main():
         time.sleep(5)
 
     server.start_clients()
+
+
+def main():
+    """Configure and start a WebSockets server."""
+
+    __ = Config()
+
+    server = {"fedavg": servers.fedavg.FedAvgServer}[Config().server.type]()
+    server.configure()
+    start_server_and_clients(server)
+
+    loop = asyncio.get_event_loop()
     loop.run_forever()
 
 
