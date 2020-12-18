@@ -13,7 +13,6 @@ import time
 import websockets
 
 from config import Config
-import utils.plot_figures as plot_figures
 
 
 class Server:
@@ -27,10 +26,13 @@ class Server:
         self.accuracy = 0
         self.accuracy_list = []
         self.reports = []
-        self.round_start_time = 0  # starting time of a gloabl training round
-        self.training_time_list = []  # training time of each round
-        self.edge_agg_num_list = [
-        ]  # number of local aggregation rounds on edge servers of each global training round
+
+        # starting time of a gloabl training round
+        self.round_start_time = 0
+        # training time of each round
+        self.training_time_list = []
+        # number of local aggregation rounds on edge servers of each global training round
+        self.edge_agg_num_list = []
 
         # Directory of results (figures etc.)
         self.result_dir = './results/' + Config(
@@ -137,7 +139,7 @@ class Server:
 
                             if target_accuracy and self.accuracy >= target_accuracy:
                                 logging.info('Target accuracy reached.')
-                                self.plot_figures_of_results()
+                                self.wrap_up()
                                 await self.close_connections()
                                 sys.exit()
 
@@ -145,7 +147,7 @@ class Server:
                                 logging.info(
                                     'Target number of training rounds reached.'
                                 )
-                                self.plot_figures_of_results()
+                                self.wrap_up()
                                 await self.close_connections()
                                 sys.exit()
 
@@ -166,18 +168,8 @@ class Server:
             logging.error(exception)
             sys.exit()
 
-    def plot_figures_of_results(self):
-        """Plot figures of results."""
-        plot_figures.plot_global_round_vs_accuracy(self.accuracy_list,
-                                                   self.result_dir)
-        plot_figures.plot_training_time_vs_accuracy(self.accuracy_list,
-                                                    self.training_time_list,
-                                                    self.result_dir)
-
-        if Config().cross_silo:
-            plot_figures.plot_edge_agg_num_vs_accuracy(self.accuracy_list,
-                                                       self.edge_agg_num_list,
-                                                       self.result_dir)
+    def wrap_up(self):
+        """Wrapping up when the training is done."""
 
     @abstractmethod
     def configure(self):

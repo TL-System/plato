@@ -11,6 +11,7 @@ from datasets import registry as datasets_registry
 from training import trainer
 from servers import Server
 from config import Config
+import utils.plot_figures as plot_figures
 
 
 class FedAvgServer(Server):
@@ -174,6 +175,19 @@ class FedAvgServer(Server):
                                                                    accuracy))
 
         return accuracy
+
+    def wrap_up(self):
+        """Wrapping up when the training is done."""
+        plot_figures.plot_global_round_vs_accuracy(self.accuracy_list,
+                                                   self.result_dir)
+        plot_figures.plot_training_time_vs_accuracy(self.accuracy_list,
+                                                    self.training_time_list,
+                                                    self.result_dir)
+
+        if Config().cross_silo:
+            plot_figures.plot_edge_agg_num_vs_accuracy(self.accuracy_list,
+                                                       self.edge_agg_num_list,
+                                                       self.result_dir)
 
     @staticmethod
     def accuracy_averaging(reports):
