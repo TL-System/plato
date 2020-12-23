@@ -3,6 +3,7 @@ A simple federated learning server using federated averaging.
 """
 
 import logging
+import time
 import random
 import torch
 
@@ -22,6 +23,18 @@ class FedAvgServer(Server):
         self.model = None
         self.selected_clients = None
         self.total_samples = 0
+
+        if Config().cross_silo:
+            # number of local aggregation rounds on edge servers
+            # of each global training round
+            self.edge_agg_num_list = []
+
+        # starting time of a gloabl training round
+        self.round_start_time = 0
+        # training time spent in each round
+        self.training_time_list = []
+        # global model accuracy of each round
+        self.accuracy_list = []
 
         self.total_clients = Config().clients.total_clients
         self.clients_per_round = Config().clients.per_round
@@ -94,6 +107,7 @@ class FedAvgServer(Server):
 
     def choose_clients(self):
         """Choose a subset of the clients to participate in each round."""
+        self.round_start_time = time.time()
 
         # Select clients randomly
         assert self.clients_per_round <= len(self.clients)
@@ -175,6 +189,15 @@ class FedAvgServer(Server):
                                                                    accuracy))
 
         return accuracy
+
+    async def wrap_up_one_round(self):
+        """Wrapping up when one round of training is done."""
+        if not Config().args.port:
+            self.accuracy_list.append(self.accuracy * 100)
+            self.training_time_list.append(time.time() - self.round_start_time)
+
+            if Config().cross_silo:
+                self.edge_agg_num_list.append(self.edge_agg_num)
 
     def wrap_up(self):
         """Wrapping up when the training is done."""
