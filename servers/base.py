@@ -9,7 +9,7 @@ import os
 import logging
 import subprocess
 import pickle
-import time
+import asyncio
 import websockets
 
 from config import Config
@@ -24,15 +24,13 @@ class Server:
         self.current_round = 0
         self.model = None
         self.accuracy = 0
-        self.accuracy_list = []
         self.reports = []
 
-        # starting time of a gloabl training round
-        self.round_start_time = 0
-        # training time of each round
-        self.training_time_list = []
-        # number of local aggregation rounds on edge servers of each global training round
-        self.edge_agg_num_list = []
+        # Parameter used by cross-silo FL
+        if Config().cross_silo:
+            # Number of local aggregation rounds on edge servers
+            # of the current global training round
+            self.edge_agg_num = Config().cross_silo.rounds
 
         # Directory of results (figures etc.)
         self.result_dir = './results/' + Config(
@@ -81,15 +79,12 @@ class Server:
         self.current_round += 1
         if Config().args.id:
             logging.info(
-                '**** Local aggregation round %s/%s on edge server #%s ****',
-                self.current_round,
-                Config().cross_silo.rounds,
+                '**** Local aggregation round %s/%s on edge server (client #%s) ****',
+                self.current_round, self.edge_agg_num,
                 Config().args.id)
         else:
             logging.info('**** Round %s/%s ****', self.current_round,
                          Config().training.rounds)
-
-        self.round_start_time = time.time()
 
         self.choose_clients()
 
@@ -98,6 +93,9 @@ class Server:
                 socket = self.clients[client_id]
                 logging.info("Selecting client #%s for training...", client_id)
                 server_response = {'id': client_id, 'payload': True}
+                if Config().rl and not Config().args.id:
+                    server_response = await self.generate_rl_info(
+                        server_response)
                 await socket.send(json.dumps(server_response))
 
                 logging.info("Sending the current model...")
@@ -125,18 +123,13 @@ class Server:
 
                     if len(self.reports) == len(self.selected_clients):
                         self.accuracy = self.process_report()
-                        self.accuracy_list.append(self.accuracy * 100)
 
-                        self.training_time_list.append(time.time() -
-                                                       self.round_start_time)
+                        await self.wrap_up_one_round()
 
                         # Break the loop when the target accuracy is achieved
                         target_accuracy = Config().training.target_accuracy
 
                         if not Config().args.port:
-                            self.edge_agg_num_list.append(
-                                Config().cross_silo.rounds)
-
                             if target_accuracy and self.accuracy >= target_accuracy:
                                 logging.info('Target accuracy reached.')
                                 self.wrap_up()
@@ -182,3 +175,7 @@ class Server:
     @abstractmethod
     def process_report(self):
         """Process the reports after all clients have sent them to the server."""
+
+    @abstractmethod
+    async def wrap_up_one_round(self):
+        """Wrapping up when one round of training is done."""
