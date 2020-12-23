@@ -4,8 +4,10 @@ A simple federated learning server using federated averaging.
 
 import logging
 import time
+import os
 import random
 import torch
+import asyncio
 
 import models.registry as models_registry
 from datasets import registry as datasets_registry
@@ -24,10 +26,9 @@ class FedAvgServer(Server):
         self.selected_clients = None
         self.total_samples = 0
 
-        if Config().cross_silo:
-            # number of local aggregation rounds on edge servers
-            # of each global training round
-            self.edge_agg_num_list = []
+        # An edge client waits for the event that a certain number of
+        # aggregations are completed
+        self.model_aggregated = asyncio.Event()
 
         # starting time of a gloabl training round
         self.round_start_time = 0
@@ -73,7 +74,7 @@ class FedAvgServer(Server):
             logging.info('Configuring edge server #%s as a %s server...',
                          Config().args.id,
                          Config().server.type)
-            logging.info('Training: %s local aggregation rounds\n',
+            logging.info('Training with %s local aggregation rounds.',
                          Config().cross_silo.rounds)
 
         else:
@@ -170,17 +171,28 @@ class FedAvgServer(Server):
 
         return updated_weights
 
-    def process_report(self):
+    def process_reports(self):
         """Process the client reports by aggregating their weights."""
         updated_weights = self.aggregate_weights(self.reports)
         trainer.load_weights(self.model, updated_weights)
+
+        # When a certain number of aggregations are completed, an edge client
+        # may need to be signaled to send a report to the central server
+        if Config().cross_silo and Config().args.port:
+            logging.info(
+                '[Server %s]: Completed %s rounds of local aggregation.',
+                os.getpid(),
+                Config().cross_silo.rounds)
+            if self.current_round % Config().cross_silo.rounds == 0:
+                self.model_aggregated.set()
 
         # Testing the global model accuracy
         if Config().clients.do_test:
             # Compute the average accuracy from client reports
             accuracy = self.accuracy_averaging(self.reports)
-            logging.info('Average client accuracy: {:.2f}%\n'.format(100 *
-                                                                     accuracy))
+            logging.info(
+                '[Server {:d}] Average client accuracy: {:.2f}%.'.format(
+                    os.getpid(), 100 * accuracy))
         else:
             # Test the updated model directly at the server
             accuracy = trainer.test(self.model, self.testset,
@@ -196,9 +208,6 @@ class FedAvgServer(Server):
             self.accuracy_list.append(self.accuracy * 100)
             self.training_time_list.append(time.time() - self.round_start_time)
 
-            if Config().cross_silo:
-                self.edge_agg_num_list.append(self.edge_agg_num)
-
     def wrap_up(self):
         """Wrapping up when the training is done."""
         plot_figures.plot_global_round_vs_accuracy(self.accuracy_list,
@@ -206,11 +215,6 @@ class FedAvgServer(Server):
         plot_figures.plot_training_time_vs_accuracy(self.accuracy_list,
                                                     self.training_time_list,
                                                     self.result_dir)
-
-        if Config().cross_silo:
-            plot_figures.plot_edge_agg_num_vs_accuracy(self.accuracy_list,
-                                                       self.edge_agg_num_list,
-                                                       self.result_dir)
 
     @staticmethod
     def accuracy_averaging(reports):

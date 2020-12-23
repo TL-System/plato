@@ -6,15 +6,16 @@ to tune a parameter.
 
 import logging
 import asyncio
-from stable_baselines3.common.env_checker import check_env
 
 from config import Config
 from servers import FedAvgServer
 import servers
-from rl_envs import FLEnv
 
 FLServer = FedAvgServer
 if Config().rl:
+    from stable_baselines3.common.env_checker import check_env
+    from rl_envs import FLEnv
+
     FLServer = {"fedavg": servers.fedavg.FedAvgServer}[Config().rl.fl_server]
 
 
