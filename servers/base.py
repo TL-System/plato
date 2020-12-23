@@ -31,6 +31,9 @@ class Server:
             # Number of local aggregation rounds on edge servers
             # of the current global training round
             self.edge_agg_num = Config().cross_silo.rounds
+            # This is a flag to prevent an edge server continues choosing clients
+            # to do local aggregation when global training is done
+            self.is_selected_by_central = False
 
         # Directory of results (figures etc.)
         self.result_dir = './results/' + Config(
@@ -78,6 +81,31 @@ class Server:
         self.reports = []
         self.current_round += 1
         if Config().args.id:
+            # To train enough rounds of local aggregations on an edge server,
+            # in clients/edges.py line 39-40, we let the edge server wait for a while until
+            # reaching target number of local aggregations.
+            # The waiting interval is 1 second.
+
+            # However, if a local aggregation can be done in less than 1 second,
+            # it would happen that the edge server starts a new round of local aggregation
+            # by calling select_clients()
+            # even when it reaches target number of local aggregations in that 1 second.
+            # Therefore, here we use self.current_round > self.edge_agg_num to check
+            # if it already runs enough rounds of local aggregations.
+
+            # But using this condition is not enough. There is another bad situation where
+            # during the 1 second waiting due to self.current_round > self.edge_agg_num,
+            # a new round of global training starts and this edge server is selected.
+            # However, now the self.current_round is 0 due to clients/edges.py line 42,
+            # and cannot be added 1 on the above line 86 before choose_clients()
+            # for its first local aggregation round.
+            # In this case, we need to add 1 to self.current_round (line 111),
+            # or this edge server will run one more round of local aggregations.
+            while self.current_round > self.edge_agg_num or not self.is_selected_by_central:
+                await asyncio.sleep(1)
+            if self.is_selected_by_central and self.current_round == 0:
+                self.current_round += 1
+
             logging.info(
                 '**** Local aggregation round %s/%s on edge server (client #%s) ****',
                 self.current_round, self.edge_agg_num,
