@@ -22,19 +22,27 @@ def main():
     try:
         # If a server needs to be running concurrently
         if Config().args.port:
-            server = {
-                "fedavg": servers.fedavg.FedAvgServer
-            }[Config().server.type]()
+            if Config().rl:
+                server = {
+                    "fedavg": servers.fedavg.FedAvgServer
+                }[Config().rl.fl_server]()
+            else:
+                server = {
+                    "fedavg": servers.fedavg.FedAvgServer
+                }[Config().server.type]()
             server.configure()
 
             client = EdgeClient(server)
             coroutines.append(client.start_client())
 
             logging.info("Starting an edge server (client #%s) on port %s",
-                Config().args.id, Config().args.port)
+                         Config().args.id,
+                         Config().args.port)
             start_server = websockets.serve(server.serve,
-                        Config().server.address, Config().args.port,
-                        ping_interval=None, max_size=2 ** 30)
+                                            Config().server.address,
+                                            Config().args.port,
+                                            ping_interval=None,
+                                            max_size=2**30)
 
             coroutines.append(start_server)
         else:
@@ -46,7 +54,7 @@ def main():
 
     except websockets.ConnectionClosed:
         logging.info("Client #%s: connection to the server is closed.",
-            client.client_id)
+                     client.client_id)
         sys.exit()
 
 
