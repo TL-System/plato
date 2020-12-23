@@ -3,7 +3,6 @@ A federated learning client at the edge server in a cross-silo training workload
 """
 
 import asyncio
-import logging
 
 from config import Config
 from training import trainer
@@ -28,16 +27,20 @@ class EdgeClient(Client):
         """Loading the model onto this client."""
         self.server.model.load_state_dict(server_model)
 
-    async def train(self):
+    async def train(self, rl_tuned_para_name=None, rl_tuned_para_value=None):
+        self.server.is_selected_by_central = True
         """The aggregation workload on an edge client."""
-        logging.info('Training on edge client #%s', self.client_id)
+        edge_agg_num = Config().cross_silo.rounds
+        if rl_tuned_para_name == 'edge_agg_num':
+            edge_agg_num = rl_tuned_para_value
+            self.server.edge_agg_num = edge_agg_num
 
         # Wait for a certain number of aggregation rounds on the edge server
-        logging.info("Edge server #%s: current local aggregation round = %s",
-                     self.client_id, self.server.current_round)
-        while self.server.current_round == 0 or self.server.current_round % Config(
-        ).cross_silo.rounds != 0:
+        while self.server.current_round <= edge_agg_num:
             await asyncio.sleep(1)
+
+        self.server.current_round = 0
+        self.server.is_selected_by_central = False
 
         # Extract model weights and biases
         weights = trainer.extract_weights(self.server.model)
