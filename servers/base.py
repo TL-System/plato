@@ -9,7 +9,7 @@ import os
 import logging
 import subprocess
 import pickle
-import time
+import asyncio
 import websockets
 
 from config import Config
@@ -24,15 +24,16 @@ class Server:
         self.current_round = 0
         self.model = None
         self.accuracy = 0
-        self.accuracy_list = []
         self.reports = []
 
-        # starting time of a gloabl training round
-        self.round_start_time = 0
-        # training time of each round
-        self.training_time_list = []
-        # number of local aggregation rounds on edge servers of each global training round
-        self.edge_agg_num_list = []
+        # Parameter used by cross-silo FL
+        if Config().cross_silo:
+            # Number of local aggregation rounds on edge servers
+            # of the current global training round
+            self.edge_agg_num = Config().cross_silo.rounds
+            # This is a flag to prevent an edge server continues choosing clients
+            # to do local aggregation when global training is done
+            self.is_selected_by_central = False
 
         # Directory of results (figures etc.)
         self.result_dir = './results/' + Config(
@@ -80,16 +81,38 @@ class Server:
         self.reports = []
         self.current_round += 1
         if Config().args.id:
+            # To train enough rounds of local aggregations on an edge server,
+            # in clients/edges.py line 39-40, we let the edge server wait for a while until
+            # reaching target number of local aggregations.
+            # The waiting interval is 1 second.
+
+            # However, if a local aggregation can be done in less than 1 second,
+            # it would happen that the edge server starts a new round of local aggregation
+            # by calling select_clients()
+            # even when it reaches target number of local aggregations in that 1 second.
+            # Therefore, here we use self.current_round > self.edge_agg_num to check
+            # if it already runs enough rounds of local aggregations.
+
+            # But using this condition is not enough. There is another bad situation where
+            # during the 1 second waiting due to self.current_round > self.edge_agg_num,
+            # a new round of global training starts and this edge server is selected.
+            # However, now the self.current_round is 0 due to clients/edges.py line 42,
+            # and cannot be added 1 on the above line 86 before choose_clients()
+            # for its first local aggregation round.
+            # In this case, we need to add 1 to self.current_round (line 111),
+            # or this edge server will run one more round of local aggregations.
+            while self.current_round > self.edge_agg_num or not self.is_selected_by_central:
+                await asyncio.sleep(1)
+            if self.is_selected_by_central and self.current_round == 0:
+                self.current_round += 1
+
             logging.info(
-                '**** Local aggregation round %s/%s on edge server #%s ****',
-                self.current_round,
-                Config().cross_silo.rounds,
+                '**** Local aggregation round %s/%s on edge server (client #%s) ****',
+                self.current_round, self.edge_agg_num,
                 Config().args.id)
         else:
             logging.info('**** Round %s/%s ****', self.current_round,
                          Config().training.rounds)
-
-        self.round_start_time = time.time()
 
         self.choose_clients()
 
@@ -98,6 +121,9 @@ class Server:
                 socket = self.clients[client_id]
                 logging.info("Selecting client #%s for training...", client_id)
                 server_response = {'id': client_id, 'payload': True}
+                if Config().rl and not Config().args.id:
+                    server_response = await self.generate_rl_info(
+                        server_response)
                 await socket.send(json.dumps(server_response))
 
                 logging.info("Sending the current model...")
@@ -125,18 +151,13 @@ class Server:
 
                     if len(self.reports) == len(self.selected_clients):
                         self.accuracy = self.process_report()
-                        self.accuracy_list.append(self.accuracy * 100)
 
-                        self.training_time_list.append(time.time() -
-                                                       self.round_start_time)
+                        await self.wrap_up_one_round()
 
                         # Break the loop when the target accuracy is achieved
                         target_accuracy = Config().training.target_accuracy
 
                         if not Config().args.port:
-                            self.edge_agg_num_list.append(
-                                Config().cross_silo.rounds)
-
                             if target_accuracy and self.accuracy >= target_accuracy:
                                 logging.info('Target accuracy reached.')
                                 self.wrap_up()
@@ -182,3 +203,7 @@ class Server:
     @abstractmethod
     def process_report(self):
         """Process the reports after all clients have sent them to the server."""
+
+    @abstractmethod
+    async def wrap_up_one_round(self):
+        """Wrapping up when one round of training is done."""

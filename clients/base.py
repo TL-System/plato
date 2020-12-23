@@ -63,6 +63,11 @@ class Client:
                     data = json.loads(server_response)
 
                     if data['id'] == self.client_id and 'payload' in data:
+                        if Config().rl and Config().args.port:
+                            # Edge server loads parameters of reinforcement learning
+                            rl_tuned_para_name = data['rl_tuned_para_name']
+                            rl_tuned_para_value = data['rl_tuned_para_value']
+
                         logging.info(
                             "Client #%s has been selected and receiving the model...",
                             self.client_id)
@@ -73,10 +78,20 @@ class Client:
                         if not self.data_loaded:
                             self.load_data()
 
-                        report = await self.train()
+                        if Config().rl and Config().args.port:
+                            report = await self.train(rl_tuned_para_name,
+                                                      rl_tuned_para_value)
+                        else:
+                            report = await self.train()
 
-                        logging.info("Model trained on client #%s.",
-                                     self.client_id)
+                        if Config().args.port:
+                            logging.info(
+                                "Model aggregated on edge server (client #%s).",
+                                self.client_id)
+                        else:
+                            logging.info("Model trained on client #%s.",
+                                         self.client_id)
+
                         # Sending client ID as metadata to the server (payload to follow)
                         client_update = {'id': self.client_id, 'payload': True}
                         await websocket.send(json.dumps(client_update))
@@ -102,5 +117,5 @@ class Client:
         """Loading the model onto this client."""
 
     @abstractmethod
-    async def train(self):
+    async def train(self, rl_tuned_para_name=None, rl_tuned_para_value=None):
         """The machine learning training workload on a client."""
