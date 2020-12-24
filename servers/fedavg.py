@@ -6,8 +6,8 @@ import logging
 import time
 import os
 import random
-import torch
 import asyncio
+import torch
 
 import models.registry as models_registry
 from datasets import registry as datasets_registry
@@ -92,6 +92,9 @@ class FedAvgServer(Server):
         self.load_test_data()
         self.load_model()
 
+        if Config().cross_silo and not Config().args.port:
+            self.prepare_load_client_data()
+
     def load_test_data(self):
         """Loading the test dataset."""
         if not Config().clients.do_test:
@@ -105,6 +108,19 @@ class FedAvgServer(Server):
         logging.info('Model: %s', model_type)
 
         self.model = models_registry.get(model_type)
+
+    def prepare_load_client_data(self):
+        """Preparing for loading data on clients."""
+        dataset = datasets_registry.get()
+
+        logging.info('Dataset size: %s', dataset.num_train_examples())
+        logging.info('Number of classes: %s', dataset.num_classes())
+
+        assert Config().data.divider in ('iid', 'bias', 'shard')
+        logging.info('Data distribution: %s', Config().data.divider)
+
+        num_clients = Config().clients.total_clients
+        logging.info('Total number of clients: %s\n', num_clients)
 
     def choose_clients(self):
         """Choose a subset of the clients to participate in each round."""

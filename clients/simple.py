@@ -34,17 +34,12 @@ class SimpleClient(Client):
 
     def load_data(self):
         """Generating data and loading them onto this client."""
+        logging.info('Client #%s is loading local dataset...', self.client_id)
+
         dataset = datasets_registry.get()
         self.data_loaded = True
 
-        logging.info('Dataset size: %s', dataset.num_train_examples())
-        logging.info('Number of classes: %s', dataset.num_classes())
-
         # Setting up the data divider
-        assert Config().data.divider in ('iid', 'bias', 'shard')
-
-        logging.info('Data distribution: %s', Config().data.divider)
-
         divider = {
             'iid': iid.IIDDivider,
             'bias': biased.BiasedDivider,
@@ -52,7 +47,6 @@ class SimpleClient(Client):
         }[Config().data.divider](dataset)
 
         num_clients = Config().clients.total_clients
-        logging.info('Total number of clients: %s', num_clients)
 
         # Extract data partition for client
         if Config().data.divider == 'iid':
