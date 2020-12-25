@@ -72,6 +72,8 @@ class FLEnv(gym.Env):
         # Let the RL agent restart FL training
         self.rl_agent.reset_rl_env()
 
+        self.rl_agent.new_episode_begin.set()
+
         self.state = [0 for i in range(self.n_states)]
         return np.array(self.state)
 

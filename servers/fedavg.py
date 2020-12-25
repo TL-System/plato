@@ -233,13 +233,14 @@ class FedAvgServer(Server):
                 # to avoid selecting clients before a new global round begins
                 await self.new_global_round_begin.wait()
 
-    def wrap_up(self):
+    async def wrap_up(self):
         """Wrapping up when the training is done."""
         plot_figures.plot_global_round_vs_accuracy(self.accuracy_list,
                                                    self.result_dir)
         plot_figures.plot_training_time_vs_accuracy(self.accuracy_list,
                                                     self.training_time_list,
                                                     self.result_dir)
+        await super().wrap_up()
 
     @staticmethod
     def accuracy_averaging(reports):
