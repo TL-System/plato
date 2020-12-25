@@ -29,6 +29,9 @@ class FedAvgServer(Server):
         # An edge client waits for the event that a certain number of
         # aggregations are completed
         self.model_aggregated = asyncio.Event()
+        # An edge client waits for the event that a new global round begins
+        # before starts the first round of local aggregation
+        self.new_global_round_begin = asyncio.Event()
 
         # starting time of a gloabl training round
         self.round_start_time = 0
@@ -192,16 +195,6 @@ class FedAvgServer(Server):
         updated_weights = self.aggregate_weights(self.reports)
         trainer.load_weights(self.model, updated_weights)
 
-        # When a certain number of aggregations are completed, an edge client
-        # may need to be signaled to send a report to the central server
-        if Config().cross_silo and Config().args.port:
-            logging.info(
-                '[Server %s]: Completed %s rounds of local aggregation.',
-                os.getpid(),
-                Config().cross_silo.rounds)
-            if self.current_round % Config().cross_silo.rounds == 0:
-                self.model_aggregated.set()
-
         # Testing the global model accuracy
         if Config().clients.do_test:
             # Compute the average accuracy from client reports
@@ -223,6 +216,22 @@ class FedAvgServer(Server):
         if not Config().args.port:
             self.accuracy_list.append(self.accuracy * 100)
             self.training_time_list.append(time.time() - self.round_start_time)
+
+        # When a certain number of aggregations are completed, an edge client
+        # may need to be signaled to send a report to the central server
+        if Config().cross_silo and Config().args.port:
+            if self.current_round == Config().cross_silo.rounds:
+                logging.info(
+                    '[Server %s] Completed %s rounds of local aggregation.',
+                    os.getpid(),
+                    Config().cross_silo.rounds)
+                self.model_aggregated.set()
+                self.new_global_round_begin.clear()
+
+                self.current_round = 0
+                # Wait until a new global round begins
+                # to avoid selecting clients before a new global round begins
+                await self.new_global_round_begin.wait()
 
     def wrap_up(self):
         """Wrapping up when the training is done."""
