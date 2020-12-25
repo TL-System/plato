@@ -6,6 +6,7 @@ to tune the number of local aggregations on edge servers.
 
 import logging
 import asyncio
+import sys
 
 from config import Config
 from servers import FedAvgServer
@@ -42,12 +43,9 @@ class FedRLServer(FLServer):
         """
         logging.info('Configuring a RL agent and a %s server...',
                      Config().rl.fl_server)
-
-        rl_tuned_para_name = {
-            'edge_agg_num': 'number of aggregations on edge servers',
-        }[Config().rl.tuned_para]
-        logging.info("This RL agent will tune the %s of FL.",
-                     rl_tuned_para_name)
+        logging.info(
+            "This RL agent will tune the number of aggregations on edge servers."
+        )
 
         total_episodes = Config().rl.episodes
         target_reward = Config().rl.target_reward
@@ -116,14 +114,12 @@ class FedRLServer(FLServer):
         # Give RL env some time to finish step() before FL starts next round
         await self.rl_env.step_done.wait()
 
-    async def generate_rl_info(self, server_response):
+    async def generate_rl_info(self):
         """Get RL tuned parameter that will be sent to clients."""
         await self.rl_tuned_para_got.wait()
         self.rl_env.state_got.clear()
 
-        server_response['rl_tuned_para_name'] = Config().rl.tuned_para
-        server_response['rl_tuned_para_value'] = self.rl_tuned_para_value
-        return server_response
+        return ['fedrl', self.rl_tuned_para_value]
 
     def get_tuned_para(self, rl_tuned_para_value, time_step):
         """

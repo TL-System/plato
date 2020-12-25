@@ -166,8 +166,8 @@ class Config:
         else:
             Config.cross_silo = None
 
-        fields = ['fl_server', 'tuned_para', 'episodes', 'target_reward']
-        defaults = ('fedavg', None, 0, None)
+        fields = ['fl_server', 'episodes', 'target_reward']
+        defaults = ('fedavg', 0, None)
         params = Config.extract_section('rl', fields, defaults, optional=True)
         if params is not None:
             Config.rl = namedtuple('rl', fields)(*params)
