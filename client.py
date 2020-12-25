@@ -22,6 +22,9 @@ def main():
     try:
         # If a server needs to be running concurrently
         if Config().args.port:
+            Config().training = Config().training._replace(
+                rounds=Config().cross_silo.rounds)
+
             if Config().rl:
                 server = {
                     "fedavg": servers.fedavg.FedAvgServer
