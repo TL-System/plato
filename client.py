@@ -26,13 +26,12 @@ def main():
                 rounds=Config().cross_silo.rounds)
 
             if Config().rl:
-                server = {
-                    "fedavg": servers.fedavg.FedAvgServer
-                }[Config().rl.fl_server]()
-            else:
-                server = {
-                    "fedavg": servers.fedavg.FedAvgServer
-                }[Config().server.type]()
+                Config().server = Config().server._replace(
+                    type=Config().rl.fl_server)
+
+            server = {
+                "fedavg": servers.fedavg.FedAvgServer
+            }[Config().server.type]()
             server.configure()
 
             client = EdgeClient(server)

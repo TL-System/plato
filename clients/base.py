@@ -74,13 +74,13 @@ class Client:
                         if not self.data_loaded:
                             self.load_data()
 
-                        if 'info' in data and Config().args.port:
-                            if data['info'][0] == 'fedrl':
-                                # Update the number of local aggregation rounds
-                                Config().cross_silo = Config(
-                                ).cross_silo._replace(rounds=data['info'][1])
-                                Config().training = Config().training._replace(
-                                    rounds=data['info'][1])
+                        if 'fedrl' in data:
+                            # Update the number of local aggregation rounds
+                            Config().cross_silo = Config().cross_silo._replace(
+                                rounds=data['fedrl'])
+                            Config().training = Config().training._replace(
+                                rounds=data['fedrl'])
+                            print('EDGE SERVER GETS TUNED PARA')
 
                         report = await self.train()
 

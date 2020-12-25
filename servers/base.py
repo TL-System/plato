@@ -82,8 +82,9 @@ class Server:
                 socket = self.clients[client_id]
                 logging.info("Selecting client #%s for training...", client_id)
                 server_response = {'id': client_id, 'payload': True}
-                if Config().rl and not Config().args.id:
-                    server_response['info'] = await self.generate_rl_info()
+                if Config().server.type == 'fedrl':
+                    await self.update_rl_tuned_parameter()
+                    server_response['fedrl'] = Config().cross_silo.rounds
                 await socket.send(json.dumps(server_response))
 
                 logging.info("Sending the current model...")

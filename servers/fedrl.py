@@ -118,12 +118,16 @@ class FedRLServer(FLServer):
         # Give RL env some time to finish step() before FL starts next round
         await self.rl_env.step_done.wait()
 
-    async def generate_rl_info(self):
-        """Get RL tuned parameter that will be sent to clients."""
+    async def update_rl_tuned_parameter(self):
+        """
+        Wait for getting RL tuned parameter from env,
+        and update this parameter in Config().
+        """
         await self.rl_tuned_para_got.wait()
         self.rl_env.state_got.clear()
 
-        return ['fedrl', self.rl_tuned_para_value]
+        Config().cross_silo = Config().cross_silo._replace(
+            rounds=self.rl_tuned_para_value)
 
     def get_tuned_para(self, rl_tuned_para_value, time_step):
         """
