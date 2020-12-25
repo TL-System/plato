@@ -29,8 +29,13 @@ class FLEnv(gym.Env):
         self.time_step = 0
         self.state = None
         self.is_episode_done = False
-        self.is_state_got = False
-        self.is_step_done = False
+
+        # An RL env waits for the event that it gets the current state from RL agent
+        self.state_got = asyncio.Event()
+
+        # An RL agent waits for the event that the RL env finishes step()
+        # so that it can start a new FL round
+        self.step_done = asyncio.Event()
         """
         Normalize action space and make it symmetric when continuous.
         The reasons behind:
@@ -102,16 +107,15 @@ class FLEnv(gym.Env):
         reward = self.get_reward()
         info = {}
 
-        self.is_step_done = True
+        self.step_done.set()
         return np.array([self.state]), reward, self.is_episode_done, info
 
     async def wait_for_state(self, time_step):
         """Wait for getting the current state."""
         print("RL env: Start waiting for state of time step", time_step)
-        while not self.is_state_got:
-            await asyncio.sleep(1)
-            self.is_step_done = False
-        self.is_state_got = False
+        await self.state_got.wait()
+        self.step_done.clear()
+        self.state_got.clear()
         print("RL env: Stop waiting for state of time step", time_step)
 
     def get_state(self, state, is_episode_done):
@@ -121,7 +125,8 @@ class FLEnv(gym.Env):
         """
         self.state = state
         self.is_episode_done = is_episode_done
-        self.is_state_got = True
+        # Signal the RL env that it gets the current state
+        self.state_got.set()
         print("RL env: Get state", state)
         self.rl_agent.is_rl_tuned_para_got = False
 

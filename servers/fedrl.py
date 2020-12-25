@@ -1,7 +1,7 @@
 """
 A federated server with a reinforcement learning agent.
 This federated server uses reinforcement learning
-to tune a parameter.
+to tune the number of local aggregations on edge servers.
 """
 
 import logging
@@ -31,6 +31,10 @@ class FedRLServer(FLServer):
         self.rl_state = None
         self.is_rl_tuned_para_got = False
         self.is_rl_episode_done = False
+
+        # An RL agent waits for the event that the tuned parameter
+        # is passed from RL environment
+        self.rl_tuned_para_got = asyncio.Event()
 
     def configure(self):
         """
@@ -77,7 +81,7 @@ class FedRLServer(FLServer):
         # The number of finished FL training round
         self.current_round = 0
 
-        self.is_rl_tuned_para_got = False
+        self.rl_tuned_para_got.clear()
         self.is_rl_episode_done = False
 
         self.rl_episode += 1
@@ -110,14 +114,12 @@ class FedRLServer(FLServer):
         self.rl_env.get_state(self.rl_state, self.is_rl_episode_done)
 
         # Give RL env some time to finish step() before FL starts next round
-        while not self.rl_env.is_step_done:
-            await asyncio.sleep(1)
+        await self.rl_env.step_done.wait()
 
     async def generate_rl_info(self, server_response):
         """Get RL tuned parameter that will be sent to clients."""
-        while not self.is_rl_tuned_para_got:
-            await asyncio.sleep(1)
-        self.rl_env.is_state_got = False
+        await self.rl_tuned_para_got.wait()
+        self.rl_env.state_got.clear()
 
         server_response['rl_tuned_para_name'] = Config().rl.tuned_para
         server_response['rl_tuned_para_value'] = self.rl_tuned_para_value
@@ -129,7 +131,8 @@ class FedRLServer(FLServer):
         This function is called by RL env.
         """
         self.rl_tuned_para_value = rl_tuned_para_value
-        self.is_rl_tuned_para_got = True
+        # Signal the RL agent that it gets the tuned parameter
+        self.rl_tuned_para_got.set()
         print("RL agent: Get tuned para of time step", time_step)
 
     def wrap_up(self):
