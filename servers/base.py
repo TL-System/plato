@@ -9,7 +9,6 @@ import os
 import logging
 import subprocess
 import pickle
-import asyncio
 import websockets
 
 from config import Config
@@ -72,7 +71,7 @@ class Server:
         self.reports = []
         self.current_round += 1
 
-        logging.info('[Server %d] Starting round %s/%s.', os.getpid(),
+        logging.info('\n[Server %d] Starting round %s/%s.', os.getpid(),
                      self.current_round,
                      Config().training.rounds)
 
@@ -84,8 +83,7 @@ class Server:
                 logging.info("Selecting client #%s for training...", client_id)
                 server_response = {'id': client_id, 'payload': True}
                 if Config().rl and not Config().args.id:
-                    server_response = await self.generate_rl_info(
-                        server_response)
+                    server_response['info'] = await self.generate_rl_info()
                 await socket.send(json.dumps(server_response))
 
                 logging.info("Sending the current model...")
@@ -122,17 +120,13 @@ class Server:
                         if not Config().args.port:
                             if target_accuracy and self.accuracy >= target_accuracy:
                                 logging.info('Target accuracy reached.')
-                                self.wrap_up()
-                                await self.close_connections()
-                                sys.exit()
+                                await self.wrap_up()
 
                             if self.current_round >= Config().training.rounds:
                                 logging.info(
                                     'Target number of training rounds reached.'
                                 )
-                                self.wrap_up()
-                                await self.close_connections()
-                                sys.exit()
+                                await self.wrap_up()
 
                         await self.select_clients()
 
@@ -151,8 +145,10 @@ class Server:
             logging.error(exception)
             sys.exit()
 
-    def wrap_up(self):
+    async def wrap_up(self):
         """Wrapping up when the training is done."""
+        await self.close_connections()
+        sys.exit()
 
     @abstractmethod
     def configure(self):

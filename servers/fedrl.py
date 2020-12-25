@@ -37,6 +37,10 @@ class FedRLServer(FLServer):
         # is passed from RL environment
         self.rl_tuned_para_got = asyncio.Event()
 
+        # An RL agent waits for the event that RL environment is reset to aviod
+        # directly starting a new time step after the previous episode ends
+        self.new_episode_begin = asyncio.Event()
+
     def configure(self):
         """
         Booting the RL agent and the FL server
@@ -131,11 +135,16 @@ class FedRLServer(FLServer):
         self.rl_tuned_para_got.set()
         print("RL agent: Get tuned para of time step", time_step)
 
-    def wrap_up(self):
+    async def wrap_up(self):
         """Wrapping up when the FL training is done."""
         if self.rl_episode >= Config().rl.episodes:
             logging.info(
                 'RL Agent: Target number of training episodes reached.')
+            await self.close_connections()
+            sys.exit()
+        else:
+            self.new_episode_begin.clear()
+            await self.new_episode_begin.wait()
 
     @staticmethod
     def check_with_sb3_env_checker(env):
