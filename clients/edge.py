@@ -29,6 +29,7 @@ class EdgeClient(Client):
         """The aggregation workload on an edge client."""
         # Wait for the edge server to finish model aggregation
         await self.server.model_aggregated.wait()
+        self.server.model_aggregated.clear()
 
         # Extract model weights and biases
         weights = trainer.extract_weights(self.server.model)
