@@ -65,8 +65,6 @@ class FedRLServer(FLServer):
         super().start_clients(as_server)
 
         # The starting point of RL training
-        #self.start_rl()
-
         # Run RL training as a coroutine
         if not as_server:
             loop = asyncio.get_event_loop()
@@ -83,7 +81,6 @@ class FedRLServer(FLServer):
         # The number of finished FL training round
         self.current_round = 0
 
-        self.rl_tuned_para_got.clear()
         self.is_rl_episode_done = False
 
         self.rl_episode += 1
@@ -94,10 +91,6 @@ class FedRLServer(FLServer):
 
         # starting time of a gloabl training round
         self.round_start_time = 0
-        # training time spent in each round
-        self.training_time_list = []
-        # global model accuracy of each round
-        self.accuracy_list = []
 
     async def wrap_up_one_round(self):
         """Wrapping up when one round of FL training is done."""
@@ -117,6 +110,7 @@ class FedRLServer(FLServer):
 
         # Give RL env some time to finish step() before FL starts next round
         await self.rl_env.step_done.wait()
+        self.rl_env.step_done.clear()
 
     async def update_rl_tuned_parameter(self):
         """
@@ -124,7 +118,7 @@ class FedRLServer(FLServer):
         and update this parameter in Config().
         """
         await self.rl_tuned_para_got.wait()
-        self.rl_env.state_got.clear()
+        self.rl_tuned_para_got.clear()
 
         Config().cross_silo = Config().cross_silo._replace(
             rounds=self.rl_tuned_para_value)
@@ -134,6 +128,7 @@ class FedRLServer(FLServer):
         Get tuned parameter from RL env.
         This function is called by RL env.
         """
+        assert time_step == self.current_round + 1
         self.rl_tuned_para_value = rl_tuned_para_value
         # Signal the RL agent that it gets the tuned parameter
         self.rl_tuned_para_got.set()
@@ -147,8 +142,9 @@ class FedRLServer(FLServer):
             await self.close_connections()
             sys.exit()
         else:
-            self.new_episode_begin.clear()
+            # Wait until RL env resets and starts a new RL episode
             await self.new_episode_begin.wait()
+            self.new_episode_begin.clear()
 
     @staticmethod
     def check_with_sb3_env_checker(env):
@@ -173,5 +169,6 @@ class FedRLServer(FLServer):
                 action = env.action_space.sample()
                 obs, reward, done, info = env.step(action)
                 if done:
-                    obs = env.reset()
+                    if i < episodes:
+                        obs = env.reset()
                     break

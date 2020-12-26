@@ -10,7 +10,6 @@ https://stable-baselines3.readthedocs.io/en/master/guide/custom_env.html.
 
 import logging
 import asyncio
-import sys
 import gym
 from gym import spaces
 import numpy as np
@@ -36,11 +35,10 @@ class FLEnv(gym.Env):
         # An RL agent waits for the event that the RL env finishes step()
         # so that it can start a new FL round
         self.step_done = asyncio.Event()
-        """
-        Normalize action space and make it symmetric when continuous.
-        The reasons behind:
-        https://stable-baselines3.readthedocs.io/en/master/guide/rl_tips.html#tips-and-tricks-when-creating-a-custom-environment
-        """
+
+        # Normalize action space and make it symmetric when continuous.
+        # The reasons behind:
+        # https://stable-baselines3.readthedocs.io/en/master/guide/rl_tips.html#tips-and-tricks-when-creating-a-custom-environment
         n_actions = 1
         self.action_space = spaces.Box(low=-1,
                                        high=1,
@@ -60,11 +58,10 @@ class FLEnv(gym.Env):
     def reset(self):
         if self.rl_agent.rl_episode >= Config().rl.episodes:
             while True:
-                # Give some time (2 seconds) to close connections
+                # Give RL agent some time to close connections and exit
                 current_loop = asyncio.get_event_loop()
-                task = current_loop.create_task(asyncio.sleep(2))
+                task = current_loop.create_task(asyncio.sleep(1))
                 current_loop.run_until_complete(task)
-                sys.exit()
 
         logging.info("Reseting RL environment...")
 
@@ -85,40 +82,43 @@ class FLEnv(gym.Env):
         reward = float(0)
         self.is_episode_done = False
 
-        # Rescale the action from [-1, 1] to [1, 2, ... , 9]
-        # The action is to choose the number of aggregations on edge servers
-        #current_edge_agg_num = int((action + 2) * (action + 2))
+        # For testing code
         current_edge_agg_num = self.time_step
 
-        print('Number of aggregations on edge servers of time step',
-              self.time_step, 'is', current_edge_agg_num)
+        # Rescale the action from [-1, 1] to [1, 2, ... , 9]
+        # The action is the number of aggregations on edge servers
+        #current_edge_agg_num = int((action + 2) * (action + 2))
+
+        logging.info('RL Agent: Start time step #%s...', self.time_step)
+        logging.info(
+            'Each edge server will run %s rounds of local aggregation.',
+            current_edge_agg_num)
 
         # Pass the tuned parameter to RL agent
         self.rl_agent.get_tuned_para(current_edge_agg_num, self.time_step)
 
         # Wait for state
         current_loop = asyncio.get_event_loop()
-        get_state_task = current_loop.create_task(
-            self.wait_for_state(self.time_step))
+        get_state_task = current_loop.create_task(self.wait_for_state())
         current_loop.run_until_complete(get_state_task)
-
         #print('State:', self.state)
+
         self.normalize_state()
         #print('Normalized state:', self.state)
 
         reward = self.get_reward()
         info = {}
 
+        # Signal the RL agent to start next time step (next round of FL)
         self.step_done.set()
+
         return np.array([self.state]), reward, self.is_episode_done, info
 
-    async def wait_for_state(self, time_step):
+    async def wait_for_state(self):
         """Wait for getting the current state."""
-        print("RL env: Start waiting for state of time step", time_step)
         await self.state_got.wait()
-        self.step_done.clear()
+        assert self.time_step == self.rl_agent.current_round
         self.state_got.clear()
-        print("RL env: Stop waiting for state of time step", time_step)
 
     def get_state(self, state, is_episode_done):
         """
@@ -133,7 +133,7 @@ class FLEnv(gym.Env):
         self.rl_agent.is_rl_tuned_para_got = False
 
     def normalize_state(self):
-        """Normalize each element of state."""
+        """Normalize each element of state to [-1,1]."""
         self.state = 2 * (self.state - 0.5)
 
     def get_reward(self):

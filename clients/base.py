@@ -80,7 +80,6 @@ class Client:
                                 rounds=data['fedrl'])
                             Config().training = Config().training._replace(
                                 rounds=data['fedrl'])
-                            print('EDGE SERVER GETS TUNED PARA')
 
                         report = await self.train()
 

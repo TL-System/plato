@@ -242,12 +242,12 @@ class FedAvgServer(Server):
                     os.getpid(),
                     Config().cross_silo.rounds)
                 self.model_aggregated.set()
-                self.new_global_round_begin.clear()
 
                 self.current_round = 0
                 # Wait until a new global round begins
                 # to avoid selecting clients before a new global round begins
                 await self.new_global_round_begin.wait()
+                self.new_global_round_begin.clear()
 
     async def wrap_up(self):
         """Wrapping up when the training is done."""
