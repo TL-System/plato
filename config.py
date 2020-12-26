@@ -174,3 +174,14 @@ class Config:
             assert Config.server.type == 'fedrl'
         else:
             Config.rl = None
+
+        fields = ['types', 'plot']
+        defaults = (None, None)
+        params = Config.extract_section('results',
+                                        fields,
+                                        defaults,
+                                        optional=True)
+        if params is not None:
+            Config.results = namedtuple('results', fields)(*params)
+        else:
+            Config.results = None
