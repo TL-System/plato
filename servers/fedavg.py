@@ -6,14 +6,15 @@ import logging
 import time
 import os
 import random
-import torch
 import asyncio
+import torch
 
 import models.registry as models_registry
 from datasets import registry as datasets_registry
 from training import trainer
 from servers import Server
 from config import Config
+from utils import csv_processor
 import utils.plot_figures as plot_figures
 
 
@@ -29,13 +30,12 @@ class FedAvgServer(Server):
         # An edge client waits for the event that a certain number of
         # aggregations are completed
         self.model_aggregated = asyncio.Event()
+        # An edge client waits for the event that a new global round begins
+        # before starts the first round of local aggregation
+        self.new_global_round_begin = asyncio.Event()
 
         # starting time of a gloabl training round
         self.round_start_time = 0
-        # training time spent in each round
-        self.training_time_list = []
-        # global model accuracy of each round
-        self.accuracy_list = []
 
         self.total_clients = Config().clients.total_clients
         self.clients_per_round = Config().clients.per_round
@@ -62,6 +62,15 @@ class FedAvgServer(Server):
                 logging.info(
                     "Started training on %s clients and %s per round...",
                     self.total_clients, self.clients_per_round)
+
+        if Config().results:
+            recorded_items = Config().results.types
+            self.recorded_items = [
+                x.strip() for x in recorded_items.split(',')
+            ]
+            self.result_csv_file = self.result_dir + 'result.csv'
+            csv_processor.initialize_csv(self.result_csv_file,
+                                         self.recorded_items, self.result_dir)
 
         random.seed()
 
@@ -92,6 +101,9 @@ class FedAvgServer(Server):
         self.load_test_data()
         self.load_model()
 
+        if not (Config().cross_silo and Config().args.port):
+            self.prepare_load_client_data()
+
     def load_test_data(self):
         """Loading the test dataset."""
         if not Config().clients.do_test:
@@ -105,6 +117,19 @@ class FedAvgServer(Server):
         logging.info('Model: %s', model_type)
 
         self.model = models_registry.get(model_type)
+
+    def prepare_load_client_data(self):
+        """Preparing for loading data on clients."""
+        dataset = datasets_registry.get()
+
+        logging.info('Dataset size: %s', dataset.num_train_examples())
+        logging.info('Number of classes: %s', dataset.num_classes())
+
+        assert Config().data.divider in ('iid', 'bias', 'shard')
+        logging.info('Data distribution: %s', Config().data.divider)
+
+        num_clients = Config().clients.total_clients
+        logging.info('Total number of clients: %s\n', num_clients)
 
     def choose_clients(self):
         """Choose a subset of the clients to participate in each round."""
@@ -176,16 +201,6 @@ class FedAvgServer(Server):
         updated_weights = self.aggregate_weights(self.reports)
         trainer.load_weights(self.model, updated_weights)
 
-        # When a certain number of aggregations are completed, an edge client
-        # may need to be signaled to send a report to the central server
-        if Config().cross_silo and Config().args.port:
-            logging.info(
-                '[Server %s]: Completed %s rounds of local aggregation.',
-                os.getpid(),
-                Config().cross_silo.rounds)
-            if self.current_round % Config().cross_silo.rounds == 0:
-                self.model_aggregated.set()
-
         # Testing the global model accuracy
         if Config().clients.do_test:
             # Compute the average accuracy from client reports
@@ -204,17 +219,44 @@ class FedAvgServer(Server):
 
     async def wrap_up_one_round(self):
         """Wrapping up when one round of training is done."""
-        if not Config().args.port:
-            self.accuracy_list.append(self.accuracy * 100)
-            self.training_time_list.append(time.time() - self.round_start_time)
 
-    def wrap_up(self):
+        # Write results into a CSV file
+        if Config().results:
+            if not Config().args.port:
+                new_row = [self.current_round]
+                for item in self.recorded_items:
+                    item_value = {
+                        'accuracy': self.accuracy * 100,
+                        'training_time': time.time() - self.round_start_time,
+                        'edge_agg_num': Config().cross_silo.rounds
+                    }[item]
+                    new_row.append(item_value)
+                csv_processor.write_csv(self.result_csv_file, new_row)
+
+        # When a certain number of aggregations are completed, an edge client
+        # may need to be signaled to send a report to the central server
+        if Config().cross_silo and Config().args.port:
+            if self.current_round == Config().cross_silo.rounds:
+                logging.info(
+                    '[Server %s] Completed %s rounds of local aggregation.',
+                    os.getpid(),
+                    Config().cross_silo.rounds)
+                self.model_aggregated.set()
+
+                self.current_round = 0
+                # Wait until a new global round begins
+                # to avoid selecting clients before a new global round begins
+                await self.new_global_round_begin.wait()
+                self.new_global_round_begin.clear()
+
+    async def wrap_up(self):
         """Wrapping up when the training is done."""
-        plot_figures.plot_global_round_vs_accuracy(self.accuracy_list,
-                                                   self.result_dir)
-        plot_figures.plot_training_time_vs_accuracy(self.accuracy_list,
-                                                    self.training_time_list,
+        if Config().results:
+            if Config().results.plot:
+                plot_figures.plot_figures_from_dict(self.result_csv_file,
                                                     self.result_dir)
+
+        await super().wrap_up()
 
     @staticmethod
     def accuracy_averaging(reports):

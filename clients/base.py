@@ -5,6 +5,7 @@ A basic federated learning client who sends weight updates to the server.
 import logging
 import json
 import random
+import os
 import pickle
 from abc import abstractmethod
 from dataclasses import dataclass
@@ -63,11 +64,6 @@ class Client:
                     data = json.loads(server_response)
 
                     if data['id'] == self.client_id and 'payload' in data:
-                        if Config().rl and Config().args.port:
-                            # Edge server loads parameters of reinforcement learning
-                            rl_tuned_para_name = data['rl_tuned_para_name']
-                            rl_tuned_para_value = data['rl_tuned_para_value']
-
                         logging.info(
                             "Client #%s has been selected and receiving the model...",
                             self.client_id)
@@ -78,16 +74,19 @@ class Client:
                         if not self.data_loaded:
                             self.load_data()
 
-                        if Config().rl and Config().args.port:
-                            report = await self.train(rl_tuned_para_name,
-                                                      rl_tuned_para_value)
-                        else:
-                            report = await self.train()
+                        if 'fedrl' in data:
+                            # Update the number of local aggregation rounds
+                            Config().cross_silo = Config().cross_silo._replace(
+                                rounds=data['fedrl'])
+                            Config().training = Config().training._replace(
+                                rounds=data['fedrl'])
+
+                        report = await self.train()
 
                         if Config().args.port:
                             logging.info(
-                                "Model aggregated on edge server (client #%s).",
-                                self.client_id)
+                                "[Server %d] Model aggregated on edge server (client #%s).",
+                                os.getpid(), self.client_id)
                         else:
                             logging.info("Model trained on client #%s.",
                                          self.client_id)
@@ -117,5 +116,5 @@ class Client:
         """Loading the model onto this client."""
 
     @abstractmethod
-    async def train(self, rl_tuned_para_name=None, rl_tuned_para_value=None):
+    async def train(self):
         """The machine learning training workload on a client."""

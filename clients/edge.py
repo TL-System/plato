@@ -25,10 +25,14 @@ class EdgeClient(Client):
         """Loading the model onto this client."""
         self.server.model.load_state_dict(server_model)
 
-    async def train(self, rl_tuned_para_name=None, rl_tuned_para_value=None):
+    async def train(self):
         """The aggregation workload on an edge client."""
+        # Signal edge server to select clients to start a new round of local aggregation
+        self.server.new_global_round_begin.set()
+
         # Wait for the edge server to finish model aggregation
         await self.server.model_aggregated.wait()
+        self.server.model_aggregated.clear()
 
         # Extract model weights and biases
         weights = trainer.extract_weights(self.server.model)
