@@ -1,11 +1,12 @@
 """
 A federated server with a reinforcement learning agent.
 This federated server uses reinforcement learning
-to tune a parameter.
+to tune the number of local aggregations on edge servers.
 """
 
 import logging
 import asyncio
+import sys
 
 from config import Config
 from servers import FedAvgServer
@@ -32,18 +33,23 @@ class FedRLServer(FLServer):
         self.is_rl_tuned_para_got = False
         self.is_rl_episode_done = False
 
+        # An RL agent waits for the event that the tuned parameter
+        # is passed from RL environment
+        self.rl_tuned_para_got = asyncio.Event()
+
+        # An RL agent waits for the event that RL environment is reset to aviod
+        # directly starting a new time step after the previous episode ends
+        self.new_episode_begin = asyncio.Event()
+
     def configure(self):
         """
         Booting the RL agent and the FL server
         """
         logging.info('Configuring a RL agent and a %s server...',
                      Config().rl.fl_server)
-
-        rl_tuned_para_name = {
-            'edge_agg_num': 'number of aggregations on edge servers',
-        }[Config().rl.tuned_para]
-        logging.info("This RL agent will tune the %s of FL.",
-                     rl_tuned_para_name)
+        logging.info(
+            "This RL agent will tune the number of aggregations on edge servers."
+        )
 
         total_episodes = Config().rl.episodes
         target_reward = Config().rl.target_reward
@@ -59,8 +65,6 @@ class FedRLServer(FLServer):
         super().start_clients(as_server)
 
         # The starting point of RL training
-        #self.start_rl()
-
         # Run RL training as a coroutine
         if not as_server:
             loop = asyncio.get_event_loop()
@@ -77,7 +81,6 @@ class FedRLServer(FLServer):
         # The number of finished FL training round
         self.current_round = 0
 
-        self.is_rl_tuned_para_got = False
         self.is_rl_episode_done = False
 
         self.rl_episode += 1
@@ -88,10 +91,6 @@ class FedRLServer(FLServer):
 
         # starting time of a gloabl training round
         self.round_start_time = 0
-        # training time spent in each round
-        self.training_time_list = []
-        # global model accuracy of each round
-        self.accuracy_list = []
 
     async def wrap_up_one_round(self):
         """Wrapping up when one round of FL training is done."""
@@ -110,33 +109,42 @@ class FedRLServer(FLServer):
         self.rl_env.get_state(self.rl_state, self.is_rl_episode_done)
 
         # Give RL env some time to finish step() before FL starts next round
-        while not self.rl_env.is_step_done:
-            await asyncio.sleep(1)
+        await self.rl_env.step_done.wait()
+        self.rl_env.step_done.clear()
 
-    async def generate_rl_info(self, server_response):
-        """Get RL tuned parameter that will be sent to clients."""
-        while not self.is_rl_tuned_para_got:
-            await asyncio.sleep(1)
-        self.rl_env.is_state_got = False
+    async def update_rl_tuned_parameter(self):
+        """
+        Wait for getting RL tuned parameter from env,
+        and update this parameter in Config().
+        """
+        await self.rl_tuned_para_got.wait()
+        self.rl_tuned_para_got.clear()
 
-        server_response['rl_tuned_para_name'] = Config().rl.tuned_para
-        server_response['rl_tuned_para_value'] = self.rl_tuned_para_value
-        return server_response
+        Config().cross_silo = Config().cross_silo._replace(
+            rounds=self.rl_tuned_para_value)
 
     def get_tuned_para(self, rl_tuned_para_value, time_step):
         """
         Get tuned parameter from RL env.
         This function is called by RL env.
         """
+        assert time_step == self.current_round + 1
         self.rl_tuned_para_value = rl_tuned_para_value
-        self.is_rl_tuned_para_got = True
+        # Signal the RL agent that it gets the tuned parameter
+        self.rl_tuned_para_got.set()
         print("RL agent: Get tuned para of time step", time_step)
 
-    def wrap_up(self):
+    async def wrap_up(self):
         """Wrapping up when the FL training is done."""
         if self.rl_episode >= Config().rl.episodes:
             logging.info(
                 'RL Agent: Target number of training episodes reached.')
+            await self.close_connections()
+            sys.exit()
+        else:
+            # Wait until RL env resets and starts a new RL episode
+            await self.new_episode_begin.wait()
+            self.new_episode_begin.clear()
 
     @staticmethod
     def check_with_sb3_env_checker(env):
@@ -161,5 +169,6 @@ class FedRLServer(FLServer):
                 action = env.action_space.sample()
                 obs, reward, done, info = env.step(action)
                 if done:
-                    obs = env.reset()
+                    if i < episodes:
+                        obs = env.reset()
                     break

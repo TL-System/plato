@@ -166,11 +166,22 @@ class Config:
         else:
             Config.cross_silo = None
 
-        fields = ['fl_server', 'tuned_para', 'episodes', 'target_reward']
-        defaults = ('fedavg', None, 0, None)
+        fields = ['fl_server', 'episodes', 'target_reward']
+        defaults = ('fedavg', 0, None)
         params = Config.extract_section('rl', fields, defaults, optional=True)
         if params is not None:
             Config.rl = namedtuple('rl', fields)(*params)
             assert Config.server.type == 'fedrl'
         else:
             Config.rl = None
+
+        fields = ['types', 'plot']
+        defaults = (None, None)
+        params = Config.extract_section('results',
+                                        fields,
+                                        defaults,
+                                        optional=True)
+        if params is not None:
+            Config.results = namedtuple('results', fields)(*params)
+        else:
+            Config.results = None
