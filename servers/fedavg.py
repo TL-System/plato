@@ -32,38 +32,9 @@ class FedAvgServer(Server):
 
         self.total_clients = Config().clients.total_clients
         self.clients_per_round = Config().clients.per_round
-
-        if Config().is_edge_server():
-            # An edge client waits for the event that a certain number of
-            # aggregations are completed
-            self.model_aggregated = asyncio.Event()
-
-            # An edge client waits for the event that a new global round begins
-            # before starting the first round of local aggregation
-            self.new_global_round_begins = asyncio.Event()
-
-            # Compute the number of clients in each silo for edge servers
-            self.total_clients = int(self.total_clients /
-                                     Config().cross_silo.total_silos)
-            self.clients_per_round = int(self.clients_per_round /
-                                         Config().cross_silo.total_silos)
-            logging.info(
-                "Edge server #%s starts training with %s clients and %s per round...",
-                Config().args.id, self.total_clients, self.clients_per_round)
-        else:
-            # Compute the number of clients for the central server
-            if Config().is_central_server():
-                self.clients_per_round = Config().cross_silo.total_silos
-                self.total_clients = self.clients_per_round
-
-                logging.info(
-                    "The central server starts training with %s edge servers...",
-                    self.total_clients)
-            else:
-                self.clients_per_round = Config().clients.per_round
-                logging.info(
-                    "Started training on %s clients and %s per round...",
-                    self.total_clients, self.clients_per_round)
+        self.clients_per_round = Config().clients.per_round
+        logging.info("Started training on %s clients and %s per round...",
+                     self.total_clients, self.clients_per_round)
 
         if Config().results:
             recorded_items = Config().results.types
@@ -81,24 +52,16 @@ class FedAvgServer(Server):
         Booting the federated learning server by setting up the data, model, and
         creating the clients.
         """
-        if Config().args.id:
-            logging.info('Configuring edge server #%s as a %s server...',
-                         Config().args.id,
-                         Config().server.type)
-            logging.info('Training with %s local aggregation rounds.',
-                         Config().cross_silo.rounds)
+        logging.info('Configuring the %s server...', Config().server.type)
 
+        total_rounds = Config().training.rounds
+        target_accuracy = Config().training.target_accuracy
+
+        if target_accuracy:
+            logging.info('Training: %s rounds or %s%% accuracy\n',
+                         total_rounds, 100 * target_accuracy)
         else:
-            logging.info('Configuring the %s server...', Config().server.type)
-
-            total_rounds = Config().training.rounds
-            target_accuracy = Config().training.target_accuracy
-
-            if target_accuracy:
-                logging.info('Training: %s rounds or %s%% accuracy\n',
-                             total_rounds, 100 * target_accuracy)
-            else:
-                logging.info('Training: %s rounds\n', total_rounds)
+            logging.info('Training: %s rounds\n', total_rounds)
 
         self.load_test_data()
         self.load_model()
@@ -208,32 +171,14 @@ class FedAvgServer(Server):
 
         # Write results into a CSV file
         if Config().results:
-            if not Config().is_edge_server():
-                new_row = [self.current_round]
-                for item in self.recorded_items:
-                    item_value = {
-                        'accuracy': self.accuracy * 100,
-                        'training_time': time.time() - self.round_start_time,
-                        'edge_agg_num': Config().cross_silo.rounds
-                    }[item]
-                    new_row.append(item_value)
-                csv_processor.write_csv(self.result_csv_file, new_row)
-
-        # When a certain number of aggregations are completed, an edge client
-        # may need to be signaled to send a report to the central server
-        if Config().is_edge_server():
-            if self.current_round == Config().cross_silo.rounds:
-                logging.info(
-                    '[Server %s] Completed %s rounds of local aggregation.',
-                    os.getpid(),
-                    Config().cross_silo.rounds)
-                self.model_aggregated.set()
-
-                self.current_round = 0
-                # Wait until a new global round begins
-                # to avoid selecting clients before a new global round begins
-                await self.new_global_round_begins.wait()
-                self.new_global_round_begins.clear()
+            new_row = [self.current_round]
+            for item in self.recorded_items:
+                item_value = {
+                    'accuracy': self.accuracy * 100,
+                    'training_time': time.time() - self.round_start_time
+                }[item]
+                new_row.append(item_value)
+            csv_processor.write_csv(self.result_csv_file, new_row)
 
     async def wrap_up(self):
         """Wrapping up when the entire training is done."""

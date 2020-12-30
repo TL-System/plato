@@ -30,7 +30,9 @@ def main():
                     type=Config().rl.fl_server)
 
             server = {
-                "fedavg": servers.fedavg.FedAvgServer
+                "fedavg": servers.fedavg.FedAvgServer,
+                "fedavg_cross_silo": servers.fedavg_cs.FedAvgCrossSiloServer,
+                "fedrl": servers.fedrl.FedRLServer
             }[Config().server.type]()
             server.configure()
 
