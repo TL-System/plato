@@ -132,7 +132,7 @@ dmypy.json
 .vscode/
 
 # Configuration files
-/config.conf
+/*.conf
 
 # Data files
 data/
