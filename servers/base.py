@@ -92,7 +92,6 @@ class Server:
 
     async def serve(self, websocket, path):
         """Running a federated learning server."""
-
         try:
             async for message in websocket:
                 data = json.loads(message)
@@ -118,7 +117,7 @@ class Server:
                         # Break the loop when the target accuracy is achieved
                         target_accuracy = Config().training.target_accuracy
 
-                        if not Config().args.port:
+                        if not Config().is_edge_server():
                             if target_accuracy and self.accuracy >= target_accuracy:
                                 logging.info('Target accuracy reached.')
                                 await self.wrap_up()

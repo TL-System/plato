@@ -31,7 +31,7 @@ def main():
     loop = asyncio.get_event_loop()
     loop.run_until_complete(start_server)
 
-    if Config().cross_silo:
+    if Config().is_central_server():
         server.start_clients(as_server=True)
         # Allowing some time for the servers to start
         time.sleep(5)
