@@ -28,7 +28,7 @@ class EdgeClient(Client):
     async def train(self):
         """The aggregation workload on an edge client."""
         # Signal edge server to select clients to start a new round of local aggregation
-        self.server.new_global_round_begin.set()
+        self.server.new_global_round_begins.set()
 
         # Wait for the edge server to finish model aggregation
         await self.server.model_aggregated.wait()

@@ -27,20 +27,21 @@ class FedAvgServer(Server):
         self.selected_clients = None
         self.total_samples = 0
 
-        # An edge client waits for the event that a certain number of
-        # aggregations are completed
-        self.model_aggregated = asyncio.Event()
-        # An edge client waits for the event that a new global round begins
-        # before starts the first round of local aggregation
-        self.new_global_round_begin = asyncio.Event()
-
         # starting time of a gloabl training round
         self.round_start_time = 0
 
         self.total_clients = Config().clients.total_clients
         self.clients_per_round = Config().clients.per_round
 
-        if Config().args.port:
+        if Config().is_edge_server():
+            # An edge client waits for the event that a certain number of
+            # aggregations are completed
+            self.model_aggregated = asyncio.Event()
+
+            # An edge client waits for the event that a new global round begins
+            # before starting the first round of local aggregation
+            self.new_global_round_begins = asyncio.Event()
+
             # Compute the number of clients in each silo for edge servers
             self.total_clients = int(self.total_clients /
                                      Config().cross_silo.total_silos)
@@ -51,9 +52,10 @@ class FedAvgServer(Server):
                 Config().args.id, self.total_clients, self.clients_per_round)
         else:
             # Compute the number of clients for the central server
-            if Config().cross_silo:
-                self.total_clients = self.clients_per_round = Config(
-                ).cross_silo.total_silos
+            if Config().is_central_server():
+                self.clients_per_round = Config().cross_silo.total_silos
+                self.total_clients = self.clients_per_round
+
                 logging.info(
                     "The central server starts training with %s edge servers...",
                     self.total_clients)
@@ -101,7 +103,7 @@ class FedAvgServer(Server):
         self.load_test_data()
         self.load_model()
 
-        if not (Config().cross_silo and Config().args.port):
+        if not Config().is_edge_server():
             self.prepare_load_client_data()
 
     def load_test_data(self):
@@ -222,7 +224,7 @@ class FedAvgServer(Server):
 
         # Write results into a CSV file
         if Config().results:
-            if not Config().args.port:
+            if not Config().is_edge_server():
                 new_row = [self.current_round]
                 for item in self.recorded_items:
                     item_value = {
@@ -235,7 +237,7 @@ class FedAvgServer(Server):
 
         # When a certain number of aggregations are completed, an edge client
         # may need to be signaled to send a report to the central server
-        if Config().cross_silo and Config().args.port:
+        if Config().is_edge_server():
             if self.current_round == Config().cross_silo.rounds:
                 logging.info(
                     '[Server %s] Completed %s rounds of local aggregation.',
@@ -246,11 +248,11 @@ class FedAvgServer(Server):
                 self.current_round = 0
                 # Wait until a new global round begins
                 # to avoid selecting clients before a new global round begins
-                await self.new_global_round_begin.wait()
-                self.new_global_round_begin.clear()
+                await self.new_global_round_begins.wait()
+                self.new_global_round_begins.clear()
 
     async def wrap_up(self):
-        """Wrapping up when the training is done."""
+        """Wrapping up when the entire training is done."""
         if Config().results:
             if Config().results.plot:
                 plot_figures.plot_figures_from_dict(self.result_csv_file,

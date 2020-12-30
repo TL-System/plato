@@ -35,7 +35,7 @@ class Client:
     async def start_client(self):
         """Startup function for a client."""
 
-        if Config().cross_silo and not Config().args.port:
+        if Config().cross_silo and not Config().is_edge_server():
             # Contact one of the edge servers
             logging.info("Client #%s is contacting one of the edge servers...",
                          self.client_id)
@@ -83,7 +83,7 @@ class Client:
 
                         report = await self.train()
 
-                        if Config().args.port:
+                        if Config().is_edge_server():
                             logging.info(
                                 "[Server %d] Model aggregated on edge server (client #%s).",
                                 os.getpid(), self.client_id)

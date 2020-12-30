@@ -65,6 +65,16 @@ class Config:
         return cls._instance
 
     @staticmethod
+    def is_edge_server():
+        """Returns whether the current instance is an edge server in cross-silo FL."""
+        return Config.args.port is not None
+
+    @staticmethod
+    def is_central_server():
+        """Returns whether the current instance is a central server in cross-silo FL."""
+        return Config.cross_silo is not None and Config.args.port is None
+
+    @staticmethod
     def device():
         """Returns the device to be used for training."""
         if torch.cuda.is_available() and torch.cuda.device_count() > 0:
