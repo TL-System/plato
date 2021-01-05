@@ -86,6 +86,16 @@ python server.py
 
 *Plato* uses a standard configuration file, parsed by Python's standard configuration parser, to manage the runtime configuration parameters. Example configuration files have been provided in the `configs` directory.
 
+### Plotting Runtime Results
+
+If the configuration file contains a `[results]` section, the selected performance metrics, such as accuracy, will be saved in a `.csv` file in the `results/` directory. As `.csv` files, these results can be used however one wishes; an example Python program, called `plot.py`, plots the necessary figures and saves them as PDF files. To run this program:
+
+```shell
+python plot.py --config=config.conf
+```
+
+* `--config` (`-c`): the path to the configuration file to be used. The default is `config.conf` in the project's home directory.
+
 ### Running Unit Tests
 
 All unit tests are in the `tests/` directory. These tests are designed to be standalone and executed separately. For example, the command `python lr_schedule_tests.py` runs the unit tests for learning rate schedules.

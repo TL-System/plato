@@ -25,10 +25,6 @@ class Server:
         self.accuracy = 0
         self.reports = []
 
-        # Directory of results (figures etc.)
-        self.result_dir = './results/' + Config(
-        ).training.dataset + '/' + Config().training.model + '/'
-
     def register_client(self, client_id, websocket):
         """Adding a newly arrived client to the list of clients."""
         if not client_id in self.clients:
@@ -110,26 +106,9 @@ class Server:
                     self.reports.append(report)
 
                     if len(self.reports) == len(self.selected_clients):
-                        self.accuracy = self.process_reports()
-
-                        await self.wrap_up_one_round()
-
-                        # Break the loop when the target accuracy is achieved
-                        target_accuracy = Config().training.target_accuracy
-
-                        if not Config().is_edge_server():
-                            if target_accuracy and self.accuracy >= target_accuracy:
-                                logging.info('Target accuracy reached.')
-                                await self.wrap_up()
-
-                            if self.current_round >= Config().training.rounds:
-                                logging.info(
-                                    'Target number of training rounds reached.'
-                                )
-                                await self.wrap_up()
-
+                        await self.process_reports()
+                        await self.wrap_up()
                         await self.select_clients()
-
                 else:
                     # a new client arrives
                     self.register_client(client_id, websocket)
@@ -146,9 +125,19 @@ class Server:
             sys.exit()
 
     async def wrap_up(self):
-        """Wrapping up when the training is done."""
-        await self.close_connections()
-        sys.exit()
+        """Wrapping up when each round of training is done."""
+        if not Config().is_edge_server():
+            # Break the loop when the target accuracy is achieved
+            target_accuracy = Config().training.target_accuracy
+
+            if target_accuracy and self.accuracy >= target_accuracy:
+                logging.info('Target accuracy reached.')
+                await self.close_connections()
+                sys.exit()
+            if self.current_round >= Config().training.rounds:
+                logging.info('Target number of training rounds reached.')
+                await self.close_connections()
+                sys.exit()
 
     @abstractmethod
     def configure(self):
@@ -159,9 +148,5 @@ class Server:
         """Choose a subset of the clients to participate in each round."""
 
     @abstractmethod
-    def process_reports(self):
+    async def process_reports(self):
         """Process the reports after all clients have sent them to the server."""
-
-    @abstractmethod
-    async def wrap_up_one_round(self):
-        """Wrapping up when one round of training is done."""

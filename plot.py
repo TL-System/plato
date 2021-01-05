@@ -1,5 +1,5 @@
 """
-Utility functions that plot figures of results.
+A simple utility that plot figures of results as PDF files, stored in results/.
 """
 
 import csv
@@ -68,3 +68,21 @@ def plot_figures_from_dict(result_csv_file, result_dir):
         x_value = x_y_values[x_label]
         y_value = x_y_values[y_label]
         plot(x_label, x_value, y_label, y_value, figure_file_name)
+
+
+def main():
+    """Plotting figures from the run-time results."""
+    __ = Config()
+
+    if Config().results:
+        result_dir = './results/' + Config().training.dataset + '/' + Config(
+        ).training.model + '/'
+        result_csv_file = result_dir + 'result.csv'
+        print(f"Plotting results located at {result_csv_file}.")
+        plot_figures_from_dict(result_csv_file, result_dir)
+    else:
+        print("No results to be plotted according to the configuration file.")
+
+
+if __name__ == "__main__":
+    main()
