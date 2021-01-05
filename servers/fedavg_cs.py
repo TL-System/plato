@@ -71,11 +71,14 @@ class FedAvgCrossSiloServer(FedAvgServer):
         self.load_test_data()
         self.load_model()
 
-    async def wrap_up_one_round(self):
-        """Wrapping up when one round of training is done."""
-
-        # Write results into a CSV file
+    async def wrap_up_processing_reports(self):
+        """Wrap up processing the reports with any additional work."""
         if Config().results:
+            result_dir = './results/' + Config(
+            ).training.dataset + '/' + Config().training.model + '/'
+            result_csv_file = result_dir + 'result.csv'
+
+            # Write results into a CSV file
             if not Config().is_edge_server():
                 new_row = [self.current_round]
                 for item in self.recorded_items:
@@ -85,7 +88,7 @@ class FedAvgCrossSiloServer(FedAvgServer):
                         'edge_agg_num': Config().cross_silo.rounds
                     }[item]
                     new_row.append(item_value)
-                csv_processor.write_csv(self.result_csv_file, new_row)
+                csv_processor.write_csv(result_csv_file, new_row)
 
         # When a certain number of aggregations are completed, an edge client
         # may need to be signaled to send a report to the central server

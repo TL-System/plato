@@ -6,7 +6,6 @@ import logging
 import time
 import os
 import random
-import asyncio
 import torch
 
 import models.registry as models_registry
@@ -15,7 +14,6 @@ from training import trainer
 from servers import Server
 from config import Config
 from utils import csv_processor
-import utils.plot_figures as plot_figures
 
 
 class FedAvgServer(Server):
@@ -41,9 +39,12 @@ class FedAvgServer(Server):
             self.recorded_items = [
                 x.strip() for x in recorded_items.split(',')
             ]
-            self.result_csv_file = self.result_dir + 'result.csv'
-            csv_processor.initialize_csv(self.result_csv_file,
-                                         self.recorded_items, self.result_dir)
+            # Directory of results (figures etc.)
+            result_dir = './results/' + Config(
+            ).training.dataset + '/' + Config().training.model + '/'
+            result_csv_file = result_dir + 'result.csv'
+            csv_processor.initialize_csv(result_csv_file, self.recorded_items,
+                                         result_dir)
 
         random.seed()
 
@@ -145,31 +146,9 @@ class FedAvgServer(Server):
 
         return updated_weights
 
-    def process_reports(self):
-        """Process the client reports by aggregating their weights."""
-        updated_weights = self.aggregate_weights(self.reports)
-        trainer.load_weights(self.model, updated_weights)
-
-        # Testing the global model accuracy
-        if Config().clients.do_test:
-            # Compute the average accuracy from client reports
-            accuracy = self.accuracy_averaging(self.reports)
-            logging.info(
-                '[Server {:d}] Average client accuracy: {:.2f}%.'.format(
-                    os.getpid(), 100 * accuracy))
-        else:
-            # Test the updated model directly at the server
-            accuracy = trainer.test(self.model, self.testset,
-                                    Config().training.batch_size)
-            logging.info('Global model accuracy: {:.2f}%\n'.format(100 *
-                                                                   accuracy))
-
-        return accuracy
-
-    async def wrap_up_one_round(self):
-        """Wrapping up when one round of training is done."""
-
-        # Write results into a CSV file
+    async def wrap_up_processing_reports(self):
+        """Wrap up processing the reports with any additional work."""
+        print("I am in parent.")
         if Config().results:
             new_row = [self.current_round]
             for item in self.recorded_items:
@@ -178,16 +157,33 @@ class FedAvgServer(Server):
                     'training_time': time.time() - self.round_start_time
                 }[item]
                 new_row.append(item_value)
-            csv_processor.write_csv(self.result_csv_file, new_row)
 
-    async def wrap_up(self):
-        """Wrapping up when the entire training is done."""
-        if Config().results:
-            if Config().results.plot:
-                plot_figures.plot_figures_from_dict(self.result_csv_file,
-                                                    self.result_dir)
+            result_dir = './results/' + Config(
+            ).training.dataset + '/' + Config().training.model + '/'
+            result_csv_file = result_dir + 'result.csv'
 
-        await super().wrap_up()
+            csv_processor.write_csv(result_csv_file, new_row)
+
+    async def process_reports(self):
+        """Process the client reports by aggregating their weights."""
+        updated_weights = self.aggregate_weights(self.reports)
+        trainer.load_weights(self.model, updated_weights)
+
+        # Testing the global model accuracy
+        if Config().clients.do_test:
+            # Compute the average accuracy from client reports
+            self.accuracy = self.accuracy_averaging(self.reports)
+            logging.info(
+                '[Server {:d}] Average client accuracy: {:.2f}%.'.format(
+                    os.getpid(), 100 * self.accuracy))
+        else:
+            # Test the updated model directly at the server
+            self.accuracy = trainer.test(self.model, self.testset,
+                                         Config().training.batch_size)
+            logging.info('Global model accuracy: {:.2f}%\n'.format(
+                100 * self.accuracy))
+
+        await self.wrap_up_processing_reports()
 
     @staticmethod
     def accuracy_averaging(reports):
