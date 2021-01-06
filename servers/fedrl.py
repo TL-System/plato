@@ -121,6 +121,12 @@ class FedRLServer(FLServer):
         if self.is_rl_episode_done:
             await self.wrap_up_an_episode()
 
+    async def wrap_up_server_response(self, server_response):
+        """Wrap up generating the server response with any additional information."""
+        await self.update_rl_tuned_parameter()
+        server_response['fedrl'] = Config().cross_silo.rounds
+        return server_response
+
     async def update_rl_tuned_parameter(self):
         """
         Wait for getting RL tuned parameter from env,

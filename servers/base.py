@@ -78,15 +78,14 @@ class Server:
                 socket = self.clients[client_id]
                 logging.info("Selecting client #%s for training...", client_id)
                 server_response = {'id': client_id, 'payload': True}
-                if Config().server.type == 'fedrl':
-                    await self.update_rl_tuned_parameter()
-                    server_response['fedrl'] = Config().cross_silo.rounds
+                server_response = await self.wrap_up_server_response(
+                    server_response)
                 await socket.send(json.dumps(server_response))
 
                 logging.info("Sending the current model...")
                 await socket.send(pickle.dumps(self.model.state_dict()))
 
-    async def serve(self, websocket, path):
+    async def serve(self, websocket, path):  # pylint: disable=unused-argument
         """Running a federated learning server."""
         try:
             async for message in websocket:
@@ -100,7 +99,7 @@ class Server:
                     client_update = await websocket.recv()
                     report = pickle.loads(client_update)
                     logging.info(
-                        "Server {}: Update from client #{} received. Accuracy = {:.2f}%."
+                        "[Server {}] Update from client #{} received. Accuracy = {:.2f}%."
                         .format(os.getpid(), client_id, 100 * report.accuracy))
 
                     self.reports.append(report)
@@ -138,6 +137,10 @@ class Server:
                 logging.info('Target number of training rounds reached.')
                 await self.close_connections()
                 sys.exit()
+
+    async def wrap_up_server_response(self, server_response):
+        """Wrap up generating the server response with any additional information."""
+        return server_response
 
     @abstractmethod
     def configure(self):
