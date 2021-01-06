@@ -101,7 +101,7 @@ class FedAvgCrossSiloServer(FedAvgServer):
                 self.model_aggregated.set()
 
                 self.current_round = 0
+                self.new_global_round_begins.clear()
                 # Wait until a new global round begins
                 # to avoid selecting clients before a new global round begins
                 await self.new_global_round_begins.wait()
-                self.new_global_round_begins.clear()
