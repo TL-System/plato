@@ -21,18 +21,17 @@ class EdgeClient(Client):
         """The edge client does not need to train models using local data."""
         return
 
-    def load_model(self, server_model):
-        """Loading the model onto this client."""
-        self.server.model.load_state_dict(server_model)
-
-    def wrap_up_before_training(self, data):
-        """ Wrap up before training in case server response has any additional information."""
-        if 'fedrl' in data:
+    def process_server_response(self, server_data):
+        if 'fedrl' in server_data:
             # Update the number of local aggregation rounds
             Config().cross_silo = Config().cross_silo._replace(
-                rounds=data['fedrl'])
+                rounds=server_data['fedrl'])
             Config().training = Config().training._replace(
-                rounds=data['fedrl'])
+                rounds=server_data['fedrl'])
+
+    def load_payload(self, server_payload):
+        """The server sends the model, which should be loaded onto this client."""
+        self.server.model.load_state_dict(server_payload)
 
     async def train(self):
         """The aggregation workload on an edge client."""

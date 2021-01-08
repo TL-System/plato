@@ -148,7 +148,6 @@ class FedAvgServer(Server):
 
     async def wrap_up_processing_reports(self):
         """Wrap up processing the reports with any additional work."""
-        print("I am in parent.")
         if Config().results:
             new_row = [self.current_round]
             for item in self.recorded_items:
