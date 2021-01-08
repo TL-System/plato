@@ -172,7 +172,7 @@ class Config:
                                         defaults,
                                         optional=True)
         if params is not None:
-            assert Config.server.type == 'fedavg_cross_silo'
+            assert Config.server.type == 'fedavg_cross_silo' or Config.server.type == 'fedrl'
             Config.cross_silo = namedtuple('cross_silo', fields)(*params)
         else:
             Config.cross_silo = None
