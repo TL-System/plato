@@ -9,6 +9,7 @@ P. Wang, et al. "MistNet: Towards Private Neural Network Training with Local Dif
 
 import logging
 import random
+from dataclasses import dataclass
 
 from models import registry as models_registry
 from datasets import registry as datasets_registry
