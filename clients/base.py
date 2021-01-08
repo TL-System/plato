@@ -1,5 +1,5 @@
 """
-A basic federated learning client who sends weight updates to the server.
+The base class for all federated learning clients on edge devices or edge servers.
 """
 
 import logging

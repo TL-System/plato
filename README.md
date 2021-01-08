@@ -54,20 +54,14 @@ In case it is needed to format Python code during development, install `yapf`:
 $ pip install yapf
 ```
 
-If you use Visual Studio Code, to use `yapf` there are a few recommended settings:
+If you use Visual Studio Code, it is possible to use `yapf` to reformat the code every time it is saved by adding the following settings to .`.vscode/settings.json`:
 
-```shell
-$ vi ~/Library/Application\ Support/Code/User/settings.json
 ```
-
-And add the following:
-
-```shell
-    "python.linting.enabled": true,
-    "python.linting.pylintPath": "pylint",
-    "editor.formatOnSave": true,
-    "python.formatting.provider": "yapf", 
-    "python.linting.pylintEnabled": true
+"python.linting.enabled": true,
+"python.linting.pylintPath": "pylint",
+"editor.formatOnSave": true,
+"python.formatting.provider": "yapf", 
+"python.linting.pylintEnabled": true
 ```
 
 ### Running Plato
