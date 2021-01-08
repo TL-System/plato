@@ -31,6 +31,37 @@ def load_weights(model: Model, weights):
     model.load_state_dict(updated_state_dict, strict=False)
 
 
+def extract_features(model: Model, cut_layer: str, trainset, randomize=False):
+    """Extracting features using layers before the cut_layer.
+
+    Arguments:
+      model: The model to train. Must be a models.base.Model subclass.
+      cut_layer: Layers before this one will be used for extracting features.
+      trainset: The training dataset.
+    """
+    device = Config().device()
+    model.to(device)
+
+    # First, place the model in evaluation mode rather than training mode
+    model.eval()
+    batch_size = Config().training.batch_size
+    train_loader = torch.utils.data.DataLoader(trainset,
+                                               batch_size=batch_size,
+                                               shuffle=True)
+
+    feature_dataset = []
+    for __, (inputs, targets) in enumerate(train_loader):
+        inputs, targets = inputs.to(device), targets.to(device)
+
+        with torch.no_grad():
+            logits = model.forward_to(inputs, cut_layer)
+
+        for i in np.arange(logits.shape[0]):  # each sample in the batch
+            feature_dataset.append((logits[i].cpu(), targets[i].cpu()))
+
+    return feature_dataset
+
+
 def train(model: Model, trainset):
     """The main training loop for each client in a federated learning workload.
 

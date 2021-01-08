@@ -149,11 +149,11 @@ class Config:
         fields = [
             'rounds', 'target_accuracy', 'epochs', 'batch_size', 'dataset',
             'data_path', 'model', 'optimizer', 'learning_rate', 'weight_decay',
-            'momentum', 'num_layers', 'num_classes', 'lr_gamma',
+            'momentum', 'num_layers', 'num_classes', 'cut_layer', 'lr_gamma',
             'lr_milestone_steps', 'lr_warmup_steps'
         ]
         defaults = (0, 0.9, 0, 128, 'MNIST', './data', 'mnist_cnn', 'SGD',
-                    0.01, 0.0, 0.9, 40, 10, 0.0, '', '')
+                    0.01, 0.0, 0.9, 40, 10, '', 0.0, '', '')
         params = Config.extract_section('training', fields, defaults)
 
         Config.training = namedtuple('training', fields)(*params)
@@ -171,7 +171,8 @@ class Config:
                                         fields,
                                         defaults,
                                         optional=True)
-        if Config.server.type == 'fedavg_cross_silo' and params is not None:
+        if params is not None:
+            assert Config.server.type == 'fedavg_cross_silo'
             Config.cross_silo = namedtuple('cross_silo', fields)(*params)
         else:
             Config.cross_silo = None
