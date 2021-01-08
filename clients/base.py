@@ -93,7 +93,6 @@ class Client:
 
     def wrap_up_before_training(self, data):
         """Wrap up before training in case server response has any additional information."""
-        pass
 
     @abstractmethod
     def configure(self):
@@ -104,11 +103,11 @@ class Client:
         """Generating data and loading them onto this client."""
 
     @abstractmethod
-    def process_server_response(self, server_model):
+    def process_server_response(self, server_response):
         """Additional client-specific processing on the server response."""
 
     @abstractmethod
-    def load_payload(self, server_model):
+    def load_payload(self, server_payload):
         """Loading the payload onto this client."""
 
     @abstractmethod
