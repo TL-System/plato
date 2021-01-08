@@ -1,7 +1,7 @@
 """
 Represents a particular step of training.
 
-A step can be represented as either an iteration or a pair of an epoch and an iteration within 
+A step can be represented as either an iteration or a pair of an epoch and an iteration within
 that epoch. This class encapsulates a step of training such that it can be freely converted between
 the two representations.
 """

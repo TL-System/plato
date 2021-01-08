@@ -4,6 +4,7 @@ The ResNet model.
 
 import torch.nn as nn
 import torch.nn.functional as F
+import collections
 
 from models import base
 
@@ -104,6 +105,25 @@ class Model(base.Model):
         self.layer4 = self._make_layer(block, 512, num_blocks[3], stride=2)
         self.linear = nn.Linear(512 * block.expansion, num_classes)
 
+        # Preparing named layers so that the model can be split and straddle
+        # across the client and the server
+        self.layers = []
+        self.layerdict = collections.OrderedDict()
+        self.layerdict['conv1'] = self.conv1
+        self.layerdict['bn1'] = self.bn1
+        self.layerdict['relu'] = self.relu
+        self.layerdict['layer1'] = self.layer1
+        self.layerdict['layer2'] = self.layer2
+        self.layerdict['layer3'] = self.layer3
+        self.layerdict['layer4'] = self.layer4
+        self.layers.append('conv1')
+        self.layers.append('bn1')
+        self.layers.append('relu')
+        self.layers.append('layer1')
+        self.layers.append('layer2')
+        self.layers.append('layer3')
+        self.layers.append('layer4')
+
     def _make_layer(self, block, planes, num_blocks, stride):
         strides = [stride] + [1] * (num_blocks - 1)
         layers = []
@@ -119,6 +139,24 @@ class Model(base.Model):
         out = self.layer3(out)
         out = self.layer4(out)
         out = F.avg_pool2d(out, 4)
+        out = out.view(out.size(0), -1)
+        out = self.linear(out)
+        return out
+
+    def forward_to(self, x, cut_layer):
+        """Forward pass, but only to the layer specified by cut_layer."""
+        layer_index = self.layers.index(cut_layer)
+        for i in range(0, layer_index + 1):
+            x = self.layerdict[self.layers[i]](x)
+        return x
+
+    def forward_from(self, x, cut_layer):
+        """Forward pass, starting from the layer specified by cut_layer."""
+        layer_index = self.layers.index(cut_layer)
+        for i in range(layer_index + 1, len(self.layers)):
+            x = self.layerdict[self.layers[i]](x)
+
+        out = F.avg_pool2d(x, 4)
         out = out.view(out.size(0), -1)
         out = self.linear(out)
         return out
