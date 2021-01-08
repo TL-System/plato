@@ -4,6 +4,7 @@ A basic federated learning client who sends weight updates to the server.
 
 import logging
 import random
+from dataclasses import dataclass
 
 from models import registry as models_registry
 from datasets import registry as datasets_registry
@@ -11,7 +12,16 @@ from dividers import iid, biased, sharded
 from utils import dists
 from training import trainer
 from config import Config
-from clients import Client, Report
+from clients import Client
+
+
+@dataclass
+class Report:
+    """Client report sent to the federated learning server."""
+    client_id: str
+    num_samples: int
+    weights: list
+    accuracy: float
 
 
 class SimpleClient(Client):

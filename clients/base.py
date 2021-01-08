@@ -8,19 +8,9 @@ import random
 import os
 import pickle
 from abc import abstractmethod
-from dataclasses import dataclass
 import websockets
 
 from config import Config
-
-
-@dataclass
-class Report:
-    """Client report sent to the federated learning server."""
-    client_id: str
-    num_samples: int
-    weights: list
-    accuracy: float
 
 
 class Client:
@@ -63,18 +53,21 @@ class Client:
                     server_response = await websocket.recv()
                     data = json.loads(server_response)
 
-                    if data['id'] == self.client_id and 'payload' in data:
-                        logging.info(
-                            "Client #%s has been selected and receiving the model...",
-                            self.client_id)
-                        server_model = await websocket.recv()
-
-                        self.load_model(pickle.loads(server_model))
+                    if data['id'] == self.client_id:
+                        self.process_server_response(data)
+                        logging.info("Client #%s has been selected.",
+                                     self.client_id)
 
                         if not self.data_loaded:
                             self.load_data()
 
-                        self.wrap_up_before_training(data)
+                        if 'payload' in data:
+                            logging.info(
+                                "Client #%s is receiving payload from the server...",
+                                self.client_id)
+                            server_payload = await websocket.recv()
+
+                            self.load_payload(pickle.loads(server_payload))
 
                         report = await self.train()
 
@@ -111,8 +104,12 @@ class Client:
         """Generating data and loading them onto this client."""
 
     @abstractmethod
-    def load_model(self, server_model):
-        """Loading the model onto this client."""
+    def process_server_response(self, server_model):
+        """Additional client-specific processing on the server response."""
+
+    @abstractmethod
+    def load_payload(self, server_model):
+        """Loading the payload onto this client."""
 
     @abstractmethod
     async def train(self):
