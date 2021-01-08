@@ -74,12 +74,7 @@ class Client:
                         if not self.data_loaded:
                             self.load_data()
 
-                        if 'fedrl' in data:
-                            # Update the number of local aggregation rounds
-                            Config().cross_silo = Config().cross_silo._replace(
-                                rounds=data['fedrl'])
-                            Config().training = Config().training._replace(
-                                rounds=data['fedrl'])
+                        self.wrap_up_before_training(data)
 
                         report = await self.train()
 
@@ -102,6 +97,10 @@ class Client:
             logging.info("Client #%s: connection to the server failed.",
                          self.client_id)
             logging.error(exception)
+
+    def wrap_up_before_training(self, data):
+        """Wrap up before training in case server response has any additional information."""
+        pass
 
     @abstractmethod
     def configure(self):
