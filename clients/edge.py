@@ -25,6 +25,15 @@ class EdgeClient(Client):
         """Loading the model onto this client."""
         self.server.model.load_state_dict(server_model)
 
+    def wrap_up_before_training(self, data):
+        """ Wrap up before training in case server response has any additional information."""
+        if 'fedrl' in data:
+            # Update the number of local aggregation rounds
+            Config().cross_silo = Config().cross_silo._replace(
+                rounds=data['fedrl'])
+            Config().training = Config().training._replace(
+                rounds=data['fedrl'])
+
     async def train(self):
         """The aggregation workload on an edge client."""
         # Signal edge server to select clients to start a new round of local aggregation
