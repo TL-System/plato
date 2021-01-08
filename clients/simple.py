@@ -101,9 +101,9 @@ class SimpleClient(Client):
         else:
             self.trainset = self.data
 
-    def load_model(self, server_model):
-        """Loading the model onto this client."""
-        self.model.load_state_dict(server_model)
+    def load_payload(self, server_payload):
+        """Loading the payload onto this client."""
+        self.model.load_state_dict(server_payload)
 
     async def train(self):
         """The machine learning training workload on a client."""
