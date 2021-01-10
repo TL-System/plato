@@ -1,10 +1,9 @@
 """
 The ResNet model.
 """
-
+import collections
 import torch.nn as nn
 import torch.nn.functional as F
-import collections
 
 from models import base
 
@@ -111,7 +110,7 @@ class Model(base.Model):
         self.layerdict = collections.OrderedDict()
         self.layerdict['conv1'] = self.conv1
         self.layerdict['bn1'] = self.bn1
-        self.layerdict['relu'] = self.relu
+        self.layerdict['relu'] = F.relu
         self.layerdict['layer1'] = self.layer1
         self.layerdict['layer2'] = self.layer2
         self.layerdict['layer3'] = self.layer3

@@ -74,8 +74,7 @@ class FedAvgCrossSiloServer(FedAvgServer):
     async def wrap_up_processing_reports(self):
         """Wrap up processing the reports with any additional work."""
         if Config().results:
-            result_dir = './results/' + Config(
-            ).training.dataset + '/' + Config().training.model + '/'
+            result_dir = f'./results/{Config().training.dataset}/{Config().training.model}/'
             result_csv_file = result_dir + 'result.csv'
 
             # Write results into a CSV file

@@ -102,7 +102,7 @@ class SimpleClient(Client):
             self.trainset = self.data
 
     def load_payload(self, server_payload):
-        """Loading the payload onto this client."""
+        """Loading the server model onto this client."""
         self.model.load_state_dict(server_payload)
 
     async def train(self):
