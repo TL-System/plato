@@ -139,6 +139,7 @@ data/
 
 # Result files
 results/
+models/pretrained/
 
 # macOS
 .DS_Store
