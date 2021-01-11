@@ -30,7 +30,6 @@ class FedAvgServer(Server):
 
         self.total_clients = Config().clients.total_clients
         self.clients_per_round = Config().clients.per_round
-        self.clients_per_round = Config().clients.per_round
         logging.info("Started training on %s clients and %s per round...",
                      self.total_clients, self.clients_per_round)
 
@@ -40,8 +39,7 @@ class FedAvgServer(Server):
                 x.strip() for x in recorded_items.split(',')
             ]
             # Directory of results (figures etc.)
-            result_dir = './results/' + Config(
-            ).training.dataset + '/' + Config().training.model + '/'
+            result_dir = f'./results/{Config().training.dataset}/{Config().training.model}/'
             result_csv_file = result_dir + 'result.csv'
             csv_processor.initialize_csv(result_csv_file, self.recorded_items,
                                          result_dir)
@@ -146,23 +144,6 @@ class FedAvgServer(Server):
 
         return updated_weights
 
-    async def wrap_up_processing_reports(self):
-        """Wrap up processing the reports with any additional work."""
-        if Config().results:
-            new_row = [self.current_round]
-            for item in self.recorded_items:
-                item_value = {
-                    'accuracy': self.accuracy * 100,
-                    'training_time': time.time() - self.round_start_time
-                }[item]
-                new_row.append(item_value)
-
-            result_dir = './results/' + Config(
-            ).training.dataset + '/' + Config().training.model + '/'
-            result_csv_file = result_dir + 'result.csv'
-
-            csv_processor.write_csv(result_csv_file, new_row)
-
     async def process_reports(self):
         """Process the client reports by aggregating their weights."""
         updated_weights = self.aggregate_weights(self.reports)
@@ -184,6 +165,22 @@ class FedAvgServer(Server):
 
         await self.wrap_up_processing_reports()
 
+    async def wrap_up_processing_reports(self):
+        """Wrap up processing the reports with any additional work."""
+        if Config().results:
+            new_row = [self.current_round]
+            for item in self.recorded_items:
+                item_value = {
+                    'accuracy': self.accuracy * 100,
+                    'training_time': time.time() - self.round_start_time
+                }[item]
+                new_row.append(item_value)
+
+            result_dir = f'./results/{Config().training.dataset}/{Config().training.model}/'
+            result_csv_file = result_dir + 'result.csv'
+
+            csv_processor.write_csv(result_csv_file, new_row)
+
     @staticmethod
     def accuracy_averaging(reports):
         """Compute the average accuracy across clients."""
@@ -196,10 +193,3 @@ class FedAvgServer(Server):
             accuracy += report.accuracy * (report.num_samples / total_samples)
 
         return accuracy
-
-    @staticmethod
-    def save_model(model_to_save, path):
-        """Save the model in a file."""
-        path += '/global_model'
-        torch.save(model_to_save.state_dict(), path)
-        logging.info('Saved the global model: %s', path)

@@ -8,7 +8,7 @@ import sys
 import websockets
 
 from config import Config
-from clients import SimpleClient, EdgeClient
+import clients
 import servers
 
 
@@ -32,11 +32,12 @@ def main():
             server = {
                 "fedavg": servers.fedavg.FedAvgServer,
                 "fedavg_cross_silo": servers.fedavg_cs.FedAvgCrossSiloServer,
-                "fedrl": servers.fedrl.FedRLServer
+                "fedrl": servers.fedrl.FedRLServer,
+                "mistnet": servers.mistnet.MistNetServer
             }[Config().server.type]()
             server.configure()
 
-            client = EdgeClient(server)
+            client = clients.EdgeClient(server)
             coroutines.append(client.start_client())
 
             logging.info("Starting an edge server (client #%s) on port %s",
@@ -50,7 +51,11 @@ def main():
 
             coroutines.append(start_server)
         else:
-            client = SimpleClient()
+            client = {
+                "simple": clients.SimpleClient,
+                "mistnet": clients.MistNetClient
+            }[Config().clients.type]()
+            logging.info("Starting a %s client.", Config().clients.type)
             client.configure()
             coroutines.append(client.start_client())
 
