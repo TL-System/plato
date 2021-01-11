@@ -7,10 +7,12 @@ to tune the number of local aggregations on edge servers.
 import logging
 import asyncio
 import sys
+import time
 
 from config import Config
 from servers import FedAvgCrossSiloServer
 import servers
+from utils import csv_processor
 
 FLServer = FedAvgCrossSiloServer
 if Config().rl:
@@ -35,6 +37,8 @@ class FedRLServer(FLServer):
         self.rl_state = None
         self.is_rl_tuned_para_got = False
         self.is_rl_episode_done = False
+        self.rl_episode_start_time = time.time()
+        self.cumulative_reward = 0
 
         # An RL agent waits for the event that the tuned parameter
         # is passed from RL environment
@@ -43,6 +47,17 @@ class FedRLServer(FLServer):
         # An RL agent waits for the event that RL environment is reset to aviod
         # directly starting a new time step after the previous episode ends
         self.new_episode_begin = asyncio.Event()
+
+        if Config().results:
+            self.recorded_items = [
+                'episoide', 'cumulative_reward', 'rl_training_time'
+            ]
+            # Directory of results (figures etc.)
+            result_dir = './results/' + Config().server.type + '/' + Config(
+            ).training.dataset + '/' + Config().training.model + '/'
+            result_csv_file = result_dir + 'result.csv'
+            csv_processor.initialize_csv(result_csv_file, self.recorded_items,
+                                         result_dir)
 
     def configure(self):
         """
@@ -96,11 +111,10 @@ class FedRLServer(FLServer):
         self.round_start_time = 0
 
     async def wrap_up(self):
-        """Wrapping up when one round of FL training is done."""
+        """Wrapping up when one time step of RL (one round of FL) is done."""
         # Get the RL state
         # Use accuracy as state for now
         self.rl_state = self.accuracy
-
         target_accuracy = Config().training.target_accuracy
 
         if target_accuracy and self.accuracy >= target_accuracy:
@@ -150,7 +164,23 @@ class FedRLServer(FLServer):
         print("RL agent: Get tuned para of time step", time_step)
 
     async def wrap_up_an_episode(self):
-        """Wrapping up when the FL training is done."""
+        """Wrapping up when one RL episode (the FL training) is done."""
+        if Config().results:
+            new_row = []
+            for item in self.recorded_items:
+                item_value = {
+                    'episoide': self.rl_episode,
+                    'cumulative_reward': self.cumulative_reward,
+                    'rl_training_time':
+                    time.time() - self.rl_episode_start_time
+                }[item]
+                new_row.append(item_value)
+
+            result_dir = f'./results/{Config().server.type}/{Config().training.dataset}/{Config().training.model}/'
+            result_csv_file = result_dir + 'result.csv'
+
+            csv_processor.write_csv(result_csv_file, new_row)
+
         if self.rl_episode >= Config().rl.episodes:
             logging.info(
                 'RL Agent: Target number of training episodes reached.')
@@ -160,6 +190,8 @@ class FedRLServer(FLServer):
             # Wait until RL env resets and starts a new RL episode
             await self.new_episode_begin.wait()
             self.new_episode_begin.clear()
+            self.cumulative_reward = 0
+            self.rl_episode_start_time = time.time()
 
     @staticmethod
     def check_with_sb3_env_checker(env):
@@ -181,7 +213,6 @@ class FedRLServer(FLServer):
         for i in range(episodes):
             for _ in range(n_steps):
                 # Random action
-
                 action = env.action_space.sample()
                 obs, reward, done, info = env.step(action)
                 if done:
