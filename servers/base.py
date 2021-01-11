@@ -6,6 +6,7 @@ from abc import abstractmethod
 import json
 import sys
 import os
+import torch
 import logging
 import subprocess
 import pickle
@@ -99,8 +100,8 @@ class Server:
                     client_update = await websocket.recv()
                     report = pickle.loads(client_update)
                     logging.info(
-                        "[Server {}] Update from client #{} received. Accuracy = {:.2f}%."
-                        .format(os.getpid(), client_id, 100 * report.accuracy))
+                        "[Server %s] Update from client #%s received.",
+                        os.getpid(), client_id)
 
                     self.reports.append(report)
 
@@ -131,12 +132,21 @@ class Server:
 
             if target_accuracy and self.accuracy >= target_accuracy:
                 logging.info('Target accuracy reached.')
+                self.save_model()
                 await self.close_connections()
                 sys.exit()
             if self.current_round >= Config().training.rounds:
                 logging.info('Target number of training rounds reached.')
+                self.save_model()
                 await self.close_connections()
                 sys.exit()
+
+    def save_model(self):
+        """Saving the model to a file."""
+        model_type = Config().training.model
+        model_path = f'./models/pretrained/{model_type}.pth'
+        torch.save(self.model.state_dict(), model_path)
+        logging.info('Model saved to %s.', model_path)
 
     async def wrap_up_server_response(self, server_response):
         """Wrap up generating the server response with any additional information."""

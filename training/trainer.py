@@ -31,26 +31,30 @@ def load_weights(model: Model, weights):
     model.load_state_dict(updated_state_dict, strict=False)
 
 
-def extract_features(model: Model, cut_layer: str, trainset, randomize=False):
+def extract_features(model: Model, dataset, cut_layer: str, train=True):
     """Extracting features using layers before the cut_layer.
 
     Arguments:
       model: The model to train. Must be a models.base.Model subclass.
+      dataset: The training or testing dataset.
       cut_layer: Layers before this one will be used for extracting features.
-      trainset: The training dataset.
+      train: Whether the model should work in training or evaluation mode.
     """
     device = Config().device()
     model.to(device)
 
-    # First, place the model in evaluation mode rather than training mode
-    model.eval()
+    if train:
+        model.train()
+    else:
+        model.eval()
+
     batch_size = Config().training.batch_size
-    train_loader = torch.utils.data.DataLoader(trainset,
-                                               batch_size=batch_size,
-                                               shuffle=True)
+    data_loader = torch.utils.data.DataLoader(dataset,
+                                              batch_size=batch_size,
+                                              shuffle=True)
 
     feature_dataset = []
-    for __, (inputs, targets) in enumerate(train_loader):
+    for inputs, targets in data_loader:
         inputs, targets = inputs.to(device), targets.to(device)
 
         with torch.no_grad():
@@ -62,12 +66,13 @@ def extract_features(model: Model, cut_layer: str, trainset, randomize=False):
     return feature_dataset
 
 
-def train(model: Model, trainset):
-    """The main training loop for each client in a federated learning workload.
+def train(model: Model, trainset, cut_layer=None):
+    """The main training loop in a federated learning workload.
 
     Arguments:
       model: The model to train. Must be a models.base.Model subclass.
       trainset: The training dataset.
+      cut_layer: The layer which training should start from.
     """
 
     # Use distributed data parallelism if multiple GPUs are available.
@@ -105,7 +110,11 @@ def train(model: Model, trainset):
         for batch_id, (examples, labels) in enumerate(train_loader):
             examples, labels = examples.to(device), labels.to(device)
             optimizer.zero_grad()
-            loss = model.loss_criterion(model(examples), labels)
+            if cut_layer is None:
+                loss = model.loss_criterion(model(examples), labels)
+            else:
+                outputs = model.forward_from(examples, cut_layer)
+                loss = model.loss_criterion(outputs, labels)
             loss.backward()
             optimizer.step()
             lr_schedule.step()
@@ -115,8 +124,15 @@ def train(model: Model, trainset):
                     epoch, epochs, loss.item()))
 
 
-def test(model: Model, testset, batch_size):
-    """Testing the model using the provided test dataset."""
+def test(model: Model, testset, batch_size, cut_layer=None):
+    """Testing the model using the provided test dataset.
+
+    Arguments:
+      model: The model to test. Must be a models.base.Model subclass.
+      testset: The test dataset.
+      batch_size: the batch size used for testing.
+      cut_layer: The layer which testing should start from.
+    """
     device = Config().device()
 
     model.to(device)
@@ -129,10 +145,14 @@ def test(model: Model, testset, batch_size):
     total = 0
 
     with torch.no_grad():
-        for data in test_loader:
-            examples, labels = data
+        for examples, labels in test_loader:
             examples, labels = examples.to(device), labels.to(device)
-            outputs = model(examples)
+
+            if cut_layer is None:
+                outputs = model(examples)
+            else:
+                outputs = model.forward_from(examples, cut_layer)
+
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
