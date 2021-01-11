@@ -5,13 +5,14 @@ based on a configuration at run-time.
 
 import logging
 
-from datasets import mnist, fashion_mnist, cifar10
+from datasets import mnist, fashion_mnist, cifar10, cinic10
 from config import Config
 
 registered_datasets = {
     'MNIST': mnist,
     'FashionMNIST': fashion_mnist,
-    'CIFAR10': cifar10
+    'CIFAR10': cifar10,
+    'CINIC10': cinic10
 }
 
 
