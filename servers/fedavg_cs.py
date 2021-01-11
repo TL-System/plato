@@ -26,6 +26,8 @@ class FedAvgCrossSiloServer(FedAvgServer):
             # before starting the first round of local aggregation
             self.new_global_round_begins = asyncio.Event()
 
+            self.current_global_round = 1
+
             # Compute the number of clients in each silo for edge servers
             self.total_clients = int(self.total_clients /
                                      Config().cross_silo.total_silos)
@@ -34,6 +36,10 @@ class FedAvgCrossSiloServer(FedAvgServer):
             logging.info(
                 "Edge server #%s starts training with %s clients and %s per round...",
                 Config().args.id, self.total_clients, self.clients_per_round)
+
+            if Config().results:
+                self.recorded_items = ['global_round'] + self.recorded_items
+
         else:
             # Compute the number of clients for the central server
             if Config().is_central_server():
@@ -80,9 +86,11 @@ class FedAvgCrossSiloServer(FedAvgServer):
 
             # Write results into a CSV file
             if not Config().is_edge_server():
-                new_row = [self.current_round]
+                new_row = []
                 for item in self.recorded_items:
                     item_value = {
+                        'global_round': self.current_global_round,
+                        'round': self.current_round,
                         'accuracy': self.accuracy * 100,
                         'training_time': time.time() - self.round_start_time,
                         'edge_agg_num': Config().cross_silo.rounds
@@ -105,3 +113,4 @@ class FedAvgCrossSiloServer(FedAvgServer):
                 # Wait until a new global round begins
                 # to avoid selecting clients before a new global round begins
                 await self.new_global_round_begins.wait()
+                self.current_global_round += 1

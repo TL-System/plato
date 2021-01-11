@@ -36,7 +36,7 @@ class FedAvgServer(Server):
 
         if Config().results:
             recorded_items = Config().results.types
-            self.recorded_items = [
+            self.recorded_items = ['round'] + [
                 x.strip() for x in recorded_items.split(',')
             ]
             # Directory of results (figures etc.)
@@ -149,9 +149,10 @@ class FedAvgServer(Server):
     async def wrap_up_processing_reports(self):
         """Wrap up processing the reports with any additional work."""
         if Config().results:
-            new_row = [self.current_round]
+            new_row = []
             for item in self.recorded_items:
                 item_value = {
+                    'round': self.current_round,
                     'accuracy': self.accuracy * 100,
                     'training_time': time.time() - self.round_start_time
                 }[item]
