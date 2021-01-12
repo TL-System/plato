@@ -9,6 +9,7 @@ import numpy as np
 
 from models.base import Model
 from config import Config
+from utils import unary_encoding
 from training import optimizers
 
 
@@ -31,14 +32,15 @@ def load_weights(model: Model, weights):
     model.load_state_dict(updated_state_dict, strict=False)
 
 
-def extract_features(model: Model, dataset, cut_layer: str, train=True):
+def extract_features(model: Model, dataset, cut_layer: str, epsilon=None):
     """Extracting features using layers before the cut_layer.
 
     Arguments:
       model: The model to train. Must be a models.base.Model subclass.
       dataset: The training or testing dataset.
       cut_layer: Layers before this one will be used for extracting features.
-      train: Whether the model should work in training or evaluation mode.
+      epsilon: If epsilon is not None, local differential privacy should be
+               applied to the features extracted.
     """
     device = Config().device()
     model.to(device)
@@ -59,9 +61,14 @@ def extract_features(model: Model, dataset, cut_layer: str, train=True):
 
         with torch.no_grad():
             logits = model.forward_to(inputs, cut_layer)
+            if epsilon is not None:
+                logits = logits.detach().cpu().numpy()
+                logits = unary_encoding.encode(logits)
+                logits = unary_encoding.randomize(logits, epsilon)
+                logits = torch.from_numpy(logits.astype('float32'))
 
         for i in np.arange(logits.shape[0]):  # each sample in the batch
-            feature_dataset.append((logits[i].cpu(), targets[i].cpu()))
+            feature_dataset.append((logits[i], targets[i]))
 
     return feature_dataset
 
