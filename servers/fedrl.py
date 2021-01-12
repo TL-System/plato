@@ -44,20 +44,25 @@ class FedRLServer(FLServer):
         # is passed from RL environment
         self.rl_tuned_para_got = asyncio.Event()
 
+        # Indicate if server response (RL tuned para) is generated in this time_step
+        self.generated_server_response = False
+
         # An RL agent waits for the event that RL environment is reset to aviod
         # directly starting a new time step after the previous episode ends
         self.new_episode_begin = asyncio.Event()
 
+        self.wrapped_previous_episode = asyncio.Event()
+        self.wrapped_previous_episode.set()
+
         if Config().results:
-            self.recorded_items = [
-                'episoide', 'cumulative_reward', 'rl_training_time'
+            self.rl_recorded_items = [
+                'episode', 'cumulative_reward', 'rl_training_time'
             ]
             # Directory of results (figures etc.)
-            result_dir = './results/' + Config().server.type + '/' + Config(
-            ).training.dataset + '/' + Config().training.model + '/'
-            result_csv_file = result_dir + 'result.csv'
-            csv_processor.initialize_csv(result_csv_file, self.recorded_items,
-                                         result_dir)
+            result_dir = f'./results/{Config().training.dataset}/{Config().training.model}/{Config().server.type}/'
+            result_csv_file = result_dir + 'result_rl.csv'
+            csv_processor.initialize_csv(result_csv_file,
+                                         self.rl_recorded_items, result_dir)
 
     def configure(self):
         """
@@ -96,10 +101,17 @@ class FedRLServer(FLServer):
 
     def reset_rl_env(self):
         """Reset the RL environment at the beginning of each episode."""
+        current_loop = asyncio.get_event_loop()
+        task = current_loop.create_task(self.wrapped_previous_episode.wait())
+        current_loop.run_until_complete(task)
+        self.wrapped_previous_episode.clear()
+
         # The number of finished FL training round
         self.current_round = 0
 
         self.is_rl_episode_done = False
+        self.cumulative_reward = 0
+        self.rl_episode_start_time = time.time()
 
         self.rl_episode += 1
         logging.info('\nRL Agent: starting episode %s...', self.rl_episode)
@@ -112,6 +124,7 @@ class FedRLServer(FLServer):
 
     async def wrap_up(self):
         """Wrapping up when one time step of RL (one round of FL) is done."""
+        self.generated_server_response = False
         # Get the RL state
         # Use accuracy as state for now
         self.rl_state = self.accuracy
@@ -137,7 +150,9 @@ class FedRLServer(FLServer):
 
     async def wrap_up_server_response(self, server_response):
         """Wrap up generating the server response with any additional information."""
-        await self.update_rl_tuned_parameter()
+        if not self.generated_server_response:
+            await self.update_rl_tuned_parameter()
+            self.generated_server_response = True
         server_response['fedrl'] = Config().cross_silo.rounds
         return server_response
 
@@ -167,19 +182,19 @@ class FedRLServer(FLServer):
         """Wrapping up when one RL episode (the FL training) is done."""
         if Config().results:
             new_row = []
-            for item in self.recorded_items:
+            for item in self.rl_recorded_items:
                 item_value = {
-                    'episoide': self.rl_episode,
+                    'episode': self.rl_episode,
                     'cumulative_reward': self.cumulative_reward,
                     'rl_training_time':
                     time.time() - self.rl_episode_start_time
                 }[item]
                 new_row.append(item_value)
 
-            result_dir = f'./results/{Config().server.type}/{Config().training.dataset}/{Config().training.model}/'
-            result_csv_file = result_dir + 'result.csv'
-
+            result_dir = f'./results/{Config().training.dataset}/{Config().training.model}/{Config().server.type}/'
+            result_csv_file = result_dir + 'result_rl.csv'
             csv_processor.write_csv(result_csv_file, new_row)
+        self.wrapped_previous_episode.set()
 
         if self.rl_episode >= Config().rl.episodes:
             logging.info(
@@ -188,10 +203,9 @@ class FedRLServer(FLServer):
             sys.exit()
         else:
             # Wait until RL env resets and starts a new RL episode
+            self.new_episode_begin.clear()
             await self.new_episode_begin.wait()
             self.new_episode_begin.clear()
-            self.cumulative_reward = 0
-            self.rl_episode_start_time = time.time()
 
     @staticmethod
     def check_with_sb3_env_checker(env):
@@ -202,7 +216,6 @@ class FedRLServer(FLServer):
         # It will check the environment and output additional warnings if needed
         check_env(env)
 
-    @staticmethod
     def try_a_random_agent(env):
         """Quickly try a random agent on the environment."""
         # pylint: disable=unused-variable
