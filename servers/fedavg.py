@@ -39,7 +39,7 @@ class FedAvgServer(Server):
                 x.strip() for x in recorded_items.split(',')
             ]
             # Directory of results (figures etc.)
-            result_dir = f'./results/{Config().training.dataset}/{Config().training.model}/'
+            result_dir = f'./results/{Config().training.dataset}/{Config().training.model}/{Config().server.type}/'
             result_csv_file = result_dir + 'result.csv'
             csv_processor.initialize_csv(result_csv_file, self.recorded_items,
                                          result_dir)
@@ -177,7 +177,7 @@ class FedAvgServer(Server):
                 }[item]
                 new_row.append(item_value)
 
-            result_dir = f'./results/{Config().training.dataset}/{Config().training.model}/'
+            result_dir = f'./results/{Config().training.dataset}/{Config().training.model}/{Config().server.type}/'
             result_csv_file = result_dir + 'result.csv'
 
             csv_processor.write_csv(result_csv_file, new_row)
