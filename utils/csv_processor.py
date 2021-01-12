@@ -14,7 +14,7 @@ def initialize_csv(result_csv_file, recorded_items, result_dir):
 
     with open(result_csv_file, 'w', newline='') as result_file:
         result_writer = csv.writer(result_file)
-        first_row = ['global_round'] + recorded_items
+        first_row = recorded_items
         result_writer.writerow(first_row)
 
 
