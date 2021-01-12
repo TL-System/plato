@@ -7,10 +7,12 @@ to tune the number of local aggregations on edge servers.
 import logging
 import asyncio
 import sys
+import time
 
 from config import Config
 from servers import FedAvgCrossSiloServer
 import servers
+from utils import csv_processor
 
 FLServer = FedAvgCrossSiloServer
 if Config().rl:
@@ -35,14 +37,32 @@ class FedRLServer(FLServer):
         self.rl_state = None
         self.is_rl_tuned_para_got = False
         self.is_rl_episode_done = False
+        self.rl_episode_start_time = time.time()
+        self.cumulative_reward = 0
 
         # An RL agent waits for the event that the tuned parameter
         # is passed from RL environment
         self.rl_tuned_para_got = asyncio.Event()
 
+        # Indicate if server response (RL tuned para) is generated in this time_step
+        self.generated_server_response = False
+
         # An RL agent waits for the event that RL environment is reset to aviod
         # directly starting a new time step after the previous episode ends
         self.new_episode_begin = asyncio.Event()
+
+        self.wrapped_previous_episode = asyncio.Event()
+        self.wrapped_previous_episode.set()
+
+        if Config().results:
+            self.rl_recorded_items = [
+                'episode', 'cumulative_reward', 'rl_training_time'
+            ]
+            # Directory of results (figures etc.)
+            result_dir = f'./results/{Config().training.dataset}/{Config().training.model}/{Config().server.type}/'
+            result_csv_file = result_dir + 'result_rl.csv'
+            csv_processor.initialize_csv(result_csv_file,
+                                         self.rl_recorded_items, result_dir)
 
     def configure(self):
         """
@@ -81,10 +101,17 @@ class FedRLServer(FLServer):
 
     def reset_rl_env(self):
         """Reset the RL environment at the beginning of each episode."""
+        current_loop = asyncio.get_event_loop()
+        task = current_loop.create_task(self.wrapped_previous_episode.wait())
+        current_loop.run_until_complete(task)
+        self.wrapped_previous_episode.clear()
+
         # The number of finished FL training round
         self.current_round = 0
 
         self.is_rl_episode_done = False
+        self.cumulative_reward = 0
+        self.rl_episode_start_time = time.time()
 
         self.rl_episode += 1
         logging.info('\nRL Agent: starting episode %s...', self.rl_episode)
@@ -96,11 +123,11 @@ class FedRLServer(FLServer):
         self.round_start_time = 0
 
     async def wrap_up(self):
-        """Wrapping up when one round of FL training is done."""
+        """Wrapping up when one time step of RL (one round of FL) is done."""
+        self.generated_server_response = False
         # Get the RL state
         # Use accuracy as state for now
         self.rl_state = self.accuracy
-
         target_accuracy = Config().training.target_accuracy
 
         if target_accuracy and self.accuracy >= target_accuracy:
@@ -123,7 +150,9 @@ class FedRLServer(FLServer):
 
     async def wrap_up_server_response(self, server_response):
         """Wrap up generating the server response with any additional information."""
-        await self.update_rl_tuned_parameter()
+        if not self.generated_server_response:
+            await self.update_rl_tuned_parameter()
+            self.generated_server_response = True
         server_response['fedrl'] = Config().cross_silo.rounds
         return server_response
 
@@ -150,7 +179,23 @@ class FedRLServer(FLServer):
         print("RL agent: Get tuned para of time step", time_step)
 
     async def wrap_up_an_episode(self):
-        """Wrapping up when the FL training is done."""
+        """Wrapping up when one RL episode (the FL training) is done."""
+        if Config().results:
+            new_row = []
+            for item in self.rl_recorded_items:
+                item_value = {
+                    'episode': self.rl_episode,
+                    'cumulative_reward': self.cumulative_reward,
+                    'rl_training_time':
+                    time.time() - self.rl_episode_start_time
+                }[item]
+                new_row.append(item_value)
+
+            result_dir = f'./results/{Config().training.dataset}/{Config().training.model}/{Config().server.type}/'
+            result_csv_file = result_dir + 'result_rl.csv'
+            csv_processor.write_csv(result_csv_file, new_row)
+        self.wrapped_previous_episode.set()
+
         if self.rl_episode >= Config().rl.episodes:
             logging.info(
                 'RL Agent: Target number of training episodes reached.')
@@ -158,6 +203,7 @@ class FedRLServer(FLServer):
             sys.exit()
         else:
             # Wait until RL env resets and starts a new RL episode
+            self.new_episode_begin.clear()
             await self.new_episode_begin.wait()
             self.new_episode_begin.clear()
 
@@ -170,7 +216,6 @@ class FedRLServer(FLServer):
         # It will check the environment and output additional warnings if needed
         check_env(env)
 
-    @staticmethod
     def try_a_random_agent(env):
         """Quickly try a random agent on the environment."""
         # pylint: disable=unused-variable
@@ -181,7 +226,6 @@ class FedRLServer(FLServer):
         for i in range(episodes):
             for _ in range(n_steps):
                 # Random action
-
                 action = env.action_space.sample()
                 obs, reward, done, info = env.step(action)
                 if done:

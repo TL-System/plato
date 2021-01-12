@@ -109,6 +109,8 @@ class FLEnv(gym.Env):
         reward = self.get_reward()
         info = {}
 
+        self.rl_agent.cumulative_reward += reward
+
         # Signal the RL agent to start next time step (next round of FL)
         self.step_done.set()
 

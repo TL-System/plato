@@ -35,11 +35,11 @@ class FedAvgServer(Server):
 
         if Config().results:
             recorded_items = Config().results.types
-            self.recorded_items = [
+            self.recorded_items = ['round'] + [
                 x.strip() for x in recorded_items.split(',')
             ]
             # Directory of results (figures etc.)
-            result_dir = f'./results/{Config().training.dataset}/{Config().training.model}/'
+            result_dir = f'./results/{Config().training.dataset}/{Config().training.model}/{Config().server.type}/'
             result_csv_file = result_dir + 'result.csv'
             csv_processor.initialize_csv(result_csv_file, self.recorded_items,
                                          result_dir)
@@ -168,15 +168,16 @@ class FedAvgServer(Server):
     async def wrap_up_processing_reports(self):
         """Wrap up processing the reports with any additional work."""
         if Config().results:
-            new_row = [self.current_round]
+            new_row = []
             for item in self.recorded_items:
                 item_value = {
+                    'round': self.current_round,
                     'accuracy': self.accuracy * 100,
                     'training_time': time.time() - self.round_start_time
                 }[item]
                 new_row.append(item_value)
 
-            result_dir = f'./results/{Config().training.dataset}/{Config().training.model}/'
+            result_dir = f'./results/{Config().training.dataset}/{Config().training.model}/{Config().server.type}/'
             result_csv_file = result_dir + 'result.csv'
 
             csv_processor.write_csv(result_csv_file, new_row)
