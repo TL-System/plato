@@ -77,7 +77,9 @@ class Server:
         if len(self.selected_clients) > 0:
             for client_id in self.selected_clients:
                 socket = self.clients[client_id]
-                logging.info("Selecting client #%s for training...", client_id)
+                logging.info(
+                    "[Server %d] Selecting client #%s for training...",
+                    os.getpid(), client_id)
                 server_response = {'id': client_id, 'payload': True}
                 server_response = await self.wrap_up_server_response(
                     server_response)
@@ -144,7 +146,10 @@ class Server:
     def save_model(self):
         """Saving the model to a file."""
         model_type = Config().training.model
-        model_path = f'./models/pretrained/{model_type}.pth'
+        model_dir = './models/pretrained/'
+        if not os.path.exists(model_dir):
+            os.makedirs(model_dir)
+        model_path = f'{model_dir}{model_type}.pth'
         torch.save(self.model.state_dict(), model_path)
         logging.info('Model saved to %s.', model_path)
 
