@@ -10,6 +10,7 @@ import logging
 import time
 import random
 import torch
+from itertools import chain
 
 import models.registry as models_registry
 from datasets import registry as datasets_registry
@@ -109,7 +110,9 @@ class MistNetServer(Server):
     async def process_reports(self):
         """Process the features extracted by the client and perform server-side training."""
         features = [report.features for report in self.reports]
-        feature_dataset = [item for sublist in features for item in sublist]
+
+        # Faster way to deep flatten a list of lists compared to list comprehension
+        feature_dataset = list(chain.from_iterable(features))
 
         # Traing the model using features received from the client
         trainer.train(self.model, FeatureDataset(feature_dataset),

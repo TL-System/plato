@@ -41,7 +41,7 @@ class MistNetClient(SimpleClient):
         features = trainer.extract_features(self.model,
                                             self.trainset,
                                             Config().training.cut_layer,
-                                            train=False)
+                                            epsilon=Config().training.epsilon)
 
         # Generate a report for the server, performing model testing if applicable
         return Report(self.client_id, len(self.trainset), features)

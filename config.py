@@ -151,11 +151,11 @@ class Config:
         fields = [
             'rounds', 'target_accuracy', 'epochs', 'batch_size', 'dataset',
             'data_path', 'model', 'optimizer', 'learning_rate', 'weight_decay',
-            'momentum', 'num_layers', 'num_classes', 'cut_layer', 'lr_gamma',
-            'lr_milestone_steps', 'lr_warmup_steps'
+            'momentum', 'num_layers', 'num_classes', 'cut_layer', 'epsilon',
+            'lr_gamma', 'lr_milestone_steps', 'lr_warmup_steps'
         ]
         defaults = (0, 0.9, 0, 128, 'MNIST', './data', 'mnist_cnn', 'SGD',
-                    0.01, 0.0, 0.9, 40, 10, '', 0.0, '', '')
+                    0.01, 0.0, 0.9, 40, 10, '', 1.0, 0.0, '', '')
         params = Config.extract_section('training', fields, defaults)
 
         Config.training = namedtuple('training', fields)(*params)
