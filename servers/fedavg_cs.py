@@ -17,6 +17,8 @@ class FedAvgCrossSiloServer(FedAvgServer):
     def __init__(self):
         super().__init__()
 
+        self.current_global_round = 1
+
         if Config().is_edge_server():
             # An edge client waits for the event that a certain number of
             # aggregations are completed
@@ -34,15 +36,22 @@ class FedAvgCrossSiloServer(FedAvgServer):
             logging.info(
                 "Edge server #%s starts training with %s clients and %s per round...",
                 Config().args.id, self.total_clients, self.clients_per_round)
-        else:
-            # Compute the number of clients for the central server
-            if Config().is_central_server():
-                self.clients_per_round = Config().cross_silo.total_silos
-                self.total_clients = self.clients_per_round
 
-                logging.info(
-                    "The central server starts training with %s edge servers...",
-                    self.total_clients)
+            if Config().results:
+                self.recorded_items = ['global_round'] + self.recorded_items
+                result_dir = f'./results/{Config().training.dataset}/{Config().training.model}/{Config().server.type}/'
+                result_csv_file = f'{result_dir}result_{Config().args.id}.csv'
+                csv_processor.initialize_csv(result_csv_file,
+                                             self.recorded_items, result_dir)
+
+        # Compute the number of clients for the central server
+        if Config().is_central_server():
+            self.clients_per_round = Config().cross_silo.total_silos
+            self.total_clients = self.clients_per_round
+
+            logging.info(
+                "The central server starts training with %s edge servers...",
+                self.total_clients)
 
     def configure(self):
         """
@@ -74,20 +83,26 @@ class FedAvgCrossSiloServer(FedAvgServer):
     async def wrap_up_processing_reports(self):
         """Wrap up processing the reports with any additional work."""
         if Config().results:
-            result_dir = f'./results/{Config().training.dataset}/{Config().training.model}/'
-            result_csv_file = result_dir + 'result.csv'
-
             # Write results into a CSV file
-            if not Config().is_edge_server():
-                new_row = [self.current_round]
-                for item in self.recorded_items:
-                    item_value = {
-                        'accuracy': self.accuracy * 100,
-                        'training_time': time.time() - self.round_start_time,
-                        'edge_agg_num': Config().cross_silo.rounds
-                    }[item]
-                    new_row.append(item_value)
-                csv_processor.write_csv(result_csv_file, new_row)
+            result_dir = f'./results/{Config().training.dataset}/{Config().training.model}/{Config().server.type}/'
+
+            new_row = []
+            for item in self.recorded_items:
+                item_value = {
+                    'global_round': self.current_global_round,
+                    'round': self.current_round,
+                    'accuracy': self.accuracy * 100,
+                    'training_time': time.time() - self.round_start_time,
+                    'edge_agg_num': Config().cross_silo.rounds
+                }[item]
+                new_row.append(item_value)
+
+            if Config().is_edge_server():
+                result_csv_file = f'{result_dir}result_{Config().args.id}.csv'
+            else:
+                result_csv_file = f'{result_dir}result.csv'
+
+            csv_processor.write_csv(result_csv_file, new_row)
 
         # When a certain number of aggregations are completed, an edge client
         # may need to be signaled to send a report to the central server
@@ -104,3 +119,4 @@ class FedAvgCrossSiloServer(FedAvgServer):
                 # Wait until a new global round begins
                 # to avoid selecting clients before a new global round begins
                 await self.new_global_round_begins.wait()
+                self.current_global_round += 1
