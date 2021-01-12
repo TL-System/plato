@@ -4,7 +4,8 @@ A federated learning client at the edge server in a cross-silo training workload
 
 from config import Config
 from training import trainer
-from clients import Client, Report
+from clients import Client
+from clients.simple import Report
 
 
 class EdgeClient(Client):

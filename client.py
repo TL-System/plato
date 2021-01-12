@@ -53,7 +53,8 @@ def main():
         else:
             client = {
                 "simple": clients.SimpleClient,
-                "mistnet": clients.MistNetClient
+                "mistnet": clients.MistNetClient,
+                "adaptive_freezing": clients.adaptive_freezing.APFClient
             }[Config().clients.type]()
             logging.info("Starting a %s client.", Config().clients.type)
             client.configure()
