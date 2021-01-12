@@ -4,7 +4,7 @@ References:
 
 Wang, et al. "Optimizing Locally Differentially Private Protocols," ATC USENIX 2017.
 
-Erlingsson, et al. "Rappor: Randomized Aggregatable Privacy-Preserving Ordinal Response,"
+Erlingsson, et al. "RAPPOR: Randomized Aggregatable Privacy-Preserving Ordinal Response,"
 ACM CCS 2014.
 
 """
@@ -29,8 +29,6 @@ def randomize(bit_array: np.ndarray, epsilon):
 def symmetric_unary_encoding(bit_array: np.ndarray, epsilon):
     p = np.e**(epsilon / 2) / (np.e**(epsilon / 2) + 1)
     q = 1 / (np.e**(epsilon / 2) + 1)
-    print(p)
-    print(q)
     return produce_random_response(bit_array, p, q)
 
 
