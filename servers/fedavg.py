@@ -95,28 +95,10 @@ class FedAvgServer(Server):
 
     def extract_client_updates(self, reports):
         """Extract the model weight updates from a client's report."""
-        # Extract baseline model weights
-        baseline_weights = self.trainer.extract_weights()
 
         # Extract weights from reports
-        weights = [report.weights for report in reports]
-
-        # Calculate updates from weights
-        updates = []
-        for weight in weights:
-            update = []
-            for i, (name, current_weight) in enumerate(weight):
-                bl_name, baseline = baseline_weights[i]
-
-                # Ensure correct weight is being updated
-                assert name == bl_name
-
-                # Calculate update
-                delta = current_weight - baseline
-                update.append((name, delta))
-            updates.append(update)
-
-        return updates
+        weights_received = [report.weights for report in reports]
+        return self.trainer.compute_weight_updates(weights_received)
 
     def federated_averaging(self, reports):
         """Aggregate weight updates from the clients using federated averaging."""

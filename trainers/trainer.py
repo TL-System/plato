@@ -44,7 +44,7 @@ class Trainer(base.Trainer):
             self.model.train()
 
     def extract_weights(self):
-        """Extract weights from a model passed in as a parameter."""
+        """Extract weights from the model."""
         weights = []
         for name, weight in self.model.to(
                 torch.device('cpu')).named_parameters():
@@ -52,6 +52,28 @@ class Trainer(base.Trainer):
                 weights.append((name, weight.data))
 
         return weights
+
+    def compute_weight_updates(self, weights_received):
+        """Extract the weights received from a client and compute the updates."""
+        # Extract baseline model weights
+        baseline_weights = self.extract_weights()
+
+        # Calculate updates from the received weights
+        updates = []
+        for weight in weights_received:
+            update = []
+            for i, (name, current_weight) in enumerate(weight):
+                bl_name, baseline = baseline_weights[i]
+
+                # Ensure correct weight is being updated
+                assert name == bl_name
+
+                # Calculate update
+                delta = current_weight - baseline
+                update.append((name, delta))
+            updates.append(update)
+
+        return updates
 
     def load_weights(self, weights):
         """Load the model weights passed in as a parameter."""

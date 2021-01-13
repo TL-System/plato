@@ -4,7 +4,6 @@ Testing a federated learning client.
 import os
 import sys
 import unittest
-import numpy as np
 
 # To import modules from the parent directory
 currentdir = os.path.dirname(os.path.realpath(__file__))
