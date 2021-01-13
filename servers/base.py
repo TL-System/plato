@@ -13,7 +13,6 @@ import torch
 import websockets
 
 from config import Config
-from training import trainer
 
 
 class Server:
@@ -24,6 +23,7 @@ class Server:
         self.selected_clients = None
         self.current_round = 0
         self.model = None
+        self.trainer = None
         self.accuracy = 0
         self.reports = []
 
@@ -88,8 +88,7 @@ class Server:
                 await socket.send(json.dumps(server_response))
 
                 logging.info("Sending the current model...")
-                await socket.send(
-                    pickle.dumps(trainer.extract_weights(self.model)))
+                await socket.send(pickle.dumps(self.trainer.extract_weights()))
 
     async def serve(self, websocket, path):  # pylint: disable=unused-argument
         """Running a federated learning server."""

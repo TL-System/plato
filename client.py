@@ -39,6 +39,7 @@ def main():
             server.configure()
 
             client = clients.EdgeClient(server)
+            client.configure()
             coroutines.append(client.start_client())
 
             logging.info("Starting an edge server (client #%s) on port %s",

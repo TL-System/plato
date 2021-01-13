@@ -10,7 +10,7 @@ import torch
 
 import models.registry as models_registry
 from datasets import registry as datasets_registry
-from training import trainer
+from trainers import registry as trainers_registry
 from servers import Server
 from config import Config
 from utils import csv_processor
@@ -78,6 +78,7 @@ class FedAvgServer(Server):
         logging.info('Model: %s', model_type)
 
         self.model = models_registry.get(model_type)
+        self.trainer = trainers_registry.get(self.model)
 
     def choose_clients(self):
         """Choose a subset of the clients to participate in each round."""
@@ -95,7 +96,7 @@ class FedAvgServer(Server):
     def extract_client_updates(self, reports):
         """Extract the model weight updates from a client's report."""
         # Extract baseline model weights
-        baseline_weights = trainer.extract_weights(self.model)
+        baseline_weights = self.trainer.extract_weights()
 
         # Extract weights from reports
         weights = [report.weights for report in reports]
@@ -135,7 +136,7 @@ class FedAvgServer(Server):
                 avg_update[j] += delta * (num_samples / self.total_samples)
 
         # Extract baseline model weights
-        baseline_weights = trainer.extract_weights(self.model)
+        baseline_weights = self.trainer.extract_weights()
 
         # Load updated weights into model
         updated_weights = []
@@ -147,7 +148,7 @@ class FedAvgServer(Server):
     async def process_reports(self):
         """Process the client reports by aggregating their weights."""
         updated_weights = self.aggregate_weights(self.reports)
-        trainer.load_weights(self.model, updated_weights)
+        self.trainer.load_weights(updated_weights)
 
         # Testing the global model accuracy
         if Config().clients.do_test:
@@ -158,8 +159,8 @@ class FedAvgServer(Server):
                     os.getpid(), 100 * self.accuracy))
         else:
             # Test the updated model directly at the server
-            self.accuracy = trainer.test(self.model, self.testset,
-                                         Config().training.batch_size)
+            self.accuracy = self.trainer.test(self.testset,
+                                              Config().training.batch_size)
             logging.info('Global model accuracy: {:.2f}%\n'.format(
                 100 * self.accuracy))
 

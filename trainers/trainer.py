@@ -1,0 +1,146 @@
+"""
+The training and testing loop.
+"""
+
+import logging
+import os
+import torch
+
+import numpy as np
+
+from models.base import Model
+from config import Config
+from trainers import base, optimizers
+
+
+class Trainer(base.Trainer):
+    """A basic federated learning trainer, used by both the client and the server."""
+    def __init__(self, model: Model):
+        """Initializing the trainer with the provided model.
+
+        Arguments:
+        model: The model to train. Must be a models.base.Model subclass.
+        """
+
+        # Use distributed data parallelism if multiple GPUs are available.
+        if Config().is_distributed():
+            logging.info("Turning on Distributed Data Parallelism...")
+
+            os.environ['MASTER_ADDR'] = 'localhost'
+            os.environ['MASTER_PORT'] = Config().DDP_port()
+            torch.distributed.init_process_group(
+                'nccl', rank=0, world_size=Config().world_size())
+
+            # DistributedDataParallel divides and allocate a batch of data to all
+            # available GPUs since device_ids are not set
+            self.model = torch.nn.parallel.DistributedDataParallel(
+                module=model)
+        else:
+            self.model = model
+
+            self.device = Config().device()
+            self.model.to(self.device)
+
+            self.model.train()
+
+    def extract_weights(self):
+        """Extract weights from a model passed in as a parameter."""
+        weights = []
+        for name, weight in self.model.to(
+                torch.device('cpu')).named_parameters():
+            if weight.requires_grad:
+                weights.append((name, weight.data))
+
+        return weights
+
+    def load_weights(self, weights):
+        """Load the model weights passed in as a parameter."""
+        updated_state_dict = {}
+        for name, weight in weights:
+            updated_state_dict[name] = weight
+
+        self.model.load_state_dict(updated_state_dict, strict=False)
+
+    def train(self, trainset, cut_layer=None):
+        """The main training loop in a federated learning workload.
+
+        Arguments:
+        trainset: The training dataset.
+        cut_layer: The layer which training should start from.
+        """
+
+        log_interval = 10
+        batch_size = Config().training.batch_size
+        train_loader = torch.utils.data.DataLoader(trainset,
+                                                   batch_size=batch_size,
+                                                   shuffle=True)
+        iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
+        epochs = Config().training.epochs
+
+        # Initializing the optimizer
+        optimizer = optimizers.get_optimizer(self.model)
+
+        # Initializing the learning rate schedule, if necessary
+        if Config().training.lr_gamma == 0.0 or Config(
+        ).training.lr_milestone_steps == '':
+            lr_schedule = optimizers.get_lr_schedule(optimizer,
+                                                     iterations_per_epoch)
+        else:
+            lr_schedule = None
+
+        for epoch in range(1, epochs + 1):
+            for batch_id, (examples, labels) in enumerate(train_loader):
+                examples, labels = examples.to(self.device), labels.to(
+                    self.device)
+                optimizer.zero_grad()
+                if cut_layer is None:
+                    loss = self.model.loss_criterion(self.model(examples),
+                                                     labels)
+                else:
+                    outputs = self.model.forward_from(examples, cut_layer)
+                    loss = self.model.loss_criterion(outputs, labels)
+                loss.backward()
+                optimizer.step()
+                if lr_schedule is not None:
+                    lr_schedule.step()
+
+                if batch_id % log_interval == 0:
+                    logging.debug('Epoch: [{}/{}]\tLoss: {:.6f}'.format(
+                        epoch, epochs, loss.item()))
+
+    def test(self, testset, batch_size, cut_layer=None):
+        """Testing the model using the provided test dataset.
+
+        Arguments:
+        testset: The test dataset.
+        batch_size: the batch size used for testing.
+        cut_layer (optional): The layer which testing should start from.
+        """
+
+        self.model.to(self.device)
+        self.model.eval()
+        test_loader = torch.utils.data.DataLoader(testset,
+                                                  batch_size=batch_size,
+                                                  shuffle=True)
+
+        correct = 0
+        total = 0
+
+        with torch.no_grad():
+            for examples, labels in test_loader:
+                examples, labels = examples.to(self.device), labels.to(
+                    self.device)
+
+                if cut_layer is None:
+                    outputs = self.model(examples)
+                else:
+                    outputs = self.model.forward_from(examples, cut_layer)
+
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
+
+        accuracy = correct / total
+        logging.debug('Accuracy: {:.2f}%'.format(100 * accuracy))
+
+        return accuracy

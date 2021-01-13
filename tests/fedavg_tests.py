@@ -11,9 +11,10 @@ parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
 from models.base import Model
-from training import trainer
+from trainers.trainer import Trainer
 from clients import simple
 from servers import fedavg
+from trainers import trainer
 
 
 class InnerProductModel(Model):
@@ -44,11 +45,12 @@ class FedAvgTest(unittest.TestCase):
         self.model = InnerProductModel(10)
         self.example = torch.ones(1, 10)
         self.label = torch.ones(1) * 40.0
+        self.trainer = Trainer(self.model)
         self.optimizer = torch.optim.SGD(self.model.parameters(), lr=0.01)
 
     def test_forward(self):
         self.assertIsNotNone(self.model)
-        weights = trainer.extract_weights(self.model)
+        weights = self.trainer.extract_weights()
         print("Testing forward pass...")
         print(f"Weights: {weights}")
         self.assertEqual(45.0, self.model(self.example).item())
@@ -62,7 +64,7 @@ class FedAvgTest(unittest.TestCase):
                                   self.label).backward()
         self.optimizer.step()
         self.assertEqual(44.0, self.model(self.example).item())
-        weights = trainer.extract_weights(self.model)
+        weights = self.trainer.extract_weights()
         print(f"Weights: {weights}")
 
         self.optimizer.zero_grad()
@@ -70,7 +72,7 @@ class FedAvgTest(unittest.TestCase):
                                   self.label).backward()
         self.optimizer.step()
         self.assertEqual(43.2, np.round(self.model(self.example).item(), 4))
-        weights = trainer.extract_weights(self.model)
+        weights = self.trainer.extract_weights()
         print(f"Weights: {weights}")
 
         self.optimizer.zero_grad()
@@ -78,16 +80,17 @@ class FedAvgTest(unittest.TestCase):
                                   self.label).backward()
         self.optimizer.step()
         self.assertEqual(42.56, np.round(self.model(self.example).item(), 4))
-        weights = trainer.extract_weights(self.model)
+        weights = self.trainer.extract_weights()
         print(f"Weights: {weights}")
 
     def test_fedavg_aggregation(self):
         print("Testing federated averaging...")
         reports = []
-        server = fedavg.FedAvgServer([])
+        server = fedavg.FedAvgServer()
         server.model = copy.deepcopy(self.model)
+        server.trainer = trainer.Trainer(server.model)
 
-        weights = copy.deepcopy(trainer.extract_weights(self.model))
+        weights = copy.deepcopy(self.trainer.extract_weights())
         print(f"Report 1 weights: {weights}")
         reports.append(simple.Report(1, 100, weights, 0))
 
@@ -98,7 +101,7 @@ class FedAvgTest(unittest.TestCase):
                                   self.label).backward()
         self.optimizer.step()
         self.assertEqual(44.0, self.model(self.example).item())
-        weights = copy.deepcopy(trainer.extract_weights(self.model))
+        weights = copy.deepcopy(self.trainer.extract_weights())
         print(f"Report 2 weights: {weights}")
         reports.append(simple.Report(1, 100, weights, 0))
 
@@ -107,7 +110,7 @@ class FedAvgTest(unittest.TestCase):
                                   self.label).backward()
         self.optimizer.step()
         self.assertEqual(43.2, np.round(self.model(self.example).item(), 4))
-        weights = copy.deepcopy(trainer.extract_weights(self.model))
+        weights = copy.deepcopy(self.trainer.extract_weights())
         print(f"Report 3 Weights: {weights}")
         reports.append(simple.Report(1, 100, weights, 0))
 
@@ -116,7 +119,7 @@ class FedAvgTest(unittest.TestCase):
                                   self.label).backward()
         self.optimizer.step()
         self.assertEqual(42.56, np.round(self.model(self.example).item(), 4))
-        weights = copy.deepcopy(trainer.extract_weights(self.model))
+        weights = copy.deepcopy(self.trainer.extract_weights())
         print(f"Report 4 Weights: {weights}")
         reports.append(simple.Report(1, 100, weights, 0))
 
@@ -124,7 +127,7 @@ class FedAvgTest(unittest.TestCase):
             f"Weights before federated averaging: {server.model.layer.weight.data}"
         )
         updated_weights = server.federated_averaging(reports)
-        trainer.load_weights(server.model, updated_weights)
+        self.trainer.load_weights(updated_weights)
         print(
             f"Weights after federated averaging: {server.model.layer.weight.data}"
         )
