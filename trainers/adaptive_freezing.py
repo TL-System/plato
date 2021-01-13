@@ -2,8 +2,10 @@
 The federated learning trainer for Adaptive Parameter Freezing.
 """
 
+import copy
 import torch
 
+from models.base import Model
 from trainers import trainer
 
 
@@ -11,9 +13,20 @@ class Trainer(trainer.Trainer):
     """The federated learning trainer for Adaptive Parameter Freezing, 
        used by both the client and the server.
     """
-    def __init__(self):
-        super().__init__()
+    def __init__(self, model: Model):
+        super().__init__(model)
         self.sync_mask = {}
+
+        # Initialize the synchronization mask
+        if not self.sync_mask:
+            for name, weight in model.to(
+                    torch.device('cpu')).named_parameters():
+                if weight.requires_grad:
+                    self.sync_mask[name] = torch.ones(weight.data.shape).bool()
+
+        # Initialize the preserved weights
+        self.previous_weights = None
+        self.preserve_weights()
 
     def extract_weights(self):
         """Extract weights from a model passed in as a parameter, and apply the sync mask."""
@@ -33,16 +46,14 @@ class Trainer(trainer.Trainer):
 
         return weights
 
+    def preserve_weights(self):
+        self.previous_weights = {
+            name: copy.deepcopy(weight)
+            for name, weight in self.model.named_parameters()
+        }
+
     def load_weights(self, weights):
         """Loading the server model onto this client."""
-        # Initialize the synchronization mask if necessary
-        self.trainer.initialize_sync()
-        if not self.sync_mask:
-            for name, weight in self.model.to(
-                    torch.device('cpu')).named_parameters():
-                if weight.requires_grad:
-                    self.sync_mask[name] = torch.ones(weight.data.shape).bool()
-
         # Masking the weights received and load them into the model
         weights_received = []
 
