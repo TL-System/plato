@@ -57,12 +57,22 @@ $ pip install yapf
 If you use Visual Studio Code, it is possible to use `yapf` to reformat the code every time it is saved by adding the following settings to .`.vscode/settings.json`:
 
 ```
-"python.linting.enabled": true,
-"python.linting.pylintPath": "pylint",
-"editor.formatOnSave": true,
 "python.formatting.provider": "yapf", 
-"python.linting.pylintEnabled": true
+"editor.formatOnSave": true
 ```
+
+In general, the following is the recommended starting point for `.vscode/settings.json`:
+
+```
+"python.linting.enabled": true,
+"python.linting.pylintEnabled": true,
+"python.linting.pylintPath": "/absolute/path/to/project/home/directory",
+"python.formatting.provider": "yapf", 
+"editor.formatOnSave": true,
+"workbench.editor.enablePreview": false
+```
+
+It goes without saying that `/absolute/path/to/project/home/directory` should be replaced with the actual path in the specific development environment.
 
 **Tip:** When working in Visual Studio Code as the development environment, one of the project developer's colour theme favourites is called `Bluloco`, both of its light and dark variants are excellent and very thoughtfully designed. The `Pylance` extension is also strongly recommended, which represents Microsoft's modern language server for Python.
 

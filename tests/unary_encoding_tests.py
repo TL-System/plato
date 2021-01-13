@@ -17,6 +17,7 @@ from utils import unary_encoding
 
 class UnaryEncodingTest(unittest.TestCase):
     """Tests for unary encoding and random response."""
+    @staticmethod
     def unary_epsilon(p, q):
         """Computes epsilon from p and q.
 

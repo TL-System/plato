@@ -9,7 +9,9 @@ This framework makes extensive use of object oriented subclassing with the help 
 
 For simplicity, all hyperpameters in the framework are read from a configuration file at the beginning, and stored in a global Singleton `Config` class (found in `config.py`). This includes hyperparameters specific to the dataset, data distribution, the training process, server configuration, and cross-silo training. The command-line arguments are only used to specify the location of the configuration file, the logging level, the client ID (on the client side), and the port number (for edge servers in cross-silo training). Use `Config()` anywhere in the framework to access these hyperparameters.
 
-### Modules for Datasets, Models, Training
+In the future, hyperparameters belonging to the framework in general will be separated from hyperparameters belonging to a specific mechanism. Both will continue to use global Singleton classes.
+
+### Modules for Datasets, Models, and Training
 
 This framework breaks commonly shared components in a federated learning training workload into distinct modules that are as independent as possible.
 
@@ -21,7 +23,7 @@ Each dataset consists of two abstractions:
 
 2. A `Divider` that partitions the dataset for local training or testing at each client in the federated learning workload.
 
-For now, we use the standard PyTorch `DataLoader` class in `torch.utils.data` for loading data. We may need to write our own custom data loaders in the future (*to be completed*). This may be useful for ImageNet (`datasets/imagenet.py`), which replaces all functionality due to the specialized needs of loading such a large dataset efficiently (*to be completed*).
+For now, we use the standard PyTorch `DataLoader` class in `torch.utils.data` for loading data. Custom data loaders are used to support custom datasets that are not supported by the PyTorch `DataLoader` class, such as the CINIC-10 and ImageNet datasets. This is especially the case for ImageNet, due to the specialized needs of loading such a large dataset efficiently (*to be completed*).
 
 A dataset must subclass the `Dataset` abstract base classes in `datasets/base.py`. This class subclasses the corresponding PyTorch `Dataset` class, and adds additional functionality to support build-in transformations.
 
@@ -41,4 +43,4 @@ The training module centers on a single function: the `train()` function in `tra
 
 The training module would use callbacks for customization (*to be completed*).
 
-To create optimizers and learning rate scheduler objects, `train()` calls the `get_optimizer()` and `get_lr_schedule()` functions (*to be completed*) in `training/optimizers.py`, which serve as small-scale registries for these objects.
+To create optimizers and learning rate scheduler objects, `train()` calls the `get_optimizer()` and `get_lr_schedule()` functions in `training/optimizers.py`, which serve as small-scale registries for these objects.
