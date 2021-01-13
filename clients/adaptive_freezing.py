@@ -7,33 +7,14 @@ C. Chen, et al. "Communication-Efficient Federated Learning with Adaptive Parame
 
 """
 
-import logging
-from dataclasses import dataclass
-
 from training import trainer
 from config import Config
 from clients import SimpleClient
-
-
-@dataclass
-class Report:
-    """Client report sent to the federated learning server."""
-    client_id: str
-    num_samples: int
-    weights: list
-    accuracy: float
+from clients.simple import Report
 
 
 class APFClient(SimpleClient):
     """A federated learning client with Adaptive Parameter Freezing."""
-    def __init__(self):
-        super().__init__()
-
-    def __repr__(self):
-        return 'Client #{}: {} samples in labels: {}'.format(
-            self.client_id, len(self.data),
-            set([label for __, label in self.data]))
-
     async def train(self):
         """Adaptive Parameter Freezing will be applied after training the model."""
         # Perform model training

@@ -64,6 +64,8 @@ If you use Visual Studio Code, it is possible to use `yapf` to reformat the code
 "python.linting.pylintEnabled": true
 ```
 
+**Tip:** When working in Visual Studio Code as the development environment, one of the project developer's colour theme favourites is called `Bluloco`, both of its light and dark variants are excellent and very thoughtfully designed. The `Pylance` extension is also strongly recommended, which represents Microsoft's modern language server for Python.
+
 ### Running Plato
 
 To start a federated learning training workload, run [`run.py`](run.py) from the repository's root directory. For example:
