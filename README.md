@@ -66,9 +66,12 @@ In general, the following is the recommended starting point for `.vscode/setting
 ```
 "python.linting.enabled": true,
 "python.linting.pylintEnabled": true,
-"python.linting.pylintPath": "/absolute/path/to/project/home/directory",
 "python.formatting.provider": "yapf", 
 "editor.formatOnSave": true,
+"python.linting.pylintArgs": [
+    "--init-hook",
+    "import sys; sys.path.append('/absolute/path/to/project/home/directory')"
+],
 "workbench.editor.enablePreview": false
 ```
 

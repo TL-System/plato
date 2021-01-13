@@ -11,10 +11,9 @@ parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
 from models.base import Model
-from trainers.trainer import Trainer
+from trainers import trainer
 from clients import simple
 from servers import fedavg
-from trainers import trainer
 
 
 class InnerProductModel(Model):
@@ -45,7 +44,7 @@ class FedAvgTest(unittest.TestCase):
         self.model = InnerProductModel(10)
         self.example = torch.ones(1, 10)
         self.label = torch.ones(1) * 40.0
-        self.trainer = Trainer(self.model)
+        self.trainer = trainer.Trainer(self.model)
         self.optimizer = torch.optim.SGD(self.model.parameters(), lr=0.01)
 
     def test_forward(self):

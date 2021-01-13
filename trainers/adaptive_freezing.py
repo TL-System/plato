@@ -10,7 +10,7 @@ from trainers import trainer
 
 
 class Trainer(trainer.Trainer):
-    """The federated learning trainer for Adaptive Parameter Freezing, 
+    """The federated learning trainer for Adaptive Parameter Freezing,
        used by both the client and the server.
     """
     def __init__(self, model: Model):
@@ -28,10 +28,11 @@ class Trainer(trainer.Trainer):
         self.previous_weights = None
         self.preserve_weights()
 
-    def extract_weights(self):
-        """Extract weights from a model passed in as a parameter, and apply the sync mask."""
+    def compress_weights(self):
+        """Extract weights from the model, and apply the sync mask
+           to make sure that frozen parameters will not be transmitted.
+        """
         weights = []
-
         for name, weight in self.model.to(
                 torch.device('cpu')).named_parameters():
             if weight.requires_grad:
@@ -39,14 +40,40 @@ class Trainer(trainer.Trainer):
                 weight.data = torch.where(self.sync_mask[name], weight.data,
                                           self.previous_weights[name].data)
                 # Removing model weights that should not be synced with ther server
-                weights_to_sync = torch.masked_select(
-                    weight.data,
-                    self.sync_mask[name]).reshape(weight.data.shape)
+                weights_to_sync = torch.masked_select(weight.data,
+                                                      self.sync_mask[name])
                 weights.append((name, weights_to_sync))
 
         return weights
 
+    def compute_weight_updates(self, weights_received):
+        """Extract the weights received from a client and compute the updates."""
+        # Extract baseline model weights
+        baseline_weights = self.extract_weights()
+
+        # Calculate updates from the received weights
+        updates = []
+        for weight in weights_received:
+            update = []
+            for i, (name, current_weight) in enumerate(weight):
+                bl_name, baseline = baseline_weights[i]
+
+                # Ensure correct weight is being updated
+                assert name == bl_name
+
+                # Expand the received weights using the sync mask
+                updated_weight = copy.deepcopy(baseline)
+                updated_weight[self.sync_mask[name]] = current_weight
+
+                # Calculate update
+                delta = updated_weight - baseline
+                update.append((name, delta))
+            updates.append(update)
+
+        return updates
+
     def preserve_weights(self):
+        """Making a copy of the model weights for later use."""
         self.previous_weights = {
             name: copy.deepcopy(weight)
             for name, weight in self.model.named_parameters()

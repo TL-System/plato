@@ -26,8 +26,8 @@ class APFClient(SimpleClient):
         # Perform model training
         self.trainer.train(self.trainset)
 
-        # Extract model weights and biases
-        weights = self.trainer.extract_weights()
+        # Extract model weights and biases, with some weights frozen
+        weights = self.trainer.compress_weights()
 
         # Generate a report for the server, performing model testing if applicable
         if Config().clients.do_test:
