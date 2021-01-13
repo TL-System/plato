@@ -6,13 +6,14 @@ from abc import abstractmethod
 import json
 import sys
 import os
-import torch
 import logging
 import subprocess
 import pickle
+import torch
 import websockets
 
 from config import Config
+from training import trainer
 
 
 class Server:
@@ -37,7 +38,8 @@ class Server:
             if value == websocket:
                 del self.clients[key]
 
-    def start_clients(self, as_server=False):
+    @staticmethod
+    def start_clients(as_server=False):
         """Starting all the clients as separate processes."""
         starting_id = 1
 
@@ -86,7 +88,8 @@ class Server:
                 await socket.send(json.dumps(server_response))
 
                 logging.info("Sending the current model...")
-                await socket.send(pickle.dumps(self.model.state_dict()))
+                await socket.send(
+                    pickle.dumps(trainer.extract_weights(self.model)))
 
     async def serve(self, websocket, path):  # pylint: disable=unused-argument
         """Running a federated learning server."""

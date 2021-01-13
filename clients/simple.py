@@ -103,7 +103,7 @@ class SimpleClient(Client):
 
     def load_payload(self, server_payload):
         """Loading the server model onto this client."""
-        self.model.load_state_dict(server_payload)
+        trainer.load_weights(self.model, server_payload)
 
     async def train(self):
         """The machine learning training workload on a client."""

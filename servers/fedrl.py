@@ -83,7 +83,7 @@ class FedRLServer(FLServer):
         else:
             logging.info('RL Training: %s episodes\n', total_episodes)
 
-    def start_clients(self, as_server=False):
+    def start_clients(as_server=False):
         """Start all clients and RL training."""
         super().start_clients(as_server)
 

@@ -18,6 +18,7 @@ def main():
 
     loop = asyncio.get_event_loop()
     coroutines = []
+    client = None
 
     try:
         # If a server needs to be running concurrently
