@@ -6,7 +6,7 @@ Reference:
 C. Chen, et al. "Communication-Efficient Federated Learning with Adaptive Parameter Freezing"
 
 """
-
+import copy
 import torch
 
 from models.base import Model
@@ -38,27 +38,34 @@ class APFClient(SimpleClient):
             weight.data[self.sync_mask[name]] = weight.data.view(-1)
             weights_received.append((name, weight.data))
 
-        print(weights_received[:2])
         trainer.load_weights(self.model, weights_received)
 
     def extract_weights(self):
-        """Extract weights from a model passed in as a parameter, and apply the APF mask."""
+        """Extract weights from a model passed in as a parameter, and apply the sync mask."""
         weights = []
+
         for name, weight in self.model.to(
                 torch.device('cpu')).named_parameters():
             if weight.requires_grad:
                 # Rolling back model parameters that should be frozen
-                weight.data = torch.where(self.sync_mask == True,
-                                          self.weight.data,
-                                          self.previous_weight.data)
+                weight.data = torch.where(self.sync_mask[name], weight.data,
+                                          self.previous_weights[name].data)
                 # Removing model weights that should not be synced with ther server
-                weights_to_sync = torch.masked_select(weight.data,
-                                                      self.sync_mask)
+                weights_to_sync = torch.masked_select(
+                    weight.data,
+                    self.sync_mask[name]).reshape(weight.data.shape)
                 weights.append((name, weights_to_sync))
+
         return weights
 
     async def train(self):
         """Adaptive Parameter Freezing will be applied after training the model."""
+        # Preserve the model before training for rolling back frozen parameters
+        self.previous_weights = {
+            name: copy.deepcopy(weight)
+            for name, weight in self.model.named_parameters()
+        }
+
         # Perform model training
         trainer.train(self.model, self.trainset)
 
