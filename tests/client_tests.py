@@ -11,9 +11,6 @@ currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
-from models.base import Model
-from training import trainer
-from servers import fedavg
 from config import Config
 from clients import SimpleClient
 

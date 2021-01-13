@@ -14,7 +14,7 @@ from itertools import chain
 
 import models.registry as models_registry
 from datasets import registry as datasets_registry
-from training import trainer
+from trainers import registry as trainers_registry
 from servers import Server
 from config import Config
 from utils import csv_processor
@@ -93,6 +93,7 @@ class MistNetServer(Server):
 
         # Loading the model for server-side training
         self.model = models_registry.get(model_type)
+        self.trainer = trainers_registry.get(self.model)
 
         # Loading pre-trained weights for the model
         model_path = f'./models/pretrained/{model_type}.pth'
@@ -115,14 +116,13 @@ class MistNetServer(Server):
         feature_dataset = list(chain.from_iterable(features))
 
         # Traing the model using features received from the client
-        trainer.train(self.model, FeatureDataset(feature_dataset),
-                      Config().training.cut_layer)
+        self.trainer.train(FeatureDataset(feature_dataset),
+                           Config().training.cut_layer)
 
         # Test the updated model
-        self.accuracy = trainer.test(self.model,
-                                     FeatureDataset(feature_dataset),
-                                     Config().training.batch_size,
-                                     Config().training.cut_layer)
+        self.accuracy = self.trainer.test(FeatureDataset(feature_dataset),
+                                          Config().training.batch_size,
+                                          Config().training.cut_layer)
         logging.info('Global model accuracy: {:.2f}%\n'.format(100 *
                                                                self.accuracy))
 

@@ -8,9 +8,9 @@ from dataclasses import dataclass
 
 from models import registry as models_registry
 from datasets import registry as datasets_registry
+from trainers import registry as trainers_registry
 from dividers import iid, biased, sharded
 from utils import dists
-from training import trainer
 from config import Config
 from clients import Client
 
@@ -41,6 +41,7 @@ class SimpleClient(Client):
         """Prepare this client for training."""
         model_name = Config().training.model
         self.model = models_registry.get(model_name)
+        self.trainer = trainers_registry.get(self.model)
 
     def load_data(self):
         """Generating data and loading them onto this client."""
@@ -103,21 +104,21 @@ class SimpleClient(Client):
 
     def load_payload(self, server_payload):
         """Loading the server model onto this client."""
-        trainer.load_weights(self.model, server_payload)
+        self.trainer.load_weights(server_payload)
 
     async def train(self):
         """The machine learning training workload on a client."""
         logging.info('Training on client #%s', self.client_id)
 
         # Perform model training
-        trainer.train(self.model, self.trainset)
+        self.trainer.train(self.trainset)
 
         # Extract model weights and biases
-        weights = trainer.extract_weights(self.model)
+        weights = self.trainer.extract_weights()
 
         # Generate a report for the server, performing model testing if applicable
         if Config().clients.do_test:
-            accuracy = trainer.test(self.model, self.testset, 1000)
+            accuracy = self.trainer.test(self.testset, 1000)
         else:
             accuracy = 0
 

@@ -1,0 +1,28 @@
+"""
+Having a registry of all available classes is convenient for retrieving an instance
+based on a configuration at run-time.
+"""
+
+import logging
+
+from models.base import Model
+from trainers import trainer, mistnet, adaptive_freezing
+from config import Config
+
+registered_trainers = {
+    'basic': trainer,
+    'mistnet': mistnet,
+    'adaptive_freezing': adaptive_freezing
+}
+
+
+def get(model: Model):
+    """Get the trainer with the provided name."""
+    trainer_name = Config().training.trainer
+
+    if trainer_name in registered_trainers:
+        trainer = registered_trainers[trainer_name].Trainer(model)
+    else:
+        raise ValueError('No such trainer: {}'.format(trainer_name))
+
+    return trainer

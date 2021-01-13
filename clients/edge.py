@@ -3,7 +3,7 @@ A federated learning client at the edge server in a cross-silo training workload
 """
 
 from config import Config
-from training import trainer
+from trainers import registry as trainers_registry
 from clients import Client
 from clients.simple import Report
 
@@ -16,6 +16,7 @@ class EdgeClient(Client):
 
     def configure(self):
         """Prepare this edge client for training."""
+        self.trainer = trainers_registry.get(self.server.model)
         return
 
     def load_data(self):
@@ -31,10 +32,6 @@ class EdgeClient(Client):
             Config().training = Config().training._replace(
                 rounds=server_response['fedrl'])
 
-    def load_payload(self, server_payload):
-        """The server sends the model, which should be loaded onto this client."""
-        self.server.model.load_state_dict(server_payload)
-
     async def train(self):
         """The aggregation workload on an edge client."""
         # Signal edge server to select clients to start a new round of local aggregation
@@ -45,7 +42,7 @@ class EdgeClient(Client):
         self.server.model_aggregated.clear()
 
         # Extract model weights and biases
-        weights = trainer.extract_weights(self.server.model)
+        weights = self.trainer.extract_weights()
 
         # Generate a report for the server, performing model testing if applicable
         if Config().clients.do_test:
