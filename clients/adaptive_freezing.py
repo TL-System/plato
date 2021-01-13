@@ -21,10 +21,7 @@ class APFClient(SimpleClient):
     async def train(self):
         """Adaptive Parameter Freezing will be applied after training the model."""
         # Preserve the model before training for rolling back frozen parameters
-        self.previous_weights = {
-            name: copy.deepcopy(weight)
-            for name, weight in self.model.named_parameters()
-        }
+        self.trainer.preserve_weights()
 
         # Perform model training
         self.trainer.train(self.trainset)
