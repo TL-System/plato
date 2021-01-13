@@ -25,14 +25,6 @@ class Report:
 
 class MistNetClient(SimpleClient):
     """A federated learning client for MistNet."""
-    def __init__(self):
-        super().__init__()
-
-    def __repr__(self):
-        return 'Client #{}: {} samples in labels: {}'.format(
-            self.client_id, len(self.data),
-            set([label for __, label in self.data]))
-
     async def train(self):
         """A MistNet client only uses the first several layers in a forward pass."""
         logging.info('Training on MistNet client #%s', self.client_id)

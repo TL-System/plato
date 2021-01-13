@@ -94,6 +94,9 @@ class Client:
     def wrap_up_before_training(self, data):
         """Wrap up before training in case server response has any additional information."""
 
+    def process_server_response(self, server_response):
+        """Additional client-specific processing on the server response."""
+
     @abstractmethod
     def configure(self):
         """Prepare this client for training."""
@@ -101,10 +104,6 @@ class Client:
     @abstractmethod
     def load_data(self):
         """Generating data and loading them onto this client."""
-
-    @abstractmethod
-    def process_server_response(self, server_response):
-        """Additional client-specific processing on the server response."""
 
     @abstractmethod
     def load_payload(self, server_payload):
