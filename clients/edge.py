@@ -2,6 +2,7 @@
 A federated learning client at the edge server in a cross-silo training workload.
 """
 
+import time
 from config import Config
 from trainers import registry as trainers_registry
 from clients import Client
@@ -13,6 +14,9 @@ class EdgeClient(Client):
     def __init__(self, server):
         super().__init__()
         self.server = server
+
+        # The communication time of the central server sending the current model to the edge server
+        self.first_communication_time = None
 
     def configure(self):
         """Prepare this edge client for training."""
@@ -34,9 +38,13 @@ class EdgeClient(Client):
         if 'current_global_round' in server_response:
             self.server.current_global_round = server_response[
                 'current_global_round']
+        if 'first_communication_start_time' in server_response:
+            self.first_communication_time = time.time(
+            ) - server_response['first_communication_start_time']
 
     async def train(self):
         """The aggregation workload on an edge client."""
+        self.server.training_time_in_one_global_round = 0
         # Signal edge server to select clients to start a new round of local aggregation
         self.server.new_global_round_begins.set()
 
@@ -53,5 +61,13 @@ class EdgeClient(Client):
         else:
             accuracy = 0
 
+        training_time = self.server.training_time_in_one_global_round
+        # Send the starting time of second communication (client sending trained model to the server)
+        # as the second communication time
+        # The server will replace it with the actual time of second communication
+        second_communication_start_time = time.time()
+
         return Report(self.client_id, self.server.total_samples, weights,
-                      accuracy)
+                      accuracy, training_time, 0,
+                      self.first_communication_time,
+                      second_communication_start_time)

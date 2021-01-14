@@ -107,6 +107,7 @@ class Server:
                         "[Server %s] Update from client #%s received.",
                         os.getpid(), client_id)
 
+                    self.wrap_up_client_report(report)
                     self.reports.append(report)
 
                     if len(self.reports) == len(self.selected_clients):
@@ -158,6 +159,9 @@ class Server:
     async def wrap_up_server_response(self, server_response):
         """Wrap up generating the server response with any additional information."""
         return server_response
+
+    def wrap_up_client_report(self, report):
+        """Wrap up after receiving the client report with any additional information."""
 
     @abstractmethod
     def configure(self):
