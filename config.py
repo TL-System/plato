@@ -153,11 +153,12 @@ class Config:
             'dataset', 'data_path', 'model', 'optimizer', 'learning_rate',
             'weight_decay', 'momentum', 'num_layers', 'num_classes',
             'cut_layer', 'epsilon', 'lr_gamma', 'lr_milestone_steps',
-            'lr_warmup_steps', 'moving_average_alpha', 'stability_threshold'
+            'lr_warmup_steps', 'moving_average_alpha', 'stability_threshold',
+            'tight_threshold', 'random_freezing'
         ]
         defaults = ('basic', 0, 0.9, 0, 128, 'MNIST', './data', 'mnist_cnn',
                     'SGD', 0.01, 0.0, 0.9, 40, 10, '', 1.0, 0.0, '', '', 0.99,
-                    0.05)
+                    0.05, 0.8, True)
         params = Config.extract_section('training', fields, defaults)
 
         Config.training = namedtuple('training', fields)(*params)
