@@ -1,5 +1,11 @@
 """
-The training and testing loop.
+The federated learning trainer for MistNet, used by both the client and the
+server.
+
+Reference:
+
+P. Wang, et al. "MistNet: Towards Private Neural Network Training with Local
+Differential Privacy," found in docs/papers.
 """
 
 import torch
@@ -11,7 +17,9 @@ from trainers import trainer
 
 
 class Trainer(trainer.Trainer):
-    """A federated learning trainer for MistNet, used by both the client and the server."""
+    """A federated learning trainer for MistNet, used by both the client and the
+    server.
+    """
     def extract_features(self, dataset, cut_layer: str, epsilon=None):
         """Extracting features using layers before the cut_layer.
 
