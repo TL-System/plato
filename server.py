@@ -34,8 +34,10 @@ def main():
     loop.run_until_complete(start_server)
 
     if Config().is_central_server():
+        # For cross-silo FL, the central server will let edge servers start first
+        # Then the edge servers will start their clients
         server.start_clients(as_server=True)
-        # Allowing some time for the servers to start
+        # Allowing some time for the edge servers to start
         time.sleep(5)
 
     server.start_clients()
