@@ -17,7 +17,7 @@ class FedAvgCrossSiloServer(FedAvgServer):
     def __init__(self):
         super().__init__()
 
-        self.current_global_round = 1
+        self.current_global_round = None
 
         if Config().is_edge_server():
             # An edge client waits for the event that a certain number of
@@ -80,6 +80,12 @@ class FedAvgCrossSiloServer(FedAvgServer):
         self.load_test_data()
         self.load_model()
 
+    async def wrap_up_server_response(self, server_response):
+        """Wrap up generating the server response with any additional information."""
+        if Config().is_central_server():
+            server_response['current_global_round'] = self.current_round
+        return server_response
+
     async def wrap_up_processing_reports(self):
         """Wrap up processing the reports with any additional work."""
         if Config().results:
@@ -119,4 +125,3 @@ class FedAvgCrossSiloServer(FedAvgServer):
                 # Wait until a new global round begins
                 # to avoid selecting clients before a new global round begins
                 await self.new_global_round_begins.wait()
-                self.current_global_round += 1
