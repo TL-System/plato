@@ -3,12 +3,13 @@ The federated learning trainer for Adaptive Parameter Freezing.
 
 Reference:
 
-C. Chen, et al. "Communication-Efficient Federated Learning with Adaptive 
+C. Chen, et al. "Communication-Efficient Federated Learning with Adaptive
 Parameter Freezing," found in docs/papers.
 """
 
 import copy
 import torch
+import logging
 
 from models.base import Model
 from trainers import trainer
@@ -27,6 +28,7 @@ class Trainer(trainer.Trainer):
         self.frozen_durations = {}
         self.wake_up_round = {}
         self.current_round = 0
+        self.stability_threshold = Config().training.stability_threshold
 
         # Initialize the synchronization mask
         if not self.sync_mask:
@@ -124,9 +126,9 @@ class Trainer(trainer.Trainer):
             self.moving_average_deltas[name]
             [indices]) / self.moving_average_abs_deltas[name][indices]
 
-        # Additive increase, multiplicative decrease
+        # Additive increase, multiplicative decrease for the frozen durations
         self.frozen_durations[name][indices] = torch.where(
-            effective_perturbation < Config().training.stability_threshold,
+            effective_perturbation < self.stability_threshold,
             self.frozen_durations[name][indices] + 1,
             self.frozen_durations[name][indices] // 2)
 
@@ -134,14 +136,34 @@ class Trainer(trainer.Trainer):
             indices] = self.current_round + self.frozen_durations[name][
                 indices] + 1
 
+        if Config().training.random_freezing:
+            rand = torch.rand(self.wake_up_round[name][indices].shape) * 100
+            rand_frozen = torch.where(rand < self.current_round / 20.0,
+                                      rand.int(),
+                                      torch.zeros(rand.shape).int())
+
+            self.wake_up_round[name][
+                indices] = self.wake_up_round[name][indices] + rand_frozen
+
         # Updating the synchronization mask
         self.sync_mask[name] = (self.wake_up_round[name] >= self.current_round)
+
+    def update_stability_threshold(self, inactive_ratio):
+        """Tune the stability threshold adaptively if necessary."""
+        logging.info('current ratio of stable parameters: {:.2f}'.format(
+            inactive_ratio))
+
+        if inactive_ratio > Config().training.tight_threshold:
+            self.stability_threshold /= 2.0
 
     def load_weights(self, weights):
         """Loading the server model onto this client."""
 
         # Masking the weights received and load them into the model
         weights_received = []
+
+        total_active_weights = 0
+        total_weights = 0
 
         for name, weight in weights:
             # Expanding the compressed weights using the sync mask
@@ -150,10 +172,17 @@ class Trainer(trainer.Trainer):
             if self.previous_weights is not None:
                 self.update_sync_mask(name, weight.data)
 
-            # Preserve the model weights for the next round
-            self.preserve_weights()
+            total_active_weights += self.sync_mask[name].sum()
+            total_weights += torch.numel(weight)
 
             weights_received.append((name, weight.data))
+
+        # Preserve the model weights for the next round
+        self.preserve_weights()
+
+        # Update the stability threshold, if necessary
+        inactive_ratio = 1 - total_active_weights / total_weights
+        self.update_stability_threshold(inactive_ratio)
 
         self.current_round += 1
 
