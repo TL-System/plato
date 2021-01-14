@@ -38,7 +38,7 @@ class FedRLServer(FLServer):
         self.rl_state = None
         self.is_rl_tuned_para_got = False
         self.is_rl_episode_done = False
-        self.rl_episode_start_time = time.time()
+        self.rl_episode_start_time = None
         self.cumulative_reward = 0
 
         # An RL agent waits for the event that the tuned parameter
