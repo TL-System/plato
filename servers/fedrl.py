@@ -8,6 +8,7 @@ import logging
 import asyncio
 import sys
 import time
+import os
 
 from config import Config
 from servers import FedAvgCrossSiloServer
@@ -44,13 +45,18 @@ class FedRLServer(FLServer):
         # is passed from RL environment
         self.rl_tuned_para_got = asyncio.Event()
 
-        # Indicate if server response (RL tuned para) is generated in this time_step
+        # Indicate if server response (contains RL tuned para that will be sent to edge servers)
+        # is generated in this RL time step, as wrap_up_server_response() is called everytime
+        # when the central server sends response to one edge server,
+        # but the response only need to be generated once in an RL time step (an FL round)
         self.generated_server_response = False
 
         # An RL agent waits for the event that RL environment is reset to aviod
         # directly starting a new time step after the previous episode ends
         self.new_episode_begin = asyncio.Event()
 
+        # Since RL training (function start_rl()) runs as a coroutine
+        # It needs to wait until wrap_up_an_episode() is complete to start a new RL episode
         self.wrapped_previous_episode = asyncio.Event()
         self.wrapped_previous_episode.set()
 
@@ -83,7 +89,7 @@ class FedRLServer(FLServer):
         else:
             logging.info('RL Training: %s episodes\n', total_episodes)
 
-    def start_clients(as_server=False):
+    def start_clients(self, as_server=False):
         """Start all clients and RL training."""
         super().start_clients(as_server)
 
@@ -114,7 +120,7 @@ class FedRLServer(FLServer):
         self.rl_episode_start_time = time.time()
 
         self.rl_episode += 1
-        logging.info('\nRL Agent: starting episode %s...', self.rl_episode)
+        logging.info('\nRL Agent: Starting episode %s...', self.rl_episode)
 
         # Configure the FL central server
         super().configure()
@@ -123,7 +129,7 @@ class FedRLServer(FLServer):
         self.round_start_time = 0
 
     async def wrap_up(self):
-        """Wrapping up when one time step of RL (one round of FL) is done."""
+        """Wrapping up when one RL time step (one FL round) is done."""
         self.generated_server_response = False
         # Get the RL state
         # Use accuracy as state for now
@@ -154,6 +160,8 @@ class FedRLServer(FLServer):
             await self.update_rl_tuned_parameter()
             self.generated_server_response = True
         server_response['fedrl'] = Config().cross_silo.rounds
+        server_response['current_global_round'] = self.current_round
+        print("CURRENT GLOBAL ROUND", self.current_round)
         return server_response
 
     async def update_rl_tuned_parameter(self):
@@ -176,7 +184,7 @@ class FedRLServer(FLServer):
         self.rl_tuned_para_value = rl_tuned_para_value
         # Signal the RL agent that it gets the tuned parameter
         self.rl_tuned_para_got.set()
-        print("RL agent: Get tuned para of time step", time_step)
+        print("RL Agent: Get tuned para of time step", time_step)
 
     async def wrap_up_an_episode(self):
         """Wrapping up when one RL episode (the FL training) is done."""
@@ -197,6 +205,12 @@ class FedRLServer(FLServer):
         self.wrapped_previous_episode.set()
 
         if self.rl_episode >= Config().rl.episodes:
+            if Config().results:
+                # Delete the csv file created when edge servers called super().__init__() as it is useless
+                os.remove(
+                    f'./results/{Config().training.dataset}/{Config().training.model}/{Config().rl.fl_server}/result.csv'
+                )
+
             logging.info(
                 'RL Agent: Target number of training episodes reached.')
             await self.close_connections()
@@ -216,6 +230,7 @@ class FedRLServer(FLServer):
         # It will check the environment and output additional warnings if needed
         check_env(env)
 
+    @staticmethod
     def try_a_random_agent(env):
         """Quickly try a random agent on the environment."""
         # pylint: disable=unused-variable

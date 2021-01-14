@@ -31,6 +31,9 @@ class EdgeClient(Client):
                 rounds=server_response['fedrl'])
             Config().training = Config().training._replace(
                 rounds=server_response['fedrl'])
+        if 'current_global_round' in server_response:
+            self.server.current_global_round = server_response[
+                'current_global_round']
 
     async def train(self):
         """The aggregation workload on an edge client."""
