@@ -3,7 +3,8 @@ A federated learning server for MistNet.
 
 Reference:
 
-P. Wang, et al. "MistNet: Towards Private Neural Network Training with Local Differential Privacy"
+P. Wang, et al. "MistNet: Towards Private Neural Network Training with Local
+Differential Privacy," found in docs/papers.
 """
 
 import logging
