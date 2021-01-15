@@ -19,6 +19,7 @@ def main():
         "fedavg": servers.fedavg.FedAvgServer,
         "fedavg_cross_silo": servers.fedavg_cs.FedAvgCrossSiloServer,
         "mistnet": servers.mistnet.MistNetServer,
+        "adaptive_sync": servers.adaptive_sync.AdaptiveSyncServer,
         "fedrl": servers.fedrl.FedRLServer
     }[Config().server.type]()
     server.configure()

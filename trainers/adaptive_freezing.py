@@ -28,7 +28,7 @@ class Trainer(trainer.Trainer):
         self.frozen_durations = {}
         self.wake_up_round = {}
         self.current_round = 0
-        self.stability_threshold = Config().training.stability_threshold
+        self.stability_threshold = Config().trainer.stability_threshold
 
         # Initialize the synchronization mask
         if not self.sync_mask:
@@ -39,7 +39,6 @@ class Trainer(trainer.Trainer):
 
         # Initialize the preserved weights
         self.previous_weights = None
-        self.preserve_weights()
 
     def compress_weights(self):
         """Extract weights from the model, and apply the sync mask
@@ -94,7 +93,7 @@ class Trainer(trainer.Trainer):
 
     def moving_average(self, previous_value, new_value):
         """Compute the exponential moving average."""
-        alpha = Config().training.moving_average_alpha
+        alpha = Config().trainer.moving_average_alpha
         return previous_value * alpha + new_value * (1 - alpha)
 
     def update_sync_mask(self, name, weights):
@@ -136,7 +135,7 @@ class Trainer(trainer.Trainer):
             indices] = self.current_round + self.frozen_durations[name][
                 indices] + 1
 
-        if Config().training.random_freezing:
+        if Config().trainer.random_freezing:
             rand = torch.rand(self.wake_up_round[name][indices].shape) * 100
             rand_frozen = torch.where(rand < self.current_round / 20.0,
                                       rand.int(),
@@ -153,7 +152,7 @@ class Trainer(trainer.Trainer):
         logging.info('current ratio of stable parameters: {:.2f}'.format(
             inactive_ratio))
 
-        if inactive_ratio > Config().training.tight_threshold:
+        if inactive_ratio > Config().trainer.tight_threshold:
             self.stability_threshold /= 2.0
 
     def load_weights(self, weights):

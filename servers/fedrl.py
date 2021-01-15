@@ -64,7 +64,7 @@ class FedRLServer(FLServer):
                 'episode', 'cumulative_reward', 'rl_training_time'
             ]
             # Directory of results (figures etc.)
-            result_dir = f'./results/{Config().training.dataset}/{Config().training.model}/{Config().server.type}/'
+            result_dir = f'./results/{Config().trainer.dataset}/{Config().trainer.model}/{Config().server.type}/'
             result_csv_file = result_dir + 'result_rl.csv'
             csv_processor.initialize_csv(result_csv_file,
                                          self.rl_recorded_items, result_dir)
@@ -133,13 +133,13 @@ class FedRLServer(FLServer):
         # Get the RL state
         # Use accuracy as state for now
         self.rl_state = self.accuracy
-        target_accuracy = Config().training.target_accuracy
+        target_accuracy = Config().trainer.target_accuracy
 
         if target_accuracy and self.accuracy >= target_accuracy:
             logging.info('Target accuracy of FL reached.')
             self.is_rl_episode_done = True
 
-        if self.current_round >= Config().training.rounds:
+        if self.current_round >= Config().trainer.rounds:
             logging.info('Target number of FL training rounds reached.')
             self.is_rl_episode_done = True
 
@@ -198,7 +198,7 @@ class FedRLServer(FLServer):
                 }[item]
                 new_row.append(item_value)
 
-            result_dir = f'./results/{Config().training.dataset}/{Config().training.model}/{Config().server.type}/'
+            result_dir = f'./results/{Config().trainer.dataset}/{Config().trainer.model}/{Config().server.type}/'
             result_csv_file = result_dir + 'result_rl.csv'
             csv_processor.write_csv(result_csv_file, new_row)
         self.wrapped_previous_episode.set()
@@ -207,7 +207,7 @@ class FedRLServer(FLServer):
             if Config().results:
                 # Delete the csv file created when edge servers called super().__init__() as it is useless
                 os.remove(
-                    f'./results/{Config().training.dataset}/{Config().training.model}/{Config().rl.fl_server}/result.csv'
+                    f'./results/{Config().trainer.dataset}/{Config().trainer.model}/{Config().rl.fl_server}/result.csv'
                 )
 
             logging.info(
@@ -235,7 +235,7 @@ class FedRLServer(FLServer):
         # pylint: disable=unused-variable
         obs = env.reset()
         episodes = Config().rl.episodes
-        n_steps = Config().training.rounds
+        n_steps = Config().trainer.rounds
 
         for i in range(episodes):
             for _ in range(n_steps):

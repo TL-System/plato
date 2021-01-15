@@ -142,8 +142,7 @@ class Model(base.Model):
             raise ValueError('Invalid model name: {}'.format(model_name))
 
         # 40 layers
-        return Model(Config().training.num_layers,
-                     Config().training.num_classes)
+        return Model(Config().trainer.num_layers, Config().trainer.num_classes)
 
     @property
     def loss_criterion(self):

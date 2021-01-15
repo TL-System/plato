@@ -45,7 +45,7 @@ class Trainer(base.Trainer):
 
     def save_model(self):
         """Saving the model to a file."""
-        model_type = Config().training.model
+        model_type = Config().trainer.model
         model_dir = './models/pretrained/'
         if not os.path.exists(model_dir):
             os.makedirs(model_dir)
@@ -107,18 +107,18 @@ class Trainer(base.Trainer):
         """
 
         log_interval = 10
-        batch_size = Config().training.batch_size
+        batch_size = Config().trainer.batch_size
         train_loader = torch.utils.data.DataLoader(trainset,
                                                    batch_size=batch_size,
                                                    shuffle=True)
         iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
-        epochs = Config().training.epochs
+        epochs = Config().trainer.epochs
 
         # Initializing the optimizer
         optimizer = optimizers.get_optimizer(self.model)
 
         # Initializing the learning rate schedule, if necessary
-        if Config().training.lr_gamma == 0.0 or Config(
+        if Config().trainer.lr_gamma == 0.0 or Config(
         ).training.lr_milestone_steps == '':
             lr_schedule = optimizers.get_lr_schedule(optimizer,
                                                      iterations_per_epoch)

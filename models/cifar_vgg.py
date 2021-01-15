@@ -56,7 +56,7 @@ class Model(base.Model):
         if not Model.is_valid_model_name(model_name):
             raise ValueError('Invalid model name: {}'.format(model_name))
 
-        outputs = Config().training.num_classes or 10
+        outputs = Config().trainer.num_classes or 10
 
         num = int(model_name.split('_')[2])
         if num == 11:

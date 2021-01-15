@@ -36,7 +36,8 @@ class FedAvgServer(Server):
                 x.strip() for x in recorded_items.split(',')
             ]
             # Directory of results (figures etc.)
-            result_dir = f'./results/{Config().training.dataset}/{Config().training.model}/{Config().server.type}/'
+            result_dir = f'./results/{Config().trainer.dataset}/{Config().trainer.model}'
+            result_dir += f'/{Config().server.type}/'
             result_csv_file = result_dir + 'result.csv'
             csv_processor.initialize_csv(result_csv_file, self.recorded_items,
                                          result_dir)
@@ -50,8 +51,8 @@ class FedAvgServer(Server):
         """
         logging.info('Configuring the %s server...', Config().server.type)
 
-        total_rounds = Config().training.rounds
-        target_accuracy = Config().training.target_accuracy
+        total_rounds = Config().trainer.rounds
+        target_accuracy = Config().trainer.target_accuracy
 
         if target_accuracy:
             logging.info('Training: %s rounds or %s%% accuracy\n',
@@ -71,7 +72,7 @@ class FedAvgServer(Server):
     def load_model(self):
         """Setting up the global model to be trained via federated learning."""
 
-        model_type = Config().training.model
+        model_type = Config().trainer.model
         logging.info('Model: %s', model_type)
 
         self.model = models_registry.get(model_type)
@@ -150,7 +151,7 @@ class FedAvgServer(Server):
         else:
             # Test the updated model directly at the server
             self.accuracy = self.trainer.test(self.testset,
-                                              Config().training.batch_size)
+                                              Config().trainer.batch_size)
             logging.info('Global model accuracy: {:.2f}%\n'.format(
                 100 * self.accuracy))
 
@@ -176,7 +177,7 @@ class FedAvgServer(Server):
                 }[item]
                 new_row.append(item_value)
 
-            result_dir = f'./results/{Config().training.dataset}/{Config().training.model}/{Config().server.type}/'
+            result_dir = f'./results/{Config().trainer.dataset}/{Config().trainer.model}/{Config().server.type}/'
             result_csv_file = result_dir + 'result.csv'
 
             csv_processor.write_csv(result_csv_file, new_row)

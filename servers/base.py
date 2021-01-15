@@ -71,7 +71,7 @@ class Server:
 
         logging.info('\n[Server %d] Starting round %s/%s.', os.getpid(),
                      self.current_round,
-                     Config().training.rounds)
+                     Config().trainer.rounds)
 
         self.choose_clients()
 
@@ -132,14 +132,14 @@ class Server:
         """Wrapping up when each round of training is done."""
         if not Config().is_edge_server():
             # Break the loop when the target accuracy is achieved
-            target_accuracy = Config().training.target_accuracy
+            target_accuracy = Config().trainer.target_accuracy
 
             if target_accuracy and self.accuracy >= target_accuracy:
                 logging.info('Target accuracy reached.')
                 self.trainer.save_model()
                 await self.close_connections()
                 sys.exit()
-            if self.current_round >= Config().training.rounds:
+            if self.current_round >= Config().trainer.rounds:
                 logging.info('Target number of training rounds reached.')
                 self.trainer.save_model()
                 await self.close_connections()
