@@ -43,7 +43,7 @@ class Trainer(trainer.Trainer):
         """
         self.model.eval()
 
-        batch_size = Config().training.batch_size
+        batch_size = Config().trainer.batch_size
         data_loader = torch.utils.data.DataLoader(dataset,
                                                   batch_size=batch_size,
                                                   shuffle=True)

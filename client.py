@@ -23,7 +23,7 @@ def main():
     try:
         # If a server needs to be running concurrently
         if Config().is_edge_server():
-            Config().training = Config().training._replace(
+            Config().training = Config().trainer._replace(
                 rounds=Config().cross_silo.rounds)
 
             if Config().rl:

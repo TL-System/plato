@@ -18,10 +18,10 @@ registered_datasets = {
 
 def get():
     """Get the dataset with the provided name."""
-    dataset_name = Config().training.dataset
-    data_path = Config().training.data_path
+    dataset_name = Config().trainer.dataset
+    data_path = Config().trainer.data_path
 
-    logging.info('Dataset: %s', Config().training.dataset)
+    logging.info('Dataset: %s', Config().trainer.dataset)
     logging.info('Dataset path: %s', data_path)
 
     if dataset_name in registered_datasets:

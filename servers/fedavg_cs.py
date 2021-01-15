@@ -42,7 +42,7 @@ class FedAvgCrossSiloServer(FedAvgServer):
 
             if Config().results:
                 self.recorded_items = ['global_round'] + self.recorded_items
-                result_dir = f'./results/{Config().training.dataset}/{Config().training.model}/{Config().server.type}/'
+                result_dir = f'./results/{Config().trainer.dataset}/{Config().trainer.model}/{Config().server.type}/'
                 result_csv_file = f'{result_dir}result_{Config().args.id}.csv'
                 csv_processor.initialize_csv(result_csv_file,
                                              self.recorded_items, result_dir)
@@ -71,8 +71,8 @@ class FedAvgCrossSiloServer(FedAvgServer):
         else:
             logging.info('Configuring the %s server...', Config().server.type)
 
-            total_rounds = Config().training.rounds
-            target_accuracy = Config().training.target_accuracy
+            total_rounds = Config().trainer.rounds
+            target_accuracy = Config().trainer.target_accuracy
 
             if target_accuracy:
                 logging.info('Training: %s rounds or %s%% accuracy\n',
@@ -94,7 +94,7 @@ class FedAvgCrossSiloServer(FedAvgServer):
         """Wrap up processing the reports with any additional work."""
         if Config().results:
             # Write results into a CSV file
-            result_dir = f'./results/{Config().training.dataset}/{Config().training.model}/{Config().server.type}/'
+            result_dir = f'./results/{Config().trainer.dataset}/{Config().trainer.model}/{Config().server.type}/'
 
             new_row = []
             for item in self.recorded_items:

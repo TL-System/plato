@@ -43,7 +43,7 @@ class MistNetServer(Server):
                 x.strip() for x in recorded_items.split(',')
             ]
             # Directory of results (figures etc.)
-            result_dir = f'./results/{Config().training.dataset}/{Config().training.model}/'
+            result_dir = f'./results/{Config().trainer.dataset}/{Config().trainer.model}/'
             result_csv_file = result_dir + 'result.csv'
             csv_processor.initialize_csv(result_csv_file, self.recorded_items,
                                          result_dir)
@@ -57,8 +57,8 @@ class MistNetServer(Server):
         """
         logging.info('Configuring the %s server...', Config().server.type)
 
-        total_rounds = Config().training.rounds
-        target_accuracy = Config().training.target_accuracy
+        total_rounds = Config().trainer.rounds
+        target_accuracy = Config().trainer.target_accuracy
 
         if target_accuracy:
             logging.info('Training: %s rounds or %s%% accuracy\n',
@@ -76,7 +76,7 @@ class MistNetServer(Server):
 
     def load_model(self):
         """Setting up a pre-trained model to be loaded on the clients."""
-        model_type = Config().training.model
+        model_type = Config().trainer.model
         logging.info('Model: %s', model_type)
 
         # Loading the model for server-side training
@@ -101,12 +101,12 @@ class MistNetServer(Server):
         feature_dataset = list(chain.from_iterable(features))
 
         # Traing the model using features received from the client
-        self.trainer.train(feature_dataset, Config().training.cut_layer)
+        self.trainer.train(feature_dataset, Config().trainer.cut_layer)
 
         # Test the updated model
         self.accuracy = self.trainer.test(feature_dataset,
-                                          Config().training.batch_size,
-                                          Config().training.cut_layer)
+                                          Config().trainer.batch_size,
+                                          Config().trainer.cut_layer)
         logging.info('Global model accuracy: {:.2f}%\n'.format(100 *
                                                                self.accuracy))
 
@@ -123,7 +123,7 @@ class MistNetServer(Server):
                 }[item]
                 new_row.append(item_value)
 
-            result_dir = f'./results/{Config().training.dataset}/{Config().training.model}/'
+            result_dir = f'./results/{Config().trainer.dataset}/{Config().trainer.model}/'
             result_csv_file = result_dir + 'result.csv'
 
             csv_processor.write_csv(result_csv_file, new_row)

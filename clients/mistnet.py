@@ -28,7 +28,7 @@ class MistNetClient(SimpleClient):
     """A federated learning client for MistNet."""
     def configure(self):
         """Prepare this client for training."""
-        model_name = Config().training.model
+        model_name = Config().trainer.model
         self.model = models_registry.get(model_name)
         self.trainer = trainers_registry.get(self.model)
 
@@ -39,8 +39,8 @@ class MistNetClient(SimpleClient):
         # Perform a forward pass till the cut layer in the model
         features = self.trainer.extract_features(
             self.trainset,
-            Config().training.cut_layer,
-            epsilon=Config().training.epsilon)
+            Config().trainer.cut_layer,
+            epsilon=Config().trainer.epsilon)
 
         # Generate a report for the server, performing model testing if applicable
         return Report(self.client_id, len(self.trainset), features)
