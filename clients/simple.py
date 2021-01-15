@@ -4,6 +4,7 @@ A basic federated learning client who sends weight updates to the server.
 
 import logging
 import random
+import time
 from dataclasses import dataclass
 
 from models import registry as models_registry
@@ -22,6 +23,10 @@ class Report:
     num_samples: int
     weights: list
     accuracy: float
+    training_time: float
+    data_loading_time: float
+    first_communication_time: float
+    second_communication_time: float
 
 
 class SimpleClient(Client):
@@ -32,6 +37,12 @@ class SimpleClient(Client):
         self.trainset = None  # Training dataset
         self.testset = None  # Testing dataset
         self.trainer = None
+
+        self.data_loading_time = None
+        self.data_loading_time_sent = False
+
+        # The communication time of the server sending the current model to the client
+        self.first_communication_time = None
 
     def __repr__(self):
         return 'Client #{}: {} samples in labels: {}'.format(
@@ -46,6 +57,7 @@ class SimpleClient(Client):
 
     def load_data(self):
         """Generating data and loading them onto this client."""
+        data_loading_start_time = time.time()
         logging.info('Client #%s is loading its dataset...', self.client_id)
 
         dataset = datasets_registry.get()
@@ -103,12 +115,21 @@ class SimpleClient(Client):
         else:
             self.trainset = self.data
 
+        self.data_loading_time = time.time() - data_loading_start_time
+
     def load_payload(self, server_payload):
         """Loading the server model onto this client."""
         self.trainer.load_weights(server_payload)
 
+    def process_server_response(self, server_response):
+        """Additional client-specific processing on the server response."""
+        if 'first_communication_start_time' in server_response:
+            self.first_communication_time = time.time(
+            ) - server_response['first_communication_start_time']
+
     async def train(self):
         """The machine learning training workload on a client."""
+        training_start_time = time.time()
         logging.info('Training on client #%s', self.client_id)
 
         # Perform model training
@@ -123,4 +144,18 @@ class SimpleClient(Client):
         else:
             accuracy = 0
 
-        return Report(self.client_id, len(self.data), weights, accuracy)
+        training_time = time.time() - training_start_time
+        data_loading_time = 0
+        if not self.data_loading_time_sent:
+            data_loading_time = self.data_loading_time
+            self.data_loading_time_sent = True
+
+        # Send the starting time of second communication (client sending trained model to the server)
+        # as the second communication time
+        # The server will replace it with the actual time of second communication
+        second_communication_start_time = time.time()
+
+        return Report(self.client_id, len(self.data), weights, accuracy,
+                      training_time, data_loading_time,
+                      self.first_communication_time,
+                      second_communication_start_time)
