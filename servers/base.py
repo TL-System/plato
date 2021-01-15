@@ -9,7 +9,6 @@ import os
 import logging
 import subprocess
 import pickle
-import torch
 import websockets
 
 from config import Config
@@ -137,24 +136,14 @@ class Server:
 
             if target_accuracy and self.accuracy >= target_accuracy:
                 logging.info('Target accuracy reached.')
-                self.save_model()
+                self.trainer.save_model()
                 await self.close_connections()
                 sys.exit()
             if self.current_round >= Config().training.rounds:
                 logging.info('Target number of training rounds reached.')
-                self.save_model()
+                self.trainer.save_model()
                 await self.close_connections()
                 sys.exit()
-
-    def save_model(self):
-        """Saving the model to a file."""
-        model_type = Config().training.model
-        model_dir = './models/pretrained/'
-        if not os.path.exists(model_dir):
-            os.makedirs(model_dir)
-        model_path = f'{model_dir}{model_type}.pth'
-        torch.save(self.model.state_dict(), model_path)
-        logging.info('Model saved to %s.', model_path)
 
     async def wrap_up_server_response(self, server_response):
         """Wrap up generating the server response with any additional information."""

@@ -32,7 +32,6 @@ class FedRLServer(FLServer):
         super().__init__()
 
         self.rl_env = FLEnv(self)
-
         self.rl_episode = 0
         self.rl_tuned_para_value = None
         self.rl_state = None
@@ -102,8 +101,8 @@ class FedRLServer(FLServer):
     def start_rl(self):
         """The starting point of RL training."""
         # Test the environment of reinforcement learning.
-        #self.check_with_sb3_env_checker(self.rl_env)
-        self.try_a_random_agent(self.rl_env)
+        #self.check_with_sb3_env_checker(FedRLServer.rl_env)
+        FedRLServer.try_a_random_agent(self.rl_env)
 
     def reset_rl_env(self):
         """Reset the RL environment at the beginning of each episode."""
