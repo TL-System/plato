@@ -3,8 +3,6 @@ Having a registry of all available classes is convenient for retrieving an insta
 based on a configuration at run-time.
 """
 
-import logging
-
 from models.base import Model
 from trainers import trainer, mistnet, adaptive_freezing
 from config import Config
@@ -21,8 +19,8 @@ def get(model: Model):
     trainer_name = Config().training.trainer
 
     if trainer_name in registered_trainers:
-        trainer = registered_trainers[trainer_name].Trainer(model)
+        registered_trainer = registered_trainers[trainer_name].Trainer(model)
     else:
         raise ValueError('No such trainer: {}'.format(trainer_name))
 
-    return trainer
+    return registered_trainer

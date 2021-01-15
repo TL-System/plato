@@ -28,9 +28,8 @@ if Config().rl:
 class FedRLServer(FLServer):
     """Federated server using RL."""
     def __init__(self):
-        super().__init__()
-
         self.rl_env = FLEnv(self)
+        super().__init__()
 
         self.rl_episode = 0
         self.rl_tuned_para_value = None
@@ -83,7 +82,7 @@ class FedRLServer(FLServer):
         else:
             logging.info('RL Training: %s episodes\n', total_episodes)
 
-    def start_clients(as_server=False):
+    def start_clients(self, as_server=False):
         """Start all clients and RL training."""
         super().start_clients(as_server)
 
@@ -96,8 +95,8 @@ class FedRLServer(FLServer):
     def start_rl(self):
         """The starting point of RL training."""
         # Test the environment of reinforcement learning.
-        #self.check_with_sb3_env_checker(self.rl_env)
-        self.try_a_random_agent(self.rl_env)
+        #self.check_with_sb3_env_checker(FedRLServer.rl_env)
+        FedRLServer.try_a_random_agent(self.rl_env)
 
     def reset_rl_env(self):
         """Reset the RL environment at the beginning of each episode."""
@@ -216,6 +215,7 @@ class FedRLServer(FLServer):
         # It will check the environment and output additional warnings if needed
         check_env(env)
 
+    @staticmethod
     def try_a_random_agent(env):
         """Quickly try a random agent on the environment."""
         # pylint: disable=unused-variable

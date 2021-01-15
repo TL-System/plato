@@ -13,15 +13,17 @@ class EdgeClient(Client):
     def __init__(self, server):
         super().__init__()
         self.server = server
+        self.trainer = None
 
     def configure(self):
         """Prepare this edge client for training."""
         self.trainer = trainers_registry.get(self.server.model)
-        return
 
     def load_data(self):
         """The edge client does not need to train models using local data."""
-        return
+
+    def load_payload(self, server_payload):
+        """The edge client does not need to train models using local data."""
 
     def process_server_response(self, server_response):
         """Additional client-specific processing on the server response."""
