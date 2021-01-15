@@ -28,9 +28,9 @@ if Config().rl:
 class FedRLServer(FLServer):
     """Federated server using RL."""
     def __init__(self):
-        self.rl_env = FLEnv(self)
         super().__init__()
 
+        self.rl_env = FLEnv(self)
         self.rl_episode = 0
         self.rl_tuned_para_value = None
         self.rl_state = None
