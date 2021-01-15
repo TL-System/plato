@@ -35,7 +35,7 @@ class EdgeClient(Client):
             # Update the number of local aggregation rounds
             Config().cross_silo = Config().cross_silo._replace(
                 rounds=server_response['fedrl'])
-            Config().training = Config().trainer._replace(
+            Config().trainer = Config().trainer._replace(
                 rounds=server_response['fedrl'])
         if 'current_global_round' in server_response:
             self.server.current_global_round = server_response[

@@ -45,7 +45,7 @@ class FedRLServer(FLServer):
         self.rl_tuned_para_got = asyncio.Event()
 
         # Indicate if server response (contains RL tuned para that will be sent to edge servers)
-        # is generated in this RL time step, as wrap_up_server_response() is called everytime
+        # is generated in this RL time step, as customize_server_response() is called everytime
         # when the central server sends response to one edge server,
         # but the response only need to be generated once in an RL time step (an FL round)
         self.generated_server_response = False
@@ -153,7 +153,7 @@ class FedRLServer(FLServer):
         if self.is_rl_episode_done:
             await self.wrap_up_an_episode()
 
-    async def wrap_up_server_response(self, server_response):
+    async def customize_server_response(self, server_response):
         """Wrap up generating the server response with any additional information."""
         if not self.generated_server_response:
             await self.update_rl_tuned_parameter()

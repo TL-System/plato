@@ -3,7 +3,7 @@ A federated learning client with support for Adaptive Parameter Freezing (APF).
 
 Reference:
 
-C. Chen, et al. "Communication-Efficient Federated Learning with Adaptive 
+C. Chen, et al. "Communication-Efficient Federated Learning with Adaptive
 Parameter Freezing," found in docs/papers.
 """
 from config import Config
@@ -11,7 +11,7 @@ from clients import SimpleClient
 from clients.simple import Report
 
 
-class APFClient(SimpleClient):
+class AdaptiveFreezingClient(SimpleClient):
     """A federated learning client with Adaptive Parameter Freezing."""
     async def train(self):
         """Adaptive Parameter Freezing will be applied after training the model."""

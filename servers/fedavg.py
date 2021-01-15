@@ -85,7 +85,7 @@ class FedAvgServer(Server):
         self.selected_clients = random.sample(list(self.clients),
                                               self.clients_per_round)
 
-    async def wrap_up_server_response(self, server_response):
+    async def customize_server_response(self, server_response):
         """Wrap up generating the server response with any additional information."""
         server_response['first_communication_start_time'] = time.time()
         return server_response

@@ -7,7 +7,6 @@ C. Chen, et al. "Communication-Efficient Federated Learning with Adaptive
 Parameter Freezing," found in docs/papers.
 """
 
-import copy
 import torch
 import logging
 
@@ -22,6 +21,7 @@ class Trainer(trainer.Trainer):
     """
     def __init__(self, model: Model):
         super().__init__(model)
+        self.sync_frequency = Config().trainer.initial_sync_frequency
 
         self.average_positive_deltas = {
             name: torch.zeros(param.data.shape)
@@ -31,6 +31,14 @@ class Trainer(trainer.Trainer):
             name: torch.zeros(param.data.shape)
             for name, param in model.named_parameters()
         }
+
+        self.sliding_window_size = 5
+        self.history = [0] * self.sliding_window_size
+        self.min_consistency_rate = 1.1
+        self.min_consistency_rate_at_round = 0
+        self.round_id = 0
+        self.frequency_increase_ratio = 2
+        self.frequency_decrease_step = 2
 
     def compute_weight_updates(self, weights_received):
         """Extract the weights received from a client and compute the updates."""
@@ -104,6 +112,39 @@ class Trainer(trainer.Trainer):
             consistency_count += torch.sum(layer_consistency_rate)
         consistency_rate = consistency_count / model_size
         print(f"Consistent_rate: {consistency_rate}")
+
+        # Update the history recorded in the sliding window
+        self.history.pop(0)
+
+        if self.min_consistency_rate > consistency_rate:
+            self.min_consistency_rate = consistency_rate
+            self.min_consistency_rate_at_round = self.round_id
+            self.history.append(1)
+        else:
+            self.history.append(0)
+            if self.round_id - self.min_consistency_rate_at_round > self.sliding_window_size:
+                logging.info("Gradient bifurcation detected.")
+                if self.sync_frequency > 1 and self.round_id > 50:
+                    self.sync_frequency = (self.sync_frequency +
+                                           self.frequency_increase_ratio -
+                                           1) / self.frequency_increase_ratio
+                    print(
+                        f"Adjusted synchronization frequency to {self.sync_frequency}"
+                    )
+                    self.min_consistency_rate = 1.1
+                    self.min_consistency_rate_at_round = self.round_id
+                    self.sliding_window_size *= self.frequency_increase_ratio
+                    self.history = [0] * self.sliding_window_size
+                    self.average_positive_deltas = {
+                        name: torch.zeros(param.data.shape)
+                        for name, param in self.model.named_parameters()
+                    }
+                    self.average_negative_deltas = {
+                        name: torch.zeros(param.data.shape)
+                        for name, param in self.model.named_parameters()
+                    }
+
+        self.round_id += 1
 
     def load_weights(self, weights):
         """Loading the server model onto this client."""

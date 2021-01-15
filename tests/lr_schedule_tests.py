@@ -26,7 +26,7 @@ class LrSchedulerTest(unittest.TestCase):
             'lr_gamma', 'lr_milestone_steps', 'lr_warmup_steps'
         ]
         params = ['SGD', 0.1, 0.5, 0.0, 0.0, '', '']
-        Config().training = namedtuple('training', fields)(*params)
+        Config().trainer = namedtuple('training', fields)(*params)
 
         self.model = models_registry.get('cifar_resnet_18')
         self.optimizer = optimizers.get_optimizer(self.model)
@@ -44,7 +44,7 @@ class LrSchedulerTest(unittest.TestCase):
                 'lr_gamma', 'lr_milestone_steps', 'lr_warmup_steps'
             ]
             params = ['SGD', 0.1, 0.5, 0.0, 0.0, '', '']
-            Config().training = namedtuple('training', fields)(*params)
+            Config().trainer = namedtuple('training', fields)(*params)
 
             lrs = optimizers.get_lr_schedule(self.optimizer, 10)
             self.assertLrEquals(0.1)
@@ -65,7 +65,7 @@ class LrSchedulerTest(unittest.TestCase):
             ]
             params = ['SGD', 0.1, 0.5, 0.0, 0.1, '2ep,4ep,7ep,8ep', '']
 
-            Config().training = namedtuple('training', fields)(*params)
+            Config().trainer = namedtuple('training', fields)(*params)
             self.assertLrEquals(0.1)
 
             lrs = optimizers.get_lr_schedule(self.optimizer, 10)
@@ -113,7 +113,7 @@ class LrSchedulerTest(unittest.TestCase):
             ]
             params = ['SGD', 0.1, 0.5, 0.0, 0.0, '', '20it']
 
-            Config().training = namedtuple('training', fields)(*params)
+            Config().trainer = namedtuple('training', fields)(*params)
 
             lrs = optimizers.get_lr_schedule(self.optimizer, 10)
 

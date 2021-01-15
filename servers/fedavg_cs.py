@@ -83,7 +83,7 @@ class FedAvgCrossSiloServer(FedAvgServer):
         self.load_test_data()
         self.load_model()
 
-    async def wrap_up_server_response(self, server_response):
+    async def customize_server_response(self, server_response):
         """Wrap up generating the server response with any additional information."""
         server_response['first_communication_start_time'] = time.time()
         if Config().is_central_server():
