@@ -43,6 +43,21 @@ class Trainer(base.Trainer):
 
             self.model.train()
 
+    def save_model(self):
+        """Saving the model to a file."""
+        model_type = Config().training.model
+        model_dir = './models/pretrained/'
+        if not os.path.exists(model_dir):
+            os.makedirs(model_dir)
+        model_path = f'{model_dir}{model_type}.pth'
+        torch.save(self.model.state_dict(), model_path)
+        logging.info('Model saved to %s.', model_path)
+
+    def load_model(self, model_type):
+        """Loading pre-trained model weights from a file."""
+        model_path = f'./models/pretrained/{model_type}.pth'
+        self.model.load_state_dict(torch.load(model_path))
+
     def extract_weights(self):
         """Extract weights from the model."""
         weights = []
@@ -88,7 +103,7 @@ class Trainer(base.Trainer):
 
         Arguments:
         trainset: The training dataset.
-        cut_layer: The layer which training should start from.
+        cut_layer (optional): The layer which training should start from.
         """
 
         log_interval = 10

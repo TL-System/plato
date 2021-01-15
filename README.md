@@ -111,7 +111,7 @@ All unit tests are in the `tests/` directory. These tests are designed to be sta
 
 ### Building a Docker container for running Plato
 
-Sometimes it may be beneficial to run Plato in a Docker container running Ubuntu Linux 20.04. To build such a Docker container, use the provided `Dockerfile` in `docker/`:
+Sometimes it may be beneficial to run Plato in a Docker container. To build such such a Docker container, use the provided `Dockerfile` in `docker/`:
 
 ```shell
 cd docker; docker build -t plato .
@@ -134,6 +134,8 @@ To remove the `plato` Docker image, use the command:
 ```shell
 docker rmi plato
 ```
+
+The provided `Dockerfile` helps to build a Docker container image running Ubuntu 20.04, with two virtual environments pre-installed: the one called `federated` supports PyTorch and Python 3.8, and one called `mindspore` supports [MindSpore 1.1](https://github.com/mindspore-ai/mindspore) and Python 3.7 (which is the Python version that MindSpore requires). Once the container is built and running, one can use Visual Studio Code to connect to it and start development within the container.
 
 ### Uninstalling Plato
 

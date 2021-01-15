@@ -36,6 +36,8 @@ class SimpleClient(Client):
         self.data = None  # The dataset to be used for local training
         self.trainset = None  # Training dataset
         self.testset = None  # Testing dataset
+        self.trainer = None
+
         self.data_loading_time = None
         self.data_loading_time_sent = False
 

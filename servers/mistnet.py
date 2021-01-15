@@ -3,13 +3,13 @@ A federated learning server for MistNet.
 
 Reference:
 
-P. Wang, et al. "MistNet: Towards Private Neural Network Training with Local Differential Privacy"
+P. Wang, et al. "MistNet: Towards Private Neural Network Training with Local
+Differential Privacy," found in docs/papers.
 """
 
 import logging
 import time
 import random
-import torch
 from itertools import chain
 
 import models.registry as models_registry
@@ -18,18 +18,6 @@ from trainers import registry as trainers_registry
 from servers import Server
 from config import Config
 from utils import csv_processor
-
-
-class FeatureDataset(torch.utils.data.Dataset):
-    def __init__(self, dataset):
-        self.dataset = dataset
-
-    def __len__(self):
-        return len(self.dataset)
-
-    def __getitem__(self, item):
-        image, label = self.dataset[item]
-        return image, label
 
 
 class MistNetServer(Server):
@@ -94,10 +82,7 @@ class MistNetServer(Server):
         # Loading the model for server-side training
         self.model = models_registry.get(model_type)
         self.trainer = trainers_registry.get(self.model)
-
-        # Loading pre-trained weights for the model
-        model_path = f'./models/pretrained/{model_type}.pth'
-        self.model.load_state_dict(torch.load(model_path))
+        self.trainer.load_model(model_type)
 
     def choose_clients(self):
         """Choose a subset of the clients to participate in each round."""
@@ -116,11 +101,10 @@ class MistNetServer(Server):
         feature_dataset = list(chain.from_iterable(features))
 
         # Traing the model using features received from the client
-        self.trainer.train(FeatureDataset(feature_dataset),
-                           Config().training.cut_layer)
+        self.trainer.train(feature_dataset, Config().training.cut_layer)
 
         # Test the updated model
-        self.accuracy = self.trainer.test(FeatureDataset(feature_dataset),
+        self.accuracy = self.trainer.test(feature_dataset,
                                           Config().training.batch_size,
                                           Config().training.cut_layer)
         logging.info('Global model accuracy: {:.2f}%\n'.format(100 *
