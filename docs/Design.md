@@ -37,10 +37,8 @@ The external interface of this module is contained in `models/registry.py`. Just
 
 Alternatively, rather than writing our own custom registry, it is conceivable to use a Python package called `ClassRegistry`, as it supports both the *registry* and the *factory* design pattern. However, `ClassRegistry` only supports the use of one name for each class, while in our case we may need to have multiple names (representing corresponding variants) for each class. An example of this can be found in `models/cifar_resnet.py`, which supports four different variants of `ResNet`.
 
-### The Training Module
+### Implementing federated learning algorithms
 
-The training module centers on a single function: the `train()` function in `training/train.py`. This function takes a `Model` and a `DataSet` as its arguments. It then trains the `Model` on the dataset.
+Most federated learning algorithms can be divided into three components: a *client*, a *server*, and a *trainer*. The *client* implements all algorithm-specific logic on the client side, but it should remain neutral to deep learning frameworks such as PyTorch, TensorFlow, or MindSpore. The *server* implements all algorithm-specific logic on the server side, but it should also be neutral across various deep learning frameworks. All the algorithm-specific logic that is framework-specific should be included in a *trainer* module, found in `trainers/`.
 
-The training module would use callbacks for customization (*to be completed*).
-
-To create optimizers and learning rate scheduler objects, `train()` calls the `get_optimizer()` and `get_lr_schedule()` functions in `training/optimizers.py`, which serve as small-scale registries for these objects.
+One of the important functions in the *trainer* module is the `train()` function, which trains the trainer's model on the provided dataset. This function would use callbacks for customization (*to be completed*). To create optimizers and learning rate scheduler objects, `train()` calls the `get_optimizer()` and `get_lr_schedule()` functions in `trainers/optimizers.py`, which serve as small-scale registries for these objects.

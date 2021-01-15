@@ -31,6 +31,7 @@ class SimpleClient(Client):
         self.data = None  # The dataset to be used for local training
         self.trainset = None  # Training dataset
         self.testset = None  # Testing dataset
+        self.trainer = None
 
     def __repr__(self):
         return 'Client #{}: {} samples in labels: {}'.format(
