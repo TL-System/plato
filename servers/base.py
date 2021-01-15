@@ -82,7 +82,7 @@ class Server:
                     "[Server %d] Selecting client #%s for training...",
                     os.getpid(), client_id)
                 server_response = {'id': client_id, 'payload': True}
-                server_response = await self.wrap_up_server_response(
+                server_response = await self.customize_server_response(
                     server_response)
                 await socket.send(json.dumps(server_response))
 
@@ -145,7 +145,7 @@ class Server:
                 await self.close_connections()
                 sys.exit()
 
-    async def wrap_up_server_response(self, server_response):
+    async def customize_server_response(self, server_response):
         """Wrap up generating the server response with any additional information."""
         return server_response
 

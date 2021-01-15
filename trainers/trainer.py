@@ -119,7 +119,7 @@ class Trainer(base.Trainer):
 
         # Initializing the learning rate schedule, if necessary
         if Config().trainer.lr_gamma == 0.0 or Config(
-        ).training.lr_milestone_steps == '':
+        ).trainer.lr_milestone_steps == '':
             lr_schedule = optimizers.get_lr_schedule(optimizer,
                                                      iterations_per_epoch)
         else:

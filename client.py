@@ -23,7 +23,7 @@ def main():
     try:
         # If a server needs to be running concurrently
         if Config().is_edge_server():
-            Config().training = Config().trainer._replace(
+            Config().trainer = Config().trainer._replace(
                 rounds=Config().cross_silo.rounds)
 
             if Config().rl:
@@ -34,7 +34,8 @@ def main():
                 "fedavg": servers.fedavg.FedAvgServer,
                 "fedavg_cross_silo": servers.fedavg_cs.FedAvgCrossSiloServer,
                 "fedrl": servers.fedrl.FedRLServer,
-                "mistnet": servers.mistnet.MistNetServer
+                "mistnet": servers.mistnet.MistNetServer,
+                "adaptive_sync": servers.adaptive_sync.AdaptiveSyncServer
             }[Config().server.type]()
             server.configure()
 
@@ -56,7 +57,9 @@ def main():
             client = {
                 "simple": clients.SimpleClient,
                 "mistnet": clients.MistNetClient,
-                "adaptive_freezing": clients.adaptive_freezing.APFClient
+                "adaptive_freezing":
+                clients.adaptive_freezing.AdaptiveFreezingClient,
+                "adaptive_sync": clients.adaptive_sync.AdaptiveSyncClient,
             }[Config().clients.type]()
             logging.info("Starting a %s client.", Config().clients.type)
             client.configure()
