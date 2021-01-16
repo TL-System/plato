@@ -91,9 +91,6 @@ class Client:
                          self.client_id)
             logging.error(exception)
 
-    def wrap_up_before_training(self, data):
-        """Wrap up before training in case server response has any additional information."""
-
     def process_server_response(self, server_response):
         """Additional client-specific processing on the server response."""
 
