@@ -19,9 +19,6 @@ class FedAvgCrossSiloServer(FedAvgServer):
 
         self.current_global_round = None
 
-        # The training time of an edge server in one global round
-        self.training_time_in_one_global_round = 0
-
         if Config().is_edge_server():
             # An edge client waits for the event that a certain number of
             # aggregations are completed
@@ -107,12 +104,10 @@ class FedAvgCrossSiloServer(FedAvgServer):
                     self.accuracy * 100,
                     'edge_agg_num':
                     Config().cross_silo.rounds,
-                    'communication_time':
-                    self.computing_communication_time(self.reports),
                     'training_time':
-                    self.computing_training_time(self.reports),
+                    max([report.training_time for report in self.reports]),
                     'round_time':
-                    self.computing_round_time(self.reports)
+                    time.time() - self.round_start_time
                 }[item]
                 new_row.append(item_value)
 
@@ -124,8 +119,6 @@ class FedAvgCrossSiloServer(FedAvgServer):
             csv_processor.write_csv(result_csv_file, new_row)
 
         if Config().is_edge_server():
-            self.training_time_in_one_global_round += self.computing_training_time(
-                self.reports)
             # When a certain number of aggregations are completed, an edge client
             # needs to be signaled to send a report to the central server
             if self.current_round == Config().cross_silo.rounds:

@@ -81,7 +81,7 @@ It goes without saying that `/absolute/path/to/project/home/directory` should be
 
 ### Running Plato
 
-To start a federated learning training workload, run [`run.py`](run.py) from the repository's root directory. For example:
+To start a federated learning training workload, run [`server.py`](server.py) from the repository's root directory. For example:
 
 ```shell
 cp configs/MNIST/mnist.conf config.conf
