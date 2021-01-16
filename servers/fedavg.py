@@ -30,6 +30,9 @@ class FedAvgServer(Server):
         logging.info("Started training on %s clients and %s per round...",
                      self.total_clients, self.clients_per_round)
 
+        # starting time of a gloabl training round
+        self.round_start_time = 0
+
         if Config().results:
             recorded_items = Config().results.types
             self.recorded_items = ['round'] + [
@@ -84,19 +87,13 @@ class FedAvgServer(Server):
         assert self.clients_per_round <= len(self.clients)
         self.selected_clients = random.sample(list(self.clients),
                                               self.clients_per_round)
+        # starting time of a gloabl training round
+        self.round_start_time = time.time()
 
     async def customize_server_response(self, server_response):
         """Wrap up generating the server response with any additional information."""
         server_response['first_communication_start_time'] = time.time()
         return server_response
-
-    def wrap_up_client_report(self, report):
-        """Wrap up after receiving the client report with any additional information."""
-        # As the client actually sends the starting time of second communication
-        # (client sending trained model to the server) as the second communication time
-        # The server replaces it with the actual time of second communication
-        report.second_communication_time = time.time(
-        ) - report.second_communication_time
 
     def aggregate_weights(self, reports):
         """Aggregate the reported weight updates from the selected clients."""
@@ -168,12 +165,10 @@ class FedAvgServer(Server):
                     self.current_round,
                     'accuracy':
                     self.accuracy * 100,
-                    'communication_time':
-                    self.computing_communication_time(self.reports),
                     'training_time':
-                    self.computing_training_time(self.reports),
+                    max([report.training_time for report in self.reports]),
                     'round_time':
-                    self.computing_round_time(self.reports)
+                    time.time() - self.round_start_time
                 }[item]
                 new_row.append(item_value)
 
@@ -194,24 +189,3 @@ class FedAvgServer(Server):
             accuracy += report.accuracy * (report.num_samples / total_samples)
 
         return accuracy
-
-    @staticmethod
-    def computing_communication_time(reports):
-        """Return the longest communication time of clients."""
-        return max([
-            report.first_communication_time + report.second_communication_time
-            for report in reports
-        ])
-
-    @staticmethod
-    def computing_training_time(reports):
-        """Return the longest training time of clients."""
-        return max([report.training_time for report in reports])
-
-    @staticmethod
-    def computing_round_time(reports):
-        """Return the slowest client's communication time + training time."""
-        return max([
-            report.first_communication_time + report.training_time +
-            report.second_communication_time for report in reports
-        ])
