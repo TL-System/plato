@@ -24,6 +24,12 @@ The next step is to install the required Python packages. PyTorch should be inst
 $ conda install pytorch torchvision cudatoolkit=10.2 -c pytorch
 ```
 
+The CUDA version, used in the command above, can be obtained on Linux Ubuntu systems by using the command:
+
+```shell
+nvidia-smi
+```
+
 In macOS (without GPU support), the typical command would be:
 
 ```shell
