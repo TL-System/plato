@@ -30,7 +30,7 @@ def get_optimizer(model: Model) -> optim.Optimizer:
 def get_lr_schedule(optimizer: optim.Optimizer, iterations_per_epoch: int):
     lambdas = [lambda it: 1.0]
     if Config().trainer.lr_gamma != 0.0 and Config(
-    ).training.lr_milestone_steps != '':
+    ).trainer.lr_milestone_steps != '':
         milestones = [
             Step.from_str(x, iterations_per_epoch).iteration
             for x in Config().trainer.lr_milestone_steps.split(',')
