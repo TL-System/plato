@@ -22,11 +22,11 @@ class Trainer(base.Trainer):
         Arguments:
         model: The model to train. Must be a models.base.Model subclass.
         """
-        # Use distributed data parallelism if multiple GPUs are available.
+        # Use data parallelism if multiple GPUs are available and the configuration specifies it
         if Config().is_parallel():
             logging.info("Using Data Parallelism...")
             # DataParallel will divide and allocate batch_size to all available GPUs
-            self.model = torch.nn.DataParallel(model)
+            self.model = nn.DataParallel(model)
         else:
             self.model = model
 
