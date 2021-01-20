@@ -80,8 +80,6 @@ class Model(base.Model):
     def __init__(self, depth, num_classes, widen_factor=1, dropRate=0.0):
         super().__init__()
 
-        self.criterion = nn.CrossEntropyLoss()
-
         n_channels = [
             16, 16 * widen_factor, 32 * widen_factor, 64 * widen_factor
         ]
@@ -143,7 +141,3 @@ class Model(base.Model):
 
         # 40 layers
         return Model(Config().trainer.num_layers, Config().trainer.num_classes)
-
-    @property
-    def loss_criterion(self):
-        return self.criterion

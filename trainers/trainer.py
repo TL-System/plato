@@ -5,6 +5,7 @@ The training and testing loop.
 import logging
 import os
 import torch
+import torch.nn as nn
 
 import numpy as np
 
@@ -21,27 +22,17 @@ class Trainer(base.Trainer):
         Arguments:
         model: The model to train. Must be a models.base.Model subclass.
         """
-
         # Use distributed data parallelism if multiple GPUs are available.
-        if Config().is_distributed():
-            logging.info("Turning on Distributed Data Parallelism...")
-
-            os.environ['MASTER_ADDR'] = 'localhost'
-            os.environ['MASTER_PORT'] = Config().DDP_port()
-            torch.distributed.init_process_group(
-                'nccl', rank=0, world_size=Config().world_size())
-
-            # DistributedDataParallel divides and allocate a batch of data to all
-            # available GPUs since device_ids are not set
-            self.model = torch.nn.parallel.DistributedDataParallel(
-                module=model)
+        if Config().is_parallel():
+            logging.info("Using Data Parallelism...")
+            # DataParallel will divide and allocate batch_size to all available GPUs
+            self.model = torch.nn.DataParallel(model)
         else:
             self.model = model
 
-            self.device = Config().device()
-            self.model.to(self.device)
-
-            self.model.train()
+        self.device = Config().device()
+        self.model.to(self.device)
+        self.model.train()
 
     def save_model(self):
         """Saving the model to a file."""
@@ -97,6 +88,7 @@ class Trainer(base.Trainer):
             updated_state_dict[name] = weight
 
         self.model.load_state_dict(updated_state_dict, strict=False)
+        self.model.to(self.device)
 
     def train(self, trainset, cut_layer=None):
         """The main training loop in a federated learning workload.
@@ -113,6 +105,9 @@ class Trainer(base.Trainer):
                                                    shuffle=True)
         iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
         epochs = Config().trainer.epochs
+
+        # Initializing the loss criterion
+        loss_criterion = nn.CrossEntropyLoss()
 
         # Initializing the optimizer
         optimizer = optimizers.get_optimizer(self.model)
@@ -131,11 +126,10 @@ class Trainer(base.Trainer):
                     self.device)
                 optimizer.zero_grad()
                 if cut_layer is None:
-                    loss = self.model.loss_criterion(self.model(examples),
-                                                     labels)
+                    loss = loss_criterion(self.model(examples), labels)
                 else:
                     outputs = self.model.forward_from(examples, cut_layer)
-                    loss = self.model.loss_criterion(outputs, labels)
+                    loss = loss_criterion(outputs, labels)
                 loss.backward()
                 optimizer.step()
                 if lr_schedule is not None:

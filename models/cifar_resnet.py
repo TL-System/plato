@@ -87,8 +87,6 @@ class Model(base.Model):
     def __init__(self, block, num_blocks, num_classes=10):
         super().__init__()
 
-        self.criterion = nn.CrossEntropyLoss()
-
         self.in_planes = 64
 
         self.conv1 = nn.Conv2d(3,
@@ -184,7 +182,3 @@ class Model(base.Model):
             return Model(Bottleneck, [3, 8, 36, 3])
         else:
             raise ValueError('Invalid model name: {}'.format(model_name))
-
-    @property
-    def loss_criterion(self):
-        return self.criterion

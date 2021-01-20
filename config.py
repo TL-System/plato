@@ -78,27 +78,18 @@ class Config:
     def device():
         """Returns the device to be used for training."""
         if torch.cuda.is_available() and torch.cuda.device_count() > 0:
-            device = 'cuda:0'
+            device = 'cuda'
         else:
             device = 'cpu'
 
         return device
 
     @staticmethod
-    def is_distributed():
+    def is_parallel():
         """Check if the hardware and OS support data parallelism."""
-        return torch.cuda.is_available() and torch.distributed.is_available(
+        return Config.trainer.parallelized and torch.cuda.is_available(
+        ) and torch.distributed.is_available(
         ) and torch.cuda.device_count() > 1
-
-    @staticmethod
-    def world_size():
-        """The world size in distributed training is the number of GPUs on the machine."""
-        return torch.cuda.device_count()
-
-    @staticmethod
-    def DDP_port():
-        """The port number used for distributed data parallel training."""
-        return str(20000 + int(Config.args.id))
 
     @staticmethod
     def extract_section(section, fields, defaults, optional=False):
@@ -149,16 +140,17 @@ class Config:
 
         # Training parameters for federated learning
         fields = [
-            'type', 'rounds', 'target_accuracy', 'epochs', 'batch_size',
-            'dataset', 'data_path', 'model', 'optimizer', 'learning_rate',
-            'weight_decay', 'momentum', 'num_layers', 'num_classes',
-            'cut_layer', 'epsilon', 'lr_gamma', 'lr_milestone_steps',
-            'lr_warmup_steps', 'moving_average_alpha', 'stability_threshold',
-            'tight_threshold', 'random_freezing', 'initial_sync_frequency'
+            'type', 'rounds', 'parallelized', 'target_accuracy', 'epochs',
+            'batch_size', 'dataset', 'data_path', 'model', 'optimizer',
+            'learning_rate', 'weight_decay', 'momentum', 'num_layers',
+            'num_classes', 'cut_layer', 'epsilon', 'lr_gamma',
+            'lr_milestone_steps', 'lr_warmup_steps', 'moving_average_alpha',
+            'stability_threshold', 'tight_threshold', 'random_freezing',
+            'initial_sync_frequency'
         ]
-        defaults = ('basic', 0, 0.9, 0, 128, 'MNIST', './data', 'mnist_cnn',
-                    'SGD', 0.01, 0.0, 0.9, 40, 10, '', 1.0, 0.0, '', '', 0.99,
-                    0.05, 0.8, True, 100)
+        defaults = ('basic', 0, False, 0.9, 0, 128, 'MNIST', './data',
+                    'mnist_cnn', 'SGD', 0.01, 0.0, 0.9, 40, 10, '', 1.0, 0.0,
+                    '', '', 0.99, 0.05, 0.8, True, 100)
         params = Config.extract_section('trainer', fields, defaults)
 
         Config.trainer = namedtuple('trainer', fields)(*params)

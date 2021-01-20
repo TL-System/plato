@@ -35,7 +35,6 @@ class Model(base.Model):
 
         self.layers = nn.Sequential(*layers)
         self.fc = nn.Linear(512, outputs)
-        self.criterion = nn.CrossEntropyLoss()
 
     def forward(self, x):
         x = self.layers(x)
@@ -80,7 +79,3 @@ class Model(base.Model):
             raise ValueError('Unknown VGG model: {}'.format(model_name))
 
         return Model(plan, outputs)
-
-    @property
-    def loss_criterion(self):
-        return self.criterion
