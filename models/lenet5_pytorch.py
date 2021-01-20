@@ -1,6 +1,10 @@
-"""
-The convolutional neural network model for the MNIST dataset.
-"""
+'''The LeNet-5 model.
+
+Reference:
+
+Y. LeCun, L. Bottou, Y. Bengio, and P. Haffner. "Gradient-based learning applied to
+document recognition." Proceedings of the IEEE, November 1998.
+'''
 import collections
 import torch.nn as nn
 import torch.nn.functional as F
@@ -11,38 +15,45 @@ from models import base
 class Model(base.Model):
     '''The LeNet-5 model.
 
-    Reference:
-
-    Y. LeCun, L. Bottou, Y. Bengio, and P. Haffner. "Gradient-based learning applied to
-    document recognition." Proceedings of the IEEE, November 1998.
-
     Arguments:
         num_classes (int): The number of classes. Default: 10.
         dropout: The dropout ratio for the dropout layer.
     '''
-    def __init__(self, num_classes=10, dropout=0.0):
+    def __init__(self, num_classes=10):
         super().__init__()
 
         self.criterion = nn.CrossEntropyLoss()
 
         # We pad the image to get an input size of 32x32 as for the
-        # original network in the LeCunn paper
-        self.conv1 = nn.Conv2d(1, 6, 5, padding=(2, 2))
+        # original network in the LeCun paper
+        self.conv1 = nn.Conv2d(in_channels=1,
+                               out_channels=6,
+                               kernel_size=5,
+                               stride=1,
+                               padding=2,
+                               bias=True)
         self.bn1 = nn.BatchNorm2d(6)
         self.relu1 = nn.ReLU()
         self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
-        self.conv2 = nn.Conv2d(6, 16, 5, 1)
+        self.conv2 = nn.Conv2d(in_channels=6,
+                               out_channels=16,
+                               kernel_size=5,
+                               stride=1,
+                               padding=0,
+                               bias=True)
         self.bn2 = nn.BatchNorm2d(16)
         self.relu2 = nn.ReLU()
         self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
-        self.conv3 = nn.Conv2d(16, 120, 5, bias=True)
+        self.conv3 = nn.Conv2d(in_channels=16,
+                               out_channels=120,
+                               kernel_size=5,
+                               bias=True)
         self.bn3 = nn.BatchNorm2d(120)
         self.relu3 = nn.ReLU()
         self.flatten = lambda x: x.view(x.shape[0], -1)
         self.fc4 = nn.Linear(120, 84)
         self.bn4 = nn.BatchNorm1d(84)
         self.relu4 = nn.ReLU()
-        self.dropout = nn.Dropout(dropout)
         self.fc5 = nn.Linear(84, num_classes)
 
         # Preparing named layers so that the model can be split and straddle
@@ -64,7 +75,6 @@ class Model(base.Model):
         self.layerdict['fc4'] = self.fc4
         self.layerdict['bn4'] = self.bn4
         self.layerdict['relu4'] = self.relu4
-        self.layerdict['dropout'] = self.dropout
         self.layerdict['fc5'] = self.fc5
         self.layers.append('conv1')
         self.layers.append('bn1')
@@ -81,7 +91,6 @@ class Model(base.Model):
         self.layers.append('fc4')
         self.layers.append('bn4')
         self.layers.append('relu4')
-        self.layers.append('dropout')
         self.layers.append('fc5')
 
     def forward(self, x):
@@ -101,7 +110,6 @@ class Model(base.Model):
         x = self.fc4(x)
         x = self.bn4(x)
         x = self.relu4(x)
-        x = self.dropout(x)
         x = self.fc5(x)
 
         return F.log_softmax(x, dim=1)
