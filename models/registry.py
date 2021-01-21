@@ -4,10 +4,11 @@ based on a configuration at run-time.
 """
 
 from models import lenet5_pytorch, resnet_pytorch, wideresnet_pytorch, vgg_pytorch
+from models import lenet5_mindspore
 
 registered_models = [
     lenet5_pytorch.Model, resnet_pytorch.Model, wideresnet_pytorch.Model,
-    vgg_pytorch.Model
+    vgg_pytorch.Model, lenet5_mindspore.Model
 ]
 
 

@@ -1,37 +1,31 @@
 """
-The training and testing loops for PyTorch.
+The training and testing loop.
 """
 
 import logging
 import os
-import torch
-import torch.nn as nn
-import torch.multiprocessing as mp
+import mindspore
+import mindspore.nn as nn
 
 import numpy as np
 
-from models.base_pytorch import Model
+from models.base_mindspore import Model
 from config import Config
 from trainers import base, optimizers
 
 
 class Trainer(base.Trainer):
-    """A basic federated learning trainer, used by both the client and the server."""
+    """A basic federated learning trainer for MindSpore, used by both
+    the client and the server.
+    """
     def __init__(self, model: Model):
         """Initializing the trainer with the provided model.
 
         Arguments:
-        model: The model to train. Must be a models.base_pytorch.Model subclass.
+        model: The model to train. Must be a models.base_mindspore.Model subclass.
         """
         super().__init__()
-
-        # Use data parallelism if multiple GPUs are available and the configuration specifies it
-        if Config().is_parallel():
-            logging.info("Using Data Parallelism...")
-            # DataParallel will divide and allocate batch_size to all available GPUs
-            self.model = nn.DataParallel(model)
-        else:
-            self.model = model
+        self.model = model
 
     def save_model(self):
         """Saving the model to a file."""
@@ -88,16 +82,15 @@ class Trainer(base.Trainer):
 
         self.model.load_state_dict(updated_state_dict, strict=False)
 
-    @staticmethod
-    def train_process(rank, self, trainset, cut_layer=None):  # pylint: disable=unused-argument
-        """The main training loop in a federated learning workload, run in
-          a separate process with a new CUDA context, so that CUDA memory
-          can be released after the training completes.
+    def train(self, trainset, cut_layer=None):
+        """The main training loop in a federated learning workload.
 
         Arguments:
         trainset: The training dataset.
         cut_layer (optional): The layer which training should start from.
         """
+        self.started_training()
+
         log_interval = 10
         batch_size = Config().trainer.batch_size
         train_loader = torch.utils.data.DataLoader(trainset,
@@ -143,30 +136,7 @@ class Trainer(base.Trainer):
                     logging.debug('Epoch: [{}/{}]\tLoss: {:.6f}'.format(
                         epoch, epochs, loss.item()))
 
-        self.model.cpu()
-        self.save_model()
-
-    def train(self, trainset, cut_layer=None):
-        """The main training loop in a federated learning workload.
-
-        Arguments:
-        trainset: The training dataset.
-        cut_layer (optional): The layer which training should start from.
-        """
-        self.started_training()
-        self.model.cpu()
-        mp.spawn(Trainer.train_process,
-                 args=(
-                     self,
-                     trainset,
-                     cut_layer,
-                 ),
-                 join=True)
-
         self.paused_training()
-
-        model_type = Config().trainer.model
-        self.load_model(model_type)
 
     def test(self, testset, batch_size, cut_layer=None):
         """Testing the model using the provided test dataset.
