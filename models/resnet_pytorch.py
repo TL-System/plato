@@ -160,15 +160,17 @@ class Model(base.Model):
 
     @staticmethod
     def is_valid_model_name(model_name):
-        return (model_name.startswith('cifar_resnet')
-                and int(model_name.split('_')[2]) in [18, 34, 50, 101, 152])
+        return (model_name.startswith('resnet_')
+                and model_name.endswith('_pytorch')
+                and len(model_name.split('_')) == 3
+                and int(model_name.split('_')[1]) in [18, 34, 50, 101, 152])
 
     @staticmethod
     def get_model_from_name(model_name):
         if not Model.is_valid_model_name(model_name):
             raise ValueError('Invalid model name: {}'.format(model_name))
 
-        resnet_type = int(model_name.split('_')[2])
+        resnet_type = int(model_name.split('_')[1])
 
         if resnet_type == 18:
             return Model(BasicBlock, [2, 2, 2, 2])
