@@ -6,7 +6,7 @@ import bisect
 from torch import optim
 import numpy as np
 
-from models.base import Model
+from models.base_pytorch import Model
 from config import Config
 from utils.step import Step
 
