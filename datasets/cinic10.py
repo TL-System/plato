@@ -7,6 +7,7 @@ https://github.com/BayesWatch/cinic-10
 import os
 import tarfile
 import requests
+
 from torchvision import datasets, transforms
 
 from datasets import base

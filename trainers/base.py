@@ -3,9 +3,44 @@ Base class for trainers.
 """
 
 from abc import ABC, abstractmethod
+import time
+import os
+from config import Config
 
 
 class Trainer(ABC):
+    """Base class for all the trainers."""
+    def __init__(self):
+        self.device = Config().device()
+        """Initialize a global counter of running trainers."""
+        if not os.path.exists('./running_trainers'):
+            with open('./running_trainers', 'w') as file:
+                file.write(str(0))
+
+    def started_training(self):
+        """Increment the global counter of running trainers."""
+        with open('./running_trainers', 'r') as file:
+            trainer_count = int(file.read())
+
+        while trainer_count >= Config().trainer.max_concurrency:
+            # Wait for a while and check again
+            time.sleep(5)
+            with open('./running_trainers', 'r') as file:
+                trainer_count = int(file.read())
+
+        with open('./running_trainers', 'w') as file:
+            file.write(str(trainer_count + 1))
+
+    def paused_training(self):
+        """Increment the global counter of running trainers."""
+        with open('./running_trainers', 'r') as file:
+            trainer_count = int(file.read())
+        with open('./running_trainers', 'w') as file:
+            file.write(str(trainer_count - 1))
+
+    def stopped_training(self):
+        os.remove('./running_trainers')
+
     @abstractmethod
     def extract_weights(self):
         """Extract weights from a model passed in as a parameter."""
