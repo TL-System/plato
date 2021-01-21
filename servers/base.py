@@ -135,11 +135,11 @@ class Server:
 
             if target_accuracy and self.accuracy >= target_accuracy:
                 logging.info('Target accuracy reached.')
-                self.close()
+                await self.close()
 
             if self.current_round >= Config().trainer.rounds:
                 logging.info('Target number of training rounds reached.')
-                self.close()
+                await self.close()
 
     async def close(self):
         """Closing the server."""

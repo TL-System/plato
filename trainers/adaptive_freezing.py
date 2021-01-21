@@ -11,7 +11,7 @@ import copy
 import torch
 import logging
 
-from models.base import Model
+from models.base_pytorch import Model
 from trainers import trainer
 from config import Config
 

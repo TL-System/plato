@@ -1,25 +1,24 @@
-'''The LeNet-5 model.
+"""The LeNet-5 model for PyTorch.
 
 Reference:
 
 Y. LeCun, L. Bottou, Y. Bengio, and P. Haffner. "Gradient-based learning applied to
 document recognition." Proceedings of the IEEE, November 1998.
-'''
+"""
 import collections
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from models import base
+import models.base_pytorch as base
 
 
 class Model(base.Model):
-    '''The LeNet-5 model.
+    """The LeNet-5 model.
 
     Arguments:
         num_classes (int): The number of classes. Default: 10.
-        dropout: The dropout ratio for the dropout layer.
-    '''
+    """
     def __init__(self, num_classes=10):
         super().__init__()
 
@@ -80,6 +79,7 @@ class Model(base.Model):
         self.layers.append('fc5')
 
     def flatten(self, x):
+        """Flatten the tensor."""
         return x.view(x.size(0), -1)
 
     def forward(self, x):
