@@ -5,7 +5,7 @@ import collections
 import torch.nn as nn
 import torch.nn.functional as F
 
-from models import base
+import models.base_pytorch as base
 
 
 class BasicBlock(nn.Module):

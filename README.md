@@ -2,11 +2,11 @@
 
 Welcome to *Plato*, a new software framework to facilitate scalable federated learning research.
 
-### Installation
+### Installing Plato with PyTorch
 
 To install *Plato*, first clone this repository to the desired directory.
 
-*Plato* uses [Miniconda](https://docs.conda.io/en/latest/miniconda.html) to manage its Python packages. Before using *Plato*, first install [Miniconda](https://docs.conda.io/en/latest/miniconda.html), update your `conda` environment, and then create a new `conda` environment with Python 3.8 using the command:
+The *Plato* developers recommend using [Miniconda](https://docs.conda.io/en/latest/miniconda.html) to manage Python packages. Before using *Plato*, first install [Miniconda](https://docs.conda.io/en/latest/miniconda.html), update your `conda` environment, and then create a new `conda` environment with Python 3.8 using the command:
 
 ```shell
 $ conda update conda
@@ -54,10 +54,10 @@ In case unit tests in the `tests` directory need to be run, `scipy` should also 
 $ conda install scipy
 ```
 
-In case it is needed to format Python code during development, install `yapf`:
+In case it is needed to run Python code through a formatter and a linter during development, install `yapf` and `pylint`:
 
 ```shell
-$ pip install yapf
+$ pip install yapf pylint
 ```
 
 If you use Visual Studio Code, it is possible to use `yapf` to reformat the code every time it is saved by adding the following settings to .`.vscode/settings.json`:
@@ -84,6 +84,49 @@ In general, the following is the recommended starting point for `.vscode/setting
 It goes without saying that `/absolute/path/to/project/home/directory` should be replaced with the actual path in the specific development environment.
 
 **Tip:** When working in Visual Studio Code as the development environment, one of the project developer's colour theme favourites is called `Bluloco`, both of its light and dark variants are excellent and very thoughtfully designed. The `Pylance` extension is also strongly recommended, which represents Microsoft's modern language server for Python.
+
+### Installing Plato with MindSpore
+
+Though we provided a `Dockerfile` for building a Docker container that supports MindSpore 1.1, it may still be necessary to install Plato with MindSpore in a GPU server running Ubuntu Linux 18.04 (which MindSpore requires). Similar to a PyTorch installation, we need to first create a new environment with Python 3.7.5 (which MindSpore 1.1 requires), and then install the required packages:
+
+```shell
+conda create -n mindspore python=3.7.5
+conda install matplotlib pylint yapf scipy
+pip install websockets requests
+```
+
+We should now install MindSpore 1.1 with the following command:
+```shell
+pip install https://ms-release.obs.cn-north-4.myhuaweicloud.com/1.1.0/MindSpore/gpu/ubuntu_x86/cuda-10.1/mindspore_gpu-1.1.0-cp37-cp37m-linux_x86_64.whl --trusted-host ms-release.obs.cn-north-4.myhuaweicloud.com
+```
+
+MindSpore may need additional packages that need to be installed if they do not exist:
+
+```shell
+sudo apt-get install libssl-dev
+sudo apt-get install build-essential
+```
+
+If CuDNN has not yet been installed, it needs to be installed with the following commands:
+
+```shell
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-ubuntu1804.pin
+sudo mv cuda-ubuntu1804.pin /etc/apt/preferences.d/cuda-repository-pin-600
+sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub
+sudo add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/ /"
+sudo apt-get update
+sudo apt-get install libcudnn8=8.0.5.39-1+cuda10.1
+```
+
+To check the current CuDNN version, the following commands are helpful:
+
+```shell
+function lib_installed() { /sbin/ldconfig -N -v $(sed 's/:/ /' <<< $LD_LIBRARY_PATH) 2>/dev/null | grep $1; }
+function check() { lib_installed $1 && echo "$1 is installed" || echo "ERROR: $1 is NOT installed"; }
+check libcudnn
+```
+
+To check if MindSpore is correctly installed on the GPU server, try to `import mindspore` with a Python interpreter.
 
 ### Running Plato
 
@@ -152,7 +195,7 @@ conda-env remove -n federated
 rm -rf plato/
 ```
 
-where `federated` is the name of the `conda` environment that *Plato* runs in.
+where `federated` (or `mindspore`) is the name of the `conda` environment that *Plato* runs in.
 
 For more specific documentation on how Plato can be run on GPU cluster environments such as Lambda Labs' GPU cloud or Compute Canada, refer to `docs/Running.md`.
 
