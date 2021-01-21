@@ -4,15 +4,14 @@ based on a configuration at run-time.
 """
 
 from models.base import Model
-from trainers import trainer, mistnet, adaptive_freezing, adaptive_sync, fednova
+from trainers import trainer, mistnet, adaptive_freezing, adaptive_sync
 from config import Config
 
 registered_trainers = {
     'basic': trainer,
     'mistnet': mistnet,
     'adaptive_freezing': adaptive_freezing,
-    'adaptive_sync': adaptive_sync,
-    'fednova': fednova
+    'adaptive_sync': adaptive_sync
 }
 
 
