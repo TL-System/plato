@@ -11,8 +11,8 @@ registered_trainers = {
     'basic': trainer,
     'mistnet': mistnet,
     'adaptive_freezing': adaptive_freezing,
-    'adaptive_sync': adaptive_sync,
-    'fednova': fednova
+    'fednova': fednova,
+    'adaptive_sync': adaptive_sync
 }
 
 

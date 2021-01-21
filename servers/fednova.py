@@ -1,6 +1,6 @@
 """
 A federated learning server using fednova.
-This is a reimplementation of the following paper:
+This is the reimplementation of the following paper:
 "Tackling the Objective Inconsistency Problem in Heterogeneous Federated Optimization" (https://arxiv.org/pdf/2007.07481.pdf)
 """
 import torch
