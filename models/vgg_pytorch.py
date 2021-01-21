@@ -1,3 +1,4 @@
+"""A VGG-style neural network model for image classification."""
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -6,7 +7,7 @@ from config import Config
 
 
 class Model(base.Model):
-    """A VGG-style neural network designed for CIFAR-10."""
+    """A VGG-style neural network model for image classification."""
     class ConvModule(nn.Module):
         """A single convolutional module in a VGG network."""
         def __init__(self, in_filters, out_filters):
@@ -45,10 +46,11 @@ class Model(base.Model):
 
     @staticmethod
     def is_valid_model_name(model_name):
-        return (model_name.startswith('cifar_vgg_')
+        return (model_name.startswith('vgg')
+                and model_name.endswith('_pytorch')
                 and len(model_name.split('_')) == 3
-                and model_name.split('_')[2].isdigit()
-                and int(model_name.split('_')[2]) in [11, 13, 16, 19])
+                and model_name.split('_')[1].isdigit()
+                and int(model_name.split('_')[1]) in [11, 13, 16, 19])
 
     @staticmethod
     def get_model_from_name(model_name):
@@ -57,7 +59,7 @@ class Model(base.Model):
 
         outputs = Config().trainer.num_classes or 10
 
-        num = int(model_name.split('_')[2])
+        num = int(model_name.split('_')[1])
         if num == 11:
             plan = [64, 'M', 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512]
         elif num == 13:

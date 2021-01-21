@@ -5,8 +5,8 @@ https://github.com/BayesWatch/cinic-10
 """
 
 import os
-import urllib
 import tarfile
+import requests
 from torchvision import datasets, transforms
 
 from datasets import base
@@ -22,14 +22,16 @@ class Dataset(base.Dataset):
         # Download and extract CINIC-10 dataset if haven't
         if not os.path.exists(self.cinic_directory):
             if not os.path.exists(self.cinic_directory + '.tar.gz'):
-                print('Downloading CINIC-10 dataset...')
-                print('It might take a while :(')
+                print('Downloading CINIC-10 dataset. This may take a while...')
+
                 url = 'https://datashare.is.ed.ac.uk/bitstream/handle/10283/3192/CINIC-10.tar.gz'
-                urllib.request.urlretrieve(url,
-                                           self.cinic_directory + '.tar.gz')
+
+                # Disable SSL verification
+                requests.get(url,
+                             self.cinic_directory + '.tar.gz',
+                             verify=False)
                 print('Done!')
-            print('Extracting CINIC-10 dataset...')
-            print('It might take a while :(')
+            print('Extracting CINIC-10 dataset. Please wait...')
             tar = tarfile.open(self.cinic_directory + '.tar.gz')
             tar.extractall(path=self.cinic_directory)
             tar.close()

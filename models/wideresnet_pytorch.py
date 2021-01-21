@@ -132,7 +132,7 @@ class Model(base.Model):
 
     @staticmethod
     def is_valid_model_name(model_name):
-        return model_name.startswith('cifar_wideresnet')
+        return model_name.startswith('wideresnet_pytorch')
 
     @staticmethod
     def get_model_from_name(model_name):
