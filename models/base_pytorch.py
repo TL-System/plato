@@ -1,4 +1,4 @@
-"""Base classes for the model."""
+"""Base classes for PyTorch models."""
 
 from abc import ABC, abstractmethod, abstractstaticmethod
 import torch.nn as nn
