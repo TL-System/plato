@@ -5,10 +5,12 @@ based on a configuration at run-time.
 
 from models.base_pytorch import Model
 from trainers import trainer, mistnet, adaptive_freezing, adaptive_sync
+from trainers import trainer_mindspore
 from config import Config
 
 registered_trainers = {
     'basic': trainer,
+    'basic_mindspore': trainer_mindspore,
     'mistnet': mistnet,
     'adaptive_freezing': adaptive_freezing,
     'adaptive_sync': adaptive_sync

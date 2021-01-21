@@ -11,7 +11,7 @@ from mindspore.common.initializer import Normal
 import models.base_mindspore as base
 
 
-class LeNet5(base.Model):
+class Model(base.Model):
     """The LeNet-5 model.
 
     Arguments:
