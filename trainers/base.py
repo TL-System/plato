@@ -39,6 +39,7 @@ class Trainer(ABC):
             file.write(str(trainer_count - 1))
 
     def stopped_training(self):
+        """ Remove the global counter after all training concluded."""
         os.remove('./running_trainers')
 
     @abstractmethod

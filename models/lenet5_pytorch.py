@@ -6,6 +6,7 @@ Y. LeCun, L. Bottou, Y. Bengio, and P. Haffner. "Gradient-based learning applied
 document recognition." Proceedings of the IEEE, November 1998.
 '''
 import collections
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -45,7 +46,6 @@ class Model(base.Model):
                                kernel_size=5,
                                bias=True)
         self.relu3 = nn.ReLU()
-        self.flatten = lambda x: x.view(x.shape[0], -1)
         self.fc4 = nn.Linear(120, 84)
         self.relu4 = nn.ReLU()
         self.fc5 = nn.Linear(84, num_classes)
@@ -78,6 +78,9 @@ class Model(base.Model):
         self.layers.append('fc4')
         self.layers.append('relu4')
         self.layers.append('fc5')
+
+    def flatten(self, x):
+        return x.view(x.size(0), -1)
 
     def forward(self, x):
         """Forward pass."""

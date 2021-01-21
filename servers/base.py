@@ -135,14 +135,18 @@ class Server:
 
             if target_accuracy and self.accuracy >= target_accuracy:
                 logging.info('Target accuracy reached.')
+                self.close()
 
             if self.current_round >= Config().trainer.rounds:
                 logging.info('Target number of training rounds reached.')
+                self.close()
 
-            self.trainer.save_model()
-            self.trainer.stopped_training()
-            await self.close_connections()
-            sys.exit()
+    async def close(self):
+        """Closing the server."""
+        self.trainer.save_model()
+        self.trainer.stopped_training()
+        await self.close_connections()
+        sys.exit()
 
     async def customize_server_response(self, server_response):
         """Wrap up generating the server response with any additional information."""
