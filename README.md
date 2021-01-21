@@ -36,10 +36,10 @@ In macOS (without GPU support), the typical command would be:
 $ conda install pytorch torchvision -c pytorch
 ```
 
-We will need to install the `websockets` package for client-server communication:
+We will need to install the `websockets` package for client-server communication, and the `requests` package for downloading datasets:
 
 ```shell
-$ pip install websockets
+$ pip install websockets requests
 ```
 
 Install `matplotlib` package for plotting figures of results:

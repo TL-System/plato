@@ -1,6 +1,0 @@
---2021-01-21 15:10:27--  https://datashare.ed.ac.uk/bitstream/handle/10283/3192/CINIC-10.tar.gz?sequence=4
-Resolving datashare.ed.ac.uk (datashare.ed.ac.uk)... 192.41.117.26
-Connecting to datashare.ed.ac.uk (datashare.ed.ac.uk)|192.41.117.26|:443... connected.
-ERROR: cannot verify datashare.ed.ac.uk's certificate, issued by ‘CN=*.cs.hku.hk’:
-  invalid CA certificate
-To connect to datashare.ed.ac.uk insecurely, use `--no-check-certificate'.
