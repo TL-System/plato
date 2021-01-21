@@ -22,6 +22,8 @@ class Trainer(base.Trainer):
         Arguments:
         model: The model to train. Must be a models.base.Model subclass.
         """
+        super().__init__()
+
         # Use data parallelism if multiple GPUs are available and the configuration specifies it
         if Config().is_parallel():
             logging.info("Using Data Parallelism...")
@@ -29,10 +31,6 @@ class Trainer(base.Trainer):
             self.model = nn.DataParallel(model)
         else:
             self.model = model
-
-        self.device = Config().device()
-        self.model.to(self.device)
-        self.model.train()
 
     def save_model(self):
         """Saving the model to a file."""
@@ -88,7 +86,6 @@ class Trainer(base.Trainer):
             updated_state_dict[name] = weight
 
         self.model.load_state_dict(updated_state_dict, strict=False)
-        self.model.to(self.device)
 
     def train(self, trainset, cut_layer=None):
         """The main training loop in a federated learning workload.
@@ -97,6 +94,7 @@ class Trainer(base.Trainer):
         trainset: The training dataset.
         cut_layer (optional): The layer which training should start from.
         """
+        self.started_training()
 
         log_interval = 10
         batch_size = Config().trainer.batch_size
@@ -105,6 +103,10 @@ class Trainer(base.Trainer):
                                                    shuffle=True)
         iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
         epochs = Config().trainer.epochs
+
+        # Sending the model to the device used for training
+        self.model.to(self.device)
+        self.model.train()
 
         # Initializing the loss criterion
         loss_criterion = nn.CrossEntropyLoss()
@@ -139,6 +141,8 @@ class Trainer(base.Trainer):
                     logging.debug('Epoch: [{}/{}]\tLoss: {:.6f}'.format(
                         epoch, epochs, loss.item()))
 
+        self.paused_training()
+
     def test(self, testset, batch_size, cut_layer=None):
         """Testing the model using the provided test dataset.
 
@@ -147,6 +151,8 @@ class Trainer(base.Trainer):
         batch_size: the batch size used for testing.
         cut_layer (optional): The layer which testing should start from.
         """
+
+        self.started_training()
 
         self.model.to(self.device)
         self.model.eval()
@@ -173,5 +179,7 @@ class Trainer(base.Trainer):
 
         accuracy = correct / total
         logging.debug('Accuracy: {:.2f}%'.format(100 * accuracy))
+
+        self.paused_training()
 
         return accuracy
