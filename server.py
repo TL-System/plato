@@ -9,7 +9,6 @@ import websockets
 
 from config import Config
 import servers
-from servers import fednova
 
 
 def main():
@@ -21,8 +20,7 @@ def main():
         "fedavg_cross_silo": servers.fedavg_cs.FedAvgCrossSiloServer,
         "mistnet": servers.mistnet.MistNetServer,
         "adaptive_sync": servers.adaptive_sync.AdaptiveSyncServer,
-        "fedrl": servers.fedrl.FedRLServer,
-        "fednova": servers.fednova.FedNovaServer
+        "fedrl": servers.fedrl.FedRLServer
     }[Config().server.type]()
     server.configure()
 
