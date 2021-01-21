@@ -4,8 +4,10 @@ The training and testing loop.
 
 import logging
 import os
+import time
 import torch
 import torch.nn as nn
+import torch.multiprocessing as mp
 
 import numpy as np
 
@@ -87,15 +89,16 @@ class Trainer(base.Trainer):
 
         self.model.load_state_dict(updated_state_dict, strict=False)
 
-    def train(self, trainset, cut_layer=None):
-        """The main training loop in a federated learning workload.
+    @staticmethod
+    def train_process(rank, self, trainset, cut_layer=None):  # pylint: disable=unused-argument
+        """The main training loop in a federated learning workload, run in
+          a separate process with a new CUDA context, so that CUDA memory
+          can be released after the training completes.
 
         Arguments:
         trainset: The training dataset.
         cut_layer (optional): The layer which training should start from.
         """
-        self.started_training()
-
         log_interval = 10
         batch_size = Config().trainer.batch_size
         train_loader = torch.utils.data.DataLoader(trainset,
@@ -141,7 +144,30 @@ class Trainer(base.Trainer):
                     logging.debug('Epoch: [{}/{}]\tLoss: {:.6f}'.format(
                         epoch, epochs, loss.item()))
 
+        self.model.cpu()
+        self.save_model()
+
+    def train(self, trainset, cut_layer=None):
+        """The main training loop in a federated learning workload.
+
+        Arguments:
+        trainset: The training dataset.
+        cut_layer (optional): The layer which training should start from.
+        """
+        self.started_training()
+        self.model.cpu()
+        mp.spawn(Trainer.train_process,
+                 args=(
+                     self,
+                     trainset,
+                     cut_layer,
+                 ),
+                 join=True)
+
         self.paused_training()
+
+        model_type = Config().trainer.model
+        self.load_model(model_type)
 
     def test(self, testset, batch_size, cut_layer=None):
         """Testing the model using the provided test dataset.
@@ -151,7 +177,6 @@ class Trainer(base.Trainer):
         batch_size: the batch size used for testing.
         cut_layer (optional): The layer which testing should start from.
         """
-
         self.started_training()
 
         self.model.to(self.device)
@@ -181,5 +206,4 @@ class Trainer(base.Trainer):
         logging.debug('Accuracy: {:.2f}%'.format(100 * accuracy))
 
         self.paused_training()
-
         return accuracy

@@ -3,6 +3,7 @@ Starting point for a Plato federated learning server.
 """
 
 import asyncio
+import os
 import time
 import logging
 import websockets
@@ -13,6 +14,11 @@ import servers
 
 def main():
     """Starting a WebSockets server."""
+
+    # Remove the global running_trainers counter if it exists from previous runs.
+    if os.path.exists('./running_trainers'):
+        os.remove('./running_trainers')
+
     __ = Config()
 
     server = {
