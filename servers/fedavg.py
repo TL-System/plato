@@ -64,14 +64,11 @@ class FedAvgServer(Server):
         else:
             logging.info('Training: %s rounds\n', total_rounds)
 
-        self.load_test_data()
-        self.load_model()
-
-    def load_test_data(self):
-        """Loading the test dataset."""
         if not Config().clients.do_test:
             dataset = datasets_registry.get()
             self.testset = dataset.get_test_set()
+
+        self.load_model()
 
     def load_model(self):
         """Setting up the global model to be trained via federated learning."""
@@ -136,8 +133,8 @@ class FedAvgServer(Server):
 
     async def process_reports(self):
         """Process the client reports by aggregating their weights."""
-        updated_weights = self.aggregate_weights(self.reports)
-        self.trainer.load_weights(updated_weights)
+        #updated_weights = self.aggregate_weights(self.reports)
+        #self.trainer.load_weights(updated_weights)
 
         # Testing the global model accuracy
         if Config().clients.do_test:
@@ -148,8 +145,7 @@ class FedAvgServer(Server):
                     os.getpid(), 100 * self.accuracy))
         else:
             # Test the updated model directly at the server
-            self.accuracy = self.trainer.test(self.testset,
-                                              Config().trainer.batch_size)
+            self.accuracy = self.trainer.test(self.testset)
             logging.info(
                 '[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(
                     os.getpid(), 100 * self.accuracy))

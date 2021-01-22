@@ -41,6 +41,7 @@ class Trainer(base.Trainer):
             os.makedirs(model_dir)
         model_path = f'{model_dir}{model_type}_{self.client_id}.pth'
         torch.save(self.model.state_dict(), model_path)
+
         logging.info('[Client #%s] Model saved to %s.', self.client_id,
                      model_path)
 
@@ -197,22 +198,20 @@ class Trainer(base.Trainer):
         self.pause_training()
 
     @staticmethod
-    def test_process(rank, self, testset, batch_size, cut_layer):  # pylint: disable=unused-argument
+    def test_process(rank, self, testset, cut_layer):  # pylint: disable=unused-argument
         """The testing loop, run in a separate process with a new CUDA context, 
         so that CUDA memory can be released after the training completes.
 
         Arguments:
         rank: Required by torch.multiprocessing to spawn processes. Unused.
         testset: The test dataset.
-        batch_size: the batch size used for testing.
         cut_layer (optional): The layer which testing should start from.
         """
         self.model.to(self.device)
         self.model.eval()
 
-        test_loader = torch.utils.data.DataLoader(testset,
-                                                  batch_size=batch_size,
-                                                  shuffle=True)
+        test_loader = torch.utils.data.DataLoader(
+            testset, batch_size=Config().trainer.batch_size, shuffle=True)
 
         correct = 0
         total = 0
@@ -235,12 +234,11 @@ class Trainer(base.Trainer):
         accuracy = correct / total
         self.save_accuracy(accuracy)
 
-    def test(self, testset, batch_size, cut_layer=None):
+    def test(self, testset, cut_layer=None):
         """Testing the model using the provided test dataset.
 
         Arguments:
         testset: The test dataset.
-        batch_size: the batch size used for testing.
         cut_layer (optional): The layer which testing should start from.
         """
         self.start_training()
@@ -249,7 +247,6 @@ class Trainer(base.Trainer):
                  args=(
                      self,
                      testset,
-                     batch_size,
                      cut_layer,
                  ),
                  join=True)

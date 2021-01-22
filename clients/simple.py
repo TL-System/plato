@@ -4,7 +4,6 @@ A basic federated learning client who sends weight updates to the server.
 
 import logging
 import random
-import os
 import time
 from dataclasses import dataclass
 
@@ -66,7 +65,7 @@ class SimpleClient(Client):
 
         # Setting up the data divider
         assert Config().data.divider in ('iid', 'bias', 'shard')
-        logging.info('[Client $%s] Data distribution: %s', self.client_id,
+        logging.info('[Client #%s] Data distribution: %s', self.client_id,
                      Config().data.divider)
 
         divider = {
@@ -135,7 +134,7 @@ class SimpleClient(Client):
 
         # Generate a report for the server, performing model testing if applicable
         if Config().clients.do_test:
-            accuracy = self.trainer.test(self.testset, 1000)
+            accuracy = self.trainer.test(self.testset)
             logging.info('[Client #{:s}] Test accuracy: {:.2f}%'.format(
                 self.client_id, 100 * accuracy))
 
