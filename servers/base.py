@@ -144,7 +144,7 @@ class Server:
     async def close(self):
         """Closing the server."""
         self.trainer.save_model()
-        self.trainer.stopped_training()
+        self.trainer.stop_training()
         await self.close_connections()
         sys.exit()
 

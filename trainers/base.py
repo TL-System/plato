@@ -10,14 +10,15 @@ from config import Config
 
 class Trainer(ABC):
     """Base class for all the trainers."""
-    def __init__(self):
+    def __init__(self, client_id):
         self.device = Config().device()
+        self.client_id = client_id
         """Initialize a global counter of running trainers."""
         if not os.path.exists('./running_trainers'):
             with open('./running_trainers', 'w') as file:
                 file.write(str(0))
 
-    def started_training(self):
+    def start_training(self):
         """Increment the global counter of running trainers."""
         with open('./running_trainers', 'r') as file:
             trainer_count = int(file.read())
@@ -31,14 +32,25 @@ class Trainer(ABC):
         with open('./running_trainers', 'w') as file:
             file.write(str(trainer_count + 1))
 
-    def paused_training(self):
+    def pause_training(self):
         """Increment the global counter of running trainers."""
         with open('./running_trainers', 'r') as file:
             trainer_count = int(file.read())
         with open('./running_trainers', 'w') as file:
             file.write(str(trainer_count - 1))
 
-    def stopped_training(self):
+        model_type = Config().trainer.model
+        model_dir = './models/pretrained/'
+        model_path = f'{model_dir}{model_type}_{self.client_id}.pth'
+        accuracy_path = f'{model_dir}{model_type}_{self.client_id}.acc'
+
+        if os.path.exists(model_path):
+            os.remove(model_path)
+
+        if os.path.exists(accuracy_path):
+            os.remove(accuracy_path)
+
+    def stop_training(self):
         """ Remove the global counter after all training concluded."""
         os.remove('./running_trainers')
 
