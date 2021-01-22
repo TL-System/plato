@@ -22,7 +22,6 @@ def get():
     data_path = Config().trainer.data_path
 
     logging.info('Dataset: %s', Config().trainer.dataset)
-    logging.info('Dataset path: %s', data_path)
 
     if dataset_name in registered_datasets:
         dataset = registered_datasets[dataset_name].Dataset(data_path)

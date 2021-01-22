@@ -41,12 +41,15 @@ class Trainer(base.Trainer):
             os.makedirs(model_dir)
         model_path = f'{model_dir}{model_type}_{self.client_id}.pth'
         torch.save(self.model.state_dict(), model_path)
-        logging.info('Model saved to %s.', model_path)
+        logging.info('[Client #%s] Model saved to %s.', self.client_id,
+                     model_path)
 
     def load_model(self, model_type):
         """Loading pre-trained model weights from a file."""
         model_dir = './models/pretrained/'
         model_path = f'{model_dir}{model_type}_{self.client_id}.pth'
+        logging.info("[Client #%s] Loading model from %s.", self.client_id,
+                     model_path)
         self.model.load_state_dict(torch.load(model_path))
 
     def save_accuracy(self, accuracy):
@@ -175,6 +178,7 @@ class Trainer(base.Trainer):
         """The main training loop in a federated learning workload.
 
         Arguments:
+        rank: Required by torch.multiprocessing to spawn processes. Unused.
         trainset: The training dataset.
         cut_layer (optional): The layer which training should start from.
         """
@@ -194,6 +198,15 @@ class Trainer(base.Trainer):
 
     @staticmethod
     def test_process(rank, self, testset, batch_size, cut_layer):  # pylint: disable=unused-argument
+        """The testing loop, run in a separate process with a new CUDA context, 
+        so that CUDA memory can be released after the training completes.
+
+        Arguments:
+        rank: Required by torch.multiprocessing to spawn processes. Unused.
+        testset: The test dataset.
+        batch_size: the batch size used for testing.
+        cut_layer (optional): The layer which testing should start from.
+        """
         self.model.to(self.device)
         self.model.eval()
 
@@ -218,8 +231,8 @@ class Trainer(base.Trainer):
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
 
+        self.model.cpu()
         accuracy = correct / total
-        logging.info('Test accuracy: {:.2f}%'.format(100 * accuracy))
         self.save_accuracy(accuracy)
 
     def test(self, testset, batch_size, cut_layer=None):

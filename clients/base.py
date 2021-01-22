@@ -27,14 +27,14 @@ class Client:
 
         if Config().cross_silo and not Config().is_edge_server():
             # Contact one of the edge servers
-            logging.info("Client #%s is contacting one of the edge servers...",
+            logging.info("[Client #%s] Contacting one of the edge servers...",
                          self.client_id)
             uri = 'ws://{}:{}'.format(
                 Config().server.address,
                 Config().server.port + Config().clients.total_clients +
                 int(self.client_id) % Config().cross_silo.total_silos + 1)
         else:
-            logging.info("Client #%s is contacting the central server...",
+            logging.info("[Client #%s] Contacting the central server.",
                          self.client_id)
             uri = 'ws://{}:{}'.format(Config().server.address,
                                       Config().server.port)
@@ -43,19 +43,19 @@ class Client:
             async with websockets.connect(uri,
                                           ping_interval=None,
                                           max_size=2**30) as websocket:
-                logging.info("Signing in at the server from client #%s...",
+                logging.info("[Client #%s] Signing in at the server.",
                              self.client_id)
                 await websocket.send(json.dumps({'id': self.client_id}))
 
                 while True:
-                    logging.info("Client #%s is waiting to be selected...",
+                    logging.info("[Client #%s] Waiting to be selected.",
                                  self.client_id)
                     server_response = await websocket.recv()
                     data = json.loads(server_response)
 
                     if data['id'] == self.client_id:
                         self.process_server_response(data)
-                        logging.info("Client #%s has been selected.",
+                        logging.info("[Client #%s] Selected by the server.",
                                      self.client_id)
 
                         if not self.data_loaded:
@@ -63,7 +63,7 @@ class Client:
 
                         if 'payload' in data:
                             logging.info(
-                                "Client #%s is receiving payload from the server...",
+                                "[Client #%s] Receiving payload from the server.",
                                 self.client_id)
                             server_payload = await websocket.recv()
 
@@ -73,10 +73,10 @@ class Client:
 
                         if Config().is_edge_server():
                             logging.info(
-                                "[Server %d] Model aggregated on edge server (client #%s).",
+                                "[Server #%d] Model aggregated on edge server (client #%s).",
                                 os.getpid(), self.client_id)
                         else:
-                            logging.info("Model trained on client #%s.",
+                            logging.info("[Client #%s] Model trained.",
                                          self.client_id)
 
                         # Sending client ID as metadata to the server (payload to follow)
@@ -87,7 +87,7 @@ class Client:
                         await websocket.send(pickle.dumps(report))
 
         except OSError as exception:
-            logging.info("Client #%s: connection to the server failed.",
+            logging.info("[Client #%s] Connection to the server failed.",
                          self.client_id)
             logging.error(exception)
 

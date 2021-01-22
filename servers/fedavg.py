@@ -27,8 +27,9 @@ class FedAvgServer(Server):
 
         self.total_clients = Config().clients.total_clients
         self.clients_per_round = Config().clients.per_round
-        logging.info("Started training on %s clients and %s per round...",
-                     self.total_clients, self.clients_per_round)
+        logging.info(
+            "[Server #%d] Started training on %s clients with %s per round...",
+            os.getpid(), self.total_clients, self.clients_per_round)
 
         # starting time of a gloabl training round
         self.round_start_time = 0
@@ -143,14 +144,15 @@ class FedAvgServer(Server):
             # Compute the average accuracy from client reports
             self.accuracy = self.accuracy_averaging(self.reports)
             logging.info(
-                '[Server {:d}] Average client accuracy: {:.2f}%.'.format(
+                '[Server #{:d}] Average client accuracy: {:.2f}%.'.format(
                     os.getpid(), 100 * self.accuracy))
         else:
             # Test the updated model directly at the server
             self.accuracy = self.trainer.test(self.testset,
                                               Config().trainer.batch_size)
-            logging.info('Global model accuracy: {:.2f}%\n'.format(
-                100 * self.accuracy))
+            logging.info(
+                '[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(
+                    os.getpid(), 100 * self.accuracy))
 
         await self.wrap_up_processing_reports()
 

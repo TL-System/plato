@@ -54,17 +54,20 @@ class SimpleClient(Client):
     def load_data(self):
         """Generating data and loading them onto this client."""
         data_loading_start_time = time.time()
-        logging.info('Client #%s is loading its dataset...', self.client_id)
+        logging.info('[Client #%s] Loading its dataset...', self.client_id)
 
         dataset = datasets_registry.get()
         self.data_loaded = True
 
-        logging.info('Dataset size: %s', dataset.num_train_examples())
-        logging.info('Number of classes: %s', dataset.num_classes())
+        logging.info('[Client #%s] Dataset size: %s', self.client_id,
+                     dataset.num_train_examples())
+        logging.info('[Client #%s] Number of classes: %s', self.client_id,
+                     dataset.num_classes())
 
         # Setting up the data divider
         assert Config().data.divider in ('iid', 'bias', 'shard')
-        logging.info('Data distribution: %s', Config().data.divider)
+        logging.info('[Client $%s] Data distribution: %s', self.client_id,
+                     Config().data.divider)
 
         divider = {
             'iid': iid.IIDDivider,
@@ -122,8 +125,7 @@ class SimpleClient(Client):
     async def train(self):
         """The machine learning training workload on a client."""
         training_start_time = time.time()
-        logging.info('[Client %s] Started to train on client #%s', os.getpid(),
-                     self.client_id)
+        logging.info('[Client #%s] Started training.', self.client_id)
 
         # Perform model training
         self.trainer.train(self.trainset)
@@ -134,6 +136,9 @@ class SimpleClient(Client):
         # Generate a report for the server, performing model testing if applicable
         if Config().clients.do_test:
             accuracy = self.trainer.test(self.testset, 1000)
+            logging.info('[Client #{:s}] Test accuracy: {:.2f}%'.format(
+                self.client_id, 100 * accuracy))
+
         else:
             accuracy = 0
 
