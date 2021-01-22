@@ -72,11 +72,10 @@ class Trainer(ABC):
         """
 
     @abstractmethod
-    def test(self, testset, batch_size, cut_layer=None):
+    def test(self, testset, cut_layer=None):
         """Testing the model using the provided test dataset.
 
         Arguments:
         testset: The test dataset.
-        batch_size: the batch size used for testing.
         cut_layer (optional): The layer which testing should start from.
         """
