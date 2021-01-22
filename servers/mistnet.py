@@ -105,7 +105,6 @@ class MistNetServer(Server):
 
         # Test the updated model
         self.accuracy = self.trainer.test(feature_dataset,
-                                          Config().trainer.batch_size,
                                           Config().trainer.cut_layer)
         logging.info('Global model accuracy: {:.2f}%\n'.format(100 *
                                                                self.accuracy))

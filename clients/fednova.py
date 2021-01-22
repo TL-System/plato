@@ -54,7 +54,7 @@ class FedNovaClient(simple.SimpleClient):
 
         # Generate a report for the server, performing model testing if applicable
         if Config().clients.do_test:
-            accuracy = self.trainer.test(self.testset, 1000)
+            accuracy = self.trainer.test(self.testset)
         else:
             accuracy = 0
 
