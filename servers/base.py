@@ -49,7 +49,7 @@ class Server:
             total_processes = Config().clients.total_clients
 
         for client_id in range(starting_id, total_processes + starting_id):
-            logging.info("Starting client #%s...", client_id)
+            logging.info("Starting client #%s.", client_id)
             command = "python client.py -i {}".format(client_id)
             command += " -c {}".format(Config.args.config)
 
@@ -78,15 +78,14 @@ class Server:
         if len(self.selected_clients) > 0:
             for client_id in self.selected_clients:
                 socket = self.clients[client_id]
-                logging.info(
-                    "[Server #%d] Selecting client #%s for training...",
-                    os.getpid(), client_id)
+                logging.info("[Server #%d] Selecting client #%s for training.",
+                             os.getpid(), client_id)
                 server_response = {'id': client_id, 'payload': True}
                 server_response = await self.customize_server_response(
                     server_response)
                 await socket.send(json.dumps(server_response))
 
-                logging.info("[Server #%d] Sending the current model...",
+                logging.info("[Server #%d] Sending the current model.",
                              os.getpid())
                 await socket.send(pickle.dumps(self.trainer.extract_weights()))
 

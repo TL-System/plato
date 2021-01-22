@@ -76,7 +76,7 @@ class SimpleClient(Client):
 
         num_clients = Config().clients.total_clients
 
-        logging.info("[Client #%s] Extracting the local dataset...",
+        logging.info("[Client #%s] Extracting the local dataset.",
                      self.client_id)
 
         # Extract data partition for client
@@ -111,7 +111,7 @@ class SimpleClient(Client):
         # Extract the trainset and testset if local testing is needed
         if Config().clients.do_test:
             self.trainset = self.data
-            self.testset = divider.testset
+            self.testset = dataset.get_test_set()
         else:
             self.trainset = self.data
 

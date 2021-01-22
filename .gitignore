@@ -134,6 +134,9 @@ dmypy.json
 # Configuration files
 /*.conf
 
+# Runtime files
+running_trainers
+
 # Data files
 data/
 

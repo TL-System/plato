@@ -50,7 +50,7 @@ class FedAvgCrossSiloServer(FedAvgServer):
             self.total_clients = self.clients_per_round
 
             logging.info(
-                "The central server starts training with %s edge servers...",
+                "The central server starts training with %s edge servers.",
                 self.total_clients)
 
     def configure(self):
@@ -59,23 +59,23 @@ class FedAvgCrossSiloServer(FedAvgServer):
         creating the clients.
         """
         if Config().args.id:
-            logging.info('Configuring edge server #%s as a %s server...',
+            logging.info("Configuring edge server #%s as a %s server.",
                          Config().args.id,
                          Config().server.type)
-            logging.info('Training with %s local aggregation rounds.',
+            logging.info("Training with %s local aggregation rounds.",
                          Config().cross_silo.rounds)
 
         else:
-            logging.info('Configuring the %s server...', Config().server.type)
+            logging.info("Configuring the %s server.", Config().server.type)
 
             total_rounds = Config().trainer.rounds
             target_accuracy = Config().trainer.target_accuracy
 
             if target_accuracy:
-                logging.info('Training: %s rounds or %s%% accuracy\n',
+                logging.info("Training: %s rounds or %s%% accuracy\n",
                              total_rounds, 100 * target_accuracy)
             else:
-                logging.info('Training: %s rounds\n', total_rounds)
+                logging.info("Training: %s rounds\n", total_rounds)
 
         self.load_test_data()
         self.load_model()

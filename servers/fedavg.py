@@ -28,7 +28,7 @@ class FedAvgServer(Server):
         self.total_clients = Config().clients.total_clients
         self.clients_per_round = Config().clients.per_round
         logging.info(
-            "[Server #%d] Started training on %s clients with %s per round...",
+            "[Server #%d] Started training on %s clients with %s per round.",
             os.getpid(), self.total_clients, self.clients_per_round)
 
         # starting time of a gloabl training round
@@ -125,16 +125,16 @@ class FedAvgServer(Server):
         baseline_weights = self.trainer.extract_weights()
 
         # Load updated weights into model
-        updated_weights = []
-        for i, (name, weight) in enumerate(baseline_weights):
-            updated_weights.append((name, weight + avg_update[i]))
+        updated_weights = {}
+        for i, (name, weight) in enumerate(baseline_weights.items()):
+            updated_weights[name] = weight + avg_update[i]
 
         return updated_weights
 
     async def process_reports(self):
         """Process the client reports by aggregating their weights."""
-        #updated_weights = self.aggregate_weights(self.reports)
-        #self.trainer.load_weights(updated_weights)
+        updated_weights = self.aggregate_weights(self.reports)
+        self.trainer.load_weights(updated_weights)
 
         # Testing the global model accuracy
         if Config().clients.do_test:

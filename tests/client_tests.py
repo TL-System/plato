@@ -22,7 +22,7 @@ class ClientTest(unittest.TestCase):
         self.client.load_data()
 
     def test_training(self):
-        print("Testing training on the client...")
+        print("Testing training on the client.")
 
         report = self.client.train()
         print(report)

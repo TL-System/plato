@@ -9,6 +9,7 @@ Differential Privacy," found in docs/papers.
 
 import logging
 import time
+import os
 import random
 from itertools import chain
 
@@ -34,8 +35,9 @@ class MistNetServer(Server):
 
         self.total_clients = Config().clients.total_clients
         self.clients_per_round = Config().clients.per_round
-        logging.info("Started training on %s clients and %s per round...",
-                     self.total_clients, self.clients_per_round)
+        logging.info(
+            "[Server #%s] Started training on %s clients and %s per round.",
+            os.getpid(), self.total_clients, self.clients_per_round)
 
         if Config().results:
             recorded_items = Config().results.types
@@ -55,16 +57,18 @@ class MistNetServer(Server):
         Booting the MistNet server by setting up the data, model, and
         creating the clients.
         """
-        logging.info('Configuring the %s server...', Config().server.type)
+        logging.info('[Server #%s] Configuring the %s server...', os.getpid(),
+                     Config().server.type)
 
         total_rounds = Config().trainer.rounds
         target_accuracy = Config().trainer.target_accuracy
 
         if target_accuracy:
-            logging.info('Training: %s rounds or %s%% accuracy\n',
-                         total_rounds, 100 * target_accuracy)
+            logging.info('[Server #%s] Training: %s rounds or %s%% accuracy\n',
+                         os.getpid(), total_rounds, 100 * target_accuracy)
         else:
-            logging.info('Training: %s rounds\n', total_rounds)
+            logging.info('[Server #%s] Training: %s rounds\n', os.getpid(),
+                         total_rounds)
 
         self.load_test_data()
         self.load_model()
@@ -77,7 +81,7 @@ class MistNetServer(Server):
     def load_model(self):
         """Setting up a pre-trained model to be loaded on the clients."""
         model_type = Config().trainer.model
-        logging.info('Model: %s', model_type)
+        logging.info('[Server #%s] Model: %s', os.getpid(), model_type)
 
         # Loading the model for server-side training
         self.model = models_registry.get(model_type)

@@ -27,7 +27,7 @@ class Client:
 
         if Config().cross_silo and not Config().is_edge_server():
             # Contact one of the edge servers
-            logging.info("[Client #%s] Contacting one of the edge servers...",
+            logging.info("[Client #%s] Contacting one of the edge servers.",
                          self.client_id)
             uri = 'ws://{}:{}'.format(
                 Config().server.address,
