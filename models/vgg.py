@@ -2,8 +2,8 @@
 import torch.nn as nn
 import torch.nn.functional as F
 
-import models.base_pytorch as base
 from config import Config
+from models import base
 
 
 class Model(base.Model):
@@ -47,8 +47,7 @@ class Model(base.Model):
     @staticmethod
     def is_valid_model_name(model_name):
         return (model_name.startswith('vgg')
-                and model_name.endswith('_pytorch')
-                and len(model_name.split('_')) == 3
+                and len(model_name.split('_')) == 2
                 and model_name.split('_')[1].isdigit()
                 and int(model_name.split('_')[1]) in [11, 13, 16, 19])
 

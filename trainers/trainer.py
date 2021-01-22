@@ -10,7 +10,7 @@ import torch.multiprocessing as mp
 
 import numpy as np
 
-from models.base_pytorch import Model
+from models.base import Model
 from config import Config
 from trainers import base, optimizers
 
@@ -21,7 +21,7 @@ class Trainer(base.Trainer):
         """Initializing the trainer with the provided model.
 
         Arguments:
-        model: The model to train. Must be a models.base_pytorch.Model subclass.
+        model: The model to train. Must be a models.base.Model subclass.
         """
         super().__init__()
 

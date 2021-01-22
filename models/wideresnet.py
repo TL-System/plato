@@ -7,7 +7,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from config import Config
-import models.base_pytorch as base
+from models import base
 
 
 class BasicBlock(nn.Module):
@@ -132,7 +132,7 @@ class Model(base.Model):
 
     @staticmethod
     def is_valid_model_name(model_name):
-        return model_name.startswith('wideresnet_pytorch')
+        return model_name.startswith('wideresnet')
 
     @staticmethod
     def get_model_from_name(model_name):

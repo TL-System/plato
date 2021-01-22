@@ -5,7 +5,7 @@ import collections
 import torch.nn as nn
 import torch.nn.functional as F
 
-import models.base_pytorch as base
+from models import base
 
 
 class BasicBlock(nn.Module):
@@ -161,8 +161,7 @@ class Model(base.Model):
     @staticmethod
     def is_valid_model_name(model_name):
         return (model_name.startswith('resnet_')
-                and model_name.endswith('_pytorch')
-                and len(model_name.split('_')) == 3
+                and len(model_name.split('_')) == 2
                 and int(model_name.split('_')[1]) in [18, 34, 50, 101, 152])
 
     @staticmethod
