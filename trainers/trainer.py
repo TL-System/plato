@@ -120,7 +120,8 @@ class Trainer(base.Trainer):
         if Config().trainer.lr_gamma == 0.0 or Config(
         ).trainer.lr_milestone_steps == '':
             lr_schedule = optimizers.get_lr_schedule(optimizer,
-                                                     iterations_per_epoch)
+                                                     iterations_per_epoch,
+                                                     train_loader)
         else:
             lr_schedule = None
 
@@ -130,18 +131,21 @@ class Trainer(base.Trainer):
                     self.device)
                 optimizer.zero_grad()
                 if cut_layer is None:
-                    loss = loss_criterion(self.model(examples), labels)
+                    outputs = self.model(examples)
                 else:
                     outputs = self.model.forward_from(examples, cut_layer)
-                    loss = loss_criterion(outputs, labels)
+
+                loss = loss_criterion(outputs, labels)
                 loss.backward()
                 optimizer.step()
                 if lr_schedule is not None:
                     lr_schedule.step()
 
                 if batch_id % log_interval == 0:
-                    logging.debug('Epoch: [{}/{}]\tLoss: {:.6f}'.format(
-                        epoch, epochs, loss.item()))
+                    logging.info(
+                        '[Client {}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}'.
+                        format(os.getpid(), epoch, epochs, batch_id,
+                               len(train_loader), loss.data.item()))
 
         self.model.cpu()
         self.save_model()

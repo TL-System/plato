@@ -128,6 +128,9 @@ check libcudnn
 
 To check if MindSpore is correctly installed on the GPU server, try to `import mindspore` with a Python interpreter.
 
+Finally, to use trainers and servers based on MindSpore, assign `True` to `use_mindspore` in the `trainer` section of the 
+configuration file. Its default value is `False`, and Plato would use PyTorch as its default framework.
+
 ### Running Plato
 
 To start a federated learning training workload, run [`server.py`](server.py) from the repository's root directory. For example:
