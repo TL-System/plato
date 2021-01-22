@@ -74,10 +74,17 @@ class SimpleClient(Client):
 
         num_clients = Config().clients.total_clients
 
+        logging.info("[Client #%s] Extracting the local dataset...",
+                     self.client_id)
+
         # Extract data partition for client
         if Config().data.divider == 'iid':
-            assert Config().data.partition_size
+            assert Config().data.partition_size is not None
             partition_size = Config().data.partition_size
+
+            assert partition_size * Config(
+            ).clients.per_round <= dataset.num_train_examples()
+
             self.data = divider.get_partition(partition_size)
 
         elif Config().data.divider == 'bias':
@@ -99,15 +106,10 @@ class SimpleClient(Client):
         elif Config().data.divider == 'shard':
             self.data = divider.get_partition()
 
-        # Extract test parameter settings from the configuration
-        test_partition = Config().clients.test_partition
-
         # Extract the trainset and testset if local testing is needed
         if Config().clients.do_test:
-            self.trainset = self.data[:int(
-                len(self.data) * (1 - test_partition))]
-            self.testset = self.data[
-                int(len(self.data) * (1 - test_partition)):]
+            self.trainset = self.data
+            self.testset = divider.testset
         else:
             self.trainset = self.data
 

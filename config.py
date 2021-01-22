@@ -120,10 +120,10 @@ class Config:
 
         # Parameters for the federated learning clients
         fields = [
-            'type', 'total_clients', 'per_round', 'do_test', 'test_partition',
-            'max_local_iter', 'pattern'
+            'type', 'total_clients', 'per_round', 'do_test', 'max_local_iter',
+            'pattern'
         ]
-        defaults = ('simple', 0, 0, False, 0.2, 10, 'constant')
+        defaults = ('simple', 0, 0, False, 10, 'constant')
         params = Config.extract_section('clients', fields, defaults)
         Config.clients = namedtuple('clients', fields)(*params)
 
