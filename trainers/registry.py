@@ -23,12 +23,13 @@ if Config().trainer.use_mindspore:
                                mindspore_trainers.items())
 
 
-def get(model: Model):
+def get(model: Model, client_id=0):
     """Get the trainer with the provided name."""
     trainer_name = Config().trainer.type
 
     if trainer_name in registered_trainers:
-        registered_trainer = registered_trainers[trainer_name].Trainer(model)
+        registered_trainer = registered_trainers[trainer_name].Trainer(
+            model, client_id)
     else:
         raise ValueError('No such trainer: {}'.format(trainer_name))
 
