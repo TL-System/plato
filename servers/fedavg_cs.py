@@ -34,7 +34,7 @@ class FedAvgCrossSiloServer(FedAvgServer):
             self.clients_per_round = int(self.clients_per_round /
                                          Config().cross_silo.total_silos)
             logging.info(
-                "Edge server #%s starts training with %s clients and %s per round...",
+                "[Edge server #%s] Started training with %s clients and %s per round.",
                 Config().args.id, self.total_clients, self.clients_per_round)
 
             if Config().results:
@@ -123,7 +123,7 @@ class FedAvgCrossSiloServer(FedAvgServer):
             # needs to be signaled to send a report to the central server
             if self.current_round == Config().cross_silo.rounds:
                 logging.info(
-                    '[Server %s] Completed %s rounds of local aggregation.',
+                    '[Server #%d] Completed %s rounds of local aggregation.',
                     os.getpid(),
                     Config().cross_silo.rounds)
                 self.model_aggregated.set()

@@ -43,7 +43,7 @@ class FedNovaClient(simple.SimpleClient):
 
         # generate local iteration randomly
         self.iteration = self.update_local_iteration(self.pattern)
-        logging.info('Traning %d epoches on client %s', self.iteration,
+        logging.info('[Client #%s] Training %d epoches.', self.iteration,
                      self.client_id)
 
         # Perform model training for specific epoches

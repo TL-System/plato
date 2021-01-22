@@ -69,7 +69,7 @@ class Server:
         self.reports = []
         self.current_round += 1
 
-        logging.info('\n[Server %d] Starting round %s/%s.', os.getpid(),
+        logging.info('\n[Server #%d] Starting round %s/%s.', os.getpid(),
                      self.current_round,
                      Config().trainer.rounds)
 
@@ -79,14 +79,15 @@ class Server:
             for client_id in self.selected_clients:
                 socket = self.clients[client_id]
                 logging.info(
-                    "[Server %d] Selecting client #%s for training...",
+                    "[Server #%d] Selecting client #%s for training...",
                     os.getpid(), client_id)
                 server_response = {'id': client_id, 'payload': True}
                 server_response = await self.customize_server_response(
                     server_response)
                 await socket.send(json.dumps(server_response))
 
-                logging.info("Sending the current model...")
+                logging.info("[Server #%d] Sending the current model...",
+                             os.getpid())
                 await socket.send(pickle.dumps(self.trainer.extract_weights()))
 
     async def serve(self, websocket, path):  # pylint: disable=unused-argument
@@ -95,7 +96,7 @@ class Server:
             async for message in websocket:
                 data = json.loads(message)
                 client_id = data['id']
-                logging.info("[Server %s] Data received from client #%s",
+                logging.info("[Server #%d] Data received from client #%s.",
                              os.getpid(), client_id)
 
                 if 'payload' in data:
@@ -103,7 +104,7 @@ class Server:
                     client_update = await websocket.recv()
                     report = pickle.loads(client_update)
                     logging.info(
-                        "[Server %s] Update from client #%s received.",
+                        "[Server #%d] Update from client #%s received.",
                         os.getpid(), client_id)
 
                     self.reports.append(report)
@@ -118,12 +119,13 @@ class Server:
 
                     if self.current_round == 0 and len(
                             self.clients) >= self.total_clients:
-                        logging.info('[Server %s] Starting FL training.',
+                        logging.info('[Server #%d] Starting training.',
                                      os.getpid())
                         await self.select_clients()
         except websockets.ConnectionClosed as exception:
-            logging.info("Server %s: WebSockets connection closed abnormally.",
-                         os.getpid())
+            logging.info(
+                "[Server #%d] WebSockets connection closed abnormally.",
+                os.getpid())
             logging.error(exception)
             sys.exit()
 
