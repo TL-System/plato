@@ -6,11 +6,10 @@ Y. LeCun, L. Bottou, Y. Bengio, and P. Haffner. "Gradient-based learning applied
 document recognition." Proceedings of the IEEE, November 1998.
 """
 import collections
-import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-import models.base_pytorch as base
+from models import base
 
 
 class Model(base.Model):
@@ -116,7 +115,7 @@ class Model(base.Model):
 
     @staticmethod
     def is_valid_model_name(model_name):
-        return model_name.startswith('lenet5_pytorch')
+        return model_name.startswith('lenet5')
 
     @staticmethod
     def get_model_from_name(model_name):
