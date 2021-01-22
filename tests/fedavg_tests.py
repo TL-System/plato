@@ -50,12 +50,12 @@ class FedAvgTest(unittest.TestCase):
     def test_forward(self):
         self.assertIsNotNone(self.model)
         weights = self.trainer.extract_weights()
-        print("Testing forward pass...")
+        print("Testing forward pass.")
         print(f"Weights: {weights}")
         self.assertEqual(45.0, self.model(self.example).item())
 
     def test_backward(self):
-        print("Testing backward pass...")
+        print("Testing backward pass.")
         self.model.train()
 
         self.optimizer.zero_grad()
@@ -83,7 +83,7 @@ class FedAvgTest(unittest.TestCase):
         print(f"Weights: {weights}")
 
     def test_fedavg_aggregation(self):
-        print("Testing federated averaging...")
+        print("Testing federated averaging.")
         reports = []
         server = fedavg.FedAvgServer()
         server.model = copy.deepcopy(self.model)
@@ -91,7 +91,7 @@ class FedAvgTest(unittest.TestCase):
 
         weights = copy.deepcopy(self.trainer.extract_weights())
         print(f"Report 1 weights: {weights}")
-        reports.append(simple.Report(1, 100, weights, 0))
+        reports.append(simple.Report(1, 100, weights, 0, 0, 0))
 
         self.model.train()
 
@@ -102,7 +102,7 @@ class FedAvgTest(unittest.TestCase):
         self.assertEqual(44.0, self.model(self.example).item())
         weights = copy.deepcopy(self.trainer.extract_weights())
         print(f"Report 2 weights: {weights}")
-        reports.append(simple.Report(1, 100, weights, 0))
+        reports.append(simple.Report(1, 100, weights, 0, 0, 0))
 
         self.optimizer.zero_grad()
         self.model.loss_criterion(self.model(self.example),
@@ -111,7 +111,7 @@ class FedAvgTest(unittest.TestCase):
         self.assertEqual(43.2, np.round(self.model(self.example).item(), 4))
         weights = copy.deepcopy(self.trainer.extract_weights())
         print(f"Report 3 Weights: {weights}")
-        reports.append(simple.Report(1, 100, weights, 0))
+        reports.append(simple.Report(1, 100, weights, 0, 0, 0))
 
         self.optimizer.zero_grad()
         self.model.loss_criterion(self.model(self.example),
@@ -120,13 +120,13 @@ class FedAvgTest(unittest.TestCase):
         self.assertEqual(42.56, np.round(self.model(self.example).item(), 4))
         weights = copy.deepcopy(self.trainer.extract_weights())
         print(f"Report 4 Weights: {weights}")
-        reports.append(simple.Report(1, 100, weights, 0))
+        reports.append(simple.Report(1, 100, weights, 0, 0, 0))
 
         print(
             f"Weights before federated averaging: {server.model.layer.weight.data}"
         )
         updated_weights = server.federated_averaging(reports)
-        self.trainer.load_weights(updated_weights)
+        server.trainer.load_weights(updated_weights)
         print(
             f"Weights after federated averaging: {server.model.layer.weight.data}"
         )

@@ -63,7 +63,7 @@ class FLEnv(gym.Env):
                 task = current_loop.create_task(asyncio.sleep(1))
                 current_loop.run_until_complete(task)
 
-        logging.info("Reseting RL environment...")
+        logging.info("Reseting RL environment.")
 
         self.time_step = 0
         # Let the RL agent restart FL training

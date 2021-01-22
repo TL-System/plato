@@ -27,7 +27,7 @@ class Trainer(base.Trainer):
 
         # Use data parallelism if multiple GPUs are available and the configuration specifies it
         if Config().is_parallel():
-            logging.info("Using Data Parallelism...")
+            logging.info("Using Data Parallelism.")
             # DataParallel will divide and allocate batch_size to all available GPUs
             self.model = nn.DataParallel(model)
         else:
@@ -74,13 +74,7 @@ class Trainer(base.Trainer):
 
     def extract_weights(self):
         """Extract weights from the model."""
-        weights = []
-        for name, weight in self.model.to(
-                torch.device('cpu')).named_parameters():
-            if weight.requires_grad:
-                weights.append((name, weight.data))
-
-        return weights
+        return self.model.state_dict()
 
     def compute_weight_updates(self, weights_received):
         """Extract the weights received from a client and compute the updates."""
@@ -91,11 +85,8 @@ class Trainer(base.Trainer):
         updates = []
         for weight in weights_received:
             update = []
-            for i, (name, current_weight) in enumerate(weight):
-                bl_name, baseline = baseline_weights[i]
-
-                # Ensure correct weight is being updated
-                assert name == bl_name
+            for name, current_weight in weight.items():
+                baseline = baseline_weights[name]
 
                 # Calculate update
                 delta = current_weight - baseline
@@ -106,11 +97,7 @@ class Trainer(base.Trainer):
 
     def load_weights(self, weights):
         """Load the model weights passed in as a parameter."""
-        updated_state_dict = {}
-        for name, weight in weights:
-            updated_state_dict[name] = weight
-
-        self.model.load_state_dict(updated_state_dict, strict=False)
+        self.model.load_state_dict(weights, strict=True)
 
     @staticmethod
     def train_process(rank, self, trainset, cut_layer=None):  # pylint: disable=unused-argument
@@ -211,7 +198,7 @@ class Trainer(base.Trainer):
         self.model.eval()
 
         test_loader = torch.utils.data.DataLoader(
-            testset, batch_size=Config().trainer.batch_size, shuffle=True)
+            testset, batch_size=Config().trainer.batch_size, shuffle=False)
 
         correct = 0
         total = 0
