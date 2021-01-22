@@ -1,7 +1,7 @@
 """
 Base class for dividing data into partitions across the clients.
 """
-import logging
+import random
 
 
 class Divider:
@@ -13,21 +13,8 @@ class Divider:
         self.labels = list(self.trainset.classes)
         self.trainset_size = len(self.trainset)
 
+        random.seed()
         self.group()
-
-    def extract(self, label, n):
-        """Extract 'n' examples of the data for a particular label."""
-        if len(self.trainset[label]) > n:
-            extracted = self.trainset[label][:n]
-        else:
-            logging.warning('Insufficient data in label: %s', label)
-            logging.warning('%s examples available, %s examples needed.',
-                            len(self.trainset[label]), n)
-
-            extracted = self.trainset[label]
-
-        del self.trainset[label][:n]  # Remove from the trainset
-        return extracted
 
     def group(self):
         """Group the training data by label."""
@@ -41,4 +28,20 @@ class Divider:
 
             grouped_data[label].append(datapoint)
 
+        # Shuffling the examples in each label randomly so that
+        # each client will retrieve a different partition
+        for label in self.labels:
+            random.shuffle(grouped_data[label])
+
         self.trainset = grouped_data  # Replaced with grouped data
+
+    def extract(self, label, n):
+        """Extract 'n' examples of the data for a particular label."""
+        if len(self.trainset[label]) > n:
+            extracted = self.trainset[label][:n]
+            del self.trainset[label][:n]  # Remove from the trainset
+        else:
+            extracted = self.trainset[label]
+            self.trainset[label] = []
+
+        return extracted
