@@ -115,7 +115,7 @@ class Model(base.Model):
 
     @staticmethod
     def is_valid_model_name(model_name):
-        return model_name.startswith('lenet5')
+        return model_name == 'lenet5'
 
     @staticmethod
     def get_model_from_name(model_name):

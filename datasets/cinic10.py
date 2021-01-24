@@ -23,7 +23,7 @@ class Dataset(base.Dataset):
         # Download and extract CINIC-10 dataset if haven't
         if not os.path.exists(self.cinic_directory):
             if not os.path.exists(self.cinic_directory + '.tar.gz'):
-                print('Downloading CINIC-10 dataset. This may take a while...')
+                print('Downloading the CINIC-10 dataset. This takes a while.')
 
                 url = 'https://datashare.is.ed.ac.uk/bitstream/handle/10283/3192/CINIC-10.tar.gz'
 

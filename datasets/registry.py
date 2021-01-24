@@ -15,6 +15,12 @@ registered_datasets = {
     'CINIC10': cinic10
 }
 
+if Config().trainer.use_mindspore:
+    from datasets import mnist_mindspore
+    mindspore_datasets = {'MNIST_mindspore': mnist_mindspore}
+    registered_datasets = dict(
+        list(registered_datasets.items()) + list(mindspore_datasets.items()))
+
 
 def get():
     """Get the dataset with the provided name."""

@@ -2,16 +2,6 @@
 A federated learning client with support for Adaptive Synchronization Frequency.
 """
 
-import logging
-import random
-import time
-from dataclasses import dataclass
-
-from models import registry as models_registry
-from datasets import registry as datasets_registry
-from trainers import registry as trainers_registry
-from dividers import iid, biased, sharded
-from utils import dists
 from config import Config
 from clients import SimpleClient
 
