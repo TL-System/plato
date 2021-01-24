@@ -1,7 +1,6 @@
 """
 The MNIST dataset.
 """
-import logging
 from torchvision import datasets, transforms
 
 from datasets import base

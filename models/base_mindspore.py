@@ -1,13 +1,12 @@
 """Base classes for MindSpore models."""
-
-from abc import ABC, abstractmethod, abstractstaticmethod
+from abc import abstractmethod, abstractstaticmethod
 import mindspore.nn as nn
 
 
-class Model(ABC, nn.Cell):
+class Model(nn.Cell):
     """The base class for by all the models."""
     @abstractmethod
-    def constrct(self, x):
+    def construct(self, *inputs, **kwargs):
         """The forward pass."""
 
     @abstractstaticmethod

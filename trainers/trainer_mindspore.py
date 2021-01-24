@@ -4,27 +4,28 @@ The training and testing loop.
 
 import logging
 import os
-import mindspore
 import mindspore.nn as nn
-
-import numpy as np
+import mindspore
+from mindspore.train.callback import LossMonitor
+from mindspore.nn.metrics import Accuracy
+from mindspore.nn.loss import SoftmaxCrossEntropyWithLogits
 
 from models.base_mindspore import Model
 from config import Config
-from trainers import base, optimizers
+from trainers import base
 
 
 class Trainer(base.Trainer):
     """A basic federated learning trainer for MindSpore, used by both
     the client and the server.
     """
-    def __init__(self, model: Model):
+    def __init__(self, model: Model, client_id=0):
         """Initializing the trainer with the provided model.
 
         Arguments:
         model: The model to train. Must be a models.base_mindspore.Model subclass.
         """
-        super().__init__()
+        super().__init__(client_id)
         self.model = model
 
     def save_model(self):
@@ -33,22 +34,26 @@ class Trainer(base.Trainer):
         model_dir = './models/pretrained/'
         if not os.path.exists(model_dir):
             os.makedirs(model_dir)
-        model_path = f'{model_dir}{model_type}.pth'
-        torch.save(self.model.state_dict(), model_path)
-        logging.info('Model saved to %s.', model_path)
+        model_path = f'{model_dir}{model_type}_{self.client_id}.ckpt'
+        mindspore.save_checkpoint(self.model, model_path)
+
+        logging.info('[Client #%s] Model saved to %s.', self.client_id,
+                     model_path)
 
     def load_model(self, model_type):
         """Loading pre-trained model weights from a file."""
-        model_path = f'./models/pretrained/{model_type}.pth'
-        self.model.load_state_dict(torch.load(model_path))
+        model_dir = './models/pretrained/'
+        model_path = f'{model_dir}{model_type}_{self.client_id}.ckpt'
+        logging.info("[Client #%s] Loading model from %s.", self.client_id,
+                     model_path)
+        param_dict = mindspore.load_checkpoint(model_path)
+        mindspore.load_param_into_net(self.model, param_dict)
 
     def extract_weights(self):
         """Extract weights from the model."""
-        weights = []
-        for name, weight in self.model.to(
-                torch.device('cpu')).named_parameters():
-            if weight.requires_grad:
-                weights.append((name, weight.data))
+        weights = {}
+        for _, param in self.model.parameters_and_names():
+            weights[param.name] = param
 
         return weights
 
@@ -80,7 +85,7 @@ class Trainer(base.Trainer):
         for name, weight in weights:
             updated_state_dict[name] = weight
 
-        self.model.load_state_dict(updated_state_dict, strict=False)
+        mindspore.load_param_into_net(self.model, updated_state_dict)
 
     def train(self, trainset, cut_layer=None):
         """The main training loop in a federated learning workload.
@@ -89,90 +94,39 @@ class Trainer(base.Trainer):
         trainset: The training dataset.
         cut_layer (optional): The layer which training should start from.
         """
-        self.started_training()
-
-        log_interval = 10
-        batch_size = Config().trainer.batch_size
-        train_loader = torch.utils.data.DataLoader(trainset,
-                                                   batch_size=batch_size,
-                                                   shuffle=True)
-        iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
-        epochs = Config().trainer.epochs
-
-        # Sending the model to the device used for training
-        self.model.to(self.device)
-        self.model.train()
+        self.start_training()
 
         # Initializing the loss criterion
-        loss_criterion = nn.CrossEntropyLoss()
+        loss_criterion = SoftmaxCrossEntropyWithLogits(sparse=True,
+                                                       reduction='mean')
 
         # Initializing the optimizer
-        optimizer = optimizers.get_optimizer(self.model)
+        optimizer = nn.Momentum(self.model.trainable_params(),
+                                Config().trainer.learning_rate,
+                                Config().trainer.momentum)
 
-        # Initializing the learning rate schedule, if necessary
-        if Config().trainer.lr_gamma == 0.0 or Config(
-        ).trainer.lr_milestone_steps == '':
-            lr_schedule = optimizers.get_lr_schedule(optimizer,
-                                                     iterations_per_epoch)
-        else:
-            lr_schedule = None
+        model = mindspore.Model(self.model,
+                                loss_criterion,
+                                optimizer,
+                                metrics={"Accuracy": Accuracy()})
 
-        for epoch in range(1, epochs + 1):
-            for batch_id, (examples, labels) in enumerate(train_loader):
-                examples, labels = examples.to(self.device), labels.to(
-                    self.device)
-                optimizer.zero_grad()
-                if cut_layer is None:
-                    loss = loss_criterion(self.model(examples), labels)
-                else:
-                    outputs = self.model.forward_from(examples, cut_layer)
-                    loss = loss_criterion(outputs, labels)
-                loss.backward()
-                optimizer.step()
-                if lr_schedule is not None:
-                    lr_schedule.step()
+        model.train(Config().trainer.epochs,
+                    trainset,
+                    callbacks=[LossMonitor()])
 
-                if batch_id % log_interval == 0:
-                    logging.debug('Epoch: [{}/{}]\tLoss: {:.6f}'.format(
-                        epoch, epochs, loss.item()))
+        self.pause_training()
 
-        self.paused_training()
-
-    def test(self, testset, batch_size, cut_layer=None):
+    def test(self, testset, cut_layer=None):
         """Testing the model using the provided test dataset.
 
         Arguments:
         testset: The test dataset.
-        batch_size: the batch size used for testing.
         cut_layer (optional): The layer which testing should start from.
         """
-        self.started_training()
+        self.start_training()
 
-        self.model.to(self.device)
-        self.model.eval()
-        test_loader = torch.utils.data.DataLoader(testset,
-                                                  batch_size=batch_size,
-                                                  shuffle=True)
+        accuracy = self.model.eval(testset, dataset_sink_mode=False)
+        print(f"Accuracy = {accuracy}")
 
-        correct = 0
-        total = 0
-
-        with torch.no_grad():
-            for examples, labels in test_loader:
-                examples, labels = examples.to(self.device), labels.to(
-                    self.device)
-
-                if cut_layer is None:
-                    outputs = self.model(examples)
-                else:
-                    outputs = self.model.forward_from(examples, cut_layer)
-
-                _, predicted = torch.max(outputs.data, 1)
-                total += labels.size(0)
-                correct += (predicted == labels).sum().item()
-
-        accuracy = correct / total
-        logging.debug('Accuracy: {:.2f}%'.format(100 * accuracy))
-
-        self.paused_training()
+        self.pause_training()
         return accuracy
