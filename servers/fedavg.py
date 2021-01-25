@@ -6,7 +6,7 @@ import logging
 import time
 import os
 import random
-import torch
+from collections import OrderedDict
 
 import models.registry as models_registry
 from datasets import registry as datasets_registry
@@ -113,21 +113,29 @@ class FedAvgServer(Server):
         self.total_samples = sum([report.num_samples for report in reports])
 
         # Perform weighted averaging
-        avg_update = [torch.zeros(x.size()) for __, x in updates[0]]
+        avg_update = {
+            name: self.trainer.zeros(weights.shape)
+            for name, weights in updates[0].items()
+        }
 
         for i, update in enumerate(updates):
             num_samples = reports[i].num_samples
-            for j, (__, delta) in enumerate(update):
+
+            for name, delta in update.items():
                 # Use weighted average by the number of samples
-                avg_update[j] += delta * (num_samples / self.total_samples)
+                if name == 'fc3.weight':
+                    print(avg_update[name])
+                avg_update[name] += delta * (num_samples / self.total_samples)
+                if name == 'fc3.weight':
+                    print(avg_update[name])
 
         # Extract baseline model weights
         baseline_weights = self.trainer.extract_weights()
 
         # Load updated weights into model
-        updated_weights = {}
-        for i, (name, weight) in enumerate(baseline_weights.items()):
-            updated_weights[name] = weight + avg_update[i]
+        updated_weights = OrderedDict()
+        for name, weight in baseline_weights.items():
+            updated_weights[name] = weight + avg_update[name]
 
         return updated_weights
 

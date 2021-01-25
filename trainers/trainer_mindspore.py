@@ -4,8 +4,12 @@ The training and testing loop.
 
 import logging
 import os
-import mindspore.nn as nn
+import copy
+import numpy as np
+from collections import OrderedDict
+
 import mindspore
+import mindspore.nn as nn
 from mindspore.train.callback import LossMonitor
 from mindspore.nn.metrics import Accuracy
 from mindspore.nn.loss import SoftmaxCrossEntropyWithLogits
@@ -24,13 +28,22 @@ class Trainer(base.Trainer):
 
         Arguments:
         model: The model to train. Must be a models.base_mindspore.Model subclass.
+        client_id: The ID of the client using this trainer (optional).
         """
         super().__init__(client_id)
         self.model = model
+        self.trainset = None
+        self.testset = None
         self.mindspore_model = None
 
-        mindspore.context.set_context(mode=mindspore.context.GRAPH_MODE,
+        mindspore.context.set_context(mode=mindspore.context.PYNATIVE_MODE,
                                       device_target='GPU')
+
+    def zeros(self, shape):
+        """Returns a MindSpore zero tensor with the given shape."""
+        # This should only be called from a server
+        #assert self.client_id == 0
+        return mindspore.Tensor(np.zeros(shape).astype(np.float32))
 
     def save_model(self):
         """Saving the model to a file."""
@@ -55,11 +68,17 @@ class Trainer(base.Trainer):
 
     def extract_weights(self):
         """Extract weights from the model."""
-        weights = {}
-        for _, param in self.model.parameters_and_names():
-            weights[param.name] = param
+        #weights = {}
+        #for _, param in self.model.parameters_and_names():
+        #    weights[param.name] = param
 
-        return weights
+        #return weights
+        return self.model.parameters_dict()
+
+    def print_weights(self):
+        """Print all the weights from the model."""
+        for _, param in self.model.parameters_and_names():
+            print(f'key = {param.name}, value = {param.asnumpy()}')
 
     def compute_weight_updates(self, weights_received):
         """Extract the weights received from a client and compute the updates."""
@@ -69,24 +88,25 @@ class Trainer(base.Trainer):
         # Calculate updates from the received weights
         updates = []
         for weight in weights_received:
-            update = []
+            update = OrderedDict()
             for name, current_weight in weight.items():
                 baseline = baseline_weights[name]
 
                 # Calculate update
                 delta = current_weight - baseline
-                update.append((name, delta))
+                update[name] = delta
             updates.append(update)
-
         return updates
 
     def load_weights(self, weights):
         """Load the model weights passed in as a parameter."""
-        updated_state_dict = {}
         for name, weight in weights.items():
-            updated_state_dict[name] = weight
-
-        mindspore.load_param_into_net(self.model, updated_state_dict)
+            weights[name] = mindspore.Parameter(weight,
+                                                name=name,
+                                                requires_grad=True)
+        # self.model.init_parameters_data()
+        # mindspore.load_param_into_net(self.model, weights, strict_load=True)
+        self.model.load_parameter_slice(weights)
 
     def train(self, trainset, cut_layer=None):
         """The main training loop in a federated learning workload.
@@ -96,6 +116,10 @@ class Trainer(base.Trainer):
         cut_layer (optional): The layer which training should start from.
         """
         self.start_training()
+
+        # Somehow, mindspore.train will run out of data in the second call
+        # if deepcopy() is not used
+        self.trainset = copy.deepcopy(trainset)
 
         # Initializing the loss criterion
         loss_criterion = SoftmaxCrossEntropyWithLogits(sparse=True,
@@ -112,9 +136,10 @@ class Trainer(base.Trainer):
             optimizer,
             metrics={"Accuracy": Accuracy()})
 
-        self.mindspore_model.train(Config().trainer.epochs,
-                                   trainset,
-                                   callbacks=[LossMonitor()])
+        self.mindspore_model.train(
+            Config().trainer.epochs,
+            self.trainset,
+            callbacks=[LossMonitor(per_print_times=300)])
 
         self.pause_training()
 
@@ -127,7 +152,8 @@ class Trainer(base.Trainer):
         """
         self.start_training()
 
-        accuracy = self.mindspore_model.eval(testset, dataset_sink_mode=False)
+        self.testset = copy.deepcopy(testset)
+        accuracy = self.mindspore_model.eval(self.testset)
 
         self.pause_training()
         return accuracy['Accuracy']

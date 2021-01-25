@@ -4,6 +4,7 @@ The training and testing loops for PyTorch.
 
 import logging
 import os
+from collections import OrderedDict
 import torch
 import torch.nn as nn
 import torch.multiprocessing as mp
@@ -32,6 +33,12 @@ class Trainer(base.Trainer):
             self.model = nn.DataParallel(model)
         else:
             self.model = model
+
+    def zeros(self, shape):
+        """Returns a MindSpore zero tensor with the given shape."""
+        # This should only be called from a server
+        assert self.client_id == 0
+        return torch.zeros(shape)
 
     def save_model(self):
         """Saving the model to a file."""
@@ -84,13 +91,13 @@ class Trainer(base.Trainer):
         # Calculate updates from the received weights
         updates = []
         for weight in weights_received:
-            update = []
+            update = OrderedDict()
             for name, current_weight in weight.items():
                 baseline = baseline_weights[name]
 
                 # Calculate update
                 delta = current_weight - baseline
-                update.append((name, delta))
+                update[name] = delta
             updates.append(update)
 
         return updates
