@@ -105,10 +105,8 @@ class Dataset(base.Dataset):
         dataset = dataset.map(operations=rescale_nml_op, input_columns="image")
         dataset = dataset.map(operations=hwc2chw_op, input_columns="image")
 
-        dataset = dataset.shuffle(buffer_size=10000)
         dataset = dataset.batch(Config().trainer.batch_size,
                                 drop_remainder=True)
-        dataset = dataset.repeat(1)
 
         return dataset
 
@@ -131,6 +129,7 @@ class Dataset(base.Dataset):
     def get_train_partition(self, num_shards, shard_id):
         """Get a trainset partition for distributed machine learning."""
         dataset = ds.MnistDataset(dataset_dir=self.train_path,
+                                  shuffle=False,
                                   num_shards=num_shards,
                                   shard_id=shard_id)
 

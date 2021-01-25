@@ -6,6 +6,7 @@ from mindspore.nn.loss import SoftmaxCrossEntropyWithLogits
 
 from datasets import registry as datasets_registry
 from models import registry as models_registry
+from trainers.trainer_mindspore import Trainer
 from dividers.iid_mindspore import IIDDivider
 from config import Config
 
@@ -27,7 +28,7 @@ def test_net(network, network_model):
 
 
 if __name__ == "__main__":
-    mindspore.context.set_context(mode=mindspore.context.GRAPH_MODE,
+    mindspore.context.set_context(mode=mindspore.context.PYNATIVE_MODE,
                                   device_target='GPU')
 
     # learning rate setting
@@ -35,18 +36,12 @@ if __name__ == "__main__":
     momentum = 0.9
     # define the loss function
     net_loss = SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
-    train_epoch = 10
+    train_epoch = 1
     # create the network
     model_name = Config().trainer.model
     net = models_registry.get(model_name)
     # define the optimizer
     net_opt = nn.Momentum(net.trainable_params(), lr, momentum)
-
-    # group layers into an object with training and evaluation features
-    model = mindspore.Model(net,
-                            net_loss,
-                            net_opt,
-                            metrics={"Accuracy": Accuracy()})
 
     dataset = datasets_registry.get()
     iid = IIDDivider(dataset)
@@ -54,10 +49,44 @@ if __name__ == "__main__":
 
     count = 0
     for item in ds_train.create_dict_iterator(output_numpy=True):
-        print(item['label'])
         count += 1
     print("Got {} batches".format(count))
 
-    model.train(train_epoch, ds_train, callbacks=[LossMonitor()])
+    trainer = Trainer(net)
 
-    test_net(net, model)
+    weights = trainer.extract_weights()
+
+    net2 = models_registry.get(model_name)
+    trainer2 = Trainer(net2)
+    trainer2.load_weights(weights)
+    net2_opt = nn.Momentum(trainer2.model.trainable_params(), lr, momentum)
+
+    # group layers into an object with training and evaluation features
+    model = mindspore.Model(trainer2.model,
+                            net_loss,
+                            net2_opt,
+                            metrics={"Accuracy": Accuracy()})
+
+    # print(weights['conv1.weight'].asnumpy())
+
+    model.train(train_epoch,
+                ds_train,
+                callbacks=[LossMonitor(per_print_times=300)])
+
+    print("Second time")
+    # Second
+    ds2_train = iid.get_partition(partition_size=60000, client_id=1)
+
+    trainer2.load_weights(trainer2.extract_weights())
+    net2_opt = nn.Momentum(trainer2.model.trainable_params(), lr, momentum)
+
+    model = mindspore.Model(trainer2.model,
+                            net_loss,
+                            net2_opt,
+                            metrics={"Accuracy": Accuracy()})
+
+    model.train(train_epoch,
+                ds2_train,
+                callbacks=[LossMonitor(per_print_times=300)])
+
+    test_net(trainer2.model, model)
