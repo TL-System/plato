@@ -27,6 +27,10 @@ class Trainer(base.Trainer):
         """
         super().__init__(client_id)
         self.model = model
+        self.mindspore_model = None
+
+        mindspore.context.set_context(mode=mindspore.context.GRAPH_MODE,
+                                      device_target='GPU')
 
     def save_model(self):
         """Saving the model to a file."""
@@ -66,11 +70,8 @@ class Trainer(base.Trainer):
         updates = []
         for weight in weights_received:
             update = []
-            for i, (name, current_weight) in enumerate(weight):
-                bl_name, baseline = baseline_weights[i]
-
-                # Ensure correct weight is being updated
-                assert name == bl_name
+            for name, current_weight in weight.items():
+                baseline = baseline_weights[name]
 
                 # Calculate update
                 delta = current_weight - baseline
@@ -82,7 +83,7 @@ class Trainer(base.Trainer):
     def load_weights(self, weights):
         """Load the model weights passed in as a parameter."""
         updated_state_dict = {}
-        for name, weight in weights:
+        for name, weight in weights.items():
             updated_state_dict[name] = weight
 
         mindspore.load_param_into_net(self.model, updated_state_dict)
@@ -105,14 +106,15 @@ class Trainer(base.Trainer):
                                 Config().trainer.learning_rate,
                                 Config().trainer.momentum)
 
-        model = mindspore.Model(self.model,
-                                loss_criterion,
-                                optimizer,
-                                metrics={"Accuracy": Accuracy()})
+        self.mindspore_model = mindspore.Model(
+            self.model,
+            loss_criterion,
+            optimizer,
+            metrics={"Accuracy": Accuracy()})
 
-        model.train(Config().trainer.epochs,
-                    trainset,
-                    callbacks=[LossMonitor()])
+        self.mindspore_model.train(Config().trainer.epochs,
+                                   trainset,
+                                   callbacks=[LossMonitor()])
 
         self.pause_training()
 
@@ -125,8 +127,7 @@ class Trainer(base.Trainer):
         """
         self.start_training()
 
-        accuracy = self.model.eval(testset, dataset_sink_mode=False)
-        print(f"Accuracy = {accuracy}")
+        accuracy = self.mindspore_model.eval(testset, dataset_sink_mode=False)
 
         self.pause_training()
-        return accuracy
+        return accuracy['Accuracy']

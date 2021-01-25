@@ -128,6 +128,14 @@ class Dataset(base.Dataset):
         dataset = ds.MnistDataset(dataset_dir=self.train_path)
         return Dataset.transform(dataset)
 
+    def get_train_partition(self, num_shards, shard_id):
+        """Get a trainset partition for distributed machine learning."""
+        dataset = ds.MnistDataset(dataset_dir=self.train_path,
+                                  num_shards=num_shards,
+                                  shard_id=shard_id)
+
+        return Dataset.transform(dataset)
+
     def get_test_set(self):
         dataset = ds.MnistDataset(dataset_dir=self.test_path)
         return Dataset.transform(dataset)

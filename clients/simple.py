@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from models import registry as models_registry
 from datasets import registry as datasets_registry
 from trainers import registry as trainers_registry
-from dividers import iid, biased, sharded
+from dividers import iid, biased, sharded, iid_mindspore
 from utils import dists
 from config import Config
 from clients import Client
@@ -35,6 +35,7 @@ class SimpleClient(Client):
         self.trainset = None  # Training dataset
         self.testset = None  # Testing dataset
         self.trainer = None
+        self.divider = None
 
         self.data_loading_time = None
         self.data_loading_time_sent = False
@@ -64,14 +65,16 @@ class SimpleClient(Client):
                      dataset.num_classes())
 
         # Setting up the data divider
-        assert Config().data.divider in ('iid', 'bias', 'shard')
+        assert Config().data.divider in ('iid', 'bias', 'shard',
+                                         'iid_mindspore')
         logging.info('[Client #%s] Data distribution: %s', self.client_id,
                      Config().data.divider)
 
-        divider = {
+        self.divider = {
             'iid': iid.IIDDivider,
             'bias': biased.BiasedDivider,
-            'shard': sharded.ShardedDivider
+            'shard': sharded.ShardedDivider,
+            'iid_mindspore': iid_mindspore.IIDDivider
         }[Config().data.divider](dataset)
 
         num_clients = Config().clients.total_clients
@@ -87,7 +90,7 @@ class SimpleClient(Client):
             assert partition_size * Config(
             ).clients.per_round <= dataset.num_train_examples()
 
-            self.data = divider.get_partition(partition_size)
+            self.data = self.divider.get_partition(partition_size)
 
         elif Config().data.divider == 'bias':
             assert Config().data.label_distribution in ('uniform', 'normal')
@@ -96,17 +99,23 @@ class SimpleClient(Client):
                 "uniform": dists.uniform,
                 "normal": dists.normal
             }[Config().data.label_distribution](num_clients,
-                                                len(divider.labels))
+                                                len(self.divider.labels))
             random.shuffle(dist)
 
-            pref = random.choices(divider.labels, dist)[0]
+            pref = random.choices(self.divider.labels, dist)[0]
 
             assert Config().data.partition_size
             partition_size = Config().data.partition_size
-            self.data = divider.get_partition(partition_size, pref)
+            self.data = self.divider.get_partition(partition_size, pref)
 
         elif Config().data.divider == 'shard':
-            self.data = divider.get_partition()
+            self.data = self.divider.get_partition()
+
+        elif Config().data.divider == 'iid_mindspore':
+            assert Config().trainer.use_mindspore
+            partition_size = Config().data.partition_size
+            self.data = self.divider.get_partition(partition_size,
+                                                   self.client_id)
 
         # Extract the trainset and testset if local testing is needed
         if Config().clients.do_test:
@@ -147,5 +156,5 @@ class SimpleClient(Client):
             data_loading_time = self.data_loading_time
             self.data_loading_time_sent = True
 
-        return Report(self.client_id, len(self.data), weights, accuracy,
-                      training_time, data_loading_time)
+        return Report(self.client_id, self.divider.trainset_size(), weights,
+                      accuracy, training_time, data_loading_time)

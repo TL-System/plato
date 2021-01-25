@@ -6,6 +6,7 @@ from mindspore.nn.loss import SoftmaxCrossEntropyWithLogits
 
 from datasets import registry as datasets_registry
 from models import registry as models_registry
+from dividers.iid_mindspore import IIDDivider
 from config import Config
 
 
@@ -18,7 +19,7 @@ def test_net(network, network_model):
         param_dict[param.name] = param  # load parameter to the network
     mindspore.load_param_into_net(network, param_dict)
     # load testing dataset
-    dataset = datasets_registry.get()
+    # dataset = datasets_registry.get()
     ds_eval = dataset.get_test_set()
 
     acc = network_model.eval(ds_eval, dataset_sink_mode=False)
@@ -48,10 +49,12 @@ if __name__ == "__main__":
                             metrics={"Accuracy": Accuracy()})
 
     dataset = datasets_registry.get()
-    ds_train = dataset.get_train_set()
+    iid = IIDDivider(dataset)
+    ds_train = iid.get_partition(partition_size=60000, client_id=1)
 
     count = 0
     for item in ds_train.create_dict_iterator(output_numpy=True):
+        print(item['label'])
         count += 1
     print("Got {} batches".format(count))
 
