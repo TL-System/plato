@@ -26,9 +26,4 @@ class IIDDivider:
 
     def trainset_size(self):
         """Return the number of batches in the training data partition."""
-        example_count = 0
-
-        for __ in self.partition.create_dict_iterator(output_numpy=True):
-            example_count += 1
-
-        return example_count
+        return self.partition.get_dataset_size()

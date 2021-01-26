@@ -123,11 +123,7 @@ class FedAvgServer(Server):
 
             for name, delta in update.items():
                 # Use weighted average by the number of samples
-                if name == 'fc3.weight':
-                    print(avg_update[name])
                 avg_update[name] += delta * (num_samples / self.total_samples)
-                if name == 'fc3.weight':
-                    print(avg_update[name])
 
         # Extract baseline model weights
         baseline_weights = self.trainer.extract_weights()
