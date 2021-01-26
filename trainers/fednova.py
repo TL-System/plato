@@ -2,8 +2,8 @@
 This is the fednova trainer, used by both the client and the
 server. Notably, the local iteration is appointed by the client.
 """
-import torch
 import logging
+import torch
 from config import Config
 from trainers import mistnet, optimizers
 

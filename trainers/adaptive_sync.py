@@ -6,9 +6,8 @@ Reference:
 C. Chen, et al. "Communication-Efficient Federated Learning with Adaptive
 Parameter Freezing," found in docs/papers.
 """
-
-import torch
 import logging
+import torch
 
 from models.base import Model
 from trainers import trainer

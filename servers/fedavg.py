@@ -174,7 +174,10 @@ class FedAvgServer(Server):
                 }[item]
                 new_row.append(item_value)
 
-            result_dir = f'./results/{Config().trainer.dataset}/{Config().trainer.model}/{Config().server.type}/'
+            dataset = Config().trainer.dataset
+            model = Config().trainer.model
+            server_type = Config().server.type
+            result_dir = f'./results/{dataset}/{model}/{server_type}/'
             result_csv_file = result_dir + 'result.csv'
 
             csv_processor.write_csv(result_csv_file, new_row)

@@ -39,7 +39,11 @@ class FedAvgCrossSiloServer(FedAvgServer):
 
             if Config().results:
                 self.recorded_items = ['global_round'] + self.recorded_items
-                result_dir = f'./results/{Config().trainer.dataset}/{Config().trainer.model}/{Config().server.type}/'
+
+                dataset = Config().trainer.dataset
+                model = Config().trainer.model
+                server_type = Config().server.type
+                result_dir = f'./results/{dataset}/{model}/{server_type}/'
                 result_csv_file = f'{result_dir}result_{Config().args.id}.csv'
                 csv_processor.initialize_csv(result_csv_file,
                                              self.recorded_items, result_dir)
@@ -64,21 +68,10 @@ class FedAvgCrossSiloServer(FedAvgServer):
                          Config().server.type)
             logging.info("Training with %s local aggregation rounds.",
                          Config().cross_silo.rounds)
+            self.load_model()
 
         else:
-            logging.info("Configuring the %s server.", Config().server.type)
-
-            total_rounds = Config().trainer.rounds
-            target_accuracy = Config().trainer.target_accuracy
-
-            if target_accuracy:
-                logging.info("Training: %s rounds or %s%% accuracy\n",
-                             total_rounds, 100 * target_accuracy)
-            else:
-                logging.info("Training: %s rounds\n", total_rounds)
-
-        self.load_test_data()
-        self.load_model()
+            super().configure()
 
     async def customize_server_response(self, server_response):
         """Wrap up generating the server response with any additional information."""
@@ -91,7 +84,10 @@ class FedAvgCrossSiloServer(FedAvgServer):
         """Wrap up processing the reports with any additional work."""
         if Config().results:
             # Write results into a CSV file
-            result_dir = f'./results/{Config().trainer.dataset}/{Config().trainer.model}/{Config().server.type}/'
+            dataset = Config().trainer.dataset
+            model = Config().trainer.model
+            server_type = Config().server.type
+            result_dir = f'./results/{dataset}/{model}/{server_type}/'
 
             new_row = []
             for item in self.recorded_items:

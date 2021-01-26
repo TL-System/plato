@@ -193,7 +193,7 @@ class Trainer(base.Trainer):
 
     @staticmethod
     def test_process(rank, self, testset, cut_layer):  # pylint: disable=unused-argument
-        """The testing loop, run in a separate process with a new CUDA context, 
+        """The testing loop, run in a separate process with a new CUDA context,
         so that CUDA memory can be released after the training completes.
 
         Arguments:
