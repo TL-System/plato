@@ -1,12 +1,7 @@
 """
 A simple federated learning server using federated averaging.
 """
-
-import logging
-import os
-
 from servers import FedAvgServer
-from config import Config
 
 
 class AdaptiveSyncServer(FedAvgServer):

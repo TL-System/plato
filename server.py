@@ -10,7 +10,6 @@ import websockets
 
 from config import Config
 import servers
-from servers import fednova
 
 
 def main():
