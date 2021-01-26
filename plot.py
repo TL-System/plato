@@ -75,7 +75,10 @@ def main():
     __ = Config()
 
     if Config().results:
-        result_dir = f'./results/{Config().trainer.dataset}/{Config().trainer.model}/{Config().server.type}/'
+        dataset = Config().trainer.dataset
+        model = Config().trainer.model
+        server_type = Config().server.type
+        result_dir = f'./results/{dataset}/{model}/{server_type}/'
         result_csv_file = result_dir + 'result.csv'
         print(f"Plotting results located at {result_csv_file}.")
         plot_figures_from_dict(result_csv_file, result_dir)
