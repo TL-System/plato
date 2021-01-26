@@ -64,7 +64,10 @@ class FedRLServer(FLServer):
                 'episode', 'cumulative_reward', 'rl_training_time'
             ]
             # Directory of results (figures etc.)
-            result_dir = f'./results/{Config().trainer.dataset}/{Config().trainer.model}/{Config().server.type}/'
+            dataset = Config().trainer.dataset
+            model = Config().trainer.model
+            server_type = Config().server.type
+            result_dir = f'./results/{dataset}/{model}/{server_type}/'
             result_csv_file = result_dir + 'result_rl.csv'
             csv_processor.initialize_csv(result_csv_file,
                                          self.rl_recorded_items, result_dir)
@@ -187,6 +190,10 @@ class FedRLServer(FLServer):
 
     async def wrap_up_an_episode(self):
         """Wrapping up when one RL episode (the FL training) is done."""
+        dataset = Config().trainer.dataset
+        model = Config().trainer.model
+        server_type = Config().server.type
+
         if Config().results:
             new_row = []
             for item in self.rl_recorded_items:
@@ -198,16 +205,17 @@ class FedRLServer(FLServer):
                 }[item]
                 new_row.append(item_value)
 
-            result_dir = f'./results/{Config().trainer.dataset}/{Config().trainer.model}/{Config().server.type}/'
+            result_dir = f'./results/{dataset}/{model}/{server_type}/'
             result_csv_file = result_dir + 'result_rl.csv'
             csv_processor.write_csv(result_csv_file, new_row)
         self.wrapped_previous_episode.set()
 
         if self.rl_episode >= Config().rl.episodes:
             if Config().results:
-                # Delete the csv file created when edge servers called super().__init__() as it is useless
+                # Deleting the csv file created when edge servers called
+                # super().__init__() as it is useless
                 os.remove(
-                    f'./results/{Config().trainer.dataset}/{Config().trainer.model}/{Config().rl.fl_server}/result.csv'
+                    f'./results/{dataset}/{model}/{Config().rl.fl_server}/result.csv'
                 )
 
             logging.info(

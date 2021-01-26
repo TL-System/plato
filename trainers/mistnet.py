@@ -68,5 +68,5 @@ class Trainer(trainer.Trainer):
     def train(self, trainset, cut_layer=None):
         super().train(FeatureDataset(trainset), cut_layer)
 
-    def test(self, testset, batch_size, cut_layer=None):
-        super().test(FeatureDataset(testset), batch_size, cut_layer)
+    def test(self, testset, cut_layer=None):
+        super().test(FeatureDataset(testset), cut_layer)

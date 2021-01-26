@@ -8,8 +8,8 @@ Parameter Freezing," found in docs/papers.
 """
 
 import copy
-import torch
 import logging
+import torch
 
 from models.base import Model
 from trainers import trainer

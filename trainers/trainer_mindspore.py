@@ -4,8 +4,8 @@ The training and testing loop.
 
 import logging
 import os
-import numpy as np
 from collections import OrderedDict
+import numpy as np
 
 import mindspore
 import mindspore.nn as nn
@@ -55,7 +55,7 @@ class Trainer(base.Trainer):
         """Returns a MindSpore zero tensor with the given shape."""
         # This should only be called from a server
         assert self.client_id == 0
-        return mindspore.Tensor(np.zeros(shape).astype(np.float32))
+        return mindspore.Tensor(np.zeros(shape), mindspore.float32)
 
     def save_model(self):
         """Saving the model to a file."""

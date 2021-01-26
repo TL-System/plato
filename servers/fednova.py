@@ -1,7 +1,10 @@
 """
 A federated learning server using FedNova.
-This is the reimplementation of the following paper:
-"Tackling the Objective Inconsistency Problem in Heterogeneous Federated Optimization" (https://arxiv.org/pdf/2007.07481.pdf)
+
+Reference:
+
+Wang et al., "Tackling the Objective Inconsistency Problem in Heterogeneous Federated
+Optimization" (https://arxiv.org/pdf/2007.07481.pdf)
 """
 import torch
 from servers import FedAvgServer
