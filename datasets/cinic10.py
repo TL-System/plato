@@ -26,17 +26,7 @@ class Dataset(base.Dataset):
                 print('Downloading the CINIC-10 dataset. This takes a while.')
 
                 url = 'https://datashare.is.ed.ac.uk/bitstream/handle/10283/3192/CINIC-10.tar.gz'
-
-                # Disable SSL verification
-                requests.get(url,
-                             self.cinic_directory + '.tar.gz',
-                             verify=False)
-                print('Done!')
-            print('Extracting CINIC-10 dataset. Please wait...')
-            tar = tarfile.open(self.cinic_directory + '.tar.gz')
-            tar.extractall(path=self.cinic_directory)
-            tar.close()
-            print('Done!')
+                Dataset.download(url)
 
         self._transform = transforms.Compose([
             transforms.ToTensor(),
