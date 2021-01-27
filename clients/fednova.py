@@ -5,7 +5,8 @@ Notably, MistNet is applied here.
 
 import logging
 import time
-import numpy as np
+import random
+
 from dataclasses import dataclass
 from models import registry as models_registry
 from config import Config
@@ -14,18 +15,19 @@ from trainers import fednova
 
 
 @dataclass
-class ReportFednova(simple.Report):
+class Report(simple.Report):
     """Client report containing the local iteration sent to the federated learning server."""
-    iteration: list
+    epochs: list
 
 
 class FedNovaClient(simple.SimpleClient):
     """A fednova federated learning client who sends weight updates and local iterations."""
     def __init__(self):
         super().__init__()
-        self.iteration = None
+        self.epochs = None
         self.pattern = None
         self.max_local_iter = None
+        random.seed(3000 + int(self.client_id))
 
     def configure(self):
         """Prepare this client for training."""
@@ -34,20 +36,20 @@ class FedNovaClient(simple.SimpleClient):
         # seperate models with trainers
         self.trainer = fednova.Trainer(
             self.model)  #trainers_registry.get(self.model)
-        self.pattern = Config().clients.pattern
-        self.max_local_iter = Config().clients.max_local_iter
 
     async def train(self):
         """The machine learning training workload on a client."""
         training_start_time = time.time()
 
         # generate local iteration randomly
-        self.iteration = self.update_local_iteration(self.pattern)
-        logging.info('[Client #%s] Training %d epoches.', self.iteration,
+        epochs = FedNovaClient.update_local_epochs()
+
+        logging.info('[Client #%s] Training with %d epoches.', self.epochs,
                      self.client_id)
 
-        # Perform model training for specific epoches
-        self.trainer.train(self.trainset, iteration=self.iteration)
+        # Perform model training for a specific number of epoches
+        Config().trainer = Config().trainer._replace(epochs=epochs)
+        self.trainer.train(self.trainset)
 
         # Extract model weights and biases
         weights = self.trainer.extract_weights()
@@ -64,15 +66,15 @@ class FedNovaClient(simple.SimpleClient):
             data_loading_time = self.data_loading_time
             self.data_loading_time_sent = True
 
-        return ReportFednova(self.client_id, len(self.data), weights, accuracy,
-                             training_time, data_loading_time, self.iteration)
+        return Report(self.client_id, len(self.data), weights, accuracy,
+                      training_time, data_loading_time, self.epochs)
 
-    def update_local_iteration(self, pattern):
-        """ update local epoch for each client"""
-        if pattern == "constant":
-            return self.max_local_iter
+    @classmethod
+    def update_local_epochs():
+        """ update the local epochs for each client."""
+        max_local_epochs = Config().clients.max_local_epochs
+        if Config().clients.pattern == "constant":
+            return max_local_epochs
 
-        if pattern == "uniform_random":
-            np.random.seed(2020 + int(self.client_id))
-            return np.random.randint(low=2, high=self.max_local_iter,
-                                     size=1)[0]
+        if Config().clients.pattern == "uniform_random":
+            return random.randint(2, max_local_epochs)

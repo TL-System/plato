@@ -106,10 +106,10 @@ class FedAvgServer(Server):
 
     def federated_averaging(self, reports):
         """Aggregate weight updates from the clients using federated averaging."""
-        # Extract updates from reports
+        # Extract updates from the reports
         updates = self.extract_client_updates(reports)
 
-        # Extract total number of samples
+        # Extract the total number of samples
         self.total_samples = sum([report.num_samples for report in reports])
 
         # Perform weighted averaging
