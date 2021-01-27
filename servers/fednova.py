@@ -6,57 +6,52 @@ Reference:
 Wang et al., "Tackling the Objective Inconsistency Problem in Heterogeneous Federated
 Optimization" (https://arxiv.org/pdf/2007.07481.pdf)
 """
-import torch
+from collections import OrderedDict
+
 from servers import FedAvgServer
 
 
 class FedNovaServer(FedAvgServer):
-    """Federated learning server using FedNova"""
+    """A federated learning server using the FedNova algorithm. """
     def federated_averaging(self, reports):
         """Aggregate weight updates from the clients using FedNova."""
-        # Extract updates from reports
+        # Extracting updates from the reports
         updates = self.extract_client_updates(reports)
 
-        # Extract total number of samples
+        # Extracting the total number of samples
         self.total_samples = sum([report.num_samples for report in reports])
 
-        # Extract local iteration tau_i from reports
-        tau = self.extract_client_local_iteration(reports)
+        # Extracting the number of local epoches, tau_i, from the reports
+        local_epochs = [report.epochs for report in reports]
 
-        # Perform weighted averaging
-        avg_update = [torch.zeros(x.size()) for __, x in updates[0]]
+        # Performing weighted averaging
+        avg_update = avg_update = {
+            name: self.trainer.zeros(weights.shape)
+            for name, weights in updates[0].items()
+        }
 
-        # compute tau_eff
-        tau_eff = []
+        tau_effs = []
+
         for i, update in enumerate(updates):
             num_samples = reports[i].num_samples
-            tau_eff_temp = 0
+            tau_eff = local_epochs[i] * num_samples / self.total_samples
 
-            for j, (___, delta) in enumerate(update):
-                tau_eff_temp += tau[i] * num_samples / self.total_samples
+            tau_effs.append(tau_eff)
 
-            tau_eff.append(tau_eff_temp)
-
-        # average and rescale updates with fednova
         for i, update in enumerate(updates):
             num_samples = reports[i].num_samples
 
-            for j, (__, delta) in enumerate(update):
-                avg_update[j] += delta * (
-                    num_samples / self.total_samples) * tau_eff[i] / tau[i]
+            for name, delta in update.items():
+                # Use weighted average by the number of samples
+                avg_update[name] += delta * (num_samples / self.total_samples
+                                             ) * tau_effs[i] / local_epochs[i]
 
         # Extract baseline model weights
         baseline_weights = self.trainer.extract_weights()
 
         # Load updated weights into model
-        updated_weights = []
-        for i, (name, weight) in enumerate(baseline_weights):
-            updated_weights.append((name, weight + avg_update[i]))
+        updated_weights = OrderedDict()
+        for name, weight in baseline_weights.items():
+            updated_weights[name] = weight + avg_update[name]
 
         return updated_weights
-
-    def extract_client_local_iteration(self, reports):
-        """Extract the model weight updates from a client's report."""
-        # Extract local iteration from reports
-        local_iteration_received = [report.iteration for report in reports]
-        return local_iteration_received
