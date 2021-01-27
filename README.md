@@ -87,7 +87,9 @@ It goes without saying that `/absolute/path/to/project/home/directory` should be
 
 ### Installing Plato with MindSpore
 
-Though we provided a `Dockerfile` for building a Docker container that supports MindSpore 1.1, it may still be necessary to install Plato with MindSpore in a GPU server running Ubuntu Linux 18.04 (which MindSpore requires). Similar to a PyTorch installation, we need to first create a new environment with Python 3.7.5 (which MindSpore 1.1 requires), and then install the required packages:
+Most of the codebase in **Plato** is designed to be framework-agnostic, so that it is relatively straightfoward to use **Plato** with a variety of deep learning frameworks beyond PyTorch, which is the default framwork it is using. One example of such deep learning frameworks is [MindSpore](https://www.mindspore.cn).
+
+Though we provided a `Dockerfile` in `docker/` for building a Docker container that supports MindSpore 1.1, it may still be necessary to install Plato with MindSpore in a GPU server running Ubuntu Linux 18.04 (which MindSpore requires). Similar to a PyTorch installation, we need to first create a new environment with Python 3.7.5 (which MindSpore 1.1 requires), and then install the required packages:
 
 ```shell
 conda create -n mindspore python=3.7.5
@@ -128,8 +130,7 @@ check libcudnn
 
 To check if MindSpore is correctly installed on the GPU server, try to `import mindspore` with a Python interpreter.
 
-Finally, to use trainers and servers based on MindSpore, assign `True` to `use_mindspore` in the `trainer` section of the 
-configuration file. Its default value is `False`, and Plato would use PyTorch as its default framework.
+Finally, to use trainers and servers based on MindSpore, assign `True` to `use_mindspore` in the `trainer` section of the configuration file. Its default value is `False`, and Plato would use PyTorch as its default framework.
 
 ### Running Plato
 
