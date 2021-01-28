@@ -11,7 +11,7 @@ import subprocess
 import pickle
 import websockets
 
-from config import Config, Params
+from config import Config
 
 
 class Server:
@@ -51,7 +51,7 @@ class Server:
         for client_id in range(starting_id, total_processes + starting_id):
             logging.info("Starting client #%s.", client_id)
             command = "python client.py -i {}".format(client_id)
-            command += " -c {}".format(Params.args.config)
+            command += " -c {}".format(Config().args.config)
 
             if as_server:
                 command += " -p {}".format(Config().server.port + client_id)
@@ -130,7 +130,7 @@ class Server:
 
     async def wrap_up(self):
         """Wrapping up when each round of training is done."""
-        if not Params.is_edge_server():
+        if not Config().is_edge_server():
             # Break the loop when the target accuracy is achieved
             target_accuracy = Config().trainer.target_accuracy
 

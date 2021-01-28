@@ -12,7 +12,7 @@ import torch.multiprocessing as mp
 import numpy as np
 
 from models.base import Model
-from config import Config, Params
+from config import Config
 from trainers import base, optimizers
 
 
@@ -27,7 +27,7 @@ class Trainer(base.Trainer):
         super().__init__(client_id)
 
         # Use data parallelism if multiple GPUs are available and the configuration specifies it
-        if Params.is_parallel():
+        if Config().is_parallel():
             logging.info("Using Data Parallelism.")
             # DataParallel will divide and allocate batch_size to all available GPUs
             self.model = nn.DataParallel(model)

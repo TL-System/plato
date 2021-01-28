@@ -10,13 +10,13 @@ import pickle
 from abc import abstractmethod
 import websockets
 
-from config import Config, Params
+from config import Config
 
 
 class Client:
     """A basic federated learning client."""
     def __init__(self):
-        self.client_id = Params.args.id
+        self.client_id = Config().args.id
         self.model = None  # Machine learning model
         self.data_loaded = False  # is training data already loaded from the disk?
 
@@ -26,7 +26,7 @@ class Client:
         """Startup function for a client."""
 
         if hasattr(Config().algorithm,
-                   'cross_silo') and not Params.is_edge_server():
+                   'cross_silo') and not Config().is_edge_server():
             # Contact one of the edge servers
             logging.info("[Client #%s] Contacting one of the edge servers.",
                          self.client_id)
@@ -73,7 +73,7 @@ class Client:
 
                         report = await self.train()
 
-                        if Params.is_edge_server():
+                        if Config().is_edge_server():
                             logging.info(
                                 "[Server #%d] Model aggregated on edge server (client #%s).",
                                 os.getpid(), self.client_id)

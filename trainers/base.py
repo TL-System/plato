@@ -5,13 +5,13 @@ Base class for trainers.
 from abc import ABC, abstractmethod
 import time
 import os
-from config import Config, Params
+from config import Config
 
 
 class Trainer(ABC):
     """Base class for all the trainers."""
     def __init__(self, client_id):
-        self.device = Params.device()
+        self.device = Config().device()
         self.client_id = client_id
         """Initialize a global counter of running trainers."""
         if not os.path.exists('./running_trainers'):
