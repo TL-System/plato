@@ -13,7 +13,7 @@ registered_models = [
     vgg.Model,
 ]
 
-if Config().trainer.use_mindspore:
+if hasattr(Config().trainer, 'use_mindspore'):
     from models import lenet5_mindspore
     registered_models += [lenet5_mindspore.Model]
 

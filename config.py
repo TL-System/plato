@@ -4,10 +4,12 @@ to work on than JSON).
 """
 
 import logging
-from collections import namedtuple
-import configparser
+from dataclasses import dataclass
+from collections import namedtuple, OrderedDict
+
 import argparse
 import torch
+import yaml
 
 
 class Config:
@@ -17,7 +19,6 @@ class Config:
     """
 
     _instance = None
-    config = configparser.ConfigParser()
 
     def __new__(cls):
         if cls._instance is None:
@@ -33,7 +34,7 @@ class Config:
             parser.add_argument('-c',
                                 '--config',
                                 type=str,
-                                default='./config.conf',
+                                default='./config.yml',
                                 help='Federated learning configuration file.')
             parser.add_argument('-l',
                                 '--log',
@@ -41,7 +42,7 @@ class Config:
                                 default='info',
                                 help='Log messages level.')
 
-            Config.args = parser.parse_args()
+            args = parser.parse_args()
 
             try:
                 log_level = {
@@ -50,7 +51,7 @@ class Config:
                     'warn': logging.WARN,
                     'info': logging.INFO,
                     'debug': logging.DEBUG
-                }[Config.args.log]
+                }[args.log]
             except KeyError:
                 log_level = logging.INFO
 
@@ -60,19 +61,53 @@ class Config:
                 datefmt='%H:%M:%S')
 
             cls._instance = super(Config, cls).__new__(cls)
-            cls.config.read(Config.args.config)
-            cls.extract()
+
+            with open(args.config, 'r') as config_file:
+                config = yaml.load(config_file, Loader=yaml.FullLoader)
+
+            cls._instance = Config.namedtuple_from_dict(config)
+            Params.args = args
+
         return cls._instance
+
+    @staticmethod
+    def namedtuple_from_dict(obj):
+        """Creates a named tuple from a dictionary."""
+        if isinstance(obj, dict):
+            fields = sorted(obj.keys())
+            namedtuple_type = namedtuple(
+                typename='GenericObject',
+                field_names=fields,
+                rename=True,
+            )
+            field_value_pairs = OrderedDict(
+                (str(field), Config.namedtuple_from_dict(obj[field]))
+                for field in fields)
+            try:
+                return namedtuple_type(**field_value_pairs)
+            except TypeError:
+                # Cannot create namedtuple instance so fallback to dict (invalid attribute names)
+                return dict(**field_value_pairs)
+        elif isinstance(obj, (list, set, tuple, frozenset)):
+            return [Config.namedtuple_from_dict(item) for item in obj]
+        else:
+            return obj
+
+
+@dataclass
+class Params:
+    args: argparse.Namespace
 
     @staticmethod
     def is_edge_server():
         """Returns whether the current instance is an edge server in cross-silo FL."""
-        return Config.args.port is not None
+        return Params.args.port is not None
 
     @staticmethod
     def is_central_server():
         """Returns whether the current instance is a central server in cross-silo FL."""
-        return Config.cross_silo is not None and Config.args.port is None
+        return hasattr(Config().algorithm,
+                       'cross_silo') and Params.args.port is None
 
     @staticmethod
     def device():
@@ -87,112 +122,6 @@ class Config:
     @staticmethod
     def is_parallel():
         """Check if the hardware and OS support data parallelism."""
-        return Config.trainer.parallelized and torch.cuda.is_available(
+        return Config().trainer.parallelized and torch.cuda.is_available(
         ) and torch.distributed.is_available(
         ) and torch.cuda.device_count() > 1
-
-    @staticmethod
-    def extract_section(section, fields, defaults, optional=False):
-        """Extract the parameters from one section in a configuration file."""
-        params = []
-
-        if optional and section not in Config.config:
-            return None
-
-        for i, field in enumerate(fields):
-            if isinstance(defaults[i], bool):
-                params.append(Config.config[section].getboolean(
-                    field, defaults[i]))
-            elif isinstance(defaults[i], int):
-                params.append(Config.config[section].getint(
-                    field, defaults[i]))
-            elif isinstance(defaults[i], float):
-                params.append(Config.config[section].getfloat(
-                    field, defaults[i]))
-            else:  # assuming that the parameter is a string
-                params.append(Config.config[section].get(field, defaults[i]))
-
-        return params
-
-    @staticmethod
-    def extract():
-        """Extract the parameters from a configuration file."""
-
-        # Parameters for the federated learning clients
-        fields = [
-            'type', 'total_clients', 'per_round', 'do_test',
-            'max_local_epochs', 'pattern'
-        ]
-        defaults = ('simple', 0, 0, False, 10, 'constant')
-        params = Config.extract_section('clients', fields, defaults)
-        Config.clients = namedtuple('clients', fields)(*params)
-
-        assert Config.clients.per_round <= Config.clients.total_clients
-
-        # Parameters for the data distribution
-        fields = [
-            'partition_size', 'divider', 'label_distribution',
-            'bias_primary_percentage', 'bias_secondary_focus',
-            'shard_per_client'
-        ]
-        defaults = (1, 'iid', 'uniform', 0.8, False, 2)
-        params = Config.extract_section('data', fields, defaults)
-        Config.data = namedtuple('data', fields)(*params)
-
-        # Training parameters for federated learning
-        fields = [
-            'type', 'use_mindspore', 'rounds', 'max_concurrency',
-            'parallelized', 'target_accuracy', 'epochs', 'batch_size',
-            'dataset', 'data_path', 'model', 'optimizer', 'lr_schedule',
-            'learning_rate', 'weight_decay', 'momentum', 'num_layers',
-            'num_classes', 'cut_layer', 'epsilon', 'lr_gamma',
-            'lr_milestone_steps', 'lr_warmup_steps', 'moving_average_alpha',
-            'stability_threshold', 'tight_threshold', 'random_freezing',
-            'initial_sync_frequency'
-        ]
-        defaults = ('basic', False, 0, 2, False, 0.9, 0, 128, 'MNIST',
-                    './data', 'lenet5', 'SGD', 'CosineAnnealingLR', 0.01, 0.0,
-                    0.9, 40, 10, '', 1.0, 0.0, '', '', 0.99, 0.05, 0.8, True,
-                    100)
-        params = Config.extract_section('trainer', fields, defaults)
-
-        Config.trainer = namedtuple('trainer', fields)(*params)
-
-        # Parameters for the federated learning server
-        fields = ['type', 'address', 'port']
-        defaults = ('fedavg', 'localhost', 8000)
-        params = Config.extract_section('server', fields, defaults)
-        Config.server = namedtuple('server', fields)(*params)
-
-        # If the topology is hierarchical (cross-silo FL training)
-        fields = ['total_silos', 'rounds']
-        defaults = (1, 1)
-        params = Config.extract_section('cross_silo',
-                                        fields,
-                                        defaults,
-                                        optional=True)
-        if params is not None:
-            assert Config.server.type == 'fedavg_cross_silo' or Config.server.type == 'fedrl'
-            Config.cross_silo = namedtuple('cross_silo', fields)(*params)
-        else:
-            Config.cross_silo = None
-
-        fields = ['fl_server', 'episodes', 'target_reward']
-        defaults = ('fedavg', 0, None)
-        params = Config.extract_section('rl', fields, defaults, optional=True)
-        if params is not None:
-            Config.rl = namedtuple('rl', fields)(*params)
-            assert Config.server.type == 'fedrl'
-        else:
-            Config.rl = None
-
-        fields = ['types', 'plot']
-        defaults = (None, None)
-        params = Config.extract_section('results',
-                                        fields,
-                                        defaults,
-                                        optional=True)
-        if params is not None:
-            Config.results = namedtuple('results', fields)(*params)
-        else:
-            Config.results = None

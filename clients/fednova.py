@@ -8,10 +8,10 @@ import time
 import random
 
 from dataclasses import dataclass
+from trainers import registry as trainers_registry
 from models import registry as models_registry
 from config import Config
 from clients import simple
-from trainers import fednova
 
 
 @dataclass
@@ -34,8 +34,7 @@ class FedNovaClient(simple.SimpleClient):
         model_name = Config().trainer.model
         self.model = models_registry.get(model_name)
         # seperate models with trainers
-        self.trainer = fednova.Trainer(
-            self.model)  #trainers_registry.get(self.model)
+        self.trainer = trainers_registry.get(self.model)
 
     async def train(self):
         """The machine learning training workload on a client."""

@@ -20,7 +20,7 @@ class Trainer(trainer.Trainer):
     """
     def __init__(self, model: Model):
         super().__init__(model)
-        self.sync_frequency = Config().trainer.initial_sync_frequency
+        self.sync_frequency = Config().algorithm.initial_sync_frequency
 
         self.average_positive_deltas = {
             name: torch.zeros(param.data.shape)
@@ -65,7 +65,7 @@ class Trainer(trainer.Trainer):
 
     def moving_average(self, previous_value, new_value):
         """Compute the exponential moving average."""
-        alpha = Config().trainer.moving_average_alpha
+        alpha = Config().algorithm.moving_average_alpha
         return previous_value * alpha + new_value * (1 - alpha)
 
     def update_sync_frequency(self, previous_weights, weights_received):

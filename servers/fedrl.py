@@ -16,14 +16,14 @@ import servers
 from utils import csv_processor
 
 FLServer = FedAvgCrossSiloServer
-if Config().rl:
+if hasattr(Config().algorithm, 'rl'):
     from stable_baselines3.common.env_checker import check_env
     from rl_envs import FLEnv
 
     # The central server of FL
     FLServer = {
         "fedavg_cross_silo": servers.fedavg_cs.FedAvgCrossSiloServer
-    }[Config().rl.fl_server]
+    }[Config().algorithm.rl.fl_server]
 
 
 class FedRLServer(FLServer):
@@ -59,14 +59,14 @@ class FedRLServer(FLServer):
         self.wrapped_previous_episode = asyncio.Event()
         self.wrapped_previous_episode.set()
 
-        if Config().results:
+        if hasattr(Config(), 'results'):
             self.rl_recorded_items = [
                 'episode', 'cumulative_reward', 'rl_training_time'
             ]
             # Directory of results (figures etc.)
-            dataset = Config().trainer.dataset
+            dataset = Config().data.dataset
             model = Config().trainer.model
-            server_type = Config().server.type
+            server_type = Config().algorithm.type
             result_dir = f'./results/{dataset}/{model}/{server_type}/'
             result_csv_file = result_dir + 'result_rl.csv'
             csv_processor.initialize_csv(result_csv_file,
@@ -77,13 +77,13 @@ class FedRLServer(FLServer):
         Booting the RL agent and the FL server
         """
         logging.info('Configuring a RL agent and a %s server...',
-                     Config().rl.fl_server)
+                     Config().algorithm.rl.fl_server)
         logging.info(
             "This RL agent will tune the number of aggregations on edge servers."
         )
 
-        total_episodes = Config().rl.episodes
-        target_reward = Config().rl.target_reward
+        total_episodes = Config().algorithm.rl.episodes
+        target_reward = Config().algorithm.rl.target_reward
 
         if target_reward:
             logging.info('RL Training: %s episodes or %s%% reward\n',
@@ -161,7 +161,7 @@ class FedRLServer(FLServer):
         if not self.generated_server_response:
             await self.update_rl_tuned_parameter()
             self.generated_server_response = True
-        server_response['fedrl'] = Config().cross_silo.rounds
+        server_response['fedrl'] = Config().algorithm.cross_silo.rounds
         server_response['current_global_round'] = self.current_round
         print("CURRENT GLOBAL ROUND", self.current_round)
         return server_response
@@ -174,7 +174,7 @@ class FedRLServer(FLServer):
         await self.rl_tuned_para_got.wait()
         self.rl_tuned_para_got.clear()
 
-        Config().cross_silo = Config().cross_silo._replace(
+        Config().algorithm.cross_silo = Config().algorithm.cross_silo._replace(
             rounds=self.rl_tuned_para_value)
 
     def get_tuned_para(self, rl_tuned_para_value, time_step):
@@ -190,11 +190,11 @@ class FedRLServer(FLServer):
 
     async def wrap_up_an_episode(self):
         """Wrapping up when one RL episode (the FL training) is done."""
-        dataset = Config().trainer.dataset
+        dataset = Config().data.dataset
         model = Config().trainer.model
-        server_type = Config().server.type
+        server_type = Config().algorithm.type
 
-        if Config().results:
+        if hasattr(Config(), 'results'):
             new_row = []
             for item in self.rl_recorded_items:
                 item_value = {
@@ -210,12 +210,12 @@ class FedRLServer(FLServer):
             csv_processor.write_csv(result_csv_file, new_row)
         self.wrapped_previous_episode.set()
 
-        if self.rl_episode >= Config().rl.episodes:
-            if Config().results:
+        if self.rl_episode >= Config().algorithm.rl.episodes:
+            if hasattr(Config(), 'results'):
                 # Deleting the csv file created when edge servers called
                 # super().__init__() as it is useless
                 os.remove(
-                    f'./results/{dataset}/{model}/{Config().rl.fl_server}/result.csv'
+                    f'./results/{dataset}/{model}/{Config().algorithm.rl.fl_server}/result.csv'
                 )
 
             logging.info(
@@ -242,7 +242,7 @@ class FedRLServer(FLServer):
         """Quickly try a random agent on the environment."""
         # pylint: disable=unused-variable
         obs = env.reset()
-        episodes = Config().rl.episodes
+        episodes = Config().algorithm.rl.episodes
         n_steps = Config().trainer.rounds
 
         for i in range(episodes):
