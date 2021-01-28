@@ -9,6 +9,7 @@ import numpy as np
 from models.base import Model
 from config import Config
 from utils.step import Step
+from trainers import fedprox_optimizer
 
 
 def get_optimizer(model: Model) -> optim.Optimizer:
@@ -22,7 +23,12 @@ def get_optimizer(model: Model) -> optim.Optimizer:
         return optim.Adam(model.parameters(),
                           lr=Config().trainer.learning_rate,
                           weight_decay=Config().trainer.weight_decay)
-
+    elif Config().trainer.optimizer == 'FedProx':
+        return fedprox_optimizer.FedProxOptim(
+            model.parameters(),
+            lr=Config().trainer.learning_rate,
+            momentum=Config().trainer.momentum,
+            weight_decay=Config().trainer.weight_decay)
     raise ValueError('No such optimizer: {}'.format(
         Config().trainer.optimizer))
 
