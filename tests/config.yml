@@ -1,0 +1,18 @@
+clients:
+    total_clients: 1
+    per_round: 1
+    do_test: true
+
+data:
+    dataset: MNIST
+    data_path: ./data
+    divider: iid
+    partition_size: 2000
+
+trainer:
+    type: basic
+    model: lenet5
+
+server:
+
+algorithm:

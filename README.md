@@ -137,10 +137,8 @@ Finally, to use trainers and servers based on MindSpore, assign `True` to `use_m
 To start a federated learning training workload, run [`server.py`](server.py) from the repository's root directory. For example:
 
 ```shell
-cp configs/MNIST/mnist.yml config.yml
-python server.py
-  --config=config.yml
-  --log=info
+cp configs/MNIST/fedavg_lenet5.yml config.yml
+python server.py --config=config.yml --log=info
 ```
 
 * `--config` (`-c`): the path to the configuration file to be used. The default is `config.yml` in the project's home directory.

@@ -20,6 +20,7 @@ class ClientTest(unittest.TestCase):
         self.client = SimpleClient()
         self.client.configure()
         self.client.load_data()
+        self.test_training()
 
     def test_training(self):
         print("Testing training on the client.")
