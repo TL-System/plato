@@ -15,7 +15,7 @@ import yaml
 class Config:
     """
     Retrieving configuration parameters by parsing a configuration file
-    using the standard Python config parser.
+    using the YAML configuration file parser.
     """
 
     _instance = None
@@ -96,6 +96,10 @@ class Config:
 
 @dataclass
 class Params:
+    """
+    Auxilliary configuration settings from the command-line arguments, along with several
+    handy utility functions.
+    """
     args: argparse.Namespace
 
     @staticmethod
