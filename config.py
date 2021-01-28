@@ -71,6 +71,9 @@ class Config:
             Config.algorithm = Config.namedtuple_from_dict(config['algorithm'])
             Config.args = args
 
+            if 'results' in config:
+                Config.results = Config.namedtuple_from_dict(config['results'])
+
         return cls._instance
 
     @staticmethod
