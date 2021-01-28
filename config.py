@@ -118,6 +118,7 @@ class Config:
     @staticmethod
     def is_parallel():
         """Check if the hardware and OS support data parallelism."""
-        return Config().trainer.parallelized and torch.cuda.is_available(
+        return hasattr(Config().trainer, 'parallelized') and Config(
+        ).trainer.parallelized and torch.cuda.is_available(
         ) and torch.distributed.is_available(
         ) and torch.cuda.device_count() > 1

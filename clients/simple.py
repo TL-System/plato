@@ -152,6 +152,7 @@ class SimpleClient(Client):
 
         training_time = time.time() - training_start_time
         data_loading_time = 0
+
         if not self.data_loading_time_sent:
             data_loading_time = self.data_loading_time
             self.data_loading_time_sent = True

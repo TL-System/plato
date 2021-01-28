@@ -33,8 +33,9 @@ def get_optimizer(model: Model) -> optim.Optimizer:
         Config().trainer.optimizer))
 
 
-def get_lr_schedule(optimizer: optim.Optimizer, iterations_per_epoch: int,
-                    train_loader):
+def get_lr_schedule(optimizer: optim.Optimizer,
+                    iterations_per_epoch: int,
+                    train_loader=None):
     """Returns a learning rate scheduler according to the configuration."""
     if Config().trainer.lr_schedule == 'CosineAnnealingLR':
         return optim.lr_scheduler.CosineAnnealingLR(
