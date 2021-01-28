@@ -10,6 +10,7 @@ import random
 from dataclasses import dataclass
 from trainers import registry as trainers_registry
 from models import registry as models_registry
+from trainers import registry as trainers_registry
 from config import Config
 from clients import simple
 
@@ -35,7 +36,7 @@ class FedNovaClient(simple.SimpleClient):
         model_name = Config().trainer.model
         self.model = models_registry.get(model_name)
         # seperate models with trainers
-        self.trainer = trainers_registry.get(self.model)
+        self.trainer = trainers_registry.get(self.model, self.client_id)
 
     async def train(self):
         """The machine learning training workload on a client."""
@@ -48,8 +49,8 @@ class FedNovaClient(simple.SimpleClient):
             local_epochs = random.randint(2,
                                           Config().algorithm.max_local_epochs)
 
-        logging.info('[Client #%s] Training with %d epoches.', self.epochs,
-                     self.client_id)
+        logging.info('[Client #%s] Training with %d epoches.', self.client_id,
+                     epochs)
 
         # Perform model training for a specific number of epoches
         Config().trainer = Config().trainer._replace(epochs=local_epochs)

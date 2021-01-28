@@ -156,9 +156,14 @@ class Trainer(base.Trainer):
 
                 loss = loss_criterion(outputs, labels)
                 loss.backward()
+
                 optimizer.step()
+
                 if lr_schedule is not None:
                     lr_schedule.step()
+
+                if Config().trainer.optimizer == 'FedProx':
+                    optimizer.params_state_update()
 
                 if batch_id % log_interval == 0:
                     logging.info(
