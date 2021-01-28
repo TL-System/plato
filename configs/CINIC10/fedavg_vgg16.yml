@@ -6,7 +6,7 @@ clients:
     total_clients: 3
 
     # The number of clients selected in each round
-    per_round: 3
+    per_round: 2
 
     # Should the clients compute test accuracy locally?
     do_test: true
@@ -17,7 +17,7 @@ server:
 
 data:
     # The training and testing dataset
-    dataset: MNIST
+    dataset: CINIC10
 
     # Where the dataset is located
     data_path: ./data
@@ -39,24 +39,24 @@ trainer:
     rounds: 100
 
     # Whether the training should use multiple GPUs if available
-    parallelized: false
+    parallelized: true
 
     # The maximum number of clients running concurrently
-    max_concurrency: 3
+    max_concurrency: 2
 
     # The target accuracy
-    target_accuracy: 0.95
+    target_accuracy: 0.88
 
     # Number of epoches for local training in each communication round
     epochs: 1
-    batch_size: 32
+    batch_size: 128
     optimizer: SGD
     learning_rate: 0.01
     momentum: 0.5
     weight_decay: 0.0
 
     # The machine learning model
-    model: lenet5
+    model: vgg_16
 
 algorithm:
     # Aggregation algorithm

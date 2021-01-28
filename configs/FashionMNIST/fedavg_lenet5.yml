@@ -17,7 +17,7 @@ server:
 
 data:
     # The training and testing dataset
-    dataset: MNIST
+    dataset: FashionMNIST
 
     # Where the dataset is located
     data_path: ./data
@@ -39,13 +39,13 @@ trainer:
     rounds: 100
 
     # Whether the training should use multiple GPUs if available
-    parallelized: false
+    parallelized: true
 
     # The maximum number of clients running concurrently
     max_concurrency: 3
 
     # The target accuracy
-    target_accuracy: 0.95
+    target_accuracy: 0.88
 
     # Number of epoches for local training in each communication round
     epochs: 1

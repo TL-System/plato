@@ -8,6 +8,7 @@ Parameter Freezing," found in docs/papers.
 """
 import logging
 import torch
+from collections import OrderedDict
 
 from models.base import Model
 from trainers import trainer
@@ -18,8 +19,9 @@ class Trainer(trainer.Trainer):
     """The federated learning trainer for Adaptive Synchronization Frequency,
        used by the server.
     """
-    def __init__(self, model: Model):
-        super().__init__(model)
+    def __init__(self, model: Model, client_id=0):
+        super().__init__(model, client_id)
+
         self.sync_frequency = Config().algorithm.initial_sync_frequency
 
         self.average_positive_deltas = {
@@ -49,16 +51,13 @@ class Trainer(trainer.Trainer):
         # Calculate updates from the received weights
         updates = []
         for weight in weights_received:
-            update = []
-            for i, (name, current_weight) in enumerate(weight):
-                bl_name, baseline = baseline_weights[i]
+            update = OrderedDict()
+            for name, current_weight in weight.items():
+                baseline = baseline_weights[name]
 
-                # Ensure correct weight is being updated
-                assert name == bl_name
-
-                # Calculate updates
+                # Calculate update
                 delta = current_weight - baseline
-                update.append((name, delta))
+                update[name] = delta
             updates.append(update)
 
         return updates
@@ -74,13 +73,13 @@ class Trainer(trainer.Trainer):
         """
         model_size = 0
         consistency_count = 0
-        for previous_name, previous_weight in previous_weights:
+        for previous_name, previous_weight in previous_weights.items():
             model_size += previous_weight.numel()
             positive_deltas = torch.zeros(previous_weight.shape)
             negative_deltas = torch.zeros(previous_weight.shape)
 
             for weights in weights_received:
-                for name, current_weight in weights:
+                for name, current_weight in weights.items():
                     if previous_name == name:
                         delta = current_weight - previous_weight
 
@@ -144,11 +143,3 @@ class Trainer(trainer.Trainer):
                     }
 
         self.round_id += 1
-
-    def load_weights(self, weights):
-        """Loading the server model onto this client."""
-        updated_state_dict = {}
-        for name, weight in weights:
-            updated_state_dict[name] = weight
-
-        self.model.load_state_dict(updated_state_dict, strict=False)

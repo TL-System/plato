@@ -1,6 +1,6 @@
 clients:
     # Type
-    type: simple
+    type: mistnet
 
     # The total number of clients
     total_clients: 3
@@ -9,7 +9,7 @@ clients:
     per_round: 3
 
     # Should the clients compute test accuracy locally?
-    do_test: true
+    do_test: false
 
 server:
     address: localhost
@@ -33,7 +33,7 @@ data:
 
 trainer:
     # The type of the trainer
-    type: basic
+    type: mistnet
 
     # The maximum number of training rounds
     rounds: 100
@@ -60,4 +60,25 @@ trainer:
 
 algorithm:
     # Aggregation algorithm
-    type: fedavg
+    type: fedrl
+
+    cross_silo:
+        # The total number of silos (edge servers)
+        total_silos: 2
+
+        # The number of local aggregation rounds on edge servers before sending
+        # aggreagted weights to the central server
+        rounds: 2
+    rl:
+        # The type of FL central server
+        fl_server: fedavg_cross_silo
+
+        # The number of episodes of RL training
+        episodes: 2
+
+results:
+    # Write the following parameter(s) into a CSV
+    types: accuracy, training_time, round_time, edge_agg_num
+
+    # Plot results (x_axis&y_axis)
+    plot: global_round&accuracy, global_round&training_time

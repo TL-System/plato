@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 1
+    total_clients: 3
 
     # The number of clients selected in each round
-    per_round: 1
+    per_round: 3
 
     # Should the clients compute test accuracy locally?
     do_test: true
@@ -49,19 +49,15 @@ trainer:
 
     # Number of epoches for local training in each communication round
     epochs: 1
-
-    batch_size: 10
-
-    dataset: MNIST
-    data_path: ./data
-
-    model: lenet5
-
+    batch_size: 32
     optimizer: FedProx
     learning_rate: 0.01
     momentum: 0.5
     weight_decay: 0.0
     mu: 0.1
+
+    # The machine learning model
+    model: lenet5
 
 algorithm:
     # Aggregation algorithm
