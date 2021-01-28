@@ -39,8 +39,8 @@ class MistNetClient(SimpleClient):
         # Perform a forward pass till the cut layer in the model
         features = self.trainer.extract_features(
             self.trainset,
-            Config().trainer.cut_layer,
-            epsilon=Config().trainer.epsilon)
+            Config().algorithm.cut_layer,
+            epsilon=Config().algorithm.epsilon)
 
         # Generate a report for the server, performing model testing if applicable
         return Report(self.client_id, len(self.trainset), features)

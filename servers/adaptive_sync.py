@@ -12,5 +12,5 @@ class AdaptiveSyncServer(FedAvgServer):
 
     async def customize_server_response(self, server_response):
         """Customizing the server response with any additional information."""
-        server_response['sync_frequency'] = self.trainer.sync_frequency
+        server_response['sync_frequency'] = self.algorithm.sync_frequency
         return server_response

@@ -1,0 +1,65 @@
+clients:
+    # Type
+    type: simple
+
+    # The total number of clients
+    total_clients: 3
+
+    # The number of clients selected in each round
+    per_round: 3
+
+    # Should the clients compute test accuracy locally?
+    do_test: true
+
+server:
+    address: localhost
+    port: 8000
+
+data:
+    # The training and testing dataset
+    dataset: MNIST_mindspore
+
+    # Where the dataset is located
+    data_path: ./data
+
+    # Number of samples in each partition
+    partition_size: 20000
+
+    # IID, biased, or sharded?
+    divider: iid_mindspore
+
+    # Uniform or normal distribution for labels across clients?
+    label_distribution: uniform
+
+trainer:
+    # Should MindSpore be used instead of PyTorch?
+    use_mindspore: true
+
+    # The type of the trainer
+    type: basic_mindspore
+
+    # The maximum number of training rounds in total
+    rounds: 100
+
+    # Whether the training should use multiple GPUs if available
+    parallelized: false
+
+    # The maximum number of clients running concurrently
+    max_concurrency: 3
+
+    # The target accuracy
+    target_accuracy: 0.96
+
+    # Parameters for local training in each communication round
+    epochs: 2
+    batch_size: 32
+    optimizer: SGD
+    learning_rate: 0.01
+    momentum: 0.9
+
+    # The machine learning model
+    model: lenet5
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg

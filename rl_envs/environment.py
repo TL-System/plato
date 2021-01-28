@@ -56,7 +56,7 @@ class FLEnv(gym.Env):
         self.state = [0 for i in range(self.n_states)]
 
     def reset(self):
-        if self.rl_agent.rl_episode >= Config().rl.episodes:
+        if self.rl_agent.rl_episode >= Config().algorithm.rl.episodes:
             while True:
                 # Give RL agent some time to close connections and exit
                 current_loop = asyncio.get_event_loop()
