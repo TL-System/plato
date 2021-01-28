@@ -5,7 +5,7 @@ based on a configuration at run-time.
 import logging
 
 from models.base import Model
-from trainers import trainer, mistnet, adaptive_freezing, adaptive_sync, fednova
+from trainers import trainer, mistnet, adaptive_freezing, adaptive_sync
 
 from config import Config
 

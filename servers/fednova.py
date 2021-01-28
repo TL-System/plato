@@ -30,13 +30,12 @@ class FedNovaServer(FedAvgServer):
             for name, weights in updates[0].items()
         }
 
-        tau_effs = []
-
+        tau_eff = 0
         for i, update in enumerate(updates):
             num_samples = reports[i].num_samples
-            tau_eff = local_epochs[i] * num_samples / self.total_samples
-
-            tau_effs.append(tau_eff)
+            tau_eff_ = local_epochs[i] * num_samples / self.total_samples
+            tau_eff += tau_eff_
+            #tau_effs.append(tau_eff)
 
         for i, update in enumerate(updates):
             num_samples = reports[i].num_samples
@@ -44,7 +43,7 @@ class FedNovaServer(FedAvgServer):
             for name, delta in update.items():
                 # Use weighted average by the number of samples
                 avg_update[name] += delta * (num_samples / self.total_samples
-                                             ) * tau_effs[i] / local_epochs[i]
+                                             ) * tau_eff / local_epochs[i]
 
         # Extract baseline model weights
         baseline_weights = self.trainer.extract_weights()

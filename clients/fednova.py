@@ -9,9 +9,9 @@ import random
 
 from dataclasses import dataclass
 from models import registry as models_registry
+from trainers import registry as trainers_registry
 from config import Config
 from clients import simple
-from trainers import fednova
 
 
 @dataclass
@@ -34,18 +34,17 @@ class FedNovaClient(simple.SimpleClient):
         model_name = Config().trainer.model
         self.model = models_registry.get(model_name)
         # seperate models with trainers
-        self.trainer = fednova.Trainer(
-            self.model)  #trainers_registry.get(self.model)
+        self.trainer = trainers_registry.get(self.model, self.client_id)
 
     async def train(self):
         """The machine learning training workload on a client."""
         training_start_time = time.time()
 
         # generate local iteration randomly
-        epochs = FedNovaClient.update_local_epochs()
+        epochs = self.update_local_epochs()
 
-        logging.info('[Client #%s] Training with %d epoches.', self.epochs,
-                     self.client_id)
+        logging.info('[Client #%s] Training with %d epoches.', self.client_id,
+                     epochs)
 
         # Perform model training for a specific number of epoches
         Config().trainer = Config().trainer._replace(epochs=epochs)
@@ -67,10 +66,10 @@ class FedNovaClient(simple.SimpleClient):
             self.data_loading_time_sent = True
 
         return Report(self.client_id, len(self.data), weights, accuracy,
-                      training_time, data_loading_time, self.epochs)
+                      training_time, data_loading_time, epochs)
 
     @classmethod
-    def update_local_epochs():
+    def update_local_epochs(self):
         """ update the local epochs for each client."""
         max_local_epochs = Config().clients.max_local_epochs
         if Config().clients.pattern == "constant":
