@@ -1,6 +1,6 @@
 """
-A federated learning client whose local iteration is randomly generated and communicated to the server at each communication round.
-Notably, MistNet is applied here.
+A federated learning client whose local number of epochs is randomly generated
+and communicated to the server at each communication round.
 """
 
 import logging
@@ -40,14 +40,18 @@ class FedNovaClient(simple.SimpleClient):
         """The machine learning training workload on a client."""
         training_start_time = time.time()
 
-        # generate local iteration randomly
-        epochs = FedNovaClient.update_local_epochs()
+        # generate the number of local epochs randomly
+        if Config().algorithm.pattern == "constant":
+            local_epochs = Config().algorithm.max_local_epochs
+        else:
+            local_epochs = random.randint(2,
+                                          Config().algorithm.max_local_epochs)
 
         logging.info('[Client #%s] Training with %d epoches.', self.epochs,
                      self.client_id)
 
         # Perform model training for a specific number of epoches
-        Config().trainer = Config().trainer._replace(epochs=epochs)
+        Config().trainer = Config().trainer._replace(epochs=local_epochs)
         self.trainer.train(self.trainset)
 
         # Extract model weights and biases
@@ -67,13 +71,3 @@ class FedNovaClient(simple.SimpleClient):
 
         return Report(self.client_id, len(self.data), weights, accuracy,
                       training_time, data_loading_time, self.epochs)
-
-    @classmethod
-    def update_local_epochs():
-        """ update the local epochs for each client."""
-        max_local_epochs = Config().clients.max_local_epochs
-        if Config().clients.pattern == "constant":
-            return max_local_epochs
-
-        if Config().clients.pattern == "uniform_random":
-            return random.randint(2, max_local_epochs)
