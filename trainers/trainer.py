@@ -156,7 +156,9 @@ class Trainer(base.Trainer):
 
                 loss = loss_criterion(outputs, labels)
                 loss.backward()
+
                 optimizer.step()
+
                 if lr_schedule is not None:
                     lr_schedule.step()
 
