@@ -39,13 +39,13 @@ class MistNetServer(Server):
             "[Server #%s] Started training on %s clients and %s per round.",
             os.getpid(), self.total_clients, self.clients_per_round)
 
-        if Config().results:
+        if hasattr(Config(), 'results'):
             recorded_items = Config().results.types
             self.recorded_items = [
                 x.strip() for x in recorded_items.split(',')
             ]
             # Directory of results (figures etc.)
-            result_dir = f'./results/{Config().trainer.dataset}/{Config().trainer.model}/'
+            result_dir = f'./results/{Config().data.dataset}/{Config().trainer.model}/'
             result_csv_file = result_dir + 'result.csv'
             csv_processor.initialize_csv(result_csv_file, self.recorded_items,
                                          result_dir)
@@ -58,7 +58,7 @@ class MistNetServer(Server):
         creating the clients.
         """
         logging.info('[Server #%s] Configuring the %s server...', os.getpid(),
-                     Config().server.type)
+                     Config().algorithm.type)
 
         total_rounds = Config().trainer.rounds
         target_accuracy = Config().trainer.target_accuracy
@@ -105,11 +105,11 @@ class MistNetServer(Server):
         feature_dataset = list(chain.from_iterable(features))
 
         # Traing the model using features received from the client
-        self.trainer.train(feature_dataset, Config().trainer.cut_layer)
+        self.trainer.train(feature_dataset, Config().algorithm.cut_layer)
 
         # Test the updated model
         self.accuracy = self.trainer.test(feature_dataset,
-                                          Config().trainer.cut_layer)
+                                          Config().algorithm.cut_layer)
         logging.info('Global model accuracy: {:.2f}%\n'.format(100 *
                                                                self.accuracy))
 
@@ -117,7 +117,7 @@ class MistNetServer(Server):
 
     async def wrap_up_processing_reports(self):
         """Wrap up processing the reports with any additional work."""
-        if Config().results:
+        if hasattr(Config(), 'results'):
             new_row = [self.current_round]
             for item in self.recorded_items:
                 item_value = {
@@ -126,7 +126,7 @@ class MistNetServer(Server):
                 }[item]
                 new_row.append(item_value)
 
-            result_dir = f'./results/{Config().trainer.dataset}/{Config().trainer.model}/'
+            result_dir = f'./results/{Config().data.dataset}/{Config().trainer.model}/'
             result_csv_file = result_dir + 'result.csv'
 
             csv_processor.write_csv(result_csv_file, new_row)

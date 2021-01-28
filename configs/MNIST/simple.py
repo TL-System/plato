@@ -112,7 +112,7 @@ class SimpleClient(Client):
             self.data = self.divider.get_partition()
 
         elif Config().data.divider == 'iid_mindspore':
-            assert hasattr(Config().trainer, 'use_mindspore')
+            assert hasattr(Config().trainer, 'if hasattr(Config().algorithm, 'cross_silo'')
             partition_size = Config().data.partition_size
             self.data = self.divider.get_partition(partition_size,
                                                    self.client_id)

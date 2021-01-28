@@ -12,7 +12,7 @@ import torch.multiprocessing as mp
 import numpy as np
 
 from models.base import Model
-from config import Config
+from config import Config, Params
 from trainers import base, optimizers
 
 
@@ -27,7 +27,7 @@ class Trainer(base.Trainer):
         super().__init__(client_id)
 
         # Use data parallelism if multiple GPUs are available and the configuration specifies it
-        if Config().is_parallel():
+        if Params.is_parallel():
             logging.info("Using Data Parallelism.")
             # DataParallel will divide and allocate batch_size to all available GPUs
             self.model = nn.DataParallel(model)
@@ -135,8 +135,8 @@ class Trainer(base.Trainer):
         optimizer = optimizers.get_optimizer(self.model)
 
         # Initializing the learning rate schedule, if necessary
-        if Config().trainer.lr_gamma == 0.0 or Config(
-        ).trainer.lr_milestone_steps == '':
+        if hasattr(Config().trainer, 'lr_gamma') or hasattr(
+                Config().trainer, 'lr_milestone_steps'):
             lr_schedule = optimizers.get_lr_schedule(optimizer,
                                                      iterations_per_epoch,
                                                      train_loader)

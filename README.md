@@ -36,10 +36,10 @@ In macOS (without GPU support), the typical command would be:
 $ conda install pytorch torchvision -c pytorch
 ```
 
-We will need to install the `websockets` package for client-server communication, and the `requests` package for downloading datasets:
+We will need to install the `websockets` package for client-server communication, the `requests` package for downloading datasets, and the 'pyyaml' package for parsing configuration files:
 
 ```shell
-$ pip install websockets requests
+$ pip install websockets requests pyyaml
 ```
 
 Install `matplotlib` package for plotting figures of results:
@@ -137,13 +137,13 @@ Finally, to use trainers and servers based on MindSpore, assign `True` to `use_m
 To start a federated learning training workload, run [`server.py`](server.py) from the repository's root directory. For example:
 
 ```shell
-cp configs/MNIST/mnist.conf config.conf
+cp configs/MNIST/mnist.yml config.yml
 python server.py
-  --config=config.conf
+  --config=config.yml
   --log=info
 ```
 
-* `--config` (`-c`): the path to the configuration file to be used. The default is `config.conf` in the project's home directory.
+* `--config` (`-c`): the path to the configuration file to be used. The default is `config.yml` in the project's home directory.
 * `--log` (`-l`): the level of logging information to be written to the console. Possible values are `critical`, `error`, `warn`, `info`, and `debug`, and the default is `info`.
 
 *Plato* uses a standard configuration file, parsed by Python's standard configuration parser, to manage the runtime configuration parameters. Example configuration files have been provided in the `configs` directory.
@@ -153,10 +153,10 @@ python server.py
 If the configuration file contains a `[results]` section, the selected performance metrics, such as accuracy, will be saved in a `.csv` file in the `results/` directory. As `.csv` files, these results can be used however one wishes; an example Python program, called `plot.py`, plots the necessary figures and saves them as PDF files. To run this program:
 
 ```shell
-python plot.py --config=config.conf
+python plot.py --config=config.yml
 ```
 
-* `--config` (`-c`): the path to the configuration file to be used. The default is `config.conf` in the project's home directory.
+* `--config` (`-c`): the path to the configuration file to be used. The default is `config.yml` in the project's home directory.
 
 ### Running Unit Tests
 
