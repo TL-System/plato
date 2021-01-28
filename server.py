@@ -8,7 +8,7 @@ import time
 import logging
 import websockets
 
-from config import Config, Params
+from config import Config
 import servers
 
 
@@ -40,7 +40,7 @@ def main():
     loop = asyncio.get_event_loop()
     loop.run_until_complete(start_server)
 
-    if Params.is_central_server():
+    if Config().is_central_server():
         # For cross-silo FL, the central server will let edge servers start first
         # Then the edge servers will start their clients
         server.start_clients(as_server=True)

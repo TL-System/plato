@@ -8,7 +8,7 @@ import os
 import asyncio
 
 from servers import FedAvgServer
-from config import Config, Params
+from config import Config
 from utils import csv_processor
 
 
@@ -19,7 +19,7 @@ class FedAvgCrossSiloServer(FedAvgServer):
 
         self.current_global_round = None
 
-        if Params.is_edge_server():
+        if Config().is_edge_server():
             # An edge client waits for the event that a certain number of
             # aggregations are completed
             self.model_aggregated = asyncio.Event()
@@ -36,7 +36,7 @@ class FedAvgCrossSiloServer(FedAvgServer):
                 Config().algorithm.cross_silo.total_silos)
             logging.info(
                 "[Edge server #%s] Started training with %s clients and %s per round.",
-                Params.args.id, self.total_clients, self.clients_per_round)
+                Config().args.id, self.total_clients, self.clients_per_round)
 
             if hasattr(Config(), 'results'):
                 self.recorded_items = ['global_round'] + self.recorded_items
@@ -45,12 +45,12 @@ class FedAvgCrossSiloServer(FedAvgServer):
                 model = Config().trainer.model
                 server_type = Config().algorithm.type
                 result_dir = f'./results/{dataset}/{model}/{server_type}/'
-                result_csv_file = f'{result_dir}result_{Params.args.id}.csv'
+                result_csv_file = f'{result_dir}result_{Config().args.id}.csv'
                 csv_processor.initialize_csv(result_csv_file,
                                              self.recorded_items, result_dir)
 
         # Compute the number of clients for the central server
-        if Params.is_central_server():
+        if Config().is_central_server():
             self.clients_per_round = Config().algorithm.cross_silo.total_silos
             self.total_clients = self.clients_per_round
 
@@ -63,9 +63,9 @@ class FedAvgCrossSiloServer(FedAvgServer):
         Booting the federated learning server by setting up the data, model, and
         creating the clients.
         """
-        if Params.args.id:
+        if Config().args.id:
             logging.info("Configuring edge server #%s as a %s server.",
-                         Params.args.id,
+                         Config().args.id,
                          Config().algorithm.type)
             logging.info("Training with %s local aggregation rounds.",
                          Config().algorithm.cross_silo.rounds)
@@ -77,7 +77,7 @@ class FedAvgCrossSiloServer(FedAvgServer):
     async def customize_server_response(self, server_response):
         """Wrap up generating the server response with any additional information."""
         server_response['first_communication_start_time'] = time.time()
-        if Params.is_central_server():
+        if Config().is_central_server():
             server_response['current_global_round'] = self.current_round
         return server_response
 
@@ -108,14 +108,14 @@ class FedAvgCrossSiloServer(FedAvgServer):
                 }[item]
                 new_row.append(item_value)
 
-            if Params.is_edge_server():
-                result_csv_file = f'{result_dir}result_{Params.args.id}.csv'
+            if Config().is_edge_server():
+                result_csv_file = f'{result_dir}result_{Config().args.id}.csv'
             else:
                 result_csv_file = f'{result_dir}result.csv'
 
             csv_processor.write_csv(result_csv_file, new_row)
 
-        if Params.is_edge_server():
+        if Config().is_edge_server():
             # When a certain number of aggregations are completed, an edge client
             # needs to be signaled to send a report to the central server
             if self.current_round == Config().algorithm.cross_silo.rounds:

@@ -4,7 +4,6 @@ to work on than JSON).
 """
 
 import logging
-from dataclasses import dataclass
 from collections import namedtuple, OrderedDict
 
 import argparse
@@ -65,8 +64,12 @@ class Config:
             with open(args.config, 'r') as config_file:
                 config = yaml.load(config_file, Loader=yaml.FullLoader)
 
-            cls._instance = Config.namedtuple_from_dict(config)
-            Params.args = args
+            Config.clients = Config.namedtuple_from_dict(config['clients'])
+            Config.server = Config.namedtuple_from_dict(config['server'])
+            Config.data = Config.namedtuple_from_dict(config['data'])
+            Config.trainer = Config.namedtuple_from_dict(config['trainer'])
+            Config.algorithm = Config.namedtuple_from_dict(config['algorithm'])
+            Config.args = args
 
         return cls._instance
 
@@ -75,11 +78,9 @@ class Config:
         """Creates a named tuple from a dictionary."""
         if isinstance(obj, dict):
             fields = sorted(obj.keys())
-            namedtuple_type = namedtuple(
-                typename='GenericObject',
-                field_names=fields,
-                rename=True,
-            )
+            namedtuple_type = namedtuple(typename='Config',
+                                         field_names=fields,
+                                         rename=True)
             field_value_pairs = OrderedDict(
                 (str(field), Config.namedtuple_from_dict(obj[field]))
                 for field in fields)
@@ -93,25 +94,16 @@ class Config:
         else:
             return obj
 
-
-@dataclass
-class Params:
-    """
-    Auxilliary configuration settings from the command-line arguments, along with several
-    handy utility functions.
-    """
-    args: argparse.Namespace
-
     @staticmethod
     def is_edge_server():
         """Returns whether the current instance is an edge server in cross-silo FL."""
-        return Params.args.port is not None
+        return Config().args.port is not None
 
     @staticmethod
     def is_central_server():
         """Returns whether the current instance is a central server in cross-silo FL."""
         return hasattr(Config().algorithm,
-                       'cross_silo') and Params.args.port is None
+                       'cross_silo') and Config().args.port is None
 
     @staticmethod
     def device():

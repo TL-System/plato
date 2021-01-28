@@ -7,9 +7,10 @@ import logging
 import sys
 import websockets
 
-from config import Config, Params
+from config import Config
 import clients
 import servers
+from collections import namedtuple
 
 
 def main():
@@ -22,13 +23,9 @@ def main():
 
     try:
         # If a server needs to be running concurrently
-        if Params.is_edge_server():
-            Config().algorithm = Config().algorithm._replace(
+        if Config().is_edge_server():
+            Config().trainer = Config().trainer._replace(
                 rounds=Config().algorithm.cross_silo.rounds)
-
-            if Config().algorithm.rl:
-                Config().algorithm = Config().algorithm._replace(
-                    type=Config().algorithm.rl.fl_server)
 
             server = {
                 "fedavg": servers.fedavg.FedAvgServer,
@@ -44,10 +41,11 @@ def main():
             coroutines.append(client.start_client())
 
             logging.info("Starting an edge server (client #%s) on port %s",
-                         Params.args.id, Params.args.port)
+                         Config().args.id,
+                         Config().args.port)
             start_server = websockets.serve(server.serve,
                                             Config().server.address,
-                                            Params.args.port,
+                                            Config().args.port,
                                             ping_interval=None,
                                             max_size=2**30)
 
