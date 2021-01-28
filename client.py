@@ -7,7 +7,7 @@ import logging
 import sys
 import websockets
 
-from config import Config
+from config import Config, Params
 import clients
 import servers
 
@@ -22,13 +22,13 @@ def main():
 
     try:
         # If a server needs to be running concurrently
-        if Config().is_edge_server():
-            Config().trainer = Config().trainer._replace(
-                rounds=Config().cross_silo.rounds)
+        if Params.is_edge_server():
+            Config().algorithm = Config().algorithm._replace(
+                rounds=Config().algorithm.cross_silo.rounds)
 
-            if Config().rl:
-                Config().server = Config().server._replace(
-                    type=Config().rl.fl_server)
+            if Config().algorithm.rl:
+                Config().algorithm = Config().algorithm._replace(
+                    type=Config().algorithm.rl.fl_server)
 
             server = {
                 "fedavg": servers.fedavg.FedAvgServer,
@@ -36,7 +36,7 @@ def main():
                 "fedrl": servers.fedrl.FedRLServer,
                 "mistnet": servers.mistnet.MistNetServer,
                 "adaptive_sync": servers.adaptive_sync.AdaptiveSyncServer
-            }[Config().server.type]()
+            }[Config().algorithm.type]()
             server.configure()
 
             client = clients.EdgeClient(server)
@@ -44,11 +44,10 @@ def main():
             coroutines.append(client.start_client())
 
             logging.info("Starting an edge server (client #%s) on port %s",
-                         Config().args.id,
-                         Config().args.port)
+                         Params.args.id, Params.args.port)
             start_server = websockets.serve(server.serve,
                                             Config().server.address,
-                                            Config().args.port,
+                                            Params.args.port,
                                             ping_interval=None,
                                             max_size=2**30)
 

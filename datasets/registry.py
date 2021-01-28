@@ -15,7 +15,7 @@ registered_datasets = {
     'CINIC10': cinic10
 }
 
-if Config().trainer.use_mindspore:
+if hasattr(Config().trainer, 'use_mindspore'):
     from datasets import mnist_mindspore
     mindspore_datasets = {'MNIST_mindspore': mnist_mindspore}
     registered_datasets = dict(
@@ -24,10 +24,10 @@ if Config().trainer.use_mindspore:
 
 def get():
     """Get the dataset with the provided name."""
-    dataset_name = Config().trainer.dataset
-    data_path = Config().trainer.data_path
+    dataset_name = Config().data.dataset
+    data_path = Config().data.data_path
 
-    logging.info('Dataset: %s', Config().trainer.dataset)
+    logging.info('Dataset: %s', Config().data.dataset)
 
     if dataset_name in registered_datasets:
         dataset = registered_datasets[dataset_name].Dataset(data_path)

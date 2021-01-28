@@ -74,10 +74,10 @@ def main():
     """Plotting figures from the run-time results."""
     __ = Config()
 
-    if Config().results:
-        dataset = Config().trainer.dataset
+    if hasattr(Config(), 'results'):
+        dataset = Config().data.dataset
         model = Config().trainer.model
-        server_type = Config().server.type
+        server_type = Config().algorithm.type
         result_dir = f'./results/{dataset}/{model}/{server_type}/'
         result_csv_file = result_dir + 'result.csv'
         print(f"Plotting results located at {result_csv_file}.")

@@ -7,11 +7,9 @@ This framework makes extensive use of object oriented subclassing with the help 
 
 ### Configuration parameters
 
-All configuration parameters are globally accessed using the Singleton `Config` class globally (found in `config.py`). They are read from a simple multi-section configuration file when the clients and the servers launch, and the configuration file follows the standard Windows INI format for the sake of simplicity and readability. 
+All configuration parameters are globally accessed using the Singleton `Config` class globally (found in `config.py`). They are read from a  configuration file when the clients and the servers launch, and the configuration file follows the YAML format for the sake of simplicity and readability. 
 
 These parameters include hyperparameters specific to the dataset, data distribution, the federated learning algorithm, server configuration, and cross-silo training. The command-line arguments are only used to specify the location of the configuration file, the logging level, the client ID (on the client side), and the port number (for edge servers in cross-silo training). Use `Config()` anywhere in the framework to access these configuration parameters.
-
-In the future, configuration parameters belonging to the framework in general will be separated from configuration parameters belonging to a specific federated learning algorithm. Both will continue to use global Singleton classes.
 
 ### Libraries containing Datasets and Models
 

@@ -8,7 +8,7 @@ import time
 import logging
 import websockets
 
-from config import Config
+from config import Config, Params
 import servers
 from servers import fednova
 
@@ -27,9 +27,8 @@ def main():
         "fedavg_cross_silo": servers.fedavg_cs.FedAvgCrossSiloServer,
         "mistnet": servers.mistnet.MistNetServer,
         "adaptive_sync": servers.adaptive_sync.AdaptiveSyncServer,
-        "fedrl": servers.fedrl.FedRLServer,
-        "fednova": servers.fednova.FedNovaServer
-    }[Config().server.type]()
+        "fedrl": servers.fedrl.FedRLServer
+    }[Config().algorithm.type]()
     server.configure()
 
     logging.info("Starting a server on port %s", Config().server.port)
@@ -42,7 +41,7 @@ def main():
     loop = asyncio.get_event_loop()
     loop.run_until_complete(start_server)
 
-    if Config().is_central_server():
+    if Params.is_central_server():
         # For cross-silo FL, the central server will let edge servers start first
         # Then the edge servers will start their clients
         server.start_clients(as_server=True)

@@ -34,14 +34,14 @@ class FedAvgServer(Server):
         # starting time of a gloabl training round
         self.round_start_time = 0
 
-        if Config().results:
+        if hasattr(Config(), 'results'):
             recorded_items = Config().results.types
             self.recorded_items = ['round'] + [
                 x.strip() for x in recorded_items.split(',')
             ]
             # Directory of results (figures etc.)
-            result_dir = f'./results/{Config().trainer.dataset}/{Config().trainer.model}'
-            result_dir += f'/{Config().server.type}/'
+            result_dir = f'./results/{Config().data.dataset}/{Config().trainer.model}'
+            result_dir += f'/{Config().algorithm.type}/'
             result_csv_file = result_dir + 'result.csv'
             csv_processor.initialize_csv(result_csv_file, self.recorded_items,
                                          result_dir)
@@ -53,7 +53,7 @@ class FedAvgServer(Server):
         Booting the federated learning server by setting up the data, model, and
         creating the clients.
         """
-        logging.info('Configuring the %s server...', Config().server.type)
+        logging.info('Configuring the %s server...', Config().algorithm.type)
 
         total_rounds = Config().trainer.rounds
         target_accuracy = Config().trainer.target_accuracy
@@ -159,7 +159,7 @@ class FedAvgServer(Server):
     async def wrap_up_processing_reports(self):
         """Wrap up processing the reports with any additional work."""
 
-        if Config().results:
+        if hasattr(Config(), 'results'):
             new_row = []
             for item in self.recorded_items:
                 item_value = {
@@ -174,9 +174,9 @@ class FedAvgServer(Server):
                 }[item]
                 new_row.append(item_value)
 
-            dataset = Config().trainer.dataset
+            dataset = Config().data.dataset
             model = Config().trainer.model
-            server_type = Config().server.type
+            server_type = Config().algorithm.type
             result_dir = f'./results/{dataset}/{model}/{server_type}/'
             result_csv_file = result_dir + 'result.csv'
 
