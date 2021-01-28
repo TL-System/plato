@@ -50,10 +50,11 @@ trainer:
     # Number of epoches for local training in each communication round
     epochs: 1
     batch_size: 32
-    optimizer: SGD
+    optimizer: FedProx
     learning_rate: 0.01
     momentum: 0.5
     weight_decay: 0.0
+    mu: 0.1
 
     # The machine learning model
     model: lenet5
@@ -61,3 +62,9 @@ trainer:
 algorithm:
     # Aggregation algorithm
     type: fedavg
+
+    # The maximum number of local epochs
+    max_local_epochs: 10
+
+    # Pattern of local epochs, either `constant` or `uniform_random`
+    pattern: uniform_random

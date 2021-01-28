@@ -30,7 +30,7 @@ class MistNetClient(SimpleClient):
         """Prepare this client for training."""
         model_name = Config().trainer.model
         self.model = models_registry.get(model_name)
-        self.trainer = trainers_registry.get(self.model)
+        self.trainer = trainers_registry.get(self.model, self.client_id)
 
     async def train(self):
         """A MistNet client only uses the first several layers in a forward pass."""

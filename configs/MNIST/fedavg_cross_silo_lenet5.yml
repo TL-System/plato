@@ -49,18 +49,14 @@ trainer:
 
     # Number of epoches for local training in each communication round
     epochs: 1
-
-    batch_size: 10
-
-    dataset: MNIST
-    data_path: ./data
-
-    model: lenet5
-
+    batch_size: 32
     optimizer: SGD
     learning_rate: 0.01
     momentum: 0.5
     weight_decay: 0.0
+
+    # The machine learning model
+    model: lenet5
 
 algorithm:
     # Aggregation algorithm

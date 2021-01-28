@@ -1,6 +1,6 @@
 clients:
     # Type
-    type: simple
+    type: adaptive_sync
 
     # The total number of clients
     total_clients: 3
@@ -33,10 +33,10 @@ data:
 
 trainer:
     # The type of the trainer
-    type: basic
+    type: adaptive_sync
 
     # The maximum number of training rounds
-    rounds: 100
+    rounds: 20
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -60,4 +60,9 @@ trainer:
 
 algorithm:
     # Aggregation algorithm
-    type: fedavg
+    type: adaptive_sync
+
+    # The initial synchronization frequency
+    initial_sync_frequency: 100
+
+    moving_average_alpha: 0.99

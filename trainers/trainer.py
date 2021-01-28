@@ -23,6 +23,7 @@ class Trainer(base.Trainer):
 
         Arguments:
         model: The model to train. Must be a models.base.Model subclass.
+        client_id: The ID of the client using this trainer (optional).
         """
         super().__init__(client_id)
 
