@@ -1,6 +1,6 @@
 """
-A federated learning client whose local number of epochs is randomly generated
-and communicated to the server at each communication round.
+A federated learning client whose local number of epochs is randomly
+generated and communicated to the server at each communication round.
 """
 
 import logging
@@ -16,12 +16,13 @@ from clients import simple
 
 @dataclass
 class Report(simple.Report):
-    """Client report containing the local iteration sent to the federated learning server."""
+    """A client report containing the number of local epochs."""
     epochs: list
 
 
 class FedNovaClient(simple.SimpleClient):
-    """A fednova federated learning client who sends weight updates and local iterations."""
+    """A fednova federated learning client who sends weight updates
+    and the number of local epochs."""
     def __init__(self):
         super().__init__()
         self.epochs = None
