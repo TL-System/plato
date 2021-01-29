@@ -10,6 +10,7 @@ Parameter Freezing," found in docs/papers.
 import copy
 import logging
 import torch
+from collections import OrderedDict
 
 from models.base import Model
 from trainers import trainer
@@ -21,7 +22,7 @@ class Trainer(trainer.Trainer):
        used by both the client and the server.
     """
     def __init__(self, model: Model, client_id=0):
-        super().__init__(client_id)
+        super().__init__(model, client_id)
         self.sync_mask = {}
         self.moving_average_deltas = {}
         self.moving_average_abs_deltas = {}
@@ -32,10 +33,8 @@ class Trainer(trainer.Trainer):
 
         # Initialize the synchronization mask
         if not self.sync_mask:
-            for name, weight in model.to(
-                    torch.device('cpu')).named_parameters():
-                if weight.requires_grad:
-                    self.sync_mask[name] = torch.ones(weight.data.shape).bool()
+            for name, weight in model.cpu().state_dict().items():
+                self.sync_mask[name] = torch.ones(weight.data.shape).bool()
 
         # Initialize the preserved weights
         self.previous_weights = None
@@ -44,18 +43,15 @@ class Trainer(trainer.Trainer):
         """Extract weights from the model, and apply the sync mask
            to make sure that frozen parameters will not be transmitted.
         """
-        weights = []
-        for name, weight in self.model.to(
-                torch.device('cpu')).named_parameters():
-            if weight.requires_grad:
-                # Rolling back model parameters that should be frozen
-                weight.data = torch.where(self.sync_mask[name], weight.data,
-                                          self.previous_weights[name].data)
-                # Removing model weights that should not be synced with ther server
-                weights_to_sync = torch.masked_select(weight.data,
-                                                      self.sync_mask[name])
-                weights.append((name, weights_to_sync))
-
+        weights = {}
+        for name, weight in self.model.cpu().state_dict().items():
+            # Rolling back model parameters that should be frozen
+            weight.data = torch.where(self.sync_mask[name], weight.data,
+                                      self.previous_weights[name].data)
+            # Removing model weights that should not be synced with ther server
+            weights_to_sync = torch.masked_select(weight.data,
+                                                  self.sync_mask[name])
+            weights[name] = weights_to_sync
         return weights
 
     def compute_weight_updates(self, weights_received):
@@ -66,12 +62,9 @@ class Trainer(trainer.Trainer):
         # Calculate updates from the received weights
         updates = []
         for weight in weights_received:
-            update = []
-            for i, (name, current_weight) in enumerate(weight):
-                bl_name, baseline = baseline_weights[i]
-
-                # Ensure correct weight is being updated
-                assert name == bl_name
+            update = OrderedDict()
+            for name, current_weight in weight.items():
+                baseline = baseline_weights[name]
 
                 # Expand the received weights using the sync mask
                 updated_weight = copy.deepcopy(baseline)
@@ -79,7 +72,7 @@ class Trainer(trainer.Trainer):
 
                 # Calculate update
                 delta = updated_weight - baseline
-                update.append((name, delta))
+                update[name] = delta
             updates.append(update)
 
         return updates
@@ -88,7 +81,7 @@ class Trainer(trainer.Trainer):
         """Making a copy of the model weights for later use."""
         self.previous_weights = {
             name: copy.deepcopy(weight)
-            for name, weight in self.model.named_parameters()
+            for name, weight in self.model.cpu().state_dict().items()
         }
 
     def moving_average(self, previous_value, new_value):
@@ -149,7 +142,7 @@ class Trainer(trainer.Trainer):
 
     def update_stability_threshold(self, inactive_ratio):
         """Tune the stability threshold adaptively if necessary."""
-        logging.info('current ratio of stable parameters: {:.2f}'.format(
+        logging.info('Current ratio of stable parameters: {:.2f}'.format(
             inactive_ratio))
 
         if inactive_ratio > Config().algorithm.tight_threshold:
@@ -164,7 +157,7 @@ class Trainer(trainer.Trainer):
         total_active_weights = 0
         total_weights = 0
 
-        for name, weight in weights:
+        for name, weight in weights.items():
             # Expanding the compressed weights using the sync mask
             weight.data[self.sync_mask[name]] = weight.data.view(-1)
 
