@@ -10,8 +10,6 @@ Differential Privacy," found in docs/papers.
 import logging
 from dataclasses import dataclass
 
-from models import registry as models_registry
-from trainers import registry as trainers_registry
 from config import Config
 from clients import SimpleClient
 
@@ -26,15 +24,13 @@ class Report:
 
 class MistNetClient(SimpleClient):
     """A federated learning client for MistNet."""
-    def configure(self):
-        """Prepare this client for training."""
-        model_name = Config().trainer.model
-        self.model = models_registry.get(model_name)
-        self.trainer = trainers_registry.get(self.model, self.client_id)
-
     async def train(self):
         """A MistNet client only uses the first several layers in a forward pass."""
         logging.info('Training on MistNet client #%s', self.client_id)
+
+        # Since training is performed on the server, the client should not be doing
+        # its own testing for the model accuracy
+        assert not Config().clients.do_test
 
         # Perform a forward pass till the cut layer in the model
         features = self.trainer.extract_features(

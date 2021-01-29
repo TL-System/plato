@@ -50,15 +50,26 @@ class Trainer(base.Trainer):
         model_path = f'{model_dir}{model_type}_{self.client_id}.pth'
         torch.save(self.model.state_dict(), model_path)
 
-        logging.info('[Client #%s] Model saved to %s.', self.client_id,
-                     model_path)
+        if self.client_id == 0:
+            logging.info('[Server #%s] Model saved to %s.', os.getpid(),
+                         model_path)
+        else:
+            logging.info('[Client #%s] Model saved to %s.', self.client_id,
+                         model_path)
 
-    def load_model(self, model_type):
+    def load_model(self):
         """Loading pre-trained model weights from a file."""
         model_dir = './models/pretrained/'
+        model_type = Config().trainer.model
         model_path = f'{model_dir}{model_type}_{self.client_id}.pth'
-        logging.info("[Client #%s] Loading model from %s.", self.client_id,
-                     model_path)
+
+        if self.client_id == 0:
+            logging.info('[Server #%s] Loading a model from %s.', os.getpid(),
+                         model_path)
+        else:
+            logging.info('[Client #%s] Loading a model from %s.',
+                         self.client_id, model_path)
+
         self.model.load_state_dict(torch.load(model_path))
 
     def save_accuracy(self, accuracy):
@@ -167,11 +178,16 @@ class Trainer(base.Trainer):
                     optimizer.params_state_update()
 
                 if batch_id % log_interval == 0:
-                    logging.info(
-                        '[Client #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}'.
-                        format(self.client_id, epoch, epochs, batch_id,
-                               len(train_loader), loss.data.item()))
-
+                    if self.client_id == 0:
+                        logging.info(
+                            '[Server #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}'.
+                            format(os.getpid(), epoch, epochs, batch_id,
+                                   len(train_loader), loss.data.item()))
+                    else:
+                        logging.info(
+                            '[Client #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}'.
+                            format(self.client_id, epoch, epochs, batch_id,
+                                   len(train_loader), loss.data.item()))
         self.model.cpu()
         self.save_model()
 
@@ -193,8 +209,7 @@ class Trainer(base.Trainer):
                  ),
                  join=True)
 
-        model_type = Config().trainer.model
-        self.load_model(model_type)
+        self.load_model()
         self.pause_training()
 
     @staticmethod
@@ -252,5 +267,6 @@ class Trainer(base.Trainer):
                  join=True)
 
         accuracy = self.load_accuracy()
+
         self.pause_training()
         return accuracy

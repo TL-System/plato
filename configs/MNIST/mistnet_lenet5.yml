@@ -3,10 +3,10 @@ clients:
     type: mistnet
 
     # The total number of clients
-    total_clients: 3
+    total_clients: 1
 
     # The number of clients selected in each round
-    per_round: 3
+    per_round: 1
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -36,7 +36,7 @@ trainer:
     type: mistnet
 
     # The maximum number of training rounds
-    rounds: 100
+    rounds: 1
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -48,7 +48,7 @@ trainer:
     target_accuracy: 0.95
 
     # Number of epoches for local training in each communication round
-    epochs: 1
+    epochs: 10
     batch_size: 32
     optimizer: SGD
     learning_rate: 0.01
@@ -63,3 +63,4 @@ algorithm:
     type: mistnet
 
     cut_layer: relu3
+    epsilon: null

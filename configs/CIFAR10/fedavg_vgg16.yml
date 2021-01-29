@@ -3,13 +3,13 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 3
+    total_clients: 1
 
     # The number of clients selected in each round
-    per_round: 2
+    per_round: 1
 
     # Should the clients compute test accuracy locally?
-    do_test: false
+    do_test: true
 
 server:
     address: localhost
@@ -23,7 +23,7 @@ data:
     data_path: ./data
 
     # Number of samples in each partition
-    partition_size: 20000
+    partition_size: 50000
 
     # IID, biased, or sharded?
     divider: iid
@@ -48,15 +48,16 @@ trainer:
     target_accuracy: 0.88
 
     # Number of epoches for local training in each communication round
-    epochs: 1
+    epochs: 5
     batch_size: 128
-    optimizer: SGD
-    learning_rate: 0.1
+    optimizer: Adam
+    learning_rate: 0.01
     momentum: 0.9
     weight_decay: 0.0
 
     # The machine learning model
     model: vgg_16
+    num_classes: 10
 
 algorithm:
     # Aggregation algorithm
