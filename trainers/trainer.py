@@ -4,11 +4,11 @@ The training and testing loops for PyTorch.
 
 import logging
 import os
+import copy
 from collections import OrderedDict
 import torch
 import torch.nn as nn
 import torch.multiprocessing as mp
-
 import numpy as np
 
 from models.base import Model
@@ -119,7 +119,7 @@ class Trainer(base.Trainer):
         self.model.load_state_dict(weights, strict=True)
 
     @staticmethod
-    def train_process(rank, self, trainset, cut_layer=None):  # pylint: disable=unused-argument
+    def train_process(rank, self, config, trainset, cut_layer=None):  # pylint: disable=unused-argument
         """The main training loop in a federated learning workload, run in
           a separate process with a new CUDA context, so that CUDA memory
           can be released after the training completes.
@@ -129,12 +129,12 @@ class Trainer(base.Trainer):
         cut_layer (optional): The layer which training should start from.
         """
         log_interval = 10
-        batch_size = Config().trainer.batch_size
+        batch_size = config['batch_size']
         train_loader = torch.utils.data.DataLoader(trainset,
                                                    batch_size=batch_size,
                                                    shuffle=True)
         iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
-        epochs = Config().trainer.epochs
+        epochs = config['epochs']
 
         # Sending the model to the device used for training
         self.model.to(self.device)
@@ -147,8 +147,7 @@ class Trainer(base.Trainer):
         optimizer = optimizers.get_optimizer(self.model)
 
         # Initializing the learning rate schedule, if necessary
-        if hasattr(Config().trainer, 'lr_gamma') or hasattr(
-                Config().trainer, 'lr_milestone_steps'):
+        if 'lr_gamma' in config or 'lr_milestone_steps' in config:
             lr_schedule = optimizers.get_lr_schedule(optimizer,
                                                      iterations_per_epoch,
                                                      train_loader)
@@ -174,7 +173,7 @@ class Trainer(base.Trainer):
                 if lr_schedule is not None:
                     lr_schedule.step()
 
-                if Config().trainer.optimizer == 'FedProx':
+                if config['optimizer'] == 'FedProx':
                     optimizer.params_state_update()
 
                 if batch_id % log_interval == 0:
@@ -201,9 +200,12 @@ class Trainer(base.Trainer):
         """
         self.start_training()
 
+        config = Config().trainer._asdict()
+
         mp.spawn(Trainer.train_process,
                  args=(
                      self,
+                     config,
                      trainset,
                      cut_layer,
                  ),
@@ -213,7 +215,7 @@ class Trainer(base.Trainer):
         self.pause_training()
 
     @staticmethod
-    def test_process(rank, self, testset, cut_layer):  # pylint: disable=unused-argument
+    def test_process(rank, self, config, testset, cut_layer):  # pylint: disable=unused-argument
         """The testing loop, run in a separate process with a new CUDA context,
         so that CUDA memory can be released after the training completes.
 
@@ -226,7 +228,7 @@ class Trainer(base.Trainer):
         self.model.eval()
 
         test_loader = torch.utils.data.DataLoader(
-            testset, batch_size=Config().trainer.batch_size, shuffle=False)
+            testset, batch_size=config['batch_size'], shuffle=False)
 
         correct = 0
         total = 0
@@ -257,10 +259,12 @@ class Trainer(base.Trainer):
         cut_layer (optional): The layer which testing should start from.
         """
         self.start_training()
+        config = Config().trainer._asdict()
 
         mp.spawn(Trainer.test_process,
                  args=(
                      self,
+                     config,
                      testset,
                      cut_layer,
                  ),
