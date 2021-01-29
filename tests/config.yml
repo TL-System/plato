@@ -7,10 +7,30 @@ data:
     dataset: MNIST
     data_path: ./data
     divider: iid
-    partition_size: 2000
+    partition_size: 60000
 
 trainer:
+    # The type of the trainer
     type: basic
+
+    # The maximum number of training rounds
+    rounds: 100
+
+    # Whether the training should use multiple GPUs if available
+    parallelized: false
+
+    # The maximum number of clients running concurrently
+    max_concurrency: 3
+
+    # Number of epoches for local training in each communication round
+    epochs: 5
+    batch_size: 32
+    optimizer: SGD
+    learning_rate: 0.01
+    momentum: 0.5
+    weight_decay: 0.0
+
+    # The machine learning model
     model: lenet5
 
 server:

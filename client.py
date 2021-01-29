@@ -10,7 +10,6 @@ import websockets
 from config import Config
 import clients
 import servers
-from collections import namedtuple
 
 
 def main():
