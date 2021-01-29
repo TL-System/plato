@@ -19,6 +19,24 @@ class FedAvgCrossSiloServer(FedAvgServer):
 
         self.current_global_round = None
 
+        if hasattr(Config(), 'results'):
+            self.recorded_items = ['global_round'] + self.recorded_items
+
+            dataset = Config().data.dataset
+            model = Config().trainer.model
+            server_type = Config().algorithm.type
+            result_dir = f'./results/{dataset}/{model}/{server_type}/'
+            csv_file = f'{result_dir}result.csv'
+            # Delete the csv file created during super().__init__()
+            if os.path.exists(csv_file):
+                os.remove(csv_file)
+
+            client_num = Config().clients.total_clients
+            silo_num = Config().algorithm.cross_silo.total_silos
+            epoch_num = Config().trainer.epochs
+            edge_agg_num = Config().algorithm.cross_silo.rounds
+            self.result_dir = f'{result_dir}/{client_num}_{silo_num}_{epoch_num}_{edge_agg_num}/'
+
         if Config().is_edge_server():
             # An edge client waits for the event that a certain number of
             # aggregations are completed
@@ -39,15 +57,10 @@ class FedAvgCrossSiloServer(FedAvgServer):
                 Config().args.id, self.total_clients, self.clients_per_round)
 
             if hasattr(Config(), 'results'):
-                self.recorded_items = ['global_round'] + self.recorded_items
-
-                dataset = Config().data.dataset
-                model = Config().trainer.model
-                server_type = Config().algorithm.type
-                result_dir = f'./results/{dataset}/{model}/{server_type}/'
-                result_csv_file = f'{result_dir}result_{Config().args.id}.csv'
+                result_csv_file = f'{self.result_dir}result_{Config().args.id}.csv'
                 csv_processor.initialize_csv(result_csv_file,
-                                             self.recorded_items, result_dir)
+                                             self.recorded_items,
+                                             self.result_dir)
 
         # Compute the number of clients for the central server
         if Config().is_central_server():
@@ -57,6 +70,16 @@ class FedAvgCrossSiloServer(FedAvgServer):
             logging.info(
                 "The central server starts training with %s edge servers.",
                 self.total_clients)
+
+            if hasattr(Config(), 'results'):
+                recorded_items = self.recorded_items
+                # For central server. 'round' is 'global_round'
+                if 'global_round' in recorded_items:
+                    recorded_items.remove('global_round')
+
+                result_csv_file = f'{self.result_dir}result.csv'
+                csv_processor.initialize_csv(result_csv_file, recorded_items,
+                                             self.result_dir)
 
     def configure(self):
         """
@@ -76,7 +99,6 @@ class FedAvgCrossSiloServer(FedAvgServer):
 
     async def customize_server_response(self, server_response):
         """Wrap up generating the server response with any additional information."""
-        server_response['first_communication_start_time'] = time.time()
         if Config().is_central_server():
             server_response['current_global_round'] = self.current_round
         return server_response
@@ -84,11 +106,6 @@ class FedAvgCrossSiloServer(FedAvgServer):
     async def wrap_up_processing_reports(self):
         """Wrap up processing the reports with any additional work."""
         if hasattr(Config(), 'results'):
-            # Write results into a CSV file
-            dataset = Config().data.dataset
-            model = Config().trainer.model
-            server_type = Config().algorithm.type
-            result_dir = f'./results/{dataset}/{model}/{server_type}/'
 
             new_row = []
             for item in self.recorded_items:
@@ -109,9 +126,9 @@ class FedAvgCrossSiloServer(FedAvgServer):
                 new_row.append(item_value)
 
             if Config().is_edge_server():
-                result_csv_file = f'{result_dir}result_{Config().args.id}.csv'
+                result_csv_file = f'{self.result_dir}result_{Config().args.id}.csv'
             else:
-                result_csv_file = f'{result_dir}result.csv'
+                result_csv_file = f'{self.result_dir}result.csv'
 
             csv_processor.write_csv(result_csv_file, new_row)
 
