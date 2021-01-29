@@ -6,9 +6,19 @@ Reference:
 C. Chen, et al. "Communication-Efficient Federated Learning with Adaptive
 Parameter Freezing," found in docs/papers.
 """
+from dataclasses import dataclass
+
 from config import Config
 from clients import SimpleClient
-from clients.simple import Report
+
+
+@dataclass
+class Report:
+    """Client report sent to the federated learning server."""
+    client_id: str
+    num_samples: int
+    weights: list
+    accuracy: float
 
 
 class AdaptiveFreezingClient(SimpleClient):
