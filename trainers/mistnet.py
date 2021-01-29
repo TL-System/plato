@@ -41,6 +41,7 @@ class Trainer(trainer.Trainer):
         epsilon: If epsilon is not None, local differential privacy should be
                 applied to the features extracted.
         """
+        self.model.to(self.device)
         self.model.eval()
 
         batch_size = Config().trainer.batch_size
@@ -69,4 +70,4 @@ class Trainer(trainer.Trainer):
         super().train(FeatureDataset(trainset), cut_layer)
 
     def test(self, testset, cut_layer=None):
-        super().test(FeatureDataset(testset), cut_layer)
+        return super().test(FeatureDataset(testset), cut_layer)

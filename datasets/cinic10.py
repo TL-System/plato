@@ -15,15 +15,17 @@ class Dataset(base.Dataset):
     def __init__(self, path):
         super().__init__(path)
 
-        self.cinic_directory = path + '/CINIC-10'
+        self.cinic_directory = path + '/CINIC10'
 
         # Download and extract CINIC-10 dataset if haven't
         if not os.path.exists(self.cinic_directory):
-            if not os.path.exists(self.cinic_directory + '.tar.gz'):
-                print('Downloading the CINIC-10 dataset. This takes a while.')
+            os.makedirs(self.cinic_directory)
 
-                url = 'https://datashare.is.ed.ac.uk/bitstream/handle/10283/3192/CINIC-10.tar.gz'
-                Dataset.download(url)
+        if not os.path.exists(self.cinic_directory + '.tar.gz'):
+            print('Downloading the CINIC-10 dataset. This takes a while.')
+
+            url = 'https://datashare.is.ed.ac.uk/bitstream/handle/10283/3192/CINIC-10.tar.gz'
+            Dataset.download(url, self.cinic_directory)
 
         self._transform = transforms.Compose([
             transforms.ToTensor(),

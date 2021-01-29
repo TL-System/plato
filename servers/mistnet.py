@@ -8,94 +8,20 @@ Differential Privacy," found in docs/papers.
 """
 
 import logging
-import time
 import os
-import random
 from itertools import chain
 
-import models.registry as models_registry
-from datasets import registry as datasets_registry
-from trainers import registry as trainers_registry
-from servers import Server
+from servers import FedAvgServer
 from config import Config
-from utils import csv_processor
 
 
-class MistNetServer(Server):
-    """A federated learning server for MistNet."""
-    def __init__(self):
-        super().__init__()
-        self.testset = None
-        self.model = None
-        self.selected_clients = None
-        self.total_samples = 0
-
-        # starting time of a gloabl training round
-        self.round_start_time = 0
-
-        self.total_clients = Config().clients.total_clients
-        self.clients_per_round = Config().clients.per_round
-        logging.info(
-            "[Server #%s] Started training on %s clients and %s per round.",
-            os.getpid(), self.total_clients, self.clients_per_round)
-
-        if hasattr(Config(), 'results'):
-            recorded_items = Config().results.types
-            self.recorded_items = [
-                x.strip() for x in recorded_items.split(',')
-            ]
-            # Directory of results (figures etc.)
-            result_dir = f'./results/{Config().data.dataset}/{Config().trainer.model}/'
-            result_csv_file = result_dir + 'result.csv'
-            csv_processor.initialize_csv(result_csv_file, self.recorded_items,
-                                         result_dir)
-
-        random.seed()
-
-    def configure(self):
-        """
-        Booting the MistNet server by setting up the data, model, and
-        creating the clients.
-        """
-        logging.info('[Server #%s] Configuring the %s server...', os.getpid(),
-                     Config().algorithm.type)
-
-        total_rounds = Config().trainer.rounds
-        target_accuracy = Config().trainer.target_accuracy
-
-        if target_accuracy:
-            logging.info('[Server #%s] Training: %s rounds or %s%% accuracy\n',
-                         os.getpid(), total_rounds, 100 * target_accuracy)
-        else:
-            logging.info('[Server #%s] Training: %s rounds\n', os.getpid(),
-                         total_rounds)
-
-        self.load_test_data()
-        self.load_model()
-
-    def load_test_data(self):
-        """Loading the test dataset."""
-        dataset = datasets_registry.get()
-        self.testset = dataset.get_test_set()
-
+class MistNetServer(FedAvgServer):
+    """The MistNet server for federated learning."""
     def load_model(self):
         """Setting up a pre-trained model to be loaded on the clients."""
-        model_type = Config().trainer.model
-        logging.info('[Server #%s] Model: %s', os.getpid(), model_type)
-
-        # Loading the model for server-side training
-        self.model = models_registry.get(model_type)
-        self.trainer = trainers_registry.get(self.model)
-        self.trainer.load_model(model_type)
-
-    def choose_clients(self):
-        """Choose a subset of the clients to participate in each round."""
-        self.round_start_time = time.time()
-
-        # Select clients randomly
-        assert self.clients_per_round <= len(self.clients)
-        self.selected_clients = random.sample(list(self.clients),
-                                              self.clients_per_round)
+        super().load_model()
+        logging.info("[Server #%s] Loading a pre-trained model.", os.getpid())
+        self.trainer.load_model()
 
     async def process_reports(self):
         """Process the features extracted by the client and perform server-side training."""
@@ -114,19 +40,3 @@ class MistNetServer(Server):
                                                                self.accuracy))
 
         await self.wrap_up_processing_reports()
-
-    async def wrap_up_processing_reports(self):
-        """Wrap up processing the reports with any additional work."""
-        if hasattr(Config(), 'results'):
-            new_row = [self.current_round]
-            for item in self.recorded_items:
-                item_value = {
-                    'accuracy': self.accuracy * 100,
-                    'training_time': time.time() - self.round_start_time
-                }[item]
-                new_row.append(item_value)
-
-            result_dir = f'./results/{Config().data.dataset}/{Config().trainer.model}/'
-            result_csv_file = result_dir + 'result.csv'
-
-            csv_processor.write_csv(result_csv_file, new_row)

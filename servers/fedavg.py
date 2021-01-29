@@ -31,7 +31,7 @@ class FedAvgServer(Server):
             "[Server #%d] Started training on %s clients with %s per round.",
             os.getpid(), self.total_clients, self.clients_per_round)
 
-        # starting time of a gloabl training round
+        # starting time of a global training round
         self.round_start_time = 0
 
         if hasattr(Config(), 'results'):
@@ -53,7 +53,8 @@ class FedAvgServer(Server):
         Booting the federated learning server by setting up the data, model, and
         creating the clients.
         """
-        logging.info('Configuring the %s server...', Config().algorithm.type)
+        logging.info('[Server #%s] Configuring the %s server...', os.getpid(),
+                     Config().algorithm.type)
 
         total_rounds = Config().trainer.rounds
         target_accuracy = Config().trainer.target_accuracy
@@ -74,7 +75,7 @@ class FedAvgServer(Server):
         """Setting up the global model to be trained via federated learning."""
 
         model_type = Config().trainer.model
-        logging.info('Model: %s', model_type)
+        logging.info('[Server #%s] Model: %s', os.getpid(), model_type)
 
         self.model = models_registry.get(model_type)
         self.trainer = trainers_registry.get(self.model)
