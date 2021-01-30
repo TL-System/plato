@@ -87,7 +87,7 @@ It goes without saying that `/absolute/path/to/project/home/directory` should be
 
 ### Installing Plato with MindSpore
 
-Most of the codebase in **Plato** is designed to be framework-agnostic, so that it is relatively straightfoward to use **Plato** with a variety of deep learning frameworks beyond PyTorch, which is the default framwork it is using. One example of such deep learning frameworks is [MindSpore](https://www.mindspore.cn).
+Most of the codebase in *Plato* is designed to be framework-agnostic, so that it is relatively straightfoward to use *Plato* with a variety of deep learning frameworks beyond PyTorch, which is the default framwork it is using. One example of such deep learning frameworks is [MindSpore](https://www.mindspore.cn).
 
 Though we provided a `Dockerfile` in `docker/` for building a Docker container that supports MindSpore 1.1, it may still be necessary to install Plato with MindSpore in a GPU server running Ubuntu Linux 18.04 (which MindSpore requires). Similar to a PyTorch installation, we need to first create a new environment with Python 3.7.5 (which MindSpore 1.1 requires), and then install the required packages:
 
@@ -130,7 +130,7 @@ check libcudnn
 
 To check if MindSpore is correctly installed on the GPU server, try to `import mindspore` with a Python interpreter.
 
-Finally, to use trainers and servers based on MindSpore, assign `True` to `use_mindspore` in the `trainer` section of the configuration file. Its default value is `False`, and Plato would use PyTorch as its default framework.
+Finally, to use trainers and servers based on MindSpore, assign `true` to `use_mindspore` in the `trainer` section of the configuration file. This variable is unassigned by default, and *Plato* would use PyTorch as its default framework.
 
 ### Running Plato
 
@@ -144,11 +144,11 @@ python server.py --config=config.yml --log=info
 * `--config` (`-c`): the path to the configuration file to be used. The default is `config.yml` in the project's home directory.
 * `--log` (`-l`): the level of logging information to be written to the console. Possible values are `critical`, `error`, `warn`, `info`, and `debug`, and the default is `info`.
 
-*Plato* uses a standard configuration file, parsed by Python's standard configuration parser, to manage the runtime configuration parameters. Example configuration files have been provided in the `configs` directory.
+*Plato* uses the YAML format for its configuration files to manage the runtime configuration parameters. Example configuration files have been provided in the `configs` directory.
 
 ### Plotting Runtime Results
 
-If the configuration file contains a `[results]` section, the selected performance metrics, such as accuracy, will be saved in a `.csv` file in the `results/` directory. As `.csv` files, these results can be used however one wishes; an example Python program, called `plot.py`, plots the necessary figures and saves them as PDF files. To run this program:
+If the configuration file contains a `results` section, the selected performance metrics, such as accuracy, will be saved in a `.csv` file in the `results/` directory. As `.csv` files, these results can be used however one wishes; an example Python program, called `plot.py`, plots the necessary figures and saves them as PDF files. To run this program:
 
 ```shell
 python plot.py --config=config.yml
@@ -186,7 +186,7 @@ To remove the `plato` Docker image, use the command:
 docker rmi plato
 ```
 
-The provided `Dockerfile` helps to build a Docker container image running Ubuntu 20.04, with two virtual environments pre-installed: the one called `federated` supports PyTorch and Python 3.8, and one called `mindspore` supports [MindSpore 1.1](https://github.com/mindspore-ai/mindspore) and Python 3.7 (which is the Python version that MindSpore requires). Once the container is built and running, one can use Visual Studio Code to connect to it and start development within the container.
+The provided `Dockerfile` helps to build a Docker container image running Ubuntu 20.04, with two virtual environments pre-installed: the one called `federated` supports PyTorch and Python 3.8, and one called `mindspore` supports [MindSpore 1.1](https://github.com/mindspore-ai/mindspore) and Python 3.7.5 (which is the Python version that MindSpore requires). Once the container is built and running, one can use Visual Studio Code to connect to it and start development within the container.
 
 ### Uninstalling Plato
 
