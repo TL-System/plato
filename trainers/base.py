@@ -10,9 +10,10 @@ from config import Config
 
 class Trainer(ABC):
     """Base class for all the trainers."""
-    def __init__(self, client_id):
+    def __init__(self, client_id, experiment_index):
         self.device = Config().device()
         self.client_id = client_id
+        self.experiment_index = experiment_index
         """Initialize a global counter of running trainers."""
         if not os.path.exists('./running_trainers'):
             with open('./running_trainers', 'w') as file:
@@ -41,8 +42,12 @@ class Trainer(ABC):
 
         model_type = Config().trainer.model
         model_dir = './models/pretrained/'
-        model_path = f'{model_dir}{model_type}_{self.client_id}.pth'
-        accuracy_path = f'{model_dir}{model_type}_{self.client_id}.acc'
+        if self.experiment_index == 0:
+            model_path = f'{model_dir}{model_type}_{self.client_id}.pth'
+            accuracy_path = f'{model_dir}{model_type}_{self.client_id}.acc'
+        else:
+            model_path = f'{model_dir}{model_type}_{self.client_id}_{self.experiment_index}.pth'
+            accuracy_path = f'{model_dir}{model_type}_{self.client_id}_{self.experiment_index}.acc'
 
         if os.path.exists(model_path):
             os.remove(model_path)

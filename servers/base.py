@@ -26,6 +26,32 @@ class Server:
         self.accuracy = 0
         self.reports = []
 
+        # When running multiple expriments at the same time or
+        # running expriments with the same config files multiple times,
+        # problems such as overwriting pth files and results files may occur.
+        # Use experiment_index to make the paths of those files different.
+        self.experiment_index = 0
+
+    def set_experiment_index(self):
+        """
+        Setting experiment_index to avoid problems
+        when running multiple experiments at the same time or
+        running expriments with the same config files multiple times.
+        """
+        model_type = Config().trainer.model
+        model_dir = './models/pretrained/'
+        model_path = f'{model_dir}{model_type}_0.pth'
+        while True:
+            if os.path.exists(model_path):
+                self.experiment_index += 1
+                model_path = f'{model_dir}{model_type}_0_{self.experiment_index}.pth'
+            else:
+                if not os.path.exists(model_dir):
+                    os.makedirs(model_dir)
+                model_file = open(model_path, "w")
+                model_file.close()
+                break
+
     def register_client(self, client_id, websocket):
         """Adding a newly arrived client to the list of clients."""
         if not client_id in self.clients:
@@ -37,8 +63,7 @@ class Server:
             if value == websocket:
                 del self.clients[key]
 
-    @staticmethod
-    def start_clients(as_server=False):
+    def start_clients(self, as_server=False):
         """Starting all the clients as separate processes."""
         starting_id = 1
 
@@ -52,6 +77,7 @@ class Server:
             logging.info("Starting client #%s.", client_id)
             command = "python client.py -i {}".format(client_id)
             command += " -c {}".format(Config().args.config)
+            command += " -e {}".format(self.experiment_index)
 
             if as_server:
                 command += " -p {}".format(Config().server.port + client_id)
@@ -156,6 +182,7 @@ class Server:
     @abstractmethod
     def configure(self):
         """Configuring the server with initialization work."""
+        self.set_experiment_index()
 
     @abstractmethod
     def choose_clients(self):
