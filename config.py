@@ -5,6 +5,7 @@ to work on than JSON).
 
 import logging
 from collections import namedtuple, OrderedDict
+import os
 
 import argparse
 import torch
@@ -40,11 +41,6 @@ class Config:
                                 type=str,
                                 default='info',
                                 help='Log messages level.')
-            parser.add_argument('-e',
-                                '--experiment_index',
-                                type=str,
-                                default=0,
-                                help='Experiment index.')
 
             args = parser.parse_args()
 
@@ -75,9 +71,10 @@ class Config:
             Config.trainer = Config.namedtuple_from_dict(config['trainer'])
             Config.algorithm = Config.namedtuple_from_dict(config['algorithm'])
             Config.args = args
-
             if 'results' in config:
                 Config.results = Config.namedtuple_from_dict(config['results'])
+                Config.result_dir = os.path.dirname(
+                    Config().args.config) + '/results/'
 
         return cls._instance
 
