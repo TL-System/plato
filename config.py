@@ -73,8 +73,7 @@ class Config:
 
             if 'results' in config:
                 Config.results = Config.namedtuple_from_dict(config['results'])
-                Config.result_dir = os.path.dirname(
-                    Config().args.config) + '/results/'
+                Config.result_dir = os.path.dirname(args.config) + '/results/'
 
             Config.args = args
             Config.experiment_id = os.getpid()
