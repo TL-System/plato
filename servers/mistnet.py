@@ -22,7 +22,7 @@ class MistNetServer(FedAvgServer):
         super().load_model()
 
         logging.info("[Server #%s] Loading a pre-trained model.", os.getpid())
-        self.trainer.load_model(Config().trainer.model + ".pth")
+        self.trainer.load_model()
 
     async def process_reports(self):
         """Process the features extracted by the client and perform server-side training."""
