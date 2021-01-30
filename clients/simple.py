@@ -3,6 +3,7 @@ A basic federated learning client who sends weight updates to the server.
 """
 
 import logging
+import os
 import random
 import time
 from dataclasses import dataclass
@@ -49,8 +50,9 @@ class SimpleClient(Client):
         """Prepare this client for training."""
         model_type = Config().trainer.model
         self.model = models_registry.get(model_type)
+        experiment_id = os.getpid()
         self.trainer = trainers_registry.get(self.model, self.client_id,
-                                             Config().args.experiment_index)
+                                             experiment_id)
 
     def load_data(self):
         """Generating data and loading them onto this client."""

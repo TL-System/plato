@@ -62,11 +62,9 @@ class FedAvgCrossSiloServer(FedAvgServer):
             logging.info("Training with %s local aggregation rounds.",
                          Config().algorithm.cross_silo.rounds)
             self.load_model()
-            self.experiment_index = Config().args.experiment_index
 
             if hasattr(Config(), 'results'):
-                result_dir = f'./results/{Config().data.dataset}/{Config().trainer.model}'
-                result_dir += f'/{Config().algorithm.type}/{self.experiment_index}/'
+                result_dir = Config().result_dir
                 result_csv_file = f'{result_dir}/result_{Config().args.id}.csv'
                 csv_processor.initialize_csv(result_csv_file,
                                              self.recorded_items, result_dir)
@@ -102,12 +100,10 @@ class FedAvgCrossSiloServer(FedAvgServer):
                 }[item]
                 new_row.append(item_value)
 
-            result_dir = f'./results/{Config().data.dataset}/{Config().trainer.model}'
-            result_dir += f'/{Config().algorithm.type}/{self.experiment_index}/'
             if Config().is_edge_server():
-                result_csv_file = f'{result_dir}result_{Config().args.id}.csv'
+                result_csv_file = f'{Config().result_dir}result_{Config().args.id}.csv'
             else:
-                result_csv_file = f'{result_dir}result.csv'
+                result_csv_file = f'{Config().result_dir}result.csv'
 
             csv_processor.write_csv(result_csv_file, new_row)
 

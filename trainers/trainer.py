@@ -17,14 +17,14 @@ from trainers import base, optimizers
 
 class Trainer(base.Trainer):
     """A basic federated learning trainer, used by both the client and the server."""
-    def __init__(self, model: Model, client_id=0, experiment_index=0):
+    def __init__(self, model: Model, client_id=0, experiment_id=0):
         """Initializing the trainer with the provided model.
 
         Arguments:
         model: The model to train. Must be a models.base.Model subclass.
         client_id: The ID of the client using this trainer (optional).
         """
-        super().__init__(client_id, experiment_index)
+        super().__init__(client_id, experiment_id)
 
         # Use data parallelism if multiple GPUs are available and the configuration specifies it
         if Config().is_parallel():
@@ -33,8 +33,6 @@ class Trainer(base.Trainer):
             self.model = nn.DataParallel(model)
         else:
             self.model = model
-
-        self.experimentl_index = experiment_index
 
     def zeros(self, shape):
         """Returns a MindSpore zero tensor with the given shape."""
@@ -48,10 +46,7 @@ class Trainer(base.Trainer):
         model_dir = './models/pretrained/'
         if not os.path.exists(model_dir):
             os.makedirs(model_dir)
-        if self.experiment_index == 0:
-            model_path = f'{model_dir}{model_type}_{self.client_id}.pth'
-        else:
-            model_path = f'{model_dir}{model_type}_{self.client_id}_{self.experiment_index}.pth'
+        model_path = f'{model_dir}{model_type}_{self.client_id}_{self.experiment_id}.pth'
         torch.save(self.model.state_dict(), model_path)
 
         if self.client_id == 0:
@@ -65,10 +60,7 @@ class Trainer(base.Trainer):
         """Loading pre-trained model weights from a file."""
         model_dir = './models/pretrained/'
         model_type = Config().trainer.model
-        if self.experiment_index == 0:
-            model_path = f'{model_dir}{model_type}_{self.client_id}.pth'
-        else:
-            model_path = f'{model_dir}{model_type}_{self.client_id}_{self.experiment_index}.pth'
+        model_path = f'{model_dir}{model_type}_{self.client_id}_{self.experiment_id}.pth'
 
         if self.client_id == 0:
             logging.info('[Server #%s] Loading a model from %s.', os.getpid(),
@@ -85,10 +77,7 @@ class Trainer(base.Trainer):
         model_dir = './models/pretrained/'
         if not os.path.exists(model_dir):
             os.makedirs(model_dir)
-        if self.experiment_index == 0:
-            accuracy_path = f'{model_dir}{model_type}_{self.client_id}.acc'
-        else:
-            accuracy_path = f'{model_dir}{model_type}_{self.client_id}_{self.experiment_index}.acc'
+        accuracy_path = f'{model_dir}{model_type}_{self.client_id}_{self.experiment_id}.acc'
 
         with open(accuracy_path, 'w') as file:
             file.write(str(accuracy))
@@ -97,10 +86,7 @@ class Trainer(base.Trainer):
         """Loading the test accuracy from a file."""
         model_type = Config().trainer.model
         model_dir = './models/pretrained/'
-        if self.experiment_index == 0:
-            accuracy_path = f'{model_dir}{model_type}_{self.client_id}.acc'
-        else:
-            accuracy_path = f'{model_dir}{model_type}_{self.client_id}_{self.experiment_index}.acc'
+        accuracy_path = f'{model_dir}{model_type}_{self.client_id}_{self.experiment_id}.acc'
         with open(accuracy_path, 'r') as file:
             accuracy = float(file.read())
         return accuracy
