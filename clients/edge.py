@@ -16,9 +16,6 @@ class EdgeClient(Client):
         self.server = server
         self.trainer = None
 
-        # The communication time of the central server sending the current model to the edge server
-        self.first_communication_time = None
-
     def configure(self):
         """Prepare this edge client for training."""
         self.trainer = trainers_registry.get(self.server.model)
