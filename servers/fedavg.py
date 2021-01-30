@@ -47,7 +47,6 @@ class FedAvgServer(Server):
         Booting the federated learning server by setting up the data, model, and
         creating the clients.
         """
-        super().configure()
 
         logging.info('[Server #%s] Configuring the %s server...', os.getpid(),
                      Config().algorithm.type)
@@ -69,12 +68,9 @@ class FedAvgServer(Server):
 
         # Initialize the csv file which will record results
         if hasattr(Config(), 'results'):
-            # Directory of results (figures etc.)
-            result_dir = f'./results/{Config().data.dataset}/{Config().trainer.model}'
-            result_dir += f'/{Config().algorithm.type}/{self.experiment_index}/'
-            result_csv_file = result_dir + 'result.csv'
+            result_csv_file = Config().result_dir + 'result.csv'
             csv_processor.initialize_csv(result_csv_file, self.recorded_items,
-                                         result_dir)
+                                         Config().result_dir)
 
     def load_model(self):
         """Setting up the global model to be trained via federated learning."""
@@ -83,8 +79,9 @@ class FedAvgServer(Server):
         logging.info('[Server #%s] Model: %s', os.getpid(), model_type)
 
         self.model = models_registry.get(model_type)
-        self.trainer = trainers_registry.get(
-            self.model, experiment_index=self.experiment_index)
+        experiment_id = os.getpid()
+        self.trainer = trainers_registry.get(self.model,
+                                             experiment_id=experiment_id)
 
     def choose_clients(self):
         """Choose a subset of the clients to participate in each round."""
@@ -176,11 +173,7 @@ class FedAvgServer(Server):
                 }[item]
                 new_row.append(item_value)
 
-            dataset = Config().data.dataset
-            model = Config().trainer.model
-            server_type = Config().algorithm.type
-            result_dir = f'./results/{dataset}/{model}/{server_type}/{self.experiment_index}/'
-            result_csv_file = result_dir + 'result.csv'
+            result_csv_file = Config().result_dir + 'result.csv'
 
             csv_processor.write_csv(result_csv_file, new_row)
 
