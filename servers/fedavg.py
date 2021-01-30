@@ -48,17 +48,17 @@ class FedAvgServer(Server):
         creating the clients.
         """
 
-        logging.info('[Server #%s] Configuring the %s server...', os.getpid(),
+        logging.info("[Server #%s] Configuring the %s server...", os.getpid(),
                      Config().algorithm.type)
 
         total_rounds = Config().trainer.rounds
         target_accuracy = Config().trainer.target_accuracy
 
         if target_accuracy:
-            logging.info('Training: %s rounds or %s%% accuracy\n',
+            logging.info("Training: %s rounds or %s%% accuracy\n",
                          total_rounds, 100 * target_accuracy)
         else:
-            logging.info('Training: %s rounds\n', total_rounds)
+            logging.info("Training: %s rounds\n", total_rounds)
 
         if not Config().clients.do_test:
             dataset = datasets_registry.get()
@@ -76,12 +76,11 @@ class FedAvgServer(Server):
         """Setting up the global model to be trained via federated learning."""
 
         model_type = Config().trainer.model
-        logging.info('[Server #%s] Model: %s', os.getpid(), model_type)
+        logging.info("[Server #%s] Model: %s", os.getpid(), model_type)
 
         self.model = models_registry.get(model_type)
         experiment_id = os.getpid()
-        self.trainer = trainers_registry.get(self.model,
-                                             experiment_id=experiment_id)
+        self.trainer = trainers_registry.get(self.model)
 
     def choose_clients(self):
         """Choose a subset of the clients to participate in each round."""
