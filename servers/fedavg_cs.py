@@ -41,14 +41,6 @@ class FedAvgCrossSiloServer(FedAvgServer):
             if hasattr(Config(), 'results'):
                 self.recorded_items = ['global_round'] + self.recorded_items
 
-                dataset = Config().data.dataset
-                model = Config().trainer.model
-                server_type = Config().algorithm.type
-                result_dir = f'./results/{dataset}/{model}/{server_type}/'
-                result_csv_file = f'{result_dir}result_{Config().args.id}.csv'
-                csv_processor.initialize_csv(result_csv_file,
-                                             self.recorded_items, result_dir)
-
         # Compute the number of clients for the central server
         if Config().is_central_server():
             self.clients_per_round = Config().algorithm.cross_silo.total_silos
@@ -70,13 +62,20 @@ class FedAvgCrossSiloServer(FedAvgServer):
             logging.info("Training with %s local aggregation rounds.",
                          Config().algorithm.cross_silo.rounds)
             self.load_model()
+            self.experiment_index = Config().args.experiment_index
+
+            if hasattr(Config(), 'results'):
+                result_dir = f'./results/{Config().data.dataset}/{Config().trainer.model}'
+                result_dir += f'/{Config().algorithm.type}/{self.experiment_index}/'
+                result_csv_file = f'{result_dir}/result_{Config().args.id}.csv'
+                csv_processor.initialize_csv(result_csv_file,
+                                             self.recorded_items, result_dir)
 
         else:
             super().configure()
 
     async def customize_server_response(self, server_response):
         """Wrap up generating the server response with any additional information."""
-        server_response['first_communication_start_time'] = time.time()
         if Config().is_central_server():
             server_response['current_global_round'] = self.current_round
         return server_response
@@ -84,11 +83,6 @@ class FedAvgCrossSiloServer(FedAvgServer):
     async def wrap_up_processing_reports(self):
         """Wrap up processing the reports with any additional work."""
         if hasattr(Config(), 'results'):
-            # Write results into a CSV file
-            dataset = Config().data.dataset
-            model = Config().trainer.model
-            server_type = Config().algorithm.type
-            result_dir = f'./results/{dataset}/{model}/{server_type}/'
 
             new_row = []
             for item in self.recorded_items:
@@ -108,6 +102,8 @@ class FedAvgCrossSiloServer(FedAvgServer):
                 }[item]
                 new_row.append(item_value)
 
+            result_dir = f'./results/{Config().data.dataset}/{Config().trainer.model}'
+            result_dir += f'/{Config().algorithm.type}/{self.experiment_index}/'
             if Config().is_edge_server():
                 result_csv_file = f'{result_dir}result_{Config().args.id}.csv'
             else:

@@ -49,7 +49,8 @@ class SimpleClient(Client):
         """Prepare this client for training."""
         model_type = Config().trainer.model
         self.model = models_registry.get(model_type)
-        self.trainer = trainers_registry.get(self.model, self.client_id)
+        self.trainer = trainers_registry.get(self.model, self.client_id,
+                                             Config().args.experiment_index)
 
     def load_data(self):
         """Generating data and loading them onto this client."""
