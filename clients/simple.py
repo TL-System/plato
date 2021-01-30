@@ -50,27 +50,25 @@ class SimpleClient(Client):
         """Prepare this client for training."""
         model_type = Config().trainer.model
         self.model = models_registry.get(model_type)
-        experiment_id = os.getpid()
-        self.trainer = trainers_registry.get(self.model, self.client_id,
-                                             experiment_id)
+        self.trainer = trainers_registry.get(self.model, self.client_id)
 
     def load_data(self):
         """Generating data and loading them onto this client."""
         data_loading_start_time = time.time()
-        logging.info('[Client #%s] Loading its dataset...', self.client_id)
+        logging.info("[Client #%s] Loading its dataset...", self.client_id)
 
         dataset = datasets_registry.get()
         self.data_loaded = True
 
-        logging.info('[Client #%s] Dataset size: %s', self.client_id,
+        logging.info("[Client #%s] Dataset size: %s", self.client_id,
                      dataset.num_train_examples())
-        logging.info('[Client #%s] Number of classes: %s', self.client_id,
+        logging.info("[Client #%s] Number of classes: %s", self.client_id,
                      dataset.num_classes())
 
         # Setting up the data divider
         assert Config().data.divider in ('iid', 'bias', 'shard',
                                          'iid_mindspore')
-        logging.info('[Client #%s] Data distribution: %s', self.client_id,
+        logging.info("[Client #%s] Data distribution: %s", self.client_id,
                      Config().data.divider)
 
         self.divider = {
@@ -136,7 +134,7 @@ class SimpleClient(Client):
     async def train(self):
         """The machine learning training workload on a client."""
         training_start_time = time.time()
-        logging.info('[Client #%s] Started training.', self.client_id)
+        logging.info("[Client #%s] Started training.", self.client_id)
 
         # Perform model training
         self.trainer.train(self.trainset)
@@ -147,7 +145,7 @@ class SimpleClient(Client):
         # Generate a report for the server, performing model testing if applicable
         if Config().clients.do_test:
             accuracy = self.trainer.test(self.testset)
-            logging.info('[Client #{:s}] Test accuracy: {:.2f}%'.format(
+            logging.info("[Client #{:s}] Test accuracy: {:.2f}%".format(
                 self.client_id, 100 * accuracy))
 
         else:

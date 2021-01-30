@@ -67,10 +67,10 @@ class Trainer(base.Trainer):
         mindspore.save_checkpoint(self.model, model_path)
 
         if self.client_id == 0:
-            logging.info('[Server #%s] Model saved to %s.', os.getpid(),
+            logging.info("[Server #%s] Model saved to %s.", os.getpid(),
                          model_path)
         else:
-            logging.info('[Client #%s] Model saved to %s.', self.client_id,
+            logging.info("[Client #%s] Model saved to %s.", self.client_id,
                          model_path)
 
     def load_model(self):
@@ -80,10 +80,10 @@ class Trainer(base.Trainer):
         model_path = f'{model_dir}{model_type}_{self.client_id}.ckpt'
 
         if self.client_id == 0:
-            logging.info('[Server #%s] Loading a model from %s.', os.getpid(),
+            logging.info("[Server #%s] Loading a model from %s.", os.getpid(),
                          model_path)
         else:
-            logging.info('[Client #%s] Loading a model from %s.',
+            logging.info("[Client #%s] Loading a model from %s.",
                          self.client_id, model_path)
 
         param_dict = mindspore.load_checkpoint(model_path)

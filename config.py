@@ -70,11 +70,15 @@ class Config:
             Config.data = Config.namedtuple_from_dict(config['data'])
             Config.trainer = Config.namedtuple_from_dict(config['trainer'])
             Config.algorithm = Config.namedtuple_from_dict(config['algorithm'])
-            Config.args = args
+
             if 'results' in config:
                 Config.results = Config.namedtuple_from_dict(config['results'])
                 Config.result_dir = os.path.dirname(
                     Config().args.config) + '/results/'
+
+            Config.args = args
+            Config.experiment_id = os.getpid()
+            Config.model_dir = './models/pretrained/'
 
         return cls._instance
 

@@ -87,11 +87,11 @@ class FLEnv(gym.Env):
 
         # Rescale the action from [-1, 1] to [1, 2, ... , 9]
         # The action is the number of aggregations on edge servers
-        #current_edge_agg_num = int((action + 2) * (action + 2))
+        # current_edge_agg_num = int((action + 2) * (action + 2))
 
-        logging.info('RL Agent: Start time step #%s...', self.time_step)
+        logging.info("RL Agent: Start time step #%s...", self.time_step)
         logging.info(
-            'Each edge server will run %s rounds of local aggregation.',
+            "Each edge server will run %s rounds of local aggregation.",
             current_edge_agg_num)
 
         # Pass the tuned parameter to RL agent

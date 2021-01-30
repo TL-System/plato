@@ -23,14 +23,14 @@ if hasattr(Config().trainer, 'use_mindspore'):
         list(registered_trainers.items()) + list(mindspore_trainers.items()))
 
 
-def get(model: Model, client_id=0, experiment_id=0):
+def get(model: Model, client_id=0):
     """Get the trainer with the provided name."""
     trainer_name = Config().trainer.type
 
     if trainer_name in registered_trainers:
         logging.info("Trainer: %s", trainer_name)
         registered_trainer = registered_trainers[trainer_name].Trainer(
-            model, client_id, experiment_id)
+            model, client_id)
     else:
         raise ValueError('No such trainer: {}'.format(trainer_name))
 
