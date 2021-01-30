@@ -39,12 +39,6 @@ class FedAvgServer(Server):
             self.recorded_items = ['round'] + [
                 x.strip() for x in recorded_items.split(',')
             ]
-            # Directory of results (figures etc.)
-            result_dir = f'./results/{Config().data.dataset}/{Config().trainer.model}'
-            result_dir += f'/{Config().algorithm.type}/'
-            result_csv_file = result_dir + 'result.csv'
-            csv_processor.initialize_csv(result_csv_file, self.recorded_items,
-                                         result_dir)
 
         random.seed()
 
@@ -53,6 +47,8 @@ class FedAvgServer(Server):
         Booting the federated learning server by setting up the data, model, and
         creating the clients.
         """
+        super().configure()
+
         logging.info('[Server #%s] Configuring the %s server...', os.getpid(),
                      Config().algorithm.type)
 
@@ -71,6 +67,15 @@ class FedAvgServer(Server):
 
         self.load_model()
 
+        # Initialize the csv file which will record results
+        if hasattr(Config(), 'results'):
+            # Directory of results (figures etc.)
+            result_dir = f'./results/{Config().data.dataset}/{Config().trainer.model}'
+            result_dir += f'/{Config().algorithm.type}/{self.experiment_index}/'
+            result_csv_file = result_dir + 'result.csv'
+            csv_processor.initialize_csv(result_csv_file, self.recorded_items,
+                                         result_dir)
+
     def load_model(self):
         """Setting up the global model to be trained via federated learning."""
 
@@ -78,7 +83,8 @@ class FedAvgServer(Server):
         logging.info('[Server #%s] Model: %s', os.getpid(), model_type)
 
         self.model = models_registry.get(model_type)
-        self.trainer = trainers_registry.get(self.model)
+        self.trainer = trainers_registry.get(
+            self.model, experiment_index=self.experiment_index)
 
     def choose_clients(self):
         """Choose a subset of the clients to participate in each round."""
@@ -88,11 +94,6 @@ class FedAvgServer(Server):
                                               self.clients_per_round)
         # starting time of a gloabl training round
         self.round_start_time = time.time()
-
-    async def customize_server_response(self, server_response):
-        """Wrap up generating the server response with any additional information."""
-        server_response['first_communication_start_time'] = time.time()
-        return server_response
 
     def aggregate_weights(self, reports):
         """Aggregate the reported weight updates from the selected clients."""
@@ -178,7 +179,7 @@ class FedAvgServer(Server):
             dataset = Config().data.dataset
             model = Config().trainer.model
             server_type = Config().algorithm.type
-            result_dir = f'./results/{dataset}/{model}/{server_type}/'
+            result_dir = f'./results/{dataset}/{model}/{server_type}/{self.experiment_index}/'
             result_csv_file = result_dir + 'result.csv'
 
             csv_processor.write_csv(result_csv_file, new_row)
