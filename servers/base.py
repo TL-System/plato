@@ -143,7 +143,7 @@ class Server:
 
     async def close(self):
         """Closing the server."""
-        self.trainer.save_model(Config().trainer.model + ".pth")
+        self.trainer.save_model()
         self.trainer.stop_training()
         await self.close_connections()
         sys.exit()
