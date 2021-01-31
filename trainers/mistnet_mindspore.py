@@ -10,7 +10,6 @@ Differential Privacy," found in docs/papers.
 
 import time
 import logging
-from mindspore.nn import optim
 import numpy as np
 import mindspore
 import mindspore.dataset as ds
@@ -96,13 +95,16 @@ class Trainer(trainer_mindspore.Trainer):
         return feature_dataset
 
     @staticmethod
-    def dataset_generator(feature_dataset):
-        for logit, target in feature_dataset:
-            yield (logit.asnumpy(), target.asnumpy())
+    def dataset_generator(trainset):
+        for logit, target in trainset:
+            yield logit.asnumpy(), target.asnumpy()
 
     def train(self, trainset, cut_layer=None):
         feature_dataset = ds.GeneratorDataset(
-            Trainer.dataset_generator(trainset), ["logit", "target"])
+            list(Trainer.dataset_generator(trainset)), column_names=["image", "label"])
+
+        for sample in feature_dataset.create_dict_iterator():
+            print(sample)
 
         super().train(feature_dataset, cut_layer)
 
