@@ -6,6 +6,8 @@ Y. LeCun, L. Bottou, Y. Bengio, and P. Haffner. "Gradient-based learning applied
 document recognition." Proceedings of the IEEE, November 1998.
 """
 import collections
+import mindspore
+import numpy as np
 import mindspore.nn as nn
 from mindspore.common.initializer import Normal
 
@@ -79,12 +81,18 @@ class Model(base_mindspore.Model):
             x = self.relu4(self.fc2(x))
             x = self.fc3(x)
         else:
+            """
             layer_index = self.layers.index(self.cut_layer)
 
             for i in range(layer_index + 1, len(self.layers)):
                 print(self.layers[i])
+                print(x.shape)
                 x = self.layerdict[self.layers[i]](x)
-            
+            """
+            print(x.shape)
+            print(x)
+            x = self.fc3(x)          
+            print("Done!")   
         return x
 
     def forward_to(self, x, cut_layer):
