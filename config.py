@@ -5,6 +5,7 @@ to work on than JSON).
 
 import logging
 from collections import namedtuple, OrderedDict
+import os
 
 import argparse
 import torch
@@ -69,7 +70,14 @@ class Config:
             Config.data = Config.namedtuple_from_dict(config['data'])
             Config.trainer = Config.namedtuple_from_dict(config['trainer'])
             Config.algorithm = Config.namedtuple_from_dict(config['algorithm'])
+
+            if 'results' in config:
+                Config.results = Config.namedtuple_from_dict(config['results'])
+                Config.result_dir = os.path.dirname(args.config) + '/results/'
+
             Config.args = args
+            Config.experiment_id = os.getpid()
+            Config.model_dir = './models/pretrained/'
 
         return cls._instance
 

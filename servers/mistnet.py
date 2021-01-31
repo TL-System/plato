@@ -20,6 +20,7 @@ class MistNetServer(FedAvgServer):
     def load_model(self):
         """Setting up a pre-trained model to be loaded on the clients."""
         super().load_model()
+
         logging.info("[Server #%s] Loading a pre-trained model.", os.getpid())
         self.trainer.load_model()
 
@@ -36,7 +37,7 @@ class MistNetServer(FedAvgServer):
         # Test the updated model
         self.accuracy = self.trainer.test(feature_dataset,
                                           Config().algorithm.cut_layer)
-        logging.info('Global model accuracy: {:.2f}%\n'.format(100 *
+        logging.info("Global model accuracy: {:.2f}%\n".format(100 *
                                                                self.accuracy))
 
         await self.wrap_up_processing_reports()

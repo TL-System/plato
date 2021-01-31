@@ -76,7 +76,7 @@ class FedRLServer(FLServer):
         """
         Booting the RL agent and the FL server
         """
-        logging.info('Configuring a RL agent and a %s server...',
+        logging.info("Configuring a RL agent and a %s server...",
                      Config().algorithm.rl.fl_server)
         logging.info(
             "This RL agent will tune the number of aggregations on edge servers."
@@ -86,10 +86,10 @@ class FedRLServer(FLServer):
         target_reward = Config().algorithm.rl.target_reward
 
         if target_reward:
-            logging.info('RL Training: %s episodes or %s%% reward\n',
+            logging.info("RL Training: %s episodes or %s%% reward\n",
                          total_episodes, 100 * target_reward)
         else:
-            logging.info('RL Training: %s episodes\n', total_episodes)
+            logging.info("RL Training: %s episodes\n", total_episodes)
 
     def start_clients(self, as_server=False):
         """Start all clients and RL training."""
@@ -139,11 +139,11 @@ class FedRLServer(FLServer):
         target_accuracy = Config().trainer.target_accuracy
 
         if target_accuracy and self.accuracy >= target_accuracy:
-            logging.info('Target accuracy of FL reached.')
+            logging.info("Target accuracy of FL reached.")
             self.is_rl_episode_done = True
 
         if self.current_round >= Config().trainer.rounds:
-            logging.info('Target number of FL training rounds reached.')
+            logging.info("Target number of FL training rounds reached.")
             self.is_rl_episode_done = True
 
         # Pass the RL state to the RL env

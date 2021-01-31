@@ -40,9 +40,9 @@ class Trainer(ABC):
             file.write(str(trainer_count - 1))
 
         model_type = Config().trainer.model
-        model_dir = './models/pretrained/'
-        model_path = f'{model_dir}{model_type}_{self.client_id}.pth'
-        accuracy_path = f'{model_dir}{model_type}_{self.client_id}.acc'
+        model_dir = Config().model_dir
+        model_path = f'{model_dir}{model_type}_{self.client_id}_{Config().experiment_id}.pth'
+        accuracy_path = f'{model_dir}{model_type}_{self.client_id}_{Config().experiment_id}.acc'
 
         if os.path.exists(model_path):
             os.remove(model_path)
