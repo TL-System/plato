@@ -149,7 +149,8 @@ class Trainer(base.Trainer):
         self.mindspore_model.train(
             Config().trainer.epochs,
             trainset,
-            callbacks=[LossMonitor(per_print_times=300)])
+            callbacks=[LossMonitor(per_print_times=300)],
+            dataset_sink_mode=False)
 
         self.pause_training()
 
