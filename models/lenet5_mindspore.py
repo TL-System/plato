@@ -74,6 +74,8 @@ class Model(base_mindspore.Model):
     def construct(self, x):
         """The forward pass."""
         if self.cut_layer is None:
+            # If cut_layer is None, use the entire model for training
+            # or testing
             x = self.pool1(self.relu1(self.conv1(x)))
             x = self.pool2(self.relu2(self.conv2(x)))
             x = self.flatten(x)
@@ -81,25 +83,23 @@ class Model(base_mindspore.Model):
             x = self.relu4(self.fc2(x))
             x = self.fc3(x)
         else:
-            """
+            # Otherwise, use only the layers after the cut_layer
+            # for training
             layer_index = self.layers.index(self.cut_layer)
 
             for i in range(layer_index + 1, len(self.layers)):
-                print(self.layers[i])
-                print(x.shape)
                 x = self.layerdict[self.layers[i]](x)
-            """
-            print(x.shape)
-            print(x)
-            x = self.fc3(x)          
-            print("Done!")   
+
         return x
 
     def forward_to(self, x, cut_layer):
+        # Extract features using the layers before (and including)
+        # the cut_layer.
         layer_index = self.layers.index(cut_layer)
 
         for i in range(0, layer_index + 1):
             x = self.layerdict[self.layers[i]](x)
+
         return x
 
     @staticmethod
@@ -107,7 +107,7 @@ class Model(base_mindspore.Model):
         return model_name == 'lenet5_mindspore'
 
     @staticmethod
-    def get_model_from_name(model_name, **kwargs):
+    def get_model_from_name(model_name):
         """Obtaining an instance of this model provided that the name is valid."""
 
         if not Model.is_valid_model_name(model_name):
@@ -120,9 +120,8 @@ class Model(base_mindspore.Model):
         cut_layer = None
 
         if hasattr(Config().algorithm, 'cut_layer'):
+            # Initialize the model with the cut_layer set, so that all the training
+            # will only use the layers after the cut_layer
             cut_layer = Config().algorithm.cut_layer
-
-        if 'cut_layer' in kwargs:
-            cut_layer = kwargs['cut_layer']
 
         return Model(num_classes=num_classes, cut_layer=cut_layer)

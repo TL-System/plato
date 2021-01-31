@@ -17,6 +17,12 @@ from config import Config
 
 class MistNetServer(FedAvgServer):
     """The MistNet server for federated learning."""
+    def __init__(self):
+        super().__init__()
+
+        # MistNet requires one round of client-server communication
+        assert Config().trainer.rounds == 1
+
     def load_model(self):
         """Setting up a pre-trained model to be loaded on the clients."""
         super().load_model()
