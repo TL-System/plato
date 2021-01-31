@@ -26,7 +26,7 @@ class MistNetClient(SimpleClient):
     """A federated learning client for MistNet."""
     async def train(self):
         """A MistNet client only uses the first several layers in a forward pass."""
-        logging.info('Training on MistNet client #%s', self.client_id)
+        logging.info("Training on MistNet client #%s", self.client_id)
 
         # Since training is performed on the server, the client should not be doing
         # its own testing for the model accuracy

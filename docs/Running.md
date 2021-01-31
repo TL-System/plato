@@ -48,10 +48,10 @@ Install PyTorch:
 $ pip install torch torchvision
 ```
 
-We will need to install the `websockets` package for client-server communication:
+We will need to install the `websockets` package for client-server communication, the `requests` package for downloading datasets, and the 'pyyaml' package for parsing configuration files:
 
 ```shell
-$ pip install websockets==8.1
+$ pip install websockets==8.1 requests pyyaml
 ```
 
 Install `matplotlib` package for plotting figures of results:
@@ -96,7 +96,7 @@ Then add your configuration parameters in the job script. The following is an ex
 #SBATCH --output=cifar_wideresnet.out # The name of the output file
 module load python/3.8
 source ~/.federated/bin/activate
-python server.py --config=configs/CIFAR10/cifar_wideresnet.conf --log=info
+python server.py --config=configs/CIFAR10/cifar_wideresnet.yml --log=info
 ```
 
 **Note:** the GPU resources requested in this example is a special group of GPU nodes on Compute Canada's `cedar` cluster. You may only request these nodes as whole nodes, therefore you must specify `--gres=gpu:p100l:4`. NVIDIA P100L GPU jobs up to 28 days can be run on the `cedar` cluster.

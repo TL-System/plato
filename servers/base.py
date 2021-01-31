@@ -37,8 +37,7 @@ class Server:
             if value == websocket:
                 del self.clients[key]
 
-    @staticmethod
-    def start_clients(as_server=False):
+    def start_clients(self, as_server=False):
         """Starting all the clients as separate processes."""
         starting_id = 1
 
@@ -69,7 +68,7 @@ class Server:
         self.reports = []
         self.current_round += 1
 
-        logging.info('\n[Server #%d] Starting round %s/%s.', os.getpid(),
+        logging.info("\n[Server #%d] Starting round %s/%s.", os.getpid(),
                      self.current_round,
                      Config().trainer.rounds)
 
@@ -118,7 +117,7 @@ class Server:
 
                     if self.current_round == 0 and len(
                             self.clients) >= self.total_clients:
-                        logging.info('[Server #%d] Starting training.',
+                        logging.info("[Server #%d] Starting training.",
                                      os.getpid())
                         await self.select_clients()
         except websockets.ConnectionClosed as exception:
@@ -135,18 +134,18 @@ class Server:
             target_accuracy = Config().trainer.target_accuracy
 
             if target_accuracy and self.accuracy >= target_accuracy:
-                logging.info('Target accuracy reached.')
+                logging.info("Target accuracy reached.")
                 await self.close()
 
             if self.current_round >= Config().trainer.rounds:
-                logging.info('Target number of training rounds reached.')
+                logging.info("Target number of training rounds reached.")
                 await self.close()
 
     async def close(self):
         """Closing the server."""
         self.trainer.save_model()
-        self.trainer.stop_training()
         await self.close_connections()
+        self.trainer.stop_training()
         sys.exit()
 
     async def customize_server_response(self, server_response):
