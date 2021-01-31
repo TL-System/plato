@@ -149,16 +149,16 @@ class Trainer(base.Trainer):
         self.mindspore_model.train(
             Config().trainer.epochs,
             trainset,
-            callbacks=[LossMonitor(per_print_times=300)])
+            callbacks=[LossMonitor(per_print_times=300)],
+            dataset_sink_mode=False)
 
         self.pause_training()
 
-    def test(self, testset, cut_layer=None):
+    def test(self, testset):
         """Testing the model using the provided test dataset.
 
         Arguments:
         testset: The test dataset.
-        cut_layer (optional): The layer which testing should start from.
         """
         self.start_training()
 

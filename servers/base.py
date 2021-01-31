@@ -99,8 +99,12 @@ class Server:
 
                 if 'payload' in data:
                     # an existing client reports new updates from local training
+                    logging.info("[Server #%d] Receiving payload from client #%s.",
+                             os.getpid(), client_id)
+
                     client_update = await websocket.recv()
                     report = pickle.loads(client_update)
+
                     logging.info(
                         "[Server #%d] Update from client #%s received.",
                         os.getpid(), client_id)
