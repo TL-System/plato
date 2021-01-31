@@ -1,14 +1,10 @@
 """Base classes for MindSpore models."""
-from abc import abstractmethod, abstractstaticmethod
+from abc import abstractstaticmethod
 import mindspore.nn as nn
 
 
 class Model(nn.Cell):
-    """The base class for by all the models."""
-    @abstractmethod
-    def construct(self, *inputs, **kwargs):
-        """The forward pass."""
-
+    """The base class for by all the MindSpore models."""
     @abstractstaticmethod
     def is_valid_model_name(model_name: str) -> bool:
         """Is the model name string a valid name for models in this class?"""

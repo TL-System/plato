@@ -109,7 +109,7 @@ class Trainer(trainer.Trainer):
                 self.average_negative_deltas[previous_name]) / divide_base
             consistency_count += torch.sum(layer_consistency_rate)
         consistency_rate = consistency_count / model_size
-        print(f"Consistent_rate: {consistency_rate}")
+        logging.info("Consistent_rate: %s", consistency_rate)
 
         # Update the history recorded in the sliding window
         self.history.pop(0)
@@ -126,9 +126,7 @@ class Trainer(trainer.Trainer):
                     self.sync_frequency = (self.sync_frequency +
                                            self.frequency_increase_ratio -
                                            1) / self.frequency_increase_ratio
-                    print(
-                        f"Adjusted synchronization frequency to {self.sync_frequency}"
-                    )
+                    logging.info("Adjusted synchronization frequency to %s", self.sync_frequency)
                     self.min_consistency_rate = 1.1
                     self.min_consistency_rate_at_round = self.round_id
                     self.sliding_window_size *= self.frequency_increase_ratio

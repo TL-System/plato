@@ -11,6 +11,7 @@ class Divider:
         self.trainset = dataset.get_train_set()
         self.testset = dataset.get_test_set()
         self.labels = list(self.trainset.classes)
+        self.partition = None
 
         random.seed()
         self.group()
@@ -46,4 +47,4 @@ class Divider:
         return extracted
 
     def trainset_size(self):
-        return len(self.trainset)
+        return len(self.partition)

@@ -72,7 +72,7 @@ class Trainer(ABC):
         """
 
     @abstractmethod
-    def test(self, testset, cut_layer=None):
+    def test(self, testset):
         """Testing the model using the provided test dataset.
 
         Arguments:

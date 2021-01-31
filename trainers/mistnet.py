@@ -8,8 +8,10 @@ P. Wang, et al. "MistNet: Towards Private Neural Network Training with Local
 Differential Privacy," found in docs/papers.
 """
 
-import torch
+import time
+import logging
 import numpy as np
+import torch
 
 from config import Config
 from utils import unary_encoding
@@ -44,16 +46,18 @@ class Trainer(trainer.Trainer):
         self.model.to(self.device)
         self.model.eval()
 
-        batch_size = Config().trainer.batch_size
         data_loader = torch.utils.data.DataLoader(dataset,
-                                                  batch_size=batch_size,
+                                                  batch_size=Config().trainer.batch_size,
                                                   shuffle=True)
 
+        tic = time.perf_counter()
+
         feature_dataset = []
+
         for inputs, targets in data_loader:
             inputs, targets = inputs.to(self.device), targets.to(self.device)
-
             with torch.no_grad():
+
                 logits = self.model.forward_to(inputs, cut_layer)
                 if epsilon is not None:
                     logits = logits.detach().cpu().numpy()
@@ -64,10 +68,16 @@ class Trainer(trainer.Trainer):
             for i in np.arange(logits.shape[0]):  # each sample in the batch
                 feature_dataset.append((logits[i], targets[i]))
 
+        toc = time.perf_counter()
+        logging.info("[Client #%s] Features extracted from %s examples.",
+            self.client_id, len(feature_dataset))
+        logging.info("[Client #{}] Time used: {:.2f} seconds.".format(
+            self.client_id, toc - tic))
+
         return feature_dataset
 
     def train(self, trainset, cut_layer=None):
         super().train(FeatureDataset(trainset), cut_layer)
 
-    def test(self, testset, cut_layer=None):
-        return super().test(FeatureDataset(testset), cut_layer)
+    def test(self, testset):
+        return super().test(FeatureDataset(testset))

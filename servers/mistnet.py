@@ -35,9 +35,9 @@ class MistNetServer(FedAvgServer):
         self.trainer.train(feature_dataset, Config().algorithm.cut_layer)
 
         # Test the updated model
-        self.accuracy = self.trainer.test(feature_dataset,
-                                          Config().algorithm.cut_layer)
-        logging.info("Global model accuracy: {:.2f}%\n".format(100 *
-                                                               self.accuracy))
+        self.accuracy = self.trainer.test(self.testset)
+        logging.info(
+            '[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(
+                os.getpid(), 100 * self.accuracy))
 
         await self.wrap_up_processing_reports()

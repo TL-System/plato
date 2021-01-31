@@ -79,7 +79,6 @@ class FedAvgServer(Server):
         logging.info("[Server #%s] Model: %s", os.getpid(), model_type)
 
         self.model = models_registry.get(model_type)
-        experiment_id = os.getpid()
         self.trainer = trainers_registry.get(self.model)
 
     def choose_clients(self):

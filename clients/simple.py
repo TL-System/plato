@@ -120,10 +120,10 @@ class SimpleClient(Client):
 
         # Extract the trainset and testset if local testing is needed
         if Config().clients.do_test:
-            self.trainset = self.data
             self.testset = dataset.get_test_set()
-        else:
-            self.trainset = self.data
+
+        self.trainset = self.data
+        self.divider.partition = self.data
 
         self.data_loading_time = time.time() - data_loading_start_time
 

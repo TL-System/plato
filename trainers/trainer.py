@@ -235,7 +235,7 @@ class Trainer(base.Trainer):
         self.pause_training()
 
     @staticmethod
-    def test_process(rank, self, config, testset, cut_layer):  # pylint: disable=unused-argument
+    def test_process(rank, self, config, testset):  # pylint: disable=unused-argument
         """The testing loop, run in a separate process with a new CUDA context,
         so that CUDA memory can be released after the training completes.
 
@@ -258,10 +258,7 @@ class Trainer(base.Trainer):
                 examples, labels = examples.to(self.device), labels.to(
                     self.device)
 
-                if cut_layer is None:
-                    outputs = self.model(examples)
-                else:
-                    outputs = self.model.forward_from(examples, cut_layer)
+                outputs = self.model(examples)
 
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
@@ -274,7 +271,7 @@ class Trainer(base.Trainer):
         filename = f"{model_type}_{self.client_id}_{config['experiment_id']}.acc"
         Trainer.save_accuracy(accuracy, filename)
 
-    def test(self, testset, cut_layer=None):
+    def test(self, testset):
         """Testing the model using the provided test dataset.
 
         Arguments:
@@ -290,7 +287,6 @@ class Trainer(base.Trainer):
                      self,
                      config,
                      testset,
-                     cut_layer,
                  ),
                  join=True)
 

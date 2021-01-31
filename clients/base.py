@@ -86,6 +86,8 @@ class Client:
                         await websocket.send(json.dumps(client_update))
 
                         # Sending the client training report to the server as payload
+                        logging.info("[Client #%s] Sending reports to the server.",
+                                         self.client_id)
                         await websocket.send(pickle.dumps(report))
 
         except OSError as exception:
