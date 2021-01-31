@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 3
+    total_clients: 1
 
     # The number of clients selected in each round
-    per_round: 3
+    per_round: 1
 
     # Should the clients compute test accuracy locally?
     do_test: true
@@ -23,7 +23,7 @@ data:
     data_path: ./data
 
     # Number of samples in each partition
-    partition_size: 20000
+    partition_size: 60000
 
     # IID, biased, or sharded?
     divider: iid_mindspore
@@ -58,7 +58,7 @@ trainer:
     momentum: 0.9
 
     # The machine learning model
-    model: lenet5
+    model: lenet5_mindspore
 
 algorithm:
     # Aggregation algorithm
