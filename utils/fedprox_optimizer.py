@@ -1,17 +1,19 @@
 """
-A FedProx optimizer.
+A customized optimizer for FedProx.
 
 Reference:
 
-Li et al., "Federated Optimization in Heterogeneous Networks"(https://arxiv.org/pdf/1812.06127.pdf).
+Li et al., "Federated Optimization in Heterogeneous Networks."
+(https://arxiv.org/pdf/1812.06127.pdf)
+
 """
 import torch
 from torch import optim
 from config import Config
 
 
-class FedProxOptim(optim.SGD):
-    """ FedProx optimizer for local solver"""
+class FedProxOptimizer(optim.SGD):
+    """A customized optimizer for FedProx's local solver."""
     def step(self, closure=None):
         """Performs a single optimization step.
 

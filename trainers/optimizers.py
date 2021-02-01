@@ -9,7 +9,7 @@ import numpy as np
 from models.base import Model
 from config import Config
 from utils.step import Step
-from trainers import fedprox_optimizer
+from utils.fedprox_optimizer import FedProxOptimizer
 
 
 def get_optimizer(model: Model) -> optim.Optimizer:
@@ -24,7 +24,7 @@ def get_optimizer(model: Model) -> optim.Optimizer:
                           lr=Config().trainer.learning_rate,
                           weight_decay=Config().trainer.weight_decay)
     elif Config().trainer.optimizer == 'FedProx':
-        return fedprox_optimizer.FedProxOptim(
+        return FedProxOptimizer(
             model.parameters(),
             lr=Config().trainer.learning_rate,
             momentum=Config().trainer.momentum,
