@@ -16,14 +16,13 @@ import servers
 from utils import csv_processor
 
 FLServer = FedAvgCrossSiloServer
-if hasattr(Config().algorithm, 'rl'):
-    from stable_baselines3.common.env_checker import check_env
+if hasattr(Config().algorithm, 'rl_episodes'):
     from rl_envs import FLEnv
 
     # The central server of FL
     FLServer = {
         "fedavg_cross_silo": servers.fedavg_cs.FedAvgCrossSiloServer
-    }[Config().algorithm.rl.fl_server]
+    }[Config().algorithm.fl_server]
 
 
 class FedRLServer(FLServer):
@@ -77,15 +76,15 @@ class FedRLServer(FLServer):
         Booting the RL agent and the FL server
         """
         logging.info("Configuring a RL agent and a %s server...",
-                     Config().algorithm.rl.fl_server)
+                     Config().algorithm.fl_server)
         logging.info(
             "This RL agent will tune the number of aggregations on edge servers."
         )
 
-        total_episodes = Config().algorithm.rl.episodes
-        target_reward = Config().algorithm.rl.target_reward
+        total_episodes = Config().algorithm.rl_episodes
+        target_reward = Config().algorithm.rl_target_reward
 
-        if target_reward:
+        if target_reward is not None:
             logging.info("RL Training: %s episodes or %s%% reward\n",
                          total_episodes, 100 * target_reward)
         else:
@@ -104,7 +103,6 @@ class FedRLServer(FLServer):
     def start_rl(self):
         """The starting point of RL training."""
         # Test the environment of reinforcement learning.
-        #self.check_with_sb3_env_checker(FedRLServer.rl_env)
         FedRLServer.try_a_random_agent(self.rl_env)
 
     def reset_rl_env(self):
@@ -161,7 +159,7 @@ class FedRLServer(FLServer):
         if not self.generated_server_response:
             await self.update_rl_tuned_parameter()
             self.generated_server_response = True
-        server_response['fedrl'] = Config().algorithm.cross_silo.rounds
+        server_response['fedrl'] = Config().algorithm.local_rounds
         server_response['current_global_round'] = self.current_round
         print("CURRENT GLOBAL ROUND", self.current_round)
         return server_response
@@ -174,8 +172,8 @@ class FedRLServer(FLServer):
         await self.rl_tuned_para_got.wait()
         self.rl_tuned_para_got.clear()
 
-        Config().algorithm.cross_silo = Config().algorithm.cross_silo._replace(
-            rounds=self.rl_tuned_para_value)
+        Config().algorithm = Config().algorithm._replace(
+            local_rounds=self.rl_tuned_para_value)
 
     def get_tuned_para(self, rl_tuned_para_value, time_step):
         """
@@ -210,12 +208,12 @@ class FedRLServer(FLServer):
             csv_processor.write_csv(result_csv_file, new_row)
         self.wrapped_previous_episode.set()
 
-        if self.rl_episode >= Config().algorithm.rl.episodes:
+        if self.rl_episode >= Config().algorithm.rl_episodes:
             if hasattr(Config(), 'results'):
                 # Deleting the csv file created when edge servers called
                 # super().__init__() as it is useless
                 os.remove(
-                    f'./results/{dataset}/{model}/{Config().algorithm.rl.fl_server}/result.csv'
+                    f'./results/{dataset}/{model}/{Config().algorithm.fl_server}/result.csv'
                 )
 
             logging.info(
@@ -229,20 +227,11 @@ class FedRLServer(FLServer):
             self.new_episode_begin.clear()
 
     @staticmethod
-    def check_with_sb3_env_checker(env):
-        """
-        Use helper provided by stable_baselines3
-        to check that the environment runs without error.
-        """
-        # It will check the environment and output additional warnings if needed
-        check_env(env)
-
-    @staticmethod
     def try_a_random_agent(env):
         """Quickly try a random agent on the environment."""
         # pylint: disable=unused-variable
         obs = env.reset()
-        episodes = Config().algorithm.rl.episodes
+        episodes = Config().algorithm.rl_episodes
         n_steps = Config().trainer.rounds
 
         for i in range(episodes):
