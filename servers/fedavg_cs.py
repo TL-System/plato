@@ -8,6 +8,7 @@ import os
 import asyncio
 
 from servers import FedAvgServer
+from datasets import registry as datasets_registry
 from config import Config
 from utils import csv_processor
 
@@ -61,6 +62,11 @@ class FedAvgCrossSiloServer(FedAvgServer):
                          Config().algorithm.type)
             logging.info("Training with %s local aggregation rounds.",
                          Config().algorithm.cross_silo.rounds)
+
+            if not Config().clients.do_test or Config().server.do_test:
+                dataset = datasets_registry.get()
+                self.testset = dataset.get_test_set()
+
             self.load_model()
 
             if hasattr(Config(), 'results'):
@@ -81,7 +87,6 @@ class FedAvgCrossSiloServer(FedAvgServer):
     async def wrap_up_processing_reports(self):
         """Wrap up processing the reports with any additional work."""
         if hasattr(Config(), 'results'):
-
             new_row = []
             for item in self.recorded_items:
                 item_value = {
@@ -91,8 +96,12 @@ class FedAvgCrossSiloServer(FedAvgServer):
                     self.current_round,
                     'accuracy':
                     self.accuracy * 100,
+                    'average_accuracy':
+                    self.average_accuracy * 100,
                     'edge_agg_num':
                     Config().algorithm.cross_silo.rounds,
+                    'local_epoch_num':
+                    Config().trainer.epochs,
                     'training_time':
                     max([report.training_time for report in self.reports]),
                     'round_time':

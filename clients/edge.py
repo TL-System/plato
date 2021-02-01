@@ -37,6 +37,14 @@ class EdgeClient(Client):
         if 'current_global_round' in server_response:
             self.server.current_global_round = server_response[
                 'current_global_round']
+        if 'local_epoch_num' in server_response:
+            # Update the number of local epochs
+            local_epoch_num = server_response['local_epoch_num'][
+                int(self.client_id) - Config().clients.total_clients - 1]
+            Config().trainer = Config().trainer._replace(
+                epochs=local_epoch_num)
+            print('Edge Server', self.client_id, 'local epoch',
+                  Config().trainer.epochs)
 
     async def train(self):
         """The aggregation workload on an edge client."""

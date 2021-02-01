@@ -24,6 +24,8 @@ class Server:
         self.model = None
         self.trainer = None
         self.accuracy = 0
+        # Average accuracy from client reports
+        self.average_accuracy = 0
         self.reports = []
 
     def register_client(self, client_id, websocket):

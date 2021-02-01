@@ -60,7 +60,7 @@ class FedAvgServer(Server):
         else:
             logging.info("Training: %s rounds\n", total_rounds)
 
-        if not Config().clients.do_test:
+        if not Config().clients.do_test or Config().server.do_test:
             dataset = datasets_registry.get()
             self.testset = dataset.get_test_set()
 
@@ -79,7 +79,6 @@ class FedAvgServer(Server):
         logging.info("[Server #%s] Model: %s", os.getpid(), model_type)
 
         self.model = models_registry.get(model_type)
-        experiment_id = os.getpid()
         self.trainer = trainers_registry.get(self.model)
 
     def choose_clients(self):
@@ -141,16 +140,19 @@ class FedAvgServer(Server):
         # Testing the global model accuracy
         if Config().clients.do_test:
             # Compute the average accuracy from client reports
-            self.accuracy = self.accuracy_averaging(self.reports)
+            self.average_accuracy = self.accuracy_averaging(self.reports)
             logging.info(
                 '[Server #{:d}] Average client accuracy: {:.2f}%.'.format(
-                    os.getpid(), 100 * self.accuracy))
-        else:
+                    os.getpid(), 100 * self.average_accuracy))
+
+        if not Config().clients.do_test or Config().server.do_test:
             # Test the updated model directly at the server
             self.accuracy = self.trainer.test(self.testset)
             logging.info(
                 '[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(
                     os.getpid(), 100 * self.accuracy))
+        else:
+            self.accuracy = self.average_accuracy
 
         await self.wrap_up_processing_reports()
 
@@ -165,6 +167,8 @@ class FedAvgServer(Server):
                     self.current_round,
                     'accuracy':
                     self.accuracy * 100,
+                    'average_accuracy':
+                    self.average_accuracy * 100,
                     'training_time':
                     max([report.training_time for report in self.reports]),
                     'round_time':
