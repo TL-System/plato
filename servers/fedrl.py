@@ -16,8 +16,9 @@ import servers
 from utils import csv_processor
 
 FLServer = FedAvgCrossSiloServer
+
 if hasattr(Config().algorithm, 'rl_episodes'):
-    from rl_envs import FLEnv
+    from utils.rl_env import RLEnv
 
     # The central server of FL
     FLServer = {
@@ -30,7 +31,7 @@ class FedRLServer(FLServer):
     def __init__(self):
         super().__init__()
 
-        self.rl_env = FLEnv(self)
+        self.rl_env = RLEnv(self)
         self.rl_episode = 0
         self.rl_tuned_para_value = None
         self.rl_state = None

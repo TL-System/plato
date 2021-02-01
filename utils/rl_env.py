@@ -9,6 +9,8 @@ https://stable-baselines3.readthedocs.io/en/master/guide/custom_env.html.
 """
 
 import logging
+import os
+import sys
 import asyncio
 import gym
 from gym import spaces
@@ -17,12 +19,12 @@ import numpy as np
 from config import Config
 
 
-class FLEnv(gym.Env):
+class RLEnv(gym.Env):
     """The environment of federated learning."""
     metadata = {'render.modes': ['fl']}
 
     def __init__(self, rl_agent):
-        super(FLEnv, self).__init__()
+        super().__init__()
 
         self.rl_agent = rl_agent
         self.time_step = 0
