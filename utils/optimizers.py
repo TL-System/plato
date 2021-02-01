@@ -2,6 +2,7 @@
 Optimizers for training workloads.
 """
 
+import sys
 import bisect
 from torch import optim
 import numpy as np
@@ -24,11 +25,10 @@ def get_optimizer(model: Model) -> optim.Optimizer:
                           lr=Config().trainer.learning_rate,
                           weight_decay=Config().trainer.weight_decay)
     elif Config().trainer.optimizer == 'FedProx':
-        return FedProxOptimizer(
-            model.parameters(),
-            lr=Config().trainer.learning_rate,
-            momentum=Config().trainer.momentum,
-            weight_decay=Config().trainer.weight_decay)
+        return FedProxOptimizer(model.parameters(),
+                                lr=Config().trainer.learning_rate,
+                                momentum=Config().trainer.momentum,
+                                weight_decay=Config().trainer.weight_decay)
     raise ValueError('No such optimizer: {}'.format(
         Config().trainer.optimizer))
 
@@ -41,11 +41,11 @@ def get_lr_schedule(optimizer: optim.Optimizer,
         return optim.lr_scheduler.CosineAnnealingLR(
             optimizer,
             len(train_loader) * Config().trainer.epochs)
-    else:
+    elif Config().trainer.lr_schedule == 'LambdaLR':
         lambdas = [lambda it: 1.0]
 
-        if Config().trainer.lr_gamma != 0.0 and Config(
-        ).trainer.lr_milestone_steps != '':
+        if hasattr(Config().trainer, 'lr_gamma') and hasattr(
+                Config().trainer, 'lr_milestone_steps'):
             milestones = [
                 Step.from_str(x, iterations_per_epoch).iteration
                 for x in Config().trainer.lr_milestone_steps.split(',')
@@ -53,8 +53,8 @@ def get_lr_schedule(optimizer: optim.Optimizer,
             lambdas.append(lambda it: Config().trainer.lr_gamma**bisect.bisect(
                 milestones, it))
 
-        # Add linear learning rate warmup if specified
-        if Config().trainer.lr_warmup_steps != '':
+        # Add a linear learning rate warmup if specified
+        if hasattr(Config().trainer, 'lr_warmup_steps'):
             warmup_iters = Step.from_str(Config().trainer.lr_warmup_steps,
                                          iterations_per_epoch).iteration
             lambdas.append(lambda it: min(1.0, it / warmup_iters))
@@ -62,3 +62,5 @@ def get_lr_schedule(optimizer: optim.Optimizer,
         # Combine the lambdas
         return optim.lr_scheduler.LambdaLR(
             optimizer, lambda it: np.product([l(it) for l in lambdas]))
+    else:
+        sys.exit('Error: Unknown learning rate scheduler.')
