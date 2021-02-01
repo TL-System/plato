@@ -42,7 +42,7 @@ class Server:
         starting_id = 1
 
         if as_server:
-            total_processes = Config().algorithm.cross_silo.total_silos
+            total_processes = Config().algorithm.total_silos
             starting_id += Config().clients.total_clients
         else:
             total_processes = Config().clients.total_clients
