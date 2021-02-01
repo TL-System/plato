@@ -11,7 +11,7 @@ currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
-from trainers import optimizers
+from utils import optimizers
 import models.registry as models_registry
 from config import Config
 

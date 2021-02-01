@@ -40,7 +40,7 @@ class ShardedDivider(base.Divider):
         self.shards = shards
         self.used = []
 
-        logging.info('Created %s shards of size %s', len(shards), shard_size)
+        logging.info("Created %s shards of size %s", len(shards), shard_size)
 
     def extract_shard(self):
         """Extract a shard from a list of shards."""

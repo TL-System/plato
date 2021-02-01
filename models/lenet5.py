@@ -101,13 +101,16 @@ class Model(base.Model):
     def forward_to(self, x, cut_layer):
         """Forward pass, but only to the layer specified by cut_layer."""
         layer_index = self.layers.index(cut_layer)
+
         for i in range(0, layer_index + 1):
             x = self.layerdict[self.layers[i]](x)
+
         return x
 
     def forward_from(self, x, cut_layer):
         """Forward pass, starting from the layer specified by cut_layer."""
         layer_index = self.layers.index(cut_layer)
+
         for i in range(layer_index + 1, len(self.layers)):
             x = self.layerdict[self.layers[i]](x)
 

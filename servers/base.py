@@ -37,13 +37,12 @@ class Server:
             if value == websocket:
                 del self.clients[key]
 
-    @staticmethod
-    def start_clients(as_server=False):
+    def start_clients(self, as_server=False):
         """Starting all the clients as separate processes."""
         starting_id = 1
 
         if as_server:
-            total_processes = Config().algorithm.cross_silo.total_silos
+            total_processes = Config().algorithm.total_silos
             starting_id += Config().clients.total_clients
         else:
             total_processes = Config().clients.total_clients
@@ -69,7 +68,7 @@ class Server:
         self.reports = []
         self.current_round += 1
 
-        logging.info('\n[Server #%d] Starting round %s/%s.', os.getpid(),
+        logging.info("\n[Server #%d] Starting round %s/%s.", os.getpid(),
                      self.current_round,
                      Config().trainer.rounds)
 
@@ -100,8 +99,12 @@ class Server:
 
                 if 'payload' in data:
                     # an existing client reports new updates from local training
+                    logging.info("[Server #%d] Receiving payload from client #%s.",
+                             os.getpid(), client_id)
+
                     client_update = await websocket.recv()
                     report = pickle.loads(client_update)
+
                     logging.info(
                         "[Server #%d] Update from client #%s received.",
                         os.getpid(), client_id)
@@ -118,7 +121,7 @@ class Server:
 
                     if self.current_round == 0 and len(
                             self.clients) >= self.total_clients:
-                        logging.info('[Server #%d] Starting training.',
+                        logging.info("[Server #%d] Starting training.",
                                      os.getpid())
                         await self.select_clients()
         except websockets.ConnectionClosed as exception:
@@ -135,18 +138,18 @@ class Server:
             target_accuracy = Config().trainer.target_accuracy
 
             if target_accuracy and self.accuracy >= target_accuracy:
-                logging.info('Target accuracy reached.')
+                logging.info("Target accuracy reached.")
                 await self.close()
 
             if self.current_round >= Config().trainer.rounds:
-                logging.info('Target number of training rounds reached.')
+                logging.info("Target number of training rounds reached.")
                 await self.close()
 
     async def close(self):
         """Closing the server."""
         self.trainer.save_model()
-        self.trainer.stop_training()
         await self.close_connections()
+        self.trainer.stop_training()
         sys.exit()
 
     async def customize_server_response(self, server_response):

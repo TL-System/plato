@@ -9,6 +9,8 @@ https://stable-baselines3.readthedocs.io/en/master/guide/custom_env.html.
 """
 
 import logging
+import os
+import sys
 import asyncio
 import gym
 from gym import spaces
@@ -17,12 +19,12 @@ import numpy as np
 from config import Config
 
 
-class FLEnv(gym.Env):
+class RLEnv(gym.Env):
     """The environment of federated learning."""
     metadata = {'render.modes': ['fl']}
 
     def __init__(self, rl_agent):
-        super(FLEnv, self).__init__()
+        super().__init__()
 
         self.rl_agent = rl_agent
         self.time_step = 0
@@ -56,7 +58,7 @@ class FLEnv(gym.Env):
         self.state = [0 for i in range(self.n_states)]
 
     def reset(self):
-        if self.rl_agent.rl_episode >= Config().algorithm.rl.episodes:
+        if self.rl_agent.rl_episode >= Config().algorithm.rl_episodes:
             while True:
                 # Give RL agent some time to close connections and exit
                 current_loop = asyncio.get_event_loop()
@@ -87,11 +89,11 @@ class FLEnv(gym.Env):
 
         # Rescale the action from [-1, 1] to [1, 2, ... , 9]
         # The action is the number of aggregations on edge servers
-        #current_edge_agg_num = int((action + 2) * (action + 2))
+        # current_edge_agg_num = int((action + 2) * (action + 2))
 
-        logging.info('RL Agent: Start time step #%s...', self.time_step)
+        logging.info("RL Agent: Start time step #%s...", self.time_step)
         logging.info(
-            'Each edge server will run %s rounds of local aggregation.',
+            "Each edge server will run %s rounds of local aggregation.",
             current_edge_agg_num)
 
         # Pass the tuned parameter to RL agent

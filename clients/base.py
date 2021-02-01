@@ -30,10 +30,13 @@ class Client:
             # Contact one of the edge servers
             logging.info("[Client #%s] Contacting one of the edge servers.",
                          self.client_id)
+
+            assert hasattr(Config().algorithm, 'total_silos')
+
             uri = 'ws://{}:{}'.format(
                 Config().server.address,
                 Config().server.port + Config().clients.total_clients +
-                int(self.client_id) % Config().algorithm.cross_silo.total_silos
+                int(self.client_id) % Config().algorithm.total_silos
                 + 1)
         else:
             logging.info("[Client #%s] Contacting the central server.",
@@ -86,6 +89,8 @@ class Client:
                         await websocket.send(json.dumps(client_update))
 
                         # Sending the client training report to the server as payload
+                        logging.info("[Client #%s] Sending reports to the server.",
+                                         self.client_id)
                         await websocket.send(pickle.dumps(report))
 
         except OSError as exception:

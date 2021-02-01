@@ -48,23 +48,19 @@ class FedAvgCrossSiloServer(FedAvgServer):
 
             # Compute the number of clients in each silo for edge servers
             self.total_clients = int(self.total_clients /
-                                     Config().algorithm.cross_silo.total_silos)
-            self.clients_per_round = int(
-                self.clients_per_round /
-                Config().algorithm.cross_silo.total_silos)
+                                     Config().algorithm.total_silos)
+            self.clients_per_round = int(self.clients_per_round /
+                                         Config().algorithm.total_silos)
             logging.info(
                 "[Edge server #%s] Started training with %s clients and %s per round.",
                 Config().args.id, self.total_clients, self.clients_per_round)
 
             if hasattr(Config(), 'results'):
-                result_csv_file = f'{self.result_dir}result_{Config().args.id}.csv'
-                csv_processor.initialize_csv(result_csv_file,
-                                             self.recorded_items,
-                                             self.result_dir)
+                self.recorded_items = ['global_round'] + self.recorded_items
 
         # Compute the number of clients for the central server
         if Config().is_central_server():
-            self.clients_per_round = Config().algorithm.cross_silo.total_silos
+            self.clients_per_round = Config().algorithm.total_silos
             self.total_clients = self.clients_per_round
 
             logging.info(
@@ -91,8 +87,14 @@ class FedAvgCrossSiloServer(FedAvgServer):
                          Config().args.id,
                          Config().algorithm.type)
             logging.info("Training with %s local aggregation rounds.",
-                         Config().algorithm.cross_silo.rounds)
+                         Config().algorithm.local_rounds)
             self.load_model()
+
+            if hasattr(Config(), 'results'):
+                result_dir = Config().result_dir
+                result_csv_file = f'{result_dir}/result_{Config().args.id}.csv'
+                csv_processor.initialize_csv(result_csv_file,
+                                             self.recorded_items, result_dir)
 
         else:
             super().configure()
@@ -117,7 +119,7 @@ class FedAvgCrossSiloServer(FedAvgServer):
                     'accuracy':
                     self.accuracy * 100,
                     'edge_agg_num':
-                    Config().algorithm.cross_silo.rounds,
+                    Config().algorithm.local_rounds,
                     'training_time':
                     max([report.training_time for report in self.reports]),
                     'round_time':
@@ -126,20 +128,20 @@ class FedAvgCrossSiloServer(FedAvgServer):
                 new_row.append(item_value)
 
             if Config().is_edge_server():
-                result_csv_file = f'{self.result_dir}result_{Config().args.id}.csv'
+                result_csv_file = f'{Config().result_dir}result_{Config().args.id}.csv'
             else:
-                result_csv_file = f'{self.result_dir}result.csv'
+                result_csv_file = f'{Config().result_dir}result.csv'
 
             csv_processor.write_csv(result_csv_file, new_row)
 
         if Config().is_edge_server():
             # When a certain number of aggregations are completed, an edge client
             # needs to be signaled to send a report to the central server
-            if self.current_round == Config().algorithm.cross_silo.rounds:
+            if self.current_round == Config().algorithm.local_rounds:
                 logging.info(
                     '[Server #%d] Completed %s rounds of local aggregation.',
                     os.getpid(),
-                    Config().algorithm.cross_silo.rounds)
+                    Config().algorithm.local_rounds)
                 self.model_aggregated.set()
 
                 self.current_round = 0

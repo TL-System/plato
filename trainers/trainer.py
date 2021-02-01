@@ -4,7 +4,6 @@ The training and testing loops for PyTorch.
 
 import logging
 import os
-import copy
 from collections import OrderedDict
 import torch
 import torch.nn as nn
@@ -13,7 +12,8 @@ import numpy as np
 
 from models.base import Model
 from config import Config
-from trainers import base, optimizers
+from trainers import base
+from utils import optimizers
 
 
 class Trainer(base.Trainer):
@@ -41,54 +41,69 @@ class Trainer(base.Trainer):
         assert self.client_id == 0
         return torch.zeros(shape)
 
-    def save_model(self):
+    def save_model(self, filename=None):
         """Saving the model to a file."""
         model_type = Config().trainer.model
-        model_dir = './models/pretrained/'
+        model_dir = Config().model_dir
+
         if not os.path.exists(model_dir):
             os.makedirs(model_dir)
-        model_path = f'{model_dir}{model_type}_{self.client_id}.pth'
+
+        if filename is not None:
+            model_path = f'{model_dir}{filename}'
+        else:
+            model_path = f'{model_dir}{model_type}.pth'
+
         torch.save(self.model.state_dict(), model_path)
 
         if self.client_id == 0:
-            logging.info('[Server #%s] Model saved to %s.', os.getpid(),
+            logging.info("[Server #%s] Model saved to %s.", os.getpid(),
                          model_path)
         else:
-            logging.info('[Client #%s] Model saved to %s.', self.client_id,
+            logging.info("[Client #%s] Model saved to %s.", self.client_id,
                          model_path)
 
-    def load_model(self):
+    def load_model(self, filename=None):
         """Loading pre-trained model weights from a file."""
-        model_dir = './models/pretrained/'
         model_type = Config().trainer.model
-        model_path = f'{model_dir}{model_type}_{self.client_id}.pth'
+        model_dir = Config().model_dir
+
+        if filename is not None:
+            model_path = f'{model_dir}{filename}'
+        else:
+            model_path = f'{model_dir}{model_type}.pth'
 
         if self.client_id == 0:
-            logging.info('[Server #%s] Loading a model from %s.', os.getpid(),
+            logging.info("[Server #%s] Loading a model from %s.", os.getpid(),
                          model_path)
         else:
-            logging.info('[Client #%s] Loading a model from %s.',
+            logging.info("[Client #%s] Loading a model from %s.",
                          self.client_id, model_path)
 
         self.model.load_state_dict(torch.load(model_path))
 
-    def save_accuracy(self, accuracy):
+    @staticmethod
+    def save_accuracy(accuracy, filename):
         """Saving the test accuracy to a file."""
-        model_type = Config().trainer.model
-        model_dir = './models/pretrained/'
+        model_dir = Config().model_dir
+
         if not os.path.exists(model_dir):
             os.makedirs(model_dir)
-        accuracy_path = f'{model_dir}{model_type}_{self.client_id}.acc'
+
+        accuracy_path = f"{model_dir}{filename}"
+
         with open(accuracy_path, 'w') as file:
             file.write(str(accuracy))
 
-    def load_accuracy(self):
+    @staticmethod
+    def load_accuracy(filename):
         """Loading the test accuracy from a file."""
-        model_type = Config().trainer.model
-        model_dir = './models/pretrained/'
-        accuracy_path = f'{model_dir}{model_type}_{self.client_id}.acc'
+        model_dir = Config().model_dir
+        accuracy_path = f"{model_dir}{filename}"
+
         with open(accuracy_path, 'r') as file:
             accuracy = float(file.read())
+
         return accuracy
 
     def extract_weights(self):
@@ -147,7 +162,7 @@ class Trainer(base.Trainer):
         optimizer = optimizers.get_optimizer(self.model)
 
         # Initializing the learning rate schedule, if necessary
-        if 'lr_gamma' in config or 'lr_milestone_steps' in config:
+        if hasattr(Config().trainer, 'lr_schedule'):
             lr_schedule = optimizers.get_lr_schedule(optimizer,
                                                      iterations_per_epoch,
                                                      train_loader)
@@ -179,16 +194,19 @@ class Trainer(base.Trainer):
                 if batch_id % log_interval == 0:
                     if self.client_id == 0:
                         logging.info(
-                            '[Server #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}'.
+                            "[Server #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}".
                             format(os.getpid(), epoch, epochs, batch_id,
                                    len(train_loader), loss.data.item()))
                     else:
                         logging.info(
-                            '[Client #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}'.
+                            "[Client #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}".
                             format(self.client_id, epoch, epochs, batch_id,
                                    len(train_loader), loss.data.item()))
         self.model.cpu()
-        self.save_model()
+
+        model_type = Config().trainer.model
+        filename = f"{model_type}_{self.client_id}_{config['experiment_id']}.pth"
+        self.save_model(filename)
 
     def train(self, trainset, cut_layer=None):
         """The main training loop in a federated learning workload.
@@ -201,6 +219,7 @@ class Trainer(base.Trainer):
         self.start_training()
 
         config = Config().trainer._asdict()
+        config['experiment_id'] = Config().experiment_id
 
         mp.spawn(Trainer.train_process,
                  args=(
@@ -211,11 +230,13 @@ class Trainer(base.Trainer):
                  ),
                  join=True)
 
-        self.load_model()
+        model_type = Config().trainer.model
+        filename = f"{model_type}_{self.client_id}_{Config().experiment_id}.pth"
+        self.load_model(filename)
         self.pause_training()
 
     @staticmethod
-    def test_process(rank, self, config, testset, cut_layer):  # pylint: disable=unused-argument
+    def test_process(rank, self, config, testset):  # pylint: disable=unused-argument
         """The testing loop, run in a separate process with a new CUDA context,
         so that CUDA memory can be released after the training completes.
 
@@ -238,20 +259,20 @@ class Trainer(base.Trainer):
                 examples, labels = examples.to(self.device), labels.to(
                     self.device)
 
-                if cut_layer is None:
-                    outputs = self.model(examples)
-                else:
-                    outputs = self.model.forward_from(examples, cut_layer)
+                outputs = self.model(examples)
 
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
 
         self.model.cpu()
-        accuracy = correct / total
-        self.save_accuracy(accuracy)
 
-    def test(self, testset, cut_layer=None):
+        accuracy = correct / total
+        model_type = Config().trainer.model
+        filename = f"{model_type}_{self.client_id}_{config['experiment_id']}.acc"
+        Trainer.save_accuracy(accuracy, filename)
+
+    def test(self, testset):
         """Testing the model using the provided test dataset.
 
         Arguments:
@@ -260,17 +281,19 @@ class Trainer(base.Trainer):
         """
         self.start_training()
         config = Config().trainer._asdict()
+        config['experiment_id'] = Config().experiment_id
 
         mp.spawn(Trainer.test_process,
                  args=(
                      self,
                      config,
                      testset,
-                     cut_layer,
                  ),
                  join=True)
 
-        accuracy = self.load_accuracy()
+        model_type = Config().trainer.model
+        filename = f"{model_type}_{self.client_id}_{Config().experiment_id}.acc"
+        accuracy = Trainer.load_accuracy(filename)
 
         self.pause_training()
         return accuracy
