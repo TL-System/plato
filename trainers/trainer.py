@@ -12,7 +12,8 @@ import numpy as np
 
 from models.base import Model
 from config import Config
-from trainers import base, optimizers
+from trainers import base
+from utils import optimizers
 
 
 class Trainer(base.Trainer):
@@ -161,7 +162,7 @@ class Trainer(base.Trainer):
         optimizer = optimizers.get_optimizer(self.model)
 
         # Initializing the learning rate schedule, if necessary
-        if 'lr_gamma' in config or 'lr_milestone_steps' in config:
+        if hasattr(Config().trainer, 'lr_schedule'):
             lr_schedule = optimizers.get_lr_schedule(optimizer,
                                                      iterations_per_epoch,
                                                      train_loader)
