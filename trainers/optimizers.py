@@ -24,11 +24,15 @@ def get_optimizer(model: Model) -> optim.Optimizer:
                           lr=Config().trainer.learning_rate,
                           weight_decay=Config().trainer.weight_decay)
     elif Config().trainer.optimizer == 'FedProx':
-        return fedprox_optimizer.FedProxOptim(
-            model.parameters(),
-            lr=Config().trainer.learning_rate,
-            momentum=Config().trainer.momentum,
-            weight_decay=Config().trainer.weight_decay)
+        return FedProxOptimizer(model.parameters(),
+                                lr=Config().trainer.learning_rate,
+                                momentum=Config().trainer.momentum,
+                                weight_decay=Config().trainer.weight_decay)
+    elif Config().trainer.optimizer == 'Scaffold':
+        return ScanffoldOptimizer(model.parameters(),
+                                  lr=Config().trainer.learning_rate,
+                                  momentum=Config().trainer.momentum,
+                                  weight_decay=Config().trainer.weight_decay)
     raise ValueError('No such optimizer: {}'.format(
         Config().trainer.optimizer))
 

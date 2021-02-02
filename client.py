@@ -56,7 +56,8 @@ def main():
                 "adaptive_freezing":
                 clients.adaptive_freezing.AdaptiveFreezingClient,
                 "adaptive_sync": clients.adaptive_sync.AdaptiveSyncClient,
-                "fednova": clients.fednova.FedNovaClient
+                "fednova": clients.fednova.FedNovaClient,
+                "scaffold": clients.scaffold.ScaffoldClient
             }[Config().clients.type]()
             logging.info("Starting a %s client.", Config().clients.type)
             client.configure()

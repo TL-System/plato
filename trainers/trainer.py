@@ -35,6 +35,11 @@ class Trainer(base.Trainer):
         else:
             self.model = model
 
+        if Config().trainer.optimizer == 'SCAFFOLD':
+            self.c_server = None
+            self.c_client = None
+            self.c_plus = None
+
     def zeros(self, shape):
         """Returns a MindSpore zero tensor with the given shape."""
         # This should only be called from a server
@@ -168,6 +173,10 @@ class Trainer(base.Trainer):
                 loss = loss_criterion(outputs, labels)
                 loss.backward()
 
+                if config['optimizer'] == 'SCAFFOLD':
+                    optimizer.c_server = self.c_server
+                    optimizer.c_client = self.c_client
+
                 optimizer.step()
 
                 if lr_schedule is not None:
@@ -175,6 +184,10 @@ class Trainer(base.Trainer):
 
                 if config['optimizer'] == 'FedProx':
                     optimizer.params_state_update()
+
+                if config['optimizer'] == 'SCAFFOLD':
+                    # update trainer.c_plus
+                    self.c_plus = optimizer.c_plus
 
                 if batch_id % log_interval == 0:
                     if self.client_id == 0:
