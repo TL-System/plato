@@ -10,7 +10,6 @@ import websockets
 
 from config import Config
 import servers
-from servers import fednova
 
 
 def main():
@@ -27,7 +26,8 @@ def main():
         "fedavg_cross_silo": servers.fedavg_cs.FedAvgCrossSiloServer,
         "mistnet": servers.mistnet.MistNetServer,
         "adaptive_sync": servers.adaptive_sync.AdaptiveSyncServer,
-        "fedrl": servers.fedrl.FedRLServer
+        "rhythm": servers.rhythm.RhythmServer,
+        "tempo": servers.tempo.TempoServer
     }[Config().algorithm.type]()
     server.configure()
 
@@ -42,8 +42,8 @@ def main():
     loop.run_until_complete(start_server)
 
     if Config().is_central_server():
-        # For cross-silo FL, the central server will let edge servers start first
-        # Then the edge servers will start their clients
+        # In cross-silo FL, the central server lets edge servers start first
+        # Then starts their clients
         server.start_clients(as_server=True)
         # Allowing some time for the edge servers to start
         time.sleep(5)
