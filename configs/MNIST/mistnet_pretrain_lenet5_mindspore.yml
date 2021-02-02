@@ -9,7 +9,7 @@ clients:
     per_round: 1
 
     # Should the clients compute test accuracy locally?
-    do_test: true
+    do_test: false 
 
 server:
     address: localhost
@@ -38,8 +38,8 @@ trainer:
     # The type of the trainer
     type: basic_mindspore
 
-    # The maximum number of training rounds in total
-    rounds: 100
+    # The maximum number of training rounds
+    rounds: 1
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -48,14 +48,15 @@ trainer:
     max_concurrency: 3
 
     # The target accuracy
-    target_accuracy: 0.96
+    target_accuracy: 0.90 
 
-    # Parameters for local training in each communication round
-    epochs: 2
+    # Number of epoches for local training in each communication round
+    epochs: 1
     batch_size: 32
     optimizer: SGD
     learning_rate: 0.01
     momentum: 0.9
+    weight_decay: 0.0
 
     # The machine learning model
     model: lenet5_mindspore

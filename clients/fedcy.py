@@ -15,5 +15,3 @@ class CYClient(SimpleClient):
             local_epoch_num = server_response['local_epoch_num']
             Config().trainer = Config().trainer._replace(
                 epochs=local_epoch_num)
-            print('Client #', self.client_id, 'local epoch',
-                  Config().trainer.epochs)

@@ -30,10 +30,9 @@ class EdgeClient(Client):
         """Additional client-specific processing on the server response."""
         if 'fedrl' in server_response:
             # Update the number of local aggregation rounds
-            Config().algorithm.cross_silo = Config(
-            ).algorithm.cross_silo._replace(rounds=server_response['fedrl'])
             Config().algorithm = Config().algorithm._replace(
-                rounds=server_response['fedrl'])
+                local_rounds=server_response['fedrl'])
+
         if 'current_global_round' in server_response:
             self.server.current_global_round = server_response[
                 'current_global_round']
@@ -43,8 +42,6 @@ class EdgeClient(Client):
                 int(self.client_id) - Config().clients.total_clients - 1]
             Config().trainer = Config().trainer._replace(
                 epochs=local_epoch_num)
-            print('Edge Server', self.client_id, 'local epoch',
-                  Config().trainer.epochs)
 
     async def train(self):
         """The aggregation workload on an edge client."""

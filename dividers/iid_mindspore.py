@@ -18,6 +18,7 @@ class IIDDivider:
         assert num_shards == Config().clients.total_clients
 
         self.partition = self.dataset.get_train_partition(num_shards, shard_id)
+
         return self.partition
 
     def get_testset(self):

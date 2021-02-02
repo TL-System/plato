@@ -39,4 +39,4 @@ class MistNetClient(SimpleClient):
             epsilon=Config().algorithm.epsilon)
 
         # Generate a report for the server, performing model testing if applicable
-        return Report(self.client_id, len(self.trainset), features)
+        return Report(self.client_id, self.divider.trainset_size(), features)

@@ -24,7 +24,7 @@ class CYServer(FedAvgCrossSiloServer):
         if Config().is_central_server():
             self.local_epoch_list = [
                 Config().trainer.epochs
-                for i in range(Config().algorithm.cross_silo.total_silos)
+                for i in range(Config().algorithm.total_silos)
             ]
 
         if hasattr(Config(), 'results'):
@@ -72,7 +72,7 @@ class CYServer(FedAvgCrossSiloServer):
         if min_value == max_value:
             self.local_epoch_list = [
                 Config().trainer.epochs
-                for i in range(Config().algorithm.cross_silo.total_silos)
+                for i in range(Config().algorithm.total_silos)
             ]
         else:
             max_epoch = 2 * Config().trainer.epochs
@@ -103,7 +103,7 @@ class CYServer(FedAvgCrossSiloServer):
         - global model accuracy.
         """
         accuracy_diff_list = []
-        for i in range(Config().algorithm.cross_silo.total_silos):
+        for i in range(Config().algorithm.total_silos):
             client_id = i + 1 + Config().clients.total_clients
             accuracy = [
                 report.accuracy for report in self.reports
@@ -119,7 +119,7 @@ class CYServer(FedAvgCrossSiloServer):
         and the global model accuracy.
         """
         weights_diff_list = []
-        for i in range(Config().algorithm.cross_silo.total_silos):
+        for i in range(Config().algorithm.total_silos):
             client_id = i + 1 + Config().clients.total_clients
             report = [
                 report for report in self.reports

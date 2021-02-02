@@ -44,7 +44,7 @@ class Server:
         starting_id = 1
 
         if as_server:
-            total_processes = Config().algorithm.cross_silo.total_silos
+            total_processes = Config().algorithm.total_silos
             starting_id += Config().clients.total_clients
         else:
             total_processes = Config().clients.total_clients
@@ -101,8 +101,12 @@ class Server:
 
                 if 'payload' in data:
                     # an existing client reports new updates from local training
+                    logging.info("[Server #%d] Receiving payload from client #%s.",
+                             os.getpid(), client_id)
+
                     client_update = await websocket.recv()
                     report = pickle.loads(client_update)
+
                     logging.info(
                         "[Server #%d] Update from client #%s received.",
                         os.getpid(), client_id)

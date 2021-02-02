@@ -57,13 +57,19 @@ class Trainer(base.Trainer):
         assert self.client_id == 0
         return mindspore.Tensor(np.zeros(shape), mindspore.float32)
 
-    def save_model(self):
+    def save_model(self, filename=None):
         """Saving the model to a file."""
         model_type = Config().trainer.model
-        model_dir = './models/pretrained/'
+        model_dir = Config().model_dir
+
         if not os.path.exists(model_dir):
             os.makedirs(model_dir)
-        model_path = f'{model_dir}{model_type}_{self.client_id}.ckpt'
+
+        if filename is not None:
+            model_path = f'{model_dir}{filename}'
+        else:
+            model_path = f'{model_dir}{model_type}.ckpt'
+
         mindspore.save_checkpoint(self.model, model_path)
 
         if self.client_id == 0:
@@ -73,11 +79,15 @@ class Trainer(base.Trainer):
             logging.info("[Client #%s] Model saved to %s.", self.client_id,
                          model_path)
 
-    def load_model(self):
+    def load_model(self, filename=None):
         """Loading pre-trained model weights from a file."""
-        model_dir = './models/pretrained/'
         model_type = Config().trainer.model
-        model_path = f'{model_dir}{model_type}_{self.client_id}.ckpt'
+        model_dir = Config().model_dir
+
+        if filename is not None:
+            model_path = f'{model_dir}{filename}'
+        else:
+            model_path = f'{model_dir}{model_type}.ckpt'
 
         if self.client_id == 0:
             logging.info("[Server #%s] Loading a model from %s.", os.getpid(),
@@ -139,16 +149,16 @@ class Trainer(base.Trainer):
         self.mindspore_model.train(
             Config().trainer.epochs,
             trainset,
-            callbacks=[LossMonitor(per_print_times=300)])
+            callbacks=[LossMonitor(per_print_times=300)],
+            dataset_sink_mode=False)
 
         self.pause_training()
 
-    def test(self, testset, cut_layer=None):
+    def test(self, testset):
         """Testing the model using the provided test dataset.
 
         Arguments:
         testset: The test dataset.
-        cut_layer (optional): The layer which testing should start from.
         """
         self.start_training()
 
