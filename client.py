@@ -29,9 +29,10 @@ def main():
             server = {
                 "fedavg": servers.fedavg.FedAvgServer,
                 "fedavg_cross_silo": servers.fedavg_cs.FedAvgCrossSiloServer,
-                "fedrl": servers.fedrl.FedRLServer,
                 "mistnet": servers.mistnet.MistNetServer,
-                "adaptive_sync": servers.adaptive_sync.AdaptiveSyncServer
+                "adaptive_sync": servers.adaptive_sync.AdaptiveSyncServer,
+                "rhythm": servers.rhythm.RhythmServer,
+                "tempo": servers.tempo.TempoServer
             }[Config().algorithm.type]()
             server.configure()
 
@@ -56,7 +57,8 @@ def main():
                 "adaptive_freezing":
                 clients.adaptive_freezing.AdaptiveFreezingClient,
                 "adaptive_sync": clients.adaptive_sync.AdaptiveSyncClient,
-                "fednova": clients.fednova.FedNovaClient
+                "fednova": clients.fednova.FedNovaClient,
+                "tempo": clients.tempo.TempoClient
             }[Config().clients.type]()
             logging.info("Starting a %s client.", Config().clients.type)
             client.configure()
