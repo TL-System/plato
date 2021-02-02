@@ -30,10 +30,18 @@ class EdgeClient(Client):
         """Additional client-specific processing on the server response."""
         if 'fedrl' in server_response:
             # Update the number of local aggregation rounds
-            Config().algorithm = Config().algorithm._replace(local_rounds=server_response['fedrl'])
+            Config().algorithm = Config().algorithm._replace(
+                local_rounds=server_response['fedrl'])
 
         if 'current_global_round' in server_response:
-            self.server.current_global_round = server_response['current_global_round']
+            self.server.current_global_round = server_response[
+                'current_global_round']
+        if 'local_epoch_num' in server_response:
+            # Update the number of local epochs
+            local_epoch_num = server_response['local_epoch_num'][
+                int(self.client_id) - Config().clients.total_clients - 1]
+            Config().trainer = Config().trainer._replace(
+                epochs=local_epoch_num)
 
     async def train(self):
         """The aggregation workload on an edge client."""
