@@ -1,15 +1,15 @@
 clients:
     # Type
-    type: simple
+    type: mistnet 
 
     # The total number of clients
-    total_clients: 1
+    total_clients: 3
 
     # The number of clients selected in each round
-    per_round: 1
+    per_round: 3
 
     # Should the clients compute test accuracy locally?
-    do_test: true
+    do_test: false
 
 server:
     address: localhost
@@ -23,7 +23,7 @@ data:
     data_path: ./data
 
     # Number of samples in each partition
-    partition_size: 60000
+    partition_size: 20000
 
     # IID, biased, or sharded?
     divider: iid_mindspore
@@ -36,10 +36,10 @@ trainer:
     use_mindspore: true
 
     # The type of the trainer
-    type: basic_mindspore
+    type: mistnet_mindspore
 
     # The maximum number of training rounds in total
-    rounds: 100
+    rounds: 1
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -51,15 +51,21 @@ trainer:
     target_accuracy: 0.96
 
     # Parameters for local training in each communication round
-    epochs: 2
+    epochs: 6
     batch_size: 32
     optimizer: SGD
     learning_rate: 0.01
     momentum: 0.9
+    weight_decay: 0.0
 
     # The machine learning model
     model: lenet5_mindspore
+    num_classes: 10
 
 algorithm:
     # Aggregation algorithm
-    type: fedavg
+    type: mistnet
+
+    cut_layer: pool1
+    epsilon: null
+

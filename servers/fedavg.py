@@ -39,12 +39,6 @@ class FedAvgServer(Server):
             self.recorded_items = ['round'] + [
                 x.strip() for x in recorded_items.split(',')
             ]
-            # Directory of results (figures etc.)
-            result_dir = f'./results/{Config().data.dataset}/{Config().trainer.model}'
-            result_dir += f'/{Config().algorithm.type}/'
-            result_csv_file = result_dir + 'result.csv'
-            csv_processor.initialize_csv(result_csv_file, self.recorded_items,
-                                         result_dir)
 
         random.seed()
 
@@ -53,17 +47,18 @@ class FedAvgServer(Server):
         Booting the federated learning server by setting up the data, model, and
         creating the clients.
         """
-        logging.info('[Server #%s] Configuring the %s server...', os.getpid(),
+
+        logging.info("[Server #%s] Configuring the %s server...", os.getpid(),
                      Config().algorithm.type)
 
         total_rounds = Config().trainer.rounds
         target_accuracy = Config().trainer.target_accuracy
 
         if target_accuracy:
-            logging.info('Training: %s rounds or %s%% accuracy\n',
+            logging.info("Training: %s rounds or %s%% accuracy\n",
                          total_rounds, 100 * target_accuracy)
         else:
-            logging.info('Training: %s rounds\n', total_rounds)
+            logging.info("Training: %s rounds\n", total_rounds)
 
         if not Config().clients.do_test:
             dataset = datasets_registry.get()
@@ -71,11 +66,17 @@ class FedAvgServer(Server):
 
         self.load_model()
 
+        # Initialize the csv file which will record results
+        if hasattr(Config(), 'results'):
+            result_csv_file = Config().result_dir + 'result.csv'
+            csv_processor.initialize_csv(result_csv_file, self.recorded_items,
+                                         Config().result_dir)
+
     def load_model(self):
         """Setting up the global model to be trained via federated learning."""
 
         model_type = Config().trainer.model
-        logging.info('[Server #%s] Model: %s', os.getpid(), model_type)
+        logging.info("[Server #%s] Model: %s", os.getpid(), model_type)
 
         self.model = models_registry.get(model_type)
         self.trainer = trainers_registry.get(self.model)
@@ -170,11 +171,7 @@ class FedAvgServer(Server):
                 }[item]
                 new_row.append(item_value)
 
-            dataset = Config().data.dataset
-            model = Config().trainer.model
-            server_type = Config().algorithm.type
-            result_dir = f'./results/{dataset}/{model}/{server_type}/'
-            result_csv_file = result_dir + 'result.csv'
+            result_csv_file = Config().result_dir + 'result.csv'
 
             csv_processor.write_csv(result_csv_file, new_row)
 

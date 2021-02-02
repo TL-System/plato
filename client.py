@@ -24,7 +24,7 @@ def main():
         # If a server needs to be running concurrently
         if Config().is_edge_server():
             Config().trainer = Config().trainer._replace(
-                rounds=Config().algorithm.cross_silo.rounds)
+                rounds=Config().algorithm.local_rounds)
 
             server = {
                 "fedavg": servers.fedavg.FedAvgServer,
