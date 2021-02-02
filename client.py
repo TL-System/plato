@@ -26,14 +26,21 @@ def main():
             Config().trainer = Config().trainer._replace(
                 rounds=Config().algorithm.local_rounds)
 
-            server = {
-                "fedavg": servers.fedavg.FedAvgServer,
-                "fedavg_cross_silo": servers.fedavg_cs.FedAvgCrossSiloServer,
-                "fedcy": servers.fedcy.CYServer,
-                "fedrl": servers.fedrl.FedRLServer,
-                "mistnet": servers.mistnet.MistNetServer,
-                "adaptive_sync": servers.adaptive_sync.AdaptiveSyncServer
-            }[Config().algorithm.type]()
+            if Config().algorithm.type == 'fedrl':
+                server = {
+                    "fedavg_cross_silo":
+                    servers.fedavg_cs.FedAvgCrossSiloServer
+                }[Config().algorithm.fl_server]()
+            else:
+                server = {
+                    "fedavg": servers.fedavg.FedAvgServer,
+                    "fedavg_cross_silo":
+                    servers.fedavg_cs.FedAvgCrossSiloServer,
+                    "fedcy": servers.fedcy.CYServer,
+                    "fedrl": servers.fedrl.FedRLServer,
+                    "mistnet": servers.mistnet.MistNetServer,
+                    "adaptive_sync": servers.adaptive_sync.AdaptiveSyncServer
+                }[Config().algorithm.type]()
             server.configure()
 
             client = clients.EdgeClient(server)

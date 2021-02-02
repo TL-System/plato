@@ -63,14 +63,6 @@ class FedRLServer(FLServer):
             self.rl_recorded_items = [
                 'episode', 'cumulative_reward', 'rl_training_time'
             ]
-            # Directory of results (figures etc.)
-            dataset = Config().data.dataset
-            model = Config().trainer.model
-            server_type = Config().algorithm.type
-            result_dir = f'./results/{dataset}/{model}/{server_type}/'
-            result_csv_file = result_dir + 'result_rl.csv'
-            csv_processor.initialize_csv(result_csv_file,
-                                         self.rl_recorded_items, result_dir)
 
     def configure(self):
         """
@@ -90,6 +82,13 @@ class FedRLServer(FLServer):
                          total_episodes, 100 * target_reward)
         else:
             logging.info("RL Training: %s episodes\n", total_episodes)
+
+        # Initialize the csv file which will record results of RL agent
+        if hasattr(Config(), 'results'):
+            result_csv_file = Config().result_dir + 'result_rl.csv'
+            csv_processor.initialize_csv(result_csv_file,
+                                         self.rl_recorded_items,
+                                         Config().result_dir)
 
     def start_clients(self, as_server=False):
         """Start all clients and RL training."""
@@ -189,9 +188,6 @@ class FedRLServer(FLServer):
 
     async def wrap_up_an_episode(self):
         """Wrapping up when one RL episode (the FL training) is done."""
-        dataset = Config().data.dataset
-        model = Config().trainer.model
-        server_type = Config().algorithm.type
 
         if hasattr(Config(), 'results'):
             new_row = []
@@ -203,20 +199,12 @@ class FedRLServer(FLServer):
                     time.time() - self.rl_episode_start_time
                 }[item]
                 new_row.append(item_value)
-
-            result_dir = f'./results/{dataset}/{model}/{server_type}/'
-            result_csv_file = result_dir + 'result_rl.csv'
+            result_csv_file = Config().result_dir + 'result_rl.csv'
             csv_processor.write_csv(result_csv_file, new_row)
+
         self.wrapped_previous_episode.set()
 
         if self.rl_episode >= Config().algorithm.rl_episodes:
-            if hasattr(Config(), 'results'):
-                # Deleting the csv file created when edge servers called
-                # super().__init__() as it is useless
-                os.remove(
-                    f'./results/{dataset}/{model}/{Config().algorithm.fl_server}/result.csv'
-                )
-
             logging.info(
                 'RL Agent: Target number of training episodes reached.')
             await self.close_connections()
