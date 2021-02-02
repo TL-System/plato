@@ -8,7 +8,6 @@ import logging
 import asyncio
 import sys
 import time
-import os
 
 from config import Config
 from servers import FedAvgCrossSiloServer
@@ -26,70 +25,75 @@ if hasattr(Config().algorithm, 'rl_episodes'):
     }[Config().algorithm.fl_server]
 
 
-class FedRLServer(FLServer):
+class RhythmServer(FLServer):
     """Federated server using RL."""
     def __init__(self):
         super().__init__()
 
-        self.rl_env = RLEnv(self)
-        self.rl_episode = 0
-        self.rl_tuned_para_value = None
-        self.rl_state = None
-        self.is_rl_tuned_para_got = False
-        self.is_rl_episode_done = False
-        self.rl_episode_start_time = None
-        self.cumulative_reward = 0
+        if Config().is_central_server():
+            self.rl_env = RLEnv(self)
+            self.rl_episode = 0
+            self.rl_tuned_para_value = None
+            self.rl_state = None
+            self.is_rl_tuned_para_got = False
+            self.is_rl_episode_done = False
+            self.rl_episode_start_time = None
+            self.cumulative_reward = 0
 
-        # An RL agent waits for the event that the tuned parameter
-        # is passed from RL environment
-        self.rl_tuned_para_got = asyncio.Event()
+            # An RL agent waits for the event that the tuned parameter
+            # is passed from RL environment
+            self.rl_tuned_para_got = asyncio.Event()
 
-        # Indicate if server response (contains RL tuned para that will be sent to edge servers)
-        # is generated in this RL time step, as customize_server_response() is called everytime
-        # when the central server sends response to one edge server,
-        # but the response only need to be generated once in an RL time step (an FL round)
-        self.generated_server_response = False
+            # Indicate if server response (contains RL tuned para that will be sent to edge servers)
+            # is generated in this RL time step, as customize_server_response() is called everytime
+            # when the central server sends response to one edge server,
+            # but the response only need to be generated once in an RL time step (an FL round)
+            self.generated_server_response = False
 
-        # An RL agent waits for the event that RL environment is reset to aviod
-        # directly starting a new time step after the previous episode ends
-        self.new_episode_begin = asyncio.Event()
+            # An RL agent waits for the event that RL environment is reset to aviod
+            # directly starting a new time step after the previous episode ends
+            self.new_episode_begin = asyncio.Event()
 
-        # Since RL training (function start_rl()) runs as a coroutine
-        # It needs to wait until wrap_up_an_episode() is complete to start a new RL episode
-        self.wrapped_previous_episode = asyncio.Event()
-        self.wrapped_previous_episode.set()
+            # Since RL training (function start_rl()) runs as a coroutine
+            # It needs to wait until wrap_up_an_episode() is complete to start a new RL episode
+            self.wrapped_previous_episode = asyncio.Event()
+            self.wrapped_previous_episode.set()
 
-        if hasattr(Config(), 'results'):
-            self.rl_recorded_items = [
-                'episode', 'cumulative_reward', 'rl_training_time'
-            ]
-            # Directory of results (figures etc.)
-            dataset = Config().data.dataset
-            model = Config().trainer.model
-            server_type = Config().algorithm.type
-            result_dir = f'./results/{dataset}/{model}/{server_type}/'
-            result_csv_file = result_dir + 'result_rl.csv'
-            csv_processor.initialize_csv(result_csv_file,
-                                         self.rl_recorded_items, result_dir)
+            if hasattr(Config(), 'results'):
+                self.rl_recorded_items = [
+                    'episode', 'cumulative_reward', 'rl_training_time'
+                ]
 
     def configure(self):
         """
-        Booting the RL agent and the FL server
+        Booting the RL agent and the FL server on the central server
+        and the FL server on edge servers.
         """
-        logging.info("Configuring a RL agent and a %s server...",
-                     Config().algorithm.fl_server)
-        logging.info(
-            "This RL agent will tune the number of aggregations on edge servers."
-        )
+        if Config().is_central_server():
+            logging.info("Configuring a RL agent and a %s server...",
+                         Config().algorithm.fl_server)
+            logging.info(
+                "This RL agent will tune the number of aggregations on edge servers."
+            )
 
-        total_episodes = Config().algorithm.rl_episodes
-        target_reward = Config().algorithm.rl_target_reward
+            total_episodes = Config().algorithm.rl_episodes
+            target_reward = Config().algorithm.rl_target_reward
 
-        if target_reward is not None:
-            logging.info("RL Training: %s episodes or %s%% reward\n",
-                         total_episodes, 100 * target_reward)
+            if target_reward is not None:
+                logging.info("RL Training: %s episodes or %s%% reward\n",
+                             total_episodes, 100 * target_reward)
+            else:
+                logging.info("RL Training: %s episodes\n", total_episodes)
+
+            # Initialize the csv file which will record results of RL agent
+            if hasattr(Config(), 'results'):
+                result_csv_file = Config().result_dir + 'result_rl.csv'
+                csv_processor.initialize_csv(result_csv_file,
+                                             self.rl_recorded_items,
+                                             Config().result_dir)
+
         else:
-            logging.info("RL Training: %s episodes\n", total_episodes)
+            super().configure()
 
     def start_clients(self, as_server=False):
         """Start all clients and RL training."""
@@ -104,7 +108,7 @@ class FedRLServer(FLServer):
     def start_rl(self):
         """The starting point of RL training."""
         # Test the environment of reinforcement learning.
-        FedRLServer.try_a_random_agent(self.rl_env)
+        RhythmServer.try_a_random_agent(self.rl_env)
 
     def reset_rl_env(self):
         """Reset the RL environment at the beginning of each episode."""
@@ -131,38 +135,40 @@ class FedRLServer(FLServer):
 
     async def wrap_up(self):
         """Wrapping up when one RL time step (one FL round) is done."""
-        self.generated_server_response = False
-        # Get the RL state
-        # Use accuracy as state for now
-        self.rl_state = self.accuracy
-        target_accuracy = Config().trainer.target_accuracy
+        if Config().is_central_server():
+            self.generated_server_response = False
+            # Get the RL state
+            # Use accuracy as state for now
+            self.rl_state = self.accuracy
+            target_accuracy = Config().trainer.target_accuracy
 
-        if target_accuracy and self.accuracy >= target_accuracy:
-            logging.info("Target accuracy of FL reached.")
-            self.is_rl_episode_done = True
+            if target_accuracy and self.accuracy >= target_accuracy:
+                logging.info("Target accuracy of FL reached.")
+                self.is_rl_episode_done = True
 
-        if self.current_round >= Config().trainer.rounds:
-            logging.info("Target number of FL training rounds reached.")
-            self.is_rl_episode_done = True
+            if self.current_round >= Config().trainer.rounds:
+                logging.info("Target number of FL training rounds reached.")
+                self.is_rl_episode_done = True
 
-        # Pass the RL state to the RL env
-        self.rl_env.get_state(self.rl_state, self.is_rl_episode_done)
+            # Pass the RL state to the RL env
+            self.rl_env.get_state(self.rl_state, self.is_rl_episode_done)
 
-        # Give RL env some time to finish step() before FL select clients to start next round
-        await self.rl_env.step_done.wait()
-        self.rl_env.step_done.clear()
+            # Give RL env some time to finish step() before FL select clients to start next round
+            await self.rl_env.step_done.wait()
+            self.rl_env.step_done.clear()
 
-        if self.is_rl_episode_done:
-            await self.wrap_up_an_episode()
+            if self.is_rl_episode_done:
+                await self.wrap_up_an_episode()
 
     async def customize_server_response(self, server_response):
         """Wrap up generating the server response with any additional information."""
-        if not self.generated_server_response:
-            await self.update_rl_tuned_parameter()
-            self.generated_server_response = True
-        server_response['fedrl'] = Config().algorithm.local_rounds
-        server_response['current_global_round'] = self.current_round
-        print("CURRENT GLOBAL ROUND", self.current_round)
+        if Config().is_central_server():
+            if not self.generated_server_response:
+                await self.update_rl_tuned_parameter()
+                self.generated_server_response = True
+            server_response['fedrl'] = Config().algorithm.local_rounds
+            server_response['current_global_round'] = self.current_round
+            print("CURRENT GLOBAL ROUND", self.current_round)
         return server_response
 
     async def update_rl_tuned_parameter(self):
@@ -189,9 +195,6 @@ class FedRLServer(FLServer):
 
     async def wrap_up_an_episode(self):
         """Wrapping up when one RL episode (the FL training) is done."""
-        dataset = Config().data.dataset
-        model = Config().trainer.model
-        server_type = Config().algorithm.type
 
         if hasattr(Config(), 'results'):
             new_row = []
@@ -203,20 +206,12 @@ class FedRLServer(FLServer):
                     time.time() - self.rl_episode_start_time
                 }[item]
                 new_row.append(item_value)
-
-            result_dir = f'./results/{dataset}/{model}/{server_type}/'
-            result_csv_file = result_dir + 'result_rl.csv'
+            result_csv_file = Config().result_dir + 'result_rl.csv'
             csv_processor.write_csv(result_csv_file, new_row)
+
         self.wrapped_previous_episode.set()
 
         if self.rl_episode >= Config().algorithm.rl_episodes:
-            if hasattr(Config(), 'results'):
-                # Deleting the csv file created when edge servers called
-                # super().__init__() as it is useless
-                os.remove(
-                    f'./results/{dataset}/{model}/{Config().algorithm.fl_server}/result.csv'
-                )
-
             logging.info(
                 'RL Agent: Target number of training episodes reached.')
             await self.close_connections()
