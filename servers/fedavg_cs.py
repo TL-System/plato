@@ -86,7 +86,15 @@ class FedAvgCrossSiloServer(FedAvgServer):
     async def customize_server_response(self, server_response):
         """Wrap up generating the server response with any additional information."""
         if Config().is_central_server():
+            server_response = await super().customize_server_response(
+                server_response)
             server_response['current_global_round'] = self.current_round
+        else:
+            trainer_counter_file_id = Config(
+            ).trainer_counter_file[Config().trainer_counter_file.rfind('/') +
+                                   1:]
+            server_response[
+                'trainer_counter_file_id'] = trainer_counter_file_id
         return server_response
 
     async def process_reports(self):
