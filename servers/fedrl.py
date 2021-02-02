@@ -8,7 +8,6 @@ import logging
 import asyncio
 import sys
 import time
-import os
 
 from config import Config
 from servers import FedAvgCrossSiloServer
