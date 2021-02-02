@@ -37,7 +37,8 @@ class TempoServer(FedAvgCrossSiloServer):
     async def customize_server_response(self, server_response):
         """Wrap up generating the server response with any additional information."""
         if Config().is_central_server():
-            server_response['current_global_round'] = self.current_round
+            server_response = await super().customize_server_response(
+                server_response)
             server_response['local_epoch_num'] = self.local_epoch_list
         if Config().is_edge_server():
             # At this point, an edge server already updated Config().trainer.epochs

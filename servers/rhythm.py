@@ -166,8 +166,10 @@ class RhythmServer(FLServer):
             if not self.generated_server_response:
                 await self.update_rl_tuned_parameter()
                 self.generated_server_response = True
-            server_response['fedrl'] = Config().algorithm.local_rounds
-            server_response['current_global_round'] = self.current_round
+            server_response['local_agg_rounds'] = Config(
+            ).algorithm.local_rounds
+            server_response = await super().customize_server_response(
+                server_response)
             print("CURRENT GLOBAL ROUND", self.current_round)
         return server_response
 
