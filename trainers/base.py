@@ -5,6 +5,7 @@ Base class for trainers.
 from abc import ABC, abstractmethod
 import time
 import os
+from filelock import FileLock
 from config import Config
 
 
@@ -20,10 +21,12 @@ class Trainer(ABC):
     def start_training(self):
         """Increment the global counter of running trainers."""
 
+        lock = FileLock(Config().trainer_counter_file + '.lock')
+
         # The first training client initializes a global counter of running trainers.
         if not os.path.exists(Config().trainer_counter_file):
-            with open(Config().trainer_counter_file, 'w') as file:
-                file.write(str(0))
+            with lock:
+                open(Config().trainer_counter_file, 'w').write(str(0))
 
         with open(Config().trainer_counter_file, 'r') as file:
             trainer_count = int(file.read())
@@ -34,15 +37,25 @@ class Trainer(ABC):
             with open(Config().trainer_counter_file, 'r') as file:
                 trainer_count = int(file.read())
 
-        with open(Config().trainer_counter_file, 'w') as file:
-            file.write(str(trainer_count + 1))
+        lock.acquire()
+        try:
+            open(Config().trainer_counter_file,
+                 'w').write(str(trainer_count + 1))
+        finally:
+            lock.release()
 
     def pause_training(self):
         """Increment the global counter of running trainers."""
         with open(Config().trainer_counter_file, 'r') as file:
             trainer_count = int(file.read())
-        with open(Config().trainer_counter_file, 'w') as file:
-            file.write(str(trainer_count - 1))
+
+        lock = FileLock(Config().trainer_counter_file + '.lock')
+        lock.acquire()
+        try:
+            open(Config().trainer_counter_file,
+                 'w').write(str(trainer_count - 1))
+        finally:
+            lock.release()
 
         model_type = Config().trainer.model
         model_dir = Config().model_dir
