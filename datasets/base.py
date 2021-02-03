@@ -7,6 +7,7 @@ import os
 import sys
 import logging
 import gzip
+import zipfile
 from urllib.parse import urlparse
 import requests
 
@@ -20,14 +21,17 @@ class Dataset(ABC):
 
     @staticmethod
     def download(url, data_path):
-        """downloading the MNIST dataset."""
+        """downloading the dataset from a URL."""
+        if not os.path.exists(data_path):
+            os.makedirs(data_path)
+
         url_parse = urlparse(url)
         file_name = os.path.join(data_path, url_parse.path.split('/')[-1])
 
         if not os.path.exists(file_name.replace('.gz', '')):
             logging.info("Downloading %s.", url)
 
-            res = requests.get(url, stream=True, verify=False)
+            res = requests.get(url, stream=True)
             total_size = int(res.headers["Content-Length"])
             downloaded_size = 0
 
@@ -45,12 +49,19 @@ class Dataset(ABC):
                 sys.stdout.write("\n")
 
             # Unzip the compressed file just downloaded
-            unzipped_file = open(file_name.replace('.gz', ''), 'wb')
-            zipped_file = gzip.GzipFile(file_name)
-            unzipped_file.write(zipped_file.read())
-            zipped_file.close()
-
-            os.remove(file_name)
+            name, suffix = os.path.splitext(file_name)
+            if suffix == '.zip':
+                logging.info("Extracting %s to %s.", file_name, data_path)
+                with zipfile.ZipFile(file_name, 'r') as zip_ref:
+                    zip_ref.extractall(data_path)
+            elif suffix == '.gz':
+                unzipped_file = open(name, 'wb')
+                zipped_file = gzip.GzipFile(file_name)
+                unzipped_file.write(zipped_file.read())
+                zipped_file.close()
+            else:
+                logging.info("Unknown compressed file type.")
+                sys.exit()
 
     @abstractstaticmethod
     def num_train_examples() -> int:
