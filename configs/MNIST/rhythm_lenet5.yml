@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 3
+    total_clients: 2
 
     # The number of clients selected in each round
-    per_round: 3
+    per_round: 2
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -23,7 +23,7 @@ data:
     data_path: ./data
 
     # Number of samples in each partition
-    partition_size: 20000
+    partition_size: 200
 
     # IID, biased, or sharded?
     divider: iid
@@ -36,7 +36,7 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 100
+    rounds: 2
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -49,7 +49,7 @@ trainer:
 
     # Number of epoches for local training in each communication round
     epochs: 1
-    batch_size: 32
+    batch_size: 20
     optimizer: SGD
     learning_rate: 0.01
     momentum: 0.9
@@ -60,7 +60,7 @@ trainer:
 
 algorithm:
     # Aggregation algorithm
-    type: fedrl
+    type: rhythm
 
     # Cross-silo training
     cross_silo: true
@@ -76,7 +76,7 @@ algorithm:
     local_rounds: 2
 
     # The number of episodes of RL training
-    rl_episodes: 2
+    rl_episodes: 1
 
     rl_target_reward: null
 
