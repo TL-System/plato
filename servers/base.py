@@ -99,8 +99,9 @@ class Server:
 
                 if 'payload' in data:
                     # an existing client reports new updates from local training
-                    logging.info("[Server #%d] Receiving payload from client #%s.",
-                             os.getpid(), client_id)
+                    logging.info(
+                        "[Server #%d] Receiving payload from client #%s.",
+                        os.getpid(), client_id)
 
                     client_update = await websocket.recv()
                     report = pickle.loads(client_update)
@@ -133,17 +134,16 @@ class Server:
 
     async def wrap_up(self):
         """Wrapping up when each round of training is done."""
-        if not Config().is_edge_server():
-            # Break the loop when the target accuracy is achieved
-            target_accuracy = Config().trainer.target_accuracy
+        # Break the loop when the target accuracy is achieved
+        target_accuracy = Config().trainer.target_accuracy
 
-            if target_accuracy and self.accuracy >= target_accuracy:
-                logging.info("Target accuracy reached.")
-                await self.close()
+        if target_accuracy and self.accuracy >= target_accuracy:
+            logging.info("Target accuracy reached.")
+            await self.close()
 
-            if self.current_round >= Config().trainer.rounds:
-                logging.info("Target number of training rounds reached.")
-                await self.close()
+        if self.current_round >= Config().trainer.rounds:
+            logging.info("Target number of training rounds reached.")
+            await self.close()
 
     async def close(self):
         """Closing the server."""

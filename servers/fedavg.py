@@ -90,6 +90,11 @@ class FedAvgServer(Server):
         # starting time of a gloabl training round
         self.round_start_time = time.time()
 
+    async def customize_server_response(self, server_response):
+        """Wrap up generating the server response with any additional information."""
+        server_response['trainer_counter_file_id'] = os.getpid()
+        return server_response
+
     def aggregate_weights(self, reports):
         """Aggregate the reported weight updates from the selected clients."""
         return self.federated_averaging(reports)
