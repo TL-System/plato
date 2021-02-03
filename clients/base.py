@@ -65,11 +65,6 @@ class Client:
                         if not self.data_loaded:
                             self.load_data()
 
-                        if 'trainer_counter_file_id' in data:
-                            Config().trainer_counter_file = Config(
-                            ).trainer_counter_dir + str(
-                                data['trainer_counter_file_id'])
-
                         if 'payload' in data:
                             logging.info(
                                 "[Client #%s] Receiving payload from the server.",

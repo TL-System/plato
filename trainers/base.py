@@ -14,46 +14,40 @@ class Trainer(ABC):
     def __init__(self, client_id):
         self.device = Config().device()
         self.client_id = client_id
-
-        if not os.path.exists(Config().trainer_counter_dir):
-            os.makedirs(Config().trainer_counter_dir)
+        """Initialize a global counter of running trainers."""
+        if not os.path.exists('./running_trainers'):
+            with open('./running_trainers', 'w') as file:
+                file.write(str(0))
 
     def start_training(self):
         """Increment the global counter of running trainers."""
 
-        lock = FileLock(Config().trainer_counter_file + '.lock')
+        lock = FileLock('./running_trainers.lock')
 
-        # The first training client initializes a global counter of running trainers.
-        if not os.path.exists(Config().trainer_counter_file):
-            with lock:
-                open(Config().trainer_counter_file, 'w').write(str(0))
-
-        with open(Config().trainer_counter_file, 'r') as file:
+        with open('./running_trainers', 'r') as file:
             trainer_count = int(file.read())
 
         while trainer_count >= Config().trainer.max_concurrency:
             # Wait for a while and check again
             time.sleep(5)
-            with open(Config().trainer_counter_file, 'r') as file:
+            with open('./running_trainers', 'r') as file:
                 trainer_count = int(file.read())
 
         lock.acquire()
         try:
-            open(Config().trainer_counter_file,
-                 'w').write(str(trainer_count + 1))
+            open('./running_trainers', 'w').write(str(trainer_count + 1))
         finally:
             lock.release()
 
     def pause_training(self):
         """Increment the global counter of running trainers."""
-        with open(Config().trainer_counter_file, 'r') as file:
+        with open('./running_trainers', 'r') as file:
             trainer_count = int(file.read())
 
-        lock = FileLock(Config().trainer_counter_file + '.lock')
+        lock = FileLock('./running_trainers' + '.lock')
         lock.acquire()
         try:
-            open(Config().trainer_counter_file,
-                 'w').write(str(trainer_count - 1))
+            open('./running_trainers', 'w').write(str(trainer_count - 1))
         finally:
             lock.release()
 
@@ -70,9 +64,8 @@ class Trainer(ABC):
 
     def stop_training(self):
         """ Remove the global counter after all training concluded."""
-        os.remove(Config().trainer_counter_file)
-        if not os.listdir(Config().trainer_counter_dir):
-            os.rmdir(Config().trainer_counter_dir)
+        os.remove('./running_trainers')
+        os.remove('./running_trainers.lock')
 
     @abstractmethod
     def extract_weights(self):

@@ -78,8 +78,6 @@ class Config:
             Config.args = args
             Config.experiment_id = os.getpid()
             Config.model_dir = './models/pretrained/'
-            Config.trainer_counter_dir = './running_trainers/'
-            Config.trainer_counter_file = f'{Config.trainer_counter_dir}{os.getpid()}'
 
         return cls._instance
 
