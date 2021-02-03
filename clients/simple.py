@@ -3,7 +3,6 @@ A basic federated learning client who sends weight updates to the server.
 """
 
 import logging
-import os
 import random
 import time
 from dataclasses import dataclass

@@ -12,8 +12,8 @@ import numpy as np
 
 from models.base import Model
 from config import Config
-from trainers import base
 from utils import optimizers
+from trainers import base
 
 
 class Trainer(base.Trainer):
