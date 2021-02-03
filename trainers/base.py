@@ -5,7 +5,6 @@ Base class for trainers.
 from abc import ABC, abstractmethod
 import time
 import os
-from filelock import FileLock
 from config import Config
 
 
@@ -14,58 +13,42 @@ class Trainer(ABC):
     def __init__(self, client_id):
         self.device = Config().device()
         self.client_id = client_id
-        """Initialize a global counter of running trainers."""
-        if not os.path.exists('./running_trainers'):
-            with open('./running_trainers', 'w') as file:
-                file.write(str(0))
+        Config().cursor.execute("CREATE TABLE IF NOT EXISTS trainers (pid int)")
 
     def start_training(self):
-        """Increment the global counter of running trainers."""
+        """Add to the list of running trainers if max_concurrency has not yet
+        been reached."""
+        with Config().sql_connection:
+            Config().cursor.execute("SELECT COUNT(*) FROM trainers")
+            trainer_count = Config().cursor.fetchone()[0]
 
-        lock = FileLock('./running_trainers.lock')
-
-        with open('./running_trainers', 'r') as file:
-            trainer_count = int(file.read())
-
-        while trainer_count >= Config().trainer.max_concurrency:
-            # Wait for a while and check again
-            time.sleep(5)
-            with open('./running_trainers', 'r') as file:
-                trainer_count = int(file.read())
-
-        lock.acquire()
-        try:
-            open('./running_trainers', 'w').write(str(trainer_count + 1))
-        finally:
-            lock.release()
+            while trainer_count >= Config().trainer.max_concurrency:
+                time.sleep(2)
+                Config().cursor.execute("SELECT COUNT(*) FROM trainers")
+                trainer_count = Config().cursor.fetchone()[0]
+            
+            Config().cursor.execute("INSERT INTO trainers VALUES (?)", (self.client_id,))
 
     def pause_training(self):
-        """Increment the global counter of running trainers."""
-        with open('./running_trainers', 'r') as file:
-            trainer_count = int(file.read())
-
-        lock = FileLock('./running_trainers' + '.lock')
-        lock.acquire()
-        try:
-            open('./running_trainers', 'w').write(str(trainer_count - 1))
-        finally:
-            lock.release()
+        """Remove from the list of running trainers."""
+        with Config().sql_connection:
+            Config().cursor.execute("DELETE FROM trainers WHERE pid = (?)", (self.client_id,))
 
         model_type = Config().trainer.model
         model_dir = Config().model_dir
-        model_path = f'{model_dir}{model_type}_{self.client_id}_{Config().experiment_id}.pth'
-        accuracy_path = f'{model_dir}{model_type}_{self.client_id}_{Config().experiment_id}.acc'
+        model_file = f'{model_dir}{model_type}_{self.client_id}_{Config().experiment_id}.pth'
+        accuracy_file = f'{model_dir}{model_type}_{self.client_id}_{Config().experiment_id}.acc'
 
-        if os.path.exists(model_path):
-            os.remove(model_path)
+        if os.path.exists(model_file):
+            os.remove(model_file)
 
-        if os.path.exists(accuracy_path):
-            os.remove(accuracy_path)
+        if os.path.exists(accuracy_file):
+            os.remove(accuracy_file)
 
     def stop_training(self):
-        """ Remove the global counter after all training concluded."""
-        os.remove('./running_trainers')
-        os.remove('./running_trainers.lock')
+        """ Remove the trainers table after all training concluded."""
+        Config().cursor.execute("DROP TABLE trainers")
+        Config().sql_connection.close()
 
     @abstractmethod
     def extract_weights(self):

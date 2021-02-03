@@ -65,8 +65,8 @@ class Trainer(base.Trainer):
 
     def load_model(self, filename=None):
         """Loading pre-trained model weights from a file."""
-        model_type = Config().trainer.model
         model_dir = Config().model_dir
+        model_type = Config().trainer.model
 
         if filename is not None:
             model_path = f'{model_dir}{filename}'
@@ -83,23 +83,32 @@ class Trainer(base.Trainer):
         self.model.load_state_dict(torch.load(model_path))
 
     @staticmethod
-    def save_accuracy(accuracy, filename):
+    def save_accuracy(accuracy, filename=None):
         """Saving the test accuracy to a file."""
         model_dir = Config().model_dir
+        model_type = Config().trainer.model
 
         if not os.path.exists(model_dir):
             os.makedirs(model_dir)
 
-        accuracy_path = f"{model_dir}{filename}"
+        if filename is not None:
+            accuracy_path = f"{model_dir}{filename}"
+        else:
+            accuracy_path = f'{model_dir}{model_type}.acc'
 
         with open(accuracy_path, 'w') as file:
             file.write(str(accuracy))
 
     @staticmethod
-    def load_accuracy(filename):
+    def load_accuracy(filename=None):
         """Loading the test accuracy from a file."""
         model_dir = Config().model_dir
-        accuracy_path = f"{model_dir}{filename}"
+        model_type = Config().trainer.model
+
+        if filename is not None:
+            accuracy_path = f"{model_dir}{filename}"
+        else:
+            accuracy_path = f'{model_dir}{model_type}.acc'
 
         with open(accuracy_path, 'r') as file:
             accuracy = float(file.read())
