@@ -14,14 +14,10 @@ import servers
 
 def main():
     """Starting a WebSockets server."""
-
-    # Remove the global running_trainers counter if it exists from previous runs.
-    if os.path.exists('./running_trainers'):
-        os.remove('./running_trainers')
-    if os.path.exists('./running_trainers.lock'):
-        os.remove('./running_trainers.lock')
-
     __ = Config()
+
+    # Remove the running trainers table from previous runs
+    Config().cursor.execute("DROP TABLE trainers")
 
     server = {
         "fedavg": servers.fedavg.FedAvgServer,

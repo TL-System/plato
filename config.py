@@ -6,6 +6,7 @@ to work on than JSON).
 import logging
 from collections import namedtuple, OrderedDict
 import os
+import sqlite3
 
 import argparse
 import torch
@@ -78,6 +79,8 @@ class Config:
             Config.args = args
             Config.experiment_id = os.getpid()
             Config.model_dir = './models/pretrained/'
+            Config.sql_connection = sqlite3.connect('./running_trainers.sqlitedb')
+            Config().cursor = Config.sql_connection.cursor()
 
         return cls._instance
 

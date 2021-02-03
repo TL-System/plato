@@ -135,7 +135,7 @@ dmypy.json
 /*.yml
 
 # Runtime files
-running_trainers
+running_trainers.sqlitedb
 
 # Data files
 data/
