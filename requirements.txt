@@ -1,0 +1,7 @@
+yapf
+pylint
+websockets
+requests
+pyyaml
+matplotlib
+scipy
