@@ -48,10 +48,10 @@ Install PyTorch:
 $ pip install torch torchvision
 ```
 
-We will need to install the `websockets` package for client-server communication, the `requests` package for downloading datasets, and the 'pyyaml' package for parsing configuration files:
+We will need to install the `websockets` package for client-server communication, the `requests` package for downloading datasets, the `pyyaml` package for parsing configuration files, and the `filelock` package for implementing file lock:
 
 ```shell
-$ pip install websockets==8.1 requests pyyaml
+$ pip install websockets==8.1 requests pyyaml filelock
 ```
 
 Install `matplotlib` package for plotting figures of results:

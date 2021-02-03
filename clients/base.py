@@ -36,8 +36,7 @@ class Client:
             uri = 'ws://{}:{}'.format(
                 Config().server.address,
                 Config().server.port + Config().clients.total_clients +
-                int(self.client_id) % Config().algorithm.total_silos
-                + 1)
+                int(self.client_id) % Config().algorithm.total_silos + 1)
         else:
             logging.info("[Client #%s] Contacting the central server.",
                          self.client_id)
@@ -66,6 +65,11 @@ class Client:
                         if not self.data_loaded:
                             self.load_data()
 
+                        if 'trainer_counter_file_id' in data:
+                            Config().trainer_counter_file = Config(
+                            ).trainer_counter_dir + str(
+                                data['trainer_counter_file_id'])
+
                         if 'payload' in data:
                             logging.info(
                                 "[Client #%s] Receiving payload from the server.",
@@ -89,8 +93,9 @@ class Client:
                         await websocket.send(json.dumps(client_update))
 
                         # Sending the client training report to the server as payload
-                        logging.info("[Client #%s] Sending reports to the server.",
-                                         self.client_id)
+                        logging.info(
+                            "[Client #%s] Sending reports to the server.",
+                            self.client_id)
                         await websocket.send(pickle.dumps(report))
 
         except OSError as exception:
