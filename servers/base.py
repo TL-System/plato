@@ -88,6 +88,9 @@ class Server:
                              os.getpid())
                 await socket.send(pickle.dumps(self.trainer.extract_weights()))
 
+                if Config().trainer.optimizer == 'Scaffold':
+                    await socket.send(pickle.dumps(self.c_server))
+
     async def serve(self, websocket, path):  # pylint: disable=unused-argument
         """Running a federated learning server."""
         try:
@@ -134,6 +137,7 @@ class Server:
 
     async def wrap_up(self):
         """Wrapping up when each round of training is done."""
+
         # Break the loop when the target accuracy is achieved
         target_accuracy = Config().trainer.target_accuracy
 

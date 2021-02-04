@@ -73,6 +73,13 @@ class Client:
 
                             self.load_payload(pickle.loads(server_payload))
 
+                        if 'c_server' in data:
+                            logging.info(
+                                "[Client #%s] Receiving c_server from the server.",
+                                self.client_id)
+                            c_server = await websocket.recv()
+                            self.load_c_server(pickle.loads(c_server))
+
                         report = await self.train()
 
                         if Config().is_edge_server():

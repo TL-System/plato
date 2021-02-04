@@ -24,7 +24,8 @@ def main():
         "mistnet": servers.mistnet.MistNetServer,
         "adaptive_sync": servers.adaptive_sync.AdaptiveSyncServer,
         "rhythm": servers.rhythm.RhythmServer,
-        "tempo": servers.tempo.TempoServer
+        "tempo": servers.tempo.TempoServer,
+        "scaffold": servers.scaffold.ScaffoldServer
     }[Config().algorithm.type]()
     server.configure()
 

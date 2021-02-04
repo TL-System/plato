@@ -35,6 +35,12 @@ class Trainer(base.Trainer):
         else:
             self.model = model
 
+        if Config().trainer.optimizer == 'Scaffold':
+            self.c_server = None
+            self.c_client = None
+            self.c_plus = None
+            self.test999 = 999
+
     def zeros(self, shape):
         """Returns a MindSpore zero tensor with the given shape."""
         # This should only be called from a server
@@ -192,6 +198,13 @@ class Trainer(base.Trainer):
                 loss = loss_criterion(outputs, labels)
                 loss.backward()
 
+                if config['optimizer'] == 'Scaffold':
+                    if self.c_client is not None:
+                        optimizer.c_server = self.c_server
+                        optimizer.c_client = self.c_client
+                    if epoch > 1:
+                        optimizer.flag_c_plus = False
+
                 optimizer.step()
 
                 if lr_schedule is not None:
@@ -199,6 +212,11 @@ class Trainer(base.Trainer):
 
                 if config['optimizer'] == 'FedProx':
                     optimizer.params_state_update()
+
+                if config[
+                        'optimizer'] == 'Scaffold' and optimizer.flag_c_plus is True:
+                    # update trainer.c_plus
+                    self.c_plus = optimizer.c_plus
 
                 if batch_id % log_interval == 0:
                     if self.client_id == 0:
@@ -212,10 +230,11 @@ class Trainer(base.Trainer):
                             format(self.client_id, epoch, epochs, batch_id,
                                    len(train_loader), loss.data.item()))
         self.model.cpu()
-
         model_type = Config().trainer.model
         filename = f"{model_type}_{self.client_id}_{config['experiment_id']}.pth"
         self.save_model(filename)
+        fn = f"{model_type}_c_plus_{self.client_id}_{config['experiment_id']}.pth"
+        torch.save(self.c_plus, fn)
 
     def train(self, trainset, cut_layer=None):
         """The main training loop in a federated learning workload.
@@ -242,6 +261,8 @@ class Trainer(base.Trainer):
         model_type = Config().trainer.model
         filename = f"{model_type}_{self.client_id}_{Config().experiment_id}.pth"
         self.load_model(filename)
+        fn = f"{model_type}_c_plus_{self.client_id}_{config['experiment_id']}.pth"
+        self.c_plus = torch.load(fn)
         self.pause_training()
 
     @staticmethod

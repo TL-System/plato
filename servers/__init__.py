@@ -5,3 +5,5 @@ from .mistnet import MistNetServer
 from .adaptive_sync import AdaptiveSyncServer
 from .rhythm import RhythmServer
 from .tempo import TempoServer
+from .fednova import FedNovaServer
+from .scaffold import ScaffoldServer
