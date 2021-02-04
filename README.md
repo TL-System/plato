@@ -36,28 +36,10 @@ In macOS (without GPU support), the typical command would be:
 $ conda install pytorch torchvision -c pytorch
 ```
 
-We will need to install the `websockets` package for client-server communication, the `requests` package for downloading datasets, the `pyyaml` package for parsing configuration files:
+We will need to install several packages using `pip` as well:
 
 ```shell
-$ pip install websockets requests pyyaml
-```
-
-Install `matplotlib` package for plotting figures of results:
-
-```shell
-$ conda install matplotlib
-```
-
-In case unit tests in the `tests` directory need to be run, `scipy` should also be installed:
-
-```shell
-$ conda install scipy
-```
-
-In case it is needed to run Python code through a formatter and a linter during development, install `yapf` and `pylint`:
-
-```shell
-$ pip install yapf pylint
+$ pip install -r requirements.txt
 ```
 
 If you use Visual Studio Code, it is possible to use `yapf` to reformat the code every time it is saved by adding the following settings to .`.vscode/settings.json`:
