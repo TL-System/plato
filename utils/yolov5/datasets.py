@@ -20,8 +20,8 @@ from PIL import Image, ExifTags
 from torch.utils.data import Dataset
 from tqdm import tqdm
 
-from utils.general import xyxy2xywh, xywh2xyxy, xywhn2xyxy, clean_str
-from utils.torch_utils import torch_distributed_zero_first
+from utils.yolov5.general import xyxy2xywh, xywh2xyxy, xywhn2xyxy, clean_str
+from utils.yolov5.torch_utils import torch_distributed_zero_first
 
 # Parameters
 help_url = 'https://github.com/ultralytics/yolov5/wiki/Train-Custom-Data'
