@@ -5,3 +5,7 @@ requests
 pyyaml
 matplotlib
 scipy
+
+# required by yolov5
+opencv-python
+tqdm

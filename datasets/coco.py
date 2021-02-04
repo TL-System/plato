@@ -14,7 +14,7 @@ from torchvision import datasets
 
 from config import Config
 from datasets import base
-
+from utils.yolov5.datasets import create_dataloader
 
 class Dataset(base.Dataset):
     """The COCO dataset."""
@@ -30,6 +30,13 @@ class Dataset(base.Dataset):
         for url in urls:
             if not os.path.exists(path + url.split('/')[-1]):
                 Dataset.download(url, path)
+
+            train_path = Config().data.train_path
+            imgsz = None
+            batch_size = Config().trainer.batch_size
+            gs = None
+            opt = None
+            dataloader, dataset = create_dataloader(train_path, imgsz, batch_size, gs, opt)
 
     @staticmethod
     def num_train_examples():
