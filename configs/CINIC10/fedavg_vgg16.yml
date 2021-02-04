@@ -20,8 +20,10 @@ data:
     dataset: CINIC10
 
     # Where the dataset is located
-    data_path: ./data
+    data_path: ./data/CINIC10
 
+    # 
+    download_url: https://datashare.is.ed.ac.uk/bitstream/handle/10283/3192/CINIC-10.tar.gz
     # Number of samples in each partition
     partition_size: 20000
 

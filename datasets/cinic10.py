@@ -8,6 +8,7 @@ import os
 import logging
 from torchvision import datasets, transforms
 
+from config import Config
 from datasets import base
 
 
@@ -15,18 +16,13 @@ class Dataset(base.Dataset):
     """The CINIC-10 dataset."""
     def __init__(self, path):
         super().__init__(path)
+        if not os.path.exists(path):
+            os.makedirs(path)
 
-        self.cinic_path = path + '/CINIC10'
-
-        # Download and extract CINIC-10 dataset if haven't
-        if not os.path.exists(self.cinic_path):
-            os.makedirs(self.cinic_path)
-
-        if not os.path.exists(self.cinic_path + '.tar.gz'):
-            logging.info('Downloading the CINIC-10 dataset. This takes a while.')
-
-            url = 'https://datashare.is.ed.ac.uk/bitstream/handle/10283/3192/CINIC-10.tar.gz'
-            Dataset.download(url, self.cinic_path)
+        logging.info("Downloading the CINIC-10 dataset. This may take a while.")
+        url = Config().data.download_url
+        if not os.path.exists(path + url.split('/')[-1]):
+            Dataset.download(url, path)
 
         self._transform = transforms.Compose([
             transforms.ToTensor(),
