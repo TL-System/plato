@@ -172,6 +172,30 @@ docker rmi plato
 
 The provided `Dockerfile` helps to build a Docker container image running Ubuntu 20.04, with two virtual environments pre-installed: the one called `federated` supports PyTorch and Python 3.8, and one called `mindspore` supports [MindSpore 1.1](https://github.com/mindspore-ai/mindspore) and Python 3.7.5 (which is the Python version that MindSpore requires). Once the container is built and running, one can use Visual Studio Code to connect to it and start development within the container.
 
+### Maintaining external repositories as subrepos
+
+The *Plato* framework uses external git repositories by cloning them as *subrepos* in the `subrepos/` directory. Most collaborators or users do not need to worry about maintaining these subrepos. In order to update these subrepos, the [git subrepo](https://github.com/ingydotnet/git-subrepo) command needs to be installed. To install it, use the following commands:
+
+```shell
+git clone https://github.com/ingydotnet/git-subrepo /path/to/git-subrepo
+echo 'source /path/to/git-subrepo/.rc' >> ~/.bashrc
+source ~/.bashrc
+```
+
+After installing `git subrepo`, one can clone an external git repository using the following commands from the *top-level* project directory:
+
+```shell
+git subrepo clone https://github.com/ultralytics/yolov5.git subrepos/yolov5
+```
+
+It is more typical that one needs to pull the latest updates from the external git repository that has already been cloned as a subrepo:
+
+```shell
+git subrepo pull subrepos/yolov5
+```
+
+Where `yolov5` is the external repo to be cloned in our example. Before cloning a new subrepo, one needs to make sure that the working directory has neither unstaged nor staged changes.
+
 ### Uninstalling Plato
 
 Remove the `conda` environment used to run *Plato* first, and then remove the directory containing *Plato*'s git repository.
