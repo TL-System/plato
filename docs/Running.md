@@ -48,24 +48,12 @@ Install PyTorch:
 $ pip install torch torchvision
 ```
 
-We will need to install the `websockets` package for client-server communication, the `requests` package for downloading datasets, the `pyyaml` package for parsing configuration files:
+We will need to install several additional packages using `pip`:
 
 ```shell
-$ pip install websockets==8.1 requests pyyaml
+$ pip install websockets==8.1
+$ pip install -r requirements.txt
 ```
-
-Install `matplotlib` package for plotting figures of results:
-
-```shell
-$ pip install matplotlib
-```
-
-In case unit tests in the `tests` directory need to be run, `scipy` should also be installed:
-
-```shell
-$ pip install scipy
-```
-
 
 ### Running Plato
 
