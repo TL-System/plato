@@ -19,16 +19,21 @@ class Dataset(base.Dataset):
         if not os.path.exists(path):
             os.makedirs(path)
 
-        logging.info("Downloading the CINIC-10 dataset. This may take a while.")
+        logging.info(
+            "Downloading the CINIC-10 dataset. This may take a while.")
         url = Config().data.download_url
         if not os.path.exists(path + url.split('/')[-1]):
             Dataset.download(url, path)
 
-        self._transform = transforms.Compose([
+        _transform = transforms.Compose([
             transforms.ToTensor(),
             transforms.Normalize([0.47889522, 0.47227842, 0.43047404],
                                  [0.24205776, 0.23828046, 0.25874835])
         ])
+        self.trainset = datasets.ImageFolder(root=self.cinic_path + '/train',
+                                             transform=_transform)
+        self.testset = datasets.ImageFolder(root=self.cinic_path + '/test',
+                                            transform=_transform)
 
     @staticmethod
     def num_train_examples():
@@ -41,11 +46,3 @@ class Dataset(base.Dataset):
     @staticmethod
     def num_classes():
         return 10
-
-    def get_train_set(self):
-        return datasets.ImageFolder(root=self.cinic_path + '/train',
-                                    transform=self._transform)
-
-    def get_test_set(self):
-        return datasets.ImageFolder(root=self.cinic_path + '/test',
-                                    transform=self._transform)

@@ -20,11 +20,7 @@ class Model(yolo.Model):
         if not Model.is_valid_model_name(model_name):
             raise ValueError('Invalid model name: {}'.format(model_name))
 
-        if hasattr(Config().trainer, 'model_config'):
-            # Initialize the model with the cut_layer set, so that all the training
-            # will only use the layers after the cut_layer
-            model_config = Config().trainer.model_config
-        
-            return Model(model_config, Config().data.num_classes)
+        if hasattr(Config().trainer, 'model_config'):        
+            return Model(Config().trainer.model_config, Config().data.num_classes)
         else:
             return Model('yolov5s.yaml', Config().data.num_classes)
