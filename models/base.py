@@ -6,6 +6,7 @@ import torch.nn as nn
 
 class Model(ABC, nn.Module):
     """The base class for by all the models."""
+    @abstractmethod
     def forward(self, x):
         """The forward pass."""
 

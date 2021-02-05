@@ -18,6 +18,8 @@ class Dataset(ABC):
     """
     def __init__(self, path):
         self._path = path
+        self.trainset = None
+        self.testset = None
 
     @staticmethod
     def download(url, data_path):
@@ -75,10 +77,12 @@ class Dataset(ABC):
     def num_classes() -> int:
         pass
 
-    @abstractstaticmethod
-    def get_train_set() -> 'Dataset':
-        pass
+    def classes(self):
+        """Obtains a list of class names in the dataset."""
+        return list(self.trainset.classes)
 
-    @abstractstaticmethod
-    def get_test_set() -> 'Dataset':
-        pass
+    def get_train_set(self):
+        return self.trainset
+
+    def get_test_set(self):
+        return self.testset

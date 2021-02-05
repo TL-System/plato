@@ -11,10 +11,18 @@ class Dataset(base.Dataset):
     def __init__(self, path):
         super().__init__(path)
 
-        self._transform = transforms.Compose([
+        _transform = transforms.Compose([
             transforms.ToTensor(),
             transforms.Normalize((0.1307, ), (0.3081, ))
         ])
+        self.trainset = datasets.MNIST(root=self._path,
+                                       train=True,
+                                       download=True,
+                                       transform=_transform)
+        self.testset = datasets.MNIST(root=self._path,
+                                      train=False,
+                                      download=True,
+                                      transform=_transform)
 
     @staticmethod
     def num_train_examples():
@@ -27,15 +35,3 @@ class Dataset(base.Dataset):
     @staticmethod
     def num_classes():
         return 10
-
-    def get_train_set(self):
-        return datasets.MNIST(root=self._path,
-                              train=True,
-                              download=True,
-                              transform=self._transform)
-
-    def get_test_set(self):
-        return datasets.MNIST(root=self._path,
-                              train=False,
-                              download=True,
-                              transform=self._transform)

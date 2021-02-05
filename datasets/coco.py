@@ -10,12 +10,11 @@ For more information about the COCO 2017 dataset, refer to http://cocodataset.or
 import os
 import logging
 
-from torchvision import datasets
-
 from config import Config
 from datasets import base
 from utils.yolov5.datasets import LoadImagesAndLabels
 from utils.yolov5.general import check_img_size
+
 
 class Dataset(base.Dataset):
     """The COCO dataset."""
@@ -34,9 +33,9 @@ class Dataset(base.Dataset):
 
         assert 'grid_size' in Config().params
 
-        self.train_path = Config().data.train_path        
         self.grid_size = Config().params['grid_size']
-        self.image_size = [check_img_size(x, self.grid_size) for x in Config().data.image_size]
+        self.image_size = check_img_size(Config().data.image_size,
+                                         self.grid_size)
 
         print(self.grid_size)
         print(self.image_size)
@@ -55,22 +54,27 @@ class Dataset(base.Dataset):
     def num_classes():
         return Config().data.num_classes
 
+    def classes(self):
+        """Obtains a list of class names in the dataset."""
+        return Config().data.classes
+
     def get_train_set(self):
         single_class = (Config().data.num_classes == 1)
 
         if self.train_set is None:
-            self.train_set = LoadImagesAndLabels(self.train_path,
-                                    self.image_size,
-                                    Config().trainer.batch_size,
-                                    augment=False, # augment images
-                                    hyp=None, # augmentation hyperparameters
-                                    rect=False, # rectangular training
-                                    cache_images=False,
-                                    single_cls=single_class,
-                                    stride=int(self.grid_size),
-                                    pad=0.0,
-                                    image_weights=False,
-                                    prefix='')
+            self.train_set = LoadImagesAndLabels(
+                Config().data.train_path,
+                self.image_size,
+                Config().trainer.batch_size,
+                augment=False,  # augment images
+                hyp=None,  # augmentation hyperparameters
+                rect=False,  # rectangular training
+                cache_images=False,
+                single_cls=single_class,
+                stride=int(self.grid_size),
+                pad=0.0,
+                image_weights=False,
+                prefix='')
 
         return self.train_set
 
@@ -78,17 +82,18 @@ class Dataset(base.Dataset):
         single_class = (Config().data.num_classes == 1)
 
         if self.test_set is None:
-            self.test_set = LoadImagesAndLabels(self.test_path,
-                                    self.image_size,
-                                    Config().trainer.batch_size,
-                                    augment=False, # augment images
-                                    hyp=None, # augmentation hyperparameters
-                                    rect=False, # rectangular training
-                                    cache_images=False,
-                                    single_cls=single_class,
-                                    stride=int(self.grid_size),
-                                    pad=0.0,
-                                    image_weights=False,
-                                    prefix='')
+            self.test_set = LoadImagesAndLabels(
+                Config().data.test_path,
+                self.image_size,
+                Config().trainer.batch_size,
+                augment=False,  # augment images
+                hyp=None,  # augmentation hyperparameters
+                rect=False,  # rectangular training
+                cache_images=False,
+                single_cls=single_class,
+                stride=int(self.grid_size),
+                pad=0.0,
+                image_weights=False,
+                prefix='')
 
         return self.test_set

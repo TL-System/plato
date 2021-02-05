@@ -10,7 +10,7 @@ class Divider:
         """Get data from the dataset."""
         self.trainset = dataset.get_train_set()
         self.testset = dataset.get_test_set()
-        self.labels = list(self.trainset.classes)
+        self.labels = dataset.classes()
         self.partition = None
 
         random.seed()
