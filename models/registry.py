@@ -3,7 +3,7 @@ Having a registry of all available classes is convenient for retrieving an insta
 based on a configuration at run-time.
 """
 
-from models import lenet5, resnet, wideresnet, vgg
+from models import lenet5, resnet, wideresnet, vgg, yolo
 from config import Config
 
 registered_models = [
@@ -11,6 +11,7 @@ registered_models = [
     resnet.Model,
     wideresnet.Model,
     vgg.Model,
+    yolo.Model
 ]
 
 if hasattr(Config().trainer, 'use_mindspore'):

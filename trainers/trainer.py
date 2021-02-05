@@ -44,7 +44,7 @@ class Trainer(base.Trainer):
     def save_model(self, filename=None):
         """Saving the model to a file."""
         model_type = Config().trainer.model
-        model_dir = Config().model_dir
+        model_dir = Config().params['model_dir']
 
         if not os.path.exists(model_dir):
             os.makedirs(model_dir)
@@ -65,7 +65,7 @@ class Trainer(base.Trainer):
 
     def load_model(self, filename=None):
         """Loading pre-trained model weights from a file."""
-        model_dir = Config().model_dir
+        model_dir = Config().params['model_dir']
         model_type = Config().trainer.model
 
         if filename is not None:
@@ -85,7 +85,7 @@ class Trainer(base.Trainer):
     @staticmethod
     def save_accuracy(accuracy, filename=None):
         """Saving the test accuracy to a file."""
-        model_dir = Config().model_dir
+        model_dir = Config().params['model_dir']
         model_type = Config().trainer.model
 
         if not os.path.exists(model_dir):
@@ -102,7 +102,7 @@ class Trainer(base.Trainer):
     @staticmethod
     def load_accuracy(filename=None):
         """Loading the test accuracy from a file."""
-        model_dir = Config().model_dir
+        model_dir = Config().params['model_dir']
         model_type = Config().trainer.model
 
         if filename is not None:
@@ -228,7 +228,7 @@ class Trainer(base.Trainer):
         self.start_training()
 
         config = Config().trainer._asdict()
-        config['experiment_id'] = Config().experiment_id
+        config['experiment_id'] = Config().params['pid']
 
         mp.spawn(Trainer.train_process,
                  args=(
@@ -240,7 +240,7 @@ class Trainer(base.Trainer):
                  join=True)
 
         model_type = Config().trainer.model
-        filename = f"{model_type}_{self.client_id}_{Config().experiment_id}.pth"
+        filename = f"{model_type}_{self.client_id}_{Config().params['pid']}.pth"
         self.load_model(filename)
         self.pause_training()
 
@@ -290,7 +290,7 @@ class Trainer(base.Trainer):
         """
         self.start_training()
         config = Config().trainer._asdict()
-        config['experiment_id'] = Config().experiment_id
+        config['experiment_id'] = Config().params['pid']
 
         mp.spawn(Trainer.test_process,
                  args=(
@@ -301,7 +301,7 @@ class Trainer(base.Trainer):
                  join=True)
 
         model_type = Config().trainer.model
-        filename = f"{model_type}_{self.client_id}_{Config().experiment_id}.acc"
+        filename = f"{model_type}_{self.client_id}_{Config().params['pid']}.acc"
         accuracy = Trainer.load_accuracy(filename)
 
         self.pause_training()

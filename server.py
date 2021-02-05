@@ -16,7 +16,7 @@ def main():
     __ = Config()
 
     # Remove the running trainers table from previous runs
-    Config().cursor.execute("DROP TABLE trainers")
+    Config().cursor.execute("DROP TABLE IF EXISTS trainers")
 
     server = {
         "fedavg": servers.fedavg.FedAvgServer,

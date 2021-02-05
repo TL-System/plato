@@ -77,10 +77,15 @@ class Config:
                 Config.result_dir = os.path.dirname(args.config) + '/results/'
 
             Config.args = args
-            Config.experiment_id = os.getpid()
-            Config.model_dir = './models/pretrained/'
+
+            # Used to limit the maximum number of concurrent trainers
             Config.sql_connection = sqlite3.connect('./running_trainers.sqlitedb')
             Config().cursor = Config.sql_connection.cursor()
+
+            # Customizable dictionary of global parameters
+            Config.params = {}
+            Config.params['pid'] = os.getpid()
+            Config.params['model_dir'] = "./models/pretrained/"
 
         return cls._instance
 

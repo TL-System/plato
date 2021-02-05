@@ -14,7 +14,8 @@ from torchvision import datasets
 
 from config import Config
 from datasets import base
-from utils.yolov5.datasets import create_dataloader
+from utils.yolov5.datasets import LoadImagesAndLabels
+from utils.yolov5.general import check_img_size
 
 class Dataset(base.Dataset):
     """The COCO dataset."""
@@ -31,12 +32,16 @@ class Dataset(base.Dataset):
             if not os.path.exists(path + url.split('/')[-1]):
                 Dataset.download(url, path)
 
-            train_path = Config().data.train_path
-            imgsz = None
-            batch_size = Config().trainer.batch_size
-            gs = None
-            opt = None
-            dataloader, dataset = create_dataloader(train_path, imgsz, batch_size, gs, opt)
+        assert 'grid_size' in Config().params
+
+        self.train_path = Config().data.train_path        
+        self.grid_size = Config().params['grid_size']
+        self.image_size = [check_img_size(x, self.grid_size) for x in Config().data.image_size]
+
+        print(self.grid_size)
+        print(self.image_size)
+        self.train_set = None
+        self.test_set = None
 
     @staticmethod
     def num_train_examples():
@@ -51,9 +56,39 @@ class Dataset(base.Dataset):
         return Config().data.num_classes
 
     def get_train_set(self):
-        return datasets.ImageFolder(root=self.coco_path + '/train',
-                                    transform=self._transform)
+        single_class = (Config().data.num_classes == 1)
+
+        if self.train_set is None:
+            self.train_set = LoadImagesAndLabels(self.train_path,
+                                    self.image_size,
+                                    Config().trainer.batch_size,
+                                    augment=False, # augment images
+                                    hyp=None, # augmentation hyperparameters
+                                    rect=False, # rectangular training
+                                    cache_images=False,
+                                    single_cls=single_class,
+                                    stride=int(self.grid_size),
+                                    pad=0.0,
+                                    image_weights=False,
+                                    prefix='')
+
+        return self.train_set
 
     def get_test_set(self):
-        return datasets.ImageFolder(root=self.coco_path + '/test',
-                                    transform=self._transform)
+        single_class = (Config().data.num_classes == 1)
+
+        if self.test_set is None:
+            self.test_set = LoadImagesAndLabels(self.test_path,
+                                    self.image_size,
+                                    Config().trainer.batch_size,
+                                    augment=False, # augment images
+                                    hyp=None, # augmentation hyperparameters
+                                    rect=False, # rectangular training
+                                    cache_images=False,
+                                    single_cls=single_class,
+                                    stride=int(self.grid_size),
+                                    pad=0.0,
+                                    image_weights=False,
+                                    prefix='')
+
+        return self.test_set
