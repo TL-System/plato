@@ -35,9 +35,9 @@ class Trainer(ABC):
             Config().cursor.execute("DELETE FROM trainers WHERE pid = (?)", (self.client_id,))
 
         model_type = Config().trainer.model
-        model_dir = Config().model_dir
-        model_file = f'{model_dir}{model_type}_{self.client_id}_{Config().experiment_id}.pth'
-        accuracy_file = f'{model_dir}{model_type}_{self.client_id}_{Config().experiment_id}.acc'
+        model_dir = Config().params['model_dir']
+        model_file = f"{model_dir}{model_type}_{self.client_id}_{Config().params['pid']}.pth"
+        accuracy_file = f"{model_dir}{model_type}_{self.client_id}_{Config().params['pid']}.acc"
 
         if os.path.exists(model_file):
             os.remove(model_file)
