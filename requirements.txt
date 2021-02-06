@@ -5,6 +5,7 @@ requests
 pyyaml
 matplotlib
 scipy
+wandb
 
 # required by yolov5
 opencv-python

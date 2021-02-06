@@ -5,16 +5,21 @@ based on a configuration at run-time.
 
 import logging
 
-from datasets import mnist, fashion_mnist, cifar10, cinic10, coco
+from datasets import mnist, fashion_mnist, cifar10, cinic10
 from config import Config
 
 registered_datasets = {
     'MNIST': mnist,
     'FashionMNIST': fashion_mnist,
     'CIFAR10': cifar10,
-    'CINIC10': cinic10,
-    'COCO': coco
+    'CINIC10': cinic10
 }
+
+if Config().data.dataset == 'COCO':
+    from datasets import coco
+    coco_dataset = {'COCO': coco}
+    registered_datasets = dict(
+        list(registered_datasets.items()) + list(coco_dataset.items()))
 
 if hasattr(Config().trainer, 'use_mindspore'):
     from datasets import mnist_mindspore

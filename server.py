@@ -6,6 +6,7 @@ import asyncio
 import time
 import logging
 import websockets
+import wandb
 
 from config import Config
 import servers
