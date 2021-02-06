@@ -7,6 +7,7 @@ import time
 import os
 import random
 from collections import OrderedDict
+import wandb
 
 import models.registry as models_registry
 from datasets import registry as datasets_registry
@@ -20,6 +21,8 @@ class FedAvgServer(Server):
     """Federated learning server using federated averaging."""
     def __init__(self):
         super().__init__()
+        wandb.init(reinit=True)
+
         self.testset = None
         self.model = None
         self.selected_clients = None
@@ -150,6 +153,8 @@ class FedAvgServer(Server):
             logging.info(
                 '[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(
                     os.getpid(), 100 * self.accuracy))
+
+        wandb.log({"accuracy": self.accuracy})
 
         await self.wrap_up_processing_reports()
 

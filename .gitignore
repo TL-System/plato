@@ -143,6 +143,7 @@ data/
 # Result files
 results/
 models/pretrained/
+wandb/
 
 # macOS
 .DS_Store

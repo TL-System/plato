@@ -3,16 +3,14 @@ Having a registry of all available classes is convenient for retrieving an insta
 based on a configuration at run-time.
 """
 
-from models import lenet5, resnet, wideresnet, vgg, yolo
+from models import lenet5, resnet, wideresnet, vgg
 from config import Config
 
-registered_models = [
-    lenet5.Model,
-    resnet.Model,
-    wideresnet.Model,
-    vgg.Model,
-    yolo.Model
-]
+registered_models = [lenet5.Model, resnet.Model, wideresnet.Model, vgg.Model]
+
+if Config().trainer.model == 'yolov5':
+    from models import yolo
+    registered_models += [yolo.Model]
 
 if hasattr(Config().trainer, 'use_mindspore'):
     from models import lenet5_mindspore

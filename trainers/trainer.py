@@ -9,6 +9,7 @@ import torch
 import torch.nn as nn
 import torch.multiprocessing as mp
 import numpy as np
+import wandb
 
 from models.base import Model
 from config import Config
@@ -152,6 +153,8 @@ class Trainer(base.Trainer):
         trainset: The training dataset.
         cut_layer (optional): The layer which training should start from.
         """
+        run = wandb.init(reinit=True)
+
         log_interval = 10
         batch_size = config['batch_size']
         train_loader = torch.utils.data.DataLoader(trainset,
@@ -207,6 +210,8 @@ class Trainer(base.Trainer):
                             format(os.getpid(), epoch, epochs, batch_id,
                                    len(train_loader), loss.data.item()))
                     else:
+                        wandb.log({"batch loss": loss.data.item()})
+
                         logging.info(
                             "[Client #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}".
                             format(self.client_id, epoch, epochs, batch_id,
@@ -216,6 +221,8 @@ class Trainer(base.Trainer):
         model_type = Config().trainer.model
         filename = f"{model_type}_{self.client_id}_{config['experiment_id']}.pth"
         self.save_model(filename)
+
+        run.finish()
 
     def train(self, trainset, cut_layer=None):
         """The main training loop in a federated learning workload.
