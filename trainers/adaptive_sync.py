@@ -1,10 +1,11 @@
 """
-The federated learning trainer for Adaptive Parameter Freezing.
+The federated learning trainer for Adaptive Synchronization Frequency, used
+by the server.
 
 Reference:
 
-C. Chen, et al. "Communication-Efficient Federated Learning with Adaptive
-Parameter Freezing," found in docs/papers.
+C. Chen, et al. "GIFT: Towards Accurate and Efficient Federated
+Learning withGradient-Instructed Frequency Tuning," found in docs/papers.
 """
 import logging
 import torch
@@ -126,7 +127,8 @@ class Trainer(trainer.Trainer):
                     self.sync_frequency = (self.sync_frequency +
                                            self.frequency_increase_ratio -
                                            1) / self.frequency_increase_ratio
-                    logging.info("Adjusted synchronization frequency to %s", self.sync_frequency)
+                    logging.info("Adjusted synchronization frequency to %s",
+                                 self.sync_frequency)
                     self.min_consistency_rate = 1.1
                     self.min_consistency_rate_at_round = self.round_id
                     self.sliding_window_size *= self.frequency_increase_ratio

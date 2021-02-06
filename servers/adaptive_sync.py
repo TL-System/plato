@@ -1,5 +1,10 @@
 """
-A simple federated learning server using federated averaging.
+The federated learning server for Adaptive Synchronization Frequency.
+
+Reference:
+
+C. Chen, et al. "GIFT: Towards Accurate and Efficient Federated
+Learning withGradient-Instructed Frequency Tuning," found in docs/papers.
 """
 from servers import FedAvgServer
 

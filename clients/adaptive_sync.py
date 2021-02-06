@@ -1,5 +1,10 @@
 """
 A federated learning client with support for Adaptive Synchronization Frequency.
+
+Reference:
+
+C. Chen, et al. "GIFT: Towards Accurate and Efficient Federated
+Learning withGradient-Instructed Frequency Tuning," found in docs/papers.
 """
 
 from config import Config
