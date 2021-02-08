@@ -109,7 +109,7 @@ class SimpleClient(Client):
             self.data = self.divider.get_partition(partition_size, pref)
 
         elif Config().data.divider == 'shard':
-            self.data = self.divider.get_partition()
+            self.data = self.divider.get_partition(self.client_id)
 
         elif Config().data.divider == 'iid_mindspore':
             assert hasattr(Config().trainer, 'use_mindspore')
