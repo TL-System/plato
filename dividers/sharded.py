@@ -16,7 +16,6 @@ class ShardedDivider(base.Divider):
     def __init__(self, dataset):
         super().__init__(dataset)
         self.shards = None
-        random.seed()
         self.__create_shards()
 
     def __create_shards(self):
@@ -35,7 +34,6 @@ class ShardedDivider(base.Divider):
         shards = [
             data[(i * shard_size):((i + 1) * shard_size)] for i in range(total)
         ]
-        random.shuffle(shards)
 
         self.shards = shards
 
