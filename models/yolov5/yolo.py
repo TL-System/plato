@@ -7,11 +7,11 @@ from pathlib import Path
 sys.path.append('./')  # to run '$ python *.py' files in subdirectories
 logger = logging.getLogger(__name__)
 
-from models.yolov5.common import *
-from models.yolov5.experimental import *
-from utils.yolov5.autoanchor import check_anchor_order
-from utils.yolov5.general import make_divisible, check_file, set_logging
-from utils.yolov5.torch_utils import time_synchronized, fuse_conv_and_bn, model_info, scale_img, initialize_weights, \
+from models.common import *
+from models.experimental import *
+from utils.autoanchor import check_anchor_order
+from utils.general import make_divisible, check_file, set_logging
+from utils.torch_utils import time_synchronized, fuse_conv_and_bn, model_info, scale_img, initialize_weights, \
     select_device, copy_attr
 
 try:
@@ -134,59 +134,6 @@ class Model(nn.Module):
 
             x = m(x)  # run
             y.append(x if m.i in self.save else None)  # save output
-
-        if profile:
-            print('%.1fms total' % sum(dt))
-        return x
-
-    def forward_to(self, x, cutlayer=4, profile=False):
-        y, dt = [], []  # outputs
-        for m in self.model:
-
-            if m.i == cutlayer:
-                return x
-
-            if m.f != -1:  # if not from previous layer
-                x = y[m.f] if isinstance(m.f, int) else [x if j == -1 else y[j] for j in m.f]  # from earlier layers
-
-            if profile:
-                o = thop.profile(m, inputs=(x,), verbose=False)[0] / 1E9 * 2 if thop else 0  # FLOPS
-                t = time_synchronized()
-                for _ in range(10):
-                    _ = m(x)
-                dt.append((time_synchronized() - t) * 100)
-                print('%10.1f%10.0f%10.1fms %-40s' % (o, m.np, dt[-1], m.type))
-
-            x = m(x)  # run
-            y.append(x if m.i in self.save else None)  # save output
-
-
-
-        if profile:
-            print('%.1fms total' % sum(dt))
-        return x
-
-    def forward_from(self, x, cutlayer=4, profile=False):
-        y, dt = [], []  # outputs
-        for m in self.model:
-            if m.i < cutlayer:
-                y.append( None)
-                continue
-            if m.f != -1:  # if not from previous layer
-                x = y[m.f] if isinstance(m.f, int) else [x if j == -1 else y[j] for j in m.f]  # from earlier layers
-
-            if profile:
-                o = thop.profile(m, inputs=(x,), verbose=False)[0] / 1E9 * 2 if thop else 0  # FLOPS
-                t = time_synchronized()
-                for _ in range(10):
-                    _ = m(x)
-                dt.append((time_synchronized() - t) * 100)
-                print('%10.1f%10.0f%10.1fms %-40s' % (o, m.np, dt[-1], m.type))
-
-            x = m(x)  # run
-            y.append(x if m.i in self.save else None)  # save output
-
-
 
         if profile:
             print('%.1fms total' % sum(dt))
