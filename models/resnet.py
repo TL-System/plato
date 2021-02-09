@@ -89,7 +89,7 @@ class Model(base.Model):
 
         self.in_planes = 64
 
-        self.conv1 = nn.Conv2d(3,
+        self.conv1 = nn.Conv2d(1,
                                64,
                                kernel_size=3,
                                stride=1,
@@ -143,6 +143,7 @@ class Model(base.Model):
     def forward_to(self, x, cut_layer):
         """Forward pass, but only to the layer specified by cut_layer."""
         layer_index = self.layers.index(cut_layer)
+
         for i in range(0, layer_index + 1):
             x = self.layerdict[self.layers[i]](x)
         return x

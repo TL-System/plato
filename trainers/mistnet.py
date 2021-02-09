@@ -43,24 +43,21 @@ class Trainer(trainer.Trainer):
         epsilon: If epsilon is not None, local differential privacy should be
                 applied to the features extracted.
         """
-        self.model.to(self.device)
         self.model.eval()
 
-        data_loader = torch.utils.data.DataLoader(dataset,
-                                                  batch_size=Config().trainer.batch_size,
-                                                  shuffle=True)
+        data_loader = torch.utils.data.DataLoader(
+            dataset, batch_size=Config().trainer.batch_size, shuffle=True)
 
         tic = time.perf_counter()
 
         feature_dataset = []
 
         for inputs, targets in data_loader:
-            inputs, targets = inputs.to(self.device), targets.to(self.device)
             with torch.no_grad():
-
                 logits = self.model.forward_to(inputs, cut_layer)
+
                 if epsilon is not None:
-                    logits = logits.detach().cpu().numpy()
+                    logits = logits.detach().numpy()
                     logits = unary_encoding.encode(logits)
                     logits = unary_encoding.randomize(logits, epsilon)
                     logits = torch.from_numpy(logits.astype('float32'))
@@ -70,7 +67,7 @@ class Trainer(trainer.Trainer):
 
         toc = time.perf_counter()
         logging.info("[Client #%s] Features extracted from %s examples.",
-            self.client_id, len(feature_dataset))
+                     self.client_id, len(feature_dataset))
         logging.info("[Client #{}] Time used: {:.2f} seconds.".format(
             self.client_id, toc - tic))
 
