@@ -89,7 +89,7 @@ class Model(base.Model):
 
         self.in_planes = 64
 
-        self.conv1 = nn.Conv2d(1,
+        self.conv1 = nn.Conv2d(3,
                                64,
                                kernel_size=3,
                                stride=1,
