@@ -139,6 +139,59 @@ class Model(nn.Module):
             print('%.1fms total' % sum(dt))
         return x
 
+    def forward_to(self, x, cutlayer=4, profile=False):
+        y, dt = [], []  # outputs
+        for m in self.model:
+
+            if m.i == cutlayer:
+                return x
+
+            if m.f != -1:  # if not from previous layer
+                x = y[m.f] if isinstance(m.f, int) else [x if j == -1 else y[j] for j in m.f]  # from earlier layers
+
+            if profile:
+                o = thop.profile(m, inputs=(x,), verbose=False)[0] / 1E9 * 2 if thop else 0  # FLOPS
+                t = time_synchronized()
+                for _ in range(10):
+                    _ = m(x)
+                dt.append((time_synchronized() - t) * 100)
+                print('%10.1f%10.0f%10.1fms %-40s' % (o, m.np, dt[-1], m.type))
+
+            x = m(x)  # run
+            y.append(x if m.i in self.save else None)  # save output
+
+
+
+        if profile:
+            print('%.1fms total' % sum(dt))
+        return x
+
+    def forward_from(self, x, cutlayer=4, profile=False):
+        y, dt = [], []  # outputs
+        for m in self.model:
+            if m.i < cutlayer:
+                y.append( None)
+                continue
+            if m.f != -1:  # if not from previous layer
+                x = y[m.f] if isinstance(m.f, int) else [x if j == -1 else y[j] for j in m.f]  # from earlier layers
+
+            if profile:
+                o = thop.profile(m, inputs=(x,), verbose=False)[0] / 1E9 * 2 if thop else 0  # FLOPS
+                t = time_synchronized()
+                for _ in range(10):
+                    _ = m(x)
+                dt.append((time_synchronized() - t) * 100)
+                print('%10.1f%10.0f%10.1fms %-40s' % (o, m.np, dt[-1], m.type))
+
+            x = m(x)  # run
+            y.append(x if m.i in self.save else None)  # save output
+
+
+
+        if profile:
+            print('%.1fms total' % sum(dt))
+        return x
+
     def _initialize_biases(self, cf=None):  # initialize biases into Detect(), cf is class frequency
         # https://arxiv.org/abs/1708.02002 section 3.3
         # cf = torch.bincount(torch.tensor(np.concatenate(dataset.labels, 0)[:, 0]).long(), minlength=nc) + 1.
