@@ -14,7 +14,6 @@ class Divider:
         self.partition = None
 
         random.seed()
-        self.group()
 
     def group(self):
         """Group the training data by label."""

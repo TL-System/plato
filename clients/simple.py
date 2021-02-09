@@ -65,7 +65,7 @@ class SimpleClient(Client):
                      dataset.num_classes())
 
         # Setting up the data divider
-        assert Config().data.divider in ('iid', 'bias', 'shard',
+        assert Config().data.divider in ('iid', 'bias', 'sharded',
                                          'iid_mindspore')
         logging.info("[Client #%s] Data distribution: %s", self.client_id,
                      Config().data.divider)
@@ -73,7 +73,7 @@ class SimpleClient(Client):
         self.divider = {
             'iid': iid.IIDDivider,
             'bias': biased.BiasedDivider,
-            'shard': sharded.ShardedDivider,
+            'sharded': sharded.ShardedDivider,
             'iid_mindspore': iid_mindspore.IIDDivider
         }[Config().data.divider](dataset)
 

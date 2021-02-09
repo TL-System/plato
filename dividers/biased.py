@@ -9,6 +9,7 @@ class BiasedDivider(base.Divider):
     """Load and pass 'preference bias' data partitions."""
     def __init__(self, dataset):
         super().__init__(dataset)
+        self.group()
         self.shards = None
 
     def get_partition(self, partition_size, pref):
