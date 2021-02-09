@@ -1,6 +1,6 @@
 clients:
     # Type
-    type: simple
+    type: mistnet
 
     # The total number of clients
     total_clients: 1
@@ -9,7 +9,7 @@ clients:
     per_round: 1
 
     # Should the clients compute test accuracy locally?
-    do_test: false 
+    do_test: false
 
 server:
     address: localhost
@@ -17,13 +17,13 @@ server:
 
 data:
     # The training and testing dataset
-    dataset: MNIST
+    dataset: CIFAR10 
 
     # Where the dataset is located
     data_path: ./data
 
     # Number of samples in each partition
-    partition_size: 20000
+    partition_size: 200
 
     # IID, biased, or sharded?
     divider: iid
@@ -33,10 +33,10 @@ data:
 
 trainer:
     # The type of the trainer
-    type: basic
+    type: mistnet
 
     # The maximum number of training rounds
-    rounds: 100
+    rounds: 1
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -45,11 +45,11 @@ trainer:
     max_concurrency: 3
 
     # The target accuracy
-    target_accuracy: 0.90 
+    target_accuracy: 0.95
 
     # Number of epoches for local training in each communication round
-    epochs: 1
-    batch_size: 32
+    epochs: 10
+    batch_size: 16
     optimizer: SGD
     learning_rate: 0.01
     momentum: 0.5
@@ -60,4 +60,7 @@ trainer:
 
 algorithm:
     # Aggregation algorithm
-    type: fedavg
+    type: mistnet
+
+    cut_layer: layer1
+    epsilon: null
