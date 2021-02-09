@@ -25,19 +25,18 @@ class ShardedDivider(base.Divider):
 
         # Determine the correct total number of shards and the size of each shard
         total = Config().clients.total_clients * per_client
-        shard_size = int(self.trainset_size() / total)
+        shard_size = int(len(self.trainset) / total)
 
         data = []
-        for __, items in self.trainset.items():
-            data.extend(items)
+        for item in self.trainset:
+            data.extend(item)
 
-        shards = [
+        self.shards = [
             data[(i * shard_size):((i + 1) * shard_size)] for i in range(total)
         ]
 
-        self.shards = shards
-
-        logging.info("Created %s shards of size %s", len(shards), shard_size)
+        logging.info("Created %s shards of size %s", len(self.shards),
+                     shard_size)
 
     def get_partition(self, client_id):
         """Get a partition for a client."""
@@ -57,10 +56,3 @@ class ShardedDivider(base.Divider):
         random.shuffle(partition)
 
         return partition
-
-    def trainset_size(self):
-        """Return the size of the whole dataset."""
-        trainset_size = 0
-        for label in self.trainset:
-            trainset_size += len(self.trainset[label])
-        return trainset_size

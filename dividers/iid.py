@@ -6,7 +6,12 @@ from utils import dists
 
 
 class IIDDivider(base.Divider):
+    def __init__(self, dataset):
+        super().__init__(dataset)
+        self.group()
+
     """Load IID data partitions."""
+
     def get_partition(self, partition_size):
         """Get a partition that is uniform across all the labels."""
         size_to_extract = partition_size
