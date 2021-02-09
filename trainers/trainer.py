@@ -5,10 +5,10 @@ The training and testing loops for PyTorch.
 import logging
 import os
 from collections import OrderedDict
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.multiprocessing as mp
-import numpy as np
 import wandb
 
 from models.base import Model

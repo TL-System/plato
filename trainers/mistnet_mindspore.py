@@ -16,6 +16,7 @@ import mindspore.dataset as ds
 from utils import unary_encoding
 from trainers import trainer_mindspore
 
+
 class Trainer(trainer_mindspore.Trainer):
     """A federated learning trainer for MistNet in the MindSpore framework, used
     by both the client and the server.
@@ -46,13 +47,11 @@ class Trainer(trainer_mindspore.Trainer):
                 logits = unary_encoding.randomize(logits, epsilon)
                 logits = mindspore.Tensor(logits.astype('float32'))
 
-            logit = mindspore.Tensor(logits.asnumpy())
-            target = mindspore.Tensor(targets.asnumpy())
-            feature_dataset.append((logit, target))
+            feature_dataset.append((logits, targets))
 
         toc = time.perf_counter()
         logging.info("[Client #%s] Features extracted from %s examples.",
-            self.client_id, len(feature_dataset))
+                     self.client_id, len(feature_dataset))
         logging.info("[Client #{}] Time used: {:.2f} seconds.".format(
             self.client_id, toc - tic))
 
@@ -71,8 +70,9 @@ class Trainer(trainer_mindspore.Trainer):
         trainset: The training dataset.
         cut_layer (optional): The layer which training should start from.
         """
-        feature_dataset = ds.GeneratorDataset(
-            list(Trainer.dataset_generator(trainset)), column_names=["image", "label"])
+        feature_dataset = ds.GeneratorDataset(list(
+            Trainer.dataset_generator(trainset)),
+                                              column_names=["image", "label"])
 
         super().train(feature_dataset, cut_layer)
 
