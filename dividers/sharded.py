@@ -29,7 +29,7 @@ class ShardedDivider(base.Divider):
 
         data = []
         for item in self.trainset:
-            data.extend(item)
+            data.append(item)
 
         self.shards = [
             data[(i * shard_size):((i + 1) * shard_size)] for i in range(total)
