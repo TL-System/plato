@@ -30,15 +30,15 @@ Attributes in **bold** are must included in a configuration file, in *italic* ar
 
 | Attribute | Meaning | Valid Value | Note |
 |:---------:|:-------:|:-----------:|:----:|
-|**dataset**| The training and testing dataset|`MNIST`, `FashionMNIST`, `CIFAR10`, or `CINIC10`||
+|**dataset**| The training and testing dataset|`MNIST`, `FashionMNIST`, `CIFAR10`, `CINIC10`, or `COCO`||
 |**data_path**|Where the dataset is located|e.g.,`./data`||
-|**divider**|How to divide the whole dataset on clients|`iid`|Must have *partition_size* attribute|
-|||`iid_mindspore`|Must have *partition_size* attribute|
-|||`bias`|Must have *partition_size* and *label_distribution* attributes|
-|||`shard`|First sort the whole dataset by labels, then divide into (*shard_per\_client* x **clients.total_clients**) shards of equal size, and assign each client **shard_per\_client** shard(s)|
-|*partition_size*|Number of samples in each partition|Any positive integer|Must have this attribute if **divider** is `iid`, `iid_mindspore` or `bias`|
-|*label_distribution*|Uniform or normal distribution for labels across clients?|`uniform` or `normal`|Must have this attribute if **divider** is `bias`|
-|*shard_per\_client*|Number of shards per client|Any positive integer|Must have this attribute if **divider** is `shard`|
+|**divider**|How to divide the entire dataset to the clients|`iid`|Must have the *partition_size* attribute|
+|||`iid_mindspore`|Must have the *partition_size* attribute|
+|||`biased`|Must have *partition_size* and *label_distribution* attributes|
+|||`sharded`|Divide the dataset into (*shards_per_client* x **clients.total_clients**) shards of equal sizes, and assign each client **shards_per_client** shard(s)|
+|*partition_size*|Number of samples in each partition|Any positive integer|Must have this attribute if the **divider** is `iid`, `iid_mindspore` or `biased`|
+|*label_distribution*|Uniform or normal distribution for labels across clients?|`uniform` or `normal`|Must have this attribute if the **divider** is `biased`|
+|*shards_per_client*|Number of shards per client|Any positive integer|Must have this attribute if the **divider** is `sharded`|
 
 
 ### trainer
