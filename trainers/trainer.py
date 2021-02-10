@@ -150,10 +150,14 @@ class Trainer(base.Trainer):
           can be released after the training completes.
 
         Arguments:
+        rank: Required by torch.multiprocessing to spawn processes. Unused.
+        config: a dictionary of configuration parameters.
         trainset: The training dataset.
         cut_layer (optional): The layer which training should start from.
         """
-        run = wandb.init(reinit=True)
+        run = wandb.init(project="plato",
+                         group=str(config['run_id']),
+                         reinit=True)
 
         log_interval = 10
         batch_size = config['batch_size']
@@ -219,7 +223,7 @@ class Trainer(base.Trainer):
         self.model.cpu()
 
         model_type = Config().trainer.model
-        filename = f"{model_type}_{self.client_id}_{config['experiment_id']}.pth"
+        filename = f"{model_type}_{self.client_id}_{config['run_id']}.pth"
         self.save_model(filename)
 
         run.finish()
@@ -228,14 +232,13 @@ class Trainer(base.Trainer):
         """The main training loop in a federated learning workload.
 
         Arguments:
-        rank: Required by torch.multiprocessing to spawn processes. Unused.
         trainset: The training dataset.
         cut_layer (optional): The layer which training should start from.
         """
         self.start_training()
 
         config = Config().trainer._asdict()
-        config['experiment_id'] = Config().params['pid']
+        config['run_id'] = Config().params['run_id']
 
         mp.spawn(Trainer.train_process,
                  args=(
@@ -247,7 +250,7 @@ class Trainer(base.Trainer):
                  join=True)
 
         model_type = Config().trainer.model
-        filename = f"{model_type}_{self.client_id}_{Config().params['pid']}.pth"
+        filename = f"{model_type}_{self.client_id}_{Config().params['run_id']}.pth"
         self.load_model(filename)
         self.pause_training()
 
@@ -257,9 +260,9 @@ class Trainer(base.Trainer):
         so that CUDA memory can be released after the training completes.
 
         Arguments:
+        config: a dictionary of configuration parameters.
         rank: Required by torch.multiprocessing to spawn processes. Unused.
         testset: The test dataset.
-        cut_layer (optional): The layer which testing should start from.
         """
         self.model.to(self.device)
         self.model.eval()
@@ -285,7 +288,7 @@ class Trainer(base.Trainer):
 
         accuracy = correct / total
         model_type = Config().trainer.model
-        filename = f"{model_type}_{self.client_id}_{config['experiment_id']}.acc"
+        filename = f"{model_type}_{self.client_id}_{config['run_id']}.acc"
         Trainer.save_accuracy(accuracy, filename)
 
     def test(self, testset):
@@ -293,11 +296,10 @@ class Trainer(base.Trainer):
 
         Arguments:
         testset: The test dataset.
-        cut_layer (optional): The layer which testing should start from.
         """
         self.start_training()
         config = Config().trainer._asdict()
-        config['experiment_id'] = Config().params['pid']
+        config['run_id'] = Config().params['run_id']
 
         mp.spawn(Trainer.test_process,
                  args=(
@@ -308,7 +310,7 @@ class Trainer(base.Trainer):
                  join=True)
 
         model_type = Config().trainer.model
-        filename = f"{model_type}_{self.client_id}_{Config().params['pid']}.acc"
+        filename = f"{model_type}_{self.client_id}_{Config().params['run_id']}.acc"
         accuracy = Trainer.load_accuracy(filename)
 
         self.pause_training()
