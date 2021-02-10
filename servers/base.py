@@ -3,7 +3,6 @@ The base class for federated learning servers.
 """
 
 from abc import abstractmethod
-import json
 import sys
 import os
 import logging
@@ -82,7 +81,7 @@ class Server:
                 server_response = {'id': client_id, 'payload': True}
                 server_response = await self.customize_server_response(
                     server_response)
-                await socket.send(json.dumps(server_response))
+                await socket.send(pickle.dumps(server_response))
 
                 logging.info("[Server #%d] Sending the current model.",
                              os.getpid())
@@ -92,25 +91,26 @@ class Server:
         """Running a federated learning server."""
         try:
             async for message in websocket:
-                data = json.loads(message)
+                data = pickle.loads(message)
                 client_id = data['id']
                 logging.info("[Server #%d] Data received from client #%s.",
                              os.getpid(), client_id)
 
                 if 'payload' in data:
                     # an existing client reports new updates from local training
+                    report = data['report']
                     logging.info(
                         "[Server #%d] Receiving payload from client #%s.",
                         os.getpid(), client_id)
 
-                    client_update = await websocket.recv()
-                    report = pickle.loads(client_update)
+                    client_payload = await websocket.recv()
+                    payload = pickle.loads(client_payload)
 
                     logging.info(
-                        "[Server #%d] Update from client #%s received.",
+                        "[Server #%d] Payload from client #%s received.",
                         os.getpid(), client_id)
 
-                    self.reports.append(report)
+                    self.reports.append((report, payload))
 
                     if len(self.reports) == len(self.selected_clients):
                         await self.process_reports()

@@ -19,10 +19,11 @@ class FedNovaServer(FedAvgServer):
         updates = self.extract_client_updates(reports)
 
         # Extracting the total number of samples
-        self.total_samples = sum([report.num_samples for report in reports])
+        self.total_samples = sum(
+            [report.num_samples for (report, __) in reports])
 
         # Extracting the number of local epoches, tau_i, from the reports
-        local_epochs = [report.epochs for report in reports]
+        local_epochs = [report.epochs for (report, __) in reports]
 
         # Performing weighted averaging
         avg_update = avg_update = {
@@ -32,13 +33,15 @@ class FedNovaServer(FedAvgServer):
 
         tau_eff = 0
         for i, update in enumerate(updates):
-            num_samples = reports[i].num_samples
+            report, __ = reports[i]
+            num_samples = report.num_samples
             tau_eff_ = local_epochs[i] * num_samples / self.total_samples
             tau_eff += tau_eff_
             #tau_effs.append(tau_eff)
 
         for i, update in enumerate(updates):
-            num_samples = reports[i].num_samples
+            report, __ = reports[i]
+            num_samples = report.num_samples
 
             for name, delta in update.items():
                 # Use weighted average by the number of samples

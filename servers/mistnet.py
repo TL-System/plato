@@ -32,7 +32,7 @@ class MistNetServer(FedAvgServer):
 
     async def process_reports(self):
         """Process the features extracted by the client and perform server-side training."""
-        features = [report.features for report in self.reports]
+        features = [features for (__, features) in self.reports]
 
         # Faster way to deep flatten a list of lists compared to list comprehension
         feature_dataset = list(chain.from_iterable(features))
@@ -42,8 +42,7 @@ class MistNetServer(FedAvgServer):
 
         # Test the updated model
         self.accuracy = self.trainer.test(self.testset)
-        logging.info(
-            '[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(
-                os.getpid(), 100 * self.accuracy))
+        logging.info('[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(
+            os.getpid(), 100 * self.accuracy))
 
         await self.wrap_up_processing_reports()

@@ -38,4 +38,4 @@ class AdaptiveFreezingClient(SimpleClient):
         else:
             accuracy = 0
 
-        return Report(self.client_id, len(self.data), weights, accuracy)
+        return Report(len(self.data), accuracy), weights
