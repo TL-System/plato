@@ -65,5 +65,5 @@ class EdgeClient(Client):
 
         training_time = time.time() - training_start_time
 
-        return Report(self.client_id, self.server.total_samples, weights,
-                      accuracy, training_time, 0)
+        return Report(self.server.total_samples, accuracy, training_time,
+                      0), weights

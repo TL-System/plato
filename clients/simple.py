@@ -18,10 +18,8 @@ from clients import Client
 
 @dataclass
 class Report:
-    """Client report sent to the federated learning server."""
-    client_id: str
+    """Client report, to be sent to the federated learning server."""
     num_samples: int
-    weights: list
     accuracy: float
     training_time: float
     data_loading_time: float
@@ -157,5 +155,5 @@ class SimpleClient(Client):
             data_loading_time = self.data_loading_time
             self.data_loading_time_sent = True
 
-        return Report(self.client_id, self.divider.trainset_size(), weights,
-                      accuracy, training_time, data_loading_time)
+        return Report(self.divider.trainset_size(), accuracy, training_time,
+                      data_loading_time), weights

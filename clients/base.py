@@ -3,7 +3,6 @@ The base class for all federated learning clients on edge devices or edge server
 """
 
 import logging
-import json
 import random
 import os
 import pickle
@@ -49,13 +48,13 @@ class Client:
                                           max_size=2**30) as websocket:
                 logging.info("[Client #%s] Signing in at the server.",
                              self.client_id)
-                await websocket.send(json.dumps({'id': self.client_id}))
+                await websocket.send(pickle.dumps({'id': self.client_id}))
 
                 while True:
                     logging.info("[Client #%s] Waiting to be selected.",
                                  self.client_id)
                     server_response = await websocket.recv()
-                    data = json.loads(server_response)
+                    data = pickle.loads(server_response)
 
                     if data['id'] == self.client_id:
                         self.process_server_response(data)
@@ -73,7 +72,7 @@ class Client:
 
                             self.load_payload(pickle.loads(server_payload))
 
-                        report = await self.train()
+                        report, payload = await self.train()
 
                         if Config().is_edge_server():
                             logging.info(
@@ -83,15 +82,19 @@ class Client:
                             logging.info("[Client #%s] Model trained.",
                                          self.client_id)
 
-                        # Sending client ID as metadata to the server (payload to follow)
-                        client_update = {'id': self.client_id, 'payload': True}
-                        await websocket.send(json.dumps(client_update))
+                        # Sending the client report as metadata to the server (payload to follow)
+                        client_report = {
+                            'id': self.client_id,
+                            'report': report,
+                            'payload': True
+                        }
+                        await websocket.send(pickle.dumps(client_report))
 
-                        # Sending the client training report to the server as payload
+                        # Sending the client training payload to the server
                         logging.info(
-                            "[Client #%s] Sending reports to the server.",
+                            "[Client #%s] Sending the payload to the server.",
                             self.client_id)
-                        await websocket.send(pickle.dumps(report))
+                        await websocket.send(pickle.dumps(payload))
 
         except OSError as exception:
             logging.info("[Client #%s] Connection to the server failed.",

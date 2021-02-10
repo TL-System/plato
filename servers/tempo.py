@@ -107,7 +107,7 @@ class TempoServer(FedAvgCrossSiloServer):
         for i in range(Config().algorithm.total_silos):
             client_id = i + 1 + Config().clients.total_clients
             accuracy = [
-                report.accuracy for report in self.reports
+                report.accuracy for (report, __) in self.reports
                 if report.client_id == client_id
             ][0]
             accuracy_diff = abs(accuracy - self.accuracy)
@@ -123,7 +123,7 @@ class TempoServer(FedAvgCrossSiloServer):
         for i in range(Config().algorithm.total_silos):
             client_id = i + 1 + Config().clients.total_clients
             report = [
-                report for report in self.reports
+                report for (report, __) in self.reports
                 if int(report.client_id) == client_id
             ][0]
             weights = report.weights

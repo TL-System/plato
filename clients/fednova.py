@@ -42,8 +42,4 @@ class FedNovaClient(simple.SimpleClient):
         # Perform model training for a specific number of epoches
         Config().trainer = Config().trainer._replace(epochs=local_epochs)
 
-        report = await super().train()
-
-        return Report(report.client_id, report.num_samples, report.weights,
-                      report.accuracy, report.training_time,
-                      report.data_loading_time, local_epochs)
+        return await super().train()

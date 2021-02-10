@@ -101,7 +101,7 @@ class FedAvgServer(Server):
         """Extract the model weight updates from a client's report."""
 
         # Extract weights from reports
-        weights_received = [report.weights for report in reports]
+        weights_received = [payload for (__, payload) in reports]
         return self.trainer.compute_weight_updates(weights_received)
 
     def federated_averaging(self, reports):
@@ -110,7 +110,8 @@ class FedAvgServer(Server):
         updates = self.extract_client_updates(reports)
 
         # Extract the total number of samples
-        self.total_samples = sum([report.num_samples for report in reports])
+        self.total_samples = sum(
+            [report.num_samples for (report, __) in reports])
 
         # Perform weighted averaging
         avg_update = {
@@ -119,7 +120,8 @@ class FedAvgServer(Server):
         }
 
         for i, update in enumerate(updates):
-            num_samples = reports[i].num_samples
+            report, __ = reports[i]
+            num_samples = report.num_samples
 
             for name, delta in update.items():
                 # Use weighted average by the number of samples
@@ -184,11 +186,11 @@ class FedAvgServer(Server):
     def accuracy_averaging(reports):
         """Compute the average accuracy across clients."""
         # Get total number of samples
-        total_samples = sum([report.num_samples for report in reports])
+        total_samples = sum([report.num_samples for (report, __) in reports])
 
         # Perform weighted averaging
         accuracy = 0
-        for report in reports:
+        for (report, __) in reports:
             accuracy += report.accuracy * (report.num_samples / total_samples)
 
         return accuracy
