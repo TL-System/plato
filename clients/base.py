@@ -5,6 +5,7 @@ The base class for all federated learning clients on edge devices or edge server
 import logging
 import random
 import os
+import sys
 import pickle
 from abc import abstractmethod
 import websockets
@@ -91,15 +92,30 @@ class Client:
                         await websocket.send(pickle.dumps(client_report))
 
                         # Sending the client training payload to the server
-                        logging.info(
-                            "[Client #%s] Sending the payload to the server.",
-                            self.client_id)
-                        await websocket.send(pickle.dumps(payload))
+                        await self.send(websocket, payload)
 
         except OSError as exception:
             logging.info("[Client #%s] Connection to the server failed.",
                          self.client_id)
             logging.error(exception)
+
+    async def send(self, websocket, payload):
+        """Sending the client payload to the server using WebSockets."""
+        if isinstance(payload, list):
+            data_size = 0
+
+            for data in payload:
+                _data = pickle.dumps(data)
+                await websocket.send(_data)
+                data_size += sys.getsizeof(_data)
+        else:
+            _data = pickle.dumps(payload)
+            await websocket.send(_data)
+            data_size = sys.getsizeof(_data)
+
+        logging.info(
+            "[Client #%s] Sent %s bytes of payload data to the server.",
+            self.client_id, data_size)
 
     def process_server_response(self, server_response):
         """Additional client-specific processing on the server response."""

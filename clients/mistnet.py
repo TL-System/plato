@@ -18,6 +18,7 @@ from clients import SimpleClient
 class Report:
     """Client report sent to the MistNet federated learning server."""
     num_samples: int
+    payload_length: int
 
 
 class MistNetClient(SimpleClient):
@@ -37,4 +38,4 @@ class MistNetClient(SimpleClient):
             epsilon=Config().algorithm.epsilon)
 
         # Generate a report for the server, performing model testing if applicable
-        return Report(self.divider.trainset_size()), features
+        return Report(self.divider.trainset_size(), len(features)), features
