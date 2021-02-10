@@ -139,7 +139,11 @@ trainer:
     # The type of the trainer
     type: basic
 
+    # Loss function
     loss: yololoss
+
+    # test function
+    testtype: map
 
     # The maximum number of training rounds
     rounds: 100
