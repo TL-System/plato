@@ -108,7 +108,7 @@ class SimpleClient(Client):
             partition_size = Config().data.partition_size
             self.data = self.divider.get_partition(partition_size, pref)
 
-        elif Config().data.divider == 'shard':
+        elif Config().data.divider == 'sharded':
             self.data = self.divider.get_partition(self.client_id)
 
         elif Config().data.divider == 'iid_mindspore':
