@@ -28,7 +28,7 @@ def main():
     }[Config().algorithm.type]()
     server.configure()
 
-    logging.info("Starting a server on port %s", Config().server.port)
+    logging.info("Starting a server on port %s.", Config().server.port)
     start_server = websockets.serve(server.serve,
                                     Config().server.address,
                                     Config().server.port,

@@ -7,6 +7,7 @@ import logging
 from collections import namedtuple, OrderedDict
 import os
 import sqlite3
+import uuid
 
 import argparse
 import torch
@@ -85,7 +86,11 @@ class Config:
 
             # Customizable dictionary of global parameters
             Config.params = {}
-            Config.params['pid'] = os.getpid()
+
+            # A run ID is unique to each client in an experiment
+            Config.params['run_id'] = os.getpid()
+
+            # Pretrained models
             Config.params['model_dir'] = "./models/pretrained/"
 
         return cls._instance

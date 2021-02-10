@@ -21,7 +21,7 @@ class FedAvgServer(Server):
     """Federated learning server using federated averaging."""
     def __init__(self):
         super().__init__()
-        wandb.init(reinit=True)
+        wandb.init(project="plato", reinit=True)
 
         self.testset = None
         self.model = None

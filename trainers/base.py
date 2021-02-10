@@ -13,7 +13,8 @@ class Trainer(ABC):
     def __init__(self, client_id):
         self.device = Config().device()
         self.client_id = client_id
-        Config().cursor.execute("CREATE TABLE IF NOT EXISTS trainers (pid int)")
+        Config().cursor.execute(
+            "CREATE TABLE IF NOT EXISTS trainers (run_id int)")
 
     def start_training(self):
         """Add to the list of running trainers if max_concurrency has not yet
@@ -26,18 +27,20 @@ class Trainer(ABC):
                 time.sleep(2)
                 Config().cursor.execute("SELECT COUNT(*) FROM trainers")
                 trainer_count = Config().cursor.fetchone()[0]
-            
-            Config().cursor.execute("INSERT INTO trainers VALUES (?)", (self.client_id,))
+
+            Config().cursor.execute("INSERT INTO trainers VALUES (?)",
+                                    (self.client_id, ))
 
     def pause_training(self):
         """Remove from the list of running trainers."""
         with Config().sql_connection:
-            Config().cursor.execute("DELETE FROM trainers WHERE pid = (?)", (self.client_id,))
+            Config().cursor.execute("DELETE FROM trainers WHERE run_id = (?)",
+                                    (self.client_id, ))
 
         model_type = Config().trainer.model
         model_dir = Config().params['model_dir']
-        model_file = f"{model_dir}{model_type}_{self.client_id}_{Config().params['pid']}.pth"
-        accuracy_file = f"{model_dir}{model_type}_{self.client_id}_{Config().params['pid']}.acc"
+        model_file = f"{model_dir}{model_type}_{self.client_id}_{Config().params['run_id']}.pth"
+        accuracy_file = f"{model_dir}{model_type}_{self.client_id}_{Config().params['run_id']}.acc"
 
         if os.path.exists(model_file):
             os.remove(model_file)
