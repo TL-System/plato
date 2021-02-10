@@ -139,6 +139,8 @@ trainer:
     # The type of the trainer
     type: basic
 
+    loss: yololoss
+
     # The maximum number of training rounds
     rounds: 100
 
@@ -153,7 +155,7 @@ trainer:
 
     # Number of epoches for local training in each communication round
     epochs: 1
-    batch_size: 32
+    batch_size: 4
     optimizer: SGD
     learning_rate: 0.01
     momentum: 0.9

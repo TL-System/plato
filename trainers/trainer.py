@@ -15,6 +15,7 @@ from models.base import Model
 from config import Config
 from utils import optimizers
 from trainers import base
+from utils.yolov5.datasets import LoadImagesAndLabels
 
 
 class Trainer(base.Trainer):
@@ -159,7 +160,9 @@ class Trainer(base.Trainer):
         batch_size = config['batch_size']
         train_loader = torch.utils.data.DataLoader(trainset,
                                                    batch_size=batch_size,
-                                                   shuffle=True)
+                                                   shuffle=True,
+                                                   collate_fn=LoadImagesAndLabels.collate_fn
+                                                   )
         iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
         epochs = config['epochs']
 
@@ -168,7 +171,12 @@ class Trainer(base.Trainer):
         self.model.train()
 
         # Initializing the loss criterion
-        loss_criterion = nn.CrossEntropyLoss()
+        if Config().trainer.loss == 'yololoss':
+
+            from utils.yolov5.loss import yololss
+            loss_criterion = yololss(self.model)
+        else:
+            loss_criterion = nn.CrossEntropyLoss()
 
         # Initializing the optimizer
         optimizer = optimizers.get_optimizer(self.model)
