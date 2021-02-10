@@ -3,8 +3,8 @@ The base class for federated learning servers.
 """
 
 from abc import abstractmethod
-import sys
 import os
+import sys
 import logging
 import subprocess
 import pickle
@@ -99,20 +99,13 @@ class Server:
                 if 'payload' in data:
                     # an existing client reports new updates from local training
                     report = data['report']
-                    logging.info(
-                        "[Server #%d] Receiving payload from client #%s.",
-                        os.getpid(), client_id)
-
-                    client_payload = await websocket.recv()
-                    payload = pickle.loads(client_payload)
-
-                    logging.info(
-                        "[Server #%d] Payload from client #%s received.",
-                        os.getpid(), client_id)
-
+                    payload = await self.recv(client_id, report, websocket)
                     self.reports.append((report, payload))
 
                     if len(self.reports) == len(self.selected_clients):
+                        logging.info(
+                            "[Server #%d] All client reports received. Processing.",
+                            os.getpid())
                         await self.process_reports()
                         await self.wrap_up()
                         await self.select_clients()
@@ -132,6 +125,30 @@ class Server:
             logging.error(exception)
             sys.exit()
 
+    async def recv(self, client_id, client_report, websocket):
+        """Receiving the payload from a client using WebSockets."""
+        logging.info("[Server #%d] Receiving payload data from client #%s.",
+                     os.getpid(), client_id)
+
+        if hasattr(client_report, 'payload_length'):
+            client_payload = []
+            payload_size = 0
+            for __ in range(0, client_report.payload_length):
+                _data = await websocket.recv()
+                payload = pickle.loads(_data)
+                client_payload.append(payload)
+                payload_size += sys.getsizeof(_data)
+        else:
+            _data = await websocket.recv()
+            client_payload = pickle.loads(_data)
+            payload_size = sys.getsizeof(_data)
+
+        logging.info(
+            "[Server #%d] Received %s bytes of payload data from client #%s.",
+            os.getpid(), payload_size, client_id)
+
+        return client_payload
+
     async def wrap_up(self):
         """Wrapping up when each round of training is done."""
         # Break the loop when the target accuracy is achieved
@@ -150,6 +167,7 @@ class Server:
         self.trainer.save_model()
         await self.close_connections()
         self.trainer.stop_training()
+        sys.stdout.flush()
         sys.exit()
 
     async def customize_server_response(self, server_response):
