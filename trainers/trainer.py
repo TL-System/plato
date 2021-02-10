@@ -277,7 +277,11 @@ class Trainer(base.Trainer):
             testset, batch_size=config['batch_size'], shuffle=False, collate_fn=LoadImagesAndLabels.collate_fn
         )
 
-        results, maps, times = testmap('utils/yolov5/coco128.yaml',
+
+
+        if Config().trainer.testtype == 'map':
+
+            results, maps, times = testmap('utils/yolov5/coco128.yaml',
                                        batch_size=config['batch_size'],
                                        imgsz=640,
                                        model=self.model,
@@ -288,10 +292,28 @@ class Trainer(base.Trainer):
                                        plots=False,
                                        log_imgs=0,
                                        compute_loss=None)
+            accuracy = results[2]
+
+        else:
+            correct = 0
+            total = 0
+
+            with torch.no_grad():
+                for examples, labels in test_loader:
+                    examples, labels = examples.to(self.device), labels.to(
+                        self.device)
+
+                    outputs = self.model(examples)
+
+                    _, predicted = torch.max(outputs.data, 1)
+                    total += labels.size(0)
+                    correct += (predicted == labels).sum().item()
+
+            accuracy = correct / total
+
 
         self.model.cpu()
 
-        accuracy = results[2]
         model_type = Config().trainer.model
         filename = f"{model_type}_{self.client_id}_{config['experiment_id']}.acc"
         Trainer.save_accuracy(accuracy, filename)
