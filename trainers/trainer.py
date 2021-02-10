@@ -16,6 +16,7 @@ from config import Config
 from utils import optimizers
 from trainers import base
 from utils.yolov5.datasets import LoadImagesAndLabels
+from utils.yolov5.test import testmap
 
 
 class Trainer(base.Trainer):
@@ -190,7 +191,7 @@ class Trainer(base.Trainer):
             lr_schedule = None
 
         for epoch in range(1, epochs + 1):
-            for batch_id, (examples, labels) in enumerate(train_loader):
+            for batch_id, (examples, labels,_,_) in enumerate(train_loader):
                 examples, labels = examples.to(self.device), labels.to(
                     self.device)
                 optimizer.zero_grad()
@@ -273,25 +274,24 @@ class Trainer(base.Trainer):
         self.model.eval()
 
         test_loader = torch.utils.data.DataLoader(
-            testset, batch_size=config['batch_size'], shuffle=False)
+            testset, batch_size=config['batch_size'], shuffle=False, collate_fn=LoadImagesAndLabels.collate_fn
+        )
 
-        correct = 0
-        total = 0
-
-        with torch.no_grad():
-            for examples, labels in test_loader:
-                examples, labels = examples.to(self.device), labels.to(
-                    self.device)
-
-                outputs = self.model(examples)
-
-                _, predicted = torch.max(outputs.data, 1)
-                total += labels.size(0)
-                correct += (predicted == labels).sum().item()
+        results, maps, times = testmap('utils/yolov5/coco128.yaml',
+                                       batch_size=config['batch_size'],
+                                       imgsz=640,
+                                       model=self.model,
+                                       single_cls=False,
+                                       dataloader=test_loader,
+                                       save_dir='',
+                                       verbose=False,
+                                       plots=False,
+                                       log_imgs=0,
+                                       compute_loss=None)
 
         self.model.cpu()
 
-        accuracy = correct / total
+        accuracy = results[2]
         model_type = Config().trainer.model
         filename = f"{model_type}_{self.client_id}_{config['experiment_id']}.acc"
         Trainer.save_accuracy(accuracy, filename)
