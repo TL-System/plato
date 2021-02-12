@@ -66,12 +66,10 @@ class Client:
                             self.load_data()
 
                         if 'payload' in data:
-                            logging.info(
-                                "[Client #%s] Receiving payload from the server.",
-                                self.client_id)
-                            server_payload = await websocket.recv()
 
-                            self.load_payload(pickle.loads(server_payload))
+                            server_payload = await self.recv(
+                                self.client_id, data, websocket)
+                            self.load_payload(server_payload)
 
                         report, payload = await self.train()
 
@@ -98,6 +96,32 @@ class Client:
             logging.info("[Client #%s] Connection to the server failed.",
                          self.client_id)
             logging.error(exception)
+
+    async def recv(self, client_id, data, websocket):
+        """Receiving the payload from the server using WebSockets."""
+
+        logging.info("[Client #%s] Receiving payload data from server",
+                     client_id)
+
+        if 'payload_length' in data:
+            server_payload = []
+            payload_size = 0
+
+            for __ in range(0, data['payload_length']):
+                _data = await websocket.recv()
+                payload = pickle.loads(_data)
+                server_payload.append(payload)
+                payload_size += sys.getsizeof(_data)
+        else:
+            _data = await websocket.recv()
+            server_payload = pickle.loads(_data)
+            payload_size = sys.getsizeof(_data)
+
+        logging.info(
+            "[Client #%s] Received %s bytes of payload data from the server.",
+            client_id, payload_size)
+
+        return server_payload
 
     async def send(self, websocket, payload):
         """Sending the client payload to the server using WebSockets."""
