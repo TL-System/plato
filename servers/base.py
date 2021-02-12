@@ -79,13 +79,35 @@ class Server:
                 logging.info("[Server #%d] Selecting client #%s for training.",
                              os.getpid(), client_id)
                 server_response = {'id': client_id, 'payload': True}
+
                 server_response = await self.customize_server_response(
                     server_response)
+                # Sending the server response as metadata to the clients (payload to follow)
                 await socket.send(pickle.dumps(server_response))
 
-                logging.info("[Server #%d] Sending the current model.",
-                             os.getpid())
-                await socket.send(pickle.dumps(self.trainer.extract_weights()))
+                payload = self.trainer.extract_weights()
+                payload = await self.customize_server_payload(payload)
+
+                # Sending the server payload to the clients
+                await self.send(socket, payload)
+
+    async def send(self, socket, payload):
+        """Sending the client payload to the server using WebSockets."""
+        logging.info("[Server #%d] Sending the current model.", os.getpid())
+        if isinstance(payload, list):
+            data_size = 0
+
+            for data in payload:
+                _data = pickle.dumps(data)
+                await socket.send(_data)
+                data_size += sys.getsizeof(_data)
+        else:
+            _data = pickle.dumps(payload)
+            await socket.send(_data)
+            data_size = sys.getsizeof(_data)
+
+        logging.info("[Server #%d] Sent %s bytes of payload data.",
+                     os.getpid(), data_size)
 
     async def serve(self, websocket, path):  # pylint: disable=unused-argument
         """Running a federated learning server."""
@@ -173,6 +195,10 @@ class Server:
     async def customize_server_response(self, server_response):
         """Wrap up generating the server response with any additional information."""
         return server_response
+
+    async def customize_server_payload(self, payload):
+        """Wrap up generating the server payload with any additional information."""
+        return payload
 
     @abstractmethod
     def configure(self):
