@@ -5,7 +5,7 @@ based on a configuration at run-time.
 import logging
 
 from models.base import Model
-from trainers import trainer, mistnet, adaptive_freezing, adaptive_sync
+from trainers import trainer, mistnet, adaptive_freezing, adaptive_sync, scaffold
 
 from config import Config
 
@@ -13,7 +13,8 @@ registered_trainers = {
     'basic': trainer,
     'mistnet': mistnet,
     'adaptive_freezing': adaptive_freezing,
-    'adaptive_sync': adaptive_sync
+    'adaptive_sync': adaptive_sync,
+    'scaffold': scaffold
 }
 
 if hasattr(Config().trainer, 'use_mindspore'):
