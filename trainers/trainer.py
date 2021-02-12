@@ -1,7 +1,7 @@
 """
 The training and testing loops for PyTorch.
 """
-
+from abc import abstractmethod
 import logging
 import os
 from collections import OrderedDict
@@ -176,6 +176,7 @@ class Trainer(base.Trainer):
 
         # Initializing the optimizer
         optimizer = optimizers.get_optimizer(self.model)
+        optimizer = self.customize_optimizer_setup(optimizer)
 
         # Initializing the learning rate schedule, if necessary
         if hasattr(Config().trainer, 'lr_schedule'):
@@ -315,3 +316,7 @@ class Trainer(base.Trainer):
 
         self.pause_training()
         return accuracy
+
+    def customize_optimizer_setup(self, optimizer):
+        """Setting up the optimizer if necessary"""
+        return optimizer
