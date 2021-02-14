@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from models import registry as models_registry
 from datasets import registry as datasets_registry
 from trainers import registry as trainers_registry
-from dividers import iid, biased, sharded, iid_mindspore
+from dividers import iid, biased, sharded, iid_mindspore, mixed
 from utils import dists
 from config import Config
 from clients import Client
@@ -64,7 +64,7 @@ class SimpleClient(Client):
 
         # Setting up the data divider
         assert Config().data.divider in ('iid', 'biased', 'sharded',
-                                         'iid_mindspore')
+                                         'iid_mindspore', 'mixed')
         logging.info("[Client #%s] Data distribution: %s", self.client_id,
                      Config().data.divider)
 
@@ -72,7 +72,8 @@ class SimpleClient(Client):
             'iid': iid.IIDDivider,
             'biased': biased.BiasedDivider,
             'sharded': sharded.ShardedDivider,
-            'iid_mindspore': iid_mindspore.IIDDivider
+            'iid_mindspore': iid_mindspore.IIDDivider,
+            'mixed': mixed.MixedDivider
         }[Config().data.divider](dataset)
 
         num_clients = Config().clients.total_clients
@@ -114,6 +115,11 @@ class SimpleClient(Client):
             partition_size = Config().data.partition_size
             self.data = self.divider.get_partition(partition_size,
                                                    self.client_id)
+
+        elif Config().data.divider == 'mixed':
+            assert hasattr(Config().data, 'iid_clients')
+            assert hasattr(Config().data, 'non_iid_clients')
+            self.data = self.divider.get_partition(self.client_id)
 
         # Extract the trainset and testset if local testing is needed
         if Config().clients.do_test:
