@@ -104,12 +104,13 @@ class FedAvgCrossSiloServer(FedAvgServer):
                 '[Server #{:d}] Average client accuracy: {:.2f}%.'.format(
                     os.getpid(), 100 * self.average_accuracy))
 
-        if not Config().clients.do_test or Config().server.do_test:
-            # Test the updated model directly at the server
-            self.accuracy = self.trainer.test(self.testset)
-            logging.info(
-                '[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(
-                    os.getpid(), 100 * self.accuracy))
+        if hasattr(Config().server, 'do_test'):
+            if not Config().clients.do_test or Config().server.do_test:
+                # Test the updated model directly at the server
+                self.accuracy = self.trainer.test(self.testset)
+                logging.info(
+                    '[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(
+                        os.getpid(), 100 * self.accuracy))
         else:
             self.accuracy = self.average_accuracy
 
@@ -134,7 +135,9 @@ class FedAvgCrossSiloServer(FedAvgServer):
                     'local_epoch_num':
                     Config().trainer.epochs,
                     'training_time':
-                    max([report.training_time for report in self.reports]),
+                    max([
+                        report.training_time for (report, __) in self.reports
+                    ]),
                     'round_time':
                     time.time() - self.round_start_time
                 }[item]
