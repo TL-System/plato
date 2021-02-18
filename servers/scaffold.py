@@ -3,7 +3,7 @@ A federated learning server using SCAFFOLD.
 
 Reference:
 
-Karimireddy et al., "SCAFFOLD: Stochastic Controlled Averaging for Federated Learning" 
+Karimireddy et al., "SCAFFOLD: Stochastic Controlled Averaging for Federated Learning"
 (https://arxiv.org/pdf/1910.06378.pdf)
 """
 
