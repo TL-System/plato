@@ -17,3 +17,19 @@ class Model(ABC, nn.Module):
     @abstractstaticmethod
     def get_model_from_name(model_name: str) -> 'Model':
         """Returns an instance of this class as described by the model_name string."""
+
+    def is_train_process(self):
+        return False
+        """Does the model has a train_process?"""
+
+    def is_test_process(self):
+        return False
+        """Does the model has a test_process?"""
+
+    # @abstractstaticmethod
+    def train_process(rank, self, config, trainset, cut_layer=None):
+        "Train_process"
+
+    def test_process(rank, self, config, testset):
+        "Test_process"
+

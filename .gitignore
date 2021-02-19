@@ -147,3 +147,6 @@ wandb/
 
 # macOS
 .DS_Store
+
+# Pycharm
+.idea

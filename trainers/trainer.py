@@ -42,7 +42,8 @@ class Trainer(base.Trainer):
         assert self.client_id == 0
         return torch.zeros(shape)
 
-    def save_model(self, filename=None):
+    @staticmethod
+    def save_model(model,client_id, filename=None):
         """Saving the model to a file."""
         model_type = Config().trainer.model
         model_dir = Config().params['model_dir']
@@ -55,13 +56,13 @@ class Trainer(base.Trainer):
         else:
             model_path = f'{model_dir}{model_type}.pth'
 
-        torch.save(self.model.state_dict(), model_path)
+        torch.save(model.state_dict(), model_path)
 
-        if self.client_id == 0:
+        if client_id == 0:
             logging.info("[Server #%s] Model saved to %s.", os.getpid(),
                          model_path)
         else:
-            logging.info("[Client #%s] Model saved to %s.", self.client_id,
+            logging.info("[Client #%s] Model saved to %s.", client_id,
                          model_path)
 
     def load_model(self, filename=None):
@@ -225,7 +226,7 @@ class Trainer(base.Trainer):
 
         model_type = Config().trainer.model
         filename = f"{model_type}_{self.client_id}_{config['run_id']}.pth"
-        self.save_model(filename)
+        self.save_model(self.model,self.client_id,filename)
 
         run.finish()
 
@@ -241,7 +242,11 @@ class Trainer(base.Trainer):
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']
 
-        mp.spawn(Trainer.train_process,
+
+
+        train_process = Trainer.train_process if not self.model.is_train_process() else self.model.train_process
+
+        mp.spawn(train_process,
                  args=(
                      self,
                      config,
@@ -302,7 +307,9 @@ class Trainer(base.Trainer):
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']
 
-        mp.spawn(Trainer.test_process,
+        test_process = Trainer.test_process if not self.model.is_test_process() else self.model.test_process
+
+        mp.spawn(test_process,
                  args=(
                      self,
                      config,
