@@ -1,6 +1,6 @@
 clients:
     # Type
-    type: simple
+    type: mistnet
 
     # The total number of clients
     total_clients: 1
@@ -9,7 +9,7 @@ clients:
     per_round: 1
 
     # Should the clients compute test accuracy locally?
-    do_test: true
+    do_test: false
 
 server:
     address: localhost
@@ -137,10 +137,7 @@ data:
 
 trainer:
     # The type of the trainer
-    type: basic
-
-    # test function
-    testtype: map
+    type: mistnet
 
     # The maximum number of training rounds
     rounds: 1
@@ -156,7 +153,7 @@ trainer:
 
     # Number of epoches for local training in each communication round
     epochs: 1
-    batch_size: 4
+    batch_size: 2
     optimizer: SGD
     learning_rate: 0.01
     momentum: 0.9
@@ -168,4 +165,8 @@ trainer:
 
 algorithm:
     # Aggregation algorithm
-    type: fedavg
+    type: mistnet
+
+    cut_layer: 4
+    epsilon: null
+

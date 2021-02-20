@@ -63,11 +63,12 @@ class FedAvgServer(Server):
         else:
             logging.info("Training: %s rounds\n", total_rounds)
 
+        self.load_model()
+
         if not Config().clients.do_test:
             dataset = datasets_registry.get()
             self.testset = dataset.get_test_set()
 
-        self.load_model()
 
         # Initialize the csv file which will record results
         if hasattr(Config(), 'results'):
