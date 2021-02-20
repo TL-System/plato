@@ -164,8 +164,8 @@ class Trainer(base.Trainer):
         logging.info("[Client %s] Loading the dataset.", self.client_id)
         _train_loader = getattr(self.model, "train_loader", None)
 
-        if callable(_train_loader) and cut_layer is None:
-            train_loader = _train_loader(batch_size, trainset)
+        if callable(_train_loader):
+            train_loader = _train_loader(batch_size, trainset, cut_layer)
         else:
             train_loader = torch.utils.data.DataLoader(trainset,
                                                        batch_size=batch_size,
