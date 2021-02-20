@@ -45,8 +45,14 @@ class Trainer(trainer.Trainer):
         """
         self.model.eval()
 
-        data_loader = torch.utils.data.DataLoader(
-            dataset, batch_size=Config().trainer.batch_size, shuffle=True)
+        _train_loader = getattr(self.model, "train_loader", None)
+
+        if callable(_train_loader):
+            data_loader = _train_loader(Config().trainer.batch_size, dataset)
+        else:
+            data_loader = torch.utils.data.DataLoader(dataset,
+                                                       batch_size=Config().trainer.batch_size,
+                                                       shuffle=True)
 
         tic = time.perf_counter()
 
@@ -77,4 +83,4 @@ class Trainer(trainer.Trainer):
         super().train(FeatureDataset(trainset), cut_layer)
 
     def test(self, testset):
-        return super().test(FeatureDataset(testset))
+        return super().test(testset)
