@@ -111,12 +111,17 @@ class Dataset(base.Dataset):
         return self.test_set
 
     @staticmethod
-    def get_train_loader(batch_size, trainset):
+    def get_train_loader(batch_size, trainset, cut_layer=None):
         """The custom train loader for YOLOv5."""
-        return torch.utils.data.DataLoader(COCODataset(trainset),
-                                           batch_size=batch_size,
-                                           shuffle=True,
-                                           collate_fn=Dataset.collate_fn)
+        if cut_layer:
+            return torch.utils.data.DataLoader(trainset,
+                                               batch_size=batch_size,
+                                               shuffle=True)
+        else:
+            return torch.utils.data.DataLoader(COCODataset(trainset),
+                                               batch_size=batch_size,
+                                               shuffle=True,
+                                               collate_fn=Dataset.collate_fn)
 
     @staticmethod
     def get_test_loader(batch_size, testset):

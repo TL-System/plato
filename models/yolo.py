@@ -120,10 +120,9 @@ class Model(yolo.Model):
         """The loss criterion for training YOLOv5."""
         return yololoss(model)
 
-    def train_loader(self, batch_size, trainset):
+    def train_loader(self, batch_size, trainset, cut_layer=None):
         """The train loader for training YOLOv5 using the COCO dataset."""
-        return coco.Dataset.get_train_loader(batch_size,
-                                                   trainset)
+        return coco.Dataset.get_train_loader(batch_size, trainset, cut_layer)
 
     @staticmethod
     def test_process(rank, self, config, testset):  # pylint: disable=unused-argument
