@@ -9,7 +9,7 @@ Karimireddy et al., "SCAFFOLD: Stochastic Controlled Averaging for Federated Lea
 import torch
 from models.base import Model
 from trainers import trainer
-import logging
+from utils import optimizers
 
 
 class Trainer(trainer.Trainer):
@@ -32,8 +32,9 @@ class Trainer(trainer.Trainer):
         self.new_client_update_direction = torch.load(c_file)
         super().pause_training()
 
-    def customize_optimizer_setup(self, optimizer):
-        """Initialize the SCAFFOLD optimizer"""
+    def get_optimizer(self, model):
+        """Initialize the SCAFFOLD optimizer."""
+        optimizer = optimizers.get_optimizer(model)
 
         optimizer.server_update_direction = self.server_update_direction
         optimizer.client_update_direction = self.client_update_direction
