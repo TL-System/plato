@@ -1,7 +1,6 @@
 """
 The training and testing loops for PyTorch.
 """
-from abc import abstractmethod
 import logging
 import os
 from collections import OrderedDict
@@ -41,7 +40,6 @@ class Trainer(base.Trainer):
         # This should only be called from a server
         assert self.client_id == 0
         return torch.zeros(shape)
-
 
     def save_model(self, filename=None):
         """Saving the model to a file."""
@@ -163,13 +161,15 @@ class Trainer(base.Trainer):
         log_interval = 10
         batch_size = config['batch_size']
 
-        trainloader = getattr(self.model, "trainloader", None)
-        if callable(trainloader):
-            train_loader = trainloader(batch_size,trainset)
+        logging.info("[Client %s] Loading the dataset.", self.client_id)
+        _train_loader = getattr(self.model, "train_loader", None)
+
+        if callable(_train_loader):
+            train_loader = _train_loader(batch_size, trainset)
         else:
             train_loader = torch.utils.data.DataLoader(trainset,
-                                        batch_size=batch_size,
-                                        shuffle=True)
+                                                       batch_size=batch_size,
+                                                       shuffle=True)
 
         iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
         epochs = config['epochs']
@@ -179,11 +179,14 @@ class Trainer(base.Trainer):
         self.model.train()
 
         # Initializing the loss criterion
-        loss_criterion = getattr(self.model, "loss_fun", nn.CrossEntropyLoss())(self.model)
+        loss_criterion = getattr(self.model, "loss_criterion",
+                                 nn.CrossEntropyLoss())
+        assert callable(loss_criterion)
 
         # Initializing the optimizer
-        optimizer = optimizers.get_optimizer(self.model)
-        optimizer = self.customize_optimizer_setup(optimizer)
+        get_optimizer = getattr(self, "get_optimizer",
+                                optimizers.get_optimizer)
+        optimizer = get_optimizer(self.model)
 
         # Initializing the learning rate schedule, if necessary
         if hasattr(Config().trainer, 'lr_schedule'):
@@ -213,7 +216,7 @@ class Trainer(base.Trainer):
                 if lr_schedule is not None:
                     lr_schedule.step()
 
-                if config['optimizer'] == 'FedProx':
+                if hasattr(optimizer, "params_state_update"):
                     optimizer.params_state_update()
 
                 if batch_id % log_interval == 0:
@@ -248,6 +251,10 @@ class Trainer(base.Trainer):
 
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']
+
+        train_process = getattr(self.model, "test_process",
+                                Trainer.train_process)
+        assert callable(train_process)
 
         mp.spawn(Trainer.train_process,
                  args=(
@@ -310,15 +317,15 @@ class Trainer(base.Trainer):
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']
 
-        test_process = getattr(self.model, "test_process", Trainer.test_process)
+        test_process = getattr(self.model, "test_process",
+                               Trainer.test_process)
+        assert callable(test_process)
 
-        mp.spawn(test_process,
-                 args=(
-                     self,
-                     config,
-                     testset,
-                 ),
-                 join=True)
+        mp.spawn(test_process, args=(
+            self,
+            config,
+            testset,
+        ), join=True)
 
         model_type = Config().trainer.model
         filename = f"{model_type}_{self.client_id}_{Config().params['run_id']}.acc"

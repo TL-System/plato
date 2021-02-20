@@ -22,6 +22,7 @@ def collate_fn(batch):
         l[:, 0] = i  # add target image index for build_targets()
     return torch.stack(img, 0), torch.cat(label, 0)
 
+
 class yololoss:
     # Compute losses
     def __init__(self, model):
@@ -35,14 +36,16 @@ class yololoss:
             hyp = yaml.load(f, Loader=yaml.SafeLoader)  # load hyps
         hyp['box'] *= 3. / nl  # scale to layers
         hyp['cls'] *= nc / 80. * 3. / nl  # scale to classes and layers
-        hyp['obj'] *= (640 / 640) ** 2 * 3. / nl  # scale to image size and layers
+        hyp['obj'] *= (640 /
+                       640)**2 * 3. / nl  # scale to image size and layers
         self.model.nc = nc  # attach number of classes to model
         self.model.hyp = hyp  # attach hyperparameters to model
         self.model.gr = 1.0  # iou loss ratio (obj_loss = 1.0 or iou)
         self.loss = ComputeLoss(self.model)
 
     def __call__(self, p, targets):
-        return self.loss(p,targets)[0]
+        return self.loss(p, targets)[0]
+
 
 class YoloDataset(torch.utils.data.Dataset):
     """Used to prepare a feature dataset for a DataLoader in PyTorch."""
@@ -135,17 +138,16 @@ class Model(yolo.Model):
         else:
             return Model('yolov5s.yaml', Config().data.num_classes)
 
-
-    def trainloader(self, batch_size, trainset):
+    def train_loader(self, batch_size, trainset):
+        """The custom train loader for YOLOv5."""
         return torch.utils.data.DataLoader(YoloDataset(trainset),
                                            batch_size=batch_size,
                                            shuffle=True,
-                                           collate_fn=collate_fn
-                                                   )
+                                           collate_fn=collate_fn)
 
-    def loss_fun(self, model):
+    def loss_criterion(self, model):
+        """The loss criterion for training YOLOv5."""
         return yololoss(model)
-
 
     @staticmethod
     def test_process(rank, self, config, testset):  # pylint: disable=unused-argument
@@ -161,21 +163,22 @@ class Model(yolo.Model):
         self.model.eval()
 
         test_loader = torch.utils.data.DataLoader(
-            testset, batch_size=config['batch_size'], shuffle=False, collate_fn=LoadImagesAndLabels.collate_fn
-        )
+            testset,
+            batch_size=config['batch_size'],
+            shuffle=False,
+            collate_fn=LoadImagesAndLabels.collate_fn)
 
-
-        results, maps, times = testmap('utils/yolov5/coco128.yaml',
-                                       batch_size=config['batch_size'],
-                                       imgsz=640,
-                                       model=self.model,
-                                       single_cls=False,
-                                       dataloader=test_loader,
-                                       save_dir='',
-                                       verbose=False,
-                                       plots=False,
-                                       log_imgs=0,
-                                       compute_loss=None)
+        results, __, __ = testmap('utils/yolov5/coco128.yaml',
+                                  batch_size=config['batch_size'],
+                                  imgsz=640,
+                                  model=self.model,
+                                  single_cls=False,
+                                  dataloader=test_loader,
+                                  save_dir='',
+                                  verbose=False,
+                                  plots=False,
+                                  log_imgs=0,
+                                  compute_loss=None)
         accuracy = results[2]
 
         self.model.cpu()

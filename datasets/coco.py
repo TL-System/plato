@@ -37,8 +37,6 @@ class Dataset(base.Dataset):
         self.image_size = check_img_size(Config().data.image_size,
                                          self.grid_size)
 
-        print(self.grid_size)
-        print(self.image_size)
         self.train_set = None
         self.test_set = None
 
