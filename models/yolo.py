@@ -124,7 +124,7 @@ class Model(yolo.Model):
         """The train loader for training YOLOv5 using the COCO dataset."""
         return coco.Dataset.get_train_loader(batch_size, trainset, cut_layer)
 
-    def test(self, config, testset):  # pylint: disable=unused-argument
+    def test_model(self, config, testset):  # pylint: disable=unused-argument
         """The testing loop for YOLOv5.
 
         Arguments:

@@ -158,7 +158,7 @@ class Trainer(base.Trainer):
                          group=str(config['run_id']),
                          reinit=True)
 
-        custom_train = getattr(self.model, "train", None)
+        custom_train = getattr(self.model, "train_model", None)
 
         if callable(custom_train):
             self.model.train(config, trainset, cut_layer)
@@ -287,10 +287,10 @@ class Trainer(base.Trainer):
         self.model.to(self.device)
         self.model.eval()
 
-        custom_test = getattr(self.model, "test", None)
+        custom_test = getattr(self.model, "test_model", None)
 
         if callable(custom_test):
-            accuracy = self.model.test(config, testset)
+            accuracy = self.model.test_model(config, testset)
         else:
             test_loader = torch.utils.data.DataLoader(
                 testset, batch_size=config['batch_size'], shuffle=False)
