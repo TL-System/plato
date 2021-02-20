@@ -121,7 +121,7 @@ class Model(yolo.Model):
         return yololoss(model)
 
     def train_loader(self, batch_size, trainset):
-        """The loss criterion for training YOLOv5."""
+        """The train loader for training YOLOv5 using the COCO dataset."""
         return coco.Dataset.get_train_loader(batch_size,
                                                    trainset)
 
