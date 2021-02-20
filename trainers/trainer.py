@@ -42,6 +42,7 @@ class Trainer(base.Trainer):
         assert self.client_id == 0
         return torch.zeros(shape)
 
+
     def save_model(self, filename=None):
         """Saving the model to a file."""
         model_type = Config().trainer.model
@@ -161,9 +162,15 @@ class Trainer(base.Trainer):
 
         log_interval = 10
         batch_size = config['batch_size']
-        train_loader = torch.utils.data.DataLoader(trainset,
-                                                   batch_size=batch_size,
-                                                   shuffle=True)
+
+        trainloader = getattr(self.model, "trainloader", None)
+        if callable(trainloader):
+            train_loader = trainloader(batch_size,trainset)
+        else:
+            train_loader = torch.utils.data.DataLoader(trainset,
+                                        batch_size=batch_size,
+                                        shuffle=True)
+
         iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
         epochs = config['epochs']
 
@@ -172,7 +179,7 @@ class Trainer(base.Trainer):
         self.model.train()
 
         # Initializing the loss criterion
-        loss_criterion = nn.CrossEntropyLoss()
+        loss_criterion = getattr(self.model, "loss_fun", nn.CrossEntropyLoss())(self.model)
 
         # Initializing the optimizer
         optimizer = optimizers.get_optimizer(self.model)
@@ -198,6 +205,7 @@ class Trainer(base.Trainer):
                     outputs = self.model.forward_from(examples, cut_layer)
 
                 loss = loss_criterion(outputs, labels)
+
                 loss.backward()
 
                 optimizer.step()
@@ -302,7 +310,9 @@ class Trainer(base.Trainer):
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']
 
-        mp.spawn(Trainer.test_process,
+        test_process = getattr(self.model, "test_process", Trainer.test_process)
+
+        mp.spawn(test_process,
                  args=(
                      self,
                      config,
