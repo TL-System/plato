@@ -21,6 +21,7 @@ def collate_fn(batch):
     for i, l in enumerate(label):
         l[:, 0] = i  # add target image index for build_targets()
     return torch.stack(img, 0), torch.cat(label, 0)
+
 class yololoss:
     # Compute losses
     def __init__(self, model):
