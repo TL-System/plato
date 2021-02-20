@@ -9,11 +9,25 @@ For more information about the COCO 2017 dataset, refer to http://cocodataset.or
 
 import os
 import logging
+import torch
 
 from config import Config
 from datasets import base
 from utils.yolov5.datasets import LoadImagesAndLabels
 from utils.yolov5.general import check_img_size
+
+
+class COCODataset(torch.utils.data.Dataset):
+    """Used to prepare the COCO dataset for a DataLoader in YOLOv5."""
+    def __init__(self, dataset):
+        self.dataset = dataset
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, item):
+        image, label, _, _ = self.dataset[item]
+        return image / 255.0, label
 
 
 class Dataset(base.Dataset):
@@ -95,3 +109,27 @@ class Dataset(base.Dataset):
                 prefix='')
 
         return self.test_set
+
+    @staticmethod
+    def get_train_loader(batch_size, trainset):
+        """The custom train loader for YOLOv5."""
+        return torch.utils.data.DataLoader(COCODataset(trainset),
+                                           batch_size=batch_size,
+                                           shuffle=True,
+                                           collate_fn=Dataset.collate_fn)
+
+    @staticmethod
+    def get_test_loader(batch_size, testset):
+        """The custom test loader for YOLOv5."""
+        return torch.utils.data.DataLoader(
+            testset,
+            batch_size=batch_size,
+            shuffle=False,
+            collate_fn=LoadImagesAndLabels.collate_fn)
+
+    @staticmethod
+    def collate_fn(batch):
+        img, label = zip(*batch)  # transposed
+        for i, l in enumerate(label):
+            l[:, 0] = i  # add target image index for build_targets()
+        return torch.stack(img, 0), torch.cat(label, 0)

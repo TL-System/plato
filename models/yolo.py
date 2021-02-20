@@ -1,14 +1,14 @@
 """The YOLOV5 model for PyTorch."""
+import torch
+from config import Config
+
+from trainers.trainer import Trainer
 
 from models.yolov5 import yolo
-from config import Config
 from utils.yolov5.torch_utils import time_synchronized
 from utils.yolov5.test import testmap
-from utils.yolov5.datasets import LoadImagesAndLabels
-
-import torch
-from trainers.trainer import Trainer
 from utils.yolov5.loss import ComputeLoss
+from datasets import coco
 
 try:
     import thop  # for FLOPS computation
@@ -16,18 +16,9 @@ except ImportError:
     thop = None
 
 
-def collate_fn(batch):
-    img, label = zip(*batch)  # transposed
-    for i, l in enumerate(label):
-        l[:, 0] = i  # add target image index for build_targets()
-    return torch.stack(img, 0), torch.cat(label, 0)
-
-
 class yololoss:
     # Compute losses
     def __init__(self, model):
-        super(yololoss, self).__init__()
-        # from utils.yolov5.loss import ComputeLoss
         self.model = model
         nc = Config().data.num_classes
         nl = self.model.model[-1].nl
@@ -45,19 +36,6 @@ class yololoss:
 
     def __call__(self, p, targets):
         return self.loss(p, targets)[0]
-
-
-class YoloDataset(torch.utils.data.Dataset):
-    """Used to prepare a feature dataset for a DataLoader in PyTorch."""
-    def __init__(self, dataset):
-        self.dataset = dataset
-
-    def __len__(self):
-        return len(self.dataset)
-
-    def __getitem__(self, item):
-        image, label, _, _ = self.dataset[item]
-        return image / 255.0, label
 
 
 class Model(yolo.Model):
@@ -138,13 +116,6 @@ class Model(yolo.Model):
         else:
             return Model('yolov5s.yaml', Config().data.num_classes)
 
-    def train_loader(self, batch_size, trainset):
-        """The custom train loader for YOLOv5."""
-        return torch.utils.data.DataLoader(YoloDataset(trainset),
-                                           batch_size=batch_size,
-                                           shuffle=True,
-                                           collate_fn=collate_fn)
-
     def loss_criterion(self, model):
         """The loss criterion for training YOLOv5."""
         return yololoss(model)
@@ -162,11 +133,9 @@ class Model(yolo.Model):
         self.model.to(self.device)
         self.model.eval()
 
-        test_loader = torch.utils.data.DataLoader(
-            testset,
-            batch_size=config['batch_size'],
-            shuffle=False,
-            collate_fn=LoadImagesAndLabels.collate_fn)
+        assert Config().data.dataset == 'COCO'
+        test_loader = coco.Dataset.get_test_loader(config['batch_size'],
+                                                   testset)
 
         results, __, __ = testmap('utils/yolov5/coco128.yaml',
                                   batch_size=config['batch_size'],
