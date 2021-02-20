@@ -124,19 +124,14 @@ class Model(yolo.Model):
         """The train loader for training YOLOv5 using the COCO dataset."""
         return coco.Dataset.get_train_loader(batch_size, trainset, cut_layer)
 
-    @staticmethod
-    def test_process(rank, self, config, testset):  # pylint: disable=unused-argument
-        """The testing loop, run in a separate process with a new CUDA context,
-        so that CUDA memory can be released after the training completes.
+    def test(self, config, testset):  # pylint: disable=unused-argument
+        """The testing loop for YOLOv5.
 
         Arguments:
-        rank: Required by torch.multiprocessing to spawn processes. Unused.
-        testset: The test dataset.
-        cut_layer (optional): The layer which testing should start from.
+            config: Configuration parameters as a dictionary.
+            model: The model.
+            testset: The test dataset.
         """
-        self.model.to(self.device)
-        self.model.eval()
-
         assert Config().data.dataset == 'COCO'
         test_loader = coco.Dataset.get_test_loader(config['batch_size'],
                                                    testset)
@@ -144,7 +139,7 @@ class Model(yolo.Model):
         results, __, __ = testmap('utils/yolov5/coco128.yaml',
                                   batch_size=config['batch_size'],
                                   imgsz=640,
-                                  model=self.model,
+                                  model=self,
                                   single_cls=False,
                                   dataloader=test_loader,
                                   save_dir='',
@@ -152,10 +147,4 @@ class Model(yolo.Model):
                                   plots=False,
                                   log_imgs=0,
                                   compute_loss=None)
-        accuracy = results[2]
-
-        self.model.cpu()
-
-        model_type = Config().trainer.model
-        filename = f"{model_type}_{self.client_id}_{config['run_id']}.acc"
-        Trainer.save_accuracy(accuracy, filename)
+        return results[2]
