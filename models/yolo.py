@@ -116,6 +116,10 @@ class Model(yolo.Model):
         else:
             return Model('yolov5s.yaml', Config().data.num_classes)
 
+    def train_loader(self, batch_size, trainset):
+        """The train loader for training YOLOv5 using the COCO dataset."""
+        return coco.Dataset.get_train_loader(batch_size, trainset)
+
     def loss_criterion(self, model):
         """The loss criterion for training YOLOv5."""
         return yololoss(model)
