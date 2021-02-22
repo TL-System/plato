@@ -139,6 +139,7 @@ running_trainers.sqlitedb
 
 # Data files
 /data/
+/tests/data/
 
 # Result files
 results/
