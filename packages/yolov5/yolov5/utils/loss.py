@@ -3,8 +3,8 @@
 import torch
 import torch.nn as nn
 
-from utils.yolov5.general import bbox_iou
-from utils.yolov5.torch_utils import is_parallel
+from yolov5.utils.general import bbox_iou
+from yolov5.utils.torch_utils import is_parallel
 
 
 def smooth_BCE(
@@ -112,12 +112,10 @@ class ComputeLoss:
         det = model.module.model[-1] if is_parallel(model) else model.model[
             -1]  # Detect() module
         self.balance = {
-            3: [4.0, 1.0, 0.4],
-            4: [4.0, 1.0, 0.25, 0.06],
-            5: [4.0, 1.0, 0.25, 0.06, .02]
-        }[det.nl]
-        self.ssi = (det.stride == 16).nonzero(
-            as_tuple=False).item()  # stride 16 index
+            3: [4.0, 1.0, 0.4]
+        }.get(det.nl, [4.0, 1.0, 0.25, 0.06, .02])  # P3-P7
+        self.ssi = list(
+            det.stride).index(16) if autobalance else 0  # stride 16 index
         self.BCEcls, self.BCEobj, self.gr, self.hyp, self.autobalance = BCEcls, BCEobj, model.gr, h, autobalance
         for k in 'na', 'nc', 'nl', 'anchors':
             setattr(self, k, getattr(det, k))

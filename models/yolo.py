@@ -1,13 +1,12 @@
 """The YOLOV5 model for PyTorch."""
-import torch
+import yaml
+
+from yolov5.models import yolo
+from yolov5.utils.torch_utils import time_synchronized
+from yolov5.utils.loss import ComputeLoss
+from yolov5.test import test
+
 from config import Config
-
-from trainers.trainer import Trainer
-
-from models.yolov5 import yolo
-from utils.yolov5.torch_utils import time_synchronized
-from utils.yolov5.test import testmap
-from utils.yolov5.loss import ComputeLoss
 from datasets import coco
 
 try:
@@ -17,13 +16,12 @@ except ImportError:
 
 
 class yololoss:
-    # Compute losses
+    """ Compute YOLOv5 losses. """
     def __init__(self, model):
         self.model = model
         nc = Config().data.num_classes
         nl = self.model.model[-1].nl
-        import yaml
-        with open('utils/yolov5/hyp.scratch.yaml') as f:
+        with open('packages/yolov5/yolov5/data/hyp.scratch.yaml') as f:
             hyp = yaml.load(f, Loader=yaml.SafeLoader)  # load hyps
         hyp['box'] *= 3. / nl  # scale to layers
         hyp['cls'] *= nc / 80. * 3. / nl  # scale to classes and layers
@@ -136,15 +134,15 @@ class Model(yolo.Model):
         test_loader = coco.Dataset.get_test_loader(config['batch_size'],
                                                    testset)
 
-        results, __, __ = testmap('utils/yolov5/coco128.yaml',
-                                  batch_size=config['batch_size'],
-                                  imgsz=640,
-                                  model=self,
-                                  single_cls=False,
-                                  dataloader=test_loader,
-                                  save_dir='',
-                                  verbose=False,
-                                  plots=False,
-                                  log_imgs=0,
-                                  compute_loss=None)
+        results, __, __ = test('packages/yolov5/yolov5/data/coco128.yaml',
+                               batch_size=config['batch_size'],
+                               imgsz=640,
+                               model=self,
+                               single_cls=False,
+                               dataloader=test_loader,
+                               save_dir='',
+                               verbose=False,
+                               plots=False,
+                               log_imgs=0,
+                               compute_loss=None)
         return results[2]

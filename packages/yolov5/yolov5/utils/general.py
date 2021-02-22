@@ -17,9 +17,9 @@ import torch
 import torchvision
 import yaml
 
-from utils.yolov5.google_utils import gsutil_getsize
-from utils.yolov5.metrics import fitness
-from utils.yolov5.torch_utils import init_torch_seeds
+from yolov5.utils.google_utils import gsutil_getsize
+from yolov5.utils.metrics import fitness
+from yolov5.utils.torch_utils import init_torch_seeds
 
 # Settings
 torch.set_printoptions(linewidth=320, precision=5, profile='long')
@@ -453,11 +453,12 @@ def non_max_suppression(prediction,
                         iou_thres=0.45,
                         classes=None,
                         agnostic=False,
+                        multi_label=False,
                         labels=()):
-    """Performs Non-Maximum Suppression (NMS) on inference results
+    """Runs Non-Maximum Suppression (NMS) on inference results
 
     Returns:
-         detections with shape: nx6 (x1, y1, x2, y2, conf, cls)
+         list of detections, on (n,6) tensor per image [xyxy, conf, cls]
     """
 
     nc = prediction.shape[2] - 5  # number of classes
@@ -469,7 +470,7 @@ def non_max_suppression(prediction,
     max_nms = 30000  # maximum number of boxes into torchvision.ops.nms()
     time_limit = 10.0  # seconds to quit after
     redundant = True  # require redundant detections
-    multi_label = nc > 1  # multiple labels per box (adds 0.5ms/img)
+    multi_label &= nc > 1  # multiple labels per box (adds 0.5ms/img)
     merge = False  # use merge-NMS
 
     t = time.time()
