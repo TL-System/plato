@@ -138,7 +138,7 @@ dmypy.json
 running_trainers.sqlitedb
 
 # Data files
-data/
+/data/
 
 # Result files
 results/

@@ -164,7 +164,7 @@ trainer:
 
     # The machine learning model
     model: yolov5
-    model_config: models/yolov5/yolov5s.yaml
+    model_config: packages/yolov5/yolov5/models/yolov5s.yaml
 
 algorithm:
     # Aggregation algorithm

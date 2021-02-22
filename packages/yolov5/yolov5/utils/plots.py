@@ -18,8 +18,8 @@ import yaml
 from PIL import Image, ImageDraw, ImageFont
 from scipy.signal import butter, filtfilt
 
-from utils.yolov5.general import xywh2xyxy, xyxy2xywh
-from utils.yolov5.metrics import fitness
+from yolov5.utils.general import xywh2xyxy, xyxy2xywh
+from yolov5.utils.metrics import fitness
 
 # Settings
 matplotlib.rc('font', **{'size': 11})

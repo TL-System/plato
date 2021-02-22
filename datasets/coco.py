@@ -13,8 +13,8 @@ import torch
 
 from config import Config
 from datasets import base
-from utils.yolov5.datasets import LoadImagesAndLabels
-from utils.yolov5.general import check_img_size
+from yolov5.utils.datasets import LoadImagesAndLabels
+from yolov5.utils.general import check_img_size
 
 
 class COCODataset(torch.utils.data.Dataset):
