@@ -128,6 +128,15 @@ python server.py --config=config.yml --log=info
 
 *Plato* uses the YAML format for its configuration files to manage the runtime configuration parameters. Example configuration files have been provided in the `configs` directory.
 
+### Installing YOLOv5 as a Python package
+
+If object detection using the YOLOv5 model and the COCO dataset is needed, it is required to install YOLOv5 as a Python package first:
+
+```shell
+cd packages/yolov5
+pip install .
+```
+
 ### Plotting Runtime Results
 
 If the configuration file contains a `results` section, the selected performance metrics, such as accuracy, will be saved in a `.csv` file in the `results/` directory. By default, the `results/` directory is under the path to the used configuration file, but it can be easily changed by modifying `Config.result_dir` in [`config.py`](config.py).
