@@ -31,7 +31,7 @@ class Model(yolo.Model):
 
     def forward_to(self, x, cut_layer=4, profile=False):
         y, dt = [], []  # outputs
-        for m in self:
+        for m in self.model:
 
             if m.i == cut_layer:
                 return x
@@ -59,7 +59,7 @@ class Model(yolo.Model):
 
     def forward_from(self, x, cut_layer=4, profile=False):
         y, dt = [], []  # outputs
-        for m in self:
+        for m in self.model:
             if m.i < cut_layer:
                 y.append(None)
                 continue
@@ -107,7 +107,6 @@ class Model(yolo.Model):
 
     def test_model(self, config, testset):  # pylint: disable=unused-argument
         """The testing loop for YOLOv5.
-
         Arguments:
             config: Configuration parameters as a dictionary.
             model: The model.
@@ -132,7 +131,6 @@ class Model(yolo.Model):
 
     def train_model(self, trainer, config, trainset, cut_layer=None):  # pylint: disable=unused-argument
         """The training loop for YOLOv5.
-
         Arguments:
         config: a dictionary of configuration parameters.
         trainset: The training dataset.
@@ -192,7 +190,7 @@ class Model(yolo.Model):
             optimizer = optim.Adam(pg0, lr=hyp['lr0'], betas=(hyp['momentum'], 0.999))  # adjust beta1 to momentum
         else:
             optimizer = optim.SGD(pg0, lr=hyp['lr0'], momentum=hyp['momentum'], nesterov=True)
-        
+
         optimizer.add_param_group({'params': pg1, 'weight_decay': hyp['weight_decay']})  # add pg1 with weight_decay
         optimizer.add_param_group({'params': pg2})  # add pg2 (biases)
         logging.info('[Client %s] Optimizer groups: %g .bias, %g conv.weight, %g other', trainer.client_id, len(pg2), len(pg1), len(pg0))
@@ -217,7 +215,6 @@ class Model(yolo.Model):
         self.names = names
         nw = max(round(hyp['warmup_epochs'] * nb), 1000)
         scaler = amp.GradScaler(enabled=cuda)
-        optimizer.zero_grad()
 
         # Initializing the loss criterion
         compute_loss = ComputeLoss(self)  # init loss class
@@ -227,6 +224,8 @@ class Model(yolo.Model):
             pbar = enumerate(train_loader)
             pbar = tqdm(pbar, total=nb)
             mloss = torch.zeros(4, device=trainer.device)  # Initializing mean losses
+
+            optimizer.zero_grad()
 
             for batch_id, (examples, labels) in pbar:
                 ni = batch_id + nb * epoch
@@ -248,7 +247,7 @@ class Model(yolo.Model):
                     else:
                             outputs = self.forward_from(examples, cut_layer)
 
-                loss, loss_items = compute_loss(outputs, labels.to(trainer.device)) 
+                loss, loss_items = compute_loss(outputs, labels.to(trainer.device))
                 scaler.scale(loss).backward()
 
                 # optimizer.step()
