@@ -31,7 +31,6 @@ class Model(yolo.Model):
         Config().params['grid_size'] = int(self.stride.max())
 
     def forward_to(self, x, cut_layer=4, profile=False):
-        x = x.float() / 255.0
         y, dt = [], []  # outputs
 
         for m in self.model:
@@ -248,8 +247,8 @@ class Model(yolo.Model):
 
             for i, (imgs, targets, *__) in pbar:
                 ni = i + nb * epoch  # number integrated batches (since train start)
-                imgs = imgs.to(trainer.device, non_blocking=True).float(
-                ) / 255.0  # uint8 to float32, 0-255 to 0.0-1.0
+                imgs, targets = imgs.to(trainer.device), targets.to(
+                    trainer.device)
 
                 # Warmup
                 if ni <= nw:
