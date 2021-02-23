@@ -17,6 +17,19 @@ from yolov5.utils.datasets import LoadImagesAndLabels
 from yolov5.utils.general import check_img_size
 
 
+class COCODataset(torch.utils.data.Dataset):
+    """Prepares the COCO dataset for use in YOLOv5."""
+    def __init__(self, dataset):
+        self.dataset = dataset
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, item):
+        image, label, paths, shapes = self.dataset[item]
+        return image.float() / 255.0, label, paths, shapes
+
+
 class Dataset(base.Dataset):
     """The COCO dataset."""
     def __init__(self, path):
@@ -106,7 +119,7 @@ class Dataset(base.Dataset):
                                                shuffle=True)
         else:
             return torch.utils.data.DataLoader(
-                trainset,
+                COCODataset(trainset),
                 batch_size=batch_size,
                 shuffle=True,
                 collate_fn=LoadImagesAndLabels.collate_fn)
