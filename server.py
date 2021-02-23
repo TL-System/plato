@@ -6,6 +6,7 @@ import asyncio
 import time
 import logging
 import websockets
+from contextlib import closing
 
 from config import Config
 import servers
@@ -16,7 +17,9 @@ def main():
     __ = Config()
 
     # Remove the running trainers table from previous runs
-    Config().cursor.execute("DROP TABLE IF EXISTS trainers")
+    with Config().sql_connection:
+        with closing(Config().sql_connection.cursor()) as cursor:
+            cursor.execute("DROP TABLE IF EXISTS trainers")
 
     server = {
         "fedavg": servers.fedavg.FedAvgServer,
