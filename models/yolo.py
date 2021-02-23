@@ -23,17 +23,6 @@ try:
 except ImportError:
     thop = None
 
-
-class yololoss:
-    """ Compute YOLOv5 losses. """
-    def __init__(self, model):
-        self.model = model
-        self.loss = ComputeLoss(self.model)
-
-    def __call__(self, p, targets):
-        return self.loss(p, targets)
-
-
 class Model(yolo.Model):
     """The YOLOV5 model."""
     def __init__(self, model_config, num_classes):
@@ -42,7 +31,7 @@ class Model(yolo.Model):
 
     def forward_to(self, x, cut_layer=4, profile=False):
         y, dt = [], []  # outputs
-        for m in self.model:
+        for m in self:
 
             if m.i == cut_layer:
                 return x
@@ -70,7 +59,7 @@ class Model(yolo.Model):
 
     def forward_from(self, x, cut_layer=4, profile=False):
         y, dt = [], []  # outputs
-        for m in self.model:
+        for m in self:
             if m.i < cut_layer:
                 y.append(None)
                 continue
@@ -112,10 +101,6 @@ class Model(yolo.Model):
         else:
             return Model('yolov5s.yaml', Config().data.num_classes)
 
-    def loss_criterion(self, model):
-        """The loss criterion for training YOLOv5."""
-        return yololoss(model)
-
     def train_loader(self, batch_size, trainset, cut_layer=None):
         """The train loader for training YOLOv5 using the COCO dataset."""
         return coco.Dataset.get_train_loader(batch_size, trainset, cut_layer)
@@ -145,20 +130,21 @@ class Model(yolo.Model):
                                compute_loss=None)
         return results[2]
 
-    @staticmethod
-    def train_model(self, config, trainset, cut_layer=None):  # pylint: disable=unused-argument
+    def train_model(self, trainer, config, trainset, cut_layer=None):  # pylint: disable=unused-argument
         """The training loop for YOLOv5.
 
         Arguments:
-        rank: Required by torch.multiprocessing to spawn processes. Unused.
         config: a dictionary of configuration parameters.
         trainset: The training dataset.
         cut_layer (optional): The layer which training should start from.
         """
 
-        batch_size = config['batch_size']
+        logging.info("[Client #%s] Setting up training parameters.", trainer.client_id)
 
-        cuda = (self.device != 'cpu')
+        batch_size = config['batch_size']
+        epochs = config['epochs']
+
+        cuda = (trainer.device != 'cpu')
         nc = Config().data.num_classes  # number of classes
         names = Config().data.classes  # class names
         total_batch_size = batch_size
@@ -167,7 +153,7 @@ class Model(yolo.Model):
             hyp = yaml.load(f, Loader=yaml.SafeLoader)  # load hyps
 
         freeze = []  # parameter names to freeze (full or partial)
-        for k, v in self.model.named_parameters():
+        for k, v in self.named_parameters():
             v.requires_grad = True  # train all layers
             if any(x in k for x in freeze):
                 print('freezing %s' % k)
@@ -176,25 +162,24 @@ class Model(yolo.Model):
         nbs = 64  # nominal batch size
         accumulate = max(round(nbs / total_batch_size), 1)  # accumulate loss before optimizing
         hyp['weight_decay'] *= total_batch_size * accumulate / nbs  # scale weight_decay
-        logging.info(f"Scaled weight_decay = {hyp['weight_decay']}")
-        logging.info("[Client %s] Loading the dataset.", self.client_id)
+        logging.info("[Client #%s] Scaled weight_decay: %s", trainer.client_id, hyp['weight_decay'])
+
+        logging.info("[Client #%s] Loading the dataset.", trainer.client_id)
 
         if cut_layer is None:
-            train_loader = self.model.train_loader(batch_size, trainset, cut_layer)
+            train_loader = self.train_loader(batch_size, trainset, cut_layer)
         else:
             train_loader = torch.utils.data.DataLoader(
                 trainset, batch_size=batch_size, shuffle=True)
 
-
         nb = len(train_loader)
-        epochs = config['epochs']
 
         # Sending the model to the device used for training
-        self.model.to(self.device)
-        self.model.train()
+        self.to(trainer.device)
+        self.train()
 
         pg0, pg1, pg2 = [], [], []  # optimizer parameter groups
-        for k, v in self.model.named_modules():
+        for k, v in self.named_modules():
             if hasattr(v, 'bias') and isinstance(v.bias, nn.Parameter):
                 pg2.append(v.bias)  # biases
             if isinstance(v, nn.BatchNorm2d):
@@ -207,9 +192,10 @@ class Model(yolo.Model):
             optimizer = optim.Adam(pg0, lr=hyp['lr0'], betas=(hyp['momentum'], 0.999))  # adjust beta1 to momentum
         else:
             optimizer = optim.SGD(pg0, lr=hyp['lr0'], momentum=hyp['momentum'], nesterov=True)
+        
         optimizer.add_param_group({'params': pg1, 'weight_decay': hyp['weight_decay']})  # add pg1 with weight_decay
         optimizer.add_param_group({'params': pg2})  # add pg2 (biases)
-        logging.info('Optimizer groups: %g .bias, %g conv.weight, %g other' % (len(pg2), len(pg1), len(pg0)))
+        logging.info('[Client %s] Optimizer groups: %g .bias, %g conv.weight, %g other', trainer.client_id, len(pg2), len(pg1), len(pg0))
         del pg0, pg1, pg2
 
         if Config().trainer.linear_lr:
@@ -219,33 +205,33 @@ class Model(yolo.Model):
         lr_schedule = lr_scheduler.LambdaLR(optimizer, lr_lambda=lf)
 
         # Image sizes
-        nl = self.model.model[-1].nl  # number of detection layers (used for scaling hyp['obj'])
+        nl = self.model[-1].nl  # number of detection layers (used for scaling hyp['obj'])
 
-        # DP mode
+        # Model parameters
         hyp['box'] *= 3. / nl  # scale to layers
         hyp['cls'] *= nc / 80. * 3. / nl  # scale to classes and layers
         hyp['obj'] *= (Config().data.image_size / 640) ** 2 * 3. / nl  # scale to image size and layers
-        self.model.nc = nc  # attach number of classes to model
-        self.model.hyp = hyp  # attach hyperparameters to model
-        self.model.gr = 1.0  # iou loss ratio (obj_loss = 1.0 or iou)
-        self.model.names = names
+        self.nc = nc  # attach number of classes to model
+        self.hyp = hyp  # attach hyperparameters to model
+        self.gr = 1.0  # iou loss ratio (obj_loss = 1.0 or iou)
+        self.names = names
         nw = max(round(hyp['warmup_epochs'] * nb), 1000)
         scaler = amp.GradScaler(enabled=cuda)
         optimizer.zero_grad()
 
         # Initializing the loss criterion
-        loss_criterion = self.model.loss_criterion(self.model)
+        compute_loss = ComputeLoss(self)  # init loss class
         for epoch in range(1, epochs + 1):
             logging.info(('\n' + '%10s' * 8) % (
                 'Epoch', 'gpu_mem', 'box', 'obj', 'cls', 'total', 'targets', 'img_size'))
             pbar = enumerate(train_loader)
             pbar = tqdm(pbar, total=nb)
-            mloss = torch.zeros(4, device=self.device)  # Initializing mean losses
+            mloss = torch.zeros(4, device=trainer.device)  # Initializing mean losses
 
             for batch_id, (examples, labels) in pbar:
                 ni = batch_id + nb * epoch
-                examples, labels = examples.to(self.device), labels.to(
-                        self.device)
+                examples, labels = examples.to(trainer.device), labels.to(
+                        trainer.device)
 
                 if ni <= nw:
                     xi = [0, nw]  # x interp
@@ -258,12 +244,11 @@ class Model(yolo.Model):
 
                 with amp.autocast(enabled=cuda):
                     if cut_layer is None:
-                            outputs = self.model(examples)
+                            outputs = self(examples)
                     else:
-                            outputs = self.model.forward_from(examples, cut_layer)
+                            outputs = self.forward_from(examples, cut_layer)
 
-
-                loss, loss_items = loss_criterion(outputs, labels)
+                loss, loss_items = compute_loss(outputs, labels.to(trainer.device)) 
                 scaler.scale(loss).backward()
 
                 # optimizer.step()
@@ -271,7 +256,6 @@ class Model(yolo.Model):
                     scaler.step(optimizer)  # optimizer.step
                     scaler.update()
                     optimizer.zero_grad()
-
 
                 mloss = (mloss * batch_id + loss_items) / (batch_id + 1)  # update mean losses
                 mem = '%.3gG' % (
