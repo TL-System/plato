@@ -48,17 +48,17 @@ class Trainer(trainer.Trainer):
         _train_loader = getattr(self.model, "train_loader", None)
 
         if callable(_train_loader):
-            data_loader = _train_loader(Config().trainer.batch_size, dataset)
+            data_loader = self.model.train_loader(Config().trainer.batch_size,
+                                                  dataset)
         else:
-            data_loader = torch.utils.data.DataLoader(dataset,
-                                                       batch_size=Config().trainer.batch_size,
-                                                       shuffle=True)
+            data_loader = torch.utils.data.DataLoader(
+                dataset, batch_size=Config().trainer.batch_size, shuffle=True)
 
         tic = time.perf_counter()
 
         feature_dataset = []
 
-        for inputs, targets in data_loader:
+        for inputs, targets, *__ in data_loader:
             with torch.no_grad():
                 logits = self.model.forward_to(inputs, cut_layer)
 

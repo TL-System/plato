@@ -23,6 +23,7 @@ try:
 except ImportError:
     thop = None
 
+
 class Model(yolo.Model):
     """The YOLOV5 model."""
     def __init__(self, model_config, num_classes):
@@ -31,8 +32,7 @@ class Model(yolo.Model):
 
     def forward_to(self, x, cut_layer=4, profile=False):
         y, dt = [], []  # outputs
-        for m in self:
-
+        for m in self.model:
             if m.i == cut_layer:
                 return x
 
@@ -59,7 +59,7 @@ class Model(yolo.Model):
 
     def forward_from(self, x, cut_layer=4, profile=False):
         y, dt = [], []  # outputs
-        for m in self:
+        for m in self.model:
             if m.i < cut_layer:
                 y.append(None)
                 continue
@@ -101,9 +101,9 @@ class Model(yolo.Model):
         else:
             return Model('yolov5s.yaml', Config().data.num_classes)
 
-    def train_loader(self, batch_size, trainset, cut_layer=None):
+    def train_loader(self, batch_size, trainset):
         """The train loader for training YOLOv5 using the COCO dataset."""
-        return coco.Dataset.get_train_loader(batch_size, trainset, cut_layer)
+        return coco.Dataset.get_train_loader(batch_size, trainset)
 
     def test_model(self, config, testset):  # pylint: disable=unused-argument
         """The testing loop for YOLOv5.
@@ -117,39 +117,41 @@ class Model(yolo.Model):
         test_loader = coco.Dataset.get_test_loader(config['batch_size'],
                                                    testset)
 
-        results, __, __ = test('packages/yolov5/yolov5/data/coco128.yaml',
-                               batch_size=config['batch_size'],
-                               imgsz=640,
-                               model=self,
-                               single_cls=False,
-                               dataloader=test_loader,
-                               save_dir='',
-                               verbose=False,
-                               plots=False,
-                               log_imgs=0,
-                               compute_loss=None)
+        results, *__ = test('packages/yolov5/yolov5/data/coco128.yaml',
+                            batch_size=config['batch_size'],
+                            imgsz=640,
+                            model=self,
+                            single_cls=False,
+                            dataloader=test_loader,
+                            save_dir='',
+                            verbose=False,
+                            plots=False,
+                            log_imgs=0,
+                            compute_loss=None)
         return results[2]
 
     def train_model(self, trainer, config, trainset, cut_layer=None):  # pylint: disable=unused-argument
         """The training loop for YOLOv5.
 
         Arguments:
-        config: a dictionary of configuration parameters.
+        trainer: The Trainer instance.
+        config: A dictionary of configuration parameters.
         trainset: The training dataset.
         cut_layer (optional): The layer which training should start from.
         """
 
-        logging.info("[Client #%s] Setting up training parameters.", trainer.client_id)
+        logging.info("[Client #%s] Setting up training parameters.",
+                     trainer.client_id)
 
         batch_size = config['batch_size']
+        total_batch_size = batch_size
         epochs = config['epochs']
 
         cuda = (trainer.device != 'cpu')
         nc = Config().data.num_classes  # number of classes
         names = Config().data.classes  # class names
-        total_batch_size = batch_size
 
-        with open('packages/yolov5/yolov5/data/hyp.scratch.yaml') as f:
+        with open(Config().trainer.train_params) as f:
             hyp = yaml.load(f, Loader=yaml.SafeLoader)  # load hyps
 
         freeze = []  # parameter names to freeze (full or partial)
@@ -160,19 +162,9 @@ class Model(yolo.Model):
                 v.requires_grad = False
 
         nbs = 64  # nominal batch size
-        accumulate = max(round(nbs / total_batch_size), 1)  # accumulate loss before optimizing
+        accumulate = max(round(nbs / total_batch_size),
+                         1)  # accumulate loss before optimizing
         hyp['weight_decay'] *= total_batch_size * accumulate / nbs  # scale weight_decay
-        logging.info("[Client #%s] Scaled weight_decay: %s", trainer.client_id, hyp['weight_decay'])
-
-        logging.info("[Client #%s] Loading the dataset.", trainer.client_id)
-
-        if cut_layer is None:
-            train_loader = self.train_loader(batch_size, trainset, cut_layer)
-        else:
-            train_loader = torch.utils.data.DataLoader(
-                trainset, batch_size=batch_size, shuffle=True)
-
-        nb = len(train_loader)
 
         # Sending the model to the device used for training
         self.to(trainer.device)
@@ -189,80 +181,118 @@ class Model(yolo.Model):
 
         # Initializing the optimizer
         if Config().trainer.optimizer == 'Adam':
-            optimizer = optim.Adam(pg0, lr=hyp['lr0'], betas=(hyp['momentum'], 0.999))  # adjust beta1 to momentum
+            optimizer = optim.Adam(pg0,
+                                   lr=hyp['lr0'],
+                                   betas=(hyp['momentum'],
+                                          0.999))  # adjust beta1 to momentum
         else:
-            optimizer = optim.SGD(pg0, lr=hyp['lr0'], momentum=hyp['momentum'], nesterov=True)
-        
-        optimizer.add_param_group({'params': pg1, 'weight_decay': hyp['weight_decay']})  # add pg1 with weight_decay
+            optimizer = optim.SGD(pg0,
+                                  lr=hyp['lr0'],
+                                  momentum=hyp['momentum'],
+                                  nesterov=True)
+
+        optimizer.add_param_group({
+            'params': pg1,
+            'weight_decay': hyp['weight_decay']
+        })  # add pg1 with weight_decay
         optimizer.add_param_group({'params': pg2})  # add pg2 (biases)
-        logging.info('[Client %s] Optimizer groups: %g .bias, %g conv.weight, %g other', trainer.client_id, len(pg2), len(pg1), len(pg0))
+        logging.info(
+            '[Client %s] Optimizer groups: %g .bias, %g conv.weight, %g other',
+            trainer.client_id, len(pg2), len(pg1), len(pg0))
         del pg0, pg1, pg2
 
         if Config().trainer.linear_lr:
-            lf = lambda x: (1 - x / (epochs - 1)) * (1.0 - hyp['lrf']) + hyp['lrf']  # linear
+            lf = lambda x: (1 - x / (epochs - 1)) * (1.0 - hyp['lrf']) + hyp[
+                'lrf']  # linear
         else:
             lf = one_cycle(1, hyp['lrf'], epochs)  # cosine 1->hyp['lrf']
         lr_schedule = lr_scheduler.LambdaLR(optimizer, lr_lambda=lf)
 
         # Image sizes
-        nl = self.model[-1].nl  # number of detection layers (used for scaling hyp['obj'])
+        nl = self.model[
+            -1].nl  # number of detection layers (used for scaling hyp['obj'])
+
+        # Trainloader
+        logging.info("[Client #%s] Loading the dataset.", trainer.client_id)
+        train_loader = self.train_loader(batch_size, trainset)
+        nb = len(train_loader)
 
         # Model parameters
         hyp['box'] *= 3. / nl  # scale to layers
         hyp['cls'] *= nc / 80. * 3. / nl  # scale to classes and layers
-        hyp['obj'] *= (Config().data.image_size / 640) ** 2 * 3. / nl  # scale to image size and layers
+        hyp['obj'] *= (Config().data.image_size /
+                       640)**2 * 3. / nl  # scale to image size and layers
         self.nc = nc  # attach number of classes to model
         self.hyp = hyp  # attach hyperparameters to model
         self.gr = 1.0  # iou loss ratio (obj_loss = 1.0 or iou)
         self.names = names
-        nw = max(round(hyp['warmup_epochs'] * nb), 1000)
-        scaler = amp.GradScaler(enabled=cuda)
-        optimizer.zero_grad()
 
-        # Initializing the loss criterion
-        compute_loss = ComputeLoss(self)  # init loss class
+        # Start training
+        nw = max(
+            round(hyp['warmup_epochs'] * nb),
+            1000)  # number of warmup iterations, max(3 epochs, 1k iterations)
+        scaler = amp.GradScaler(enabled=cuda)
+        compute_loss = ComputeLoss(self)
+
         for epoch in range(1, epochs + 1):
-            logging.info(('\n' + '%10s' * 8) % (
-                'Epoch', 'gpu_mem', 'box', 'obj', 'cls', 'total', 'targets', 'img_size'))
+            logging.info(
+                ('\n' + '%10s' * 8) % ('Epoch', 'gpu_mem', 'box', 'obj', 'cls',
+                                       'total', 'targets', 'img_size'))
             pbar = enumerate(train_loader)
             pbar = tqdm(pbar, total=nb)
-            mloss = torch.zeros(4, device=trainer.device)  # Initializing mean losses
+            mloss = torch.zeros(
+                4, device=trainer.device)  # Initializing mean losses
+            optimizer.zero_grad()
 
-            for batch_id, (examples, labels) in pbar:
-                ni = batch_id + nb * epoch
-                examples, labels = examples.to(trainer.device), labels.to(
-                        trainer.device)
+            for i, (imgs, targets, paths, _) in pbar:
+                ni = i + nb * epoch  # number integrated batches (since train start)
+                imgs = imgs.to(trainer.device, non_blocking=True).float(
+                ) / 255.0  # uint8 to float32, 0-255 to 0.0-1.0
 
+                # Warmup
                 if ni <= nw:
                     xi = [0, nw]  # x interp
-                    accumulate = max(1, np.interp(ni, xi, [1, nbs / total_batch_size]).round())
+                    accumulate = max(
+                        1,
+                        np.interp(ni, xi, [1, nbs / total_batch_size]).round())
                     for j, x in enumerate(optimizer.param_groups):
-                        x['lr'] = np.interp(ni, xi,
-                                            [hyp['warmup_bias_lr'] if j == 2 else 0.0, x['initial_lr'] * lf(epoch)])
+                        x['lr'] = np.interp(ni, xi, [
+                            hyp['warmup_bias_lr'] if j == 2 else 0.0,
+                            x['initial_lr'] * lf(epoch)
+                        ])
                         if 'momentum' in x:
-                            x['momentum'] = np.interp(ni, xi, [hyp['warmup_momentum'], hyp['momentum']])
+                            x['momentum'] = np.interp(
+                                ni, xi,
+                                [hyp['warmup_momentum'], hyp['momentum']])
 
+                # Forward
                 with amp.autocast(enabled=cuda):
                     if cut_layer is None:
-                            outputs = self(examples)
+                        pred = self(imgs)
                     else:
-                            outputs = self.forward_from(examples, cut_layer)
+                        pred = self.forward_from(imgs, cut_layer)
 
-                loss, loss_items = compute_loss(outputs, labels.to(trainer.device)) 
+                    loss, loss_items = compute_loss(
+                        pred, targets.to(
+                            trainer.device))  # loss scaled by batch_size
+
+                # Backward
                 scaler.scale(loss).backward()
 
-                # optimizer.step()
+                # Optimize
                 if ni % accumulate == 0:
                     scaler.step(optimizer)  # optimizer.step
                     scaler.update()
                     optimizer.zero_grad()
 
-                mloss = (mloss * batch_id + loss_items) / (batch_id + 1)  # update mean losses
-                mem = '%.3gG' % (
-                                torch.cuda.memory_reserved() / 1E9 if torch.cuda.is_available() else 0)  # (GB)
-                s = ('%10s' * 2 + '%10.4g' * 6) % (
-                                '%g/%g' % (epoch, epochs - 1), mem, *mloss, labels.shape[0], examples.shape[-1])
+                # Print
+                mloss = (mloss * i + loss_items) / (i + 1
+                                                    )  # update mean losses
+                mem = '%.3gG' % (torch.cuda.memory_reserved() / 1E9
+                                 if torch.cuda.is_available() else 0)  # (GB)
+                s = ('%10s' * 2 +
+                     '%10.4g' * 6) % ('%g/%g' % (epoch, epochs - 1), mem,
+                                      *mloss, targets.shape[0], imgs.shape[-1])
                 pbar.set_description(s)
 
-            if lr_schedule is not None:
-                lr_schedule.step()
+            lr_schedule.step()

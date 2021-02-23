@@ -17,19 +17,6 @@ from yolov5.utils.datasets import LoadImagesAndLabels
 from yolov5.utils.general import check_img_size
 
 
-class COCODataset(torch.utils.data.Dataset):
-    """Used to prepare the COCO dataset for a DataLoader in YOLOv5."""
-    def __init__(self, dataset):
-        self.dataset = dataset
-
-    def __len__(self):
-        return len(self.dataset)
-
-    def __getitem__(self, item):
-        image, label, _, _ = self.dataset[item]
-        return image / 255.0, label
-
-
 class Dataset(base.Dataset):
     """The COCO dataset."""
     def __init__(self, path):
@@ -111,17 +98,12 @@ class Dataset(base.Dataset):
         return self.test_set
 
     @staticmethod
-    def get_train_loader(batch_size, trainset, cut_layer=None):
+    def get_train_loader(batch_size, trainset):
         """The custom train loader for YOLOv5."""
-        if cut_layer:
-            return torch.utils.data.DataLoader(trainset,
-                                               batch_size=batch_size,
-                                               shuffle=True)
-        else:
-            return torch.utils.data.DataLoader(COCODataset(trainset),
-                                               batch_size=batch_size,
-                                               shuffle=True,
-                                               collate_fn=Dataset.collate_fn)
+        return torch.utils.data.DataLoader(trainset,
+                                           batch_size=batch_size,
+                                           shuffle=True,
+                                           collate_fn=LoadImagesAndLabels.collate_fn)
 
     @staticmethod
     def get_test_loader(batch_size, testset):
@@ -131,10 +113,3 @@ class Dataset(base.Dataset):
             batch_size=batch_size,
             shuffle=False,
             collate_fn=LoadImagesAndLabels.collate_fn)
-
-    @staticmethod
-    def collate_fn(batch):
-        img, label = zip(*batch)  # transposed
-        for i, l in enumerate(label):
-            l[:, 0] = i  # add target image index for build_targets()
-        return torch.stack(img, 0), torch.cat(label, 0)
