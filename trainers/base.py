@@ -5,6 +5,8 @@ Base class for trainers.
 from abc import ABC, abstractmethod
 import time
 import os
+from contextlib import closing
+
 from config import Config
 
 
@@ -13,29 +15,37 @@ class Trainer(ABC):
     def __init__(self, client_id):
         self.device = Config().device()
         self.client_id = client_id
-        Config().cursor.execute(
-            "CREATE TABLE IF NOT EXISTS trainers (run_id int)")
+        with Config().sql_connection:
+            with closing(Config().sql_connection.cursor()) as cursor:
+                cursor.execute(
+                    "CREATE TABLE IF NOT EXISTS trainers (run_id int)")
 
     def start_training(self):
         """Add to the list of running trainers if max_concurrency has not yet
         been reached."""
         with Config().sql_connection:
-            Config().cursor.execute("SELECT COUNT(*) FROM trainers")
-            trainer_count = Config().cursor.fetchone()[0]
+            with closing(Config().sql_connection.cursor()) as cursor:
+                cursor.execute("SELECT COUNT(*) FROM trainers")
+                trainer_count = cursor.fetchone()[0]
 
-            while trainer_count >= Config().trainer.max_concurrency:
-                time.sleep(2)
-                Config().cursor.execute("SELECT COUNT(*) FROM trainers")
-                trainer_count = Config().cursor.fetchone()[0]
+        while trainer_count >= Config().trainer.max_concurrency:
+            time.sleep(2)
+            with Config().sql_connection:
+                with closing(Config().sql_connection.cursor()) as cursor:
+                    cursor.execute("SELECT COUNT(*) FROM trainers")
+                    trainer_count = cursor.fetchone()[0]
 
-            Config().cursor.execute("INSERT INTO trainers VALUES (?)",
-                                    (self.client_id, ))
+        with Config().sql_connection:
+            with closing(Config().sql_connection.cursor()) as cursor:
+                cursor.execute("INSERT INTO trainers VALUES (?)",
+                               (self.client_id, ))
 
     def pause_training(self):
         """Remove from the list of running trainers."""
         with Config().sql_connection:
-            Config().cursor.execute("DELETE FROM trainers WHERE run_id = (?)",
-                                    (self.client_id, ))
+            with closing(Config().sql_connection.cursor()) as cursor:
+                cursor.execute("DELETE FROM trainers WHERE run_id = (?)",
+                               (self.client_id, ))
 
         model_type = Config().trainer.model
         model_dir = Config().params['model_dir']
@@ -50,7 +60,9 @@ class Trainer(ABC):
 
     def stop_training(self):
         """ Remove the trainers table after all training concluded."""
-        Config().cursor.execute("DROP TABLE trainers")
+        with Config().sql_connection:
+            with closing(Config().sql_connection.cursor()) as cursor:
+                cursor.execute("DROP TABLE trainers")
         Config().sql_connection.close()
 
     @abstractmethod
