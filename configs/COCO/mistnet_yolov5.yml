@@ -153,11 +153,9 @@ trainer:
 
     # Number of epoches for local training in each communication round
     epochs: 1
-    batch_size: 2
-    optimizer: SGD
-    learning_rate: 0.01
-    momentum: 0.9
-    weight_decay: 0.0
+    batch_size: 4
+    optimizer: Adam
+    linear_lr: false
 
     # The machine learning model
     model: yolov5

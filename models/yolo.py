@@ -103,9 +103,9 @@ class Model(yolo.Model):
         else:
             return Model('yolov5s.yaml', Config().data.num_classes)
 
-    def train_loader(self, batch_size, trainset):
+    def train_loader(self, batch_size, trainset, cut_layer=None):
         """The train loader for training YOLOv5 using the COCO dataset."""
-        return coco.Dataset.get_train_loader(batch_size, trainset)
+        return coco.Dataset.get_train_loader(batch_size, trainset, cut_layer)
 
     def test_model(self, config, testset):  # pylint: disable=unused-argument
         """The testing loop for YOLOv5.
@@ -216,7 +216,7 @@ class Model(yolo.Model):
 
         # Trainloader
         logging.info("[Client #%s] Loading the dataset.", trainer.client_id)
-        train_loader = self.train_loader(batch_size, trainset)
+        train_loader = self.train_loader(batch_size, trainset, cut_layer)
         nb = len(train_loader)
 
         # Model parameters
