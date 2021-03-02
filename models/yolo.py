@@ -103,9 +103,9 @@ class Model(yolo.Model):
         else:
             return Model('yolov5s.yaml', Config().data.num_classes)
 
-    def train_loader(self, batch_size, trainset, feature=None, cut_layer=None):
+    def train_loader(self, batch_size, trainset, extract_features=False, cut_layer=None):
         """The train loader for training YOLOv5 using the COCO dataset."""
-        return coco.Dataset.get_train_loader(batch_size, trainset, feature, cut_layer)
+        return coco.Dataset.get_train_loader(batch_size, trainset, extract_features, cut_layer)
 
     def test_model(self, config, testset):  # pylint: disable=unused-argument
         """The testing loop for YOLOv5.
@@ -119,10 +119,6 @@ class Model(yolo.Model):
         test_loader = coco.Dataset.get_test_loader(config['batch_size'],
                                                    testset)
 
-        if Config().algorithm.type == 'mistnet' :
-            mistnet = True
-        else:
-            mistnet = False
 
         results, *__ = test('packages/yolov5/yolov5/data/coco128.yaml',
                             batch_size=config['batch_size'],
@@ -134,8 +130,7 @@ class Model(yolo.Model):
                             verbose=False,
                             plots=False,
                             log_imgs=0,
-                            compute_loss=None,
-                            mistnet=mistnet)
+                            compute_loss=None)
         return results[2]
 
     def train_model(self, trainer, config, trainset, cut_layer=None):  # pylint: disable=unused-argument
