@@ -48,8 +48,8 @@ class Trainer(trainer.Trainer):
         _train_loader = getattr(self.model, "train_loader", None)
 
         if callable(_train_loader):
-            data_loader = self.model.train_loader(Config().trainer.batch_size,
-                                                  dataset)
+            data_loader = self.model.train_loader(
+		1,dataset,'features')
         else:
             data_loader = torch.utils.data.DataLoader(
                 dataset, batch_size=Config().trainer.batch_size, shuffle=True)

@@ -16,6 +16,11 @@ from datasets import base
 from yolov5.utils.datasets import LoadImagesAndLabels
 from yolov5.utils.general import check_img_size
 
+def collate_fn(batch):
+    img, label = zip(*batch)  # transposed
+    for i, l in enumerate(label):
+        l[:, 0] = i  # add target image index for build_targets()
+    return torch.stack(img, 0), torch.cat(label, 0)
 
 class COCODataset(torch.utils.data.Dataset):
     """Prepares the COCO dataset for use in YOLOv5."""
@@ -111,12 +116,18 @@ class Dataset(base.Dataset):
         return self.test_set
 
     @staticmethod
-    def get_train_loader(batch_size, trainset, cut_layer=None):
+    def get_train_loader(batch_size, trainset, feature=None, cut_layer=None):
         """The custom train loader for YOLOv5."""
-        if cut_layer is not None:
+        if feature is not None:
+            return torch.utils.data.DataLoader(
+                COCODataset(trainset),
+                batch_size=batch_size,
+                shuffle=False)
+        elif cut_layer is not None:
             return torch.utils.data.DataLoader(trainset,
                                                batch_size=batch_size,
-                                               shuffle=True)
+                                               shuffle=False,
+                collate_fn=collate_fn)
         else:
             return torch.utils.data.DataLoader(
                 COCODataset(trainset),

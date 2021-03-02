@@ -16,6 +16,7 @@ from yolov5.utils.general import coco80_to_coco91_class, check_dataset, check_fi
 from yolov5.utils.metrics import ap_per_class, ConfusionMatrix
 from yolov5.utils.plots import plot_images, output_to_target, plot_study_txt
 from yolov5.utils.torch_utils import select_device, time_synchronized
+from utils import unary_encoding
 
 
 def test(data,
@@ -36,7 +37,8 @@ def test(data,
          save_conf=False,  # save auto-label confidences
          plots=True,
          log_imgs=0,  # number of logged images
-         compute_loss=None):
+         compute_loss=None,
+	 mistnet=False):
     # Initialize/load model and set device
     training = model is not None
     if training:  # called by train.py
@@ -107,7 +109,14 @@ def test(data,
         with torch.no_grad():
             # Run model
             t = time_synchronized()
-            out, train_out = model(img, augment=augment)  # inference and training outputs
+            if mistnet:
+                logits = model.forward_to(img)
+                logits = logits.cpu().detach().numpy()
+                logits = unary_encoding.encode(logits)
+                logits = torch.from_numpy(logits.astype('float16'))
+                out, train_out = model.forward_from(logits.to(device))
+            else:
+                out, train_out = model(img)
             t0 += time_synchronized() - t
 
             # Compute loss
