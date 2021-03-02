@@ -4,6 +4,7 @@ from yolov5.utils.torch_utils import time_synchronized
 from yolov5.utils.loss import ComputeLoss
 from yolov5.test import test
 from yolov5.utils.general import one_cycle
+from yolov5.utils.datasets import LoadImagesAndLabels
 
 import logging
 from torch.cuda import amp
@@ -102,9 +103,9 @@ class Model(yolo.Model):
         else:
             return Model('yolov5s.yaml', Config().data.num_classes)
 
-    def train_loader(self, batch_size, trainset, cut_layer=None):
+    def train_loader(self, batch_size, trainset, extract_features=False, cut_layer=None):
         """The train loader for training YOLOv5 using the COCO dataset."""
-        return coco.Dataset.get_train_loader(batch_size, trainset, cut_layer)
+        return coco.Dataset.get_train_loader(batch_size, trainset, extract_features, cut_layer)
 
     def test_model(self, config, testset):  # pylint: disable=unused-argument
         """The testing loop for YOLOv5.
@@ -117,6 +118,7 @@ class Model(yolo.Model):
         assert Config().data.dataset == 'COCO'
         test_loader = coco.Dataset.get_test_loader(config['batch_size'],
                                                    testset)
+
 
         results, *__ = test('packages/yolov5/yolov5/data/coco128.yaml',
                             batch_size=config['batch_size'],
@@ -144,6 +146,7 @@ class Model(yolo.Model):
         logging.info("[Client #%s] Setting up training parameters.",
                      trainer.client_id)
 
+
         batch_size = config['batch_size']
         total_batch_size = batch_size
         epochs = config['epochs']
@@ -169,7 +172,7 @@ class Model(yolo.Model):
 
         # Sending the model to the device used for training
         self.to(trainer.device)
-        self.train()
+
 
         pg0, pg1, pg2 = [], [], []  # optimizer parameter groups
         for k, v in self.named_modules():
@@ -215,7 +218,7 @@ class Model(yolo.Model):
 
         # Trainloader
         logging.info("[Client #%s] Loading the dataset.", trainer.client_id)
-        train_loader = self.train_loader(batch_size, trainset, cut_layer)
+        train_loader = self.train_loader(batch_size, trainset, cut_layer=cut_layer)
         nb = len(train_loader)
 
         # Model parameters
@@ -236,6 +239,7 @@ class Model(yolo.Model):
         compute_loss = ComputeLoss(self)
 
         for epoch in range(1, epochs + 1):
+            self.train()
             logging.info(
                 ('\n' + '%10s' * 8) % ('Epoch', 'gpu_mem', 'box', 'obj', 'cls',
                                        'total', 'targets', 'img_size'))
@@ -274,8 +278,7 @@ class Model(yolo.Model):
                         pred = self.forward_from(imgs, cut_layer)
 
                     loss, loss_items = compute_loss(
-                        pred, targets.to(
-                            trainer.device))  # loss scaled by batch_size
+                        pred, targets)  # loss scaled by batch_size
 
                 # Backward
                 scaler.scale(loss).backward()
@@ -292,8 +295,9 @@ class Model(yolo.Model):
                 mem = '%.3gG' % (torch.cuda.memory_reserved() / 1E9
                                  if torch.cuda.is_available() else 0)  # (GB)
                 s = ('%10s' * 2 +
-                     '%10.4g' * 6) % ('%g/%g' % (epoch, epochs - 1), mem,
+                     '%10.4g' * 6) % ('%g/%g' % (epoch, epochs), mem,
                                       *mloss, targets.shape[0], imgs.shape[-1])
                 pbar.set_description(s)
 
             lr_schedule.step()
+
