@@ -11,16 +11,19 @@ import os
 import logging
 import torch
 
-from config import Config
-from datasets import base
 from yolov5.utils.datasets import LoadImagesAndLabels
 from yolov5.utils.general import check_img_size
+from config import Config
+from datasets import base
+
 
 def collate_fn(batch):
+    """Customized version for the MistNet server when cut_layer is used."""
     img, label = zip(*batch)  # transposed
     for i, l in enumerate(label):
         l[:, 0] = i  # add target image index for build_targets()
     return torch.stack(img, 0), torch.cat(label, 0)
+
 
 class COCODataset(torch.utils.data.Dataset):
     """Prepares the COCO dataset for use in YOLOv5."""
@@ -116,20 +119,24 @@ class Dataset(base.Dataset):
         return self.test_set
 
     @staticmethod
-    def get_train_loader(batch_size, trainset, extract_features=False, cut_layer=None):
+    def get_train_loader(batch_size,
+                         trainset,
+                         extract_features=False,
+                         cut_layer=None):
         """The custom train loader for YOLOv5."""
 
-
-        if extract_features:
-            return torch.utils.data.DataLoader(
-                COCODataset(trainset),
-                batch_size=batch_size,
-                shuffle=False)
+        if extract_features is not None:
+            # MistNet client: feature extraction
+            return torch.utils.data.DataLoader(COCODataset(trainset),
+                                               batch_size=batch_size,
+                                               shuffle=False)
         elif cut_layer is not None:
+            # MistNet server: training from the cut layer forwards using
+            # the features extracted on the client
             return torch.utils.data.DataLoader(trainset,
                                                batch_size=batch_size,
                                                shuffle=False,
-                collate_fn=collate_fn)
+                                               collate_fn=collate_fn)
         else:
             return torch.utils.data.DataLoader(
                 COCODataset(trainset),
