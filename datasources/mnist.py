@@ -3,23 +3,25 @@ The MNIST dataset.
 """
 from torchvision import datasets, transforms
 
+from config import Config
 from datasources import base
 
 
 class DataSource(base.DataSource):
     """The MNIST dataset."""
-    def __init__(self, path):
-        super().__init__(path)
+    def __init__(self):
+        super().__init__()
+        _path = Config().data.data_path
 
         _transform = transforms.Compose([
             transforms.ToTensor(),
             transforms.Normalize((0.1307, ), (0.3081, ))
         ])
-        self.trainset = datasets.MNIST(root=self._path,
+        self.trainset = datasets.MNIST(root=_path,
                                        train=True,
                                        download=True,
                                        transform=_transform)
-        self.testset = datasets.MNIST(root=self._path,
+        self.testset = datasets.MNIST(root=_path,
                                       train=False,
                                       download=True,
                                       transform=_transform)

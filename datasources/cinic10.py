@@ -14,16 +14,18 @@ from datasources import base
 
 class DataSource(base.DataSource):
     """The CINIC-10 dataset."""
-    def __init__(self, path):
-        super().__init__(path)
-        if not os.path.exists(path):
-            os.makedirs(path)
+    def __init__(self):
+        super().__init__()
+        _path = Config().data.data_path
+
+        if not os.path.exists(_path):
+            os.makedirs(_path)
 
         logging.info(
             "Downloading the CINIC-10 dataset. This may take a while.")
         url = Config().data.download_url
-        if not os.path.exists(path + url.split('/')[-1]):
-            DataSource.download(url, path)
+        if not os.path.exists(_path + url.split('/')[-1]):
+            DataSource.download(url, _path)
 
         _transform = transforms.Compose([
             transforms.ToTensor(),
