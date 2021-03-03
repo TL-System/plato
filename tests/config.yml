@@ -4,7 +4,7 @@ clients:
     do_test: true
 
 data:
-    dataset: MNIST
+    datasource: MNIST
     data_path: ./data
     divider: iid
     partition_size: 60000

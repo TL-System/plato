@@ -17,7 +17,7 @@ server:
 
 data:
     # The training and testing dataset
-    dataset: MNIST_mindspore
+    datasource: MNIST_mindspore
 
     # Where the dataset is located
     data_path: ./data
