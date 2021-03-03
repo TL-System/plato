@@ -7,3 +7,4 @@ matplotlib
 scipy
 wandb
 datasets
+feedback-transformer-pytorch
