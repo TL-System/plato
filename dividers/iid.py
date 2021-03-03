@@ -6,8 +6,8 @@ from utils import dists
 
 
 class IIDDivider(base.Divider):
-    def __init__(self, dataset):
-        super().__init__(dataset)
+    def __init__(self, datasource):
+        super().__init__(datasource)
         self.group()
 
     """Load IID data partitions."""

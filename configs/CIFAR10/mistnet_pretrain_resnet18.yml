@@ -9,7 +9,7 @@ clients:
     per_round: 1
 
     # Should the clients compute test accuracy locally?
-    do_test: false 
+    do_test: false
 
 server:
     address: localhost
@@ -17,7 +17,7 @@ server:
 
 data:
     # The training and testing dataset
-    dataset: CIFAR10 
+    datasource: CIFAR10
 
     # Where the dataset is located
     data_path: ./data
@@ -45,7 +45,7 @@ trainer:
     max_concurrency: 3
 
     # The target accuracy
-    target_accuracy: 0.90 
+    target_accuracy: 0.90
 
     # Number of epoches for local training in each communication round
     epochs: 1

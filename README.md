@@ -130,7 +130,7 @@ python server.py --config=config.yml --log=info
 
 ### Installing YOLOv5 as a Python package
 
-If object detection using the YOLOv5 model and the COCO dataset is needed, it is required to install YOLOv5 as a Python package first:
+If object detection using the YOLOv5 model and any of the COCO datasets is needed, it is required to install YOLOv5 as a Python package first:
 
 ```shell
 cd packages/yolov5

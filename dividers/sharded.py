@@ -13,8 +13,8 @@ class ShardedDivider(base.Divider):
     """
     Divide data into partitions with sharding, where data is to be horizontally partitioned.
     """
-    def __init__(self, dataset):
-        super().__init__(dataset)
+    def __init__(self, datasource):
+        super().__init__(datasource)
         self.shards = None
         self.__create_shards()
 

@@ -8,7 +8,7 @@ import os
 import asyncio
 
 from servers import FedAvgServer
-from datasets import registry as datasets_registry
+from datasources import registry as datasources_registry
 from config import Config
 from utils import csv_processor
 
@@ -66,8 +66,8 @@ class FedAvgCrossSiloServer(FedAvgServer):
 
             if hasattr(Config().server, 'do_test'):
                 if not Config().clients.do_test or Config().server.do_test:
-                    dataset = datasets_registry.get()
-                    self.testset = dataset.get_test_set()
+                    datasource = datasources_registry.get()
+                    self.testset = datasource.get_test_set()
 
             self.load_model()
 
@@ -82,8 +82,8 @@ class FedAvgCrossSiloServer(FedAvgServer):
 
             if hasattr(Config().server, 'do_test'):
                 if Config().clients.do_test and Config().server.do_test:
-                    dataset = datasets_registry.get()
-                    self.testset = dataset.get_test_set()
+                    datasource = datasources_registry.get()
+                    self.testset = datasource.get_test_set()
 
     async def customize_server_response(self, server_response):
         """Wrap up generating the server response with any additional information."""

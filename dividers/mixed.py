@@ -12,8 +12,8 @@ from config import Config
 
 class MixedDivider(base.Divider):
     """Load mixed data partitions."""
-    def __init__(self, dataset):
-        super().__init__(dataset)
+    def __init__(self, datasource):
+        super().__init__(datasource)
         self.sort_trainset()
 
         self.shards = None

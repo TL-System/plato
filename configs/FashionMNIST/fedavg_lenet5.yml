@@ -17,7 +17,7 @@ server:
 
 data:
     # The training and testing dataset
-    dataset: FashionMNIST
+    datasource: FashionMNIST
 
     # Where the dataset is located
     data_path: ./data

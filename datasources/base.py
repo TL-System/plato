@@ -1,0 +1,88 @@
+"""
+Base class for datasets.
+"""
+from abc import ABC, abstractstaticmethod
+
+import os
+import sys
+import logging
+import gzip
+import zipfile
+from urllib.parse import urlparse
+import requests
+
+
+class DataSource(ABC):
+    """
+    The training or testing dataset that accommodates custom augmentation and transforms.
+    """
+    def __init__(self, path):
+        self._path = path
+        self.trainset = None
+        self.testset = None
+
+    @staticmethod
+    def download(url, data_path):
+        """downloading the dataset from a URL."""
+        if not os.path.exists(data_path):
+            os.makedirs(data_path)
+
+        url_parse = urlparse(url)
+        file_name = os.path.join(data_path, url_parse.path.split('/')[-1])
+
+        if not os.path.exists(file_name.replace('.gz', '')):
+            logging.info("Downloading %s.", url)
+
+            res = requests.get(url, stream=True)
+            total_size = int(res.headers["Content-Length"])
+            downloaded_size = 0
+
+            with open(file_name, "wb+") as file:
+                for chunk in res.iter_content(chunk_size=1024):
+                    downloaded_size += len(chunk)
+                    file.write(chunk)
+                    file.flush()
+                    done = int(100 * downloaded_size / total_size)
+                    # show download progress
+                    sys.stdout.write("\r[{}{}] {:.2f}%".format(
+                        "█" * done, " " * (100 - done),
+                        100 * downloaded_size / total_size))
+                    sys.stdout.flush()
+                sys.stdout.write("\n")
+
+            # Unzip the compressed file just downloaded
+            name, suffix = os.path.splitext(file_name)
+            if suffix == '.zip':
+                logging.info("Extracting %s to %s.", file_name, data_path)
+                with zipfile.ZipFile(file_name, 'r') as zip_ref:
+                    zip_ref.extractall(data_path)
+            elif suffix == '.gz':
+                unzipped_file = open(name, 'wb')
+                zipped_file = gzip.GzipFile(file_name)
+                unzipped_file.write(zipped_file.read())
+                zipped_file.close()
+            else:
+                logging.info("Unknown compressed file type.")
+                sys.exit()
+
+    @abstractstaticmethod
+    def num_train_examples() -> int:
+        pass
+
+    @abstractstaticmethod
+    def num_test_examples() -> int:
+        pass
+
+    @abstractstaticmethod
+    def num_classes() -> int:
+        pass
+
+    def classes(self):
+        """Obtains a list of class names in the dataset."""
+        return list(self.trainset.classes)
+
+    def get_train_set(self):
+        return self.trainset
+
+    def get_test_set(self):
+        return self.testset

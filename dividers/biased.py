@@ -7,8 +7,8 @@ from config import Config
 
 class BiasedDivider(base.Divider):
     """Load and pass 'preference bias' data partitions."""
-    def __init__(self, dataset):
-        super().__init__(dataset)
+    def __init__(self, datasource):
+        super().__init__(datasource)
         self.group()
         self.shards = None
 

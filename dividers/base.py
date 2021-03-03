@@ -6,11 +6,11 @@ import random
 
 class Divider:
     """Base class for dividing data into partitions across the clients."""
-    def __init__(self, dataset):
-        """Get data from the dataset."""
-        self.trainset = dataset.get_train_set()
-        self.testset = dataset.get_test_set()
-        self.labels = dataset.classes()
+    def __init__(self, datasource):
+        """Get data from the data source."""
+        self.trainset = datasource.get_train_set()
+        self.testset = datasource.get_test_set()
+        self.labels = datasource.classes()
         self.partition = None
 
         random.seed()

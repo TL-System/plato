@@ -10,7 +10,7 @@ from collections import OrderedDict
 import wandb
 
 import models.registry as models_registry
-from datasets import registry as datasets_registry
+from datasources import registry as datasources_registry
 from trainers import registry as trainers_registry
 from servers import Server
 from config import Config
@@ -66,9 +66,8 @@ class FedAvgServer(Server):
         self.load_model()
 
         if not Config().clients.do_test:
-            dataset = datasets_registry.get()
+            dataset = datasources_registry.get()
             self.testset = dataset.get_test_set()
-
 
         # Initialize the csv file which will record results
         if hasattr(Config(), 'results'):

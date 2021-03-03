@@ -75,10 +75,10 @@ def main():
     __ = Config()
 
     if hasattr(Config(), 'results'):
-        dataset = Config().data.dataset
+        datasource = Config().data.datasource
         model = Config().trainer.model
         server_type = Config().algorithm.type
-        result_dir = f'./results/{dataset}/{model}/{server_type}/'
+        result_dir = f'./results/{datasource}/{model}/{server_type}/'
         result_csv_file = result_dir + 'result.csv'
         print(f"Plotting results located at {result_csv_file}.")
         plot_figures_from_dict(result_csv_file, result_dir)

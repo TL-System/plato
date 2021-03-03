@@ -17,7 +17,7 @@ server:
 
 data:
     # The training and testing dataset
-    dataset: CIFAR10
+    datasource: CIFAR10
 
     # Where the dataset is located
     data_path: ./data

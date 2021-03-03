@@ -8,7 +8,7 @@ import time
 from dataclasses import dataclass
 
 from models import registry as models_registry
-from datasets import registry as datasets_registry
+from datasources import registry as datasources_registry
 from trainers import registry as trainers_registry
 from dividers import iid, biased, sharded, iid_mindspore, mixed
 from utils import dists
@@ -52,15 +52,15 @@ class SimpleClient(Client):
     def load_data(self):
         """Generating data and loading them onto this client."""
         data_loading_start_time = time.time()
-        logging.info("[Client #%s] Loading its dataset...", self.client_id)
+        logging.info("[Client #%s] Loading its data source...", self.client_id)
 
-        dataset = datasets_registry.get()
+        datasource = datasources_registry.get()
         self.data_loaded = True
 
         logging.info("[Client #%s] Dataset size: %s", self.client_id,
-                     dataset.num_train_examples())
+                     datasource.num_train_examples())
         logging.info("[Client #%s] Number of classes: %s", self.client_id,
-                     dataset.num_classes())
+                     datasource.num_classes())
 
         # Setting up the data divider
         assert Config().data.divider in ('iid', 'biased', 'sharded',
@@ -74,7 +74,7 @@ class SimpleClient(Client):
             'sharded': sharded.ShardedDivider,
             'iid_mindspore': iid_mindspore.IIDDivider,
             'mixed': mixed.MixedDivider
-        }[Config().data.divider](dataset)
+        }[Config().data.divider](datasource)
 
         num_clients = Config().clients.total_clients
 
@@ -87,7 +87,7 @@ class SimpleClient(Client):
             partition_size = Config().data.partition_size
 
             assert partition_size * Config(
-            ).clients.per_round <= dataset.num_train_examples()
+            ).clients.per_round <= datasource.num_train_examples()
 
             self.data = self.divider.get_partition(partition_size)
 
@@ -123,7 +123,7 @@ class SimpleClient(Client):
 
         # Extract the trainset and testset if local testing is needed
         if Config().clients.do_test:
-            self.testset = dataset.get_test_set()
+            self.testset = datasource.get_test_set()
 
         self.trainset = self.data
         self.divider.partition = self.data

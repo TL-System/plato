@@ -1,6 +1,6 @@
 clients:
     # Type
-    type: mistnet 
+    type: mistnet
 
     # The total number of clients
     total_clients: 3
@@ -17,7 +17,7 @@ server:
 
 data:
     # The training and testing dataset
-    dataset: MNIST_mindspore
+    datasource: MNIST_mindspore
 
     # Where the dataset is located
     data_path: ./data
@@ -68,4 +68,3 @@ algorithm:
 
     cut_layer: pool1
     epsilon: null
-
