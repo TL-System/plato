@@ -33,12 +33,11 @@ if hasattr(Config().trainer, 'use_mindspore'):
 def get():
     """Get the data source with the provided name."""
     datasource_name = Config().data.datasource
-    data_path = Config().data.data_path
 
     logging.info("Data source: %s", Config().data.datasource)
 
     if datasource_name in registered_datasources:
-        dataset = registered_datasources[datasource_name].DataSource(data_path)
+        dataset = registered_datasources[datasource_name].DataSource()
     else:
         raise ValueError('No such data source: {}'.format(datasource_name))
 

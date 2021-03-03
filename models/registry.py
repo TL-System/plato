@@ -8,7 +8,7 @@ from config import Config
 
 registered_models = [
     lenet5.Model, resnet.Model, wideresnet.Model, vgg.Model,
-    feedback_transformer
+    feedback_transformer.Model
 ]
 
 if Config().trainer.model == 'yolov5':

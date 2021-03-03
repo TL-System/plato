@@ -40,18 +40,19 @@ class COCODataset(torch.utils.data.Dataset):
 
 class DataSource(base.DataSource):
     """The COCO dataset."""
-    def __init__(self, path):
-        super().__init__(path)
+    def __init__(self):
+        super().__init__()
+        _path = Config().data.data_path
 
-        if not os.path.exists(path):
-            os.makedirs(path)
+        if not os.path.exists(self._path):
+            os.makedirs(self._path)
 
         logging.info("Downloading the COCO dataset. This may take a while.")
 
         urls = Config().data.download_urls
         for url in urls:
-            if not os.path.exists(path + url.split('/')[-1]):
-                DataSource.download(url, path)
+            if not os.path.exists(_path + url.split('/')[-1]):
+                DataSource.download(url, _path)
 
         assert 'grid_size' in Config().params
 

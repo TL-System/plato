@@ -17,12 +17,13 @@ from datasources import base
 
 class DataSource(base.DataSource):
     """The MNIST dataset."""
-    def __init__(self, path):
-        super().__init__(path)
+    def __init__(self):
+        super().__init__()
+        _path = Config().data.data_path
 
         # Downloading the MNIST dataset from http://yann.lecun.com/exdb/mnist/
-        self.train_path = self._path + "/MNIST/raw/train/"
-        self.test_path = self._path + "/MNIST/raw/test/"
+        self.train_path = _path + "/MNIST/raw/train/"
+        self.test_path = _path + "/MNIST/raw/test/"
 
         for data_path in [self.train_path, self.test_path]:
             if not os.path.exists(data_path):
