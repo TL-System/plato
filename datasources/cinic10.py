@@ -35,14 +35,8 @@ class DataSource(base.DataSource):
         self.testset = datasets.ImageFolder(root=self.cinic_path + '/test',
                                             transform=_transform)
 
-    @staticmethod
-    def num_train_examples():
+    def num_train_examples(self):
         return 90000
 
-    @staticmethod
-    def num_test_examples():
+    def num_test_examples(self):
         return 90000
-
-    @staticmethod
-    def num_classes():
-        return 10

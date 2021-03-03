@@ -1,7 +1,7 @@
 """
 Base class for datasets.
 """
-from abc import ABC, abstractstaticmethod
+from abc import ABC, abstractmethod
 
 import os
 import sys
@@ -65,16 +65,12 @@ class DataSource(ABC):
                 logging.info("Unknown compressed file type.")
                 sys.exit()
 
-    @abstractstaticmethod
-    def num_train_examples() -> int:
+    @abstractmethod
+    def num_train_examples(self) -> int:
         pass
 
-    @abstractstaticmethod
-    def num_test_examples() -> int:
-        pass
-
-    @abstractstaticmethod
-    def num_classes() -> int:
+    @abstractmethod
+    def num_test_examples(self) -> int:
         pass
 
     def classes(self):

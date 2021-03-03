@@ -62,17 +62,11 @@ class DataSource(base.DataSource):
         self.train_set = None
         self.test_set = None
 
-    @staticmethod
-    def num_train_examples():
+    def num_train_examples(self):
         return Config().data.num_train_examples
 
-    @staticmethod
-    def num_test_examples():
+    def num_test_examples(self):
         return Config().data.num_test_examples
-
-    @staticmethod
-    def num_classes():
-        return Config().data.num_classes
 
     def classes(self):
         """Obtains a list of class names in the dataset."""

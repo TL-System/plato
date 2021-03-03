@@ -71,17 +71,11 @@ class DataSource(base.DataSource):
 
         return dataset
 
-    @staticmethod
-    def num_train_examples():
+    def num_train_examples(self):
         return 60000
 
-    @staticmethod
-    def num_test_examples():
+    def num_test_examples(self):
         return 10000
-
-    @staticmethod
-    def num_classes():
-        return 10
 
     def get_train_set(self):
         dataset = ds.MnistDataset(dataset_dir=self.train_path)
