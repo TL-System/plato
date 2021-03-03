@@ -5,14 +5,15 @@ based on a configuration at run-time.
 
 import logging
 
-from datasources import mnist, fashion_mnist, cifar10, cinic10
+from datasources import mnist, fashion_mnist, cifar10, cinic10, huggingface
 from config import Config
 
 registered_datasources = {
     'MNIST': mnist,
     'FashionMNIST': fashion_mnist,
     'CIFAR10': cifar10,
-    'CINIC10': cinic10
+    'CINIC10': cinic10,
+    'HuggingFace': huggingface
 }
 
 if Config().data.datasource == 'COCO':

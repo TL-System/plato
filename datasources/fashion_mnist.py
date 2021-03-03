@@ -26,14 +26,8 @@ class DataSource(base.DataSource):
                                              download=True,
                                              transform=_transform)
 
-    @staticmethod
-    def num_train_examples():
+    def num_train_examples(self):
         return 60000
 
-    @staticmethod
-    def num_test_examples():
+    def num_test_examples(self):
         return 10000
-
-    @staticmethod
-    def num_classes():
-        return 10

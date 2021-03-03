@@ -59,8 +59,6 @@ class SimpleClient(Client):
 
         logging.info("[Client #%s] Dataset size: %s", self.client_id,
                      datasource.num_train_examples())
-        logging.info("[Client #%s] Number of classes: %s", self.client_id,
-                     datasource.num_classes())
 
         # Setting up the data divider
         assert Config().data.divider in ('iid', 'biased', 'sharded',
