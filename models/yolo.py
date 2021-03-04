@@ -8,7 +8,6 @@ import yaml
 
 from yolov5.models import yolo
 from yolov5.utils.loss import ComputeLoss
-from yolov5.utils.datasets import LoadImagesAndLabels
 from yolov5.utils.general import check_dataset, box_iou, non_max_suppression, scale_coords, xywh2xyxy, one_cycle
 from yolov5.utils.metrics import ap_per_class
 from yolov5.utils.torch_utils import time_synchronized
