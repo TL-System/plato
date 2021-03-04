@@ -2,13 +2,16 @@
 The base class for federated learning servers.
 """
 
-from abc import abstractmethod
+from abc import abstractmethod, abstractstaticmethod
 import os
 import sys
 import logging
+import time
 import subprocess
 import pickle
 import websockets
+import asyncio
+from contextlib import closing
 
 from config import Config
 
@@ -24,6 +27,36 @@ class Server:
         self.trainer = None
         self.accuracy = 0
         self.reports = []
+
+    def run(self):
+        """Start a run loop for the server. """
+        # Remove the running trainers table from previous runs.
+        with Config().sql_connection:
+            with closing(Config().sql_connection.cursor()) as cursor:
+                cursor.execute("DROP TABLE IF EXISTS trainers")
+
+        self.configure()
+
+        logging.info("Starting a server on port %s.", Config().server.port)
+        start_server = websockets.serve(self.serve,
+                                        Config().server.address,
+                                        Config().server.port,
+                                        ping_interval=None,
+                                        max_size=2**30)
+
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(start_server)
+
+        if Config().is_central_server():
+            # In cross-silo FL, the central server lets edge servers start first
+            # Then starts their clients
+            self.start_clients(as_server=True)
+
+            # Allowing some time for the edge servers to start
+            time.sleep(5)
+
+        self.start_clients()
+        loop.run_forever()
 
     def register_client(self, client_id, websocket):
         """Adding a newly arrived client to the list of clients."""
@@ -211,3 +244,11 @@ class Server:
     @abstractmethod
     async def process_reports(self):
         """Process the reports after all clients have sent them to the server."""
+
+    @abstractstaticmethod
+    def is_valid_server_type(server_type):
+        """Determine if the server type is valid. """
+
+    @abstractstaticmethod
+    def get_server():
+        """Returns an instance of this server. """

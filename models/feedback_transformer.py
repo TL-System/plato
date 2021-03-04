@@ -13,15 +13,15 @@ from config import Config
 class Model(FeedbackTransformer):
     """The Feedback Transformer model for language modeling. """
     @staticmethod
-    def is_valid_model_name(model_name):
-        return model_name == 'feedback_transformer'
+    def is_valid_model_type(model_type):
+        return model_type == 'feedback_transformer'
 
     @staticmethod
-    def get_model_from_name(model_name):
+    def get_model_from_type(model_type):
         """Obtaining an instance of this model provided that the name is valid."""
 
-        if not Model.is_valid_model_name(model_name):
-            raise ValueError('Invalid model name: {}'.format(model_name))
+        if not Model.is_valid_model_type(model_type):
+            raise ValueError('Invalid model name: {}'.format(model_type))
 
         num_tokens = Config().trainer.num_tokens if hasattr(
             Config().trainer, 'num_tokens') else 20000

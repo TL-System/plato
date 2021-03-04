@@ -194,3 +194,13 @@ class FedAvgServer(Server):
             accuracy += report.accuracy * (report.num_samples / total_samples)
 
         return accuracy
+
+    @staticmethod
+    def is_valid_server_type(server_type):
+        """Determine if the server type is valid. """
+        return server_type == 'fedavg'
+
+    @staticmethod
+    def get_server():
+        """Returns an instance of this server. """
+        return FedAvgServer()

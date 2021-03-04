@@ -14,6 +14,7 @@ from mindspore.common.initializer import Normal
 import models.base_mindspore as base_mindspore
 from config import Config
 
+
 class Model(base_mindspore.Model):
     """The LeNet-5 model.
 
@@ -103,15 +104,15 @@ class Model(base_mindspore.Model):
         return x
 
     @staticmethod
-    def is_valid_model_name(model_name):
-        return model_name == 'lenet5_mindspore'
+    def is_valid_model_type(model_type):
+        return model_type == 'lenet5_mindspore'
 
     @staticmethod
-    def get_model_from_name(model_name):
+    def get_model_from_type(model_type):
         """Obtaining an instance of this model provided that the name is valid."""
 
-        if not Model.is_valid_model_name(model_name):
-            raise ValueError('Invalid model name: {}'.format(model_name))
+        if not Model.is_valid_model_type(model_type):
+            raise ValueError('Invalid model name: {}'.format(model_type))
 
         num_classes = 10
         if hasattr(Config().trainer, 'num_classes'):

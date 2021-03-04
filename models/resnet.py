@@ -160,17 +160,17 @@ class Model(base.Model):
         return out
 
     @staticmethod
-    def is_valid_model_name(model_name):
-        return (model_name.startswith('resnet_')
-                and len(model_name.split('_')) == 2
-                and int(model_name.split('_')[1]) in [18, 34, 50, 101, 152])
+    def is_valid_model_type(model_type):
+        return (model_type.startswith('resnet_')
+                and len(model_type.split('_')) == 2
+                and int(model_type.split('_')[1]) in [18, 34, 50, 101, 152])
 
     @staticmethod
-    def get_model_from_name(model_name):
-        if not Model.is_valid_model_name(model_name):
-            raise ValueError('Invalid model name: {}'.format(model_name))
+    def get_model_from_type(model_type):
+        if not Model.is_valid_model_type(model_type):
+            raise ValueError('Invalid model name: {}'.format(model_type))
 
-        resnet_type = int(model_name.split('_')[1])
+        resnet_type = int(model_type.split('_')[1])
 
         if resnet_type == 18:
             return Model(BasicBlock, [2, 2, 2, 2])
@@ -183,4 +183,4 @@ class Model(base.Model):
         elif resnet_type == 152:
             return Model(Bottleneck, [3, 8, 36, 3])
         else:
-            raise ValueError('Invalid model name: {}'.format(model_name))
+            raise ValueError('Invalid model name: {}'.format(model_type))

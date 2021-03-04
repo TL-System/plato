@@ -20,15 +20,15 @@ if hasattr(Config().trainer, 'use_mindspore'):
     registered_models += [lenet5_mindspore.Model]
 
 
-def get(model_name):
-    """Get the model with the provided name."""
+def get(model_type):
+    """Get the model with the provided type."""
     model = None
     for registered_model in registered_models:
-        if registered_model.is_valid_model_name(model_name):
-            model = registered_model.get_model_from_name(model_name)
+        if registered_model.is_valid_model_type(model_type):
+            model = registered_model.get_model_from_type(model_type)
             break
 
     if model is None:
-        raise ValueError('No such model: {}'.format(model_name))
+        raise ValueError('No such model: {}'.format(model_type))
 
     return model

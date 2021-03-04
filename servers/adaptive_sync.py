@@ -19,3 +19,13 @@ class AdaptiveSyncServer(FedAvgServer):
         """Customizing the server response with any additional information."""
         server_response['sync_frequency'] = self.trainer.sync_frequency
         return server_response
+
+    @staticmethod
+    def is_valid_server_type(server_type):
+        """Determine if the server type is valid. """
+        return server_type == 'adaptive_sync'
+
+    @staticmethod
+    def get_server():
+        """Returns an instance of this server. """
+        return AdaptiveSyncServer()

@@ -11,9 +11,9 @@ class Model(ABC, nn.Module):
         """The forward pass."""
 
     @abstractstaticmethod
-    def is_valid_model_name(model_name: str) -> bool:
+    def is_valid_model_type(model_type: str) -> bool:
         """Is the model name string a valid name for models in this class?"""
 
     @abstractstaticmethod
-    def get_model_from_name(model_name: str) -> 'Model':
-        """Returns an instance of this class as described by the model_name string."""
+    def get_model_from_type(model_type: str) -> 'Model':
+        """Returns an instance of this class as described by the model_type string."""

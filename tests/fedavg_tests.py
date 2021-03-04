@@ -18,11 +18,11 @@ from servers import fedavg
 
 class InnerProductModel(Model):
     @staticmethod
-    def is_valid_model_name(model_name):
+    def is_valid_model_type(model_type):
         raise NotImplementedError
 
     @staticmethod
-    def get_model_from_name(model_name):
+    def get_model_from_type(model_type):
         raise NotImplementedError
 
     @property
