@@ -18,6 +18,7 @@ server:
 data:
     # The training and testing dataset
     datasource: COCO
+    data_params: packages/yolov5/yolov5/data/coco128.yaml
 
     # Where the dataset is located
     data_path: ./data/COCO
@@ -152,9 +153,9 @@ trainer:
     target_accuracy: 0.99
 
     # Number of epoches for local training in each communication round
-    epochs: 1
-    batch_size: 4
-    optimizer: Adam
+    epochs: 5
+    batch_size: 16
+    optimizer: SGD
     linear_lr: false
 
     # The machine learning model
@@ -162,9 +163,10 @@ trainer:
     model_config: packages/yolov5/yolov5/models/yolov5s.yaml
     train_params: packages/yolov5/yolov5/data/hyp.scratch.yaml
 
+
 algorithm:
     # Aggregation algorithm
     type: mistnet
 
     cut_layer: 4
-    epsilon: null
+    epsilon: 100
