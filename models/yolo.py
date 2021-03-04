@@ -7,10 +7,12 @@ import numpy as np
 import yaml
 
 from yolov5.models import yolo
-from yolov5.utils.torch_utils import time_synchronized
 from yolov5.utils.loss import ComputeLoss
-from yolov5.test import test
-from yolov5.utils.general import one_cycle
+from yolov5.utils.datasets import LoadImagesAndLabels
+from yolov5.utils.general import check_dataset, box_iou, non_max_suppression, scale_coords, xywh2xyxy, one_cycle
+from yolov5.utils.metrics import ap_per_class
+from yolov5.utils.torch_utils import time_synchronized
+from utils import unary_encoding
 
 from torch.cuda import amp
 import torch.optim.lr_scheduler as lr_scheduler
@@ -18,6 +20,7 @@ from tqdm import tqdm
 
 from config import Config
 from datasources import coco
+
 
 try:
     import thop  # for FLOPS computation
@@ -120,22 +123,119 @@ class Model(yolo.Model):
             model: The model.
             testset: The test dataset.
         """
-        assert Config().data.datasource == 'COCO'
-        test_loader = coco.DataSource.get_test_loader(config['batch_size'],
-                                                      testset)
+        assert Config().data.dataset == 'COCO'
+        test_loader = coco.Dataset.get_test_loader(config['batch_size'], testset)
 
-        results, *__ = test('packages/yolov5/yolov5/data/coco128.yaml',
-                            batch_size=config['batch_size'],
-                            imgsz=640,
-                            model=self,
-                            single_cls=False,
-                            dataloader=test_loader,
-                            save_dir='',
-                            verbose=False,
-                            plots=False,
-                            log_imgs=0,
-                            compute_loss=None)
-        return results[2]
+        device = next(self.parameters()).device  # get model device
+
+        # Configure
+        self.eval()
+        with open(Config().data.data_params) as f:
+            data = yaml.load(f, Loader=yaml.SafeLoader)  # model dict
+        check_dataset(data)  # check
+        nc = Config().data.num_classes  # number of classes
+        iouv = torch.linspace(0.5, 0.95, 10).to(device)  # iou vector for mAP@0.5:0.95
+        niou = iouv.numel()
+
+        seen = 0
+        names = {k: v for k, v in enumerate(self.names if hasattr(self, 'names')
+                                            else self.module.names)}
+        s = ('%20s' + '%12s' * 6) % \
+            ('Class', 'Images', 'Targets', 'P', 'R', 'mAP@.5', 'mAP@.5:.95')
+        p, r, f1, mp, mr, map50, map, = 0., 0., 0., 0., 0., 0., 0.
+        stats, ap, ap_class = [], [], []
+
+        for batch_i, (img, targets, paths, shapes) in enumerate(tqdm(test_loader, desc=s)):
+            img = img.to(device, non_blocking=True).float()
+            img /= 255.0  # 0 - 255 to 0.0 - 1.0
+            targets = targets.to(device)
+            nb, _, height, width = img.shape  # batch size, channels, height, width
+
+            with torch.no_grad():
+                # Run model
+                if Config().algorithm.type == 'mistnet':
+                    logits = self.forward_to(img)
+                    logits = logits.cpu().detach().numpy()
+                    logits = unary_encoding.encode(logits)
+                    logits = torch.from_numpy(logits.astype('float32'))
+                    out, train_out = self.forward_from(logits.to(device))
+                else:
+                    out, train_out = self(img)
+
+                # Run NMS
+                targets[:, 2:] *= torch.Tensor([width, height, width, height]).to(device)  # to pixels
+                lb = []  # for autolabelling
+                out = non_max_suppression(out, conf_thres=0.001, iou_thres=0.6,
+                                          labels=lb, multi_label=True)
+
+            # Statistics per image
+            for si, pred in enumerate(out):
+                labels = targets[targets[:, 0] == si, 1:]
+                nl = len(labels)
+                tcls = labels[:, 0].tolist() if nl else []  # target class
+                seen += 1
+
+                if len(pred) == 0:
+                    if nl:
+                        stats.append((torch.zeros(0, niou, dtype=torch.bool),
+                                      torch.Tensor(), torch.Tensor(), tcls))
+                    continue
+
+                # Predictions
+                predn = pred.clone()
+                scale_coords(img[si].shape[1:], predn[:, :4],
+                             shapes[si][0], shapes[si][1])  # native-space pred
+
+                # Assign all predictions as incorrect
+                correct = torch.zeros(pred.shape[0], niou, dtype=torch.bool, device=device)
+                if nl:
+                    detected = []  # target indices
+                    tcls_tensor = labels[:, 0]
+
+                    # target boxes
+                    tbox = xywh2xyxy(labels[:, 1:5])
+                    scale_coords(img[si].shape[1:], tbox,
+                                 shapes[si][0], shapes[si][1])  # native-space labels
+
+                    # Per target class
+                    for cls in torch.unique(tcls_tensor):
+                        ti = (cls == tcls_tensor).nonzero(as_tuple=False).view(-1)  # prediction indices
+                        pi = (cls == pred[:, 5]).nonzero(as_tuple=False).view(-1)  # target indices
+
+                        # Search for detections
+                        if pi.shape[0]:
+                            # Prediction to target ious
+                            ious, i = box_iou(predn[pi, :4], tbox[ti]).max(1)  # best ious, indices
+
+                            # Append detections
+                            detected_set = set()
+                            for j in (ious > iouv[0]).nonzero(as_tuple=False):
+                                d = ti[i[j]]  # detected target
+                                if d.item() not in detected_set:
+                                    detected_set.add(d.item())
+                                    detected.append(d)
+                                    correct[pi[j]] = ious[j] > iouv  # iou_thres is 1xn
+                                    if len(detected) == nl:  # all targets already located in image
+                                        break
+
+                # Append statistics (correct, conf, pcls, tcls)
+                stats.append((correct.cpu(), pred[:, 4].cpu(), pred[:, 5].cpu(), tcls))
+
+        # Compute statistics
+        stats = [np.concatenate(x, 0) for x in zip(*stats)]  # to numpy
+        if len(stats) and stats[0].any():
+            p, r, ap, f1, ap_class = ap_per_class(*stats, plot=False, save_dir='', names=names)
+            ap50, ap = ap[:, 0], ap.mean(1)  # AP@0.5, AP@0.5:0.95
+            mp, mr, map50, map = p.mean(), r.mean(), ap50.mean(), ap.mean()
+            nt = np.bincount(stats[3].astype(np.int64), minlength=nc)  # number of targets per class
+        else:
+            nt = torch.zeros(1)
+
+        # Print results
+        pf = '%20s' + '%12.3g' * 6  # print format
+        print(pf % ('all', seen, nt.sum(), mp, mr, map50, map))
+
+        return map50
 
     def train_model(self, trainer, config, trainset, cut_layer=None):  # pylint: disable=unused-argument
         """The training loop for YOLOv5.
