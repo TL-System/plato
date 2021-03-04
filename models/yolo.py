@@ -87,15 +87,15 @@ class Model(yolo.Model):
         return x
 
     @staticmethod
-    def is_valid_model_name(model_name):
-        return model_name == 'yolov5'
+    def is_valid_model_type(model_type):
+        return model_type == 'yolov5'
 
     @staticmethod
-    def get_model_from_name(model_name):
+    def get_model_from_type(model_type):
         """Obtaining an instance of this model provided that the name is valid."""
 
-        if not Model.is_valid_model_name(model_name):
-            raise ValueError('Invalid model name: {}'.format(model_name))
+        if not Model.is_valid_model_type(model_type):
+            raise ValueError('Invalid model name: {}'.format(model_type))
 
         if hasattr(Config().trainer, 'model_config'):
             return Model(Config().trainer.model_config,

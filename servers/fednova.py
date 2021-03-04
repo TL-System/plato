@@ -57,3 +57,13 @@ class FedNovaServer(FedAvgServer):
             updated_weights[name] = weight + avg_update[name]
 
         return updated_weights
+
+    @staticmethod
+    def is_valid_server_type(server_type):
+        """Determine if the server type is valid. """
+        return server_type == 'fednova'
+
+    @staticmethod
+    def get_server():
+        """Returns an instance of this server. """
+        return FedNovaServer()

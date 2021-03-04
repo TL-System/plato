@@ -131,13 +131,13 @@ class Model(base.Model):
         return self.fc(out)
 
     @staticmethod
-    def is_valid_model_name(model_name):
-        return model_name.startswith('wideresnet')
+    def is_valid_model_type(model_type):
+        return model_type.startswith('wideresnet')
 
     @staticmethod
-    def get_model_from_name(model_name):
-        if not Model.is_valid_model_name(model_name):
-            raise ValueError('Invalid model name: {}'.format(model_name))
+    def get_model_from_type(model_type):
+        if not Model.is_valid_model_type(model_type):
+            raise ValueError('Invalid model name: {}'.format(model_type))
 
         # 40 layers
         return Model(Config().trainer.num_layers, Config().trainer.num_classes)

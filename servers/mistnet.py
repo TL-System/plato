@@ -46,3 +46,13 @@ class MistNetServer(FedAvgServer):
             os.getpid(), 100 * self.accuracy))
 
         await self.wrap_up_processing_reports()
+
+    @staticmethod
+    def is_valid_server_type(server_type):
+        """Determine if the server type is valid. """
+        return server_type == 'mistnet'
+
+    @staticmethod
+    def get_server():
+        """Returns an instance of this server. """
+        return MistNetServer()

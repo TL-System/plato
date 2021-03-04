@@ -45,20 +45,20 @@ class Model(base.Model):
         return x
 
     @staticmethod
-    def is_valid_model_name(model_name):
-        return (model_name.startswith('vgg')
-                and len(model_name.split('_')) == 2
-                and model_name.split('_')[1].isdigit()
-                and int(model_name.split('_')[1]) in [11, 13, 16, 19])
+    def is_valid_model_type(model_type):
+        return (model_type.startswith('vgg')
+                and len(model_type.split('_')) == 2
+                and model_type.split('_')[1].isdigit()
+                and int(model_type.split('_')[1]) in [11, 13, 16, 19])
 
     @staticmethod
-    def get_model_from_name(model_name):
-        if not Model.is_valid_model_name(model_name):
-            raise ValueError('Invalid model name: {}'.format(model_name))
+    def get_model_from_type(model_type):
+        if not Model.is_valid_model_type(model_type):
+            raise ValueError('Invalid model name: {}'.format(model_type))
 
         outputs = Config().trainer.num_classes or 10
 
-        num = int(model_name.split('_')[1])
+        num = int(model_type.split('_')[1])
         if num == 11:
             plan = [64, 'M', 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512]
         elif num == 13:
@@ -77,6 +77,6 @@ class Model(base.Model):
                 512, 512, 'M', 512, 512, 512, 512
             ]
         else:
-            raise ValueError('Unknown VGG model: {}'.format(model_name))
+            raise ValueError('Unknown VGG model: {}'.format(model_type))
 
         return Model(plan, outputs)

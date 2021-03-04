@@ -170,3 +170,13 @@ class FedAvgCrossSiloServer(FedAvgServer):
         """Wrapping up when each round of training is done."""
         if Config().is_central_server():
             await super().wrap_up()
+
+    @staticmethod
+    def is_valid_server_type(server_type):
+        """Determine if the server type is valid. """
+        return server_type == 'fedavg_cs'
+
+    @staticmethod
+    def get_server():
+        """Returns an instance of this server. """
+        return FedAvgCrossSiloServer()

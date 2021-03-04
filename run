@@ -1,0 +1,19 @@
+#!/usr/bin/env python
+"""
+Starting point for a Plato federated learning training session.
+"""
+
+from config import Config
+from servers import registry as server_registry
+
+
+def main():
+    """Starting point for a Plato federated learning training session. """
+    __ = Config()
+
+    server = server_registry.get(Config().algorithm.type)
+    server.run()
+
+
+if __name__ == "__main__":
+    main()
