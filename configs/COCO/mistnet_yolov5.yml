@@ -17,7 +17,7 @@ server:
 
 data:
     # The training and testing dataset
-    dataset: COCO
+    datasource: COCO
     data_params: packages/yolov5/yolov5/data/coco128.yaml
 
     # Where the dataset is located
@@ -162,7 +162,6 @@ trainer:
     model: yolov5
     model_config: packages/yolov5/yolov5/models/yolov5s.yaml
     train_params: packages/yolov5/yolov5/data/hyp.scratch.yaml
-
 
 
 algorithm:
