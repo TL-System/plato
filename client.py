@@ -32,7 +32,9 @@ def main():
                 "mistnet": servers.mistnet.MistNetServer,
                 "adaptive_sync": servers.adaptive_sync.AdaptiveSyncServer,
                 "rhythm": servers.rhythm.RhythmServer,
-                "tempo": servers.tempo.TempoServer
+                "tempo": servers.tempo.TempoServer,
+                "scaffold": servers.scaffold.ScaffoldServer,
+                "fedsarah": servers.fedsarah.FedSarahServer
             }[Config().algorithm.type]()
             server.configure()
 
@@ -59,7 +61,8 @@ def main():
                 "adaptive_sync": clients.adaptive_sync.AdaptiveSyncClient,
                 "fednova": clients.fednova.FedNovaClient,
                 "tempo": clients.tempo.TempoClient,
-                "scaffold": clients.scaffold.ScaffoldClient
+                "scaffold": clients.scaffold.ScaffoldClient,
+                "fedsarah": clients.fedsarah.FedSarahClient
             }[Config().clients.type]()
             logging.info("Starting a %s client.", Config().clients.type)
             client.configure()
