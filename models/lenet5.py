@@ -12,7 +12,7 @@ import torch.nn.functional as F
 from models import base
 
 
-class Model(base.Model):
+class Model(base.Model, nn.Module):
     """The LeNet-5 model.
 
     Arguments:
@@ -125,6 +125,6 @@ class Model(base.Model):
         """Obtaining an instance of this model provided that the name is valid."""
 
         if not Model.is_valid_model_type(model_type):
-            raise ValueError('Invalid model name: {}'.format(model_type))
+            raise ValueError('Invalid model type: {}'.format(model_type))
 
         return Model()

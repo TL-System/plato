@@ -11,11 +11,11 @@ import numpy as np
 import mindspore.nn as nn
 from mindspore.common.initializer import Normal
 
-import models.base_mindspore as base_mindspore
 from config import Config
+from models import base
 
 
-class Model(base_mindspore.Model):
+class Model(base.Model, nn.Cell):
     """The LeNet-5 model.
 
     Arguments:
@@ -112,7 +112,7 @@ class Model(base_mindspore.Model):
         """Obtaining an instance of this model provided that the name is valid."""
 
         if not Model.is_valid_model_type(model_type):
-            raise ValueError('Invalid model name: {}'.format(model_type))
+            raise ValueError('Invalid model type: {}'.format(model_type))
 
         num_classes = 10
         if hasattr(Config().trainer, 'num_classes'):

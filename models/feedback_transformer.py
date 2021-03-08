@@ -7,10 +7,11 @@ https://arxiv.org/abs/2002.09402.
 """
 from feedback_transformer_pytorch import FeedbackTransformer
 
+from models import base
 from config import Config
 
 
-class Model(FeedbackTransformer):
+class Model(base.Model, FeedbackTransformer):
     """The Feedback Transformer model for language modeling. """
     @staticmethod
     def is_valid_model_type(model_type):
@@ -21,7 +22,7 @@ class Model(FeedbackTransformer):
         """Obtaining an instance of this model provided that the name is valid."""
 
         if not Model.is_valid_model_type(model_type):
-            raise ValueError('Invalid model name: {}'.format(model_type))
+            raise ValueError('Invalid model type: {}'.format(model_type))
 
         num_tokens = Config().trainer.num_tokens if hasattr(
             Config().trainer, 'num_tokens') else 20000
