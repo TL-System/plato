@@ -6,7 +6,7 @@ from config import Config
 from models import base
 
 
-class Model(base.Model):
+class Model(base.Model, nn.Module):
     """A VGG-style neural network model for image classification."""
     class ConvModule(nn.Module):
         """A single convolutional module in a VGG network."""
@@ -54,7 +54,7 @@ class Model(base.Model):
     @staticmethod
     def get_model_from_type(model_type):
         if not Model.is_valid_model_type(model_type):
-            raise ValueError('Invalid model name: {}'.format(model_type))
+            raise ValueError('Invalid model type: {}'.format(model_type))
 
         outputs = Config().trainer.num_classes or 10
 

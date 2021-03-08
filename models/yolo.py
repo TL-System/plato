@@ -18,8 +18,8 @@ import torch.optim.lr_scheduler as lr_scheduler
 from tqdm import tqdm
 
 from config import Config
+from models import base
 from datasources import coco
-
 
 try:
     import thop  # for FLOPS computation
@@ -27,7 +27,7 @@ except ImportError:
     thop = None
 
 
-class Model(yolo.Model):
+class Model(base.Model, yolo.Model):
     """The YOLOV5 model."""
     def __init__(self, model_config, num_classes):
         super().__init__(cfg=model_config, ch=3, nc=num_classes)
@@ -97,7 +97,7 @@ class Model(yolo.Model):
         """Obtaining an instance of this model provided that the name is valid."""
 
         if not Model.is_valid_model_type(model_type):
-            raise ValueError('Invalid model name: {}'.format(model_type))
+            raise ValueError('Invalid model type: {}'.format(model_type))
 
         if hasattr(Config().trainer, 'model_config'):
             return Model(Config().trainer.model_config,
@@ -119,11 +119,11 @@ class Model(yolo.Model):
 
         Arguments:
             config: Configuration parameters as a dictionary.
-            model: The model.
             testset: The test dataset.
         """
         assert Config().data.dataset == 'COCO'
-        test_loader = coco.Dataset.get_test_loader(config['batch_size'], testset)
+        test_loader = coco.Dataset.get_test_loader(config['batch_size'],
+                                                   testset)
 
         device = next(self.parameters()).device  # get model device
 
@@ -133,18 +133,23 @@ class Model(yolo.Model):
             data = yaml.load(f, Loader=yaml.SafeLoader)  # model dict
         check_dataset(data)  # check
         nc = Config().data.num_classes  # number of classes
-        iouv = torch.linspace(0.5, 0.95, 10).to(device)  # iou vector for mAP@0.5:0.95
+        iouv = torch.linspace(0.5, 0.95,
+                              10).to(device)  # iou vector for mAP@0.5:0.95
         niou = iouv.numel()
 
         seen = 0
-        names = {k: v for k, v in enumerate(self.names if hasattr(self, 'names')
-                                            else self.module.names)}
+        names = {
+            k: v
+            for k, v in enumerate(
+                self.names if hasattr(self, 'names') else self.module.names)
+        }
         s = ('%20s' + '%12s' * 6) % \
             ('Class', 'Images', 'Targets', 'P', 'R', 'mAP@.5', 'mAP@.5:.95')
         p, r, f1, mp, mr, map50, map, = 0., 0., 0., 0., 0., 0., 0.
         stats, ap, ap_class = [], [], []
 
-        for batch_i, (img, targets, paths, shapes) in enumerate(tqdm(test_loader, desc=s)):
+        for batch_i, (img, targets, paths,
+                      shapes) in enumerate(tqdm(test_loader, desc=s)):
             img = img.to(device, non_blocking=True).float()
             img /= 255.0  # 0 - 255 to 0.0 - 1.0
             targets = targets.to(device)
@@ -162,10 +167,15 @@ class Model(yolo.Model):
                     out, train_out = self(img)
 
                 # Run NMS
-                targets[:, 2:] *= torch.Tensor([width, height, width, height]).to(device)  # to pixels
+                targets[:,
+                        2:] *= torch.Tensor([width, height, width,
+                                             height]).to(device)  # to pixels
                 lb = []  # for autolabelling
-                out = non_max_suppression(out, conf_thres=0.001, iou_thres=0.6,
-                                          labels=lb, multi_label=True)
+                out = non_max_suppression(out,
+                                          conf_thres=0.001,
+                                          iou_thres=0.6,
+                                          labels=lb,
+                                          multi_label=True)
 
             # Statistics per image
             for si, pred in enumerate(out):
@@ -182,29 +192,35 @@ class Model(yolo.Model):
 
                 # Predictions
                 predn = pred.clone()
-                scale_coords(img[si].shape[1:], predn[:, :4],
-                             shapes[si][0], shapes[si][1])  # native-space pred
+                scale_coords(img[si].shape[1:], predn[:, :4], shapes[si][0],
+                             shapes[si][1])  # native-space pred
 
                 # Assign all predictions as incorrect
-                correct = torch.zeros(pred.shape[0], niou, dtype=torch.bool, device=device)
+                correct = torch.zeros(pred.shape[0],
+                                      niou,
+                                      dtype=torch.bool,
+                                      device=device)
                 if nl:
                     detected = []  # target indices
                     tcls_tensor = labels[:, 0]
 
                     # target boxes
                     tbox = xywh2xyxy(labels[:, 1:5])
-                    scale_coords(img[si].shape[1:], tbox,
-                                 shapes[si][0], shapes[si][1])  # native-space labels
+                    scale_coords(img[si].shape[1:], tbox, shapes[si][0],
+                                 shapes[si][1])  # native-space labels
 
                     # Per target class
                     for cls in torch.unique(tcls_tensor):
-                        ti = (cls == tcls_tensor).nonzero(as_tuple=False).view(-1)  # prediction indices
-                        pi = (cls == pred[:, 5]).nonzero(as_tuple=False).view(-1)  # target indices
+                        ti = (cls == tcls_tensor).nonzero(as_tuple=False).view(
+                            -1)  # prediction indices
+                        pi = (cls == pred[:, 5]).nonzero(as_tuple=False).view(
+                            -1)  # target indices
 
                         # Search for detections
                         if pi.shape[0]:
                             # Prediction to target ious
-                            ious, i = box_iou(predn[pi, :4], tbox[ti]).max(1)  # best ious, indices
+                            ious, i = box_iou(predn[pi, :4], tbox[ti]).max(
+                                1)  # best ious, indices
 
                             # Append detections
                             detected_set = set()
@@ -213,20 +229,28 @@ class Model(yolo.Model):
                                 if d.item() not in detected_set:
                                     detected_set.add(d.item())
                                     detected.append(d)
-                                    correct[pi[j]] = ious[j] > iouv  # iou_thres is 1xn
-                                    if len(detected) == nl:  # all targets already located in image
+                                    correct[pi[j]] = ious[
+                                        j] > iouv  # iou_thres is 1xn
+                                    if len(
+                                            detected
+                                    ) == nl:  # all targets already located in image
                                         break
 
                 # Append statistics (correct, conf, pcls, tcls)
-                stats.append((correct.cpu(), pred[:, 4].cpu(), pred[:, 5].cpu(), tcls))
+                stats.append(
+                    (correct.cpu(), pred[:, 4].cpu(), pred[:, 5].cpu(), tcls))
 
         # Compute statistics
         stats = [np.concatenate(x, 0) for x in zip(*stats)]  # to numpy
         if len(stats) and stats[0].any():
-            p, r, ap, f1, ap_class = ap_per_class(*stats, plot=False, save_dir='', names=names)
+            p, r, ap, f1, ap_class = ap_per_class(*stats,
+                                                  plot=False,
+                                                  save_dir='',
+                                                  names=names)
             ap50, ap = ap[:, 0], ap.mean(1)  # AP@0.5, AP@0.5:0.95
             mp, mr, map50, map = p.mean(), r.mean(), ap50.mean(), ap.mean()
-            nt = np.bincount(stats[3].astype(np.int64), minlength=nc)  # number of targets per class
+            nt = np.bincount(stats[3].astype(np.int64),
+                             minlength=nc)  # number of targets per class
         else:
             nt = torch.zeros(1)
 

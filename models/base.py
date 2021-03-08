@@ -4,8 +4,8 @@ from abc import ABC, abstractmethod, abstractstaticmethod
 import torch.nn as nn
 
 
-class Model(ABC, nn.Module):
-    """The base class for by all the models."""
+class Model(ABC):
+    """The base class for all the models in Plato."""
     @abstractmethod
     def forward(self, x):
         """The forward pass."""

@@ -76,7 +76,7 @@ class NetworkBlock(nn.Module):
         return self.layer(x)
 
 
-class Model(base.Model):
+class Model(base.Model, nn.Module):
     def __init__(self, depth, num_classes, widen_factor=1, dropRate=0.0):
         super().__init__()
 
@@ -137,7 +137,7 @@ class Model(base.Model):
     @staticmethod
     def get_model_from_type(model_type):
         if not Model.is_valid_model_type(model_type):
-            raise ValueError('Invalid model name: {}'.format(model_type))
+            raise ValueError('Invalid model type: {}'.format(model_type))
 
         # 40 layers
         return Model(Config().trainer.num_layers, Config().trainer.num_classes)
