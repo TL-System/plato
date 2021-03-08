@@ -222,9 +222,6 @@ class Trainer(base.Trainer):
                     if lr_schedule is not None:
                         lr_schedule.step()
 
-                    if hasattr(optimizer, "params_state_update"):
-                        optimizer.params_state_update()
-
                     if batch_id % log_interval == 0:
                         if self.client_id == 0:
                             logging.info(
@@ -239,6 +236,8 @@ class Trainer(base.Trainer):
                                 .format(self.client_id, epoch, epochs,
                                         batch_id, len(train_loader),
                                         loss.data.item()))
+                if hasattr(optimizer, "params_state_update"):
+                    optimizer.params_state_update()
 
         self.model.cpu()
 

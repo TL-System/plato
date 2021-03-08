@@ -7,3 +7,4 @@ from .rhythm import RhythmServer
 from .tempo import TempoServer
 from .fednova import FedNovaServer
 from .scaffold import ScaffoldServer
+from .fedsarah import FedSarahServer

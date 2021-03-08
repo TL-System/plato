@@ -7,3 +7,4 @@ from .adaptive_sync import AdaptiveSyncClient
 from .fednova import FedNovaClient
 from .tempo import TempoClient
 from .scaffold import ScaffoldClient
+from .fedsarah import FedSarahClient
