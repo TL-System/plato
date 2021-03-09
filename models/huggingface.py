@@ -4,10 +4,8 @@ The Transformer models from HuggingFace for natural language processing.
 
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
-from models import base
 
-
-class Model(base.Model):
+class Model:
     """The HuggingFace Transformer models for natural language processing. """
     def __init__(self, tokenizer, model):
         super().__init__()

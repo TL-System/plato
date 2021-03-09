@@ -9,10 +9,8 @@ import collections
 import torch.nn as nn
 import torch.nn.functional as F
 
-from models import base
 
-
-class Model(base.Model, nn.Module):
+class Model(nn.Module):
     """The LeNet-5 model.
 
     Arguments:
@@ -117,14 +115,6 @@ class Model(base.Model, nn.Module):
         return F.log_softmax(x, dim=1)
 
     @staticmethod
-    def is_valid_model_type(model_type):
-        return model_type == 'lenet5'
-
-    @staticmethod
-    def get_model_from_type(model_type):
-        """Obtaining an instance of this model provided that the name is valid."""
-
-        if not Model.is_valid_model_type(model_type):
-            raise ValueError('Invalid model type: {}'.format(model_type))
-
+    def get_model(*args):
+        """Obtaining an instance of this model."""
         return Model()

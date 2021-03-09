@@ -3,10 +3,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from config import Config
-from models import base
 
 
-class Model(base.Model, nn.Module):
+class Model(nn.Module):
     """A VGG-style neural network model for image classification."""
     class ConvModule(nn.Module):
         """A single convolutional module in a VGG network."""
@@ -52,9 +51,9 @@ class Model(base.Model, nn.Module):
                 and int(model_type.split('_')[1]) in [11, 13, 16, 19])
 
     @staticmethod
-    def get_model_from_type(model_type):
+    def get_model(model_type):
         if not Model.is_valid_model_type(model_type):
-            raise ValueError('Invalid model type: {}'.format(model_type))
+            raise ValueError('Invalid VGG model type: {}'.format(model_type))
 
         outputs = Config().trainer.num_classes or 10
 
@@ -76,7 +75,5 @@ class Model(base.Model, nn.Module):
                 64, 64, 'M', 128, 128, 'M', 256, 256, 256, 256, 'M', 512, 512,
                 512, 512, 'M', 512, 512, 512, 512
             ]
-        else:
-            raise ValueError('Unknown VGG model: {}'.format(model_type))
 
         return Model(plan, outputs)

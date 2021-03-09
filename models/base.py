@@ -1,19 +1,10 @@
-"""Base classes for PyTorch models."""
+"""Class definition for Plato models."""
 
-from abc import ABC, abstractmethod, abstractstaticmethod
-import torch.nn as nn
+import torch
+from config import Config
 
-
-class Model(ABC):
-    """The base class for all the models in Plato."""
-    @abstractmethod
-    def forward(self, x):
-        """The forward pass."""
-
-    @abstractstaticmethod
-    def is_valid_model_type(model_type: str) -> bool:
-        """Is the model name string a valid name for models in this class?"""
-
-    @abstractstaticmethod
-    def get_model_from_type(model_type: str) -> 'Model':
-        """Returns an instance of this class as described by the model_type string."""
+if hasattr(Config().trainer, 'use_mindspore'):
+    import mindspore
+    Model = mindspore.nn.Cell
+else:
+    Model = torch.nn.Module

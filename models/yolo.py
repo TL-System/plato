@@ -18,7 +18,6 @@ import torch.optim.lr_scheduler as lr_scheduler
 from tqdm import tqdm
 
 from config import Config
-from models import base
 from datasources import coco
 
 try:
@@ -27,7 +26,7 @@ except ImportError:
     thop = None
 
 
-class Model(base.Model, yolo.Model):
+class Model(yolo.Model):
     """The YOLOV5 model."""
     def __init__(self, model_config, num_classes):
         super().__init__(cfg=model_config, ch=3, nc=num_classes)
@@ -89,16 +88,8 @@ class Model(base.Model, yolo.Model):
         return x
 
     @staticmethod
-    def is_valid_model_type(model_type):
-        return model_type == 'yolov5'
-
-    @staticmethod
-    def get_model_from_type(model_type):
+    def get_model(*args):
         """Obtaining an instance of this model provided that the name is valid."""
-
-        if not Model.is_valid_model_type(model_type):
-            raise ValueError('Invalid model type: {}'.format(model_type))
-
         if hasattr(Config().trainer, 'model_config'):
             return Model(Config().trainer.model_config,
                          Config().data.num_classes)
