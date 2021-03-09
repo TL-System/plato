@@ -21,6 +21,7 @@ class FedSarahClient(simple.SimpleClient):
         self.client_control_variates = None
         self.server_control_variates = None
         self.new_client_control_variates = None
+        self.fl_round_counter = 0
 
     async def train(self):
         # Initialize the server control variates and client control variates for the trainer
@@ -28,31 +29,19 @@ class FedSarahClient(simple.SimpleClient):
             self.trainer.client_control_variates = self.client_control_variates
             self.trainer.server_control_variates = self.server_control_variates
 
+        self.trainer.fl_round_counter = self.fl_round_counter
+        self.fl_round_counter += 1
+
         report, weights = await super().train()
 
         # Get new client control variates from the trainer
-        self.new_client_control_variates = self.trainer.new_client_control_variates
+        self.client_control_variates = self.trainer.new_client_control_variates
 
-        # Compute deltas from client control variates
-        deltas = []
-        if self.client_control_variates is None:
-            self.client_control_variates = [0] * len(
-                self.new_client_control_variates)
-
-        for client_control_variate, new_client_control_variate in zip(
-                self.client_control_variates,
-                self.new_client_control_variates):
-            delta = torch.sub(new_client_control_variate,
-                              client_control_variate)
-            deltas.append(delta)
-
-        # Update client control variates
-        self.client_control_variates = self.new_client_control_variates
         fn = f"new_client_control_variates_{self.client_id}.pth"
         os.remove(fn)
         return Report(report.num_samples, report.accuracy,
                       report.training_time, report.data_loading_time,
-                      2), [weights, deltas]
+                      2), [weights, self.client_control_variates]
 
     def load_payload(self, server_payload):
         "Load model weights and server control vairates from server payload onto this client"
