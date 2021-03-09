@@ -23,7 +23,10 @@ class FedSarahOptimizer(optim.SGD):
         self.client_control_variates = None
         self.client_id = None
         self.max_counter = None
-
+        self.max_epsilon = 2
+        self.min_epsilon = 1
+        self.epsilon_decay = 0.1
+        self.epsilon = None
         self.epoch_counter = 0
 
     def step(self, closure=None):
@@ -72,7 +75,7 @@ class FedSarahOptimizer(optim.SGD):
                         d_p = buf
 
                 # Apply variance reduction
-                control_variate_batch = torch.sub(
+                control_variate_batch = self.epsilon * torch.sub(
                     server_control_variate,
                     client_control_variate)  # will be adaptively adjusted
                 control_variate_batch = torch.add(d_p, control_variate_batch)
