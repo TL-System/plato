@@ -16,15 +16,8 @@ from config import Config
 
 registered_models = OrderedDict([
     ('lenet5', lenet5.Model),
-    ('resnet_18', resnet.Model),
-    ('resnet_34', resnet.Model),
-    ('resnet_50', resnet.Model),
-    ('resnet_101', resnet.Model),
-    ('resnet_152', resnet.Model),
-    ('vgg_11', vgg.Model),
-    ('vgg_13', vgg.Model),
-    ('vgg_16', vgg.Model),
-    ('vgg_19', vgg.Model),
+    ('resnet', resnet.Model),
+    ('vgg', vgg.Model),
     ('wideresnet', wideresnet.Model),
     ('feedback_transformer', feedback_transformer.Model),
 ])
@@ -38,11 +31,19 @@ if hasattr(Config().trainer, 'use_mindspore'):
     registered_models += ('lenet5_mindspore', lenet5_mindspore.Model)
 
 
-def get(model_type):
+def get():
     """Get the model with the provided type."""
-    if model_type in registered_models:
-        model = registered_models[model_type].get_model(model_type)
-    else:
-        raise ValueError('No such model: {}'.format(model_type))
+    model_type = Config().trainer.model
+    model_name = model_type.split('_')[0]
+    model = None
 
-    return model
+    for name, registered_model in registered_models.items():
+        if name.startswith(model_name):
+            model = registered_model.get_model(model_type)
+
+    print(model_type)
+    print(model)
+    if model is None:
+        raise ValueError('No such model: {}'.format(model_type))
+    else:
+        return model
