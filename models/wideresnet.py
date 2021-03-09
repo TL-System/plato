@@ -7,7 +7,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from config import Config
-from models import base
 
 
 class BasicBlock(nn.Module):
@@ -76,7 +75,7 @@ class NetworkBlock(nn.Module):
         return self.layer(x)
 
 
-class Model(base.Model, nn.Module):
+class Model(nn.Module):
     def __init__(self, depth, num_classes, widen_factor=1, dropRate=0.0):
         super().__init__()
 
@@ -131,13 +130,6 @@ class Model(base.Model, nn.Module):
         return self.fc(out)
 
     @staticmethod
-    def is_valid_model_type(model_type):
-        return model_type.startswith('wideresnet')
-
-    @staticmethod
-    def get_model_from_type(model_type):
-        if not Model.is_valid_model_type(model_type):
-            raise ValueError('Invalid model type: {}'.format(model_type))
-
-        # 40 layers
+    def get_model(*args):
+        """Obtaining an instance of this model. """
         return Model(Config().trainer.num_layers, Config().trainer.num_classes)

@@ -5,8 +5,6 @@ import collections
 import torch.nn as nn
 import torch.nn.functional as F
 
-from models import base
-
 
 class BasicBlock(nn.Module):
     expansion = 1
@@ -83,7 +81,7 @@ class Bottleneck(nn.Module):
         return out
 
 
-class Model(base.Model, nn.Module):
+class Model(nn.Module):
     def __init__(self, block, num_blocks, num_classes=10):
         super().__init__()
 
@@ -166,9 +164,10 @@ class Model(base.Model, nn.Module):
                 and int(model_type.split('_')[1]) in [18, 34, 50, 101, 152])
 
     @staticmethod
-    def get_model_from_type(model_type):
+    def get_model(model_type):
         if not Model.is_valid_model_type(model_type):
-            raise ValueError('Invalid model type: {}'.format(model_type))
+            raise ValueError(
+                'Invalid Resnet model type: {}'.format(model_type))
 
         resnet_type = int(model_type.split('_')[1])
 
@@ -177,10 +176,8 @@ class Model(base.Model, nn.Module):
         elif resnet_type == 34:
             return Model(BasicBlock, [3, 4, 6, 3])
         elif resnet_type == 50:
-            return Model(BasicBlock, [3, 4, 6, 3])
+            return Model(Bottleneck, [3, 4, 6, 3])
         elif resnet_type == 101:
             return Model(Bottleneck, [3, 4, 23, 3])
         elif resnet_type == 152:
             return Model(Bottleneck, [3, 8, 36, 3])
-        else:
-            raise ValueError('Invalid model type: {}'.format(model_type))

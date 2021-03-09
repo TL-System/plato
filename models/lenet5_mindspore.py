@@ -12,10 +12,9 @@ import mindspore.nn as nn
 from mindspore.common.initializer import Normal
 
 from config import Config
-from models import base
 
 
-class Model(base.Model, nn.Cell):
+class Model(nn.Cell):
     """The LeNet-5 model.
 
     Arguments:
@@ -104,16 +103,8 @@ class Model(base.Model, nn.Cell):
         return x
 
     @staticmethod
-    def is_valid_model_type(model_type):
-        return model_type == 'lenet5_mindspore'
-
-    @staticmethod
-    def get_model_from_type(model_type):
+    def get_model():
         """Obtaining an instance of this model provided that the name is valid."""
-
-        if not Model.is_valid_model_type(model_type):
-            raise ValueError('Invalid model type: {}'.format(model_type))
-
         num_classes = 10
         if hasattr(Config().trainer, 'num_classes'):
             num_classes = Config().trainer.num_classes
