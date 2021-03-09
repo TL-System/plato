@@ -31,14 +31,13 @@ class FedSarahServer(FedAvgServer):
         updated_weights = super().federated_averaging(reports)
 
         # Initialize server control variates
-        if self.server_control_variates is None:
-            self.server_control_variates = [0] * len(
-                self.control_variates_received[0])
+        self.server_control_variates = [0] * len(
+            self.control_variates_received[0])
 
         # Update server control variates
-        for deltas in self.control_variates_received:
-            for j, delta in enumerate(deltas):
-                self.server_control_variates[j] += delta / Config(
+        for control_variates in self.control_variates_received:
+            for j, control_variate in enumerate(control_variates):
+                self.server_control_variates[j] += control_variate / Config(
                 ).clients.total_clients
 
         return updated_weights
