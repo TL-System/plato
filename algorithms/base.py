@@ -10,7 +10,7 @@ from trainers.base import Trainer
 
 class Algorithm(ABC):
     """Base class for all the algorithms."""
-    def __init__(self, model: Model, trainer: Trainer, client_id=None):
+    def __init__(self, model: Model, trainer: Trainer = None, client_id=None):
         """Initializing the algorithm with the provided model and trainer.
 
         Arguments:

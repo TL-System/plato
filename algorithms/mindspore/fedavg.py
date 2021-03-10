@@ -1,16 +1,23 @@
 """
-The federated averaging algorithm for PyTorch.
+The federated averaging algorithm for MindSpore.
 """
 from collections import OrderedDict
+
+import mindspore
 
 from algorithms import base
 
 
 class Algorithm(base.Algorithm):
-    """PyTorch-based federated averaging algorithm, used by both the client and the server."""
+    """MindSpore-based federated averaging algorithm, used by both the client and the server."""
     def extract_weights(self):
         """Extract weights from the model."""
-        return self.model.state_dict()
+        return self.model.parameters_dict()
+
+    def print_weights(self):
+        """Print all the weights from the model."""
+        for _, param in self.model.parameters_and_names():
+            print(f'key = {param.name}, value = {param.asnumpy()}')
 
     def compute_weight_updates(self, weights_received):
         """Extract the weights received from a client and compute the updates."""
@@ -33,4 +40,10 @@ class Algorithm(base.Algorithm):
 
     def load_weights(self, weights):
         """Load the model weights passed in as a parameter."""
-        self.model.load_state_dict(weights, strict=True)
+        for name, weight in weights.items():
+            weights[name] = mindspore.Parameter(weight, name=name)
+
+        # One can also use `self.model.load_parameter_slice(weights)', which
+        # seems to be equivalent to mindspore.load_param_into_net() in its effects
+
+        mindspore.load_param_into_net(self.model, weights, strict_load=True)

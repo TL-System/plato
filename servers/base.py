@@ -119,7 +119,7 @@ class Server:
                 # Sending the server response as metadata to the clients (payload to follow)
                 await socket.send(pickle.dumps(server_response))
 
-                payload = self.trainer.extract_weights()
+                payload = self.algorithm.extract_weights()
                 payload = await self.customize_server_payload(payload)
 
                 # Sending the server payload to the clients

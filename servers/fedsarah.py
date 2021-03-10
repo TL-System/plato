@@ -23,7 +23,7 @@ class FedSarahServer(FedAvgServer):
             payload[1] for (__, payload) in reports
         ]
 
-        return self.trainer.compute_weight_updates(weights_received)
+        return self.algorithm.compute_weight_updates(weights_received)
 
     def federated_averaging(self, reports):
         """Aggregate weight updates and deltas updates from the clients."""

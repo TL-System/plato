@@ -12,9 +12,8 @@ from config import Config
 
 class Trainer(ABC):
     """Base class for all the trainers."""
-    def __init__(self, algorithm, client_id):
+    def __init__(self, client_id):
         self.device = Config().device()
-        self.algorithm = algorithm
         self.client_id = client_id
         with Config().sql_connection:
             with closing(Config().sql_connection.cursor()) as cursor:
@@ -65,14 +64,6 @@ class Trainer(ABC):
             with closing(Config().sql_connection.cursor()) as cursor:
                 cursor.execute("DROP TABLE trainers")
         Config().sql_connection.close()
-
-    @abstractmethod
-    def extract_weights(self):
-        """Extract weights from a model passed in as a parameter."""
-
-    @abstractmethod
-    def load_weights(self, weights):
-        """Load the model weights passed in as a parameter."""
 
     @abstractmethod
     def train(self, trainset, cut_layer=None):

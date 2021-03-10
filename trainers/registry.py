@@ -5,15 +5,12 @@ based on a configuration at run-time.
 import logging
 
 from models.base import Model
-from algorithms.base import Algorithm
-from trainers import trainer, adaptive_freezing, adaptive_sync, scaffold, fedsarah
+from trainers import trainer, scaffold, fedsarah
 
 from config import Config
 
 registered_trainers = {
     'basic': trainer,
-    'adaptive_freezing': adaptive_freezing,
-    'adaptive_sync': adaptive_sync,
     'scaffold': scaffold,
     'fedsarah': fedsarah
 }

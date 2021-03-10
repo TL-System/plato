@@ -90,16 +90,16 @@ class FedAvgServer(Server):
         # starting time of a gloabl training round
         self.round_start_time = time.time()
 
-    def aggregate_weights(self, reports):
-        """Aggregate the reported weight updates from the selected clients."""
-        return self.federated_averaging(reports)
-
     def extract_client_updates(self, reports):
         """Extract the model weight updates from a client's report."""
 
         # Extract weights from reports
         weights_received = [payload for (__, payload) in reports]
-        return self.trainer.compute_weight_updates(weights_received)
+        return self.algorithm.compute_weight_updates(weights_received)
+
+    def aggregate_weights(self, reports):
+        """Aggregate the reported weight updates from the selected clients."""
+        return self.federated_averaging(reports)
 
     def federated_averaging(self, reports):
         """Aggregate weight updates from the clients using federated averaging."""
@@ -125,7 +125,7 @@ class FedAvgServer(Server):
                 avg_update[name] += delta * (num_samples / self.total_samples)
 
         # Extract baseline model weights
-        baseline_weights = self.trainer.extract_weights()
+        baseline_weights = self.algorithm.extract_weights()
 
         # Load updated weights into model
         updated_weights = OrderedDict()
@@ -137,7 +137,7 @@ class FedAvgServer(Server):
     async def process_reports(self):
         """Process the client reports by aggregating their weights."""
         updated_weights = self.aggregate_weights(self.reports)
-        self.trainer.load_weights(updated_weights)
+        self.algorithm.load_weights(updated_weights)
 
         # Testing the global model accuracy
         if Config().clients.do_test:

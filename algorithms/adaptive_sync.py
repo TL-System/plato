@@ -11,17 +11,18 @@ import logging
 import torch
 from collections import OrderedDict
 
-from models.base import Model
-from trainers import trainer
 from config import Config
+from models.base import Model
+from trainers.base import Trainer
+from algorithms import fedavg
 
 
-class Trainer(trainer.Trainer):
+class Algorithm(fedavg.Algorithm):
     """The federated learning trainer for Adaptive Synchronization Frequency,
        used by the server.
     """
-    def __init__(self, model: Model, client_id=0):
-        super().__init__(model, client_id)
+    def __init__(self, model: Model, trainer: Trainer = None, client_id=0):
+        super().__init__(model, trainer, client_id)
 
         self.sync_frequency = Config().algorithm.initial_sync_frequency
 

@@ -1,5 +1,5 @@
 """
-The federated learning trainer for Adaptive Parameter Freezing.
+The federated learning algorithm for Adaptive Parameter Freezing.
 
 Reference:
 
@@ -12,17 +12,18 @@ import logging
 import torch
 from collections import OrderedDict
 
-from models.base import Model
-from trainers import trainer
 from config import Config
+from models.base import Model
+from trainers.base import Trainer
+from algorithms import fedavg
 
 
-class Trainer(trainer.Trainer):
+class Algorithm(fedavg.Algorithm):
     """The federated learning trainer for Adaptive Parameter Freezing,
        used by both the client and the server.
     """
-    def __init__(self, model: Model, client_id=0):
-        super().__init__(model, client_id)
+    def __init__(self, model: Model, trainer: Trainer = None, client_id=0):
+        super().__init__(model, trainer, client_id)
         self.sync_mask = {}
         self.moving_average_deltas = {}
         self.moving_average_abs_deltas = {}
@@ -33,7 +34,7 @@ class Trainer(trainer.Trainer):
 
         # Initialize the synchronization mask
         if not self.sync_mask:
-            for name, weight in model.cpu().state_dict().items():
+            for name, weight in self.model.cpu().state_dict().items():
                 self.sync_mask[name] = torch.ones(weight.data.shape).bool()
 
         # Initialize the preserved weights
