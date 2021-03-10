@@ -33,7 +33,7 @@ data:
 
 trainer:
     # The type of the trainer
-    type: mistnet
+    type: basic
 
     # The maximum number of training rounds
     rounds: 1

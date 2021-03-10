@@ -9,6 +9,7 @@ from dataclasses import dataclass
 
 from models import registry as models_registry
 from datasources import registry as datasources_registry
+from algorithms import registry as algorithms_registry
 from trainers import registry as trainers_registry
 from dividers import iid, biased, sharded, iid_mindspore, mixed
 from utils import dists
@@ -32,6 +33,7 @@ class SimpleClient(Client):
         self.data = None  # The dataset to be used for local training
         self.trainset = None  # Training dataset
         self.testset = None  # Testing dataset
+        self.algorithm = None
         self.trainer = None
         self.divider = None
 
@@ -45,9 +47,10 @@ class SimpleClient(Client):
 
     def configure(self):
         """Prepare this client for training."""
-        model_type = Config().trainer.model
-        self.model = models_registry.get(model_type)
+        self.model = models_registry.get()
         self.trainer = trainers_registry.get(self.model, self.client_id)
+        self.algorithm = algorithms_registry.get(self.model, self.trainer,
+                                                 self.client_id)
 
     def load_data(self):
         """Generating data and loading them onto this client."""
@@ -130,7 +133,7 @@ class SimpleClient(Client):
 
     def load_payload(self, server_payload):
         """Loading the server model onto this client."""
-        self.trainer.load_weights(server_payload)
+        self.algorithm.load_weights(server_payload)
 
     async def train(self):
         """The machine learning training workload on a client."""
@@ -141,7 +144,7 @@ class SimpleClient(Client):
         self.trainer.train(self.trainset)
 
         # Extract model weights and biases
-        weights = self.trainer.extract_weights()
+        weights = self.algorithm.extract_weights()
 
         # Generate a report for the server, performing model testing if applicable
         if Config().clients.do_test:

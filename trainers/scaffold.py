@@ -13,7 +13,7 @@ from utils import optimizers
 
 
 class Trainer(trainer.Trainer):
-    """The federated learning trainer for the SCAFFOLD client"""
+    """The federated learning trainer for the SCAFFOLD client. """
     def __init__(self, model: Model, client_id=0):
         """Initializing the trainer with the provided model.
 

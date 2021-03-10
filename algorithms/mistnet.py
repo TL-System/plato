@@ -1,6 +1,5 @@
 """
-The federated learning trainer for MistNet, used by both the client and the
-server.
+The PyTorch-based MistNet algorithm, used by both the client and the server.
 
 Reference:
 
@@ -15,7 +14,7 @@ import torch
 
 from config import Config
 from utils import unary_encoding
-from trainers import trainer
+from algorithms import fedavg
 
 
 class FeatureDataset(torch.utils.data.Dataset):
@@ -31,8 +30,8 @@ class FeatureDataset(torch.utils.data.Dataset):
         return image, label
 
 
-class Trainer(trainer.Trainer):
-    """A federated learning trainer for MistNet, used by both the client and the
+class Algorithm(fedavg.Algorithm):
+    """The PyTorch-based MistNet algorithm, used by both the client and the
     server.
     """
     def extract_features(self, dataset, cut_layer: str, epsilon=None):
@@ -81,7 +80,4 @@ class Trainer(trainer.Trainer):
         return feature_dataset
 
     def train(self, trainset, cut_layer=None):
-        super().train(FeatureDataset(trainset), cut_layer)
-
-    def test(self, testset):
-        return super().test(testset)
+        self.trainer.train(FeatureDataset(trainset), cut_layer)

@@ -12,8 +12,9 @@ from config import Config
 
 class Trainer(ABC):
     """Base class for all the trainers."""
-    def __init__(self, client_id):
+    def __init__(self, algorithm, client_id):
         self.device = Config().device()
+        self.algorithm = algorithm
         self.client_id = client_id
         with Config().sql_connection:
             with closing(Config().sql_connection.cursor()) as cursor:

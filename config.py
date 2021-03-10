@@ -7,7 +7,6 @@ import logging
 from collections import namedtuple, OrderedDict
 import os
 import sqlite3
-import uuid
 
 import argparse
 import torch

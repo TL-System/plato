@@ -11,6 +11,7 @@ import torch.multiprocessing as mp
 import wandb
 
 from models.base import Model
+from algorithms.base import Algorithm
 from config import Config
 from utils import optimizers
 from trainers import base
@@ -18,14 +19,14 @@ from trainers import base
 
 class Trainer(base.Trainer):
     """A basic federated learning trainer, used by both the client and the server."""
-    def __init__(self, model: Model, client_id=0):
+    def __init__(self, model: Model, algorithm: Algorithm, client_id=0):
         """Initializing the trainer with the provided model.
 
         Arguments:
         model: The model to train. Must be a models.base.Model subclass.
         client_id: The ID of the client using this trainer (optional).
         """
-        super().__init__(client_id)
+        super().__init__(algorithm, client_id)
 
         # Use data parallelism if multiple GPUs are available and the configuration specifies it
         if Config().is_parallel():
@@ -36,7 +37,7 @@ class Trainer(base.Trainer):
             self.model = model
 
     def zeros(self, shape):
-        """Returns a MindSpore zero tensor with the given shape."""
+        """Returns a PyTorch zero tensor with the given shape."""
         # This should only be called from a server
         assert self.client_id == 0
         return torch.zeros(shape)
