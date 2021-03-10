@@ -13,7 +13,7 @@ from mindspore.train.callback import LossMonitor
 from mindspore.nn.metrics import Accuracy
 from mindspore.nn.loss import SoftmaxCrossEntropyWithLogits
 
-from models.base_mindspore import Model
+from models.base import Model
 from config import Config
 from trainers import base
 
@@ -32,7 +32,7 @@ class Trainer(base.Trainer):
         super().__init__(client_id)
 
         mindspore.context.set_context(mode=mindspore.context.PYNATIVE_MODE,
-                                      device_target='GPU')
+                                      device_target='CPU')
 
         self.model = model
 

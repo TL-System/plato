@@ -16,21 +16,23 @@ from algorithms import (
 
 from config import Config
 
-registered_algorithms = OrderedDict([
-    ('fedavg', fedavg.Algorithm),
-    ('mistnet', mistnet.Algorithm),
-    ('adaptive_sync', adaptive_sync.Algorithm),
-    ('adaptive_freezing', adaptive_freezing.Algorithm),
-])
 
 if hasattr(Config().trainer, 'use_mindspore'):
     from algorithms.mindspore import (
         fedavg as fedavg_mindspore,
         mistnet as mistnet_mindspore,
     )
-    registered_algorithms += OrderedDict([
+
+    registered_algorithms = OrderedDict([
         ('fedavg_mindspore', fedavg_mindspore.Algorithm),
         ('mistnet_mindspore', mistnet_mindspore.Algorithm),
+    ])
+else:
+    registered_algorithms = OrderedDict([
+        ('fedavg', fedavg.Algorithm),
+        ('mistnet', mistnet.Algorithm),
+        ('adaptive_sync', adaptive_sync.Algorithm),
+        ('adaptive_freezing', adaptive_freezing.Algorithm),
     ])
 
 
