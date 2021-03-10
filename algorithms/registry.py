@@ -2,7 +2,7 @@
 The registry for algorithms that contains framework-specific implementations.
 
 Having a registry of all available classes is convenient for retrieving an instance
-based using a configuration at run-time.
+based on a configuration at run-time.
 """
 import logging
 from collections import OrderedDict
@@ -35,15 +35,15 @@ if hasattr(Config().trainer, 'use_mindspore'):
 
 
 def get(model, trainer=None, client_id=None):
-    """Get the algorithm with the provided name."""
-    algorithm_name = Config().algorithm.type
+    """Get the algorithm with the provided type."""
+    algorithm_type = Config().algorithm.type
 
     # There is no frameworks-specific algorithm by default
     registered_alg = None
 
-    if algorithm_name in registered_algorithms:
-        logging.info("Algorithm: %s", algorithm_name)
-        registered_alg = registered_algorithms[algorithm_name](model, trainer,
+    if algorithm_type in registered_algorithms:
+        logging.info("Algorithm: %s", algorithm_type)
+        registered_alg = registered_algorithms[algorithm_type](model, trainer,
                                                                client_id)
 
     return registered_alg

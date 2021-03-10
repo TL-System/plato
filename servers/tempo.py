@@ -7,11 +7,11 @@ import math
 import statistics
 import torch
 
-from servers import FedAvgCrossSiloServer
+from servers import fedavg_cs
 from config import Config
 
 
-class TempoServer(FedAvgCrossSiloServer):
+class Server(fedavg_cs.Server):
     """
     A cross-silo federated learning server that tunes
     clients' local epoch numbers of each institution.
@@ -164,11 +164,6 @@ class TempoServer(FedAvgCrossSiloServer):
         return weights_diff
 
     @staticmethod
-    def is_valid_server_type(server_type):
-        """Determine if the server type is valid. """
-        return server_type == 'tempo'
-
-    @staticmethod
-    def get_server():
+    def get():
         """Returns an instance of this server. """
-        return TempoServer()
+        return Server()

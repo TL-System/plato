@@ -10,22 +10,21 @@ import sys
 import time
 
 from config import Config
-from servers import FedAvgCrossSiloServer
 import servers
 from utils import csv_processor
 
-FLServer = FedAvgCrossSiloServer
+FLServer = servers.fedavg_cs.Server
 
 if hasattr(Config().algorithm, 'rl_episodes'):
     from utils.rl_env import RLEnv
 
     # The central server of FL
     FLServer = {
-        "fedavg_cross_silo": servers.fedavg_cs.FedAvgCrossSiloServer
+        "fedavg_cross_silo": servers.fedavg_cs.Server
     }[Config().algorithm.fl_server]
 
 
-class RhythmServer(FLServer):
+class Server(FLServer):
     """Federated server using RL."""
     def __init__(self):
         super().__init__()
@@ -108,7 +107,7 @@ class RhythmServer(FLServer):
     def start_rl(self):
         """The starting point of RL training."""
         # Test the environment of reinforcement learning.
-        RhythmServer.try_a_random_agent(self.rl_env)
+        Server.try_a_random_agent(self.rl_env)
 
     def reset_rl_env(self):
         """Reset the RL environment at the beginning of each episode."""
@@ -243,11 +242,6 @@ class RhythmServer(FLServer):
                     break
 
     @staticmethod
-    def is_valid_server_type(server_type):
-        """Determine if the server type is valid. """
-        return server_type == 'rhythm'
-
-    @staticmethod
-    def get_server():
+    def get():
         """Returns an instance of this server. """
-        return RhythmServer()
+        return Server()

@@ -9,9 +9,9 @@ import logging
 import time
 import subprocess
 import pickle
-import websockets
 import asyncio
 from contextlib import closing
+import websockets
 
 from config import Config
 
@@ -247,5 +247,6 @@ class Server:
         """Determine if the server type is valid. """
 
     @abstractstaticmethod
-    def get_server():
+    def get():
         """Returns an instance of this server. """
+        ValueError('Server: get() in the base class should never be called.')

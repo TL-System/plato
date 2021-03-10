@@ -7,13 +7,13 @@ import time
 import os
 import asyncio
 
-from servers import FedAvgServer
+from servers import fedavg
 from datasources import registry as datasources_registry
 from config import Config
 from utils import csv_processor
 
 
-class FedAvgCrossSiloServer(FedAvgServer):
+class Server(fedavg.Server):
     """Cross-silo federated learning server using federated averaging."""
     def __init__(self):
         super().__init__()
@@ -172,11 +172,6 @@ class FedAvgCrossSiloServer(FedAvgServer):
             await super().wrap_up()
 
     @staticmethod
-    def is_valid_server_type(server_type):
-        """Determine if the server type is valid. """
-        return server_type == 'fedavg_cs'
-
-    @staticmethod
-    def get_server():
+    def get():
         """Returns an instance of this server. """
-        return FedAvgCrossSiloServer()
+        return Server()
