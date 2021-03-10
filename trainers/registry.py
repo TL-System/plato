@@ -16,10 +16,9 @@ registered_trainers = {
 }
 
 if hasattr(Config().trainer, 'use_mindspore'):
-    from trainers import trainer_mindspore, mistnet_mindspore
+    from trainers import trainer_mindspore
     mindspore_trainers = {
         'basic_mindspore': trainer_mindspore,
-        'mistnet_mindspore': mistnet_mindspore
     }
 
     registered_trainers = dict(

@@ -16,23 +16,24 @@ from models import (
 
 from config import Config
 
-registered_models = OrderedDict([
-    ('lenet5', lenet5.Model),
-    ('resnet', resnet.Model),
-    ('vgg', vgg.Model),
-    ('wideresnet', wideresnet.Model),
-    ('feedback_transformer', feedback_transformer.Model),
-])
-
-if Config().trainer.model == 'yolov5':
-    from models import yolo
-    registered_models += ('yolov5', yolo.Model)
-
 if hasattr(Config().trainer, 'use_mindspore'):
     from models import lenet5_mindspore
-    registered_models += OrderedDict([
+    
+    registered_models = OrderedDict([
         ('lenet5_mindspore', lenet5_mindspore.Model),
     ])
+else:
+    registered_models = OrderedDict([
+        ('lenet5', lenet5.Model),
+        ('resnet', resnet.Model),
+        ('vgg', vgg.Model),
+        ('wideresnet', wideresnet.Model),
+        ('feedback_transformer', feedback_transformer.Model),
+    ])
+
+    if Config().trainer.model == 'yolov5':
+        from models import yolo
+        registered_models += ('yolov5', yolo.Model)
 
 
 def get():

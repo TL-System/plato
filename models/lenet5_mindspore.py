@@ -103,7 +103,7 @@ class Model(nn.Cell):
         return x
 
     @staticmethod
-    def get_model():
+    def get_model(*args):
         """Obtaining an instance of this model provided that the name is valid."""
         num_classes = 10
         if hasattr(Config().trainer, 'num_classes'):
