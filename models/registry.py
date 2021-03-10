@@ -28,7 +28,9 @@ if Config().trainer.model == 'yolov5':
 
 if hasattr(Config().trainer, 'use_mindspore'):
     from models import lenet5_mindspore
-    registered_models += ('lenet5_mindspore', lenet5_mindspore.Model)
+    registered_models += OrderedDict([
+        ('lenet5_mindspore', lenet5_mindspore.Model),
+    ])
 
 
 def get():

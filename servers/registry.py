@@ -2,13 +2,14 @@
 A registry of all available servers.
 """
 
-from servers import fedavg, fedavg_cs, fednova, mistnet, scaffold, rhythm, tempo, adaptive_sync, fedsarah
+from servers import fedavg, fedavg_cs, fednova, mistnet, scaffold, rhythm, tempo, adaptive_sync, adaptive_freezing, fedsarah
 
 registered_servers = [
     fedavg.FedAvgServer, fedavg_cs.FedAvgCrossSiloServer,
     mistnet.MistNetServer, adaptive_sync.AdaptiveSyncServer,
-    rhythm.RhythmServer, tempo.TempoServer, fednova.FedNovaServer,
-    scaffold.ScaffoldServer, fedsarah.FedSarahServer
+    adaptive_freezing.AdaptiveFreezingServer, rhythm.RhythmServer,
+    tempo.TempoServer, fednova.FedNovaServer, scaffold.ScaffoldServer,
+    fedsarah.FedSarahServer
 ]
 
 

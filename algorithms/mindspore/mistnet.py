@@ -14,12 +14,12 @@ import mindspore
 import mindspore.dataset as ds
 
 from utils import unary_encoding
-from trainers import trainer_mindspore
+from algorithms.mindspore import fedavg
 
 
-class Trainer(trainer_mindspore.Trainer):
-    """A federated learning trainer for MistNet in the MindSpore framework, used
-    by both the client and the server.
+class Algorithm(fedavg.Algorithm):
+    """The PyTorch-based MistNet algorithm, used by both the client and the
+    server.
     """
     def extract_features(self, dataset, cut_layer, epsilon=None):
         """Extracting features using layers before the cut_layer.
@@ -71,21 +71,7 @@ class Trainer(trainer_mindspore.Trainer):
         cut_layer (optional): The layer which training should start from.
         """
         feature_dataset = ds.GeneratorDataset(list(
-            Trainer.dataset_generator(trainset)),
+            Algorithm.dataset_generator(trainset)),
                                               column_names=["image", "label"])
 
-        super().train(feature_dataset, cut_layer)
-
-    def test(self, testset):
-        """Testing the model using the provided test dataset.
-
-        Arguments:
-        testset: The test dataset.
-        """
-        self.start_training()
-
-        self.model.cut_layer = None
-        accuracy = self.mindspore_model.eval(testset)
-
-        self.pause_training()
-        return accuracy['Accuracy']
+        self.trainer.train(feature_dataset, cut_layer)
