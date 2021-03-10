@@ -32,7 +32,7 @@ class MistNetClient(SimpleClient):
         assert not Config().clients.do_test
 
         # Perform a forward pass till the cut layer in the model
-        features = self.trainer.extract_features(
+        features = self.algorithm.extract_features(
             self.trainset,
             Config().algorithm.cut_layer,
             epsilon=Config().algorithm.epsilon)

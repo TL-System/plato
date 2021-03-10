@@ -24,6 +24,7 @@ class Server:
         self.selected_clients = None
         self.current_round = 0
         self.model = None
+        self.algorithm = None
         self.trainer = None
         self.accuracy = 0
         self.reports = []
@@ -240,10 +241,6 @@ class Server:
     @abstractmethod
     def choose_clients(self):
         """Choose a subset of the clients to participate in each round."""
-
-    @abstractmethod
-    async def process_reports(self):
-        """Process the reports after all clients have sent them to the server."""
 
     @abstractstaticmethod
     def is_valid_server_type(server_type):

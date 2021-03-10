@@ -1,8 +1,6 @@
 """
 A federated learning server for MistNet.
-
 Reference:
-
 P. Wang, et al. "MistNet: Towards Private Neural Network Training with Local
 Differential Privacy," found in docs/papers.
 """
@@ -38,7 +36,7 @@ class MistNetServer(FedAvgServer):
         feature_dataset = list(chain.from_iterable(features))
 
         # Traing the model using features received from the client
-        self.trainer.train(feature_dataset, Config().algorithm.cut_layer)
+        self.algorithm.train(feature_dataset, Config().algorithm.cut_layer)
 
         # Test the updated model
         self.accuracy = self.trainer.test(self.testset)

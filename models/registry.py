@@ -32,18 +32,16 @@ if hasattr(Config().trainer, 'use_mindspore'):
 
 
 def get():
-    """Get the model with the provided type."""
-    model_type = Config().trainer.model
-    model_name = model_type.split('_')[0]
+    """Get the model with the provided name."""
+    model_name = Config().trainer.model
+    model_type = model_name.split('_')[0]
     model = None
 
     for name, registered_model in registered_models.items():
-        if name.startswith(model_name):
-            model = registered_model.get_model(model_type)
+        if name.startswith(model_type):
+            model = registered_model.get_model(model_name)
 
-    print(model_type)
-    print(model)
     if model is None:
-        raise ValueError('No such model: {}'.format(model_type))
+        raise ValueError('No such model: {}'.format(model_name))
     else:
         return model

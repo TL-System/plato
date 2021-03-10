@@ -11,6 +11,7 @@ import wandb
 
 import models.registry as models_registry
 from datasources import registry as datasources_registry
+from algorithms import registry as algorithms_registry
 from trainers import registry as trainers_registry
 from servers import Server
 from config import Config
@@ -24,7 +25,6 @@ class FedAvgServer(Server):
         wandb.init(project="plato", reinit=True)
 
         self.testset = None
-        self.model = None
         self.selected_clients = None
         self.total_samples = 0
 
@@ -77,12 +77,9 @@ class FedAvgServer(Server):
 
     def load_model(self):
         """Setting up the global model to be trained via federated learning."""
-
-        model_type = Config().trainer.model
-        logging.info("[Server #%s] Model: %s", os.getpid(), model_type)
-
-        self.model = models_registry.get(model_type)
+        self.model = models_registry.get()
         self.trainer = trainers_registry.get(self.model)
+        self.algorithm = algorithms_registry.get(self.model, self.trainer)
 
     def choose_clients(self):
         """Choose a subset of the clients to participate in each round."""
