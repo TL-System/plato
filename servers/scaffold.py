@@ -7,11 +7,11 @@ Karimireddy et al., "SCAFFOLD: Stochastic Controlled Averaging for Federated Lea
 (https://arxiv.org/pdf/1910.06378.pdf)
 """
 
-from servers import FedAvgServer
+from servers import fedavg
 from config import Config
 
 
-class ScaffoldServer(FedAvgServer):
+class Server(fedavg.Server):
     """A federated learning server using the SCAFFOLD algorithm."""
     def __init__(self):
         super().__init__()
@@ -64,11 +64,6 @@ class ScaffoldServer(FedAvgServer):
         return payload_list
 
     @staticmethod
-    def is_valid_server_type(server_type):
-        """Determine if the server type is valid. """
-        return server_type == 'scaffold'
-
-    @staticmethod
-    def get_server():
+    def get():
         """Returns an instance of this server. """
-        return ScaffoldServer()
+        return Server()

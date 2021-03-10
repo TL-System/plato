@@ -9,11 +9,11 @@ import logging
 import os
 from itertools import chain
 
-from servers import FedAvgServer
+from servers import fedavg
 from config import Config
 
 
-class MistNetServer(FedAvgServer):
+class Server(fedavg.Server):
     """The MistNet server for federated learning."""
     def __init__(self):
         super().__init__()
@@ -46,11 +46,6 @@ class MistNetServer(FedAvgServer):
         await self.wrap_up_processing_reports()
 
     @staticmethod
-    def is_valid_server_type(server_type):
-        """Determine if the server type is valid. """
-        return server_type == 'mistnet'
-
-    @staticmethod
-    def get_server():
+    def get():
         """Returns an instance of this server. """
-        return MistNetServer()
+        return Server()

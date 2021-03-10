@@ -1,11 +1,11 @@
 """
 A customized server for FedSarah.
 """
-from servers import FedAvgServer
+from servers import fedavg
 from config import Config
 
 
-class FedSarahServer(FedAvgServer):
+class Server(fedavg.Server):
     """A federated learning server using the FedSarah algorithm."""
     def __init__(self):
         super().__init__()
@@ -57,11 +57,6 @@ class FedSarahServer(FedAvgServer):
         return payload_list
 
     @staticmethod
-    def is_valid_server_type(server_type):
-        """Determine if the server type is valid. """
-        return server_type == 'fedsarah'
-
-    @staticmethod
-    def get_server():
+    def get():
         """Returns an instance of this server. """
-        return FedSarahServer()
+        return Server()

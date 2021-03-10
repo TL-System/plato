@@ -12,6 +12,8 @@ clients:
     do_test: true
 
 server:
+    type: fedavg
+
     address: localhost
     port: 8000
 

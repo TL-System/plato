@@ -11,7 +11,7 @@ def main():
     """Starting point for a Plato federated learning training session. """
     __ = Config()
 
-    server = server_registry.get(Config().algorithm.type)
+    server = server_registry.get()
     server.run()
 
 

@@ -13,12 +13,12 @@ import models.registry as models_registry
 from datasources import registry as datasources_registry
 from algorithms import registry as algorithms_registry
 from trainers import registry as trainers_registry
-from servers import Server
+from servers import base
 from config import Config
 from utils import csv_processor
 
 
-class FedAvgServer(Server):
+class Server(base.Server):
     """Federated learning server using federated averaging."""
     def __init__(self):
         super().__init__()
@@ -193,11 +193,6 @@ class FedAvgServer(Server):
         return accuracy
 
     @staticmethod
-    def is_valid_server_type(server_type):
-        """Determine if the server type is valid. """
-        return server_type == 'fedavg'
-
-    @staticmethod
-    def get_server():
+    def get():
         """Returns an instance of this server. """
-        return FedAvgServer()
+        return Server()

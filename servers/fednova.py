@@ -8,10 +8,10 @@ Optimization" (https://arxiv.org/pdf/2007.07481.pdf)
 """
 from collections import OrderedDict
 
-from servers import FedAvgServer
+from servers import fedavg
 
 
-class FedNovaServer(FedAvgServer):
+class Server(fedavg.Server):
     """A federated learning server using the FedNova algorithm. """
     def federated_averaging(self, reports):
         """Aggregate weight updates from the clients using FedNova."""
@@ -59,11 +59,6 @@ class FedNovaServer(FedAvgServer):
         return updated_weights
 
     @staticmethod
-    def is_valid_server_type(server_type):
-        """Determine if the server type is valid. """
-        return server_type == 'fednova'
-
-    @staticmethod
-    def get_server():
+    def get():
         """Returns an instance of this server. """
-        return FedNovaServer()
+        return Server()
