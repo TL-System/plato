@@ -62,8 +62,3 @@ class Server(fedavg.Server):
         payload_list.append(self.server_update_direction)
 
         return payload_list
-
-    @staticmethod
-    def get():
-        """Returns an instance of this server. """
-        return Server()

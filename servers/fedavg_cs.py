@@ -170,8 +170,3 @@ class Server(fedavg.Server):
         """Wrapping up when each round of training is done."""
         if Config().is_central_server():
             await super().wrap_up()
-
-    @staticmethod
-    def get():
-        """Returns an instance of this server. """
-        return Server()

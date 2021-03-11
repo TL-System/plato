@@ -7,7 +7,7 @@ from collections import OrderedDict
 
 from models.base import Model
 from trainers import (
-    trainer,
+    basic,
     scaffold,
     fedsarah,
 )
@@ -16,14 +16,14 @@ from config import Config
 
 if hasattr(Config().trainer, 'use_mindspore'):
     from trainers.mindspore import (
-        trainer as trainer_mindspore, )
+        basic as basic_mindspore, )
 
     registered_datasources = OrderedDict([
-        ('basic', trainer_mindspore.Trainer),
+        ('basic', basic_mindspore.Trainer),
     ])
 else:
     registered_trainers = OrderedDict([
-        ('basic', trainer.Trainer),
+        ('basic', basic.Trainer),
         ('scaffold', scaffold.Trainer),
         ('fedsarah', fedsarah.Trainer),
     ])

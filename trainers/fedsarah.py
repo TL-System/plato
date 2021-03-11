@@ -3,13 +3,13 @@ A customized trainer for FedSarah.
 """
 import torch
 from models.base import Model
-from trainers import trainer
+from trainers import basic
 from utils import optimizers
 from config import Config
 import numpy as np
 
 
-class Trainer(trainer.Trainer):
+class Trainer(basic.Trainer):
     """The federated learning trainer for the FedSarah client"""
     def __init__(self, model: Model, client_id=0):
         """Initializing the trainer with the provided model.

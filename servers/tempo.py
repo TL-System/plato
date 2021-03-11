@@ -162,8 +162,3 @@ class Server(fedavg_cs.Server):
         #     num_samples / self.total_samples)
 
         return weights_diff
-
-    @staticmethod
-    def get():
-        """Returns an instance of this server. """
-        return Server()

@@ -44,7 +44,7 @@ def get():
 
     if server_type in registered_servers:
         logging.info("Server: %s", server_type)
-        registered_server = registered_servers[server_type].get()
+        registered_server = registered_servers[server_type]()
     else:
         raise ValueError('No such server: {}'.format(server_type))
 

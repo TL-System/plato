@@ -8,11 +8,11 @@ Karimireddy et al., "SCAFFOLD: Stochastic Controlled Averaging for Federated Lea
 """
 import torch
 from models.base import Model
-from trainers import trainer
+from trainers import basic
 from utils import optimizers
 
 
-class Trainer(trainer.Trainer):
+class Trainer(basic.Trainer):
     """The federated learning trainer for the SCAFFOLD client. """
     def __init__(self, model: Model, client_id=0):
         """Initializing the trainer with the provided model.
