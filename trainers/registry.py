@@ -19,13 +19,13 @@ if hasattr(Config().trainer, 'use_mindspore'):
         trainer as trainer_mindspore, )
 
     registered_datasources = OrderedDict([
-        ('basic', trainer_mindspore),
+        ('basic', trainer_mindspore.Trainer),
     ])
 else:
     registered_trainers = OrderedDict([
-        ('basic', trainer),
-        ('scaffold', scaffold),
-        ('fedsarah', fedsarah),
+        ('basic', trainer.Trainer),
+        ('scaffold', scaffold.Trainer),
+        ('fedsarah', fedsarah.Trainer),
     ])
 
     if Config().trainer.model == 'yolov5':
