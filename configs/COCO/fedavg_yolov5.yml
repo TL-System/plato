@@ -18,6 +18,7 @@ server:
 data:
     # The training and testing dataset
     datasource: COCO
+    data_params: packages/yolov5/yolov5/data/coco128.yaml
 
     # Where the dataset is located
     data_path: ./data/COCO

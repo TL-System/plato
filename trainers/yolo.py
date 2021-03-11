@@ -43,7 +43,7 @@ class Trainer(trainer.Trainer):
                      trainset,
                      extract_features=False,
                      cut_layer=None):
-        """The train loader for training YOLOv5 using the COCO dataset."""
+        """The train loader for training YOLOv5 using the COCO dataset. """
         return coco.DataSource.get_train_loader(batch_size, trainset,
                                                 extract_features, cut_layer)
 
@@ -220,14 +220,14 @@ class Trainer(trainer.Trainer):
             config: Configuration parameters as a dictionary.
             testset: The test dataset.
         """
-        assert Config().data.dataset == 'COCO'
-        test_loader = coco.Dataset.get_test_loader(config['batch_size'],
-                                                   testset)
+        assert Config().data.datasource == 'COCO'
+        test_loader = coco.DataSource.get_test_loader(config['batch_size'],
+                                                      testset)
 
-        device = next(self.parameters()).device  # get model device
+        device = next(self.model.parameters()).device  # get model device
 
         # Configure
-        self.eval()
+        self.model.eval()
         with open(Config().data.data_params) as f:
             data = yaml.load(f, Loader=yaml.SafeLoader)  # model dict
         check_dataset(data)  # check
@@ -239,8 +239,8 @@ class Trainer(trainer.Trainer):
         seen = 0
         names = {
             k: v
-            for k, v in enumerate(
-                self.names if hasattr(self, 'names') else self.module.names)
+            for k, v in enumerate(self.model.names if hasattr(
+                self.model, 'names') else self.module.names)
         }
         s = ('%20s' + '%12s' * 6) % \
             ('Class', 'Images', 'Targets', 'P', 'R', 'mAP@.5', 'mAP@.5:.95')
@@ -257,13 +257,13 @@ class Trainer(trainer.Trainer):
             with torch.no_grad():
                 # Run model
                 if Config().algorithm.type == 'mistnet':
-                    logits = self.forward_to(img)
+                    logits = self.model.forward_to(img)
                     logits = logits.cpu().detach().numpy()
                     logits = unary_encoding.encode(logits)
                     logits = torch.from_numpy(logits.astype('float32'))
-                    out, train_out = self.forward_from(logits.to(device))
+                    out, train_out = self.model.forward_from(logits.to(device))
                 else:
-                    out, train_out = self(img)
+                    out, train_out = self.model(img)
 
                 # Run NMS
                 targets[:,
