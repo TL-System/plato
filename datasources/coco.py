@@ -120,7 +120,7 @@ class DataSource(base.DataSource):
                          cut_layer=None):
         """The custom train loader for YOLOv5."""
 
-        if extract_features is not None:
+        if extract_features:
             # MistNet client: feature extraction
             return torch.utils.data.DataLoader(COCODataset(trainset),
                                                batch_size=batch_size,

@@ -44,12 +44,12 @@ class Algorithm(fedavg.Algorithm):
         """
         self.model.eval()
 
-        _train_loader = getattr(self.model, "train_loader", None)
+        _train_loader = getattr(self, "train_loader", None)
 
         if callable(_train_loader):
-            data_loader = self.model.train_loader(batch_size=1,
-                                                  trainset=dataset,
-                                                  extract_features=True)
+            data_loader = self.train_loader(batch_size=1,
+                                            trainset=dataset,
+                                            extract_features=True)
         else:
             data_loader = torch.utils.data.DataLoader(
                 dataset, batch_size=Config().trainer.batch_size, shuffle=True)

@@ -81,7 +81,7 @@ pip install websockets requests
 
 We should now install MindSpore 1.1 with the following command:
 ```shell
-pip install https://ms-release.obs.cn-north-4.myhuaweicloud.com/1.1.0/MindSpore/gpu/ubuntu_x86/cuda-10.1/mindspore_gpu-1.1.0-cp37-cp37m-linux_x86_64.whl --trusted-host ms-release.obs.cn-north-4.myhuaweicloud.com
+pip install https://ms-release.obs.cn-north-4.myhuaweicloud.com/1.1.1/MindSpore/gpu/ubuntu_x86/cuda-10.1/mindspore_gpu-1.1.1-cp37-cp37m-linux_x86_64.whl --trusted-host ms-release.obs.cn-north-4.myhuaweicloud.com
 ```
 
 MindSpore may need additional packages that need to be installed if they do not exist:
