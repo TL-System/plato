@@ -28,15 +28,22 @@ else:
         ('fedsarah', fedsarah),
     ])
 
+    if Config().trainer.model == 'yolov5':
+        from trainers import yolo
+        yolo_trainers = {'yolov5': yolo.Trainer}
+
+        registered_trainers = OrderedDict(
+            list(registered_trainers.items()) + list(yolo_trainers.items()))
+
 
 def get(model: Model, client_id=0):
     """Get the trainer with the provided name."""
     trainer_name = Config().trainer.type
-    logging.info("Trainer: %s", Config().data.datasource)
+    logging.info("Trainer: %s", trainer_name)
 
     if trainer_name in registered_trainers:
-        registered_trainer = registered_trainers[trainer_name].Trainer(
-            model, client_id)
+        registered_trainer = registered_trainers[trainer_name](model,
+                                                               client_id)
     else:
         raise ValueError('No such trainer: {}'.format(trainer_name))
 

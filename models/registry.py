@@ -34,7 +34,10 @@ else:
 
     if Config().trainer.model == 'yolov5':
         from models import yolo
-        registered_models += ('yolov5', yolo.Model)
+        yolo_models = {'yolov5': yolo.Model}
+
+        registered_models = OrderedDict(
+            list(registered_models.items()) + list(yolo_models.items()))
 
 
 def get():

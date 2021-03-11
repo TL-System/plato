@@ -137,7 +137,7 @@ data:
 
 trainer:
     # The type of the trainer
-    type: basic
+    type: yolov5
 
     # test function
     testtype: map

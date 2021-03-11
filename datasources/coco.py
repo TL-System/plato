@@ -44,8 +44,8 @@ class DataSource(base.DataSource):
         super().__init__()
         _path = Config().data.data_path
 
-        if not os.path.exists(self._path):
-            os.makedirs(self._path)
+        if not os.path.exists(_path):
+            os.makedirs(_path)
 
         logging.info("Downloading the COCO dataset. This may take a while.")
 
