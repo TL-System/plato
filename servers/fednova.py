@@ -57,8 +57,3 @@ class Server(fedavg.Server):
             updated_weights[name] = weight + avg_update[name]
 
         return updated_weights
-
-    @staticmethod
-    def get():
-        """Returns an instance of this server. """
-        return Server()

@@ -240,8 +240,3 @@ class Server(FLServer):
                     if i < episodes:
                         obs = env.reset()
                     break
-
-    @staticmethod
-    def get():
-        """Returns an instance of this server. """
-        return Server()

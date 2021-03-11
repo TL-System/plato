@@ -245,8 +245,3 @@ class Server:
     @abstractstaticmethod
     def is_valid_server_type(server_type):
         """Determine if the server type is valid. """
-
-    @abstractstaticmethod
-    def get():
-        """Returns an instance of this server. """
-        ValueError('Server: get() in the base class should never be called.')

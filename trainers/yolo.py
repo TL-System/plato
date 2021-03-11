@@ -22,7 +22,7 @@ from tqdm import tqdm
 
 from config import Config
 from datasources import coco
-from trainers import trainer
+from trainers import basic
 from models.base import Model
 from utils import unary_encoding
 
@@ -32,7 +32,7 @@ except ImportError:
     thop = None
 
 
-class Trainer(trainer.Trainer):
+class Trainer(basic.Trainer):
     """The YOLOV5 trainer."""
     def __init__(self, model: Model, client_id=0):
         super().__init__(model, client_id)

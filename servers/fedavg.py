@@ -191,8 +191,3 @@ class Server(base.Server):
             accuracy += report.accuracy * (report.num_samples / total_samples)
 
         return accuracy
-
-    @staticmethod
-    def get():
-        """Returns an instance of this server. """
-        return Server()

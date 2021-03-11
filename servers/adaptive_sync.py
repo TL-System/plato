@@ -15,8 +15,3 @@ class Server(fedavg.Server):
         """Customizing the server response with any additional information."""
         server_response['sync_frequency'] = self.algorithm.sync_frequency
         return server_response
-
-    @staticmethod
-    def get():
-        """Returns an instance of this server. """
-        return Server()

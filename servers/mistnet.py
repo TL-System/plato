@@ -44,8 +44,3 @@ class Server(fedavg.Server):
             os.getpid(), 100 * self.accuracy))
 
         await self.wrap_up_processing_reports()
-
-    @staticmethod
-    def get():
-        """Returns an instance of this server. """
-        return Server()
