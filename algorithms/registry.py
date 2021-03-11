@@ -24,8 +24,8 @@ if hasattr(Config().trainer, 'use_mindspore'):
     )
 
     registered_algorithms = OrderedDict([
-        ('fedavg_mindspore', fedavg_mindspore.Algorithm),
-        ('mistnet_mindspore', mistnet_mindspore.Algorithm),
+        ('fedavg', fedavg_mindspore.Algorithm),
+        ('mistnet', mistnet_mindspore.Algorithm),
     ])
 else:
     registered_algorithms = OrderedDict([
@@ -40,12 +40,11 @@ def get(model, trainer=None, client_id=None):
     """Get the algorithm with the provided type."""
     algorithm_type = Config().algorithm.type
 
-    # There is no frameworks-specific algorithm by default
-    registered_alg = None
-
     if algorithm_type in registered_algorithms:
         logging.info("Algorithm: %s", algorithm_type)
         registered_alg = registered_algorithms[algorithm_type](model, trainer,
                                                                client_id)
+        return registered_alg
+    else:
+        raise ValueError('No such model: {}'.format(algorithm_type))
 
-    return registered_alg
