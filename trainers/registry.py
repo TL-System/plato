@@ -3,34 +3,38 @@ Having a registry of all available classes is convenient for retrieving an insta
 based on a configuration at run-time.
 """
 import logging
+from collections import OrderedDict
 
 from models.base import Model
-from trainers import trainer, scaffold, fedsarah
+from trainers import (
+    trainer,
+    scaffold,
+    fedsarah,
+)
 
 from config import Config
 
-registered_trainers = {
-    'basic': trainer,
-    'scaffold': scaffold,
-    'fedsarah': fedsarah
-}
-
 if hasattr(Config().trainer, 'use_mindspore'):
-    from trainers import trainer_mindspore
-    mindspore_trainers = {
-        'basic_mindspore': trainer_mindspore,
-    }
+    from trainers.mindspore import (
+        trainer as trainer_mindspore, )
 
-    registered_trainers = dict(
-        list(registered_trainers.items()) + list(mindspore_trainers.items()))
+    registered_datasources = OrderedDict([
+        ('basic', trainer_mindspore),
+    ])
+else:
+    registered_trainers = OrderedDict([
+        ('basic', trainer),
+        ('scaffold', scaffold),
+        ('fedsarah', fedsarah),
+    ])
 
 
 def get(model: Model, client_id=0):
     """Get the trainer with the provided name."""
     trainer_name = Config().trainer.type
+    logging.info("Trainer: %s", Config().data.datasource)
 
     if trainer_name in registered_trainers:
-        logging.info("Trainer: %s", trainer_name)
         registered_trainer = registered_trainers[trainer_name].Trainer(
             model, client_id)
     else:
