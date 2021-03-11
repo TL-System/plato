@@ -17,10 +17,11 @@ from models import (
 from config import Config
 
 if hasattr(Config().trainer, 'use_mindspore'):
-    from models import lenet5_mindspore
-    
+    from models.mindspore import (
+        lenet5 as lenet5_mindspore, )
+
     registered_models = OrderedDict([
-        ('lenet5_mindspore', lenet5_mindspore.Model),
+        ('lenet5', lenet5_mindspore.Model),
     ])
 else:
     registered_models = OrderedDict([

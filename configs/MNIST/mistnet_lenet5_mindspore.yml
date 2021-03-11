@@ -12,12 +12,14 @@ clients:
     do_test: false
 
 server:
+    type: mistnet
+
     address: localhost
     port: 8000
 
 data:
     # The training and testing dataset
-    datasource: MNIST_mindspore
+    datasource: MNIST
 
     # Where the dataset is located
     data_path: ./data
@@ -36,7 +38,7 @@ trainer:
     use_mindspore: true
 
     # The type of the trainer
-    type: mistnet_mindspore
+    type: basic
 
     # The maximum number of training rounds in total
     rounds: 1
@@ -59,7 +61,7 @@ trainer:
     weight_decay: 0.0
 
     # The machine learning model
-    model: lenet5_mindspore
+    model: lenet5
     num_classes: 10
 
 algorithm:
