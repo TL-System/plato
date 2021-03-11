@@ -10,7 +10,6 @@ import torch.multiprocessing as mp
 import wandb
 
 from models.base import Model
-from algorithms.base import Algorithm
 from config import Config
 from utils import optimizers
 from trainers import base
@@ -131,16 +130,16 @@ class Trainer(base.Trainer):
                          group=str(config['run_id']),
                          reinit=True)
 
-        custom_train = getattr(self.model, "train_model", None)
+        custom_train = getattr(self, "train_model", None)
 
         if callable(custom_train):
-            self.model.train_model(self, config, trainset, cut_layer)
+            self.train_model(config, trainset, cut_layer)
         else:
             log_interval = 10
             batch_size = config['batch_size']
 
             logging.info("[Client %s] Loading the dataset.", self.client_id)
-            _train_loader = getattr(self.model, "train_loader", None)
+            _train_loader = getattr(self, "train_loader", None)
 
             if callable(_train_loader):
                 train_loader = _train_loader(batch_size, trainset, cut_layer)
@@ -157,7 +156,7 @@ class Trainer(base.Trainer):
             self.model.train()
 
             # Initializing the loss criterion
-            _loss_criterion = getattr(self.model, "loss_criterion", None)
+            _loss_criterion = getattr(self, "loss_criterion", None)
             if callable(_loss_criterion):
                 loss_criterion = _loss_criterion(self.model)
             else:
@@ -259,10 +258,10 @@ class Trainer(base.Trainer):
         self.model.to(self.device)
         self.model.eval()
 
-        custom_test = getattr(self.model, "test_model", None)
+        custom_test = getattr(self, "test_model", None)
 
         if callable(custom_test):
-            accuracy = self.model.test_model(config, testset)
+            accuracy = self.test_model(config, testset)
         else:
             test_loader = torch.utils.data.DataLoader(
                 testset, batch_size=config['batch_size'], shuffle=False)
