@@ -12,7 +12,7 @@ from mindspore.train.callback import LossMonitor
 from mindspore.nn.metrics import Accuracy
 from mindspore.nn.loss import SoftmaxCrossEntropyWithLogits
 
-from models.base import Model
+import models.registry as models_registry
 from config import Config
 from trainers import base
 
@@ -21,7 +21,7 @@ class Trainer(base.Trainer):
     """A basic federated learning trainer for MindSpore, used by both
     the client and the server.
     """
-    def __init__(self, model: Model, client_id=0):
+    def __init__(self, client_id=0):
         """Initializing the trainer with the provided model.
 
         Arguments:
@@ -33,7 +33,7 @@ class Trainer(base.Trainer):
         mindspore.context.set_context(mode=mindspore.context.PYNATIVE_MODE,
                                       device_target='CPU')
 
-        self.model = model
+        self.model = models_registry.get()
 
         # Initializing the loss criterion
         loss_criterion = SoftmaxCrossEntropyWithLogits(sparse=True,

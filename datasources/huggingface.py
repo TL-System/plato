@@ -25,9 +25,7 @@ class DataSource(base.DataSource):
         else:
             dataset_config = None
 
-        self.train_set = load_dataset(dataset_name,
-                                      dataset_config,
-                                      split='train')
+        self.train_set = load_dataset(dataset_name, dataset_config)
         self.test_set = load_dataset(dataset_name,
                                      dataset_config,
                                      split='test')

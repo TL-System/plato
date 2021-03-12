@@ -9,7 +9,7 @@ import torch.nn as nn
 import torch.multiprocessing as mp
 import wandb
 
-from models.base import Model
+import models.registry as models_registry
 from config import Config
 from utils import optimizers
 from trainers import base
@@ -17,7 +17,7 @@ from trainers import base
 
 class Trainer(base.Trainer):
     """A basic federated learning trainer, used by both the client and the server."""
-    def __init__(self, model: Model, client_id=0):
+    def __init__(self, client_id=0):
         """Initializing the trainer with the provided model.
 
         Arguments:
@@ -25,6 +25,7 @@ class Trainer(base.Trainer):
         client_id: The ID of the client using this trainer (optional).
         """
         super().__init__(client_id)
+        model = models_registry.get()
 
         # Use data parallelism if multiple GPUs are available and the configuration specifies it
         if Config().is_parallel():

@@ -14,6 +14,7 @@ class MixedDivider(base.Divider):
     """Load mixed data partitions."""
     def __init__(self, datasource):
         super().__init__(datasource)
+        self.labels = datasource.classes()
         self.sort_trainset()
 
         self.shards = None

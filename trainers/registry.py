@@ -5,11 +5,11 @@ based on a configuration at run-time.
 import logging
 from collections import OrderedDict
 
-import models.registry as models_registry
 from trainers import (
     basic,
     scaffold,
     fedsarah,
+    huggingface,
 )
 
 from config import Config
@@ -26,6 +26,7 @@ else:
         ('basic', basic.Trainer),
         ('scaffold', scaffold.Trainer),
         ('fedsarah', fedsarah.Trainer),
+        ('HuggingFace', huggingface.Trainer),
     ])
 
 
@@ -34,14 +35,11 @@ def get(client_id=0):
     trainer_name = Config().trainer.type
     logging.info("Trainer: %s", trainer_name)
 
-    model = models_registry.get()
-
     if Config().trainer.model_name == 'yolov5':
         from trainers import yolo
-        return yolo.Trainer(model, client_id)
+        return yolo.Trainer(client_id)
     elif trainer_name in registered_trainers:
-        registered_trainer = registered_trainers[trainer_name](model,
-                                                               client_id)
+        registered_trainer = registered_trainers[trainer_name](client_id)
     else:
         raise ValueError('No such trainer: {}'.format(trainer_name))
 

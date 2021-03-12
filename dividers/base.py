@@ -10,7 +10,6 @@ class Divider:
         """Get data from the data source."""
         self.trainset = datasource.get_train_set()
         self.testset = datasource.get_test_set()
-        self.labels = datasource.classes()
         self.partition = None
 
         random.seed()

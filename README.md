@@ -127,6 +127,8 @@ To start a federated learning training workload, run [`run`](run) from the repos
 
 *Plato* uses the YAML format for its configuration files to manage the runtime configuration parameters. Example configuration files have been provided in the `configs` directory.
 
+If there are issues in the code that prevented it from running to completion, there could be running processes from previous runs. Use the command `pkill python` to terminate them so that there will not be CUDA errors in the upcoming run.
+
 ### Installing YOLOv5 as a Python package
 
 If object detection using the YOLOv5 model and any of the COCO datasets is needed, it is required to install YOLOv5 as a Python package first:
