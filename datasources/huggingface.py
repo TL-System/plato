@@ -20,8 +20,17 @@ class DataSource(base.DataSource):
         dataset_name = Config().data.dataset_name
         logging.info("Dataset: %s", dataset_name)
 
-        self.train_set = load_dataset(dataset_name, split='train')
-        self.test_set = load_dataset(dataset_name, split='test')
+        if hasattr(Config.data, 'dataset_config'):
+            dataset_config = Config().data.dataset_config
+        else:
+            dataset_config = None
+
+        self.train_set = load_dataset(dataset_name,
+                                      dataset_config,
+                                      split='train')
+        self.test_set = load_dataset(dataset_name,
+                                     dataset_config,
+                                     split='test')
 
     def num_train_examples(self):
         return len(self.train_set)

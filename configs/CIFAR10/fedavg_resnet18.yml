@@ -61,7 +61,7 @@ trainer:
     lr_milestone_steps: 80ep,120ep
 
     # The machine learning model
-    model: resnet_18
+    model_name: resnet_18
 
 algorithm:
     # Aggregation algorithm

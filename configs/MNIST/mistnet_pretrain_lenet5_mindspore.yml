@@ -59,7 +59,7 @@ trainer:
     weight_decay: 0.0
 
     # The machine learning model
-    model: lenet5_mindspore
+    model_name: lenet5_mindspore
 
 algorithm:
     # Aggregation algorithm

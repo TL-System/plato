@@ -58,7 +58,7 @@ class Trainer(base.Trainer):
 
     def save_model(self, filename=None):
         """Saving the model to a file."""
-        model_type = Config().trainer.model
+        model_name = Config().trainer.model_name
         model_dir = Config().params['model_dir']
 
         if not os.path.exists(model_dir):
@@ -67,7 +67,7 @@ class Trainer(base.Trainer):
         if filename is not None:
             model_path = f'{model_dir}{filename}'
         else:
-            model_path = f'{model_dir}{model_type}.ckpt'
+            model_path = f'{model_dir}{model_name}.ckpt'
 
         mindspore.save_checkpoint(self.model, model_path)
 
@@ -80,13 +80,13 @@ class Trainer(base.Trainer):
 
     def load_model(self, filename=None):
         """Loading pre-trained model weights from a file."""
-        model_type = Config().trainer.model
+        model_name = Config().trainer.model_name
         model_dir = Config().params['model_dir']
 
         if filename is not None:
             model_path = f'{model_dir}{filename}'
         else:
-            model_path = f'{model_dir}{model_type}.ckpt'
+            model_path = f'{model_dir}{model_name}.ckpt'
 
         if self.client_id == 0:
             logging.info("[Server #%s] Loading a model from %s.", os.getpid(),

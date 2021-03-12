@@ -58,7 +58,7 @@ trainer:
     weight_decay: 0.0
 
     # The machine learning model
-    model: vgg_16
+    model_name: vgg_16
     num_classes: 10
 
 algorithm:

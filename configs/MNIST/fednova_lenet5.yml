@@ -57,7 +57,7 @@ trainer:
     mu: 0.1
 
     # The machine learning model
-    model: lenet5
+    model_name: lenet5
 
 algorithm:
     # Aggregation algorithm

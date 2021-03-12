@@ -4,13 +4,12 @@ Base class for algorithms.
 
 from abc import ABC, abstractmethod
 
-from models.base import Model
 from trainers.base import Trainer
 
 
 class Algorithm(ABC):
     """Base class for all the algorithms."""
-    def __init__(self, model: Model, trainer: Trainer = None, client_id=None):
+    def __init__(self, trainer: Trainer, client_id=None):
         """Initializing the algorithm with the provided model and trainer.
 
         Arguments:
@@ -18,8 +17,8 @@ class Algorithm(ABC):
         trainer: The trainer for the model, which is a trainers.base.Trainer class.
         """
         super().__init__()
-        self.model = model
         self.trainer = trainer
+        self.model = trainer.model
         self.client_id = client_id
 
     @abstractmethod

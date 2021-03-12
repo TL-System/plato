@@ -17,7 +17,6 @@ class Client:
     """A basic federated learning client."""
     def __init__(self):
         self.client_id = Config().args.id
-        self.model = None  # Machine learning model
         self.data_loaded = False  # is training data already loaded from the disk?
 
         random.seed()
