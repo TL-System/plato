@@ -11,14 +11,14 @@ import numpy as np
 
 class Trainer(basic.Trainer):
     """The federated learning trainer for the FedSarah client"""
-    def __init__(self, model: Model, client_id=0):
+    def __init__(self, client_id=0):
         """Initializing the trainer with the provided model.
 
         Arguments:
         model: The model to train. Must be a models.base.Model subclass.
         client_id: The ID of the client using this trainer (optional).
         """
-        super().__init__(model, client_id)
+        super().__init__(client_id)
 
         self.server_control_variates = None
         self.client_control_variates = None

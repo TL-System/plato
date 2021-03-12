@@ -99,7 +99,7 @@ class Client:
     async def recv(self, client_id, data, websocket):
         """Receiving the payload from the server using WebSockets."""
 
-        logging.info("[Client #%s] Receiving payload data from server",
+        logging.info("[Client #%s] Receiving payload data from the server.",
                      client_id)
 
         if 'payload_length' in data:

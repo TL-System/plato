@@ -14,14 +14,14 @@ from utils import optimizers
 
 class Trainer(basic.Trainer):
     """The federated learning trainer for the SCAFFOLD client. """
-    def __init__(self, model: Model, client_id=0):
+    def __init__(self, client_id=0):
         """Initializing the trainer with the provided model.
 
         Arguments:
         model: The model to train. Must be a models.base.Model subclass.
         client_id: The ID of the client using this trainer (optional).
         """
-        super().__init__(model, client_id)
+        super().__init__(client_id)
 
         self.server_update_direction = None
         self.client_update_direction = None
