@@ -76,7 +76,7 @@ def main():
 
     if hasattr(Config(), 'results'):
         datasource = Config().data.datasource
-        model = Config().trainer.model
+        model = Config().trainer.model_name
         server_type = Config().algorithm.type
         result_dir = f'./results/{datasource}/{model}/{server_type}/'
         result_csv_file = result_dir + 'result.csv'

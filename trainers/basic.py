@@ -42,7 +42,7 @@ class Trainer(base.Trainer):
 
     def save_model(self, filename=None):
         """Saving the model to a file."""
-        model_type = Config().trainer.model
+        model_name = Config().trainer.model_name
         model_dir = Config().params['model_dir']
 
         if not os.path.exists(model_dir):
@@ -51,7 +51,7 @@ class Trainer(base.Trainer):
         if filename is not None:
             model_path = f'{model_dir}{filename}'
         else:
-            model_path = f'{model_dir}{model_type}.pth'
+            model_path = f'{model_dir}{model_name}.pth'
 
         torch.save(self.model.state_dict(), model_path)
 
@@ -65,12 +65,12 @@ class Trainer(base.Trainer):
     def load_model(self, filename=None):
         """Loading pre-trained model weights from a file."""
         model_dir = Config().params['model_dir']
-        model_type = Config().trainer.model
+        model_name = Config().trainer.model_name
 
         if filename is not None:
             model_path = f'{model_dir}{filename}'
         else:
-            model_path = f'{model_dir}{model_type}.pth'
+            model_path = f'{model_dir}{model_name}.pth'
 
         if self.client_id == 0:
             logging.info("[Server #%s] Loading a model from %s.", os.getpid(),
@@ -85,7 +85,7 @@ class Trainer(base.Trainer):
     def save_accuracy(accuracy, filename=None):
         """Saving the test accuracy to a file."""
         model_dir = Config().params['model_dir']
-        model_type = Config().trainer.model
+        model_name = Config().trainer.model_name
 
         if not os.path.exists(model_dir):
             os.makedirs(model_dir)
@@ -93,7 +93,7 @@ class Trainer(base.Trainer):
         if filename is not None:
             accuracy_path = f"{model_dir}{filename}"
         else:
-            accuracy_path = f'{model_dir}{model_type}.acc'
+            accuracy_path = f'{model_dir}{model_name}.acc'
 
         with open(accuracy_path, 'w') as file:
             file.write(str(accuracy))
@@ -102,12 +102,12 @@ class Trainer(base.Trainer):
     def load_accuracy(filename=None):
         """Loading the test accuracy from a file."""
         model_dir = Config().params['model_dir']
-        model_type = Config().trainer.model
+        model_name = Config().trainer.model_name
 
         if filename is not None:
             accuracy_path = f"{model_dir}{filename}"
         else:
-            accuracy_path = f'{model_dir}{model_type}.acc'
+            accuracy_path = f'{model_dir}{model_name}.acc'
 
         with open(accuracy_path, 'r') as file:
             accuracy = float(file.read())
@@ -213,7 +213,7 @@ class Trainer(base.Trainer):
 
         self.model.cpu()
 
-        model_type = Config().trainer.model
+        model_type = Config().trainer.model_name
         filename = f"{model_type}_{self.client_id}_{config['run_id']}.pth"
         self.save_model(filename)
 
@@ -240,8 +240,8 @@ class Trainer(base.Trainer):
                  ),
                  join=True)
 
-        model_type = Config().trainer.model
-        filename = f"{model_type}_{self.client_id}_{Config().params['run_id']}.pth"
+        model_name = Config().trainer.model_name
+        filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.pth"
         self.load_model(filename)
         self.pause_training()
 
@@ -284,8 +284,8 @@ class Trainer(base.Trainer):
 
             accuracy = correct / total
 
-        model_type = Config().trainer.model
-        filename = f"{model_type}_{self.client_id}_{config['run_id']}.acc"
+        model_name = Config().trainer.model_name
+        filename = f"{model_name}_{self.client_id}_{config['run_id']}.acc"
         Trainer.save_accuracy(accuracy, filename)
 
     def test(self, testset):
@@ -306,8 +306,8 @@ class Trainer(base.Trainer):
                  ),
                  join=True)
 
-        model_type = Config().trainer.model
-        filename = f"{model_type}_{self.client_id}_{Config().params['run_id']}.acc"
+        model_name = Config().trainer.model_name
+        filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
         accuracy = Trainer.load_accuracy(filename)
 
         self.pause_training()

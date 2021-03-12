@@ -60,7 +60,7 @@ trainer:
     weight_decay: 5e-4
 
     # The machine learning model
-    model: wideresnet
+    model_name: wideresnet
 
 algorithm:
     # Aggregation algorithm

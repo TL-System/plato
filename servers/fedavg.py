@@ -9,7 +9,6 @@ import random
 from collections import OrderedDict
 import wandb
 
-import models.registry as models_registry
 from datasources import registry as datasources_registry
 from algorithms import registry as algorithms_registry
 from trainers import registry as trainers_registry
@@ -63,7 +62,7 @@ class Server(base.Server):
         else:
             logging.info("Training: %s rounds\n", total_rounds)
 
-        self.load_model()
+        self.load_trainer()
 
         if not Config().clients.do_test:
             dataset = datasources_registry.get()
@@ -75,11 +74,10 @@ class Server(base.Server):
             csv_processor.initialize_csv(result_csv_file, self.recorded_items,
                                          Config().result_dir)
 
-    def load_model(self):
+    def load_trainer(self):
         """Setting up the global model to be trained via federated learning."""
-        self.model = models_registry.get()
-        self.trainer = trainers_registry.get(self.model)
-        self.algorithm = algorithms_registry.get(self.model, self.trainer)
+        self.trainer = trainers_registry.get()
+        self.algorithm = algorithms_registry.get(self.trainer)
 
     def choose_clients(self):
         """Choose a subset of the clients to participate in each round."""

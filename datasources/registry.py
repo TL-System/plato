@@ -31,13 +31,6 @@ else:
         ('HuggingFace', huggingface),
     ])
 
-    if Config().data.datasource == 'COCO':
-        from datasources import coco
-        coco_datasources = {'COCO': coco}
-        registered_datasources = OrderedDict(
-            list(registered_datasources.items()) +
-            list(coco_datasources.items()))
-
 
 def get():
     """Get the data source with the provided name."""
@@ -45,7 +38,10 @@ def get():
 
     logging.info("Data source: %s", Config().data.datasource)
 
-    if datasource_name in registered_datasources:
+    if Config().data.datasource == 'COCO':
+        from datasources import coco
+        return coco.DataSource()
+    elif datasource_name in registered_datasources:
         dataset = registered_datasources[datasource_name].DataSource()
     else:
         raise ValueError('No such data source: {}'.format(datasource_name))

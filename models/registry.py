@@ -32,23 +32,24 @@ else:
         ('feedback_transformer', feedback_transformer.Model),
     ])
 
-    if Config().trainer.model == 'yolov5':
-        from models import yolo
-        yolo_models = {'yolov5': yolo.Model}
-
-        registered_models = OrderedDict(
-            list(registered_models.items()) + list(yolo_models.items()))
-
 
 def get():
     """Get the model with the provided name."""
-    model_name = Config().trainer.model
+    model_name = Config().trainer.model_name
     model_type = model_name.split('_')[0]
     model = None
 
-    for name, registered_model in registered_models.items():
-        if name.startswith(model_type):
-            model = registered_model.get_model(model_name)
+    if model_name == 'yolov5':
+        from models import yolo
+        return yolo.Model.get_model()
+    elif model_name == 'HuggingFace_CausalLM':
+        from transformers import AutoModelForCausalLM
+        model_checkpoint = Config.trainer.model_checkpoint
+        return AutoModelForCausalLM.from_pretrained(model_checkpoint)
+    else:
+        for name, registered_model in registered_models.items():
+            if name.startswith(model_type):
+                model = registered_model.get_model(model_name)
 
     if model is None:
         raise ValueError('No such model: {}'.format(model_name))

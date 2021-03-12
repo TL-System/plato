@@ -56,7 +56,7 @@ trainer:
     weight_decay: 0.0
 
     # The machine learning model
-    model: resnet_18
+    model_name: resnet_18
 
 algorithm:
     # Aggregation algorithm

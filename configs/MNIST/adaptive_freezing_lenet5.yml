@@ -58,7 +58,7 @@ trainer:
     weight_decay: 0.0
 
     # The machine learning model
-    model: lenet5
+    model_name: lenet5
 
 algorithm:
     # Aggregation algorithm

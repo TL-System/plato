@@ -47,10 +47,10 @@ class Trainer(ABC):
                 cursor.execute("DELETE FROM trainers WHERE run_id = (?)",
                                (self.client_id, ))
 
-        model_type = Config().trainer.model
+        model_name = Config().trainer.model_name
         model_dir = Config().params['model_dir']
-        model_file = f"{model_dir}{model_type}_{self.client_id}_{Config().params['run_id']}.pth"
-        accuracy_file = f"{model_dir}{model_type}_{self.client_id}_{Config().params['run_id']}.acc"
+        model_file = f"{model_dir}{model_name}_{self.client_id}_{Config().params['run_id']}.pth"
+        accuracy_file = f"{model_dir}{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
 
         if os.path.exists(model_file):
             os.remove(model_file)

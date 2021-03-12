@@ -16,7 +16,6 @@ from algorithms import (
 
 from config import Config
 
-
 if hasattr(Config().trainer, 'use_mindspore'):
     from algorithms.mindspore import (
         fedavg as fedavg_mindspore,
@@ -36,15 +35,14 @@ else:
     ])
 
 
-def get(model, trainer=None, client_id=None):
+def get(trainer=None, client_id=None):
     """Get the algorithm with the provided type."""
     algorithm_type = Config().algorithm.type
 
     if algorithm_type in registered_algorithms:
         logging.info("Algorithm: %s", algorithm_type)
-        registered_alg = registered_algorithms[algorithm_type](model, trainer,
+        registered_alg = registered_algorithms[algorithm_type](trainer,
                                                                client_id)
         return registered_alg
     else:
         raise ValueError('No such model: {}'.format(algorithm_type))
-

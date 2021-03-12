@@ -5,7 +5,7 @@ based on a configuration at run-time.
 import logging
 from collections import OrderedDict
 
-from models.base import Model
+import models.registry as models_registry
 from trainers import (
     basic,
     scaffold,
@@ -28,20 +28,18 @@ else:
         ('fedsarah', fedsarah.Trainer),
     ])
 
-    if Config().trainer.model == 'yolov5':
-        from trainers import yolo
-        yolo_trainers = {'yolov5': yolo.Trainer}
 
-        registered_trainers = OrderedDict(
-            list(registered_trainers.items()) + list(yolo_trainers.items()))
-
-
-def get(model: Model, client_id=0):
+def get(client_id=0):
     """Get the trainer with the provided name."""
     trainer_name = Config().trainer.type
     logging.info("Trainer: %s", trainer_name)
 
-    if trainer_name in registered_trainers:
+    model = models_registry.get()
+
+    if Config().trainer.model_name == 'yolov5':
+        from trainers import yolo
+        return yolo.Trainer(model, client_id)
+    elif trainer_name in registered_trainers:
         registered_trainer = registered_trainers[trainer_name](model,
                                                                client_id)
     else:

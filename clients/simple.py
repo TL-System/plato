@@ -7,7 +7,6 @@ import random
 import time
 from dataclasses import dataclass
 
-from models import registry as models_registry
 from datasources import registry as datasources_registry
 from algorithms import registry as algorithms_registry
 from trainers import registry as trainers_registry
@@ -47,10 +46,8 @@ class SimpleClient(Client):
 
     def configure(self):
         """Prepare this client for training."""
-        self.model = models_registry.get()
-        self.trainer = trainers_registry.get(self.model, self.client_id)
-        self.algorithm = algorithms_registry.get(self.model, self.trainer,
-                                                 self.client_id)
+        self.trainer = trainers_registry.get(self.client_id)
+        self.algorithm = algorithms_registry.get(self.trainer, self.client_id)
 
     def load_data(self):
         """Generating data and loading them onto this client."""

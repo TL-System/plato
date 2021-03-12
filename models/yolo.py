@@ -72,7 +72,7 @@ class Model(yolo.Model):
         return x
 
     @staticmethod
-    def get_model(*args):
+    def get_model():
         """Obtaining an instance of this model provided that the name is valid."""
         if hasattr(Config().trainer, 'model_config'):
             return Model(Config().trainer.model_config,

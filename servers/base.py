@@ -23,7 +23,6 @@ class Server:
         self.total_clients = 0
         self.selected_clients = None
         self.current_round = 0
-        self.model = None
         self.algorithm = None
         self.trainer = None
         self.accuracy = 0
