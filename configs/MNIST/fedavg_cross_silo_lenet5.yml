@@ -12,6 +12,7 @@ clients:
     do_test: true
 
 server:
+    type: fedavg_cross_silo
     address: localhost
     port: 8000
 
@@ -60,7 +61,7 @@ trainer:
 
 algorithm:
     # Aggregation algorithm
-    type: fedavg_cross_silo
+    type: fedavg
 
     # Cross-silo training
     cross_silo: true
