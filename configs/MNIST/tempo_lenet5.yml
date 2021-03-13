@@ -12,6 +12,7 @@ clients:
     do_test: false
 
 server:
+    type: tempo
     address: localhost
     port: 8000
 
@@ -60,7 +61,7 @@ trainer:
 
 algorithm:
     # Aggregation algorithm
-    type: tempo
+    type: fedavg
 
     # Cross-silo training
     cross_silo: true

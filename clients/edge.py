@@ -3,10 +3,21 @@ A federated learning client at the edge server in a cross-silo training workload
 """
 
 import time
+from dataclasses import dataclass
 from config import Config
 from trainers import registry as trainers_registry
+from algorithms import registry as algorithms_registry
 from clients import Client
-from clients.simple import Report
+
+
+@dataclass
+class Report:
+    """Client report, to be sent to the federated learning server."""
+    client_id: str
+    num_samples: int
+    accuracy: float
+    training_time: float
+    data_loading_time: float
 
 
 class EdgeClient(Client):
@@ -15,10 +26,12 @@ class EdgeClient(Client):
         super().__init__()
         self.server = server
         self.trainer = None
+        self.algorithm = None
 
     def configure(self):
         """Prepare this edge client for training."""
-        self.trainer = trainers_registry.get(self.server.model)
+        self.trainer = trainers_registry.get(self.client_id)
+        self.algorithm = algorithms_registry.get(self.trainer, self.client_id)
 
     def load_data(self):
         """The edge client does not need to train models using local data."""
@@ -55,7 +68,7 @@ class EdgeClient(Client):
         self.server.model_aggregated.clear()
 
         # Extract model weights and biases
-        weights = self.trainer.extract_weights()
+        weights = self.algorithm.extract_weights()
 
         # Generate a report for the server, performing model testing if applicable
         if Config().clients.do_test:
@@ -65,5 +78,5 @@ class EdgeClient(Client):
 
         training_time = time.time() - training_start_time
 
-        return Report(self.server.total_samples, accuracy, training_time,
-                      0), weights
+        return Report(self.client_id, self.server.total_samples, accuracy,
+                      training_time, 0), weights

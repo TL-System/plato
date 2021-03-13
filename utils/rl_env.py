@@ -9,8 +9,6 @@ https://stable-baselines3.readthedocs.io/en/master/guide/custom_env.html.
 """
 
 import logging
-import os
-import sys
 import asyncio
 import gym
 from gym import spaces

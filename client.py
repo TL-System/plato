@@ -2,6 +2,7 @@
 Starting point for a Plato federated learning client.
 """
 
+from collections import OrderedDict
 import asyncio
 import logging
 import sys
@@ -9,7 +10,13 @@ import websockets
 
 from config import Config
 import clients
-import servers
+from servers import fedavg_cs, rhythm, tempo
+
+edge_servers = OrderedDict([
+    ('fedavg_cross_silo', fedavg_cs.Server),
+    ('tempo', tempo.Server),
+    ('rhythm', rhythm.Server),
+])
 
 
 def main():
@@ -26,16 +33,7 @@ def main():
             Config().trainer = Config().trainer._replace(
                 rounds=Config().algorithm.local_rounds)
 
-            server = {
-                "fedavg": servers.fedavg.FedAvgServer,
-                "fedavg_cross_silo": servers.fedavg_cs.FedAvgCrossSiloServer,
-                "mistnet": servers.mistnet.MistNetServer,
-                "adaptive_sync": servers.adaptive_sync.AdaptiveSyncServer,
-                "rhythm": servers.rhythm.RhythmServer,
-                "tempo": servers.tempo.TempoServer,
-                "scaffold": servers.scaffold.ScaffoldServer,
-                "fedsarah": servers.fedsarah.FedSarahServer
-            }[Config().algorithm.type]()
+            server = edge_servers[Config().server.type]()
             server.configure()
 
             client = clients.EdgeClient(server)
