@@ -167,7 +167,9 @@ class Server(base.Server):
                     'accuracy':
                     self.accuracy * 100,
                     'training_time':
-                    max([report.training_time for report in self.reports]),
+                    max([
+                        report.training_time for (report, __) in self.reports
+                    ]),
                     'round_time':
                     time.time() - self.round_start_time
                 }[item]
