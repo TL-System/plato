@@ -122,11 +122,9 @@ class Server(fedavg_cs.Server):
         weights_diff_list = []
         for i in range(Config().algorithm.total_silos):
             client_id = i + 1 + Config().clients.total_clients
-            report = [
-                report for (report, __) in self.reports
-                if int(report.client_id) == client_id
-            ][0]
-            weights = report.weights
+            (report, weights) = [(report, payload)
+                                 for (report, payload) in self.reports
+                                 if int(report.client_id) == client_id][0]
             num_samples = report.num_samples
 
             weights_diff = self.compute_weights_difference(
@@ -144,7 +142,7 @@ class Server(fedavg_cs.Server):
         weights_diff = 0
 
         # Extract global model weights
-        global_weights = self.trainer.extract_weights()
+        global_weights = self.algorithm.extract_weights()
 
         for name, local_weight in local_weights.items():
             global_weight = global_weights[name]

@@ -23,6 +23,7 @@ Attributes in **bold** are must included in a configuration file, in *italic* ar
 
 | Attribute | Meaning | Valid Value | Note |
 |:---------:|:-------:|:-----------:|:----:|
+|*type*|The type of the server|`fedavg_cross_silo`|**algorithm.type** must be `fedavg`|
 |**address**|The address of the central server|e.g., `localhost`||
 |**port**|The port number of the central server|e.g., `8000`||
 
@@ -60,16 +61,16 @@ Attributes in **bold** are must included in a configuration file, in *italic* ar
 |**learning_rate**||||
 |**momentum**||||
 |**weight_decay**||||    
-|**model**|The machine learning model|`lenet5`, `resnet`, `wideresnet`, `vgg`||
+|**model_name**|The machine learning model|`lenet5`, `resnet`, `vgg`,`wideresnet`, `feedback_transformer`, `yolov5`, `HuggingFace_CausalLM`||
 
 ### algorithm
 
 | Attribute | Meaning | Valid Value | Note |
 |:---------:|:-------:|:-----------:|:----:|
 |**type**|Aggregation algorithm|`fedavg`|
-|||`fedavg_cross_silo`||
 |||`mistnet`||
 |||`adaptive_sync`||
+|||`adaptive_freezing`||
 |*cross_silo*|Cross-silo training|`true` or `false`|If `true`, must have **total_silos** and **local_rounds** attributes|
 |*total_silos*|The total number of silos (edge servers)|Any positive integer||
 |*local_rounds*|The number of local aggregation rounds on edge servers before sending aggregated weights to the central server|Any positive integer||

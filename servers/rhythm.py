@@ -11,17 +11,11 @@ import time
 
 from config import Config
 import servers
+from utils import rl_env
 from utils import csv_processor
 
 FLServer = servers.fedavg_cs.Server
-
-if hasattr(Config().algorithm, 'rl_episodes'):
-    from utils.rl_env import RLEnv
-
-    # The central server of FL
-    FLServer = {
-        "fedavg_cross_silo": servers.fedavg_cs.Server
-    }[Config().algorithm.fl_server]
+RLEnv = rl_env.RLEnv
 
 
 class Server(FLServer):

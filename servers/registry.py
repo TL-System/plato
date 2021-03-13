@@ -25,7 +25,7 @@ from config import Config
 registered_servers = OrderedDict([
     ('fedavg', fedavg.Server),
     ('adaptive_sync', adaptive_sync.Server),
-    ('fedavg_cs', fedavg_cs.Server),
+    ('fedavg_cross_silo', fedavg_cs.Server),
     ('fednova', fednova.Server),
     ('mistnet', mistnet.Server),
     ('scaffold', scaffold.Server),
