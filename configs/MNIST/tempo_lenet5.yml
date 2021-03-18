@@ -66,9 +66,6 @@ algorithm:
     # Cross-silo training
     cross_silo: true
 
-    # The type of FL central server in cross-silo training
-    fl_server: fedavg_cross_silo
-
     # The total number of silos (edge servers)
     total_silos: 2
 
