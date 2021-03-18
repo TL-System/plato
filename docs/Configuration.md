@@ -36,6 +36,7 @@ Attributes in **bold** are must included in a configuration file, in *italic* ar
 |**divider**|How to divide the entire dataset to the clients|`iid`|Must have the *partition_size* attribute|
 |||`iid_mindspore`|Must have the *partition_size* attribute|
 |||`biased`|Must have *partition_size* and *label_distribution* attributes|
+|random_seed|Keep a random seed to make experiments reproducible (clients always have the same datasets)||
 |||`sharded`|Divide the dataset into (*shards_per_client* x **clients.total_clients**) shards of equal sizes, and assign each client **shards_per_client** shard(s)|
 |||`mixed`|Some clients' datasets are iid. Some are non-iid. Must have *iid_clients* and *non_iid_clients* attributes|
 |*partition_size*|Number of samples in each partition|Any positive integer|Must have this attribute if the **divider** is `iid`, `iid_mindspore` or `biased`|
