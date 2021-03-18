@@ -26,7 +26,7 @@ data:
     partition_size: 60000
 
     # IID, biased, or sharded?
-    divider: iid_mindspore
+    sampler: iid_mindspore
 
     # Uniform or normal distribution for labels across clients?
     label_distribution: uniform

@@ -22,10 +22,6 @@ class IIDDivider:
 
         return self.partition
 
-    def get_testset(self):
-        """Return the entire testset."""
-        return self.datasource.get_test_set()
-
     def trainset_size(self):
         """Return the number of batches in the training data partition."""
         return self.partition.get_dataset_size()

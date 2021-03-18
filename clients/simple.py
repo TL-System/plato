@@ -10,7 +10,8 @@ from dataclasses import dataclass
 from datasources import registry as datasources_registry
 from algorithms import registry as algorithms_registry
 from trainers import registry as trainers_registry
-from dividers import iid, biased, sharded, iid_mindspore, mixed
+from dividers import biased, sharded, iid_mindspore, mixed
+from samplers import iid
 from utils import dists
 from config import Config
 from clients import Client
@@ -34,15 +35,14 @@ class SimpleClient(Client):
         self.testset = None  # Testing dataset
         self.algorithm = None
         self.trainer = None
-        self.divider = None
+        self.sampler = None
 
         self.data_loading_time = None
         self.data_loading_time_sent = False
 
     def __repr__(self):
-        return 'Client #{}: {} samples in labels: {}'.format(
-            self.client_id, len(self.data),
-            set([label for __, label in self.data]))
+        return 'Client #{}: {} samples.'.format(self.client_id,
+                                                self.sampler.dataset_size)
 
     def configure(self):
         """Prepare this client for training."""
@@ -60,71 +60,20 @@ class SimpleClient(Client):
         logging.info("[Client #%s] Dataset size: %s", self.client_id,
                      datasource.num_train_examples())
 
-        # Setting up the data divider
-        assert Config().data.divider in ('iid', 'biased', 'sharded',
+        # Setting up the data sampler
+        assert Config().data.sampler in ('iid', 'biased', 'sharded',
                                          'iid_mindspore', 'mixed')
         logging.info("[Client #%s] Data distribution: %s", self.client_id,
-                     Config().data.divider)
+                     Config().data.sampler)
 
-        self.divider = {
-            'iid': iid.IIDDivider,
-            'biased': biased.BiasedDivider,
-            'sharded': sharded.ShardedDivider,
-            'iid_mindspore': iid_mindspore.IIDDivider,
-            'mixed': mixed.MixedDivider
-        }[Config().data.divider](datasource)
+        self.sampler = {
+            'iid': iid.Sampler,
+        }[Config().data.sampler](datasource, self.client_id)
+        self.trainset = datasource.get_train_set()
 
-        num_clients = Config().clients.total_clients
-
-        logging.info("[Client #%s] Extracting the local dataset.",
-                     self.client_id)
-
-        # Extract data partition for client
-        if Config().data.divider == 'iid':
-            assert Config().data.partition_size is not None
-            partition_size = Config().data.partition_size
-
-            assert partition_size * Config(
-            ).clients.per_round <= datasource.num_train_examples()
-
-            self.data = self.divider.get_partition(partition_size)
-
-        elif Config().data.divider == 'biased':
-            assert Config().data.label_distribution in ('uniform', 'normal')
-
-            dist, __ = {
-                "uniform": dists.uniform,
-                "normal": dists.normal
-            }[Config().data.label_distribution](num_clients,
-                                                len(self.divider.labels))
-            random.shuffle(dist)
-
-            pref = random.choices(self.divider.labels, dist)[0]
-
-            assert Config().data.partition_size
-            partition_size = Config().data.partition_size
-            self.data = self.divider.get_partition(partition_size, pref)
-
-        elif Config().data.divider == 'sharded':
-            self.data = self.divider.get_partition(self.client_id)
-
-        elif Config().data.divider == 'iid_mindspore':
-            assert hasattr(Config().trainer, 'use_mindspore')
-            partition_size = Config().data.partition_size
-            self.data = self.divider.get_partition(partition_size,
-                                                   self.client_id)
-
-        elif Config().data.divider == 'mixed':
-            assert hasattr(Config().data, 'iid_clients')
-            assert hasattr(Config().data, 'non_iid_clients')
-            self.data = self.divider.get_partition(self.client_id)
-
-        # Extract the trainset and testset if local testing is needed
+        # Set the testset if local testing is needed
         if Config().clients.do_test:
             self.testset = datasource.get_test_set()
-
-        self.trainset = self.data
-        self.divider.partition = self.data
 
         self.data_loading_time = time.time() - data_loading_start_time
 
@@ -138,7 +87,7 @@ class SimpleClient(Client):
         logging.info("[Client #%s] Started training.", self.client_id)
 
         # Perform model training
-        self.trainer.train(self.trainset)
+        self.trainer.train(self.trainset, self.sampler)
 
         # Extract model weights and biases
         weights = self.algorithm.extract_weights()
@@ -159,5 +108,5 @@ class SimpleClient(Client):
             data_loading_time = self.data_loading_time
             self.data_loading_time_sent = True
 
-        return Report(self.divider.trainset_size(), accuracy, training_time,
+        return Report(self.sampler.trainset_size(), accuracy, training_time,
                       data_loading_time), weights

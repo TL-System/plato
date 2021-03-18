@@ -30,7 +30,3 @@ class IIDDivider(base.Divider):
             size_to_extract -= examples_extracted
 
         return partition
-
-    def get_testset(self):
-        """Return the entire testset."""
-        return self.testset

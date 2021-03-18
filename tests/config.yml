@@ -6,7 +6,7 @@ clients:
 data:
     datasource: MNIST
     data_path: ./data
-    divider: iid
+    sampler: iid
     partition_size: 60000
 
 trainer:

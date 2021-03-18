@@ -25,8 +25,11 @@ data:
     # Number of samples in each partition
     partition_size: 20000
 
+    # Fixed random seed
+    random_seed: 1
+
     # IID, biased, or sharded?
-    divider: iid
+    sampler: iid
 
     # Uniform or normal distribution for labels across clients?
     label_distribution: uniform
