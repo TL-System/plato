@@ -116,7 +116,7 @@ class Trainer(base.Trainer):
         return accuracy
 
     @staticmethod
-    def train_process(rank, self, config, trainset, cut_layer=None):  # pylint: disable=unused-argument
+    def train_process(rank, self, config, trainset, sampler, cut_layer=None):  # pylint: disable=unused-argument
         """The main training loop in a federated learning workload, run in
           a separate process with a new CUDA context, so that CUDA memory
           can be released after the training completes.
@@ -125,6 +125,7 @@ class Trainer(base.Trainer):
         rank: Required by torch.multiprocessing to spawn processes. Unused.
         config: a dictionary of configuration parameters.
         trainset: The training dataset.
+        sampler: the sampler that extracts a partition for this client.
         cut_layer (optional): The layer which training should start from.
         """
         run = wandb.init(project="plato",
@@ -143,10 +144,14 @@ class Trainer(base.Trainer):
             _train_loader = getattr(self, "train_loader", None)
 
             if callable(_train_loader):
-                train_loader = _train_loader(batch_size, trainset, cut_layer)
+                train_loader = _train_loader(batch_size, trainset, sampler,
+                                             cut_layer)
             else:
                 train_loader = torch.utils.data.DataLoader(
-                    trainset, batch_size=batch_size, shuffle=True)
+                    dataset=trainset,
+                    shuffle=False,
+                    batch_size=batch_size,
+                    sampler=sampler.get())
 
             iterations_per_epoch = np.ceil(len(trainset) /
                                            batch_size).astype(int)
@@ -220,11 +225,12 @@ class Trainer(base.Trainer):
 
         run.finish()
 
-    def train(self, trainset, cut_layer=None):
+    def train(self, trainset, sampler, cut_layer=None):
         """The main training loop in a federated learning workload.
 
         Arguments:
         trainset: The training dataset.
+        sampler: the sampler that extracts a partition for this client.
         cut_layer (optional): The layer which training should start from.
         """
         self.start_training()
@@ -237,6 +243,7 @@ class Trainer(base.Trainer):
                      self,
                      config,
                      trainset,
+                     sampler,
                      cut_layer,
                  ),
                  join=True)

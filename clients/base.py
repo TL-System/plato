@@ -19,8 +19,6 @@ class Client:
         self.client_id = Config().args.id
         self.data_loaded = False  # is training data already loaded from the disk?
 
-        random.seed()
-
     async def start_client(self):
         """Startup function for a client."""
 

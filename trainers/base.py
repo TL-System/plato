@@ -66,11 +66,12 @@ class Trainer(ABC):
         Config().sql_connection.close()
 
     @abstractmethod
-    def train(self, trainset, cut_layer=None):
+    def train(self, trainset, sampler, cut_layer=None):
         """The main training loop in a federated learning workload.
 
         Arguments:
         trainset: The training dataset.
+        sampler: the sampler that extracts a partition for this client.
         cut_layer (optional): The layer which training should start from.
         """
 

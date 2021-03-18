@@ -9,7 +9,6 @@ from trainers import (
     basic,
     scaffold,
     fedsarah,
-    huggingface,
 )
 
 from config import Config
@@ -26,7 +25,6 @@ else:
         ('basic', basic.Trainer),
         ('scaffold', scaffold.Trainer),
         ('fedsarah', fedsarah.Trainer),
-        ('HuggingFace', huggingface.Trainer),
     ])
 
 
@@ -38,6 +36,9 @@ def get(client_id=0):
     if Config().trainer.model_name == 'yolov5':
         from trainers import yolo
         return yolo.Trainer(client_id)
+    elif Config().trainer.type == 'HuggingFace':
+        from trainers import huggingface
+        return huggingface.Trainer
     elif trainer_name in registered_trainers:
         registered_trainer = registered_trainers[trainer_name](client_id)
     else:
