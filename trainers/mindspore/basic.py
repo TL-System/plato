@@ -122,6 +122,9 @@ class Trainer(base.Trainer):
         """
         self.start_training()
 
+        # Deactivate the cut layer so that testing uses all the layers
+        self.mindspore_model._network.cut_layer = None
+
         accuracy = self.mindspore_model.eval(testset)
 
         self.pause_training()
