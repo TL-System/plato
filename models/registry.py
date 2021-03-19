@@ -42,7 +42,8 @@ def get():
     if model_name == 'yolov5':
         from models import yolo
         return yolo.Model.get_model()
-    elif model_name == 'HuggingFace_CausalLM':
+
+    if model_name == 'HuggingFace_CausalLM':
         from transformers import AutoModelForCausalLM
         model_checkpoint = Config.trainer.model_checkpoint
         return AutoModelForCausalLM.from_pretrained(model_checkpoint)
@@ -53,5 +54,5 @@ def get():
 
     if model is None:
         raise ValueError('No such model: {}'.format(model_name))
-    else:
-        return model
+
+    return model
