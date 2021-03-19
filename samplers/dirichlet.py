@@ -13,7 +13,7 @@ class Sampler(base.Sampler):
     """Create a data sampler for each client to use a divided partition of the
     dataset, biased across labels according to the Dirichlet distribution."""
     def __init__(self, datasource, client_id):
-        super().__init__(datasource)
+        super().__init__()
         self.client_id = client_id
 
         # Different clients should have a different bias across the labels

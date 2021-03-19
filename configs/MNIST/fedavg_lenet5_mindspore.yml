@@ -26,7 +26,7 @@ data:
     partition_size: 60000
 
     # IID or non-IID?
-    sampler: iid_mindspore
+    sampler: iid
 
 trainer:
     # Should MindSpore be used instead of PyTorch?

@@ -17,7 +17,7 @@ if hasattr(Config().trainer, 'use_mindspore'):
     from trainers.mindspore import (
         basic as basic_mindspore, )
 
-    registered_datasources = OrderedDict([
+    registered_trainers = OrderedDict([
         ('basic', basic_mindspore.Trainer),
     ])
 else:

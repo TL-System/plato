@@ -41,7 +41,6 @@ def get(datasource, client_id):
     logging.info("[Client #%s] Sampler: %s", client_id, sampler_type)
 
     if sampler_type in registered_samplers:
-        logging.info("Sampler: %s", sampler_type)
         registered_sampler = registered_samplers[sampler_type](datasource,
                                                                client_id)
     else:

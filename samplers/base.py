@@ -10,11 +10,7 @@ from config import Config
 class Sampler:
     """Base class for data samplers so that the dataset is divided into
     partitions across the clients."""
-    def __init__(self, datasource):
-        """Get data from the data source."""
-        dataset = datasource.get_train_set()
-        self.dataset_size = len(dataset)
-
+    def __init__(self):
         if hasattr(Config().data, 'random_seed'):
             # Keeping random seed the same across the clients
             # so that the experiments are reproducible

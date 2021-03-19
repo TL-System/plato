@@ -21,22 +21,22 @@ class DataSource(base.DataSource):
         super().__init__()
         _path = Config().data.data_path
 
-        # Downloading the MNIST dataset from http://yann.lecun.com/exdb/mnist/
-        self.train_path = _path + "/MNIST/raw/train/"
-        self.test_path = _path + "/MNIST/raw/test/"
+        # Downloading the MNIST dataset from https://ossci-datasets.s3.amazonaws.com/mnist/
+        self.train_path = _path + "/MNIST/raw/train"
+        self.test_path = _path + "/MNIST/raw/test"
 
         for data_path in [self.train_path, self.test_path]:
             if not os.path.exists(data_path):
                 os.makedirs(data_path)
 
         train_urls = [
-            "http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz",
-            "http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz"
+            "https://ossci-datasets.s3.amazonaws.com/mnist/train-images-idx3-ubyte.gz",
+            "https://ossci-datasets.s3.amazonaws.com/mnist/train-labels-idx1-ubyte.gz"
         ]
 
         test_urls = [
-            "http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz",
-            "http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz"
+            "https://ossci-datasets.s3.amazonaws.com/mnist/t10k-images-idx3-ubyte.gz",
+            "https://ossci-datasets.s3.amazonaws.com/mnist/t10k-labels-idx1-ubyte.gz"
         ]
 
         for url in train_urls:
@@ -78,17 +78,8 @@ class DataSource(base.DataSource):
     def num_test_examples(self):
         return 10000
 
-    def get_train_set(self):
-        dataset = ds.MnistDataset(dataset_dir=self.train_path)
-        return DataSource.transform(dataset)
-
-    def get_train_partition(self, num_shards, shard_id):
-        """Get a trainset partition for distributed machine learning."""
-        dataset = ds.MnistDataset(dataset_dir=self.train_path,
-                                  shuffle=False,
-                                  num_shards=num_shards,
-                                  shard_id=shard_id)
-
+    def get_train_set(self, sampler):
+        dataset = ds.MnistDataset(dataset_dir=self.train_path, sampler=sampler.get())
         return DataSource.transform(dataset)
 
     def get_test_set(self):

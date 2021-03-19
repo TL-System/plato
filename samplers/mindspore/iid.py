@@ -14,10 +14,10 @@ class Sampler(base.Sampler):
     """Create a data sampler for each client to use a randomly divided partition of the
     dataset."""
     def __init__(self, datasource, client_id):
-        super().__init__(datasource)
+        super().__init__()
         self.client_id = client_id
 
-        indices = list(range(self.dataset_size))
+        indices = list(range(datasource.num_train_examples()))
         np.random.seed(self.random_seed)
         np.random.shuffle(indices)
 
