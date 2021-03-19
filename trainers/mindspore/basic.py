@@ -98,12 +98,11 @@ class Trainer(base.Trainer):
         param_dict = mindspore.load_checkpoint(model_path)
         mindspore.load_param_into_net(self.model, param_dict)
 
-    def train(self, trainset, cut_layer=None):
+    def train(self, trainset, *args):
         """The main training loop in a federated learning workload.
 
         Arguments:
         trainset: The training dataset.
-        cut_layer (optional): The layer which training should start from.
         """
         self.start_training()
 

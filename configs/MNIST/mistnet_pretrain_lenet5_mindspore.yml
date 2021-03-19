@@ -17,7 +17,7 @@ server:
 
 data:
     # The training and testing dataset
-    datasource: MNIST_mindspore
+    datasource: MNIST
 
     # Where the dataset is located
     data_path: ./data
@@ -33,7 +33,7 @@ trainer:
     use_mindspore: true
 
     # The type of the trainer
-    type: basic_mindspore
+    type: basic
 
     # The maximum number of training rounds
     rounds: 1
