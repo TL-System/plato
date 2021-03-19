@@ -3,11 +3,11 @@ A basic federated learning client who sends weight updates to the server.
 """
 
 import logging
-import random
 import time
 from dataclasses import dataclass
 
 from datasources import registry as datasources_registry
+from samplers import registry as samplers_registry
 from algorithms import registry as algorithms_registry
 from trainers import registry as trainers_registry
 from samplers import iid, dirichlet
@@ -59,14 +59,7 @@ class SimpleClient(Client):
                      datasource.num_train_examples())
 
         # Setting up the data sampler
-        assert Config().data.sampler in ('iid', 'noniid')
-        logging.info("[Client #%s] Data distribution: %s", self.client_id,
-                     Config().data.sampler)
-
-        self.sampler = {
-            'iid': iid.Sampler,
-            'noniid': dirichlet.Sampler,
-        }[Config().data.sampler](datasource, self.client_id)
+        self.sampler = samplers_registry.get(datasource, self.client_id)
         self.trainset = datasource.get_train_set()
 
         # Set the testset if local testing is needed

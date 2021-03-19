@@ -73,11 +73,18 @@ class DataSource(ABC):
         pass
 
     def classes(self):
-        """Obtains a list of class names in the dataset."""
+        """Obtains a list of class names in the dataset. """
         return list(self.trainset.classes)
 
+    def targets(self):
+        """Obtains a list of targets (labels) for all the examples
+        in the dataset. """
+        return self.trainset.targets
+
     def get_train_set(self):
+        """Obtains the training dataset. """
         return self.trainset
 
     def get_test_set(self):
+        """Obtains the validation dataset. """
         return self.testset

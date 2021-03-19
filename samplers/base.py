@@ -26,7 +26,8 @@ class Sampler:
 
     @abstractmethod
     def get(self):
-        """Obtain an instance of the sampler. """
+        """Obtains an instance of the sampler. """
 
+    @abstractmethod
     def trainset_size(self):
-        return len(self.subset_indices)
+        """Returns the length of the dataset after sampling. """
