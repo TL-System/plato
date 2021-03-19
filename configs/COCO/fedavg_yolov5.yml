@@ -131,10 +131,8 @@ data:
     # Number of samples in each partition
     partition_size: 128
 
-    # IID, biased, or sharded?
+    # IID or non-IID?
     sampler: iid
-
-    shards_per_client: 2
 
 trainer:
     # The type of the trainer

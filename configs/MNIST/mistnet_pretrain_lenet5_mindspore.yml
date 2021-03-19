@@ -25,11 +25,8 @@ data:
     # Number of samples in each partition
     partition_size: 60000
 
-    # IID, biased, or sharded?
-    sampler: iid_mindspore
-
-    # Uniform or normal distribution for labels across clients?
-    label_distribution: uniform
+    # IID or non-IID?
+    sampler: iid
 
 trainer:
     # Should MindSpore be used instead of PyTorch?

@@ -32,7 +32,7 @@ data:
     sampler: iid
 
     # Uniform or normal distribution for labels across clients?
-    label_distribution: uniform
+    : uniform
 
 trainer:
     # The type of the trainer

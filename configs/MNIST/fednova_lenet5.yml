@@ -25,11 +25,8 @@ data:
     # Number of samples in each partition
     partition_size: 20000
 
-    # IID, biased, or sharded?
+    # IID or non-IID?
     sampler: iid
-
-    # Uniform or normal distribution for labels across clients?
-    label_distribution: uniform
 
 trainer:
     # The type of the trainer
