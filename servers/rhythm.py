@@ -64,7 +64,7 @@ class Server(FLServer):
         """
         if Config().is_central_server():
             logging.info("Configuring a RL agent and a %s server...",
-                         Config().algorithm.fl_server)
+                         Config().algorithm.type)
             logging.info(
                 "This RL agent will tune the number of aggregations on edge servers."
             )
