@@ -33,6 +33,7 @@ class Sampler(base.Sampler):
                                        1):total_size:total_clients]
 
     def get(self):
+        """Obtain an instance of the sampler. """
         gen = torch.Generator()
         gen.manual_seed(self.random_seed)
         return SubsetRandomSampler(self.subset_indices, generator=gen)

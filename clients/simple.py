@@ -10,9 +10,7 @@ from dataclasses import dataclass
 from datasources import registry as datasources_registry
 from algorithms import registry as algorithms_registry
 from trainers import registry as trainers_registry
-from dividers import biased, sharded, iid_mindspore, mixed
-from samplers import iid
-from utils import dists
+from samplers import iid, dirichlet
 from config import Config
 from clients import Client
 
@@ -61,13 +59,13 @@ class SimpleClient(Client):
                      datasource.num_train_examples())
 
         # Setting up the data sampler
-        assert Config().data.sampler in ('iid', 'biased', 'sharded',
-                                         'iid_mindspore', 'mixed')
+        assert Config().data.sampler in ('iid', 'noniid')
         logging.info("[Client #%s] Data distribution: %s", self.client_id,
                      Config().data.sampler)
 
         self.sampler = {
             'iid': iid.Sampler,
+            'noniid': dirichlet.Sampler,
         }[Config().data.sampler](datasource, self.client_id)
         self.trainset = datasource.get_train_set()
 
