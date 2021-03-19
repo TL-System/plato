@@ -1,12 +1,13 @@
 """
-Samples data from a dataset in an independent and identically distributed fashion.
+Samples data from a MindSpore dataset in an independent and identically distributed fashion.
 """
-import torch
 import numpy as np
+
+import mindspore.dataset as ds
+from mindspore.dataset import SubsetRandomSampler
 
 from samplers import base
 from config import Config
-from torch.utils.data import SubsetRandomSampler
 
 
 class Sampler(base.Sampler):
@@ -37,9 +38,8 @@ class Sampler(base.Sampler):
 
     def get(self):
         """Obtains an instance of the sampler. """
-        gen = torch.Generator()
-        gen.manual_seed(self.random_seed)
-        return SubsetRandomSampler(self.subset_indices, generator=gen)
+        ds.config.set_seed(self.random_seed)
+        return SubsetRandomSampler(self.subset_indices)
 
     def trainset_size(self):
         """Returns the length of the dataset after sampling. """

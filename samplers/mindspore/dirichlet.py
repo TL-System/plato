@@ -1,12 +1,13 @@
 """
 Samples data from a dataset, biased across labels according to the Dirichlet distribution.
 """
-import torch
 import numpy as np
+
+import mindspore.dataset as ds
+from mindspore.dataset import WeightedRandomSampler
 
 from samplers import base
 from config import Config
-from torch.utils.data import WeightedRandomSampler
 
 
 class Sampler(base.Sampler):
@@ -36,14 +37,12 @@ class Sampler(base.Sampler):
 
     def get(self):
         """Obtains an instance of the sampler. """
-        gen = torch.Generator()
-        gen.manual_seed(self.random_seed)
+        ds.config.set_seed(self.random_seed)
 
         # Samples without replacement using the sample weights
         return WeightedRandomSampler(weights=self.sample_weights,
                                      num_samples=self.partition_size,
-                                     replacement=False,
-                                     generator=gen)
+                                     replacement=False)
 
     def trainset_size(self):
         """Returns the length of the dataset after sampling. """
