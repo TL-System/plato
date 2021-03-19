@@ -125,7 +125,7 @@ class DataSource(base.DataSource):
             # MistNet client: feature extraction
             return torch.utils.data.DataLoader(dataset=COCODataset(trainset),
                                                batch_size=batch_size,
-                                               sampler=sampler.get(),
+                                               sampler=sampler,
                                                shuffle=False)
         elif cut_layer is not None:
             # MistNet server: training from the cut layer forwards using
@@ -133,14 +133,14 @@ class DataSource(base.DataSource):
             return torch.utils.data.DataLoader(dataset=trainset,
                                                batch_size=batch_size,
                                                shuffle=False,
-                                               sampler=sampler.get(),
+                                               sampler=sampler,
                                                collate_fn=collate_fn)
         else:
             return torch.utils.data.DataLoader(
                 COCODataset(trainset),
                 batch_size=batch_size,
                 shuffle=False,
-                sampler=sampler.get(),
+                sampler=sampler,
                 collate_fn=LoadImagesAndLabels.collate_fn)
 
     @staticmethod

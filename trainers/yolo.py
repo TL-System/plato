@@ -23,7 +23,7 @@ from tqdm import tqdm
 from config import Config
 from datasources import coco
 from trainers import basic
-from models.base import Model
+import models.registry as models_registry
 from utils import unary_encoding
 
 try:
@@ -34,20 +34,22 @@ except ImportError:
 
 class Trainer(basic.Trainer):
     """The YOLOV5 trainer."""
-    def __init__(self, model: Model, client_id=0):
-        super().__init__(model, client_id)
+    def __init__(self, client_id=0):
+        super().__init__(client_id)
+        self.model = models_registry.get()
         Config().params['grid_size'] = int(self.model.stride.max())
 
     def train_loader(self,
                      batch_size,
                      trainset,
+                     sampler,
                      extract_features=False,
                      cut_layer=None):
         """The train loader for training YOLOv5 using the COCO dataset. """
-        return coco.DataSource.get_train_loader(batch_size, trainset,
+        return coco.DataSource.get_train_loader(batch_size, trainset, sampler,
                                                 extract_features, cut_layer)
 
-    def train_model(self, config, trainset, cut_layer=None):  # pylint: disable=unused-argument
+    def train_model(self, config, trainset, sampler, cut_layer=None):  # pylint: disable=unused-argument
         """The training loop for YOLOv5.
 
         Arguments:
@@ -131,6 +133,7 @@ class Trainer(basic.Trainer):
         logging.info("[Client #%s] Loading the dataset.", self.client_id)
         train_loader = self.train_loader(batch_size,
                                          trainset,
+                                         sampler,
                                          cut_layer=cut_layer)
         nb = len(train_loader)
 

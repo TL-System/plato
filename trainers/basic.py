@@ -135,7 +135,7 @@ class Trainer(base.Trainer):
         custom_train = getattr(self, "train_model", None)
 
         if callable(custom_train):
-            self.train_model(config, trainset, cut_layer)
+            self.train_model(config, trainset, sampler.get(), cut_layer)
         else:
             log_interval = 10
             batch_size = config['batch_size']
@@ -144,8 +144,8 @@ class Trainer(base.Trainer):
             _train_loader = getattr(self, "train_loader", None)
 
             if callable(_train_loader):
-                train_loader = _train_loader(batch_size, trainset, sampler,
-                                             cut_layer)
+                train_loader = _train_loader(batch_size, trainset,
+                                             sampler.get(), cut_layer)
             else:
                 train_loader = torch.utils.data.DataLoader(
                     dataset=trainset,

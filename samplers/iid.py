@@ -31,10 +31,6 @@ class Sampler(base.Sampler):
         # Compute the indices of data in the subset for this client
         self.subset_indices = indices[(int(self.client_id) -
                                        1):total_size:total_clients]
-        print(len(indices))
-        print(indices[:10])
-        print(len(self.subset_indices))
-        print(self.subset_indices[:10])
 
     def get(self):
         gen = torch.Generator()

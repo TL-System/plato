@@ -132,7 +132,7 @@ data:
     partition_size: 128
 
     # IID, biased, or sharded?
-    sampler: sharded
+    sampler: iid
 
     shards_per_client: 2
 
