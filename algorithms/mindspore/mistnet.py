@@ -63,15 +63,13 @@ class Algorithm(fedavg.Algorithm):
         for logit, target in trainset:
             yield logit.asnumpy(), target.asnumpy()
 
-    def train(self, trainset, cut_layer=None):
+    def train(self, trainset, *args):
         """The main training loop used in the MistNet server.
 
         Arguments:
         trainset: The training dataset.
-        cut_layer (optional): The layer which training should start from.
         """
         feature_dataset = ds.GeneratorDataset(list(
-            Algorithm.dataset_generator(trainset)),
-                                              column_names=["image", "label"])
+            Algorithm.dataset_generator(trainset)), column_names=["image", "label"])
 
-        self.trainer.train(feature_dataset, cut_layer)
+        self.trainer.train(feature_dataset)
