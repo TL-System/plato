@@ -38,7 +38,7 @@ def get(client_id=0):
         return yolo.Trainer(client_id)
     elif Config().trainer.type == 'HuggingFace':
         from trainers import huggingface
-        return huggingface.Trainer
+        return huggingface.Trainer(client_id)
     elif trainer_name in registered_trainers:
         registered_trainer = registered_trainers[trainer_name](client_id)
     else:
