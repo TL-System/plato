@@ -35,12 +35,10 @@ Attributes in **bold** are must included in a configuration file, in *italic* ar
 |**data_path**|Where the dataset is located|e.g.,`./data`||
 |**divider**|How to divide the entire dataset to the clients|`iid`|Must have the *partition_size* attribute|
 |||`iid_mindspore`|Must have the *partition_size* attribute|
-|||`biased`|Must have *partition_size* and *label_distribution* attributes|
+|||`noniid`|Must have the *partition_size* attribute, and can have *concentration* attribute to specify the concentration parameter in the Dirichlet distribution|
 |random_seed|Keep a random seed to make experiments reproducible (clients always have the same datasets)||
-|||`sharded`|Divide the dataset into (*shards_per_client* x **clients.total_clients**) shards of equal sizes, and assign each client **shards_per_client** shard(s)|
 |||`mixed`|Some clients' datasets are iid. Some are non-iid. Must have *iid_clients* and *non_iid_clients* attributes|
 |*partition_size*|Number of samples in each partition|Any positive integer|Must have this attribute if the **divider** is `iid`, `iid_mindspore` or `biased`|
-|*label_distribution*|Uniform or normal distribution for labels across clients?|`uniform` or `normal`|Must have this attribute if the **divider** is `biased`|
 |*shards_per_client*|Number of shards per client|Any positive integer|Must have this attribute if the **divider** is `sharded`|
 |*iid_clients*|Ids of clients whose datasets are iid|e.g., 1,2,3|Must have this attribute if the **divider** is `mixed`|
 |*non_iid_clients*|Ids of clients whose datasets are non-iid|e.g., 4|Must have this attribute if the **divider** is `mixed`|
