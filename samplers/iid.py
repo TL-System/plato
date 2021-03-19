@@ -25,7 +25,10 @@ class Sampler(base.Sampler):
         total_size = partition_size * total_clients
 
         # add extra samples to make it evenly divisible, if needed
-        indices += indices[:(total_size - len(indices))]
+        if len(indices) < total_size:
+            indices += indices[:(total_size - len(indices))]
+        else:
+            indices = indices[:total_size]
         assert len(indices) == total_size
 
         # Compute the indices of data in the subset for this client
