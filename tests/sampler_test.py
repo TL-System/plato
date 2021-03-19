@@ -2,7 +2,7 @@ import os
 import sys
 import numpy as np
 import torch
-from torch.utils.data import SubsetRandomSampler
+from torch.utils.data import WeightedRandomSampler
 from torchvision import datasets, transforms
 
 # To import modules from the parent directory
@@ -11,6 +11,18 @@ parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
 from datasources import base
+
+
+def get_class_distribution(dataset_obj):
+    count_dict = {k: 0 for k, v in dataset_obj.class_to_idx.items()}
+    idx2class = {v: k for k, v in dataset_obj.class_to_idx.items()}
+
+    for element in dataset_obj:
+        y_lbl = element[1]
+        y_lbl = idx2class[y_lbl]
+        count_dict[y_lbl] += 1
+
+    return count_dict
 
 
 class DataSource(base.DataSource):
@@ -38,10 +50,10 @@ class DataSource(base.DataSource):
         return 10000
 
 
-datasource = DataSource('data').trainset
+datasource = DataSource('data')
 
 # Creating data indices for training and validation splits:
-dataset_size = len(datasource)
+dataset_size = len(datasource.trainset)
 
 np.random.seed(0)
 indices = list(range(dataset_size))
@@ -55,17 +67,29 @@ indices += indices[:(total_size - len(indices))]
 assert len(indices) == total_size
 client_id = 2
 subset_indices = indices[(client_id - 1):total_size:total_clients]
-print(len(indices))
-print(indices[:10])
-print(len(subset_indices))
-print(subset_indices[:10])
+
+target_list = datasource.trainset.targets
+class_list = datasource.classes()
+print(f'target_list = {target_list}')
+target_list = target_list[torch.randperm(len(target_list))]
+print(f'target_list shuffled = {target_list}')
+
+np.random.seed(5)
+proportions = np.random.dirichlet(np.repeat(0.5, len(class_list)))
+print(proportions)
+class_weights = proportions
+print(class_weights)
+class_weights_all = class_weights[target_list]
+print(class_weights_all)
 
 gen = torch.Generator()
 gen.manual_seed(10)
 
-train_sampler = SubsetRandomSampler(subset_indices, generator=gen)
+train_sampler = WeightedRandomSampler(weights=class_weights_all,
+                                      num_samples=len(class_weights_all),
+                                      generator=gen)
 
-train_loader = torch.utils.data.DataLoader(datasource,
+train_loader = torch.utils.data.DataLoader(datasource.trainset,
                                            batch_size=16,
                                            sampler=train_sampler)
 

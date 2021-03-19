@@ -2,7 +2,7 @@
 Base class for sampling data so that a dataset can be divided across the clients.
 """
 import os
-import numpy as np
+from abc import abstractmethod
 
 from config import Config
 
@@ -23,6 +23,10 @@ class Sampler:
             # The random seed will be different across different
             # runs if it is not provided.
             self.random_seed = os.getpid()
+
+    @abstractmethod
+    def get(self):
+        """Obtain an instance of the sampler. """
 
     def trainset_size(self):
         return len(self.subset_indices)

@@ -25,8 +25,9 @@ data:
     # Number of samples in each partition
     partition_size: 20000
 
-    # IID, biased, or sharded?
-    sampler: iid
+    # IID or non-IID?
+    sampler: noniid
+    concentration: 0.5
 
     # The random seed for sampling data
     random_seed: 1
