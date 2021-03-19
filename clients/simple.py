@@ -60,7 +60,14 @@ class SimpleClient(Client):
 
         # Setting up the data sampler
         self.sampler = samplers_registry.get(datasource, self.client_id)
-        self.trainset = datasource.get_train_set()
+
+        if hasattr(Config().trainer, 'use_mindspore'):
+            # MindSpore requires samplers to be used while constructing
+            # the dataset
+            self.trainset = datasource.get_train_set(self.sampler)
+        else:
+            # PyTorch uses samplers when loading data with a data loader
+            self.trainset = datasource.get_train_set()
 
         # Set the testset if local testing is needed
         if Config().clients.do_test:

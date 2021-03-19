@@ -71,7 +71,6 @@ class Algorithm(fedavg.Algorithm):
         cut_layer (optional): The layer which training should start from.
         """
         feature_dataset = ds.GeneratorDataset(list(
-            Algorithm.dataset_generator(trainset)),
-                                              column_names=["image", "label"])
+            Algorithm.dataset_generator(trainset)), column_names=["image", "label"])
 
-        self.trainer.train(feature_dataset, cut_layer)
+        self.trainer.train(feature_dataset, cut_layer=cut_layer)
