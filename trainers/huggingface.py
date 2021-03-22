@@ -1,12 +1,31 @@
 """
 The Transformer models from HuggingFace for natural language processing.
 """
+import torch
 
 from transformers import AutoTokenizer, TrainingArguments
 from transformers import Trainer as HuggingFaceTrainer
 
 from config import Config
 from trainers import basic
+
+
+class SampledHuggingFaceTrainer(HuggingFaceTrainer):
+    def __init__(self, model, args, train_dataset, eval_dataset, sampler):
+        super().__init__(model=model,
+                         args=args,
+                         train_dataset=train_dataset,
+                         eval_dataset=eval_dataset)
+        self.sampler = sampler
+        self.trainset = train_dataset
+        self.batch_size = Config().trainer.batch_size
+
+    def get_train_dataloader(self):
+        if self.sampler is not None:
+            return torch.utils.data.DataLoader(dataset=self.trainset,
+                                               shuffle=False,
+                                               batch_size=self.batch_size,
+                                               sampler=self.sampler.get())
 
 
 class Trainer(basic.Trainer):
@@ -37,7 +56,8 @@ class Trainer(basic.Trainer):
 
         total_length = len(concatenated_examples[list(examples.keys())[0]])
 
-        # We drop the small remainder, we could add padding if the model supported it instead of this drop, you can customize this part to your needs.
+        # We drop the small remainder, we could add padding if the model supported it
+        # instead of this drop, you can customize this part to your needs.
         total_length = (total_length // block_size) * block_size
 
         # Split by chunks of max_len.
@@ -63,12 +83,13 @@ class Trainer(basic.Trainer):
             num_proc=4,
         )
 
-    def train_model(self, config, trainset, cut_layer=None):  # pylint: disable=unused-argument
-        """The training loop for YOLOv5.
+    def train_model(self, config, trainset, sampler, cut_layer=None):  # pylint: disable=unused-argument
+        """The training loop for HuggingFace models.
 
         Arguments:
         config: A dictionary of configuration parameters.
         trainset: The training dataset.
+        sampler: the sampler that extracts a partition for this client.
         cut_layer (optional): The layer which training should start from.
         """
         training_args = TrainingArguments(
@@ -78,24 +99,29 @@ class Trainer(basic.Trainer):
             weight_decay=0.01,
         )
 
-        lm_datasets = self.preprocess_data(trainset)
+        print("Training dataset preprocessed.")
 
-        print("Training dataset preproessed.")
-
-        self.trainer = HuggingFaceTrainer(
+        self.trainer = SampledHuggingFaceTrainer(
             model=self.model,
             args=training_args,
-            train_dataset=lm_datasets["train"],
-            eval_dataset=lm_datasets["validation"],
-        )
+            train_dataset=self.preprocess_data(trainset),
+            eval_dataset=None,
+            sampler=sampler)
 
         self.trainer.train()
 
     def test_model(self, config, testset):  # pylint: disable=unused-argument
-        """The testing loop for YOLOv5.
+        """The testing loop for HuggingFace models.
 
         Arguments:
             config: Configuration parameters as a dictionary.
             testset: The test dataset.
         """
+        self.trainer = SampledHuggingFaceTrainer(
+            model=self.model,
+            args=None,
+            train_dataset=None,
+            eval_dataset=self.preprocess_data(testset),
+            sampler=None)
+
         return self.trainer.evaluate()

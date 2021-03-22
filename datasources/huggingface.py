@@ -25,19 +25,18 @@ class DataSource(base.DataSource):
         else:
             dataset_config = None
 
-        self.train_set = load_dataset(dataset_name, dataset_config)
-        self.test_set = load_dataset(dataset_name,
-                                     dataset_config,
-                                     split='test')
+        self.dataset = load_dataset(dataset_name, dataset_config)
+        self.trainset = self.dataset['train']
+        self.testset = self.dataset['validation']
 
     def num_train_examples(self):
-        return len(self.train_set)
+        return len(self.trainset)
 
     def num_test_examples(self):
-        return len(self.test_set)
+        return len(self.testset)
 
     def get_train_set(self):
-        return self.train_set
+        return self.trainset
 
     def get_test_set(self):
-        return self.test_set
+        return self.testset

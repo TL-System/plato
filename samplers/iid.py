@@ -19,7 +19,7 @@ class Sampler(base.Sampler):
         dataset = datasource.get_train_set()
         self.dataset_size = len(dataset)
         indices = list(range(self.dataset_size))
-
+        print(len(indices))
         np.random.seed(self.random_seed)
         np.random.shuffle(indices)
 
@@ -32,6 +32,8 @@ class Sampler(base.Sampler):
             indices += indices[:(total_size - len(indices))]
         else:
             indices = indices[:total_size]
+        print(len(indices))
+        print(total_size)
         assert len(indices) == total_size
 
         # Compute the indices of data in the subset for this client
