@@ -62,5 +62,5 @@ class ScaffoldClient(simple.SimpleClient):
 
     def load_payload(self, server_payload):
         "Load model weights and server update direction from server payload onto this client"
-        self.trainer.load_weights(server_payload[0])
+        self.algorithm.load_weights(server_payload[0])
         self.server_update_direction = server_payload[1]
