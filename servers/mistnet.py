@@ -35,7 +35,7 @@ class Server(fedavg.Server):
         # Faster way to deep flatten a list of lists compared to list comprehension
         feature_dataset = list(chain.from_iterable(features))
 
-        # Traing the model using features received from the client
+        # Training the model using features received from the client
         self.algorithm.train(feature_dataset, Config().algorithm.cut_layer)
 
         # Test the updated model
