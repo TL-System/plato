@@ -7,12 +7,8 @@ based on a configuration at run-time.
 import logging
 from collections import OrderedDict
 
-from algorithms import (
-    fedavg,
-    mistnet,
-    adaptive_sync,
-    adaptive_freezing,
-)
+from algorithms import (fedavg, mistnet, adaptive_sync, adaptive_freezing,
+                        fedsarah, scaffold)
 
 from config import Config
 
@@ -28,10 +24,10 @@ if hasattr(Config().trainer, 'use_mindspore'):
     ])
 else:
     registered_algorithms = OrderedDict([
-        ('fedavg', fedavg.Algorithm),
-        ('mistnet', mistnet.Algorithm),
+        ('fedavg', fedavg.Algorithm), ('mistnet', mistnet.Algorithm),
         ('adaptive_sync', adaptive_sync.Algorithm),
         ('adaptive_freezing', adaptive_freezing.Algorithm),
+        ('fedsarah', fedsarah.Algorithm), ('scaffold', scaffold.Algorithm)
     ])
 
 

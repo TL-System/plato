@@ -45,5 +45,7 @@ class FedSarahClient(simple.SimpleClient):
 
     def load_payload(self, server_payload):
         "Load model weights and server control vairates from server payload onto this client"
-        self.trainer.load_weights(server_payload[0])
+        self.algorithm.load_weights(server_payload[0])
+
+        #self.trainer.load_weights(server_payload[0])
         self.server_control_variates = server_payload[1]
