@@ -26,7 +26,7 @@ class Server(fedavg.Server):
         return self.algorithm.compute_weight_updates(weights_received)
 
     def federated_averaging(self, reports):
-        """Aggregate weight updates and deltas updates from the clients."""
+        """Aggregate weight and delta updates from the clients."""
 
         updated_weights = super().federated_averaging(reports)
 

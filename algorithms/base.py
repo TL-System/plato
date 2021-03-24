@@ -13,8 +13,8 @@ class Algorithm(ABC):
         """Initializing the algorithm with the provided model and trainer.
 
         Arguments:
-        model: The model to train, which is a models.base.Model class.
         trainer: The trainer for the model, which is a trainers.base.Trainer class.
+        model: The model to train, which is a models.base.Model class.
         """
         super().__init__()
         self.trainer = trainer
