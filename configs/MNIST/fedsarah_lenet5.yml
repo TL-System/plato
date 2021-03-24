@@ -12,6 +12,7 @@ clients:
     do_test: true
 
 server:
+    type: fedsarah
     address: localhost
     port: 8000
 
@@ -57,4 +58,4 @@ trainer:
 
 algorithm:
     # Aggregation algorithm
-    type: fedsarah
+    type: fedavg
