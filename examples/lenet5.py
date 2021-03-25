@@ -1,19 +1,18 @@
 #!/usr/bin/env python
 """
-A Plato federated learning training session using a provided LeNet5 model.
+A Plato federated learning training session using a provided config file and the LeNet5 model.
 """
+import os
+os.environ['config_file'] = 'configs/MNIST/fedavg_lenet5.yml'
 
-from config import Config
-from servers import registry as server_registry
+from models import lenet5
 from clients import simple
-import models
+from servers import registry as server_registry
 
 
 def main():
     """A Plato federated learning training session using a provided LeNet5 model. """
-    __ = Config()
-
-    model = models.lenet5.Model()
+    model = lenet5.Model()
     client = simple.Client(model)
     server = server_registry.get()
     server.run(client)

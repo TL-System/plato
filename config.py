@@ -64,7 +64,12 @@ class Config:
 
             cls._instance = super(Config, cls).__new__(cls)
 
-            with open(args.config, 'r') as config_file:
+            if 'config_file' in os.environ:
+                filename = os.environ['config_file']
+            else:
+                filename = args.config
+
+            with open(filename, 'r') as config_file:
                 config = yaml.load(config_file, Loader=yaml.FullLoader)
 
             Config.clients = Config.namedtuple_from_dict(config['clients'])
