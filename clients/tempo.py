@@ -3,10 +3,10 @@ A federated learning client of fedcy.
 """
 
 from config import Config
-from clients import SimpleClient
+from clients import simple
 
 
-class TempoClient(SimpleClient):
+class Client(simple.Client):
     """A federated learning client of fedcy."""
     def process_server_response(self, server_response):
         """Additional client-specific processing on the server response."""

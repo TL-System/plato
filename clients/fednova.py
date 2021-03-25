@@ -5,8 +5,8 @@ generated and communicated to the server at each communication round.
 
 import logging
 import random
-
 from dataclasses import dataclass
+
 from config import Config
 from clients import simple
 
@@ -17,7 +17,7 @@ class Report(simple.Report):
     epochs: int
 
 
-class FedNovaClient(simple.SimpleClient):
+class Client(simple.Client):
     """A fednova federated learning client who sends weight updates
     and the number of local epochs."""
     def __init__(self):

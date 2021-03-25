@@ -8,10 +8,10 @@ Learning withGradient-Instructed Frequency Tuning," found in docs/papers.
 """
 
 from config import Config
-from clients import SimpleClient
+from clients import simple
 
 
-class AdaptiveSyncClient(SimpleClient):
+class Client(simple.Client):
     """A federated learning client with support for Adaptive Synchronization
     Frequency.
     """

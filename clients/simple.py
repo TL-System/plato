@@ -10,9 +10,8 @@ from datasources import registry as datasources_registry
 from samplers import registry as samplers_registry
 from algorithms import registry as algorithms_registry
 from trainers import registry as trainers_registry
-from samplers import iid, dirichlet
 from config import Config
-from clients import Client
+from clients import base
 
 
 @dataclass
@@ -24,7 +23,7 @@ class Report:
     data_loading_time: float
 
 
-class SimpleClient(Client):
+class Client(base.Client):
     """A basic federated learning client who sends simple weight updates."""
     def __init__(self, model=None):
         super().__init__()
