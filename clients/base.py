@@ -3,7 +3,6 @@ The base class for all federated learning clients on edge devices or edge server
 """
 
 import logging
-import random
 import os
 import sys
 import pickle
