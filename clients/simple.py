@@ -93,7 +93,7 @@ class SimpleClient(Client):
         # Generate a report for the server, performing model testing if applicable
         if Config().clients.do_test:
             accuracy = self.trainer.test(self.testset)
-            logging.info("[Client #{:s}] Test accuracy: {:.2f}%".format(
+            logging.info("[Client #{:d}] Test accuracy: {:.2f}%".format(
                 self.client_id, 100 * accuracy))
 
         else:

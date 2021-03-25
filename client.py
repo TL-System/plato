@@ -5,23 +5,17 @@ Starting point for a Plato federated learning client.
 from collections import OrderedDict
 import asyncio
 import logging
-import sys
 import websockets
 
 from config import Config
 import clients
-from servers import fedavg_cs, rhythm, tempo
-
-edge_servers = OrderedDict([
-    ('fedavg_cross_silo', fedavg_cs.Server),
-    ('tempo', tempo.Server),
-    ('rhythm', rhythm.Server),
-])
 
 
-def main():
+def run(client_id, port):
     """Starting a client to connect to the server via WebSockets."""
-    __ = Config()
+    Config().args.id = client_id
+    if port is not None:
+        Config().args.port = port
 
     loop = asyncio.get_event_loop()
     coroutines = []
@@ -30,6 +24,14 @@ def main():
     try:
         # If a server needs to be running concurrently
         if Config().is_edge_server():
+            from servers import fedavg_cs, tempo, rhythm
+
+            edge_servers = OrderedDict([
+                ('fedavg_cross_silo', fedavg_cs.Server),
+                ('tempo', tempo.Server),
+                ('rhythm', rhythm.Server),
+            ])
+
             Config().trainer = Config().trainer._replace(
                 rounds=Config().algorithm.local_rounds)
 
@@ -71,8 +73,8 @@ def main():
     except websockets.ConnectionClosed:
         logging.info("Client #%s: connection to the server is closed.",
                      client.client_id)
-        sys.exit()
 
 
 if __name__ == "__main__":
-    main()
+    __ = Config()
+    run(Config().args.id, Config().args.port)
