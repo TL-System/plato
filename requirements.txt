@@ -9,4 +9,3 @@ wandb
 gym
 datasets
 transformers
-feedback-transformer-pytorch

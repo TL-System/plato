@@ -11,7 +11,6 @@ from models import (
     resnet,
     wideresnet,
     vgg,
-    feedback_transformer,
 )
 
 from config import Config
@@ -29,7 +28,6 @@ else:
         ('resnet', resnet.Model),
         ('vgg', vgg.Model),
         ('wideresnet', wideresnet.Model),
-        ('feedback_transformer', feedback_transformer.Model),
     ])
 
 
@@ -47,6 +45,7 @@ def get():
         from transformers import AutoModelForCausalLM
         model_checkpoint = Config.trainer.model_checkpoint
         return AutoModelForCausalLM.from_pretrained(model_checkpoint)
+
     else:
         for name, registered_model in registered_models.items():
             if name.startswith(model_type):
