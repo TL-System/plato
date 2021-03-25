@@ -9,7 +9,7 @@ Parameter Freezing," found in docs/papers.
 from dataclasses import dataclass
 
 from config import Config
-from clients import SimpleClient
+from clients import simple
 
 
 @dataclass
@@ -19,7 +19,7 @@ class Report:
     accuracy: float
 
 
-class AdaptiveFreezingClient(SimpleClient):
+class Client(simple.Client):
     """A federated learning client with Adaptive Parameter Freezing."""
     async def train(self):
         """Adaptive Parameter Freezing will be applied after training the model."""

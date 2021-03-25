@@ -1,10 +1,10 @@
 """
 A customized client for FedSarah.
 """
-import torch
-from dataclasses import dataclass
-from clients import simple
 import os
+from dataclasses import dataclass
+
+from clients import simple
 
 
 @dataclass
@@ -13,7 +13,7 @@ class Report(simple.Report):
     payload_length: int
 
 
-class FedSarahClient(simple.SimpleClient):
+class Client(simple.Client):
     """A FedSarah federated learning client who sends weight updates
     and client control variates."""
     def __init__(self):

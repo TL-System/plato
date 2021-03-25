@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from config import Config
 from trainers import registry as trainers_registry
 from algorithms import registry as algorithms_registry
-from clients import Client
+from clients import base
 
 
 @dataclass
@@ -20,7 +20,7 @@ class Report:
     data_loading_time: float
 
 
-class EdgeClient(Client):
+class Client(base.Client):
     """A federated learning client at the edge server in a cross-silo training workload."""
     def __init__(self, server):
         super().__init__()

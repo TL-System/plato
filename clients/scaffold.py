@@ -7,10 +7,11 @@ Karimireddy et al., "SCAFFOLD: Stochastic Controlled Averaging for Federated Lea
 (https://arxiv.org/pdf/1910.06378.pdf)
 """
 
-import torch
-from dataclasses import dataclass
-from clients import simple
 import os
+from dataclasses import dataclass
+import torch
+
+from clients import simple
 
 
 @dataclass
@@ -19,7 +20,7 @@ class Report(simple.Report):
     payload_length: int
 
 
-class ScaffoldClient(simple.SimpleClient):
+class Client(simple.Client):
     """A SCAFFOLD federated learning client who sends weight updates
     and client control variate."""
     def __init__(self):

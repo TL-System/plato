@@ -5,7 +5,7 @@ A Plato federated learning training session using a provided LeNet5 model.
 
 from config import Config
 from servers import registry as server_registry
-import clients
+from clients import simple
 import models
 
 
@@ -14,7 +14,7 @@ def main():
     __ = Config()
 
     model = models.lenet5.Model()
-    client = clients.SimpleClient(model)
+    client = simple.Client(model)
     server = server_registry.get()
     server.run(client)
 

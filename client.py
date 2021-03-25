@@ -8,7 +8,7 @@ import logging
 import websockets
 
 from config import Config
-import clients
+from clients import registry as client_registry
 
 
 def run(client_id, port, client=None):
@@ -24,6 +24,7 @@ def run(client_id, port, client=None):
         # If a server needs to be running concurrently
         if Config().is_edge_server():
             from servers import fedavg_cs, tempo, rhythm
+            from clients import edge
 
             edge_servers = OrderedDict([
                 ('fedavg_cross_silo', fedavg_cs.Server),
@@ -37,7 +38,7 @@ def run(client_id, port, client=None):
             server = edge_servers[Config().server.type]()
             server.configure()
 
-            client = clients.EdgeClient(server)
+            client = edge.Client(server)
             client.configure()
             coroutines.append(client.start_client())
 
@@ -53,17 +54,7 @@ def run(client_id, port, client=None):
             coroutines.append(start_server)
         else:
             if client is None:
-                client = {
-                    "simple": clients.SimpleClient,
-                    "mistnet": clients.MistNetClient,
-                    "adaptive_freezing":
-                    clients.adaptive_freezing.AdaptiveFreezingClient,
-                    "adaptive_sync": clients.adaptive_sync.AdaptiveSyncClient,
-                    "fednova": clients.fednova.FedNovaClient,
-                    "tempo": clients.tempo.TempoClient,
-                    "scaffold": clients.scaffold.ScaffoldClient,
-                    "fedsarah": clients.fedsarah.FedSarahClient
-                }[Config().clients.type]()
+                client = client_registry.get()
                 logging.info("Starting a %s client.", Config().clients.type)
             else:
                 client.client_id = client_id

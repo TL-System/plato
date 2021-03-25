@@ -11,7 +11,7 @@ import logging
 from dataclasses import dataclass
 
 from config import Config
-from clients import SimpleClient
+from clients import simple
 
 
 @dataclass
@@ -21,7 +21,7 @@ class Report:
     payload_length: int
 
 
-class MistNetClient(SimpleClient):
+class Client(simple.Client):
     """A federated learning client for MistNet."""
     async def train(self):
         """A MistNet client only uses the first several layers in a forward pass."""
