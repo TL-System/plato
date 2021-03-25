@@ -17,7 +17,7 @@ from trainers import base
 
 class Trainer(base.Trainer):
     """A basic federated learning trainer, used by both the client and the server."""
-    def __init__(self, client_id=0):
+    def __init__(self, client_id=0, model=None):
         """Initializing the trainer with the provided model.
 
         Arguments:
@@ -25,7 +25,9 @@ class Trainer(base.Trainer):
         client_id: The ID of the client using this trainer (optional).
         """
         super().__init__(client_id)
-        model = models_registry.get()
+
+        if model is None:
+            model = models_registry.get()
 
         # Use data parallelism if multiple GPUs are available and the configuration specifies it
         if Config().is_parallel():

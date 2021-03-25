@@ -11,7 +11,7 @@ from config import Config
 import clients
 
 
-def run(client_id, port):
+def run(client_id, port, client=None):
     """Starting a client to connect to the server via WebSockets."""
     Config().args.id = client_id
     if port is not None:
@@ -19,7 +19,6 @@ def run(client_id, port):
 
     loop = asyncio.get_event_loop()
     coroutines = []
-    client = None
 
     try:
         # If a server needs to be running concurrently
@@ -53,18 +52,23 @@ def run(client_id, port):
 
             coroutines.append(start_server)
         else:
-            client = {
-                "simple": clients.SimpleClient,
-                "mistnet": clients.MistNetClient,
-                "adaptive_freezing":
-                clients.adaptive_freezing.AdaptiveFreezingClient,
-                "adaptive_sync": clients.adaptive_sync.AdaptiveSyncClient,
-                "fednova": clients.fednova.FedNovaClient,
-                "tempo": clients.tempo.TempoClient,
-                "scaffold": clients.scaffold.ScaffoldClient,
-                "fedsarah": clients.fedsarah.FedSarahClient
-            }[Config().clients.type]()
-            logging.info("Starting a %s client.", Config().clients.type)
+            if client is None:
+                client = {
+                    "simple": clients.SimpleClient,
+                    "mistnet": clients.MistNetClient,
+                    "adaptive_freezing":
+                    clients.adaptive_freezing.AdaptiveFreezingClient,
+                    "adaptive_sync": clients.adaptive_sync.AdaptiveSyncClient,
+                    "fednova": clients.fednova.FedNovaClient,
+                    "tempo": clients.tempo.TempoClient,
+                    "scaffold": clients.scaffold.ScaffoldClient,
+                    "fedsarah": clients.fedsarah.FedSarahClient
+                }[Config().clients.type]()
+                logging.info("Starting a %s client.", Config().clients.type)
+            else:
+                client.client_id = client_id
+                logging.info("Starting a custom client #%s", client_id)
+
             client.configure()
             coroutines.append(client.start_client())
 

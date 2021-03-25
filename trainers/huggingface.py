@@ -30,8 +30,8 @@ class SampledHuggingFaceTrainer(HuggingFaceTrainer):
 
 class Trainer(basic.Trainer):
     """The trainer for HuggingFace transformer models for natural language processing. """
-    def __init__(self, client_id=0):
-        super().__init__(client_id)
+    def __init__(self, client_id=0, model=None):
+        super().__init__(client_id, model)
 
         self.trainer = None
 
@@ -46,7 +46,7 @@ class Trainer(basic.Trainer):
 
     @staticmethod
     def group_texts(examples):
-        # Concatenate all texts.
+        """Concatenate all texts. """
         block_size = 128
 
         concatenated_examples = {
