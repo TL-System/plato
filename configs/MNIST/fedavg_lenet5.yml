@@ -39,7 +39,7 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 100
+    rounds: 5
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -48,7 +48,7 @@ trainer:
     max_concurrency: 3
 
     # The target accuracy
-    target_accuracy: 0.97
+    target_accuracy: 0.94
 
     # Number of epoches for local training in each communication round
     epochs: 5

@@ -9,6 +9,7 @@ import logging
 import time
 import pickle
 import asyncio
+import subprocess
 from contextlib import closing
 import multiprocessing as mp
 import websockets
@@ -80,18 +81,22 @@ class Server:
         else:
             total_processes = Config().clients.total_clients
 
+        if mp.get_start_method(allow_none=True) != 'spawn':
+            mp.set_start_method('spawn', force=True)
+
         for client_id in range(starting_id, total_processes + starting_id):
             if as_server:
                 logging.info("Starting client #%s is an edge server.",
                              client_id)
-                proc = mp.Process(target=client.run,
-                                  args=(client_id,
-                                        Config().server.port + client_id))
+                command = "python client.py -i {}".format(client_id)
+                command += " -c {}".format(Config().args.config)
+                command += " -p {}".format(Config().server.port + client_id)
+                subprocess.Popen(command, shell=True)
             else:
                 logging.info("Starting client #%s.", client_id)
                 proc = mp.Process(target=client.run, args=(client_id, None))
 
-            proc.start()
+                proc.start()
 
     async def close_connections(self):
         """Closing all WebSocket connections after training completes."""
