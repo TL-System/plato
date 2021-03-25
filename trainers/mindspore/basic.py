@@ -21,7 +21,7 @@ class Trainer(base.Trainer):
     """A basic federated learning trainer for MindSpore, used by both
     the client and the server.
     """
-    def __init__(self, client_id=0):
+    def __init__(self, client_id=0, model=None):
         """Initializing the trainer with the provided model.
 
         Arguments:
@@ -33,7 +33,8 @@ class Trainer(base.Trainer):
         mindspore.context.set_context(mode=mindspore.context.PYNATIVE_MODE,
                                       device_target='CPU')
 
-        self.model = models_registry.get()
+        if model is None:
+            self.model = models_registry.get()
 
         # Initializing the loss criterion
         loss_criterion = SoftmaxCrossEntropyWithLogits(sparse=True,

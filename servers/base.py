@@ -15,12 +15,13 @@ import multiprocessing as mp
 import websockets
 
 from config import Config
-import client
+from client import run
 
 
 class Server:
     """The base class for federated learning servers."""
     def __init__(self):
+        self.client = None
         self.clients = {}
         self.total_clients = 0
         self.selected_clients = None
@@ -30,13 +31,14 @@ class Server:
         self.accuracy = 0
         self.reports = []
 
-    def run(self):
+    def run(self, client=None):
         """Start a run loop for the server. """
         # Remove the running trainers table from previous runs.
         with Config().sql_connection:
             with closing(Config().sql_connection.cursor()) as cursor:
                 cursor.execute("DROP TABLE IF EXISTS trainers")
 
+        self.client = client
         self.configure()
 
         logging.info("Starting a server on port %s.", Config().server.port)
@@ -57,7 +59,7 @@ class Server:
             # Allowing some time for the edge servers to start
             time.sleep(5)
 
-        self.start_clients()
+        self.start_clients(client=self.client)
         loop.run_forever()
 
     def register_client(self, client_id, websocket):
@@ -71,7 +73,7 @@ class Server:
             if value == websocket:
                 del self.clients[key]
 
-    def start_clients(self, as_server=False):
+    def start_clients(self, client=None, as_server=False):
         """Starting all the clients as separate processes."""
         starting_id = 1
 
@@ -94,7 +96,7 @@ class Server:
                 subprocess.Popen(command, shell=True)
             else:
                 logging.info("Starting client #%s.", client_id)
-                proc = mp.Process(target=client.run, args=(client_id, None))
+                proc = mp.Process(target=run, args=(client_id, None, client))
 
                 proc.start()
 

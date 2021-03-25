@@ -26,8 +26,9 @@ class Report:
 
 class SimpleClient(Client):
     """A basic federated learning client who sends simple weight updates."""
-    def __init__(self):
+    def __init__(self, model=None):
         super().__init__()
+        self.model = model
         self.data = None  # The dataset to be used for local training
         self.trainset = None  # Training dataset
         self.testset = None  # Testing dataset
@@ -39,12 +40,11 @@ class SimpleClient(Client):
         self.data_loading_time_sent = False
 
     def __repr__(self):
-        return 'Client #{}: {} samples.'.format(self.client_id,
-                                                self.sampler.dataset_size)
+        return 'Client #{}.'.format(self.client_id)
 
     def configure(self):
         """Prepare this client for training."""
-        self.trainer = trainers_registry.get(self.client_id)
+        self.trainer = trainers_registry.get(self.client_id, self.model)
         self.algorithm = algorithms_registry.get(self.trainer, self.client_id)
 
     def load_data(self):
