@@ -7,10 +7,7 @@ on a configuration at run-time.
 import logging
 from collections import OrderedDict
 
-from samplers import (
-    iid,
-    dirichlet,
-)
+from samplers import (iid, dirichlet, mixed)
 
 from config import Config
 
@@ -28,6 +25,7 @@ else:
     registered_samplers = OrderedDict([
         ('iid', iid.Sampler),
         ('noniid', dirichlet.Sampler),
+        ('mixed', mixed.Sampler),
     ])
 
 
