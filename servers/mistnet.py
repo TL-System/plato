@@ -23,7 +23,7 @@ class Server(fedavg.Server):
         assert Config().trainer.rounds == 1
 
     def load_trainer(self):
-        """Setting up a pre-trained model to be loaded on the clients."""
+        """Setting up a pre-trained model to be loaded on the server."""
         super().load_trainer()
 
         logging.info("[Server #%s] Loading a pre-trained model.", os.getpid())
@@ -36,7 +36,7 @@ class Server(fedavg.Server):
         # Faster way to deep flatten a list of lists compared to list comprehension
         feature_dataset = list(chain.from_iterable(features))
 
-        # Training the model using features received from the client
+        # Training the model using all the features received from the client
         sampler = AllDataSampler(feature_dataset)
         self.algorithm.train(feature_dataset, sampler,
                              Config().algorithm.cut_layer)
