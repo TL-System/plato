@@ -34,7 +34,7 @@ class Algorithm(fedavg.Algorithm):
     """The PyTorch-based MistNet algorithm, used by both the client and the
     server.
     """
-    def extract_features(self, dataset, cut_layer: str, epsilon=None):
+    def extract_features(self, dataset, sampler, cut_layer: str, epsilon=None):
         """Extracting features using layers before the cut_layer.
 
         dataset: The training or testing dataset.
@@ -49,10 +49,11 @@ class Algorithm(fedavg.Algorithm):
         if callable(_train_loader):
             data_loader = self.trainer.train_loader(batch_size=1,
                                                     trainset=dataset,
+                                                    sampler=sampler.get(),
                                                     extract_features=True)
         else:
             data_loader = torch.utils.data.DataLoader(
-                dataset, batch_size=Config().trainer.batch_size, shuffle=True)
+                dataset, batch_size=Config().trainer.batch_size, sampler=sampler.get(), shuffle=True)
 
         tic = time.perf_counter()
 
@@ -79,5 +80,5 @@ class Algorithm(fedavg.Algorithm):
 
         return feature_dataset
 
-    def train(self, trainset, cut_layer=None):
-        self.trainer.train(FeatureDataset(trainset), cut_layer)
+    def train(self, trainset, sampler, cut_layer=None):
+        self.trainer.train(FeatureDataset(trainset), sampler, cut_layer)

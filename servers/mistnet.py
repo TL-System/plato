@@ -11,6 +11,7 @@ from itertools import chain
 
 from servers import fedavg
 from config import Config
+from torch.utils.data import SubsetRandomSampler
 
 
 class Server(fedavg.Server):
@@ -36,7 +37,8 @@ class Server(fedavg.Server):
         feature_dataset = list(chain.from_iterable(features))
 
         # Training the model using features received from the client
-        self.algorithm.train(feature_dataset, Config().algorithm.cut_layer)
+        sampler = Mistnet_Sampler(feature_dataset)
+        self.algorithm.train(feature_dataset, sampler, Config().algorithm.cut_layer)
 
         # Test the updated model
         self.accuracy = self.trainer.test(self.testset)
@@ -44,3 +46,10 @@ class Server(fedavg.Server):
             os.getpid(), 100 * self.accuracy))
 
         await self.wrap_up_processing_reports()
+
+class Mistnet_Sampler:
+    def __init__(self, dataset):
+        self.alldata = range(len(dataset))
+
+    def get(self):
+        return SubsetRandomSampler(self.alldata)
