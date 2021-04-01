@@ -79,6 +79,14 @@ class Server(base.Server):
         self.trainer = trainers_registry.get()
         self.algorithm = algorithms_registry.get(self.trainer)
 
+        model_dir = Config().params['model_dir']
+        model_name = Config().trainer.model_name
+        model_path = f'{model_dir}{model_name}.pth'
+
+        if os.path.isfile(model_path):
+            logging.info("[Server #%s] Loading a pre-trained model.", os.getpid())
+            self.trainer.load_model()
+
     def choose_clients(self):
         """Choose a subset of the clients to participate in each round."""
         # Select clients randomly

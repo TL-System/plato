@@ -36,7 +36,6 @@ class Trainer(basic.Trainer):
     """The YOLOV5 trainer."""
     def __init__(self, client_id=0):
         super().__init__(client_id)
-        self.model = models_registry.get()
         Config().params['grid_size'] = int(self.model.stride.max())
 
     def train_loader(self,

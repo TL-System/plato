@@ -47,12 +47,12 @@ class DataSource(base.DataSource):
         if not os.path.exists(_path):
             os.makedirs(_path)
 
-        logging.info("Downloading the COCO dataset. This may take a while.")
+            logging.info("Downloading the COCO dataset. This may take a while.")
 
-        urls = Config().data.download_urls
-        for url in urls:
-            if not os.path.exists(_path + url.split('/')[-1]):
-                DataSource.download(url, _path)
+            urls = Config().data.download_urls
+            for url in urls:
+                if not os.path.exists(_path + url.split('/')[-1]):
+                    DataSource.download(url, _path)
 
         assert 'grid_size' in Config().params
 
@@ -125,21 +125,19 @@ class DataSource(base.DataSource):
             # MistNet client: feature extraction
             return torch.utils.data.DataLoader(dataset=COCODataset(trainset),
                                                batch_size=batch_size,
-                                               sampler=sampler,
                                                shuffle=False)
         elif cut_layer is not None:
             # MistNet server: training from the cut layer forwards using
             # the features extracted on the client
             return torch.utils.data.DataLoader(dataset=trainset,
                                                batch_size=batch_size,
-                                               shuffle=False,
-                                               sampler=sampler,
+                                               shuffle=True,
                                                collate_fn=collate_fn)
         else:
             return torch.utils.data.DataLoader(
                 COCODataset(trainset),
                 batch_size=batch_size,
-                shuffle=False,
+                shuffle=True,
                 sampler=sampler,
                 collate_fn=LoadImagesAndLabels.collate_fn)
 

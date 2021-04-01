@@ -65,9 +65,14 @@ class Algorithm(fedavg.Algorithm):
 
                 if epsilon is not None:
                     logits = logits.detach().numpy()
+                    targets = targets.detach().numpy()
                     logits = unary_encoding.encode(logits)
-                    logits = unary_encoding.randomize(logits, epsilon)
-                    logits = torch.from_numpy(logits.astype('float32'))
+                    if Config().trainer.type == 'yolov5':
+                        logits = unary_encoding.randomize_obj(logits, targets, epsilon)
+                    else:
+                        logits = unary_encoding.randomize(logits, epsilon)
+                    logits = torch.from_numpy(logits.astype('float16'))
+                    targets = torch.from_numpy(targets.astype('float16'))
 
             for i in np.arange(logits.shape[0]):  # each sample in the batch
                 feature_dataset.append((logits[i], targets[i]))

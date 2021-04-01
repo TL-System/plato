@@ -8,10 +8,10 @@ Differential Privacy," found in docs/papers.
 import logging
 import os
 from itertools import chain
-from torch.utils.data import SubsetRandomSampler
 
 from servers import fedavg
 from config import Config
+from torch.utils.data import SubsetRandomSampler
 
 
 class Server(fedavg.Server):
@@ -22,13 +22,6 @@ class Server(fedavg.Server):
         # MistNet requires one round of client-server communication
         assert Config().trainer.rounds == 1
 
-    def load_trainer(self):
-        """Setting up a pre-trained model to be loaded on the server."""
-        super().load_trainer()
-
-        logging.info("[Server #%s] Loading a pre-trained model.", os.getpid())
-        self.trainer.load_model()
-
     async def process_reports(self):
         """Process the features extracted by the client and perform server-side training."""
         features = [features for (__, features) in self.reports]
@@ -36,10 +29,9 @@ class Server(fedavg.Server):
         # Faster way to deep flatten a list of lists compared to list comprehension
         feature_dataset = list(chain.from_iterable(features))
 
-        # Training the model using all the features received from the client
-        sampler = AllDataSampler(feature_dataset)
-        self.algorithm.train(feature_dataset, sampler,
-                             Config().algorithm.cut_layer)
+        # Training the model using features received from the client
+        sampler = Mistnet_Sampler(feature_dataset)
+        self.algorithm.train(feature_dataset, sampler, Config().algorithm.cut_layer)
 
         # Test the updated model
         self.accuracy = self.trainer.test(self.testset)
@@ -48,10 +40,9 @@ class Server(fedavg.Server):
 
         await self.wrap_up_processing_reports()
 
-
-class AllDataSampler:
+class Mistnet_Sampler:
     def __init__(self, dataset):
-        self.all_data = range(len(dataset))
+        self.alldata = range(len(dataset))
 
     def get(self):
-        return SubsetRandomSampler(self.all_data)
+        return SubsetRandomSampler(self.alldata)
