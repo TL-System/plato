@@ -16,11 +16,12 @@ RUN apt-get update \
     && ~/miniconda3/bin/conda init bash \
     && ~/miniconda3/bin/conda create -n federated python=3.8 \
     && ~/miniconda3/bin/conda install pytorch torchvision -c pytorch -n federated \
-    && ~/miniconda3/bin/conda install matplotlib pylint scipy -n federated \
-    && ~/miniconda3/bin/conda install -c conda-forge websockets -n federated \
+    && ~/miniconda3/envs/federated/bin/pip install -r ~/plato/requirements.txt \
     && ~/miniconda3/bin/conda create -n mindspore python=3.7 \
     && ~/miniconda3/envs/mindspore/bin/pip install https://ms-release.obs.cn-north-4.myhuaweicloud.com/1.1.0/MindSpore/cpu/ubuntu_x86/mindspore-1.1.0-cp37-cp37m-linux_x86_64.whl \
+    && ~/miniconda3/bin/conda install pytorch torchvision -c pytorch -n mindspore \
     && ~/miniconda3/bin/conda install matplotlib pylint -n mindspore \
     && ~/miniconda3/bin/conda install -c conda-forge websockets -n mindspore \
+    && ~/miniconda3/envs/mindspore/bin/pip install -r ~/plato/requirements.txt \
     && git clone https://github.com/mindspore-ai/mindspore.git \
 
