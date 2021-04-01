@@ -23,7 +23,7 @@ data:
     data_path: ./data
 
     # Number of samples in each partition
-    partition_size: 20
+    partition_size: 2000
 
     # IID, biased, or sharded?
     sampler: iid
