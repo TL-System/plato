@@ -15,12 +15,12 @@ This repo is the official implementation of ["DeepViT: Towards Deeper Vision Tra
 
 | Model    | Re-attention | Top1 Acc (%) | #params | #Similar Blocks |  Checkpoint | Attention Map |
 | :---     |   :---:         |  :---:   |  :---:  | :---: |  :---:   | :---:   | 
-| ViT-16   |  NA  |   78.88   |  21.5M  | 5 | [here](comming soon)| |
-| DeepViT-16   |  FC  |   79.10   |  39.2M  | 0  | [here](comming soon)|  |
-| ViT-24   |  NA  |   79.35   |  64.1M  | 11  | [here](comming soon)|  |
-| DeepViT-24  |  FC  |   79.99   |  21.7M  | 0  | [here](comming soon)|  |
-| ViT-32 | NA |   79.27   |  21.5M  | 16 | [here](comming soon)  |  |
-| DeepViT_t-32 | FC |   80.90   |  39.2M  | 0  | [here](comming soon) |  |
+| ViT-16   |  NA  |   78.88   |  24.5M  | 5 | [here](comming soon)| |
+| DeepViT-16   |  FC  |   79.10   |  24.5M   | 0  | [here](comming soon)|  |
+| ViT-24   |  NA  |   79.35   |  36.3M  | 11  | [here](comming soon)|  |
+| DeepViT-24  |  FC  |   79.99   |  36.3M   | 0  | [here](comming soon)|  |
+| ViT-32 | NA |   79.27   |  21.5M  | 48.1M | [here](comming soon)  |  |
+| DeepViT_t-32 | FC |   80.90   |  48.1M  | 0  | [here](comming soon) |  |
 
 ## Citing DeepVit
 
