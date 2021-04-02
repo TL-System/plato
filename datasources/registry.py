@@ -38,9 +38,9 @@ def get():
 
     logging.info("Data source: %s", Config().data.datasource)
 
-    if Config().data.datasource == 'COCO':
-        from datasources import coco
-        return coco.DataSource()
+    if Config().data.datasource == 'yolo':
+        from datasources import yolo
+        return yolo.DataSource()
     elif datasource_name in registered_datasources:
         dataset = registered_datasources[datasource_name].DataSource()
     else:
