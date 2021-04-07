@@ -1,4 +1,4 @@
-# DeepViT Repo
+# DeepViT
 
 This repo is the official implementation of ["DeepViT: Towards Deeper Vision Transformer"](https://arxiv.org/abs/2103.11886). The repo is based on the timm library (https://github.com/rwightman/pytorch-image-models) by [Ross Wightman](https://github.com/rwightman)
 
