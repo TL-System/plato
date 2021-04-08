@@ -1,5 +1,5 @@
 """
-The COCO dataset.
+The COCO dataset or other datasets for the YOLOv5 model.
 
 For more information about COCO 128, which contains the first 128 images of the
 COCO 2017 dataset, refer to https://www.kaggle.com/ultralytics/coco128.
