@@ -21,14 +21,14 @@ data:
     data_params: ./configs/Helmet/helmet_data.yaml
 
     # Where the dataset is located
-    data_path: ./data/helmet
-    train_path: ./data/helmet/images/train/
-    test_path: ./data/helmet/images/val/
+    data_path: ./data/helmet/
+    train_path: ./data/helmet/helmet/images/train/
+    test_path: ./data/helmet/helmet/images/val/
 
-    # download command/URL (optional)
+    # download command/URL
     download_urls:
         [
-            "http://www.930921.xyz:5000/fsdownload/7A4cuseKj/helmet.zip",
+            "https://iqua.ece.toronto.edu/~bli/helmet.zip",
         ]
 
     # number of training examples
