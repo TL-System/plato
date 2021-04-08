@@ -44,7 +44,7 @@ class Trainer(basic.Trainer):
                      sampler,
                      extract_features=False,
                      cut_layer=None):
-        """The train loader for training YOLOv5 using the COCO dataset. """
+        """The train loader for training YOLOv5 using the COCO dataset or other datasets for the YOLOv5 model. """
         return yolo.DataSource.get_train_loader(batch_size, trainset, sampler,
                                                 extract_features, cut_layer)
 
@@ -222,7 +222,7 @@ class Trainer(basic.Trainer):
             config: Configuration parameters as a dictionary.
             testset: The test dataset.
         """
-        assert Config().data.datasource == 'COCO'
+        assert Config().data.datasource == 'YOLO'
         test_loader = yolo.DataSource.get_test_loader(config['batch_size'],
                                                       testset)
 
