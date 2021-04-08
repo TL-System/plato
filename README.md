@@ -71,7 +71,7 @@ It goes without saying that `/absolute/path/to/project/home/directory` should be
 
 Most of the codebase in *Plato* is designed to be framework-agnostic, so that it is relatively straightfoward to use *Plato* with a variety of deep learning frameworks beyond PyTorch, which is the default framwork it is using. One example of such deep learning frameworks is [MindSpore](https://www.mindspore.cn).
 
-Though we provided a `Dockerfile` in `docker/` for building a Docker container that supports MindSpore 1.1, it may still be necessary to install Plato with MindSpore in a GPU server running Ubuntu Linux 18.04 (which MindSpore requires). Similar to a PyTorch installation, we need to first create a new environment with Python 3.7.5 (which MindSpore 1.1 requires), and then install the required packages:
+Though we provided a `Dockerfile` for building a Docker container that supports MindSpore 1.1, it may still be necessary to install Plato with MindSpore in a GPU server running Ubuntu Linux 18.04 (which MindSpore requires). Similar to a PyTorch installation, we need to first create a new environment with Python 3.7.5 (which MindSpore 1.1 requires), and then install the required packages:
 
 ```shell
 conda create -n mindspore python=3.7.5
@@ -156,10 +156,10 @@ All unit tests are in the `tests/` directory. These tests are designed to be sta
 
 ### Building a Docker container for running Plato
 
-Sometimes it may be beneficial to run Plato in a Docker container. To build such such a Docker container, use the provided `Dockerfile` in `docker/`:
+Sometimes it may be beneficial to run Plato in a Docker container. To build such such a Docker container, use the provided `Dockerfile`:
 
 ```shell
-cd docker; docker build -t plato .
+docker build -t plato .
 ```
 
 To run the docker image that was just built, use the command:
@@ -180,7 +180,7 @@ To remove the `plato` Docker image, use the command:
 docker rmi plato
 ```
 
-The provided `Dockerfile` helps to build a Docker container image running Ubuntu 20.04, with two virtual environments pre-installed: the one called `federated` supports PyTorch and Python 3.8, and one called `mindspore` supports [MindSpore 1.1](https://github.com/mindspore-ai/mindspore) and Python 3.7.5 (which is the Python version that MindSpore requires). Once the container is built and running, one can use Visual Studio Code to connect to it and start development within the container.
+The provided `Dockerfile` helps to build a Docker container image running Ubuntu 20.04, with two virtual environments pre-installed: the one called `pytorch` supports PyTorch and Python 3.8, and one called `mindspore` supports [MindSpore 1.2rc1](https://github.com/mindspore-ai/mindspore) and Python 3.7.5 (which is the Python version that MindSpore requires). Once the container is built and running, one can use Visual Studio Code to connect to it and start development within the container.
 
 ### Uninstalling Plato
 
