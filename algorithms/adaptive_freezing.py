@@ -11,11 +11,10 @@ Systems (ICDCS 2021), Online, July 7-10, 2021 (found in docs/papers).
 
 import copy
 import logging
-import torch
 from collections import OrderedDict
+import torch
 
 from config import Config
-from models.base import Model
 from trainers.base import Trainer
 from algorithms import fedavg
 
@@ -24,8 +23,8 @@ class Algorithm(fedavg.Algorithm):
     """The federated learning trainer for Adaptive Parameter Freezing,
        used by both the client and the server.
     """
-    def __init__(self, model: Model, trainer: Trainer = None, client_id=0):
-        super().__init__(model, trainer, client_id)
+    def __init__(self, trainer: Trainer = None, client_id=0):
+        super().__init__(trainer, client_id)
         self.sync_mask = {}
         self.moving_average_deltas = {}
         self.moving_average_abs_deltas = {}
