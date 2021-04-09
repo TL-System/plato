@@ -112,13 +112,12 @@ Though we provided a `Dockerfile` for building a Docker container that supports 
 
 ```shell
 conda create -n mindspore python=3.7.5
-conda install matplotlib pylint yapf scipy
-pip install websockets requests
+pip install -r requirements.txt
 ```
 
 We should now install MindSpore 1.1 with the following command:
 ```shell
-pip install https://ms-release.obs.cn-north-4.myhuaweicloud.com/1.1.1/MindSpore/gpu/ubuntu_x86/cuda-10.1/mindspore_gpu-1.1.1-cp37-cp37m-linux_x86_64.whl --trusted-host ms-release.obs.cn-north-4.myhuaweicloud.com
+pip install https://ms-release.obs.cn-north-4.myhuaweicloud.com/1.1.1/MindSpore/gpu/ubuntu_x86/cuda-10.1/mindspore_gpu-1.1.1-cp37-cp37m-linux_x86_64.whl
 ```
 
 MindSpore may need additional packages that need to be installed if they do not exist:
@@ -163,6 +162,8 @@ To start a federated learning training workload, run [`run`](run) from the repos
 * `--log` (`-l`): the level of logging information to be written to the console. Possible values are `critical`, `error`, `warn`, `info`, and `debug`, and the default is `info`.
 
 *Plato* uses the YAML format for its configuration files to manage the runtime configuration parameters. Example configuration files have been provided in the `configs` directory.
+
+*Plato* uses `wandb` to produce and collect logs in the cloud. If this is not needed, run the command `wandb offline` before running *Plato*.
 
 If there are issues in the code that prevented it from running to completion, there could be running processes from previous runs. Use the command `pkill python` to terminate them so that there will not be CUDA errors in the upcoming run.
 
