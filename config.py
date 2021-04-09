@@ -9,7 +9,6 @@ import os
 import sqlite3
 
 import argparse
-import torch
 import yaml
 
 
@@ -146,6 +145,8 @@ class Config:
     @staticmethod
     def device():
         """Returns the device to be used for training."""
+        import torch
+
         if torch.cuda.is_available() and torch.cuda.device_count() > 0:
             device = 'cuda'
         else:
@@ -156,6 +157,8 @@ class Config:
     @staticmethod
     def is_parallel():
         """Check if the hardware and OS support data parallelism."""
+        import torch
+
         return hasattr(Config().trainer, 'parallelized') and Config(
         ).trainer.parallelized and torch.cuda.is_available(
         ) and torch.distributed.is_available(
