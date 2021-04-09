@@ -75,19 +75,25 @@ To build such a Docker image, use the provided `Dockerfile` for PyTorch and `Doc
 
 ```shell
 docker build -t plato -f Dockerfile .
-docker build -t plato_mindspore -f Dockerfile_MindSpore .
 ```
 
-To run any of the docker images that was just built, use the command:
+or:
+
+```
+shell
+docker build -t plato -f Dockerfile_MindSpore .
+```
+
+To run the docker image that was just built, use the command:
 
 ```shell
-docker run -it --net=host -v /dev/shm:/dev/shm plato bash
+./dockerrun.sh
 ```
 
 Or if GPUs are available, use the command:
 
 ```shell
-docker run -it --net=host -v /dev/shm:/dev/shm --gpus all plato bash
+./dockerrun_gpu.sh
 ```
 
 To remove all the containers after they are run, use the command:
@@ -99,7 +105,7 @@ docker rm $(docker ps -a -q)
 To remove the `plato` Docker image, use the command:
 
 ```shell
-docker rmi plato plato_mindspore
+docker rmi plato
 ```
 
 On Ubuntu Linux, you may need to add `sudo` before these `docker` commands.

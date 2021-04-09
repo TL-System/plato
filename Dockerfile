@@ -3,9 +3,8 @@ FROM nvidia/cuda:11.1.1-cudnn8-devel-ubuntu20.04
 LABEL maintainer="Baochun Li"
 
 ADD .bashrc /root/
-COPY . /root/plato
-RUN useradd plato
-WORKDIR /root/plato
+COPY requirements.txt /root/
+WORKDIR /root
 
 RUN apt-get update \
     && apt-get install -y wget \
@@ -20,4 +19,6 @@ RUN apt-get update \
     && ~/miniconda3/bin/conda init bash \
     && ~/miniconda3/bin/conda create -n federated python=3.8 \
     && ~/miniconda3/bin/conda install pytorch torchvision cudatoolkit=11.1 -c pytorch -c conda-forge -n federated \
-    && ~/miniconda3/envs/federated/bin/pip install -r ~/plato/requirements.txt \
+    && ~/miniconda3/envs/federated/bin/pip install -r ~/requirements.txt \
+
+RUN rm /root/requirements.txt
