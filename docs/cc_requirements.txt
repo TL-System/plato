@@ -1,0 +1,9 @@
+websockets
+requests
+matplotlib
+scipy
+wandb
+torch
+torchvision
+gym
+transformers
