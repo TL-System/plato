@@ -156,22 +156,23 @@ All unit tests are in the `tests/` directory. These tests are designed to be sta
 
 ### Building a Docker container for running Plato
 
-Sometimes it may be beneficial to run Plato in a Docker container. To build such such a Docker container, use the provided `Dockerfile`:
+It is strongly recommended to run Plato in a Docker container, even on a GPU server. To build such such a Docker container, use the provided `Dockerfile` for PyTorch and `Dockerfile_MindSpore` for MindSpore:
 
 ```shell
-docker build -t plato .
+docker build -t plato -f Dockerfile .
+docker build -t plato_mindspore -f Dockerfile_MindSpore .
 ```
 
-To run the docker image that was just built, use the command:
+To run any of the docker images that was just built, use the command:
 
 ```shell
-docker run -it --net=host --ipc=host plato bash
+docker run -it --net=host -v /dev/shm:/dev/shm plato bash
 ```
 
 Or if GPUs are available, use the command:
 
 ```shell
-docker run -it --net=host --ipc=host --gpus all plato bash
+docker run -it --net=host -v /dev/shm:/dev/shm --gpus all plato bash
 ```
 
 To remove all the containers after they are run, use the command:
@@ -186,7 +187,9 @@ To remove the `plato` Docker image, use the command:
 docker rmi plato
 ```
 
-The provided `Dockerfile` helps to build a Docker container image running Ubuntu 20.04, with two virtual environments pre-installed: the one called `pytorch` supports PyTorch and Python 3.8, and one called `mindspore` supports [MindSpore 1.2rc1](https://github.com/mindspore-ai/mindspore) and Python 3.7.5 (which is the Python version that MindSpore requires). Once the container is built and running, one can use Visual Studio Code to connect to it and start development within the container.
+On Ubuntu Linux, you may need to add `sudo` before these `docker` commands.
+
+The provided `Dockerfile` helps to build a GPU-enabled Docker container image running Ubuntu 20.04, with a virtual environment called `federated` pre-configured to support PyTorch and Python 3.8. If MindSpore support is needed, the provided `Dockerfile_MindSpore` contains a pre-configured environment, also called `federated`, that supports [MindSpore 1.1.1](https://github.com/mindspore-ai/mindspore) and Python 3.7.5 (which is the Python version that MindSpore requires). Both Dockerfiles have GPU support enabled. Once an image is built and and a container is running, one can use Visual Studio Code to connect to it and start development within the container.
 
 ### Uninstalling Plato
 
