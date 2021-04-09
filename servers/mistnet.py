@@ -8,11 +8,10 @@ Differential Privacy," found in docs/papers.
 import logging
 import os
 from itertools import chain
-from torch.utils.data import SubsetRandomSampler
 
 from servers import fedavg
 from config import Config
-
+from samplers import all_inclusive
 
 class Server(fedavg.Server):
     """The MistNet server for federated learning."""
@@ -37,7 +36,7 @@ class Server(fedavg.Server):
         feature_dataset = list(chain.from_iterable(features))
 
         # Training the model using all the features received from the client
-        sampler = AllDataSampler(feature_dataset)
+        sampler = all_inclusive.Sampler(feature_dataset)
         self.algorithm.train(feature_dataset, sampler,
                              Config().algorithm.cut_layer)
 
@@ -47,11 +46,3 @@ class Server(fedavg.Server):
             os.getpid(), 100 * self.accuracy))
 
         await self.wrap_up_processing_reports()
-
-
-class AllDataSampler:
-    def __init__(self, dataset):
-        self.all_data = range(len(dataset))
-
-    def get(self):
-        return SubsetRandomSampler(self.all_data)

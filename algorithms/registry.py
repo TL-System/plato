@@ -7,13 +7,6 @@ based on a configuration at run-time.
 import logging
 from collections import OrderedDict
 
-from algorithms import (
-    fedavg,
-    mistnet,
-    adaptive_sync,
-    adaptive_freezing,
-)
-
 from config import Config
 
 if hasattr(Config().trainer, 'use_mindspore'):
@@ -27,6 +20,13 @@ if hasattr(Config().trainer, 'use_mindspore'):
         ('mistnet', mistnet_mindspore.Algorithm),
     ])
 else:
+    from algorithms import (
+        fedavg,
+        mistnet,
+        adaptive_sync,
+        adaptive_freezing,
+    )
+
     registered_algorithms = OrderedDict([
         ('fedavg', fedavg.Algorithm),
         ('mistnet', mistnet.Algorithm),

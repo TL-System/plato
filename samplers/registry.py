@@ -7,8 +7,6 @@ on a configuration at run-time.
 import logging
 from collections import OrderedDict
 
-from samplers import (iid, dirichlet, mixed)
-
 from config import Config
 
 if hasattr(Config().trainer, 'use_mindspore'):
@@ -22,6 +20,8 @@ if hasattr(Config().trainer, 'use_mindspore'):
         ('noniid', dirichlet_mindspore.Sampler),
     ])
 else:
+    from samplers import (iid, dirichlet, mixed)
+
     registered_samplers = OrderedDict([
         ('iid', iid.Sampler),
         ('noniid', dirichlet.Sampler),
