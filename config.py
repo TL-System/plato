@@ -88,8 +88,6 @@ class Config:
                 Config.server = Config.server._replace(
                     port=args.server.split(':')[1])
 
-            print(Config.server)
-
             if 'results' in config:
                 Config.results = Config.namedtuple_from_dict(config['results'])
                 Config.result_dir = os.path.dirname(args.config) + '/results/'

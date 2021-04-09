@@ -31,7 +31,7 @@ class Trainer(base.Trainer):
         super().__init__(client_id)
 
         mindspore.context.set_context(mode=mindspore.context.PYNATIVE_MODE,
-                                      device_target='CPU')
+                                      device_target='GPU')
 
         if model is None:
             self.model = models_registry.get()
