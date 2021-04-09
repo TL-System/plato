@@ -16,6 +16,7 @@ from config import Config
 from utils import unary_encoding
 from algorithms import fedavg
 
+
 class FeatureDataset(torch.utils.data.Dataset):
     """Used to prepare a feature dataset for a DataLoader in PyTorch."""
     def __init__(self, dataset):
@@ -52,7 +53,9 @@ class Algorithm(fedavg.Algorithm):
                                                     extract_features=True)
         else:
             data_loader = torch.utils.data.DataLoader(
-                dataset, batch_size=Config().trainer.batch_size, sampler=sampler.get(), shuffle=True)
+                dataset,
+                batch_size=Config().trainer.batch_size,
+                sampler=sampler.get())
 
         tic = time.perf_counter()
 
@@ -67,11 +70,11 @@ class Algorithm(fedavg.Algorithm):
                     logits = logits.detach().numpy()
                     logits = unary_encoding.encode(logits)
                     if callable(_randomize):
-                        logits = self.trainer.randomize(logits, targets, epsilon)
+                        logits = self.trainer.randomize(
+                            logits, targets, epsilon)
                     else:
                         logits = unary_encoding.randomize(logits, epsilon)
                     logits = torch.from_numpy(logits.astype('float16'))
-
 
             for i in np.arange(logits.shape[0]):  # each sample in the batch
                 feature_dataset.append((logits[i], targets[i]))
