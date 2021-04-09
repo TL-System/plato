@@ -31,9 +31,6 @@ data:
     # IID, biased, or sharded?
     sampler: iid
 
-    # Uniform or normal distribution for labels across clients?
-    : uniform
-
 trainer:
     # The type of the trainer
     type: basic
