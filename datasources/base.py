@@ -60,7 +60,7 @@ class DataSource(ABC):
                 zipped_file = gzip.GzipFile(file_name)
                 unzipped_file.write(zipped_file.read())
                 zipped_file.close()
-                os.remove(name)
+                os.remove(file_name)
             else:
                 logging.info("Unknown compressed file type.")
                 sys.exit()
