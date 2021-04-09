@@ -12,6 +12,8 @@ clients:
     do_test: false
 
 server:
+    type: mistnet
+
     address: localhost
     port: 8000
 
