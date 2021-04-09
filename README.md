@@ -21,7 +21,7 @@ Update any packages, if necessary by typing `y` to proceed.
 The next step is to install the required Python packages. PyTorch should be installed following the advice of its [getting started website](https://pytorch.org/get-started/locally/). The typical command in Linux with CUDA GPU support, for example, would be:
 
 ```shell
-$ conda install pytorch torchvision cudatoolkit=10.2 -c pytorch
+$ conda install pytorch torchvision cudatoolkit=11.1 -c pytorch
 ```
 
 The CUDA version, used in the command above, can be obtained on Ubuntu Linux systems by using the command:
@@ -67,11 +67,48 @@ It goes without saying that `/absolute/path/to/project/home/directory` should be
 
 **Tip:** When working in Visual Studio Code as the development environment, one of the project developer's colour theme favourites is called `Bluloco`, both of its light and dark variants are excellent and very thoughtfully designed. The `Pylance` extension is also strongly recommended, which represents Microsoft's modern language server for Python.
 
+### Running Plato in a Docker container
+
+Most of the codebase in *Plato* is designed to be framework-agnostic, so that it is relatively straightfoward to use *Plato* with a variety of deep learning frameworks beyond PyTorch, which is the default framwork it is using. One example of such deep learning frameworks that *Plato* currently supports is [MindSpore](https://www.mindspore.cn). Due to the wide variety of tricks that need to be followed correctly for running *Plato* without Docker, it is strongly recommended to run Plato in a Docker container, on either a CPU-only or a GPU-enabled server.
+
+To build such a Docker image, use the provided `Dockerfile` for PyTorch and `Dockerfile_MindSpore` for MindSpore:
+
+```shell
+docker build -t plato -f Dockerfile .
+docker build -t plato_mindspore -f Dockerfile_MindSpore .
+```
+
+To run any of the docker images that was just built, use the command:
+
+```shell
+docker run -it --net=host -v /dev/shm:/dev/shm plato bash
+```
+
+Or if GPUs are available, use the command:
+
+```shell
+docker run -it --net=host -v /dev/shm:/dev/shm --gpus all plato bash
+```
+
+To remove all the containers after they are run, use the command:
+
+```shell
+docker rm $(docker ps -a -q)
+```
+
+To remove the `plato` Docker image, use the command:
+
+```shell
+docker rmi plato plato_mindspore
+```
+
+On Ubuntu Linux, you may need to add `sudo` before these `docker` commands.
+
+The provided `Dockerfile` helps to build a Docker image running Ubuntu 20.04, with a virtual environment called `federated` pre-configured to support PyTorch 1.8.1 and Python 3.8. If MindSpore support is needed, the provided `Dockerfile_MindSpore` contains a pre-configured environment, also called `federated`, that supports [MindSpore 1.1.1](https://github.com/mindspore-ai/mindspore) and Python 3.7.5 (which is the Python version that MindSpore requires). Both Dockerfiles have GPU support enabled. Once an image is built and  a container is running, one can use Visual Studio Code to connect to it and start development within the container.
+
 ### Installing Plato with MindSpore
 
-Most of the codebase in *Plato* is designed to be framework-agnostic, so that it is relatively straightfoward to use *Plato* with a variety of deep learning frameworks beyond PyTorch, which is the default framwork it is using. One example of such deep learning frameworks is [MindSpore](https://www.mindspore.cn).
-
-Though we provided a `Dockerfile` for building a Docker container that supports MindSpore 1.1, it may still be necessary to install Plato with MindSpore in a GPU server running Ubuntu Linux 18.04 (which MindSpore requires). Similar to a PyTorch installation, we need to first create a new environment with Python 3.7.5 (which MindSpore 1.1 requires), and then install the required packages:
+Though we provided a `Dockerfile` for building a Docker container that supports MindSpore 1.1, in rare cases it may still be necessary to install Plato with MindSpore in a GPU server running Ubuntu Linux 18.04 (which MindSpore requires). Similar to a PyTorch installation, we need to first create a new environment with Python 3.7.5 (which MindSpore 1.1 requires), and then install the required packages:
 
 ```shell
 conda create -n mindspore python=3.7.5
@@ -153,43 +190,6 @@ python plot.py --config=config.yml
 ### Running Unit Tests
 
 All unit tests are in the `tests/` directory. These tests are designed to be standalone and executed separately. For example, the command `python lr_schedule_tests.py` runs the unit tests for learning rate schedules.
-
-### Building a Docker container for running Plato
-
-It is strongly recommended to run Plato in a Docker container, even on a GPU server. To build such such a Docker container, use the provided `Dockerfile` for PyTorch and `Dockerfile_MindSpore` for MindSpore:
-
-```shell
-docker build -t plato -f Dockerfile .
-docker build -t plato_mindspore -f Dockerfile_MindSpore .
-```
-
-To run any of the docker images that was just built, use the command:
-
-```shell
-docker run -it --net=host -v /dev/shm:/dev/shm plato bash
-```
-
-Or if GPUs are available, use the command:
-
-```shell
-docker run -it --net=host -v /dev/shm:/dev/shm --gpus all plato bash
-```
-
-To remove all the containers after they are run, use the command:
-
-```shell
-docker rm $(docker ps -a -q)
-```
-
-To remove the `plato` Docker image, use the command:
-
-```shell
-docker rmi plato
-```
-
-On Ubuntu Linux, you may need to add `sudo` before these `docker` commands.
-
-The provided `Dockerfile` helps to build a GPU-enabled Docker container image running Ubuntu 20.04, with a virtual environment called `federated` pre-configured to support PyTorch and Python 3.8. If MindSpore support is needed, the provided `Dockerfile_MindSpore` contains a pre-configured environment, also called `federated`, that supports [MindSpore 1.1.1](https://github.com/mindspore-ai/mindspore) and Python 3.7.5 (which is the Python version that MindSpore requires). Both Dockerfiles have GPU support enabled. Once an image is built and and a container is running, one can use Visual Studio Code to connect to it and start development within the container.
 
 ### Uninstalling Plato
 
