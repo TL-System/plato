@@ -1,5 +1,5 @@
 # Download base image from NVIDIA's Docker Hub
-FROM nvidia/cuda:11.1.1-cudnn8-devel-ubuntu20.04
+FROM nvidia/cuda:10.1-cudnn7-devel-ubuntu18.04
 LABEL maintainer="Baochun Li"
 
 ADD .bashrc /root/
@@ -18,6 +18,6 @@ RUN apt-get update \
     && rm -rf ~/miniconda3/miniconda.sh \
     && ~/miniconda3/bin/conda update -n base -c defaults conda \
     && ~/miniconda3/bin/conda init bash \
-    && ~/miniconda3/bin/conda create -n federated python=3.8 \
-    && ~/miniconda3/bin/conda install pytorch torchvision cudatoolkit=11.1 -c pytorch -c conda-forge -n federated \
-    && ~/miniconda3/envs/federated/bin/pip install -r /root/plato/requirements.txt \
+    && ~/miniconda3/bin/conda create -n federated python=3.7 \
+    && ~/miniconda3/envs/federated/bin/pip install https://ms-release.obs.cn-north-4.myhuaweicloud.com/1.1.1/MindSpore/gpu/ubuntu_x86/cuda-10.1/mindspore_gpu-1.1.1-cp37-cp37m-linux_x86_64.whl \
+    && ~/miniconda3/envs/federated/bin/pip install -r /root/plato/requirements.txt
