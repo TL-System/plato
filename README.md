@@ -165,7 +165,13 @@ docker build -t plato .
 To run the docker image that was just built, use the command:
 
 ```shell
-docker run -it --net=host plato
+docker run -it --net=host --ipc=host plato bash
+```
+
+Or if GPUs are available, use the command:
+
+```shell
+docker run -it --net=host --ipc=host --gpus all plato bash
 ```
 
 To remove all the containers after they are run, use the command:
