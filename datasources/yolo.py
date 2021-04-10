@@ -1,5 +1,5 @@
 """
-The COCO dataset.
+The COCO dataset or other datasets for the YOLOv5 model.
 
 For more information about COCO 128, which contains the first 128 images of the
 COCO 2017 dataset, refer to https://www.kaggle.com/ultralytics/coco128.
@@ -25,8 +25,8 @@ def collate_fn(batch):
     return torch.stack(img, 0), torch.cat(label, 0)
 
 
-class COCODataset(torch.utils.data.Dataset):
-    """Prepares the COCO dataset for use in YOLOv5."""
+class YOLODataset(torch.utils.data.Dataset):
+    """Prepares the YOLO dataset for use in YOLOv5."""
     def __init__(self, dataset):
         self.dataset = dataset
 
@@ -39,7 +39,7 @@ class COCODataset(torch.utils.data.Dataset):
 
 
 class DataSource(base.DataSource):
-    """The COCO dataset."""
+    """The YOLO dataset."""
     def __init__(self):
         super().__init__()
         _path = Config().data.data_path
@@ -47,12 +47,12 @@ class DataSource(base.DataSource):
         if not os.path.exists(_path):
             os.makedirs(_path)
 
-        logging.info("Downloading the COCO dataset. This may take a while.")
+            logging.info("Downloading the YOLO dataset. This may take a while.")
 
-        urls = Config().data.download_urls
-        for url in urls:
-            if not os.path.exists(_path + url.split('/')[-1]):
-                DataSource.download(url, _path)
+            urls = Config().data.download_urls
+            for url in urls:
+                if not os.path.exists(_path + url.split('/')[-1]):
+                    DataSource.download(url, _path)
 
         assert 'grid_size' in Config().params
 
@@ -123,23 +123,21 @@ class DataSource(base.DataSource):
 
         if extract_features:
             # MistNet client: feature extraction
-            return torch.utils.data.DataLoader(dataset=COCODataset(trainset),
+            return torch.utils.data.DataLoader(dataset=YOLODataset(trainset),
                                                batch_size=batch_size,
-                                               sampler=sampler,
                                                shuffle=False)
         elif cut_layer is not None:
             # MistNet server: training from the cut layer forwards using
             # the features extracted on the client
             return torch.utils.data.DataLoader(dataset=trainset,
                                                batch_size=batch_size,
-                                               shuffle=False,
-                                               sampler=sampler,
+                                               shuffle=True,
                                                collate_fn=collate_fn)
         else:
             return torch.utils.data.DataLoader(
-                COCODataset(trainset),
+                YOLODataset(trainset),
                 batch_size=batch_size,
-                shuffle=False,
+                shuffle=True,
                 sampler=sampler,
                 collate_fn=LoadImagesAndLabels.collate_fn)
 

@@ -142,7 +142,7 @@ class Trainer(base.Trainer):
             log_interval = 10
             batch_size = config['batch_size']
 
-            logging.info("[Client %s] Loading the dataset.", self.client_id)
+            logging.info("[Client #%s] Loading the dataset.", self.client_id)
             _train_loader = getattr(self, "train_loader", None)
 
             if callable(_train_loader):

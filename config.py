@@ -9,7 +9,6 @@ import os
 import sqlite3
 
 import argparse
-import torch
 import yaml
 
 
@@ -37,6 +36,11 @@ class Config:
                                 type=str,
                                 default='./config.yml',
                                 help='Federated learning configuration file.')
+            parser.add_argument('-s',
+                                '--server',
+                                type=str,
+                                default='localhost:8000',
+                                help='The server hostname and port number.')
             parser.add_argument('-l',
                                 '--log',
                                 type=str,
@@ -77,6 +81,12 @@ class Config:
             Config.data = Config.namedtuple_from_dict(config['data'])
             Config.trainer = Config.namedtuple_from_dict(config['trainer'])
             Config.algorithm = Config.namedtuple_from_dict(config['algorithm'])
+
+            if Config.args.server is not None:
+                Config.server = Config.server._replace(
+                    address=args.server.split(':')[0])
+                Config.server = Config.server._replace(
+                    port=args.server.split(':')[1])
 
             if 'results' in config:
                 Config.results = Config.namedtuple_from_dict(config['results'])
@@ -133,6 +143,8 @@ class Config:
     @staticmethod
     def device():
         """Returns the device to be used for training."""
+        import torch
+
         if torch.cuda.is_available() and torch.cuda.device_count() > 0:
             device = 'cuda'
         else:
@@ -143,6 +155,8 @@ class Config:
     @staticmethod
     def is_parallel():
         """Check if the hardware and OS support data parallelism."""
+        import torch
+
         return hasattr(Config().trainer, 'parallelized') and Config(
         ).trainer.parallelized and torch.cuda.is_available(
         ) and torch.distributed.is_available(

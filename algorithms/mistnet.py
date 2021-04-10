@@ -53,21 +53,28 @@ class Algorithm(fedavg.Algorithm):
                                                     extract_features=True)
         else:
             data_loader = torch.utils.data.DataLoader(
-                dataset, batch_size=Config().trainer.batch_size, sampler=sampler.get(), shuffle=True)
+                dataset,
+                batch_size=Config().trainer.batch_size,
+                sampler=sampler.get())
 
         tic = time.perf_counter()
 
         feature_dataset = []
 
+        _randomize = getattr(self.trainer, "randomize", None)
+
         for inputs, targets, *__ in data_loader:
             with torch.no_grad():
                 logits = self.model.forward_to(inputs, cut_layer)
-
                 if epsilon is not None:
                     logits = logits.detach().numpy()
                     logits = unary_encoding.encode(logits)
-                    logits = unary_encoding.randomize(logits, epsilon)
-                    logits = torch.from_numpy(logits.astype('float32'))
+                    if callable(_randomize):
+                        logits = self.trainer.randomize(
+                            logits, targets, epsilon)
+                    else:
+                        logits = unary_encoding.randomize(logits, epsilon)
+                    logits = torch.from_numpy(logits.astype('float16'))
 
             for i in np.arange(logits.shape[0]):  # each sample in the batch
                 feature_dataset.append((logits[i], targets[i]))

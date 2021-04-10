@@ -7,14 +7,6 @@ import logging
 from collections import OrderedDict
 from config import Config
 
-from datasources import (
-    mnist,
-    fashion_mnist,
-    cifar10,
-    cinic10,
-    huggingface,
-)
-
 if hasattr(Config().trainer, 'use_mindspore'):
     from datasources.mindspore import (
         mnist as mnist_mindspore, )
@@ -23,6 +15,14 @@ if hasattr(Config().trainer, 'use_mindspore'):
         ('MNIST', mnist_mindspore),
     ])
 else:
+    from datasources import (
+        mnist,
+        fashion_mnist,
+        cifar10,
+        cinic10,
+        huggingface,
+    )
+
     registered_datasources = OrderedDict([
         ('MNIST', mnist),
         ('FashionMNIST', fashion_mnist),
@@ -38,9 +38,9 @@ def get():
 
     logging.info("Data source: %s", Config().data.datasource)
 
-    if Config().data.datasource == 'COCO':
-        from datasources import coco
-        return coco.DataSource()
+    if Config().data.datasource == 'YOLO':
+        from datasources import yolo
+        return yolo.DataSource()
     elif datasource_name in registered_datasources:
         dataset = registered_datasources[datasource_name].DataSource()
     else:

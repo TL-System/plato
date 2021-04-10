@@ -12,7 +12,6 @@ import torch
 from collections import OrderedDict
 
 from config import Config
-from models.base import Model
 from trainers.base import Trainer
 from algorithms import fedavg
 
@@ -21,18 +20,18 @@ class Algorithm(fedavg.Algorithm):
     """The federated learning trainer for Adaptive Synchronization Frequency,
        used by the server.
     """
-    def __init__(self, model: Model, trainer: Trainer = None, client_id=0):
-        super().__init__(model, trainer, client_id)
+    def __init__(self, trainer: Trainer = None, client_id=0):
+        super().__init__(trainer, client_id)
 
         self.sync_frequency = Config().algorithm.initial_sync_frequency
 
         self.average_positive_deltas = {
             name: torch.zeros(param.data.shape)
-            for name, param in model.named_parameters()
+            for name, param in self.model.named_parameters()
         }
         self.average_negative_deltas = {
             name: torch.zeros(param.data.shape)
-            for name, param in model.named_parameters()
+            for name, param in self.model.named_parameters()
         }
 
         self.sliding_window_size = 5
