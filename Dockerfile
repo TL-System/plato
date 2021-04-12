@@ -19,6 +19,6 @@ RUN apt-get update \
     && ~/miniconda3/bin/conda init bash \
     && ~/miniconda3/bin/conda create -n federated python=3.8 \
     && ~/miniconda3/bin/conda install pytorch torchvision cudatoolkit=11.1 -c pytorch -c conda-forge -n federated \
-    && ~/miniconda3/envs/federated/bin/pip install -r ~/requirements.txt \
+    && ~/miniconda3/envs/federated/bin/pip install -r ~/requirements.txt
 
 RUN rm /root/requirements.txt
