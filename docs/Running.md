@@ -63,7 +63,7 @@ $ pip install -r docs/cc_requirements.txt --no-index
 The `--no-index` option tells `pip` to not install from PyPI, but only from locally-available packages, i.e. the Compute Canada wheels.
 Whenever a Compute Canada wheel is available for a given package, it is strongly recommended to use it by way of the `--no-index` option. Compared to using packages from PyPI, wheels that have been compiled by Compute Canada staff can prevent issues with missing or conflicting dependencies, and were optimised for its clusters hardware and libraries. 
 
-**Note:** I am still working on finding an available way to install the `datasets` package with `virtualenvs` (Compute Canada asks users to not use Conda.) So we cannot run Plato with HuggingFace datasets right now. Please comment out 2 lines of code related to `huggingface` in `datasources/registry.py` before your experiments for now.
+**Note:** I am still working on finding an available way to install the `datasets` package with `virtualenvs` (Compute Canada asks users to not use Conda.) So we cannot run Plato with HuggingFace datasets on Compute Canada right now. Please comment out 2 lines of code related to `huggingface` in `datasources/registry.py` before your experiments for now. Or you could run it on Google Colaboratory.
 
 
 ### Running Plato
