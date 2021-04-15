@@ -42,8 +42,8 @@ def get():
         from datasources import yolo
         return yolo.DataSource()
     elif datasource_name in registered_datasources:
-        dataset = registered_datasources[datasource_name].DataSource()
+        datasource = registered_datasources[datasource_name].DataSource()
     else:
         raise ValueError('No such data source: {}'.format(datasource_name))
 
-    return dataset
+    return datasource
