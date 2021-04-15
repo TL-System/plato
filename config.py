@@ -39,7 +39,7 @@ class Config:
             parser.add_argument('-s',
                                 '--server',
                                 type=str,
-                                default='localhost:8000',
+                                default=None,
                                 help='The server hostname and port number.')
             parser.add_argument('-l',
                                 '--log',
@@ -94,7 +94,8 @@ class Config:
 
             # Used to limit the maximum number of concurrent trainers
             Config.sql_connection = sqlite3.connect(
-                os.path.dirname(args.config) + '/running_trainers.sqlitedb',
+                os.path.dirname(Config.args.config) +
+                '/running_trainers.sqlitedb',
                 timeout=20 * Config.clients.total_clients)
 
             # Customizable dictionary of global parameters

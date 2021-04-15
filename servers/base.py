@@ -41,7 +41,9 @@ class Server:
         self.client = client
         self.configure()
 
-        logging.info("Starting a server on port %s.", Config().server.port)
+        logging.info("Starting a server at address %s and port %s.",
+                     Config().server.address,
+                     Config().server.port)
         start_server = websockets.serve(self.serve,
                                         Config().server.address,
                                         Config().server.port,
