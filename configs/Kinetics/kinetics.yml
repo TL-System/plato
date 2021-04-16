@@ -12,9 +12,8 @@ clients:
     do_test: true
 
 server:
-    address: localhost
+    address: 127.0.0.1
     port: 8000
-
 
 data:
     # The training and testing dataset
