@@ -72,13 +72,11 @@ class DataSource(ABC):
                 logging.info("Unknown compressed file type.")
                 sys.exit()
 
-    @abstractmethod
     def num_train_examples(self) -> int:
-        pass
+        return len(self.trainset)
 
-    @abstractmethod
     def num_test_examples(self) -> int:
-        pass
+        return len(self.testset)
 
     def classes(self):
         """Obtains a list of class names in the dataset. """
