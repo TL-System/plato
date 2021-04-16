@@ -24,7 +24,7 @@ Attributes in **bold** are must included in a configuration file, in *italic* ar
 | Attribute | Meaning | Valid Value | Note |
 |:---------:|:-------:|:-----------:|:----:|
 |*type*|The type of the server|`fedavg_cross_silo`|**algorithm.type** must be `fedavg`|
-|**address**|The address of the central server|e.g., `localhost`||
+|**address**|The address of the central server|e.g., `127.0.0.1`||
 |**port**|The port number of the central server|e.g., `8000`||
 
 ### data

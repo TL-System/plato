@@ -12,7 +12,7 @@ clients:
     do_test: false
 
 server:
-    address: localhost
+    address: 127.0.0.1
     port: 8000
 
 data:
@@ -26,10 +26,7 @@ data:
     test_path: ./data/helmet/helmet/images/val/
 
     # download command/URL
-    download_urls:
-        [
-            "https://iqua.ece.toronto.edu/~bli/helmet.zip",
-        ]
+    download_urls: ["https://iqua.ece.toronto.edu/~bli/helmet.zip"]
 
     # number of training examples
     num_train_examples: 5457
@@ -44,8 +41,7 @@ data:
     image_size: 640
 
     # class names
-    classes:
-        ['head', 'helmet']
+    classes: ["head", "helmet"]
     # Number of samples in each partition
     partition_size: 5457
 
