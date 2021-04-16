@@ -5,10 +5,11 @@ clients' local epoch numbers of each institution.
 
 import math
 import statistics
+
 import torch
+from config import Config
 
 from servers import fedavg_cs
-from config import Config
 
 
 class Server(fedavg_cs.Server):

@@ -9,6 +9,7 @@ Karimireddy et al., "SCAFFOLD: Stochastic Controlled Averaging for Federated Lea
 
 import os
 from dataclasses import dataclass
+
 import torch
 
 from clients import simple

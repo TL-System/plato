@@ -1,8 +1,9 @@
 """
 A customized server for FedSarah.
 """
-from servers import fedavg
 from config import Config
+
+from servers import fedavg
 
 
 class Server(fedavg.Server):

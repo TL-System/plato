@@ -1,12 +1,12 @@
 """
 Samples data from a dataset in an independent and identically distributed fashion.
 """
-import torch
 import numpy as np
-
-from samplers import iid
+import torch
 from config import Config
 from torch.utils.data import WeightedRandomSampler
+
+from samplers import iid
 
 
 class Sampler(iid.Sampler):

@@ -4,11 +4,12 @@ For more information about CINIC-10, refer to
 https://github.com/BayesWatch/cinic-10
 """
 
-import os
 import logging
-from torchvision import datasets, transforms
+import os
 
 from config import Config
+from torchvision import datasets, transforms
+
 from datasources import base
 
 

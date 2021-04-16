@@ -4,15 +4,15 @@ This federated server uses reinforcement learning
 to tune the number of local aggregations on edge servers.
 """
 
-import logging
 import asyncio
+import logging
 import sys
 import time
 
 from config import Config
+from utils import csv_processor, rl_env
+
 import servers
-from utils import rl_env
-from utils import csv_processor
 
 FLServer = servers.fedavg_cs.Server
 RLEnv = rl_env.RLEnv

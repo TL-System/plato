@@ -1,15 +1,15 @@
 """
 Base class for datasets.
 """
-from abc import ABC, abstractmethod
-
+import gzip
+import logging
 import os
 import sys
-import logging
-import gzip
-import zipfile
 import tarfile
+import zipfile
+from abc import ABC, abstractmethod
 from urllib.parse import urlparse
+
 import requests
 
 

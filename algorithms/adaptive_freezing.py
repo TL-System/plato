@@ -12,10 +12,11 @@ Systems (ICDCS 2021), Online, July 7-10, 2021 (found in docs/papers).
 import copy
 import logging
 from collections import OrderedDict
-import torch
 
+import torch
 from config import Config
 from trainers.base import Trainer
+
 from algorithms import fedavg
 
 

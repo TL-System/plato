@@ -5,16 +5,18 @@ Note that the setting for the data loader is obtained from the github repo provi
 https://github.com/pytorch/vision/references/video_classification/train.py
 """
 
-import json, os, sys
+import json
 import logging
-
-from torchvision import datasets
-from torch.utils.data.dataloader import default_collate
+import os
+import sys
 
 from config import Config
+from torch.utils.data.dataloader import default_collate
+from torchvision import datasets
+
+from datasources import base
 from datasources.datalib import parallel_downloader as parallel
 from datasources.datalib import video_transform
-from datasources import base
 
 
 class DataSource(base.DataSource):

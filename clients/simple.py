@@ -6,11 +6,12 @@ import logging
 import time
 from dataclasses import dataclass
 
+from algorithms import registry as algorithms_registry
+from config import Config
 from datasources import registry as datasources_registry
 from samplers import registry as samplers_registry
-from algorithms import registry as algorithms_registry
 from trainers import registry as trainers_registry
-from config import Config
+
 from clients import base
 
 

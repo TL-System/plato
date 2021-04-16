@@ -7,8 +7,9 @@ Karimireddy et al., "SCAFFOLD: Stochastic Controlled Averaging for Federated Lea
 (https://arxiv.org/pdf/1910.06378.pdf)
 """
 
-from servers import fedavg
 from config import Config
+
+from servers import fedavg
 
 
 class Server(fedavg.Server):

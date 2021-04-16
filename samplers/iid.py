@@ -1,12 +1,12 @@
 """
 Samples data from a dataset in an independent and identically distributed fashion.
 """
-import torch
 import numpy as np
-
-from samplers import base
+import torch
 from config import Config
 from torch.utils.data import SubsetRandomSampler
+
+from samplers import base
 
 
 class Sampler(base.Sampler):

@@ -7,13 +7,14 @@ COCO 2017 dataset, refer to https://www.kaggle.com/ultralytics/coco128.
 For more information about the COCO 2017 dataset, refer to http://cocodataset.org.
 """
 
-import os
 import logging
-import torch
+import os
 
+import torch
+from config import Config
 from yolov5.utils.datasets import LoadImagesAndLabels
 from yolov5.utils.general import check_img_size
-from config import Config
+
 from datasources import base
 
 

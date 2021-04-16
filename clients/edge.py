@@ -4,9 +4,11 @@ A federated learning client at the edge server in a cross-silo training workload
 
 import time
 from dataclasses import dataclass
+
+from algorithms import registry as algorithms_registry
 from config import Config
 from trainers import registry as trainers_registry
-from algorithms import registry as algorithms_registry
+
 from clients import base
 
 

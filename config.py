@@ -3,12 +3,12 @@ Reading runtime parameters from a standard configuration file (which is easier
 to work on than JSON).
 """
 
+import argparse
 import logging
-from collections import namedtuple, OrderedDict
 import os
 import sqlite3
+from collections import OrderedDict, namedtuple
 
-import argparse
 import yaml
 
 

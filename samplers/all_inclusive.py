@@ -1,10 +1,15 @@
+"""
+Samples all the data from a dataset. Applicable in cases where the dataset comes from
+local sources only, and used by the MistNet server.
+"""
+from torch.utils.data import SubsetRandomSampler
+
 from samplers import base
 
-from torch.utils.data import SubsetRandomSampler
 
 class Sampler(base.Sampler):
     """Create a data sampler that samples all the data in the dataset.
-       Used directly by the MistNet server.
+       Used by the MistNet server.
     """
     def __init__(self, dataset):
         super().__init__()

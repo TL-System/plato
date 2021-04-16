@@ -3,18 +3,19 @@ A simple federated learning server using federated averaging.
 """
 
 import logging
-import time
 import os
 import random
+import time
 from collections import OrderedDict
-import wandb
 
-from datasources import registry as datasources_registry
+import wandb
 from algorithms import registry as algorithms_registry
-from trainers import registry as trainers_registry
-from servers import base
 from config import Config
+from datasources import registry as datasources_registry
+from trainers import registry as trainers_registry
 from utils import csv_processor
+
+from servers import base
 
 
 class Server(base.Server):

@@ -2,15 +2,16 @@
 A cross-silo federated learning server using federated averaging, as either edge or central servers.
 """
 
-import logging
-import time
-import os
 import asyncio
+import logging
+import os
+import time
+
+from config import Config
+from datasources import registry as datasources_registry
+from utils import csv_processor
 
 from servers import fedavg
-from datasources import registry as datasources_registry
-from config import Config
-from utils import csv_processor
 
 
 class Server(fedavg.Server):

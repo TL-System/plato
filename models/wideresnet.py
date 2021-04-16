@@ -5,7 +5,6 @@ The WideResNet model (https://github.com/xternalz/WideResNet-pytorch/).
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
 from config import Config
 
 

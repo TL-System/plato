@@ -7,8 +7,9 @@ Karimireddy et al., "SCAFFOLD: Stochastic Controlled Averaging for Federated Lea
 (https://arxiv.org/pdf/1910.06378.pdf)
 """
 import torch
-from trainers import basic
 from utils import optimizers
+
+from trainers import basic
 
 
 class Trainer(basic.Trainer):

@@ -2,9 +2,9 @@
 Base class for trainers.
 """
 
-from abc import ABC, abstractmethod
-import time
 import os
+import time
+from abc import ABC, abstractmethod
 from contextlib import closing
 
 from config import Config
