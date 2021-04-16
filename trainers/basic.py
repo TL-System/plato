@@ -3,15 +3,16 @@ The training and testing loops for PyTorch.
 """
 import logging
 import os
-import numpy as np
-import torch
-import torch.nn as nn
-import torch.multiprocessing as mp
-import wandb
 
 import models.registry as models_registry
+import numpy as np
+import torch
+import torch.multiprocessing as mp
+import torch.nn as nn
+import wandb
 from config import Config
 from utils import optimizers
+
 from trainers import base
 
 

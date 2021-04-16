@@ -3,6 +3,7 @@ A simple utility that plot figures of results as PDF files, stored in results/.
 """
 
 import csv
+
 import matplotlib.pyplot as plt
 
 from config import Config

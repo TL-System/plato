@@ -8,13 +8,13 @@ To create and use other custom environments, check out:
 https://stable-baselines3.readthedocs.io/en/master/guide/custom_env.html.
 """
 
-import logging
 import asyncio
-import gym
-from gym import spaces
-import numpy as np
+import logging
 
+import gym
+import numpy as np
 from config import Config
+from gym import spaces
 
 
 class RLEnv(gym.Env):

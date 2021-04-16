@@ -1,7 +1,6 @@
 """A VGG-style neural network model for image classification."""
 import torch.nn as nn
 import torch.nn.functional as F
-
 from config import Config
 
 

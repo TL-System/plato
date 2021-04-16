@@ -1,12 +1,12 @@
 """
 A customized trainer for FedSarah.
 """
-import torch
-from models.base import Model
-from trainers import basic
-from utils import optimizers
-from config import Config
 import numpy as np
+import torch
+from config import Config
+from utils import optimizers
+
+from trainers import basic
 
 
 class Trainer(basic.Trainer):

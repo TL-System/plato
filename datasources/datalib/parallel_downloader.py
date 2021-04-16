@@ -5,7 +5,7 @@ The functions for downloading the datasets in parallel.
 import os
 from multiprocessing import Process, Queue
 
-import datasources.datalib.downloader as downloader
+from datasources.datalib import downloader
 
 
 class VideoDownloaderPool:

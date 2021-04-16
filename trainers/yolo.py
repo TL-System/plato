@@ -1,29 +1,23 @@
 """The YOLOV5 model for PyTorch."""
 import logging
-import torch
-import torch.optim as optim
-import torch.nn as nn
+
 import numpy as np
-import yaml
-
-from yolov5.utils.loss import ComputeLoss
-from yolov5.utils.general import (
-    check_dataset,
-    box_iou,
-    non_max_suppression,
-    scale_coords,
-    xywh2xyxy,
-    one_cycle,
-)
-from yolov5.utils.metrics import ap_per_class
-from torch.cuda import amp
+import torch
+import torch.nn as nn
+import torch.optim as optim
 import torch.optim.lr_scheduler as lr_scheduler
-from tqdm import tqdm
-
+import yaml
 from config import Config
 from datasources import yolo
-from trainers import basic
+from torch.cuda import amp
+from tqdm import tqdm
 from utils import unary_encoding
+from yolov5.utils.general import (box_iou, check_dataset, non_max_suppression,
+                                  one_cycle, scale_coords, xywh2xyxy)
+from yolov5.utils.loss import ComputeLoss
+from yolov5.utils.metrics import ap_per_class
+
+from trainers import basic
 
 try:
     import thop  # for FLOPS computation

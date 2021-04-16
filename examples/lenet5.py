@@ -3,10 +3,11 @@
 A Plato federated learning training session using a provided config file and the LeNet5 model.
 """
 import os
+
 os.environ['config_file'] = 'configs/MNIST/fedavg_lenet5.yml'
 
-from models import lenet5
 from clients import simple
+from models import lenet5
 from servers import registry as server_registry
 
 

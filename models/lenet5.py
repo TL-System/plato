@@ -6,6 +6,7 @@ Y. LeCun, L. Bottou, Y. Bengio, and P. Haffner. "Gradient-based learning applied
 document recognition." Proceedings of the IEEE, November 1998.
 """
 import collections
+
 import torch.nn as nn
 import torch.nn.functional as F
 

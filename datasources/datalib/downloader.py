@@ -2,7 +2,8 @@
 The functions for downloading the youtube datasets.
 """
 
-import os, subprocess
+import os
+import subprocess
 
 
 def download_video(video_id, download_path, video_format="mp4", log_file=None):
