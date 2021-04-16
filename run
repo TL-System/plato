@@ -2,9 +2,12 @@
 """
 Starting point for a Plato federated learning training session.
 """
+import os
 
 from config import Config
 from servers import registry as server_registry
+
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 
 def main():

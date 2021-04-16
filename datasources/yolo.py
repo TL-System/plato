@@ -47,7 +47,8 @@ class DataSource(base.DataSource):
         if not os.path.exists(_path):
             os.makedirs(_path)
 
-            logging.info("Downloading the YOLO dataset. This may take a while.")
+            logging.info(
+                "Downloading the YOLO dataset. This may take a while.")
 
             urls = Config().data.download_urls
             for url in urls:
@@ -137,7 +138,6 @@ class DataSource(base.DataSource):
             return torch.utils.data.DataLoader(
                 YOLODataset(trainset),
                 batch_size=batch_size,
-                shuffle=True,
                 sampler=sampler,
                 collate_fn=LoadImagesAndLabels.collate_fn)
 
