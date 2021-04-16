@@ -21,6 +21,7 @@ else:
         cifar10,
         cinic10,
         huggingface,
+        kinetics,
     )
 
     registered_datasources = OrderedDict([
@@ -29,6 +30,7 @@ else:
         ('CIFAR10', cifar10),
         ('CINIC10', cinic10),
         ('HuggingFace', huggingface),
+        ('Kinetics', kinetics),
     ])
 
 
@@ -42,8 +44,8 @@ def get():
         from datasources import yolo
         return yolo.DataSource()
     elif datasource_name in registered_datasources:
-        datasource = registered_datasources[datasource_name].DataSource()
+        dataset = registered_datasources[datasource_name].DataSource()
     else:
         raise ValueError('No such data source: {}'.format(datasource_name))
 
-    return datasource
+    return dataset
