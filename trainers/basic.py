@@ -4,7 +4,6 @@ The training and testing loops for PyTorch.
 import logging
 import os
 
-import models.registry as models_registry
 import numpy as np
 import torch
 import torch.multiprocessing as mp
@@ -14,6 +13,7 @@ from config import Config
 from utils import optimizers
 
 from trainers import base
+import models.registry as models_registry
 
 
 class Trainer(base.Trainer):
