@@ -23,7 +23,6 @@ from tqdm import tqdm
 from config import Config
 from datasources import yolo
 from trainers import basic
-import models.registry as models_registry
 from utils import unary_encoding
 
 try:
@@ -44,7 +43,9 @@ class Trainer(basic.Trainer):
                      sampler,
                      extract_features=False,
                      cut_layer=None):
-        """The train loader for training YOLOv5 using the COCO dataset or other datasets for the YOLOv5 model. """
+        """The train loader for training YOLOv5 using the COCO dataset or other datasets for the
+           YOLOv5 model.
+        """
         return yolo.DataSource.get_train_loader(batch_size, trainset, sampler,
                                                 extract_features, cut_layer)
 
@@ -361,7 +362,6 @@ class Trainer(basic.Trainer):
 
         return map50
 
-
     def randomize(self, bit_array: np.ndarray, targets: np.ndarray, epsilon):
         """
         The object detection unary encoding method.
@@ -373,7 +373,8 @@ class Trainer(basic.Trainer):
         targets_new = targets_new.detach().numpy()
         for i in range(targets_new.shape[1]):
             box = self.convert(bit_array.shape[2:], targets_new[0][i][2:])
-            img[:,:,box[0]:box[2],box[1]:box[3]] = label[:,:,box[0]:box[2],box[1]:box[3]]
+            img[:, :, box[0]:box[2],
+                box[1]:box[3]] = label[:, :, box[0]:box[2], box[1]:box[3]]
         return img
 
     def convert(self, size, box):
@@ -387,7 +388,7 @@ class Trainer(basic.Trainer):
         w = box[2]
         h = box[3]
         x1 = max(x - 0.5 * w - 3, 0)
-        x2 = min(x + 0.5 * w + 3,  size[0])
+        x2 = min(x + 0.5 * w + 3, size[0])
         y1 = max(y - 0.5 * h - 3, 0)
         y2 = min(y + 0.5 * h + 3, size[1])
 
@@ -396,4 +397,4 @@ class Trainer(basic.Trainer):
         y1 = round(y1 * size[1])
         y2 = round(y2 * size[1])
 
-        return (x1,y1,x2,y2)
+        return (x1, y1, x2, y2)
