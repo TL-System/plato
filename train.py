@@ -233,10 +233,10 @@ parser.add_argument('--use-multi-epochs-loader', action='store_true', default=Fa
 parser.add_argument('--torchscript', dest='torchscript', action='store_true',
                     help='convert model torchscript for inference')
 parser.add_argument('--use_lmdb', action='store_true', default=False,
-                    help='Start with pretrained version of specified network (if avail)')
+                    help='Use lmdb format ImageNet for training ')
 parser.add_argument('--use_repeated_aug', action='store_true')
 parser.add_argument('--max_iter', type=int, default=0, metavar='N',
-                    help='bn calibration after training')
+                    help='bn calibration steps after training')
 parser.add_argument('-cali', '--cali_batch_size', type=int, default=256, metavar='N',
                     help='input batch size forbn calibration (default: 256)')
 parser.add_argument('--eval-only', action='store_true', default=False,
