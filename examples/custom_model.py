@@ -57,6 +57,38 @@ class Trainer(basic.Trainer):
                 optimizer.step()
                 optimizer.zero_grad()
 
+    def test_model(self, config, testset):  # pylint: disable=unused-argument
+        # Initializing test loader
+        test_loader = torch.utils.data.DataLoader(
+            testset, 
+            batch_size=config['batch_size'], 
+            shuffle=False)
+        
+        correct = 0
+        total = 0
+
+        # model test
+        with torch.no_grad():
+            for examples, labels in test_loader:
+                examples, labels = examples.to(self.device), labels.to(
+                        self.device)
+
+                examples = examples.view(len(examples), -1)
+
+                outputs = self.model(examples)
+
+                _, predicted = torch.max(outputs.data, 1)
+
+                total += labels.size(0)
+                
+                correct += (predicted == labels).sum().item()
+
+        self.model.cpu()
+
+        # compute result
+        accuracy = correct / total
+        return accuracy
+
 
 def main():
     """A Plato federated learning training session using a custom model. """
