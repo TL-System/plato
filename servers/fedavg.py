@@ -20,10 +20,11 @@ from servers import base
 
 class Server(base.Server):
     """Federated learning server using federated averaging."""
-    def __init__(self):
+    def __init__(self, model=None):
         super().__init__()
         wandb.init(project="plato", reinit=True)
 
+        self.model = model
         self.testset = None
         self.selected_clients = None
         self.total_samples = 0
@@ -77,7 +78,7 @@ class Server(base.Server):
 
     def load_trainer(self):
         """Setting up the global model to be trained via federated learning."""
-        self.trainer = trainers_registry.get()
+        self.trainer = trainers_registry.get(model=self.model)
         self.algorithm = algorithms_registry.get(self.trainer)
 
     def choose_clients(self):
