@@ -145,6 +145,7 @@ running_trainers.sqlitedb
 results/
 models/pretrained/
 wandb/
+logs/
 
 # macOS
 .DS_Store
