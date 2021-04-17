@@ -3,6 +3,7 @@ A federated learning client of fedcy.
 """
 
 from config import Config
+
 from clients import simple
 
 

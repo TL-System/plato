@@ -7,13 +7,14 @@ P. Wang, et al. "MistNet: Towards Private Neural Network Training with Local
 Differential Privacy," found in docs/papers.
 """
 
-import time
 import logging
+import time
+
 import numpy as np
 import torch
-
 from config import Config
 from utils import unary_encoding
+
 from algorithms import fedavg
 
 

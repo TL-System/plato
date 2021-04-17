@@ -2,7 +2,7 @@ yapf
 pylint
 websockets
 requests
-pyyaml
+pyyaml>=5.4.1
 matplotlib
 scipy
 wandb

@@ -1,0 +1,41 @@
+clients:
+    # Type
+    type: simple
+
+    # The total number of clients
+    total_clients: 1
+
+    # The number of clients selected in each round
+    per_round: 1
+
+    # Should the clients compute test accuracy locally?
+    do_test: true
+
+server:
+    address: 127.0.0.1
+    port: 8000
+
+data:
+    # The training and testing dataset
+    datasource: Kinetics
+
+    # Where the dataset is located
+    data_path: ./data/Kinetics
+    download_url: "https://storage.googleapis.com/deepmind-media/Datasets/kinetics700_2020.tar.gz"
+    num_workers: 4
+    failed_save_file: "failed_record.txt"
+    compress: False
+    verbose: False
+    skip: False
+    log_file: None
+    clip_len: 16
+    clips_per_video: 5
+
+trainer:
+    # The type of the trainer
+    type: basic
+    batch_size: 24
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg

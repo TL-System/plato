@@ -1,14 +1,15 @@
 """
 Base class for datasets.
 """
-from abc import ABC, abstractmethod
-
+import gzip
+import logging
 import os
 import sys
-import logging
-import gzip
+import tarfile
 import zipfile
+from abc import ABC, abstractmethod
 from urllib.parse import urlparse
+
 import requests
 
 
@@ -51,7 +52,13 @@ class DataSource(ABC):
 
             # Unzip the compressed file just downloaded
             name, suffix = os.path.splitext(file_name)
-            if suffix == '.zip':
+
+            if file_name.endswith("tar.gz"):
+                tar = tarfile.open(file_name, "r:gz")
+                tar.extractall(data_path)
+                tar.close()
+                os.remove(file_name)
+            elif suffix == '.zip':
                 logging.info("Extracting %s to %s.", file_name, data_path)
                 with zipfile.ZipFile(file_name, 'r') as zip_ref:
                     zip_ref.extractall(data_path)
@@ -65,13 +72,11 @@ class DataSource(ABC):
                 logging.info("Unknown compressed file type.")
                 sys.exit()
 
-    @abstractmethod
     def num_train_examples(self) -> int:
-        pass
+        return len(self.trainset)
 
-    @abstractmethod
     def num_test_examples(self) -> int:
-        pass
+        return len(self.testset)
 
     def classes(self):
         """Obtains a list of class names in the dataset. """

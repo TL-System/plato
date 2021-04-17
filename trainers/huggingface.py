@@ -2,11 +2,11 @@
 The Transformer models from HuggingFace for natural language processing.
 """
 import torch
-
-from transformers import AutoTokenizer, TrainingArguments
-from transformers import Trainer as HuggingFaceTrainer
-
 from config import Config
+from transformers import AutoTokenizer
+from transformers import Trainer as HuggingFaceTrainer
+from transformers import TrainingArguments
+
 from trainers import basic
 
 

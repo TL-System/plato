@@ -4,11 +4,11 @@ The base class for all federated learning clients on edge devices or edge server
 
 import logging
 import os
-import sys
 import pickle
+import sys
 from abc import abstractmethod
-import websockets
 
+import websockets
 from config import Config
 
 

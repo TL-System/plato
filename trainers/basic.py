@@ -3,16 +3,17 @@ The training and testing loops for PyTorch.
 """
 import logging
 import os
+
 import numpy as np
 import torch
-import torch.nn as nn
 import torch.multiprocessing as mp
+import torch.nn as nn
 import wandb
-
-import models.registry as models_registry
 from config import Config
 from utils import optimizers
+
 from trainers import base
+import models.registry as models_registry
 
 
 class Trainer(base.Trainer):
@@ -21,7 +22,7 @@ class Trainer(base.Trainer):
         """Initializing the trainer with the provided model.
 
         Arguments:
-        model: The model to train. Must be a models.base.Model subclass.
+        model: The model to train.
         client_id: The ID of the client using this trainer (optional).
         """
         super().__init__(client_id)
@@ -290,9 +291,9 @@ class Trainer(base.Trainer):
                     total += labels.size(0)
                     correct += (predicted == labels).sum().item()
 
-            self.model.cpu()
-
             accuracy = correct / total
+
+        self.model.cpu()
 
         model_name = Config().trainer.model_name
         filename = f"{model_name}_{self.client_id}_{config['run_id']}.acc"

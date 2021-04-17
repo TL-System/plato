@@ -1,12 +1,12 @@
 """
 Samples data from a dataset, biased across labels according to the Dirichlet distribution.
 """
-import torch
 import numpy as np
-
-from samplers import base
+import torch
 from config import Config
 from torch.utils.data import WeightedRandomSampler
+
+from samplers import base
 
 
 class Sampler(base.Sampler):

@@ -8,8 +8,8 @@ Li et al., "Federated Optimization in Heterogeneous Networks."
 
 """
 import torch
-from torch import optim
 from config import Config
+from torch import optim
 
 
 class FedProxOptimizer(optim.SGD):

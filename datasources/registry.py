@@ -21,6 +21,7 @@ else:
         cifar10,
         cinic10,
         huggingface,
+        kinetics,
     )
 
     registered_datasources = OrderedDict([
@@ -29,6 +30,7 @@ else:
         ('CIFAR10', cifar10),
         ('CINIC10', cinic10),
         ('HuggingFace', huggingface),
+        ('Kinetics', kinetics),
     ])
 
 

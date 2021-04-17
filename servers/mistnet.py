@@ -9,9 +9,11 @@ import logging
 import os
 from itertools import chain
 
-from servers import fedavg
 from config import Config
 from samplers import all_inclusive
+
+from servers import fedavg
+
 
 class Server(fedavg.Server):
     """The MistNet server for federated learning."""

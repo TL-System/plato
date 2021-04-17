@@ -2,20 +2,20 @@
 The base class for federated learning servers.
 """
 
-from abc import abstractmethod, abstractstaticmethod
-import os
-import sys
-import logging
-import time
-import pickle
 import asyncio
-import subprocess
-from contextlib import closing
+import logging
 import multiprocessing as mp
-import websockets
+import os
+import pickle
+import subprocess
+import sys
+import time
+from abc import abstractmethod, abstractstaticmethod
+from contextlib import closing
 
-from config import Config
+import websockets
 from client import run
+from config import Config
 
 
 class Server:
@@ -41,7 +41,9 @@ class Server:
         self.client = client
         self.configure()
 
-        logging.info("Starting a server on port %s.", Config().server.port)
+        logging.info("Starting a server at address %s and port %s.",
+                     Config().server.address,
+                     Config().server.port)
         start_server = websockets.serve(self.serve,
                                         Config().server.address,
                                         Config().server.port,

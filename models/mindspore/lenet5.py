@@ -6,12 +6,12 @@ Y. LeCun, L. Bottou, Y. Bengio, and P. Haffner. "Gradient-based learning applied
 document recognition." Proceedings of the IEEE, November 1998.
 """
 import collections
-import mindspore
+
 import numpy as np
+from config import Config
+
 import mindspore.nn as nn
 from mindspore.common.initializer import Normal
-
-from config import Config
 
 
 class Model(nn.Cell):

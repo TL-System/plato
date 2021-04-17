@@ -2,9 +2,9 @@
 Base class for trainers.
 """
 
-from abc import ABC, abstractmethod
-import time
 import os
+import time
+from abc import ABC, abstractmethod
 from contextlib import closing
 
 from config import Config
@@ -15,6 +15,7 @@ class Trainer(ABC):
     def __init__(self, client_id):
         self.device = Config().device()
         self.client_id = client_id
+
         with Config().sql_connection:
             with closing(Config().sql_connection.cursor()) as cursor:
                 cursor.execute(

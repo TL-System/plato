@@ -79,7 +79,8 @@ class DataSource(base.DataSource):
         return 10000
 
     def get_train_set(self, sampler):
-        dataset = ds.MnistDataset(dataset_dir=self.train_path, sampler=sampler.get())
+        dataset = ds.MnistDataset(dataset_dir=self.train_path,
+                                  sampler=sampler.get())
         return DataSource.transform(dataset)
 
     def get_test_set(self):

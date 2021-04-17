@@ -2,13 +2,14 @@
 Starting point for a Plato federated learning client.
 """
 
-from collections import OrderedDict
 import asyncio
 import logging
+from collections import OrderedDict
+
 import websockets
 
-from config import Config
 from clients import registry as client_registry
+from config import Config
 
 
 def run(client_id, port, client=None):
@@ -23,8 +24,8 @@ def run(client_id, port, client=None):
     try:
         # If a server needs to be running concurrently
         if Config().is_edge_server():
-            from servers import fedavg_cs, tempo, rhythm
             from clients import edge
+            from servers import fedavg_cs, rhythm, tempo
 
             edge_servers = OrderedDict([
                 ('fedavg_cross_silo', fedavg_cs.Server),

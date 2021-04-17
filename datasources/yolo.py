@@ -7,13 +7,14 @@ COCO 2017 dataset, refer to https://www.kaggle.com/ultralytics/coco128.
 For more information about the COCO 2017 dataset, refer to http://cocodataset.org.
 """
 
-import os
 import logging
-import torch
+import os
 
+import torch
+from config import Config
 from yolov5.utils.datasets import LoadImagesAndLabels
 from yolov5.utils.general import check_img_size
-from config import Config
+
 from datasources import base
 
 
@@ -47,7 +48,8 @@ class DataSource(base.DataSource):
         if not os.path.exists(_path):
             os.makedirs(_path)
 
-            logging.info("Downloading the YOLO dataset. This may take a while.")
+            logging.info(
+                "Downloading the YOLO dataset. This may take a while.")
 
             urls = Config().data.download_urls
             for url in urls:
@@ -137,7 +139,6 @@ class DataSource(base.DataSource):
             return torch.utils.data.DataLoader(
                 YOLODataset(trainset),
                 batch_size=batch_size,
-                shuffle=True,
                 sampler=sampler,
                 collate_fn=LoadImagesAndLabels.collate_fn)
 

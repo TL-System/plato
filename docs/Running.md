@@ -26,6 +26,12 @@ Your CCDB username can be located after signing into the [CCDB portal](https://c
 
 **Note:** when the command line prompts for your password for `git clone`, you should enter your [personal access token](https://github.com/settings/tokens) instead of your actual password. 
 
+Change the permissions on `plato` directory:"
+
+```shell
+$chmod 777 -R plato/"
+```
+
 ### Preparing the Python Runtime Environment
 
 First, you need to load version 3.8 of the Python programming language:
@@ -48,18 +54,17 @@ You can now activate your environment:
 $ source ~/.federated/bin/activate
 ```
 
-Install PyTorch:
+Install required packages using `pip`:
 
 ```shell
-$ pip install torch torchvision
+$ pip install -r docs/cc_requirements.txt --no-index
 ```
 
-We will need to install several additional packages using `pip`:
+The `--no-index` option tells `pip` to not install from PyPI, but only from locally-available packages, i.e. the Compute Canada wheels.
+Whenever a Compute Canada wheel is available for a given package, it is strongly recommended to use it by way of the `--no-index` option. Compared to using packages from PyPI, wheels that have been compiled by Compute Canada staff can prevent issues with missing or conflicting dependencies, and were optimised for its clusters hardware and libraries. 
 
-```shell
-$ pip install websockets==8.1
-$ pip install -r requirements.txt
-```
+**Note:** I am still working on finding an available way to install the `datasets` package with `virtualenvs` (Compute Canada asks users to not use Conda.) So we cannot run Plato with HuggingFace datasets on Compute Canada right now. Please comment out 2 lines of code related to `huggingface` in `datasources/registry.py` before your experiments for now. Or you could run it on Google Colaboratory.
+
 
 ### Running Plato
 
@@ -80,7 +85,7 @@ Then add your configuration parameters in the job script. The following is an ex
 
 ```
 #!/bin/bash
-#SBATCH --time=00:15:00       # Request a job to be executed for 15 minutes
+#SBATCH --time=15:00:00       # Request a job to be executed for 15 hours
 #SBATCH --nodes=1 
 #SBATCH --gres=gpu:p100l:4   
 #SBATCH --ntasks=1
@@ -90,7 +95,7 @@ Then add your configuration parameters in the job script. The following is an ex
 #SBATCH --output=cifar_wideresnet.out # The name of the output file
 module load python/3.8
 source ~/.federated/bin/activate
-python server.py --config=configs/CIFAR10/cifar_wideresnet.yml --log=info
+./run --config=configs/CIFAR10/fedavg_wideresnet.yml --log=info
 ```
 
 **Note:** the GPU resources requested in this example is a special group of GPU nodes on Compute Canada's `cedar` cluster. You may only request these nodes as whole nodes, therefore you must specify `--gres=gpu:p100l:4`. NVIDIA P100L GPU jobs up to 28 days can be run on the `cedar` cluster.
@@ -131,6 +136,22 @@ The job will then be queued and waiting for resources:
 salloc: Pending job allocation 53923456
 salloc: job 53923456 queued and waiting for resources
 ```
+
+As soon as your job gets resources, you get the following prompts:
+
+```
+salloc: job 53923456 has been allocated resources
+salloc: Granted job allocation 53923456
+```
+
+Then you can run Plato:
+
+```shell
+$ module load python/3.8
+$ virtualenv --no-download ~/.federated
+$ ./run --config=configs/CIFAR10/fedavg_wideresnet.yml
+```
+
 
 After the job is done, use `exit` at the command to relinquish the job allocation.
 

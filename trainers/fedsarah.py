@@ -1,24 +1,24 @@
 """
 A customized trainer for FedSarah.
 """
-import torch
-from models.base import Model
-from trainers import basic
-from utils import optimizers
-from config import Config
 import numpy as np
+import torch
+from config import Config
+from utils import optimizers
+
+from trainers import basic
 
 
 class Trainer(basic.Trainer):
     """The federated learning trainer for the FedSarah client"""
-    def __init__(self, client_id=0):
+    def __init__(self, client_id=0, model=None):
         """Initializing the trainer with the provided model.
 
         Arguments:
-        model: The model to train. Must be a models.base.Model subclass.
+        model: The model to train.
         client_id: The ID of the client using this trainer (optional).
         """
-        super().__init__(client_id)
+        super().__init__(client_id, model)
 
         self.server_control_variates = None
         self.client_control_variates = None

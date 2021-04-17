@@ -8,11 +8,12 @@ C. Chen, et al. "GIFT: Towards Accurate and Efficient Federated
 Learning withGradient-Instructed Frequency Tuning," found in docs/papers.
 """
 import logging
-import torch
 from collections import OrderedDict
 
+import torch
 from config import Config
 from trainers.base import Trainer
+
 from algorithms import fedavg
 
 

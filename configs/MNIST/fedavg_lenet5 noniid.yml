@@ -3,16 +3,16 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 2
+    total_clients: 3
 
     # The number of clients selected in each round
-    per_round: 2
+    per_round: 1
 
     # Should the clients compute test accuracy locally?
     do_test: true
 
 server:
-    address: 0.0.0.0
+    address: 127.0.0.1
     port: 8000
 
 data:
@@ -23,11 +23,15 @@ data:
     data_path: ./data
 
     # Number of samples in each partition
-    partition_size: 2000
+    partition_size: 20000
 
-    # IID, biased, or sharded?
-    sampler: iid
+    # IID or non-IID?
+    sampler: noniid
 
+    # The concentration parameter for the Dirichlet distribution
+    concentration: 0.5
+
+    # The random seed for sampling data
     random_seed: 1
 
 trainer:
@@ -35,7 +39,7 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 1
+    rounds: 5
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -44,10 +48,10 @@ trainer:
     max_concurrency: 3
 
     # The target accuracy
-    target_accuracy: 0.95
+    target_accuracy: 0.94
 
     # Number of epoches for local training in each communication round
-    epochs: 1
+    epochs: 5
     batch_size: 32
     optimizer: SGD
     learning_rate: 0.01
@@ -60,10 +64,3 @@ trainer:
 algorithm:
     # Aggregation algorithm
     type: fedavg
-
-results:
-    # Write the following parameter(s) into a CSV
-    types: accuracy, training_time, round_time
-
-    # Plot results (x_axis&y_axis)
-    plot: global_round&accuracy, global_round&training_time

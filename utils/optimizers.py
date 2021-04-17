@@ -2,17 +2,18 @@
 Optimizers for training workloads.
 """
 
-import sys
 import bisect
-from torch import optim
-import numpy as np
+import sys
 
-from models.base import Model
+import numpy as np
 from config import Config
-from utils.step import Step
+from models.base import Model
+from torch import optim
+
 from utils.fedprox_optimizer import FedProxOptimizer
-from utils.scaffold_optimizer import ScaffoldOptimizer
 from utils.fedsarah_optimizer import FedSarahOptimizer
+from utils.scaffold_optimizer import ScaffoldOptimizer
+from utils.step import Step
 
 
 def get_optimizer(model: Model) -> optim.Optimizer:

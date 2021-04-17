@@ -6,11 +6,12 @@ import logging
 import time
 from dataclasses import dataclass
 
+from algorithms import registry as algorithms_registry
+from config import Config
 from datasources import registry as datasources_registry
 from samplers import registry as samplers_registry
-from algorithms import registry as algorithms_registry
 from trainers import registry as trainers_registry
-from config import Config
+
 from clients import base
 
 
@@ -25,14 +26,14 @@ class Report:
 
 class Client(base.Client):
     """A basic federated learning client who sends simple weight updates."""
-    def __init__(self, model=None):
+    def __init__(self, model=None, datasource=None, trainer=None):
         super().__init__()
         self.model = model
-        self.data = None  # The dataset to be used for local training
+        self.datasource = datasource
+        self.trainer = trainer
         self.trainset = None  # Training dataset
         self.testset = None  # Testing dataset
         self.algorithm = None
-        self.trainer = None
         self.sampler = None
 
         self.data_loading_time = None
@@ -43,7 +44,9 @@ class Client(base.Client):
 
     def configure(self):
         """Prepare this client for training."""
-        self.trainer = trainers_registry.get(self.client_id, self.model)
+        if self.trainer is None:
+            self.trainer = trainers_registry.get(self.client_id, self.model)
+
         self.algorithm = algorithms_registry.get(self.trainer, self.client_id)
 
     def load_data(self):
@@ -51,26 +54,28 @@ class Client(base.Client):
         data_loading_start_time = time.time()
         logging.info("[Client #%s] Loading its data source...", self.client_id)
 
-        datasource = datasources_registry.get()
+        if self.datasource is None:
+            self.datasource = datasources_registry.get()
+
         self.data_loaded = True
 
         logging.info("[Client #%s] Dataset size: %s", self.client_id,
-                     datasource.num_train_examples())
+                     self.datasource.num_train_examples())
 
         # Setting up the data sampler
-        self.sampler = samplers_registry.get(datasource, self.client_id)
+        self.sampler = samplers_registry.get(self.datasource, self.client_id)
 
         if hasattr(Config().trainer, 'use_mindspore'):
             # MindSpore requires samplers to be used while constructing
             # the dataset
-            self.trainset = datasource.get_train_set(self.sampler)
+            self.trainset = self.datasource.get_train_set(self.sampler)
         else:
             # PyTorch uses samplers when loading data with a data loader
-            self.trainset = datasource.get_train_set()
+            self.trainset = self.datasource.get_train_set()
 
-        # Set the testset if local testing is needed
         if Config().clients.do_test:
-            self.testset = datasource.get_test_set()
+            # Set the testset if local testing is needed
+            self.testset = self.datasource.get_test_set()
 
         self.data_loading_time = time.time() - data_loading_start_time
 

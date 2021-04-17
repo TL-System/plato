@@ -3,7 +3,7 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 3
+    total_clients: 1
 
     # The number of clients selected in each round
     per_round: 1
@@ -12,7 +12,7 @@ clients:
     do_test: true
 
 server:
-    address: localhost
+    address: 127.0.0.1
     port: 8000
 
 data:
@@ -23,13 +23,10 @@ data:
     data_path: ./data
 
     # Number of samples in each partition
-    partition_size: 20000
+    partition_size: 60000
 
     # IID or non-IID?
-    sampler: noniid
-
-    # The concentration parameter for the Dirichlet distribution
-    concentration: 0.5
+    sampler: iid
 
     # The random seed for sampling data
     random_seed: 1

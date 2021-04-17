@@ -3,12 +3,12 @@ Reading runtime parameters from a standard configuration file (which is easier
 to work on than JSON).
 """
 
+import argparse
 import logging
-from collections import namedtuple, OrderedDict
 import os
 import sqlite3
+from collections import OrderedDict, namedtuple
 
-import argparse
 import yaml
 
 
@@ -39,7 +39,7 @@ class Config:
             parser.add_argument('-s',
                                 '--server',
                                 type=str,
-                                default='localhost:8000',
+                                default=None,
                                 help='The server hostname and port number.')
             parser.add_argument('-l',
                                 '--log',
@@ -94,8 +94,9 @@ class Config:
 
             # Used to limit the maximum number of concurrent trainers
             Config.sql_connection = sqlite3.connect(
-                './running_trainers.sqlitedb',
-                timeout=2 * Config.clients.total_clients)
+                os.path.dirname(Config.args.config) +
+                '/running_trainers.sqlitedb',
+                timeout=20 * Config.clients.total_clients)
 
             # Customizable dictionary of global parameters
             Config.params = {}

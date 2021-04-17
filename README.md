@@ -14,7 +14,7 @@ $ conda create -n federated python=3.8
 $ conda activate federated
 ```
 
-where `federated` is the the preferred name of your new environment.
+where `federated` is the preferred name of your new environment.
 
 Update any packages, if necessary by typing `y` to proceed.
 
@@ -79,8 +79,7 @@ docker build -t plato -f Dockerfile .
 
 or:
 
-```
-shell
+```shell
 docker build -t plato -f Dockerfile_MindSpore .
 ```
 
@@ -110,7 +109,49 @@ docker rmi plato
 
 On Ubuntu Linux, you may need to add `sudo` before these `docker` commands.
 
-The provided `Dockerfile` helps to build a Docker image running Ubuntu 20.04, with a virtual environment called `federated` pre-configured to support PyTorch 1.8.1 and Python 3.8. If MindSpore support is needed, the provided `Dockerfile_MindSpore` contains a pre-configured environment, also called `federated`, that supports [MindSpore 1.1.1](https://github.com/mindspore-ai/mindspore) and Python 3.7.5 (which is the Python version that MindSpore requires). Both Dockerfiles have GPU support enabled. Once an image is built and  a container is running, one can use Visual Studio Code to connect to it and start development within the container.
+The provided `Dockerfile` helps to build a Docker image running Ubuntu 20.04, with a virtual environment called `federated` pre-configured to support PyTorch 1.8.1 and Python 3.8. If MindSpore support is needed, the provided `Dockerfile_MindSpore` contains a pre-configured environment, also called `federated`, that supports [MindSpore 1.1.1](https://github.com/mindspore-ai/mindspore) and Python 3.7.5 (which is the Python version that MindSpore requires). Both Dockerfiles have GPU support enabled. Once an image is built and a Docker container is running, one can use Visual Studio Code to connect to it and start development within the container.
+
+### Running Plato
+
+To start a federated learning training workload, run [`run`](run) from the repository's root directory. For example:
+
+```shell
+./run --config=configs/MNIST/fedavg_lenet5.yml
+```
+
+* `--config` (`-c`): the path to the configuration file to be used. The default is `config.yml` in the project's home directory.
+* `--log` (`-l`): the level of logging information to be written to the console. Possible values are `critical`, `error`, `warn`, `info`, and `debug`, and the default is `info`.
+
+*Plato* uses the YAML format for its configuration files to manage the runtime configuration parameters. Example configuration files have been provided in the `configs` directory.
+
+*Plato* uses `wandb` to produce and collect logs in the cloud. If this is not needed, run the command `wandb offline` before running *Plato*.
+
+If there are issues in the code that prevented it from running to completion, there could be running processes from previous runs. Use the command `pkill python` to terminate them so that there will not be CUDA errors in the upcoming run.
+
+### Installing YOLOv5 as a Python package
+
+If object detection using the YOLOv5 model and any of the COCO datasets is needed, it is required to install YOLOv5 as a Python package first:
+
+```shell
+cd packages/yolov5
+pip install .
+```
+
+### Plotting Runtime Results
+
+If the configuration file contains a `results` section, the selected performance metrics, such as accuracy, will be saved in a `.csv` file in the `results/` directory. By default, the `results/` directory is under the path to the used configuration file, but it can be easily changed by modifying `Config.result_dir` in [`config.py`](config.py).
+
+As `.csv` files, these results can be used however one wishes; an example Python program, called `plot.py`, plots the necessary figures and saves them as PDF files. To run this program:
+
+```shell
+python plot.py --config=config.yml
+```
+
+* `--config` (`-c`): the path to the configuration file to be used. The default is `config.yml` in the project's home directory.
+
+### Running Unit Tests
+
+All unit tests are in the `tests/` directory. These tests are designed to be standalone and executed separately. For example, the command `python lr_schedule_tests.py` runs the unit tests for learning rate schedules.
 
 ### Installing Plato with MindSpore
 
@@ -155,48 +196,6 @@ check libcudnn
 To check if MindSpore is correctly installed on the GPU server, try to `import mindspore` with a Python interpreter.
 
 Finally, to use trainers and servers based on MindSpore, assign `true` to `use_mindspore` in the `trainer` section of the configuration file. This variable is unassigned by default, and *Plato* would use PyTorch as its default framework.
-
-### Running Plato
-
-To start a federated learning training workload, run [`run`](run) from the repository's root directory. For example:
-
-```shell
-./run --config=configs/MNIST/fedavg_lenet5.yml
-```
-
-* `--config` (`-c`): the path to the configuration file to be used. The default is `config.yml` in the project's home directory.
-* `--log` (`-l`): the level of logging information to be written to the console. Possible values are `critical`, `error`, `warn`, `info`, and `debug`, and the default is `info`.
-
-*Plato* uses the YAML format for its configuration files to manage the runtime configuration parameters. Example configuration files have been provided in the `configs` directory.
-
-*Plato* uses `wandb` to produce and collect logs in the cloud. If this is not needed, run the command `wandb offline` before running *Plato*.
-
-If there are issues in the code that prevented it from running to completion, there could be running processes from previous runs. Use the command `pkill python` to terminate them so that there will not be CUDA errors in the upcoming run.
-
-### Installing YOLOv5 as a Python package
-
-If object detection using the YOLOv5 model and any of the COCO datasets is needed, it is required to install YOLOv5 as a Python package first:
-
-```shell
-cd packages/yolov5
-pip install .
-```
-
-### Plotting Runtime Results
-
-If the configuration file contains a `results` section, the selected performance metrics, such as accuracy, will be saved in a `.csv` file in the `results/` directory. By default, the `results/` directory is under the path to the used configuration file, but it can be easily changed by modifying `Config.result_dir` in [`config.py`](config.py).
-
-As `.csv` files, these results can be used however one wishes; an example Python program, called `plot.py`, plots the necessary figures and saves them as PDF files. To run this program:
-
-```shell
-python plot.py --config=config.yml
-```
-
-* `--config` (`-c`): the path to the configuration file to be used. The default is `config.yml` in the project's home directory.
-
-### Running Unit Tests
-
-All unit tests are in the `tests/` directory. These tests are designed to be standalone and executed separately. For example, the command `python lr_schedule_tests.py` runs the unit tests for learning rate schedules.
 
 ### Uninstalling Plato
 
