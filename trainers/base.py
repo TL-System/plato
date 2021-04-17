@@ -36,7 +36,7 @@ class Trainer(ABC):
                 trainer_count = cursor.fetchone()[0]
 
         while trainer_count >= Config().trainer.max_concurrency:
-            time.sleep(2)
+            time.sleep(self.client_id)
             with Config().sql_connection:
                 with closing(Config().sql_connection.cursor()) as cursor:
                     cursor.execute("SELECT COUNT(*) FROM trainers")
