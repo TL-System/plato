@@ -22,7 +22,7 @@ class Trainer(base.Trainer):
         """Initializing the trainer with the provided model.
 
         Arguments:
-        model: The model to train. Must be a models.base.Model subclass.
+        model: The model to train.
         client_id: The ID of the client using this trainer (optional).
         """
         super().__init__(client_id)
@@ -291,9 +291,9 @@ class Trainer(base.Trainer):
                     total += labels.size(0)
                     correct += (predicted == labels).sum().item()
 
-            self.model.cpu()
-
             accuracy = correct / total
+
+        self.model.cpu()
 
         model_name = Config().trainer.model_name
         filename = f"{model_name}_{self.client_id}_{config['run_id']}.acc"
