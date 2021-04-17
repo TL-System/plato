@@ -30,8 +30,8 @@ class SampledHuggingFaceTrainer(HuggingFaceTrainer):
 
 class Trainer(basic.Trainer):
     """The trainer for HuggingFace transformer models for natural language processing. """
-    def __init__(self, client_id=0, model=None):
-        super().__init__(client_id, model)
+    def __init__(self, model=None):
+        super().__init__(model)
 
         self.trainer = None
 

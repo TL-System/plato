@@ -47,6 +47,8 @@ class Client(base.Client):
         if self.trainer is None:
             self.trainer = trainers_registry.get(self.client_id, self.model)
 
+        self.trainer.set_client_id(self.client_id)
+
         self.algorithm = algorithms_registry.get(self.trainer, self.client_id)
 
     def load_data(self):

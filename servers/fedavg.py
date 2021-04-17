@@ -20,11 +20,13 @@ from servers import base
 
 class Server(base.Server):
     """Federated learning server using federated averaging."""
-    def __init__(self, model=None):
+    def __init__(self, model=None, trainer=None):
         super().__init__()
         wandb.init(project="plato", reinit=True)
 
         self.model = model
+        self.trainer = trainer
+
         self.testset = None
         self.selected_clients = None
         self.total_samples = 0
@@ -65,6 +67,7 @@ class Server(base.Server):
             logging.info("Training: %s rounds\n", total_rounds)
 
         self.load_trainer()
+        self.trainer.set_client_id(0)
 
         if not Config().clients.do_test:
             dataset = datasources_registry.get()
@@ -78,7 +81,9 @@ class Server(base.Server):
 
     def load_trainer(self):
         """Setting up the global model to be trained via federated learning."""
-        self.trainer = trainers_registry.get(model=self.model)
+        if self.trainer is None:
+            self.trainer = trainers_registry.get(model=self.model)
+
         self.algorithm = algorithms_registry.get(self.trainer)
 
     def choose_clients(self):
@@ -147,7 +152,7 @@ class Server(base.Server):
                 '[Server #{:d}] Average client accuracy: {:.2f}%.'.format(
                     os.getpid(), 100 * self.accuracy))
         else:
-            # Test the updated model directly at the server
+            # Testing the updated model directly at the server
             self.accuracy = self.trainer.test(self.testset)
             logging.info(
                 '[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(

@@ -18,14 +18,14 @@ import models.registry as models_registry
 
 class Trainer(base.Trainer):
     """A basic federated learning trainer, used by both the client and the server."""
-    def __init__(self, client_id=0, model=None):
+    def __init__(self, model=None):
         """Initializing the trainer with the provided model.
 
         Arguments:
         model: The model to train.
         client_id: The ID of the client using this trainer (optional).
         """
-        super().__init__(client_id)
+        super().__init__()
 
         if model is None:
             model = models_registry.get()

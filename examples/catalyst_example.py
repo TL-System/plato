@@ -65,9 +65,6 @@ class Trainer(basic.Trainer):
         test_loader = torch.utils.data.DataLoader(
             testset, batch_size=config['batch_size'], shuffle=False)
 
-        correct = 0
-        total = 0
-
         # Using Catalyst's SupervisedRunner and AccuracyCallback to compute accuracies
         runner = dl.SupervisedRunner()
         runner.train(model=self.model,
@@ -81,9 +78,8 @@ class Trainer(basic.Trainer):
                                              num_classes=10)
                      ])
 
-        # Get top-1 accuracy from accuracy callback
+        # Retrieving the top-1 accuracy from SupervisedRunner
         accuracy = runner.epoch_metrics["valid"]["accuracy"]
-
         return accuracy
 
 
@@ -96,7 +92,7 @@ def main():
     trainer = Trainer(model=model)
 
     client = simple.Client(model=model, datasource=datasource, trainer=trainer)
-    server = fedavg.Server(model=model)
+    server = fedavg.Server(model=model, trainer=trainer)
     server.run(client)
 
 

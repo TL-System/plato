@@ -38,10 +38,9 @@ def get(client_id=0, model=None):
         return yolo.Trainer(client_id)
     elif Config().trainer.type == 'HuggingFace':
         from trainers import huggingface
-        return huggingface.Trainer(client_id, model)
+        return huggingface.Trainer(model)
     elif trainer_name in registered_trainers:
-        registered_trainer = registered_trainers[trainer_name](client_id,
-                                                               model)
+        registered_trainer = registered_trainers[trainer_name](model)
     else:
         raise ValueError('No such trainer: {}'.format(trainer_name))
 

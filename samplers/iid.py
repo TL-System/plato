@@ -15,7 +15,6 @@ class Sampler(base.Sampler):
     def __init__(self, datasource, client_id):
         super().__init__()
         self.client_id = client_id
-
         dataset = datasource.get_train_set()
         self.dataset_size = len(dataset)
         indices = list(range(self.dataset_size))
