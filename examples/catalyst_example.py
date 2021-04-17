@@ -81,19 +81,9 @@ class Trainer(basic.Trainer):
                                              num_classes=10)
                      ])
 
-        # Computing top-1 accuracy
-        with torch.no_grad():
-            for examples, labels in test_loader:
-                examples, labels = examples.to(self.device), labels.to(
-                    self.device)
+        # Get top-1 accuracy from accuracy callback
+        accuracy = runner.epoch_metrics["valid"]["accuracy"]
 
-                examples = examples.view(len(examples), -1)
-                outputs = self.model(examples)
-                _, predicted = torch.max(outputs.data, 1)
-                total += labels.size(0)
-                correct += (predicted == labels).sum().item()
-
-        accuracy = correct / total
         return accuracy
 
 
