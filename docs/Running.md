@@ -6,9 +6,16 @@ At $1.50 an hour for a 4-GPU server with 8 VCPUs, the [GPU Cloud from Labmda Lab
 
 ## Running Plato on Google Colaboratory
 
+### Option 1
+
 Go to [Google Colaboratory](https://colab.research.google.com/notebooks/intro.ipynb).
 
 Click `File` on the menu (upper left of the page), select `Upload Notebook`, and upload `plato_colab.ipynb`, which is under `plato/examples/` directory.
+
+### Option 2
+
+Click [this link](https://colab.research.google.com/drive/1boDurcQF5X9jq25-DsKDTus3h50NBn8h?usp=sharing).
+
 
 ## Running Plato on Compute Canada
 

@@ -90,11 +90,13 @@ class Server:
 
         for client_id in range(starting_id, total_processes + starting_id):
             if as_server:
-                logging.info("Starting client #%s is an edge server.",
-                             client_id)
+                port = int(Config().server.port) + client_id
+                logging.info(
+                    "Starting client #%s as an edge server on port %s.",
+                    client_id, port)
                 command = "python client.py -i {}".format(client_id)
                 command += " -c {}".format(Config().args.config)
-                command += " -p {}".format(Config().server.port + client_id)
+                command += " -p {}".format(port)
                 subprocess.Popen(command, shell=True)
             else:
                 logging.info("Starting client #%s.", client_id)
