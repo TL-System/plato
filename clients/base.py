@@ -31,8 +31,9 @@ class Client:
 
             uri = 'ws://{}:{}'.format(
                 Config().server.address,
-                Config().server.port + Config().clients.total_clients +
-                int(self.client_id) % Config().algorithm.total_silos + 1)
+                int(Config().server.port) +
+                int(Config().clients.total_clients) +
+                int(self.client_id) % int(Config().algorithm.total_silos) + 1)
         else:
             logging.info("[Client #%s] Contacting the central server.",
                          self.client_id)
