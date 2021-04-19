@@ -12,7 +12,7 @@ This repo is the official implementation of ["DeepViT: Towards Deeper Vision Tra
 
 ## 2. DeepViT Models
 
-
+#2. DeepViT Models
 | Model        | Re-attention | Top1 Acc (%) | #params | #Similar Blocks |  Checkpoint | Attention Map |
 | :---         |   :---:         |  :---:   |  :---:  | :---: |  :---:   | :---:   | 
 | ViT-16       |  NA  |   78.88   |  24.5M  | 5 | [here](comming soon)| |
