@@ -23,7 +23,7 @@ This repo is the official implementation of ["DeepViT: Towards Deeper Vision Tra
 | ViT-32       | NA   |   79.27   |  48.1M  | 15 | [here](comming soon)  |  |
 | DeepViT_t-32 | FC   |   80.90   |  48.1M  | 0  | [here](comming soon) |  |
 
-1. DeepViTs with CNNs for patch processing and optimized training hyper-parameters
+2. DeepViTs with CNNs for patch processing and optimized training hyper-parameters
 
 | Model        | Re-attention | Top1 Acc (%) | #Params | Image Size |  Checkpoint | 
 | :---         |   :---:         |  :---:   |  :---:  | :---: |  :---:   | 
