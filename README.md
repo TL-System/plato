@@ -20,7 +20,7 @@ This repo is the official implementation of ["DeepViT: Towards Deeper Vision Tra
 | ViT-24       |  NA  |   79.35   |  36.3M  | 11  | [here](comming soon)|  |
 | DeepViT-24   |  FC  |   79.99   |  36.3M  | 0  | [here](comming soon)|  |
 | ViT-32       | NA   |   79.27   |  48.1M  | 15 | [here](comming soon)  |  |
-| DeepViT_-32 | FC   |   80.90   |  48.1M  | 0  | [here](comming soon) |  |
+| DeepViT-32 | FC   |   80.90   |  48.1M  | 0  | [here](comming soon) |  |
 
 ## Citing DeepVit
 
