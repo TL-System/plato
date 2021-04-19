@@ -13,14 +13,23 @@ This repo is the official implementation of ["DeepViT: Towards Deeper Vision Tra
 ## 2. DeepViT Models
 
 1. Comparison with ViTs
-| Model        | Re-attention | Top1 Acc (%) | #Params | #Similar Blocks |  Checkpoint | Attention Map |
+
+| Model        | Re-attention | Top1 Acc (%) | #params | #Similar Blocks |  Checkpoint | Attention Map |
 | :---         |   :---:         |  :---:   |  :---:  | :---: |  :---:   | :---:   | 
 | ViT-16       |  NA  |   78.88   |  24.5M  | 5 | [here](comming soon)| |
 | DeepViT-16   |  FC  |   79.10   |  24.5M  | 0  | [here](comming soon)|  |
 | ViT-24       |  NA  |   79.35   |  36.3M  | 11  | [here](comming soon)|  |
 | DeepViT-24   |  FC  |   79.99   |  36.3M  | 0  | [here](comming soon)|  |
 | ViT-32       | NA   |   79.27   |  48.1M  | 15 | [here](comming soon)  |  |
-| DeepViT-32 | FC   |   80.90   |  48.1M  | 0  | [here](comming soon) |  |
+| DeepViT_t-32 | FC   |   80.90   |  48.1M  | 0  | [here](comming soon) |  |
+
+1. DeepViTs with CNNs for patch processing and optimized training hyper-parameters
+
+| Model        | Re-attention | Top1 Acc (%) | #Params | Image Size |  Checkpoint | 
+| :---         |   :---:         |  :---:   |  :---:  | :---: |  :---:   | 
+| DeepViT-16   |  FC + BN  |   82.3   |  24.5M  | 224  | [here](comming soon)| 
+| DeepViT-24   |  FC + BN  |   83.1   |  36.3M  | 224  | [here](comming soon)| 
+| DeepViT_t-32 | FC  + BN  |   84.25   |  48.1M  | 384  | [here](comming soon) | 
 
 
 ## Citing DeepVit
