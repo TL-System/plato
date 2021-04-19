@@ -12,8 +12,14 @@ from config import Config
 
 class Trainer(ABC):
     """Base class for all the trainers."""
-    def __init__(self, client_id):
+    def __init__(self):
         self.device = Config().device()
+        self.client_id = 0
+
+    def set_client_id(self, client_id):
+        """Setting the client ID and initialize the shared database table for controlling
+           maximum concurrency with respect to the number of training clients.
+        """
         self.client_id = client_id
 
         with Config().sql_connection:
@@ -30,7 +36,7 @@ class Trainer(ABC):
                 trainer_count = cursor.fetchone()[0]
 
         while trainer_count >= Config().trainer.max_concurrency:
-            time.sleep(2)
+            time.sleep(self.client_id)
             with Config().sql_connection:
                 with closing(Config().sql_connection.cursor()) as cursor:
                     cursor.execute("SELECT COUNT(*) FROM trainers")
