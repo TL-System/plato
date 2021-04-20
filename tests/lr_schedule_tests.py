@@ -23,12 +23,13 @@ class LrSchedulerTest(unittest.TestCase):
 
         fields = [
             'optimizer', 'lr_schedule', 'learning_rate', 'momentum',
-            'weight_decay', 'lr_gamma', 'lr_milestone_steps', 'lr_warmup_steps'
+            'weight_decay', 'lr_gamma', 'lr_milestone_steps', 'lr_warmup_steps',
+            'model_name'
         ]
-        params = ['SGD', '', 0.1, 0.5, 0.0, 0.0, '', '']
+        params = ['SGD', 'LambdaLR', 0.1, 0.5, 0.0, 0.0, '', '', 'resnet_18']
         Config().trainer = namedtuple('trainer', fields)(*params)
 
-        self.model = models_registry.get('resnet_18')
+        self.model = models_registry.get()
         self.optimizer = optimizers.get_optimizer(self.model)
 
     def assertLrEquals(self, lr):
@@ -41,10 +42,9 @@ class LrSchedulerTest(unittest.TestCase):
 
             fields = [
                 'optimizer', 'lr_schedule', 'learning_rate', 'momentum',
-                'weight_decay', 'lr_gamma', 'lr_milestone_steps',
-                'lr_warmup_steps'
+                'weight_decay', 'lr_gamma'
             ]
-            params = ['SGD', '', 0.1, 0.5, 0.0, 0.0, '', '']
+            params = ['SGD', 'LambdaLR', 0.1, 0.5, 0.0, 0.0]
             Config().trainer = namedtuple('trainer', fields)(*params)
 
             lrs = optimizers.get_lr_schedule(self.optimizer, 10)
@@ -62,10 +62,9 @@ class LrSchedulerTest(unittest.TestCase):
 
             fields = [
                 'optimizer', 'lr_schedule', 'learning_rate', 'momentum',
-                'weight_decay', 'lr_gamma', 'lr_milestone_steps',
-                'lr_warmup_steps'
+                'weight_decay', 'lr_gamma', 'lr_milestone_steps'
             ]
-            params = ['SGD', '', 0.1, 0.5, 0.0, 0.1, '2ep,4ep,7ep,8ep', '']
+            params = ['SGD', 'LambdaLR', 0.1, 0.5, 0.0, 0.1, '2ep,4ep,7ep,8ep']
 
             Config().trainer = namedtuple('trainer', fields)(*params)
             self.assertLrEquals(0.1)
@@ -111,10 +110,9 @@ class LrSchedulerTest(unittest.TestCase):
 
             fields = [
                 'optimizer', 'lr_schedule', 'learning_rate', 'momentum',
-                'weight_decay', 'lr_gamma', 'lr_milestone_steps',
-                'lr_warmup_steps'
+                'weight_decay', 'lr_gamma', 'lr_warmup_steps'
             ]
-            params = ['SGD', '', 0.1, 0.5, 0.0, 0.0, '', '20it']
+            params = ['SGD', 'LambdaLR', 0.1, 0.5, 0.0, 0.0, '20it']
 
             Config().trainer = namedtuple('trainer', fields)(*params)
 
