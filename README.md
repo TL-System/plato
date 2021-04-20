@@ -31,6 +31,12 @@ This repo is the official implementation of ["DeepViT: Towards Deeper Vision Tra
 | DeepViT-24   |  FC + BN  |   83.1   |  36.3M  | 224  | [here](comming soon)| 
 | DeepViT-32 | FC  + BN  |   84.25   |  48.1M  | 384  | [here](comming soon) | 
 
+## Evaluation
+To evaluate a pre-trained DeepViT models on ImageNet val with a single GPU run:
+```
+bash scrits/
+python main.py --eval --resume https://dl.fbaipublicfiles.com/deit/deit_base_patch16_224-b5f2ef4d.pth --data-path /path/to/imagenet
+```
 
 ## Citing DeepVit
 
