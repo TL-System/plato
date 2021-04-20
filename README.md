@@ -16,20 +16,20 @@ This repo is the official implementation of ["DeepViT: Towards Deeper Vision Tra
 
 | Model        | Re-attention | Top1 Acc (%) | #params | #Similar Blocks |  Checkpoint | Attention Map |
 | :---         |   :---:         |  :---:   |  :---:  | :---: |  :---:   | :---:   | 
-| ViT-16       |  NA  |   78.88   |  24.5M  | 5 | [here](comming soon)| |
-| DeepViT-16   |  FC  |   79.10   |  24.5M  | 0  | [here](comming soon)|  |
-| ViT-24       |  NA  |   79.35   |  36.3M  | 11  | [here](comming soon)|  |
-| DeepViT-24   |  FC  |   79.99   |  36.3M  | 0  | [here](https://drive.google.com/file/d/1lPmKdNMPJq-mq-4FivqIY4JNAPoQHYxV/view?usp=sharing)|  |
-| ViT-32       | NA   |   79.27   |  48.1M  | 15 | [here](comming soon)  |  |
-| DeepViT-32 | FC   |   80.90   |  48.1M  | 0  | [here](https://drive.google.com/file/d/1kUBrAbAQfMT5FQJprITRxDtOE6ECZM0M/view?usp=sharing) |  |
+| ViT-16       |  NA  |   78.88   |  24.5M  | 5 | [download here](comming soon)| |
+| DeepViT-16   |  FC  |   79.10   |  24.5M  | 0  | [download here](comming soon)|  |
+| ViT-24       |  NA  |   79.35   |  36.3M  | 11  | [download here](comming soon)|  |
+| DeepViT-24   |  FC  |   79.99   |  36.3M  | 0  | [download here](https://drive.google.com/file/d/1lPmKdNMPJq-mq-4FivqIY4JNAPoQHYxV/view?usp=sharing)|  |
+| ViT-32       | NA   |   79.27   |  48.1M  | 15 | [download here](comming soon)  |  |
+| DeepViT-32 | FC   |   80.90   |  48.1M  | 0  | [download here](https://drive.google.com/file/d/1kUBrAbAQfMT5FQJprITRxDtOE6ECZM0M/view?usp=sharing) |  |
 
 2. DeepViTs with CNNs for patch processing and optimized training hyper-parameters
 
 | Model        | Re-attention | Top1 Acc (%) | #Params | Image Size |  Checkpoint | 
 | :---         |   :---:         |  :---:   |  :---:  | :---: |  :---:   | 
-| DeepViT-16   |  FC + BN  |   82.3   |  24.5M  | 224  | [here](https://drive.google.com/file/d/1evhBjla4Nth7LawW2PAXnGEcpv3YBWEC/view?usp=sharing)| 
-| DeepViT-32   |  FC + BN  |   83.1   |  36.3M  | 224  | [here](https://drive.google.com/file/d/1WbzPXJ6P4UxArGQWGbkcUIoW53ICNUYF/view?usp=sharing)| 
-| DeepViT-32 | FC  + BN  |   84.25   |  48.1M  | 384  | [here](comming soon) | 
+| DeepViT-16   |  FC + BN  |   82.3   |  24.5M  | 224  | [download here](https://drive.google.com/file/d/1evhBjla4Nth7LawW2PAXnGEcpv3YBWEC/view?usp=sharing)| 
+| DeepViT-32   |  FC + BN  |   83.1   |  36.3M  | 224  | [download here](https://drive.google.com/file/d/1WbzPXJ6P4UxArGQWGbkcUIoW53ICNUYF/view?usp=sharing)| 
+| DeepViT-32 | FC  + BN  |   84.25   |  48.1M  | 384  | [download here](comming soon) | 
 
 ## Evaluation
 To evaluate a pre-trained DeepViT models on ImageNet val run:
