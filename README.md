@@ -28,7 +28,7 @@ This repo is the official implementation of ["DeepViT: Towards Deeper Vision Tra
 | Model        | Re-attention | Top1 Acc (%) | #Params | Image Size |  Checkpoint | 
 | :---         |   :---:         |  :---:   |  :---:  | :---: |  :---:   | 
 | DeepViT-16   |  FC + BN  |   82.3   |  24.5M  | 224  | [here](comming soon)| 
-| DeepViT-24   |  FC + BN  |   83.1   |  36.3M  | 224  | [here](comming soon)| 
+| DeepViT-32   |  FC + BN  |   83.1   |  36.3M  | 224  | [here](comming soon)| 
 | DeepViT-32 | FC  + BN  |   84.25   |  48.1M  | 384  | [here](comming soon) | 
 
 ## Evaluation
