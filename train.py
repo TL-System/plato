@@ -235,7 +235,7 @@ parser.add_argument('--torchscript', dest='torchscript', action='store_true',
 parser.add_argument('--use_lmdb', action='store_true', default=False,
                     help='Use lmdb format ImageNet for training ')
 parser.add_argument('--use_repeated_aug', action='store_true')
-parser.add_argument('--max_iter', type=int, default=0, metavar='N',
+parser.add_argument('--max_iter', type=int, default=50, metavar='N',
                     help='bn calibration steps after training')
 parser.add_argument('-cali', '--cali_batch_size', type=int, default=256, metavar='N',
                     help='input batch size forbn calibration (default: 256)')
