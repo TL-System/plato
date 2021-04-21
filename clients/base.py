@@ -7,18 +7,27 @@ import os
 import pickle
 import sys
 from abc import abstractmethod
+from dataclasses import dataclass
+from typing import List
 
 import websockets
 from config import Config
 
 
+@dataclass
+class Report:
+    """Client report, to be sent to the federated learning server."""
+    num_samples: int
+    accuracy: float
+
+
 class Client:
     """A basic federated learning client."""
-    def __init__(self):
+    def __init__(self) -> None:
         self.client_id = Config().args.id
         self.data_loaded = False  # is training data already loaded from the disk?
 
-    async def start_client(self):
+    async def start_client(self) -> None:
         """Startup function for a client."""
 
         if hasattr(Config().algorithm,
@@ -94,7 +103,7 @@ class Client:
                          self.client_id)
             logging.error(exception)
 
-    async def recv(self, client_id, data, websocket):
+    async def recv(self, client_id, data, websocket) -> List:
         """Receiving the payload from the server using WebSockets."""
 
         logging.info("[Client #%s] Receiving payload data from the server.",
@@ -120,10 +129,10 @@ class Client:
 
         return server_payload
 
-    async def send(self, websocket, payload):
+    async def send(self, websocket, payload) -> None:
         """Sending the client payload to the server using WebSockets."""
         if isinstance(payload, list):
-            data_size = 0
+            data_size: int = 0
 
             for data in payload:
                 _data = pickle.dumps(data)
@@ -142,15 +151,15 @@ class Client:
         """Additional client-specific processing on the server response."""
 
     @abstractmethod
-    def configure(self):
+    def configure(self) -> None:
         """Prepare this client for training."""
 
     @abstractmethod
-    def load_data(self):
+    def load_data(self) -> None:
         """Generating data and loading them onto this client."""
 
     @abstractmethod
-    def load_payload(self, server_payload):
+    def load_payload(self, server_payload) -> None:
         """Loading the payload onto this client."""
 
     @abstractmethod

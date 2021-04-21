@@ -3,15 +3,17 @@ A simple utility that plot figures of results as PDF files, stored in results/.
 """
 
 import csv
+from typing import Dict, List, Any
 
 import matplotlib.pyplot as plt
 
 from config import Config
 
 
-def read_csv_to_dict(result_csv_file):
-    """Read CSV file and write numbers that need to be plot into a dictionary."""
-    result_dict = {}
+def read_csv_to_dict(result_csv_file: str) -> Dict[str, List]:
+    """Read a CSV file and write the values that need to be plotted
+    into a dictionary."""
+    result_dict: Dict[str, List] = {}
 
     plot_pairs = Config().results.plot
     plot_pairs = [x.strip() for x in plot_pairs.split(',')]
@@ -34,7 +36,8 @@ def read_csv_to_dict(result_csv_file):
     return result_dict
 
 
-def plot(x_label, x_value, y_label, y_value, figure_file_name):
+def plot(x_label: str, x_value: List[Any], y_label: str, y_value: List[Any],
+         figure_file_name: str):
     """Plot a figure."""
     fig, ax = plt.subplots()
     ax.plot(x_value, y_value)
@@ -42,7 +45,7 @@ def plot(x_label, x_value, y_label, y_value, figure_file_name):
     fig.savefig(figure_file_name)
 
 
-def plot_figures_from_dict(result_csv_file, result_dir):
+def plot_figures_from_dict(result_csv_file: str, result_dir: str):
     """Plot figures with dictionary of results."""
     result_dict = read_csv_to_dict(result_csv_file)
 
@@ -52,8 +55,8 @@ def plot_figures_from_dict(result_csv_file, result_dir):
     for pairs in plot_pairs:
         figure_file_name = result_dir + pairs + '.pdf'
         pair = [x.strip() for x in pairs.split('&')]
-        x_y_labels = []
-        x_y_values = {}
+        x_y_labels: List = []
+        x_y_values: Dict[str, List] = {}
         for item in pair:
             label = {
                 'global_round': 'Global training round',

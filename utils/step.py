@@ -9,16 +9,16 @@ the two representations.
 
 class Step:
     """Represents a particular step of training."""
-    def __init__(self, iteration: int, iterations_per_epoch: int) -> 'Step':
+    def __init__(self, iteration: int, iterations_per_epoch: int) -> None:
         if iteration < 0:
             raise ValueError('iteration must >= 0.')
         if iterations_per_epoch <= 0:
             raise ValueError('iterations_per_epoch must be > 0.')
         self._iteration = iteration
-        self._iterations_per_epoch = iterations_per_epoch
+        self.iterations_per_epoch = iterations_per_epoch
 
     @staticmethod
-    def str_is_zero(s: str):
+    def str_is_zero(s: str) -> bool:
         return s in ['0ep', '0it', '0ep0it']
 
     @staticmethod
@@ -70,44 +70,44 @@ class Step:
     @property
     def ep(self):
         """The current epoch of training."""
-        return self._iteration // self._iterations_per_epoch
+        return self._iteration // self.iterations_per_epoch
 
     @property
     def it(self):
         """The iteration within the current epoch of training."""
-        return self._iteration % self._iterations_per_epoch
+        return self._iteration % self.iterations_per_epoch
 
     def _check(self, other):
         if not isinstance(other, Step):
             raise ValueError('Invalid type for other: {}.'.format(type(other)))
-        if self._iterations_per_epoch != other._iterations_per_epoch:
+        if self.iterations_per_epoch != other.iterations_per_epoch:
             raise ValueError(
                 'Cannot compare steps when epochs are of different lengths.')
 
     def __lt__(self, other):
         self._check(other)
-        return self._iteration < other._iteration
+        return self._iteration < other.iteration
 
     def __le__(self, other):
         self._check(other)
-        return self._iteration <= other._iteration
+        return self._iteration <= other.iteration
 
     def __eq__(self, other):
         self._check(other)
-        return self._iteration == other._iteration
+        return self._iteration == other.iteration
 
     def __ne__(self, other):
         self._check(other)
-        return self._iteration != other._iteration
+        return self._iteration != other.iteration
 
     def __gt__(self, other):
         self._check(other)
-        return self._iteration > other._iteration
+        return self._iteration > other.iteration
 
     def __ge__(self, other):
         self._check(other)
-        return self._iteration >= other._iteration
+        return self._iteration >= other.iteration
 
     def __str__(self):
         return '(Iteration {}; Iterations per Epoch: {})'.format(
-            self._iteration, self._iterations_per_epoch)
+            self._iteration, self.iterations_per_epoch)

@@ -1,4 +1,5 @@
 yapf
+mypy
 pylint
 websockets
 requests
