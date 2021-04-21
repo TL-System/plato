@@ -12,19 +12,16 @@ import time
 from config import Config
 from utils import csv_processor, rl_env
 
-import servers
-
-FLServer = servers.fedavg_cs.Server
-RLEnv = rl_env.RLEnv
+from servers import fedavg_cs
 
 
-class Server(FLServer):
+class Server(fedavg_cs.Server):
     """Federated server using RL."""
     def __init__(self):
         super().__init__()
 
         if Config().is_central_server():
-            self.rl_env = RLEnv(self)
+            self.rl_env = rl_env.RLEnv(self)
             self.rl_episode = 0
             self.rl_tuned_para_value = None
             self.rl_state = None
@@ -88,9 +85,9 @@ class Server(FLServer):
         else:
             super().configure()
 
-    def start_clients(self, as_server=False):
+    def start_clients(self, client=None, as_server=False):
         """Start all clients and RL training."""
-        super().start_clients(as_server)
+        super().start_clients(client, as_server)
 
         # The starting point of RL training
         # Run RL training as a coroutine

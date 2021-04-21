@@ -2,7 +2,6 @@
 Reading runtime parameters from a standard configuration file (which is easier
 to work on than JSON).
 """
-
 import argparse
 import logging
 import os
@@ -99,7 +98,7 @@ class Config:
                 timeout=20 * Config.clients.total_clients)
 
             # Customizable dictionary of global parameters
-            Config.params = {}
+            Config.params: Dict = {}
 
             # A run ID is unique to each client in an experiment
             Config.params['run_id'] = os.getpid()
@@ -131,18 +130,18 @@ class Config:
             return obj
 
     @staticmethod
-    def is_edge_server():
+    def is_edge_server() -> bool:
         """Returns whether the current instance is an edge server in cross-silo FL."""
         return Config().args.port is not None
 
     @staticmethod
-    def is_central_server():
+    def is_central_server() -> bool:
         """Returns whether the current instance is a central server in cross-silo FL."""
         return hasattr(Config().algorithm,
                        'cross_silo') and Config().args.port is None
 
     @staticmethod
-    def device():
+    def device() -> str:
         """Returns the device to be used for training."""
         import torch
 
@@ -154,7 +153,7 @@ class Config:
         return device
 
     @staticmethod
-    def is_parallel():
+    def is_parallel() -> bool:
         """Check if the hardware and OS support data parallelism."""
         import torch
 

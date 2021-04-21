@@ -16,10 +16,8 @@ from clients import base
 
 
 @dataclass
-class Report:
-    """Client report, to be sent to the federated learning server."""
-    num_samples: int
-    accuracy: float
+class Report(base.Report):
+    """Report from a simple client, to be sent to the federated learning server."""
     training_time: float
     data_loading_time: float
 
@@ -42,7 +40,7 @@ class Client(base.Client):
     def __repr__(self):
         return 'Client #{}.'.format(self.client_id)
 
-    def configure(self):
+    def configure(self) -> None:
         """Prepare this client for training."""
         if self.trainer is None:
             self.trainer = trainers_registry.get(self.client_id, self.model)
@@ -51,7 +49,7 @@ class Client(base.Client):
 
         self.algorithm = algorithms_registry.get(self.trainer, self.client_id)
 
-    def load_data(self):
+    def load_data(self) -> None:
         """Generating data and loading them onto this client."""
         data_loading_start_time = time.time()
         logging.info("[Client #%s] Loading its data source...", self.client_id)
@@ -81,7 +79,7 @@ class Client(base.Client):
 
         self.data_loading_time = time.time() - data_loading_start_time
 
-    def load_payload(self, server_payload):
+    def load_payload(self, server_payload) -> None:
         """Loading the server model onto this client."""
         self.algorithm.load_weights(server_payload)
 

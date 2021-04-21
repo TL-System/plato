@@ -39,7 +39,7 @@ $ conda install pytorch torchvision -c pytorch
 We will need to install several packages using `pip` as well:
 
 ```shell
-$ pip install -r requirements.txt
+$ pip install -r requirements.txt --upgrade
 ```
 
 If you use Visual Studio Code, it is possible to use `yapf` to reformat the code every time it is saved by adding the following settings to .`.vscode/settings.json`:
