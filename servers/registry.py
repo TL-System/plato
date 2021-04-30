@@ -17,6 +17,7 @@ from servers import (
     rhythm,
     tempo,
     fedsarah,
+    split_learning,
 )
 
 from config import Config
@@ -31,6 +32,7 @@ registered_servers = OrderedDict([
     ('rhythm', rhythm.Server),
     ('tempo', tempo.Server),
     ('fedsarah', fedsarah.Server),
+    ('split_learning', split_learning.Server),
 ])
 
 
