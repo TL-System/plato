@@ -9,6 +9,7 @@ from trainers import (
     basic,
     scaffold,
     fedsarah,
+    split_learning,
 )
 
 from config import Config
@@ -25,6 +26,7 @@ else:
         ('basic', basic.Trainer),
         ('scaffold', scaffold.Trainer),
         ('fedsarah', fedsarah.Trainer),
+        ('split_learning', split_learning.Trainer),
     ])
 
 

@@ -16,6 +16,7 @@ from clients import (
     fednova,
     fedsarah,
     tempo,
+    split_learning,
 )
 
 from config import Config
@@ -29,6 +30,7 @@ registered_clients = OrderedDict([
     ('fednova', fednova.Client),
     ('fedsarah', fedsarah.Client),
     ('tempo', tempo.Client),
+    ('split_learning', split_learning.Client),
 ])
 
 

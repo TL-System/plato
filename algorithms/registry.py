@@ -25,6 +25,7 @@ else:
         mistnet,
         adaptive_sync,
         adaptive_freezing,
+        split_learning,
     )
 
     registered_algorithms = OrderedDict([
@@ -32,6 +33,7 @@ else:
         ('mistnet', mistnet.Algorithm),
         ('adaptive_sync', adaptive_sync.Algorithm),
         ('adaptive_freezing', adaptive_freezing.Algorithm),
+        ('split_learning', split_learning.Algorithm),
     ])
 
 
