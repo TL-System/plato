@@ -26,7 +26,6 @@ class Server(fedavg.Server):
 
     def choose_clients(self):
         assert self.clients_per_round == 1
-        print(len(self.clients))
         if self.last_selected_client_id is None:
             # 1st train loop
             self.last_selected_client_id = -1 # Skip this snippet
