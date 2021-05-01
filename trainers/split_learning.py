@@ -20,7 +20,8 @@ class Trainer(basic.Trainer):
         super().__init__(model)
 
         # Record the gradients w.r.t cut layer in a batch
-        self.gradients_cus = None
+        self.grad_input_cus = None
+        self.grad_output_cus = None
 
         # Record the gradients w.r.t whole batches
         self.gradients_list = []
@@ -30,7 +31,8 @@ class Trainer(basic.Trainer):
         Use to record gradients
         Called by register_backward_hook
         """
-        self.gradients_cus = grad_input
+        self.grad_input_cus = grad_input
+        self.grad_output_cus = grad_output
 
     def train_model(self, config, trainset, sampler, cut_layer=None):  # pylint: disable=unused-argument
 
@@ -43,7 +45,6 @@ class Trainer(basic.Trainer):
                 hook_layer = self.model.layers[cut_layer_index + 1]
             else:
                 hook_layer = cut_layer
-            print(hook_layer)
             self.model.layerdict[hook_layer].register_backward_hook(self.save_gradients)
 
         log_interval = 10
@@ -103,9 +104,12 @@ class Trainer(basic.Trainer):
             loss.backward()
 
             # Record gradients in this batch
-            if not self.gradients_cus is None:
-                self.gradients_list.append(self.gradients_cus)
-            self.gradients_cus = None
+            if (self.grad_input_cus is not None
+                ) and (self.grad_output_cus is not None):
+                self.gradients_list.append(self.grad_input_cus)
+                self.gradients_list.append(self.grad_output_cus)
+            self.grad_input_cus = None
+            self.grad_output_cus = None
 
             optimizer.step()
 
