@@ -27,7 +27,8 @@ class Sampler(base.Sampler):
 
         # add extra samples to make it evenly divisible, if needed
         if len(indices) < total_size:
-            indices += indices[:(total_size - len(indices))]
+            while len(indices) < total_size:
+                indices += indices[:(total_size - len(indices))]
         else:
             indices = indices[:total_size]
         assert len(indices) == total_size

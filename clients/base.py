@@ -33,16 +33,16 @@ class Client:
         if hasattr(Config().algorithm,
                    'cross_silo') and not Config().is_edge_server():
             # Contact one of the edge servers
-            logging.info("[Client #%s] Contacting one of the edge servers.",
-                         self.client_id)
+            edge_server_id = int(Config().clients.total_clients) + (int(
+                self.client_id) - 1) % int(Config().algorithm.total_silos) + 1
+            logging.info("[Client #%s] Contacting Edge server #%s.",
+                         self.client_id, edge_server_id)
 
             assert hasattr(Config().algorithm, 'total_silos')
 
             uri = 'ws://{}:{}'.format(
                 Config().server.address,
-                int(Config().server.port) +
-                int(Config().clients.total_clients) +
-                int(self.client_id) % int(Config().algorithm.total_silos) + 1)
+                int(Config().server.port) + edge_server_id)
         else:
             logging.info("[Client #%s] Contacting the central server.",
                          self.client_id)
@@ -72,7 +72,6 @@ class Client:
                             self.load_data()
 
                         if 'payload' in data:
-
                             server_payload = await self.recv(
                                 self.client_id, data, websocket)
                             self.load_payload(server_payload)
@@ -124,8 +123,8 @@ class Client:
             payload_size = sys.getsizeof(_data)
 
         logging.info(
-            "[Client #%s] Received %s bytes of payload data from the server.",
-            client_id, payload_size)
+            "[Client #%s] Received %s MB of payload data from the server.",
+            client_id, round(payload_size / 1024**2, 2))
 
         return server_payload
 
@@ -143,9 +142,8 @@ class Client:
             await websocket.send(_data)
             data_size = sys.getsizeof(_data)
 
-        logging.info(
-            "[Client #%s] Sent %s bytes of payload data to the server.",
-            self.client_id, data_size)
+        logging.info("[Client #%s] Sent %s MB of payload data to the server.",
+                     self.client_id, round(data_size / 1024**2, 2))
 
     def process_server_response(self, server_response):
         """Additional client-specific processing on the server response."""

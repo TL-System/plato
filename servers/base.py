@@ -99,7 +99,7 @@ class Server:
                 command += " -p {}".format(port)
                 subprocess.Popen(command, shell=True)
             else:
-                logging.info("Starting client #%s.", client_id)
+                logging.info("Starting client #%s's process.", client_id)
                 proc = mp.Process(target=run, args=(client_id, None, client))
 
                 proc.start()
@@ -136,11 +136,12 @@ class Server:
                 payload = await self.customize_server_payload(payload)
 
                 # Sending the server payload to the clients
-                await self.send(socket, payload)
+                await self.send(socket, payload, client_id)
 
-    async def send(self, socket, payload):
+    async def send(self, socket, payload, client_id):
         """Sending the client payload to the server using WebSockets."""
-        logging.info("[Server #%d] Sending the current model.", os.getpid())
+        logging.info("[Server #%d] Sending the current model to client #%s.",
+                     os.getpid(), client_id)
         if isinstance(payload, list):
             data_size = 0
 
@@ -153,8 +154,8 @@ class Server:
             await socket.send(_data)
             data_size = sys.getsizeof(_data)
 
-        logging.info("[Server #%d] Sent %s bytes of payload data.",
-                     os.getpid(), data_size)
+        logging.info("[Server #%d] Sent %s MB of payload data to client #%s.",
+                     os.getpid(), round(data_size / 1024**2, 2), client_id)
 
     async def serve(self, websocket, path):  # pylint: disable=unused-argument
         """Running a federated learning server."""
@@ -213,8 +214,8 @@ class Server:
             payload_size = sys.getsizeof(_data)
 
         logging.info(
-            "[Server #%d] Received %s bytes of payload data from client #%s.",
-            os.getpid(), payload_size, client_id)
+            "[Server #%d] Received %s MB of payload data from client #%s.",
+            os.getpid(), round(payload_size / 1024**2, 2), client_id)
 
         return client_payload
 
