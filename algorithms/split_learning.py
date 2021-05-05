@@ -36,8 +36,6 @@ class Algorithm(fedavg.Algorithm):
     def __init__(self, trainer=None, client_id=None):
         super().__init__(trainer, client_id)
         self.gradients_list = []
-        self.cus_layer_grad_input = None
-        self.cus_layer_grad_output = None
 
     def load_gradients(self, gradients):
         """
@@ -73,8 +71,9 @@ class Algorithm(fedavg.Algorithm):
         _randomize = getattr(self.trainer, "randomize", None)
 
         for inputs, targets, *__ in data_loader:
-            with torch.no_grad():
-                logits = self.model.forward_to(inputs, cut_layer)
+            logits = self.model.forward_to(inputs, cut_layer)
+
+            logits = logits.clone().detach().requires_grad_(True)
 
             for i in np.arange(logits.shape[0]):  # each sample in the batch
                 feature_dataset.append((logits[i], targets[i]))
@@ -88,16 +87,6 @@ class Algorithm(fedavg.Algorithm):
         return feature_dataset
 
     def complete_train(self, config, dataset, sampler, cut_layer: str):
-        # Register hook in backward,
-        # to apply gradients received from server
-        if cut_layer is not None and hasattr(self.model, cut_layer):
-            # Fine the layer next to cut_layer
-            cut_layer_index = self.model.layers.index(cut_layer)
-            if cut_layer_index < (len(self.model.layers) - 1):
-                hook_layer = self.model.layers[cut_layer_index + 1]
-            else:
-                hook_layer = cut_layer
-            self.model.layerdict[hook_layer].register_backward_hook(self.apply_gradients)
 
         # Sending the model to the device used for training
         self.model.train()
@@ -132,27 +121,18 @@ class Algorithm(fedavg.Algorithm):
                                 optimizers.get_optimizer)
         optimizer = get_optimizer(self.model)
 
-        # Get gradients for first batch
-        gradients_index = 2
-        self.cus_layer_grad_input = self.gradients_list[0]
-        self.cus_layer_grad_output = self.gradients_list[1]
+        grad_index = 0
 
         for batch_id, (examples, labels) in enumerate(data_loader):
             optimizer.zero_grad()
 
-            outputs = self.model(examples)
+            outputs = self.model.forward_to(examples, cut_layer)
 
-            loss = loss_criterion(outputs, labels)
+            outputs.backward(self.gradients_list[grad_index])
 
-            loss.backward()
+            grad_index = grad_index + 1
 
             optimizer.step()
-
-            # Get gradients for next batch
-            if gradients_index + 2 < len(self.gradients_list):
-                gradients_index = gradients_index + 2
-            self.cus_layer_grad_input = self.gradients_list[gradients_index]
-            self.cus_layer_grad_output = self.gradients_list[gradients_index + 1]
 
         toc = time.perf_counter()
         # logging.info("[Client #%s] Features extracted from %s examples.",
@@ -162,14 +142,3 @@ class Algorithm(fedavg.Algorithm):
 
     def train(self, trainset, sampler, cut_layer=None):
         self.trainer.train(FeatureDataset(trainset), sampler, cut_layer)
-
-    def apply_gradients(self, module, grad_input, grad_output):
-        """
-        Use to apply gradients
-        Called by register_backward_hook
-        """
-        if self.cus_layer_grad_output is not None:
-            grad_output = self.cus_layer_grad_output
-
-        if self.cus_layer_grad_input is not None:
-            return self.cus_layer_grad_input
