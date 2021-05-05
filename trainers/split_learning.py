@@ -20,32 +20,9 @@ class Trainer(basic.Trainer):
         super().__init__(model)
 
         # Record the gradients w.r.t cut layer in a batch
-        self.grad_input_cus = None
-        self.grad_output_cus = None
-
-        # Record the gradients w.r.t whole batches
-        self.gradients_list = []
-
-    def save_gradients(self, module, grad_input, grad_output):
-        """
-        Use to record gradients
-        Called by register_backward_hook
-        """
-        self.grad_input_cus = grad_input
-        self.grad_output_cus = grad_output
+        self.cut_layer_grad = []
 
     def train_model(self, config, trainset, sampler, cut_layer=None):  # pylint: disable=unused-argument
-
-        self.gradients_list.clear()
-
-        if cut_layer is not None and hasattr(self.model, cut_layer):
-            # Fine the layer next to cut_layer
-            cut_layer_index = self.model.layers.index(cut_layer)
-            if cut_layer_index < (len(self.model.layers) - 1):
-                hook_layer = self.model.layers[cut_layer_index + 1]
-            else:
-                hook_layer = cut_layer
-            self.model.layerdict[hook_layer].register_backward_hook(self.save_gradients)
 
         log_interval = 10
         batch_size = config['batch_size']
@@ -94,6 +71,8 @@ class Trainer(basic.Trainer):
                 self.device)
             optimizer.zero_grad()
 
+            examples = examples.detach().requires_grad_(True)
+
             if cut_layer is None:
                 outputs = self.model(examples)
             else:
@@ -103,13 +82,8 @@ class Trainer(basic.Trainer):
 
             loss.backward()
 
-            # Record gradients in this batch
-            if (self.grad_input_cus is not None
-                ) and (self.grad_output_cus is not None):
-                self.gradients_list.append(self.grad_input_cus)
-                self.gradients_list.append(self.grad_output_cus)
-            self.grad_input_cus = None
-            self.grad_output_cus = None
+            #Record gradients of cut_layer
+            self.cut_layer_grad.append(examples.grad.clone().detach())
 
             optimizer.step()
 
@@ -150,7 +124,7 @@ class Trainer(basic.Trainer):
         else:
             model_path = f'{model_dir}{model_name}_gradients.pth'
 
-        torch.save(self.gradients_list, model_path)
+        torch.save(self.cut_layer_grad, model_path)
 
         logging.info("[Server #%s] Gradients saved to %s.", os.getpid(),
                     model_path)
