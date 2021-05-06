@@ -3,8 +3,8 @@ Samples data from a dataset, biased across labels according to the Dirichlet dis
 """
 import numpy as np
 import torch
-from config import Config
 from torch.utils.data import WeightedRandomSampler
+from config import Config
 
 from samplers import base
 
