@@ -21,7 +21,7 @@ Click [this link](https://colab.research.google.com/drive/1boDurcQF5X9jq25-DsKDT
 
 ### Installation
 
-SSH into `cedar.computecanada.ca` (the main server for Compute Canada) and clone the *Plato* repository to your own directory:
+SSH into a cluster on Compute Canada. Here we take [Cedar]((https://docs.computecanada.ca/wiki/Cedar)) as an example, while [Graham](https://docs.computecanada.ca/wiki/Graham) and [Béluga](https://docs.computecanada.ca/wiki/Béluga/en) are also available. Then clone the *Plato* repository to your own directory:
 
 ```shell
 $ ssh <CCDB username>@cedar.computecanada.ca
@@ -31,12 +31,10 @@ $ git clone https://github.com/TL-System/plato.git
 
 Your CCDB username can be located after signing into the [CCDB portal](https://ccdb.computecanada.ca/). Contact Baochun Li (`bli@ece.toronto.edu`) for a new account on Compute Canada.
 
-**Note:** when the command line prompts for your password for `git clone`, you should enter your [personal access token](https://github.com/settings/tokens) instead of your actual password. 
-
-Change the permissions on `plato` directory:"
+Change the permissions on `plato` directory:
 
 ```shell
-$chmod 777 -R plato/"
+$chmod 777 -R plato/
 ```
 
 ### Preparing the Python Runtime Environment
@@ -70,12 +68,40 @@ $ pip install -r docs/cc_requirements.txt --no-index
 The `--no-index` option tells `pip` to not install from PyPI, but only from locally-available packages, i.e. the Compute Canada wheels.
 Whenever a Compute Canada wheel is available for a given package, it is strongly recommended to use it by way of the `--no-index` option. Compared to using packages from PyPI, wheels that have been compiled by Compute Canada staff can prevent issues with missing or conflicting dependencies, and were optimised for its clusters hardware and libraries. 
 
-**Note:** I am still working on finding an available way to install the `datasets` package with `virtualenvs` (Compute Canada asks users to not use Conda.) So we cannot run Plato with HuggingFace datasets on Compute Canada right now. Please comment out 2 lines of code related to `huggingface` in `datasources/registry.py` before your experiments for now. Or you could run it on Google Colaboratory.
+**Note:** Currently there is no feasiable way to install the `datasets` package with `virtualenvs` (Compute Canada asks users to not use Conda.) So we cannot run *Plato* with HuggingFace datasets on Compute Canada right now. Please comment out the following 2 lines of code related to `huggingface` in `datasources/registry.py` to run your experiment with other datasets.
+
+```
+# from datasets import load_dataset
+# self.dataset = load_dataset(dataset_name, dataset_config)
+```
+
+If you want to run *Plato* with HuggingFace datasets, you could do it on Google Colaboratory.
+
+**Tip:** Use alias to save trouble for future running *Plato*.
+
+```
+$ vim ~/.bashrc
+```
+
+Then add 
+
+```
+alias plato='cd ~/projects/def-baochun/<CCDB username>/plato/; module load python/3.8; source ~/.federated/bin/activate'
+```
+
+After saving this change and exiting `vim`, 
+
+```
+$ source ~/.bashrc
+```
+
+Next time, after you SSH into this cluster, just type `plato`:)
+
 
 
 ### Running Plato
 
-To start a federated learning training workload with Plato, create a job script:
+To start a federated learning training workload with *Plato*, create a job script:
 
 ```shell
 $ vi <job script file name>.sh
@@ -105,9 +131,9 @@ source ~/.federated/bin/activate
 ./run --config=configs/CIFAR10/fedavg_wideresnet.yml --log=info
 ```
 
-**Note:** the GPU resources requested in this example is a special group of GPU nodes on Compute Canada's `cedar` cluster. You may only request these nodes as whole nodes, therefore you must specify `--gres=gpu:p100l:4`. NVIDIA P100L GPU jobs up to 28 days can be run on the `cedar` cluster.
+**Note:** the GPU resources requested in this example is a special group of GPU nodes on Compute Canada's `Cedar` cluster. You may only request these nodes as whole nodes, therefore you must specify `--gres=gpu:p100l:4`.
 
-You may use any type of GPU available on Compute Canada, but in most cases using the NVIDIA P100L GPU requires shorter waiting times, especially for jobs requiring long running times.
+You may use any type of [GPUs available on Compute Canada](https://docs.computecanada.ca/wiki/Using_GPUs_with_Slurm).
 
 Submit the job:
 
@@ -151,14 +177,13 @@ salloc: job 53923456 has been allocated resources
 salloc: Granted job allocation 53923456
 ```
 
-Then you can run Plato:
+Then you can run *Plato*:
 
 ```shell
 $ module load python/3.8
 $ virtualenv --no-download ~/.federated
 $ ./run --config=configs/CIFAR10/fedavg_wideresnet.yml
 ```
-
 
 After the job is done, use `exit` at the command to relinquish the job allocation.
 
