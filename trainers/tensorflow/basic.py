@@ -1,48 +1,40 @@
 """
-The training and testing loops for PyTorch.
+The training and testing loop.
 """
+
 import logging
+import multiprocessing as mp
 import os
 
-import numpy as np
-import torch
-import torch.multiprocessing as mp
-import torch.nn as nn
+import tensorflow as tf
 import wandb
-from config import Config
-from utils import optimizers
 
-from trainers import base
 import models.registry as models_registry
+from config import Config
+from trainers import base
 
 
 class Trainer(base.Trainer):
-    """A basic federated learning trainer, used by both the client and the server."""
-    def __init__(self, model=None):
+    """A basic federated learning trainer for TensorFlow, used by both
+    the client and the server.
+    """
+    def __init__(self, client_id=0, model=None):
         """Initializing the trainer with the provided model.
 
         Arguments:
-        model: The model to train.
         client_id: The ID of the client using this trainer (optional).
+        model: The model to train.
         """
-        super().__init__()
+        super().__init__(client_id)
 
         if model is None:
-            model = models_registry.get()
-
-        # Use data parallelism if multiple GPUs are available and the configuration specifies it
-        if Config().is_parallel():
-            logging.info("Using Data Parallelism.")
-            # DataParallel will divide and allocate batch_size to all available GPUs
-            self.model = nn.DataParallel(model)
-        else:
-            self.model = model
+            self.model = models_registry.get()
 
     def zeros(self, shape):
-        """Returns a PyTorch zero tensor with the given shape."""
+        """Returns a TensorFlow zero tensor with the given shape."""
         # This should only be called from a server
         assert self.client_id == 0
-        return torch.zeros(shape)
+        return tf.zeros(shape)
 
     def save_model(self, filename=None):
         """Saving the model to a file."""
@@ -55,9 +47,9 @@ class Trainer(base.Trainer):
         if filename is not None:
             model_path = f'{model_dir}{filename}'
         else:
-            model_path = f'{model_dir}{model_name}.pth'
+            model_path = f'{model_dir}{model_name}.ckpt'
 
-        torch.save(self.model.state_dict(), model_path)
+        self.model.save_weights(model_path)
 
         if self.client_id == 0:
             logging.info("[Server #%s] Model saved to %s.", os.getpid(),
@@ -68,13 +60,13 @@ class Trainer(base.Trainer):
 
     def load_model(self, filename=None):
         """Loading pre-trained model weights from a file."""
-        model_dir = Config().params['model_dir']
         model_name = Config().trainer.model_name
+        model_dir = Config().params['model_dir']
 
         if filename is not None:
             model_path = f'{model_dir}{filename}'
         else:
-            model_path = f'{model_dir}{model_name}.pth'
+            model_path = f'{model_dir}{model_name}.ckpt'
 
         if self.client_id == 0:
             logging.info("[Server #%s] Loading a model from %s.", os.getpid(),
@@ -83,16 +75,14 @@ class Trainer(base.Trainer):
             logging.info("[Client #%s] Loading a model from %s.",
                          self.client_id, model_path)
 
-        self.model.load_state_dict(torch.load(model_path))
+        self.model.load_weights(model_path)
 
-    @staticmethod
-    def train_process(rank, self, config, trainset, sampler, cut_layer=None):  # pylint: disable=unused-argument
+    def train_process(self, config, trainset, sampler, cut_layer=None):
         """The main training loop in a federated learning workload, run in
           a separate process with a new CUDA context, so that CUDA memory
           can be released after the training completes.
 
         Arguments:
-        rank: Required by torch.multiprocessing to spawn processes. Unused.
         config: a dictionary of configuration parameters.
         trainset: The training dataset.
         sampler: the sampler that extracts a partition for this client.
@@ -114,8 +104,8 @@ class Trainer(base.Trainer):
             _train_loader = getattr(self, "train_loader", None)
 
             if callable(_train_loader):
-                train_loader = _train_loader(batch_size, trainset,
-                                             sampler.get(), cut_layer)
+                train_loader = self.train_loader(batch_size, trainset,
+                                                 sampler.get(), cut_layer)
             else:
                 train_loader = torch.utils.data.DataLoader(
                     dataset=trainset,
@@ -200,71 +190,29 @@ class Trainer(base.Trainer):
 
         Arguments:
         trainset: The training dataset.
-        sampler: the sampler that extracts a partition for this client.
-        cut_layer (optional): The layer which training should start from.
         """
         self.start_training()
+        mp.set_start_method('spawn')
 
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']
 
-        mp.spawn(Trainer.train_process,
-                 args=(
-                     self,
-                     config,
-                     trainset,
-                     sampler,
-                     cut_layer,
-                 ),
-                 join=True)
+        proc = mp.Process(target=Trainer.train_process,
+                          args=(
+                              self,
+                              config,
+                              trainset,
+                              sampler,
+                              cut_layer,
+                          ))
+        proc.start()
+        proc.join()
 
         model_name = Config().trainer.model_name
-        filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.pth"
+        filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.ckpt"
         self.load_model(filename)
+
         self.pause_training()
-
-    @staticmethod
-    def test_process(rank, self, config, testset):  # pylint: disable=unused-argument
-        """The testing loop, run in a separate process with a new CUDA context,
-        so that CUDA memory can be released after the training completes.
-
-        Arguments:
-        config: a dictionary of configuration parameters.
-        rank: Required by torch.multiprocessing to spawn processes. Unused.
-        testset: The test dataset.
-        """
-        self.model.to(self.device)
-        self.model.eval()
-
-        custom_test = getattr(self, "test_model", None)
-
-        if callable(custom_test):
-            accuracy = self.test_model(config, testset)
-        else:
-            test_loader = torch.utils.data.DataLoader(
-                testset, batch_size=config['batch_size'], shuffle=False)
-
-            correct = 0
-            total = 0
-
-            with torch.no_grad():
-                for examples, labels in test_loader:
-                    examples, labels = examples.to(self.device), labels.to(
-                        self.device)
-
-                    outputs = self.model(examples)
-
-                    _, predicted = torch.max(outputs.data, 1)
-                    total += labels.size(0)
-                    correct += (predicted == labels).sum().item()
-
-            accuracy = correct / total
-
-        self.model.cpu()
-
-        model_name = Config().trainer.model_name
-        filename = f"{model_name}_{self.client_id}_{config['run_id']}.acc"
-        Trainer.save_accuracy(accuracy, filename)
 
     def test(self, testset):
         """Testing the model using the provided test dataset.
@@ -273,20 +221,66 @@ class Trainer(base.Trainer):
         testset: The test dataset.
         """
         self.start_training()
+        mp.set_start_method('spawn')
+
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']
 
-        mp.spawn(Trainer.test_process,
-                 args=(
-                     self,
-                     config,
-                     testset,
-                 ),
-                 join=True)
+        proc = mp.Process(target=Trainer.test_process,
+                          args=(
+                              self,
+                              config,
+                              testset,
+                          ))
+        proc.start()
+        proc.join()
 
         model_name = Config().trainer.model_name
         filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
         accuracy = Trainer.load_accuracy(filename)
 
         self.pause_training()
+        return accuracy
+
+    """A custom trainer with custom training and testing loops. """
+
+    def train_model(self, config, trainset, sampler, cut_layer=None):  # pylint: disable=unused-argument
+        """A custom training loop. """
+        criterion = nn.CrossEntropyLoss()
+        optimizer = optim.Adam(self.model.parameters(), lr=0.02)
+        train_loader = DataLoader(dataset=trainset,
+                                  batch_size=config['batch_size'],
+                                  sampler=sampler)
+
+        # Training the model using Catalyst's SupervisedRunner
+        runner = dl.SupervisedRunner()
+
+        runner.train(model=self.model,
+                     criterion=criterion,
+                     optimizer=optimizer,
+                     loaders={"train": train_loader},
+                     num_epochs=1,
+                     logdir="./logs",
+                     verbose=True)
+
+    def test_model(self, config, testset):  # pylint: disable=unused-argument
+        """A custom testing loop. """
+        test_loader = torch.utils.data.DataLoader(
+            testset, batch_size=config['batch_size'], shuffle=False)
+
+        # Using Catalyst's SupervisedRunner and AccuracyCallback to compute accuracies
+        runner = dl.SupervisedRunner()
+        runner.train(model=self.model,
+                     num_epochs=1,
+                     loaders={"valid": test_loader},
+                     logdir="./logs",
+                     verbose=True,
+                     callbacks=[
+                         dl.AccuracyCallback(input_key="logits",
+                                             target_key="targets",
+                                             num_classes=10)
+                     ])
+
+        # Retrieving the top-1 accuracy from SupervisedRunner
+        accuracy = runner.epoch_metrics["valid"]["accuracy"]
         return accuracy

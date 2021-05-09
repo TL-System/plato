@@ -7,9 +7,9 @@ https://github.com/BayesWatch/cinic-10
 import logging
 import os
 
-from config import Config
 from torchvision import datasets, transforms
 
+from config import Config
 from datasources import base
 
 

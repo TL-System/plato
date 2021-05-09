@@ -5,6 +5,7 @@ based on a configuration at run-time.
 
 import logging
 from collections import OrderedDict
+
 from config import Config
 
 if hasattr(Config().trainer, 'use_mindspore'):
@@ -14,6 +15,15 @@ if hasattr(Config().trainer, 'use_mindspore'):
     registered_datasources = OrderedDict([
         ('MNIST', mnist_mindspore),
     ])
+elif hasattr(Config().trainer, 'use_tensorflow'):
+    from datasources.tensorflow import (
+        mnist as mnist_tensorflow,
+        fashion_mnist as fashion_mnist_tensorflow,
+    )
+
+    registered_datasources = OrderedDict([('MNIST', mnist_tensorflow),
+                                          ('FashionMNIST',
+                                           fashion_mnist_tensorflow)])
 else:
     from datasources import (
         mnist,

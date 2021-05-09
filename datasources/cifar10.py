@@ -2,9 +2,9 @@
 The CIFAR-10 dataset.
 """
 
-from config import Config
 from torchvision import datasets, transforms
 
+from config import Config
 from datasources import base
 
 
