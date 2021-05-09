@@ -22,6 +22,13 @@ if hasattr(Config().trainer, 'use_mindspore'):
     registered_models = OrderedDict([
         ('lenet5', lenet5_mindspore.Model),
     ])
+elif hasattr(Config().trainer, 'use_tensorflow'):
+    from models.tensorflow import (
+        lenet5 as lenet5_tensorflow, )
+
+    registered_models = OrderedDict([
+        ('lenet5', lenet5_tensorflow.Model),
+    ])
 else:
     registered_models = OrderedDict([
         ('lenet5', lenet5.Model),

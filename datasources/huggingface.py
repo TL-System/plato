@@ -7,9 +7,9 @@ https://huggingface.co/docs/datasets/quicktour.html.
 
 import logging
 
-from config import Config
 from datasets import load_dataset
 
+from config import Config
 from datasources import base
 
 

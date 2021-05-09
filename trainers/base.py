@@ -27,6 +27,39 @@ class Trainer(ABC):
                 cursor.execute(
                     "CREATE TABLE IF NOT EXISTS trainers (run_id int)")
 
+    @staticmethod
+    def save_accuracy(accuracy, filename=None):
+        """Saving the test accuracy to a file."""
+        model_dir = Config().params['model_dir']
+        model_name = Config().trainer.model_name
+
+        if not os.path.exists(model_dir):
+            os.makedirs(model_dir)
+
+        if filename is not None:
+            accuracy_path = f"{model_dir}{filename}"
+        else:
+            accuracy_path = f'{model_dir}{model_name}.acc'
+
+        with open(accuracy_path, 'w') as file:
+            file.write(str(accuracy))
+
+    @staticmethod
+    def load_accuracy(filename=None):
+        """Loading the test accuracy from a file."""
+        model_dir = Config().params['model_dir']
+        model_name = Config().trainer.model_name
+
+        if filename is not None:
+            accuracy_path = f"{model_dir}{filename}"
+        else:
+            accuracy_path = f'{model_dir}{model_name}.acc'
+
+        with open(accuracy_path, 'r') as file:
+            accuracy = float(file.read())
+
+        return accuracy
+
     def start_training(self):
         """Add to the list of running trainers if max_concurrency has not yet
         been reached."""

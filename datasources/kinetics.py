@@ -10,10 +10,10 @@ import logging
 import os
 import sys
 
-from config import Config
 from torch.utils.data.dataloader import default_collate
 from torchvision import datasets
 
+from config import Config
 from datasources import base
 from datasources.datalib import parallel_downloader as parallel
 from datasources.datalib import video_transform

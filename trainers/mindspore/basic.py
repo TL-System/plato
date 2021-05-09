@@ -25,8 +25,8 @@ class Trainer(base.Trainer):
         """Initializing the trainer with the provided model.
 
         Arguments:
-        model: The model to train. Must be a models.base_mindspore.Model subclass.
         client_id: The ID of the client using this trainer (optional).
+        model: The model to train.
         """
         super().__init__(client_id)
 

@@ -14,7 +14,7 @@ class Algorithm(ABC):
 
         Arguments:
         trainer: The trainer for the model, which is a trainers.base.Trainer class.
-        model: The model to train, which is a models.base.Model class.
+        model: The model to train.
         """
         super().__init__()
         self.trainer = trainer
