@@ -56,7 +56,8 @@ def run(client_id, port, client=None):
         else:
             if client is None:
                 client = client_registry.get()
-                logging.info("Starting a %s client.", Config().clients.type)
+                logging.info("Starting a %s client #%s.",
+                             Config().clients.type, client_id)
             else:
                 client.client_id = client_id
                 logging.info("Starting a custom client #%s", client_id)

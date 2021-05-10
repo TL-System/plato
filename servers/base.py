@@ -11,7 +11,6 @@ import subprocess
 import sys
 import time
 from abc import abstractmethod, abstractstaticmethod
-from contextlib import closing
 
 import websockets
 from client import run
@@ -34,9 +33,9 @@ class Server:
     def run(self, client=None):
         """Start a run loop for the server. """
         # Remove the running trainers table from previous runs.
-        with Config().sql_connection:
-            with closing(Config().sql_connection.cursor()) as cursor:
-                cursor.execute("DROP TABLE IF EXISTS trainers")
+        if not Config().is_edge_server():
+            with Config().sql_connection:
+                Config().cursor.execute("DROP TABLE IF EXISTS trainers")
 
         self.client = client
         self.configure()
