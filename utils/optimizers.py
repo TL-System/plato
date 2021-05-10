@@ -7,7 +7,6 @@ import sys
 
 import numpy as np
 from config import Config
-from models.base import Model
 from torch import optim
 
 from utils.fedprox_optimizer import FedProxOptimizer
@@ -16,7 +15,7 @@ from utils.scaffold_optimizer import ScaffoldOptimizer
 from utils.step import Step
 
 
-def get_optimizer(model: Model) -> optim.Optimizer:
+def get_optimizer(model) -> optim.Optimizer:
     """Obtain the optimizer used for training the model."""
     if Config().trainer.optimizer == 'SGD':
         return optim.SGD(model.parameters(),
