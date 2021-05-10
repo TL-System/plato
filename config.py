@@ -94,8 +94,9 @@ class Config:
             # Used to limit the maximum number of concurrent trainers
             Config.sql_connection = sqlite3.connect(
                 os.path.dirname(Config.args.config) +
-                '/running_trainers.sqlitedb',
-                timeout=20 * Config.clients.total_clients)
+                '/running_trainers.sqlitedb')
+
+            Config().cursor = Config.sql_connection.cursor()
 
             # Customizable dictionary of global parameters
             Config.params: Dict = {}
