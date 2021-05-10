@@ -10,14 +10,13 @@ currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
-from models.base import Model
 from clients import simple
 from algorithms import fedavg as fedavg_alg
 from servers import fedavg as fedavg_server
 from trainers import basic
 
 
-class InnerProductModel(Model):
+class InnerProductModel(torch.nn.Module):
     @staticmethod
     def is_valid_model_type(model_type):
         raise NotImplementedError
@@ -91,7 +90,7 @@ class FedAvgTest(unittest.TestCase):
         server = fedavg_server.Server(model=model)
         trainer = basic.Trainer(model=model)
         algorithm = fedavg_alg.Algorithm(trainer=trainer)
-        server.trainer = trainer      
+        server.trainer = trainer
         server.algorithm = algorithm
 
         weights = copy.deepcopy(self.algorithm.extract_weights())
