@@ -15,23 +15,16 @@ if hasattr(Config().trainer, 'use_mindspore'):
         ('MNIST', mnist_mindspore),
     ])
 else:
-    from datasources import (
-        mnist,
-        fashion_mnist,
-        cifar10,
-        cinic10,
-        huggingface,
-        kinetics,
-    )
+    from datasources import (mnist, fashion_mnist, cifar10, cinic10,
+                             huggingface, kinetics, pascal_voc)
 
-    registered_datasources = OrderedDict([
-        ('MNIST', mnist),
-        ('FashionMNIST', fashion_mnist),
-        ('CIFAR10', cifar10),
-        ('CINIC10', cinic10),
-        ('HuggingFace', huggingface),
-        ('Kinetics', kinetics),
-    ])
+    registered_datasources = OrderedDict([('MNIST', mnist),
+                                          ('FashionMNIST', fashion_mnist),
+                                          ('CIFAR10', cifar10),
+                                          ('CINIC10', cinic10),
+                                          ('HuggingFace', huggingface),
+                                          ('Kinetics', kinetics),
+                                          ('PASCAL_VOC', pascal_voc)])
 
 
 def get():

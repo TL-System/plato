@@ -7,6 +7,7 @@ from collections import OrderedDict
 
 from trainers import (
     basic,
+    pascal_voc,
     scaffold,
     fedsarah,
 )
@@ -21,11 +22,10 @@ if hasattr(Config().trainer, 'use_mindspore'):
         ('basic', basic_mindspore.Trainer),
     ])
 else:
-    registered_trainers = OrderedDict([
-        ('basic', basic.Trainer),
-        ('scaffold', scaffold.Trainer),
-        ('fedsarah', fedsarah.Trainer),
-    ])
+    registered_trainers = OrderedDict([('basic', basic.Trainer),
+                                       ('scaffold', scaffold.Trainer),
+                                       ('fedsarah', fedsarah.Trainer),
+                                       ('pascal_voc', pascal_voc.Trainer)])
 
 
 def get(client_id=0, model=None):
