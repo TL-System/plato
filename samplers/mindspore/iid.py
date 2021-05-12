@@ -7,7 +7,7 @@ import mindspore.dataset as ds
 from mindspore.dataset import SubsetRandomSampler
 
 from samplers import base
-from config import Config
+from plato.config import Config
 
 
 class Sampler(base.Sampler):

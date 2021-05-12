@@ -12,10 +12,10 @@ from torchvision.transforms import ToTensor
 
 os.environ['config_file'] = 'configs/MNIST/fedavg_lenet5.yml'
 
-from clients import simple
-from datasources import base
-from servers import fedavg
-from trainers import basic
+from plato.clients import simple
+from plato.datasources import base
+from plato.servers import fedavg
+from plato.trainers import basic
 
 
 class DataSource(base.DataSource):

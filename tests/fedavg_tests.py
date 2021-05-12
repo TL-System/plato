@@ -10,10 +10,10 @@ currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
-from clients import simple
-from algorithms import fedavg as fedavg_alg
-from servers import fedavg as fedavg_server
-from trainers import basic
+from plato.clients import simple
+from plato.algorithms import fedavg as fedavg_alg
+from plato.servers import fedavg as fedavg_server
+from plato.trainers import basic
 
 
 class InnerProductModel(torch.nn.Module):

@@ -42,6 +42,11 @@ We will need to install several packages using `pip` as well:
 $ pip install -r requirements.txt --upgrade
 ```
 
+Finally, we will install Plato as a pip package:
+```shell
+$ pip install .
+$
+
 If you use Visual Studio Code, it is possible to use `yapf` to reformat the code every time it is saved by adding the following settings to .`.vscode/settings.json`:
 
 ```

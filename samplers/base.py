@@ -4,7 +4,7 @@ Base class for sampling data so that a dataset can be divided across the clients
 import os
 from abc import abstractmethod
 
-from config import Config
+from plato.config import Config
 
 
 class Sampler:
