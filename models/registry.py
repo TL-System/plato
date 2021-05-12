@@ -6,7 +6,13 @@ based on a configuration at run-time.
 """
 from collections import OrderedDict
 
-from models import (lenet5, resnet, wideresnet, vgg, unet)
+from models import (
+    lenet5,
+    resnet,
+    wideresnet,
+    vgg,
+    unet,
+)
 
 from config import Config
 
@@ -17,12 +23,21 @@ if hasattr(Config().trainer, 'use_mindspore'):
     registered_models = OrderedDict([
         ('lenet5', lenet5_mindspore.Model),
     ])
+elif hasattr(Config().trainer, 'use_tensorflow'):
+    from models.tensorflow import (
+        lenet5 as lenet5_tensorflow, )
+
+    registered_models = OrderedDict([
+        ('lenet5', lenet5_tensorflow.Model),
+    ])
 else:
-    registered_models = OrderedDict([('lenet5', lenet5.Model),
-                                     ('resnet', resnet.Model),
-                                     ('vgg', vgg.Model),
-                                     ('wideresnet', wideresnet.Model),
-                                     ('unet', unet.Model)])
+    registered_models = OrderedDict([
+        ('lenet5', lenet5.Model),
+        ('resnet', resnet.Model),
+        ('vgg', vgg.Model),
+        ('wideresnet', wideresnet.Model),
+        ('unet', unet.Model)
+    ])
 
 
 def get():
