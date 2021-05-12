@@ -32,6 +32,7 @@ else:
         cinic10,
         huggingface,
         kinetics,
+        pascal_voc,
     )
 
     registered_datasources = OrderedDict([
@@ -41,6 +42,7 @@ else:
         ('CINIC10', cinic10),
         ('HuggingFace', huggingface),
         ('Kinetics', kinetics),
+        ('PASCAL_VOC', pascal_voc)
     ])
 
 
