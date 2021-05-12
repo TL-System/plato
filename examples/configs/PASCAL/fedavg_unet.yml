@@ -1,0 +1,64 @@
+clients:
+    # Type
+    type: simple
+
+    # The total number of clients
+    total_clients: 1
+
+    # The number of clients selected in each round
+    per_round: 1
+
+    # Should the clients compute test accuracy locally?
+    do_test: true
+
+server:
+    address: 127.0.0.1
+    port: 8000
+
+data:
+    # The training and testing dataset
+    datasource: PASCAL_VOC
+
+    # Where the dataset is located
+    data_path: ./data
+
+    # Number of samples in each partition
+    partition_size: 2000
+
+    # IID or non-IID?
+    sampler: iid
+
+    # The random seed for sampling data
+    random_seed: 1
+
+trainer:
+    # The type of the trainer
+    type: pascal_voc
+
+    # The maximum number of training rounds
+    rounds: 2
+
+    # Whether the training should use multiple GPUs if available
+    parallelized: false
+
+    # The maximum number of clients running concurrently
+    max_concurrency: 1
+
+    # The target accuracy
+    target_accuracy: 0.94
+
+    # Number of epoches for local training in each communication round
+    epochs: 1
+    batch_size: 32
+    optimizer: SGD
+    learning_rate: 0.01
+    momentum: 0.9
+    weight_decay: 0.0
+    loss_criterion: BCEWithLogitsLoss
+
+    # The machine learning model
+    model_name: unet
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg

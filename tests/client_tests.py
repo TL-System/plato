@@ -12,8 +12,8 @@ currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
-from config import Config
-from clients import simple
+from plato.config import Config
+from plato.clients import simple
 
 
 async def test_training(client):
@@ -23,6 +23,7 @@ async def test_training(client):
     print("Client model trained.")
     print(f"Report to be sent to the server: {report}")
     print(f"Model weights: {weights}")
+
 
 def main():
     """Starting a client to connect to the server via WebSockets."""

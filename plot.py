@@ -7,7 +7,7 @@ from typing import Dict, List, Any
 
 import matplotlib.pyplot as plt
 
-from config import Config
+from plato.config import Config
 
 
 def read_csv_to_dict(result_csv_file: str) -> Dict[str, List]:

@@ -4,7 +4,7 @@ Some are biased across labels according to the Dirichlet distribution,
 while some are in an independent and identically distributed fashion.
 """
 import numpy as np
-from config import Config
+from plato.config import Config
 from samplers import dirichlet
 
 

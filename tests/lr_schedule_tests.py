@@ -11,9 +11,9 @@ currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
-from utils import optimizers
+from plato.utils import optimizers
 import models.registry as models_registry
-from config import Config
+from plato.config import Config
 
 
 class LrSchedulerTest(unittest.TestCase):
@@ -23,8 +23,8 @@ class LrSchedulerTest(unittest.TestCase):
 
         fields = [
             'optimizer', 'lr_schedule', 'learning_rate', 'momentum',
-            'weight_decay', 'lr_gamma', 'lr_milestone_steps', 'lr_warmup_steps',
-            'model_name'
+            'weight_decay', 'lr_gamma', 'lr_milestone_steps',
+            'lr_warmup_steps', 'model_name'
         ]
         params = ['SGD', 'LambdaLR', 0.1, 0.5, 0.0, 0.0, '', '', 'resnet_18']
         Config().trainer = namedtuple('trainer', fields)(*params)

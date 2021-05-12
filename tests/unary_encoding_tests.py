@@ -12,7 +12,7 @@ currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
-from utils import unary_encoding
+from plato.utils import unary_encoding
 
 
 class UnaryEncodingTest(unittest.TestCase):
