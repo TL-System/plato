@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 3
+    total_clients: 5
 
     # The number of clients selected in each round
-    per_round: 3
+    per_round: 5
 
     # Should the clients compute test accuracy locally?
     do_test: true
@@ -26,7 +26,7 @@ data:
     partition_size: 20000
 
     # IID or non-IID?
-    sampler: iid
+    sampler: noniid
 
 trainer:
     # The type of the trainer

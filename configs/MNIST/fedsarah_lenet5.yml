@@ -3,10 +3,10 @@ clients:
     type: fedsarah
 
     # The total number of clients
-    total_clients: 1
+    total_clients: 10
 
     # The number of clients selected in each round
-    per_round: 1
+    per_round: 10
 
     # Should the clients compute test accuracy locally?
     do_test: true
@@ -27,7 +27,7 @@ data:
     partition_size: 20000
 
     # IID or non-IID?
-    sampler: iid
+    sampler: noniid
 
 trainer:
     # The type of the trainer

@@ -14,6 +14,7 @@ from utils.fedprox_optimizer import FedProxOptimizer
 from utils.fedsarah_optimizer import FedSarahOptimizer
 from utils.scaffold_optimizer import ScaffoldOptimizer
 from utils.step import Step
+import torch.nn as nn
 
 
 def get_optimizer(model: Model) -> optim.Optimizer:
@@ -38,10 +39,10 @@ def get_optimizer(model: Model) -> optim.Optimizer:
                                  momentum=Config().trainer.momentum,
                                  weight_decay=Config().trainer.weight_decay)
     elif Config().trainer.optimizer == 'FedSarah':
-        return FedSarahOptimizer(model.parameters(),
-                                 lr=Config().trainer.learning_rate,
-                                 momentum=Config().trainer.momentum,
-                                 weight_decay=Config().trainer.weight_decay)
+        return FedSarahOptimizer(model.parameters())  #,
+        #lr=Config().trainer.learning_rate,
+        #momentum=Config().trainer.momentum,
+        #weight_decay=Config().trainer.weight_decay)
 
     raise ValueError('No such optimizer: {}'.format(
         Config().trainer.optimizer))
@@ -78,3 +79,10 @@ def get_lr_schedule(optimizer: optim.Optimizer,
             optimizer, lambda it: np.product([l(it) for l in lambdas]))
     else:
         sys.exit('Error: Unknown learning rate scheduler.')
+
+    def get_loss_criterion():
+        """Obtain the loss criterion used for training the model."""
+        if Config().trainer.loss_criterion == 'BCEWithLogitsLoss':
+            return nn.BCEWithLogitsLoss()
+        else:
+            return nn.CrossEntropyLoss()
