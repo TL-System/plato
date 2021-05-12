@@ -38,15 +38,17 @@ class Trainer(basic.Trainer):
         optimizer.client_control_variates = self.client_control_variates
         optimizer.client_id = self.client_id
         optimizer.max_counter = Config().trainer.epochs
-
+        """
         if self.adjustment:
             optimizer.epsilon = optimizer.max_epsilon - (
                 optimizer.max_epsilon - optimizer.min_epsilon) * np.exp(
                     -1 * optimizer.epsilon_decay * self.fl_round_counter)
+        
             #optimizer.epsilon = optimizer.min_epsilon + (
             #optimizer.max_epsilon - optimizer.min_epsilon) * np.exp(
             #   -1 * optimizer.epsilon_decay * self.fl_round_counter)
         else:
             optimizer.epsilon = optimizer.min_epsilon
+        """
 
         return optimizer
