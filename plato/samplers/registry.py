@@ -10,7 +10,7 @@ from collections import OrderedDict
 from plato.config import Config
 
 if hasattr(Config().trainer, 'use_mindspore'):
-    from samplers.mindspore import (
+    from plato.samplers.mindspore import (
         iid as iid_mindspore,
         dirichlet as dirichlet_mindspore,
     )
@@ -20,7 +20,7 @@ if hasattr(Config().trainer, 'use_mindspore'):
         ('noniid', dirichlet_mindspore.Sampler),
     ])
 else:
-    from samplers import (iid, dirichlet, mixed)
+    from plato.samplers import (iid, dirichlet, mixed)
 
     registered_samplers = OrderedDict([
         ('iid', iid.Sampler),

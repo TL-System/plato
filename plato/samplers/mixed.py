@@ -5,7 +5,7 @@ while some are in an independent and identically distributed fashion.
 """
 import numpy as np
 from plato.config import Config
-from samplers import dirichlet
+from plato.samplers import dirichlet
 
 
 class Sampler(dirichlet.Sampler):

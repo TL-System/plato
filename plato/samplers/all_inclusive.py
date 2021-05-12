@@ -4,7 +4,7 @@ local sources only, and used by the MistNet server.
 """
 from torch.utils.data import SubsetRandomSampler
 
-from samplers import base
+from plato.samplers import base
 
 
 class Sampler(base.Sampler):

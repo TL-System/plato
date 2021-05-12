@@ -1,13 +1,12 @@
 """
-Samples data from a MindSpore dataset in an independent and identically distributed fashion.
+Samples data from a dataset in an independent and identically distributed fashion.
 """
 import numpy as np
-
-import mindspore.dataset as ds
-from mindspore.dataset import SubsetRandomSampler
-
-from samplers import base
+import torch
 from plato.config import Config
+from torch.utils.data import SubsetRandomSampler
+
+from plato.samplers import base
 
 
 class Sampler(base.Sampler):
@@ -16,8 +15,9 @@ class Sampler(base.Sampler):
     def __init__(self, datasource, client_id):
         super().__init__()
         self.client_id = client_id
-
-        indices = list(range(datasource.num_train_examples()))
+        dataset = datasource.get_train_set()
+        self.dataset_size = len(dataset)
+        indices = list(range(self.dataset_size))
         np.random.seed(self.random_seed)
         np.random.shuffle(indices)
 
@@ -27,7 +27,8 @@ class Sampler(base.Sampler):
 
         # add extra samples to make it evenly divisible, if needed
         if len(indices) < total_size:
-            indices += indices[:(total_size - len(indices))]
+            while len(indices) < total_size:
+                indices += indices[:(total_size - len(indices))]
         else:
             indices = indices[:total_size]
         assert len(indices) == total_size
@@ -38,8 +39,9 @@ class Sampler(base.Sampler):
 
     def get(self):
         """Obtains an instance of the sampler. """
-        ds.config.set_seed(self.random_seed)
-        return SubsetRandomSampler(self.subset_indices)
+        gen = torch.Generator()
+        gen.manual_seed(self.random_seed)
+        return SubsetRandomSampler(self.subset_indices, generator=gen)
 
     def trainset_size(self):
         """Returns the length of the dataset after sampling. """
