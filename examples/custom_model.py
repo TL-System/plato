@@ -10,7 +10,7 @@ from torch import nn
 from torchvision.datasets import MNIST
 from torchvision.transforms import ToTensor
 
-os.environ['config_file'] = 'configs/MNIST/fedavg_lenet5.yml'
+os.environ['config_file'] = 'configs/fedavg_lenet5.yml'
 
 from plato.clients import simple
 from plato.datasources import base
