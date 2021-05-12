@@ -14,7 +14,7 @@ from catalyst import dl
 from catalyst.data.transforms import ToTensor
 from catalyst.contrib.datasets import MNIST
 
-os.environ['config_file'] = 'configs/MNIST/fedavg_lenet5.yml'
+os.environ['config_file'] = 'configs/fedavg_lenet5.yml'
 
 from plato.clients import simple
 from plato.datasources import base
