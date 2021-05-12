@@ -11,6 +11,7 @@ from models import (
     resnet,
     wideresnet,
     vgg,
+    unet,
 )
 
 from config import Config
@@ -35,6 +36,7 @@ else:
         ('resnet', resnet.Model),
         ('vgg', vgg.Model),
         ('wideresnet', wideresnet.Model),
+        ('unet', unet.Model)
     ])
 
 
