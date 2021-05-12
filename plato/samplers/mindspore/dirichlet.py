@@ -2,18 +2,19 @@
 Samples data from a dataset, biased across labels according to the Dirichlet distribution.
 """
 import numpy as np
-import torch
-from torch.utils.data import WeightedRandomSampler
-from plato.config import Config
 
-from samplers import base
+import mindspore.dataset as ds
+from mindspore.dataset import WeightedRandomSampler
+
+from plato.samplers import base
+from plato.config import Config
 
 
 class Sampler(base.Sampler):
     """Create a data sampler for each client to use a divided partition of the
     dataset, biased across labels according to the Dirichlet distribution."""
     def __init__(self, datasource, client_id):
-        super().__init__()
+        super().__init__(datasource)
         self.client_id = client_id
 
         # Different clients should have a different bias across the labels
@@ -36,14 +37,12 @@ class Sampler(base.Sampler):
 
     def get(self):
         """Obtains an instance of the sampler. """
-        gen = torch.Generator()
-        gen.manual_seed(self.random_seed)
+        ds.config.set_seed(self.random_seed)
 
         # Samples without replacement using the sample weights
         return WeightedRandomSampler(weights=self.sample_weights,
                                      num_samples=self.partition_size,
-                                     replacement=False,
-                                     generator=gen)
+                                     replacement=False)
 
     def trainset_size(self):
         """Returns the length of the dataset after sampling. """

@@ -10,7 +10,7 @@ import os
 from itertools import chain
 
 from plato.config import Config
-from samplers import all_inclusive
+from plato.samplers import all_inclusive
 
 from plato.servers import fedavg
 
