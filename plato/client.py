@@ -43,7 +43,7 @@ def run(client_id, port, client=None):
             client.configure()
             coroutines.append(client.start_client())
 
-            logging.info("Starting an edge server (client #%s) on port %s",
+            logging.info("Starting an edge server (client #%d) on port %d",
                          Config().args.id,
                          Config().args.port)
             start_server = websockets.serve(server.serve,
