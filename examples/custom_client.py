@@ -1,19 +1,19 @@
 import os
 import asyncio
 import logging
-from collections import OrderedDict
+import websockets
 
 import torch
 from torch import nn
 from torchvision.datasets import MNIST
 from torchvision.transforms import ToTensor
 
-os.environ['config_file'] = 'examples/demo/client.yml'
+os.environ['config_file'] = 'configs/client.yml'
 
 from plato.clients import simple
 from plato.datasources import base
 from plato.trainers import basic
-from plato.config import Config
+
 
 class DataSource(base.DataSource):
     """A custom datasource with custom training and validation
@@ -30,6 +30,7 @@ class DataSource(base.DataSource):
                              train=False,
                              download=True,
                              transform=ToTensor())
+
 
 class Trainer(basic.Trainer):
     """A custom trainer with custom training and testing loops. """
@@ -79,32 +80,38 @@ class Trainer(basic.Trainer):
         accuracy = correct / total
         return accuracy
 
-class Myclient(simple.Client):
+
+class CustomClient(simple.Client):
     def __init__(self, model=None, datasource=None, trainer=None):
         super().__init__(model, datasource, trainer)
+        logging.info("A customized client has been initialized.")
+
 
 def main():
-    Config().args.id = int(Config().args.id)
-    Config().args.port = int(Config().args.port)
-    
-    loop = asyncio.get_event_loop()
-    coroutines = []
-    """A Plato federated learning training session using a custom model. """
-    model = nn.Sequential(
-        nn.Linear(28 * 28, 128),
-        nn.ReLU(),
-        nn.Linear(128, 128),
-        nn.ReLU(),
-        nn.Linear(128, 10),
-    )
-    datasource = DataSource()
-    trainer = Trainer(model=model)
+    try:
+        # A Plato federated learning training session using a custom model.
+        model = nn.Sequential(
+            nn.Linear(28 * 28, 128),
+            nn.ReLU(),
+            nn.Linear(128, 128),
+            nn.ReLU(),
+            nn.Linear(128, 10),
+        )
+        datasource = DataSource()
+        trainer = Trainer(model=model)
 
-    client = Myclient(model=model, datasource=datasource, trainer=trainer)
-    client.configure()
-    coroutines.append(client.start_client())
-    loop.run_until_complete(asyncio.gather(*coroutines))
+        client = CustomClient(model=model,
+                              datasource=datasource,
+                              trainer=trainer)
+        client.configure()
+
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(client.start_client())
+
+    except websockets.ConnectionClosed:
+        logging.info("Client #%s: connection to the server is closed.",
+                     client.client_id)
+
 
 if __name__ == "__main__":
     main()
-

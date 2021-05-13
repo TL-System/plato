@@ -49,6 +49,11 @@ class Config:
             args = parser.parse_args()
             Config.args = args
 
+            if Config.args.id is not None:
+                Config.args.id = int(args.id)
+            if Config.args.port is not None:
+                Config.args.port = int(args.port)
+
             try:
                 log_level = {
                     'critical': logging.CRITICAL,
