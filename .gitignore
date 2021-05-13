@@ -140,10 +140,14 @@ running_trainers.sqlitedb
 # Data files
 /data/
 /tests/data/
+examples/data/
 
 # Result files
 results/
+
+# Models
 models/pretrained/
+examples/models/pretrained
 wandb/
 logs/
 
