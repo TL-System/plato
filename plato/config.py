@@ -5,6 +5,7 @@ to work on than JSON).
 import argparse
 import logging
 import os
+import random
 import sqlite3
 from collections import OrderedDict, namedtuple
 
@@ -151,7 +152,7 @@ class Config:
         import torch
 
         if torch.cuda.is_available() and torch.cuda.device_count() > 0:
-            device = 'cuda'
+            device = 'cuda:' + str(random.randint(0, torch.cuda.device_count() - 1))
         else:
             device = 'cpu'
 
