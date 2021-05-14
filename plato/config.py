@@ -94,12 +94,11 @@ class Config:
 
             if 'results' in config:
                 Config.results = Config.namedtuple_from_dict(config['results'])
-                Config.result_dir = os.path.dirname(args.config) + '/results/'
+                Config.result_dir = os.path.dirname(__file__) + '/results/'
 
             # Used to limit the maximum number of concurrent trainers
             Config.sql_connection = sqlite3.connect(
-                os.path.dirname(Config.args.config) +
-                '/running_trainers.sqlitedb')
+                os.path.dirname(__file__) + '/running_trainers.sqlitedb')
 
             Config().cursor = Config.sql_connection.cursor()
 
