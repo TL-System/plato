@@ -26,7 +26,7 @@ def get_version():
 
 
 setuptools.setup(
-    name="plato",
+    name="plato-learn",
     version=get_version(),
     author="",
     license="Apache-2.0",
@@ -41,7 +41,7 @@ setuptools.setup(
     extras_require={"tests": ["pytest"]},
     include_package_data=True,
     options={'bdist_wheel': {
-        'python_tag': 'py36.py37.py38'
+        'python_tag': 'py37.py38.py39'
     }},
     classifiers=[
         "Development Status :: 3 - Alpha",
@@ -50,14 +50,14 @@ setuptools.setup(
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Topic :: Software Development :: Libraries",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Education",
         "Topic :: Scientific/Engineering",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
     ],
-    keywords="machine-learning, deep-learning, federated-learning",
+    keywords="machine-learning, deep-learning, edge-learning, federated-learning",
 )

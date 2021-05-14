@@ -8,6 +8,7 @@ from plato.config import Config
 from plato.servers import registry as server_registry
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+os.environ["MKL_THREADING_LAYER"] = "GNU"
 
 
 def main():
