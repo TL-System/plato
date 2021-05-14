@@ -5,6 +5,7 @@ to work on than JSON).
 import argparse
 import logging
 import os
+import random
 import sqlite3
 from collections import OrderedDict, namedtuple
 
@@ -94,12 +95,11 @@ class Config:
 
             if 'results' in config:
                 Config.results = Config.namedtuple_from_dict(config['results'])
-                Config.result_dir = os.path.dirname(args.config) + '/results/'
+                Config.result_dir = os.path.dirname(__file__) + '/results/'
 
             # Used to limit the maximum number of concurrent trainers
             Config.sql_connection = sqlite3.connect(
-                os.path.dirname(Config.args.config) +
-                '/running_trainers.sqlitedb')
+                os.path.dirname(__file__) + '/running_trainers.sqlitedb')
 
             Config().cursor = Config.sql_connection.cursor()
 
@@ -152,7 +152,7 @@ class Config:
         import torch
 
         if torch.cuda.is_available() and torch.cuda.device_count() > 0:
-            device = 'cuda'
+            device = 'cuda:' + str(random.randint(0, torch.cuda.device_count() - 1))
         else:
             device = 'cpu'
 
