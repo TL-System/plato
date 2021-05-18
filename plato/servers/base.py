@@ -93,7 +93,7 @@ class Server:
                 logging.info(
                     "Starting client #%s as an edge server on port %s.",
                     client_id, port)
-                command = "python client.py -i {}".format(client_id)
+                command = "python ./plato/client.py -i {}".format(client_id)
                 command += " -c {}".format(Config().args.config)
                 command += " -p {}".format(port)
                 subprocess.Popen(command, shell=True)
