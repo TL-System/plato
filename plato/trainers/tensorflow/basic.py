@@ -25,7 +25,7 @@ class Trainer(base.Trainer):
         client_id: The ID of the client using this trainer (optional).
         model: The model to train.
         """
-        super().__init__()
+        super().__init__(client_id)
 
         if model is None:
             self.model = models_registry.get()
