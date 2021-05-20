@@ -44,7 +44,8 @@ def get(client_id=0, model=None):
         from plato.trainers import huggingface
         return huggingface.Trainer(model)
     elif trainer_name in registered_trainers:
-        registered_trainer = registered_trainers[trainer_name](model)
+        registered_trainer = registered_trainers[trainer_name](client_id,
+                                                               model)
     else:
         raise ValueError('No such trainer: {}'.format(trainer_name))
 
