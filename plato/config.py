@@ -104,7 +104,7 @@ class Config:
             Config().cursor = Config.sql_connection.cursor()
 
             # Customizable dictionary of global parameters
-            Config.params: Dict = {}
+            Config.params: dict = {}
 
             # A run ID is unique to each client in an experiment
             Config.params['run_id'] = os.getpid()
@@ -152,7 +152,9 @@ class Config:
         import torch
 
         if torch.cuda.is_available() and torch.cuda.device_count() > 0:
-            device = 'cuda:' + str(random.randint(0, torch.cuda.device_count() - 1))
+            device = 'cuda:' + str(
+                random.randint(0,
+                               torch.cuda.device_count() - 1))
         else:
             device = 'cpu'
 

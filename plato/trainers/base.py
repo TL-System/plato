@@ -17,20 +17,31 @@ class Trainer(ABC):
         self.device = Config().device()
         self.client_id = 0
 
-    def set_client_id(self, client_id):
-        """Setting the client ID and initialize the shared database table for controlling
-           maximum concurrency with respect to the number of training clients.
-        """
-        self.client_id = client_id
-
+    @staticmethod
+    def run_sql_statement(statement: str, params: tuple = None):
+        """ Run a particular command with a SQLite database connection. """
         while True:
             try:
                 with Config().sql_connection:
-                    Config().cursor.execute(
-                        "CREATE TABLE IF NOT EXISTS trainers (run_id int)")
+                    if params is None:
+                        Config().cursor.execute(statement)
+                    else:
+                        Config().cursor.execute(statement, params)
+
+                    return_value = Config().cursor.fetchone()
+                    if return_value is not None:
+                        return return_value[0]
                 break
             except sqlite3.OperationalError:
-                time.sleep(random.randint(10, 30))
+                time.sleep(random.random())
+
+    def set_client_id(self, client_id):
+        """ Setting the client ID and initialize the shared database table for controlling
+            the maximum concurrency with respect to the number of training clients.
+        """
+        self.client_id = client_id
+        Trainer.run_sql_statement(
+            "CREATE TABLE IF NOT EXISTS trainers (run_id int)")
 
     @staticmethod
     def save_accuracy(accuracy, filename=None):
@@ -68,44 +79,21 @@ class Trainer(ABC):
     def start_training(self):
         """Add to the list of running trainers if max_concurrency has not yet
         been reached."""
-        while True:
-            try:
-                with Config().sql_connection:
-                    Config().cursor.execute("SELECT COUNT(*) FROM trainers")
-                    trainer_count = Config().cursor.fetchone()[0]
-                break
-            except sqlite3.OperationalError:
-                time.sleep(random.randint(10, 30))
+        trainer_count = Trainer.run_sql_statement(
+            "SELECT COUNT(*) FROM trainers")
 
         while trainer_count >= Config().trainer.max_concurrency:
-            time.sleep(self.client_id)
-            try:
-                with Config().sql_connection:
-                    Config().cursor.execute("SELECT COUNT(*) FROM trainers")
-                    trainer_count = Config().cursor.fetchone()[0]
-            except sqlite3.OperationalError:
-                time.sleep(random.randint(10, 30))
+            time.sleep(random.random())
+            trainer_count = Trainer.run_sql_statement(
+                "SELECT COUNT(*) FROM trainers")
 
-        while True:
-            try:
-                with Config().sql_connection:
-                    Config().cursor.execute("INSERT INTO trainers VALUES (?)",
-                                            (self.client_id, ))
-                break
-            except sqlite3.OperationalError:
-                time.sleep(random.randint(10, 30))
+        Trainer.run_sql_statement("INSERT INTO trainers VALUES (?)",
+                                  (self.client_id, ))
 
     def pause_training(self):
         """Remove from the list of running trainers."""
-        while True:
-            try:
-                with Config().sql_connection:
-                    Config().cursor.execute(
-                        "DELETE FROM trainers WHERE run_id = (?)",
-                        (self.client_id, ))
-                break
-            except sqlite3.OperationalError:
-                time.sleep(random.randint(10, 30))
+        Trainer.run_sql_statement("DELETE FROM trainers WHERE run_id = (?)",
+                                  (self.client_id, ))
 
         model_name = Config().trainer.model_name
         model_dir = Config().params['model_dir']
@@ -121,14 +109,8 @@ class Trainer(ABC):
     def stop_training(self):
         """ Remove the trainers table after all training concluded."""
         if not Config().is_edge_server():
-            while True:
-                try:
-                    with Config().sql_connection:
-                        Config().cursor.execute("DROP TABLE trainers")
-                    Config().sql_connection.close()
-                    break
-                except sqlite3.OperationalError:
-                    time.sleep(random.randint(10, 30))
+            Trainer.run_sql_statement("DROP TABLE trainers")
+            Config().sql_connection.close()
 
     @abstractmethod
     def train(self, trainset, sampler, cut_layer=None):
