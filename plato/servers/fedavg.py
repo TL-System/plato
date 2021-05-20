@@ -22,7 +22,9 @@ class Server(base.Server):
     """Federated learning server using federated averaging."""
     def __init__(self, model=None, trainer=None):
         super().__init__()
-        wandb.init(project="plato", reinit=True)
+
+        if hasattr(Config().trainer, 'use_wandb'):
+            wandb.init(project="plato", reinit=True)
 
         self.model = model
         self.trainer = trainer
@@ -158,7 +160,8 @@ class Server(base.Server):
                 '[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(
                     os.getpid(), 100 * self.accuracy))
 
-        wandb.log({"accuracy": self.accuracy})
+        if hasattr(Config().trainer, 'use_wandb'):
+            wandb.log({"accuracy": self.accuracy})
 
         await self.wrap_up_processing_reports()
 

@@ -28,7 +28,7 @@ class Trainer(base.Trainer):
         client_id: The ID of the client using this trainer (optional).
         model: The model to train.
         """
-        super().__init__(client_id)
+        super().__init__()
 
         mindspore.context.set_context(mode=mindspore.context.PYNATIVE_MODE,
                                       device_target='GPU')

@@ -25,7 +25,7 @@ class Trainer(base.Trainer):
         client_id: The ID of the client using this trainer (optional).
         model: The model to train.
         """
-        super().__init__(client_id)
+        super().__init__()
 
         if model is None:
             self.model = models_registry.get()
@@ -88,9 +88,10 @@ class Trainer(base.Trainer):
         sampler: the sampler that extracts a partition for this client.
         cut_layer (optional): The layer which training should start from.
         """
-        run = wandb.init(project="plato",
-                         group=str(config['run_id']),
-                         reinit=True)
+        if hasattr(Config().trainer, 'use_wandb'):
+            run = wandb.init(project="plato",
+                             group=str(config['run_id']),
+                             reinit=True)
 
         custom_train = getattr(self, "train_model", None)
 
@@ -167,7 +168,8 @@ class Trainer(base.Trainer):
                                 .format(os.getpid(), epoch, epochs, batch_id,
                                         len(train_loader), loss.data.item()))
                         else:
-                            wandb.log({"batch loss": loss.data.item()})
+                            if hasattr(Config().trainer, 'use_wandb'):
+                                wandb.log({"batch loss": loss.data.item()})
 
                             logging.info(
                                 "[Client #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}"
@@ -183,7 +185,8 @@ class Trainer(base.Trainer):
         filename = f"{model_type}_{self.client_id}_{config['run_id']}.pth"
         self.save_model(filename)
 
-        run.finish()
+        if hasattr(Config().trainer, 'use_wandb'):
+            run.finish()
 
     def train(self, trainset, sampler, cut_layer=None):
         """The main training loop in a federated learning workload.

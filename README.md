@@ -130,7 +130,7 @@ To start a federated learning training workload, run [`run`](run) from the repos
 
 *Plato* uses the YAML format for its configuration files to manage the runtime configuration parameters. Example configuration files have been provided in the `configs` directory.
 
-*Plato* uses `wandb` to produce and collect logs in the cloud. If this is not needed, run the command `wandb offline` before running *Plato*.
+*Plato* can opt to use `wandb` to produce and collect logs in the cloud. If this is needed, add `use_wandb: true` to the `trainer` section of a configuration file.
 
 If there are issues in the code that prevented it from running to completion, there could be running processes from previous runs. Use the command `pkill python` to terminate them so that there will not be CUDA errors in the upcoming run.
 
