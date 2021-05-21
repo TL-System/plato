@@ -43,6 +43,16 @@ class Trainer(ABC):
         Trainer.run_sql_statement(
             "CREATE TABLE IF NOT EXISTS trainers (run_id int)")
 
+    @abstractmethod
+    def save_model(self, filename=None):
+        """Saving the model to a file. """
+        raise "save_model() not implemented."
+
+    @abstractmethod
+    def load_model(self, filename=None):
+        """Loading pre-trained model weights from a file. """
+        raise "load_model() not implemented."
+
     @staticmethod
     def save_accuracy(accuracy, filename=None):
         """Saving the test accuracy to a file."""
