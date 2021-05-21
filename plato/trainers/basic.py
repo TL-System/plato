@@ -6,7 +6,7 @@ import os
 
 import numpy as np
 import torch
-import torch.multiprocessing as mp
+from multiprocessing import Process
 import torch.nn as nn
 import wandb
 from plato.config import Config
@@ -85,20 +85,20 @@ class Trainer(base.Trainer):
 
         self.model.load_state_dict(torch.load(model_path))
 
-    @staticmethod
-    def train_process(rank, self, config, trainset, sampler, cut_layer=None):  # pylint: disable=unused-argument
+    def train_process(self, config, trainset, sampler, cut_layer=None):  # pylint: disable=unused-argument
         """The main training loop in a federated learning workload, run in
           a separate process with a new CUDA context, so that CUDA memory
           can be released after the training completes.
 
         Arguments:
         rank: Required by torch.multiprocessing to spawn processes. Unused.
+        self: the trainer itself.
         config: a dictionary of configuration parameters.
         trainset: The training dataset.
         sampler: the sampler that extracts a partition for this client.
         cut_layer (optional): The layer which training should start from.
         """
-        if hasattr(Config().trainer, 'use_wandb'):
+        if 'use_wandb' in config:
             run = wandb.init(project="plato",
                              group=str(config['run_id']),
                              reinit=True)
@@ -145,7 +145,7 @@ class Trainer(base.Trainer):
             optimizer = get_optimizer(self.model)
 
             # Initializing the learning rate schedule, if necessary
-            if hasattr(Config().trainer, 'lr_schedule'):
+            if hasattr(config, 'lr_schedule'):
                 lr_schedule = optimizers.get_lr_schedule(
                     optimizer, iterations_per_epoch, train_loader)
             else:
@@ -178,7 +178,7 @@ class Trainer(base.Trainer):
                                 .format(os.getpid(), epoch, epochs, batch_id,
                                         len(train_loader), loss.data.item()))
                         else:
-                            if hasattr(Config().trainer, 'use_wandb'):
+                            if hasattr(config, 'use_wandb'):
                                 wandb.log({"batch loss": loss.data.item()})
 
                             logging.info(
@@ -191,11 +191,11 @@ class Trainer(base.Trainer):
 
         self.model.cpu()
 
-        model_type = Config().trainer.model_name
+        model_type = config['model_name']
         filename = f"{model_type}_{self.client_id}_{config['run_id']}.pth"
         self.save_model(filename)
 
-        if hasattr(Config().trainer, 'use_wandb'):
+        if 'use_wandb' in config:
             run.finish()
 
     def train(self, trainset, sampler, cut_layer=None):
@@ -211,23 +211,23 @@ class Trainer(base.Trainer):
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']
 
-        mp.spawn(Trainer.train_process,
-                 args=(
-                     self,
-                     config,
-                     trainset,
-                     sampler,
-                     cut_layer,
-                 ),
-                 join=True)
+        proc = Process(target=Trainer.train_process,
+                       args=(
+                           self,
+                           config,
+                           trainset,
+                           sampler,
+                           cut_layer,
+                       ))
+        proc.start()
+        proc.join()
 
         model_name = Config().trainer.model_name
         filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.pth"
         self.load_model(filename)
         self.pause_training()
 
-    @staticmethod
-    def test_process(rank, self, config, testset):  # pylint: disable=unused-argument
+    def test_process(self, config, testset):  # pylint: disable=unused-argument
         """The testing loop, run in a separate process with a new CUDA context,
         so that CUDA memory can be released after the training completes.
 
@@ -265,7 +265,7 @@ class Trainer(base.Trainer):
 
         self.model.cpu()
 
-        model_name = Config().trainer.model_name
+        model_name = config['model_name']
         filename = f"{model_name}_{self.client_id}_{config['run_id']}.acc"
         Trainer.save_accuracy(accuracy, filename)
 
@@ -279,13 +279,14 @@ class Trainer(base.Trainer):
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']
 
-        mp.spawn(Trainer.test_process,
-                 args=(
-                     self,
-                     config,
-                     testset,
-                 ),
-                 join=True)
+        proc = Process(target=Trainer.test_process,
+                       args=(
+                           self,
+                           config,
+                           testset,
+                       ))
+        proc.start()
+        proc.join()
 
         model_name = Config().trainer.model_name
         filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
