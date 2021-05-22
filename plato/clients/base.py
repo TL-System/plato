@@ -2,10 +2,14 @@
 The base class for all federated learning clients on edge devices or edge servers.
 """
 
+import asyncio
 import logging
+import random
 import os
 import pickle
 import sys
+from multiprocessing import Process
+
 from abc import abstractmethod
 from dataclasses import dataclass
 from typing import List
@@ -22,13 +26,36 @@ class Report:
 
 
 class Client:
-    """A basic federated learning client."""
+    """ A basic federated learning client. """
     def __init__(self) -> None:
         self.client_id = Config().args.id
         self.data_loaded = False  # is training data already loaded from the disk?
 
+    @staticmethod
+    async def heartbeat(uri, client_id):
+        """ Sending client heartbeats. """
+        try:
+            async with websockets.connect(uri,
+                                            ping_interval=None,
+                                            max_size=2**30) as websocket:
+                while True:            
+                    logging.info(
+                        "[Client #%s] Sending a heartbeat to the server.",
+                        client_id)
+                    await websocket.send(pickle.dumps({'id': client_id}))
+                    await asyncio.sleep(20 * random.random())
+        except OSError as exception:
+            logging.info("[Client #%s] Connection to the server failed while sending heartbeats.",
+                         client_id)
+            logging.error(exception)
+
+    @staticmethod
+    def heartbeat_process(uri, client_id):
+        """ Starting an asyncio loop for sending client heartbeats. """
+        asyncio.run(Client.heartbeat(uri, client_id))
+
     async def start_client(self) -> None:
-        """Startup function for a client."""
+        """ Startup function for a client. """
 
         if hasattr(Config().algorithm,
                    'cross_silo') and not Config().is_edge_server():
@@ -55,6 +82,7 @@ class Client:
                                           max_size=2**30) as websocket:
                 logging.info("[Client #%s] Signing in at the server.",
                              self.client_id)
+
                 await websocket.send(pickle.dumps({'id': self.client_id}))
 
                 while True:
@@ -76,7 +104,15 @@ class Client:
                                 self.client_id, data, websocket)
                             self.load_payload(server_payload)
 
+                        heartbeat_proc = Process(
+                            target=Client.heartbeat_process,
+                            args=(
+                                uri,
+                                self.client_id,
+                            ))
+                        heartbeat_proc.start()
                         report, payload = await self.train()
+                        heartbeat_proc.terminate()
 
                         if Config().is_edge_server():
                             logging.info(

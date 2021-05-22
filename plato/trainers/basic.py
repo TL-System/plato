@@ -4,9 +4,9 @@ The training and testing loops for PyTorch.
 import logging
 import os
 
+from multiprocessing import Process
 import numpy as np
 import torch
-from multiprocessing import Process
 import torch.nn as nn
 import wandb
 from plato.config import Config
@@ -85,13 +85,13 @@ class Trainer(base.Trainer):
 
         self.model.load_state_dict(torch.load(model_path))
 
-    def train_process(self, config, trainset, sampler, cut_layer=None):  # pylint: disable=unused-argument
+    # pylint: disable=not-callable
+    def train_process(self, config, trainset, sampler, cut_layer=None):
         """The main training loop in a federated learning workload, run in
           a separate process with a new CUDA context, so that CUDA memory
           can be released after the training completes.
 
         Arguments:
-        rank: Required by torch.multiprocessing to spawn processes. Unused.
         self: the trainer itself.
         config: a dictionary of configuration parameters.
         trainset: The training dataset.
@@ -103,91 +103,99 @@ class Trainer(base.Trainer):
                              group=str(config['run_id']),
                              reinit=True)
 
-        custom_train = getattr(self, "train_model", None)
+        try:
+            custom_train = getattr(self, "train_model", None)
 
-        if callable(custom_train):
-            self.train_model(config, trainset, sampler.get(), cut_layer)
-        else:
-            log_interval = 10
-            batch_size = config['batch_size']
-
-            logging.info("[Client #%s] Loading the dataset.", self.client_id)
-            _train_loader = getattr(self, "train_loader", None)
-
-            if callable(_train_loader):
-                train_loader = _train_loader(batch_size, trainset,
-                                             sampler.get(), cut_layer)
+            if callable(custom_train):
+                self.train_model(config, trainset, sampler.get(), cut_layer)
             else:
-                train_loader = torch.utils.data.DataLoader(
-                    dataset=trainset,
-                    shuffle=False,
-                    batch_size=batch_size,
-                    sampler=sampler.get())
+                log_interval = 10
+                batch_size = config['batch_size']
 
-            iterations_per_epoch = np.ceil(len(trainset) /
-                                           batch_size).astype(int)
-            epochs = config['epochs']
+                logging.info("[Client #%s] Loading the dataset.", self.client_id)
+                _train_loader = getattr(self, "train_loader", None)
 
-            # Sending the model to the device used for training
-            self.model.to(self.device)
-            self.model.train()
+                if callable(_train_loader):
+                    train_loader = _train_loader(batch_size, trainset,
+                                                sampler.get(), cut_layer)
+                else:
+                    train_loader = torch.utils.data.DataLoader(
+                        dataset=trainset,
+                        shuffle=False,
+                        batch_size=batch_size,
+                        sampler=sampler.get())
 
-            # Initializing the loss criterion
-            _loss_criterion = getattr(self, "loss_criterion", None)
-            if callable(_loss_criterion):
-                loss_criterion = _loss_criterion(self.model)
-            else:
-                loss_criterion = nn.CrossEntropyLoss()
+                iterations_per_epoch = np.ceil(len(trainset) /
+                                            batch_size).astype(int)
+                epochs = config['epochs']
 
-            # Initializing the optimizer
-            get_optimizer = getattr(self, "get_optimizer",
-                                    optimizers.get_optimizer)
-            optimizer = get_optimizer(self.model)
+                # Sending the model to the device used for training
+                self.model.to(self.device)
+                self.model.train()
 
-            # Initializing the learning rate schedule, if necessary
-            if hasattr(config, 'lr_schedule'):
-                lr_schedule = optimizers.get_lr_schedule(
-                    optimizer, iterations_per_epoch, train_loader)
-            else:
-                lr_schedule = None
+                # Initializing the loss criterion
+                _loss_criterion = getattr(self, "loss_criterion", None)
+                if callable(_loss_criterion):
+                    loss_criterion = _loss_criterion(self.model)
+                else:
+                    loss_criterion = nn.CrossEntropyLoss()
 
-            for epoch in range(1, epochs + 1):
-                for batch_id, (examples, labels) in enumerate(train_loader):
-                    examples, labels = examples.to(self.device), labels.to(
-                        self.device)
-                    optimizer.zero_grad()
+                # Initializing the optimizer
+                get_optimizer = getattr(self, "get_optimizer",
+                                        optimizers.get_optimizer)
+                optimizer = get_optimizer(self.model)
 
-                    if cut_layer is None:
-                        outputs = self.model(examples)
-                    else:
-                        outputs = self.model.forward_from(examples, cut_layer)
+                # Initializing the learning rate schedule, if necessary
+                if hasattr(config, 'lr_schedule'):
+                    lr_schedule = optimizers.get_lr_schedule(
+                        optimizer, iterations_per_epoch, train_loader)
+                else:
+                    lr_schedule = None
 
-                    loss = loss_criterion(outputs, labels)
+                for epoch in range(1, epochs + 1):
+                    for batch_id, (examples, labels) in enumerate(train_loader):
+                        examples, labels = examples.to(self.device), labels.to(
+                            self.device)
+                        optimizer.zero_grad()
 
-                    loss.backward()
-
-                    optimizer.step()
-
-                    if lr_schedule is not None:
-                        lr_schedule.step()
-
-                    if batch_id % log_interval == 0:
-                        if self.client_id == 0:
-                            logging.info(
-                                "[Server #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}"
-                                .format(os.getpid(), epoch, epochs, batch_id,
-                                        len(train_loader), loss.data.item()))
+                        if cut_layer is None:
+                            outputs = self.model(examples)
                         else:
-                            if hasattr(config, 'use_wandb'):
-                                wandb.log({"batch loss": loss.data.item()})
+                            outputs = self.model.forward_from(examples, cut_layer)
 
-                            logging.info(
-                                "[Client #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}"
-                                .format(self.client_id, epoch, epochs,
-                                        batch_id, len(train_loader),
-                                        loss.data.item()))
-                if hasattr(optimizer, "params_state_update"):
-                    optimizer.params_state_update()
+                        loss = loss_criterion(outputs, labels)
+
+                        loss.backward()
+
+                        optimizer.step()
+
+                        if lr_schedule is not None:
+                            lr_schedule.step()
+
+                        if batch_id % log_interval == 0:
+                            if self.client_id == 0:
+                                logging.info(
+                                    "[Server #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}"
+                                    .format(os.getpid(), epoch, epochs, batch_id,
+                                            len(train_loader), loss.data.item()))
+                            else:
+                                if hasattr(config, 'use_wandb'):
+                                    wandb.log({"batch loss": loss.data.item()})
+
+                                logging.info(
+                                    "[Client #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}"
+                                    .format(self.client_id, epoch, epochs,
+                                            batch_id, len(train_loader),
+                                            loss.data.item()))
+
+                    if hasattr(optimizer, "params_state_update"):
+                        optimizer.params_state_update()
+
+        except RuntimeError as training_exception:
+            logging.info("Client #%s has failed.", self.client_id)
+            self.run_sql_statement("DELETE FROM trainers WHERE run_id = (?)",
+                                      (self.client_id, ))
+            raise training_exception
 
         self.model.cpu()
 
@@ -211,16 +219,16 @@ class Trainer(base.Trainer):
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']
 
-        proc = Process(target=Trainer.train_process,
-                       args=(
-                           self,
-                           config,
-                           trainset,
-                           sampler,
-                           cut_layer,
-                       ))
-        proc.start()
-        proc.join()
+        train_proc = Process(target=Trainer.train_process,
+                             args=(
+                                 self,
+                                 config,
+                                 trainset,
+                                 sampler,
+                                 cut_layer,
+                             ))
+        train_proc.start()
+        train_proc.join()
 
         model_name = Config().trainer.model_name
         filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.pth"
