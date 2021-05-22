@@ -1,9 +1,3 @@
-## Running Plato on the GPU Cloud from Lambda Labs
-
-At $1.50 an hour for a 4-GPU server with 8 VCPUs, the [GPU Cloud from Labmda Labs](https://lambdalabs.com/service/gpu-cloud) is among one of the least expensive GPU virtual machines available for lease.
-
-(*to be completed*)
-
 ## Running Plato on Google Colaboratory
 
 ### Option 1
