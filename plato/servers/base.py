@@ -23,12 +23,39 @@ class Server:
         self.client = None
         self.clients = {}
         self.total_clients = 0
+        self.clients_per_round = 0
         self.selected_clients = None
         self.current_round = 0
         self.algorithm = None
         self.trainer = None
         self.accuracy = 0
         self.reports = []
+
+    async def check_clients(self):
+        """Periodically checks whether any of the clients timed out and should be removed. """
+        while True:
+            await asyncio.sleep(5)  # one-second interval between checks
+
+            for key, value in dict(self.clients).items():
+                # A client should be sending heartbeats every 5 seconds, remove it if it times out
+                client_timeout = Config().server.client_timeout if hasattr(
+                    Config().server, 'client_timeout') else 60
+
+                if time.time() - value[1] > client_timeout:
+                    del self.clients[key]
+                    if key in self.selected_clients:
+                        self.selected_clients.remove(key)
+
+                    logging.info("[Server #%d] Client #%d failed and removed from the server.", os.getpid(), key)
+
+                    if len(self.reports) > 0 and len(self.reports) >= len(
+                            self.selected_clients):
+                        logging.info(
+                            "[Server #%d] All %d client reports received. Processing.",
+                            os.getpid(), len(self.reports))
+                        await self.process_reports()
+                        await self.wrap_up()
+                        await self.select_clients()
 
     def run(self, client=None):
         """Start a run loop for the server. """
@@ -49,6 +76,8 @@ class Server:
                                         ping_interval=None,
                                         max_size=2**30)
 
+        asyncio.ensure_future(self.check_clients())
+
         loop = asyncio.get_event_loop()
         loop.run_until_complete(start_server)
 
@@ -66,12 +95,17 @@ class Server:
     def register_client(self, client_id, websocket):
         """Adding a newly arrived client to the list of clients."""
         if not client_id in self.clients:
-            self.clients[client_id] = websocket
+            # The websocket and last contact time is stored for each client
+            self.clients[client_id] = [websocket, time.time()]
+        else:
+            self.clients[client_id][1] = time.time()
+            logging.info("[Server #%d] Heartbeat from Client #%d received.",
+                         os.getpid(), client_id)
 
     def unregister_client(self, websocket):
         """Removing an existing client from the list of clients."""
         for key, value in dict(self.clients).items():
-            if value == websocket:
+            if value[0] == websocket:
                 del self.clients[key]
 
     def start_clients(self, client=None, as_server=False):
@@ -106,7 +140,7 @@ class Server:
     async def close_connections(self):
         """Closing all WebSocket connections after training completes."""
         for _, client_socket in dict(self.clients).items():
-            await client_socket.close()
+            await client_socket[0].close()
 
     async def select_clients(self):
         """Select a subset of the clients and send messages to them to start training."""
@@ -117,11 +151,11 @@ class Server:
                      self.current_round,
                      Config().trainer.rounds)
 
-        self.choose_clients()
+        self.selected_clients = self.choose_clients()
 
         if len(self.selected_clients) > 0:
             for client_id in self.selected_clients:
-                socket = self.clients[client_id]
+                socket = self.clients[client_id][0]
                 logging.info("[Server #%d] Selecting client #%s for training.",
                              os.getpid(), client_id)
                 server_response = {'id': client_id, 'payload': True}
@@ -171,10 +205,11 @@ class Server:
                     payload = await self.recv(client_id, report, websocket)
                     self.reports.append((report, payload))
 
-                    if len(self.reports) == len(self.selected_clients):
+                    if len(self.reports) > 0 and len(self.reports) >= len(
+                            self.selected_clients):
                         logging.info(
-                            "[Server #%d] All client reports received. Processing.",
-                            os.getpid())
+                            "[Server #%d] All %d client reports received. Processing.",
+                            os.getpid(), len(self.reports))
                         await self.process_reports()
                         await self.wrap_up()
                         await self.select_clients()
@@ -183,7 +218,7 @@ class Server:
                     self.register_client(client_id, websocket)
 
                     if self.current_round == 0 and len(
-                            self.clients) >= self.total_clients:
+                            self.clients) >= self.clients_per_round:
                         logging.info("[Server #%d] Starting training.",
                                      os.getpid())
                         await self.select_clients()
@@ -252,7 +287,7 @@ class Server:
         """Configuring the server with initialization work."""
 
     @abstractmethod
-    def choose_clients(self):
+    def choose_clients(self) -> list:
         """Choose a subset of the clients to participate in each round."""
 
     @abstractstaticmethod

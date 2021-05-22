@@ -30,7 +30,6 @@ class Server(base.Server):
         self.trainer = trainer
 
         self.testset = None
-        self.selected_clients = None
         self.total_samples = 0
 
         self.total_clients = Config().clients.total_clients
@@ -92,10 +91,7 @@ class Server(base.Server):
         """Choose a subset of the clients to participate in each round."""
         # Select clients randomly
         assert self.clients_per_round <= len(self.clients)
-        self.selected_clients = random.sample(list(self.clients),
-                                              self.clients_per_round)
-        # starting time of a gloabl training round
-        self.round_start_time = time.time()
+        return random.sample(list(self.clients), self.clients_per_round)
 
     def extract_client_updates(self, reports):
         """Extract the model weight updates from a client's report."""
