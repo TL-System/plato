@@ -16,7 +16,6 @@ import websockets
 from plato.client import run
 from plato.config import Config
 
-
 class Server:
     """The base class for federated learning servers."""
     def __init__(self):
@@ -70,12 +69,13 @@ class Server:
         logging.info("Starting a server at address %s and port %s.",
                      Config().server.address,
                      Config().server.port)
+
         start_server = websockets.serve(self.serve,
                                         Config().server.address,
                                         Config().server.port,
                                         ping_interval=None,
-                                        max_size=2**30)
-
+                                        max_size=2**31)
+ 
         asyncio.ensure_future(self.check_clients())
 
         loop = asyncio.get_event_loop()
@@ -101,12 +101,6 @@ class Server:
             self.clients[client_id][1] = time.time()
             logging.info("[Server #%d] Heartbeat from Client #%d received.",
                          os.getpid(), client_id)
-
-    def unregister_client(self, websocket):
-        """Removing an existing client from the list of clients."""
-        for key, value in dict(self.clients).items():
-            if value[0] == websocket:
-                del self.clients[key]
 
     def start_clients(self, client=None, as_server=False):
         """Starting all the clients as separate processes."""
@@ -139,7 +133,8 @@ class Server:
 
     async def close_connections(self):
         """Closing all WebSocket connections after training completes."""
-        for _, client_socket in dict(self.clients).items():
+        for client_id, client_socket in dict(self.clients).items():
+            logging.info("closing connection for client #%s.", client_id)
             await client_socket[0].close()
 
     async def select_clients(self):
@@ -214,7 +209,7 @@ class Server:
                         await self.wrap_up()
                         await self.select_clients()
                 else:
-                    # a new client arrives
+                    # a new client or client heartbeat arrives
                     self.register_client(client_id, websocket)
 
                     if self.current_round == 0 and len(
