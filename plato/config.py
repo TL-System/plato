@@ -152,9 +152,13 @@ class Config:
         import torch
 
         if torch.cuda.is_available() and torch.cuda.device_count() > 0:
-            device = 'cuda:' + str(
-                random.randint(0,
-                               torch.cuda.device_count() - 1))
+            if hasattr(Config().trainer,
+                       'parallelized') and Config().trainer.parallelized:
+                device = 'cuda'
+            else:
+                device = 'cuda:' + str(
+                    random.randint(0,
+                                   torch.cuda.device_count() - 1))
         else:
             device = 'cpu'
 
