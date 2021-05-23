@@ -46,7 +46,11 @@ class Client:
                     await websocket.send(pickle.dumps({'id': client_id}))
 
                 await websocket.close()
-                await asyncio.sleep(2 * random.random())
+
+                heartbeat_max_interval = Config().clients.heartbeat_max_interval if hasattr(
+                    Config().server, 'heartbeat_max_interval') else 60
+                await asyncio.sleep(heartbeat_max_interval * random.random())
+
         except OSError as exception:
             logging.info("[Client #%s] Connection to the server failed while sending heartbeats.",
                          client_id)
