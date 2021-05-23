@@ -55,7 +55,7 @@ class Server(base.Server):
         creating the clients.
         """
 
-        logging.info("[Server #%s] Configuring the %s server...", os.getpid(),
+        logging.info("[Server #%d] Configuring the %s server...", os.getpid(),
                      Config().algorithm.type)
 
         total_rounds = Config().trainer.rounds

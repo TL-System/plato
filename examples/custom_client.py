@@ -109,7 +109,7 @@ def main():
         loop.run_until_complete(client.start_client())
 
     except websockets.ConnectionClosed:
-        logging.info("Client #%s: connection to the server is closed.",
+        logging.info("Client #%d: connection to the server is closed.",
                      client.client_id)
 
 

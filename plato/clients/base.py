@@ -31,6 +31,18 @@ class Client:
         self.client_id = Config().args.id
         self.data_loaded = False  # is training data already loaded from the disk?
 
+        if hasattr(Config().algorithm,
+                   'cross_silo') and not Config().is_edge_server():
+            # Contact one of the edge servers
+            self.edge_server_id = int(Config().clients.total_clients) + (
+                self.client_id - 1) % int(Config().algorithm.total_silos) + 1
+
+            assert hasattr(Config().algorithm, 'total_silos')
+
+            self.server_port = Config().server.port + self.edge_server_id
+        else:
+            self.server_port = Config().server.port
+
     @staticmethod
     async def heartbeat(client_id):
         """ Sending client heartbeats. """
@@ -41,19 +53,21 @@ class Client:
             while True:
                 async with websockets.connect(uri) as websocket:
                     logging.info(
-                        "[Client #%s] Sending a heartbeat to the server.",
+                        "[Client #%d] Sending a heartbeat to the server.",
                         client_id)
                     await websocket.send(pickle.dumps({'id': client_id}))
 
                 await websocket.close()
 
-                heartbeat_max_interval = Config().clients.heartbeat_max_interval if hasattr(
+                heartbeat_max_interval = Config(
+                ).clients.heartbeat_max_interval if hasattr(
                     Config().server, 'heartbeat_max_interval') else 60
                 await asyncio.sleep(heartbeat_max_interval * random.random())
 
         except OSError as exception:
-            logging.info("[Client #%s] Connection to the server failed while sending heartbeats.",
-                         client_id)
+            logging.info(
+                "[Client #%d] Connection to the server failed while sending heartbeats.",
+                client_id)
             logging.error(exception)
 
     @staticmethod
@@ -67,40 +81,31 @@ class Client:
         if hasattr(Config().algorithm,
                    'cross_silo') and not Config().is_edge_server():
             # Contact one of the edge servers
-            edge_server_id = int(Config().clients.total_clients) + (int(
-                self.client_id) - 1) % int(Config().algorithm.total_silos) + 1
-            logging.info("[Client #%s] Contacting Edge server #%s.",
-                         self.client_id, edge_server_id)
-
-            assert hasattr(Config().algorithm, 'total_silos')
-
-            uri = 'ws://{}:{}'.format(
-                Config().server.address,
-                int(Config().server.port) + edge_server_id)
+            logging.info("[Client #%d] Contacting Edge server #%d.",
+                         self.client_id, self.edge_server_id)
         else:
-            logging.info("[Client #%s] Contacting the central server.",
+            logging.info("[Client #%d] Contacting the central server.",
                          self.client_id)
-            uri = 'ws://{}:{}'.format(Config().server.address,
-                                      Config().server.port)
+        uri = 'ws://{}:{}'.format(Config().server.address, self.server_port)
 
         try:
             async with websockets.connect(uri,
                                           ping_interval=None,
                                           max_size=2**30) as websocket:
-                logging.info("[Client #%s] Signing in at the server.",
+                logging.info("[Client #%d] Signing in at the server.",
                              self.client_id)
 
                 await websocket.send(pickle.dumps({'id': self.client_id}))
 
                 while True:
-                    logging.info("[Client #%s] Waiting to be selected.",
+                    logging.info("[Client #%d] Waiting to be selected.",
                                  self.client_id)
                     server_response = await websocket.recv()
                     data = pickle.loads(server_response)
 
                     if data['id'] == self.client_id:
                         self.process_server_response(data)
-                        logging.info("[Client #%s] Selected by the server.",
+                        logging.info("[Client #%d] Selected by the server.",
                                      self.client_id)
 
                         if not self.data_loaded:
@@ -113,19 +118,17 @@ class Client:
 
                         heartbeat_proc = Process(
                             target=Client.heartbeat_process,
-                            args=(
-                                self.client_id,
-                            ))
+                            args=(self.client_id, ))
                         heartbeat_proc.start()
                         report, payload = await self.train()
                         heartbeat_proc.terminate()
 
                         if Config().is_edge_server():
                             logging.info(
-                                "[Server #%d] Model aggregated on edge server (client #%s).",
+                                "[Server #%d] Model aggregated on edge server (client #%d).",
                                 os.getpid(), self.client_id)
                         else:
-                            logging.info("[Client #%s] Model trained.",
+                            logging.info("[Client #%d] Model trained.",
                                          self.client_id)
 
                         # Sending the client report as metadata to the server (payload to follow)
@@ -140,14 +143,14 @@ class Client:
                         await self.send(websocket, payload)
 
         except OSError as exception:
-            logging.info("[Client #%s] Connection to the server failed.",
+            logging.info("[Client #%d] Connection to the server failed.",
                          self.client_id)
             logging.error(exception)
 
     async def recv(self, client_id, data, websocket) -> List:
         """Receiving the payload from the server using WebSockets."""
 
-        logging.info("[Client #%s] Receiving payload data from the server.",
+        logging.info("[Client #%d] Receiving payload data from the server.",
                      client_id)
 
         if 'payload_length' in data:
@@ -165,7 +168,7 @@ class Client:
             payload_size = sys.getsizeof(_data)
 
         logging.info(
-            "[Client #%s] Received %s MB of payload data from the server.",
+            "[Client #%d] Received %s MB of payload data from the server.",
             client_id, round(payload_size / 1024**2, 2))
 
         return server_payload
@@ -184,7 +187,7 @@ class Client:
             await websocket.send(_data)
             data_size = sys.getsizeof(_data)
 
-        logging.info("[Client #%s] Sent %s MB of payload data to the server.",
+        logging.info("[Client #%d] Sent %s MB of payload data to the server.",
                      self.client_id, round(data_size / 1024**2, 2))
 
     def process_server_response(self, server_response):

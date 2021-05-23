@@ -79,7 +79,7 @@ class Algorithm(fedavg.Algorithm):
                 feature_dataset.append((logits[i], targets[i]))
 
         toc = time.perf_counter()
-        logging.info("[Client #%s] Features extracted from %s examples.",
+        logging.info("[Client #%d] Features extracted from %s examples.",
                      self.client_id, len(feature_dataset))
         logging.info("[Client #{}] Time used: {:.2f} seconds.".format(
             self.client_id, toc - tic))
@@ -134,7 +134,7 @@ class Algorithm(fedavg.Algorithm):
             optimizer.step()
 
         toc = time.perf_counter()
-        # logging.info("[Client #%s] Features extracted from %s examples.",
+        # logging.info("[Client #%d] Features extracted from %s examples.",
         #              self.client_id, len(feature_dataset))
         # logging.info("[Client #{}] Time used: {:.2f} seconds.".format(
         #     self.client_id, toc - tic))

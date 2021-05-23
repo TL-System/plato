@@ -37,7 +37,7 @@ class Client(simple.Client):
             local_epochs = random.randint(2,
                                           Config().algorithm.max_local_epochs)
 
-        logging.info("[Client #%s] Training with %d epoches.", self.client_id,
+        logging.info("[Client #%d] Training with %d epoches.", self.client_id,
                      local_epochs)
 
         # Perform model training for a specific number of epoches

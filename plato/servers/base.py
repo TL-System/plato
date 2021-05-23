@@ -16,6 +16,7 @@ import websockets
 from plato.client import run
 from plato.config import Config
 
+
 class Server:
     """The base class for federated learning servers."""
     def __init__(self):
@@ -40,11 +41,14 @@ class Server:
                 client_timeout = Config().server.client_timeout if hasattr(
                     Config().server, 'client_timeout') else 120
 
-                if key in self.selected_clients and time.time() - value[1] > client_timeout:
+                if key in self.selected_clients and time.time(
+                ) - value[1] > client_timeout:
                     del self.clients[key]
                     self.selected_clients.remove(key)
 
-                    logging.info("[Server #%d] Client #%d failed and removed from the server.", os.getpid(), key)
+                    logging.info(
+                        "[Server #%d] Client #%d failed and removed from the server.",
+                        os.getpid(), key)
 
                     if len(self.reports) > 0 and len(self.reports) >= len(
                             self.selected_clients):
@@ -74,7 +78,7 @@ class Server:
                                         Config().server.port,
                                         ping_interval=None,
                                         max_size=2**31)
- 
+
         asyncio.ensure_future(self.check_clients())
 
         loop = asyncio.get_event_loop()
@@ -118,14 +122,14 @@ class Server:
             if as_server:
                 port = int(Config().server.port) + client_id
                 logging.info(
-                    "Starting client #%s as an edge server on port %s.",
+                    "Starting client #%d as an edge server on port %s.",
                     client_id, port)
                 command = "python ./plato/client.py -i {}".format(client_id)
                 command += " -c {}".format(Config().args.config)
                 command += " -p {}".format(port)
                 subprocess.Popen(command, shell=True)
             else:
-                logging.info("Starting client #%s's process.", client_id)
+                logging.info("Starting client #%d's process.", client_id)
                 proc = mp.Process(target=run, args=(client_id, None, client))
 
                 proc.start()
@@ -152,7 +156,7 @@ class Server:
                 socket = self.clients[client_id][0]
                 self.register_client(client_id, socket)
 
-                logging.info("[Server #%d] Selecting client #%s for training.",
+                logging.info("[Server #%d] Selecting client #%d for training.",
                              os.getpid(), client_id)
                 server_response = {'id': client_id, 'payload': True}
 
@@ -169,7 +173,7 @@ class Server:
 
     async def send(self, socket, payload, client_id):
         """Sending the client payload to the server using WebSockets."""
-        logging.info("[Server #%d] Sending the current model to client #%s.",
+        logging.info("[Server #%d] Sending the current model to client #%d.",
                      os.getpid(), client_id)
         if isinstance(payload, list):
             data_size = 0
@@ -183,7 +187,7 @@ class Server:
             await socket.send(_data)
             data_size = sys.getsizeof(_data)
 
-        logging.info("[Server #%d] Sent %s MB of payload data to client #%s.",
+        logging.info("[Server #%d] Sent %s MB of payload data to client #%d.",
                      os.getpid(), round(data_size / 1024**2, 2), client_id)
 
     async def serve(self, websocket, path):  # pylint: disable=unused-argument
@@ -192,7 +196,7 @@ class Server:
             async for message in websocket:
                 data = pickle.loads(message)
                 client_id = data['id']
-                logging.info("[Server #%d] Data received from client #%s.",
+                logging.info("[Server #%d] Data received from client #%d.",
                              os.getpid(), client_id)
 
                 if 'payload' in data:
@@ -227,7 +231,7 @@ class Server:
 
     async def recv(self, client_id, client_report, websocket):
         """Receiving the payload from a client using WebSockets."""
-        logging.info("[Server #%d] Receiving payload data from client #%s.",
+        logging.info("[Server #%d] Receiving payload data from client #%d.",
                      os.getpid(), client_id)
 
         if hasattr(client_report, 'payload_length'):
@@ -244,7 +248,7 @@ class Server:
             payload_size = sys.getsizeof(_data)
 
         logging.info(
-            "[Server #%d] Received %s MB of payload data from client #%s.",
+            "[Server #%d] Received %s MB of payload data from client #%d.",
             os.getpid(), round(payload_size / 1024**2, 2), client_id)
 
         return client_payload

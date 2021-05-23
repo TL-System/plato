@@ -69,7 +69,7 @@ class Server(fedavg.Server):
         payload = self.load_gradients_from_disk()
         if len(payload) > 0:
             client_id = str(self.selected_client_id)
-            logging.info("[Server #%d] Reporting gradients to client #%s.",
+            logging.info("[Server #%d] Reporting gradients to client #%d.",
                          os.getpid(), client_id)
             server_response = {
                 'id': client_id,
@@ -114,7 +114,7 @@ class Server(fedavg.Server):
         else:
             model_path = f'{model_dir}{model_name}_gradients.pth'
 
-        logging.info("[Server #%s] Loading gradients from %s.", os.getpid(),
+        logging.info("[Server #%d] Loading gradients from %s.", os.getpid(),
                      model_path)
 
         return torch.load(model_path)

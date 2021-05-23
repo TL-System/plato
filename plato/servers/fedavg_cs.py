@@ -38,7 +38,7 @@ class Server(fedavg.Server):
             self.clients_per_round = int(self.clients_per_round /
                                          Config().algorithm.total_silos)
             logging.info(
-                "[Edge server #%s] Started training with %s clients and %s per round.",
+                "[Edge server #%d] Started training with %d clients and %d per round.",
                 Config().args.id, self.total_clients, self.clients_per_round)
 
             if hasattr(Config(), 'results'):
@@ -59,7 +59,7 @@ class Server(fedavg.Server):
         creating the clients.
         """
         if Config().is_edge_server():
-            logging.info("Configuring edge server #%s as a %s server.",
+            logging.info("Configuring edge server #%d as a %s server.",
                          Config().args.id,
                          Config().algorithm.type)
             logging.info("Training with %s local aggregation rounds.",

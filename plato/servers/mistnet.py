@@ -27,7 +27,7 @@ class Server(fedavg.Server):
         """Setting up a pre-trained model to be loaded on the server."""
         super().load_trainer()
 
-        logging.info("[Server #%s] Loading a pre-trained model.", os.getpid())
+        logging.info("[Server #%d] Loading a pre-trained model.", os.getpid())
         self.trainer.load_model()
 
     async def process_reports(self):

@@ -28,7 +28,7 @@ class Trainer(basic.Trainer):
         log_interval = 10
         batch_size = config['batch_size']
 
-        logging.info("[Client #%s] Loading the dataset.", self.client_id)
+        logging.info("[Client #%d] Loading the dataset.", self.client_id)
         _train_loader = getattr(self, "train_loader", None)
 
         if callable(_train_loader):
@@ -125,5 +125,5 @@ class Trainer(basic.Trainer):
 
         torch.save(self.cut_layer_grad, model_path)
 
-        logging.info("[Server #%s] Gradients saved to %s.", os.getpid(),
+        logging.info("[Server #%d] Gradients saved to %s.", os.getpid(),
                      model_path)

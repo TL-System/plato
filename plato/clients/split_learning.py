@@ -39,7 +39,7 @@ class Client(simple.Client):
 
     async def train(self):
         """A split learning client only uses the first several layers in a forward pass."""
-        logging.info("Training on split learning client #%s", self.client_id)
+        logging.info("Training on split learning client #%d", self.client_id)
 
         # Since training is performed on the server, the client should not be doing
         # its own testing for the model accuracy
