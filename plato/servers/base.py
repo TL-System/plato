@@ -38,12 +38,11 @@ class Server:
             for key, value in dict(self.clients).items():
                 # A client should be sending heartbeats every 5 seconds, remove it if it times out
                 client_timeout = Config().server.client_timeout if hasattr(
-                    Config().server, 'client_timeout') else 60
+                    Config().server, 'client_timeout') else 120
 
-                if time.time() - value[1] > client_timeout:
+                if key in self.selected_clients and time.time() - value[1] > client_timeout:
                     del self.clients[key]
-                    if key in self.selected_clients:
-                        self.selected_clients.remove(key)
+                    self.selected_clients.remove(key)
 
                     logging.info("[Server #%d] Client #%d failed and removed from the server.", os.getpid(), key)
 
@@ -134,7 +133,7 @@ class Server:
     async def close_connections(self):
         """Closing all WebSocket connections after training completes."""
         for client_id, client_socket in dict(self.clients).items():
-            logging.info("closing connection for client #%s.", client_id)
+            logging.info("Closing connection for client #%d.", client_id)
             await client_socket[0].close()
 
     async def select_clients(self):
@@ -151,6 +150,8 @@ class Server:
         if len(self.selected_clients) > 0:
             for client_id in self.selected_clients:
                 socket = self.clients[client_id][0]
+                self.register_client(client_id, socket)
+
                 logging.info("[Server #%d] Selecting client #%s for training.",
                              os.getpid(), client_id)
                 server_response = {'id': client_id, 'payload': True}
