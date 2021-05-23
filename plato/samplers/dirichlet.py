@@ -1,6 +1,7 @@
 """
 Samples data from a dataset, biased across labels according to the Dirichlet distribution.
 """
+import random
 import numpy as np
 import torch
 from torch.utils.data import WeightedRandomSampler
@@ -31,6 +32,10 @@ class Sampler(base.Sampler):
 
         target_proportions = np.random.dirichlet(
             np.repeat(concentration, len(class_list)))
+
+        if np.isnan(np.sum(target_proportions)):
+            target_proportions = np.repeat(0, len(class_list))
+            target_proportions[random.randint(0, len(class_list) - 1)] = 1
 
         self.sample_weights = target_proportions[target_list]
 
