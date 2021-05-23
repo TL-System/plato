@@ -17,10 +17,11 @@ from fedreId import DataSource, Trainer
 from plato.clients import simple
 from plato.config import Config
 
+
 class fedReIdClient(simple.Client):
     def __init__(self, model=None, datasource=None, trainer=None):
         super().__init__(model, datasource, trainer)
-    
+
     async def start_client(self) -> None:
         """Startup function for a client."""
 
@@ -29,7 +30,7 @@ class fedReIdClient(simple.Client):
             # Contact one of the edge servers
             edge_server_id = int(Config().clients.total_clients) + (int(
                 self.client_id) - 1) % int(Config().algorithm.total_silos) + 1
-            logging.info("[Client #%s] Contacting Edge server #%s.",
+            logging.info("[Client #%d] Contacting Edge server #%d.",
                          self.client_id, edge_server_id)
 
             assert hasattr(Config().algorithm, 'total_silos')
@@ -38,7 +39,7 @@ class fedReIdClient(simple.Client):
                 Config().server.address,
                 int(Config().server.port) + edge_server_id)
         else:
-            logging.info("[Client #%s] Contacting the central server.",
+            logging.info("[Client #%d] Contacting the central server.",
                          self.client_id)
             uri = 'ws://{}:{}'.format(Config().server.address,
                                       Config().server.port)
@@ -48,19 +49,19 @@ class fedReIdClient(simple.Client):
             async with websockets.connect(uri,
                                           ping_interval=None,
                                           max_size=2**30) as websocket:
-                logging.info("[Client #%s] Signing in at the server.",
+                logging.info("[Client #%d] Signing in at the server.",
                              self.client_id)
                 await websocket.send(pickle.dumps({'id': self.client_id}))
 
                 while True:
-                    logging.info("[Client #%s] Waiting to be selected.",
+                    logging.info("[Client #%d] Waiting to be selected.",
                                  self.client_id)
                     server_response = await websocket.recv()
                     data = pickle.loads(server_response)
 
                     if data['id'] == self.client_id:
                         self.process_server_response(data)
-                        logging.info("[Client #%s] Selected by the server.",
+                        logging.info("[Client #%d] Selected by the server.",
                                      self.client_id)
 
                         if not self.data_loaded:
@@ -72,18 +73,20 @@ class fedReIdClient(simple.Client):
                             self.load_payload(server_payload)
                             # get old weights
                             old_weights = server_payload
-                            
+
                         self.client_id = int(self.client_id)
                         report, payload = await self.train()
-                        report.belive = self.cos_feature_distance(old_weights, payload) # self.sampler.trainset_size()
+                        report.belive = self.cos_feature_distance(
+                            old_weights,
+                            payload)  # self.sampler.trainset_size()
                         self.client_id = str(self.client_id)
-                        
+
                         if Config().is_edge_server():
                             logging.info(
-                                "[Server #%d] Model aggregated on edge server (client #%s).",
+                                "[Server #%d] Model aggregated on edge server (client #%d).",
                                 os.getpid(), self.client_id)
                         else:
-                            logging.info("[Client #%s] Model trained.",
+                            logging.info("[Client #%d] Model trained.",
                                          self.client_id)
 
                         # Sending the client report as metadata to the server (payload to follow)
@@ -98,10 +101,10 @@ class fedReIdClient(simple.Client):
                         await self.send(websocket, payload)
 
         except OSError as exception:
-            logging.info("[Client #%s] Connection to the server failed.",
+            logging.info("[Client #%d] Connection to the server failed.",
                          self.client_id)
             logging.error(exception)
-        
+
     def cos_feature_distance(self, old_weights, new_weights):
         if old_weights == None:
             logging.info("old_weights is None")
@@ -112,18 +115,20 @@ class fedReIdClient(simple.Client):
         # old_feature = self.trainer.test_output(Config().trainer._asdict(), self.datasource.get_test_set())
         # self.load_payload(new_weights)
         # new_feature = self.trainer.test_output(Config().trainer._asdict(), self.datasource.get_test_set())
-   
+
         # for i in range(len(old_feature)):
         #     # print(old_feature[i].shape, new_feature[i].shape)
         #     distance = 1.0 - F.cosine_similarity(old_feature[i].float(), new_feature[i].float(), 0)
         #     dis.append(distance)
-        
+
         for i in old_weights:
-            distance = 1.0 - F.cosine_similarity(old_weights[i].float(), new_weights[i].float(), 0)
+            distance = 1.0 - F.cosine_similarity(old_weights[i].float(),
+                                                 new_weights[i].float(), 0)
             dis.append(torch.mean(distance))
-        
+
         print(dis)
-        return sum(dis)/len(dis)
+        return sum(dis) / len(dis)
+
 
 def main():
     try:
@@ -138,13 +143,15 @@ def main():
         )
         datasource = DataSource()
         trainer = Trainer(model=model)
-        client = fedReIdClient(model=model, datasource=datasource, trainer=trainer)
+        client = fedReIdClient(model=model,
+                               datasource=datasource,
+                               trainer=trainer)
         client.configure()
         loop.run_until_complete(client.start_client())
     except websockets.ConnectionClosed:
-        logging.info("Client #%s: connection to the server is closed.",
+        logging.info("Client #%d: connection to the server is closed.",
                      client.client_id)
+
 
 if __name__ == "__main__":
     main()
-

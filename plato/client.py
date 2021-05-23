@@ -56,11 +56,11 @@ def run(client_id, port, client=None):
         else:
             if client is None:
                 client = client_registry.get()
-                logging.info("Starting a %s client #%s.",
+                logging.info("Starting a %s client #%d.",
                              Config().clients.type, client_id)
             else:
                 client.client_id = client_id
-                logging.info("Starting a custom client #%s", client_id)
+                logging.info("Starting a custom client #%d", client_id)
 
             client.configure()
             coroutines.append(client.start_client())
@@ -68,7 +68,7 @@ def run(client_id, port, client=None):
         loop.run_until_complete(asyncio.gather(*coroutines))
 
     except websockets.ConnectionClosed:
-        logging.info("Client #%s: connection to the server is closed.",
+        logging.info("Client #%d: connection to the server is closed.",
                      client.client_id)
 
 

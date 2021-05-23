@@ -52,14 +52,14 @@ class Client(base.Client):
     def load_data(self) -> None:
         """Generating data and loading them onto this client."""
         data_loading_start_time = time.time()
-        logging.info("[Client #%s] Loading its data source...", self.client_id)
+        logging.info("[Client #%d] Loading its data source...", self.client_id)
 
         if self.datasource is None:
             self.datasource = datasources_registry.get()
 
         self.data_loaded = True
 
-        logging.info("[Client #%s] Dataset size: %s", self.client_id,
+        logging.info("[Client #%d] Dataset size: %s", self.client_id,
                      self.datasource.num_train_examples())
 
         # Setting up the data sampler
@@ -86,7 +86,7 @@ class Client(base.Client):
     async def train(self):
         """The machine learning training workload on a client."""
         training_start_time = time.time()
-        logging.info("[Client #%s] Started training.", self.client_id)
+        logging.info("[Client #%d] Started training.", self.client_id)
 
         # Perform model training
         self.trainer.train(self.trainset, self.sampler)

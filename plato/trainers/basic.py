@@ -60,10 +60,10 @@ class Trainer(base.Trainer):
         torch.save(self.model.state_dict(), model_path)
 
         if self.client_id == 0:
-            logging.info("[Server #%s] Model saved to %s.", os.getpid(),
+            logging.info("[Server #%d] Model saved to %s.", os.getpid(),
                          model_path)
         else:
-            logging.info("[Client #%s] Model saved to %s.", self.client_id,
+            logging.info("[Client #%d] Model saved to %s.", self.client_id,
                          model_path)
 
     def load_model(self, filename=None):
@@ -77,10 +77,10 @@ class Trainer(base.Trainer):
             model_path = f'{model_dir}{model_name}.pth'
 
         if self.client_id == 0:
-            logging.info("[Server #%s] Loading a model from %s.", os.getpid(),
+            logging.info("[Server #%d] Loading a model from %s.", os.getpid(),
                          model_path)
         else:
-            logging.info("[Client #%s] Loading a model from %s.",
+            logging.info("[Client #%d] Loading a model from %s.",
                          self.client_id, model_path)
 
         self.model.load_state_dict(torch.load(model_path))
@@ -112,12 +112,13 @@ class Trainer(base.Trainer):
                 log_interval = 10
                 batch_size = config['batch_size']
 
-                logging.info("[Client #%s] Loading the dataset.", self.client_id)
+                logging.info("[Client #%d] Loading the dataset.",
+                             self.client_id)
                 _train_loader = getattr(self, "train_loader", None)
 
                 if callable(_train_loader):
                     train_loader = _train_loader(batch_size, trainset,
-                                                sampler.get(), cut_layer)
+                                                 sampler.get(), cut_layer)
                 else:
                     train_loader = torch.utils.data.DataLoader(
                         dataset=trainset,
@@ -126,7 +127,7 @@ class Trainer(base.Trainer):
                         sampler=sampler.get())
 
                 iterations_per_epoch = np.ceil(len(trainset) /
-                                            batch_size).astype(int)
+                                               batch_size).astype(int)
                 epochs = config['epochs']
 
                 # Sending the model to the device used for training
@@ -153,7 +154,8 @@ class Trainer(base.Trainer):
                     lr_schedule = None
 
                 for epoch in range(1, epochs + 1):
-                    for batch_id, (examples, labels) in enumerate(train_loader):
+                    for batch_id, (examples,
+                                   labels) in enumerate(train_loader):
                         examples, labels = examples.to(self.device), labels.to(
                             self.device)
                         optimizer.zero_grad()
@@ -161,7 +163,8 @@ class Trainer(base.Trainer):
                         if cut_layer is None:
                             outputs = self.model(examples)
                         else:
-                            outputs = self.model.forward_from(examples, cut_layer)
+                            outputs = self.model.forward_from(
+                                examples, cut_layer)
 
                         loss = loss_criterion(outputs, labels)
 
@@ -176,8 +179,9 @@ class Trainer(base.Trainer):
                             if self.client_id == 0:
                                 logging.info(
                                     "[Server #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}"
-                                    .format(os.getpid(), epoch, epochs, batch_id,
-                                            len(train_loader), loss.data.item()))
+                                    .format(os.getpid(), epoch, epochs,
+                                            batch_id, len(train_loader),
+                                            loss.data.item()))
                             else:
                                 if hasattr(config, 'use_wandb'):
                                     wandb.log({"batch loss": loss.data.item()})
@@ -192,9 +196,9 @@ class Trainer(base.Trainer):
                         optimizer.params_state_update()
 
         except RuntimeError as training_exception:
-            logging.info("Client #%s has failed.", self.client_id)
+            logging.info("Client #%d has failed.", self.client_id)
             self.run_sql_statement("DELETE FROM trainers WHERE run_id = (?)",
-                                      (self.client_id, ))
+                                   (self.client_id, ))
             raise training_exception
 
         self.model.cpu()

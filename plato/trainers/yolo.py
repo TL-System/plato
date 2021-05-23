@@ -52,7 +52,7 @@ class Trainer(basic.Trainer):
         cut_layer (optional): The layer which training should start from.
         """
 
-        logging.info("[Client #%s] Setting up training parameters.",
+        logging.info("[Client #%d] Setting up training parameters.",
                      self.client_id)
 
         batch_size = config['batch_size']
@@ -124,7 +124,7 @@ class Trainer(basic.Trainer):
             -1].nl  # number of detection layers (used for scaling hyp['obj'])
 
         # Trainloader
-        logging.info("[Client #%s] Loading the dataset.", self.client_id)
+        logging.info("[Client #%d] Loading the dataset.", self.client_id)
         train_loader = self.train_loader(batch_size,
                                          trainset,
                                          sampler,
