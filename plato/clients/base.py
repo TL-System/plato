@@ -32,27 +32,30 @@ class Client:
         self.data_loaded = False  # is training data already loaded from the disk?
 
     @staticmethod
-    async def heartbeat(uri, client_id):
+    async def heartbeat(client_id):
         """ Sending client heartbeats. """
         try:
-            async with websockets.connect(uri,
-                                            ping_interval=None,
-                                            max_size=2**30) as websocket:
-                while True:            
+            uri = 'ws://{}:{}'.format(Config().server.address,
+                                      Config().server.port)
+
+            while True:
+                async with websockets.connect(uri) as websocket:
                     logging.info(
                         "[Client #%s] Sending a heartbeat to the server.",
                         client_id)
                     await websocket.send(pickle.dumps({'id': client_id}))
-                    await asyncio.sleep(20 * random.random())
+
+                await websocket.close()
+                await asyncio.sleep(2 * random.random())
         except OSError as exception:
             logging.info("[Client #%s] Connection to the server failed while sending heartbeats.",
                          client_id)
             logging.error(exception)
 
     @staticmethod
-    def heartbeat_process(uri, client_id):
+    def heartbeat_process(client_id):
         """ Starting an asyncio loop for sending client heartbeats. """
-        asyncio.run(Client.heartbeat(uri, client_id))
+        asyncio.run(Client.heartbeat(client_id))
 
     async def start_client(self) -> None:
         """ Startup function for a client. """
@@ -107,7 +110,6 @@ class Client:
                         heartbeat_proc = Process(
                             target=Client.heartbeat_process,
                             args=(
-                                uri,
                                 self.client_id,
                             ))
                         heartbeat_proc.start()
