@@ -133,10 +133,17 @@ class Trainer(ABC):
         """
 
     @abstractmethod
-    def test(self, testset):
+    def test(self, testset) -> float:
         """Testing the model using the provided test dataset.
 
         Arguments:
         testset: The test dataset.
-        cut_layer (optional): The layer which testing should start from.
+        """
+
+    @abstractmethod
+    async def server_test(self, testset):
+        """Testing the model on the server using the provided test dataset.
+
+        Arguments:
+        testset: The test dataset.
         """

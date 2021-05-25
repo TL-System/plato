@@ -2,6 +2,7 @@
 A simple federated learning server using federated averaging.
 """
 
+import asyncio
 import logging
 import os
 import random
@@ -34,6 +35,10 @@ class Server(base.Server):
 
         self.total_clients = Config().clients.total_clients
         self.clients_per_round = Config().clients.per_round
+
+        # Results from federated averaging
+        self.updated_weights = None
+
         logging.info(
             "[Server #%d] Started training on %s clients with %s per round.",
             os.getpid(), self.total_clients, self.clients_per_round)
@@ -100,11 +105,11 @@ class Server(base.Server):
         weights_received = [payload for (__, payload) in reports]
         return self.algorithm.compute_weight_updates(weights_received)
 
-    def aggregate_weights(self, reports):
+    async def aggregate_weights(self, reports):
         """Aggregate the reported weight updates from the selected clients."""
-        return self.federated_averaging(reports)
+        await self.federated_averaging(reports)
 
-    def federated_averaging(self, reports):
+    async def federated_averaging(self, reports):
         """Aggregate weight updates from the clients using federated averaging."""
         # Extract updates from the reports
         updates = self.extract_client_updates(reports)
@@ -127,20 +132,21 @@ class Server(base.Server):
                 # Use weighted average by the number of samples
                 avg_update[name] += delta * (num_samples / self.total_samples)
 
+            # Yield to other tasks in the websocket server
+            await asyncio.sleep(0)
+
         # Extract baseline model weights
         baseline_weights = self.algorithm.extract_weights()
 
         # Load updated weights into model
-        updated_weights = OrderedDict()
+        self.updated_weights = OrderedDict()
         for name, weight in baseline_weights.items():
-            updated_weights[name] = weight + avg_update[name]
-
-        return updated_weights
+            self.updated_weights[name] = weight + avg_update[name]
 
     async def process_reports(self):
         """Process the client reports by aggregating their weights."""
-        updated_weights = self.aggregate_weights(self.reports)
-        self.algorithm.load_weights(updated_weights)
+        await self.aggregate_weights(self.reports)
+        self.algorithm.load_weights(self.updated_weights)
 
         # Testing the global model accuracy
         if Config().clients.do_test:
@@ -151,7 +157,9 @@ class Server(base.Server):
                     os.getpid(), 100 * self.accuracy))
         else:
             # Testing the updated model directly at the server
-            self.accuracy = self.trainer.test(self.testset)
+            loop = asyncio.get_event_loop()
+            self.accuracy = loop.run_until_complete(self.trainer.test(self.testset))
+
             logging.info(
                 '[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(
                     os.getpid(), 100 * self.accuracy))

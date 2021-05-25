@@ -1,19 +1,20 @@
 """
 The training and testing loops for PyTorch.
 """
+import asyncio
 import logging
 import os
-
 from multiprocessing import Process
+
 import numpy as np
 import torch
 import torch.nn as nn
 import wandb
-from plato.config import Config
-from plato.utils import optimizers
 
-from plato.trainers import base
+from plato.config import Config
 from plato.models import registry as models_registry
+from plato.trainers import base
+from plato.utils import optimizers
 
 
 class Trainer(base.Trainer):
@@ -85,7 +86,6 @@ class Trainer(base.Trainer):
 
         self.model.load_state_dict(torch.load(model_path))
 
-    # pylint: disable=not-callable
     def train_process(self, config, trainset, sampler, cut_layer=None):
         """The main training loop in a federated learning workload, run in
           a separate process with a new CUDA context, so that CUDA memory
@@ -117,7 +117,7 @@ class Trainer(base.Trainer):
                 _train_loader = getattr(self, "train_loader", None)
 
                 if callable(_train_loader):
-                    train_loader = _train_loader(batch_size, trainset,
+                    train_loader = self.train_loader(batch_size, trainset,
                                                  sampler.get(), cut_layer)
                 else:
                     train_loader = torch.utils.data.DataLoader(
@@ -137,7 +137,7 @@ class Trainer(base.Trainer):
                 # Initializing the loss criterion
                 _loss_criterion = getattr(self, "loss_criterion", None)
                 if callable(_loss_criterion):
-                    loss_criterion = _loss_criterion(self.model)
+                    loss_criterion = self.loss_criterion(self.model)
                 else:
                     loss_criterion = nn.CrossEntropyLoss()
 
@@ -239,7 +239,7 @@ class Trainer(base.Trainer):
         self.load_model(filename)
         self.pause_training()
 
-    def test_process(self, config, testset):  # pylint: disable=unused-argument
+    def test_process(self, config, testset):
         """The testing loop, run in a separate process with a new CUDA context,
         so that CUDA memory can be released after the training completes.
 
@@ -287,16 +287,17 @@ class Trainer(base.Trainer):
         Arguments:
         testset: The test dataset.
         """
-        self.start_training()
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']
 
+        self.start_training()
+
         proc = Process(target=Trainer.test_process,
-                       args=(
-                           self,
-                           config,
-                           testset,
-                       ))
+                    args=(
+                        self,
+                        config,
+                        testset,
+                    ))
         proc.start()
         proc.join()
 
@@ -306,3 +307,42 @@ class Trainer(base.Trainer):
 
         self.pause_training()
         return accuracy
+
+    async def server_test(self, testset):
+        """Testing the model on the server using the provided test dataset.
+
+        Arguments:
+        testset: The test dataset.
+        """
+        config = Config().trainer._asdict()
+        config['run_id'] = Config().params['run_id']
+
+        self.model.to(self.device)
+        self.model.eval()
+
+        custom_test = getattr(self, "test_model", None)
+
+        if callable(custom_test):
+            return self.test_model(config, testset)
+        else:
+            test_loader = torch.utils.data.DataLoader(
+                testset, batch_size=config['batch_size'], shuffle=False)
+
+            correct = 0
+            total = 0
+
+            with torch.no_grad():
+                for examples, labels in test_loader:
+                    examples, labels = examples.to(self.device), labels.to(
+                        self.device)
+
+                    outputs = self.model(examples)
+
+                    _, predicted = torch.max(outputs.data, 1)
+                    total += labels.size(0)
+                    correct += (predicted == labels).sum().item()
+                    
+                    # Yield to other tasks in the websocket server
+                    await asyncio.sleep(0)
+
+            return correct / total

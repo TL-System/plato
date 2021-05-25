@@ -42,7 +42,7 @@ class Server:
                     Config().server, 'client_timeout') else 120
 
                 if key in self.selected_clients and time.time(
-                ) - value[1] > client_timeout:
+                ) - value['last_contacted'] > client_timeout:
                     del self.clients[key]
                     self.selected_clients.remove(key)
 
@@ -99,9 +99,9 @@ class Server:
         """Adding a newly arrived client to the list of clients."""
         if not client_id in self.clients:
             # The websocket and last contact time is stored for each client
-            self.clients[client_id] = [websocket, time.time()]
+            self.clients[client_id] = {'socket': websocket, 'last_contacted': time.time()}
         else:
-            self.clients[client_id][1] = time.time()
+            self.clients[client_id]['last_contacted'] = time.time()
             logging.info("[Server #%d] Heartbeat from Client #%d received.",
                          os.getpid(), client_id)
 
@@ -138,7 +138,7 @@ class Server:
         """Closing all WebSocket connections after training completes."""
         for client_id, client_socket in dict(self.clients).items():
             logging.info("Closing connection for client #%d.", client_id)
-            await client_socket[0].close()
+            await client_socket['socket'].close()
 
     async def select_clients(self):
         """Select a subset of the clients and send messages to them to start training."""
@@ -153,7 +153,7 @@ class Server:
 
         if len(self.selected_clients) > 0:
             for client_id in self.selected_clients:
-                socket = self.clients[client_id][0]
+                socket = self.clients[client_id]['socket']
                 self.register_client(client_id, socket)
 
                 logging.info("[Server #%d] Selecting client #%d for training.",
@@ -190,7 +190,8 @@ class Server:
         logging.info("[Server #%d] Sent %s MB of payload data to client #%d.",
                      os.getpid(), round(data_size / 1024**2, 2), client_id)
 
-    async def serve(self, websocket, path):  # pylint: disable=unused-argument
+    # pylint: disable=unused-argument
+    async def serve(self, websocket: websockets.WebSocketServerProtocol, path: str):
         """Running a federated learning server."""
         try:
             async for message in websocket:
