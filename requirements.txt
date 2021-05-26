@@ -1,7 +1,8 @@
 yapf
 mypy
 pylint
-websockets
+python-socketio
+aiohttp
 requests
 pyyaml>=5.4.1
 matplotlib

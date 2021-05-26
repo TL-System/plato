@@ -105,34 +105,34 @@ class Server(base.Server):
         weights_received = [payload for (__, payload) in reports]
         return self.algorithm.compute_weight_updates(weights_received)
 
-    async def aggregate_weights(self, reports):
+    async def aggregate_weights(self, updates):
         """Aggregate the reported weight updates from the selected clients."""
-        await self.federated_averaging(reports)
+        await self.federated_averaging(updates)
 
-    async def federated_averaging(self, reports):
+    async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using federated averaging."""
         # Extract updates from the reports
-        updates = self.extract_client_updates(reports)
+        weights_received = self.extract_client_updates(updates)
 
         # Extract the total number of samples
         self.total_samples = sum(
-            [report.num_samples for (report, __) in reports])
+            [report.num_samples for (report, __) in updates])
 
         # Perform weighted averaging
         avg_update = {
             name: self.trainer.zeros(weights.shape)
-            for name, weights in updates[0].items()
+            for name, weights in weights_received[0].items()
         }
 
-        for i, update in enumerate(updates):
-            report, __ = reports[i]
+        for i, update in enumerate(weights_received):
+            report, __ = updates[i]
             num_samples = report.num_samples
 
             for name, delta in update.items():
                 # Use weighted average by the number of samples
                 avg_update[name] += delta * (num_samples / self.total_samples)
 
-            # Yield to other tasks in the websocket server
+            # Yield to other tasks in the server
             await asyncio.sleep(0)
 
         # Extract baseline model weights
@@ -145,20 +145,21 @@ class Server(base.Server):
 
     async def process_reports(self):
         """Process the client reports by aggregating their weights."""
-        await self.aggregate_weights(self.reports)
+        await self.aggregate_weights(self.updates)
         self.algorithm.load_weights(self.updated_weights)
 
         # Testing the global model accuracy
         if Config().clients.do_test:
             # Compute the average accuracy from client reports
-            self.accuracy = self.accuracy_averaging(self.reports)
+            self.accuracy = self.accuracy_averaging(self.updates)
             logging.info(
                 '[Server #{:d}] Average client accuracy: {:.2f}%.'.format(
                     os.getpid(), 100 * self.accuracy))
         else:
             # Testing the updated model directly at the server
             loop = asyncio.get_event_loop()
-            self.accuracy = loop.run_until_complete(self.trainer.test(self.testset))
+            self.accuracy = loop.run_until_complete(
+                self.trainer.test(self.testset))
 
             logging.info(
                 '[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(
@@ -182,7 +183,7 @@ class Server(base.Server):
                     self.accuracy * 100,
                     'training_time':
                     max([
-                        report.training_time for (report, __) in self.reports
+                        report.training_time for (report, __) in self.updates
                     ]),
                     'round_time':
                     time.time() - self.round_start_time

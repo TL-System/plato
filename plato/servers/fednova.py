@@ -13,7 +13,7 @@ from plato.servers import fedavg
 
 class Server(fedavg.Server):
     """A federated learning server using the FedNova algorithm. """
-    def federated_averaging(self, reports):
+    async def federated_averaging(self, reports):
         """Aggregate weight updates from the clients using FedNova."""
         # Extracting updates from the reports
         updates = self.extract_client_updates(reports)

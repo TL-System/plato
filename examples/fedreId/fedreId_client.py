@@ -131,26 +131,19 @@ class fedReIdClient(simple.Client):
 
 
 def main():
-    try:
-        loop = asyncio.get_event_loop()
-        """A Plato federated learning training session using a custom model. """
-        model = nn.Sequential(
-            nn.Linear(28 * 28, 128),
-            nn.ReLU(),
-            nn.Linear(128, 128),
-            nn.ReLU(),
-            nn.Linear(128, 10),
-        )
-        datasource = DataSource()
-        trainer = Trainer(model=model)
-        client = fedReIdClient(model=model,
-                               datasource=datasource,
-                               trainer=trainer)
-        client.configure()
-        loop.run_until_complete(client.start_client())
-    except websockets.ConnectionClosed:
-        logging.info("Client #%d: connection to the server is closed.",
-                     client.client_id)
+    """A Plato federated learning training session using a custom client. """
+    model = nn.Sequential(
+        nn.Linear(28 * 28, 128),
+        nn.ReLU(),
+        nn.Linear(128, 128),
+        nn.ReLU(),
+        nn.Linear(128, 10),
+    )
+    datasource = DataSource()
+    trainer = Trainer(model=model)
+    client = fedReIdClient(model=model, datasource=datasource, trainer=trainer)
+    client.configure()
+    asyncio.run(client.start_client())
 
 
 if __name__ == "__main__":

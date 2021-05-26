@@ -1,4 +1,5 @@
-websockets
+python-socketio
+aiohttp
 requests
 matplotlib
 scipy
