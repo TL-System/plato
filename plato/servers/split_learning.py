@@ -95,7 +95,7 @@ class Server(fedavg.Server):
         target_accuracy = Config().trainer.target_accuracy
 
         if target_accuracy and self.accuracy >= target_accuracy:
-            logging.info("Target accuracy reached.")
+            logging.info("[Server #%d] Target accuracy reached.", os.getpid())
             await self.close()
 
         if self.current_round >= Config().trainer.rounds:

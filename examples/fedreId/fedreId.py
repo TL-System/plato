@@ -25,8 +25,9 @@ class DataSource(base.DataSource):
                              transform=ToTensor())
 
 class Trainer(basic.Trainer):
+    # pylint: disable=unused-argument
     """A custom trainer with custom training and testing loops. """
-    def train_model(self, config, trainset, sampler, cut_layer=None):  # pylint: disable=unused-argument
+    def train_model(self, config, trainset, sampler, cut_layer=None):
         """A custom training loop. """
         optimizer = torch.optim.Adam(self.model.parameters(), lr=1e-3)
         criterion = nn.CrossEntropyLoss()

@@ -118,7 +118,7 @@ class Trainer(base.Trainer):
 
                 if callable(_train_loader):
                     train_loader = self.train_loader(batch_size, trainset,
-                                                 sampler.get(), cut_layer)
+                                                     sampler.get(), cut_layer)
                 else:
                     train_loader = torch.utils.data.DataLoader(
                         dataset=trainset,
@@ -293,11 +293,11 @@ class Trainer(base.Trainer):
         self.start_training()
 
         proc = Process(target=Trainer.test_process,
-                    args=(
-                        self,
-                        config,
-                        testset,
-                    ))
+                       args=(
+                           self,
+                           config,
+                           testset,
+                       ))
         proc.start()
         proc.join()
 
@@ -341,8 +341,8 @@ class Trainer(base.Trainer):
                     _, predicted = torch.max(outputs.data, 1)
                     total += labels.size(0)
                     correct += (predicted == labels).sum().item()
-                    
-                    # Yield to other tasks in the websocket server
+
+                    # Yield to other tasks in the server
                     await asyncio.sleep(0)
 
             return correct / total

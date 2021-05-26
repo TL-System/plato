@@ -1,7 +1,7 @@
-import os
+""" An example for running Plato with custom clients. """
 import asyncio
 import logging
-import websockets
+import os
 
 import torch
 from torch import nn
@@ -88,29 +88,25 @@ class CustomClient(simple.Client):
 
 
 def main():
-    try:
-        # A Plato federated learning training session using a custom model.
-        model = nn.Sequential(
-            nn.Linear(28 * 28, 128),
-            nn.ReLU(),
-            nn.Linear(128, 128),
-            nn.ReLU(),
-            nn.Linear(128, 10),
-        )
-        datasource = DataSource()
-        trainer = Trainer(model=model)
+    """ 
+    A Plato federated learning training session using a custom client.
 
-        client = CustomClient(model=model,
-                              datasource=datasource,
-                              trainer=trainer)
-        client.configure()
+    To run this example:
+    python custom_client.py -i <client_id>
+    """
+    model = nn.Sequential(
+        nn.Linear(28 * 28, 128),
+        nn.ReLU(),
+        nn.Linear(128, 128),
+        nn.ReLU(),
+        nn.Linear(128, 10),
+    )
+    datasource = DataSource()
+    trainer = Trainer(model=model)
 
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(client.start_client())
-
-    except websockets.ConnectionClosed:
-        logging.info("Client #%d: connection to the server is closed.",
-                     client.client_id)
+    client = CustomClient(model=model, datasource=datasource, trainer=trainer)
+    client.configure()
+    asyncio.run(client.start_client())
 
 
 if __name__ == "__main__":

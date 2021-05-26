@@ -94,13 +94,13 @@ class Server(fedavg.Server):
 
     async def process_reports(self):
         """Process the client reports by aggregating their weights."""
-        updated_weights = self.aggregate_weights(self.reports)
-        self.algorithm.load_weights(updated_weights)
+        await self.aggregate_weights(self.updates)
+        self.algorithm.load_weights(self.updated_weights)
 
         # Testing the global model accuracy
         if Config().clients.do_test:
             # Compute the average accuracy from client reports
-            self.average_accuracy = self.accuracy_averaging(self.reports)
+            self.average_accuracy = self.accuracy_averaging(self.updates)
             logging.info(
                 '[Server #{:d}] Average client accuracy: {:.2f}%.'.format(
                     os.getpid(), 100 * self.average_accuracy))
@@ -137,7 +137,7 @@ class Server(fedavg.Server):
                     Config().trainer.epochs,
                     'training_time':
                     max([
-                        report.training_time for (report, __) in self.reports
+                        report.training_time for (report, __) in self.updates
                     ]),
                     'round_time':
                     time.time() - self.round_start_time

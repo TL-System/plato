@@ -89,6 +89,7 @@ class Trainer(ABC):
     def start_training(self):
         """Add to the list of running trainers if max_concurrency has not yet
         been reached."""
+        time.sleep(random.random())
         trainer_count = Trainer.run_sql_statement(
             "SELECT COUNT(*) FROM trainers")
 

@@ -2,7 +2,7 @@ clients:
     # Type
     type: simple
 
-    # The total number of clients, server 
+    # The total number of clients, server
     total_clients: 0
 
     # The number of clients selected in each round
