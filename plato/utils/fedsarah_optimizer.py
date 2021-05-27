@@ -1,11 +1,13 @@
 """
 A customized trainer for FedSarah.
 
-Reference: Ngunyen et al., "SARAH: A Novel Method for Machine Learning Problems Using Stochastic Recursive Gradient" (https://arxiv.org/pdf/1703.00102.pdf) 
+Reference: Ngunyen et al., "SARAH: A Novel Method for Machine Learning Problems
+Using Stochastic Recursive Gradient." (https://arxiv.org/pdf/1703.00102.pdf)
 """
+import os
+
 import torch
 from torch import optim
-import os
 
 
 class FedSarahOptimizer(optim.Adam):
@@ -31,7 +33,7 @@ class FedSarahOptimizer(optim.Adam):
 
         for group in self.param_groups:
 
-            #Initialize server control variates and client control variates
+            # Initialize server control variates and client control variates
             if self.server_control_variates is None:
                 self.client_control_variates = [0] * len(group['params'])
                 self.server_control_variates = [0] * len(group['params'])

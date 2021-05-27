@@ -89,7 +89,9 @@ class Client(base.Client):
         logging.info("[Client #%d] Started training.", self.client_id)
 
         # Perform model training
-        self.trainer.train(self.trainset, self.sampler)
+        if not self.trainer.train(self.trainset, self.sampler):
+            # Training failed
+            await self.sio.disconnect()
 
         # Extract model weights and biases
         weights = self.algorithm.extract_weights()
@@ -97,9 +99,13 @@ class Client(base.Client):
         # Generate a report for the server, performing model testing if applicable
         if Config().clients.do_test:
             accuracy = self.trainer.test(self.testset)
+
+            if accuracy == 0:
+                # The testing process failed, disconnect from the server
+                await self.sio.disconnect()
+
             logging.info("[Client #{:d}] Test accuracy: {:.2f}%".format(
                 self.client_id, 100 * accuracy))
-
         else:
             accuracy = 0
 

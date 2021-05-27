@@ -194,10 +194,8 @@ class Trainer(base.Trainer):
                     if hasattr(optimizer, "params_state_update"):
                         optimizer.params_state_update()
 
-        except RuntimeError as training_exception:
-            logging.info("Client #%d has failed.", self.client_id)
-            self.run_sql_statement("DELETE FROM trainers WHERE run_id = (?)",
-                                   (self.client_id, ))
+        except Exception as training_exception:
+            logging.info("Training on client #%d failed.", self.client_id)
             raise training_exception
 
         self.model.cpu()
@@ -209,13 +207,16 @@ class Trainer(base.Trainer):
         if 'use_wandb' in config:
             run.finish()
 
-    def train(self, trainset, sampler, cut_layer=None):
+    def train(self, trainset, sampler, cut_layer=None) -> bool:
         """The main training loop in a federated learning workload.
 
         Arguments:
         trainset: The training dataset.
         sampler: the sampler that extracts a partition for this client.
         cut_layer (optional): The layer which training should start from.
+
+        Returns:
+        Whether training was successfully completed.
         """
         self.start_training()
 
@@ -238,8 +239,16 @@ class Trainer(base.Trainer):
 
         model_name = Config().trainer.model_name
         filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.pth"
-        self.load_model(filename)
+        try:
+            self.load_model(filename)
+        except OSError: # the model file is not found, training failed
+            logging.info("The training process on client #%d failed.", self.client_id)
+            self.run_sql_statement("DELETE FROM trainers WHERE run_id = (?)",
+                                   (self.client_id, ))
+            return False
+
         self.pause_training()
+        return True
 
     def test_process(self, config, testset):
         """The testing loop, run in a separate process with a new CUDA context,
@@ -253,29 +262,33 @@ class Trainer(base.Trainer):
         self.model.to(self.device)
         self.model.eval()
 
-        custom_test = getattr(self, "test_model", None)
+        try:
+            custom_test = getattr(self, "test_model", None)
 
-        if callable(custom_test):
-            accuracy = self.test_model(config, testset)
-        else:
-            test_loader = torch.utils.data.DataLoader(
-                testset, batch_size=config['batch_size'], shuffle=False)
+            if callable(custom_test):
+                accuracy = self.test_model(config, testset)
+            else:
+                test_loader = torch.utils.data.DataLoader(
+                    testset, batch_size=config['batch_size'], shuffle=False)
 
-            correct = 0
-            total = 0
+                correct = 0
+                total = 0
 
-            with torch.no_grad():
-                for examples, labels in test_loader:
-                    examples, labels = examples.to(self.device), labels.to(
-                        self.device)
+                with torch.no_grad():
+                    for examples, labels in test_loader:
+                        examples, labels = examples.to(self.device), labels.to(
+                            self.device)
 
-                    outputs = self.model(examples)
+                        outputs = self.model(examples)
 
-                    _, predicted = torch.max(outputs.data, 1)
-                    total += labels.size(0)
-                    correct += (predicted == labels).sum().item()
+                        _, predicted = torch.max(outputs.data, 1)
+                        total += labels.size(0)
+                        correct += (predicted == labels).sum().item()
 
-            accuracy = correct / total
+                accuracy = correct / total
+        except Exception as testing_exception:
+            logging.info("Testing on client #%d failed.", self.client_id)
+            raise testing_exception
 
         self.model.cpu()
 
@@ -283,7 +296,7 @@ class Trainer(base.Trainer):
         filename = f"{model_name}_{self.client_id}_{config['run_id']}.acc"
         Trainer.save_accuracy(accuracy, filename)
 
-    def test(self, testset):
+    def test(self, testset) -> float:
         """Testing the model using the provided test dataset.
 
         Arguments:
@@ -306,9 +319,13 @@ class Trainer(base.Trainer):
         proc.start()
         proc.join()
 
-        model_name = Config().trainer.model_name
-        filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
-        accuracy = Trainer.load_accuracy(filename)
+        try:
+            model_name = Config().trainer.model_name
+            filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
+            accuracy = Trainer.load_accuracy(filename)
+        except OSError: # the model file is not found, training failed
+            logging.info("The testing process on client #%d failed.", self.client_id)
+            return 0
 
         self.pause_training()
         return accuracy
@@ -329,25 +346,25 @@ class Trainer(base.Trainer):
 
         if callable(custom_test):
             return self.test_model(config, testset)
-        else:
-            test_loader = torch.utils.data.DataLoader(
-                testset, batch_size=config['batch_size'], shuffle=False)
 
-            correct = 0
-            total = 0
+        test_loader = torch.utils.data.DataLoader(
+            testset, batch_size=config['batch_size'], shuffle=False)
 
-            with torch.no_grad():
-                for examples, labels in test_loader:
-                    examples, labels = examples.to(self.device), labels.to(
-                        self.device)
+        correct = 0
+        total = 0
 
-                    outputs = self.model(examples)
+        with torch.no_grad():
+            for examples, labels in test_loader:
+                examples, labels = examples.to(self.device), labels.to(
+                    self.device)
 
-                    _, predicted = torch.max(outputs.data, 1)
-                    total += labels.size(0)
-                    correct += (predicted == labels).sum().item()
+                outputs = self.model(examples)
 
-                    # Yield to other tasks in the server
-                    await asyncio.sleep(0)
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
 
-            return correct / total
+                # Yield to other tasks in the server
+                await asyncio.sleep(0)
+
+        return correct / total
