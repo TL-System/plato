@@ -2,15 +2,8 @@
 Unit tests for unary encoding, a local differential privacy mechanism that adds
 noise to model weights or features before transmitting to the federated learning server.
 """
-import os
-import sys
 import unittest
 import numpy as np
-
-# To import modules from the parent directory
-currentdir = os.path.dirname(os.path.realpath(__file__))
-parentdir = os.path.dirname(currentdir)
-sys.path.append(parentdir)
 
 from plato.utils import unary_encoding
 

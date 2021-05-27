@@ -3,14 +3,13 @@ The training and testing loops for PyTorch.
 """
 import asyncio
 import logging
+import multiprocessing as mp
 import os
-from multiprocessing import Process
 
 import numpy as np
 import torch
 import torch.nn as nn
 import wandb
-
 from plato.config import Config
 from plato.models import registry as models_registry
 from plato.trainers import base
@@ -220,10 +219,13 @@ class Trainer(base.Trainer):
         """
         self.start_training()
 
+        if mp.get_start_method(allow_none=True) != 'spawn':
+            mp.set_start_method('spawn', force=True)
+
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']
 
-        train_proc = Process(target=Trainer.train_process,
+        train_proc = mp.Process(target=Trainer.train_process,
                              args=(
                                  self,
                                  config,
@@ -292,7 +294,10 @@ class Trainer(base.Trainer):
 
         self.start_training()
 
-        proc = Process(target=Trainer.test_process,
+        if mp.get_start_method(allow_none=True) != 'spawn':
+            mp.set_start_method('spawn', force=True)
+
+        proc = mp.Process(target=Trainer.test_process,
                        args=(
                            self,
                            config,

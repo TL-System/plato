@@ -195,7 +195,9 @@ class Trainer(base.Trainer):
         trainset: The training dataset.
         """
         self.start_training()
-        mp.set_start_method('spawn')
+
+        if mp.get_start_method(allow_none=True) != 'spawn':
+            mp.set_start_method('spawn', force=True)
 
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']
@@ -224,7 +226,9 @@ class Trainer(base.Trainer):
         testset: The test dataset.
         """
         self.start_training()
-        mp.set_start_method('spawn')
+
+        if mp.get_start_method(allow_none=True) != 'spawn':
+            mp.set_start_method('spawn', force=True)
 
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']
