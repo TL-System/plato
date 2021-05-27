@@ -74,10 +74,6 @@ class Client:
 
             assert hasattr(Config().algorithm, 'total_silos')
 
-            self.server_port = Config().server.port + self.edge_server_id
-        else:
-            self.server_port = Config().server.port
-
     async def start_client(self) -> None:
         """ Startup function for a client. """
 
@@ -97,12 +93,22 @@ class Client:
 
         uri = ""
         if hasattr(Config().server, 'use_https'):
-            uri = 'https://{}:{}'.format(Config().server.address,
-                                         self.server_port)
+            uri = 'https://{}'.format(Config().server.address)
         else:
-            uri = 'http://{}:{}'.format(Config().server.address,
-                                        self.server_port)
+            uri = 'http://{}'.format(Config().server.address)
 
+        if hasattr(Config().server, 'port'):
+            # If we are not using a production server deployed in the cloud
+            if hasattr(Config().algorithm,
+                       'cross_silo') and not Config().is_edge_server():
+                uri = '{}:{}'.format(
+                    uri,
+                    Config().server.port + self.edge_server_id)
+            else:
+                uri = '{}:{}'.format(uri, Config().server.port)
+
+        logging.info("[Client #%d] Connecting to the server at %s.",
+                     self.client_id, uri)
         await self.sio.connect(uri)
         await self.sio.emit('client_alive', {'id': self.client_id})
 
