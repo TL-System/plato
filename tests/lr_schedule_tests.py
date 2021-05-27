@@ -1,19 +1,12 @@
 """Unit tests for the learning rate scheduler."""
-import os
-import sys
 import unittest
 import warnings
 from collections import namedtuple
 import numpy as np
 
-# To import modules from the parent directory
-currentdir = os.path.dirname(os.path.realpath(__file__))
-parentdir = os.path.dirname(currentdir)
-sys.path.append(parentdir)
-
 from plato.utils import optimizers
-import models.registry as models_registry
 from plato.config import Config
+import plato.models.registry as models_registry
 
 
 class LrSchedulerTest(unittest.TestCase):
