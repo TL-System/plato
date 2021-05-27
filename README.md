@@ -203,6 +203,10 @@ To check if MindSpore is correctly installed on the GPU server, try to `import m
 
 Finally, to use trainers and servers based on MindSpore, assign `true` to `use_mindspore` in the `trainer` section of the configuration file. This variable is unassigned by default, and *Plato* would use PyTorch as its default framework.
 
+### Deploying Plato Servers in a Production Environment in the Cloud
+
+The Plato federated learning server is designed to use Socket.IO over HTTP and HTTPS, and can be easily deployed in a production server environment in the public cloud. See `/docs/Deploy.md` for more details on how the nginx web server can be used as a reverse proxy for such a deployment in production servers.
+
 ### Uninstalling Plato
 
 Remove the `conda` environment used to run *Plato* first, and then remove the directory containing *Plato*'s git repository.
