@@ -37,9 +37,9 @@ class Algorithm(fedavg.Algorithm):
         super().__init__(trainer, client_id)
         self.gradients_list = []
 
-    def load_gradients(self, gradients):
+    def receive_gradients(self, gradients):
         """
-        Receive gradients from server
+        Receive gradients from the server.
         """
         self.gradients_list = deepcopy(gradients)
 
@@ -111,7 +111,7 @@ class Algorithm(fedavg.Algorithm):
         # Initializing the loss criterion
         _loss_criterion = getattr(self, "loss_criterion", None)
         if callable(_loss_criterion):
-            loss_criterion = _loss_criterion(self.model)
+            loss_criterion = self.loss_criterion(self.model)
         else:
             loss_criterion = nn.CrossEntropyLoss()
 
@@ -134,10 +134,6 @@ class Algorithm(fedavg.Algorithm):
             optimizer.step()
 
         toc = time.perf_counter()
-        # logging.info("[Client #%d] Features extracted from %s examples.",
-        #              self.client_id, len(feature_dataset))
-        # logging.info("[Client #{}] Time used: {:.2f} seconds.".format(
-        #     self.client_id, toc - tic))
 
     def train(self, trainset, sampler, cut_layer=None):
         self.trainer.train(FeatureDataset(trainset), sampler, cut_layer)

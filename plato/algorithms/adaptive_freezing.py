@@ -162,7 +162,7 @@ class Algorithm(fedavg.Algorithm):
 
         for name, weight in weights.items():
             # Expanding the compressed weights using the sync mask
-            weight.data[self.sync_mask[name]] = weight.data.view(-1)
+            weight.data[self.sync_mask[name]] = weight.data.clone().view(-1)
 
             if self.previous_weights is not None:
                 self.update_sync_mask(name, weight.data)

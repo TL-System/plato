@@ -4,15 +4,14 @@ A split learning server.
 
 import logging
 import os
+import pickle
 import time
 from copy import deepcopy
-import torch
-import pickle
 from itertools import chain
 
+import torch
 from plato.config import Config
 from plato.samplers import all_inclusive
-
 from plato.servers import fedavg
 
 
@@ -45,7 +44,7 @@ class Server(fedavg.Server):
 
     async def process_reports(self):
         """Process the features extracted by the client and perform server-side training."""
-        features = [features for (__, features) in self.reports]
+        features = [features for (__, features) in self.updates]
 
         # Faster way to deep flatten a list of lists compared to list comprehension
         feature_dataset = list(chain.from_iterable(features))
@@ -63,10 +62,10 @@ class Server(fedavg.Server):
         await self.wrap_up_processing_reports()
 
     async def wrap_up(self):
-        """Wrapping up when each round of training is done."""
+        """ Wrapping up when each round of training is done. """
 
         # Report gradients to client
-        payload = self.load_gradients_from_disk()
+        payload = self.load_gradients()
         if len(payload) > 0:
             client_id = str(self.selected_client_id)
             logging.info("[Server #%d] Reporting gradients to client #%d.",
@@ -102,18 +101,12 @@ class Server(fedavg.Server):
             logging.info("Target number of training rounds reached.")
             await self.close()
 
-    def load_gradients_from_disk(self, filename=None):
-        """
-        Loading gradients from a file.
-        """
+    def load_gradients(self):
+        """ Loading gradients from a file. """
         model_dir = Config().params['model_dir']
         model_name = Config().trainer.model_name
 
-        if filename is not None:
-            model_path = f'{model_dir}{filename}'
-        else:
-            model_path = f'{model_dir}{model_name}_gradients.pth'
-
+        model_path = f'{model_dir}{model_name}_gradients.pth'
         logging.info("[Server #%d] Loading gradients from %s.", os.getpid(),
                      model_path)
 

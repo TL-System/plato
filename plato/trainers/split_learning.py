@@ -4,12 +4,9 @@ The training loop for split learning.
 import logging
 import os
 
-import copy
 import numpy as np
 import torch
-import torch.multiprocessing as mp
 import torch.nn as nn
-import wandb
 from plato.config import Config
 from plato.utils import optimizers
 
@@ -17,22 +14,20 @@ from plato.trainers import basic
 
 
 class Trainer(basic.Trainer):
-    def __init__(self, model=None):
-        super().__init__(model)
+    def __init__(self, client_id=0, model=None):
+        super().__init__(client_id, model)
 
-        # Record the gradients w.r.t cut layer in a batch
+        # Record the gradients of the cut layer
         self.cut_layer_grad = []
 
-    def train_model(self, config, trainset, sampler, cut_layer=None):  # pylint: disable=unused-argument
-
-        log_interval = 10
+    def train_model(self, config, trainset, sampler, cut_layer=None):
         batch_size = config['batch_size']
 
         logging.info("[Client #%d] Loading the dataset.", self.client_id)
         _train_loader = getattr(self, "train_loader", None)
 
         if callable(_train_loader):
-            train_loader = _train_loader(batch_size, trainset, sampler,
+            train_loader = self.train_loader(batch_size, trainset, sampler,
                                          cut_layer)
         else:
             train_loader = torch.utils.data.DataLoader(dataset=trainset,
@@ -49,7 +44,7 @@ class Trainer(basic.Trainer):
         # Initializing the loss criterion
         _loss_criterion = getattr(self, "loss_criterion", None)
         if callable(_loss_criterion):
-            loss_criterion = _loss_criterion(self.model)
+            loss_criterion = self.loss_criterion(self.model)
         else:
             loss_criterion = nn.CrossEntropyLoss()
 
@@ -66,7 +61,7 @@ class Trainer(basic.Trainer):
         else:
             lr_schedule = None
 
-        for batch_id, (examples, labels) in enumerate(train_loader):
+        for __, (examples, labels) in enumerate(train_loader):
             examples, labels = examples.to(self.device), labels.to(self.device)
             optimizer.zero_grad()
 
@@ -81,7 +76,7 @@ class Trainer(basic.Trainer):
 
             loss.backward()
 
-            #Record gradients of cut_layer
+            # Record gradients within the cut layer
             self.cut_layer_grad.append(examples.grad.clone().detach())
 
             optimizer.step()
@@ -89,40 +84,20 @@ class Trainer(basic.Trainer):
             if lr_schedule is not None:
                 lr_schedule.step()
 
-            # if batch_id % log_interval == 0:
-            #     if self.client_id == 0:
-            #         logging.info(
-            #             "[Server #{}] Batch: [{}/{}]\tLoss: {:.6f}"
-            #             .format(os.getpid(), batch_id,
-            #                     len(train_loader), loss.data.item()))
-            #     else:
-            #         wandb.log({"batch loss": loss.data.item()})
-
-            #         logging.info(
-            #             "[Client #{}] Batch: [{}/{}]\tLoss: {:.6f}"
-            #             .format(self.client_id, batch_id,
-            #                     len(train_loader),
-            #                     loss.data.item()))
         if hasattr(optimizer, "params_state_update"):
             optimizer.params_state_update()
 
-        self.save_gradients_to_disk()
+        self.save_gradients()
 
-    def save_gradients_to_disk(self, filename=None):
-        """
-        Saving gradients to a file.
-        """
+    def save_gradients(self):
+        """ Saving gradients to a file. """
         model_name = Config().trainer.model_name
         model_dir = Config().params['model_dir']
 
         if not os.path.exists(model_dir):
             os.makedirs(model_dir)
 
-        if filename is not None:
-            model_path = f'{model_dir}{filename}'
-        else:
-            model_path = f'{model_dir}{model_name}_gradients.pth'
-
+        model_path = f'{model_dir}{model_name}_gradients.pth'
         torch.save(self.cut_layer_grad, model_path)
 
         logging.info("[Server #%d] Gradients saved to %s.", os.getpid(),

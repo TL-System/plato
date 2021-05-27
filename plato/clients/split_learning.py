@@ -35,7 +35,7 @@ class Client(simple.Client):
             self.algorithm.load_weights(server_payload)
         elif self.gradient_received == False:
             self.gradient_received = True
-            self.algorithm.load_gradients(server_payload)
+            self.algorithm.receive_gradients(server_payload)
 
     async def train(self):
         """A split learning client only uses the first several layers in a forward pass."""

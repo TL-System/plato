@@ -108,7 +108,7 @@ class Server(fedavg_cs.Server):
         for i in range(Config().algorithm.total_silos):
             client_id = i + 1 + Config().clients.total_clients
             accuracy = [
-                report.accuracy for (report, __) in self.reports
+                report.accuracy for (report, __) in self.updates
                 if report.client_id == client_id
             ][0]
             accuracy_diff = abs(accuracy - self.accuracy)
@@ -124,7 +124,7 @@ class Server(fedavg_cs.Server):
         for i in range(Config().algorithm.total_silos):
             client_id = i + 1 + Config().clients.total_clients
             (report, weights) = [(report, payload)
-                                 for (report, payload) in self.reports
+                                 for (report, payload) in self.updates
                                  if int(report.client_id) == client_id][0]
             num_samples = report.num_samples
 

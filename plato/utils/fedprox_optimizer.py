@@ -39,7 +39,7 @@ class FedProxOptimizer(optim.SGD):
                 param_state = self.state[p]
 
                 if weight_decay != 0:
-                    d_p.add_(weight_decay, p.data)
+                    d_p.add_(p.data, alpha=weight_decay)
 
                 if 'old_init' not in param_state:
                     param_state['old_init'] = torch.clone(p.data).detach()
@@ -50,14 +50,14 @@ class FedProxOptimizer(optim.SGD):
                             d_p).detach()
                     else:
                         buf = param_state['momentum_buffer']
-                        buf.mul_(momentum).add_(1 - dampening, d_p)
+                        buf.mul_(momentum).add_(d_p, alpha=1 - dampening)
                     if nesterov:
                         d_p = d_p.add(momentum, buf)
                     else:
                         d_p = buf
                 # apply proximal update
-                d_p.add_(Config().trainer.mu, p.data - param_state['old_init'])
-                p.data.add_(-group['lr'], d_p)
+                d_p.add_(p.data - param_state['old_init'], alpha=Config().trainer.mu)
+                p.data.add_(d_p, alpha=-group['lr'])
 
         return loss
 

@@ -28,7 +28,7 @@ class Client(simple.Client):
         """Adaptive Parameter Freezing will be applied after training the model."""
 
         # Perform model training
-        self.trainer.train(self.trainset)
+        self.trainer.train(self.trainset, self.sampler)
 
         # Extract model weights and biases, with some weights frozen
         weights = self.algorithm.compress_weights()
@@ -39,4 +39,4 @@ class Client(simple.Client):
         else:
             accuracy = 0
 
-        return Report(len(self.data), accuracy), weights
+        return Report(self.sampler.trainset_size(), accuracy), weights

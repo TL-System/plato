@@ -1,7 +1,6 @@
 """
 A customized trainer for FedSarah.
 """
-import numpy as np
 import torch
 from plato.config import Config
 from plato.utils import optimizers
@@ -11,14 +10,14 @@ from plato.trainers import basic
 
 class Trainer(basic.Trainer):
     """The federated learning trainer for the FedSarah client"""
-    def __init__(self, model=None):
+    def __init__(self, client_id=0, model=None):
         """Initializing the trainer with the provided model.
 
         Arguments:
         model: The model to train.
         client_id: The ID of the client using this trainer (optional).
         """
-        super().__init__(model)
+        super().__init__(client_id, model)
 
         self.server_control_variates = None
         self.client_control_variates = None
