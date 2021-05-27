@@ -3,19 +3,18 @@ A customized trainer for FedSarah.
 """
 import torch
 from plato.config import Config
-from plato.utils import optimizers
-
 from plato.trainers import basic
+from plato.utils import optimizers
 
 
 class Trainer(basic.Trainer):
-    """The federated learning trainer for the FedSarah client"""
+    """ The federated learning trainer for the FedSarah client. """
     def __init__(self, client_id=0, model=None):
-        """Initializing the trainer with the provided model.
+        """ Initializing the trainer with the provided model.
 
         Arguments:
-        model: The model to train.
-        client_id: The ID of the client using this trainer (optional).
+            client_id: The ID of the client using this trainer (optional).
+            model: The model to train (optional).
         """
         super().__init__(client_id, model)
 
@@ -37,17 +36,5 @@ class Trainer(basic.Trainer):
         optimizer.client_control_variates = self.client_control_variates
         optimizer.client_id = self.client_id
         optimizer.max_counter = Config().trainer.epochs
-        """
-        if self.adjustment:
-            optimizer.epsilon = optimizer.max_epsilon - (
-                optimizer.max_epsilon - optimizer.min_epsilon) * np.exp(
-                    -1 * optimizer.epsilon_decay * self.fl_round_counter)
-        
-            #optimizer.epsilon = optimizer.min_epsilon + (
-            #optimizer.max_epsilon - optimizer.min_epsilon) * np.exp(
-            #   -1 * optimizer.epsilon_decay * self.fl_round_counter)
-        else:
-            optimizer.epsilon = optimizer.min_epsilon
-        """
 
         return optimizer

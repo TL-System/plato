@@ -117,20 +117,17 @@ class Trainer(ABC):
         if os.path.exists(accuracy_file):
             os.remove(accuracy_file)
 
-    def stop_training(self):
-        """ Remove the trainers table after all training concluded."""
-        if not Config().is_edge_server():
-            Trainer.run_sql_statement("DROP TABLE trainers")
-            Config().sql_connection.close()
-
     @abstractmethod
-    def train(self, trainset, sampler, cut_layer=None):
+    def train(self, trainset, sampler, cut_layer=None) -> bool:
         """The main training loop in a federated learning workload.
 
         Arguments:
         trainset: The training dataset.
         sampler: the sampler that extracts a partition for this client.
         cut_layer (optional): The layer which training should start from.
+
+        Returns:
+        Whether training was successfully completed.
         """
 
     @abstractmethod
