@@ -9,7 +9,7 @@ import pickle
 import subprocess
 import sys
 import time
-from abc import abstractmethod, abstractstaticmethod
+from abc import abstractmethod
 
 import socketio
 from aiohttp import web
@@ -319,7 +319,3 @@ class Server:
     @abstractmethod
     def choose_clients(self) -> list:
         """Choose a subset of the clients to participate in each round."""
-
-    @abstractstaticmethod
-    def is_valid_server_type(server_type):
-        """Determine if the server type is valid. """

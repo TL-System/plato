@@ -157,9 +157,7 @@ class Server(base.Server):
                     os.getpid(), 100 * self.accuracy))
         else:
             # Testing the updated model directly at the server
-            loop = asyncio.get_event_loop()
-            self.accuracy = loop.run_until_complete(
-                self.trainer.test(self.testset))
+            self.accuracy = await self.trainer.server_test(self.testset)
 
             logging.info(
                 '[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(

@@ -60,6 +60,6 @@ algorithm:
     type: adaptive_sync
 
     # The initial synchronization frequency
-    initial_sync_frequency: 100
+    initial_sync_frequency: 1
 
     moving_average_alpha: 0.99

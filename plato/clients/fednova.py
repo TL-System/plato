@@ -43,4 +43,4 @@ class Client(simple.Client):
         # Perform model training for a specific number of epoches
         Config().trainer = Config().trainer._replace(epochs=local_epochs)
 
-        await super().train()
+        return await super().train()

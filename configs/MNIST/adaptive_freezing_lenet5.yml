@@ -61,9 +61,6 @@ algorithm:
     # Aggregation algorithm
     type: adaptive_freezing
 
-    # The initial synchronization frequency
-    initial_sync_frequency: 100
-
     moving_average_alpha: 0.99
     stability_threshold: 0.05
     tight_threshold: 0.8
