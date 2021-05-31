@@ -103,7 +103,7 @@ class Client:
                        'cross_silo') and not Config().is_edge_server():
                 uri = '{}:{}'.format(
                     uri,
-                    Config().server.port + self.edge_server_id)
+                    int(Config().server.port) + int(self.edge_server_id))
             else:
                 uri = '{}:{}'.format(uri, Config().server.port)
 
