@@ -18,6 +18,7 @@ from plato.servers import (
     tempo,
     fedsarah,
     fedatt,
+    fed_attack_adapt,
     split_learning,
 )
 
@@ -34,6 +35,7 @@ registered_servers = OrderedDict([
     ('tempo', tempo.Server),
     ('fedsarah', fedsarah.Server),
     ('fedatt', fedatt.Server),
+    ('fed_attack_adapt', fed_attack_adapt.Server),
     ('split_learning', split_learning.Server),
 ])
 
