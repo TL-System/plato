@@ -48,7 +48,7 @@ class Server(fedavg.Server):
                 delta = update[name]
                 # atts[name][i] = torch.linalg.norm(weight - delta) (fedatt)
                 cos = torch.nn.CosineSimilarity(dim=0)
-                atts[name][i] = cos(weight, delta)
+                atts[name][i] = cos(torch.flatten(weight), torch.flatten(delta))
             # atts[name] = F.softmax(atts[name], dim=0)
             c = 10 # scaling factor for temperature
             atts[name] = F.softmax(atts[name]*c, dim=0)
@@ -73,4 +73,4 @@ class Server(fedavg.Server):
         for name, weight in baseline_weights.items():
             updated_weights[name] = att_update[name]
 
-        return updated_weights
+        self.updated_weights = updated_weights
