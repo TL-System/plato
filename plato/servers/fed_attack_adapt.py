@@ -46,22 +46,12 @@ class Server(fedavg.Server):
             atts[name] = self.trainer.zeros(len(updates))
             for i, update in enumerate(updates):
                 delta = update[name]
-                # atts[name][i] = torch.linalg.norm(weight - delta) (fedatt)
                 cos = torch.nn.CosineSimilarity(dim=0)
+                # cosine similarity
                 atts[name][i] = cos(torch.flatten(weight), torch.flatten(delta))
-            # atts[name] = F.softmax(atts[name], dim=0)
             c = 10 # scaling factor for temperature
             atts[name] = F.softmax(atts[name]*c, dim=0)
-        '''
-        for name, weight in baseline_weights.items():
-            att_weight = self.trainer.zeros(weight.shape)
-            for i, update in enumerate(updates):
-                delta = update[name]
-                att_weight += (weight - delta).mul(atts[name][i])
-            #TODO: plus random noise?
-            # epsilon as an argument?
-            att_update[name] = -att_weight.mul(1.2)
-        '''
+
         for name, weight in baseline_weights.items():
             att_weight = self.trainer.zeros(weight.shape)
             for i, update in enumerate(updates):
