@@ -20,12 +20,10 @@ def run(client_id, port, client=None):
     # If a server needs to be running concurrently
     if Config().is_edge_server():
         from plato.clients import edge
-        from plato.servers import fedavg_cs, rhythm, tempo
+        from plato.servers import fedavg_cs
 
         edge_servers = OrderedDict([
             ('fedavg_cross_silo', fedavg_cs.Server),
-            ('tempo', tempo.Server),
-            ('rhythm', rhythm.Server),
         ])
 
         Config().trainer = Config().trainer._replace(

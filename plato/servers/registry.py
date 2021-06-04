@@ -11,8 +11,6 @@ from plato.servers import (
     fedavg,
     fedavg_cs,
     mistnet,
-    rhythm,
-    tempo,
     split_learning,
 )
 
@@ -22,8 +20,6 @@ registered_servers = OrderedDict([
     ('fedavg', fedavg.Server),
     ('fedavg_cross_silo', fedavg_cs.Server),
     ('mistnet', mistnet.Server),
-    ('rhythm', rhythm.Server),
-    ('tempo', tempo.Server),
     ('split_learning', split_learning.Server),
 ])
 

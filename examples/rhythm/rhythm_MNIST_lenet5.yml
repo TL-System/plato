@@ -1,18 +1,15 @@
 clients:
-    # Type
-    type: simple
-
     # The total number of clients
-    total_clients: 2
+    total_clients: 3
 
     # The number of clients selected in each round
-    per_round: 2
+    per_round: 3
 
     # Should the clients compute test accuracy locally?
     do_test: false
 
 server:
-    type: tempo
+    type: rhythm
     address: 127.0.0.1
     port: 8000
 
@@ -24,7 +21,7 @@ data:
     data_path: ./data
 
     # Number of samples in each partition
-    partition_size: 200
+    partition_size: 20000
 
     # IID or non-IID?
     sampler: iid
@@ -34,7 +31,7 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 2
+    rounds: 100
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -47,7 +44,7 @@ trainer:
 
     # Number of epoches for local training in each communication round
     epochs: 1
-    batch_size: 20
+    batch_size: 32
     optimizer: SGD
     learning_rate: 0.01
     momentum: 0.9
@@ -67,12 +64,10 @@ algorithm:
     total_silos: 2
 
     # The number of local aggregation rounds on edge servers before sending
-    # aggreagted weights to the central server
+    # aggregated weights to the central server
     local_rounds: 2
 
-results:
-    # Write the following parameter(s) into a CSV
-    types: accuracy, training_time, round_time, edge_agg_num
+    # The number of episodes of RL training
+    rl_episodes: 1
 
-    # Plot results (x_axis&y_axis)
-    plot: global_round&accuracy, global_round&training_time
+    rl_target_reward: null
