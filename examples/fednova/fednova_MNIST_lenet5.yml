@@ -1,7 +1,4 @@
 clients:
-    # Type
-    type: fednova
-
     # The total number of clients
     total_clients: 3
 
@@ -12,7 +9,6 @@ clients:
     do_test: false
 
 server:
-    type: fednova
     address: 127.0.0.1
     port: 8000
 

@@ -24,8 +24,8 @@ class Algorithm(fedavg.Algorithm):
     """The federated learning trainer for Adaptive Parameter Freezing,
        used by both the client and the server.
     """
-    def __init__(self, trainer: Trainer = None, client_id=0):
-        super().__init__(trainer, client_id)
+    def __init__(self, trainer: Trainer = None):
+        super().__init__(trainer)
         self.sync_mask = {}
         self.moving_average_deltas = {}
         self.moving_average_abs_deltas = {}

@@ -8,8 +8,8 @@ from plato.servers import fedavg
 
 class Server(fedavg.Server):
     """A federated learning server using the FedSarah algorithm."""
-    def __init__(self, model=None, trainer=None):
-        super().__init__(model=model, trainer=trainer)
+    def __init__(self, model=None, algorithm=None, trainer=None):
+        super().__init__(model=model, algorithm=algorithm, trainer=trainer)
         self.server_control_variates = None
         self.control_variates_received = None
 
@@ -26,10 +26,10 @@ class Server(fedavg.Server):
 
         return self.algorithm.compute_weight_updates(weights_received)
 
-    async def federated_averaging(self, reports):
+    async def federated_averaging(self, updates):
         """Aggregate weight and delta updates from the clients."""
 
-        updated_weights = await super().federated_averaging(reports)
+        await super().federated_averaging(updates)
 
         # Initialize server control variates
         self.server_control_variates = [0] * len(
@@ -40,8 +40,6 @@ class Server(fedavg.Server):
             for j, control_variate in enumerate(control_variates):
                 self.server_control_variates[j] += control_variate / Config(
                 ).clients.total_clients
-
-        return updated_weights
 
     async def customize_server_response(self, server_response):
         """Add 'payload_length' into the server response."""

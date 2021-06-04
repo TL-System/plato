@@ -13,9 +13,9 @@ from plato.config import Config
 
 class Trainer(ABC):
     """Base class for all the trainers."""
-    def __init__(self, client_id=0):
+    def __init__(self):
         self.device = Config().device()
-        self.set_client_id(client_id)
+        self.client_id = 0
 
     @staticmethod
     def run_sql_statement(statement: str, params: tuple = None):
