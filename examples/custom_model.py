@@ -98,7 +98,7 @@ def main():
     trainer = Trainer(model=model)
 
     client = simple.Client(model=model, datasource=datasource, trainer=trainer)
-    server = fedavg.Server(model=model)
+    server = fedavg.Server(model=model, trainer=trainer)
     server.run(client)
 
 

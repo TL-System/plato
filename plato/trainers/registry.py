@@ -8,7 +8,6 @@ from collections import OrderedDict
 from plato.trainers import (
     basic,
     scaffold,
-    fedsarah,
     split_learning,
     pascal_voc,
 )
@@ -26,7 +25,6 @@ else:
     registered_trainers = OrderedDict([
         ('basic', basic.Trainer),
         ('scaffold', scaffold.Trainer),
-        ('fedsarah', fedsarah.Trainer),
         ('split_learning', split_learning.Trainer),
         ('pascal_voc', pascal_voc.Trainer),
     ])

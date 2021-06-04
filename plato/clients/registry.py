@@ -13,7 +13,6 @@ from plato.clients import (
     adaptive_freezing,
     mistnet,
     scaffold,
-    fedsarah,
     tempo,
     split_learning,
 )
@@ -26,7 +25,6 @@ registered_clients = OrderedDict([
     ('adaptive_freezing', adaptive_freezing.Client),
     ('mistnet', mistnet.Client),
     ('scaffold', scaffold.Client),
-    ('fedsarah', fedsarah.Client),
     ('tempo', tempo.Client),
     ('split_learning', split_learning.Client),
 ])
