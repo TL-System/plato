@@ -1,13 +1,17 @@
 """
-A customized optimizer for SCAFFOLD.
+A federated learning client using SCAFFOLD.
 
 Reference:
 
-Karimireddy et al., "SCAFFOLD: Stochastic Controlled Averaging for Federated Learning"
-(https://arxiv.org/pdf/1910.06378.pdf)
+Karimireddy et al., "SCAFFOLD: Stochastic Controlled Averaging for Federated Learning,"
+in Proceedings of the 37th International Conference on Machine Learning (ICML), 2020.
+
+https://arxiv.org/pdf/1910.06378.pdf
 """
 import torch
 from torch import optim
+
+import scaffold_optimizer
 
 
 class ScaffoldOptimizer(optim.SGD):
