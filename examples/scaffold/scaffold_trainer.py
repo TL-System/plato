@@ -10,8 +10,10 @@ https://arxiv.org/pdf/1910.06378.pdf
 """
 import torch
 
+from plato.config import Config
 from plato.trainers import basic
-from plato.utils import optimizers
+
+import scaffold_optimizer
 
 
 class Trainer(basic.Trainer):
@@ -36,7 +38,11 @@ class Trainer(basic.Trainer):
 
     def get_optimizer(self, model):
         """Initialize the SCAFFOLD optimizer."""
-        optimizer = optimizers.get_optimizer(model)
+        optimizer = scaffold_optimizer.ScaffoldOptimizer(
+            model.parameters(),
+            lr=Config().trainer.learning_rate,
+            momentum=Config().trainer.momentum,
+            weight_decay=Config().trainer.weight_decay)
 
         optimizer.server_update_direction = self.server_update_direction
         optimizer.client_update_direction = self.client_update_direction

@@ -2,9 +2,11 @@
 A customized trainer for FedSarah.
 """
 import torch
+
 from plato.config import Config
 from plato.trainers import basic
-from plato.utils import optimizers
+
+import fedsarah_optimizer
 
 
 class Trainer(basic.Trainer):
@@ -31,7 +33,8 @@ class Trainer(basic.Trainer):
 
     def get_optimizer(self, model):
         """Initialize the FedSarah optimizer."""
-        optimizer = optimizers.get_optimizer(model)
+        optimizer = fedsarah_optimizer.FedSarahOptimizer(model.parameters())
+
         optimizer.server_control_variates = self.server_control_variates
         optimizer.client_control_variates = self.client_control_variates
         optimizer.client_id = self.client_id

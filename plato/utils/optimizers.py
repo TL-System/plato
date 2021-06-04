@@ -12,8 +12,6 @@ from torch import nn
 from plato.config import Config
 
 from plato.utils.fedprox_optimizer import FedProxOptimizer
-from plato.utils.fedsarah_optimizer import FedSarahOptimizer
-from plato.utils.scaffold_optimizer import ScaffoldOptimizer
 from plato.utils.step import Step
 
 
@@ -33,13 +31,6 @@ def get_optimizer(model) -> optim.Optimizer:
                                 lr=Config().trainer.learning_rate,
                                 momentum=Config().trainer.momentum,
                                 weight_decay=Config().trainer.weight_decay)
-    elif Config().trainer.optimizer == 'Scaffold':
-        return ScaffoldOptimizer(model.parameters(),
-                                 lr=Config().trainer.learning_rate,
-                                 momentum=Config().trainer.momentum,
-                                 weight_decay=Config().trainer.weight_decay)
-    elif Config().trainer.optimizer == 'FedSarah':
-        return FedSarahOptimizer(model.parameters())
 
     raise ValueError('No such optimizer: {}'.format(
         Config().trainer.optimizer))
