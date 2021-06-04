@@ -15,7 +15,6 @@ from plato.servers import (
     scaffold,
     rhythm,
     tempo,
-    fedsarah,
     fedatt,
     split_learning,
 )
@@ -30,7 +29,6 @@ registered_servers = OrderedDict([
     ('scaffold', scaffold.Server),
     ('rhythm', rhythm.Server),
     ('tempo', tempo.Server),
-    ('fedsarah', fedsarah.Server),
     ('fedatt', fedatt.Server),
     ('split_learning', split_learning.Server),
 ])
