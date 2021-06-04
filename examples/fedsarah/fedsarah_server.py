@@ -1,5 +1,9 @@
 """
 A customized server for FedSarah.
+
+Reference: Ngunyen et al., "SARAH: A Novel Method for Machine Learning Problems
+Using Stochastic Recursive Gradient." (https://arxiv.org/pdf/1703.00102.pdf)
+
 """
 from plato.config import Config
 
