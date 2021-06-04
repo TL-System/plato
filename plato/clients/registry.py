@@ -20,7 +20,6 @@ from plato.config import Config
 
 registered_clients = OrderedDict([
     ('simple', simple.Client),
-    ('adaptive_sync', adaptive_sync.Client),
     ('mistnet', mistnet.Client),
     ('scaffold', scaffold.Client),
     ('tempo', tempo.Client),

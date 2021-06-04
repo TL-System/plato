@@ -5,7 +5,7 @@ by the server.
 Reference:
 
 C. Chen, et al. "GIFT: Towards Accurate and Efficient Federated
-Learning withGradient-Instructed Frequency Tuning," found in docs/papers.
+Learning withGradient-Instructed Frequency Tuning," found in papers/.
 """
 import logging
 from collections import OrderedDict
@@ -21,8 +21,8 @@ class Algorithm(fedavg.Algorithm):
     """The federated learning trainer for Adaptive Synchronization Frequency,
        used by the server.
     """
-    def __init__(self, trainer: Trainer = None, client_id=0):
-        super().__init__(trainer, client_id)
+    def __init__(self, trainer: Trainer = None):
+        super().__init__(trainer)
 
         self.sync_frequency = Config().algorithm.initial_sync_frequency
 

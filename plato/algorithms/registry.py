@@ -30,7 +30,6 @@ else:
     registered_algorithms = OrderedDict([
         ('fedavg', fedavg.Algorithm),
         ('mistnet', mistnet.Algorithm),
-        ('adaptive_sync', adaptive_sync.Algorithm),
         ('split_learning', split_learning.Algorithm),
     ])
 
