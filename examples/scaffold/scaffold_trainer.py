@@ -1,27 +1,29 @@
 """
-A customized trainer for SCAFFOLD.
+A federated learning client using SCAFFOLD.
 
 Reference:
 
-Karimireddy et al., "SCAFFOLD: Stochastic Controlled Averaging for Federated Learning"
-(https://arxiv.org/pdf/1910.06378.pdf)
+Karimireddy et al., "SCAFFOLD: Stochastic Controlled Averaging for Federated Learning,"
+in Proceedings of the 37th International Conference on Machine Learning (ICML), 2020.
+
+https://arxiv.org/pdf/1910.06378.pdf
 """
 import torch
-from plato.utils import optimizers
 
 from plato.trainers import basic
+from plato.utils import optimizers
 
 
 class Trainer(basic.Trainer):
     """The federated learning trainer for the SCAFFOLD client. """
-    def __init__(self, client_id=0, model=None):
+    def __init__(self, model=None):
         """Initializing the trainer with the provided model.
 
         Arguments:
         model: The model to train.
         client_id: The ID of the client using this trainer (optional).
         """
-        super().__init__(client_id, model)
+        super().__init__(model)
 
         self.server_update_direction = None
         self.client_update_direction = None

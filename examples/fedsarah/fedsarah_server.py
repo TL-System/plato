@@ -9,7 +9,7 @@ from plato.servers import fedavg
 class Server(fedavg.Server):
     """A federated learning server using the FedSarah algorithm."""
     def __init__(self, model=None, algorithm=None, trainer=None):
-        super().__init__(model=model, algorithm=algorithm, trainer=trainer)
+        super().__init__(model, algorithm, trainer)
         self.server_control_variates = None
         self.control_variates_received = None
 

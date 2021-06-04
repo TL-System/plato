@@ -1,7 +1,4 @@
 clients:
-    # Type
-    type: scaffold
-
     # The total number of clients
     total_clients: 1
 
@@ -12,7 +9,6 @@ clients:
     do_test: true
 
 server:
-    type: scaffold
     address: 127.0.0.1
     port: 8000
 
@@ -30,9 +26,6 @@ data:
     sampler: iid
 
 trainer:
-    # The type of the trainer
-    type: scaffold
-
     # The maximum number of training rounds
     rounds: 100
 

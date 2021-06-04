@@ -3,19 +3,20 @@ A federated learning server using SCAFFOLD.
 
 Reference:
 
-Karimireddy et al., "SCAFFOLD: Stochastic Controlled Averaging for Federated Learning"
-(https://arxiv.org/pdf/1910.06378.pdf)
+Karimireddy et al., "SCAFFOLD: Stochastic Controlled Averaging for Federated Learning," 
+in Proceedings of the 37th International Conference on Machine Learning (ICML), 2020.
+
+https://arxiv.org/pdf/1910.06378.pdf
 """
 
 from plato.config import Config
-
 from plato.servers import fedavg
 
 
 class Server(fedavg.Server):
     """A federated learning server using the SCAFFOLD algorithm."""
-    def __init__(self):
-        super().__init__()
+    def __init__(self, model=None, algorithm=None, trainer=None):
+        super().__init__(model, algorithm, trainer)
         self.server_update_direction = None
         self.update_directions_received = None
 

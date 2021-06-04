@@ -9,10 +9,8 @@ from collections import OrderedDict
 
 from plato.servers import (
     fedavg,
-    adaptive_sync,
     fedavg_cs,
     mistnet,
-    scaffold,
     rhythm,
     tempo,
     fedatt,
@@ -23,10 +21,8 @@ from plato.config import Config
 
 registered_servers = OrderedDict([
     ('fedavg', fedavg.Server),
-    ('adaptive_sync', adaptive_sync.Server),
     ('fedavg_cross_silo', fedavg_cs.Server),
     ('mistnet', mistnet.Server),
-    ('scaffold', scaffold.Server),
     ('rhythm', rhythm.Server),
     ('tempo', tempo.Server),
     ('fedatt', fedatt.Server),

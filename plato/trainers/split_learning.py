@@ -14,8 +14,8 @@ from plato.trainers import basic
 
 
 class Trainer(basic.Trainer):
-    def __init__(self, client_id=0, model=None):
-        super().__init__(client_id, model)
+    def __init__(self, model=None):
+        super().__init__(model)
 
         # Record the gradients of the cut layer
         self.cut_layer_grad = []
