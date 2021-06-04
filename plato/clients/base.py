@@ -87,7 +87,7 @@ class Client:
             logging.info("[Client #%d] Contacting the central server.",
                          self.client_id)
 
-        self.sio = socketio.AsyncClient(reconnection=False)
+        self.sio = socketio.AsyncClient(reconnection=True)
         self.sio.register_namespace(
             ClientEvents(namespace='/', plato_client=self))
 

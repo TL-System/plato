@@ -6,7 +6,6 @@ import logging
 import multiprocessing as mp
 import os
 import pickle
-import subprocess
 import sys
 import time
 from abc import abstractmethod
@@ -93,8 +92,7 @@ class Server:
     def start(self, port=Config().server.port):
         """ Start running the socket.io server. """
         logging.info("Starting a server at address %s and port %s.",
-                     Config().server.address,
-                     Config().server.port)
+                     Config().server.address, port)
 
         ping_interval = Config().server.ping_interval if hasattr(
             Config().server, 'ping_interval') else 3600
@@ -146,14 +144,11 @@ class Server:
                 logging.info(
                     "Starting client #%d as an edge server on port %s.",
                     client_id, port)
-                command = "python ./plato/client.py -i {}".format(client_id)
-                command += " -c {}".format(Config().args.config)
-                command += " -p {}".format(port)
-                subprocess.Popen(command, shell=True)
+                proc = mp.Process(target=run, args=(client_id, port, client))
+                proc.start()
             else:
                 logging.info("Starting client #%d's process.", client_id)
                 proc = mp.Process(target=run, args=(client_id, None, client))
-
                 proc.start()
 
     async def close_connections(self):

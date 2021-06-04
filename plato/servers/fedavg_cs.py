@@ -38,8 +38,9 @@ class Server(fedavg.Server):
             self.clients_per_round = int(self.clients_per_round /
                                          Config().algorithm.total_silos)
             logging.info(
-                "[Edge server #%d] Started training with %d clients and %d per round.",
-                Config().args.id, self.total_clients, self.clients_per_round)
+                "[Edge server #%d (#%d)] Started training on %d clients with %d per round.",
+                Config().args.id, os.getpid(), self.total_clients,
+                self.clients_per_round)
 
             if hasattr(Config(), 'results'):
                 self.recorded_items = ['global_round'] + self.recorded_items
@@ -85,6 +86,16 @@ class Server(fedavg.Server):
                 if Config().clients.do_test and Config().server.do_test:
                     datasource = datasources_registry.get()
                     self.testset = datasource.get_test_set()
+
+    async def select_clients(self):
+        if Config().is_edge_server():
+            if self.current_round == 0:
+                # Wait until this edge server is selected by the central server
+                # to avoid the edge server selects clients and clients begin training
+                # before the edge server is selected
+                await self.new_global_round_begins.wait()
+
+        await super().select_clients()
 
     async def customize_server_response(self, server_response):
         """Wrap up generating the server response with any additional information."""
