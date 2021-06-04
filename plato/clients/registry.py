@@ -10,7 +10,6 @@ from collections import OrderedDict
 from plato.clients import (
     simple,
     mistnet,
-    tempo,
     split_learning,
 )
 
@@ -19,7 +18,6 @@ from plato.config import Config
 registered_clients = OrderedDict([
     ('simple', simple.Client),
     ('mistnet', mistnet.Client),
-    ('tempo', tempo.Client),
     ('split_learning', split_learning.Client),
 ])
 
