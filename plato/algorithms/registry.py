@@ -23,7 +23,6 @@ else:
     from plato.algorithms import (
         fedavg,
         mistnet,
-        adaptive_sync,
         split_learning,
     )
 

@@ -12,7 +12,6 @@ clients:
     do_test: true
 
 server:
-    type: fedatt
     address: 127.0.0.1
     port: 8000
 
