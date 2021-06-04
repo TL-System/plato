@@ -3,8 +3,10 @@ A federated learning client using SCAFFOLD.
 
 Reference:
 
-Karimireddy et al., "SCAFFOLD: Stochastic Controlled Averaging for Federated Learning" 
-(https://arxiv.org/pdf/1910.06378.pdf)
+Karimireddy et al., "SCAFFOLD: Stochastic Controlled Averaging for Federated Learning,"
+in Proceedings of the 37th International Conference on Machine Learning (ICML), 2020.
+
+https://arxiv.org/pdf/1910.06378.pdf
 """
 
 import os
@@ -24,8 +26,8 @@ class Report(simple.Report):
 class Client(simple.Client):
     """A SCAFFOLD federated learning client who sends weight updates
     and client control variate."""
-    def __init__(self):
-        super().__init__()
+    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
+        super().__init__(model, datasource, algorithm, trainer)
         self.client_update_direction = None
         self.server_update_direction = None
         self.new_client_update_direction = None

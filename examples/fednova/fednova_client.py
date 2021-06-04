@@ -27,8 +27,8 @@ class Report(base.Report):
 class Client(simple.Client):
     """A fednova federated learning client who sends weight updates
     and the number of local epochs."""
-    def __init__(self, model=None, datasource=None, trainer=None):
-        super().__init__(model=model, datasource=datasource, trainer=trainer)
+    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
+        super().__init__(model, datasource, algorithm, trainer)
         self.pattern = None
         self.max_local_iter = None
 

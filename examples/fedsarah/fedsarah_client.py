@@ -16,8 +16,8 @@ class Report(simple.Report):
 class Client(simple.Client):
     """A FedSarah federated learning client who sends weight updates
     and client control variates."""
-    def __init__(self, model=None, datasource=None, trainer=None):
-        super().__init__(model=model, datasource=datasource, trainer=trainer)
+    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
+        super().__init__(model, datasource, algorithm, trainer)
         self.client_control_variates = None
         self.server_control_variates = None
         self.new_client_control_variates = None

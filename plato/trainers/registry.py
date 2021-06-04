@@ -7,7 +7,6 @@ from collections import OrderedDict
 
 from plato.trainers import (
     basic,
-    scaffold,
     split_learning,
     pascal_voc,
 )
@@ -24,7 +23,6 @@ if hasattr(Config().trainer, 'use_mindspore'):
 else:
     registered_trainers = OrderedDict([
         ('basic', basic.Trainer),
-        ('scaffold', scaffold.Trainer),
         ('split_learning', split_learning.Trainer),
         ('pascal_voc', pascal_voc.Trainer),
     ])
