@@ -2,14 +2,10 @@ import os
 import asyncio
 import logging
 import websockets
-from dataclasses import dataclass
 import pickle
-import time
 
 import torch
 from torch import nn
-from torchvision.datasets import MNIST
-from torchvision.transforms import ToTensor
 import torch.nn.functional as F
 
 os.environ['config_file'] = 'examples/configs/client.yml'

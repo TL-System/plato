@@ -12,6 +12,7 @@ clients:
     do_test: false
 
 server:
+    type: fednova
     address: 127.0.0.1
     port: 8000
 

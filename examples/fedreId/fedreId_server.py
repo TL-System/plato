@@ -40,11 +40,9 @@ class fedReIdServer(fedavg.Server):
         baseline_weights = self.algorithm.extract_weights()
 
         # Load updated weights into model
-        updated_weights = OrderedDict()
+        self.updated_weights = OrderedDict()
         for name, weight in baseline_weights.items():
-            updated_weights[name] = weight + avg_update[name]
-
-        return updated_weights
+            self.updated_weights[name] = weight + avg_update[name]
 
 
 def main():

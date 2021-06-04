@@ -11,15 +11,12 @@ Systems (ICDCS 2021), Online, July 7-10, 2021 (found in docs/papers).
 from dataclasses import dataclass
 
 from plato.config import Config
-
+from plato.clients import base
 from plato.clients import simple
 
-
 @dataclass
-class Report:
+class Report(base.Report):
     """Client report sent to the federated learning server."""
-    num_samples: int
-    accuracy: float
 
 
 class Client(simple.Client):

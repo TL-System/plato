@@ -8,12 +8,11 @@ import random
 from dataclasses import dataclass
 
 from plato.config import Config
-
 from plato.clients import simple
-
+from plato.clients import base
 
 @dataclass
-class Report(simple.Report):
+class Report(base.Report):
     """A client report containing the number of local epochs."""
     epochs: int
 
@@ -25,10 +24,13 @@ class Client(simple.Client):
         super().__init__()
         self.pattern = None
         self.max_local_iter = None
-        random.seed(3000 + int(self.client_id))
+    
+    def configure(self):
+        super().configure()
+        random.seed(3000 + self.client_id)
 
     async def train(self):
-        """FedNova clients use different number of local epochs."""
+        """ FedNova clients use different number of local epochs. """
 
         # generate the number of local epochs randomly
         if Config().algorithm.pattern == "constant":
@@ -43,4 +45,6 @@ class Client(simple.Client):
         # Perform model training for a specific number of epoches
         Config().trainer = Config().trainer._replace(epochs=local_epochs)
 
-        return await super().train()
+        report, weights = await super().train()
+
+        return Report(report.num_samples, report.accuracy, local_epochs), weights
