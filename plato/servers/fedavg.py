@@ -111,7 +111,7 @@ class Server(base.Server):
 
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using federated averaging."""
-        # Extract updates from the reports
+        # Extract weights from the updates
         weights_received = self.extract_client_updates(updates)
 
         # Extract the total number of samples
