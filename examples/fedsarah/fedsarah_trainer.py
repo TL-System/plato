@@ -1,5 +1,9 @@
 """
 A customized trainer for FedSarah.
+
+Reference: Ngunyen et al., "SARAH: A Novel Method for Machine Learning Problems
+Using Stochastic Recursive Gradient." (https://arxiv.org/pdf/1703.00102.pdf)
+
 """
 import torch
 

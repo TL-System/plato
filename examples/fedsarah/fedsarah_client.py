@@ -1,5 +1,9 @@
 """
 A customized client for FedSarah.
+
+Reference: Ngunyen et al., "SARAH: A Novel Method for Machine Learning Problems
+Using Stochastic Recursive Gradient." (https://arxiv.org/pdf/1703.00102.pdf)
+
 """
 import os
 from dataclasses import dataclass
@@ -16,7 +20,11 @@ class Report(simple.Report):
 class Client(simple.Client):
     """A FedSarah federated learning client who sends weight updates
     and client control variates."""
-    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
+    def __init__(self,
+                 model=None,
+                 datasource=None,
+                 algorithm=None,
+                 trainer=None):
         super().__init__(model, datasource, algorithm, trainer)
         self.client_control_variates = None
         self.server_control_variates = None
