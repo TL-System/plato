@@ -1,6 +1,13 @@
 """
-A federated learning client whose local number of epochs is randomly
+A federated learning client using FedNova, and the local number of epochs is randomly
 generated and communicated to the server at each communication round.
+
+Reference:
+
+Wang et al., "Tackling the Objective Inconsistency Problem in Heterogeneous Federated
+Optimization", in the Proceedings of NeurIPS 2020.
+
+https://proceedings.neurips.cc/paper/2020/hash/564127c03caab942e503ee6f810f54fd-Abstract.html
 """
 
 import logging

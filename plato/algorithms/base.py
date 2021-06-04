@@ -9,7 +9,7 @@ from plato.trainers.base import Trainer
 
 class Algorithm(ABC):
     """Base class for all the algorithms."""
-    def __init__(self, trainer: Trainer, client_id=None):
+    def __init__(self, trainer: Trainer):
         """Initializing the algorithm with the provided model and trainer.
 
         Arguments:
@@ -19,6 +19,10 @@ class Algorithm(ABC):
         super().__init__()
         self.trainer = trainer
         self.model = trainer.model
+        self.client_id = 0
+
+    def set_client_id(self, client_id):
+        """ Setting the client ID. """
         self.client_id = client_id
 
     @abstractmethod

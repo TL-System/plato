@@ -24,14 +24,14 @@ class Report(base.Report):
 
 class Client(base.Client):
     """A basic federated learning client who sends simple weight updates."""
-    def __init__(self, model=None, datasource=None, trainer=None):
+    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
         super().__init__()
         self.model = model
         self.datasource = datasource
+        self.algorithm = algorithm
         self.trainer = trainer
         self.trainset = None  # Training dataset
         self.testset = None  # Testing dataset
-        self.algorithm = None
         self.sampler = None
 
         self.data_loading_time = None
@@ -43,11 +43,12 @@ class Client(base.Client):
     def configure(self) -> None:
         """Prepare this client for training."""
         if self.trainer is None:
-            self.trainer = trainers_registry.get(self.client_id, self.model)
-
+            self.trainer = trainers_registry.get(self.model)
         self.trainer.set_client_id(self.client_id)
 
-        self.algorithm = algorithms_registry.get(self.trainer, self.client_id)
+        if self.algorithm is None:
+            self.algorithm = algorithms_registry.get(self.trainer)
+        self.algorithm.set_client_id(self.client_id)
 
     def load_data(self) -> None:
         """Generating data and loading them onto this client."""

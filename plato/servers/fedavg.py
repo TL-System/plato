@@ -21,13 +21,14 @@ from plato.servers import base
 
 class Server(base.Server):
     """Federated learning server using federated averaging."""
-    def __init__(self, model=None, trainer=None):
+    def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__()
 
         if hasattr(Config().trainer, 'use_wandb'):
             wandb.init(project="plato", reinit=True)
 
         self.model = model
+        self.algorithm = algorithm
         self.trainer = trainer
 
         self.testset = None
@@ -60,8 +61,7 @@ class Server(base.Server):
         creating the clients.
         """
 
-        logging.info("[Server #%d] Configuring the %s server...", os.getpid(),
-                     Config().algorithm.type)
+        logging.info("[Server #%d] Configuring the server...", os.getpid())
 
         total_rounds = Config().trainer.rounds
         target_accuracy = Config().trainer.target_accuracy
@@ -90,7 +90,8 @@ class Server(base.Server):
         if self.trainer is None:
             self.trainer = trainers_registry.get(model=self.model)
 
-        self.algorithm = algorithms_registry.get(self.trainer)
+        if self.algorithm is None:
+            self.algorithm = algorithms_registry.get(self.trainer)
 
     def choose_clients(self):
         """Choose a subset of the clients to participate in each round."""

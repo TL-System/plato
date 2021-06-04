@@ -1,7 +1,4 @@
 clients:
-    # Type
-    type: adaptive_freezing
-
     # The total number of clients
     total_clients: 1
 
@@ -58,9 +55,6 @@ trainer:
     model_name: lenet5
 
 algorithm:
-    # Aggregation algorithm
-    type: adaptive_freezing
-
     moving_average_alpha: 0.99
     stability_threshold: 0.05
     tight_threshold: 0.8
