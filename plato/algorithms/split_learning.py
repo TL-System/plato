@@ -10,7 +10,6 @@ import numpy as np
 import torch
 import torch.nn as nn
 from plato.config import Config
-from plato.utils import unary_encoding
 from plato.utils import optimizers
 
 from plato.algorithms import fedavg
@@ -33,8 +32,8 @@ class Algorithm(fedavg.Algorithm):
     """The PyTorch-based split learning algorithm, used by both the client and the
     server.
     """
-    def __init__(self, trainer=None, client_id=None):
-        super().__init__(trainer, client_id)
+    def __init__(self, trainer=None):
+        super().__init__(trainer)
         self.gradients_list = []
 
     def receive_gradients(self, gradients):

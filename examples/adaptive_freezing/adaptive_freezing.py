@@ -6,7 +6,7 @@ Reference:
 C. Chen, H. Xu, W. Wang, B. Li, B. Li, L. Chen, G. Zhang. “Communication-
 Efficient Federated Learning with Adaptive Parameter Freezing,” in the
 Proceedings of the 41st IEEE International Conference on Distributed Computing
-Systems (ICDCS 2021), Online, July 7-10, 2021 (found in docs/papers).
+Systems (ICDCS 2021), Online, July 7-10, 2021 (found in papers/).
 """
 import os
 
