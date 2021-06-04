@@ -145,10 +145,11 @@ tests/data/
 # Result files
 results/
 
-# Datasets and models
+# Models
 pretrained/
 wandb/
 logs/
+*.pth
 
 # macOS
 .DS_Store
