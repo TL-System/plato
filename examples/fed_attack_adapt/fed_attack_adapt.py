@@ -16,7 +16,7 @@ import fed_attack_adapt_server
 
 
 def main():
-    """ A Plato federated learning training session using the fedatt algorithm. """
+    """ A Plato federated learning training session using the fed_attack_adapt algorithm. """
     server = fed_attack_adapt_server.Server()
     server.run()
 
