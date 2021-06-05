@@ -4,6 +4,7 @@ A federated learning server using fed_attack_adapt.
 Reference:
 
 Ching Pui Wan, Qifeng Chen, "Robust Federated Learning with Attack-Adaptive Aggregation"
+unpublished
 (https://arxiv.org/pdf/2102.05257.pdf)
 
 Comparison to FedAtt:
@@ -12,7 +13,6 @@ Instead of using norm distance, fed_attack_adapt uses cosine similarity between 
 
 It also applies softmax with temperatures.
 
-So actually the only difference is how they calculate the attention score.
 """
 from collections import OrderedDict
 
@@ -59,8 +59,6 @@ class Server(fedavg.Server):
                 att_weight += delta.mul(atts[name][i])
             att_update[name] = att_weight
         # Load updated weights into model
-        updated_weights = OrderedDict()
+        self.updated_weights = OrderedDict()
         for name, weight in baseline_weights.items():
-            updated_weights[name] = att_update[name]
-
-        self.updated_weights = updated_weights
+            self.updated_weights[name] = att_update[name]

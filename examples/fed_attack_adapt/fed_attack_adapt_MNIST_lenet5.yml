@@ -12,7 +12,6 @@ clients:
     do_test: true
 
 server:
-    type: fed_attack_adapt
     address: 127.0.0.1
     port: 8000
 
@@ -46,7 +45,7 @@ trainer:
     max_concurrency: 1
 
     # The target accuracy
-    target_accuracy: 0.94
+    target_accuracy: 0.98
 
     # Number of epoches for local training in each communication round
     epochs: 5
