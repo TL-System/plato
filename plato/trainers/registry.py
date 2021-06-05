@@ -7,8 +7,6 @@ from collections import OrderedDict
 
 from plato.trainers import (
     basic,
-    scaffold,
-    fedsarah,
     split_learning,
     pascal_voc,
 )
@@ -25,27 +23,24 @@ if hasattr(Config().trainer, 'use_mindspore'):
 else:
     registered_trainers = OrderedDict([
         ('basic', basic.Trainer),
-        ('scaffold', scaffold.Trainer),
-        ('fedsarah', fedsarah.Trainer),
         ('split_learning', split_learning.Trainer),
         ('pascal_voc', pascal_voc.Trainer),
     ])
 
 
-def get(client_id=0, model=None):
+def get(model=None):
     """Get the trainer with the provided name."""
     trainer_name = Config().trainer.type
     logging.info("Trainer: %s", trainer_name)
 
     if Config().trainer.model_name == 'yolov5':
         from plato.trainers import yolo
-        return yolo.Trainer(client_id)
+        return yolo.Trainer()
     elif Config().trainer.type == 'HuggingFace':
         from plato.trainers import huggingface
         return huggingface.Trainer(model)
     elif trainer_name in registered_trainers:
-        registered_trainer = registered_trainers[trainer_name](client_id,
-                                                               model)
+        registered_trainer = registered_trainers[trainer_name](model)
     else:
         raise ValueError('No such trainer: {}'.format(trainer_name))
 

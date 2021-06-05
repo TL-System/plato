@@ -9,12 +9,7 @@ from collections import OrderedDict
 
 from plato.clients import (
     simple,
-    adaptive_sync,
-    adaptive_freezing,
     mistnet,
-    scaffold,
-    fednova,
-    fedsarah,
     tempo,
     split_learning,
 )
@@ -23,12 +18,7 @@ from plato.config import Config
 
 registered_clients = OrderedDict([
     ('simple', simple.Client),
-    ('adaptive_sync', adaptive_sync.Client),
-    ('adaptive_freezing', adaptive_freezing.Client),
     ('mistnet', mistnet.Client),
-    ('scaffold', scaffold.Client),
-    ('fednova', fednova.Client),
-    ('fedsarah', fedsarah.Client),
     ('tempo', tempo.Client),
     ('split_learning', split_learning.Client),
 ])

@@ -1,17 +1,16 @@
 clients:
-    # Type
-    type: adaptive_sync
-
     # The total number of clients
-    total_clients: 3
+    total_clients: 1
 
     # The number of clients selected in each round
-    per_round: 3
+    per_round: 1
 
     # Should the clients compute test accuracy locally?
     do_test: true
 
 server:
+    type: fedavg
+
     address: 127.0.0.1
     port: 8000
 
@@ -56,10 +55,7 @@ trainer:
     model_name: lenet5
 
 algorithm:
-    # Aggregation algorithm
-    type: adaptive_sync
-
-    # The initial synchronization frequency
-    initial_sync_frequency: 1
-
     moving_average_alpha: 0.99
+    stability_threshold: 0.05
+    tight_threshold: 0.8
+    random_freezing: true

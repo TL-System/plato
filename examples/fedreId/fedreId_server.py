@@ -13,7 +13,7 @@ class fedReIdServer(fedavg.Server):
 
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using federated averaging."""
-        # Extract updates from the reports
+        # Extract weights from the updates
         weights_received = self.extract_client_updates(updates)
 
         # Extract the total number of samples
@@ -40,11 +40,9 @@ class fedReIdServer(fedavg.Server):
         baseline_weights = self.algorithm.extract_weights()
 
         # Load updated weights into model
-        updated_weights = OrderedDict()
+        self.updated_weights = OrderedDict()
         for name, weight in baseline_weights.items():
-            updated_weights[name] = weight + avg_update[name]
-
-        return updated_weights
+            self.updated_weights[name] = weight + avg_update[name]
 
 
 def main():

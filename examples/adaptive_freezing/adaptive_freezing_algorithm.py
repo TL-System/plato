@@ -6,7 +6,7 @@ Reference:
 C. Chen, H. Xu, W. Wang, B. Li, B. Li, L. Chen, G. Zhang. “Communication-
 Efficient Federated Learning with Adaptive Parameter Freezing,” in the
 Proceedings of the 41st IEEE International Conference on Distributed Computing
-Systems (ICDCS 2021), Online, July 7-10, 2021 (found in docs/papers).
+Systems (ICDCS 2021), Online, July 7-10, 2021 (found in papers/).
 """
 
 import copy
@@ -24,8 +24,8 @@ class Algorithm(fedavg.Algorithm):
     """The federated learning trainer for Adaptive Parameter Freezing,
        used by both the client and the server.
     """
-    def __init__(self, trainer: Trainer = None, client_id=0):
-        super().__init__(trainer, client_id)
+    def __init__(self, trainer: Trainer = None):
+        super().__init__(trainer)
         self.sync_mask = {}
         self.moving_average_deltas = {}
         self.moving_average_abs_deltas = {}

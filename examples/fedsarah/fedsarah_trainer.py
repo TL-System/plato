@@ -1,22 +1,28 @@
 """
 A customized trainer for FedSarah.
+
+Reference: Ngunyen et al., "SARAH: A Novel Method for Machine Learning Problems
+Using Stochastic Recursive Gradient." (https://arxiv.org/pdf/1703.00102.pdf)
+
 """
 import torch
+
 from plato.config import Config
 from plato.trainers import basic
-from plato.utils import optimizers
+
+import fedsarah_optimizer
 
 
 class Trainer(basic.Trainer):
     """ The federated learning trainer for the FedSarah client. """
-    def __init__(self, client_id=0, model=None):
+    def __init__(self, model=None):
         """ Initializing the trainer with the provided model.
 
         Arguments:
             client_id: The ID of the client using this trainer (optional).
             model: The model to train (optional).
         """
-        super().__init__(client_id, model)
+        super().__init__(model)
 
         self.server_control_variates = None
         self.client_control_variates = None
@@ -31,7 +37,8 @@ class Trainer(basic.Trainer):
 
     def get_optimizer(self, model):
         """Initialize the FedSarah optimizer."""
-        optimizer = optimizers.get_optimizer(model)
+        optimizer = fedsarah_optimizer.FedSarahOptimizer(model.parameters())
+
         optimizer.server_control_variates = self.server_control_variates
         optimizer.client_control_variates = self.client_control_variates
         optimizer.client_id = self.client_id

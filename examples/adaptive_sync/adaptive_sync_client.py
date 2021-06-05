@@ -4,7 +4,7 @@ A federated learning client with support for Adaptive Synchronization Frequency.
 Reference:
 
 C. Chen, et al. "GIFT: Towards Accurate and Efficient Federated
-Learning withGradient-Instructed Frequency Tuning," found in docs/papers.
+Learning withGradient-Instructed Frequency Tuning," found in papers/.
 """
 
 from plato.config import Config

@@ -1,19 +1,17 @@
 clients:
     # Type
-    type: adaptive_freezing
+    type: simple
 
     # The total number of clients
-    total_clients: 1
+    total_clients: 3
 
     # The number of clients selected in each round
-    per_round: 1
+    per_round: 3
 
     # Should the clients compute test accuracy locally?
     do_test: true
 
 server:
-    type: fedavg
-
     address: 127.0.0.1
     port: 8000
 
@@ -30,24 +28,27 @@ data:
     # IID or non-IID?
     sampler: iid
 
+    # The random seed for sampling data
+    random_seed: 1
+
 trainer:
     # The type of the trainer
     type: basic
 
     # The maximum number of training rounds
-    rounds: 20
+    rounds: 5
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
 
     # The maximum number of clients running concurrently
-    max_concurrency: 3
+    max_concurrency: 1
 
     # The target accuracy
-    target_accuracy: 0.95
+    target_accuracy: 0.94
 
     # Number of epoches for local training in each communication round
-    epochs: 1
+    epochs: 5
     batch_size: 32
     optimizer: SGD
     learning_rate: 0.01
@@ -59,9 +60,4 @@ trainer:
 
 algorithm:
     # Aggregation algorithm
-    type: adaptive_freezing
-
-    moving_average_alpha: 0.99
-    stability_threshold: 0.05
-    tight_threshold: 0.8
-    random_freezing: true
+    type: fedavg

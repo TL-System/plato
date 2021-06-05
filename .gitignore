@@ -139,18 +139,17 @@ dmypy.json
 running_trainers.sqlitedb
 
 # Data files
-/data/
-/tests/data/
-examples/data/
+data/
+tests/data/
 
 # Result files
 results/
 
 # Models
-models/pretrained/
-examples/models/pretrained
+pretrained/
 wandb/
 logs/
+*.pth
 
 # macOS
 .DS_Store

@@ -32,8 +32,11 @@ class Client(base.Client):
 
     def configure(self):
         """Prepare this edge client for training."""
-        self.trainer = trainers_registry.get(self.client_id)
-        self.algorithm = algorithms_registry.get(self.trainer, self.client_id)
+        self.trainer = trainers_registry.get()
+        self.trainer.set_client_id(self.client_id)
+
+        self.algorithm = algorithms_registry.get(self.trainer)
+        self.algorithm.set_client_id(self.client_id)
 
     def load_data(self):
         """The edge client does not need to train models using local data."""

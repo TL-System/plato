@@ -23,28 +23,23 @@ else:
     from plato.algorithms import (
         fedavg,
         mistnet,
-        adaptive_sync,
-        adaptive_freezing,
         split_learning,
     )
 
     registered_algorithms = OrderedDict([
         ('fedavg', fedavg.Algorithm),
         ('mistnet', mistnet.Algorithm),
-        ('adaptive_sync', adaptive_sync.Algorithm),
-        ('adaptive_freezing', adaptive_freezing.Algorithm),
         ('split_learning', split_learning.Algorithm),
     ])
 
 
-def get(trainer=None, client_id=None):
+def get(trainer=None):
     """Get the algorithm with the provided type."""
     algorithm_type = Config().algorithm.type
 
     if algorithm_type in registered_algorithms:
         logging.info("Algorithm: %s", algorithm_type)
-        registered_alg = registered_algorithms[algorithm_type](trainer,
-                                                               client_id)
+        registered_alg = registered_algorithms[algorithm_type](trainer)
         return registered_alg
     else:
         raise ValueError('No such model: {}'.format(algorithm_type))
