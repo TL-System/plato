@@ -48,3 +48,8 @@ class DataSource(base.DataSource):
 
     def num_test_examples(self):
         return 10000
+
+    def input_shape(self):
+        """ Returns the input shape of the MNIST dataset, useful for building
+        a TF model. """
+        return [60000, 28, 28, 1]

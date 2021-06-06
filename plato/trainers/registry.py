@@ -20,6 +20,13 @@ if hasattr(Config().trainer, 'use_mindspore'):
     registered_trainers = OrderedDict([
         ('basic', basic_mindspore.Trainer),
     ])
+elif hasattr(Config().trainer, 'use_tensorflow'):
+    from plato.trainers.tensorflow import (
+        basic as basic_tensorflow, )
+
+    registered_trainers = OrderedDict([
+        ('basic', basic_tensorflow.Trainer),
+    ])
 else:
     registered_trainers = OrderedDict([
         ('basic', basic.Trainer),

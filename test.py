@@ -1,5 +1,4 @@
 import tensorflow as tf
-import tensorflow_datasets as tfds
 
 from plato.models.tensorflow import lenet5
 from plato.datasources.tensorflow import mnist
@@ -14,5 +13,6 @@ model.compile(optimizer=optimizer,
               loss=loss_criterion,
               metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
 model.fit(data.trainset, epochs=5)
+model.summary()
 score = model.evaluate(data.testset, verbose=0)
 print(f'Accuracy = {score}')
