@@ -1,60 +1,57 @@
 """
-A federated learning server using fed_attack_adapt.
-
-Reference:
+A federated learning server using the algorithm proposed in the following unpublished
+manuscript:
 
 Ching Pui Wan, Qifeng Chen, "Robust Federated Learning with Attack-Adaptive Aggregation"
-unpublished
+Unpublished
 (https://arxiv.org/pdf/2102.05257.pdf)
 
-Comparison to FedAtt:
-
-Instead of using norm distance, fed_attack_adapt uses cosine similarity between client parameters and server parameters.
-
-It also applies softmax with temperatures.
-
+Comparison to FedAtt, instead of using norm distance, this algorithm uses cosine
+similarity between the client and server parameters. It also applies softmax with
+temperatures.
 """
 from collections import OrderedDict
 
-from plato.servers import fedavg
-
-import logging
 import torch
 import torch.nn.functional as F
-import numpy as np
+
+from plato.servers import fedavg
 
 
 class Server(fedavg.Server):
     """A federated learning server using the fed_attack_adapt algorithm."""
-    async def federated_averaging(self, reports):
+    async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using fed_attack_adapt."""
         # Extracting updates from the reports
-        updates = self.extract_client_updates(reports)
+        weights_received = self.extract_client_updates(updates)
 
         # Performing attentive aggregating
         att_update = {
             name: self.trainer.zeros(weights.shape)
-            for name, weights in updates[0].items()
+            for name, weights in weights_received[0].items()
         }
 
-        # Extract baseline model weights
+        # Extracting baseline model weights
         baseline_weights = self.algorithm.extract_weights()
 
-        # Calculate attention
+        # Calculating attention
         atts = OrderedDict()
         for name, weight in baseline_weights.items():
-            atts[name] = self.trainer.zeros(len(updates))
-            for i, update in enumerate(updates):
+            atts[name] = self.trainer.zeros(len(weights_received))
+            for i, update in enumerate(weights_received):
                 delta = update[name]
+
+                # Calculating the cosine similarity
                 cos = torch.nn.CosineSimilarity(dim=0)
-                # cosine similarity
                 atts[name][i] = cos(torch.flatten(weight), torch.flatten(delta))
-            c = 10 # scaling factor for temperature
-            atts[name] = F.softmax(atts[name]*c, dim=0)
+
+            # scaling factor for the temperature
+            scaling_factor = 10
+            atts[name] = F.softmax(atts[name] * scaling_factor, dim=0)
 
         for name, weight in baseline_weights.items():
             att_weight = self.trainer.zeros(weight.shape)
-            for i, update in enumerate(updates):
+            for i, update in enumerate(weights_received):
                 delta = update[name]
                 att_weight += delta.mul(atts[name][i])
             att_update[name] = att_weight
