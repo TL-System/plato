@@ -28,7 +28,6 @@ class Model(keras.Model):
                                    activation='relu',
                                    input_shape=(32, 32, 1))
         self.pool1 = layers.AveragePooling2D()
-
         self.conv2 = layers.Conv2D(filters=16,
                                    kernel_size=(3, 3),
                                    activation='relu')
@@ -42,7 +41,7 @@ class Model(keras.Model):
 
         # Preparing named layers so that the model can be split and straddle
         # across the client and the server
-        self.layers = []
+        self.model_layers = []
         self.layerdict = collections.OrderedDict()
         self.layerdict['conv1'] = self.conv1
         self.layerdict['pool1'] = self.pool1
@@ -52,14 +51,14 @@ class Model(keras.Model):
         self.layerdict['fc1'] = self.fc1
         self.layerdict['fc2'] = self.fc2
         self.layerdict['fc3'] = self.fc3
-        self.layers.append('conv1')
-        self.layers.append('pool1')
-        self.layers.append('conv2')
-        self.layers.append('pool2')
-        self.layers.append('flatten')
-        self.layers.append('fc1')
-        self.layers.append('fc2')
-        self.layers.append('fc3')
+        self.model_layers.append('conv1')
+        self.model_layers.append('pool1')
+        self.model_layers.append('conv2')
+        self.model_layers.append('pool2')
+        self.model_layers.append('flatten')
+        self.model_layers.append('fc1')
+        self.model_layers.append('fc2')
+        self.model_layers.append('fc3')
 
     def call(self, x):
         """The forward pass."""
@@ -75,10 +74,10 @@ class Model(keras.Model):
         else:
             # Otherwise, use only the layers after the cut_layer
             # for training
-            layer_index = self.layers.index(self.cut_layer)
+            layer_index = self.model_layers.index(self.cut_layer)
 
-            for i in range(layer_index + 1, len(self.layers)):
-                x = self.layerdict[self.layers[i]](x)
+            for i in range(layer_index + 1, len(self.model_layers)):
+                x = self.layerdict[self.model_layers[i]](x)
 
         return x
 
@@ -86,10 +85,10 @@ class Model(keras.Model):
         """ Extract features using the layers before (and including)
             the cut_layer.
         """
-        layer_index = self.layers.index(cut_layer)
+        layer_index = self.model_layers.index(cut_layer)
 
         for i in range(0, layer_index + 1):
-            x = self.layerdict[self.layers[i]](x)
+            x = self.layerdict[self.model_layers[i]](x)
 
         return x
 

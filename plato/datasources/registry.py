@@ -9,14 +9,14 @@ from collections import OrderedDict
 from plato.config import Config
 
 if hasattr(Config().trainer, 'use_mindspore'):
-    from datasources.mindspore import (
+    from plato.datasources.mindspore import (
         mnist as mnist_mindspore, )
 
     registered_datasources = OrderedDict([
         ('MNIST', mnist_mindspore),
     ])
 elif hasattr(Config().trainer, 'use_tensorflow'):
-    from datasources.tensorflow import (
+    from plato.datasources.tensorflow import (
         mnist as mnist_tensorflow,
         fashion_mnist as fashion_mnist_tensorflow,
     )

@@ -1,9 +1,8 @@
 """
 The FashionMNIST dataset.
 """
-import numpy as np
 import tensorflow as tf
-from tensorflow.keras import datasets
+import tensorflow_datasets as tfds
 
 from plato.config import Config
 from plato.datasources import base
@@ -14,20 +13,30 @@ class DataSource(base.DataSource):
     def __init__(self):
         super().__init__()
 
-        (x_train, y_train), (x_test,
-                             y_test) = datasets.fashion_mnist.load_data()
+        (ds_train, ds_test), ds_info = tfds.load(
+            'fashion_mnist',
+            split=['train', 'test'],
+            shuffle_files=True,
+            as_supervised=True,
+            with_info=True,
+        )
 
-        x_train = np.reshape(x_train, (-1, 784))
-        x_test = np.reshape(x_test, (-1, 784))
+        ds_train = ds_train.map(
+            DataSource.normalize_img,
+            num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        ds_train = ds_train.cache()
+        ds_train = ds_train.shuffle(ds_info.splits['train'].num_examples)
+        ds_train = ds_train.batch(Config().trainer.batch_size)
+        ds_train = ds_train.prefetch(tf.data.experimental.AUTOTUNE)
 
-        # Prepare the training dataset.
-        self.trainset = tf.data.Dataset.from_tensor_slices((x_train, y_train))
-        self.trainset = self.trainset.shuffle(buffer_size=1024).batch(
-            Config().trainer.batch_size)
+        ds_test = ds_test.map(DataSource.normalize_img,
+                              num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        ds_test = ds_test.batch(Config().trainer.batch_size)
+        ds_test = ds_test.cache()
+        ds_test = ds_test.prefetch(tf.data.experimental.AUTOTUNE)
 
-        # Prepare the test dataset.
-        self.testset = tf.data.Dataset.from_tensor_slices((x_test, y_test))
-        self.testset = self.testset.batch(Config().trainer.batch_size)
+        self.trainset = ds_train
+        self.testset = ds_test
 
     def num_train_examples(self):
         return 60000

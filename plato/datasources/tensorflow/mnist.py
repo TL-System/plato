@@ -1,9 +1,8 @@
 """
 The MNIST dataset.
 """
-import numpy as np
 import tensorflow as tf
-from tensorflow.keras import datasets
+import tensorflow_datasets as tfds
 
 from plato.config import Config
 from plato.datasources import base
@@ -13,23 +12,36 @@ class DataSource(base.DataSource):
     """The MNIST dataset."""
     def __init__(self):
         super().__init__()
-        _path = Config().data.data_path
 
-        (x_train, y_train), (x_test,
-                             y_test) = datasets.mnist.load_data(path=_path)
+        (ds_train, ds_test), ds_info = tfds.load(
+            'mnist',
+            split=['train', 'test'],
+            shuffle_files=True,
+            as_supervised=True,
+            with_info=True,
+        )
 
-        x_train = np.reshape(x_train, (-1, 784))
-        x_test = np.reshape(x_test, (-1, 784))
+        ds_train = ds_train.map(
+            DataSource.normalize_img,
+            num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        ds_train = ds_train.cache()
+        ds_train = ds_train.shuffle(ds_info.splits['train'].num_examples)
+        ds_train = ds_train.batch(Config().trainer.batch_size)
+        ds_train = ds_train.prefetch(tf.data.experimental.AUTOTUNE)
 
-        # Prepare the training dataset.
-        self.trainset = tf.data.Dataset.from_tensor_slices((x_train, y_train))
-        self.trainset = self.trainset.shuffle(buffer_size=1024).batch(
-            Config().trainer.batch_size)
+        ds_test = ds_test.map(DataSource.normalize_img,
+                              num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        ds_test = ds_test.batch(Config().trainer.batch_size)
+        ds_test = ds_test.cache()
+        ds_test = ds_test.prefetch(tf.data.experimental.AUTOTUNE)
 
-        # Prepare the test dataset.
-        self.testset = tf.data.Dataset.from_tensor_slices((x_test, y_test))
-        self.testset = self.testset.batch(Config().trainer.batch_size)
-        (x_train, y_train), (x_test, y_test) = datasets.mnist.load_data()
+        self.trainset = ds_train
+        self.testset = ds_test
+
+    @staticmethod
+    def normalize_img(image, label):
+        """ Normalizes images: uint8 -> float32. """
+        return tf.cast(image, tf.float32) / 255., label
 
     def num_train_examples(self):
         return 60000
