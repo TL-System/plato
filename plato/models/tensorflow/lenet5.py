@@ -19,8 +19,8 @@ class Model(keras.Model):
     Arguments:
         num_classes (int): The number of classes.
     """
-    def __init__(self, num_classes=10, cut_layer=None):
-        super().__init__()
+    def __init__(self, num_classes=10, cut_layer=None, **kwargs):
+        super().__init__(**kwargs)
         self.cut_layer = cut_layer
 
         self.conv1 = layers.Conv2D(filters=6,
@@ -106,4 +106,11 @@ class Model(keras.Model):
             # will only use the layers after the cut_layer
             cut_layer = Config().algorithm.cut_layer
 
-        return Model(num_classes=num_classes, cut_layer=cut_layer)
+        return Model(num_classes=num_classes,
+                     cut_layer=cut_layer,
+                     name='lenet5')
+
+    def build_model(self, input_shape):
+        """ Building the model using dimensions for the datasource. """
+        self.build(input_shape)
+        self.summary()

@@ -10,7 +10,7 @@ from collections import OrderedDict
 from plato.config import Config
 
 if hasattr(Config().trainer, 'use_mindspore'):
-    from algorithms.mindspore import (
+    from plato.algorithms.mindspore import (
         fedavg as fedavg_mindspore,
         mistnet as mistnet_mindspore,
     )
@@ -18,6 +18,13 @@ if hasattr(Config().trainer, 'use_mindspore'):
     registered_algorithms = OrderedDict([
         ('fedavg', fedavg_mindspore.Algorithm),
         ('mistnet', mistnet_mindspore.Algorithm),
+    ])
+elif hasattr(Config().trainer, 'use_tensorflow'):
+    from plato.algorithms.tensorflow import (
+        fedavg as fedavg_tensorflow, )
+
+    registered_algorithms = OrderedDict([
+        ('fedavg', fedavg_tensorflow.Algorithm),
     ])
 else:
     from plato.algorithms import (

@@ -78,17 +78,19 @@ class Trainer(base.Trainer):
 
         self.model.load_weights(model_path)
 
-    def train_process(self, config, trainset, sampler, cut_layer=None):
-        """The main training loop in a federated learning workload, run in
-          a separate process with a new CUDA context, so that CUDA memory
-          can be released after the training completes.
+    def train(self, trainset, sampler, cut_layer=None):
+        """The main training loop in a federated learning workload.
 
         Arguments:
-        config: a dictionary of configuration parameters.
         trainset: The training dataset.
         sampler: the sampler that extracts a partition for this client.
         cut_layer (optional): The layer which training should start from.
         """
+        self.start_training()
+
+        config = Config().trainer._asdict()
+        config['run_id'] = Config().params['run_id']
+
         if 'use_wandb' in config:
             run = wandb.init(project="plato",
                              group=str(config['run_id']),
@@ -105,7 +107,7 @@ class Trainer(base.Trainer):
                 loss_criterion = self.loss_criterion(self.model)
             else:
                 loss_criterion = tf.keras.losses.SparseCategoricalCrossentropy(
-                    from_logits=True)
+                )
 
             # Initializing the optimizer
             get_optimizer = getattr(self, "get_optimizer", None)
@@ -120,94 +122,32 @@ class Trainer(base.Trainer):
                 metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
             self.model.fit(trainset, epochs=config['epochs'])
 
-        model_type = Config().trainer.model_name
-        filename = f"{model_type}_{self.client_id}_{config['run_id']}.ckpt"
-        self.save_model(filename)
-
         if 'use_wandb' in config:
             run.finish()
 
-    def test_process(self, config, testset):
-        """The testing loop, run in a separate process with a new CUDA context,
-        so that CUDA memory can be released after the training completes.
-
-        Arguments:
-        config: a dictionary of configuration parameters.
-        rank: Required by torch.multiprocessing to spawn processes. Unused.
-        testset: The test dataset.
-        """
-        try:
-            custom_test = getattr(self, "test_model", None)
-
-            if callable(custom_test):
-                accuracy = self.test_model(config, testset)
-            else:
-                accuracy = self.model.evaluate(testset, verbose=0)[1]
-        except Exception as testing_exception:
-            logging.info("Testing on client #%d failed.", self.client_id)
-            raise testing_exception
-
-        model_name = config['model_name']
-        filename = f"{model_name}_{self.client_id}_{config['run_id']}.acc"
-        Trainer.save_accuracy(accuracy, filename)
-
-    def train(self, trainset, sampler, cut_layer=None):
-        """The main training loop in a federated learning workload.
-
-        Arguments:
-        trainset: The training dataset.
-        """
-        self.start_training()
-
-        if mp.get_start_method(allow_none=True) != 'spawn':
-            mp.set_start_method('spawn', force=True)
-
-        config = Config().trainer._asdict()
-        config['run_id'] = Config().params['run_id']
-
-        proc = mp.Process(target=Trainer.train_process,
-                          args=(
-                              self,
-                              config,
-                              trainset,
-                              sampler,
-                              cut_layer,
-                          ))
-        proc.start()
-        proc.join()
-
-        model_name = Config().trainer.model_name
-        filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.ckpt"
-        self.load_model(filename)
-
         self.pause_training()
+        return True
 
     def test(self, testset):
-        """Testing the model using the provided test dataset.
+        """Testing the model on the client using the provided test dataset.
 
         Arguments:
         testset: The test dataset.
         """
-        self.start_training()
+        custom_test = getattr(self, "test_model", None)
 
-        if mp.get_start_method(allow_none=True) != 'spawn':
-            mp.set_start_method('spawn', force=True)
+        if callable(custom_test):
+            config = Config().trainer._asdict()
+            accuracy = self.test_model(config, testset)
+        else:
+            accuracy = self.model.evaluate(testset, verbose=0)[1]
 
-        config = Config().trainer._asdict()
-        config['run_id'] = Config().params['run_id']
-
-        proc = mp.Process(target=Trainer.test_process,
-                          args=(
-                              self,
-                              config,
-                              testset,
-                          ))
-        proc.start()
-        proc.join()
-
-        model_name = Config().trainer.model_name
-        filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
-        accuracy = Trainer.load_accuracy(filename)
-
-        self.pause_training()
         return accuracy
+
+    async def server_test(self, testset):
+        """Testing the model on the server using the provided test dataset.
+
+        Arguments:
+        testset: The test dataset.
+        """
+        return self.test(testset)
