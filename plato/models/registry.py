@@ -17,14 +17,14 @@ from plato.models import (
 from plato.config import Config
 
 if hasattr(Config().trainer, 'use_mindspore'):
-    from models.mindspore import (
+    from plato.models.mindspore import (
         lenet5 as lenet5_mindspore, )
 
     registered_models = OrderedDict([
         ('lenet5', lenet5_mindspore.Model),
     ])
 elif hasattr(Config().trainer, 'use_tensorflow'):
-    from models.tensorflow import (
+    from plato.models.tensorflow import (
         lenet5 as lenet5_tensorflow, )
 
     registered_models = OrderedDict([

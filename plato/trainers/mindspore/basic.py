@@ -12,23 +12,23 @@ from mindspore.train.callback import LossMonitor
 from mindspore.nn.metrics import Accuracy
 from mindspore.nn.loss import SoftmaxCrossEntropyWithLogits
 
-import models.registry as models_registry
 from plato.config import Config
 from plato.trainers import base
+from plato.models import registry as models_registry
 
 
 class Trainer(base.Trainer):
     """A basic federated learning trainer for MindSpore, used by both
     the client and the server.
     """
-    def __init__(self, client_id=0, model=None):
+    def __init__(self, model=None):
         """Initializing the trainer with the provided model.
 
         Arguments:
         client_id: The ID of the client using this trainer (optional).
         model: The model to train.
         """
-        super().__init__(client_id)
+        super().__init__()
 
         mindspore.context.set_context(mode=mindspore.context.PYNATIVE_MODE,
                                       device_target='GPU')

@@ -11,3 +11,5 @@ wandb
 gym
 datasets
 transformers
+tensorflow
+tensorflow-datasets
