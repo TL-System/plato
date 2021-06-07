@@ -24,7 +24,11 @@ class Report(base.Report):
 
 class Client(base.Client):
     """A basic federated learning client who sends simple weight updates."""
-    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
+    def __init__(self,
+                 model=None,
+                 datasource=None,
+                 algorithm=None,
+                 trainer=None):
         super().__init__()
         self.model = model
         self.datasource = datasource

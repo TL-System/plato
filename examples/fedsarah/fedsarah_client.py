@@ -18,8 +18,8 @@ class Report(simple.Report):
 
 
 class Client(simple.Client):
-    """A FedSarah federated learning client who sends weight updates
-    and client control variates."""
+    """ A FedSarah federated learning client who sends weight updates
+    and client control variates. """
     def __init__(self,
                  model=None,
                  datasource=None,
@@ -32,7 +32,7 @@ class Client(simple.Client):
         self.fl_round_counter = 0
 
     async def train(self):
-        # Initialize the server control variates and client control variates for the trainer
+        """ Initialize the server control variates and client control variates for the trainer. """
         if self.server_control_variates is not None:
             self.trainer.client_control_variates = self.client_control_variates
             self.trainer.server_control_variates = self.server_control_variates
@@ -52,8 +52,6 @@ class Client(simple.Client):
                       2), [weights, self.client_control_variates]
 
     def load_payload(self, server_payload):
-        "Load model weights and server control vairates from server payload onto this client"
+        """ Load model weights and server control vairates from server payload onto this client. """
         self.algorithm.load_weights(server_payload[0])
-
-        #self.trainer.load_weights(server_payload[0])
         self.server_control_variates = server_payload[1]

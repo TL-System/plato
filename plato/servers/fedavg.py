@@ -96,11 +96,9 @@ class Server(base.Server):
         assert self.clients_per_round <= len(self.clients)
         return random.sample(list(self.clients), self.clients_per_round)
 
-    def extract_client_updates(self, reports):
-        """Extract the model weight updates from a client's report."""
-
-        # Extract weights from reports
-        weights_received = [payload for (__, payload) in reports]
+    def extract_client_updates(self, updates):
+        """Extract the model weight updates from client updates."""
+        weights_received = [payload for (__, payload) in updates]
         return self.algorithm.compute_weight_updates(weights_received)
 
     async def aggregate_weights(self, updates):

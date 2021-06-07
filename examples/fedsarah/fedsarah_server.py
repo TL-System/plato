@@ -6,7 +6,6 @@ Using Stochastic Recursive Gradient." (https://arxiv.org/pdf/1703.00102.pdf)
 
 """
 from plato.config import Config
-
 from plato.servers import fedavg
 
 
@@ -17,22 +16,18 @@ class Server(fedavg.Server):
         self.server_control_variates = None
         self.control_variates_received = None
 
-    def extract_client_updates(self, reports):
-        """Extract the model weights and control variates from clients reports."""
+    def extract_client_updates(self, updates):
+        """ Extract the model weights and control variates from clients updates. """
+        weights_received = [payload[0] for (__, payload) in updates]
 
-        # Extract the model weights from reports
-        weights_received = [payload[0] for (__, payload) in reports]
-
-        # Extract the control variates from reports
         self.control_variates_received = [
-            payload[1] for (__, payload) in reports
+            payload[1] for (__, payload) in updates
         ]
 
         return self.algorithm.compute_weight_updates(weights_received)
 
     async def federated_averaging(self, updates):
-        """Aggregate weight and delta updates from the clients."""
-
+        """ Aggregate weight and delta updates from client updates. """
         update = await super().federated_averaging(updates)
 
         # Initialize server control variates
@@ -47,16 +42,6 @@ class Server(fedavg.Server):
 
         return update
 
-    async def customize_server_response(self, server_response):
-        """Add 'payload_length' into the server response."""
-        server_response['payload_length'] = 2
-
-        return server_response
-
-    async def customize_server_payload(self, payload):
+    def customize_server_payload(self, payload):
         "Add server control variates into the server payload."
-        payload_list = []
-        payload_list.append(payload)
-        payload_list.append(self.server_control_variates)
-
-        return payload_list
+        return [payload, self.server_control_variates]

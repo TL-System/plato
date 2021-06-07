@@ -17,12 +17,6 @@ import torch
 from plato.clients import simple
 
 
-@dataclass
-class Report(simple.Report):
-    """Client report sent to the SCAFFOLD federated learning server."""
-    payload_length: int
-
-
 class Client(simple.Client):
     """A SCAFFOLD federated learning client who sends weight updates
     and client control variate."""
@@ -32,12 +26,13 @@ class Client(simple.Client):
                  algorithm=None,
                  trainer=None):
         super().__init__(model, datasource, algorithm, trainer)
+
         self.client_update_direction = None
         self.server_update_direction = None
         self.new_client_update_direction = None
 
     async def train(self):
-        # Initialize the server update direction and client update direction for trainer
+        """ Initialize the server update direction and client update direction for trainer. """
         if self.server_update_direction is not None:
             self.trainer.client_update_direction = self.client_update_direction
             self.trainer.server_update_direction = self.server_update_direction
@@ -64,11 +59,9 @@ class Client(simple.Client):
         self.client_update_direction = self.new_client_update_direction
         fn = f"new_client_update_direction_{self.client_id}.pth"
         os.remove(fn)
-        return Report(report.num_samples, report.accuracy,
-                      report.training_time, report.data_loading_time,
-                      2), [weights, deltas]
+        return report, [weights, deltas]
 
     def load_payload(self, server_payload):
-        "Load model weights and server update direction from server payload onto this client"
-        self.algorithm.load_weights(server_payload, len(server_payload) - 1)
-        self.server_update_direction = server_payload[-1]
+        " Load model weights and server update direction from server payload onto this client. "
+        self.algorithm.load_weights(server_payload[0])
+        self.server_update_direction = server_payload[1]
