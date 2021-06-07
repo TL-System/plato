@@ -106,7 +106,6 @@ class Server(fedavg.Server):
     async def process_reports(self):
         """Process the client reports by aggregating their weights."""
         await self.aggregate_weights(self.updates)
-        self.algorithm.load_weights(self.updated_weights)
 
         # Testing the global model accuracy
         if Config().clients.do_test:

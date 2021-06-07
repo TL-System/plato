@@ -114,6 +114,7 @@ class Trainer(base.Trainer):
             dataset_sink_mode=False)
 
         self.pause_training()
+        return True
 
     def test(self, testset):
         """Testing the model using the provided test dataset.

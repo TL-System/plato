@@ -36,13 +36,7 @@ class fedReIdServer(fedavg.Server):
                 # Use weighted average by the number of samples
                 avg_update[name] += delta * (belive / self.total_belive)
 
-        # Extract baseline model weights
-        baseline_weights = self.algorithm.extract_weights()
-
-        # Load updated weights into model
-        self.updated_weights = OrderedDict()
-        for name, weight in baseline_weights.items():
-            self.updated_weights[name] = weight + avg_update[name]
+        return avg_update
 
 
 def main():

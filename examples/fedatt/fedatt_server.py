@@ -49,7 +49,4 @@ class Server(fedavg.Server):
 
             att_update[name] = -att_weight.mul(1.2)
 
-        # Load updated weights into model
-        self.updated_weights = OrderedDict()
-        for name, weight in baseline_weights.items():
-            self.updated_weights[name] = weight + att_update[name]
+        return att_update

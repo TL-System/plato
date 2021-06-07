@@ -227,13 +227,13 @@ class Trainer(base.Trainer):
         config['run_id'] = Config().params['run_id']
 
         train_proc = mp.Process(target=Trainer.train_process,
-                             args=(
-                                 self,
-                                 config,
-                                 trainset,
-                                 sampler,
-                                 cut_layer,
-                             ))
+                                args=(
+                                    self,
+                                    config,
+                                    trainset,
+                                    sampler,
+                                    cut_layer,
+                                ))
         train_proc.start()
         train_proc.join()
 
@@ -241,8 +241,9 @@ class Trainer(base.Trainer):
         filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.pth"
         try:
             self.load_model(filename)
-        except OSError: # the model file is not found, training failed
-            logging.info("The training process on client #%d failed.", self.client_id)
+        except OSError:  # the model file is not found, training failed
+            logging.info("The training process on client #%d failed.",
+                         self.client_id)
             self.run_sql_statement("DELETE FROM trainers WHERE run_id = (?)",
                                    (self.client_id, ))
             return False
@@ -311,11 +312,11 @@ class Trainer(base.Trainer):
             mp.set_start_method('spawn', force=True)
 
         proc = mp.Process(target=Trainer.test_process,
-                       args=(
-                           self,
-                           config,
-                           testset,
-                       ))
+                          args=(
+                              self,
+                              config,
+                              testset,
+                          ))
         proc.start()
         proc.join()
 
@@ -323,8 +324,9 @@ class Trainer(base.Trainer):
             model_name = Config().trainer.model_name
             filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
             accuracy = Trainer.load_accuracy(filename)
-        except OSError: # the model file is not found, training failed
-            logging.info("The testing process on client #%d failed.", self.client_id)
+        except OSError:  # the model file is not found, training failed
+            logging.info("The testing process on client #%d failed.",
+                         self.client_id)
             return 0
 
         self.pause_training()

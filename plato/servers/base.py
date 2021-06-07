@@ -189,12 +189,13 @@ class Server:
                 payload = await self.customize_server_payload(payload)
 
                 # Sending the server payload to the client
+                logging.info(
+                    "[Server #%d] Sending the current model to client #%d.",
+                    os.getpid(), client_id)
                 await self.send(sid, payload, client_id)
 
     async def send(self, sid, payload, client_id):
         """ Sending the client payload to the server using socket.io. """
-        logging.info("[Server #%d] Sending the current model to client #%d.",
-                     os.getpid(), client_id)
         if isinstance(payload, list):
             data_size = 0
 
@@ -309,8 +310,12 @@ class Server:
 
     @abstractmethod
     def configure(self):
-        """Configuring the server with initialization work."""
+        """ Configuring the server with initialization work. """
+
+    @abstractmethod
+    async def process_reports(self) -> None:
+        """ Process a client report. """
 
     @abstractmethod
     def choose_clients(self) -> list:
-        """Choose a subset of the clients to participate in each round."""
+        """ Choose a subset of the clients to participate in each round. """
