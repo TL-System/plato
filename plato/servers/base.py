@@ -208,13 +208,7 @@ class Server:
         """ Sending a new data payload to the client using socket.io. """
         data_size = 0
 
-        if isinstance(payload, dict):
-            for key, value in payload.items():
-                _data = pickle.dumps({key: value})
-                await self.send_in_chunks(_data, sid, client_id)
-                data_size += sys.getsizeof(_data)
-
-        elif isinstance(payload, list):
+        if isinstance(payload, list):
             for data in payload:
                 _data = pickle.dumps(data)
                 await self.send_in_chunks(_data, sid, client_id)

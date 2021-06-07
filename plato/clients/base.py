@@ -141,27 +141,12 @@ class Client:
         self.chunks = []
 
         if self.server_payload is None:
-            if isinstance(_data, dict):
-                self.server_payload = {}
-                for key, value in _data.items():
-                    self.server_payload[key] = value
-            else:
-                self.server_payload = _data
-
+            self.server_payload = _data
         elif isinstance(self.server_payload, list):
             self.server_payload.append(_data)
-
-        elif isinstance(self.server_payload, dict):
-            for key, value in _data.items():
-                self.server_payload[key] = value
-
         else:
-            if isinstance(_data, dict):
-                for key, value in _data.items():
-                    self.server_payload[key] = value
-            else:
-                self.server_payload = [self.server_payload]
-                self.server_payload.append(_data)
+            self.server_payload = [self.server_payload]
+            self.server_payload.append(_data)
 
     async def payload_done(self, client_id) -> None:
         """ Upon receiving all the new payload from the server. """
@@ -219,7 +204,6 @@ class Client:
         logging.info("[Client #%d] Sent %s MB of payload data to the server.",
                      self.client_id, round(data_size / 1024**2, 2))
 
-    @abstractmethod
     def process_server_response(self, server_response) -> None:
         """Additional client-specific processing on the server response."""
 
