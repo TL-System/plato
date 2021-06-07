@@ -7,7 +7,6 @@ import logging
 import os
 import random
 import time
-from collections import OrderedDict
 
 import wandb
 from plato.algorithms import registry as algorithms_registry
@@ -36,9 +35,6 @@ class Server(base.Server):
 
         self.total_clients = Config().clients.total_clients
         self.clients_per_round = Config().clients.per_round
-
-        # Results from federated averaging
-        self.updated_weights = None
 
         logging.info(
             "[Server #%d] Started training on %s clients with %s per round.",
@@ -73,7 +69,6 @@ class Server(base.Server):
             logging.info("Training: %s rounds\n", total_rounds)
 
         self.load_trainer()
-        self.trainer.set_client_id(0)
 
         if not Config().clients.do_test:
             dataset = datasources_registry.get()
@@ -89,6 +84,8 @@ class Server(base.Server):
         """Setting up the global model to be trained via federated learning."""
         if self.trainer is None:
             self.trainer = trainers_registry.get(model=self.model)
+
+        self.trainer.set_client_id(0)
 
         if self.algorithm is None:
             self.algorithm = algorithms_registry.get(self.trainer)
@@ -108,11 +105,12 @@ class Server(base.Server):
 
     async def aggregate_weights(self, updates):
         """Aggregate the reported weight updates from the selected clients."""
-        await self.federated_averaging(updates)
+        update = await self.federated_averaging(updates)
+        updated_weights = self.algorithm.update_weights(update)
+        self.algorithm.load_weights(updated_weights)
 
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using federated averaging."""
-        # Extract weights from the updates
         weights_received = self.extract_client_updates(updates)
 
         # Extract the total number of samples
@@ -136,18 +134,11 @@ class Server(base.Server):
             # Yield to other tasks in the server
             await asyncio.sleep(0)
 
-        # Extract baseline model weights
-        baseline_weights = self.algorithm.extract_weights()
-
-        # Load updated weights into model
-        self.updated_weights = OrderedDict()
-        for name, weight in baseline_weights.items():
-            self.updated_weights[name] = weight + avg_update[name]
+        return avg_update
 
     async def process_reports(self):
         """Process the client reports by aggregating their weights."""
         await self.aggregate_weights(self.updates)
-        self.algorithm.load_weights(self.updated_weights)
 
         # Testing the global model accuracy
         if Config().clients.do_test:

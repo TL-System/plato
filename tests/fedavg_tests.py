@@ -34,7 +34,7 @@ class InnerProductModel(torch.nn.Module):
 
 async def test_fedavg_aggregation(self):
     print("\nTesting federated averaging.")
-    reports = []
+    updates = []
     model = copy.deepcopy(self.model)
     server = fedavg_server.Server(model=model)
     trainer = basic.Trainer(model=model)
@@ -44,7 +44,7 @@ async def test_fedavg_aggregation(self):
 
     weights = copy.deepcopy(self.algorithm.extract_weights())
     print(f"Report 1 weights: {weights}")
-    reports.append((simple.Report(1, 100, 0, 0), weights))
+    updates.append((simple.Report(1, 100, 0, 0), weights))
 
     self.model.train()
 
@@ -54,7 +54,7 @@ async def test_fedavg_aggregation(self):
     self.assertEqual(44.0, self.model(self.example).item())
     weights = copy.deepcopy(self.algorithm.extract_weights())
     print(f"Report 2 weights: {weights}")
-    reports.append((simple.Report(1, 100, 0, 0), weights))
+    updates.append((simple.Report(1, 100, 0, 0), weights))
 
     self.optimizer.zero_grad()
     self.model.loss_criterion(self.model(self.example), self.label).backward()
@@ -62,7 +62,7 @@ async def test_fedavg_aggregation(self):
     self.assertEqual(43.2, np.round(self.model(self.example).item(), 4))
     weights = copy.deepcopy(self.algorithm.extract_weights())
     print(f"Report 3 Weights: {weights}")
-    reports.append((simple.Report(1, 100, 0, 0), weights))
+    updates.append((simple.Report(1, 100, 0, 0), weights))
 
     self.optimizer.zero_grad()
     self.model.loss_criterion(self.model(self.example), self.label).backward()
@@ -70,14 +70,15 @@ async def test_fedavg_aggregation(self):
     self.assertEqual(42.56, np.round(self.model(self.example).item(), 4))
     weights = copy.deepcopy(self.algorithm.extract_weights())
     print(f"Report 4 Weights: {weights}")
-    reports.append((simple.Report(1, 100, 0, 0), weights))
+    updates.append((simple.Report(1, 100, 0, 0), weights))
 
     print(
         f"Weights before federated averaging: {server.model.layer.weight.data}"
     )
 
-    await server.federated_averaging(reports)
-    server.algorithm.load_weights(server.updated_weights)
+    update = await server.federated_averaging(updates)
+    updated_weights = server.algorithm.update_weights(update)
+    server.algorithm.load_weights(updated_weights)
 
     print(
         f"Weights after federated averaging: {server.model.layer.weight.data}")

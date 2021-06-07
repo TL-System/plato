@@ -21,11 +21,10 @@ from plato.servers import fedavg
 class Server(fedavg.Server):
     """A federated learning server using the fed_attack_adapt algorithm."""
     async def federated_averaging(self, updates):
-        """Aggregate weight updates from the clients using fed_attack_adapt."""
-        # Extracting updates from the reports
+        """Aggregate weight updates from the clients using attack-adaptive aggregation."""
         weights_received = self.extract_client_updates(updates)
 
-        # Performing attentive aggregating
+        # Performing attack-adaptive aggregation
         att_update = {
             name: self.trainer.zeros(weights.shape)
             for name, weights in weights_received[0].items()
@@ -43,7 +42,8 @@ class Server(fedavg.Server):
 
                 # Calculating the cosine similarity
                 cos = torch.nn.CosineSimilarity(dim=0)
-                atts[name][i] = cos(torch.flatten(weight), torch.flatten(delta))
+                atts[name][i] = cos(torch.flatten(weight),
+                                    torch.flatten(delta))
 
             # scaling factor for the temperature
             scaling_factor = 10
@@ -55,7 +55,5 @@ class Server(fedavg.Server):
                 delta = update[name]
                 att_weight += delta.mul(atts[name][i])
             att_update[name] = att_weight
-        # Load updated weights into model
-        self.updated_weights = OrderedDict()
-        for name, weight in baseline_weights.items():
-            self.updated_weights[name] = att_update[name]
+
+        return att_update

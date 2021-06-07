@@ -33,10 +33,10 @@ class Server(fedavg.Server):
 
         return self.algorithm.compute_weight_updates(weights_received)
 
-    async def federated_averaging(self, reports):
+    async def federated_averaging(self, updates):
         """Aggregate weight updates and deltas updates from the clients."""
 
-        updated_weights = await super().federated_averaging(reports)
+        update = await super().federated_averaging(updates)
 
         # Initialize server update direction
         if self.server_update_direction is None:
@@ -49,7 +49,7 @@ class Server(fedavg.Server):
                 self.server_update_direction[j] += delta / Config(
                 ).clients.total_clients
 
-        return updated_weights
+        return update
 
     async def customize_server_response(self, server_response):
         """Add 'payload_length' into the server response."""

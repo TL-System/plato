@@ -3,6 +3,7 @@ Base class for algorithms.
 """
 
 from abc import ABC, abstractmethod
+from collections import OrderedDict
 
 from plato.trainers.base import Trainer
 
@@ -24,6 +25,35 @@ class Algorithm(ABC):
     def set_client_id(self, client_id):
         """ Setting the client ID. """
         self.client_id = client_id
+
+    def compute_weight_updates(self, weights_received):
+        """Extract the weights received from a client and compute the updates."""
+        # Extract baseline model weights
+        baseline_weights = self.extract_weights()
+
+        # Calculate updates from the received weights
+        updates = []
+        for weight in weights_received:
+            update = OrderedDict()
+            for name, current_weight in weight.items():
+                baseline = baseline_weights[name]
+
+                # Calculate update
+                delta = current_weight - baseline
+                update[name] = delta
+            updates.append(update)
+
+        return updates
+
+    def update_weights(self, update):
+        """ Update the existing model weights. """
+        baseline_weights = self.extract_weights()
+
+        updated_weights = OrderedDict()
+        for name, weight in baseline_weights.items():
+            updated_weights[name] = weight + update[name]
+
+        return updated_weights
 
     @abstractmethod
     def extract_weights(self):

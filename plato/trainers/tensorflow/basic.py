@@ -150,4 +150,9 @@ class Trainer(base.Trainer):
         Arguments:
         testset: The test dataset.
         """
+        self.model.compile(
+            optimizer=tf.keras.optimizers.Adam(Config().trainer.learning_rate),
+            loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+            metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
+
         return self.test(testset)

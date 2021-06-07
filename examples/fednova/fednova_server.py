@@ -50,11 +50,4 @@ class Server(fedavg.Server):
                 avg_update[name] += delta * (num_samples / self.total_samples
                                              ) * tau_eff / local_epochs[i]
 
-        # Extract baseline model weights
-        baseline_weights = self.algorithm.extract_weights()
-
-        # Load updated weights into model
-        self.updated_weights = OrderedDict()
-        for name, weight in baseline_weights.items():
-            self.updated_weights[name] = weight + avg_update[name]
-
+        return avg_update
