@@ -186,7 +186,7 @@ class Server:
                                     room=sid)
 
                 payload = self.algorithm.extract_weights()
-                payload = await self.customize_server_payload(payload)
+                payload = self.customize_server_payload(payload)
 
                 # Sending the server payload to the client
                 logging.info(
@@ -194,18 +194,35 @@ class Server:
                     os.getpid(), client_id)
                 await self.send(sid, payload, client_id)
 
-    async def send(self, sid, payload, client_id):
-        """ Sending the client payload to the server using socket.io. """
-        if isinstance(payload, list):
-            data_size = 0
+    async def send_in_chunks(self, data, sid, client_id):
+        """ Sending a bytes object in fixed-sized chunks to the client. """
+        step = 1024 ^ 2
+        chunks = [data[i:i + step] for i in range(0, len(data), step)]
 
+        for chunk in chunks:
+            await self.sio.emit('chunk', {'data': chunk}, room=sid)
+
+        await self.sio.emit('payload', {'id': client_id}, room=sid)
+
+    async def send(self, sid, payload, client_id):
+        """ Sending a new data payload to the client using socket.io. """
+        data_size = 0
+
+        if isinstance(payload, dict):
+            for key, value in payload.items():
+                _data = pickle.dumps({key: value})
+                await self.send_in_chunks(_data, sid, client_id)
+                data_size += sys.getsizeof(_data)
+
+        elif isinstance(payload, list):
             for data in payload:
                 _data = pickle.dumps(data)
-                await self.sio.emit('payload', {'data': _data}, room=sid)
+                await self.send_in_chunks(_data, sid, client_id)
                 data_size += sys.getsizeof(_data)
+
         else:
             _data = pickle.dumps(payload)
-            await self.sio.emit('payload', {'data': _data}, room=sid)
+            await self.send_in_chunks(_data, sid, client_id)
             data_size = sys.getsizeof(_data)
 
         await self.sio.emit('payload_done', {'id': client_id}, room=sid)
@@ -304,9 +321,9 @@ class Server:
         """Wrap up generating the server response with any additional information."""
         return server_response
 
-    async def customize_server_payload(self, payload):
+    @abstractmethod
+    def customize_server_payload(self, payload):
         """Wrap up generating the server payload with any additional information."""
-        return payload
 
     @abstractmethod
     def configure(self):

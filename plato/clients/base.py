@@ -49,12 +49,16 @@ class ClientEvents(socketio.AsyncClientNamespace):
         """ New payload is about to arrive from the server. """
         await self.plato_client.payload_to_arrive(data['response'])
 
+    async def on_chunk(self, data):
+        """ A chunk of data from the server arrived. """
+        await self.plato_client.chunk_arrived(data['data'])
+
     async def on_payload(self, data):
-        """ An existing client sends a new report from local training. """
-        await self.plato_client.payload_arrived(data['data'])
+        """ A portion of the new payload from the server arrived. """
+        await self.plato_client.payload_arrived(data['id'])
 
     async def on_payload_done(self, data):
-        """ An existing client sends a new report from local training. """
+        """ All of the new payload sent from the server arrived. """
         await self.plato_client.payload_done(data['id'])
 
 
@@ -63,6 +67,7 @@ class Client:
     def __init__(self) -> None:
         self.client_id = Config().args.id
         self.sio = None
+        self.chunks = []
         self.server_payload = None
         self.data_loaded = False  # is training data already loaded from the disk?
 
@@ -123,25 +128,51 @@ class Client:
         if not self.data_loaded:
             self.load_data()
 
-    async def payload_arrived(self, payload) -> None:
-        """ Upon receiving a portion of the payload from the server. """
+    async def chunk_arrived(self, data) -> None:
+        """ Upon receiving a chunk of data from the server. """
+        self.chunks.append(data)
+
+    async def payload_arrived(self, client_id) -> None:
+        """ Upon receiving a portion of the new payload from the server. """
+        assert client_id == self.client_id
+
+        payload = b''.join(self.chunks)
         _data = pickle.loads(payload)
+        self.chunks = []
 
         if self.server_payload is None:
-            self.server_payload = _data
+            if isinstance(_data, dict):
+                self.server_payload = {}
+                for key, value in _data.items():
+                    self.server_payload[key] = value
+            else:
+                self.server_payload = _data
+
         elif isinstance(self.server_payload, list):
             self.server_payload.append(_data)
+
+        elif isinstance(self.server_payload, dict):
+            for key, value in _data.items():
+                self.server_payload[key] = value
+
         else:
-            self.server_payload = [self.server_payload]
-            self.server_payload.append(_data)
+            if isinstance(_data, dict):
+                for key, value in _data.items():
+                    self.server_payload[key] = value
+            else:
+                self.server_payload = [self.server_payload]
+                self.server_payload.append(_data)
 
     async def payload_done(self, client_id) -> None:
-        """ Upon receiving all the payload from the server. """
+        """ Upon receiving all the new payload from the server. """
         payload_size = 0
 
         if isinstance(self.server_payload, list):
             for _data in self.server_payload:
                 payload_size += sys.getsizeof(pickle.dumps(_data))
+        elif isinstance(self.server_payload, dict):
+            for key, value in self.server_payload.items():
+                payload_size += sys.getsizeof(pickle.dumps({key: value}))
         else:
             payload_size = sys.getsizeof(pickle.dumps(self.server_payload))
 
@@ -188,7 +219,8 @@ class Client:
         logging.info("[Client #%d] Sent %s MB of payload data to the server.",
                      self.client_id, round(data_size / 1024**2, 2))
 
-    def process_server_response(self, server_response):
+    @abstractmethod
+    def process_server_response(self, server_response) -> None:
         """Additional client-specific processing on the server response."""
 
     @abstractmethod
