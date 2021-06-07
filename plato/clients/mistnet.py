@@ -11,7 +11,6 @@ import logging
 from dataclasses import dataclass
 
 from plato.config import Config
-
 from plato.clients import simple
 
 

@@ -8,6 +8,8 @@ in Proceedings of the 37th International Conference on Machine Learning (ICML), 
 
 https://arxiv.org/pdf/1910.06378.pdf
 """
+import logging
+import os
 
 from plato.config import Config
 from plato.servers import fedavg
@@ -51,16 +53,17 @@ class Server(fedavg.Server):
 
         return update
 
-    async def customize_server_response(self, server_response):
-        """Add 'payload_length' into the server response."""
-        server_response['payload_length'] = 2
+    def customize_server_payload(self, payload):
+        """ Add server update direction into the server payload. """
+        custom_payload = super().customize_server_payload(payload)
+        if isinstance(custom_payload, list):
+            custom_payload.append(self.server_update_direction)
+        elif isinstance(custom_payload, dict):
+            custom_payload[
+                'server_update_direction'] = self.server_update_direction
+        else:
+            logging.info(
+                "Server payload is neither a list nor a dictionary. Aborting.")
+            os.exit()
 
-        return server_response
-
-    async def customize_server_payload(self, payload):
-        "Add server update direction into the server payload."
-        payload_list = []
-        payload_list.append(payload)
-        payload_list.append(self.server_update_direction)
-
-        return payload_list
+        return custom_payload

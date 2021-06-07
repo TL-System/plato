@@ -1,5 +1,5 @@
 """
-The federated averaging algorithm for MindSpore.
+The federated averaging algorithm for TensorFlow.
 """
 from collections import OrderedDict
 

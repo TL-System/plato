@@ -196,3 +196,7 @@ class Server(base.Server):
             accuracy += report.accuracy * (report.num_samples / total_samples)
 
         return accuracy
+
+    def customize_server_payload(self, payload):
+        """ Customize the server payload before sending to the client. """
+        return payload
