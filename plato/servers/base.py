@@ -41,9 +41,13 @@ class ServerEvents(socketio.AsyncNamespace):
         """ An existing client sends a new report from local training. """
         await self.plato_server.client_report_arrived(sid, data['report'])
 
+    async def on_chunk(self, sid, data):
+        """ A chunk of data from the server arrived. """
+        await self.plato_server.client_chunk_arrived(sid, data['data'])
+
     async def on_client_payload(self, sid, data):
         """ An existing client sends a new payload from local training. """
-        await self.plato_server.client_payload_arrived(sid, data['payload'])
+        await self.plato_server.client_payload_arrived(sid, data['id'])
 
     async def on_client_payload_done(self, sid, data):
         """ An existing client finished sending its payloads from local training. """
@@ -66,6 +70,7 @@ class Server:
         self.reports = {}
         self.updates = []
         self.client_payload = {}
+        self.client_chunks = {}
 
     def run(self, client=None):
         """Start a run loop for the server. """
@@ -194,7 +199,7 @@ class Server:
                     os.getpid(), client_id)
                 await self.send(sid, payload, client_id)
 
-    async def send_in_chunks(self, data, sid, client_id):
+    async def send_in_chunks(self, data, sid, client_id) -> None:
         """ Sending a bytes object in fixed-sized chunks to the client. """
         step = 1024 ^ 2
         chunks = [data[i:i + step] for i in range(0, len(data), step)]
@@ -204,7 +209,7 @@ class Server:
 
         await self.sio.emit('payload', {'id': client_id}, room=sid)
 
-    async def send(self, sid, payload, client_id):
+    async def send(self, sid, payload, client_id) -> None:
         """ Sending a new data payload to the client using socket.io. """
         data_size = 0
 
@@ -228,10 +233,20 @@ class Server:
         """ Upon receiving a report from a client. """
         self.reports[sid] = pickle.loads(report)
         self.client_payload[sid] = None
+        self.client_chunks[sid] = []
 
-    async def client_payload_arrived(self, sid, payload):
+    async def client_chunk_arrived(self, sid, data) -> None:
+        """ Upon receiving a chunk of data from a client. """
+        self.client_chunks[sid].append(data)
+
+    async def client_payload_arrived(self, sid, client_id):
         """ Upon receiving a portion of the payload from a client. """
+        assert len(
+            self.client_chunks[sid]) > 0 and client_id in self.selected_clients
+
+        payload = b''.join(self.client_chunks[sid])
         _data = pickle.loads(payload)
+        self.client_chunks[sid] = []
 
         if self.client_payload[sid] is None:
             self.client_payload[sid] = _data
