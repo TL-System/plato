@@ -14,49 +14,46 @@ from torch.utils.data.dataloader import default_collate
 from torchvision import datasets
 
 from plato.config import Config
-from plato.datasources import base
+from plato.datasources import multimodal_base
 from plato.datasources.datalib import parallel_downloader as parallel
 from plato.datasources.datalib import video_transform
 
 
-class DataSource(base.DataSource):
+class DataSource(multimodal_base.MultiModalDataSource):
     """The Kinetics700 dataset."""
     def __init__(self):
         super().__init__()
+
+        self.data_name = Config().data.datasource
+
+        self.modality_names = ["video", "audio"]
+
         _path = Config().data.data_path
-        if not os.path.exists(_path):
-            os.makedirs(_path)
+        self._data_path_process(data_path=_path, data_source=self.data_name)
 
         download_url = Config().data.download_url
-        if not os.path.exists(_path + download_url.split('/')[-1]):
+        download_dir_name = download_url.split('/')[-1].split('.')[0]
+        download_info_dir_path = os.path.join(self.source_data_path,
+                                              download_dir_name)
+        if not os.path.exists(download_info_dir_path):
             logging.info(
                 "Downloading the Kinetics700 dataset. This may take a while.")
-            DataSource.download(download_url, _path)
+            DataSource.download(download_url, self.source_data_path)
+            logging.info("Done.")
 
-        self.source_data_path = _path
-        meta_dirs = [
-            meta_dir for meta_dir in os.listdir(_path)
-            if "kinetics" in meta_dir
-        ]
         # obtain the path of the data information
-        tg_meta_dir = meta_dirs[0]
-        self.tg_meta_categories = os.path.join(self.source_data_path,
-                                               "categories.json")
-        self.tg_meta_classes = os.path.join(self.source_data_path,
-                                            "classes.json")
-        self.train_meta_data_path = os.path.join(self.source_data_path,
-                                                 tg_meta_dir, "train.json")
-        self.test_meta_data_path = os.path.join(self.source_data_path,
-                                                tg_meta_dir, "test.json")
-        self.val_meta_data_path = os.path.join(self.source_data_path,
-                                               tg_meta_dir, "validate.json")
+        self.data_categories_file = os.path.join(self.source_data_path,
+                                                 "categories.json")
+        self.data_classes_file = os.path.join(self.source_data_path,
+                                              "classes.json")
+        self.train_info_data_path = os.path.join(download_info_dir_path,
+                                                 "train.json")
+        self.test_info_data_path = os.path.join(download_info_dir_path,
+                                                "test.json")
+        self.val_info_data_path = os.path.join(download_info_dir_path,
+                                               "validate.json")
 
-        # define the paths for the splited data - train, test, and val
-        self.train_root_path = os.path.join(_path, "train")
-        self.test_root_path = os.path.join(_path, "test")
-        self.val_root_path = os.path.join(_path, "val")
-
-        self.data_classes = self.classes()
+        self.data_classes = self.extract_data_classes()
 
         # get the download hyper-parameters
         num_workers = Config().data.num_workers
@@ -74,7 +71,6 @@ class DataSource(base.DataSource):
             logging.info(
                 "Downloading the raw videos for the Kinetics700 dataset. This may take a long time."
             )
-            self.maybe_create_dirs()
 
             self.download_train_val_sets(num_workers=num_workers,
                                          failed_log=failed_save_file,
@@ -91,21 +87,11 @@ class DataSource(base.DataSource):
                                    skip=skip,
                                    log_file=os.path.join(
                                        self.source_data_path, log_file))
+            logging.info("Done.")
 
         # obtain the data loader settings
         self.clip_len = Config().data.clip_len
         self.clips_per_video = Config().data.clips_per_video
-
-    def maybe_create_dirs(self):
-        # Create directories for training, validation and testing videos if they do not exist.
-        for path in [
-                self.train_root_path, self.test_root_path, self.val_root_path
-        ]:
-            if not os.path.exists(path):
-                try:
-                    os.makedirs(path)
-                except FileExistsError:
-                    pass
 
     def download_category(self, category, num_workers, failed_save_file,
                           compress, verbose, skip, log_file):
@@ -123,8 +109,8 @@ class DataSource(base.DataSource):
         Raises:
             ValueError: [description]
         """
-        if os.path.exists(self.tg_meta_categories):
-            with open(self.tg_meta_categories, "r") as file:
+        if os.path.exists(self.data_classes_file):
+            with open(self.data_classes_file, "r") as file:
                 categories = json.load(file)
 
             if category not in categories:
@@ -138,11 +124,11 @@ class DataSource(base.DataSource):
                          compress, verbose, skip, log_file):
         """ Download the specific classes """
         for list_path, save_root in zip(
-            [self.train_meta_data_path, self.val_meta_data_path],
+            [self.train_info_data_path, self.val_info_data_path],
             [self.train_root_path, self.val_root_path]):
             with open(list_path) as file:
                 data = json.load(file)
-
+            print("save_root: ", save_root)
             pool = parallel.VideoDownloaderPool(classes,
                                                 data,
                                                 save_root,
@@ -166,8 +152,8 @@ class DataSource(base.DataSource):
         """ Download all categories => all videos for train and the val set. """
 
         # # download the required categories in class-wise
-        if os.path.exists(self.tg_meta_categories):
-            with open(self.tg_meta_categories, "r") as file:
+        if os.path.exists(self.data_categories):
+            with open(self.data_categories, "r") as file:
                 categories = json.load(file)
 
             for category in categories:
@@ -203,25 +189,25 @@ class DataSource(base.DataSource):
         pool.feed_videos()
         pool.stop_workers()
 
-    def classes(self):
+    def extract_data_classes(self):
         """ Obtain a list of class names in the dataset. """
 
         classes_container = list()
-        if os.path.exists(self.tg_meta_classes):
-            with open(self.tg_meta_classes, "r") as class_file:
+        if os.path.exists(self.data_classes_file):
+            with open(self.data_classes_file, "r") as class_file:
                 lines = class_file.readlines()
                 classes_container = [line.replace("\n", "") for line in lines]
 
             return classes_container
 
-        if not os.path.exists(self.train_meta_data_path) or not os.path.exists(
-                self.val_meta_data_path):
+        if not os.path.exists(self.train_info_data_path) or not os.path.exists(
+                self.val_info_data_path):
             logging.info(
                 "The json files of the dataset are not completed. Download it first."
             )
             sys.exit()
 
-        for list_path in [self.train_meta_data_path, self.val_meta_data_path]:
+        for list_path in [self.train_info_data_path, self.val_info_data_path]:
             with open(list_path) as file:
                 videos_data = json.load(file)
             for key in videos_data.keys():
@@ -231,7 +217,7 @@ class DataSource(base.DataSource):
                 class_name = label.replace("_", " ")
                 if class_name not in classes_container:
                     classes_container.append(class_name)
-        with open(self.tg_meta_classes, "w") as file:
+        with open(self.data_classes_file, "w") as file:
             for class_name in classes_container:
                 file.write(class_name)
                 file.write('\n')
