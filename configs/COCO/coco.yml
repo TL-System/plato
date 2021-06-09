@@ -1,0 +1,37 @@
+clients:
+    # Type
+    type: simple
+
+    # The total number of clients
+    total_clients: 1
+
+    # The number of clients selected in each round
+    per_round: 1
+
+    # Should the clients compute test accuracy locally?
+    do_test: true
+
+server:
+    address: 127.0.0.1
+    port: 8000
+
+data:
+    # The training and testing dataset
+    dataname: COCO2017
+    datasource: COCO
+
+    # Where the dataset is located
+    data_path: ./data 
+    download_train_url: http://images.cocodataset.org/zips/train2017.zip
+    download_val_url: http://images.cocodataset.org/zips/val2017.zip
+    download_annotation_url: http://images.cocodataset.org/annotations/annotations_trainval2017.zip
+
+
+trainer:
+    # The type of the trainer
+    type: basic
+    batch_size: 24
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg
