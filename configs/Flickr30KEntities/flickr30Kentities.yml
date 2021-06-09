@@ -1,0 +1,36 @@
+clients:
+    # Type
+    type: simple
+
+    # The total number of clients
+    total_clients: 1
+
+    # The number of clients selected in each round
+    per_round: 1
+
+    # Should the clients compute test accuracy locally?
+    do_test: true
+
+server:
+    address: 127.0.0.1
+    port: 8000
+
+data:
+    # The training and testing dataset
+    dataname: Flickr30KEntities
+    datasource: Flickr30K
+
+    # Where the dataset is located
+    data_path: ./data
+    download_file_id: 14qrLYzC0eazGzdkDkTxr534QQrZjLMaf
+    num_workers: 4
+
+
+trainer:
+    # The type of the trainer
+    type: basic
+    batch_size: 24
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg
