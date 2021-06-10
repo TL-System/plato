@@ -7,22 +7,17 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.optim.lr_scheduler as lr_scheduler
 import yaml
+
 from plato.config import Config
 from plato.datasources import yolo
+from plato.trainers import basic
+from plato.utils import unary_encoding
 from torch.cuda import amp
 from tqdm import tqdm
-from plato.utils import unary_encoding
-from yolov5.utils.general import (box_iou, check_dataset, non_max_suppression,
-                                  one_cycle, scale_coords, xywh2xyxy)
+from yolov5.utils.general import (box_iou, check_dataset, one_cycle,
+                                  non_max_suppression, scale_coords, xywh2xyxy)
 from yolov5.utils.loss import ComputeLoss
 from yolov5.utils.metrics import ap_per_class
-
-from plato.trainers import basic
-
-try:
-    import thop  # for FLOPS computation
-except ImportError:
-    thop = None
 
 
 class Trainer(basic.Trainer):
@@ -237,19 +232,19 @@ class Trainer(basic.Trainer):
         names = {
             k: v
             for k, v in enumerate(self.model.names if hasattr(
-                self.model, 'names') else self.module.names)
+                self.model, 'names') else self.model.module.names)
         }
-        s = ('%20s' + '%12s' * 6) % \
-            ('Class', 'Images', 'Targets', 'P', 'R', 'mAP@.5', 'mAP@.5:.95')
-        p, r, f1, mp, mr, map50, map, = 0., 0., 0., 0., 0., 0., 0.
-        stats, ap, ap_class = [], [], []
+        s = ('%20s' + '%11s' * 6) % ('Class', 'Images', 'Labels', 'P', 'R',
+                                     'mAP@.5', 'mAP@.5:.95')
+        mp, map50 = 0., 0.
+        stats, ap = [], []
 
-        for batch_i, (img, targets, paths,
-                      shapes) in enumerate(tqdm(test_loader, desc=s)):
+        for __, (img, targets, __,
+                 shapes) in enumerate(tqdm(test_loader, desc=s)):
             img = img.to(device, non_blocking=True).float()
             img /= 255.0  # 0 - 255 to 0.0 - 1.0
             targets = targets.to(device)
-            nb, _, height, width = img.shape  # batch size, channels, height, width
+            __, __, height, width = img.shape  # batch size, channels, height, width
 
             with torch.no_grad():
                 # Run model
@@ -258,9 +253,9 @@ class Trainer(basic.Trainer):
                     logits = logits.cpu().detach().numpy()
                     logits = unary_encoding.encode(logits)
                     logits = torch.from_numpy(logits.astype('float32'))
-                    out, train_out = self.model.forward_from(logits.to(device))
+                    out, __ = self.model.forward_from(logits.to(device))
                 else:
-                    out, train_out = self.model(img)
+                    out, __ = self.model(img)
 
                 # Run NMS
                 targets[:,
@@ -296,6 +291,7 @@ class Trainer(basic.Trainer):
                                       niou,
                                       dtype=torch.bool,
                                       device=device)
+
                 if nl:
                     detected = []  # target indices
                     tcls_tensor = labels[:, 0]
@@ -308,9 +304,9 @@ class Trainer(basic.Trainer):
                     # Per target class
                     for cls in torch.unique(tcls_tensor):
                         ti = (cls == tcls_tensor).nonzero(as_tuple=False).view(
-                            -1)  # prediction indices
-                        pi = (cls == pred[:, 5]).nonzero(as_tuple=False).view(
                             -1)  # target indices
+                        pi = (cls == pred[:, 5]).nonzero(as_tuple=False).view(
+                            -1)  # prediction indices
 
                         # Search for detections
                         if pi.shape[0]:
@@ -339,10 +335,10 @@ class Trainer(basic.Trainer):
         # Compute statistics
         stats = [np.concatenate(x, 0) for x in zip(*stats)]  # to numpy
         if len(stats) and stats[0].any():
-            p, r, ap, f1, ap_class = ap_per_class(*stats,
-                                                  plot=False,
-                                                  save_dir='',
-                                                  names=names)
+            p, r, ap, __, __ = ap_per_class(*stats,
+                                            plot=False,
+                                            save_dir='',
+                                            names=names)
             ap50, ap = ap[:, 0], ap.mean(1)  # AP@0.5, AP@0.5:0.95
             mp, mr, map50, map = p.mean(), r.mean(), ap50.mean(), ap.mean()
             nt = np.bincount(stats[3].astype(np.int64),
