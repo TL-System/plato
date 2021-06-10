@@ -31,7 +31,6 @@ else:
         cifar10,
         cinic10,
         huggingface,
-        kinetics,
         pascal_voc,
     )
 
@@ -40,7 +39,6 @@ else:
                                           ('CIFAR10', cifar10),
                                           ('CINIC10', cinic10),
                                           ('HuggingFace', huggingface),
-                                          ('Kinetics', kinetics),
                                           ('PASCAL_VOC', pascal_voc)])
 
 
