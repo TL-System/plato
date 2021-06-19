@@ -17,16 +17,16 @@ server:
 
 data:
     # The training and testing dataset
-    datasource: MNIST
+    datasource: CIFAR10
 
     # Where the dataset is located
     data_path: ./data
 
     # Number of samples in each partition
-    per_client_classes_size: 2
+    per_client_classes_size: 5
 
     # IID or non-IID?
-    sampler: noniid
+    sampler: quantity_label_noniid
 
     # The concentration parameter for the Dirichlet distribution
     concentration: 0.5

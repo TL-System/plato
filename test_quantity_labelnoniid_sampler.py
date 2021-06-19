@@ -14,9 +14,10 @@ from plato.samplers.quantity_label_noniid import Sampler
 if __name__ == "__main__":
     cifar10_datasource = DataSource()
     q_label_noniid_sampler = Sampler(datasource=cifar10_datasource,
-                                     client_id=1)
+                                     client_id=3)
     print("sampled size: ", q_label_noniid_sampler.trainset_size())
-
+    print("sampled distribution: ",
+          q_label_noniid_sampler.get_trainset_condition())
     trainset = cifar10_datasource.get_train_set()
     train_loader = torch.utils.data.DataLoader(
         dataset=trainset,
@@ -24,13 +25,13 @@ if __name__ == "__main__":
         batch_size=5,
         sampler=q_label_noniid_sampler.get())
 
-    num_sow = 2
+    num_sow = 10
     show_id = 0
     for examples, labels in train_loader:
 
         examples = examples.view(len(examples), -1)
-        # print("examples: ", examples)
-        # print("labels: ", labels)
+
+        print("labels: ", labels)
 
         if show_id > num_sow:
             break

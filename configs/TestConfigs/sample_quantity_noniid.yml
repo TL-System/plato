@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 3
+    total_clients: 5
 
     # The number of clients selected in each round
-    per_round: 1
+    per_round: 2
 
     # Should the clients compute test accuracy locally?
     do_test: true
@@ -23,9 +23,6 @@ data:
     data_path: ./data
 
     # Maximum number of samples in each partition
-    max_partition_size: 40000
-
-    # Maximum number of samples in each partition
     min_partition_size: 5000
 
     # Levels of the partition size 
@@ -35,7 +32,7 @@ data:
     sampler: sample_quantity_noniid
 
     # The concentration parameter for the Dirichlet distribution
-    concentration: 0.5
+    concentration: 0.1
 
     # The random seed for sampling data
     random_seed: 1
