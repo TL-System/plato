@@ -1,8 +1,8 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
-Samples data from a dataset, biased across labels according to the Dirichlet distribution.
-This is the Distribution-based label imbalance.
-An advantage of current sampler approach is that we can flexibly change the imbalance level by varying the
-concentration parameter 𝛽. If 𝛽 is set to a smaller value, then the partition is more unbalanced.
+Samples data from a dataset, biased across labels according to the Dirichlet distribution and quantity skew.
+
 """
 import random
 import numpy as np
@@ -11,19 +11,11 @@ from torch.utils.data import WeightedRandomSampler
 from plato.config import Config
 
 from plato.samplers import base
-'''
-Label Distribution Skew:
-
-This sampler is one type of label distribution skew, that is:
-
-    Distribution-based label imbalance: each party is allocated a proportion of the samples of each label according to Dirichlet distribution.
-    The Figure 3 of the paper "https://arxiv.org/pdf/2102.02079v2.pdf" gives an example of distribution-based label imbalance.
-'''
 
 
 class Sampler(base.Sampler):
     """Create a data sampler for each client to use a divided partition of the
-    dataset, biased across labels according to the Dirichlet distribution."""
+    dataset, biased across labels according to the Dirichlet distribution and biased partition size."""
     def __init__(self, datasource, client_id):
         super().__init__()
         self.client_id = client_id
@@ -31,7 +23,19 @@ class Sampler(base.Sampler):
         # Different clients should have a different bias across the labels
         np.random.seed(self.random_seed * int(client_id))
 
-        self.partition_size = Config().data.partition_size
+        # Different clients should have a different bias across the partition size
+        if not hasattr(Config().trainer, 'min_partition_size'):
+            min_partition_size = 500
+        if not hasattr(Config().trainer, 'max_partition_size'):
+            max_partition_size = 2000
+
+        min_partition_size = Config().data.min_partition_size
+        max_partition_size = Config().data.max_partition_size
+
+        self.partition_size = np.random.randint(low=min_partition_size,
+                                                high=max_partition_size,
+                                                size=1)[0]
+        self.partition_size = int(self.partition_size)
 
         # Concentration parameter to be used in the Dirichlet distribution
         concentration = Config().data.concentration if hasattr(
@@ -50,6 +54,10 @@ class Sampler(base.Sampler):
 
         self.sample_weights = target_proportions[target_list]
 
+        # print("target_list: ", target_list)
+        print("target_proportions: ", target_proportions)
+        print("self.sample_weights: ", self.sample_weights)
+
     def get(self):
         """Obtains an instance of the sampler. """
         gen = torch.Generator()
@@ -60,6 +68,9 @@ class Sampler(base.Sampler):
                                      num_samples=self.partition_size,
                                      replacement=False,
                                      generator=gen)
+
+    def obtain_sampled_subset_information(self):
+        pass
 
     def trainset_size(self):
         """Returns the length of the dataset after sampling. """
