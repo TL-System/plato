@@ -20,6 +20,8 @@ This sampler is one type of label distribution skew, that is:
 
     Quantity-based label imbalance: each party owns data samples of a fixed number of labels.
 
+For one client, it contain the defined number of classes while the samples in each class is almost the same. 
+
 '''
 
 

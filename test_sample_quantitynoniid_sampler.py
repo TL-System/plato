@@ -16,6 +16,9 @@ if __name__ == "__main__":
                                       client_id=1)
     print("sampled size: ", sample_q_noniid_sampler.trainset_size())
 
+    print("sampled distribution: ",
+          sample_q_noniid_sampler.get_trainset_condition())
+
     trainset = cifar10_datasource.get_train_set()
     train_loader = torch.utils.data.DataLoader(
         dataset=trainset,

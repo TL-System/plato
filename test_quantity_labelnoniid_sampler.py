@@ -14,7 +14,7 @@ from plato.samplers.quantity_label_noniid import Sampler
 if __name__ == "__main__":
     cifar10_datasource = DataSource()
     q_label_noniid_sampler = Sampler(datasource=cifar10_datasource,
-                                     client_id=3)
+                                     client_id=2)
     print("sampled size: ", q_label_noniid_sampler.trainset_size())
     print("sampled distribution: ",
           q_label_noniid_sampler.get_trainset_condition())

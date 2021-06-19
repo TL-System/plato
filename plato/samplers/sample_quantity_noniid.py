@@ -5,6 +5,8 @@ Samples data from a dataset in an independent and identically distributed fashio
 This sampler achieves the sample quantity noniid. Nmber of samples of each class in each party follows Dirichlet
 distribution.
 
+For each client, it will contain all classes while the number of samples in each class is the almost the same.
+
 """
 import numpy as np
 import torch
@@ -26,14 +28,18 @@ class Sampler(base.Sampler):
         np.random.seed(self.random_seed)
         np.random.shuffle(indices)
 
+        total_size = self.dataset_size
+        # The list of labels (targets) for all the examples
+        self.targets_list = datasource.targets()
+        classes_text_list = datasource.classes()
+        classes_id_list = list(range(len(classes_text_list)))
+
         # Concentration parameter to be used in the Dirichlet distribution
         concentration = Config().data.concentration if hasattr(
             Config().data, 'concentration') else 1.0
 
         min_partition_size = Config().data.min_partition_size
-
         total_clients = Config().clients.total_clients
-        total_size = self.dataset_size
 
         self.subset_indices = self.sample_quantity_skew(
             dataset_indices=indices,
@@ -48,15 +54,16 @@ class Sampler(base.Sampler):
         while min_size < min_partition_size:
             proportions = np.random.dirichlet(
                 np.repeat(concentration, num_clients))
+
             proportions = proportions / proportions.sum()
             min_size = np.min(proportions * dataset_size)
 
         proportions = (np.cumsum(proportions) * dataset_size).astype(int)[:-1]
-        print("proportions: ", proportions)
+
         # obtain the assigned subdataset indices for current client
         # net_dataidx_map = {i: batch_idxs[i] for i in range(n_parties)}
         clients_assigned_idxs = np.split(dataset_indices, proportions)
-        print("clients_assigned_idxs: ", clients_assigned_idxs)
+
         return clients_assigned_idxs
 
     def get(self):
@@ -68,3 +75,10 @@ class Sampler(base.Sampler):
     def trainset_size(self):
         """Returns the length of the dataset after sampling. """
         return len(self.subset_indices)
+
+    def get_trainset_condition(self):
+        targets_array = np.array(self.targets_list)
+        client_sampled_subset_labels = targets_array[self.subset_indices]
+        unique, counts = np.unique(client_sampled_subset_labels,
+                                   return_counts=True)
+        return np.asarray((unique, counts)).T
