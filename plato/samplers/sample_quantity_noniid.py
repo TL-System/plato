@@ -14,6 +14,7 @@ from plato.config import Config
 from torch.utils.data import SubsetRandomSampler
 
 from plato.samplers import base
+from plato.samplers import sampler_utils
 
 
 class Sampler(base.Sampler):
@@ -48,23 +49,22 @@ class Sampler(base.Sampler):
             concentration=concentration,
             num_clients=total_clients)[client_id]
 
-    def sample_quantity_skew(self, dataset_indices, dataset_size,
-                             min_partition_size, concentration, num_clients):
-        min_size = 0
-        while min_size < min_partition_size:
-            proportions = np.random.dirichlet(
-                np.repeat(concentration, num_clients))
 
-            proportions = proportions / proportions.sum()
-            min_size = np.min(proportions * dataset_size)
+def sample_quantity_skew(self, dataset_indices, dataset_size,
+                         min_partition_size, concentration, num_clients):
+    proportions = sampler_utils.create_dirichlet_skew(
+        total_size=dataset_size,
+        concentration=concentration,
+        min_partition_size=min_partition_size,
+        number_partitions=num_clients)
 
-        proportions = (np.cumsum(proportions) * dataset_size).astype(int)[:-1]
+    proportions = (np.cumsum(proportions) * dataset_size).astype(int)[:-1]
 
-        # obtain the assigned subdataset indices for current client
-        # net_dataidx_map = {i: batch_idxs[i] for i in range(n_parties)}
-        clients_assigned_idxs = np.split(dataset_indices, proportions)
+    # obtain the assigned subdataset indices for current client
+    # net_dataidx_map = {i: batch_idxs[i] for i in range(n_parties)}
+    clients_assigned_idxs = np.split(dataset_indices, proportions)
 
-        return clients_assigned_idxs
+    return clients_assigned_idxs
 
     def get(self):
         """Obtains an instance of the sampler. """

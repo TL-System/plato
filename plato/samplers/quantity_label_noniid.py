@@ -38,10 +38,6 @@ class Sampler(base.Sampler):
         per_client_classes_size = Config().data.per_client_classes_size
         total_clients = Config().clients.total_clients
 
-        # Concentration parameter to be used in the Dirichlet distribution
-        concentration = Config().data.concentration if hasattr(
-            Config().data, 'concentration') else 1.0
-
         # The list of labels (targets) for all the examples
         self.targets_list = datasource.targets()
         classes_text_list = datasource.classes()

@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 3
+    total_clients: 5
 
     # The number of clients selected in each round
-    per_round: 2
+    per_round: 4
 
     # Should the clients compute test accuracy locally?
     do_test: true
@@ -22,17 +22,17 @@ data:
     # Where the dataset is located
     data_path: ./data
 
-    # Maximum number of samples in each partition
-    max_partition_size: 40000
-
     # Minimum number of samples in each partition
-    min_partition_size: 10000
+    min_partition_size: 5000
 
     # IID or non-IID?
-    sampler: label_distribution_noniid
+    sampler: distribution_noniid
 
     # The concentration parameter for the Dirichlet distribution
-    concentration: 500
+    client_quantity_concentration: 0.5
+
+    # The concentration parameter for the Dirichlet distribution
+    label_concentration: 0.5
 
     # The random seed for sampling data
     random_seed: 1

@@ -3,6 +3,12 @@
 """
 Samples data from a dataset, biased across labels according to the Dirichlet distribution and quantity skew.
 
+This sampler is the most hard noniid, because it contains:
+
+    - the label noniid according to the Dirichlet distribution
+    - the unbalance between numbers of samples in classes assigned to one client. 
+        It is achieved according to the Dirichlet distribution
+
 """
 import random
 import numpy as np
@@ -11,6 +17,7 @@ from torch.utils.data import WeightedRandomSampler
 from plato.config import Config
 
 from plato.samplers import base
+from plato.samplers import sampler_utils
 
 
 class Sampler(base.Sampler):
@@ -23,40 +30,43 @@ class Sampler(base.Sampler):
         # Different clients should have a different bias across the labels
         np.random.seed(self.random_seed * int(client_id))
 
-        # Different clients should have a different bias across the partition size
-        if not hasattr(Config().trainer, 'min_partition_size'):
-            min_partition_size = 500
-        if not hasattr(Config().trainer, 'max_partition_size'):
-            max_partition_size = 2000
+        # Obtain the dataset information
+        dataset = datasource.get_train_set()
+        total_data_size = len(dataset)
 
+        # Obtain the configuration
         min_partition_size = Config().data.min_partition_size
-        max_partition_size = Config().data.max_partition_size
-
-        self.partition_size = np.random.randint(low=min_partition_size,
-                                                high=max_partition_size,
-                                                size=1)[0]
-        self.partition_size = int(self.partition_size)
+        total_clients = Config().clients.total_clients
 
         # Concentration parameter to be used in the Dirichlet distribution
-        concentration = Config().data.concentration if hasattr(
-            Config().data, 'concentration') else 1.0
+        ## control the label noniid distribution among clients
+        client_quantity_concentration = Config(
+        ).data.client_quantity_concentration if hasattr(
+            Config().data, 'client_quantity_concentration') else 1.0
+        ## control the number of samples of labels in one client
+        label_concentration = Config().data.label_concentration if hasattr(
+            Config().data, 'label_concentration') else 1.0
 
         # The list of labels (targets) for all the examples
         target_list = datasource.targets()
         class_list = datasource.classes()
 
-        target_proportions = np.random.dirichlet(
-            np.repeat(concentration, len(class_list)))
+        self.client_partition = sampler_utils.create_dirichlet_skew(
+            total_size=total_data_size,
+            concentration=client_quantity_concentration,
+            min_partition_size=min_partition_size,
+            number_partitions=total_clients)[client_id]
 
-        if np.isnan(np.sum(target_proportions)):
-            target_proportions = np.repeat(0, len(class_list))
-            target_proportions[random.randint(0, len(class_list) - 1)] = 1
+        self.client_partition_size = int(total_data_size *
+                                         self.client_partition)
 
-        self.sample_weights = target_proportions[target_list]
+        self.client_label_proportions = sampler_utils.create_dirichlet_skew(
+            total_size=len(class_list),
+            concentration=label_concentration,
+            min_partition_size=None,
+            number_partitions=len(class_list))
 
-        # print("target_list: ", target_list)
-        print("target_proportions: ", target_proportions)
-        print("self.sample_weights: ", self.sample_weights)
+        self.sample_weights = self.client_label_proportions[target_list]
 
     def get(self):
         """Obtains an instance of the sampler. """
@@ -65,13 +75,13 @@ class Sampler(base.Sampler):
 
         # Samples without replacement using the sample weights
         return WeightedRandomSampler(weights=self.sample_weights,
-                                     num_samples=self.partition_size,
+                                     num_samples=self.client_partition_size,
                                      replacement=False,
                                      generator=gen)
 
-    def obtain_sampled_subset_information(self):
-        pass
-
     def trainset_size(self):
         """Returns the length of the dataset after sampling. """
-        return self.partition_size
+        return self.client_partition_size
+
+    def get_trainset_condition(self):
+        return self.client_label_proportions, self.sample_weights
