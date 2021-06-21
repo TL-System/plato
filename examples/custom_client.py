@@ -8,7 +8,7 @@ from torch import nn
 from torchvision.datasets import MNIST
 from torchvision.transforms import ToTensor
 
-os.environ['config_file'] = 'configs/client.yml'
+os.environ['config_file'] = 'examples/configs/client.yml'
 
 from plato.clients import simple
 from plato.datasources import base
@@ -107,7 +107,6 @@ def main():
     client = CustomClient(model=model, datasource=datasource, trainer=trainer)
     client.configure()
     asyncio.run(client.start_client())
-
 
 if __name__ == "__main__":
     main()
