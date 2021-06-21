@@ -3,10 +3,9 @@ import os
 
 from torch import nn
 
-os.environ['config_file'] = 'configs/server.yml'
+os.environ['config_file'] = 'examples/configs/server.yml'
 
 from plato.servers import fedavg
-
 
 class CustomServer(fedavg.Server):
     """ A custom federated learning server. """
