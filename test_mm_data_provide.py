@@ -5,6 +5,7 @@ import os
 import sys
 
 # put the configuration file here:
+os.environ['config_file'] = 'configs/Kinetics/kinetics.yml'
 
 import numpy as np
 
@@ -21,7 +22,7 @@ def test_coco_provide():
 
 
 def test_kinetics_provide():
-    os.environ['config_file'] = 'configs/Kinetics/kinetics.yml'
+
     kinetics_data_source = kinetics.DataSource()
     kinetics_data_source.get_train_set()
 
@@ -43,4 +44,4 @@ def test_referitgame_provide():
 if __name__ == "__main__":
     _ = Config()
 
-    test_coco_provide()
+    test_kinetics_provide()

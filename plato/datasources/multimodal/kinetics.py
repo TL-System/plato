@@ -29,23 +29,23 @@ class DataSource(multimodal_base.MultiModalDataSource):
         self.modality_names = ["video", "audio"]
 
         _path = Config().data.data_path
-        self._data_path_process(data_path=_path, data_source=self.data_name)
+        self._data_path_process(data_path=_path, base_data_name=self.data_name)
 
+        base_data_path = self.mm_data_info["base_data_dir_path"]
         download_url = Config().data.download_url
         download_dir_name = download_url.split('/')[-1].split('.')[0]
-        download_info_dir_path = os.path.join(self.source_data_path,
+        download_info_dir_path = os.path.join(base_data_path,
                                               download_dir_name)
         if not os.path.exists(download_info_dir_path):
             logging.info(
                 "Downloading the Kinetics700 dataset. This may take a while.")
-            DataSource.download(download_url, self.source_data_path)
+            DataSource.download(download_url, base_data_path)
             logging.info("Done.")
 
         # obtain the path of the data information
-        self.data_categories_file = os.path.join(self.source_data_path,
+        self.data_categories_file = os.path.join(base_data_path,
                                                  "categories.json")
-        self.data_classes_file = os.path.join(self.source_data_path,
-                                              "classes.json")
+        self.data_classes_file = os.path.join(base_data_path, "classes.json")
         self.train_info_data_path = os.path.join(download_info_dir_path,
                                                  "train.json")
         self.test_info_data_path = os.path.join(download_info_dir_path,
@@ -63,22 +63,22 @@ class DataSource(multimodal_base.MultiModalDataSource):
         skip = Config().data.skip
         log_file = Config().data.log_file
 
-        failed_save_file = os.path.join(self.source_data_path,
-                                        failed_save_file)
+        failed_save_file = os.path.join(base_data_path, failed_save_file)
 
         # download the raw dataset if necessary
-        if not os.path.exists(self.train_root_path):
+        if not self._exist_judgement(self.splits_info["train"]["path"]):
+
             logging.info(
                 "Downloading the raw videos for the Kinetics700 dataset. This may take a long time."
             )
-
+            print(self.splits_info["train"]["path"])
             self.download_train_val_sets(num_workers=num_workers,
                                          failed_log=failed_save_file,
                                          compress=compress,
                                          verbose=verbose,
                                          skip=skip,
                                          log_file=os.path.join(
-                                             self.source_data_path, log_file))
+                                             base_data_path, log_file))
 
             self.download_test_set(num_workers=num_workers,
                                    failed_log=failed_save_file,
@@ -86,7 +86,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
                                    verbose=verbose,
                                    skip=skip,
                                    log_file=os.path.join(
-                                       self.source_data_path, log_file))
+                                       base_data_path, log_file))
             logging.info("Done.")
 
         # obtain the data loader settings
@@ -124,8 +124,10 @@ class DataSource(multimodal_base.MultiModalDataSource):
                          compress, verbose, skip, log_file):
         """ Download the specific classes """
         for list_path, save_root in zip(
-            [self.train_info_data_path, self.val_info_data_path],
-            [self.train_root_path, self.val_root_path]):
+            [self.train_info_data_path, self.val_info_data_path], [
+                self.splits_info["train"]["path"],
+                self.splits_info["val"]["path"]
+            ]):
             with open(list_path) as file:
                 data = json.load(file)
             print("save_root: ", save_root)
@@ -152,8 +154,8 @@ class DataSource(multimodal_base.MultiModalDataSource):
         """ Download all categories => all videos for train and the val set. """
 
         # # download the required categories in class-wise
-        if os.path.exists(self.data_categories):
-            with open(self.data_categories, "r") as file:
+        if os.path.exists(self.data_categories_file):
+            with open(self.data_categories_file, "r") as file:
                 categories = json.load(file)
 
             for category in categories:
@@ -173,12 +175,12 @@ class DataSource(multimodal_base.MultiModalDataSource):
                           skip, log_file):
         """ Download the test set. """
 
-        with open(self.test_meta_data_path) as file:
+        with open(self.test_info_data_path) as file:
             data = json.load(file)
 
         pool = parallel.VideoDownloaderPool(None,
                                             data,
-                                            self.test_root_path,
+                                            self.splits_info["test"]["path"],
                                             num_workers,
                                             failed_log,
                                             compress,
@@ -225,20 +227,20 @@ class DataSource(multimodal_base.MultiModalDataSource):
         return classes_container
 
     def num_train_examples(self):
-        if not os.path.exists(self.train_root_path):
+        if not os.path.exists(self.splits_info["train"]["path"]):
             return 0
-        return len(os.listdir(self.train_root_path))
+        return len(os.listdir(self.splits_info["train"]["path"]))
 
     def num_test_examples(self):
-        if not os.path.exists(self.test_root_path):
+        if not os.path.exists(self.splits_info["test"]["path"]):
             return 0
-        return len(os.listdir(self.test_root_path))
+        return len(os.listdir(self.splits_info["test"]["path"]))
 
     def get_train_set(self):
         transform_train = video_transform.VideoClassificationTrainTransformer(
             (128, 171), (112, 112))
         kinetics_train_data = datasets.Kinetics400(
-            root=self.train_root_path,
+            root=self.splits_info["train"]["path"],
             frames_per_clip=self.clip_len,
             step_between_clips=1,
             transform=transform_train,
@@ -252,22 +254,23 @@ class DataSource(multimodal_base.MultiModalDataSource):
     def get_val_set(self):
         transform_val = video_transform.VideoClassificationEvalTransformer(
             (128, 171), (112, 112))
-        kinetics_val_data = datasets.Kinetics400(root=self.val_root_path,
-                                                 frames_per_clip=self.clip_len,
-                                                 step_between_clips=1,
-                                                 transform=transform_val,
-                                                 frame_rate=15,
-                                                 extensions=(
-                                                     'avi',
-                                                     'mp4',
-                                                 ))
+        kinetics_val_data = datasets.Kinetics400(
+            root=self.splits_info["val"]["path"],
+            frames_per_clip=self.clip_len,
+            step_between_clips=1,
+            transform=transform_val,
+            frame_rate=15,
+            extensions=(
+                'avi',
+                'mp4',
+            ))
         return kinetics_val_data
 
     def get_test_set(self):
         transform_test = video_transform.VideoClassificationEvalTransformer(
             (128, 171), (112, 112))
         kinetics_test_data = datasets.Kinetics400(
-            root=self.test_root_path,
+            root=self.splits_info["test"]["path"],
             frames_per_clip=self.clip_len,
             step_between_clips=1,
             transform=transform_test,
