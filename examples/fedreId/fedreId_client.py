@@ -1,7 +1,6 @@
 import os
 import asyncio
 import logging
-import websockets
 import pickle
 
 import torch
@@ -13,10 +12,9 @@ from fedreId import DataSource, Trainer
 from plato.clients import simple
 from plato.config import Config
 
-
 class fedReIdClient(simple.Client):
     def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
-        super().__init__(model, datasource, trainer)
+        super().__init__(model=model, datasource=datasource, trainer=trainer)
     
     async def train(self):
         old_weights = self.algorithm.extract_weights()
