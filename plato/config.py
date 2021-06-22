@@ -8,6 +8,7 @@ import os
 import random
 import sqlite3
 from collections import OrderedDict, namedtuple
+from mmcv import Config as mmcvConfig
 
 import yaml
 
@@ -78,14 +79,21 @@ class Config:
             else:
                 filename = args.config
 
-            with open(filename, 'r') as config_file:
-                config = yaml.load(config_file, Loader=yaml.FullLoader)
+            # with open(filename, 'r') as config_file:
+            #     config = yaml.load(config_file, Loader=yaml.FullLoader)
+            # Config.clients = Config.namedtuple_from_dict(config['clients'])
+            # Config.server = Config.namedtuple_from_dict(config['server'])
+            # Config.data = Config.namedtuple_from_dict(config['data'])
+            # Config.trainer = Config.namedtuple_from_dict(config['trainer'])
+            # Config.algorithm = Config.namedtuple_from_dict(config['algorithm'])
 
-            Config.clients = Config.namedtuple_from_dict(config['clients'])
-            Config.server = Config.namedtuple_from_dict(config['server'])
-            Config.data = Config.namedtuple_from_dict(config['data'])
-            Config.trainer = Config.namedtuple_from_dict(config['trainer'])
-            Config.algorithm = Config.namedtuple_from_dict(config['algorithm'])
+            # mmcv support a wider range of file types
+            mmcv_cfg = mmcvConfig.fromfile(filename)
+            Config.clients = Config.namedtuple_from_dict(mmcv_cfg.clients)
+            Config.server = Config.namedtuple_from_dict(mmcv_cfg.server)
+            Config.data = Config.namedtuple_from_dict(mmcv_cfg.data)
+            Config.trainer = Config.namedtuple_from_dict(mmcv_cfg.trainer)
+            Config.algorithm = Config.namedtuple_from_dict(mmcv_cfg.algorithm)
 
             if Config.args.server is not None:
                 Config.server = Config.server._replace(
@@ -93,8 +101,9 @@ class Config:
                 Config.server = Config.server._replace(
                     port=args.server.split(':')[1])
 
-            if 'results' in config:
-                Config.results = Config.namedtuple_from_dict(config['results'])
+            if 'results' in mmcv_cfg:
+                Config.results = Config.namedtuple_from_dict(
+                    mmcv_cfg['results'])
                 Config.result_dir = os.path.dirname(__file__) + '/results/'
 
             # Used to limit the maximum number of concurrent trainers

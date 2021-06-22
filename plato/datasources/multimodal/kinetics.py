@@ -17,6 +17,7 @@ from plato.config import Config
 from plato.datasources import multimodal_base
 from plato.datasources.datalib import parallel_downloader as parallel
 from plato.datasources.datalib import video_transform
+from mmaction.datasets import build_dataset
 
 
 class DataSource(multimodal_base.MultiModalDataSource):
@@ -90,8 +91,8 @@ class DataSource(multimodal_base.MultiModalDataSource):
             logging.info("Done.")
 
         # obtain the data loader settings
-        self.clip_len = Config().data.clip_len
-        self.clips_per_video = Config().data.clips_per_video
+        # self.clip_len = Config().data.clip_len
+        # self.clips_per_video = Config().data.clips_per_video
 
     def download_category(self, category, num_workers, failed_save_file,
                           compress, verbose, skip, log_file):
@@ -236,12 +237,16 @@ class DataSource(multimodal_base.MultiModalDataSource):
             return 0
         return len(os.listdir(self.splits_info["test"]["path"]))
 
+    def build_kinetics_train_dataset(self):
+        pass
+
     def get_train_set(self):
+        clip_len = Config().data.train.pipeline[0].clip_len
         transform_train = video_transform.VideoClassificationTrainTransformer(
             (128, 171), (112, 112))
         kinetics_train_data = datasets.Kinetics400(
             root=self.splits_info["train"]["path"],
-            frames_per_clip=self.clip_len,
+            frames_per_clip=clip_len,
             step_between_clips=1,
             transform=transform_train,
             frame_rate=15,
@@ -252,11 +257,12 @@ class DataSource(multimodal_base.MultiModalDataSource):
         return kinetics_train_data
 
     def get_val_set(self):
+        clip_len = Config().data.val.pipeline[0].clip_len
         transform_val = video_transform.VideoClassificationEvalTransformer(
             (128, 171), (112, 112))
         kinetics_val_data = datasets.Kinetics400(
             root=self.splits_info["val"]["path"],
-            frames_per_clip=self.clip_len,
+            frames_per_clip=clip_len,
             step_between_clips=1,
             transform=transform_val,
             frame_rate=15,
@@ -267,11 +273,12 @@ class DataSource(multimodal_base.MultiModalDataSource):
         return kinetics_val_data
 
     def get_test_set(self):
+        clip_len = Config().data.val.pipeline[0].clip_len
         transform_test = video_transform.VideoClassificationEvalTransformer(
             (128, 171), (112, 112))
         kinetics_test_data = datasets.Kinetics400(
             root=self.splits_info["test"]["path"],
-            frames_per_clip=self.clip_len,
+            frames_per_clip=clip_len,
             step_between_clips=1,
             transform=transform_test,
             frame_rate=15,
