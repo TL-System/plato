@@ -83,7 +83,7 @@ class Trainer(basic.Trainer):
 
 class CustomClient(simple.Client):
     def __init__(self, model=None, datasource=None, trainer=None):
-        super().__init__(model, datasource, trainer)
+        super().__init__(model=model, datasource=datasource, trainer=trainer)
         logging.info("A customized client has been initialized.")
 
 
