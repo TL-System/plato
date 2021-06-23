@@ -17,6 +17,7 @@ from plato.config import Config
 from plato.datasources import multimodal_base
 from plato.datasources.datalib import parallel_downloader as parallel
 from plato.datasources.datalib import video_transform
+from plato.datasources.datalib import modality_extraction_tools
 from mmaction.datasets import build_dataset
 
 
@@ -27,10 +28,11 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         self.data_name = Config().data.datasource
 
-        self.modality_names = ["video", "audio"]
+        self.modality_names = ["video", "rgb", "audio", "flow"]
 
         _path = Config().data.data_path
         self._data_path_process(data_path=_path, base_data_name=self.data_name)
+        self._create_modalities_path(modality_names=self.modality_names)
 
         base_data_path = self.mm_data_info["base_data_dir_path"]
         download_url = Config().data.download_url
@@ -66,13 +68,12 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         failed_save_file = os.path.join(base_data_path, failed_save_file)
 
-        # download the raw dataset if necessary
-        if not self._exist_judgement(self.splits_info["train"]["path"]):
+        # download the raw video dataset if necessary
+        if not self._exist_judgement(self.splits_info["train"]["video_path"]):
 
             logging.info(
                 "Downloading the raw videos for the Kinetics700 dataset. This may take a long time."
             )
-            print(self.splits_info["train"]["path"])
             self.download_train_val_sets(num_workers=num_workers,
                                          failed_log=failed_save_file,
                                          compress=compress,
@@ -90,9 +91,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
                                        base_data_path, log_file))
             logging.info("Done.")
 
-        # obtain the data loader settings
-        # self.clip_len = Config().data.clip_len
-        # self.clips_per_video = Config().data.clips_per_video
+        logging.info("The Kinetics700 dataset has been prepared")
 
     def download_category(self, category, num_workers, failed_save_file,
                           compress, verbose, skip, log_file):
@@ -126,8 +125,8 @@ class DataSource(multimodal_base.MultiModalDataSource):
         """ Download the specific classes """
         for list_path, save_root in zip(
             [self.train_info_data_path, self.val_info_data_path], [
-                self.splits_info["train"]["path"],
-                self.splits_info["val"]["path"]
+                self.splits_info["train"]["video_path"],
+                self.splits_info["val"]["video_path"]
             ]):
             with open(list_path) as file:
                 data = json.load(file)
@@ -179,15 +178,16 @@ class DataSource(multimodal_base.MultiModalDataSource):
         with open(self.test_info_data_path) as file:
             data = json.load(file)
 
-        pool = parallel.VideoDownloaderPool(None,
-                                            data,
-                                            self.splits_info["test"]["path"],
-                                            num_workers,
-                                            failed_log,
-                                            compress,
-                                            verbose,
-                                            skip,
-                                            log_file=log_file)
+        pool = parallel.VideoDownloaderPool(
+            None,
+            data,
+            self.splits_info["test"]["video_path"],
+            num_workers,
+            failed_log,
+            compress,
+            verbose,
+            skip,
+            log_file=log_file)
         pool.start_workers()
         pool.feed_videos()
         pool.stop_workers()
@@ -227,18 +227,29 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         return classes_container
 
-    def num_train_examples(self):
-        if not os.path.exists(self.splits_info["train"]["path"]):
-            return 0
-        return len(os.listdir(self.splits_info["train"]["path"]))
+    def extract_videos_rgb_flow_audio(self, mode="train"):
+        src_mode_videos_dir = os.path.join(
+            self.splits_info[mode]["video_path"])
+        rgb_out_dir_path = self.splits_info[mode]["rgb_path"]
+        flow_our_dir_path = self.splits_info[mode]["flow_path"]
+        audio_out_dir_path = self.splits_info[mode]["audio_path"]
 
-    def num_test_examples(self):
-        if not os.path.exists(self.splits_info["test"]["path"]):
-            return 0
-        return len(os.listdir(self.splits_info["test"]["path"]))
-
-    def build_kinetics_train_dataset(self):
-        pass
+        # define the modalities extractor
+        vm_extractor = modality_extraction_tools.VideoModalityExtractor(
+            video_src_dir=src_mode_videos_dir,
+            dir_level=2,
+            num_worker=8,
+            video_ext="mp4",
+            mixed_ext=False)
+        vm_extractor.build_rgb_frames(rgb_out_dir_path,
+                                      new_short=1,
+                                      new_width=0,
+                                      new_height=0)
+        vm_extractor.build_optical_flow_frames(flow_our_dir_path,
+                                                 new_short=1,
+                                                 new_width=0,
+                                                 new_height=0)
+        vm_extractor.build_audios(to_dir=audio_out_dir_path)
 
     def get_train_set(self):
         clip_len = Config().data.train.pipeline[0].clip_len

@@ -24,7 +24,8 @@ def test_coco_provide():
 def test_kinetics_provide():
 
     kinetics_data_source = kinetics.DataSource()
-    kinetics_data_source.get_train_set()
+    # kinetics_data_source.get_train_set()
+    kinetics_data_source.extract_videos_rgb_flow_audio(mode="train")
 
 
 def test_flickr30k_entities_provide():

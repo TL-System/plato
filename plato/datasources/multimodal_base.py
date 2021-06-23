@@ -48,9 +48,22 @@ class MultiModalDataSource(base.DataSource):
             }
         }
 
+    def _create_modalities_path(self, modality_names):
+        for split_type in list(self.splits_info.keys()):
+            split_path = self.splits_info[split_type]["path"]
+            for modality_nm in modality_names:
+                split_modality_path = os.path.join(split_path, modality_nm)
+                self.splits_info[split_type][modality_nm + "_" +
+                                             "path"] = split_modality_path
+                if not os.path.exists(split_modality_path):
+                    try:
+                        os.makedirs(split_modality_path)
+                    except FileExistsError:
+                        pass
+
     def _data_path_process(
         self,
-        data_path,  # the base directory for the data 
+        data_path,  # the base directory for the data
         base_data_name=None):  # the directory name of the working data
         base_data_path = os.path.join(data_path, base_data_name)
         if not os.path.exists(base_data_path):
