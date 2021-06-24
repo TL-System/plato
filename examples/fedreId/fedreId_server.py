@@ -40,7 +40,7 @@ class fedReIdServer(fedavg.Server):
             belive = self.clients_belive[i]
             logging.info("%d -> %f", i, belive)
             for name, delta in update.items():
-                # Use weighted average by the number of samples
+                # Use weighted average by the belive of each client
                 avg_update[name] += delta * (belive / self.total_belive)
 
         return avg_update
