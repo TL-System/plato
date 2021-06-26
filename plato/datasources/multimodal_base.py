@@ -99,6 +99,7 @@ class MultiModalDataSource(base.DataSource):
                                          extract_root=put_data_dir,
                                          filename=download_file_name,
                                          remove_finished=True)
+        return download_extracted_file_name
 
     def _download_google_driver_arrange_data(
         self,

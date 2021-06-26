@@ -11,10 +11,11 @@ server = dict(address="127.0.0.1", port=8000)
 # dataset settings
 dataset_type = 'RawframeDataset'
 data_root_name = 'rawframes_train'
+data_root_test_name = 'rawframes_test'
 data_root_val_name = 'rawframes_val'
 ann_file_train_name = 'train_list_rawframes.txt'
-ann_file_val_name = 'val_list_rawframes.txt'
 ann_file_test_name = 'val_list_rawframes.txt'
+ann_file_val_name = 'val_list_rawframes.txt'
 img_norm_cfg = dict(mean=[123.675, 116.28, 103.53],
                     std=[58.395, 57.12, 57.375],
                     to_bgr=False)
@@ -82,8 +83,8 @@ data = dict(
              data_prefix=data_root_val_name,
              pipeline=val_pipeline),
     test=dict(type=dataset_type,
-              ann_file=ann_file_val_name,
-              data_prefix=data_root_val_name,
+              ann_file=ann_file_test_name,
+              data_prefix=data_root_test_name,
               pipeline=test_pipeline),
     sampler="dis_noniid")
 

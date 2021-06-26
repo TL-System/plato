@@ -9,16 +9,20 @@ import json
 import logging
 import os
 import sys
+import shutil
 
+import torch
 from torch.utils.data.dataloader import default_collate
 from torchvision import datasets
+from mmaction.datasets import build_dataset
 
 from plato.config import Config
 from plato.datasources import multimodal_base
 from plato.datasources.datalib import parallel_downloader as parallel
 from plato.datasources.datalib import video_transform
-from plato.datasources.datalib import modality_extraction_tools
-from mmaction.datasets import build_dataset
+from plato.datasources.datalib import frames_extraction_tools
+from plato.datasources.datalib import audio_extraction_tools
+from plato.datasources.datalib import modality_data_anntation_tools
 
 
 class DataSource(multimodal_base.MultiModalDataSource):
@@ -28,7 +32,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         self.data_name = Config().data.datasource
 
-        self.modality_names = ["video", "rgb", "audio", "flow"]
+        self.modality_names = ["video", "rgb", "audio", "flow", "rawframes"]
 
         _path = Config().data.data_path
         self._data_path_process(data_path=_path, base_data_name=self.data_name)
@@ -36,14 +40,17 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         base_data_path = self.mm_data_info["base_data_dir_path"]
         download_url = Config().data.download_url
-        download_dir_name = download_url.split('/')[-1].split('.')[0]
+        extracted_dir_name = self._download_arrange_data(
+            download_url=download_url, put_data_dir=base_data_path)
+
         download_info_dir_path = os.path.join(base_data_path,
-                                              download_dir_name)
-        if not os.path.exists(download_info_dir_path):
-            logging.info(
-                "Downloading the Kinetics700 dataset. This may take a while.")
-            DataSource.download(download_url, base_data_path)
-            logging.info("Done.")
+                                              extracted_dir_name)
+        # convert the Kinetics data dir structure to the typical one shown in
+        #   https://github.com/open-mmlab/mmaction2/blob/master/tools/data/kinetics/README.md
+        Kinetics_annotation_dir_name = "annotations"
+        ann_dst_path = os.path.join(base_data_path,
+                                    Kinetics_annotation_dir_name)
+        shutil.copytree(download_info_dir_path, ann_dst_path)
 
         # obtain the path of the data information
         self.data_categories_file = os.path.join(base_data_path,
@@ -55,6 +62,12 @@ class DataSource(multimodal_base.MultiModalDataSource):
                                                 "test.json")
         self.val_info_data_path = os.path.join(download_info_dir_path,
                                                "validate.json")
+
+        self.data_splits_file_info = {
+            "train": self.train_info_data_path,
+            "test": self.test_info_data_path,
+            "val": self.val_info_data_path
+        }
 
         self.data_classes = self.extract_data_classes()
 
@@ -227,7 +240,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         return classes_container
 
-    def extract_videos_rgb_flow_audio(self, mode="train"):
+    def extract_videos_rgb_flow_audio(self, mode="train", device="CPU"):
         src_mode_videos_dir = os.path.join(
             self.splits_info[mode]["video_path"])
         rgb_out_dir_path = self.splits_info[mode]["rgb_path"]
@@ -235,68 +248,55 @@ class DataSource(multimodal_base.MultiModalDataSource):
         audio_out_dir_path = self.splits_info[mode]["audio_path"]
 
         # define the modalities extractor
-        vm_extractor = modality_extraction_tools.VideoModalityExtractor(
+        vdf_extractor = frames_extraction_tools.VideoFramesExtractor(
             video_src_dir=src_mode_videos_dir,
             dir_level=2,
             num_worker=8,
             video_ext="mp4",
             mixed_ext=False)
-        vm_extractor.build_rgb_frames(rgb_out_dir_path,
-                                      new_short=1,
-                                      new_width=0,
-                                      new_height=0)
-        vm_extractor.build_optical_flow_frames(flow_our_dir_path,
-                                                 new_short=1,
-                                                 new_width=0,
-                                                 new_height=0)
-        vm_extractor.build_audios(to_dir=audio_out_dir_path)
+        vda_extractor = audio_extraction_tools.VideoAudioExtractor(
+            video_src_dir=src_mode_videos_dir,
+            dir_level=2,
+            num_worker=8,
+            video_ext="mp4",
+            mixed_ext=False)
+
+        if torch.cuda.is_available():
+            vdf_extractor.build_frames_gpu(rgb_out_dir_path,
+                                           flow_our_dir_path,
+                                           new_short=1,
+                                           new_width=0,
+                                           new_height=0)
+        else:
+            vdf_extractor.build_frames_cpu(
+                to_dir=self.splits_info[mode]["rawframes_path"])
+
+        vda_extractor.build_audios(to_dir=audio_out_dir_path)
+
+    def extract_split_list_files(self, out_path):
+        gen_annots_op = modality_data_anntation_tools.GenerateMDataAnnotation(
+            data_src_dir=self.splits_info[mode]["rawframes_path"],
+            data_annos_files_info=self.
+            data_splits_file_info,  # a dict that contains the data splits' file path
+            data_format="rawframes",  # 'rawframes', 'videos'
+            out_path=out_path,
+        )
+        gen_annots_op.generate_data_splits_info_file(data_name=self.data_name)
 
     def get_train_set(self):
-        clip_len = Config().data.train.pipeline[0].clip_len
-        transform_train = video_transform.VideoClassificationTrainTransformer(
-            (128, 171), (112, 112))
-        kinetics_train_data = datasets.Kinetics400(
-            root=self.splits_info["train"]["path"],
-            frames_per_clip=clip_len,
-            step_between_clips=1,
-            transform=transform_train,
-            frame_rate=15,
-            extensions=(
-                'avi',
-                'mp4',
-            ))
-        return kinetics_train_data
+        train_dataset = build_dataset(Config().data.train)
 
-    def get_val_set(self):
-        clip_len = Config().data.val.pipeline[0].clip_len
-        transform_val = video_transform.VideoClassificationEvalTransformer(
-            (128, 171), (112, 112))
-        kinetics_val_data = datasets.Kinetics400(
-            root=self.splits_info["val"]["path"],
-            frames_per_clip=clip_len,
-            step_between_clips=1,
-            transform=transform_val,
-            frame_rate=15,
-            extensions=(
-                'avi',
-                'mp4',
-            ))
-        return kinetics_val_data
+        return train_dataset
 
     def get_test_set(self):
-        clip_len = Config().data.val.pipeline[0].clip_len
-        transform_test = video_transform.VideoClassificationEvalTransformer(
-            (128, 171), (112, 112))
-        kinetics_test_data = datasets.Kinetics400(
-            root=self.splits_info["test"]["path"],
-            frames_per_clip=clip_len,
-            step_between_clips=1,
-            transform=transform_test,
-            frame_rate=15,
-            extensions=(
-                'avi',
-                'mp4',
-            ))
+        test_dataset = build_dataset(Config().data.test)
+
+        return test_dataset
+
+    def get_val_set(self):
+        val_dataset = build_dataset(Config().data.val)
+
+        return val_dataset
 
     @staticmethod
     def get_data_loader(self, batch_size, dataset, sampler):
