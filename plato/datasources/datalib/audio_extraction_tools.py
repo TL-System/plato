@@ -39,9 +39,11 @@ class VideoAudioExtractor(modality_extraction_base.VideoExtractorBase):
                  dir_level=2,
                  num_worker=2,
                  video_ext="mp4",
-                 mixed_ext=False):
+                 mixed_ext=False,
+                 audio_ext="wav"):
         super().__init__(video_src_dir, dir_level, num_worker, video_ext,
                          mixed_ext)
+        self.audio_ext = audio_ext
 
     def build_audios(
         self,
@@ -57,3 +59,39 @@ class VideoAudioExtractor(modality_extraction_base.VideoExtractorBase):
             zip(self.fullpath_list,
                 len(self.videos_path_list) * [sourc_video_dir],
                 len(self.videos_path_list) * [to_dir]))
+
+    def build_audios_features(
+            self,
+            audio_src_path,  # the dir that contains the src audio files
+            to_dir,  # dir to save the extracted features
+            frame_rate=30,  # The frame rate per second of the video.
+            sample_rate=16000,  # The sample rate for audio sampling
+            num_mels=80,  # Number of channels of the melspectrogram. Default
+            fft_size=1280,  # fft_size / sample_rate is window size
+            hop_size=320,  # hop_size / sample_rate is step size
+            spectrogram_type='lws',  # lws, 'librosa', recommand lws
+            part="1/1"):
+
+        audio_tools = build_audio_features.AudioTools(frame_rate=frame_rate,
+                                                      sample_rate=sample_rate,
+                                                      num_mels=num_mels,
+                                                      fft_size=fft_size,
+                                                      hop_size=hop_size,
+                                                      spectrogram_type='lws')
+        audio_files = glob.glob(
+            osp.join(audio_src_path, '*/' * self.dir_level,
+                     '*' + self.audio_ext))
+
+        files = sorted(files)
+        if part is not None:
+            [this_part, num_parts] = [int(i) for i in part.split('/')]
+            part_len = len(files) // num_parts
+
+        p = Pool(self.num_worker)
+        for file in files[part_len * (this_part - 1):(
+                part_len *
+                this_part) if this_part != num_parts else len(files)]:
+            p.apply_async(build_audio_features.extract_audio_feature,
+                          args=(file, audio_tools, to_dir))
+        p.close()
+        p.join()

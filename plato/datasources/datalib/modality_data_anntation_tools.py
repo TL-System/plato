@@ -39,6 +39,7 @@ class GenerateMDataAnnotation(object):
         data_annos_files_info,  # a dict that contains the data splits' file path
         data_format,  # 'rawframes', 'videos'
         out_path,
+        dataset_name,
         data_dir_level=2,
         rgb_prefix="img_'",  # prefix of rgb frames
         flow_x_prefix="flow_x_",  # prefix of flow x frames
@@ -48,6 +49,7 @@ class GenerateMDataAnnotation(object):
 
         self.data_src_dir = data_src_dir
         self.data_annos_files_info = data_annos_files_info
+        self.dataset_name = dataset_name
         self.data_format = data_format
         self.annotations_out_path = out_path
         self.data_dir_level = data_dir_level
@@ -96,14 +98,15 @@ class GenerateMDataAnnotation(object):
             split_built_list = build_list(split=split_info,
                                           frame_info=self.frame_info,
                                           shuffle=False)
-            filename = f'{args.dataset}_{split_name}_list_{self.data_format}.txt'
+            filename = f'{self.dataset_name}_{split_name}_list_{self.data_format}.txt'
 
             if self.output_format == 'txt':
                 with open(os.path.join(self.annotations_out_path, filename),
                           'w') as f:
                     f.writelines(split_built_list[0])
             elif self.output_format == 'json':
-                data_list = lines2dictlist(split_built_list[0], args.format)
+                data_list = lines2dictlist(split_built_list[0],
+                                           self.data_format)
                 filename = filename.replace('.txt', '.json')
                 with open(os.path.join(self.annotations_out_path, filename),
                           'w') as f:

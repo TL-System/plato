@@ -15,9 +15,11 @@ import torch
 from torch.utils.data.dataloader import default_collate
 from torchvision import datasets
 from mmaction.datasets import build_dataset
+from mmaction.datasets import rawframe_dataset
+from mmaction.datasets import audio_feature_dataset
 
 from plato.config import Config
-from plato.datasources import multimodal_base
+from plato.datasources.multimodal import multimodal_base
 from plato.datasources.datalib import parallel_downloader as parallel
 from plato.datasources.datalib import video_transform
 from plato.datasources.datalib import frames_extraction_tools
@@ -32,7 +34,8 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         self.data_name = Config().data.datasource
 
-        self.modality_names = ["video", "rgb", "audio", "flow", "rawframes"]
+        # the rawframes contains the "flow" and "rgb",
+        self.modality_names = ["video", "audio", "rawframes", "audio_feature"]
 
         _path = Config().data.data_path
         self._data_path_process(data_path=_path, base_data_name=self.data_name)
@@ -64,9 +67,9 @@ class DataSource(multimodal_base.MultiModalDataSource):
                                                "validate.json")
 
         self.data_splits_file_info = {
-            "train": self.train_info_data_path,
-            "test": self.test_info_data_path,
-            "val": self.val_info_data_path
+            "train": os.path.join(download_info_dir_path, "train.csv"),
+            "test": os.path.join(download_info_dir_path, "test.csv"),
+            "val": os.path.join(download_info_dir_path, "validate.csv")
         }
 
         self.data_classes = self.extract_data_classes()
@@ -246,6 +249,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
         rgb_out_dir_path = self.splits_info[mode]["rgb_path"]
         flow_our_dir_path = self.splits_info[mode]["flow_path"]
         audio_out_dir_path = self.splits_info[mode]["audio_path"]
+        audio_feature_dir_path = self.splits_info[mode]["audio_feature_path"]
 
         # define the modalities extractor
         vdf_extractor = frames_extraction_tools.VideoFramesExtractor(
@@ -273,30 +277,49 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         vda_extractor.build_audios(to_dir=audio_out_dir_path)
 
-    def extract_split_list_files(self, out_path):
+        vda_extractor.build_audios_features(audio_src_path=audio_out_dir_path,
+                                            to_dir=audio_feature_dir_path)
+
+    def extract_split_list_files(self):
         gen_annots_op = modality_data_anntation_tools.GenerateMDataAnnotation(
             data_src_dir=self.splits_info[mode]["rawframes_path"],
             data_annos_files_info=self.
             data_splits_file_info,  # a dict that contains the data splits' file path
+            dataset_name=self.dataset_name,
             data_format="rawframes",  # 'rawframes', 'videos'
-            out_path=out_path,
+            out_path=self.
+            mm_data_info["base_data_dir_path"],  # put to the base dir
         )
         gen_annots_op.generate_data_splits_info_file(data_name=self.data_name)
 
     def get_train_set(self):
-        train_dataset = build_dataset(Config().data.train)
+        rgb_train_dataset = build_dataset(Config().data.train[0])
+        flow_train_dataset = build_dataset(Config().data.train[1])
+        audio_feature_train_dataset = build_dataset(Config().data.train[2])
 
-        return train_dataset
+        mm_train_dataset = multimodal_base.MultiModalDataset([
+            rgb_train_dataset, flow_train_dataset, audio_feature_train_dataset
+        ])
+        return mm_train_dataset
 
     def get_test_set(self):
-        test_dataset = build_dataset(Config().data.test)
+        rgb_test_dataset = build_dataset(Config().data.test[0])
+        flow_test_dataset = build_dataset(Config().data.test[1])
+        audio_feature_test_dataset = build_dataset(Config().data.test[2])
 
-        return test_dataset
+        mm_test_dataset = multimodal_base.MultiModalDataset(
+            [rgb_test_dataset, flow_test_dataset, audio_feature_test_dataset])
+        return mm_test_dataset
 
     def get_val_set(self):
-        val_dataset = build_dataset(Config().data.val)
+        rgb_val_dataset = build_dataset(Config().data.val[0])
+        flow_val_dataset = build_dataset(Config().data.val[1])
+        audio_feature_val_dataset = build_dataset(Config().data.val[2])
 
-        return val_dataset
+        # one sample of this dataset contains three part of data
+        mm_val_dataset = multimodal_base.MultiModalDataset(
+            [rgb_val_dataset, flow_val_dataset, audio_feature_val_dataset])
+        return mm_val_dataset
 
     @staticmethod
     def get_data_loader(self, batch_size, dataset, sampler):

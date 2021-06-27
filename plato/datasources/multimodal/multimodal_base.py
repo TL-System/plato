@@ -10,6 +10,7 @@ import sys
 import requests
 
 import numpy as np
+import torch
 from torchvision.datasets.utils import download_and_extract_archive
 from torchvision.datasets.utils import download_file_from_google_drive, extract_archive
 
@@ -36,15 +37,15 @@ class MultiModalDataSource(base.DataSource):
         self.splits_info = {
             "train": {
                 "path": '',
-                "split_file": ''
+                "split_anno_file": ''
             },
             "test": {
                 "path": '',
-                "split_file": ''
+                "split_anno_file": ''
             },
             "val": {
                 "path": '',
-                "split_file": ''
+                "split_anno_file": ''
             }
         }
 
@@ -53,6 +54,7 @@ class MultiModalDataSource(base.DataSource):
             split_path = self.splits_info[split_type]["path"]
             for modality_nm in modality_names:
                 split_modality_path = os.path.join(split_path, modality_nm)
+                # modality data dir
                 self.splits_info[split_type][modality_nm + "_" +
                                              "path"] = split_modality_path
                 if not os.path.exists(split_modality_path):
@@ -141,3 +143,29 @@ class MultiModalDataSource(base.DataSource):
 
     def num_modalities(self) -> int:
         return len(self.modality_names)
+
+
+class MultiModalDataset(torch.utils.data.Dataset):
+    def __init__(self, *datasets):
+        self.datasets = datasets
+
+    def __getitem__(self, idx):
+        """Get the sample for either training or testing given index."""
+        obtained_mm_sample = ()
+        for dataset in self.datasets:
+            if dataset.test_mode:
+                obtained_mm_sample.append(dataset.prepare_test_frames(idx))
+            else:
+                obtained_mm_sample.append(dataset.prepare_train_frames(idx))
+
+        return obtained_mm_sample
+
+    def __len__(self):
+        """ obtain the length of the multi-modal data"""
+        mm_datas_lens = [len(dt) for dt in self.datasets]
+
+        result = all(element == mm_datas_lens[0] for element in mm_datas_lens)
+        if result:
+            return mm_datas_lens[0]
+        else:
+            return min(mm_datas_lens)
