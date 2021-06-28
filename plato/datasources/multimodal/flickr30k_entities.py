@@ -13,7 +13,7 @@ from torchvision.datasets.utils import download_file_from_google_drive, extract_
 from torchvision import datasets
 
 from plato.config import Config
-from plato.datasources import multimodal_base
+from plato.datasources.multimodal import multimodal_base
 from plato.datasources.datalib import data_utils, flickr30k_utils
 
 

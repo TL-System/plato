@@ -42,17 +42,21 @@ audio_test_pipeline = [
     dict(type='ToTensor', keys=['audios'])
 ]
 
-audio_data_train = dict(type=dataset_type,
+audio_data_train = dict(type=audio_dataset_type,
                         ann_file=audio_ann_file_train_name,
                         data_prefix=audio_data_root_train_name,
                         pipeline=audio_train_pipeline)
 
-audio_data_val = dict(type=dataset_type,
+audio_data_val = dict(type=audio_dataset_type,
                       ann_file=audio_ann_file_val_name,
                       data_prefix=audio_data_root_val_name,
                       pipeline=audio_val_pipeline)
 
-audio_data_test = dict(type=dataset_type,
+audio_data_test = dict(type=audio_dataset_type,
                        ann_file=audio_ann_file_test_name,
                        data_prefix=audio_data_root_test_name,
                        pipeline=audio_test_pipeline)
+
+audio_data = dict(train=audio_data_train,
+                  val=audio_data_val,
+                  test=audio_data_test)

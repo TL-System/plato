@@ -5,7 +5,7 @@ import os
 import sys
 
 # put the configuration file here:
-os.environ['config_file'] = 'configs/Kinetics/kinetics_CSN.py'
+os.environ['config_file'] = 'configs/Kinetics/kinetics_mm_CSN.py'
 
 import numpy as np
 

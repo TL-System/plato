@@ -56,27 +56,25 @@ flow_test_pipeline = [
     dict(type='ToTensor', keys=['imgs'])
 ]
 
+flow_data_train = dict(type=flow_dataset_type,
+                       ann_file=flow_ann_file_train_name,
+                       data_prefix=flow_data_root_train_name,
+                       filename_tmpl='{}_{:05d}.jpg',
+                       modality='Flow',
+                       pipeline=flow_train_pipeline),
 
-flow_data_train = dict(
-        type=flow_dataset_type,
-        ann_file=flow_ann_file_train_name,
-        data_prefix=flow_data_root_train_name,
-        filename_tmpl='{}_{:05d}.jpg',
-        modality='Flow',
-        pipeline=flow_train_pipeline),
+flow_data_val = dict(type=flow_dataset_type,
+                     ann_file=flow_ann_file_val_name,
+                     data_prefix=flow_data_root_val_name,
+                     filename_tmpl='{}_{:05d}.jpg',
+                     modality='Flow',
+                     pipeline=flow_val_pipeline),
 
-flow_data_val = dict(
-        type=flow_dataset_type,
-        ann_file=flow_ann_file_val_name,
-        data_prefix=flow_data_root_val_name,
-        filename_tmpl='{}_{:05d}.jpg',
-        modality='Flow',
-        pipeline=flow_val_pipeline),
+flow_data_test = dict(type=flow_dataset_type,
+                      ann_file=flow_ann_file_test_name,
+                      data_prefix=flow_data_root_test_name,
+                      filename_tmpl='{}_{:05d}.jpg',
+                      modality='Flow',
+                      pipeline=flow_test_pipeline)
 
-flow_data_test = dict(
-        type=flow_dataset_type,
-        ann_file=flow_ann_file_test_name,
-        data_prefix=flow_data_root_test_name,
-        filename_tmpl='{}_{:05d}.jpg',
-        modality='Flow',
-        pipeline=flow_test_pipeline))
+flow_data = dict(train=flow_data_train, val=flow_data_val, test=flow_data_test)

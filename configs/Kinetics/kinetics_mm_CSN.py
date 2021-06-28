@@ -1,3 +1,8 @@
+_base_ = [
+    'kinetics_csn_rgb.py', 'kinetics_tsn_flow.py', 'kinetics_audio_feature.py',
+    'kinetics_mmf_models.py'
+]
+
 # clients settings
 clients = dict(
     type="simple",  # Type
@@ -9,7 +14,6 @@ clients = dict(
 server = dict(address="127.0.0.1", port=8000)
 
 # dataset settings for the multimodal data, frames, flow, and audio
-import kinetics_csn_rgb, kinetics_tsn_flow, kinetics_audio_feature
 
 data = dict(
     datasource="Kinetics700",
@@ -24,18 +28,6 @@ data = dict(
     skip=False,
     videos_per_gpu=3,
     workers_per_gpu=4,
-    train=[
-        kinetics_csn_rgb.rgb_data_train, kinetics_tsn_flow.flow_data_train,
-        kinetics_audio_feature.audio_data_train
-    ],
-    val=[
-        kinetics_csn_rgb.rgb_data_val, kinetics_tsn_flow.flow_data_val,
-        kinetics_audio_feature.audio_data_val
-    ],
-    test=[
-        kinetics_csn_rgb.rgb_data_test, kinetics_tsn_flow.flow_data_test,
-        kinetics_audio_feature.audio_data_test
-    ],
     sampler="dis_noniid")
 
 # Train settings
@@ -52,9 +44,7 @@ lr_config = dict(policy='step',
                  warmup_by_epoch=True,
                  warmup_iters=16)
 total_epochs = 58
-checkpoint_config = dict(interval=2)
-evaluation = dict(interval=5,
-                  metrics=['top_k_accuracy', 'mean_class_accuracy'])
+
 log_config = dict(
     interval=20,
     hooks=[dict(type='TextLoggerHook'),
@@ -69,6 +59,10 @@ trainer = dict(type="basic",
                parallelized=False,
                max_concurrency=clients["per_round"],
                target_accuracy=0.67)
+checkpoint_config = dict(interval=2)
+evaluation = dict(interval=5,
+                  metrics=['top_k_accuracy', 'mean_class_accuracy'])
+
 algorithm = dict(
     type="fedavg",  # Aggregation algorithm
     cross_silo=True,  # Cross-silo training
@@ -78,10 +72,11 @@ algorithm = dict(
 # aggreagted weights to the central server
 
 # runtime settings
-dist_params = dict(backend='nccl')
-log_level = 'INFO'
-work_dir = './work_dirs/ircsn_ig65m_pretrained_bnfrozen_r152_32x2x1_58e_kinetics400_rgb'  # noqa: E501
-load_from = None
-resume_from = None
-workflow = [('train', 1)]
-find_unused_parameters = True
+runner_setting = dict(
+    dist_params=dict(backend='nccl'),
+    log_level='INFO',
+    work_dir='./work_dirs/mmf',  # noqa: E501
+    load_from=None,
+    resume_from=None,
+    workflow=[('train', 1)],
+    find_unused_parameters=True)

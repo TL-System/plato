@@ -95,6 +95,37 @@ class Config:
             Config.trainer = Config.namedtuple_from_dict(mmcv_cfg.trainer)
             Config.algorithm = Config.namedtuple_from_dict(mmcv_cfg.algorithm)
 
+            # adding necessary configuration to the multimodal part
+            supported_multimodal_data_names = ["rgb", "flow", "audio", "text"]
+            multimodal_data_configs = dict()
+            multimodal_data_model_configs = dict()
+            for mm_data_name in supported_multimodal_data_names:
+                mm_data_name = mm_data_name + "_data"
+                mm_data_model_name = mm_data_name + "_model"
+                try:
+                    data_config = mmcv_cfg[mm_data_name]
+                    data_config["videos_per_gpu"] = Config.data.videos_per_gpu
+                    data_config[
+                        "workers_per_gpu"] = Config.data.workers_per_gpu
+
+                    model_config = mmcv_cfg[mm_data_model_name]
+                except KeyError:
+                    continue
+                multimodal_data_configs[mm_data_name] = data_config
+                multimodal_data_model_configs[
+                    mm_data_model_name] = model_config
+
+            try:
+                multimodal_data_model_configs[
+                    'fuse_model'] = mmcv_cfg.fuse_model
+            except KeyError:
+                pass
+
+            Config.multimodal_data = Config.namedtuple_from_dict(
+                multimodal_data_configs)
+            Config.multimodal_data_model = Config.namedtuple_from_dict(
+                multimodal_data_model_configs)
+
             if Config.args.server is not None:
                 Config.server = Config.server._replace(
                     address=args.server.split(':')[0])

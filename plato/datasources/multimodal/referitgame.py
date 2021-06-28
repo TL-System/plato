@@ -12,7 +12,7 @@ from torchvision import datasets
 import cv2
 
 from plato.config import Config
-from plato.datasources import multimodal_base
+from plato.datasources.multimodal import multimodal_base
 from plato.datasources.datalib import data_utils
 from plato.datasources.datalib import referitgame_utils
 

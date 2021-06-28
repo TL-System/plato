@@ -18,7 +18,7 @@ rgb_train_pipeline = [
     dict(type='RandomResizedCrop'),
     dict(type='Resize', scale=(224, 224), keep_ratio=False),
     dict(type='Flip', flip_ratio=0.5),
-    dict(type='Normalize', **img_norm_cfg),
+    dict(type='Normalize', **rgb_img_norm_cfg),
     dict(type='FormatShape', input_format='NCTHW'),
     dict(type='Collect', keys=['imgs', 'label'], meta_keys=[]),
     dict(type='ToTensor', keys=['imgs', 'label'])
@@ -33,7 +33,7 @@ rgb_val_pipeline = [
     dict(type='Resize', scale=(-1, 256)),
     dict(type='CenterCrop', crop_size=224),
     dict(type='Flip', flip_ratio=0),
-    dict(type='Normalize', **img_norm_cfg),
+    dict(type='Normalize', **rgb_img_norm_cfg),
     dict(type='FormatShape', input_format='NCTHW'),
     dict(type='Collect', keys=['imgs', 'label'], meta_keys=[]),
     dict(type='ToTensor', keys=['imgs'])
@@ -48,7 +48,7 @@ rgb_test_pipeline = [
     dict(type='Resize', scale=(-1, 256)),
     dict(type='ThreeCrop', crop_size=256),
     dict(type='Flip', flip_ratio=0),
-    dict(type='Normalize', **img_norm_cfg),
+    dict(type='Normalize', **rgb_img_norm_cfg),
     dict(type='FormatShape', input_format='NCTHW'),
     dict(type='Collect', keys=['imgs', 'label'], meta_keys=[]),
     dict(type='ToTensor', keys=['imgs'])
@@ -68,3 +68,5 @@ rgb_data_test = dict(type=rgb_dataset_type,
                      ann_file=rgb_ann_file_test_name,
                      data_prefix=rgb_data_root_test_name,
                      pipeline=rgb_test_pipeline)
+
+rgb_data = dict(train=rgb_data_train, val=rgb_data_val, test=rgb_data_test)
