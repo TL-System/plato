@@ -119,11 +119,6 @@ class MM3F(nn.Module):
         flow_feat = self.flow_model.extract_feat(flow_imgs)
         audio_feat = self.audio_model.extract_feat(audio_features)
 
-        if fused_head:
-            # obtain the fused feats
-            fused_feat = torch.cat((rgb_feat, flow_feat, audio_feat), 1)
-            fuse_cls_score = self.fuse_model(fused_feat)
-
         # 2. obtain the losses
         rgb_cls_score = self.rgb_model.cls_head(rgb_feat)
         flow_cls_score = self.flow_model.cls_head(flow_feat)
@@ -150,6 +145,42 @@ class MM3F(nn.Module):
         losses['audio_losses'].update(audio_loss_cls)
 
         return losses
+
+    def forward_test(self, rgb_imgs, flow_imgs, audio_features, **kwargs):
+        """Defines the computation performed at every call when training."""
+
+        assert self.rgb_model.with_cls_head and self.flow_model.with_cls_head and self.audio_model.with_cls_head
+
+        rgb_imgs = rgb_imgs.reshape((-1, ) + rgb_imgs.shape[2:])
+        flow_imgs = flow_imgs.reshape((-1, ) + flow_imgs.shape[2:])
+
+        audio_num_segs = audio_features.shape[1]
+        audio_features = audio_features.reshape((-1, ) +
+                                                audio_features.shape[2:])
+
+        predicted_scores = dict()
+        # 1. forward the backbone
+        rgb_feat = self.rgb_model.extract_feat(rgb_imgs)
+        flow_feat = self.flow_model.extract_feat(flow_imgs)
+        audio_feat = self.audio_model.extract_feat(audio_features)
+
+        # 2. obtain the losses
+        rgb_cls_score = self.rgb_model.cls_head(rgb_feat)
+        flow_cls_score = self.flow_model.cls_head(flow_feat)
+        audio_cls_score = self.audio_model.cls_head(audio_feat)
+        audio_cls_score = self.audio_model.average_clip(
+            audio_cls_score, audio_num_segs)
+
+        if fused_head:
+            # obtain the fused feats
+            fused_feat = torch.cat((rgb_feat, flow_feat, audio_feat), 1)
+            fused_cls_score = self.fuse_model(fused_feat)
+            predicted_scores['fused_scores'].update(fused_cls_score)
+        predicted_scores['rgb_scores'].update(rgb_cls_score)
+        predicted_scores['flow_scores'].update(flow_cls_score)
+        predicted_scores['audio_scores'].update(audio_cls_score)
+
+        return predicted_scores
 
     def forward(self,
                 rgb_imgs,
@@ -185,4 +216,4 @@ class MM3F(nn.Module):
             return self.forward_train(rgb_imgs, flow_imgs, audio_features,
                                       label)
 
-        return self.forward_test(rgb_imgs, flow_imgs, audio_features, **kwargs)
+        return self.forward_train(rgb_imgs, flow_imgs, audio_features)

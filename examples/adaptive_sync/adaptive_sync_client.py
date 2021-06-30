@@ -11,6 +11,8 @@ from plato.config import Config
 
 from plato.clients import simple
 
+# the functions contained
+
 
 class Client(simple.Client):
     """A federated learning client with support for Adaptive Synchronization

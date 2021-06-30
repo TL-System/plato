@@ -20,11 +20,27 @@ from the raw video dataset.
 """
 
 
+def obtain_video_dest_dir(out_dir, video_path):
+    if '/' in video_path:
+        class_name = os.path.basename(os.path.dirname(video_path))
+        head, tail = os.path.split(video_path)
+        video_name = tail.split(".")[0]
+        out_full_path = os.path.join(out_dir, class_name, video_name)
+    else:  # the class name is not contained
+        video_name = input_video_path.split(".")[0]
+        out_full_path = os.path.join(out_dir, video_name)
+
+    return out_full_path
+
+
 def extract_dense_flow_wrapper(items):
     """ This function can extract the frame based on the cpu hardware"""
     input_video_path, dest_dir, bound, save_rgb, start_idx, rgb_tmpl, flow_tmpl, method = items
-    extract_dense_flow(input_video_path, dest_dir, bound, save_rgb, start_idx,
-                       rgb_tmpl, flow_tmpl, method)
+
+    out_full_path = obtain_video_dest_dir(input_video_path)
+
+    extract_dense_flow(input_video_path, out_full_path, bound, save_rgb,
+                       start_idx, rgb_tmpl, flow_tmpl, method)
 
 
 def extract_rgb_frame(videos_extraction_items):
@@ -38,11 +54,13 @@ def extract_rgb_frame(videos_extraction_items):
         bool: Whether generate optical flow successfully.
     """
     full_path, vid_path, vid_id, out_dir, new_width, new_height, new_short = videos_extraction_items
-    if '/' in vid_path:
-        act_name = os.path.basename(os.path.dirname(vid_path))
-        out_full_path = os.path.join(out_dir, act_name)
-    else:
-        out_full_path = out_dir
+    # if '/' in vid_path:
+    #     act_name = os.path.basename(os.path.dirname(vid_path))
+    #     out_full_path = os.path.join(out_dir, act_name)
+    # else:
+    #     out_full_path = out_dir
+
+    out_full_path = obtain_video_dest_dir(vid_path)
 
     if new_short == 0:
         cmd = os.path.join(
@@ -59,11 +77,13 @@ def extract_optical_flow(videos_items):
 
     full_path, vid_path, vid_id, method, out_dir, new_short, new_width, new_height = videos_items
 
-    if '/' in vid_path:
-        act_name = os.path.basename(os.path.dirname(vid_path))
-        out_full_path = os.path.join(out_dir, act_name)
-    else:
-        out_full_path = out_dir
+    # if '/' in vid_path:
+    #     act_name = os.path.basename(os.path.dirname(vid_path))
+    #     out_full_path = os.path.join(out_dir, act_name)
+    # else:
+    #     out_full_path = out_dir
+
+    out_full_path = obtain_video_dest_dir(vid_path)
 
     if new_short == 0:
         cmd = os.path.join(
