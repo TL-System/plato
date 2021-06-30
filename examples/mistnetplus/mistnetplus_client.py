@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from plato.config import Config
 from plato.clients import simple
 
+from mistnetplus import DataSource, Trainer
+
 @dataclass
 class Report:
     """Client report sent to the MistNet federated learning server."""
@@ -55,4 +57,19 @@ class Client(simple.Client):
             train_status = "train done"
             return Report(self.sampler.trainset_size(), 0), weights
 
+def main():
+    """A Plato federated learning training session using a custom model. """
+    model = nn.Sequential(
+        nn.Linear(28 * 28, 128),
+        nn.ReLU(),
+        nn.Linear(128, 128),
+        nn.ReLU(),
+        nn.Linear(128, 10),
+    )
 
+    server = fedReIdServer(model=model)
+    server.run()
+
+
+if __name__ == "__main__":
+    main()
