@@ -106,16 +106,14 @@ class DataSource(multimodal_base.MultiModalDataSource):
                                          compress=compress,
                                          verbose=verbose,
                                          skip=skip,
-                                         log_file=os.path.join(
-                                             base_data_path, log_file))
+                                         log_file=log_file)
 
             self.download_test_set(num_workers=num_workers,
                                    failed_log=failed_save_file,
                                    compress=compress,
                                    verbose=verbose,
                                    skip=skip,
-                                   log_file=os.path.join(
-                                       base_data_path, log_file))
+                                   log_file=log_file)
             logging.info("Done.")
 
         logging.info("The Kinetics700 dataset has been prepared")

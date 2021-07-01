@@ -27,7 +27,7 @@ def obtain_video_dest_dir(out_dir, video_path):
         video_name = tail.split(".")[0]
         out_full_path = os.path.join(out_dir, class_name, video_name)
     else:  # the class name is not contained
-        video_name = input_video_path.split(".")[0]
+        video_name = video_path.split(".")[0]
         out_full_path = os.path.join(out_dir, video_name)
 
     return out_full_path
@@ -37,7 +37,7 @@ def extract_dense_flow_wrapper(items):
     """ This function can extract the frame based on the cpu hardware"""
     input_video_path, dest_dir, bound, save_rgb, start_idx, rgb_tmpl, flow_tmpl, method = items
 
-    out_full_path = obtain_video_dest_dir(input_video_path)
+    out_full_path = obtain_video_dest_dir(dest_dir, input_video_path)
 
     extract_dense_flow(input_video_path, out_full_path, bound, save_rgb,
                        start_idx, rgb_tmpl, flow_tmpl, method)

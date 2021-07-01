@@ -149,14 +149,20 @@ class MultiModalDataset(torch.utils.data.Dataset):
     def __init__(self, *datasets):
         self.datasets = datasets
 
+        self.supported_modalities = ["RGB", "Flow", "Audio"]
+
     def __getitem__(self, idx):
         """Get the sample for either training or testing given index."""
-        obtained_mm_sample = ()
+        obtained_mm_sample = dict()
         for dataset in self.datasets:
+            dataset_modality = dataset.modality
+            obtained_mm_sample[dataset_modality] = list()
             if dataset.test_mode:
-                obtained_mm_sample.append(dataset.prepare_test_frames(idx))
+                obtained_mm_sample[dataset_modality].append(
+                    dataset.prepare_test_frames(idx))
             else:
-                obtained_mm_sample.append(dataset.prepare_train_frames(idx))
+                obtained_mm_sample[dataset_modality].append(
+                    dataset.prepare_train_frames(idx))
 
         return obtained_mm_sample
 

@@ -15,6 +15,19 @@ import numpy as np
 from plato.datasources.datalib import modality_extraction_base
 
 
+def obtain_audio_dest_dir(out_dir, audio_path):
+    if '/' in audio_path:
+        class_name = os.path.basename(os.path.dirname(audio_path))
+        head, tail = os.path.split(audio_path)
+        audio_name = tail.split(".")[0]
+        out_full_path = os.path.join(out_dir, class_name)
+    else:  # the class name is not contained
+        audio_name = audio_path.split(".")[0]
+        out_full_path = out_dir
+
+    return out_full_path
+
+
 def extract_audio_wav(line_times):
     """Extract the audio wave from video streams using FFMPEG."""
     line, root, out_dir = line_times
@@ -72,17 +85,26 @@ class VideoAudioExtractor(modality_extraction_base.VideoExtractorBase):
             spectrogram_type='lws',  # lws, 'librosa', recommand lws
             part="1/1"):
 
+        # audio_tools = build_audio_features.AudioTools(frame_rate=frame_rate,
+        #                                               sample_rate=sample_rate,
+        #                                               num_mels=num_mels,
+        #                                               fft_size=fft_size,
+        #                                               hop_size=hop_size,
+        #                                               spectrogram_type='lws')
         audio_tools = build_audio_features.AudioTools(frame_rate=frame_rate,
                                                       sample_rate=sample_rate,
                                                       num_mels=num_mels,
                                                       fft_size=fft_size,
-                                                      hop_size=hop_size,
-                                                      spectrogram_type='lws')
-        audio_files = glob.glob(
-            osp.join(audio_src_path, '*/' * self.dir_level,
-                     '*' + self.audio_ext))
+                                                      hop_size=hop_size)
+        # audio_files = glob.glob(
+        #     os.path.join(audio_src_path, '*/' * self.dir_level,
+        #                  '*' + self.audio_ext))
+        audio_files = glob.glob(audio_src_path + '/*' * self.dir_level + '.' +
+                                self.audio_ext)
+        files = sorted(audio_files)
 
-        files = sorted(files)
+
+        # print(ok)
         if part is not None:
             [this_part, num_parts] = [int(i) for i in part.split('/')]
             part_len = len(files) // num_parts
@@ -91,7 +113,10 @@ class VideoAudioExtractor(modality_extraction_base.VideoExtractorBase):
         for file in files[part_len * (this_part - 1):(
                 part_len *
                 this_part) if this_part != num_parts else len(files)]:
+            out_full_path = obtain_audio_dest_dir(out_dir=to_dir,
+                                                  audio_path=file)
+
             p.apply_async(build_audio_features.extract_audio_feature,
-                          args=(file, audio_tools, to_dir))
+                          args=(file, audio_tools, out_full_path))
         p.close()
         p.join()
