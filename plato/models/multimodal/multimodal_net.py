@@ -65,6 +65,17 @@ class MM3F(nn.Module):
             fuse_model_config = multimoda_model_configs.fuse_model
             self.fuse_model = build_fc_from_config(fuse_model_config)
 
+        self.module_name_net_mapper = {
+            "RGB": self.rgb_model,
+            "Flow": self.flow_model,
+            "Audio": self.audio_model,
+            "Fused": self.fuse_model
+        }
+
+    def assing_weights(self, module_name, weights):
+        self.module_name_net_mapper[module_name].load_state_dict(weights,
+                                                                 strict=True)
+
     def init_weights(self):
         """Initiate the parameters either from existing checkpoint or from
         scratch."""

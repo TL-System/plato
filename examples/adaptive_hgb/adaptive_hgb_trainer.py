@@ -36,34 +36,35 @@ class Trainer(basic.Trainer):
 
         self.is_distributed = Config().is_parallel()
 
-        # record the gradients of the client
-        self.gradients_trajectory = list()
+        # mm is the abbreviation of multimodal 
 
         # For the Overfitting:
         # record the training losse:
         #  each item of the dict is a list containing the losses of the specific modality
-        self.train_losses_trajectory = dict()
+        self.mm_train_losses_trajectory = dict()
         # the global training losses - sum of all losses
-        self.global_train_losses_trajectory = list()
+        self.global_mm_train_losses_trajectory = list()
 
         # For the Generalization:
         # record the val losse:
         #  each item of the dict is a list containing the losses of the specific modality
-        self.val_losses_trajectory = dict()
+        self.mm_val_losses_trajectory = dict()
         # the global val losses - sum of all losses
-        self.global_val_losses_trajectory = list()
+        self.global_mm_val_losses_trajectory = list()
 
         self.losses_trajectory = {
-            "train": self.train_losses_trajectory,
-            "val": self.val_losses_trajectory
+            "train": self.mm_train_losses_trajectory,
+            "val": self.mm_val_losses_trajectory
         }
 
         self.global_losses_trajectory = {
-            "train": self.global_train_losses_trajectory,
-            "val": self.global_val_losses_trajectory
+            "train": self.global_mm_train_losses_trajectory,
+            "val": self.global_mm_val_losses_trajectory
         }
 
-        
+        # 
+        self.mm_weights_trajectory = dict()
+        self.mm_gradients_trajectory = dict()
 
     def backtrack_gradient_trajectory(self, trajectory_idx):
         assert gradient_idx < len(self.gradients_trajectory)
@@ -90,10 +91,11 @@ class Trainer(basic.Trainer):
         assert all(
             [traj_idx < len(mode_mdl_trajs) for traj_idx in trajectory_idxs])
 
-        backtracked_mode_mdl_losses = [
+        backtracked_mode_mdl_losses = dict()
+        backtracked_mode_mdl_losses[modality_name] = [
             mode_mdl_trajs[traj_idx] for traj_idx in trajectory_idxs
         ]
-        return backtracked_tr_losses
+        return backtracked_mode_mdl_losses
 
     def backtrack_multimodal_loss_trajectory(self, mode, modality_names,
                                              trajectory_idx):
@@ -108,30 +110,103 @@ class Trainer(basic.Trainer):
             for mdl_name in modality_names
         ])
 
-        backtracked_multimodal_mode_losses = [
-            mode_trajs[mdl_name][trajectory_idx] for mdl_name in modality_names
-        ]
+        backtracked_multimodal_mode_losses = dict()
+        for mdl_name in modality_names:
+             backtracked_multimodal_mode_losses[mdl_name] = mode_trajs[mdl_name][trajectory_idx]
+
         return backtracked_multimodal_mode_losses
 
+    @torch.no_grad()
+    def eval_step(self, eval_data_loader, num_iters=None, model=None):
+        if model == None:
+            model = self.model
 
-    def build_optimizer(self, model):
+        model.eval()
+        mode = 'val'
+        eval_avg_losses = dict()
+        eval_data_loader = eval_data_loader
+        for batch_id, (examples,
+                        labels) in enumerate(eval_data_loader):
+            examples, labels = examples.to(self.device), labels.to(
+                self.device)
+            
+            losses = model(rgb_imgs=examples["RGB"],
+                flow_imgs = examples["Flow"],
+                audio_features = examples["Audio"],
+                label=labels,
+                return_loss=True)
+            for loss_key in list(losses.keys()):
+                if loss_key in list(eval_avg_losses.keys()):
+                    eval_avg_losses[loss_key].append(losses[loss_key])
+                else:
+                    eval_avg_losses[loss_key] = [losses[loss_key]]
+
+            if isinstance(num_iters, int) and batch_id > num_iters:
+                break
+
+        for loss_key in list(eval_avg_losses.keys()):
+            eval_key_losses = eval_avg_losses[loss_key]
+            eval_avg_losses[loss_key] = np.mean(np.array(eval_key_losses))
+
+        return eval_avg_losses
+
+    def obtain_local_global_OGR_items(self, trainset, evalset):
+        """ We can directly call the self.model in this function to get the global model
+            because the weights from the server are assigned to the client before training """
+        
+        # we can call eval directly to get the performance of the global model on the local dataset
+        # prepare data loaders
+        eval_loader = torch.utils.data.DataLoader(dataset=evalset,
+                                                   shuffle=False,
+                                                   batch_size=1,
+                                                   sampler=sampler.get()
+                                                   num_workers=config.data.get('workers_per_gpu', 1))
+        # 1. obtain the eval loss of the received global model
+        eval_avg_losses = self.eval_step(eval_data_loader = eval_loader)
+        
+        # obtain the training loss of the received global model
+        eval_trainset_loader = torch.utils.data.DataLoader(dataset=trainset,
+                                                   shuffle=False,
+                                                   batch_size=1,
+                                                   sampler=sampler.get()
+                                                   num_workers=config.data.get('workers_per_gpu', 1))
+        
+        # get the averaged loss on 50 batch size                                           
+        eval_subtrainset_avg_losses = self.eval_step(eval_data_loader = eval_trainset_loader, num_iters=50)
+
+
+        # 2. extract the eval and train loss of the local model
+        #   this part of value should be stored in the last position of the loss trajectory
+
+        local_train_avg_losses = self.backtrack_multimodal_loss_trajectory(mode="train", 
+                                            modality_names=["RGB", "Flow", "Audio", "Fused"],
+                                             trajectory_idx=-1)
+        local_eval_avg_losses = self.backtrack_multimodal_loss_trajectory(mode="eval", 
+                                            modality_names=["RGB", "Flow", "Audio", "Fused"],
+                                             trajectory_idx=-1)
+
+        return eval_avg_losses, eval_subtrainset_avg_losses, local_train_avg_losses, local_eval_avg_losses
+
+
+    def multimodal_gradient_blending(self, original_losses):
+        """ The main code for the local multimodal gradient blending """
         pass
-    
 
-    def backtrack_last_round_
-
-    def train_process(self, config, trainset, sampler):
+    def train_process(self, config, trainset, evalset, sampler):
         log_interval = config.log_config["interval"]
         batch_size = config.trainer['batch_size']
 
         logging.info("[Client #%d] Loading the dataset.", self.client_id)
 
-        # prepare data loaders
+        # prepare traindata loaders
         train_loader = torch.utils.data.DataLoader(dataset=trainset,
                                                    shuffle=False,
                                                    batch_size=batch_size,
                                                    sampler=sampler.get()
                                                    num_workers=config.data.get('workers_per_gpu', 1))
+
+        
+        
         # put model on gpus
         if self.is_distributed:
             logging.info("Using Data Parallelism.")
