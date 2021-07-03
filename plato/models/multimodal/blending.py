@@ -39,3 +39,57 @@ def OGR_n2N(n_eval_avg_loss, n_train_avg_loss, N_eval_avg_loss,
 
     ogr = abs(delta_O / delta_G)
     return ogr
+
+
+# Optimal Gradient Blend
+#   x << N
+def get_optimal_gradient_blend_weights(modalities_losses_n,
+                                       modalities_losses_N):
+    """ Get the weights of modaliteis for optimal gradient blending 
+    
+
+        Args:
+            modalities_losses_n (dict): contains the train/eval losses for each modality in epoch n
+            modalities_losses_N (dict): contains the train/eval losses for each modality in epoch N
+            
+            The structure of the above two dicts should be: (for example)
+                {"train": {"RGB": float, "Flow": float},
+                "eval": {"RGB": float, "Flow": float}}
+        
+        The equation:
+            w^i = <∇L^*, v_i>/(σ_i)^2 * 1/Z
+                = <∇L^*, v_i>/(σ_i)^2 * 1/(sum_i <∇L^*, v_i>/2*(σ_i)^2)
+                = G^i / (O^i)^2 * 1 / (sum_i G^i / (2 * (O^i)^2))
+            
+
+            where G^i = G_N,n =  L^*_n − L^*_N = compute_delta_generalization,
+                    O^i = O_N,n =  O_N - O_n = compute_delta_overfitting_O
+    """
+    modality_names = list(modalities_losses_n["train"].keys())
+
+    Z = 0
+    modls_GO = dict()
+    for modality_nm in modality_names:
+        modl_eval_avg_loss_n = modalities_losses_n["eval"][modality_nm]
+        modl_subtrain_avg_loss_n = modalities_losses_n["train"][modality_nm]
+        modl_eval_avg_loss_N = modalities_losses_N["eval"][modality_nm]
+        modl_subtrain_avg_loss_N = modalities_losses_N["train"][modality_nm]
+        G_i = compute_delta_generalization(
+            eval_avg_loss_n=modl_eval_avg_loss_n,
+            eval_avg_loss_N=modl_eval_avg_loss_N)
+        O_i = compute_delta_overfitting_O(
+            n_eval_avg_loss=modl_eval_avg_loss_n,
+            n_train_avg_loss=modl_subtrain_avg_loss_n,
+            N_eval_avg_loss=modl_eval_avg_loss_N,
+            N_train_avg_loss=modl_subtrain_avg_loss_N)
+
+        modls_GO[modality_nm] = G_i / (O_i * O_i)
+        Gi_div_sqr_Oi = G_i / (2 * O_i * O_i)
+
+        Z += Gi_div_sqr_Oi
+
+    optimal_weights = dict()
+    for modality_nm in modality_names:
+        optimal_weights[modality_nm] = modls_GO[modality_nm] / Z
+
+    return optimal_weights

@@ -149,11 +149,11 @@ class MM3F(nn.Module):
             fused_cls_score = self.fuse_model(fused_feat)
             fused_loss_cls = self.fuse_model.cls_head.loss(
                 fused_cls_score, gt_labels, **kwargs)
-            losses['fused_losses'].update(loss_cls)
+            losses['Fused'].update(loss_cls)
 
-        losses['rgb_losses'].update(loss_cls)
-        losses['flow_losses'].update(flow_loss_cls)
-        losses['audio_losses'].update(audio_loss_cls)
+        losses['RGB'].update(loss_cls)
+        losses['Flow'].update(flow_loss_cls)
+        losses['Audio'].update(audio_loss_cls)
 
         return losses
 

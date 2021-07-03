@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+
+import numpy as np
 import torch
-
+import torch.nn as nn
+import wandb
 from plato.config import Config
+from plato.models import registry as models_registry
+from plato.utils import optimizers
 from plato.trainers import basic
-from mmcv.parallel import MMDataParallel, MMDistributedDataParallel
-
 # basic.Trainer
 #   arguments: model=None
 #       One can either set the model in the initialization or the trainer will
@@ -163,7 +166,7 @@ class Trainer(basic.Trainer):
                                                    num_workers=config.data.get('workers_per_gpu', 1))
         # 1. obtain the eval loss of the received global model
         eval_avg_losses = self.eval_step(eval_data_loader = eval_loader)
-        
+         
         # obtain the training loss of the received global model
         eval_trainset_loader = torch.utils.data.DataLoader(dataset=trainset,
                                                    shuffle=False,
@@ -185,14 +188,26 @@ class Trainer(basic.Trainer):
                                             modality_names=["RGB", "Flow", "Audio", "Fused"],
                                              trajectory_idx=-1)
 
-        return eval_avg_losses, eval_subtrainset_avg_losses, local_train_avg_losses, local_eval_avg_losses
+        return eval_avg_losses, eval_subtrainset_avg_losses, local_eval_avg_losses, local_train_avg_losses
 
 
-    def multimodal_gradient_blending(self, original_losses):
-        """ The main code for the local multimodal gradient blending """
-        pass
+    def reweight_losses(self, blending_weights, losses):
+        """[Reweight the losses to achieve the gradient blending]
 
-    def train_process(self, config, trainset, evalset, sampler):
+        Args:
+            blending_weights ([dict]): contains the blending weight of each modality network 
+                                        {"RGB": float, "Flow": float}
+            losses ([dict]): contains the loss of each modality network 
+                                        {"RGB": float, "Flow": float}
+        """ 
+        modality_names = list(blending_weights.keys())
+        reweighted_losses = dict()
+        for modl_nm in modality_names:
+            reweighted_losses[modl_nm] = blending_weights[modl_nm] * losses[modl_nm]
+
+        return reweighted_losses
+
+    def train_process(self, config, trainset, evalset, sampler, blending_weights):
         log_interval = config.log_config["interval"]
         batch_size = config.trainer['batch_size']
 
@@ -206,14 +221,122 @@ class Trainer(basic.Trainer):
                                                    num_workers=config.data.get('workers_per_gpu', 1))
 
         
-        
-        # put model on gpus
-        if self.is_distributed:
-            logging.info("Using Data Parallelism.")
-            # DataParallel will divide and allocate batch_size to all available GPUs
-            model = nn.DataParallel(model)
 
-        # build runner
-        optimizer = self.build_optimizer(model, config.optimizer)
+        iterations_per_epoch = np.ceil(len(trainset) /
+                                        batch_size).astype(int)
+        epochs = config['epochs']
 
-        # conduct the local training epoches
+        # Sending the model to the device used for training
+        self.model.to(self.device)
+        self.model.train()
+        # Initializing the optimizer
+        get_optimizer = getattr(self, "get_optimizer",
+                                optimizers.get_optimizer)
+        optimizer = get_optimizer(self.model)
+        # Initializing the learning rate schedule, if necessary
+        if hasattr(config, 'lr_schedule'):
+            lr_schedule = optimizers.get_lr_schedule(
+                optimizer, iterations_per_epoch, train_loader)
+        else:
+            lr_schedule = None
+
+        # operate the local training
+        supported_modalities = trainset.supported_modalities 
+        for epoch in range(1, epochs + 1):
+            for batch_id, (multimodal_examples,
+                            labels) in enumerate(train_loader):
+                labels = labels.to(self.device)
+  
+                optimizer.zero_grad()
+
+                losses = self.model.forward_from(rgb_imgs=multimodal_examples["RGB"].to(self.device),
+                flow_imgs=multimodal_examples["Flow"].to(self.device),
+                audio_features=multimodal_examples["Audio"].to(self.device),
+                label=labels,
+                return_loss=True)
+
+                weighted_losses = self.reweight_losses(blending_weights, losses)
+
+                weighted_losses.backward()
+
+                optimizer.step()
+
+                if lr_schedule is not None:
+                    lr_schedule.step()
+
+                if batch_id % log_interval == 0:
+                    if self.client_id == 0:
+                        logging.info(
+                            "[Server #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}"
+                            .format(os.getpid(), epoch, epochs,
+                                    batch_id, len(train_loader),
+                                    weighted_losses.data.item()))
+                    else:
+                        if hasattr(config, 'use_wandb'):
+                            wandb.log({"batch loss": weighted_losses.data.item()})
+
+                        logging.info(
+                            "[Client #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}"
+                            .format(self.client_id, epoch, epochs,
+                                    batch_id, len(train_loader),
+                                    weighted_losses.data.item()))
+
+            if hasattr(optimizer, "params_state_update"):
+                optimizer.params_state_update()
+
+        except Exception as training_exception:
+            logging.info("Training on client #%d failed.", self.client_id)
+            raise training_exception
+
+        self.model.cpu()
+
+        model_type = config['model_name']
+        filename = f"{model_type}_{self.client_id}_{config['run_id']}.pth"
+        self.save_model(filename)
+
+        if 'use_wandb' in config:
+            run.finish()
+
+    def train(self, trainset, evalset, sampler, blending_weights) -> bool:
+        """The main training loop in a federated learning workload.
+
+        Arguments:
+        trainset: The training dataset.
+        sampler: the sampler that extracts a partition for this client.
+
+        Returns:
+        Whether training was successfully completed.
+        """
+        self.start_training()
+
+        if mp.get_start_method(allow_none=True) != 'spawn':
+            mp.set_start_method('spawn', force=True)
+
+        config = Config().trainer._asdict()
+        config['run_id'] = Config().params['run_id']
+
+        train_proc = mp.Process(target=Trainer.train_process,
+                                args=(
+                                    self,
+                                    config,
+                                    trainset,
+                                    evalset,
+                                    sampler,
+                                    blending_weights,
+                                ))
+        train_proc.start()
+        train_proc.join()
+
+        model_name = Config().trainer.model_name
+        filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.pth"
+        try:
+            self.load_model(filename)
+        except OSError:  # the model file is not found, training failed
+            logging.info("The training process on client #%d failed.",
+                         self.client_id)
+            self.run_sql_statement("DELETE FROM trainers WHERE run_id = (?)",
+                                   (self.client_id, ))
+            return False
+
+        self.pause_training()
+        return True

@@ -27,6 +27,13 @@ from plato.models.multimodal import blending
 #   - train: self.trainer.train operate the local training stage
 
 
+@dataclass
+class Report(base.Report):
+    """Report from a simple client, to be sent to the federated learning server."""
+    training_time: float
+    data_loading_time: float
+
+
 class Client(simple.Client):
     """A federated learning client with support for Adaptive gradient blending.
     """
@@ -48,18 +55,21 @@ class Client(simple.Client):
         self.data_loading_time = None
         self.data_loading_time_sent = False
 
-        cur_work_path = os.getcwd()
-        save_path = os.path.join(cur_work_path, "learningModels",
+        save_path = os.path.join("learningModels",
                                  "client_" + str(self.client_id),
                                  "recored_model.pt")
         self.recored_model_path = save_path
 
+        self.optimal_blending_weights = dict()
+        # for example of the self.optimal_blending_weights:
+        #   {"RGB": 0.24, "Flow": 0.48, "Audio": 0.11, "Fused"; 17}
+
     def record_model(self):
         # put the client's model to the desktop
-        torch.save(self.model.state_dict(), self.recored_model_path)
+        self.trainer.save_model(filename=self.recored_model_path)
 
     def load_recorded_model(self):
-        self.model.load_state_dict(torch.load(self.recored_model_path))
+        self.trainer.load_model(filename=self.recored_model_path)
 
     def local_global_gradient_blending(self, local_model,
                                        global_eval_avg_loses,
@@ -118,15 +128,38 @@ class Client(simple.Client):
 
         # using ogr merge
         eval_avg_losses, eval_subtrainset_avg_losses, \
-            local_train_avg_losses, local_eval_avg_losses = self.trainer.obtain_local_global_OGR_items(
+            local_eval_avg_losses, local_train_avg_losses = self.trainer.obtain_local_global_OGR_items(
             trainset=self.trainset, evalset=self.evalset)
 
         self.local_global_gradient_blending(
             local_model=local_model,
             global_eval_avg_loses=eval_avg_losses,
             global_eval_subtrain_avg_losses=eval_subtrainset_avg_losses,
-            local_eval_avg_losses=local_train_avg_losses,
-            local_eval_subtrain_avg_losses=local_eval_avg_losses)
+            local_eval_avg_losses=local_eval_avg_losses,
+            local_eval_subtrain_avg_losses=local_train_avg_losses)
+
+        self.optimal_blending_weights = self.adaptive_gradient_blending_weights(
+            eval_avg_losses=eval_avg_losses,
+            eval_train_avg_losses=eval_subtrainset_avg_losses,
+            local_eval_avg_losses=local_eval_avg_losses,
+            local_train_avg_losses=local_train_avg_losses)
+
+    def adaptive_gradient_blending_weights(self, eval_avg_losses,
+                                           eval_train_avg_losses,
+                                           local_eval_avg_losses,
+                                           local_train_avg_losses):
+        modalities_losses_n = {
+            "eval": local_eval_avg_losses,
+            "train": local_train_avg_losses
+        }
+        modalities_losses_N = {
+            "eval": eval_avg_losses,
+            "train": eval_train_avg_losses
+        }
+        optimal_weights = blending.get_optimal_gradient_blend_weights(
+            modalities_losses_n, modalities_losses_N)
+
+        return optimal_weights
 
     async def train(self):
         """The machine learning training workload on a client."""
@@ -134,7 +167,8 @@ class Client(simple.Client):
         logging.info("[Client #%d] Started training.", self.client_id)
 
         # Perform model training
-        if not self.trainer.train(self.trainset, self.evalset, self.sampler):
+        if not self.trainer.train(self.trainset, self.evalset, self.sampler,
+                                  self.optimal_blending_weights):
             # Training failed
             await self.sio.disconnect()
 
