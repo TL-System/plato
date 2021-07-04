@@ -7,10 +7,20 @@ A federated learning client with support for Adaptive gradient blending.
 import os
 
 import copy
+
+import logging
+import time
+from dataclasses import dataclass
+
 import torch
 
+from plato.algorithms import registry as algorithms_registry
 from plato.config import Config
+from plato.datasources import registry as datasources_registry
+from plato.samplers import registry as samplers_registry
+from plato.trainers import registry as trainers_registry
 
+from plato.clients import base
 from plato.clients import simple
 
 from plato.models.multimodal import blending
@@ -32,6 +42,8 @@ class Report(base.Report):
     """Report from a simple client, to be sent to the federated learning server."""
     training_time: float
     data_loading_time: float
+    delta_O: float
+    delta_G: float
 
 
 class Client(simple.Client):
@@ -161,6 +173,22 @@ class Client(simple.Client):
 
         return optimal_weights
 
+    def obtain_delta_OG(self):
+        start_eval_loss = self.trainer.global_losses_trajectory["eval"][0]
+        start_train_loss = self.trainer.global_losses_trajectory["train"][0]
+        end_eval_loss = self.trainer.global_losses_trajectory["eval"][-1]
+        end_train_loss = self.trainer.global_losses_trajectory["train"][-1]
+
+        delta_O = blending.compute_delta_overfitting_O(
+            n_eval_avg_loss=start_eval_loss,
+            n_train_avg_loss=start_train_loss,
+            N_eval_avg_loss=end_eval_loss,
+            N_train_avg_loss=end_train_loss)
+        delta_G = blending.compute_delta_generalization(
+            eval_avg_loss_n=start_eval_loss, eval_avg_loss_N=end_eval_loss)
+
+        return delta_O, delta_G
+
     async def train(self):
         """The machine learning training workload on a client."""
         training_start_time = time.time()
@@ -174,6 +202,9 @@ class Client(simple.Client):
 
         # Extract model weights and biases
         weights = self.algorithm.extract_weights()
+
+        # Obtain the delta O and delta G
+        delta_O, delta_G = self.obtain_delta_OG()
 
         # Generate a report for the server, performing model testing if applicable
         if Config().clients.do_test:
@@ -196,4 +227,4 @@ class Client(simple.Client):
             self.data_loading_time_sent = True
 
         return Report(self.sampler.trainset_size(), accuracy, training_time,
-                      data_loading_time), weights
+                      data_loading_time, delta_O, delta_G), weights

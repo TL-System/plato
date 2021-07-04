@@ -93,3 +93,46 @@ def get_optimal_gradient_blend_weights(modalities_losses_n,
         optimal_weights[modality_nm] = modls_GO[modality_nm] / Z
 
     return optimal_weights
+
+
+# Optimal Gradient Blend
+#   x << N
+def get_optimal_gradient_blend_weights_OG(delta_OGs):
+    """ Get the weights of clients for optimal gradient blending 
+    
+
+        Args:
+            delta_OGs (list): each item is a tuple that contains (delta_O, delta_G)
+            
+            The structure of the above two dicts should be: (for example)
+                [(0.2, 0.45), (0.3, 0.67)]
+        
+        The equation that is the same as the weights computation for modalities:
+            w^i = <∇L^*, v_i>/(σ_i)^2 * 1/Z
+                = <∇L^*, v_i>/(σ_i)^2 * 1/(sum_i <∇L^*, v_i>/2*(σ_i)^2)
+                = G^i / (O^i)^2 * 1 / (sum_i G^i / (2 * (O^i)^2))
+            
+
+            where G^i = G_N,n =  delta_G,
+                    O^i = O_N,n =  O_N - O_n = delta_O
+    """
+    num_of_clients = len(delta_OGs)
+
+    Z = 0
+    clients_ratios = list()
+    for cli_i in range(num_of_clients):
+        cli_delta_O, cli_delta_G = delta_OGs[cli_i]
+
+        G_i = cli_delta_G
+        O_i = cli_delta_O
+
+        modls_GO[modality_nm] = G_i / (O_i * O_i)
+        Gi_div_sqr_Oi = G_i / (2 * O_i * O_i)
+
+        clients_ratios.append(Gi_div_sqr_Oi)
+
+        Z += Gi_div_sqr_Oi
+
+    optimal_weights = np.array(clients_ratios) / Z
+
+    return optimal_weights
