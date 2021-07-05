@@ -35,7 +35,7 @@ class Trainer(basic.Trainer):
             dataset=trainset,
             shuffle=False,
             batch_size=batch_size,
-            sampler=sampler.get())
+            sampler=sampler)
 
         iterations_per_epoch = np.ceil(len(trainset) /
                                         batch_size).astype(int)

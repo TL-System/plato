@@ -1,9 +1,9 @@
 clients:
     # The total number of clients
-    total_clients: 150
+    total_clients: 150  #7527
 
     # The number of clients selected in each round
-    per_round: 4
+    per_round: 4  #200
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -30,7 +30,7 @@ data:
 
 trainer:
     # The maximum number of training rounds
-    rounds: 20
+    rounds: 10
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -39,10 +39,10 @@ trainer:
     max_concurrency: 1
 
     # The target accuracy
-    target_accuracy: 0.94
+    target_accuracy: 0.98
 
     # Number of epoches for local training in each communication round
-    epochs: 5
+    epochs: 1
     batch_size: 128
     optimizer: SGD
     learning_rate: 0.01
