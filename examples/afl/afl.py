@@ -26,7 +26,7 @@ def main():
     """ A Plato federated learning training session using the AFL algorithm. """
     trainer = afl_trainer.Trainer()
     client = afl_client.Client(trainer=trainer)
-    server = afl_server.Server()
+    server = afl_server.Server(trainer=trainer)
     server.run(client)
 
 
