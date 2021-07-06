@@ -13,11 +13,8 @@ from plato.servers import fedavg
 
 import logging
 import numpy as np
-import torch
-import torch.nn.functional as F
 import math
 import random
-from operator import itemgetter
 
 
 class Server(fedavg.Server):
