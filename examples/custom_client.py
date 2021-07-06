@@ -101,10 +101,11 @@ def main():
         nn.ReLU(),
         nn.Linear(128, 10),
     )
-    datasource = DataSource()
-    trainer = Trainer(model=model)
+    # datasource = DataSource()
+    # trainer = Trainer(model=model)
 
-    client = CustomClient(model=model, datasource=datasource, trainer=trainer)
+    # client = CustomClient(model=model, trainer=trainer)
+    client = CustomClient()
     client.configure()
     asyncio.run(client.start_client())
 

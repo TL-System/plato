@@ -2,9 +2,8 @@ import logging
 import os
 
 from torch import nn
-
+# need to run 'ulimit -n 64000' on the server nodes
 os.environ['config_file'] = 'examples/dist_mistnet/mistnet_lenet5_server.yml'
-
 from plato.servers import mistnet
 
 class CustomServer(mistnet.Server):
@@ -17,7 +16,6 @@ def main():
     """ A Plato federated learning training session using a custom model. """
     server = CustomServer()
     server.run()
-
 
 if __name__ == "__main__":
     main()

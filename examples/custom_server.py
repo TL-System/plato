@@ -24,9 +24,9 @@ def main():
         nn.Linear(128, 10),
     )
 
-    server = CustomServer(model=model)
+    # server = CustomServer(model=model)
+    server = CustomServer()
     server.run()
-
 
 if __name__ == "__main__":
     main()
