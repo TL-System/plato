@@ -1,9 +1,9 @@
 clients:
     # The total number of clients
-    total_clients: 150  #7527
+    total_clients: 100  #7527
 
     # The number of clients selected in each round
-    per_round: 4  #200
+    per_round: 30  #200
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -30,7 +30,7 @@ data:
 
 trainer:
     # The maximum number of training rounds
-    rounds: 10
+    rounds: 20
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -42,8 +42,8 @@ trainer:
     target_accuracy: 0.98
 
     # Number of epoches for local training in each communication round
-    epochs: 1
-    batch_size: 128
+    epochs: 5
+    batch_size: 32
     optimizer: SGD
     learning_rate: 0.01
     momentum: 0.9
@@ -51,6 +51,8 @@ trainer:
 
     # The machine learning model
     model_name: lenet5
+
+    use_wandb: true
 
 algorithm:
     # Aggregation algorithm

@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 3
+    total_clients: 100
 
     # The number of clients selected in each round
-    per_round: 3
+    per_round: 30
 
     # Should the clients compute test accuracy locally?
     do_test: true
@@ -36,7 +36,7 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 5
+    rounds: 20
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -45,7 +45,7 @@ trainer:
     max_concurrency: 1
 
     # The target accuracy
-    target_accuracy: 0.94
+    target_accuracy: 0.98
 
     # Number of epoches for local training in each communication round
     epochs: 5
@@ -57,6 +57,8 @@ trainer:
 
     # The machine learning model
     model_name: lenet5
+
+    use_wandb: true
 
 algorithm:
     # Aggregation algorithm
