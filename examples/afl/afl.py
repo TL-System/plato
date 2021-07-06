@@ -9,7 +9,6 @@ https://arxiv.org/pdf/1909.12641.pdf
 """
 import os
 
-
 os.environ['config_file'] = 'examples/afl/afl_MNIST_lenet5.yml'
 
 import afl_server
