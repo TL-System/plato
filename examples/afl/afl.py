@@ -12,11 +12,6 @@ import os
 
 os.environ['config_file'] = 'examples/afl/afl_MNIST_lenet5.yml'
 
-import numpy as np
-import torch
-import torch.nn as nn
-import wandb
-
 import afl_server
 import afl_client
 import afl_trainer
