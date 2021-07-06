@@ -27,6 +27,7 @@ class Server(fedavg.Server):
         self.alpha2 = 0.01
         # The proportion of clients which are selected uniformly at random
         self.alpha3 = 0.1
+        self.local_values = {}
 
     async def federated_averaging(self, updates):
         """ Aggregate weight updates and deltas updates from the clients. """
@@ -39,7 +40,7 @@ class Server(fedavg.Server):
         for i, update in enumerate(weights_received):
             report, __ = updates[i]
             client_id = self.selected_clients[i]
-            self.clients[client_id]["valuation"] = report.valuation
+            self.local_values[client_id]["valuation"] = report.valuation
         
         return update
 
@@ -47,18 +48,18 @@ class Server(fedavg.Server):
         """Calculate the sampling probability of each client for the next round."""
         # Initialize valuations and probabilities when new clients are connected
         for client_id, client in self.clients.items():
-            if "valuation" not in client:
-                client["valuation"] = -float("inf")
-            if "prob" not in client:
-                client["prob"] = 0.0
+            if client_id not in self.local_values.keys():
+                self.local_values[client_id] = {}
+                self.local_values[client_id]["valuation"] = -float("inf")
+                self.local_values[client_id]["prob"] = 0.0
 
         # For a proportion of clients with smallest valuations, reset these valuations to negative infinities
         num_smallest = int(self.alpha1 * len(self.clients))
-        smallest_valuations = dict(sorted(self.clients.items(), key=lambda item: item[1]["valuation"])[:num_smallest])
+        smallest_valuations = dict(sorted(self.local_values.items(), key=lambda item: item[1]["valuation"])[:num_smallest])
         for client_id in smallest_valuations.keys():
-            self.clients[client_id]["valuation"] = -float("inf")
-        for client_id, client in self.clients.items():
-            client["prob"] = math.exp(self.alpha2 * client["valuation"])
+            self.local_values[client_id]["valuation"] = -float("inf")
+        for client_id in self.clients.keys():
+            self.local_values[client_id]["prob"] = math.exp(self.alpha2 * self.local_values[client_id]["valuation"])
 
     def choose_clients(self):
         """Choose a subset of the clients to participate in each round."""
@@ -67,23 +68,17 @@ class Server(fedavg.Server):
         # 1. Sample a subset of the clients according to the sampling distribution
         num1 = int(math.floor((1 - self.alpha3) * self.clients_per_round))
         pool = list(self.clients)
-        probs = np.array([self.clients[client_id]["prob"] for client_id in pool])
+        probs = np.array([self.local_values[client_id]["prob"] for client_id in pool])
         if probs.sum() != 0.0:
             probs /= probs.sum()
         else:
             probs = None
         subset1 = np.random.choice(pool, num1, p=probs,replace=False).tolist()
-        for i in subset1:
-            logging.info("client in subset1: %s", i)
         # 2. Sample a subset of the remaining clients uniformly at random
         num2 = self.clients_per_round - num1
         remaining = pool
         for client_id in subset1:
             remaining.remove(client_id)
-        for i in remaining:
-            logging.info("client in remaining: %s", i)
         subset2 = random.sample(remaining, num2)
-        for i in subset2:
-            logging.info("client in subset2: %s", i)
         # 3. Selected clients are the union of these two subsets
         return subset1 + subset2
