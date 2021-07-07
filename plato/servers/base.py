@@ -202,7 +202,7 @@ class Server:
                 logging.info("[Server #%d] Selecting client #%d for training.",
                             os.getpid(), selected_client_id)
 
-                server_response = {'id': selected_client_id}
+                server_response = {'id': client_id, 'virtual_id': selected_client_id}
                 server_response = await self.customize_server_response(
                     server_response)
 
@@ -219,7 +219,7 @@ class Server:
                     "[Server #%d] Sending the current model to client #%d.",
                     os.getpid(), selected_client_id)
 
-                await self.send(sid, payload, selected_client_id)
+                await self.send(sid, payload, client_id)
 
 
     async def send_in_chunks(self, data, sid, client_id) -> None:
@@ -230,7 +230,7 @@ class Server:
         for chunk in chunks:
             await self.sio.emit('chunk', {'data': chunk}, room=sid)
 
-        await self.sio.emit('payload', {'id': client_id}, room=sid)
+        await self.sio.emit('payload', {'id': client_id, 'virtual_id': self.clients[client_id]['virtual_id']}, room=sid)
 
     async def send(self, sid, payload, client_id) -> None:
         """ Sending a new data payload to the client using socket.io. """
@@ -247,7 +247,7 @@ class Server:
             await self.send_in_chunks(_data, sid, client_id)
             data_size = sys.getsizeof(_data)
 
-        await self.sio.emit('payload_done', {'id': client_id}, room=sid)
+        await self.sio.emit('payload_done', {'id': client_id, 'virtual_id': self.clients[client_id]['virtual_id']}, room=sid)
 
         logging.info("[Server #%d] Sent %s MB of payload data to client #%d.",
                      os.getpid(), round(data_size / 1024**2, 2), client_id)
@@ -265,7 +265,7 @@ class Server:
     async def client_payload_arrived(self, sid, client_id):
         """ Upon receiving a portion of the payload from a client. """
         assert len(
-            self.client_chunks[sid]) > 0 and client_id in self.selected_clients
+            self.client_chunks[sid]) > 0 and self.clients[client_id]['virtual_id'] in self.selected_clients
 
         payload = b''.join(self.client_chunks[sid])
         _data = pickle.loads(payload)
@@ -293,7 +293,7 @@ class Server:
 
         logging.info(
             "[Server #%d] Received %s MB of payload data from client #%d.",
-            os.getpid(), round(payload_size / 1024**2, 2), client_id)
+            os.getpid(), round(payload_size / 1024**2, 2), self.clients[client_id]['virtual_id'])
 
         self.updates.append((self.reports[sid], self.client_payload[sid]))
 
