@@ -98,7 +98,8 @@ class Config:
                 datasource = Config.data.datasource
                 model = Config.trainer.model_name
                 server_type = Config.algorithm.type
-                Config.result_dir = f'./results/{datasource}/{model}/{server_type}/'
+                config_file_dir = '/'.join(filename.split('/')[:-1])
+                Config.result_dir = f'{config_file_dir}/results/{datasource}/{model}/{server_type}/'
 
             # Used to limit the maximum number of concurrent trainers
             Config.sql_connection = sqlite3.connect(

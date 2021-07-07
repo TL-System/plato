@@ -83,13 +83,9 @@ def main():
     __ = Config()
 
     if hasattr(Config(), 'results'):
-        datasource = Config().data.datasource
-        model = Config().trainer.model_name
-        server_type = Config().algorithm.type
-        result_dir = f'./results/{datasource}/{model}/{server_type}/'
-        result_csv_file = result_dir + 'result.csv'
+        result_csv_file = Config().result_dir + 'result.csv'
         print(f"Plotting results located at {result_csv_file}.")
-        plot_figures_from_dict(result_csv_file, result_dir)
+        plot_figures_from_dict(result_csv_file, Config().result_dir)
     else:
         print("No results to be plotted according to the configuration file.")
 
