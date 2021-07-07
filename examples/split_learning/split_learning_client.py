@@ -18,8 +18,16 @@ class Report:
 
 
 class Client(simple.Client):
-    def __init__(self, model=None, datasource=None, trainer=None):
-        super().__init__()
+    """ A split learning client. """
+    def __init__(self,
+                 model=None,
+                 datasource=None,
+                 algorithm=None,
+                 trainer=None):
+        super().__init__(model=model,
+                         datasource=datasource,
+                         algorithm=algorithm,
+                         trainer=trainer)
 
         self.model_received = False
         self.gradient_received = False

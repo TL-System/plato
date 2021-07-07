@@ -17,8 +17,8 @@ from plato.servers import fedavg
 
 class Server(fedavg.Server):
     """The split learning server."""
-    def __init__(self):
-        super().__init__()
+    def __init__(self, model=None, algorithm=None, trainer=None):
+        super().__init__(model=model, algorithm=algorithm, trainer=trainer)
         self.select_client_socket = None
         self.selected_client_id = None
         self.last_selected_client_id = None
