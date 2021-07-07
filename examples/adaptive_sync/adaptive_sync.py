@@ -13,8 +13,8 @@ os.environ['config_file'] = 'adaptive_sync_MNIST_lenet5.yml'
 from plato.servers import fedavg
 from plato.trainers import basic
 
-import adaptive_sync_client
 import adaptive_sync_algorithm
+import adaptive_sync_client
 
 
 def main():
