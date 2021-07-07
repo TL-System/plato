@@ -58,8 +58,6 @@ trainer:
     # The machine learning model
     model_name: lenet5
 
-    use_wandb: true
-
 algorithm:
     # Aggregation algorithm
     type: fedavg
