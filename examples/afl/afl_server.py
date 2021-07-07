@@ -7,8 +7,6 @@ Goetz et al., "Active Federated Learning".
 
 https://arxiv.org/pdf/1909.12641.pdf
 """
-from collections import OrderedDict
-
 from plato.servers import fedavg
 
 import logging
