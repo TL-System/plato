@@ -100,5 +100,20 @@ class Server(fedavg.Server):
 
         return torch.load(model_path)
 
+def main():
+    """A Plato federated learning training session using a custom model. """
+    model = nn.Sequential(
+        nn.Linear(28 * 28, 128),
+        nn.ReLU(),
+        nn.Linear(128, 128),
+        nn.ReLU(),
+        nn.Linear(128, 10),
+    )
 
+    server = fedReIdServer(model=model)
+    server.run()
+
+
+if __name__ == "__main__":
+    main()
 
