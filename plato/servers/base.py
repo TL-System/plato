@@ -87,12 +87,12 @@ class Server:
         if Config().is_central_server():
             # In cross-silo FL, the central server lets edge servers start first
             # Then starts their clients
-            Server.start_clients(as_server=True)
+            self.start_clients(as_server=True)
 
             # Allowing some time for the edge servers to start
             time.sleep(5)
 
-        Server.start_clients(client=self.client)
+        self.start_clients(client=self.client)
 
         self.start()
 
@@ -139,15 +139,14 @@ class Server:
             logging.info("[Server #%d] Starting training.", os.getpid())
             await self.select_clients()
 
-    @staticmethod
-    def start_clients(client=None, as_server=False):
+    def start_clients(self, client=None, as_server=False):
         """Starting all the clients as separate processes."""
         starting_id = 1
 
         if Config().clients.simulation:
             client_processes = Config().clients.per_round
             # The client pool for client selection contains all the virtual clients in simulation
-            self.clients_pool = [i for i in range(starting_id, starting_id + len(Config().client.total_clients))]
+            self.clients_pool = [i for i in range(starting_id, starting_id + Config().clients.total_clients)]
         else:
             client_processes = Config().clients.total_clients
 
@@ -250,7 +249,7 @@ class Server:
         await self.sio.emit('payload_done', {'id': client_id, 'virtual_id': self.clients[client_id]['virtual_id']}, room=sid)
 
         logging.info("[Server #%d] Sent %s MB of payload data to client #%d.",
-                     os.getpid(), round(data_size / 1024**2, 2), client_id)
+                     os.getpid(), round(data_size / 1024**2, 2), self.clients[client_id]['virtual_id'])
 
     async def client_report_arrived(self, sid, report):
         """ Upon receiving a report from a client. """
