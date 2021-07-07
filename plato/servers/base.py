@@ -85,7 +85,7 @@ class Server:
         if Config().is_central_server():
             # In cross-silo FL, the central server lets edge servers start first
             # Then starts their clients
-            Server.start_clients(as_server=True)
+            Server.start_clients(as_server=True, client=self.client)
 
             # Allowing some time for the edge servers to start
             time.sleep(5)
