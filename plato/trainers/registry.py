@@ -7,7 +7,6 @@ from collections import OrderedDict
 
 from plato.trainers import (
     basic,
-    split_learning,
     pascal_voc,
 )
 
@@ -30,7 +29,6 @@ elif hasattr(Config().trainer, 'use_tensorflow'):
 else:
     registered_trainers = OrderedDict([
         ('basic', basic.Trainer),
-        ('split_learning', split_learning.Trainer),
         ('pascal_voc', pascal_voc.Trainer),
     ])
 

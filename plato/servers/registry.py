@@ -11,7 +11,6 @@ from plato.servers import (
     fedavg,
     fedavg_cs,
     mistnet,
-    split_learning,
 )
 
 from plato.config import Config
@@ -20,7 +19,6 @@ registered_servers = OrderedDict([
     ('fedavg', fedavg.Server),
     ('fedavg_cross_silo', fedavg_cs.Server),
     ('mistnet', mistnet.Server),
-    ('split_learning', split_learning.Server),
 ])
 
 

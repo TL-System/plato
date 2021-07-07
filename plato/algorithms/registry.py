@@ -30,13 +30,11 @@ else:
     from plato.algorithms import (
         fedavg,
         mistnet,
-        split_learning,
     )
 
     registered_algorithms = OrderedDict([
         ('fedavg', fedavg.Algorithm),
         ('mistnet', mistnet.Algorithm),
-        ('split_learning', split_learning.Algorithm),
     ])
 
 
