@@ -61,6 +61,8 @@ class Server:
         self.client = None
         self.clients = {}
         self.total_clients = 0
+        # The client ids are stored for client selection
+        self.clients_pool = []
         self.clients_per_round = 0
         self.selected_clients = None
         self.current_round = 0
@@ -109,18 +111,26 @@ class Server:
         self.sio.attach(app)
         web.run_app(app, host=Config().server.address, port=port)
 
-    async def register_client(self, sid, client_id):
+    async def register_client(self, sid, client_id, virtual_id=None):
         """Adding a newly arrived client to the list of clients."""
+        if not virtual_id:
+            virtual_id = client_id
+
         if not client_id in self.clients:
             # The last contact time is stored for each client
             self.clients[client_id] = {
                 'sid': sid,
-                'last_contacted': time.time()
+                'last_contacted': time.time(),
+                'virtual_id': virtual_id
             }
+            if not Config().clients.simulation:
+                # The client pool for client selection is updated when new client arrives
+                self.clients_pool.append(client_id)
             logging.info("[Server #%d] New client with id #%d arrived.",
                          os.getpid(), client_id)
         else:
             self.clients[client_id]['last_contacted'] = time.time()
+            self.clients[client_id]['virtual_id'] = virtual_id
             logging.info("[Server #%d] New contact from Client #%d received.",
                          os.getpid(), client_id)
 
@@ -134,11 +144,18 @@ class Server:
         """Starting all the clients as separate processes."""
         starting_id = 1
 
+        if Config().clients.simulation:
+            client_processes = Config().clients.per_round
+            # The client pool for client selection contains all the virtual clients in simulation
+            self.clients_pool = [i for i in range(starting_id, starting_id + len(Config().client.total_clients))]
+        else:
+            client_processes = Config().clients.total_clients
+
         if as_server:
             total_processes = Config().algorithm.total_silos
-            starting_id += Config().clients.total_clients
+            starting_id += client_processes
         else:
-            total_processes = Config().clients.total_clients
+            total_processes = client_processes
 
         if mp.get_start_method(allow_none=True) != 'spawn':
             mp.set_start_method('spawn', force=True)
@@ -171,17 +188,21 @@ class Server:
                      self.current_round,
                      Config().trainer.rounds)
 
+        
         self.selected_clients = self.choose_clients()
-
         if len(self.selected_clients) > 0:
-            for client_id in self.selected_clients:
+            for i, selected_client_id in enumerate(self.selected_clients):
+                if not Config().clients.simulation:
+                    client_id = selected_client_id
+                else:
+                    client_id = i+1
                 sid = self.clients[client_id]['sid']
-                await self.register_client(sid, client_id)
+                await self.register_client(sid, client_id, selected_client_id)
 
                 logging.info("[Server #%d] Selecting client #%d for training.",
-                             os.getpid(), client_id)
+                            os.getpid(), selected_client_id)
 
-                server_response = {'id': client_id}
+                server_response = {'id': selected_client_id}
                 server_response = await self.customize_server_response(
                     server_response)
 
@@ -196,8 +217,10 @@ class Server:
                 # Sending the server payload to the client
                 logging.info(
                     "[Server #%d] Sending the current model to client #%d.",
-                    os.getpid(), client_id)
-                await self.send(sid, payload, client_id)
+                    os.getpid(), selected_client_id)
+
+                await self.send(sid, payload, selected_client_id)
+
 
     async def send_in_chunks(self, data, sid, client_id) -> None:
         """ Sending a bytes object in fixed-sized chunks to the client. """

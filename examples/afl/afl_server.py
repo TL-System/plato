@@ -52,7 +52,7 @@ class Server(fedavg.Server):
                 self.local_values[client_id]["prob"] = 0.0
 
         # For a proportion of clients with smallest valuations, reset these valuations to negative infinities
-        num_smallest = int(self.alpha1 * len(self.clients))
+        num_smallest = int(self.alpha1 * len(self.clients_pool))
         smallest_valuations = dict(sorted(self.local_values.items(), key=lambda item: item[1]["valuation"])[:num_smallest])
         for client_id in smallest_valuations.keys():
             self.local_values[client_id]["valuation"] = -float("inf")
