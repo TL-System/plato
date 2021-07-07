@@ -39,7 +39,7 @@ class Client(simple.Client):
     
     def get_loss(self):
         model_name = Config().trainer.model_name
-        filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.loss"
+        filename = f"{model_name}_{self.virtual_id}_{Config().params['run_id']}.loss"
         loss = self.trainer.load_loss(filename)
         return loss
 
