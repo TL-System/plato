@@ -66,6 +66,7 @@ class Client:
     """ A basic federated learning client. """
     def __init__(self) -> None:
         self.client_id = Config().args.id
+        self.virtual_id = self.client_id
         self.sio = None
         self.chunks = []
         self.server_payload = None
@@ -75,7 +76,7 @@ class Client:
                    'cross_silo') and not Config().is_edge_server():
             # Contact one of the edge servers
             self.edge_server_id = int(Config().clients.total_clients) + (
-                self.client_id - 1) % int(Config().algorithm.total_silos) + 1
+                self.virtual_id - 1) % int(Config().algorithm.total_silos) + 1
 
             assert hasattr(Config().algorithm, 'total_silos')
 
@@ -123,7 +124,13 @@ class Client:
     async def payload_to_arrive(self, response) -> None:
         """ Upon receiving a response from the server. """
         self.process_server_response(response)
-        logging.info("[Client #%d] Selected by the server.", self.client_id)
+
+        # Update (virtual) client id for client, trainer and algorithm
+        if Config().clients.simulation:
+            self.virtual_id = response['virtual_id']
+            self.configure()
+
+        logging.info("[Client #%d] Selected by the server.", self.virtual_id)
 
         if not self.data_loaded:
             self.load_data()
@@ -165,7 +172,7 @@ class Client:
 
         logging.info(
             "[Client #%d] Received %s MB of payload data from the server.",
-            client_id, round(payload_size / 1024**2, 2))
+            self.virtual_id, round(payload_size / 1024**2, 2))
 
         self.load_payload(self.server_payload)
         self.server_payload = None
@@ -175,9 +182,9 @@ class Client:
         if Config().is_edge_server():
             logging.info(
                 "[Server #%d] Model aggregated on edge server (client #%d).",
-                os.getpid(), client_id)
+                os.getpid(), self.virtual_id)
         else:
-            logging.info("[Client #%d] Model trained.", client_id)
+            logging.info("[Client #%d] Model trained.", self.virtual_id)
 
         # Sending the client report as metadata to the server (payload to follow)
         await self.sio.emit('client_report', {'report': pickle.dumps(report)})
@@ -192,7 +199,7 @@ class Client:
 
         for chunk in chunks:
             await self.sio.emit('chunk', {'data': chunk})
-
+        
         await self.sio.emit('client_payload', {'id': self.client_id})
 
     async def send(self, payload) -> None:
@@ -208,18 +215,18 @@ class Client:
             _data = pickle.dumps(payload)
             await self.send_in_chunks(_data)
             data_size = sys.getsizeof(_data)
-
+        
         await self.sio.emit('client_payload_done', {'id': self.client_id})
 
         logging.info("[Client #%d] Sent %s MB of payload data to the server.",
-                     self.client_id, round(data_size / 1024**2, 2))
+                     self.virtual_id, round(data_size / 1024**2, 2))
 
     def process_server_response(self, server_response) -> None:
         """Additional client-specific processing on the server response."""
 
     @abstractmethod
     def configure(self) -> None:
-        """Prepare this client for training."""
+        """Prepare this (virtual) client for training."""
 
     @abstractmethod
     def load_data(self) -> None:
