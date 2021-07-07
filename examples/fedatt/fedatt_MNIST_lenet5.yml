@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 100
+    total_clients: 10
 
     # The number of clients selected in each round
-    per_round: 30
+    per_round: 4
 
     # Should the clients compute test accuracy locally?
     do_test: true
@@ -36,7 +36,7 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 20
+    rounds: 5
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -63,3 +63,10 @@ trainer:
 algorithm:
     # Aggregation algorithm
     type: fedavg
+
+results:
+    # Write the following parameter(s) into a CSV
+    types: accuracy, training_time, round_time
+
+    # Plot results (x_axis&y_axis)
+    plot: global_round&accuracy, global_round&training_time
