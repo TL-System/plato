@@ -8,13 +8,13 @@ Goetz et al., "Active Federated Learning".
 https://arxiv.org/pdf/1909.12641.pdf
 """
 import os
+import wandb
 import logging
-
 
 import numpy as np
 import torch
 import torch.nn as nn
-import wandb
+
 
 from plato.config import Config
 from plato.trainers import basic
