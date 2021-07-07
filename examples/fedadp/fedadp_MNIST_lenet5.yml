@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 3
+    total_clients: 10
 
     # The number of clients selected in each round
-    per_round: 3
+    per_round: 4
 
     # Should the clients compute test accuracy locally?
     do_test: true
@@ -45,7 +45,7 @@ trainer:
     max_concurrency: 1
 
     # The target accuracy
-    target_accuracy: 0.94
+    target_accuracy: 0.98
 
     # Number of epoches for local training in each communication round
     epochs: 5
@@ -61,3 +61,10 @@ trainer:
 algorithm:
     # Aggregation algorithm
     type: fedavg
+
+results:
+    # Write the following parameter(s) into a CSV
+    types: accuracy, training_time, round_time
+
+    # Plot results (x_axis&y_axis)
+    plot: global_round&accuracy, global_round&training_time
