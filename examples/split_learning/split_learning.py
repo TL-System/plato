@@ -1,12 +1,12 @@
 """
-A federated learning training session using FedAtt.
+A federated learning training session using split learning.
 
 Reference:
 
-Ji et al., "Learning Private Neural Language Modeling with Attentive Aggregation,"
-in the Proceedings of the 2019 International Joint Conference on Neural Networks (IJCNN).
+Vepakomma, et al., "Split learning for health: Distributed deep learning without sharing
+raw patient data," in Proc. AI for Social Good Workshop, affiliated with ICLR 2018.
 
-https://arxiv.org/pdf/1812.07108.pdf
+https://arxiv.org/pdf/1812.00564.pdf
 """
 import os
 
