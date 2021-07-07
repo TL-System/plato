@@ -2,15 +2,16 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 3
+    total_clients: 2
 
     # The number of clients selected in each round
-    per_round: 3
+    per_round: 2
 
     # Should the clients compute test accuracy locally?
     do_test: false
 
 server:
+    type: fedavg_cross_silo
     address: 127.0.0.1
     port: 8000
 
@@ -22,7 +23,7 @@ data:
     data_path: ./data
 
     # Number of samples in each partition
-    partition_size: 20000
+    partition_size: 2
 
     # IID or non-IID?
     sampler: iid
@@ -32,20 +33,20 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 100
+    rounds: 2
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
 
     # The maximum number of clients running concurrently
-    max_concurrency: 3
+    max_concurrency: 1
 
     # The target accuracy
     target_accuracy: 0.95
 
     # Number of epoches for local training in each communication round
     epochs: 1
-    batch_size: 32
+    batch_size: 1
     optimizer: SGD
     learning_rate: 0.01
     momentum: 0.9
