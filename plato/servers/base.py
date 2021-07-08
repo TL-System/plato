@@ -111,28 +111,19 @@ class Server:
         self.sio.attach(app)
         web.run_app(app, host=Config().server.address, port=port)
 
-    async def register_client(self, sid, client_id, virtual_id=None):
+    async def register_client(self, sid, client_id):
         """Adding a newly arrived client to the list of clients."""
-        if not virtual_id:
-            virtual_id = client_id
-
         if not client_id in self.clients:
             # The last contact time is stored for each client
             self.clients[client_id] = {
                 'sid': sid,
-                'last_contacted': time.time(),
-                'virtual_id': virtual_id
+                'last_contacted': time.time()
             }
-
-            if not (hasattr(Config().clients, 'simulation') and Config().clients.simulation):
-                # The client pool for client selection is updated when new client arrives if no simulation
-                self.clients_pool.append(client_id)
 
             logging.info("[Server #%d] New client with id #%d arrived.",
                          os.getpid(), client_id)
         else:
             self.clients[client_id]['last_contacted'] = time.time()
-            self.clients[client_id]['virtual_id'] = virtual_id
             logging.info("[Server #%d] New contact from Client #%d received.",
                          os.getpid(), client_id)
 
@@ -190,7 +181,6 @@ class Server:
         logging.info("\n[Server #%d] Starting round %s/%s.", os.getpid(),
                      self.current_round,
                      Config().trainer.rounds)
-
         
         self.selected_clients = self.choose_clients()
         if len(self.selected_clients) > 0:
@@ -200,9 +190,11 @@ class Server:
                     client_id = i+1
                 else:
                     client_id = selected_client_id
+                    # The client pool for client selection is updated when new client arrives if no simulation
+                    self.clients_pool.append(client_id)
                     
                 sid = self.clients[client_id]['sid']
-                await self.register_client(sid, client_id, selected_client_id)
+                self.clients[client_id]['virtual_id'] = selected_client_id
 
                 logging.info("[Server #%d] Selecting client #%d for training.",
                             os.getpid(), selected_client_id)
