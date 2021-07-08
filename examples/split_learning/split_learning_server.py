@@ -32,7 +32,7 @@ class Server(fedavg.Server):
         else:
             self.last_selected_client_id = self.selected_client_id
             self.selected_client_id = (self.selected_client_id +
-                                       1) % (len(self.clients) + 1)
+                                       1) % (len(self.clients_pool) + 1)
             if self.selected_client_id == 0:
                 self.selected_client_id = 1
         selected_clients_list = []

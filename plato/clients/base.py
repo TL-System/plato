@@ -123,6 +123,13 @@ class Client:
     async def payload_to_arrive(self, response) -> None:
         """ Upon receiving a response from the server. """
         self.process_server_response(response)
+
+        # Update (virtual) client id for client, trainer and algorithm
+        if hasattr(Config().clients,
+                   'simulation') and Config().clients.simulation:
+            self.client_id = response['id']
+            self.configure()
+
         logging.info("[Client #%d] Selected by the server.", self.client_id)
 
         if not self.data_loaded:

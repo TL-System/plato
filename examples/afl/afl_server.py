@@ -45,14 +45,14 @@ class Server(fedavg.Server):
     def calc_sample_distribution(self):
         """Calculate the sampling probability of each client for the next round."""
         # Initialize valuations and probabilities when new clients are connected
-        for client_id, client in self.clients.items():
+        for client_id in self.clients_pool:
             if client_id not in self.local_values.keys():
                 self.local_values[client_id] = {}
                 self.local_values[client_id]["valuation"] = -float("inf")
                 self.local_values[client_id]["prob"] = 0.0
 
         # For a proportion of clients with smallest valuations, reset these valuations to negative infinities
-        num_smallest = int(self.alpha1 * len(self.clients))
+        num_smallest = int(self.alpha1 * len(self.clients_pool))
         smallest_valuations = dict(sorted(self.local_values.items(), key=lambda item: item[1]["valuation"])[:num_smallest])
         for client_id in smallest_valuations.keys():
             self.local_values[client_id]["valuation"] = -float("inf")
@@ -65,16 +65,15 @@ class Server(fedavg.Server):
         self.calc_sample_distribution()
         # 1. Sample a subset of the clients according to the sampling distribution
         num1 = int(math.floor((1 - self.alpha3) * self.clients_per_round))
-        pool = list(self.clients)
-        probs = np.array([self.local_values[client_id]["prob"] for client_id in pool])
+        probs = np.array([self.local_values[client_id]["prob"] for client_id in self.clients_pool])
         if probs.sum() != 0.0:
             probs /= probs.sum()
         else:
             probs = None
-        subset1 = np.random.choice(pool, num1, p=probs,replace=False).tolist()
+        subset1 = np.random.choice(self.clients_pool, num1, p=probs,replace=False).tolist()
         # 2. Sample a subset of the remaining clients uniformly at random
         num2 = self.clients_per_round - num1
-        remaining = pool
+        remaining = self.clients_pool
         for client_id in subset1:
             remaining.remove(client_id)
         subset2 = random.sample(remaining, num2)

@@ -76,7 +76,7 @@ class Server(fedavg.Server):
         
         # Update the baseline model weights
         curr_global_grads = self.process_grad(self.algorithm.extract_weights())
-        if not self.last_global_grads:
+        if self.last_global_grads is None:
             self.last_global_grads = np.zeros(len(curr_global_grads))
         global_grads = np.subtract(curr_global_grads, self.last_global_grads)
         self.last_global_grads = curr_global_grads
