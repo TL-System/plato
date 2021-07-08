@@ -137,12 +137,12 @@ class Server:
         starting_id = 1
 
         if hasattr(Config().clients,
-                       'simulation') and Config().clients.simulation:
+                   'simulation') and Config().clients.simulation:
             # Only launch a limited number of client objects (the same as the number of clients per round) in simulation
             client_processes = Config().clients.per_round
         else:
             client_processes = Config().clients.total_clients
-            
+
         if as_server:
             total_processes = Config().algorithm.total_silos
             starting_id += client_processes
@@ -179,28 +179,31 @@ class Server:
         logging.info("\n[Server #%d] Starting round %s/%s.", os.getpid(),
                      self.current_round,
                      Config().trainer.rounds)
-        
+
         if hasattr(Config().clients,
-                       'simulation') and Config().clients.simulation:
+                   'simulation') and Config().clients.simulation:
             # The client pool for client selection contains all the virtual clients in simulation
-            self.clients_pool = [i for i in range(1, 1+Config().clients.total_clients)]
+            self.clients_pool = [
+                i for i in range(1, 1 + Config().clients.total_clients)
+            ]
         else:
             # The client pool for client selection is updated as current clients if no simulation
             self.clients_pool = list(self.clients)
+
         self.selected_clients = self.choose_clients()
 
         if len(self.selected_clients) > 0:
             for i, selected_client_id in enumerate(self.selected_clients):
                 if hasattr(Config().clients,
-                       'simulation') and Config().clients.simulation:
-                    client_id = i+1
+                           'simulation') and Config().clients.simulation:
+                    client_id = i + 1
                 else:
                     client_id = selected_client_id
-                    
+
                 sid = self.clients[client_id]['sid']
 
                 logging.info("[Server #%d] Selecting client #%d for training.",
-                            os.getpid(), selected_client_id)
+                             os.getpid(), selected_client_id)
 
                 server_response = {'id': selected_client_id}
                 server_response = await self.customize_server_response(
@@ -219,7 +222,6 @@ class Server:
                     "[Server #%d] Sending the current model to client #%d.",
                     os.getpid(), selected_client_id)
                 await self.send(sid, payload, selected_client_id)
-
 
     async def send_in_chunks(self, data, sid, client_id) -> None:
         """ Sending a bytes object in fixed-sized chunks to the client. """
