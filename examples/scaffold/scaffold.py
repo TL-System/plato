@@ -10,7 +10,7 @@ https://arxiv.org/pdf/1910.06378.pdf
 """
 import os
 
-os.environ['config_file'] = 'scaffold_MNIST_lenet5.yml'
+os.environ['config_file'] = 'examples/scaffold/scaffold_MNIST_lenet5.yml'
 
 import scaffold_client
 import scaffold_server

@@ -64,4 +64,4 @@ results:
     types: accuracy, training_time, round_time
 
     # Plot results (x_axis&y_axis)
-    plot: global_round&accuracy, global_round&training_time
+    plot: round&accuracy, round&training_time
