@@ -138,7 +138,8 @@ class Server:
 
         if hasattr(Config().clients,
                    'simulation') and Config().clients.simulation:
-            # Only launch a limited number of client objects (the same as the number of clients per round) in simulation
+            # In the client simulation mode, we only need to launch a limited
+            # number of client objects (same as the number of clients per round)
             client_processes = Config().clients.per_round
         else:
             client_processes = Config().clients.total_clients
@@ -182,12 +183,14 @@ class Server:
 
         if hasattr(Config().clients,
                    'simulation') and Config().clients.simulation:
-            # The client pool for client selection contains all the virtual clients in simulation
+            # In the client simulation mode, the client pool for client selection contains
+            # all the virtual clients to be simulated
             self.clients_pool = [
                 i for i in range(1, 1 + Config().clients.total_clients)
             ]
         else:
-            # The client pool for client selection is updated as current clients if no simulation
+            # If no clients are simulated, the client pool for client selection consists of
+            # the current set of clients that have contacted the server
             self.clients_pool = list(self.clients)
 
         self.selected_clients = self.choose_clients()
