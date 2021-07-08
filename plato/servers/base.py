@@ -182,7 +182,12 @@ class Server:
                      self.current_round,
                      Config().trainer.rounds)
         
+        # The client pool for client selection is updated as current clients if no simulation
+        if not (hasattr(Config().clients,
+                       'simulation') and Config().clients.simulation):
+            self.clients_pool = list(self.clients)
         self.selected_clients = self.choose_clients()
+        
         if len(self.selected_clients) > 0:
             for i, selected_client_id in enumerate(self.selected_clients):
                 if hasattr(Config().clients,
@@ -190,8 +195,6 @@ class Server:
                     client_id = i+1
                 else:
                     client_id = selected_client_id
-                    # The client pool for client selection is updated when new client arrives if no simulation
-                    self.clients_pool.append(client_id)
                     
                 sid = self.clients[client_id]['sid']
 
