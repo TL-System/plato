@@ -93,8 +93,8 @@ class Server(base.Server):
     def choose_clients(self):
         """Choose a subset of the clients to participate in each round."""
         # Select clients randomly
-        assert self.clients_per_round <= len(self.clients)
-        return random.sample(list(self.clients), self.clients_per_round)
+        assert self.clients_per_round <= len(self.clients_pool)
+        return random.sample(self.clients_pool, self.clients_per_round)
 
     def extract_client_updates(self, updates):
         """Extract the model weight updates from client updates."""

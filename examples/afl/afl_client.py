@@ -12,14 +12,13 @@ import logging
 from dataclasses import dataclass
 
 from plato.config import Config
-from plato.clients import base
 from plato.clients import simple
 
 import math
 
 
 @dataclass
-class Report(base.Report):
+class Report(simple.Report):
     """A client report containing the valuation, to be sent to the AFL federated learning server."""
     valuation: float
 
@@ -35,7 +34,8 @@ class Client(simple.Client):
         loss = self.get_loss()
         valuation = self.calc_valuation(report.num_samples, loss)
 
-        return Report(report.num_samples, report.accuracy, valuation), weights
+        return Report(report.num_samples, report.accuracy, report.training_time,
+                      report.data_loading_time, valuation), weights
     
     def get_loss(self):
         model_name = Config().trainer.model_name

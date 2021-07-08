@@ -61,6 +61,8 @@ class Server:
         self.client = None
         self.clients = {}
         self.total_clients = 0
+        # The client ids are stored for client selection
+        self.clients_pool = []
         self.clients_per_round = 0
         self.selected_clients = None
         self.current_round = 0
@@ -134,11 +136,19 @@ class Server:
         """Starting all the clients as separate processes."""
         starting_id = 1
 
+        if hasattr(Config().clients,
+                   'simulation') and Config().clients.simulation:
+            # In the client simulation mode, we only need to launch a limited
+            # number of client objects (same as the number of clients per round)
+            client_processes = Config().clients.per_round
+        else:
+            client_processes = Config().clients.total_clients
+
         if as_server:
             total_processes = Config().algorithm.total_silos
-            starting_id += Config().clients.total_clients
+            starting_id += client_processes
         else:
-            total_processes = Config().clients.total_clients
+            total_processes = client_processes
 
         if mp.get_start_method(allow_none=True) != 'spawn':
             mp.set_start_method('spawn', force=True)
@@ -171,17 +181,33 @@ class Server:
                      self.current_round,
                      Config().trainer.rounds)
 
+        if hasattr(Config().clients,
+                   'simulation') and Config().clients.simulation:
+            # In the client simulation mode, the client pool for client selection contains
+            # all the virtual clients to be simulated
+            self.clients_pool = list(
+                range(1, 1 + Config().clients.total_clients))
+        else:
+            # If no clients are simulated, the client pool for client selection consists of
+            # the current set of clients that have contacted the server
+            self.clients_pool = list(self.clients)
+
         self.selected_clients = self.choose_clients()
 
         if len(self.selected_clients) > 0:
-            for client_id in self.selected_clients:
+            for i, selected_client_id in enumerate(self.selected_clients):
+                if hasattr(Config().clients,
+                           'simulation') and Config().clients.simulation:
+                    client_id = i + 1
+                else:
+                    client_id = selected_client_id
+
                 sid = self.clients[client_id]['sid']
-                await self.register_client(sid, client_id)
 
                 logging.info("[Server #%d] Selecting client #%d for training.",
-                             os.getpid(), client_id)
+                             os.getpid(), selected_client_id)
 
-                server_response = {'id': client_id}
+                server_response = {'id': selected_client_id}
                 server_response = await self.customize_server_response(
                     server_response)
 
@@ -196,8 +222,8 @@ class Server:
                 # Sending the server payload to the client
                 logging.info(
                     "[Server #%d] Sending the current model to client #%d.",
-                    os.getpid(), client_id)
-                await self.send(sid, payload, client_id)
+                    os.getpid(), selected_client_id)
+                await self.send(sid, payload, selected_client_id)
 
     async def send_in_chunks(self, data, sid, client_id) -> None:
         """ Sending a bytes object in fixed-sized chunks to the client. """
