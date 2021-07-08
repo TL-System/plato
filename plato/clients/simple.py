@@ -42,34 +42,34 @@ class Client(base.Client):
         self.data_loading_time_sent = False
 
     def __repr__(self):
-        return 'Client #{}.'.format(self.virtual_id)
+        return 'Client #{}.'.format(self.client_id)
 
     # TODO: not only once
     def configure(self) -> None:
         """Prepare this client for training."""
         if self.trainer is None:
             self.trainer = trainers_registry.get(self.model)
-        self.trainer.set_client_id(self.virtual_id)
+        self.trainer.set_client_id(self.client_id)
 
         if self.algorithm is None:
             self.algorithm = algorithms_registry.get(self.trainer)
-        self.algorithm.set_client_id(self.virtual_id)
+        self.algorithm.set_client_id(self.client_id)
 
     def load_data(self) -> None:
         """Generating data and loading them onto this client."""
         data_loading_start_time = time.time()
-        logging.info("[Client #%d] Loading its data source...", self.virtual_id)
+        logging.info("[Client #%d] Loading its data source...", self.client_id)
 
         if self.datasource is None:
             self.datasource = datasources_registry.get()
 
         self.data_loaded = True
 
-        logging.info("[Client #%d] Dataset size: %s", self.virtual_id,
+        logging.info("[Client #%d] Dataset size: %s", self.client_id,
                      self.datasource.num_train_examples())
 
         # Setting up the data sampler
-        self.sampler = samplers_registry.get(self.datasource, self.virtual_id)
+        self.sampler = samplers_registry.get(self.datasource, self.client_id)
 
         if hasattr(Config().trainer, 'use_mindspore'):
             # MindSpore requires samplers to be used while constructing
@@ -92,7 +92,7 @@ class Client(base.Client):
     async def train(self):
         """The machine learning training workload on a client."""
         training_start_time = time.time()
-        logging.info("[Client #%d] Started training.", self.virtual_id)
+        logging.info("[Client #%d] Started training.", self.client_id)
 
         # Perform model training
         if not self.trainer.train(self.trainset, self.sampler):
@@ -111,7 +111,7 @@ class Client(base.Client):
                 await self.sio.disconnect()
 
             logging.info("[Client #{:d}] Test accuracy: {:.2f}%".format(
-                self.virtual_id, 100 * accuracy))
+                self.client_id, 100 * accuracy))
         else:
             accuracy = 0
 

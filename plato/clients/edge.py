@@ -33,10 +33,10 @@ class Client(base.Client):
     def configure(self):
         """Prepare this edge client for training."""
         self.trainer = trainers_registry.get()
-        self.trainer.set_client_id(self.virtual_id)
+        self.trainer.set_client_id(self.client_id)
 
         self.algorithm = algorithms_registry.get(self.trainer)
-        self.algorithm.set_client_id(self.virtual_id)
+        self.algorithm.set_client_id(self.client_id)
 
     def load_data(self):
         """The edge client does not need to train models using local data."""
@@ -58,7 +58,7 @@ class Client(base.Client):
         if 'local_epoch_num' in server_response:
             # Update the number of local epochs
             local_epoch_num = server_response['local_epoch_num'][
-                int(self.virtual_id) - Config().clients.total_clients - 1]
+                int(self.client_id) - Config().clients.total_clients - 1]
             Config().trainer = Config().trainer._replace(
                 epochs=local_epoch_num)
 
@@ -83,5 +83,5 @@ class Client(base.Client):
 
         training_time = time.time() - training_start_time
 
-        return Report(self.virtual_id, self.server.total_samples, accuracy,
+        return Report(self.client_id, self.server.total_samples, accuracy,
                       training_time, 0), weights

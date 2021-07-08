@@ -26,7 +26,7 @@ class ClientEvents(socketio.AsyncClientNamespace):
     def __init__(self, namespace, plato_client):
         super().__init__(namespace)
         self.plato_client = plato_client
-        self.client_id = plato_client.client_id
+        self.client_id = plato_client.actual_client_id
 
     #pylint: disable=unused-argument
     async def on_connect(self):
@@ -65,8 +65,8 @@ class ClientEvents(socketio.AsyncClientNamespace):
 class Client:
     """ A basic federated learning client. """
     def __init__(self) -> None:
-        self.client_id = Config().args.id
-        self.virtual_id = self.client_id
+        self.actual_client_id = Config().args.id
+        self.client_id = self.actual_client_id
         self.sio = None
         self.chunks = []
         self.server_payload = None
@@ -76,7 +76,7 @@ class Client:
                    'cross_silo') and not Config().is_edge_server():
             # Contact one of the edge servers
             self.edge_server_id = int(Config().clients.total_clients) + (
-                self.virtual_id - 1) % int(Config().algorithm.total_silos) + 1
+                self.client_id - 1) % int(Config().algorithm.total_silos) + 1
 
             assert hasattr(Config().algorithm, 'total_silos')
 
@@ -87,11 +87,11 @@ class Client:
                    'cross_silo') and not Config().is_edge_server():
             # Contact one of the edge servers
             logging.info("[Client #%d] Contacting Edge server #%d.",
-                         self.client_id, self.edge_server_id)
+                         self.actual_client_id, self.edge_server_id)
         else:
             await asyncio.sleep(5)
             logging.info("[Client #%d] Contacting the central server.",
-                         self.client_id)
+                         self.actual_client_id)
 
         self.sio = socketio.AsyncClient(reconnection=True)
         self.sio.register_namespace(
@@ -114,11 +114,11 @@ class Client:
                 uri = '{}:{}'.format(uri, Config().server.port)
 
         logging.info("[Client #%d] Connecting to the server at %s.",
-                     self.client_id, uri)
+                     self.actual_client_id, uri)
         await self.sio.connect(uri)
-        await self.sio.emit('client_alive', {'id': self.client_id})
+        await self.sio.emit('client_alive', {'id': self.actual_client_id})
 
-        logging.info("[Client #%d] Waiting to be selected.", self.client_id)
+        logging.info("[Client #%d] Waiting to be selected.", self.actual_client_id)
         await self.sio.wait()
 
     async def payload_to_arrive(self, response) -> None:
@@ -126,11 +126,12 @@ class Client:
         self.process_server_response(response)
 
         # Update (virtual) client id for client, trainer and algorithm
-        if Config().clients.simulation:
-            self.virtual_id = response['virtual_id']
+        if hasattr(Config().clients,
+                       'simulation') and Config().clients.simulation:
+            self.client_id = response['virtual_id']
             self.configure()
 
-        logging.info("[Client #%d] Selected by the server.", self.virtual_id)
+        logging.info("[Client #%d] Selected by the server.", self.client_id)
 
         if not self.data_loaded:
             self.load_data()
@@ -141,7 +142,7 @@ class Client:
 
     async def payload_arrived(self, client_id) -> None:
         """ Upon receiving a portion of the new payload from the server. """
-        assert client_id == self.client_id
+        assert client_id == self.actual_client_id
 
         payload = b''.join(self.chunks)
         _data = pickle.loads(payload)
@@ -168,11 +169,11 @@ class Client:
         else:
             payload_size = sys.getsizeof(pickle.dumps(self.server_payload))
 
-        assert client_id == self.client_id
+        assert client_id == self.actual_client_id
 
         logging.info(
             "[Client #%d] Received %s MB of payload data from the server.",
-            self.virtual_id, round(payload_size / 1024**2, 2))
+            self.client_id, round(payload_size / 1024**2, 2))
 
         self.load_payload(self.server_payload)
         self.server_payload = None
@@ -182,9 +183,9 @@ class Client:
         if Config().is_edge_server():
             logging.info(
                 "[Server #%d] Model aggregated on edge server (client #%d).",
-                os.getpid(), self.virtual_id)
+                os.getpid(), self.client_id)
         else:
-            logging.info("[Client #%d] Model trained.", self.virtual_id)
+            logging.info("[Client #%d] Model trained.", self.client_id)
 
         # Sending the client report as metadata to the server (payload to follow)
         await self.sio.emit('client_report', {'report': pickle.dumps(report)})
@@ -200,7 +201,7 @@ class Client:
         for chunk in chunks:
             await self.sio.emit('chunk', {'data': chunk})
         
-        await self.sio.emit('client_payload', {'id': self.client_id})
+        await self.sio.emit('client_payload', {'id': self.actual_client_id})
 
     async def send(self, payload) -> None:
         """Sending the client payload to the server using socket.io."""
@@ -216,10 +217,10 @@ class Client:
             await self.send_in_chunks(_data)
             data_size = sys.getsizeof(_data)
         
-        await self.sio.emit('client_payload_done', {'id': self.client_id})
+        await self.sio.emit('client_payload_done', {'id': self.actual_client_id})
 
         logging.info("[Client #%d] Sent %s MB of payload data to the server.",
-                     self.virtual_id, round(data_size / 1024**2, 2))
+                     self.client_id, round(data_size / 1024**2, 2))
 
     def process_server_response(self, server_response) -> None:
         """Additional client-specific processing on the server response."""
