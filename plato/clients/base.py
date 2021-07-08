@@ -172,7 +172,7 @@ class Client:
 
         logging.info(
             "[Client #%d] Received %s MB of payload data from the server.",
-            self.client_id, round(payload_size / 1024**2, 2))
+            client_id, round(payload_size / 1024**2, 2))
 
         self.load_payload(self.server_payload)
         self.server_payload = None
@@ -182,9 +182,9 @@ class Client:
         if Config().is_edge_server():
             logging.info(
                 "[Server #%d] Model aggregated on edge server (client #%d).",
-                os.getpid(), self.client_id)
+                os.getpid(), client_id)
         else:
-            logging.info("[Client #%d] Model trained.", self.client_id)
+            logging.info("[Client #%d] Model trained.", client_id)
 
         # Sending the client report as metadata to the server (payload to follow)
         await self.sio.emit('client_report', {'report': pickle.dumps(report)})
@@ -199,7 +199,6 @@ class Client:
 
         for chunk in chunks:
             await self.sio.emit('chunk', {'data': chunk})
-        
         await self.sio.emit('client_payload', {'id': self.client_id})
 
     async def send(self, payload) -> None:
@@ -215,7 +214,6 @@ class Client:
             _data = pickle.dumps(payload)
             await self.send_in_chunks(_data)
             data_size = sys.getsizeof(_data)
-        
         await self.sio.emit('client_payload_done', {'id': self.client_id})
 
         logging.info("[Client #%d] Sent %s MB of payload data to the server.",
@@ -226,7 +224,7 @@ class Client:
 
     @abstractmethod
     def configure(self) -> None:
-        """Prepare this (virtual) client for training."""
+        """Prepare this client for training."""
 
     @abstractmethod
     def load_data(self) -> None:
