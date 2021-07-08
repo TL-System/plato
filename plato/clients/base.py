@@ -126,7 +126,7 @@ class Client:
 
         # Update (virtual) client id for client, trainer and algorithm
         if hasattr(Config().clients,
-                       'simulation') and Config().clients.simulation:
+                   'simulation') and Config().clients.simulation:
             self.client_id = response['id']
             self.configure()
 
@@ -199,6 +199,7 @@ class Client:
 
         for chunk in chunks:
             await self.sio.emit('chunk', {'data': chunk})
+
         await self.sio.emit('client_payload', {'id': self.client_id})
 
     async def send(self, payload) -> None:
@@ -214,6 +215,7 @@ class Client:
             _data = pickle.dumps(payload)
             await self.send_in_chunks(_data)
             data_size = sys.getsizeof(_data)
+
         await self.sio.emit('client_payload_done', {'id': self.client_id})
 
         logging.info("[Client #%d] Sent %s MB of payload data to the server.",
