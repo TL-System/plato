@@ -44,7 +44,6 @@ class Client(base.Client):
     def __repr__(self):
         return 'Client #{}.'.format(self.client_id)
 
-    # TODO: not only once
     def configure(self) -> None:
         """Prepare this client for training."""
         if self.trainer is None:
