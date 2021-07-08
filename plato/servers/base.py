@@ -87,12 +87,12 @@ class Server:
         if Config().is_central_server():
             # In cross-silo FL, the central server lets edge servers start first
             # Then starts their clients
-            self.start_clients(as_server=True)
+            Server.start_clients(as_server=True, client=self.client)
 
             # Allowing some time for the edge servers to start
             time.sleep(5)
 
-        self.start_clients(client=self.client)
+        Server.start_clients(client=self.client)
 
         self.start()
 
@@ -119,7 +119,6 @@ class Server:
                 'sid': sid,
                 'last_contacted': time.time()
             }
-
             logging.info("[Server #%d] New client with id #%d arrived.",
                          os.getpid(), client_id)
         else:
@@ -132,7 +131,8 @@ class Server:
             logging.info("[Server #%d] Starting training.", os.getpid())
             await self.select_clients()
 
-    def start_clients(self, client=None, as_server=False):
+    @staticmethod
+    def start_clients(client=None, as_server=False):
         """Starting all the clients as separate processes."""
         starting_id = 1
 
@@ -140,8 +140,6 @@ class Server:
                        'simulation') and Config().clients.simulation:
             # Only launch a limited number of client objects (the same as the number of clients per round) in simulation
             client_processes = Config().clients.per_round
-            # The client pool for client selection contains all the virtual clients in simulation
-            self.clients_pool = [i for i in range(starting_id, starting_id + Config().clients.total_clients)]
         else:
             client_processes = Config().clients.total_clients
             
@@ -182,12 +180,15 @@ class Server:
                      self.current_round,
                      Config().trainer.rounds)
         
-        # The client pool for client selection is updated as current clients if no simulation
-        if not (hasattr(Config().clients,
-                       'simulation') and Config().clients.simulation):
+        if hasattr(Config().clients,
+                       'simulation') and Config().clients.simulation:
+            # The client pool for client selection contains all the virtual clients in simulation
+            self.clients_pool = [i for i in range(1, 1+Config().clients.total_clients)]
+        else:
+            # The client pool for client selection is updated as current clients if no simulation
             self.clients_pool = list(self.clients)
         self.selected_clients = self.choose_clients()
-        
+
         if len(self.selected_clients) > 0:
             for i, selected_client_id in enumerate(self.selected_clients):
                 if hasattr(Config().clients,
@@ -217,7 +218,6 @@ class Server:
                 logging.info(
                     "[Server #%d] Sending the current model to client #%d.",
                     os.getpid(), selected_client_id)
-
                 await self.send(sid, payload, selected_client_id)
 
 
