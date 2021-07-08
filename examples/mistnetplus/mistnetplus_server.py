@@ -49,7 +49,8 @@ class Server(fedavg.Server):
             server_response = await self.customize_server_response(
                 server_response)
             # Sending the server response as metadata to the clients (payload to follow)
-            socket = self.clients[client_id]
+            actual_client_id = [k for k,v in self.clients.items() if v['virtual_id'] == client_id][0]
+            socket = self.clients[actual_client_id]
             await socket.send(pickle.dumps(server_response))
 
             payload = await self.customize_server_payload(payload)
@@ -58,8 +59,8 @@ class Server(fedavg.Server):
             await self.send(socket, payload)
 
             # Wait until client finish its train
-            report = await self.clients[client_id].recv()
-            payload = await self.clients[client_id].recv()
+            report = await self.clients[actual_client_id].recv()
+            payload = await self.clients[actual_client_id].recv()
             self.updates.append(report, payload)
             
         # do_avg
