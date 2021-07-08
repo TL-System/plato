@@ -74,9 +74,7 @@ class Client:
 
         if hasattr(Config().algorithm,
                    'cross_silo') and not Config().is_edge_server():
-            # Contact one of the edge servers
-            self.edge_server_id = int(Config().clients.total_clients) + (
-                self.client_id - 1) % int(Config().algorithm.total_silos) + 1
+            self.edge_server_id = None
 
             assert hasattr(Config().algorithm, 'total_silos')
 
@@ -86,6 +84,8 @@ class Client:
         if hasattr(Config().algorithm,
                    'cross_silo') and not Config().is_edge_server():
             # Contact one of the edge servers
+            self.edge_server_id = int(Config().clients.total_clients) + (
+                self.client_id - 1) % int(Config().algorithm.total_silos) + 1
             logging.info("[Client #%d] Contacting Edge server #%d.",
                          self.actual_client_id, self.edge_server_id)
         else:

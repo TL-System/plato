@@ -11,6 +11,7 @@ clients:
     do_test: false
 
 server:
+    type: fedavg_cross_silo
     address: 127.0.0.1
     port: 8000
 
