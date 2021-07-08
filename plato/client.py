@@ -51,7 +51,7 @@ def run(client_id, port, client=None):
             logging.info("Starting a %s client #%d.",
                          Config().clients.type, client_id)
         else:
-            client.client_id = client_id
+            client.actual_client_id = client_id
             logging.info("Starting a custom client #%d", client_id)
 
         client.configure()
