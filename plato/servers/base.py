@@ -123,9 +123,11 @@ class Server:
                 'last_contacted': time.time(),
                 'virtual_id': virtual_id
             }
-            if not Config().clients.simulation:
-                # The client pool for client selection is updated when new client arrives
+
+            if not (hasattr(Config().clients, 'simulation') and Config().clients.simulation):
+                # The client pool for client selection is updated when new client arrives if no simulation
                 self.clients_pool.append(client_id)
+
             logging.info("[Server #%d] New client with id #%d arrived.",
                          os.getpid(), client_id)
         else:
@@ -143,13 +145,15 @@ class Server:
         """Starting all the clients as separate processes."""
         starting_id = 1
 
-        if Config().clients.simulation:
+        if hasattr(Config().clients,
+                       'simulation') and Config().clients.simulation:
+            # Only launch a limited number of client objects (the same as the number of clients per round) in simulation
             client_processes = Config().clients.per_round
             # The client pool for client selection contains all the virtual clients in simulation
             self.clients_pool = [i for i in range(starting_id, starting_id + Config().clients.total_clients)]
         else:
             client_processes = Config().clients.total_clients
-
+            
         if as_server:
             total_processes = Config().algorithm.total_silos
             starting_id += client_processes
@@ -191,10 +195,12 @@ class Server:
         self.selected_clients = self.choose_clients()
         if len(self.selected_clients) > 0:
             for i, selected_client_id in enumerate(self.selected_clients):
-                if not Config().clients.simulation:
-                    client_id = selected_client_id
-                else:
+                if hasattr(Config().clients,
+                       'simulation') and Config().clients.simulation:
                     client_id = i+1
+                else:
+                    client_id = selected_client_id
+                    
                 sid = self.clients[client_id]['sid']
                 await self.register_client(sid, client_id, selected_client_id)
 
