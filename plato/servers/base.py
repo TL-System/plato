@@ -181,12 +181,12 @@ class Server:
                      self.current_round,
                      Config().trainer.rounds)
 
-        if hasattr(Config().clients,
-                   'simulation') and Config().clients.simulation:
+        if hasattr(Config().clients, 'simulation') and Config(
+        ).clients.simulation and not Config().is_central_server:
             # In the client simulation mode, the client pool for client selection contains
             # all the virtual clients to be simulated
-            self.clients_pool = list(
-                range(1, 1 + Config().clients.total_clients))
+            self.clients_pool = list(range(1, 1 + self.total_clients))
+
         else:
             # If no clients are simulated, the client pool for client selection consists of
             # the current set of clients that have contacted the server
@@ -196,8 +196,8 @@ class Server:
 
         if len(self.selected_clients) > 0:
             for i, selected_client_id in enumerate(self.selected_clients):
-                if hasattr(Config().clients,
-                           'simulation') and Config().clients.simulation:
+                if hasattr(Config().clients, 'simulation') and Config(
+                ).clients.simulation and not Config().is_central_server:
                     client_id = i + 1
                 else:
                     client_id = selected_client_id
