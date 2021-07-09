@@ -1,10 +1,13 @@
+import asyncio
+import os
 import logging
 from dataclasses import dataclass
 
-from plato.config import Config
-from plato.clients import simple
+os.environ['config_file'] = 'examples/mistnetplus/mistnet_lenet5_client.yml'
 
-from mistnetplus import DataSource, Trainer
+from plato.clients import simple
+from plato.config import Config
+
 
 @dataclass
 class Report:
@@ -12,8 +15,7 @@ class Report:
     num_samples: int
     payload_length: int
 
-# copy from split_learning and update the model aggregation
-class Client(simple.Client):
+class MistnetplusClient(simple.Client):
     def __init__(self, model=None, datasource=None, trainer=None):
         super().__init__()
 
@@ -54,21 +56,13 @@ class Client(simple.Client):
                                           Config().algorithm.cut_layer)
             weights = self.algorithm.extract_weights()
             # Generate a report, signal the end of train
-            train_status = "train done"
             return Report(self.sampler.trainset_size(), 0), weights
 
 def main():
     """A Plato federated learning training session using a custom model. """
-    model = nn.Sequential(
-        nn.Linear(28 * 28, 128),
-        nn.ReLU(),
-        nn.Linear(128, 128),
-        nn.ReLU(),
-        nn.Linear(128, 10),
-    )
-
-    server = fedReIdServer(model=model)
-    server.run()
+    client = MistnetplusClient()
+    client.configure()
+    asyncio.run(client.start_client())
 
 
 if __name__ == "__main__":

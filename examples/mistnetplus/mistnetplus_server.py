@@ -1,17 +1,19 @@
 import logging
 import os
+import pickle
 from itertools import chain
+
+os.environ['config_file'] = 'examples/mistnetplus/mistnet_lenet5_server.yml'
 
 from plato.config import Config
 from plato.samplers import all_inclusive
 from plato.servers import fedavg
-from mistnetplus import DataSource, Trainer
 
-class Server(fedavg.Server):
+
+class MistnetplusServer(fedavg.Server):
     """The split learning server."""
     def __init__(self):
         super().__init__()
-        assert Config().trainer.rounds == 1
 
     async def process_reports(self):
         """Process the features extracted by the client and perform server-side training."""
@@ -102,15 +104,7 @@ class Server(fedavg.Server):
 
 def main():
     """A Plato federated learning training session using a custom model. """
-    model = nn.Sequential(
-        nn.Linear(28 * 28, 128),
-        nn.ReLU(),
-        nn.Linear(128, 128),
-        nn.ReLU(),
-        nn.Linear(128, 10),
-    )
-
-    server = fedReIdServer(model=model)
+    server = MistnetplusServer()
     server.run()
 
 
