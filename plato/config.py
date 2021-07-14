@@ -77,10 +77,16 @@ class Config:
                 filename = os.environ['config_file']
             else:
                 filename = args.config
-
-            with open(filename, 'r') as config_file:
-                config = yaml.load(config_file, Loader=yaml.FullLoader)
-
+                
+            # if the configuration file not exist, create a fake config object
+            if os.path.isfile(filename):
+                with open(filename, 'r') as config_file:
+                    config = yaml.load(config_file, Loader=yaml.FullLoader)
+                    print(config)
+            else:
+                # create a default configured config
+                config = Config.defaultConfig()
+                
             Config.clients = Config.namedtuple_from_dict(config['clients'])
             Config.server = Config.namedtuple_from_dict(config['server'])
             Config.data = Config.namedtuple_from_dict(config['data'])
@@ -177,3 +183,40 @@ class Config:
         ).trainer.parallelized and torch.cuda.is_available(
         ) and torch.distributed.is_available(
         ) and torch.cuda.device_count() > 1
+        
+    @staticmethod
+    def defaultConfig() -> dict:
+        ''' list a default configuration when the config file is missing'''
+        config = {}
+        config['clients'] = {}
+        config['clients']['type'] = 'simple'
+        config['clients']['total_clients'] = 1
+        config['clients']['per_round'] = 1
+        config['clients']['do_test'] = True
+        config['server'] = {}
+        config['server']['simulation'] = False
+        config['server']['address'] = '127.0.0.1'
+        config['server']['port'] = 8000
+        config['data'] = {}
+        config['data']['datasource'] = 'MNIST'
+        config['data']['data_path'] = './data'
+        config['data']['partition_size'] = 20000
+        config['data']['sampler'] = 'iid'
+        config['data']['random_seed'] = 1
+        config['trainer'] = {}
+        config['trainer']['type'] = 'basic'
+        config['trainer']['rounds'] = 5
+        config['trainer']['parallelized'] = False
+        config['trainer']['max_concurrency'] = 1
+        config['trainer']['target_accuracy'] = 0.94
+        config['trainer']['epochs'] = 5
+        config['trainer']['batch_size'] = 32
+        config['trainer']['optimizer'] = 'SGD'
+        config['trainer']['learning_rate'] = 0.01
+        config['trainer']['momentum'] = 0.9
+        config['trainer']['weight_decay'] = 0.0
+        config['trainer']['model_name'] = 'lenet5'
+        config['algorithm'] = {}
+        config['algorithm']['type'] = 'fedavg'
+        
+        return config

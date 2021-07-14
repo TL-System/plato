@@ -91,8 +91,9 @@ class Server:
 
             # Allowing some time for the edge servers to start
             time.sleep(5)
-
-        Server.start_clients(client=self.client)
+        
+        if Config().server.simulation:
+            Server.start_clients(client=self.client)
 
         self.start()
 

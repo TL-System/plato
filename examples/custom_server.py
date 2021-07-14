@@ -3,7 +3,7 @@ import os
 
 from torch import nn
 
-os.environ['config_file'] = 'examples/configs/server.yml'
+# os.environ['config_file'] = 'examples/configs/server.yml'
 
 from plato.servers import fedavg
 
