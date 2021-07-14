@@ -2,7 +2,7 @@ import logging
 import os
 
 # need to run 'ulimit -n 64000' on the server nodes
-os.system('ulimit -n 64000')
+# os.system('ulimit -n 64000')
 os.environ['config_file'] = 'examples/dist_mistnet/mistnet_lenet5_server.yml'
 from plato.servers import mistnet
 
