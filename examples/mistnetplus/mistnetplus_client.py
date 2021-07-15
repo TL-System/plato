@@ -1,6 +1,7 @@
 import asyncio
 import os
 import logging
+import pickle
 from dataclasses import dataclass
 
 os.environ['config_file'] = 'examples/mistnetplus/mistnet_lenet5_client.yml'
@@ -8,17 +9,21 @@ os.environ['config_file'] = 'examples/mistnetplus/mistnet_lenet5_client.yml'
 from plato.clients import simple
 from plato.config import Config
 
+import split_learning_algorithm
+import split_learning_trainer
 
 @dataclass
 class Report:
     """Client report sent to the MistNet federated learning server."""
     num_samples: int
     payload_length: int
+    phase: str
 
 class MistnetplusClient(simple.Client):
-    def __init__(self, model=None, datasource=None, trainer=None):
-        super().__init__()
-
+    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
+        super().__init__(model=model, 
+                         datasource=datasource, 
+                         algorithm=algorithm, trainer=trainer)
         self.model_received = False
         self.gradient_received = False
     
@@ -48,7 +53,7 @@ class MistnetplusClient(simple.Client):
 
             # Generate a report for the server, performing model testing if applicable
             return Report(self.sampler.trainset_size(),
-                          len(features)), features
+                          len(features), "features"), features
         else:
             # Perform a complete training with gradients received
             config = Config().trainer._asdict()
@@ -56,14 +61,15 @@ class MistnetplusClient(simple.Client):
                                           Config().algorithm.cut_layer)
             weights = self.algorithm.extract_weights()
             # Generate a report, signal the end of train
-            return Report(self.sampler.trainset_size(), 0), weights
+            return Report(self.sampler.trainset_size(), 0, "weights"), weights
 
 def main():
     """A Plato federated learning training session using a custom model. """
-    client = MistnetplusClient()
+    trainer = split_learning_trainer.Trainer()
+    algorithm = split_learning_algorithm.Algorithm(trainer=trainer)
+    client = MistnetplusClient(algorithm=algorithm, trainer=trainer)
     client.configure()
     asyncio.run(client.start_client())
-
 
 if __name__ == "__main__":
     main()

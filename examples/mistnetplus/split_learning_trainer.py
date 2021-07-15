@@ -61,7 +61,6 @@ class Trainer(basic.Trainer):
         else:
             lr_schedule = None
 
-        logging.info("[Client #%d] Begining to train.", self.client_id)
         for __, (examples, labels) in enumerate(train_loader):
             examples, labels = examples.to(self.device), labels.to(self.device)
             optimizer.zero_grad()
@@ -74,9 +73,7 @@ class Trainer(basic.Trainer):
                 outputs = self.model.forward_from(examples, cut_layer)
 
             loss = loss_criterion(outputs, labels)
-            logging.info("[Client #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}"
-                         .format(self.client_id, epoch, epochs,
-                                 batch_id, len(train_loader), loss.data.item()))
+
             loss.backward()
 
             # Record gradients within the cut layer
