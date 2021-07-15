@@ -64,5 +64,8 @@ algorithm:
     # Aggregation algorithm
     type: mistnet
 
+    # Split learning flag
+    split_learning: true
+
     cut_layer: relu3
     epsilon: null

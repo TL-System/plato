@@ -82,7 +82,9 @@ class Config:
             if os.path.isfile(filename):
                 with open(filename, 'r') as config_file:
                     config = yaml.load(config_file, Loader=yaml.FullLoader)
-                    print(config)
+                    # A temporary solution for config['server']['simulation']
+                    if 'simulation' not in config['server']:
+                        config['server']['simulation'] = True
             else:
                 # create a default configured config
                 config = Config.defaultConfig()
