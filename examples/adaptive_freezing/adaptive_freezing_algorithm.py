@@ -34,6 +34,13 @@ class Algorithm(fedavg.Algorithm):
         self.current_round = 0
         self.stability_threshold = Config().algorithm.stability_threshold
 
+        # Layers in ResNet models with the following suffixes in their names need to be skipped
+        self.skipped_layers = [
+            'running_var',
+            'running_mean',
+            'num_batches_tracked',
+        ]
+
         # Initialize the synchronization mask
         if not self.sync_mask:
             for name, weight in self.model.cpu().state_dict().items():
@@ -164,7 +171,8 @@ class Algorithm(fedavg.Algorithm):
             # Expanding the compressed weights using the sync mask
             weight.data[self.sync_mask[name]] = weight.data.clone().view(-1)
 
-            if self.previous_weights is not None:
+            if self.previous_weights is not None and name.split(
+                    '.')[-1] not in self.skipped_layers:
                 self.update_sync_mask(name, weight.data)
 
             total_active_weights += self.sync_mask[name].sum()
