@@ -12,9 +12,10 @@ from plato.clients import simple
 
 @dataclass
 class Report:
-    """Client report sent to the split learning server."""
+    """Client report sent to the MistNet federated learning server."""
     num_samples: int
     payload_length: int
+    phase: str
 
 
 class Client(simple.Client):
@@ -49,8 +50,6 @@ class Client(simple.Client):
         """A split learning client only uses the first several layers in a forward pass."""
         logging.info("Training on split learning client #%d", self.client_id)
 
-        # Since training is performed on the server, the client should not be doing
-        # its own testing for the model accuracy
         assert not Config().clients.do_test
 
         if self.gradient_received == False:
@@ -61,13 +60,12 @@ class Client(simple.Client):
 
             # Generate a report for the server, performing model testing if applicable
             return Report(self.sampler.trainset_size(),
-                          len(features)), features
+                          len(features), "features"), features
         else:
             # Perform a complete training with gradients received
             config = Config().trainer._asdict()
             self.algorithm.complete_train(config, self.trainset, self.sampler,
                                           Config().algorithm.cut_layer)
-
+            weights = self.algorithm.extract_weights()
             # Generate a report, signal the end of train
-            train_status = "train done"
-            return Report(0, 0), train_status
+            return Report(self.sampler.trainset_size(), 0, "weights"), weights
