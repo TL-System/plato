@@ -12,7 +12,7 @@ from plato.clients import simple
 
 @dataclass
 class Report:
-    """Client report sent to the MistNet federated learning server."""
+    """Client report sent to the split learning server."""
     num_samples: int
     payload_length: int
     phase: str
