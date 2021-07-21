@@ -36,7 +36,6 @@ class Server(fedavg.Server):
         # add the new registered clients
         add_clients = new_client_id_set - old_client_id_set
         for i in add_clients:
-            # self.clients_running_queue.append(i)
             insert_index = len(self.clients_running_queue) - 1
             self.clients_running_queue.insert(insert_index, i)
 
@@ -95,7 +94,6 @@ class Server(fedavg.Server):
                          os.getpid(), client_id)
             
             sid = self.clients[client_id]['sid']
-            # payload = await self.customize_server_payload(pickle.dumps(payload))
             # Sending the server payload to the clients
             payload = self.load_gradients()
             await self.send(sid, payload, client_id)
