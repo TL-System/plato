@@ -20,29 +20,36 @@ class Server(fedavg.Server):
     """The split learning server."""
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
-        self.select_client_socket = None
-        self.selected_client_id = None
-        self.last_selected_client_id = None
+
+        self.clients_running_queue = [] # a FIFO queue(list) for choosing the running client
 
     def choose_clients(self):
         assert self.clients_per_round == 1
-        if self.last_selected_client_id is None:
-            # 1st train loop
-            self.last_selected_client_id = -1  # Skip this snippet
-            self.selected_client_id = 1
-        else:
-            self.last_selected_client_id = self.selected_client_id
-            self.selected_client_id = (self.selected_client_id +
-                                       1) % (len(self.clients_pool) + 1)
-            if self.selected_client_id == 0:
-                self.selected_client_id = 1
-        selected_clients_list = []
-        selected_clients_list.append(self.selected_client_id)
-        self.selected_clients = None
-        self.selected_clients = deepcopy(selected_clients_list)
-        # starting time of a gloabl training round
-        self.round_start_time = time.time()
-        return self.selected_clients
+
+        # fist step: make sure that the sl running queue sync with the clients pool
+        new_client_id_set = set(self.clients_pool)
+        old_client_id_set = set(self.clients_running_queue)
+        # delete the disconnected clients
+        remove_clients = old_client_id_set - new_client_id_set
+        for i in remove_clients:
+            self.clients_running_queue.remove(i)
+        # add the new registered clients
+        add_clients = new_client_id_set - old_client_id_set
+        for i in add_clients:
+            # self.clients_running_queue.append(i)
+            insert_index = len(self.clients_running_queue) - 1
+            self.clients_running_queue.insert(insert_index, i)
+
+        # second step: use FIFO strategy to choose one client
+        res_list = []
+        if len(self.clients_running_queue) > 0:
+            queue_head = self.clients_running_queue.pop(0)
+            res_list.append(queue_head)
+            self.clients_running_queue.append(queue_head)
+            self.round_start_time = time.time()
+
+        return res_list
+
 
     def load_gradients(self):
         """ Loading gradients from a file. """
