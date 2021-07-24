@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
 import numpy as np
 import torch
 import torch.nn as nn
@@ -41,9 +40,8 @@ class Trainer(basic.Trainer):
 
         self.init_trajectory_items()
 
-
     def init_trajectory_items(self):
-        # mm is the abbreviation of multimodal 
+        # mm is the abbreviation of multimodal
         # For the Overfitting:
         # record the training losse:
         #  each item of the dict is a list containing the losses of the specific modality
@@ -67,7 +65,6 @@ class Trainer(basic.Trainer):
             "train": self.global_mm_train_losses_trajectory,
             "val": self.global_mm_val_losses_trajectory
         }
-
 
     def backtrack_gradient_trajectory(self, trajectory_idx):
         assert gradient_idx < len(self.gradients_trajectory)
@@ -115,11 +112,10 @@ class Trainer(basic.Trainer):
 
         backtracked_multimodal_mode_losses = dict()
         for mdl_name in modality_names:
-             backtracked_multimodal_mode_losses[mdl_name] = mode_trajs[mdl_name][trajectory_idx]
+            backtracked_multimodal_mode_losses[mdl_name] = mode_trajs[
+                mdl_name][trajectory_idx]
 
         return backtracked_multimodal_mode_losses
-
-
 
     @torch.no_grad()
     def eval_step(self, eval_data_loader, num_iters=None, model=None):
@@ -130,16 +126,14 @@ class Trainer(basic.Trainer):
         mode = 'val'
         eval_avg_losses = dict()
         eval_data_loader = eval_data_loader
-        for batch_id, (examples,
-                        labels) in enumerate(eval_data_loader):
-            examples, labels = examples.to(self.device), labels.to(
-                self.device)
-            
+        for batch_id, (examples, labels) in enumerate(eval_data_loader):
+            examples, labels = examples.to(self.device), labels.to(self.device)
+
             losses = model(rgb_imgs=examples["RGB"],
-                flow_imgs = examples["Flow"],
-                audio_features = examples["Audio"],
-                label=labels,
-                return_loss=True)
+                           flow_imgs=examples["Flow"],
+                           audio_features=examples["Audio"],
+                           label=labels,
+                           return_loss=True)
             for loss_key in list(losses.keys()):
                 if loss_key in list(eval_avg_losses.keys()):
                     eval_avg_losses[loss_key].append(losses[loss_key])
@@ -158,40 +152,43 @@ class Trainer(basic.Trainer):
     def obtain_local_global_OGR_items(self, trainset, evalset):
         """ We can directly call the self.model in this function to get the global model
             because the weights from the server are assigned to the client before training """
-        
+
         # we can call eval directly to get the performance of the global model on the local dataset
         # prepare data loaders
         eval_loader = torch.utils.data.DataLoader(dataset=evalset,
-                                                   shuffle=False,
-                                                   batch_size=1,
-                                                   sampler=sampler.get()
-                                                   num_workers=config.data.get('workers_per_gpu', 1))
+                                                  shuffle=False,
+                                                  batch_size=1,
+                                                  sampler=sampler.get(),
+                                                  num_workers=config.data.get(
+                                                      'workers_per_gpu', 1))
         # 1. obtain the eval loss of the received global model
-        eval_avg_losses = self.eval_step(eval_data_loader = eval_loader)
-         
+        eval_avg_losses = self.eval_step(eval_data_loader=eval_loader)
+
         # obtain the training loss of the received global model
-        eval_trainset_loader = torch.utils.data.DataLoader(dataset=trainset,
-                                                   shuffle=False,
-                                                   batch_size=1,
-                                                   sampler=sampler.get()
-                                                   num_workers=config.data.get('workers_per_gpu', 1))
-        
-        # get the averaged loss on 50 batch size                                           
-        eval_subtrainset_avg_losses = self.eval_step(eval_data_loader = eval_trainset_loader, num_iters=50)
+        eval_trainset_loader = torch.utils.data.DataLoader(
+            dataset=trainset,
+            shuffle=False,
+            batch_size=1,
+            sampler=sampler.get(),
+            num_workers=config.data.get('workers_per_gpu', 1))
+
+        # get the averaged loss on 50 batch size
+        eval_subtrainset_avg_losses = self.eval_step(
+            eval_data_loader=eval_trainset_loader, num_iters=50)
 
         # 2. extract the eval and train loss of the local model
         #   this part of value should be stored in the last position of the loss trajectory
 
-        local_train_avg_losses = self.backtrack_multimodal_loss_trajectory(mode="train", 
-                                            modality_names=["RGB", "Flow", "Audio", "Fused"],
-                                             trajectory_idx=-1)
-        local_eval_avg_losses = self.backtrack_multimodal_loss_trajectory(mode="eval", 
-                                            modality_names=["RGB", "Flow", "Audio", "Fused"],
-                                             trajectory_idx=-1)
+        local_train_avg_losses = self.backtrack_multimodal_loss_trajectory(
+            mode="train",
+            modality_names=["RGB", "Flow", "Audio", "Fused"],
+            trajectory_idx=-1)
+        local_eval_avg_losses = self.backtrack_multimodal_loss_trajectory(
+            mode="eval",
+            modality_names=["RGB", "Flow", "Audio", "Fused"],
+            trajectory_idx=-1)
 
         return eval_avg_losses, eval_subtrainset_avg_losses, local_eval_avg_losses, local_train_avg_losses
-
-
 
     def reweight_losses(self, blending_weights, losses):
         """[Reweight the losses to achieve the gradient blending]
@@ -201,16 +198,17 @@ class Trainer(basic.Trainer):
                                         {"RGB": float, "Flow": float}
             losses ([dict]): contains the loss of each modality network 
                                         {"RGB": float, "Flow": float}
-        """ 
+        """
         modality_names = list(blending_weights.keys())
         reweighted_losses = dict()
         for modl_nm in modality_names:
-            reweighted_losses[modl_nm] = blending_weights[modl_nm] * losses[modl_nm]
+            reweighted_losses[
+                modl_nm] = blending_weights[modl_nm] * losses[modl_nm]
 
         return reweighted_losses
 
-    
-    def train_process(self, config, trainset, evalset, sampler, blending_weights):
+    def train_process(self, config, trainset, evalset, sampler,
+                      blending_weights):
         log_interval = config.log_config["interval"]
         batch_size = config.trainer['batch_size']
 
@@ -220,17 +218,18 @@ class Trainer(basic.Trainer):
         train_loader = torch.utils.data.DataLoader(dataset=trainset,
                                                    shuffle=False,
                                                    batch_size=batch_size,
-                                                   sampler=sampler.get()
-                                                   num_workers=config.data.get('workers_per_gpu', 1))
+                                                   sampler=sampler.get(),
+                                                   num_workers=config.data.get(
+                                                       'workers_per_gpu', 1))
 
         eval_loader = torch.utils.data.DataLoader(dataset=evalset,
-                                            shuffle=False,
-                                            batch_size=batch_size,
-                                            sampler=sampler.get()
-                                            num_workers=config.data.get('workers_per_gpu', 1))
+                                                  shuffle=False,
+                                                  batch_size=batch_size,
+                                                  sampler=sampler.get(),
+                                                  num_workers=config.data.get(
+                                                      'workers_per_gpu', 1))
 
-        iterations_per_epoch = np.ceil(len(trainset) /
-                                        batch_size).astype(int)
+        iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
         epochs = config['epochs']
 
         # Sending the model to the device used for training
@@ -242,39 +241,46 @@ class Trainer(basic.Trainer):
         optimizer = get_optimizer(self.model)
         # Initializing the learning rate schedule, if necessary
         if hasattr(config, 'lr_schedule'):
-            lr_schedule = optimizers.get_lr_schedule(
-                optimizer, iterations_per_epoch, train_loader)
+            lr_schedule = optimizers.get_lr_schedule(optimizer,
+                                                     iterations_per_epoch,
+                                                     train_loader)
         else:
             lr_schedule = None
 
         # operate the local training
-        supported_modalities = trainset.supported_modalities 
+        supported_modalities = trainset.supported_modalities
         # in order to blend the gradients in the server side
         #   The eval/train loss of the first and last epoches should be recorded
         for epoch in range(1, epochs + 1):
-            epoch_train_losses = {modl_nm: 0.0 for modl_nm in supported_modalities}
-            total_batches = 0 
+            epoch_train_losses = {
+                modl_nm: 0.0
+                for modl_nm in supported_modalities
+            }
+            total_batches = 0
             total_epoch_loss = 0
             for batch_id, (multimodal_examples,
-                            labels) in enumerate(train_loader):
+                           labels) in enumerate(train_loader):
                 labels = labels.to(self.device)
-  
+
                 optimizer.zero_grad()
 
-                losses = self.model.forward_from(rgb_imgs=multimodal_examples["RGB"].to(self.device),
-                flow_imgs=multimodal_examples["Flow"].to(self.device),
-                audio_features=multimodal_examples["Audio"].to(self.device),
-                label=labels,
-                return_loss=True)
+                losses = self.model.forward_from(
+                    rgb_imgs=multimodal_examples["RGB"].to(self.device),
+                    flow_imgs=multimodal_examples["Flow"].to(self.device),
+                    audio_features=multimodal_examples["Audio"].to(
+                        self.device),
+                    label=labels,
+                    return_loss=True)
 
-                weighted_losses = self.reweight_losses(blending_weights, losses)
+                weighted_losses = self.reweight_losses(blending_weights,
+                                                       losses)
 
                 # added the losses
                 weighted_global_loss = 0
                 for modl_nm in supported_modalities:
                     epoch_train_losses[modl_nm] += weighted_losses[modl_nm]
                     weighted_global_loss += weighted_losses[modl_nm]
-                    
+
                 total_epoch_loss += weighted_global_loss
 
                 weighted_global_loss.backward()
@@ -287,46 +293,56 @@ class Trainer(basic.Trainer):
                 if batch_id % log_interval == 0:
                     if self.client_id == 0:
                         logging.info(
-                            "[Server #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}"
-                            .format(os.getpid(), epoch, epochs,
-                                    batch_id, len(train_loader),
-                                    weighted_losses.data.item()))
+                            "[Server #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}".
+                            format(os.getpid(), epoch, epochs, batch_id,
+                                   len(train_loader),
+                                   weighted_losses.data.item()))
                     else:
                         if hasattr(config, 'use_wandb'):
-                            wandb.log({"batch loss": weighted_losses.data.item()})
+                            wandb.log(
+                                {"batch loss": weighted_losses.data.item()})
 
                         logging.info(
-                            "[Client #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}"
-                            .format(self.client_id, epoch, epochs,
-                                    batch_id, len(train_loader),
-                                    weighted_losses.data.item()))
+                            "[Client #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}".
+                            format(self.client_id, epoch, epochs, batch_id,
+                                   len(train_loader),
+                                   weighted_losses.data.item()))
                 total_batches = batch_id
             if hasattr(optimizer, "params_state_update"):
                 optimizer.params_state_update()
 
             # only record the first and final performance of the local epoches
             if epoch == 1 or epoch == epochs:
-                epoch_avg_train_loss = total_epoch_loss / (total_batches+1)
+                epoch_avg_train_loss = total_epoch_loss / (total_batches + 1)
 
-                eval_avg_losses = self.eval_step(eval_data_loader = eval_loader)
-                weighted_eval_losses = self.reweight_losses(blending_weights, eval_avg_losses)
+                eval_avg_losses = self.eval_step(eval_data_loader=eval_loader)
+                weighted_eval_losses = self.reweight_losses(
+                    blending_weights, eval_avg_losses)
                 total_eval_loss = 0
                 for modl_nm in supported_modalities:
-                    modl_train_avg_loss = epoch_train_losses[modl_nm] / total_batches
+                    modl_train_avg_loss = epoch_train_losses[
+                        modl_nm] / total_batches
                     modl_eval_avg_loss = eval_avg_losses[modl_nm]
-                    if modl_nm not in list(self.mm_train_losses_trajectory.keys()):
-                        self.mm_train_losses_trajectory[modl_nm] = modl_train_avg_loss
+                    if modl_nm not in list(
+                            self.mm_train_losses_trajectory.keys()):
+                        self.mm_train_losses_trajectory[
+                            modl_nm] = modl_train_avg_loss
                     else:
-                        self.mm_train_losses_trajectory[modl_nm].append(modl_train_avg_loss)
-                    if modl_nm not in list(self.mm_val_losses_trajectory.keys()):
-                        self.mm_val_losses_trajectory[modl_nm] = modl_eval_avg_loss
+                        self.mm_train_losses_trajectory[modl_nm].append(
+                            modl_train_avg_loss)
+                    if modl_nm not in list(
+                            self.mm_val_losses_trajectory.keys()):
+                        self.mm_val_losses_trajectory[
+                            modl_nm] = modl_eval_avg_loss
                     else:
-                        self.mm_val_losses_trajectory[modl_nm].append(modl_eval_avg_loss)
+                        self.mm_val_losses_trajectory[modl_nm].append(
+                            modl_eval_avg_loss)
 
                     total_eval_loss += weighted_eval_losses[modl_nm]
 
                 # store the global losses
-                self.global_mm_train_losses_trajectory.append(epoch_avg_train_loss)
+                self.global_mm_train_losses_trajectory.append(
+                    epoch_avg_train_loss)
                 self.global_mm_val_losses_trajectory.append(total_eval_loss)
         self.model.cpu()
 

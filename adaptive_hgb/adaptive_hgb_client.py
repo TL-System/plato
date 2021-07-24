@@ -18,6 +18,7 @@ from plato.algorithms import registry as algorithms_registry
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
 from plato.samplers import registry as samplers_registry
+from plato.samplers import modality_registry as modality_samplers_registry
 from plato.trainers import registry as trainers_registry
 
 from plato.clients import base
@@ -82,6 +83,33 @@ class Client(simple.Client):
 
     def load_recorded_model(self):
         self.trainer.load_model(filename=self.recored_model_path)
+
+    def load_data(self) -> None:
+        """Generating data and loading them onto this client."""
+        data_loading_start_time = time.time()
+        logging.info("[Client #%d] Loading its data source...", self.client_id)
+
+        self.data_loaded = True
+
+        logging.info("[Client #%d] Dataset size: %s", self.client_id,
+                     self.datasource.num_train_examples())
+
+        # Setting up the data sampler
+        self.sampler = samplers_registry.get(self.datasource, self.client_id)
+
+        # Setting up the modality sampler
+        self.modality_sampler = modality_samplers_registry.get(
+            datasource=self.datasource, client_id=self.client_id)
+
+        # PyTorch uses samplers when loading data with a data loader
+        self.trainset = self.datasource.get_train_set(
+            self.modality_sampler.get())
+
+        if Config().clients.do_test:
+            # Set the testset if local testing is needed
+            self.testset = self.datasource.get_test_set()
+
+        self.data_loading_time = time.time() - data_loading_start_time
 
     def local_global_gradient_blending(self, local_model,
                                        global_eval_avg_loses,
