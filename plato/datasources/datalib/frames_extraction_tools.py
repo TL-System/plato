@@ -21,13 +21,19 @@ from the raw video dataset.
 
 
 def obtain_video_dest_dir(out_dir, video_path):
+
     if '/' in video_path:
         class_name = os.path.basename(os.path.dirname(video_path))
         head, tail = os.path.split(video_path)
         video_name = tail.split(".")[0]
-        out_full_path = os.path.join(out_dir, class_name, video_name)
+
+        if class_name not in head:
+            out_full_path = os.path.join(out_dir, class_name, video_name)
+        else:
+            out_full_path = os.path.join(out_dir, video_name)
     else:  # the class name is not contained
         video_name = video_path.split(".")[0]
+
         out_full_path = os.path.join(out_dir, video_name)
 
     return out_full_path
@@ -109,7 +115,8 @@ class VideoFramesExtractor(modality_extraction_base.VideoExtractorBase):
 
     def build_rgb_frames(self, to_dir, new_short=0, new_width=0, new_height=0):
         sourc_video_dir = self.video_src_dir
-        self.organize_modality_dir(src_dir=sourc_video_dir, to_dir=to_dir)
+        if self.dir_level == 2:
+            self.organize_modality_dir(src_dir=sourc_video_dir, to_dir=to_dir)
         done_fullpath_list = glob.glob(to_dir + '/*' * self.dir_level)
 
         pool = Pool(self.num_worker)
@@ -130,7 +137,8 @@ class VideoFramesExtractor(modality_extraction_base.VideoExtractorBase):
             new_width=0,
             new_height=0):
         sourc_video_dir = self.video_src_dir
-        self.organize_modality_dir(src_dir=sourc_video_dir, to_dir=to_dir)
+        if self.dir_level == 2:
+            self.organize_modality_dir(src_dir=sourc_video_dir, to_dir=to_dir)
         done_fullpath_list = glob.glob(to_dir + '/*' * self.dir_level)
 
         pool = Pool(self.num_worker)
@@ -182,7 +190,8 @@ class VideoFramesExtractor(modality_extraction_base.VideoExtractorBase):
         method="tvl1"):  # use which method to generate the flow
 
         sourc_video_dir = self.video_src_dir
-        self.organize_modality_dir(src_dir=sourc_video_dir, to_dir=to_dir)
+        if self.dir_level == 2:
+            self.organize_modality_dir(src_dir=sourc_video_dir, to_dir=to_dir)
         done_fullpath_list = glob.glob(to_dir + '/*' * self.dir_level)
 
         pool = Pool(self.num_worker)

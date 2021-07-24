@@ -24,7 +24,7 @@ class VideoExtractorBase:
         self.video_ext = video_ext  # support 'avi', 'mp4', 'webm'
         self.mixed_ext = mixed_ext
 
-        assert self.dir_level == 2  # we insist two-level data directory setting
+        #assert self.dir_level == 2  # we insist two-level data directory setting
 
         logging.info(
             ("Reading videos from folder: {}").format(self.video_src_dir))

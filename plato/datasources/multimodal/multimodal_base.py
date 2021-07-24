@@ -11,6 +11,7 @@ import requests
 
 import numpy as np
 import torch
+from torchvision.datasets.utils import download_url
 from torchvision.datasets.utils import download_and_extract_archive
 from torchvision.datasets.utils import download_file_from_google_drive, extract_archive
 
@@ -85,10 +86,11 @@ class MultiModalDataSource(base.DataSource):
 
     def _download_arrange_data(
         self,
-        download_url,
+        download_url_address,
         put_data_dir,
+        obtained_file_name=None,
     ):
-        download_file_name = download_url.split("/")[-1]
+        download_file_name = download_url_address.split("/")[-1]
         download_extracted_file_name = download_file_name.split(".")[0]
         download_extracted_dir_path = os.path.join(
             put_data_dir, download_extracted_file_name)
@@ -96,11 +98,20 @@ class MultiModalDataSource(base.DataSource):
         if not self._exist_judgement(download_extracted_dir_path):
             logging.info(
                 ("Downloading the {} data.....").format(download_file_name))
-            download_and_extract_archive(url=download_url,
-                                         download_root=put_data_dir,
-                                         extract_root=put_data_dir,
-                                         filename=download_file_name,
-                                         remove_finished=True)
+            if ".zip" in download_file_name or ".tar.gz" in download_file_name:
+                download_and_extract_archive(url=download_url_address,
+                                             download_root=put_data_dir,
+                                             extract_root=put_data_dir,
+                                             filename=download_file_name,
+                                             remove_finished=True)
+            else:
+                if obtained_file_name is not None:
+                    download_url(url=download_url_address,
+                                 root=put_data_dir,
+                                 filename=obtained_file_name)
+                    download_extracted_file_name = obtained_file_name
+                else:
+                    download_url(url=download_url_address, root=put_data_dir)
         return download_extracted_file_name
 
     def _download_google_driver_arrange_data(
@@ -146,8 +157,8 @@ class MultiModalDataSource(base.DataSource):
 
 
 class MultiModalDataset(torch.utils.data.Dataset):
-    def __init__(self, *datasets):
-        self.datasets = datasets
+    def __init__(self, modality_datasets):
+        self.datasets = modality_datasets  # a dict that holds the corresponding built dataset.
 
         self.supported_modalities = ["RGB", "Flow", "Audio"]
 

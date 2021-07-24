@@ -54,7 +54,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
         base_data_path = self.mm_data_info["base_data_dir_path"]
         download_url = Config().data.download_url
         extracted_dir_name = self._download_arrange_data(
-            download_url=download_url, put_data_dir=base_data_path)
+            download_url_address=download_url, put_data_dir=base_data_path)
 
         download_info_dir_path = os.path.join(base_data_path,
                                               extracted_dir_name)
@@ -117,6 +117,9 @@ class DataSource(multimodal_base.MultiModalDataSource):
             logging.info("Done.")
 
         logging.info("The Kinetics700 dataset has been prepared")
+
+    def get_modality_name():
+        return ["RGB", "Flow", "Audio"]
 
     def download_category(self, category, num_workers, failed_save_file,
                           compress, verbose, skip, log_file):
@@ -275,19 +278,27 @@ class DataSource(multimodal_base.MultiModalDataSource):
             mixed_ext=False)
 
         if torch.cuda.is_available():
-            vdf_extractor.build_frames_gpu(rgb_out_dir_path,
-                                           flow_our_dir_path,
-                                           new_short=1,
-                                           new_width=0,
-                                           new_height=0)
+            if not self._exist_judgement(
+                    rgb_out_dir_path) and not self._exist_judgement(
+                        flow_our_dir_path):
+                vdf_extractor.build_frames_gpu(rgb_out_dir_path,
+                                               flow_our_dir_path,
+                                               new_short=1,
+                                               new_width=0,
+                                               new_height=0)
         else:
-            vdf_extractor.build_frames_cpu(
-                to_dir=self.splits_info[mode]["rawframes_path"])
+            if not self._exist_judgement(
+                    self.splits_info[mode]["rawframes_path"]):
+                vdf_extractor.build_frames_cpu(
+                    to_dir=self.splits_info[mode]["rawframes_path"])
 
-        vda_extractor.build_audios(to_dir=audio_out_dir_path)
+        if not self._exist_judgement(audio_out_dir_path):
+            vda_extractor.build_audios(to_dir=audio_out_dir_path)
 
-        vda_extractor.build_audios_features(audio_src_path=audio_out_dir_path,
-                                            to_dir=audio_feature_dir_path)
+        if not self._exist_judgement(audio_feature_dir_path):
+            vda_extractor.build_audios_features(
+                audio_src_path=audio_out_dir_path,
+                to_dir=audio_feature_dir_path)
 
     def extract_split_list_files(self):
         gen_annots_op = modality_data_anntation_tools.GenerateMDataAnnotation(
@@ -301,17 +312,22 @@ class DataSource(multimodal_base.MultiModalDataSource):
         )
         gen_annots_op.generate_data_splits_info_file(data_name=self.data_name)
 
-    def get_train_set(self):
-        rgb_train_dataset = build_dataset(
-            Config().multimodal_data.rgb_data.train)
-        flow_train_dataset = build_dataset(
-            Config().multimodal_data.flow_data.train)
-        audio_feature_train_dataset = build_dataset(
-            Config().multimodal_data.audio_data.train)
+    def get_train_set(self, modality_sampler):
+        modality_dataset = []
+        if "RGB" in modality_sampler:
+            rgb_train_dataset = build_dataset(
+                Config().multimodal_data.rgb_data.train)
+            modality_dataset.append(rgb_train_dataset)
+        if "Flow" in modality_sampler:
+            flow_train_dataset = build_dataset(
+                Config().multimodal_data.flow_data.train)
+            modality_dataset.append(flow_train_dataset)
+        if "Audio" in modality_sampler:
+            audio_feature_train_dataset = build_dataset(
+                Config().multimodal_data.audio_data.train)
+            modality_dataset.append(audio_feature_train_dataset)
 
-        mm_train_dataset = multimodal_base.MultiModalDataset([
-            rgb_train_dataset, flow_train_dataset, audio_feature_train_dataset
-        ])
+        mm_train_dataset = multimodal_base.MultiModalDataset(modality_dataset)
         return mm_train_dataset
 
     def get_test_set(self):

@@ -63,7 +63,8 @@ class VideoAudioExtractor(modality_extraction_base.VideoExtractorBase):
         to_dir,
     ):
         sourc_video_dir = self.video_src_dir
-        self.organize_modality_dir(src_dir=sourc_video_dir, to_dir=to_dir)
+        if self.dir_level == 2:
+            self.organize_modality_dir(src_dir=sourc_video_dir, to_dir=to_dir)
         done_fullpath_list = glob.glob(to_dir + '/*' * self.dir_level + '.wav')
 
         pool = Pool(self.num_worker)
@@ -102,7 +103,6 @@ class VideoAudioExtractor(modality_extraction_base.VideoExtractorBase):
         audio_files = glob.glob(audio_src_path + '/*' * self.dir_level + '.' +
                                 self.audio_ext)
         files = sorted(audio_files)
-
 
         # print(ok)
         if part is not None:
