@@ -1,8 +1,8 @@
 # clients settings
 clients = dict(
     type="simple",  # Type
-    total_clients=5,  # The total number of clients
-    per_round=2,  # The number of clients selected in each round
+    total_clients=50,  # The total number of clients
+    per_round=40,  # The number of clients selected in each round
     do_test=True)  # Should the clients compute test accuracy locally?
 
 # server settings
@@ -101,7 +101,7 @@ lr_config = dict(policy='step',
                  warmup_ratio=0.1,
                  warmup_by_epoch=True,
                  warmup_iters=16)
-total_epochs = 58
+total_epochs = 1000
 checkpoint_config = dict(interval=2)
 evaluation = dict(interval=5,
                   metrics=['top_k_accuracy', 'mean_class_accuracy'])
@@ -121,9 +121,6 @@ trainer = dict(type="basic",
                target_accuracy=0.67)
 algorithm = dict(
     type="fedavg",  # Aggregation algorithm
-    cross_silo=True,  # Cross-silo training
-    total_silos=2,  # The total number of silos (edge servers)
-    local_rounds=2
 )  # The number of local aggregation rounds on edge servers before sending
 # aggreagted weights to the central server
 

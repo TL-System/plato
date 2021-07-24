@@ -1,14 +1,15 @@
 _base_ = [
-    'kinetics_csn_rgb.py', 'kinetics_tsn_flow.py', 'kinetics_audio_feature.py',
-    'kinetics_mmf_models.py'
+    '../Pipeline/kinetics_csn_rgb.py', '../Pipeline/kinetics_tsn_flow.py',
+    '../Pipeline/kinetics_audio_feature.py',
+    '../Models/kinetics_full_models.py'
 ]
 
 # clients settings
 clients = dict(
     type="simple",  # Type
-    total_clients=5,  # The total number of clients
-    per_round=2,  # The number of clients selected in each round
-    do_test=True)  # Should the clients compute test accuracy locally?
+    total_clients=50,  # The total number of clients
+    per_round=40,  # The number of clients selected in each round
+    do_test=False)  # Should the clients compute test accuracy locally?
 
 # server settings
 server = dict(address="127.0.0.1", port=8000)
@@ -22,13 +23,14 @@ data = dict(
     "https://storage.googleapis.com/deepmind-media/Datasets/kinetics700_2020.tar.gz",
     num_workers=4,
     failed_save_file="failed_record.txt",
-    log_file=None,
+    log_file="download_log.txt",
     compress=False,
     verbose=False,
     skip=False,
     videos_per_gpu=3,
     workers_per_gpu=4,
-    sampler="dis_noniid")
+    sampler="dis_noniid",
+    modality_sampler="modality_iid")
 
 # Train settings
 
@@ -43,7 +45,7 @@ lr_config = dict(policy='step',
                  warmup_ratio=0.1,
                  warmup_by_epoch=True,
                  warmup_iters=16)
-total_epochs = 58
+total_epochs = 1000
 
 log_config = dict(
     interval=20,
@@ -65,9 +67,6 @@ evaluation = dict(interval=5,
 
 algorithm = dict(
     type="fedavg",  # Aggregation algorithm
-    cross_silo=True,  # Cross-silo training
-    total_silos=2,  # The total number of silos (edge servers)
-    local_rounds=2
 )  # The number of local aggregation rounds on edge servers before sending
 # aggreagted weights to the central server
 

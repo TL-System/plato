@@ -31,6 +31,8 @@ data:
     clip_len: 16
     clips_per_video: 5
 
+    sampler: iid
+                    
 trainer:
     # The type of the trainer
     type: basic
