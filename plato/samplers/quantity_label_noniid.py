@@ -1,11 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-Samples data from a dataset, biased across labels according to the Dirichlet distribution.
-This is the Quantity-based label imbalance.
-An advantage of current sampler approach is that we can flexibly change the imbalance level by varying the
-concentration parameter 𝛽. If 𝛽 is set to a smaller value, then the partition is more unbalanced.
-"""
+
 import random
 import numpy as np
 import torch
