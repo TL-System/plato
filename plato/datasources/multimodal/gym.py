@@ -176,13 +176,12 @@ class DataSource(multimodal_base.MultiModalDataSource):
         if not self._exist_judgement(audio_out_dir_path):
             vda_extractor.build_audios(to_dir=audio_out_dir_path)
 
-        if not self._exist_judgement(audio_feature_dir_path):
-            vda_extractor.build_audios_features(
-                audio_src_path=audio_out_dir_path,
-                to_dir=audio_feature_dir_path)
+        # if not self._exist_judgement(audio_feature_dir_path):
+        #     vda_extractor.build_audios_features(
+        #         audio_src_path=audio_out_dir_path,
+        #         to_dir=audio_feature_dir_path)
 
         # split the data based on the frames information
-        gym_trim.generate_splits_list(
-            data_root=self.mm_data_info["base_data_dir_path"],
-            annotation_root=self.data_anno_dir_path,
-            frame_data_root=self.event_subsection_frames_dir_path)
+        gym_trim.generate_splits_list(data_root=self.event_subsection_dir_path,
+                                      annotation_root=self.data_anno_dir_path,
+                                      frame_data_root=frames_out_dir_path)

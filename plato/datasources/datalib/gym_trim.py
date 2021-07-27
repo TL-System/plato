@@ -128,8 +128,11 @@ def generate_splits_list(data_root, annotation_root, frame_data_root):
     val_frame_file = osp.join(annotation_root, 'gym99_val_frame.txt')
 
     train_org = open(train_file_org).readlines()
+
     train_org = [x.strip().split() for x in train_org]
+
     train = [x for x in train_org if x[0] + '.mp4' in videos]
+
     if osp.exists(frame_data_root):
         train_frames = []
         for line in train:
@@ -140,15 +143,19 @@ def generate_splits_list(data_root, annotation_root, frame_data_root):
             fout.write('\n'.join(train_frames))
 
     train = [x[0] + '.mp4 ' + x[1] for x in train]
+
     with open(train_file, 'w') as fout:
         fout.write('\n'.join(train))
 
     val_org = open(val_file_org).readlines()
     val_org = [x.strip().split() for x in val_org]
     val = [x for x in val_org if x[0] + '.mp4' in videos]
+
     if osp.exists(frame_data_root):
         val_frames = []
         for line in val:
+            if not os.path.exists(osp.join(frame_data_root, line[0])):
+                continue
             length = len(os.listdir(osp.join(frame_data_root, line[0])))
             val_frames.append([line[0], str(length // 3), line[1]])
         val_frames = [' '.join(x) for x in val_frames]
