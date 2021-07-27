@@ -7,7 +7,6 @@ import os
 import pickle
 import sys
 import time
-from copy import deepcopy
 from itertools import chain
 
 import torch
@@ -49,7 +48,6 @@ class Server(fedavg.Server):
 
         return res_list
 
-
     def load_gradients(self):
         """ Loading gradients from a file. """
         model_dir = Config().params['model_dir']
@@ -74,7 +72,7 @@ class Server(fedavg.Server):
         logging.info(
             "[Server #%d] Received %s MB of payload data from client #%d.",
             os.getpid(), round(payload_size / 1024**2, 2), client_id)
-        
+
         # if clients send features, train it and return gradient
         if self.reports[sid].phase == "features":
             logging.info(
@@ -88,7 +86,7 @@ class Server(fedavg.Server):
             # Test the updated model
             self.accuracy = self.trainer.test(self.testset)
             logging.info('[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(os.getpid(), 100 * self.accuracy))
-            
+
             payload = self.load_gradients()
             logging.info("[Server #%d] Reporting gradients to client #%d.",
                          os.getpid(), client_id)
@@ -109,5 +107,3 @@ class Server(fedavg.Server):
             await self.process_reports()
             await self.wrap_up()
             await self.select_clients()
-
-    

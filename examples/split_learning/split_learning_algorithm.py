@@ -8,7 +8,6 @@ from copy import deepcopy
 
 import numpy as np
 import torch
-import torch.nn as nn
 from plato.config import Config
 from plato.utils import optimizers
 
@@ -84,8 +83,7 @@ class Algorithm(fedavg.Algorithm):
         return feature_dataset
 
     def complete_train(self, config, dataset, sampler, cut_layer: str):
-
-        # Sending the model to the device used for training
+        """ Sending the model to the device used for training. """
         self.model.train()
 
         batch_size = config['batch_size']

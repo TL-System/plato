@@ -5,16 +5,14 @@ A split learning client.
 import logging
 from dataclasses import dataclass
 
-from plato.config import Config
-
 from plato.clients import simple
+from plato.config import Config
 
 
 @dataclass
 class Report:
     """Client report sent to the split learning server."""
     num_samples: int
-    payload_length: int
     phase: str
 
 
@@ -35,14 +33,14 @@ class Client(simple.Client):
 
     def load_payload(self, server_payload):
         """Loading the server model onto this client."""
-        if self.model_received == True and self.gradient_received == True:
+        if self.model_received and self.gradient_received:
             self.model_received = False
             self.gradient_received = False
 
-        if self.model_received == False:
+        if not self.model_received:
             self.model_received = True
             self.algorithm.load_weights(server_payload)
-        elif self.gradient_received == False:
+        elif not self.gradient_received:
             self.gradient_received = True
             self.algorithm.receive_gradients(server_payload)
 
