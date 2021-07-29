@@ -81,7 +81,7 @@ def get_requirements():
 The next step is to install the required Python packages. PyTorch should be installed following the advice of its [getting started website](https://pytorch.org/get-started/locally/). Currently Compute Canada provides GPU with CUDA version 11.2, so the command would be:
 
 ```shell
-$ pip3 install torch==1.8.1+cu111 torchvision==0.9.1+cu111 torchaudio==0.8.1 -f https://download.pytorch.org/whl/torch_stable.html
+$ pip3 install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
 ```
 
 To double-check the CUDA version used in the command above, use the following command:
