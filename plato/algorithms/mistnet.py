@@ -75,7 +75,10 @@ class Algorithm(fedavg.Algorithm):
                             logits, targets, epsilon)
                     else:
                         logits = unary_encoding.randomize(logits, epsilon)
-                    logits = torch.from_numpy(logits.astype('float16'))
+                    if self.trainer.device != 'cpu':
+                        logits = torch.from_numpy(logits.astype('float16'))
+                    else:
+                        logits = torch.from_numpy(logits.astype('float32'))
 
             for i in np.arange(logits.shape[0]):  # each sample in the batch
                 feature_dataset.append((logits[i], targets[i]))
