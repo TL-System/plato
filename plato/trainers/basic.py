@@ -5,11 +5,13 @@ import asyncio
 import logging
 import multiprocessing as mp
 import os
+import time
 
 import numpy as np
 import torch
 import torch.nn as nn
 import wandb
+
 from plato.config import Config
 from plato.models import registry as models_registry
 from plato.trainers import base
@@ -219,6 +221,7 @@ class Trainer(base.Trainer):
         Whether training was successfully completed.
         """
         self.start_training()
+        start_time = time.time()
 
         if mp.get_start_method(allow_none=True) != 'spawn':
             mp.set_start_method('spawn', force=True)
@@ -249,7 +252,8 @@ class Trainer(base.Trainer):
             return False
 
         self.pause_training()
-        return True
+        training_time = time.time() - start_time
+        return training_time
 
     def test_process(self, config, testset):
         """The testing loop, run in a separate process with a new CUDA context,
