@@ -90,12 +90,12 @@ class Client(base.Client):
 
     async def train(self):
         """The machine learning training workload on a client."""
-        training_start_time = time.time()
         logging.info("[Client #%d] Started training.", self.client_id)
 
         # Perform model training
-        if not self.trainer.train(self.trainset, self.sampler):
-            # Training failed
+        train_succeeded, training_time = self.trainer.train(self.trainset, self.sampler)
+
+        if not train_succeeded:
             await self.sio.disconnect()
 
         # Extract model weights and biases
@@ -114,7 +114,6 @@ class Client(base.Client):
         else:
             accuracy = 0
 
-        training_time = time.time() - training_start_time
         data_loading_time = 0
 
         if not self.data_loading_time_sent:

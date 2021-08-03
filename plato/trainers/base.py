@@ -7,6 +7,7 @@ import random
 import sqlite3
 import time
 from abc import ABC, abstractmethod
+from typing import Tuple
 
 from plato.config import Config
 
@@ -118,7 +119,7 @@ class Trainer(ABC):
             os.remove(accuracy_file)
 
     @abstractmethod
-    def train(self, trainset, sampler, cut_layer=None) -> bool:
+    def train(self, trainset, sampler, cut_layer=None) -> Tuple[bool, float]:
         """The main training loop in a federated learning workload.
 
         Arguments:
@@ -127,7 +128,8 @@ class Trainer(ABC):
         cut_layer (optional): The layer which training should start from.
 
         Returns:
-        Whether training was successfully completed.
+        bool: Whether training was successfully completed.
+        float: The training time.
         """
 
     @abstractmethod
