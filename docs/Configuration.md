@@ -77,5 +77,5 @@ Attributes in **bold** are must included in a configuration file, in *italic* ar
 |:---------:|:-------:|:-----------:|:----:|
 |types|Which parameter(s) will be written into a CSV file|`accuracy`, `training_time`, `round_time`, `local_epoch_num`, `edge_agg_num`|Use comma `,` to seperate parameters|
 |plot|Plot results ||Format: x\_axis&y\_axis|
-|results_dir|The directory of results||If not specify, results will be stored under <config_file_dir>/results/<datasource>/<model>/<server_type>/|
+|results_dir|The directory of results||If not specify, results will be stored under `./results/<datasource>/<model>/<server_type>/`|
 |trainer_counter_dir|The directory of running_trainers.sqlitedb||If not specify, it will be stored under `__file__`|
