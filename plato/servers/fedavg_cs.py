@@ -150,7 +150,7 @@ class Server(fedavg.Server):
                         report.training_time for (report, __) in self.updates
                     ]),
                     'round_time':
-                    time.time() - self.round_start_time
+                    time.perf_counter() - self.round_start_time
                 }[item]
                 new_row.append(item_value)
 

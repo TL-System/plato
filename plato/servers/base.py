@@ -118,12 +118,12 @@ class Server:
             # The last contact time is stored for each client
             self.clients[client_id] = {
                 'sid': sid,
-                'last_contacted': time.time()
+                'last_contacted': time.perf_counter()
             }
             logging.info("[Server #%d] New client with id #%d arrived.",
                          os.getpid(), client_id)
         else:
-            self.clients[client_id]['last_contacted'] = time.time()
+            self.clients[client_id]['last_contacted'] = time.perf_counter()
             logging.info("[Server #%d] New contact from Client #%d received.",
                          os.getpid(), client_id)
 

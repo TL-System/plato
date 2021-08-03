@@ -56,7 +56,7 @@ class Client(base.Client):
 
     def load_data(self) -> None:
         """Generating data and loading them onto this client."""
-        data_loading_start_time = time.time()
+        data_loading_start_time = time.perf_counter()
         logging.info("[Client #%d] Loading its data source...", self.client_id)
 
         if self.datasource is None:
@@ -82,7 +82,7 @@ class Client(base.Client):
             # Set the testset if local testing is needed
             self.testset = self.datasource.get_test_set()
 
-        self.data_loading_time = time.time() - data_loading_start_time
+        self.data_loading_time = time.perf_counter() - data_loading_start_time
 
     def load_payload(self, server_payload) -> None:
         """Loading the server model onto this client."""

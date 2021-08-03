@@ -112,7 +112,7 @@ class Server(fedavg_cs.Server):
 
         self.is_rl_episode_done = False
         self.cumulative_reward = 0
-        self.rl_episode_start_time = time.time()
+        self.rl_episode_start_time = time.perf_counter()
 
         self.rl_episode += 1
         logging.info('\nRL Agent: Starting episode %s...', self.rl_episode)
@@ -195,7 +195,7 @@ class Server(fedavg_cs.Server):
                     'episode': self.rl_episode,
                     'cumulative_reward': self.cumulative_reward,
                     'rl_training_time':
-                    time.time() - self.rl_episode_start_time
+                    time.perf_counter() - self.rl_episode_start_time
                 }[item]
                 new_row.append(item_value)
             result_csv_file = Config().result_dir + 'result_rl.csv'

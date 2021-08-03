@@ -35,7 +35,7 @@ class REFER:
             sys.exit()
 
         # load refs from data/datasetrefs(dataset).json
-        tic = time.time()
+        tic = time.perf_counter()
         ref_file = osp.join(self.DATA_DIR, 'refs(' + splitBy + ').p')
         self.data = {}
         self.data['dataset'] = dataset
@@ -50,7 +50,7 @@ class REFER:
 
         # create index
         self.createIndex()
-        print('DONE (t=%.2fs)' % (time.time() - tic))
+        print('DONE (t=%.2fs)' % (time.perf_counter() - tic))
 
     def createIndex(self):
         # create sets of mapping
