@@ -77,7 +77,7 @@ class Config:
                 filename = os.environ['config_file']
             else:
                 filename = args.config
-                
+
             # if the configuration file not exist, create a fake config object
             if os.path.isfile(filename):
                 with open(filename, 'r') as config_file:
@@ -88,30 +88,35 @@ class Config:
             else:
                 # create a default configured config
                 config = Config.defaultConfig()
-                
+
             Config.clients = Config.namedtuple_from_dict(config['clients'])
             Config.server = Config.namedtuple_from_dict(config['server'])
             Config.data = Config.namedtuple_from_dict(config['data'])
             Config.trainer = Config.namedtuple_from_dict(config['trainer'])
             Config.algorithm = Config.namedtuple_from_dict(config['algorithm'])
 
-            if Config.args.server is not None:
-                Config.server = Config.server._replace(
-                    address=args.server.split(':')[0])
-                Config.server = Config.server._replace(
-                    port=args.server.split(':')[1])
-
             if 'results' in config:
                 Config.results = Config.namedtuple_from_dict(config['results'])
-                datasource = Config.data.datasource
-                model = Config.trainer.model_name
-                server_type = Config.algorithm.type
-                config_file_dir = '/'.join(filename.split('/')[:-1])
-                Config.result_dir = f'{config_file_dir}/results/{datasource}/{model}/{server_type}/'
+                if hasattr(Config().results, 'results_dir'):
+                    Config.result_dir = Config.results.results_dir
+                else:
+                    datasource = Config.data.datasource
+                    model = Config.trainer.model_name
+                    server_type = Config.algorithm.type
+                    config_file_dir = '/'.join(filename.split('/')[:-1])
+                    Config.result_dir = f'{config_file_dir}/results/{datasource}/{model}/{server_type}/'
+
+            if 'results' in config and hasattr(Config().results,
+                                               'trainer_counter_dir'):
+                trainer_counter_dir = Config.results.trainer_counter_dir
+                if not os.path.exists(trainer_counter_dir):
+                    os.makedirs(trainer_counter_dir)
+            else:
+                trainer_counter_dir = os.path.dirname(__file__)
 
             # Used to limit the maximum number of concurrent trainers
             Config.sql_connection = sqlite3.connect(
-                os.path.dirname(__file__) + '/running_trainers.sqlitedb')
+                trainer_counter_dir + '/running_trainers.sqlitedb')
 
             Config().cursor = Config.sql_connection.cursor()
 
@@ -185,7 +190,7 @@ class Config:
         ).trainer.parallelized and torch.cuda.is_available(
         ) and torch.distributed.is_available(
         ) and torch.cuda.device_count() > 1
-        
+
     @staticmethod
     def defaultConfig() -> dict:
         ''' list a default configuration when the config file is missing'''
@@ -220,5 +225,5 @@ class Config:
         config['trainer']['model_name'] = 'lenet5'
         config['algorithm'] = {}
         config['algorithm']['type'] = 'fedavg'
-        
+
         return config

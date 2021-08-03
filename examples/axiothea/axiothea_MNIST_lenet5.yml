@@ -80,3 +80,11 @@ algorithm:
     # The number of local aggregation rounds on edge servers before sending
     # aggregated weights to the central server
     local_rounds: 1
+
+results:
+    # Write the following parameter(s) into a CSV
+    types: accuracy, training_time, round_time, edge_agg_num
+
+    results_dir: ./results/test/
+
+    trainer_counter_dir: ./results/trainer/
