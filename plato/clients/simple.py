@@ -94,9 +94,9 @@ class Client(base.Client):
         logging.info("[Client #%d] Started training.", self.client_id)
 
         # Perform model training
-        training_time = self.trainer.train(self.trainset, self.sampler)
+        train_succeeded, training_time = self.trainer.train(self.trainset, self.sampler)
         # Training failed
-        if not training_time:
+        if not train_succeeded:
             await self.sio.disconnect()
 
         # Extract model weights and biases
