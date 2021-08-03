@@ -109,8 +109,7 @@ class Config:
                     datasource = Config.data.datasource
                     model = Config.trainer.model_name
                     server_type = Config.algorithm.type
-                    config_file_dir = '/'.join(filename.split('/')[:-1])
-                    Config.result_dir = f'{config_file_dir}/results/{datasource}/{model}/{server_type}/'
+                    Config.result_dir = f'./results/{datasource}/{model}/{server_type}/'
 
             if 'results' in config and hasattr(Config().results,
                                                'trainer_counter_dir'):
