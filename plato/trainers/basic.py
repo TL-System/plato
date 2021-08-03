@@ -218,7 +218,8 @@ class Trainer(base.Trainer):
         cut_layer (optional): The layer which training should start from.
 
         Returns:
-        Whether training was successfully completed.
+        bool: Whether training was successfully completed.
+        float: The training time.
         """
         self.start_training()
         start_time = time.time()
@@ -249,7 +250,7 @@ class Trainer(base.Trainer):
                          self.client_id)
             self.run_sql_statement("DELETE FROM trainers WHERE run_id = (?)",
                                    (self.client_id, ))
-            return False, 0
+            return False, 0.0
 
         self.pause_training()
         training_time = time.time() - start_time
