@@ -95,6 +95,12 @@ class Config:
             Config.trainer = Config.namedtuple_from_dict(config['trainer'])
             Config.algorithm = Config.namedtuple_from_dict(config['algorithm'])
 
+            if Config.args.server is not None:
+                Config.server = Config.server._replace(
+                    address=args.server.split(':')[0])
+                Config.server = Config.server._replace(
+                    port=args.server.split(':')[1])
+
             if 'results' in config:
                 Config.results = Config.namedtuple_from_dict(config['results'])
                 if hasattr(Config().results, 'results_dir'):
