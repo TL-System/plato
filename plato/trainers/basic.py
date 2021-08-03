@@ -6,12 +6,12 @@ import logging
 import multiprocessing as mp
 import os
 import time
+from typing import Tuple
 
 import numpy as np
 import torch
 import torch.nn as nn
 import wandb
-
 from plato.config import Config
 from plato.models import registry as models_registry
 from plato.trainers import base
@@ -209,7 +209,7 @@ class Trainer(base.Trainer):
         if 'use_wandb' in config:
             run.finish()
 
-    def train(self, trainset, sampler, cut_layer=None) -> bool:
+    def train(self, trainset, sampler, cut_layer=None) -> Tuple[bool, float]:
         """The main training loop in a federated learning workload.
 
         Arguments:
@@ -222,7 +222,7 @@ class Trainer(base.Trainer):
         float: The training time.
         """
         self.start_training()
-        start_time = time.time()
+        tic = time.perf_counter()
 
         if mp.get_start_method(allow_none=True) != 'spawn':
             mp.set_start_method('spawn', force=True)
@@ -252,8 +252,10 @@ class Trainer(base.Trainer):
                                    (self.client_id, ))
             return False, 0.0
 
+        toc = time.perf_counter()
         self.pause_training()
-        training_time = time.time() - start_time
+        training_time = toc - tic
+
         return True, training_time
 
     def test_process(self, config, testset):
