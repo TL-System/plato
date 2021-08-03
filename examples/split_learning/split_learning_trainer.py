@@ -74,9 +74,8 @@ class Trainer(basic.Trainer):
                 outputs = self.model.forward_from(examples, cut_layer)
 
             loss = loss_criterion(outputs, labels)
-            logging.info("[Client #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}"
-                         .format(self.client_id, epoch, epochs,
-                                 batch_id, len(train_loader), loss.data.item()))
+            logging.info("[Client #{}] \tLoss: {:.6f}"
+                         .format(self.client_id, loss.data.item()))
             loss.backward()
 
             # Record gradients within the cut layer
@@ -101,6 +100,8 @@ class Trainer(basic.Trainer):
             os.makedirs(model_dir)
 
         model_path = f'{model_dir}{model_name}_gradients.pth'
+        if os.path.exists(model_path):
+            os.remove(model_path)
         torch.save(self.cut_layer_grad, model_path)
 
         logging.info("[Server #%d] Gradients saved to %s.", os.getpid(),

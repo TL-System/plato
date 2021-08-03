@@ -1,7 +1,6 @@
 import asyncio
 import os
 import logging
-import pickle
 from dataclasses import dataclass
 
 os.environ['config_file'] = 'examples/mistnetplus/mistnet_lenet5_client.yml'
