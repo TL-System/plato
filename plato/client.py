@@ -5,13 +5,12 @@ Starting point for a Plato federated learning client.
 import asyncio
 import logging
 import os
-from collections import OrderedDict
 
 from plato.clients import registry as client_registry
 from plato.config import Config
 
 
-def run(client_id, port, client=None):
+def run(client_id, port, client=None, edge_server=None, edge_client=None):
     """Starting a client to connect to the server."""
     Config().args.id = client_id
     if port is not None:
@@ -19,20 +18,20 @@ def run(client_id, port, client=None):
 
     # If a server needs to be running concurrently
     if Config().is_edge_server():
-        from plato.clients import edge
-        from plato.servers import fedavg_cs
-
-        edge_servers = OrderedDict([
-            ('fedavg_cross_silo', fedavg_cs.Server),
-        ])
-
         Config().trainer = Config().trainer._replace(
             rounds=Config().algorithm.local_rounds)
 
-        server = edge_servers[Config().server.type]()
-        server.configure()
+        if edge_server is None:
+            from plato.clients import edge
+            from plato.servers import fedavg_cs
+            server = fedavg_cs.Server()
+            client = edge.Client(server)
+        else:
+            # A custom edge server
+            server = edge_server()
+            client = edge_client(server)
 
-        client = edge.Client(server)
+        server.configure()
         client.configure()
 
         logging.info("Starting an edge server as client #%d on port %d",
