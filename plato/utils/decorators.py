@@ -11,6 +11,9 @@ def timeit(func_timed):
         output = func_timed(*args, **kwargs)
         ended = time.perf_counter()
         elapsed = ended - started
-        print('"{}" took {:.3f} seconds to execute\n'.format(func_timed.__name__, elapsed))
-        return output, elapsed
+        print('"{}" took {:.2f} seconds to execute.'.format(func_timed.__name__, elapsed))
+        if output is None:
+            return elapsed
+        else:
+            return output, elapsed
     return timed
