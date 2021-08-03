@@ -74,7 +74,7 @@ class Server:
         self.client_payload = {}
         self.client_chunks = {}
 
-    def run(self, client=None):
+    def run(self, client=None, edge_server=None, edge_client=None):
         """Start a run loop for the server. """
         # Remove the running trainers table from previous runs.
         if not Config().is_edge_server():
@@ -87,11 +87,14 @@ class Server:
         if Config().is_central_server():
             # In cross-silo FL, the central server lets edge servers start first
             # Then starts their clients
-            Server.start_clients(as_server=True, client=self.client)
+            Server.start_clients(as_server=True,
+                                 client=self.client,
+                                 edge_server=edge_server,
+                                 edge_client=edge_client)
 
             # Allowing some time for the edge servers to start
             time.sleep(5)
-        
+
         if Config().server.simulation:
             Server.start_clients(client=self.client)
 
@@ -133,7 +136,10 @@ class Server:
             await self.select_clients()
 
     @staticmethod
-    def start_clients(client=None, as_server=False):
+    def start_clients(client=None,
+                      as_server=False,
+                      edge_server=None,
+                      edge_client=None):
         """Starting all the clients as separate processes."""
         starting_id = 1
 
@@ -160,11 +166,14 @@ class Server:
                 logging.info(
                     "Starting client #%d as an edge server on port %s.",
                     client_id, port)
-                proc = mp.Process(target=run, args=(client_id, port, client))
+                proc = mp.Process(target=run,
+                                  args=(client_id, port, client, edge_server,
+                                        edge_client))
                 proc.start()
             else:
                 logging.info("Starting client #%d's process.", client_id)
-                proc = mp.Process(target=run, args=(client_id, None, client))
+                proc = mp.Process(target=run,
+                                  args=(client_id, None, client, None, None))
                 proc.start()
 
     async def close_connections(self):
