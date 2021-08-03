@@ -249,11 +249,11 @@ class Trainer(base.Trainer):
                          self.client_id)
             self.run_sql_statement("DELETE FROM trainers WHERE run_id = (?)",
                                    (self.client_id, ))
-            return False
+            return False, 0
 
         self.pause_training()
         training_time = time.time() - start_time
-        return training_time
+        return True, training_time
 
     def test_process(self, config, testset):
         """The testing loop, run in a separate process with a new CUDA context,
