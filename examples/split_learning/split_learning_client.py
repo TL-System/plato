@@ -57,8 +57,7 @@ class Client(simple.Client):
                 Config().algorithm.cut_layer)
 
             # Generate a report for the server, performing model testing if applicable
-            return Report(self.sampler.trainset_size(),
-                          len(features), "features"), features
+            return Report(self.sampler.trainset_size(), "features"), features
         else:
             # Perform a complete training with gradients received
             config = Config().trainer._asdict()
@@ -66,4 +65,4 @@ class Client(simple.Client):
                                           Config().algorithm.cut_layer)
             weights = self.algorithm.extract_weights()
             # Generate a report, signal the end of train
-            return Report(self.sampler.trainset_size(), 0, "weights"), weights
+            return Report(self.sampler.trainset_size(), "weights"), weights
