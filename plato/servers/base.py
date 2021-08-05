@@ -107,8 +107,11 @@ class Server:
 
         ping_interval = Config().server.ping_interval if hasattr(
             Config().server, 'ping_interval') else 3600
+        ping_timeout = Config().server.ping_timeout if hasattr(
+            Config().server, 'ping_timeout') else 20
         self.sio = socketio.AsyncServer(ping_interval=ping_interval,
-                                        max_http_buffer_size=2**31)
+                                        max_http_buffer_size=2**31,
+                                        ping_timeout=ping_timeout)
         self.sio.register_namespace(
             ServerEvents(namespace='/', plato_server=self))
         app = web.Application()

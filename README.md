@@ -132,7 +132,20 @@ To start a federated learning training workload, run [`run`](run) from the repos
 
 *Plato* can opt to use `wandb` to produce and collect logs in the cloud. If this is needed, add `use_wandb: true` to the `trainer` section of a configuration file.
 
-If there are issues in the code that prevented it from running to completion, there could be running processes from previous runs. Use the command `pkill python` to terminate them so that there will not be CUDA errors in the upcoming run.
+If there are issues in the code that prevented it from running to completion, there could be:
+
+* Out of CUDA memory.
+
+  Solution: Use more GPU resources or decrease the number of clients selected in each round (with *client simluation mode* on) / max_concurrency / batch_size, etc.
+ 
+* The time that a client waits for the server to respond before disconnecting is too short. This could happen especially when training with large neural network models.
+
+  Solution: Add `ping_timeout` under `server` in your configuration file. Now the default value is 20 (seconds). You could specify a larger number, like 100.
+
+* Running processes from previous runs. 
+
+  Solution: Use the command `pkill python` to terminate them so that there will not be CUDA errors in the upcoming run.
+
 
 ### Client Simulation Mode
 

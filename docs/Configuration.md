@@ -25,6 +25,8 @@ Attributes in **bold** are must included in a configuration file, in *italic* ar
 |*type*|The type of the server|`fedavg_cross_silo`|**algorithm.type** must be `fedavg`|
 |**address**|The address of the central server|e.g., `127.0.0.1`||
 |**port**|The port number of the central server|e.g., `8000`||
+|ping_interval|The interval in seconds at which the server pings the client. The default is 3600 seconds. |||
+|ping_timeout| The time in seconds that the client waits for the server to respond before disconnecting. The default is 20 seconds.|e.g., `100`|Increase this number when you encounter 'mysterious' stuck (but make sure it is not due to out of CUDA memory first) expecially when training with large NN models|
 
 ### data
 
