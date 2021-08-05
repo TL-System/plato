@@ -136,11 +136,11 @@ If there are issues in the code that prevented it from running to completion, th
 
 * Out of CUDA memory.
 
-  Solution: Use more GPU resources or decrease the number of clients selected in each round (with *client simluation mode* on) / max_concurrency / batch_size, etc.
+  Solution: Use more GPU resources or decrease the number of clients selected in each round (with *client simulation mode* on) / max_concurrency / batch_size, etc.
  
-* The time that a client waits for the server to respond before disconnecting is too short. This could happen especially when training with large neural network models.
+* The time that a client waits for the server to respond before disconnecting is too short. This could happen especially when training with large neural network models. If you get an `AssertionError` saying that there are not enough launched clients for the server to select, this could be the reason. But make sure you first check if it is because out of CUDA memory.
 
-  Solution: Add `ping_timeout` under `server` in your configuration file. Now the default value is 20 (seconds). You could specify a larger number, like 100.
+  Solution: Add `ping_timeout` under `server` in your configuration file. Now the default value is 20 (seconds). You could specify a larger number, like 120.
 
 * Running processes from previous runs. 
 
