@@ -15,10 +15,10 @@ Click [this link](https://colab.research.google.com/drive/1boDurcQF5X9jq25-DsKDT
 
 ### Installation
 
-SSH into a cluster on Compute Canada. Here we take [Cedar]((https://docs.computecanada.ca/wiki/Cedar)) as an example, while [Graham](https://docs.computecanada.ca/wiki/Graham) and [Béluga](https://docs.computecanada.ca/wiki/Béluga/en) are also available. Then clone the *Plato* repository to your own directory:
+SSH into a cluster on Compute Canada. Here we take [Béluga](https://docs.computecanada.ca/wiki/Béluga/en) as an example, while [Graham](https://docs.computecanada.ca/wiki/Graham) and [Cedar]((https://docs.computecanada.ca/wiki/Cedar)) are also available. Then clone the *Plato* repository to your own directory:
 
 ```shell
-$ ssh <CCDB username>@cedar.computecanada.ca
+$ ssh <CCDB username>@beluga.computecanada.ca
 $ cd projects/def-baochun/<CCDB username>
 $ git clone https://github.com/TL-System/plato.git
 ```
@@ -150,12 +150,12 @@ Then add your configuration parameters in the job script. The following is an ex
 
 ```
 #!/bin/bash
-#SBATCH --time=15:00:00       # Request a job to be executed for 15 hours
-#SBATCH --nodes=1 
-#SBATCH --gres=gpu:p100l:4   
+#SBATCH --time=20:00:00  # Request a job to be executed for 20 hours
+#SBATCH --gres=gpu:4
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=24    # There are 24 CPU cores on P100 Cedar GPU nodes
-#SBATCH --mem=0               # Request the full memory of the node
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=191000M
+#SBATCH --nodes=1
 #SBATCH --account=def-baochun
 #SBATCH --output=cifar_wideresnet.out # The name of the output file
 module load python/3.8
@@ -163,7 +163,7 @@ source ~/.federated/bin/activate
 ./run --config=configs/CIFAR10/fedavg_wideresnet.yml --log=info
 ```
 
-**Note:** the GPU resources requested in this example is a special group of GPU nodes on Compute Canada's `Cedar` cluster. You may only request these nodes as whole nodes, therefore you must specify `--gres=gpu:p100l:4`.
+**Note:** The above example requests a type of GPU on Compute Canada's `Béluga` cluster that requires a very short waiting time (as for July 2021, but things may change.)
 
 You may use any type of [GPUs available on Compute Canada](https://docs.computecanada.ca/wiki/Using_GPUs_with_Slurm).
 
@@ -192,7 +192,7 @@ where `./cifar_wideresnet.out` is the output file that needs to be monitored, an
 If there is a need to start an interactive session (for debugging purposes, for example), it is also supported by Compute Canada using the `salloc` command:
 
 ```shell
-$ salloc --time=0:15:0 --ntasks=1 --cpus-per-task=4 --gres=gpu:p100l:4 --mem=32G --account=def-baochun
+$ salloc --time=0:20:0 --ntasks=1 --cpus-per-task=4 --gres=gpu:4 --account=def-baochun --mem=191000M
 ```
 
 The job will then be queued and waiting for resources:
@@ -218,6 +218,18 @@ $ ./run --config=configs/CIFAR10/fedavg_wideresnet.yml
 ```
 
 After the job is done, use `exit` at the command to relinquish the job allocation.
+
+**Note:** On Compute Canada, if there are issues in the code that prevented it from running to completion, the two most possible reasons are:
+
+* Out of CUDA memory.
+
+  Solution: Request another type of GPU with more memory or decrease the number of clients selected in each round (with *client simulation mode* on) / max_concurrency / batch_size, etc.
+ 
+* The time that a client waits for the server to respond before disconnecting is too short. This could happen especially when training with large neural network models. If you get an `AssertionError` saying that there are not enough launched clients for the server to select, this could be the reason. But make sure you first check if it is because out of CUDA memory.
+
+  Solution: Add `ping_timeout` under `server` in your configuration file. Now the default value is 20 (seconds). You could specify a larger number. 
+  
+  I find that to run with the CIFAR-10 dataset, ResNet-18 model, and selected 10 clients per round, `ping_timeout` needs to be 120. Consider an even larger number if you run with larger models and more clients.
 
 ### Removing the Python virtual environment
 
