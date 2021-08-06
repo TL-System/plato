@@ -184,7 +184,7 @@ All unit tests are in the `tests/` directory. These tests are designed to be sta
 
 ### Installing Plato with MindSpore
 
-Plato is designed to support multiple deep learning frameworks, including PyTorch, TensorFlow, and MindSpore. For MindSpore support, Plato currently supports MindSpore 1.1.1 (1.2 and 1.3 are not supported, as they do not support `Tensor` objects to be pickled and sent over a network). Though we provided a `Dockerfile` for building a Docker container that supports MindSpore 1.1.1, in rare cases it may still be necessary to install Plato with MindSpore in a GPU server running Ubuntu Linux 18.04 (which MindSpore requires). Similar to a PyTorch installation, we need to first create a new environment with Python 3.7.5 (which MindSpore 1.1.1 requires), and then install the required packages:
+Plato is designed to support multiple deep learning frameworks, including PyTorch, TensorFlow, and MindSpore. For MindSpore support, Plato currently supports MindSpore 1.1.1 (1.2.1 and 1.3.0 are not supported, as [they do not support `Tensor` objects to be pickled](https://gitee.com/mindspore/mindspore/issues/I43RPP?from=project-issue) and sent over a network). Though we provided a `Dockerfile` for building a Docker container that supports MindSpore 1.1.1, in rare cases it may still be necessary to install Plato with MindSpore in a GPU server running Ubuntu Linux 18.04 (which MindSpore requires). Similar to a PyTorch installation, we need to first create a new environment with Python 3.7.5 (which MindSpore 1.1.1 requires), and then install the required packages:
 
 ```shell
 conda create -n mindspore python=3.7.5
