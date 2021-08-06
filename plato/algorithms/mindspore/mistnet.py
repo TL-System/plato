@@ -14,7 +14,7 @@ import mindspore
 import mindspore.dataset as ds
 
 from plato.utils import unary_encoding
-from algorithms.mindspore import fedavg
+from plato.algorithms.mindspore import fedavg
 
 
 class Algorithm(fedavg.Algorithm):

@@ -3,7 +3,7 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 3
+    total_clients: 1
 
     # The number of clients selected in each round
     per_round: 1
@@ -31,6 +31,9 @@ data:
 trainer:
     # Should MindSpore be used instead of PyTorch?
     use_mindspore: true
+    
+    # Should MindSpore be used with CPU as its target?
+    cpuonly: true
 
     # The type of the trainer
     type: basic

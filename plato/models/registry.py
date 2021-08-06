@@ -6,14 +6,6 @@ based on a configuration at run-time.
 """
 from collections import OrderedDict
 
-from plato.models import (
-    lenet5,
-    resnet,
-    wideresnet,
-    vgg,
-    unet,
-)
-
 from plato.config import Config
 
 if hasattr(Config().trainer, 'use_mindspore'):
@@ -31,10 +23,17 @@ elif hasattr(Config().trainer, 'use_tensorflow'):
         ('lenet5', lenet5_tensorflow.Model),
     ])
 else:
+    from plato.models import (
+        lenet5,
+        resnet,
+        wideresnet,
+        vgg,
+        unet,
+    )
     registered_models = OrderedDict([('lenet5', lenet5.Model),
                                      ('resnet', resnet.Model),
-                                     ('vgg', vgg.Model),
                                      ('wideresnet', wideresnet.Model),
+                                     ('vgg', vgg.Model),
                                      ('unet', unet.Model)])
 
 
