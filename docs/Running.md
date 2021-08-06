@@ -4,12 +4,11 @@
 
 Go to [Google Colaboratory](https://colab.research.google.com/notebooks/intro.ipynb).
 
-Click `File` on the menu (upper left of the page), select `Upload Notebook`, and upload `plato_colab.ipynb`, which is under `plato/examples/` directory.
+Click `File` on the menu (upper left of the page), select `Upload Notebook`, and upload `plato_colab.ipynb`, which is under the `plato/examples/` directory.
 
 ### Option 2
 
 Click [this link](https://colab.research.google.com/drive/1boDurcQF5X9jq25-DsKDTus3h50NBn8h?usp=sharing).
-
 
 ## Running Plato on Compute Canada
 
@@ -221,15 +220,21 @@ After the job is done, use `exit` at the command to relinquish the job allocatio
 
 **Note:** On Compute Canada, if there are issues in the code that prevented it from running to completion, the two most possible reasons are:
 
+If runtime exceptions occur that prevent a federated learning session from running to completion, the potential issues could be:
+
 * Out of CUDA memory.
 
-  Solution: Request another type of GPU with more memory or decrease the number of clients selected in each round (with *client simulation mode* on) / max_concurrency / batch_size, etc.
+  *Potential solutions:* Decrease the number of clients selected in each round (with the *client simulation mode* turned on); decrease the `max_concurrency` value in the `trainer` section in your configuration file; decrease the  `batch_size` used in the `trainer` section.
  
-* The time that a client waits for the server to respond before disconnecting is too short. This could happen especially when training with large neural network models. If you get an `AssertionError` saying that there are not enough launched clients for the server to select, this could be the reason. But make sure you first check if it is because out of CUDA memory.
+* The time that a client waits for the server to respond before disconnecting is too short. This could happen when training with large neural network models. If you get an `AssertionError` saying that there are not enough launched clients for the server to select, this could be the reason. But make sure you first check if it is due to the *out of CUDA memory* error.
 
-  Solution: Add `ping_timeout` under `server` in your configuration file. Now the default value is 20 (seconds). You could specify a larger number. 
+  *Potential solutions:* Add `ping_timeout` in the `server` section in your configuration file. The default value for `ping_timeout` is 20 (seconds). You could specify a larger timeout value, such as 120.
   
-  I find that to run with the CIFAR-10 dataset, ResNet-18 model, and selected 10 clients per round, `ping_timeout` needs to be 120. Consider an even larger number if you run with larger models and more clients.
+  For example, to run a training session with the CIFAR-10 dataset and the ResNet-18 model, and if 10 clients are selected per round, `ping_timeout` needs to be 120. Consider an even larger number if you run with larger models and more clients.
+
+* Running processes have not been terminated from previous runs. 
+
+  *Potential solutions:* Use the command `pkill python` to terminate them so that there will not be CUDA errors in the upcoming run.
 
 ### Removing the Python virtual environment
 

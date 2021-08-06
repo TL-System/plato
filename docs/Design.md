@@ -35,4 +35,4 @@ The external interface of this module is contained in `models/registry.py`. Just
 
 ### Federated learning algorithms
 
-Most federated learning algorithms can be divided into three components: a *client*, a *server*, and a *algorithm*. The *client* implements all algorithm logic on the client side, while the *server* implements all algorithm logic on the server side. Both the client and the server should also be neutral across various deep learning frameworks. All algorithm logic that is framework-specific should be included in an *algorithm* module, found in `algorithms/`.
+Most federated learning algorithms can be divided into three components: a *client*, a *server*, and an *algorithm*. The *client* implements all algorithm logic on the client side, while the *server* implements all algorithm logic on the server side. Both the client and the server should also be neutral across various deep learning frameworks. All algorithm logic that is framework-specific should be included in an *algorithm* module, found in `algorithms/`.
