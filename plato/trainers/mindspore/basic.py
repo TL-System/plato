@@ -30,8 +30,12 @@ class Trainer(base.Trainer):
         """
         super().__init__()
 
-        mindspore.context.set_context(mode=mindspore.context.PYNATIVE_MODE,
-                                      device_target='GPU')
+        if hasattr(Config().trainer, 'cpuonly') and Config().trainer.cpuonly:
+            mindspore.context.set_context(mode=mindspore.context.PYNATIVE_MODE,
+                                        device_target='CPU')
+        else:
+            mindspore.context.set_context(mode=mindspore.context.PYNATIVE_MODE,
+                                        device_target='GPU')
 
         if model is None:
             self.model = models_registry.get()
