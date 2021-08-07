@@ -27,14 +27,18 @@ else:
         lenet5,
         resnet,
         wideresnet,
+        inceptionv3,
         vgg,
         unet,
     )
-    registered_models = OrderedDict([('lenet5', lenet5.Model),
-                                     ('resnet', resnet.Model),
-                                     ('wideresnet', wideresnet.Model),
-                                     ('vgg', vgg.Model),
-                                     ('unet', unet.Model)])
+    registered_models = OrderedDict([
+        ('lenet5', lenet5.Model),
+        ('resnet', resnet.Model),
+        ('wideresnet', wideresnet.Model),
+        ('inceptionv3', inceptionv3.Model),
+        ('vgg', vgg.Model),
+        ('unet', unet.Model),
+    ])
 
 
 def get():
