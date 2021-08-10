@@ -6,7 +6,7 @@ In Plato, all configuration parameters are read from a configuration file when t
 
 This document introduces all the possible parameters in the configuration file.
 
-Attributes in **bold** are must included in a configuration file, in *italic* are must included under certain conditions.
+Attributes in **bold** must be included in a configuration file, while attributes in *italic* only need to be included under certain conditions.
 
 ### clients
 
@@ -26,14 +26,14 @@ Attributes in **bold** are must included in a configuration file, in *italic* ar
 |**address**|The address of the central server|e.g., `127.0.0.1`||
 |**port**|The port number of the central server|e.g., `8000`||
 |ping_interval|The interval in seconds at which the server pings the client. The default is 3600 seconds. |||
-|ping_timeout| The time in seconds that the client waits for the server to respond before disconnecting. The default is 20 seconds.|e.g., `100`|Increase this number when you encounter 'mysterious' stuck (but make sure it is not due to out of CUDA memory first) expecially when training with large NN models|
+|ping_timeout| The time in seconds that the client waits for the server to respond before disconnecting. The default is 20 seconds.|e.g., `100`|Increase this number when your session stops running when training larger models (but make sure it is not due to the *out of CUDA memory* error)|
 
 ### data
 
 | Attribute | Meaning | Valid Value | Note |
 |:---------:|:-------:|:-----------:|:----:|
 |**dataset**| The training and testing dataset|`MNIST`, `FashionMNIST`, `CIFAR10`, `CINIC10`, `COCO`, `PASCAL_VOC`, or `TinyImageNet`||
-|**data_path**|Where the dataset is located|e.g.,`./data`|For `CINIC10` dataset, `data_path` is `./data/CINIC-10`, For `TingImageNet` dataset, `data_path` is `./data/ting-imagenet-200`|
+|**data_path**|Where the dataset is located|e.g.,`./data`|For the `CINIC10` dataset, the default `data_path` is `./data/CINIC-10`, For the `TingImageNet` dataset, the default `data_path` is `./data/ting-imagenet-200`|
 |**sampler**|How to divide the entire dataset to the clients|`iid`||
 |||`iid_mindspore`||
 |||`noniid`|Could have *concentration* attribute to specify the concentration parameter in the Dirichlet distribution|
@@ -42,8 +42,6 @@ Attributes in **bold** are must included in a configuration file, in *italic* ar
 |**partition_size**|Number of samples in each client's dataset|Any positive integer||
 |concentration| The concentration parameter of symmetric Dirichlet distribution, used by `noniid` **sampler** || Default value is 1|
 |*non_iid_clients*|Indexs of clients whose datasets are non-iid. Other clients' datasets are iid|e.g., 4|Must have this attribute if the **sampler** is `mixed`|
-
-
 
 ### trainer
 
@@ -67,10 +65,8 @@ Attributes in **bold** are must included in a configuration file, in *italic* ar
 
 | Attribute | Meaning | Valid Value | Note |
 |:---------:|:-------:|:-----------:|:----:|
-|**type**|Aggregation algorithm|`fedavg`|
-|||`mistnet`||
-|||`adaptive_sync`||
-|||`adaptive_freezing`||
+|**type**|Aggregation algorithm|`fedavg`|the federated averaging algorithm|
+|||`mistnet`|the MistNet algorithm|
 |*cross_silo*|Cross-silo training|`true` or `false`|If `true`, must have **total_silos** and **local_rounds** attributes|
 |*total_silos*|The total number of silos (edge servers)|Any positive integer||
 |*local_rounds*|The number of local aggregation rounds on edge servers before sending aggregated weights to the central server|Any positive integer||
