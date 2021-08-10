@@ -15,9 +15,10 @@ rgb_model = dict(
                   spatial_strides=(1, 2, 2, 2),
                   temporal_strides=(1, 2, 2, 2),
                   zero_init_residual=False),
+    backbone_out_dim=512,
     cls_head=dict(type='I3DHead',
                   num_classes=400,
-                  in_channels=512,
+                  in_channels=backbone_out_dim,
                   spatial_type='avg',
                   dropout_ratio=0.5,
                   init_std=0.01),
@@ -42,9 +43,10 @@ flow_model = dict(
                   spatial_strides=(1, 2, 2, 2),
                   temporal_strides=(1, 2, 2, 2),
                   zero_init_residual=False),
+    backbone_out_dim=512,
     cls_head=dict(type='I3DHead',
                   num_classes=400,
-                  in_channels=512,
+                  in_channels=backbone_out_dim,
                   spatial_type='avg',
                   dropout_ratio=0.5,
                   init_std=0.01),
@@ -56,9 +58,10 @@ flow_model = dict(
 audio_model = dict(
     type='AudioRecognizer',
     backbone=dict(type='ResNet', depth=50, in_channels=1, norm_eval=False),
+    backbone_out_dim=512,
     cls_head=dict(type='AudioTSNHead',
                   num_classes=400,
-                  in_channels=512,
+                  in_channels=backbone_out_dim,
                   dropout_ratio=0.5,
                   init_std=0.01),
     # model training and testing settings
@@ -68,9 +71,8 @@ audio_model = dict(
 fuse_model = dict(
     type='FullyConnectedHead',
     num_classes=400,
-    in_channels=rgb_model['cls_head']['in_channels'] +
-    flow_model['cls_head']['in_channels'] +
-    audio_model['cls_head']['in_channels'],
+    in_channels=rgb_model['backbone_out_dim'] +
+    flow_model['backbone_out_dim'] + audio_model['backbone_out_dim'],
     hidden_layer_size=[512],
     dropout_ratio=0.5,
 )
