@@ -1,8 +1,8 @@
-## Implemented Methods
+## Examples of Federated Learning Algorithms
 
 **To be completed**
 
-Plato includes the implementation of the existing federated learning methods listed below.
+Plato includes implementations of some existing federated learning algorithms, listed below.
 
 |  Method  | Instruction | Tested  |
 | :------: | :---------- | :-----: |
