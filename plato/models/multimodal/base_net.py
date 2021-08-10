@@ -23,13 +23,20 @@ class BaseClassificationNet(nn.Module):
         # 1 build the model based on the configurations
         self._net = build_model(net_configs)
 
+        print("self._net: ", type(self._net))
+
     def forward_train(self, ipt_data, labels, **kwargs):
         """Defines the computation performed at every call when training."""
         outputs = []
 
-        ipt_data = ipt_data.reshape((-1, ) + ipt_data.shape[2:])
+        print("ipt_data: ", ipt_data.shape)
+
+        ipt_data_sz = ipt_data.reshape((-1, ) + ipt_data.shape[2:])
+
+        print("ipt_data_sz: ", ipt_data_sz.shape)
+
         # 1. forward the backbone
-        data_feat = self._net.extract_feat(ipt_data)
+        data_feat = self._net.extract_feat(ipt_data_sz)
 
         # 2. forward the classification head if possible and obtain the losses
         loss_cls = 0.0
@@ -74,7 +81,8 @@ class BaseClassificationNet(nn.Module):
                 raise ValueError('Label should not be None.')
             if self._net.blending is not None:
                 blended_ipt_data, label = self._net.blending(ipt_data, label)
-
+            else:
+                blended_ipt_data = ipt_data
             return self.forward_train(blended_ipt_data, label, **kwargs)
 
         return self.forward_test(blended_ipt_data, **kwargs)

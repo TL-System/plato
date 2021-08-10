@@ -12,5 +12,5 @@ from plato.datasources.multimodal import kinetics
 kinetics_source = kinetics.DataSource()
 
 multi_model = multimodal_module.DynamicMultimodalModule(
-    support_modality_names=['RGB', "Flow", "Audio"],
+    support_modality_names=['rgb', "flow", "audio"],
     multimodal_nets_configs=Config.multimodal_nets_configs)

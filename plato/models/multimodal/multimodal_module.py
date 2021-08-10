@@ -77,10 +77,10 @@ class DynamicMultimodalModule(nn.Module):
                 net_configs=fuse_net_config)
 
         self.name_net_mapper = {
-            "RGB": self.rgb_net,
-            "Flow": self.flow_net,
-            "Audio": self.audio_net,
-            "Fused": self.cat_fusion_net
+            "rgb": self.rgb_net,
+            "flow": self.flow_net,
+            "audio": self.audio_net,
+            "fused": self.cat_fusion_net
         }
 
     def assing_weights(self, net_name, weights):
@@ -111,11 +111,12 @@ class DynamicMultimodalModule(nn.Module):
         modalities_pred_scores_container = dict()
         modalities_losses_container = dict()
         modalities_features_container = dict()
-        modalities_features_dims_container
+
         for modality_name in data_container.keys():
             modality_net = self.name_net_mapper[modality_name]
             modality_ipt_data = data_container[modality_name]
             batch_size = modality_ipt_data.shape[0]
+
             # obtain the modality fea and the class opt
             modality_opt = modality_net.forward(ipt_data=modality_ipt_data,
                                                 label=label,
@@ -133,7 +134,7 @@ class DynamicMultimodalModule(nn.Module):
                 modalities_features_container=modalities_features_container)
             fused_cls_score, fused_loss = self.cat_fusion_net.forward(
                 fused_feat, label, return_loss=return_loss)
-            modalities_pred_scores_container["Fused"] = fused_cls_score
-            modalities_losses_container["Fused"] = fused_loss
+            modalities_pred_scores_container["fused"] = fused_cls_score
+            modalities_losses_container["fused"] = fused_loss
 
         return modalities_pred_scores_container, modalities_losses_container
