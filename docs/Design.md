@@ -33,6 +33,72 @@ Each model is created by subclassing the `Model` abstract base class in `models/
 
 The external interface of this module is contained in `models/registry.py`. Just like `datasets/registry.py`, there is a list of all existing models in the framework so that they can be discovered and loaded. The registry similarly contains a `get()` function that returns the corresponding `Model` as specified. 
 
-### Federated learning algorithms
+### Extending Plato with new federated learning algorithms
 
-Most federated learning algorithms can be divided into three components: a *client*, a *server*, and an *algorithm*. The *client* implements all algorithm logic on the client side, while the *server* implements all algorithm logic on the server side. Both the client and the server should also be neutral across various deep learning frameworks. All algorithm logic that is framework-specific should be included in an *algorithm* module, found in `algorithms/`.
+Most federated learning algorithms can be divided into four components: a *client*, a *server*, an *algorithm*, and a *trainer*.
+
+- The *client* implements all algorithm logic on the client side. Typically, one would inherit from the `simple.Client` class to reuse some of the useful methods there, but it is also possible to inherit from the `base.Client` class.
+
+- The *server* implements all algorithm logic on the server side. Typically, one would inherit from the `fedavg.Server` class to reuse some of the useful methods there, but it is also possible to inherit from the `base.Server` class.
+
+    *Note:* Implementations for both the client and the server should be neutral across various deep learning frameworks, such as PyTorch, TensorFlow, and MindSpore.
+
+- Framework-specific algorithm logic should be implemented in an *algorithm* module. Typically, one would inherit from the PyTorch-based `fedavg.Algorithm` class if PyTorch is to be used. If other frameworks, for example TensorFlow, is to be used, one can inherit from the `tensorflow.fedavg.Algorithm` class. Several frequently-used algorithms are provided in `algorithms/`, while more examples are provided outside the framework in `examples/`.
+
+- Custom training loops should be implemented as a *trainer* class. If a PyTorch-based trainer is to be implemented, one may inherit from the `basic.Trainer` class. Typically, the `train_model` method should be overridden with a custom implementation.
+
+Once the custom *client*, *server*, *algorithm*, *trainer* classes have been implemented, they can be initialized using the following example code (from `examples/split_learning`):
+
+```python
+trainer = split_learning_trainer.Trainer()
+algorithm = split_learning_algorithm.Algorithm(trainer=trainer)
+client = split_learning_client.Client(algorithm=algorithm, trainer=trainer)
+server = split_learning_server.Server(algorithm=algorithm, trainer=trainer)
+
+server.run(client)
+```
+
+### Implementing custom models and data sources
+
+To define a custom model, one does not need to inherit from any base class in Plato, as Plato uses standard model classes in each machine learning framework. For example, Plato uses `nn.Module` as the base class in PyTorch, `nn.Cell` as the base class in MindSpore, and `keras.Model` as the base class in TensorFlow.
+
+For example (excerpt from `examples/custom_model.py`), one can define a simple model in PyTorch as follows:
+
+```python
+model = nn.Sequential(
+        nn.Linear(28 * 28, 128),
+        nn.ReLU(),
+        nn.Linear(128, 128),
+        nn.ReLU(),
+        nn.Linear(128, 10),
+    )
+```
+
+If a custom `DataSource` is also needed for a custom training session, one can inherit from the `base.DataSource` class (assuming PyTorch is used as the framework), as in the following example (excerpt from `examples/custom_model.py`):
+
+```python
+class DataSource(base.DataSource):
+    """A custom datasource with custom training and validation
+       datasets.
+    """
+    def __init__(self):
+        super().__init__()
+
+        self.trainset = MNIST("./data",
+                              train=True,
+                              download=True,
+                              transform=ToTensor())
+        self.testset = MNIST("./data",
+                             train=False,
+                             download=True,
+                             transform=ToTensor())
+```
+
+Then, a `DataSource` object can be initialized and passed to the client, along with a custom model if desired:
+
+```python
+datasource = DataSource()
+trainer = Trainer(model=model)
+client = simple.Client(model=model, datasource=datasource)
+```
+
