@@ -99,30 +99,28 @@ class Config:
             supported_multimodal_data_names = ["rgb", "flow", "audio", "text"]
             multimodal_data_configs = dict()
             multimodal_nets_configs = dict()
-            for mm_data_name in supported_multimodal_data_names:
-                mm_data_name = mm_data_name + "_data"
-                mm_net_name = mm_data_name + "_model"
-                try:
+            for modality_name in supported_multimodal_data_names:
+                mm_data_name = modality_name + "_data"
+                mm_net_name = modality_name + "_model"
+
+                if mm_data_name in mmcv_cfg.keys():
                     data_config = mmcv_cfg[mm_data_name]
+
                     data_config["videos_per_gpu"] = Config.data.videos_per_gpu
                     data_config[
                         "workers_per_gpu"] = Config.data.workers_per_gpu
+                    multimodal_data_configs[mm_data_name] = data_config
 
+                if mm_net_name in mmcv_cfg.keys():
                     model_config = mmcv_cfg[mm_net_name]
-                except KeyError:
-                    continue
-                multimodal_data_configs[mm_data_name] = data_config
-                multimodal_nets_configs[mm_net_name] = model_config
+                    multimodal_nets_configs[mm_net_name] = model_config
 
-            try:
+            if "fuse_model" in mmcv_cfg.keys():
                 multimodal_nets_configs['fuse_model'] = mmcv_cfg.fuse_model
-            except KeyError:
-                pass
-
-            # Config.multimodal_data = Config.namedtuple_from_dict(
-            #     multimodal_data_configs)
-            # Config.multimodal_data_model = Config.namedtuple_from_dict(
-            #     multimodal_data_model_configs)
+                multimodal_nets_configs[
+                    'modalities_feature_dim'] = mmcv_cfg.modalities_feature_dim
+            Config.multimodal_data_configs = multimodal_data_configs
+            Config.multimodal_nets_configs = multimodal_nets_configs
 
             if Config.args.server is not None:
                 Config.server = Config.server._replace(

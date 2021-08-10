@@ -67,7 +67,7 @@ class ConcatFusionNet(nn.Module):
     def forward(self, fused_features, gt_labels, return_loss):
         fused_cls_score = self._fuse_net(fused_features)
 
-        if return_loss
+        if return_loss:
             fused_loss = self._fuse_net.cls_head.loss(fused_cls_score,
                                                       gt_labels, **kwargs)
 

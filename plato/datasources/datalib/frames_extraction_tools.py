@@ -9,6 +9,7 @@ import sys
 import warnings
 from multiprocessing import Pool
 
+import mmaction
 from mmaction.tools.data import build_rawframes, build_audio_features
 from mmaction.tools.flow_extraction import extract_dense_flow
 import numpy as np

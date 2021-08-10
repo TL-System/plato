@@ -3,13 +3,14 @@
 
 import os
 
-os.environ['config_file'] = 'configs/Kinetics/kinetics_mm_CSN.py'
+os.environ['config_file'] = 'configs/Kinetics/kinetics_mm.py'
 
 from plato.config import Config
-from plato.models.multimodal import multimodal_net
+from plato.models.multimodal import multimodal_module
 from plato.datasources.multimodal import kinetics
 
-multi_model = multimodal_net.MM3F(
-    multimoda_model_configs=Config.multimodal_data_model)
-
 kinetics_source = kinetics.DataSource()
+
+multi_model = multimodal_module.DynamicMultimodalModule(
+    support_modality_names=['RGB', "Flow", "Audio"],
+    multimodal_nets_configs=Config.multimodal_nets_configs)

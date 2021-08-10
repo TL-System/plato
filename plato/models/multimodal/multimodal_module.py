@@ -28,6 +28,7 @@ from mmaction.models import losses
 from plato.models.multimodal import base_net
 from plato.models.multimodal import fusion_net
 
+
 class DynamicMultimodalModule(nn.Module):
     """DynamicMultimodalModule network.
         This network supports the learning of several modalities (the modalities can be dynamic)
@@ -39,47 +40,47 @@ class DynamicMultimodalModule(nn.Module):
     """
     def __init__(
         self,
+        support_modality_names,
         multimodal_nets_configs,  # multimodal_data_model
         is_fused_head=True
     ):  # a cls head makes prediction based on the fused multimodal feature
         super().__init__()
-        
 
-        self.support_nets = ['rgb_net', 'flow_net', 'audio_net']
-        self.support_modality_names = ['RGB', "Flow", "Audio"]
+        self.support_nets = ['rgb_model', 'flow_model', 'audio_model']
+        # ['RGB', "Flow", "Audio"]
+        self.support_modality_names = support_modality_names
 
-        assert any([
-            s_net in multimodal_nets_configs.keys() for s_net in self.support_nets
+        assert all([
+            s_net in multimodal_nets_configs.keys()
+            for s_net in self.support_nets
         ])
 
-        self.modalities_fea_dim = dict()
-        if "rgb_net" in multimodal_nets_configs.keys():
+        if "rgb_model" in multimodal_nets_configs.keys():
             rgb_net_config = multimodal_nets_configs["rgb_model"]
             self.rgb_net = base_net.BaseClassificationNet(rgb_net_config)
-            self.modalities_fea_dim["RGB"] = rgb_net_config["backbone_out_dim"]
 
-        elif "flow_net" in multimodal_nets_configs.keys():
+        if "flow_model" in multimodal_nets_configs.keys():
             flow_net_config = multimodal_nets_configs["flow_model"]
             self.flow_net = base_net.BaseClassificationNet(flow_net_config)
-            self.modalities_fea_dim["Flow"] = flow_net_config["backbone_out_dim"]
 
-        elif "audio_net" in multimodal_nets_configs.keys():
+        if "audio_model" in multimodal_nets_configs.keys():
             audio_net_config = multimodal_nets_configs["audio_model"]
             self.audio_net = base_net.BaseClassificationNet(audio_net_config)
-            self.modalities_fea_dim["Audio"] = audio_net_config["backbone_out_dim"]
 
         if is_fused_head:
-            fuse_net_config = multimodal_nets_configs.fuse_model
-            self.cat_fusion_net = fusion_net.ConcatFusionNet(support_modalities=support_modality_names, 
-                                                            modalities_fea_dim=self.modalities_fea_dim,
-                                                            net_configs=fuse_net_config)
-            
-            
+            self.modalities_fea_dim = multimodal_nets_configs[
+                "modalities_feature_dim"]
+            fuse_net_config = multimodal_nets_configs["fuse_model"]
+            self.cat_fusion_net = fusion_net.ConcatFusionNet(
+                support_modalities=support_modality_names,
+                modalities_fea_dim=self.modalities_fea_dim,
+                net_configs=fuse_net_config)
+
         self.name_net_mapper = {
             "RGB": self.rgb_net,
             "Flow": self.flow_net,
             "Audio": self.audio_net,
-            "Fused": self.fuse_model
+            "Fused": self.cat_fusion_net
         }
 
     def assing_weights(self, net_name, weights):
@@ -114,11 +115,11 @@ class DynamicMultimodalModule(nn.Module):
         for modality_name in data_container.keys():
             modality_net = self.name_net_mapper[modality_name]
             modality_ipt_data = data_container[modality_name]
-            batch_size = modality_ipt_data.shape[]
-            # obtain the modality fea and the class opt 
-            modality_opt = modality_net.forward(ipt_data=modality_ipt_data
-                label=label,
-                return_loss=return_loss)
+            batch_size = modality_ipt_data.shape[0]
+            # obtain the modality fea and the class opt
+            modality_opt = modality_net.forward(ipt_data=modality_ipt_data,
+                                                label=label,
+                                                return_loss=return_loss)
 
             modalities_features_container[modality_name] = modality_opt[0]
             modalities_pred_scores_container[modality_name] = modality_opt[1]
@@ -127,10 +128,12 @@ class DynamicMultimodalModule(nn.Module):
         if fused_head:
             # obtain the fused feats by concating the modalities features
             #   The order should follow the that in the support_modality_names
-            fused_feat = self.cat_fusion_net.create_fusion_feature(batch_size=batch_size, 
-                                                    modalities_features_container=modalities_features_container)
-            fused_cls_score, fused_loss = self.cat_fusion_net.forward(fused_feat, label, return_loss=return_loss)
+            fused_feat = self.cat_fusion_net.create_fusion_feature(
+                batch_size=batch_size,
+                modalities_features_container=modalities_features_container)
+            fused_cls_score, fused_loss = self.cat_fusion_net.forward(
+                fused_feat, label, return_loss=return_loss)
             modalities_pred_scores_container["Fused"] = fused_cls_score
             modalities_losses_container["Fused"] = fused_loss
-        
+
         return modalities_pred_scores_container, modalities_losses_container

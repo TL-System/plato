@@ -14,8 +14,6 @@ from mmaction.models import losses
 
 from mmaction.models import build_model
 
-from plato.models.multimodal import build_fc_from_config
-
 
 class BaseClassificationNet(nn.Module):
     def __init__(self, net_configs, is_head_included=True):
@@ -60,11 +58,7 @@ class BaseClassificationNet(nn.Module):
 
         return [data_feat, _, _]
 
-    def forward(self,
-                ipt_data
-                label=None,
-                return_loss=True,
-                **kwargs):
+    def forward(self, ipt_data, label=None, return_loss=True, **kwargs):
         """Defines the computation performed at every call.
 
         Args:
@@ -74,15 +68,13 @@ class BaseClassificationNet(nn.Module):
             torch.Tensor: The feature of the input
             samples extracted by the backbone.
         """
-        
+
         if return_loss:
             if label is None:
                 raise ValueError('Label should not be None.')
             if self._net.blending is not None:
                 blended_ipt_data, label = self._net.blending(ipt_data, label)
 
-
-            return self.forward_train(blended_ipt_data, 
-                                      label, **kwargs)
+            return self.forward_train(blended_ipt_data, label, **kwargs)
 
         return self.forward_test(blended_ipt_data, **kwargs)
