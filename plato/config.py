@@ -117,8 +117,7 @@ class Config:
 
             if "fuse_model" in mmcv_cfg.keys():
                 multimodal_nets_configs['fuse_model'] = mmcv_cfg.fuse_model
-                multimodal_nets_configs[
-                    'modalities_feature_dim'] = mmcv_cfg.modalities_feature_dim
+
             Config.multimodal_data_configs = multimodal_data_configs
             Config.multimodal_nets_configs = multimodal_nets_configs
 

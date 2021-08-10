@@ -15,6 +15,8 @@ three different networks:
 """
 
 import os
+import json
+import logging
 
 import numpy
 
@@ -48,7 +50,9 @@ class DynamicMultimodalModule(nn.Module):
 
         # ['rgb', "flow", "audio"]
         self.support_modality_names = support_modality_names
-        self.support_nets = ['rgb_model', 'flow_model', 'audio_model']
+        self.support_nets = [
+            mod_nm + "_model" for mod_nm in self.support_modality_names
+        ]
 
         self.is_fused_head = is_fused_head
 
@@ -56,41 +60,30 @@ class DynamicMultimodalModule(nn.Module):
             s_net in multimodal_nets_configs.keys()
             for s_net in self.support_nets
         ])
+        self.name_net_mapper = {}
+        for idx in range(len(self.support_nets)):
+            modality_name = self.support_modality_names[idx]
+            modality_net = self.support_nets[idx]
+            if modality_net in multimodal_nets_configs.keys():
+                logging.info(("Building the {}......").format(modality_net))
+                net_config = multimodal_nets_configs[modality_net]
+                is_head_included = "cls_head" in net_config.keys()
+                logging.info("The head is defined")
 
-        if "rgb_model" in multimodal_nets_configs.keys():
-            rgb_net_config = multimodal_nets_configs["rgb_model"]
-            is_head_included = "cls_head" in rgb_net_config.keys()
-            self.rgb_net = base_net.BaseClassificationNet(
-                net_configs=rgb_net_config, is_head_included=is_head_included)
-
-        if "flow_model" in multimodal_nets_configs.keys():
-            flow_net_config = multimodal_nets_configs["flow_model"]
-            is_head_included = "cls_head" in flow_net_config.keys()
-            self.flow_net = base_net.BaseClassificationNet(
-                net_configs=flow_net_config, is_head_included=is_head_included)
-
-        if "audio_model" in multimodal_nets_configs.keys():
-            audio_net_config = multimodal_nets_configs["audio_model"]
-            is_head_included = "cls_head" in audio_net_config.keys()
-            self.audio_net = base_net.BaseClassificationNet(
-                net_configs=audio_net_config,
-                is_head_included=is_head_included)
+                self.name_net_mapper[
+                    modality_name] = base_net.BaseClassificationNet(
+                        net_configs=net_config,
+                        is_head_included=is_head_included)
 
         if is_fused_head:
             self.modalities_fea_dim = multimodal_nets_configs[
                 "modalities_feature_dim"]
             fuse_net_config = multimodal_nets_configs["fuse_model"]
+
             self.cat_fusion_net = fusion_net.ConcatFusionNet(
                 support_modalities=support_modality_names,
                 modalities_fea_dim=self.modalities_fea_dim,
                 net_configs=fuse_net_config)
-
-        self.name_net_mapper = {
-            "rgb": self.rgb_net,
-            "flow": self.flow_net,
-            "audio": self.audio_net,
-            "fused": self.cat_fusion_net
-        }
 
     def assing_weights(self, net_name, weights):
         self.name_net_mapper[net_name].load_state_dict(weights, strict=True)
