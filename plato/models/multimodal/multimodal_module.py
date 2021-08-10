@@ -46,9 +46,11 @@ class DynamicMultimodalModule(nn.Module):
     ):  # a cls head makes prediction based on the fused multimodal feature
         super().__init__()
 
-        self.support_nets = ['rgb_model', 'flow_model', 'audio_model']
-        # ['RGB', "Flow", "Audio"]
+        # ['rgb', "flow", "audio"]
         self.support_modality_names = support_modality_names
+        self.support_nets = ['rgb_model', 'flow_model', 'audio_model']
+
+        self.is_fused_head = is_fused_head
 
         assert all([
             s_net in multimodal_nets_configs.keys()
@@ -57,15 +59,22 @@ class DynamicMultimodalModule(nn.Module):
 
         if "rgb_model" in multimodal_nets_configs.keys():
             rgb_net_config = multimodal_nets_configs["rgb_model"]
-            self.rgb_net = base_net.BaseClassificationNet(rgb_net_config)
+            is_head_included = "cls_head" in rgb_net_config.keys()
+            self.rgb_net = base_net.BaseClassificationNet(
+                net_configs=rgb_net_config, is_head_included=is_head_included)
 
         if "flow_model" in multimodal_nets_configs.keys():
             flow_net_config = multimodal_nets_configs["flow_model"]
-            self.flow_net = base_net.BaseClassificationNet(flow_net_config)
+            is_head_included = "cls_head" in flow_net_config.keys()
+            self.flow_net = base_net.BaseClassificationNet(
+                net_configs=flow_net_config, is_head_included=is_head_included)
 
         if "audio_model" in multimodal_nets_configs.keys():
             audio_net_config = multimodal_nets_configs["audio_model"]
-            self.audio_net = base_net.BaseClassificationNet(audio_net_config)
+            is_head_included = "cls_head" in audio_net_config.keys()
+            self.audio_net = base_net.BaseClassificationNet(
+                net_configs=audio_net_config,
+                is_head_included=is_head_included)
 
         if is_fused_head:
             self.modalities_fea_dim = multimodal_nets_configs[
@@ -113,9 +122,16 @@ class DynamicMultimodalModule(nn.Module):
         modalities_features_container = dict()
 
         for modality_name in data_container.keys():
+
             modality_net = self.name_net_mapper[modality_name]
             modality_ipt_data = data_container[modality_name]
             batch_size = modality_ipt_data.shape[0]
+
+            print("modality_name: ", modality_name)
+            print("modality_net: ", type(modality_net))
+            print("modality_net inner net: ", type(modality_net._net))
+            print("modality_ipt_data: ", modality_ipt_data.shape)
+            print("batch_size: ", batch_size)
 
             # obtain the modality fea and the class opt
             modality_opt = modality_net.forward(ipt_data=modality_ipt_data,
@@ -126,7 +142,7 @@ class DynamicMultimodalModule(nn.Module):
             modalities_pred_scores_container[modality_name] = modality_opt[1]
             modalities_losses_container[modality_name] = modality_opt[2]
 
-        if fused_head:
+        if self.is_fused_head:
             # obtain the fused feats by concating the modalities features
             #   The order should follow the that in the support_modality_names
             fused_feat = self.cat_fusion_net.create_fusion_feature(

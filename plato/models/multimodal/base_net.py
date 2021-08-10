@@ -23,7 +23,7 @@ class BaseClassificationNet(nn.Module):
         # 1 build the model based on the configurations
         self._net = build_model(net_configs)
 
-        print("self._net: ", type(self._net))
+        self.is_head_included = is_head_included
 
     def forward_train(self, ipt_data, labels, **kwargs):
         """Defines the computation performed at every call when training."""
@@ -40,7 +40,7 @@ class BaseClassificationNet(nn.Module):
 
         # 2. forward the classification head if possible and obtain the losses
         loss_cls = 0.0
-        if is_head_included:
+        if self.is_head_included:
             cls_score = self._net.cls_head(data_feat)
 
             gt_labels = labels.squeeze()
@@ -58,7 +58,7 @@ class BaseClassificationNet(nn.Module):
         data_feat = self._net.extract_feat(ipt_data)
         # 2. forward the classification head if possible and obtain the losses
         cls_score = 0.0
-        if is_head_included:
+        if self.is_head_included:
             cls_score = self._net.cls_head(data_feat)
 
             return [data_feat, cls_score, _]

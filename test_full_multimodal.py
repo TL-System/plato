@@ -20,9 +20,9 @@ def test_full_multimodal_model():
     for modality_nm in support_modalities:
         modality_model_nm = modality_nm + "_model"
         if modality_model_nm in Config.multimodal_nets_configs.keys():
-
             modality_net = Config.multimodal_nets_configs[modality_model_nm]
             modality_net['backbone']['pretrained'] = None
+            modality_net['backbone']['pretrained2d'] = False
 
     # define the model
     multi_model = multimodal_module.DynamicMultimodalModule(
@@ -70,6 +70,29 @@ def test_full_multimodal_model():
         img_list = [img[None, :] for img in imgs]
         for one_img in img_list:
             recognizer(one_img, None, return_loss=False)
+
+
+def test_rgb_build():
+    from mmaction.models import build_model
+    # define the test data
+
+    rgb_input_shape = (1, 3, 3, 8, 32, 32)
+    rgb_demo_inputs = test_models.base.generate_recognizer_demo_inputs(
+        rgb_input_shape, model_type='3D')
+
+    rbg_model = build_model(Config.multimodal_nets_configs["rgb_model"])
+
+    rgb_imgs = rgb_demo_inputs['imgs']
+    # flow_imgs = flow_demo_inputs['imgs']
+    # audio_feas = flow_demo_inputs['imgs']
+    gt_labels = rgb_demo_inputs['gt_labels']
+
+    print("rgb_imgs: ", rgb_imgs.shape)
+    # print("flow_imgs: ", flow_imgs.shape)
+    # print("audio_feas: ", audio_feas.shape)
+    print("gt_labels: ", gt_labels.shape)
+
+    losses = rbg_model(rgb_imgs, gt_labels)
 
 
 if __name__ == "__main__":
