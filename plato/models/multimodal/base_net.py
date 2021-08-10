@@ -41,9 +41,9 @@ class BaseClassificationNet(nn.Module):
             gt_labels = labels.squeeze()
             loss_cls = self._net.cls_head.loss(cls_score, gt_labels, **kwargs)
 
-            return [data_feat, loss_cls]
+            return [data_feat, cls_score, loss_cls]
 
-        return [data_feat, _]
+        return [data_feat, _, _]
 
     def forward_test(self, ipt_data, **kwargs):
         """Defines the computation performed at every call when training."""
@@ -56,9 +56,9 @@ class BaseClassificationNet(nn.Module):
         if is_head_included:
             cls_score = self._net.cls_head(data_feat)
 
-            return [data_feat, cls_score]
+            return [data_feat, cls_score, _]
 
-        return [data_feat, _]
+        return [data_feat, _, _]
 
     def forward(self,
                 ipt_data

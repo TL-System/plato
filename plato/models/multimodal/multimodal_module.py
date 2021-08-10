@@ -107,8 +107,8 @@ class DynamicMultimodalModule(nn.Module):
             label (torch.tensor, optional): [the lable of the sample]. Defaults to None.
             return_loss (bool, optional): [whether return the loss ]. Defaults to True.
         """
-        modalities_pred_scores = dict()
-        modalities_losses = dict()
+        modalities_pred_scores_container = dict()
+        modalities_losses_container = dict()
         modalities_features_container = dict()
         modalities_features_dims_container
         for modality_name in data_container.keys():
@@ -119,9 +119,10 @@ class DynamicMultimodalModule(nn.Module):
             modality_opt = modality_net.forward(ipt_data=modality_ipt_data
                 label=label,
                 return_loss=return_loss)
-            
-            modalities_pred_scores[modality_name] = modality_opt[1]
+
             modalities_features_container[modality_name] = modality_opt[0]
+            modalities_pred_scores_container[modality_name] = modality_opt[1]
+            modalities_losses_container[modality_name] = modality_opt[2]
 
         if fused_head:
             # obtain the fused feats by concating the modalities features
@@ -129,3 +130,7 @@ class DynamicMultimodalModule(nn.Module):
             fused_feat = self.cat_fusion_net.create_fusion_feature(batch_size=batch_size, 
                                                     modalities_features_container=modalities_features_container)
             fused_cls_score, fused_loss = self.cat_fusion_net.forward(fused_feat, label, return_loss=return_loss)
+            modalities_pred_scores_container["Fused"] = fused_cls_score
+            modalities_losses_container["Fused"] = fused_loss
+        
+        return modalities_pred_scores_container, modalities_losses_container

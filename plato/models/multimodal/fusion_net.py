@@ -71,6 +71,6 @@ class ConcatFusionNet(nn.Module):
             fused_loss = self._fuse_net.cls_head.loss(fused_cls_score,
                                                       gt_labels, **kwargs)
 
-            return fused_cls_score, fused_loss
+            return [fused_cls_score, fused_loss]
         else:
-            fused_cls_score, _
+            [fused_cls_score, _]
