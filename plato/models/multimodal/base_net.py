@@ -25,18 +25,22 @@ class BaseClassificationNet(nn.Module):
 
         self.is_head_included = is_head_included
 
+        # the features must be forwarded the avg pool
+        self.avg_pool = nn.AdaptiveAvgPool2d((1, 1))
+
     def forward_train(self, ipt_data, labels, **kwargs):
         """Defines the computation performed at every call when training."""
         outputs = []
 
-        print("ipt_data: ", ipt_data.shape)
-
         ipt_data_sz = ipt_data.reshape((-1, ) + ipt_data.shape[2:])
-
-        print("ipt_data_sz: ", ipt_data_sz.shape)
 
         # 1. forward the backbone
         data_feat = self._net.extract_feat(ipt_data_sz)
+        # from [N * num_segs, in_channels, h, w]
+        #   to [N, in_channels, 1, 1]
+        immediate_feat = self.avg_pool(data_feat)
+        # to [N, in_channels]
+        immediate_feat = torch.squeeze(immediate_feat)
 
         # 2. forward the classification head if possible and obtain the losses
         loss_cls = 0.0
@@ -46,9 +50,9 @@ class BaseClassificationNet(nn.Module):
             gt_labels = labels.squeeze()
             loss_cls = self._net.cls_head.loss(cls_score, gt_labels, **kwargs)
 
-            return [data_feat, cls_score, loss_cls]
+            return [immediate_feat, cls_score, loss_cls]
 
-        return [data_feat, _, _]
+        return [immediate_feat, _, _]
 
     def forward_test(self, ipt_data, **kwargs):
         """Defines the computation performed at every call when training."""

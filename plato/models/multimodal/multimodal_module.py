@@ -61,6 +61,7 @@ class DynamicMultimodalModule(nn.Module):
             for s_net in self.support_nets
         ])
         self.name_net_mapper = {}
+        self.modality_fea_dims_mapper = {}
         for idx in range(len(self.support_nets)):
             modality_name = self.support_modality_names[idx]
             modality_net = self.support_nets[idx]
@@ -70,19 +71,27 @@ class DynamicMultimodalModule(nn.Module):
                 is_head_included = "cls_head" in net_config.keys()
                 logging.info("The head is defined")
 
+                if is_head_included:
+                    # the feature dimension is the input dimension of the cls head
+                    fea_dims = net_config["cls_head"]["in_channels"]
+                    self.modality_fea_dims_mapper[modality_name] = fea_dims
+
                 self.name_net_mapper[
                     modality_name] = base_net.BaseClassificationNet(
                         net_configs=net_config,
                         is_head_included=is_head_included)
 
         if is_fused_head:
-            self.modalities_fea_dim = multimodal_nets_configs[
-                "modalities_feature_dim"]
+
             fuse_net_config = multimodal_nets_configs["fuse_model"]
+
+            if "modalities_feature_dim" in list(fuse_net_config.keys()):
+                self.modality_fea_dims_mapper.update(
+                    fuse_net_config["modalities_feature_dim"])
 
             self.cat_fusion_net = fusion_net.ConcatFusionNet(
                 support_modalities=support_modality_names,
-                modalities_fea_dim=self.modalities_fea_dim,
+                modalities_fea_dim=self.modality_fea_dims_mapper,
                 net_configs=fuse_net_config)
 
     def assing_weights(self, net_name, weights):
@@ -120,11 +129,13 @@ class DynamicMultimodalModule(nn.Module):
             modality_ipt_data = data_container[modality_name]
             batch_size = modality_ipt_data.shape[0]
 
-            print("modality_name: ", modality_name)
-            print("modality_net: ", type(modality_net))
-            print("modality_net inner net: ", type(modality_net._net))
-            print("modality_ipt_data: ", modality_ipt_data.shape)
-            print("batch_size: ", batch_size)
+            logging.debug(("modality_name: ").format(modality_name))
+            logging.debug(("modality_net: ").format(type(modality_net)))
+            logging.debug(
+                ("modality_net inner net: ").format(type(modality_net._net)))
+            logging.debug(
+                ("modality_ipt_data: ").format(modality_ipt_data.shape))
+            logging.debug(("batch_size: ").format(batch_size))
 
             # obtain the modality fea and the class opt
             modality_opt = modality_net.forward(ipt_data=modality_ipt_data,

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import logging
 
 import numpy as np
 
@@ -31,7 +32,7 @@ def test_full_multimodal_model():
     multi_model = multimodal_module.DynamicMultimodalModule(
         support_modality_names=support_modalities,
         multimodal_nets_configs=Config.multimodal_nets_configs,
-        is_fused_head=False)
+        is_fused_head=True)
 
     # define the test data
     rgb_input_shape = (1, 3, 3, 8, 32, 32)
@@ -51,10 +52,10 @@ def test_full_multimodal_model():
     audio_feas = audio_demo_inputs['imgs']
     gt_labels = rgb_demo_inputs['gt_labels']
 
-    print("rgb_imgs: ", rgb_imgs.shape)
-    print("flow_imgs: ", flow_imgs.shape)
-    print("audio_feas: ", audio_feas.shape)
-    print("gt_labels: ", gt_labels.shape)
+    logging.debug(("rgb_imgs: ").format(rgb_imgs.shape))
+    logging.debug(("flow_imgs: ").format(flow_imgs.shape))
+    logging.debug(("audio_feas: ").format(audio_feas.shape))
+    logging.debug(("gt_labels: ").format(gt_labels.shape))
 
     mm_data_container = {
         "rgb": rgb_imgs,
@@ -62,12 +63,19 @@ def test_full_multimodal_model():
         "audio": audio_feas
     }
 
-    outputs = multi_model(
+    opt_scores, opt_losses = multi_model(
         data_container=mm_data_container,
         label=gt_labels,
         return_loss=True,
     )
-    print(outputs)
+
+    for key in list(opt_scores.keys()):
+        print(key)
+        print(opt_scores[key])
+
+    for key in list(opt_losses.keys()):
+        print(key)
+        print(opt_losses[key])
 
 
 def test_rgb_build():

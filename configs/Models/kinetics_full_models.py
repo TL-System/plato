@@ -71,7 +71,8 @@ audio_model = dict(
 fuse_model = dict(
     type='FullyConnectedHead',
     num_classes=400,
-    in_channels=None,
+    in_channels=2048 + 2048 + 2048,
     hidden_layer_size=[512],
     dropout_ratio=0.5,
+    loss_cls=dict(type='CrossEntropyLoss', loss_weight=1.0),
 )

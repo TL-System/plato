@@ -24,6 +24,7 @@ import torch.nn as nn
 from mmaction.models import backbones
 from mmaction.models import heads
 from mmaction.models import losses
+from mmaction.models import build_loss
 
 from plato.models.multimodal import fc_net
 
@@ -35,11 +36,13 @@ class ConcatFusionNet(nn.Module):
 
         # the support modality name is the pre-defined order that must be followed in the forward process
         #   especially in the fusion part
-        self.support_modality_names = support_modalities
+        self.support_modality_names = support_modalities  # a list
         self.modalities_fea_dim = modalities_fea_dim
         self.net_configs = net_configs
         # 1 build the model based on the configurations
         self._fuse_net = fc_net.build_fc_from_config(net_configs)
+
+        self.loss_cls = build_loss(self.net_configs["loss_cls"])
 
     def create_fusion_feature(self, batch_size, modalities_features_container):
         """[summary]
@@ -60,6 +63,7 @@ class ConcatFusionNet(nn.Module):
                 modality_feature = modalities_features_container[modality_name]
 
             modalities_feature.append(modality_feature)
+
         fused_feat = torch.cat(modalities_feature, 1)
 
         return fused_feat
@@ -68,8 +72,7 @@ class ConcatFusionNet(nn.Module):
         fused_cls_score = self._fuse_net(fused_features)
 
         if return_loss:
-            fused_loss = self._fuse_net.cls_head.loss(fused_cls_score,
-                                                      gt_labels, **kwargs)
+            fused_loss = self.loss_cls(fused_cls_score, gt_labels)
 
             return [fused_cls_score, fused_loss]
         else:
