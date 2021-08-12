@@ -28,8 +28,9 @@ class Client(base.Client):
                  model=None,
                  datasource=None,
                  algorithm=None,
-                 trainer=None):
-        super().__init__()
+                 trainer=None, 
+                 transmitter=None):
+        super().__init__(transmitter)
         self.model = model
         self.datasource = datasource
         self.algorithm = algorithm

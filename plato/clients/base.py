@@ -64,12 +64,15 @@ class ClientEvents(socketio.AsyncClientNamespace):
 
 class Client:
     """ A basic federated learning client. """
-    def __init__(self) -> None:
+    def __init__(self, transmitter=None) -> None:
         self.client_id = Config().args.id
         self.sio = None
         self.chunks = []
         self.server_payload = None
         self.data_loaded = False  # is training data already loaded from the disk?
+        self.transmitter = transmitter
+        if self.transmitter != None:
+            logging.info("S3 works")
 
         if hasattr(Config().algorithm,
                    'cross_silo') and not Config().is_edge_server():
@@ -127,6 +130,7 @@ class Client:
         logging.info("[Client #%d] Waiting to be selected.", self.client_id)
         await self.sio.wait()
 
+    
     async def payload_to_arrive(self, response) -> None:
         """ Upon receiving a response from the server. """
         self.process_server_response(response)
@@ -141,6 +145,24 @@ class Client:
 
         if not self.data_loaded:
             self.load_data()
+            
+        if self.transmitter != None:
+            # load data from S3
+            payload = self.transmitter.recv("server_payload")
+            report, payload = await self.train()
+            name = "client_payload_" + str(self.client_id)
+            logging.info("Client name %s", name)
+            self.transmitter.send(name, payload)
+            
+            if Config().is_edge_server():
+                logging.info(
+                    "[Server #%d] Model aggregated on edge server (client #%d).",
+                    os.getpid(), client_id)
+            else:
+                logging.info("[Client #%d] Model trained.", self.client_id)
+                
+            # Sending the client report as metadata to the server (payload to follow)
+            await self.sio.emit('client_report', {'id': self.client_id, 'report': pickle.dumps(report)})
 
     async def chunk_arrived(self, data) -> None:
         """ Upon receiving a chunk of data from the server. """
@@ -194,7 +216,7 @@ class Client:
             logging.info("[Client #%d] Model trained.", client_id)
 
         # Sending the client report as metadata to the server (payload to follow)
-        await self.sio.emit('client_report', {'report': pickle.dumps(report)})
+        await self.sio.emit('client_report', {'id': self.client_id, 'report': pickle.dumps(report)})
 
         # Sending the client training payload to the server
         await self.send(payload)

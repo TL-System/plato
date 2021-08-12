@@ -81,7 +81,8 @@ class Config:
             # if the configuration file not exist, create a fake config object
             if os.path.isfile(filename):
                 with open(filename, 'r') as config_file:
-                    config = yaml.load(config_file, Loader=yaml.FullLoader)
+                    # config = yaml.load(config_file, Loader=yaml.FullLoader)
+                    config = yaml.load(config_file, Loader=yaml.Loader)
                     # A temporary solution for config['server']['simulation']
                     if 'simulation' not in config['server']:
                         config['server']['simulation'] = True
@@ -232,3 +233,14 @@ class Config:
         config['algorithm']['type'] = 'fedavg'
 
         return config
+    
+    @staticmethod
+    def store() -> None:
+        data = {}
+        data['clients'] = Config.clients._asdict()
+        data['server'] = Config.server._asdict()
+        data['data'] = Config.data._asdict()
+        data['trainer'] = Config.trainer._asdict()
+        data['algorithm'] = Config.algorithm._asdict()
+        with open(Config.args.config, "w") as out:
+            yaml.dump(data, out, default_flow_style=False)

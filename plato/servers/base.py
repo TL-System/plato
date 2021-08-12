@@ -39,7 +39,7 @@ class ServerEvents(socketio.AsyncNamespace):
 
     async def on_client_report(self, sid, data):
         """ An existing client sends a new report from local training. """
-        await self.plato_server.client_report_arrived(sid, data['report'])
+        await self.plato_server.client_report_arrived(sid, data['id'], data['report'])
 
     async def on_chunk(self, sid, data):
         """ A chunk of data from the server arrived. """
@@ -53,10 +53,9 @@ class ServerEvents(socketio.AsyncNamespace):
         """ An existing client finished sending its payloads from local training. """
         await self.plato_server.client_payload_done(sid, data['id'])
 
-
 class Server:
     """The base class for federated learning servers."""
-    def __init__(self):
+    def __init__(self, transmitter=None):
         self.sio = None
         self.client = None
         self.clients = {}
@@ -73,6 +72,9 @@ class Server:
         self.updates = []
         self.client_payload = {}
         self.client_chunks = {}
+        self.transmitter = transmitter
+        if self.transmitter != None:
+            logging.info("S3 works")
 
     def run(self, client=None, edge_server=None, edge_client=None):
         """Start a run loop for the server. """
@@ -100,7 +102,8 @@ class Server:
 
         self.start()
 
-    def start(self, port=Config().server.port):
+    def start(self, port=""):
+        port = Config().server.port
         """ Start running the socket.io server. """
         logging.info("Starting a server at address %s and port %s.",
                      Config().server.address, port)
@@ -203,6 +206,10 @@ class Server:
             self.clients_pool = list(self.clients)
 
         self.selected_clients = self.choose_clients()
+        
+        if self.transmitter != None:
+            payload = self.algorithm.extract_weights()
+            self.transmitter.send("server_payload", payload)
 
         if len(self.selected_clients) > 0:
             for i, selected_client_id in enumerate(self.selected_clients):
@@ -225,7 +232,10 @@ class Server:
                 await self.sio.emit('payload_to_arrive',
                                     {'response': server_response},
                                     room=sid)
-
+                
+                if self.transmitter != None:
+                    continue
+                
                 payload = self.algorithm.extract_weights()
                 payload = self.customize_server_payload(payload)
 
@@ -234,7 +244,7 @@ class Server:
                     "[Server #%d] Sending the current model to client #%d.",
                     os.getpid(), selected_client_id)
                 await self.send(sid, payload, selected_client_id)
-
+                
     async def send_in_chunks(self, data, sid, client_id) -> None:
         """ Sending a bytes object in fixed-sized chunks to the client. """
         step = 1024 ^ 2
@@ -265,11 +275,23 @@ class Server:
         logging.info("[Server #%d] Sent %s MB of payload data to client #%d.",
                      os.getpid(), round(data_size / 1024**2, 2), client_id)
 
-    async def client_report_arrived(self, sid, report):
+    async def client_report_arrived(self, sid, client_id, report):
         """ Upon receiving a report from a client. """
         self.reports[sid] = pickle.loads(report)
         self.client_payload[sid] = None
-        self.client_chunks[sid] = []
+        self.client_chunks[sid] = [] 
+        if self.transmitter != None:
+            name = "client_payload_" + str(client_id)
+            logging.info("Client name %s", name)
+            data = self.transmitter.recv(name)
+            self.updates.append((self.reports[sid], data))
+            if len(self.updates) > 0 and len(self.updates) >= len(self.selected_clients):
+                logging.info(
+                    "[Server #%d] All %d client reports received. Processing.",
+                    os.getpid(), len(self.updates))
+                await self.process_reports()
+                await self.wrap_up()
+                await self.select_clients()
 
     async def client_chunk_arrived(self, sid, data) -> None:
         """ Upon receiving a chunk of data from a client. """

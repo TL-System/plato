@@ -1,5 +1,6 @@
 """The YOLOV5 model for PyTorch."""
 import logging
+import time
 
 import numpy as np
 import torch
@@ -7,6 +8,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.optim.lr_scheduler as lr_scheduler
 import yaml
+from typing import Tuple
 
 from plato.config import Config
 from plato.datasources import yolo
@@ -37,6 +39,41 @@ class Trainer(basic.Trainer):
         """
         return yolo.DataSource.get_train_loader(batch_size, trainset, sampler,
                                                 extract_features, cut_layer)
+        
+    def train(self, trainset, sampler, cut_layer=None) -> Tuple[bool, float]:
+        """The main training loop in a federated learning workload.
+        Arguments:
+        trainset: The training dataset.
+        sampler: the sampler that extracts a partition for this client.
+        cut_layer (optional): The layer which training should start from.
+        Returns:
+        bool: Whether training was successfully completed.
+        float: The training time.
+        """
+        self.start_training()
+        tic = time.perf_counter()
+
+        config = Config().trainer._asdict()
+        config['run_id'] = Config().params['run_id']
+        
+        self.train_model(config, trainset, sampler.get(), cut_layer)
+
+        model_name = Config().trainer.model_name
+        filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.pth"
+        try:
+            self.load_model(filename)
+        except OSError:  # the model file is not found, training failed
+            logging.info("The training process on client #%d failed.",
+                         self.client_id)
+            self.run_sql_statement("DELETE FROM trainers WHERE run_id = (?)",
+                                   (self.client_id, ))
+            return False, 0.0
+
+        toc = time.perf_counter()
+        self.pause_training()
+        training_time = toc - tic
+
+        return True, training_time
 
     def train_model(self, config, trainset, sampler, cut_layer=None):  # pylint: disable=unused-argument
         """The training loop for YOLOv5.
@@ -205,6 +242,30 @@ class Trainer(basic.Trainer):
 
             lr_schedule.step()
 
+    def test(self, testset) -> float:
+        """Testing the model using the provided test dataset.
+        Arguments:
+        testset: The test dataset.
+        """
+        config = Config().trainer._asdict()
+        config['run_id'] = Config().params['run_id']
+
+        self.start_training()
+            
+        self.test_model(config, testset)
+
+        try:
+            model_name = Config().trainer.model_name
+            filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
+            accuracy = Trainer.load_accuracy(filename)
+        except OSError:  # the model file is not found, training failed
+            logging.info("The testing process on client #%d failed.",
+                         self.client_id)
+            return 0
+
+        self.pause_training()
+        return accuracy
+
     def test_model(self, config, testset):  # pylint: disable=unused-argument
         """The testing loop for YOLOv5.
 
@@ -213,6 +274,7 @@ class Trainer(basic.Trainer):
             testset: The test dataset.
         """
         assert Config().data.datasource == 'YOLO'
+        assert testset != None
         test_loader = yolo.DataSource.get_test_loader(config['batch_size'],
                                                       testset)
 
@@ -387,4 +449,4 @@ class Trainer(basic.Trainer):
         y1 = round(y1 * size[1])
         y2 = round(y2 * size[1])
 
-        return (x1, y1, x2, y2)
+        return (int(x1), int(y1), int(x2), int(y2))

@@ -20,8 +20,9 @@ from plato.servers import base
 
 class Server(base.Server):
     """Federated learning server using federated averaging."""
-    def __init__(self, model=None, algorithm=None, trainer=None):
-        super().__init__()
+    def __init__(self, model=None, algorithm=None, trainer=None, 
+                 transmitter=None):
+        super().__init__(transmitter)
 
         if hasattr(Config().trainer, 'use_wandb'):
             wandb.init(project="plato", reinit=True)
