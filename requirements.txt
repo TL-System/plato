@@ -4,6 +4,7 @@ pylint
 python-socketio
 aiohttp
 requests
+boto3
 pyyaml>=5.4.1
 matplotlib
 scipy
