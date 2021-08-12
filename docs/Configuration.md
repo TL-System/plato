@@ -26,7 +26,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |**address**|The address of the central server|e.g., `127.0.0.1`||
 |**port**|The port number of the central server|e.g., `8000`||
 |ping_interval|The interval in seconds at which the server pings the client. The default is 3600 seconds. |||
-|ping_timeout| The time in seconds that the client waits for the server to respond before disconnecting. The default is 20 seconds.|e.g., `100`|Increase this number when your session stops running when training larger models (but make sure it is not due to the *out of CUDA memory* error)|
+|ping_timeout| The time in seconds that the client waits for the server to respond before disconnecting. The default is 360 (seconds).||Increase this number when your session stops running when training larger models (but make sure it is not due to the *out of CUDA memory* error)|
 
 ### data
 
@@ -59,7 +59,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |**momentum**||||
 |**weight_decay**||||   
 |lr_schedule|Learning rate scheduler|`CosineAnnealingLR`, `LambdaLR`, `StepLR`, `ReduceLROnPlateau`|| 
-|**model_name**|The machine learning model|`lenet5`, `resnet`, `vgg`,`wideresnet`, `feedback_transformer`, `yolov5`, `HuggingFace_CausalLM`, `inceptionv3`||
+|**model_name**|The machine learning model|`lenet5`, `resnet`, `vgg`,`wideresnet`, `feedback_transformer`, `yolov5`, `HuggingFace_CausalLM`, `inceptionv3`, `alexnet`||
 
 ### algorithm
 
