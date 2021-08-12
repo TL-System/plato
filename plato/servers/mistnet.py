@@ -24,8 +24,9 @@ torch.multiprocessing.set_sharing_strategy('file_system')
 
 class Server(fedavg.Server):
     """The MistNet server for federated learning."""
-    def __init__(self, model=None, algorithm=None, trainer=None):
-        super().__init__(model=model, algorithm=algorithm, trainer=trainer)
+    def __init__(self, model=None, algorithm=None, trainer=None, 
+                 transmitter=None):
+        super().__init__(model=model, algorithm=algorithm, trainer=trainer, transmitter=transmitter)
 
         # MistNet requires one round of client-server communication
         assert Config().trainer.rounds == 1
