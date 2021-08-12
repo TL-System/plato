@@ -1,0 +1,66 @@
+clients:
+    # Type
+    type: simple
+
+    # The total number of clients
+    total_clients: 3
+
+    # The number of clients selected in each round
+    per_round: 2
+
+    # Should the clients compute test accuracy locally?
+    do_test: true
+
+    # Whether simulate clients or not
+    simulation: true
+
+server:
+    address: 127.0.0.1
+    port: 8000
+
+data:
+    # The training and testing dataset
+    datasource: TinyImageNet
+
+    # Where the dataset is located
+    data_path: ./data/tiny-imagenet-200
+
+    # Number of samples in each partition
+    partition_size: 20000
+
+    # IID or non-IID?
+    sampler: iid
+
+trainer:
+    # The type of the trainer
+    type: basic
+
+    # The maximum number of training rounds
+    rounds: 100
+
+    # Whether the training should use multiple GPUs if available
+    parallelized: true
+
+    # The maximum number of clients running concurrently
+    max_concurrency: 2
+
+    # The target accuracy
+    target_accuracy: 0.88
+
+    # Number of epoches for local training in each communication round
+    epochs: 1
+    batch_size: 128
+    optimizer: SGD
+    learning_rate: 0.001
+    momentum: 0.9
+    weight_decay: 0.0001
+
+    # Learning rate schedule
+    lr_schedule: StepLR
+
+    # The machine learning model
+    model_name: alexnet
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg

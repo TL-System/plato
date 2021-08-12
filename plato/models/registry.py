@@ -30,6 +30,7 @@ else:
         inceptionv3,
         vgg,
         unet,
+        alexnet,
     )
     registered_models = OrderedDict([
         ('lenet5', lenet5.Model),
@@ -38,6 +39,7 @@ else:
         ('inceptionv3', inceptionv3.Model),
         ('vgg', vgg.Model),
         ('unet', unet.Model),
+        ('alexnet', alexnet.Model),
     ])
 
 
