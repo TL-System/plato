@@ -39,7 +39,7 @@ $ conda install pytorch torchvision -c pytorch
 To use *Plato* as a Python framework, you only need to install it as a pip package:
 
 ```shell
-# pip install plato-learn
+$ pip install plato-learn
 ```
 
 After *Plato* is installed, you can try to run any of the examples in `examples/`.
@@ -198,7 +198,7 @@ docker rmi plato
 
 On Ubuntu Linux, you may need to add `sudo` before these `docker` commands.
 
-The provided `Dockerfile` helps to build a Docker image running Ubuntu 20.04, with a virtual environment called `plato` pre-configured to support PyTorch 1.8.1 and Python 3.8. 
+The provided `Dockerfile` helps to build a Docker image running Ubuntu 20.04, with a virtual environment called `plato` pre-configured to support PyTorch 1.9.0 and Python 3.8. 
 
 If MindSpore support is needed, the provided `Dockerfile_MindSpore` contains two pre-configured environments for CPU and GPU environments, respectively, called `plato_cpu` or `plato_gpu`. They support [MindSpore 1.1.1](https://github.com/mindspore-ai/mindspore) and Python 3.7.5 (which is the Python version that MindSpore requires). Both Dockerfiles have GPU support enabled. Once an image is built and a Docker container is running, one can use Visual Studio Code to connect to it and start development within the container.
 
