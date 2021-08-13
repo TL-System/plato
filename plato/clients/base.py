@@ -219,7 +219,7 @@ class Client:
     async def send(self, payload) -> None:
         """Sending the client payload to the server using either S3 or socket.io."""
         if hasattr(Config().server,
-                   'endpoint_url') and hasattr(Config().server, 'bucket'):
+                   's3_endpoint_url') and hasattr(Config().server, 's3_bucket'):
             unique_key = uuid.uuid4().hex[:6].upper()
             payload_key = f'client_payload_{self.client_id}_{unique_key}'
             s3_url = s3.send_to_s3(payload_key, payload)
@@ -227,7 +227,6 @@ class Client:
         else:
             s3_url = None
             if isinstance(payload, list):
-                s3_url = None
                 data_size: int = 0
 
                 for data in payload:
