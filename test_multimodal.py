@@ -9,8 +9,18 @@ from plato.config import Config
 from plato.models.multimodal import multimodal_module
 from plato.datasources.multimodal import kinetics
 
-kinetics_source = kinetics.DataSource()
+support_modalities = ['rgb', "flow", "audio"]
 
-multi_model = multimodal_module.DynamicMultimodalModule(
-    support_modality_names=['rgb', "flow", "audio"],
-    multimodal_nets_configs=Config.multimodal_nets_configs)
+
+def test_multimodal():
+    kinetics_source = kinetics.DataSource()
+
+    multi_model = multimodal_module.DynamicMultimodalModule(
+        support_modality_names=support_modalities,
+        multimodal_nets_configs=Config.multimodal_nets_configs,
+        is_fused_head=True)
+
+
+if __name__ == "__main__":
+    _ = Config()
+    test_multimodal()

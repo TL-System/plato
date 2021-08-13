@@ -17,7 +17,7 @@ server = dict(address="127.0.0.1", port=8000)
 # dataset settings for the multimodal data, frames, flow, and audio
 
 data = dict(
-    datasource="Kinetics700",
+    datasource="kinetics700",
     data_path="./data/Kinetics",
     download_url=
     "https://storage.googleapis.com/deepmind-media/Datasets/kinetics700_2020.tar.gz",

@@ -5,13 +5,14 @@ import os
 import sys
 
 # put the configuration file here:
-# os.environ['config_file'] = 'configs/Kinetics/kinetics_mm.py'
-os.environ['config_file'] = 'configs/Gym/gym_mm.py'
+os.environ['config_file'] = 'configs/Kinetics/kinetics_mm.py'
+# os.environ['config_file'] = 'configs/Gym/gym_mm.py'
 
 import numpy as np
 
 from plato.config import Config
 from plato.datasources.multimodal import kinetics
+from plato.datasources.multimodal import kinetics_mm
 from plato.datasources.multimodal import gym
 from plato.datasources.multimodal import flickr30k_entities
 from plato.datasources.multimodal import coco
@@ -25,9 +26,8 @@ def test_coco_provide():
 
 def test_kinetics_provide():
 
-    kinetics_data_source = kinetics.DataSource()
+    kinetics_data_source = kinetics_mm.DataSource()
     # kinetics_data_source.get_train_set()
-    kinetics_data_source.extract_videos_rgb_flow_audio(mode="train")
 
 
 def test_gym_provide():
@@ -53,6 +53,6 @@ def test_referitgame_provide():
 if __name__ == "__main__":
     _ = Config()
 
-    # test_kinetics_provide()
+    test_kinetics_provide()
 
-    test_gym_provide()
+    # test_gym_provide()
