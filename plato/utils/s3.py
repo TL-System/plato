@@ -22,19 +22,18 @@ def send_to_s3(object_key, object_to_send) -> str:
         Returns: A presigned URL for use later to retrieve the data.
     """
     if hasattr(Config().server,
-                   'endpoint_url') and hasattr(Config().server, 'bucket'):
-        s3_client = boto3.client('s3', endpoint_url=Config().server.endpoint_url)
+                   's3_endpoint_url') and hasattr(Config().server, 's3_bucket'):
+        s3_client = boto3.client('s3', endpoint_url=Config().server.s3_endpoint_url)
 
         try:
             # Does the object key exist already in S3?
-            s3_client.head_object(Bucket=Config().server.bucket, Key=object_key)
+            s3_client.head_object(Bucket=Config().server.s3_bucket, Key=object_key)
         except botocore.exceptions.ClientError:
             try:
                 # Only send the object if the key does not exist yet
-                print('sending to s3...')
                 put_url = s3_client.generate_presigned_url(
                         ClientMethod='put_object',
-                        Params={'Bucket': Config().server.bucket, 'Key': object_key},
+                        Params={'Bucket': Config().server.s3_bucket, 'Key': object_key},
                         ExpiresIn=300)
                 data = pickle.dumps(object_to_send)
                 response = requests.put(put_url, data=data)
@@ -51,12 +50,12 @@ def send_to_s3(object_key, object_to_send) -> str:
 
         get_url = s3_client.generate_presigned_url(
             ClientMethod='get_object',
-            Params={'Bucket': Config().server.bucket, 'Key': object_key},
+            Params={'Bucket': Config().server.s3_bucket, 'Key': object_key},
             ExpiresIn=300)
 
         return get_url
 
-    raise ValueError('The Endpoint URL and bucket are not found in the configuration.')
+    raise ValueError('s3_endpoint_url and s3_bucket are not found in the configuration.')
 
 def receive_from_s3(presigned_url) -> Any:
     """ Retrieves an object from an S3-compatible object storage service.

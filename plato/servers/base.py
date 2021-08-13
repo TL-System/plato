@@ -253,7 +253,7 @@ class Server:
     async def send(self, sid, payload, client_id) -> None:
         """ Sending a new data payload to the client using either S3 or socket.io. """
         if hasattr(Config().server,
-                   'endpoint_url') and hasattr(Config().server, 'bucket'):
+                   's3_endpoint_url') and hasattr(Config().server, 's3_bucket'):
             payload_key = f'server_payload_{os.getpid()}_{self.current_round}'
             s3_url = s3.send_to_s3(payload_key, payload)
             data_size = sys.getsizeof(pickle.dumps(payload))
