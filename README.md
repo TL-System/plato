@@ -4,21 +4,17 @@ Welcome to *Plato*, a new software framework to facilitate scalable federated le
 
 ## Installation
 
-### Installing Plato with PyTorch
+### Setting up your Python environment
 
-To install *Plato*, first clone this repository to the desired directory.
-
-The *Plato* developers recommend using [Miniconda](https://docs.conda.io/en/latest/miniconda.html) to manage Python packages. Before using *Plato*, first install [Miniconda](https://docs.conda.io/en/latest/miniconda.html), update your `conda` environment, and then create a new `conda` environment with Python 3.8 using the command:
+It is recommended that [Miniconda](https://docs.conda.io/en/latest/miniconda.html) is used to manage Python packages. Before using *Plato*, first install [Miniconda](https://docs.conda.io/en/latest/miniconda.html), update your `conda` environment, and then create a new `conda` environment with Python 3.8 using the command:
 
 ```shell
-$ conda update conda
+$ conda update conda -y
 $ conda create -n federated python=3.8
 $ conda activate federated
 ```
 
 where `federated` is the preferred name of your new environment.
-
-Update any packages, if necessary by typing `y` to proceed.
 
 The next step is to install the required Python packages. PyTorch should be installed following the advice of its [getting started website](https://pytorch.org/get-started/locally/). The typical command in Linux with CUDA GPU support, for example, would be:
 
@@ -38,13 +34,27 @@ In macOS (without GPU support), the typical command would be:
 $ conda install pytorch torchvision -c pytorch
 ```
 
+### Installing Plato as a pip package
+
+To use *Plato* as a Python framework, you only need to install it as a pip package:
+
+```shell
+# pip install plato-learn
+```
+
+After *Plato* is installed, you can try to run any of the examples in `examples/`.
+
+### Installing Plato for development with PyTorch
+
+If you wish to modify the source code in *Plato* (rather than just using it as a framework), first clone this repository to a desired directory.
+
 We will need to install several packages using `pip` as well:
 
 ```shell
 $ pip install -r requirements.txt --upgrade
 ```
 
-Finally, we will install Plato as a pip package:
+Finally, we will install the current GitHub version of *Plato* as a local pip package:
 
 ```shell
 $ pip install .
