@@ -41,8 +41,10 @@ class Trainer(ABC):
             the maximum concurrency with respect to the number of training clients.
         """
         self.client_id = client_id
-        Trainer.run_sql_statement(
-            "CREATE TABLE IF NOT EXISTS trainers (run_id int)")
+
+        if hasattr(Config().trainer, 'max_concurrency'):
+            Trainer.run_sql_statement(
+                "CREATE TABLE IF NOT EXISTS trainers (run_id int)")
 
     @abstractmethod
     def save_model(self, filename=None):

@@ -52,7 +52,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |**type**|The type of the trainer|`basic`|
 |**rounds**|The maximum number of training rounds|Any positive integer||
 |**parallelized**|Whether the training should use multiple GPUs if available|`true` or `false`||
-|**max_concurrency**|The maximum number of clients running concurrently|Any positive integer||
+|max_concurrency|The maximum number of clients running concurrently. if this is not defined, no new processes are spawned for training|Any positive integer||
 |target_accuracy|The target accuracy of the global model|||
 |**epochs**|Number of epoches for local training in each communication round|Any positive integer||
 |**optimizer**||`SGD`, `Adam` or `FedProx`||
@@ -81,4 +81,4 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |types|Which parameter(s) will be written into a CSV file|`accuracy`, `training_time`, `round_time`, `local_epoch_num`, `edge_agg_num`|Use comma `,` to seperate parameters|
 |plot|Plot results ||Format: x\_axis&y\_axis. Use comma `,` to seperate multiple plots|
 |results_dir|The directory of results||If not specify, results will be stored under `./results/<datasource>/<model>/<server_type>/`|
-|trainer_counter_dir|The directory of running_trainers.sqlitedb||If not specify, it will be stored under `__file__`|
+|trainer_dir|The directory containing running_trainers.sqlitedb||If not specified, it will be stored under `__file__`|

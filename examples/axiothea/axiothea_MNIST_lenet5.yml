@@ -87,4 +87,4 @@ results:
 
     results_dir: ./results/test/
 
-    trainer_counter_dir: ./results/trainer/
+    trainer_dir: ./results/trainer/
