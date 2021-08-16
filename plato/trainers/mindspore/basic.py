@@ -5,7 +5,6 @@ The training and testing loop.
 import logging
 import os
 import time
-from typing import Tuple
 
 import numpy as np
 
@@ -105,7 +104,7 @@ class Trainer(base.Trainer):
         param_dict = mindspore.load_checkpoint(model_path)
         mindspore.load_param_into_net(self.model, param_dict)
 
-    def train(self, trainset, *args)  -> Tuple[bool, float]:
+    def train(self, trainset, *args)  -> float:
         """The main training loop in a federated learning workload.
 
         Arguments:
@@ -124,7 +123,7 @@ class Trainer(base.Trainer):
         self.pause_training()
         training_time = toc - tic
 
-        return True, training_time
+        return training_time
 
     def test(self, testset):
         """Testing the model using the provided test dataset.

@@ -87,7 +87,7 @@ class Config:
                         config['server']['simulation'] = True
             else:
                 # create a default configured config
-                config = Config.defaultConfig()
+                config = Config.default_config()
 
             Config.clients = Config.namedtuple_from_dict(config['clients'])
             Config.server = Config.namedtuple_from_dict(config['server'])
@@ -112,18 +112,19 @@ class Config:
                     Config.result_dir = f'./results/{datasource}/{model}/{server_type}/'
 
             if 'results' in config and hasattr(Config().results,
-                                               'trainer_counter_dir'):
-                trainer_counter_dir = Config.results.trainer_counter_dir
-                if not os.path.exists(trainer_counter_dir):
-                    os.makedirs(trainer_counter_dir)
+                                               'trainer_dir'):
+                trainer_dir = Config.results.trainer_dir
+                if not os.path.exists(trainer_dir):
+                    os.makedirs(trainer_dir)
             else:
-                trainer_counter_dir = os.path.dirname(__file__)
+                trainer_dir = os.path.dirname(__file__)
 
-            # Used to limit the maximum number of concurrent trainers
-            Config.sql_connection = sqlite3.connect(
-                trainer_counter_dir + '/running_trainers.sqlitedb')
+            if hasattr(Config().trainer, 'max_concurrency'):
+                # Used to limit the maximum number of concurrent trainers
+                Config.sql_connection = sqlite3.connect(
+                    trainer_dir + '/running_trainers.sqlitedb')
 
-            Config().cursor = Config.sql_connection.cursor()
+                Config().cursor = Config.sql_connection.cursor()
 
             # Customizable dictionary of global parameters
             Config.params: dict = {}
@@ -197,8 +198,8 @@ class Config:
         ) and torch.cuda.device_count() > 1
 
     @staticmethod
-    def defaultConfig() -> dict:
-        ''' list a default configuration when the config file is missing'''
+    def default_config() -> dict:
+        ''' Supply a default configuration when the config file is missing. '''
         config = {}
         config['clients'] = {}
         config['clients']['type'] = 'simple'

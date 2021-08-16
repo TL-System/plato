@@ -5,7 +5,6 @@ The training and testing loop.
 import logging
 import os
 import time
-from typing import Tuple
 
 import tensorflow as tf
 import wandb
@@ -78,7 +77,7 @@ class Trainer(base.Trainer):
 
         self.model.load_weights(model_path)
 
-    def train(self, trainset, sampler, cut_layer=None) -> Tuple[bool, float]:
+    def train(self, trainset, sampler, cut_layer=None) -> float:
         """The main training loop in a federated learning workload.
 
         Arguments:
@@ -130,7 +129,7 @@ class Trainer(base.Trainer):
         self.pause_training()
         training_time = toc - tic
 
-        return True, training_time
+        return training_time
 
     def test(self, testset):
         """Testing the model on the client using the provided test dataset.
