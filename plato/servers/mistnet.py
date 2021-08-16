@@ -11,15 +11,7 @@ from itertools import chain
 
 from plato.config import Config
 from plato.samplers import all_inclusive
-
 from plato.servers import fedavg
-
-os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
-os.environ["MKL_THREADING_LAYER"] = "GNU"
-
-import torch.multiprocessing
-
-torch.multiprocessing.set_sharing_strategy('file_system')
 
 
 class Server(fedavg.Server):
