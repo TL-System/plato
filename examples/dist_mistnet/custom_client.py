@@ -1,28 +1,20 @@
 """ An example for running Plato with custom clients. """
 import asyncio
-import logging
 import os
 
-os.environ['config_file'] = 'examples/dist_mistnet/mistnet_lenet5_client.yml'
+os.environ['config_file'] = './mistnet_lenet5_client.yml'
 
 from plato.clients import mistnet
 
-
-class CustomClient(mistnet.Client):
-    def __init__(self, model=None, datasource=None, trainer=None):
-        super().__init__(model=model, datasource=datasource, trainer=trainer)
-        logging.info("A customized client has been initialized.")
-
-
 def main():
     """
-    A Plato federated learning training session using a custom client.
+    A Plato federated learning client using the MistNet algorithm.
 
     To run this example:
-    python custom_client.py -i <client_id>
+    python mistnet_client.py -i <client_id>
     """
 
-    client = CustomClient()
+    client = mistnet.Client()
     client.configure()
     asyncio.run(client.start_client())
 
