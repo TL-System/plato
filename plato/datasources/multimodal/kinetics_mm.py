@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
+import re
 
 import json
 import logging
@@ -43,6 +43,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
         super().__init__()
 
         self.data_name = Config().data.datasource
+        base_data_name = re.findall(r'\D+', self.data_name)[0]
 
         # the rawframes contains the "flow", "rgb"
         # thus, the flow and rgb will be put in in same directory rawframes/
@@ -57,21 +58,6 @@ class DataSource(multimodal_base.MultiModalDataSource):
         Kinetics_annotation_dir_name = "annotations"
         self.data_anno_dir_path = os.path.join(base_data_path,
                                                Kinetics_annotation_dir_name)
-        self.data_anno_file_path = os.path.join(self.data_anno_dir_path,
-                                                "annotation.json")
-        self.raw_videos_path = os.path.join(base_data_path, "videos")
-        self.event_dir_path = os.path.join(base_data_path, "event")
-        self.event_subsection_dir_path = os.path.join(base_data_path,
-                                                      "subactions")
-        self.data_event_anno_file_path = os.path.join(self.data_anno_dir_path,
-                                                      "event_annotation.json")
-        self.event_subsection_frames_dir_path = os.path.join(
-            base_data_path, "subaction_frames")
-        self.event_subsection_audios_dir_path = os.path.join(
-            base_data_path, "subaction_audios")
-
-        self.event_subsection_audios_fea_dir_path = os.path.join(
-            base_data_path, "subaction_audios_features")
 
         anno_download_url = (
             "https://storage.googleapis.com/deepmind-media/Datasets/{}.tar.gz"
@@ -86,16 +72,26 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         downloaded_files = os.listdir(download_anno_path)
         for file_name in downloaded_files:
+            new_file_name = base_data_name + "_" + file_name
+            shutil.move(os.path.join(download_anno_path, file_name),
+                        os.path.join(self.data_anno_dir_path, new_file_name))
 
-            shutil.move(os.path.join(download_anno_path, file),
-                        os.path.join(download_anno_path, file))
-        if not self._exist_judgement(self.raw_videos_path):
-
-            logging.info(
-                "Downloading the raw videos for the Gym dataset. This may take a long time."
-            )
-
-            logging.info("Done.")
+        # download the trainset
+        for split in ["train", "test", "validation"]:
+            split_anno_path = os.path.join(
+                self.data_anno_dir_path, base_data_name + "_" + split + ".csv")
+            split_name = split if split != "validation" else "val"
+            video_dir = os.path.join(base_data_path, "video_" + split_name)
+            if not self._exist_judgement(video_dir):
+                logging.info((
+                    "Downloading the raw {} videos for the {} dataset. This may take a long time."
+                ).format(split, self.data_name))
+                kinetics_downloader.main(input_csv=split_anno_path,
+                                         output_dir=video_dir,
+                                         trim_format='%06d',
+                                         num_jobs=2,
+                                         tmp_dir='/tmp/kinetics')
+        logging.info("Done.")
 
         logging.info(
             ("The {} dataset has been prepared").format(self.data_name))

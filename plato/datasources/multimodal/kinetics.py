@@ -5,7 +5,6 @@ Note that the setting for the data loader is obtained from the github repo provi
 https://github.com/pytorch/vision/references/video_classification/train.py
 """
 
-import json
 import logging
 import os
 import sys
@@ -20,7 +19,9 @@ from mmaction.datasets import audio_feature_dataset
 
 from plato.config import Config
 from plato.datasources.multimodal import multimodal_base
-from plato.datasources.datalib import parallel_downloader as parallel
+
+from plato.datasources.datalib.kinetics_utils import download_tools
+from plato.datasources.datalib.kinetics_utils import utils as kine_utils
 from plato.datasources.datalib import video_transform
 from plato.datasources.datalib import frames_extraction_tools
 from plato.datasources.datalib import audio_extraction_tools
@@ -83,7 +84,10 @@ class DataSource(multimodal_base.MultiModalDataSource):
             "val": os.path.join(download_info_dir_path, "validate.csv")
         }
 
-        self.data_classes = self.extract_data_classes()
+        self.data_classes = kine_utils.extract_data_classes(
+            data_classes_file=self.data_classes_file,
+            train_info_data_path=self.train_info_data_path,
+            val_info_data_path=self.test_info_data_path)
 
         # get the download hyper-parameters
         num_workers = Config().data.num_workers
@@ -101,159 +105,36 @@ class DataSource(multimodal_base.MultiModalDataSource):
             logging.info(
                 "Downloading the raw videos for the Kinetics700 dataset. This may take a long time."
             )
-            self.download_train_val_sets(num_workers=num_workers,
-                                         failed_log=failed_save_file,
-                                         compress=compress,
-                                         verbose=verbose,
-                                         skip=skip,
-                                         log_file=log_file)
+            download_tools.download_train_val_sets(
+                splits_info=zip(
+                    [self.train_info_data_path, self.val_info_data_path], [
+                        self.splits_info["train"]["video_path"],
+                        self.splits_info["val"]["video_path"]
+                    ]),
+                data_classes=self.data_classes,
+                data_categories_file=self.data_categories_file,
+                num_workers=num_workers,
+                failed_log=failed_save_file,
+                compress=compress,
+                verbose=verbose,
+                skip=skip,
+                log_file=log_file)
 
-            self.download_test_set(num_workers=num_workers,
-                                   failed_log=failed_save_file,
-                                   compress=compress,
-                                   verbose=verbose,
-                                   skip=skip,
-                                   log_file=log_file)
+            download_tools.download_test_set(
+                test_info_data_path=self.test_info_data_path,
+                test_video_des_path=self.splits_info["test"]["video_path"],
+                num_workers=num_workers,
+                failed_log=failed_save_file,
+                compress=compress,
+                verbose=verbose,
+                skip=skip,
+                log_file=log_file)
             logging.info("Done.")
 
         logging.info("The Kinetics700 dataset has been prepared")
 
     def get_modality_name():
         return ["RGB", "Flow", "Audio"]
-
-    def download_category(self, category, num_workers, failed_save_file,
-                          compress, verbose, skip, log_file):
-        """[Download all videos that belong to the given category.]
-
-        Args:
-            category ([str]): [The category to download.]
-            num_workers ([int]): [Number of downloads in parallel.]
-            failed_save_file ([str]): [Where to save failed video ids.]
-            compress ([bool]): [Decides if the videos should be compressed.]
-            verbose ([bool]): [Print status.]
-            skip ([bool]): [Skip classes that already have folders (i.e. at least one video was downloaded).]
-            log_file ([str]): [Path to log file for youtube-dl.]
-
-        Raises:
-            ValueError: [description]
-        """
-        if os.path.exists(self.data_classes_file):
-            with open(self.data_classes_file, "r") as file:
-                categories = json.load(file)
-
-            if category not in categories:
-                raise ValueError("Category {} not found.".format(category))
-
-        classes = categories[category]
-        self.download_classes(classes, num_workers, failed_save_file, compress,
-                              verbose, skip, log_file)
-
-    def download_classes(self, classes, num_workers, failed_save_file,
-                         compress, verbose, skip, log_file):
-        """ Download the specific classes """
-        for list_path, save_root in zip(
-            [self.train_info_data_path, self.val_info_data_path], [
-                self.splits_info["train"]["video_path"],
-                self.splits_info["val"]["video_path"]
-            ]):
-            with open(list_path) as file:
-                data = json.load(file)
-            print("save_root: ", save_root)
-            pool = parallel.VideoDownloaderPool(classes,
-                                                data,
-                                                save_root,
-                                                num_workers,
-                                                failed_save_file,
-                                                compress,
-                                                verbose,
-                                                skip,
-                                                log_file=log_file)
-            pool.start_workers()
-            pool.feed_videos()
-            pool.stop_workers()
-
-    def download_train_val_sets(self,
-                                num_workers=4,
-                                failed_log="train_val_failed_log.txt",
-                                compress=False,
-                                verbose=False,
-                                skip=False,
-                                log_file=None):
-        """ Download all categories => all videos for train and the val set. """
-
-        # # download the required categories in class-wise
-        if os.path.exists(self.data_categories_file):
-            with open(self.data_categories_file, "r") as file:
-                categories = json.load(file)
-
-            for category in categories:
-                self.download_category(category,
-                                       num_workers,
-                                       failed_log,
-                                       compress=compress,
-                                       verbose=verbose,
-                                       skip=skip,
-                                       log_file=log_file)
-        else:  # download all the classes in the training and val data files
-
-            self.download_classes(self.data_classes, num_workers, failed_log,
-                                  compress, verbose, skip, log_file)
-
-    def download_test_set(self, num_workers, failed_log, compress, verbose,
-                          skip, log_file):
-        """ Download the test set. """
-
-        with open(self.test_info_data_path) as file:
-            data = json.load(file)
-
-        pool = parallel.VideoDownloaderPool(
-            None,
-            data,
-            self.splits_info["test"]["video_path"],
-            num_workers,
-            failed_log,
-            compress,
-            verbose,
-            skip,
-            log_file=log_file)
-        pool.start_workers()
-        pool.feed_videos()
-        pool.stop_workers()
-
-    def extract_data_classes(self):
-        """ Obtain a list of class names in the dataset. """
-
-        classes_container = list()
-        if os.path.exists(self.data_classes_file):
-            with open(self.data_classes_file, "r") as class_file:
-                lines = class_file.readlines()
-                classes_container = [line.replace("\n", "") for line in lines]
-
-            return classes_container
-
-        if not os.path.exists(self.train_info_data_path) or not os.path.exists(
-                self.val_info_data_path):
-            logging.info(
-                "The json files of the dataset are not completed. Download it first."
-            )
-            sys.exit()
-
-        for list_path in [self.train_info_data_path, self.val_info_data_path]:
-            with open(list_path) as file:
-                videos_data = json.load(file)
-            for key in videos_data.keys():
-                metadata = videos_data[key]
-                annotations = metadata["annotations"]
-                label = annotations["label"]
-                class_name = label.replace("_", " ")
-                if class_name not in classes_container:
-                    classes_container.append(class_name)
-        with open(self.data_classes_file, "w") as file:
-            for class_name in classes_container:
-                file.write(class_name)
-                file.write('\n')
-
-        return classes_container
 
     def extract_videos_rgb_flow_audio(self, mode="train", device="CPU"):
         src_mode_videos_dir = os.path.join(

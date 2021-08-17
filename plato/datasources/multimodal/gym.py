@@ -20,7 +20,7 @@ from mmaction.datasets import rawframe_dataset
 from mmaction.datasets import audio_feature_dataset
 
 from plato.config import Config
-from plato.datasources.datalib import gym_trim
+from plato.datasources.datalib.gym_utils import gym_trim
 from plato.datasources.multimodal import multimodal_base
 from plato.datasources.datalib import video_transform
 from plato.datasources.datalib import frames_extraction_tools

@@ -14,7 +14,8 @@ from torchvision import datasets
 
 from plato.config import Config
 from plato.datasources.multimodal import multimodal_base
-from plato.datasources.datalib import data_utils, flickr30k_utils
+from plato.datasources.datalib import data_utils
+from plato.datasources.datalib.flicker30k_utils import flickr30k_utils
 
 
 def collate_fn(batch):

@@ -13,7 +13,7 @@ from torchvision import datasets
 
 from plato.config import Config
 from plato.datasources.multimodal import multimodal_base
-from plato.datasources.datalib import data_utils, flickr30k_utils
+from plato.datasources.datalib import data_utils
 
 
 class DataSource(multimodal_base.MultiModalDataSource):
