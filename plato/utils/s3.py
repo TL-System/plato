@@ -30,17 +30,18 @@ def send_to_s3(object_key, object_to_send) -> str:
             s3_client.head_object(Bucket=Config().server.s3_bucket, Key=object_key)
         except botocore.exceptions.ClientError:
             try:
-                # Only send the object if the key does not exist yet
+                # Mistnet, this step costs a long period and may cause URL Expires.
+                data = pickle.dumps(object_to_send)
+                # Only send the object if the key does not exist yet)
                 put_url = s3_client.generate_presigned_url(
                         ClientMethod='put_object',
                         Params={'Bucket': Config().server.s3_bucket, 'Key': object_key},
-                        ExpiresIn=300)
-                data = pickle.dumps(object_to_send)
+                        ExpiresIn=300
                 response = requests.put(put_url, data=data)
 
                 if response.status_code != 200:
-                    raise ValueError('Error occurred sending data: status code = {}').format(
-                        response.status_code) from None
+                    raise ValueError('Error occurred sending data: status code = {}'.format(
+                        response.status_code)) from None
 
             except botocore.exceptions.ClientError as error:
                 raise ValueError('Error occurred sending data to S3: {}'.format(error)) from error
@@ -70,5 +71,5 @@ def receive_from_s3(presigned_url) -> Any:
     if response.status_code == 200:
         return pickle.loads(response.content)
     else:
-        raise ValueError('Error occurred sending data: request status code = {}').format(
-            response.status_code)
+        raise ValueError('Error occurred sending data: request status code = {}'.format(
+            response.status_code))
