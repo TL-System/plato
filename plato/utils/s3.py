@@ -31,13 +31,13 @@ def send_to_s3(object_key, object_to_send) -> str:
         except botocore.exceptions.ClientError:
             try:
                 # Only send the object if the key does not exist yet
-                data = pickle.dumps(object_to_send)
+                _data = pickle.dumps(object_to_send)
 
                 put_url = s3_client.generate_presigned_url(
                         ClientMethod='put_object',
                         Params={'Bucket': Config().server.s3_bucket, 'Key': object_key},
                         ExpiresIn=300)
-                response = requests.put(put_url, data=data)
+                response = requests.put(put_url, data=_data)
 
                 if response.status_code != 200:
                     raise ValueError('Error occurred sending data: status code = {}'.format(
