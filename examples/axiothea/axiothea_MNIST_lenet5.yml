@@ -86,5 +86,3 @@ results:
     types: accuracy, training_time, round_time, edge_agg_num
 
     results_dir: ./results/test/
-
-    trainer_dir: ./results/trainer/

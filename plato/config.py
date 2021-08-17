@@ -111,19 +111,9 @@ class Config:
                     server_type = Config.algorithm.type
                     Config.result_dir = f'./results/{datasource}/{model}/{server_type}/'
 
-            if 'results' in config and hasattr(Config().results,
-                                               'trainer_dir'):
-                trainer_dir = Config.results.trainer_dir
-                if not os.path.exists(trainer_dir):
-                    os.makedirs(trainer_dir)
-            else:
-                trainer_dir = os.path.dirname(__file__)
-
             if hasattr(Config().trainer, 'max_concurrency'):
-                # Used to limit the maximum number of concurrent trainers
-                Config.sql_connection = sqlite3.connect(
-                    trainer_dir + '/running_trainers.sqlitedb')
-
+                # Use an in-memory SQLite database to limit the maximum number of concurrent trainers
+                Config.sql_connection = sqlite3.connect("/tmp/running_trainers.sqlitedb")
                 Config().cursor = Config.sql_connection.cursor()
 
             # Customizable dictionary of global parameters
