@@ -387,4 +387,4 @@ class Trainer(basic.Trainer):
         y1 = round(y1 * size[1])
         y2 = round(y2 * size[1])
 
-        return (x1, y1, x2, y2)
+        return (int(x1), int(y1), int(x2), int(y2))
