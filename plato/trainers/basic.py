@@ -199,9 +199,8 @@ class Trainer(base.Trainer):
             logging.info("Training on client #%d failed.", self.client_id)
             raise training_exception
 
-        self.model.cpu()
-
         if 'max_concurrency' in config:
+            self.model.cpu()
             model_type = config['model_name']
             filename = f"{model_type}_{self.client_id}_{config['run_id']}.pth"
             self.save_model(filename)
