@@ -20,11 +20,12 @@ Attributes in **bold** must be included in a configuration file, while attribute
 
 ### server
 
-| Attribute | Meaning | Valid Value | Note |
+| Attribute | Meaning | Valid Values | Note |
 |:---------:|:-------:|:-----------:|:----:|
 |*type*|The type of the server|`fedavg_cross_silo`|**algorithm.type** must be `fedavg`|
 |**address**|The address of the central server|e.g., `127.0.0.1`||
 |**port**|The port number of the central server|e.g., `8000`||
+|disable_clients|If this optional setting is enabled as `true`, the server will not launched client processes on the same machine.||
 |s3_endpoint_url|The endpoint URL for an S3-compatible storage service, used for transferring payloads between clients and servers.||
 |s3_bucket|The bucket name for an S3-compatible storage service, used for transferring payloads between clients and servers.||
 |ping_interval|The interval in seconds at which the server pings the client. The default is 3600 seconds. |||
