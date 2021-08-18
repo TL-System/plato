@@ -1,15 +1,17 @@
 """
-A federated learning training session using AFL.
+A federated learning server using Active Federated Learning, where in each round
+clients are selected not uniformly at random, but with a probability conditioned
+on the current model, as well as the data on the client, to maximize efficiency.
 
 Reference:
 
-Goetz et al., "Active Federated Learning".
+Goetz et al., "Active Federated Learning", 2019.
 
 https://arxiv.org/pdf/1909.12641.pdf
 """
 import os
 
-os.environ['config_file'] = 'examples/afl/afl_MNIST_lenet5.yml'
+os.environ['config_file'] = './afl_MNIST_lenet5.yml'
 
 import afl_server
 import afl_client
