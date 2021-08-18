@@ -22,7 +22,7 @@ registered_servers = OrderedDict([
 ])
 
 
-def get():
+def get(model=None, algorithm=None, trainer=None):
     """Get an instance of the server."""
     if hasattr(Config().server, 'type'):
         server_type = Config().server.type
@@ -31,7 +31,7 @@ def get():
 
     if server_type in registered_servers:
         logging.info("Server: %s", server_type)
-        registered_server = registered_servers[server_type]()
+        registered_server = registered_servers[server_type](model=model, algorithm=algorithm, trainer=trainer)
     else:
         raise ValueError('No such server: {}'.format(server_type))
 
