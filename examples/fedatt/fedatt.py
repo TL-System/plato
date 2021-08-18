@@ -6,7 +6,7 @@ Reference:
 Ji et al., "Learning Private Neural Language Modeling with Attentive Aggregation,"
 in the Proceedings of the 2019 International Joint Conference on Neural Networks (IJCNN).
 
-https://arxiv.org/pdf/1812.07108.pdf
+https://arxiv.org/abs/1812.07108
 """
 import os
 
