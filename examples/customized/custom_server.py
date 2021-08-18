@@ -3,7 +3,7 @@ import os
 
 from torch import nn
 
-# os.environ['config_file'] = 'examples/configs/server.yml'
+os.environ['config_file'] = './custom_server.yml'
 
 from plato.servers import fedavg
 
@@ -24,8 +24,7 @@ def main():
         nn.Linear(128, 10),
     )
 
-    # server = CustomServer(model=model)
-    server = CustomServer()
+    server = CustomServer(model=model)
     server.run()
 
 if __name__ == "__main__":

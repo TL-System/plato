@@ -97,7 +97,9 @@ class Server:
             # Allowing some time for the edge servers to start
             time.sleep(5)
 
-        if Config().clients.total_clients > 0:
+        if hasattr(Config().server, 'disable_clients') and Config().server.disable_clients:
+            logging.info("No clients are launched (server:disable_clients = true)")
+        else:
             Server.start_clients(client=self.client)
 
         self.start()

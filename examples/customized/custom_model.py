@@ -10,7 +10,7 @@ from torch import nn
 from torchvision.datasets import MNIST
 from torchvision.transforms import ToTensor
 
-# os.environ['config_file'] = 'configs/fedavg_lenet5.yml'
+os.environ['config_file'] = './fedavg_lenet5.yml'
 
 from plato.clients import simple
 from plato.datasources import base
@@ -19,8 +19,7 @@ from plato.trainers import basic
 
 
 class DataSource(base.DataSource):
-    """A custom datasource with custom training and validation
-       datasets.
+    """A custom datasource with custom training and validation datasets.
     """
     def __init__(self):
         super().__init__()
@@ -85,7 +84,9 @@ class Trainer(basic.Trainer):
 
 
 def main():
-    """A Plato federated learning training session using a custom model. """
+    """A Plato federated learning training session using a custom model,
+       datasource, and trainer.
+    """
     model = nn.Sequential(
         nn.Linear(28 * 28, 128),
         nn.ReLU(),

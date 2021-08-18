@@ -14,7 +14,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |:---------:|:-------:|:-----------:|:----:|
 **type**|Type of federated learning client|`simple`|A basic client who sends weight updates to the server|
 |||`mistnet`|A client for MistNet|
-|**total_clients**|The total number of clients|If this is positive number on the server, it will spawn the client processes. If this is 0, the server will not spawn any client processes||
+|**total_clients**|The total number of clients|A positive number||
 |**per_round**|The number of clients selected in each round| Any positive integer that is not larger than **total_clients**||
 |**do_test**|Should the clients compute test accuracy locally?| `true` or `false`|| 
 
