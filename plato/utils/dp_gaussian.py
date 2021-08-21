@@ -37,7 +37,11 @@ def clip_weights(weights):
     # Compute clipped weights
     for name, weight in weights.items():
         weight_norm = torch.linalg.norm(weight.float()).item()
-        clipped_weights[name] = weight / max(1, weight_norm / clipping_bound)
+        if clipping_bound == 0:
+            clipped_weights[name] = weight
+        else:
+            clipped_weights[name] = weight / max(1,
+                                                 weight_norm / clipping_bound)
 
     return clipped_weights, clipping_bound
 
