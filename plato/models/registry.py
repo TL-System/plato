@@ -28,20 +28,24 @@ else:
         resnet,
         wideresnet,
         inceptionv3,
+        googlenet,
         vgg,
         unet,
         alexnet,
         squeezenet,
+        shufflenet,
     )
     registered_models = OrderedDict([
         ('lenet5', lenet5.Model),
         ('resnet', resnet.Model),
         ('wideresnet', wideresnet.Model),
         ('inceptionv3', inceptionv3.Model),
+        ('googlenet', googlenet.Model),
         ('vgg', vgg.Model),
         ('unet', unet.Model),
         ('alexnet', alexnet.Model),
         ('squeezenet', squeezenet.Model),
+        ('shufflenet', shufflenet.Model),
     ])
 
 
