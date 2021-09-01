@@ -62,7 +62,7 @@ class ClientEvents(socketio.AsyncClientNamespace):
 
     async def on_payload_done(self, data):
         """ All of the new payload sent from the server arrived. """
-        await self.plato_client.payload_done(data['id'], data['s3_url'])
+        await self.plato_client.payload_done(data['id'], data['obkey'])
 
 
 class Client:
@@ -106,6 +106,12 @@ class Client:
         self.sio.register_namespace(
             ClientEvents(namespace='/', plato_client=self))
 
+        self.s3_client = None
+        try:
+            self.s3_client = s3.S3()
+        except:
+            self.s3_client = None
+        
         uri = ""
         if hasattr(Config().server, 'use_https'):
             uri = 'https://{}'.format(Config().server.address)
@@ -165,11 +171,11 @@ class Client:
             self.server_payload = [self.server_payload]
             self.server_payload.append(_data)
 
-    async def payload_done(self, client_id, s3_url) -> None:
+    async def payload_done(self, client_id, object_key) -> None:
         """ Upon receiving all the new payload from the server. """
         payload_size = 0
 
-        if s3_url is None:
+        if object_key is None:
             if isinstance(self.server_payload, list):
                 for _data in self.server_payload:
                     payload_size += sys.getsizeof(pickle.dumps(_data))
@@ -179,7 +185,7 @@ class Client:
             else:
                 payload_size = sys.getsizeof(pickle.dumps(self.server_payload))
         else:
-            self.server_payload = s3.receive_from_s3(s3_url)
+            self.server_payload = self.s3_client.receive_from_s3(object_key)
             payload_size = sys.getsizeof(pickle.dumps(self.server_payload))
 
         assert client_id == self.client_id
@@ -218,14 +224,13 @@ class Client:
 
     async def send(self, payload) -> None:
         """Sending the client payload to the server using either S3 or socket.io."""
-        if hasattr(Config().server,
-                   's3_endpoint_url') and hasattr(Config().server, 's3_bucket'):
+        if self.s3_client != None:
             unique_key = uuid.uuid4().hex[:6].upper()
-            payload_key = f'client_payload_{self.client_id}_{unique_key}'
-            s3_url = s3.send_to_s3(payload_key, payload)
+            payload_key = self.s3_client.key_prefix + f'client_payload_{self.client_id}_{unique_key}'
+            self.s3_client.send_to_s3(payload_key, payload)
             data_size = sys.getsizeof(pickle.dumps(payload))
         else:
-            s3_url = None
+            payload_key = None
             if isinstance(payload, list):
                 data_size: int = 0
 
@@ -238,7 +243,7 @@ class Client:
                 await self.send_in_chunks(_data)
                 data_size = sys.getsizeof(_data)
 
-        await self.sio.emit('client_payload_done', {'id': self.client_id, 's3_url': s3_url})
+        await self.sio.emit('client_payload_done', {'id': self.client_id, 'obkey': payload_key})
 
         logging.info("[Client #%d] Sent %s MB of payload data to the server.",
                      self.client_id, round(data_size / 1024**2, 2))

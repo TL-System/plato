@@ -190,12 +190,13 @@ class Config:
         config = {}
         config['clients'] = {}
         config['clients']['type'] = 'simple'
-        config['clients']['total_clients'] = 0
+        config['clients']['total_clients'] = 1
         config['clients']['per_round'] = 1
-        config['clients']['do_test'] = True
+        config['clients']['do_test'] = False
         config['server'] = {}
         config['server']['address'] = '127.0.0.1'
         config['server']['port'] = 8000
+        config['server']['disable_clients'] = True
         config['data'] = {}
         config['data']['datasource'] = 'MNIST'
         config['data']['data_path'] = './data'
@@ -206,7 +207,6 @@ class Config:
         config['trainer']['type'] = 'basic'
         config['trainer']['rounds'] = 5
         config['trainer']['parallelized'] = False
-        config['trainer']['max_concurrency'] = 1
         config['trainer']['target_accuracy'] = 0.94
         config['trainer']['epochs'] = 5
         config['trainer']['batch_size'] = 32
@@ -219,3 +219,14 @@ class Config:
         config['algorithm']['type'] = 'fedavg'
 
         return config
+    
+    @staticmethod
+    def store() -> None:
+        data = {}
+        data['clients'] = Config.clients._asdict()
+        data['server'] = Config.server._asdict()
+        data['data'] = Config.data._asdict()
+        data['trainer'] = Config.trainer._asdict()
+        data['algorithm'] = Config.algorithm._asdict()
+        with open(Config.args.config, "w") as out:
+            yaml.dump(data, out, default_flow_style=False)
