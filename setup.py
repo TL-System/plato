@@ -41,7 +41,7 @@ setuptools.setup(
     extras_require={"tests": ["pytest"]},
     include_package_data=True,
     options={'bdist_wheel': {
-        'python_tag': 'py37.py38.py39'
+        'python_tag': 'py36.py37.py38.py39'
     }},
     classifiers=[
         "Development Status :: 3 - Alpha",

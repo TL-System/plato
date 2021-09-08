@@ -19,7 +19,7 @@ where `federated` is the preferred name of your new environment.
 The next step is to install the required Python packages. PyTorch should be installed following the advice of its [getting started website](https://pytorch.org/get-started/locally/). The typical command in Linux with CUDA GPU support, for example, would be:
 
 ```shell
-$ conda install pytorch torchvision torchaudio cudatoolkit=11.1 -c pytorch -c nvidia
+$ conda install pytorch torchvision cudatoolkit=11.1 -c pytorch -c nvidia
 ```
 
 The CUDA version, used in the command above, can be obtained on Ubuntu Linux systems by using the command:
@@ -58,6 +58,7 @@ Finally, we will install the current GitHub version of *Plato* as a local pip pa
 
 ```shell
 $ pip install .
+$ pip install yapf mypy pylint
 ```
 
 If you use Visual Studio Code, it is possible to use `yapf` to reformat the code every time it is saved by adding the following settings to .`.vscode/settings.json`:
@@ -94,9 +95,13 @@ cd packages/yolov5
 pip install .
 ```
 
-### Installing Plato with MindSpore
+### Installing Plato with MindSpore or TensorFlow
 
-Plato is designed to support multiple deep learning frameworks, including PyTorch, TensorFlow, and MindSpore. For MindSpore support, Plato currently supports MindSpore 1.1.1 (1.2.1 and 1.3.0 are not supported, as [they do not support `Tensor` objects to be pickled](https://gitee.com/mindspore/mindspore/issues/I43RPP?from=project-issue) and sent over a network). Though we provided a `Dockerfile` for building a Docker container that supports MindSpore 1.1.1, in rare cases it may still be necessary to install Plato with MindSpore in a GPU server running Ubuntu Linux 18.04 (which MindSpore requires). Similar to a PyTorch installation, we need to first create a new environment with Python 3.7.5 (which MindSpore 1.1.1 requires), and then install the required packages:
+Plato is designed to support multiple deep learning frameworks, including PyTorch, TensorFlow, and MindSpore. 
+
+For TensorFlow support, please install the `tensorflow` and `tensorflow-datasets` pip packages first. 
+
+For MindSpore support, Plato currently supports MindSpore 1.1.1 (1.2.1 and 1.3.0 are not supported, as [they do not support `Tensor` objects to be pickled](https://gitee.com/mindspore/mindspore/issues/I43RPP?from=project-issue) and sent over a network). Though we provided a `Dockerfile` for building a Docker container that supports MindSpore 1.1.1, in rare cases it may still be necessary to install Plato with MindSpore in a GPU server running Ubuntu Linux 18.04 (which MindSpore requires). Similar to a PyTorch installation, we need to first create a new environment with Python 3.7.5 (which MindSpore 1.1.1 requires), and then install the required packages:
 
 ```shell
 conda create -n mindspore python=3.7.5
@@ -154,7 +159,7 @@ To start a federated learning training workload, run [`run`](run) from the repos
 
 *Plato* uses the YAML format for its configuration files to manage the runtime configuration parameters. Example configuration files have been provided in the `configs` directory.
 
-*Plato* can opt to use `wandb` to produce and collect logs in the cloud. If this is needed, add `use_wandb: true` to the `trainer` section in your configuration file.
+*Plato* can opt to use `wandb` to produce and collect logs in the cloud. If this is needed, add `use_wandb: true` to the `trainer` section in your configuration file, and install the `wandb` pip package in your `conda` environment.
 
 ### Running Plato in a Docker container
 

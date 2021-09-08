@@ -68,7 +68,8 @@ def main():
     algorithm = split_learning_algorithm.Algorithm(trainer=trainer)
     client = MistnetplusClient(algorithm=algorithm, trainer=trainer)
     client.configure()
-    asyncio.run(client.start_client())
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(client.start_client())
 
 if __name__ == "__main__":
     main()

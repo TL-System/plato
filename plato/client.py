@@ -54,7 +54,9 @@ def run(client_id, port, client=None, edge_server=None, edge_client=None):
             logging.info("Starting a custom client #%d", client_id)
 
         client.configure()
-        asyncio.run(client.start_client())
+
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(client.start_client())
 
 
 if __name__ == "__main__":
