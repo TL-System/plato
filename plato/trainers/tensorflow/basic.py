@@ -7,7 +7,6 @@ import os
 import time
 
 import tensorflow as tf
-import wandb
 
 from plato.config import Config
 from plato.trainers import base
@@ -92,6 +91,8 @@ class Trainer(base.Trainer):
         config['run_id'] = Config().params['run_id']
 
         if 'use_wandb' in config:
+            import wandb
+
             run = wandb.init(project="plato",
                              group=str(config['run_id']),
                              reinit=True)

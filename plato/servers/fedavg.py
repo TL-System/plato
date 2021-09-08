@@ -8,7 +8,6 @@ import os
 import random
 import time
 
-import wandb
 from plato.algorithms import registry as algorithms_registry
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
@@ -24,6 +23,8 @@ class Server(base.Server):
         super().__init__()
 
         if hasattr(Config().trainer, 'use_wandb'):
+            import wandb
+
             wandb.init(project="plato", reinit=True)
 
         self.model = model

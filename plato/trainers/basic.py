@@ -10,7 +10,6 @@ import time
 import numpy as np
 import torch
 import torch.nn as nn
-import wandb
 from plato.config import Config
 from plato.models import registry as models_registry
 from plato.trainers import base
@@ -99,6 +98,8 @@ class Trainer(base.Trainer):
         cut_layer (optional): The layer which training should start from.
         """
         if 'use_wandb' in config:
+            import wandb
+
             run = wandb.init(project="plato",
                              group=str(config['run_id']),
                              reinit=True)
