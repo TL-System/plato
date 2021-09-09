@@ -87,7 +87,7 @@ class Trainer(base.Trainer):
     def load_model(self, filename=None):
         """Loading pre-trained model weights from a file."""
         model_name = Config().trainer.model_name
-        model_dir = Config().params['model_dir']
+        model_dir = Config().params['pretrained_model_dir']
 
         if filename is not None:
             model_path = f'{model_dir}{filename}'

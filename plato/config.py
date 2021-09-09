@@ -121,6 +121,7 @@ class Config:
 
             # Pretrained models
             Config.params['model_dir'] = "./models/pretrained/"
+            Config.params['pretrained_model_dir'] = "./models/pretrained/"
 
         return cls._instance
 

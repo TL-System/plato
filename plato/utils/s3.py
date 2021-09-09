@@ -38,16 +38,16 @@ class S3:
             if len(str_list) > 1:
                 self.key_prefix = bucket_part[len(self.bucket):]
         
-        if os.path.exists("~/.obs/credentials") and (self.access_key == None or self.secret_key == None):
-            # read from ~/.aws/credentials
-            with open("~/.obs/credentials") as f:
-                data = f.readlines()
-                if len(data) >= 3:
-                    try:
-                        self.access_key = data[1].split("=")[1].replace(" ", "").replace("\n", "")
-                        self.secret_key = data[2].split("=")[1].replace(" ", "").replace("\n", "")
-                    except Error:
-                        raise ValueError("credentials format error")
+        # if os.path.exists("~/.obs/credentials") and (self.access_key == None or self.secret_key == None):
+        #     # read from ~/.aws/credentials
+        #     with open("~/.obs/credentials") as f:
+        #         data = f.readlines()
+        #         if len(data) >= 3:
+        #             try:
+        #                 self.access_key = data[1].split("=")[1].replace(" ", "").replace("\n", "")
+        #                 self.secret_key = data[2].split("=")[1].replace(" ", "").replace("\n", "")
+        #             except Error:
+        #                 raise ValueError("credentials format error")
                         
         if self.endpoint == None or self.bucket == None or self.access_key == None or self.secret_key == None:
             raise ValueError("S3 does not existed")
@@ -73,6 +73,7 @@ class S3:
     
             Returns: A presigned URL for use later to retrieve the data.
         """
+        object_key = self.key_prefix + "/" + object_key
         try:
             # Does the object key exist already in S3?
             self.s3_client.head_object(Bucket=self.bucket, Key=object_key)
@@ -105,6 +106,7 @@ class S3:
 
             Returns: The object to be retrieved.
         """
+        object_key = self.key_prefix + "/" + object_key
         get_url = self.s3_client.generate_presigned_url(
             ClientMethod='get_object',
             Params={'Bucket': self.bucket, 'Key': object_key},
@@ -120,4 +122,10 @@ class S3:
     def delete_from_s3(self, object_key):
         response = self.s3_client.delete_object(
             Bucket=self.bucket, Key=object_key)
-
+    
+    def lists(self):
+        response = self.s3_client.list_objects_v2(Bucket=self.bucket)
+        keys = []
+        for obj in response['Contents']:
+            keys.append(obj['Key'])
+        return keys
