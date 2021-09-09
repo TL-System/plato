@@ -226,7 +226,7 @@ class Client:
         """Sending the client payload to the server using either S3 or socket.io."""
         if self.s3_client != None:
             unique_key = uuid.uuid4().hex[:6].upper()
-            payload_key = self.s3_client.key_prefix + f'client_payload_{self.client_id}_{unique_key}'
+            payload_key = f'client_payload_{self.client_id}_{unique_key}'
             self.s3_client.send_to_s3(payload_key, payload)
             data_size = sys.getsizeof(pickle.dumps(payload))
         else:
