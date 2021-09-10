@@ -77,21 +77,8 @@ class Trainer(base.Trainer):
                          self.client_id, model_path)
 
         self.model.load_weights(model_path)
-
-    def train(self, trainset, sampler, cut_layer=None) -> float:
-        """The main training loop in a federated learning workload.
-
-        Arguments:
-        trainset: The training dataset.
-        sampler: the sampler that extracts a partition for this client.
-        cut_layer (optional): The layer which training should start from.
-        """
-        self.start_training()
-        tic = time.perf_counter()
-
-        config = Config().trainer._asdict()
-        config['run_id'] = Config().params['run_id']
-
+        
+    def train_process(self, config, trainset, sampler, cut_layer=None):
         if 'use_wandb' in config:
             import wandb
 
@@ -100,36 +87,59 @@ class Trainer(base.Trainer):
                              reinit=True)
 
         custom_train = getattr(self, "train_model", None)
-
-        if callable(custom_train):
-            self.train_model(config, trainset, sampler.get(), cut_layer)
-        else:
-            # Initializing the loss criterion
-            _loss_criterion = getattr(self, "loss_criterion", None)
-            if callable(_loss_criterion):
-                loss_criterion = self.loss_criterion(self.model)
+        try:
+            if callable(custom_train):
+                self.train_model(config, trainset, sampler.get(), cut_layer)
             else:
-                loss_criterion = tf.keras.losses.SparseCategoricalCrossentropy(
-                )
+                # Initializing the loss criterion
+                _loss_criterion = getattr(self, "loss_criterion", None)
+                if callable(_loss_criterion):
+                    loss_criterion = self.loss_criterion(self.model)
+                else:
+                    loss_criterion = tf.keras.losses.SparseCategoricalCrossentropy(
+                    )
 
-            # Initializing the optimizer
-            get_optimizer = getattr(self, "get_optimizer", None)
-            if callable(get_optimizer):
-                optimizer = self.get_optimizer(self.model)
-            else:
-                optimizer = tf.keras.optimizers.Adam(config['learning_rate'])
+                # Initializing the optimizer
+                get_optimizer = getattr(self, "get_optimizer", None)
+                if callable(get_optimizer):
+                    optimizer = self.get_optimizer(self.model)
+                else:
+                    optimizer = tf.keras.optimizers.Adam(config['learning_rate'])
 
-            self.model.compile(
-                optimizer=optimizer,
-                loss=loss_criterion,
-                metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
-            self.model.fit(trainset, epochs=config['epochs'])
-
+                self.model.compile(
+                    optimizer=optimizer,
+                    loss=loss_criterion,
+                    metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
+                self.model.fit(trainset, epochs=config['epochs'])
+        except Exception as training_exception:
+            logging.info("Training on client #%d failed.", self.client_id)
+            raise training_exception
+        
         if 'use_wandb' in config:
             run.finish()
+    
+    def train(self, trainset, sampler, cut_layer=None) -> float:
+        """The main training loop in a federated learning workload.
 
-        toc = time.perf_counter()
-        self.pause_training()
+        Arguments:
+        trainset: The training dataset.
+        sampler: the sampler that extracts a partition for this client.
+        cut_layer (optional): The layer which training should start from.
+        """
+        config = Config().trainer._asdict()
+        config['run_id'] = Config().params['run_id']
+        if hasattr(Config().trainer, 'max_concurrency'):
+            # reserved for mp.Process
+            self.start_training()
+            tic = time.perf_counter()
+            self.train_process(config, trainset, sampler, cut_layer)
+            toc = time.perf_counter()
+            self.pause_training()
+        else:
+            tic = time.perf_counter()
+            self.train_process(config, trainset, sampler, cut_layer)
+            toc = time.perf_counter()
+        
         training_time = toc - tic
 
         return training_time
