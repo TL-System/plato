@@ -19,8 +19,11 @@ class Algorithm(base.Algorithm):
         model: The model to train.
         """
         super().__init__(trainer)
-        datasource = datasources_registry.get()
-        self.model.build_model(datasource.input_shape())
+        if hasattr(self.model, 'build_model'):
+            datasource = datasources_registry.get()
+            self.model.build_model(datasource.input_shape())
+        else:
+            self.model = trainer.model
 
     def extract_weights(self):
         """ Extract weights from the model. """
