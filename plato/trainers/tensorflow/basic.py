@@ -92,6 +92,7 @@ class Trainer(base.Trainer):
                 self.train_model(config, trainset, sampler.get(), cut_layer)
             else:
                 # Initializing the loss criterion
+                logging.info("Get loss_criterion on client #%d.", self.client_id)
                 _loss_criterion = getattr(self, "loss_criterion", None)
                 if callable(_loss_criterion):
                     loss_criterion = self.loss_criterion(self.model)
@@ -100,6 +101,7 @@ class Trainer(base.Trainer):
                     )
 
                 # Initializing the optimizer
+                logging.info("Get_optimizer on client #%d.", self.client_id)
                 get_optimizer = getattr(self, "get_optimizer", None)
                 if callable(get_optimizer):
                     optimizer = self.get_optimizer(self.model)
@@ -110,6 +112,8 @@ class Trainer(base.Trainer):
                     optimizer=optimizer,
                     loss=loss_criterion,
                     metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
+                
+                logging.info("Begining training on client #%d.", self.client_id)
                 self.model.fit(trainset, epochs=config['epochs'])
         except Exception as training_exception:
             logging.info("Training on client #%d failed.", self.client_id)
