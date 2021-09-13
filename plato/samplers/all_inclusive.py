@@ -2,8 +2,7 @@
 Samples all the data from a dataset. Applicable in cases where the dataset comes from
 local sources only, and used by the MistNet server.
 """
-from torch.utils.data import SubsetRandomSampler
-
+import random
 from plato.samplers import base
 
 
@@ -16,7 +15,7 @@ class Sampler(base.Sampler):
         self.all_inclusive = range(len(dataset))
 
     def get(self):
-        return SubsetRandomSampler(self.all_inclusive)
+        return random.shuffle(self.all_inclusive)
 
     def trainset_size(self):
         """Returns the length of the dataset after sampling. """
