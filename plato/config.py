@@ -160,18 +160,25 @@ class Config:
     @staticmethod
     def device() -> str:
         """Returns the device to be used for training."""
-        import torch
-
-        if torch.cuda.is_available() and torch.cuda.device_count() > 0:
-            if hasattr(Config().trainer,
-                       'parallelized') and Config().trainer.parallelized:
-                device = 'cuda'
-            else:
-                device = 'cuda:' + str(
-                    random.randint(0,
-                                   torch.cuda.device_count() - 1))
+        device = 'cpu'
+        if hasattr(Config().trainer, 'use_mindspore'):
+            pass
+        elif hasattr(Config().trainer, 'use_tensorflow'):
+            import tensorflow as tf
+            gpus = tf.config.experimental.list_physical_devices('GPU')
+            if len(gpus) > 0:
+                device = 'GPU'
+                tf.config.experimental.set_visible_devices(gpus[random.randint(0, len(gpus) - 1)], 'GPU')
         else:
-            device = 'cpu'
+            import torch
+
+            if torch.cuda.is_available() and torch.cuda.device_count() > 0:
+                if hasattr(Config().trainer,
+                           'parallelized') and Config().trainer.parallelized:
+                    device = 'cuda'
+                else:
+                    device = 'cuda:' + str(
+                        random.randint(0, torch.cuda.device_count() - 1))
 
         return device
 

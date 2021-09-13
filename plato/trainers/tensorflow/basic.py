@@ -77,7 +77,7 @@ class Trainer(base.Trainer):
                          self.client_id, model_path)
 
         self.model.load_weights(model_path)
-        
+
     def train_process(self, config, trainset, sampler, cut_layer=None):
         if 'use_wandb' in config:
             import wandb
@@ -91,37 +91,43 @@ class Trainer(base.Trainer):
             if callable(custom_train):
                 self.train_model(config, trainset, sampler.get(), cut_layer)
             else:
-                # Initializing the loss criterion
-                logging.info("Get loss_criterion on client #%d.", self.client_id)
-                _loss_criterion = getattr(self, "loss_criterion", None)
-                if callable(_loss_criterion):
-                    loss_criterion = self.loss_criterion(self.model)
-                else:
-                    loss_criterion = tf.keras.losses.SparseCategoricalCrossentropy(
-                    )
+                if 'is_compiled' not in config:
+                    # Initializing the loss criterion
+                    logging.info("Get loss_criterion on client #%d.",
+                                 self.client_id)
+                    _loss_criterion = getattr(self, "loss_criterion", None)
+                    if callable(_loss_criterion):
+                        loss_criterion = self.loss_criterion(self.model)
+                    else:
+                        loss_criterion = tf.keras.losses.SparseCategoricalCrossentropy(
+                        )
 
-                # Initializing the optimizer
-                logging.info("Get_optimizer on client #%d.", self.client_id)
-                get_optimizer = getattr(self, "get_optimizer", None)
-                if callable(get_optimizer):
-                    optimizer = self.get_optimizer(self.model)
-                else:
-                    optimizer = tf.keras.optimizers.Adam(config['learning_rate'])
+                    # Initializing the optimizer
+                    logging.info("Get_optimizer on client #%d.",
+                                 self.client_id)
+                    get_optimizer = getattr(self, "get_optimizer", None)
+                    if callable(get_optimizer):
+                        optimizer = self.get_optimizer(self.model)
+                    else:
+                        optimizer = tf.keras.optimizers.Adam(
+                            config['learning_rate'])
 
-                self.model.compile(
-                    optimizer=optimizer,
-                    loss=loss_criterion,
-                    metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
-                
-                logging.info("Begining training on client #%d.", self.client_id)
+                    self.model.compile(
+                        optimizer=optimizer,
+                        loss=loss_criterion,
+                        metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
+
+                logging.info("Begining training on client #%d.",
+                             self.client_id)
                 self.model.fit(trainset, epochs=config['epochs'])
         except Exception as training_exception:
-            logging.info("Training on client #%d failed.", self.client_id)
+            logging.info("Training on client #%d failed: %s", self.client_id,
+                         training_exception)
             raise training_exception
-        
+
         if 'use_wandb' in config:
             run.finish()
-    
+
     def train(self, trainset, sampler, cut_layer=None) -> float:
         """The main training loop in a federated learning workload.
 
@@ -143,7 +149,7 @@ class Trainer(base.Trainer):
             tic = time.perf_counter()
             self.train_process(config, trainset, sampler, cut_layer)
             toc = time.perf_counter()
-        
+
         training_time = toc - tic
 
         return training_time
@@ -170,9 +176,11 @@ class Trainer(base.Trainer):
         Arguments:
         testset: The test dataset.
         """
-        self.model.compile(
-            optimizer=tf.keras.optimizers.Adam(Config().trainer.learning_rate),
-            loss=tf.keras.losses.SparseCategoricalCrossentropy(),
-            metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
+        if hasattr(Config().trainer, 'is_compiled'):
+            self.model.compile(
+                optimizer=tf.keras.optimizers.Adam(
+                    Config().trainer.learning_rate),
+                loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+                metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
 
         return self.test(testset)
