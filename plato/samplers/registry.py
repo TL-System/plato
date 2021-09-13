@@ -19,6 +19,13 @@ if hasattr(Config().trainer, 'use_mindspore'):
         ('iid', iid_mindspore.Sampler),
         ('noniid', dirichlet_mindspore.Sampler),
     ])
+elif hasattr(Config().trainer, 'use_tensorflow'):
+    from plato.samplers.tensorflow import base
+    registered_samplers = OrderedDict([
+        ('iid', base.Sampler),
+        ('noniid', base.Sampler),
+        ('mixed', base.Sampler),
+    ])
 else:
     from plato.samplers import (iid, dirichlet, mixed)
 
