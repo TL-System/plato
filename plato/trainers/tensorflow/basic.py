@@ -116,7 +116,7 @@ class Trainer(base.Trainer):
                 logging.info("Begining training on client #%d.", self.client_id)
                 self.model.fit(trainset, epochs=config['epochs'])
         except Exception as training_exception:
-            logging.info("Training on client #%d failed.", self.client_id)
+            logging.info("Training on client #%d failed: %s", self.client_id, training_exception)
             raise training_exception
         
         if 'use_wandb' in config:
