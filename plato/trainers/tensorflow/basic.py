@@ -170,7 +170,7 @@ class Trainer(base.Trainer):
         Arguments:
         testset: The test dataset.
         """
-        if hasattr(Config().trainer, 'is_compiled'):
+        if not hasattr(Config().trainer, 'is_compiled'):
             self.model.compile(
                 optimizer=tf.keras.optimizers.Adam(Config().trainer.learning_rate),
                 loss=tf.keras.losses.SparseCategoricalCrossentropy(),
