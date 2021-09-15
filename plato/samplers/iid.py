@@ -41,8 +41,12 @@ class Sampler(base.Sampler):
         """Obtains an instance of the sampler. """
         gen = torch.Generator()
         gen.manual_seed(self.random_seed)
+        version = torch.__version__
+        if int(version[0]) <= 1 and int(version[2]) <= 5:
+            return SubsetRandomSampler(self.subset_indices)
         return SubsetRandomSampler(self.subset_indices, generator=gen)
 
     def trainset_size(self):
         """Returns the length of the dataset after sampling. """
         return len(self.subset_indices)
+    
