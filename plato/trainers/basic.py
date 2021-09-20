@@ -309,7 +309,7 @@ class Trainer(base.Trainer):
         if 'max_concurrency' in config:
             model_name = config['model_name']
             filename = f"{model_name}_{self.client_id}_{config['run_id']}.acc"
-            Trainer.save_accuracy(accuracy, filename)
+            self.save_accuracy(accuracy, filename)
         else:
             return accuracy
 
@@ -339,7 +339,7 @@ class Trainer(base.Trainer):
             try:
                 model_name = Config().trainer.model_name
                 filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
-                accuracy = Trainer.load_accuracy(filename)
+                accuracy = self.load_accuracy(filename)
             except OSError as error:  # the model file is not found, training failed
                 raise ValueError(
                     f"Testing on client #{self.client_id} failed.") from error
