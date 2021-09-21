@@ -11,7 +11,15 @@ import requests
 from plato.config import Config
 
 class S3:
+    """ Manages the utilities to transmit Python objects to and from an S3-compatibile
+        object storage service.
+    """
     def __init__(self, endpoint=None, access_key=None, secret_key=None, bucket=None):
+        """ All S3-related credentials, such as the access key and the secret key,
+            are either to be stored in ~/.aws/credentials by using the 'aws configure'
+            command, passed into the constructor as parameters, or specified in the
+            `server` section of the configuration file.
+        """
         self.endpoint = endpoint
         self.bucket = bucket
         self.key_prefix = ""
@@ -56,14 +64,10 @@ class S3:
                 self.s3_client.create_bucket(Bucket=self.bucket)
             except botocore.exception.ClientError as s3_exception:    
                 raise ValueError("Fail to create a bucket.") from s3_exception
-    
+
     def send_to_s3(self, object_key, object_to_send) -> str:
         """ Sends an object to an S3-compatible object storage service.
 
-            All S3-related credentials, such as the access key and the secret key,
-            are assumed to be stored in ~/.aws/credentials by using the 'aws configure'
-            command.
-    
             Returns: A presigned URL for use later to retrieve the data.
         """
         object_key = self.key_prefix + "/" + object_key
@@ -105,18 +109,20 @@ class S3:
             Params={'Bucket': self.bucket, 'Key': object_key},
             ExpiresIn=300)
         response = requests.get(get_url)
-    
+
         if response.status_code == 200:
             return pickle.loads(response.content)
         else:
             raise ValueError('Error occurred sending data: request status code = {}'.format(
                 response.status_code))
-    
+
     def delete_from_s3(self, object_key):
-        response = self.s3_client.delete_object(
+        """ Deletes an object using its key from S3. """
+        __ = self.s3_client.delete_object(
             Bucket=self.bucket, Key=object_key)
-    
+
     def lists(self):
+        """ Retrieves keys to all the objects in the S3 bucket. """
         response = self.s3_client.list_objects_v2(Bucket=self.bucket)
         keys = []
         for obj in response['Contents']:
