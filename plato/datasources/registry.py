@@ -33,6 +33,7 @@ else:
         huggingface,
         pascal_voc,
         tiny_imagenet,
+        femnist,
     )
 
     registered_datasources = OrderedDict([('MNIST', mnist),
@@ -41,7 +42,8 @@ else:
                                           ('CINIC10', cinic10),
                                           ('HuggingFace', huggingface),
                                           ('PASCAL_VOC', pascal_voc),
-                                          ('TinyImageNet', tiny_imagenet)])
+                                          ('TinyImageNet', tiny_imagenet),
+                                          ('FEMNIST', femnist)])
 
 
 def get():

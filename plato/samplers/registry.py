@@ -27,12 +27,13 @@ elif hasattr(Config().trainer, 'use_tensorflow'):
         ('mixed', base.Sampler),
     ])
 else:
-    from plato.samplers import (iid, dirichlet, mixed)
+    from plato.samplers import (iid, dirichlet, mixed, empty)
 
     registered_samplers = OrderedDict([
         ('iid', iid.Sampler),
         ('noniid', dirichlet.Sampler),
         ('mixed', mixed.Sampler),
+        ('empty', empty.Sampler),
     ])
 
 
