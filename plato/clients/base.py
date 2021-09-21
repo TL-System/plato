@@ -73,6 +73,7 @@ class Client:
         self.chunks = []
         self.server_payload = None
         self.data_loaded = False  # is training data already loaded from the disk?
+        self.s3_client = None
 
         if hasattr(Config().algorithm,
                    'cross_silo') and not Config().is_edge_server():
@@ -106,13 +107,9 @@ class Client:
         self.sio.register_namespace(
             ClientEvents(namespace='/', plato_client=self))
 
-        self.s3_client = None
-        try:
+        if hasattr(Config().server, 's3_endpoint_url'):
             self.s3_client = s3.S3()
-        except:
-            self.s3_client = None
-        
-        uri = ""
+
         if hasattr(Config().server, 'use_https'):
             uri = 'https://{}'.format(Config().server.address)
         else:
