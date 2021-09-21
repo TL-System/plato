@@ -1,7 +1,6 @@
 """
 Utilities to transmit Python objects to and from an S3-compatible object storage service.
 """
-from locale import Error
 import pickle
 from typing import Any
 
@@ -18,51 +17,45 @@ class S3:
         self.key_prefix = ""
         self.access_key = access_key
         self.secret_key = secret_key
-        
+
         if hasattr(Config().server, 's3_endpoint_url'):
             self.endpoint = Config().server.s3_endpoint_url
-            
+
         if hasattr(Config().server, 's3_bucket'):
             self.bucket = Config().server.s3_bucket
-            
+
         if hasattr(Config().server, 'access_key'):
             self.access_key = Config().server.access_key
-            
+
         if hasattr(Config().server, 'secret_key'):
             self.secret_key = Config().server.secret_key
-        
+
+        if self.bucket is None:
+            raise ValueError("The S3 storage service has not been properly configured.")
+
         if "s3://" in self.bucket:
             bucket_part = self.bucket[5:]
             str_list = bucket_part.split("/")
             self.bucket = str_list[0]
             if len(str_list) > 1:
                 self.key_prefix = bucket_part[len(self.bucket):]
-        
-        # if os.path.exists("~/.obs/credentials") and (self.access_key == None or self.secret_key == None):
-        #     # read from ~/.aws/credentials
-        #     with open("~/.obs/credentials") as f:
-        #         data = f.readlines()
-        #         if len(data) >= 3:
-        #             try:
-        #                 self.access_key = data[1].split("=")[1].replace(" ", "").replace("\n", "")
-        #                 self.secret_key = data[2].split("=")[1].replace(" ", "").replace("\n", "")
-        #             except Error:
-        #                 raise ValueError("credentials format error")
-                        
-        if self.endpoint == None or self.bucket == None or self.access_key == None or self.secret_key == None:
-            raise ValueError("S3 does not existed")
-        
-        self.s3_client = boto3.client('s3', endpoint_url=self.endpoint, 
-                                      aws_access_key_id=self.access_key,
-                                      aws_secret_access_key=self.secret_key)
-        # check the bucket exist or not
+
+        if self.access_key is not None and self.secret_key is not None:
+            self.s3_client = boto3.client('s3', endpoint_url=self.endpoint,
+                                        aws_access_key_id=self.access_key,
+                                        aws_secret_access_key=self.secret_key)
+        else:
+            # the access key and secret key are stored locally in ~/.aws/credentials
+            self.s3_client = boto3.client('s3', endpoint_url=self.endpoint)
+
+        # Does the bucket exist?
         try:
             self.s3_client.head_bucket(Bucket=self.bucket)
-        except:
+        except botocore.exception.ClientError:
             try:
                 self.s3_client.create_bucket(Bucket=self.bucket)
-            except botocore.exception.ClientError:    
-                raise ValueError("Fail to create a bucket")
+            except botocore.exception.ClientError as s3_exception:    
+                raise ValueError("Fail to create a bucket.") from s3_exception
     
     def send_to_s3(self, object_key, object_to_send) -> str:
         """ Sends an object to an S3-compatible object storage service.
