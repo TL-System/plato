@@ -1,5 +1,4 @@
 """
-Contributor: Zhifeng Jiang, HKUST
 The FEMNIST Classification dataset.
 
 FEMNIST contains 817851 images, each of which is a 28x28 greyscale image in 1 out of 62 classes.
@@ -20,7 +19,7 @@ from torchvision import transforms
 from plato.config import Config
 from plato.datasources import base
 
-import np
+import numpy as np
 import json
 from collections import defaultdict
 import subprocess
