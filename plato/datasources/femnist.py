@@ -464,7 +464,7 @@ class DataSource(base.DataSource):
 
                         for j in train_indices:
                             train_blist[j] = True
-                        for j in train_indices:
+                        for j in test_indices:
                             test_blist[j] = True
 
                         for j in range(curr_num_samples):
