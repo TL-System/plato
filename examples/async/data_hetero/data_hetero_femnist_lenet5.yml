@@ -24,8 +24,8 @@ data:
     # The training and testing dataset
     datasource: FEMNIST
 
-    # Where LEAF project is locate
-    data_path: /data/samuel/plato/submodules/leaf
+    # Where the dataset is located
+    data_path: ./
 
     # Number of samples in each partition
     partition_size: 500
