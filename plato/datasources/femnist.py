@@ -28,7 +28,7 @@ import hashlib
 import numpy as np
 from PIL import Image
 from collections import defaultdict, OrderedDict
-from zhifeng_learning.patch.utils import (
+from plato.utils.custom_transform import (
     CustomDictDataset, ReshapeListTransform
 )
 
