@@ -80,26 +80,6 @@ class DataSource(base.DataSource):
         self.testset_size = len(result['x'])
         return result
 
-    def do_nothing(self):
-        pass
-
-    def read_dir_worker(self, files, data_dir):
-        clients = []
-        groups = []
-        data = defaultdict(self.do_nothing)
-
-        for f in files:
-            file_path = os.path.join(data_dir, f)
-            with open(file_path, 'r') as inf:
-                cdata = json.load(inf)
-            clients.extend(cdata['users'])
-            if 'hierarchies' in cdata:
-                groups.extend(cdata['hierarchies'])
-            data.update(cdata['user_data'])
-
-        clients = list(sorted(data.keys()))
-        return clients, groups, data
-
     def read_dir(self, data_dir):
         clients = []
         groups = []
