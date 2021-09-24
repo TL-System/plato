@@ -3,12 +3,13 @@ The FEMNIST Classification dataset.
 
 FEMNIST contains 817851 images, each of which is a 28x28 greyscale image in 1 out of 62 classes.
 The dataset is already partitioned by clients' identification.
-There are in total 3597 clients, each of which has 227.37 images on average (std is 88.84).
+There are 3597 clients in total, each of which has 227.37 images on average (std is 88.84).
 For each client, 90% data samples are used for training, while the rest are used for testing.
 
 Reference for the dataset: Cohen, G., Afshar, S., Tapson, J. and Van Schaik, A.,
 EMNIST: Extending MNIST to handwritten letters. In 2017 IEEE IJCNN.
-Reference for the related submodule: https://github.com/TalwalkarLab/leaf/tree/master
+
+Reference: https://github.com/TalwalkarLab/leaf/tree/master
 """
 
 from __future__ import division
@@ -207,8 +208,8 @@ class DataSource(base.DataSource):
 
     def match_hashes(self, class_file_hashes_path, write_file_hashes_path,
                      write_with_class_path):
-        logging.info("Matching hashes so that class labels"
-                     " can be assigned to images in the `by_write` folder.")
+        logging.info("Matching hashes so that class labels "
+                     "can be assigned to images in the `by_write` folder.")
         with open(class_file_hashes_path, 'rb') as fin:
             class_file_hashes = pickle.load(fin)
         with open(write_file_hashes_path, 'rb') as fin:
@@ -316,7 +317,7 @@ class DataSource(base.DataSource):
     def sample_data(self, all_data_dir, sampled_data_dir, scale, rng_seed):
         # Equivalent to executing `LEAF_DATA_META_DIR=meta python3 sample.py --name femnist
         # --fraction [scale] --seed [rng_seed]` at ~/data/utils/ of LEAF
-        logging.info(f"Sampling {scale} data using seed {rng_seed}")
+        logging.info("Sampling %d data using seed %d", scale, rng_seed)
 
         os.makedirs(sampled_data_dir)
         files = os.listdir(all_data_dir)
@@ -362,7 +363,7 @@ class DataSource(base.DataSource):
 
                 if ctot_num_samples + cnum_samples > num_new_samples:
                     cnum_samples = num_new_samples - ctot_num_samples
-                    indices = [i for i in range(cnum_samples)]
+                    indices = list(range(cnum_samples))
                     new_indices = rng.sample(indices, cnum_samples)
 
                     x, y = [], []
@@ -406,7 +407,7 @@ class DataSource(base.DataSource):
         # Equivalent to executing `LEAF_DATA_META_DIR=meta python3 split_data.py --by_sample
         # --name femnist --frac [train_fraction] --seed [rng_seed]` at ~/data/utils/ of LEAF
         logging.info(
-            f"Splitting datasets for training and testing using seed {rng_seed}"
+            "Splitting datasets for training and testing using seed %s", rng_seed
         )
 
         os.makedirs(train_dir)
@@ -498,8 +499,8 @@ class DataSource(base.DataSource):
                 all_data_train['hierarchies'] = hierarchies
                 all_data_test['hierarchies'] = hierarchies
 
-            file_name_train = '%s_train_%s.json' % ((f[:-5]), arg_label)
-            file_name_test = '%s_test_%s.json' % ((f[:-5]), arg_label)
+            file_name_train = f'{f[:-5]}_train_{arg_label}.json'
+            file_name_test = f'{f[:-5]}_test_{arg_label}.json'
             out_dir_train = os.path.join(train_dir, file_name_train)
             out_dir_test = os.path.join(test_dir, file_name_test)
 
@@ -511,7 +512,7 @@ class DataSource(base.DataSource):
         logging.info("Split.")
 
     # Equivalent to executing `./preprocess.sh -s niid --sf 1.0 -k 0 -t sample`
-    # at `~/data/femnist/` folder of LEAF
+    # at `~/data/femnist/` folder in LEAF
     def preprocess_data(self, data_path):
         if not os.path.exists(data_path):
             os.makedirs(data_path)
@@ -542,10 +543,10 @@ class DataSource(base.DataSource):
 
         if not os.path.isdir(all_data_dir):
             logging.info(
-                "[FEMNIST Phase 2] Converting the raw data to files in json format. "
+                "[FEMNIST Phase 2] Converting the raw data to files in the JSON format. "
                 "This may take a while.")
 
-            # correspond to ~/data/femnist/preprocess/get_file_dirs.py in LEAF
+            # corresponds to ~/data/femnist/preprocess/get_file_dirs.py in LEAF
             class_file_dirs_path = os.path.join(intermediate_dir,
                                                 'class_file_dirs.pkl')
             if not os.path.isfile(class_file_dirs_path):
@@ -555,7 +556,7 @@ class DataSource(base.DataSource):
             if not os.path.isfile(write_file_dirs_path):
                 self.extract_write_file_dirs(raw_dir, write_file_dirs_path)
 
-            # correspond to ~/data/femnist/preprocess/get_hashes.py
+            # corresponds to ~/data/femnist/preprocess/get_hashes.py in LEAF
             class_file_hashes_path = os.path.join(intermediate_dir,
                                                   'class_file_hashes.pkl')
             if not os.path.isfile(class_file_hashes_path):
@@ -567,7 +568,7 @@ class DataSource(base.DataSource):
                 self.compute_file_hashes(write_file_dirs_path,
                                          write_file_hashes_path, 'by_write')
 
-            # correspond to ~/data/femnist/preprocess/match_hashes.py
+            # corresponds to ~/data/femnist/preprocess/match_hashes.py in LEAF
             write_with_class_path = os.path.join(intermediate_dir,
                                                  'write_with_class.pkl')
             if not os.path.isfile(write_with_class_path):
@@ -575,14 +576,14 @@ class DataSource(base.DataSource):
                                   write_file_hashes_path,
                                   write_with_class_path)
 
-            # correspond to ~/data/femnist/preprocess/group_by_writer.py
+            # corresponds to ~/data/femnist/preprocess/group_by_writer.py in LEAF
             images_by_writer_path = os.path.join(intermediate_dir,
                                                  'images_by_writer.pkl')
             if not os.path.isfile(images_by_writer_path):
                 self.group_by_writers(write_with_class_path,
                                       images_by_writer_path)
 
-            # correspond to ~/data/femnist/preprocess/data_to_json.py
+            # corresponds to ~/data/femnist/preprocess/data_to_json.py in LEAF
             self.summarize_all_data(images_by_writer_path, all_data_dir)
 
             logging.info("[FEMNIST Phase 2] Converted.")
@@ -592,14 +593,14 @@ class DataSource(base.DataSource):
             "[FEMNIST Phase 3] Partitioning the FEMNIST dataset. This may take a while."
         )
 
-        # correspond to ~/data/utils/sample.py
+        # corresponds to ~/data/utils/sample.py in LEAF
         sampled_data_dir = os.path.join(intermediate_dir, 'sampled_data')
         if not os.path.isdir(sampled_data_dir):
             sample_rng_seed, scale = 233, 1.0  # TODO: to get rid of hard-coding
             self.sample_data(all_data_dir, sampled_data_dir, scale,
                              sample_rng_seed)
 
-        # correspond to ~/data/utils/split_data.py
+        # corresponds to ~/data/utils/split_data.py in LEAF
         train_dir = os.path.join(data_path, 'ready', 'train')
         test_dir = os.path.join(data_path, 'ready', 'test')
         if os.path.isdir(train_dir):

@@ -25,7 +25,7 @@ data:
     datasource: FEMNIST
 
     # Where the dataset is located
-    data_path: ./
+    data_path: ./data
 
     # Number of samples in each partition
     partition_size: 500
