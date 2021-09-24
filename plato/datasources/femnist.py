@@ -12,25 +12,24 @@ Reference for the related submodule: https://github.com/TalwalkarLab/leaf/tree/m
 """
 
 from __future__ import division
+
+import hashlib
+import json
 import logging
 import os
+import pickle
+import random
+import shutil
+from collections import OrderedDict, defaultdict
 
+import numpy as np
+from PIL import Image
 from torchvision import transforms
 
 from plato.config import Config
 from plato.datasources import base
-
-import json
-import shutil
-import random
-import pickle
-import hashlib
-import numpy as np
-from PIL import Image
-from collections import defaultdict, OrderedDict
-from plato.utils.custom_transform import (
-    CustomDictDataset, ReshapeListTransform
-)
+from plato.utils.custom_transform import (CustomDictDataset,
+                                          ReshapeListTransform)
 
 
 class DataSource(base.DataSource):
@@ -47,21 +46,31 @@ class DataSource(base.DataSource):
             self.preprocess_data(data_path=data_path)
 
         logging.info("Loading the FEMNIST dataset. This may take a while.")
-        train_clients, _, train_data, test_data = self.read_data(train_dir, test_dir)
+        train_clients, _, train_data, test_data = self.read_data(
+            train_dir, test_dir)
         trainset = self.dict_to_list(train_clients, train_data)
         testset = self.merge_testset(train_clients, test_data)
 
         _transform = transforms.Compose([
             ReshapeListTransform((28, 28, 1)),
             transforms.ToPILImage(),
-            transforms.RandomCrop(28, padding=2, padding_mode="constant", fill=1.0),
-            transforms.RandomResizedCrop(28, scale=(0.8, 1.2), ratio=(4. / 5., 5. / 4.)),
+            transforms.RandomCrop(28,
+                                  padding=2,
+                                  padding_mode="constant",
+                                  fill=1.0),
+            transforms.RandomResizedCrop(28,
+                                         scale=(0.8, 1.2),
+                                         ratio=(4. / 5., 5. / 4.)),
             transforms.RandomRotation(5, fill=1.0),
             transforms.ToTensor(),
             transforms.Normalize(0.9637, 0.1597),
         ])
-        self.trainset = [CustomDictDataset(dictionary=d, transform=_transform) for d in trainset]
-        self.testset = CustomDictDataset(dictionary=testset, transform=_transform)
+        self.trainset = [
+            CustomDictDataset(dictionary=d, transform=_transform)
+            for d in trainset
+        ]
+        self.testset = CustomDictDataset(dictionary=testset,
+                                         transform=_transform)
 
     def dict_to_list(self, list_of_keys, dictionary):
         result = []
@@ -135,7 +144,7 @@ class DataSource(base.DataSource):
         return class_files
 
     def get_write_files(self, raw_dir):
-        write_files = []   # (writer, file directory)
+        write_files = []  # (writer, file directory)
 
         # directory hierarchy: by_write -> folders containing writers
         # -> writer -> types of images -> images
@@ -154,7 +163,9 @@ class DataSource(base.DataSource):
                     type_dir = os.path.join(writer_dir, wtype)
                     rel_type_dir = os.path.join(writer_dir, wtype)
                     images = os.listdir(type_dir)
-                    image_dirs = [os.path.join(rel_type_dir, i) for i in images]
+                    image_dirs = [
+                        os.path.join(rel_type_dir, i) for i in images
+                    ]
 
                     for image_dir in image_dirs:
                         write_files.append((writer, image_dir))
@@ -162,21 +173,25 @@ class DataSource(base.DataSource):
         return write_files
 
     def extract_class_file_dirs(self, raw_dir, class_file_dirs_path):
-        logging.info("Extracting meta info of images in the `by_class` folder.")
+        logging.info(
+            "Extracting meta info of images in the `by_class` folder.")
         class_files = self.get_class_files(raw_dir)  # (class, file directory)
         with open(class_file_dirs_path, 'wb') as fout:
             pickle.dump(class_files, fout, pickle.HIGHEST_PROTOCOL)
         logging.info("Extracted.")
 
     def extract_write_file_dirs(self, raw_dir, write_file_dirs_path):
-        logging.info("Extracting meta info of images in the `by_write` folder.")
+        logging.info(
+            "Extracting meta info of images in the `by_write` folder.")
         write_files = self.get_write_files(raw_dir)  # (writer, file directory)
         with open(write_file_dirs_path, 'wb') as fout:
             pickle.dump(write_files, fout, pickle.HIGHEST_PROTOCOL)
         logging.info("Extracted.")
 
-    def compute_file_hashes(self, file_dirs_path, file_hashes_path, related_folder):
-        logging.info(f"Computing hashes for images in the `{related_folder}` folder.")
+    def compute_file_hashes(self, file_dirs_path, file_hashes_path,
+                            related_folder):
+        logging.info("Computing hashes for images in the %s folder.",
+                     related_folder)
         with open(file_dirs_path, 'rb') as fin:
             file_dirs = pickle.load(fin)
 
@@ -193,7 +208,7 @@ class DataSource(base.DataSource):
     def match_hashes(self, class_file_hashes_path, write_file_hashes_path,
                      write_with_class_path):
         logging.info("Matching hashes so that class labels"
-                     " can be assigned to images in the `by_write` folder")
+                     " can be assigned to images in the `by_write` folder.")
         with open(class_file_hashes_path, 'rb') as fin:
             class_file_hashes = pickle.load(fin)
         with open(write_file_hashes_path, 'rb') as fin:
@@ -384,12 +399,15 @@ class DataSource(base.DataSource):
             with open(out_dir, 'w') as fout:
                 json.dump(all_data, fout)
 
-        logging.info(f"Sampled.")
+        logging.info("Sampled.")
 
-    def split_data(self, sampled_data_dir, train_dir, test_dir, train_fraction, rng_seed):
+    def split_data(self, sampled_data_dir, train_dir, test_dir, train_fraction,
+                   rng_seed):
         # Equivalent to executing `LEAF_DATA_META_DIR=meta python3 split_data.py --by_sample
         # --name femnist --frac [train_fraction] --seed [rng_seed]` at ~/data/utils/ of LEAF
-        logging.info(f"Splitting datasets for training and testing using seed {rng_seed}")
+        logging.info(
+            f"Splitting datasets for training and testing using seed {rng_seed}"
+        )
 
         os.makedirs(train_dir)
         os.makedirs(test_dir)
@@ -416,13 +434,15 @@ class DataSource(base.DataSource):
             user_data_train = {}
             num_samples_test = []
             user_data_test = {}
-            user_indices = []  # indices of users in data['users'] that are not deleted
+            user_indices = [
+            ]  # indices of users in data['users'] that are not deleted
 
             for i, u in enumerate(data['users']):
                 curr_num_samples = len(data['user_data'][u]['y'])
                 if curr_num_samples >= 2:
                     # ensures number of train and test samples both >= 1
-                    num_train_samples = max(1, int(train_fraction * curr_num_samples))
+                    num_train_samples = max(
+                        1, int(train_fraction * curr_num_samples))
                     if curr_num_samples == 2:
                         num_train_samples = 1
 
@@ -430,7 +450,10 @@ class DataSource(base.DataSource):
 
                     indices = [j for j in range(curr_num_samples)]
                     train_indices = rng.sample(indices, num_train_samples)
-                    test_indices = [i for i in range(curr_num_samples) if i not in train_indices]
+                    test_indices = [
+                        i for i in range(curr_num_samples)
+                        if i not in train_indices
+                    ]
 
                     if len(train_indices) >= 1 and len(test_indices) >= 1:
                         user_indices.append(i)
@@ -449,11 +472,15 @@ class DataSource(base.DataSource):
 
                         for j in range(curr_num_samples):
                             if train_blist[j]:
-                                user_data_train[u]['x'].append(data['user_data'][u]['x'][j])
-                                user_data_train[u]['y'].append(data['user_data'][u]['y'][j])
+                                user_data_train[u]['x'].append(
+                                    data['user_data'][u]['x'][j])
+                                user_data_train[u]['y'].append(
+                                    data['user_data'][u]['y'][j])
                             elif test_blist[j]:
-                                user_data_test[u]['x'].append(data['user_data'][u]['x'][j])
-                                user_data_test[u]['y'].append(data['user_data'][u]['y'][j])
+                                user_data_test[u]['x'].append(
+                                    data['user_data'][u]['x'][j])
+                                user_data_test[u]['y'].append(
+                                    data['user_data'][u]['y'][j])
 
             users = [data['users'][i] for i in user_indices]
             all_data_train = {
@@ -496,7 +523,9 @@ class DataSource(base.DataSource):
         write_dir = os.path.join(raw_dir, 'by_write')
 
         if not os.path.isdir(class_dir) or not os.path.isdir(write_dir):
-            logging.info("[FEMNIST Phase 1] Downloading the FEMNIST dataset. This may take a while.")
+            logging.info(
+                "[FEMNIST Phase 1] Downloading the FEMNIST dataset. This may take a while."
+            )
             if not os.path.isdir(class_dir):
                 by_class_url = "https://s3.amazonaws.com/nist-srd/SD19/by_class.zip"
                 self.download(by_class_url, raw_dir)
@@ -512,14 +541,17 @@ class DataSource(base.DataSource):
         all_data_dir = os.path.join(intermediate_dir, 'all_data')
 
         if not os.path.isdir(all_data_dir):
-            logging.info("[FEMNIST Phase 2] Converting the raw data to files in json format. "
-                         "This may take a while.")
+            logging.info(
+                "[FEMNIST Phase 2] Converting the raw data to files in json format. "
+                "This may take a while.")
 
             # correspond to ~/data/femnist/preprocess/get_file_dirs.py in LEAF
-            class_file_dirs_path = os.path.join(intermediate_dir, 'class_file_dirs.pkl')
+            class_file_dirs_path = os.path.join(intermediate_dir,
+                                                'class_file_dirs.pkl')
             if not os.path.isfile(class_file_dirs_path):
                 self.extract_class_file_dirs(raw_dir, class_file_dirs_path)
-            write_file_dirs_path = os.path.join(intermediate_dir, 'write_file_dirs.pkl')
+            write_file_dirs_path = os.path.join(intermediate_dir,
+                                                'write_file_dirs.pkl')
             if not os.path.isfile(write_file_dirs_path):
                 self.extract_write_file_dirs(raw_dir, write_file_dirs_path)
 
@@ -527,26 +559,28 @@ class DataSource(base.DataSource):
             class_file_hashes_path = os.path.join(intermediate_dir,
                                                   'class_file_hashes.pkl')
             if not os.path.isfile(class_file_hashes_path):
-                self.compute_file_hashes(class_file_dirs_path, class_file_hashes_path,
-                                         'by_class')
+                self.compute_file_hashes(class_file_dirs_path,
+                                         class_file_hashes_path, 'by_class')
             write_file_hashes_path = os.path.join(intermediate_dir,
                                                   'write_file_hashes.pkl')
             if not os.path.isfile(write_file_hashes_path):
-                self.compute_file_hashes(write_file_dirs_path, write_file_hashes_path,
-                                         'by_write')
+                self.compute_file_hashes(write_file_dirs_path,
+                                         write_file_hashes_path, 'by_write')
 
             # correspond to ~/data/femnist/preprocess/match_hashes.py
             write_with_class_path = os.path.join(intermediate_dir,
                                                  'write_with_class.pkl')
             if not os.path.isfile(write_with_class_path):
-                self.match_hashes(class_file_hashes_path, write_file_hashes_path,
+                self.match_hashes(class_file_hashes_path,
+                                  write_file_hashes_path,
                                   write_with_class_path)
 
             # correspond to ~/data/femnist/preprocess/group_by_writer.py
             images_by_writer_path = os.path.join(intermediate_dir,
                                                  'images_by_writer.pkl')
             if not os.path.isfile(images_by_writer_path):
-                self.group_by_writers(write_with_class_path, images_by_writer_path)
+                self.group_by_writers(write_with_class_path,
+                                      images_by_writer_path)
 
             # correspond to ~/data/femnist/preprocess/data_to_json.py
             self.summarize_all_data(images_by_writer_path, all_data_dir)
@@ -554,13 +588,16 @@ class DataSource(base.DataSource):
             logging.info("[FEMNIST Phase 2] Converted.")
 
         # PART THREE: Partitioning
-        logging.info("[FEMNIST Phase 3] Partitioning the FEMNIST dataset. This may take a while.")
+        logging.info(
+            "[FEMNIST Phase 3] Partitioning the FEMNIST dataset. This may take a while."
+        )
 
         # correspond to ~/data/utils/sample.py
         sampled_data_dir = os.path.join(intermediate_dir, 'sampled_data')
         if not os.path.isdir(sampled_data_dir):
             sample_rng_seed, scale = 233, 1.0  # TODO: to get rid of hard-coding
-            self.sample_data(all_data_dir, sampled_data_dir, scale, sample_rng_seed)
+            self.sample_data(all_data_dir, sampled_data_dir, scale,
+                             sample_rng_seed)
 
         # correspond to ~/data/utils/split_data.py
         train_dir = os.path.join(data_path, 'ready', 'train')
@@ -570,7 +607,8 @@ class DataSource(base.DataSource):
         if os.path.isdir(test_dir):
             shutil.rmtree(test_dir)
         split_rng_seed, train_fraction = 233, 0.9  # TODO: to get rid of hard-coding
-        self.split_data(sampled_data_dir, train_dir, test_dir, train_fraction, split_rng_seed)
+        self.split_data(sampled_data_dir, train_dir, test_dir, train_fraction,
+                        split_rng_seed)
 
         logging.info("[FEMNIST Phase 3] Partitioned.")
 
