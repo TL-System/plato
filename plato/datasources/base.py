@@ -41,13 +41,13 @@ class DataSource:
                     downloaded_size += len(chunk)
                     file.write(chunk)
                     file.flush()
-                    done = int(100 * downloaded_size / total_size)
+                    # done = int(100 * downloaded_size / total_size)
                     # show download progress
-                    sys.stdout.write("\r[{}{}] {:.2f}%".format(
-                        "█" * done, " " * (100 - done),
-                        100 * downloaded_size / total_size))
-                    sys.stdout.flush()
-                sys.stdout.write("\n")
+                #     sys.stdout.write("\r[{}{}] {:.2f}%".format(
+                #         "█" * done, " " * (100 - done),
+                #         100 * downloaded_size / total_size))
+                #     sys.stdout.flush()
+                # sys.stdout.write("\n")
 
             # Unzip the compressed file just downloaded
             name, suffix = os.path.splitext(file_name)

@@ -117,9 +117,6 @@ class Trainer(base.Trainer):
                              self.client_id)
                 _train_loader = getattr(self, "train_loader", None)
 
-                if hasattr(Config().data, 'sampler') and Config().data.sampler == "empty":
-                    trainset = trainset[self.client_id]
-
                 if callable(_train_loader):
                     train_loader = self.train_loader(batch_size, trainset,
                                                      sampler.get(), cut_layer)

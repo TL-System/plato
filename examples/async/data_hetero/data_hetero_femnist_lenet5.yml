@@ -34,7 +34,7 @@ data:
     sampler: empty
 
     # The random seed for sampling data
-    random_seed: 1
+    random_seed: 4
 
 trainer:
     # The type of the trainer
