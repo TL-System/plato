@@ -42,11 +42,12 @@ else:
                                           ('CINIC10', cinic10),
                                           ('HuggingFace', huggingface),
                                           ('PASCAL_VOC', pascal_voc),
-                                          ('TinyImageNet', tiny_imagenet),
-                                          ('FEMNIST', femnist)])
+                                          ('TinyImageNet', tiny_imagenet)])
+
+    registered_partitioned_datasources = OrderedDict([('FEMNIST', femnist)])
 
 
-def get():
+def get(client_id=0):
     """Get the data source with the provided name."""
     datasource_name = Config().data.datasource
 
@@ -57,6 +58,8 @@ def get():
         return yolo.DataSource()
     elif datasource_name in registered_datasources:
         dataset = registered_datasources[datasource_name].DataSource()
+    elif datasource_name in registered_partitioned_datasources:
+        dataset = registered_partitioned_datasources[datasource_name].DataSource(client_id=client_id)
     else:
         raise ValueError('No such data source: {}'.format(datasource_name))
 
