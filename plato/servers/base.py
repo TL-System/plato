@@ -53,7 +53,8 @@ class ServerEvents(socketio.AsyncNamespace):
 
     async def on_client_payload_done(self, sid, data):
         """ An existing client finished sending its payloads from local training. """
-        await self.plato_server.client_payload_done(sid, data['id'], data['obkey'])
+        await self.plato_server.client_payload_done(sid, data['id'],
+                                                    data['obkey'])
 
 
 class Server:
@@ -76,10 +77,15 @@ class Server:
         self.client_payload = {}
         self.client_chunks = {}
 
-    def run(self, client=None, edge_server=None, edge_client=None):
+    def run(self,
+            client=None,
+            edge_server=None,
+            edge_client=None,
+            trainer=None):
         """Start a run loop for the server. """
         # Remove the running trainers table from previous runs.
-        if not Config().is_edge_server() and hasattr(Config().trainer, 'max_concurrency'):
+        if not Config().is_edge_server() and hasattr(Config().trainer,
+                                                     'max_concurrency'):
             with Config().sql_connection:
                 Config().cursor.execute("DROP TABLE IF EXISTS trainers")
 
@@ -92,20 +98,22 @@ class Server:
             Server.start_clients(as_server=True,
                                  client=self.client,
                                  edge_server=edge_server,
-                                 edge_client=edge_client)
+                                 edge_client=edge_client,
+                                 trainer=trainer)
 
             # Allowing some time for the edge servers to start
             time.sleep(5)
 
-        if hasattr(Config().server, 'disable_clients') and Config().server.disable_clients:
-            logging.info("No clients are launched (server:disable_clients = true)")
+        if hasattr(Config().server,
+                   'disable_clients') and Config().server.disable_clients:
+            logging.info(
+                "No clients are launched (server:disable_clients = true)")
         else:
             Server.start_clients(client=self.client)
 
         self.start()
 
-    def start(self, port=""):
-        port = Config().server.port
+    def start(self, port=Config().server.port):
         """ Start running the socket.io server. """
         logging.info("Starting a server at address %s and port %s.",
                      Config().server.address, port)
@@ -119,13 +127,13 @@ class Server:
                                         ping_timeout=ping_timeout)
         self.sio.register_namespace(
             ServerEvents(namespace='/', plato_server=self))
-        
+
         self.s3_client = None
         try:
             self.s3_client = s3.S3()
         except:
             self.s3_client = None
-            
+
         app = web.Application()
         self.sio.attach(app)
         web.run_app(app, host=Config().server.address, port=port)
@@ -154,7 +162,8 @@ class Server:
     def start_clients(client=None,
                       as_server=False,
                       edge_server=None,
-                      edge_client=None):
+                      edge_client=None,
+                      trainer=None):
         """Starting all the clients as separate processes."""
         starting_id = 1
 
@@ -183,12 +192,13 @@ class Server:
                     client_id, port)
                 proc = mp.Process(target=run,
                                   args=(client_id, port, client, edge_server,
-                                        edge_client))
+                                        edge_client, trainer))
                 proc.start()
             else:
                 logging.info("Starting client #%d's process.", client_id)
                 proc = mp.Process(target=run,
-                                  args=(client_id, None, client, None, None))
+                                  args=(client_id, None, client, None, None,
+                                        None))
                 proc.start()
 
     async def close_connections(self):
@@ -262,7 +272,7 @@ class Server:
 
     async def send(self, sid, payload, client_id) -> None:
         """ Sending a new data payload to the client using either S3 or socket.io. """
-        if self.s3_client != None:
+        if self.s3_client is not None:
             payload_key = f'server_payload_{os.getpid()}_{self.current_round}'
             self.s3_client.send_to_s3(payload_key, payload)
             data_size = sys.getsizeof(pickle.dumps(payload))
@@ -281,7 +291,11 @@ class Server:
                 await self.send_in_chunks(_data, sid, client_id)
                 data_size = sys.getsizeof(_data)
 
-        await self.sio.emit('payload_done', {'id': client_id, 'obkey': payload_key}, room=sid)
+        await self.sio.emit('payload_done', {
+            'id': client_id,
+            'obkey': payload_key
+        },
+                            room=sid)
 
         logging.info("[Server #%d] Sent %s MB of payload data to client #%d.",
                      os.getpid(), round(data_size / 1024**2, 2), client_id)
@@ -323,11 +337,13 @@ class Server:
                 for _data in self.client_payload[sid]:
                     payload_size += sys.getsizeof(pickle.dumps(_data))
             else:
-                payload_size = sys.getsizeof(pickle.dumps(
-                    self.client_payload[sid]))
+                payload_size = sys.getsizeof(
+                    pickle.dumps(self.client_payload[sid]))
         else:
-            self.client_payload[sid] = self.s3_client.receive_from_s3(object_key)
-            payload_size = sys.getsizeof(pickle.dumps(self.client_payload[sid]))
+            self.client_payload[sid] = self.s3_client.receive_from_s3(
+                object_key)
+            payload_size = sys.getsizeof(pickle.dumps(
+                self.client_payload[sid]))
 
         logging.info(
             "[Server #%d] Received %s MB of payload data from client #%d.",
