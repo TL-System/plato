@@ -27,33 +27,32 @@ from torch.utils.data import Dataset
 
 class CustomDictDataset(Dataset):
     """Custom dataset from a dictionary with support of transforms."""
-    def __init__(self, files, size, transform=None):
+    def __init__(self, files, transform=None):
         self.files = files
-        self.size = size
         self.transform = transform
+        self.samples = []
+        self.targets = []
+
+        for file_path in files:
+            with open(file_path, 'r') as fin:
+                data = json.load(fin)
+            user = data['users'][0]
+            samples = data['user_data'][user]['x']
+            targets = data['user_data'][user]['y']
+
+            self.samples.extend(samples)
+            self.targets.extend(targets)
 
     def __getitem__(self, index):
-        remain = index
-        file_idx = -1
-        for i, size in enumerate(self.size):
-            if remain < size:
-                file_idx = i
-                break
-            remain -= size
-
-        with open(self.files[file_idx], 'r') as fin:
-            data = json.load(fin)
-
-        user = data['users'][0]
-        sample = data['user_data'][user]['x'][remain]
-        target = data['user_data'][user]['y'][remain]
+        sample = self.samples[index]
+        target = self.targets[index]
         if self.transform:
             sample = self.transform(sample)
 
         return sample, target
 
     def __len__(self):
-        return sum(self.size)
+        return len(self.targets)
 
 
 class ReshapeListTransform:
@@ -70,8 +69,6 @@ class DataSource(base.DataSource):
         super().__init__()
         self.trainset = None
         self.testset = None
-        self.trainset_size = 0
-        self.testset_size = 0
 
         root_path = os.path.join(Config().data.data_path, 'FEMNIST')
         if client_id == 0:
@@ -89,7 +86,10 @@ class DataSource(base.DataSource):
             )
             self.download(url=data_url, data_path=root_path)
 
-        files, size = self.read_data(data_dir=data_dir, client_id=client_id)
+        if client_id == 0:
+            files = self.read_data(data_dir=os.path.join(root_path, 'test'), client_id=client_id)
+        else:
+            files = self.read_data(data_dir=os.path.join(root_path, 'train'), client_id=client_id)
 
         _transform = transforms.Compose([
             ReshapeListTransform((28, 28, 1)),
@@ -105,15 +105,11 @@ class DataSource(base.DataSource):
             transforms.ToTensor(),
             transforms.Normalize(0.9637, 0.1597),
         ])
-        dataset = CustomDictDataset(files=files,
-                                    size=size,
-                                    transform=_transform)
+        dataset = CustomDictDataset(files=files, transform=_transform)
 
         if client_id == 0:  # testing set of the server
-            self.testset_size = sum(size)
             self.testset = dataset
         else:  # training set of a client
-            self.trainset_size = sum(size)
             self.trainset = dataset
 
     def read_data(self, data_dir, client_id=0):
@@ -124,16 +120,10 @@ class DataSource(base.DataSource):
             files = [files[client_id - 1]]
         files = [os.path.join(data_dir, f) for f in files]
 
-        size = []
-        for f in files:
-            with open(f, 'r') as fin:
-                cdata = json.load(fin)
-            size.append(cdata['num_samples'][0])
-
-        return files, size
+        return files
 
     def num_train_examples(self):
-        return self.trainset_size
+        return len(self.trainset)
 
     def num_test_examples(self):
-        return self.testset_size
+        return len(self.testset)
