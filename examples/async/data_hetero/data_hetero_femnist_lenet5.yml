@@ -31,7 +31,7 @@ data:
     partition_size: 500
 
     # IID or non-IID?
-    sampler: empty
+    sampler: all_inclusive
 
     # The random seed for sampling data
     random_seed: 4
