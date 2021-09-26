@@ -1,55 +1,67 @@
 """
-The registry for samplers designed to partition the dataset across the clients.
-
-Having a registry of all available classes is convenient for retrieving an instance based
-on a configuration at run-time.
+Having a registry of all available classes is convenient for retrieving an instance
+based on a configuration at run-time.
 """
+
 import logging
 from collections import OrderedDict
 
 from plato.config import Config
 
 if hasattr(Config().trainer, 'use_mindspore'):
-    from plato.samplers.mindspore import (
-        iid as iid_mindspore,
-        dirichlet as dirichlet_mindspore,
-    )
+    from plato.datasources.mindspore import (
+        mnist as mnist_mindspore, )
 
-    registered_samplers = OrderedDict([
-        ('iid', iid_mindspore.Sampler),
-        ('noniid', dirichlet_mindspore.Sampler),
+    registered_datasources = OrderedDict([
+        ('MNIST', mnist_mindspore),
     ])
 elif hasattr(Config().trainer, 'use_tensorflow'):
-    from plato.samplers.tensorflow import base
-    registered_samplers = OrderedDict([
-        ('iid', base.Sampler),
-        ('noniid', base.Sampler),
-        ('mixed', base.Sampler),
-    ])
+    from plato.datasources.tensorflow import (
+        mnist as mnist_tensorflow,
+        fashion_mnist as fashion_mnist_tensorflow,
+    )
+
+    registered_datasources = OrderedDict([('MNIST', mnist_tensorflow),
+                                          ('FashionMNIST',
+                                           fashion_mnist_tensorflow)])
 else:
-    from plato.samplers import (iid, dirichlet, mixed, all_inclusive)
+    from plato.datasources import (
+        mnist,
+        fashion_mnist,
+        cifar10,
+        cinic10,
+        huggingface,
+        pascal_voc,
+        tiny_imagenet,
+        femnist,
+    )
 
-    registered_samplers = OrderedDict([
-        ('iid', iid.Sampler),
-        ('noniid', dirichlet.Sampler),
-        ('mixed', mixed.Sampler),
-        ('all_inclusive', all_inclusive.Sampler),
-    ])
+    registered_datasources = OrderedDict([('MNIST', mnist),
+                                          ('FashionMNIST', fashion_mnist),
+                                          ('CIFAR10', cifar10),
+                                          ('CINIC10', cinic10),
+                                          ('HuggingFace', huggingface),
+                                          ('PASCAL_VOC', pascal_voc),
+                                          ('TinyImageNet', tiny_imagenet),
+                                          ])
+
+    registered_partitioned_datasources = OrderedDict([('FEMNIST', femnist)])
 
 
-def get(datasource, client_id):
-    """Get an instance of the sampler."""
-    if hasattr(Config().data, 'sampler'):
-        sampler_type = Config().data.sampler
+def get(client_id=0):
+    """Get the data source with the provided name."""
+    datasource_name = Config().data.datasource
+
+    logging.info("Data source: %s", Config().data.datasource)
+
+    if Config().data.datasource == 'YOLO':
+        from plato.datasources import yolo
+        return yolo.DataSource()
+    elif datasource_name in registered_datasources:
+        dataset = registered_datasources[datasource_name].DataSource()
+    elif datasource_name in registered_partitioned_datasources:
+        dataset = registered_partitioned_datasources[datasource_name].DataSource(client_id)
     else:
-        sampler_type = 'iid'
+        raise ValueError('No such data source: {}'.format(datasource_name))
 
-    logging.info("[Client #%d] Sampler: %s", client_id, sampler_type)
-
-    if sampler_type in registered_samplers:
-        registered_sampler = registered_samplers[sampler_type](datasource,
-                                                               client_id)
-    else:
-        raise ValueError('No such sampler: {}'.format(sampler_type))
-
-    return registered_sampler
+    return dataset
