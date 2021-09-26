@@ -22,35 +22,22 @@ from plato.datasources import base
 
 class CustomDictDataset(Dataset):
     """ Custom dataset from a dictionary with support of transforms. """
-    def __init__(self, files, transform=None):
+    def __init__(self, loaded_data, transform=None):
         """ Initializing the custom dataset. """
         super().__init__()
-
-        self.files = files
+        self.loaded_data = loaded_data
         self.transform = transform
-        self.samples = []
-        self.targets = []
-
-        for file_path in files:
-            with open(file_path, 'r', encoding='UTF-8') as fin:
-                data = json.load(fin)
-            user = data['users'][0]
-            samples = data['user_data'][user]['x']
-            targets = data['user_data'][user]['y']
-
-            self.samples.extend(samples)
-            self.targets.extend(targets)
 
     def __getitem__(self, index):
-        sample = self.samples[index]
-        target = self.targets[index]
+        sample = self.loaded_data['x'][index]
+        target = self.loaded_data['y'][index]
         if self.transform:
             sample = self.transform(sample)
 
         return sample, target
 
     def __len__(self):
-        return len(self.targets)
+        return len(self.loaded_data['y'])
 
 
 class ReshapeListTransform:
@@ -69,32 +56,27 @@ class DataSource(base.DataSource):
         self.trainset = None
         self.testset = None
 
-        root_path = os.path.join(Config().data.data_path, 'FEMNIST')
+        root_path = os.path.join(Config().data.data_path, 'FEMNIST',
+                                 'packaged_data')
         if client_id == 0:
             # If we are on the federated learning server
             data_dir = os.path.join(root_path, 'test')
-            data_url = "https://jiangzhifeng.s3.us-east-2.amazonaws.com/FEMNIST/test.zip"
-            data_size = 21.1
+            data_url = "https://jiangzhifeng.s3.us-east-2.amazonaws.com/FEMNIST/test/" \
+                       + str(client_id) + ".zip"
         else:
             data_dir = os.path.join(root_path, 'train')
-            data_url = "https://jiangzhifeng.s3.us-east-2.amazonaws.com/FEMNIST/train.zip"
-            data_size = 169.2
+            data_url = "https://jiangzhifeng.s3.us-east-2.amazonaws.com/FEMNIST/train/" \
+                       + str(client_id) + ".zip"
 
-        if not os.path.exists(data_dir):
+        if not os.path.exists(os.path.join(data_dir, str(client_id))):
             logging.info(
-                "Downloading the Federated EMNIST dataset (%s MB) "
+                "Downloading the Federated EMNIST dataset "
                 "with the client datasets pre-partitioned. This may take a while.",
-                data_size)
-            self.download(url=data_url, data_path=root_path)
+            )
+            self.download(url=data_url, data_path=data_dir)
 
-        if client_id == 0:
-            files = DataSource.read_data(data_dir=os.path.join(
-                root_path, 'test'),
-                                         client_id=client_id)
-        else:
-            files = DataSource.read_data(data_dir=os.path.join(
-                root_path, 'train'),
-                                         client_id=client_id)
+        loaded_data = DataSource.read_data(
+            file_path=os.path.join(data_dir, str(client_id), 'data.json'))
 
         _transform = transforms.Compose([
             ReshapeListTransform((28, 28, 1)),
@@ -110,7 +92,8 @@ class DataSource(base.DataSource):
             transforms.ToTensor(),
             transforms.Normalize(0.9637, 0.1597),
         ])
-        dataset = CustomDictDataset(files=files, transform=_transform)
+        dataset = CustomDictDataset(loaded_data=loaded_data,
+                                    transform=_transform)
 
         if client_id == 0:  # testing dataset on the server
             self.testset = dataset
@@ -118,16 +101,11 @@ class DataSource(base.DataSource):
             self.trainset = dataset
 
     @staticmethod
-    def read_data(data_dir, client_id=0):
+    def read_data(file_path):
         """ Reading the dataset specific to a client_id. """
-        files = os.listdir(data_dir)
-        files = [f for f in files if f.endswith('.json')]
-        files = sorted(files)
-        if client_id > 0:
-            files = [files[client_id - 1]]
-        files = [os.path.join(data_dir, f) for f in files]
-
-        return files
+        with open(file_path, 'r') as fin:
+            loaded_data = json.load(fin)
+        return loaded_data
 
     def num_train_examples(self):
         return len(self.trainset)
