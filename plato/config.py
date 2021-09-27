@@ -41,6 +41,11 @@ class Config:
                                 type=str,
                                 default=None,
                                 help='The server hostname and port number.')
+            parser.add_argument(
+                '-d',
+                '--download',
+                action='store_true',
+                help='Download the dataset to prepare for a training session.')
             parser.add_argument('-l',
                                 '--log',
                                 type=str,
@@ -97,6 +102,10 @@ class Config:
                 Config.server = Config.server._replace(
                     port=args.server.split(':')[1])
 
+            if Config.args.download:
+                Config.clients = Config.clients._replace(total_clients=1)
+                Config.clients = Config.clients._replace(per_round=1)
+
             if 'results' in config:
                 Config.results = Config.namedtuple_from_dict(config['results'])
                 if hasattr(Config().results, 'results_dir'):
@@ -110,7 +119,8 @@ class Config:
             if hasattr(Config().trainer, 'max_concurrency'):
                 # Using a temporary SQLite database to limit the maximum number of concurrent
                 # trainers
-                Config.sql_connection = sqlite3.connect("/tmp/running_trainers.sqlitedb")
+                Config.sql_connection = sqlite3.connect(
+                    "/tmp/running_trainers.sqlitedb")
                 Config().cursor = Config.sql_connection.cursor()
 
             # Customizable dictionary of global parameters
@@ -168,7 +178,9 @@ class Config:
             gpus = tf.config.experimental.list_physical_devices('GPU')
             if len(gpus) > 0:
                 device = 'GPU'
-                tf.config.experimental.set_visible_devices(gpus[random.randint(0, len(gpus) - 1)], 'GPU')
+                tf.config.experimental.set_visible_devices(
+                    gpus[random.randint(0,
+                                        len(gpus) - 1)], 'GPU')
         else:
             import torch
 
@@ -178,7 +190,8 @@ class Config:
                     device = 'cuda'
                 else:
                     device = 'cuda:' + str(
-                        random.randint(0, torch.cuda.device_count() - 1))
+                        random.randint(0,
+                                       torch.cuda.device_count() - 1))
 
         return device
 
@@ -227,7 +240,7 @@ class Config:
         config['algorithm']['type'] = 'fedavg'
 
         return config
-    
+
     @staticmethod
     def store() -> None:
         data = {}
