@@ -8,13 +8,14 @@ from torch._C import parse_schema
 from plato.samplers import base
 from plato.config import Config
 
+
 class Sampler(base.Sampler):
     """Create a data sampler that samples all the data in the dataset.
        Used by the MistNet server.
     """
-    def __init__(self, dataset):
+    def __init__(self, dataset, client_id):
         super().__init__()
-        self.all_inclusive = range(len(dataset))
+        self.all_inclusive = range(dataset.num_train_examples())
 
     def get(self):
         # return random.shuffle(self.all_inclusive)
