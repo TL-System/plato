@@ -72,7 +72,7 @@ class Server(base.Server):
         self.load_trainer()
 
         if not Config().clients.do_test:
-            dataset = datasources_registry.get()
+            dataset = datasources_registry.get(client_id=0)
             self.testset = dataset.get_test_set()
 
         # Initialize the csv file which will record results

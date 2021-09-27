@@ -60,7 +60,7 @@ class Client(base.Client):
         logging.info("[Client #%d] Loading its data source...", self.client_id)
 
         if self.datasource is None:
-            self.datasource = datasources_registry.get()
+            self.datasource = datasources_registry.get(client_id=self.client_id)
 
         self.data_loaded = True
 

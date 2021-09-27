@@ -10,6 +10,8 @@ import collections
 import torch.nn as nn
 import torch.nn.functional as F
 
+from plato.config import Config
+
 
 class Model(nn.Module):
     """The LeNet-5 model.
@@ -118,4 +120,6 @@ class Model(nn.Module):
     @staticmethod
     def get_model(*args):
         """Obtaining an instance of this model."""
+        if hasattr(Config().trainer, 'num_classes'):
+            return Model(num_classes=Config().trainer.num_classes)
         return Model()

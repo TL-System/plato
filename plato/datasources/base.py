@@ -24,7 +24,7 @@ class DataSource:
     def download(url, data_path):
         """downloading the dataset from a URL."""
         if not os.path.exists(data_path):
-            os.makedirs(data_path)
+            os.makedirs(data_path, exist_ok=True)
 
         url_parse = urlparse(url)
         file_name = os.path.join(data_path, url_parse.path.split('/')[-1])
