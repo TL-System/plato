@@ -140,6 +140,7 @@ tests/data/
 
 # Result files
 results/
+result.csv
 
 # Models
 pretrained/

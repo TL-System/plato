@@ -27,17 +27,14 @@ class Trainer(basic.Trainer):
         log_interval = 10
         batch_size = config['batch_size']
 
-        logging.info("[Client #%d] Loading the dataset.",
-                    self.client_id)
+        logging.info("[Client #%d] Loading the dataset.", self.client_id)
 
-        train_loader = torch.utils.data.DataLoader(
-            dataset=trainset,
-            shuffle=False,
-            batch_size=batch_size,
-            sampler=sampler)
+        train_loader = torch.utils.data.DataLoader(dataset=trainset,
+                                                   shuffle=False,
+                                                   batch_size=batch_size,
+                                                   sampler=sampler)
 
-        iterations_per_epoch = np.ceil(len(trainset) /
-                                        batch_size).astype(int)
+        iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
         epochs = config['epochs']
 
         # Sending the model to the device used for training
@@ -58,15 +55,15 @@ class Trainer(basic.Trainer):
 
         # Initializing the learning rate schedule, if necessary
         if hasattr(config, 'lr_schedule'):
-            lr_schedule = optimizers.get_lr_schedule(
-                optimizer, iterations_per_epoch, train_loader)
+            lr_schedule = optimizers.get_lr_schedule(optimizer,
+                                                     iterations_per_epoch,
+                                                     train_loader)
         else:
             lr_schedule = None
 
         try:
             for epoch in range(1, epochs + 1):
-                for batch_id, (examples,
-                                labels) in enumerate(train_loader):
+                for batch_id, (examples, labels) in enumerate(train_loader):
                     examples, labels = examples.to(self.device), labels.to(
                         self.device)
                     optimizer.zero_grad()
@@ -74,8 +71,7 @@ class Trainer(basic.Trainer):
                     if cut_layer is None:
                         outputs = self.model(examples)
                     else:
-                        outputs = self.model.forward_from(
-                            examples, cut_layer)
+                        outputs = self.model.forward_from(examples, cut_layer)
 
                     loss = loss_criterion(outputs, labels)
 
@@ -90,9 +86,8 @@ class Trainer(basic.Trainer):
                         if self.client_id == 0:
                             logging.info(
                                 "[Server #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}"
-                                .format(os.getpid(), epoch, epochs,
-                                        batch_id, len(train_loader),
-                                        loss.data.item()))
+                                .format(os.getpid(), epoch, epochs, batch_id,
+                                        len(train_loader), loss.data.item()))
                         else:
                             logging.info(
                                 "[Client #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}"
@@ -134,7 +129,7 @@ class Trainer(basic.Trainer):
 
         with open(loss_path, 'w') as file:
             file.write(str(loss))
-    
+
     @staticmethod
     def load_loss(filename=None):
         """ Loading the training loss from a file. """
