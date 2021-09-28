@@ -1,5 +1,5 @@
 """
-The FashionMNIST dataset.
+The FashionMNIST dataset from the torchvision package.
 """
 
 from torchvision import datasets, transforms
@@ -9,7 +9,7 @@ from plato.datasources import base
 
 
 class DataSource(base.DataSource):
-    """The FashionMNIST dataset."""
+    """ The FashionMNIST dataset. """
     def __init__(self):
         super().__init__()
         _path = Config().data.data_path

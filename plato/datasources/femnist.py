@@ -1,16 +1,20 @@
 """
 The Federated EMNIST dataset.
 
-The Federated EMNIST dataset originates from the EMNIST dataset, which contains 817851 images, each of which is a 28x28
-greyscale image in 1 out of 62 classes. The difference between the Federated EMNIST dataset and its original counterpart is
-that this dataset is already partitioned by the client ID, using the data provider IDs included in the original EMNIST
-dataset. As a result of this partitioning, there are 3597 clients in total, each of which has 227.37 images on average (std
-is 88.84). For each client, 90% data samples are used for training, while the remaining samples are used for testing.
+The Federated EMNIST dataset originates from the EMNIST dataset, which contains
+817851 images, each of which is a 28x28 greyscale image in 1 out of 62 classes.
+The difference between the Federated EMNIST dataset and its original counterpart
+is that this dataset is already partitioned by the client ID, using the data
+provider IDs included in the original EMNIST dataset. As a result of this
+partitioning, there are 3597 clients in total, each of which has 227.37 images
+on average (std is 88.84). For each client, 90% data samples are used for
+training, while the remaining samples are used for testing.
 
 Reference:
 
-G. Cohen, S. Afshar, J. Tapson, and A. Van Schaik, "EMNIST: Extending MNIST to handwritten letters," in the 2017
-International Joint Conference on Neural Networks (IJCNN).
+G. Cohen, S. Afshar, J. Tapson, and A. Van Schaik, "EMNIST: Extending MNIST to
+handwritten letters," in the 2017 International Joint Conference on Neural
+Networks (IJCNN).
 
 """
 import json
