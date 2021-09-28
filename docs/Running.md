@@ -83,23 +83,10 @@ The next step is to install the required Python packages. PyTorch should be inst
 $ pip3 install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
 ```
 
-To double-check the CUDA version used in the command above, use the following command:
+To double-check the CUDA version used in the command above, start an interactive session and use the following command:
 
 ```shell
 nvidia-smi
-```
-
-Install `python-socketio` package:
-
-```
-$ curl -O https://files.pythonhosted.org/packages/4a/c0/78ca7a1d905fd8a5fc13f75fc5516af3a35e5cb37ce593f6fc249ab13cc3/python-socketio-5.3.0.tar.gz
-$ pip install python-socketio-5.3.0.tar.gz
-```
-
-Install `aiohttp` package:
-
-```
-$ pip install aiohttp
 ```
 
 Finally, install Plato as a pip package:
