@@ -1,16 +1,22 @@
 """
-The Transformer models from HuggingFace for natural language processing.
+Training and testing loops for HuggingFace's transformer models for natural
+language processing.
 """
 import torch
-from plato.config import Config
+
 from transformers import AutoTokenizer
 from transformers import Trainer as HuggingFaceTrainer
 from transformers import TrainingArguments
 
+from plato.config import Config
 from plato.trainers import basic
 
 
 class SampledHuggingFaceTrainer(HuggingFaceTrainer):
+    """
+    Training and testing loops for HuggingFace's transformer models for natural
+    language processing.
+    """
     def __init__(self, model, args, train_dataset, eval_dataset, sampler):
         super().__init__(model=model,
                          args=args,

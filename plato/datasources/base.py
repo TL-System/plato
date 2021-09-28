@@ -1,5 +1,6 @@
 """
-Base class for datasets.
+Base class for data sources, encapsulating training and testing datasets with
+custom augmentations and transforms already accommodated.
 """
 import gzip
 import logging
@@ -15,7 +16,8 @@ from plato.config import Config
 
 class DataSource:
     """
-    The training or testing dataset that accommodates custom augmentation and transforms.
+    Training and testing datasets with custom augmentations and transforms
+    already accommodated.
     """
     def __init__(self):
         self.trainset = None
@@ -23,7 +25,7 @@ class DataSource:
 
     @staticmethod
     def download(url, data_path):
-        """downloading the dataset from a URL."""
+        """downloads a dataset from a URL."""
         if not os.path.exists(data_path):
             if Config().clients.total_clients > 1:
                 if not hasattr(Config().data,
