@@ -11,6 +11,7 @@ from plato.servers import (
     fedavg,
     fedavg_cs,
     mistnet,
+    async_fedavg,
 )
 
 from plato.config import Config
@@ -19,6 +20,7 @@ registered_servers = OrderedDict([
     ('fedavg', fedavg.Server),
     ('fedavg_cross_silo', fedavg_cs.Server),
     ('mistnet', mistnet.Server),
+    ('async_fedavg', async_fedavg.Server),
 ])
 
 
