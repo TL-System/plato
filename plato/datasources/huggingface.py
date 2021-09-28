@@ -1,8 +1,9 @@
 """
-The HuggingFace datasets.
+A data source for the HuggingFace datasets.
 
-For more information about the HuggingFace datasets, refer to
-https://huggingface.co/docs/datasets/quicktour.html.
+For more information about the HuggingFace datasets, refer to:
+
+https://huggingface.co/docs/datasets/quicktour.html
 """
 
 import logging
@@ -14,7 +15,7 @@ from plato.datasources import base
 
 
 class DataSource(base.DataSource):
-    """A data source for HuggingFace datasets."""
+    """A data source for the HuggingFace datasets."""
     def __init__(self):
         super().__init__()
 
