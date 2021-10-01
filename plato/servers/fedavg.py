@@ -42,7 +42,7 @@ class Server(base.Server):
             os.getpid(), self.total_clients, self.clients_per_round)
 
         # starting time of a global training round
-        self.round_start_time = 0
+        self.round_start_time = time.perf_counter()
 
         if hasattr(Config(), 'results'):
             recorded_items = Config().results.types
