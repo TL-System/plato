@@ -74,7 +74,7 @@ class Config:
             logging.basicConfig(
                 format='[%(levelname)s][%(asctime)s]: %(message)s',
                 level=log_level,
-                datefmt='%H:%M:%S')
+                datefmt='(%m-%d) %H:%M:%S')
 
             cls._instance = super(Config, cls).__new__(cls)
 
