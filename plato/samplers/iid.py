@@ -14,7 +14,6 @@ class Sampler(base.Sampler):
     dataset."""
     def __init__(self, datasource, client_id):
         super().__init__()
-        self.client_id = client_id
         dataset = datasource.get_train_set()
         self.dataset_size = len(dataset)
         indices = list(range(self.dataset_size))
@@ -34,7 +33,7 @@ class Sampler(base.Sampler):
         assert len(indices) == total_size
 
         # Compute the indices of data in the subset for this client
-        self.subset_indices = indices[(int(self.client_id) -
+        self.subset_indices = indices[(int(client_id) -
                                        1):total_size:total_clients]
 
     def get(self):

@@ -47,8 +47,7 @@ def get(datasource, client_id):
     logging.info("[Client #%d] Sampler: %s", client_id, sampler_type)
 
     if sampler_type in registered_samplers:
-        registered_sampler = registered_samplers[sampler_type](datasource,
-                                                               client_id)
+        registered_sampler = registered_samplers[sampler_type](datasource, client_id)
     else:
         raise ValueError('No such sampler: {}'.format(sampler_type))
 

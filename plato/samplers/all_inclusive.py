@@ -1,10 +1,8 @@
 """
 Samples all the data from a dataset. Applicable in cases where the dataset comes from
-local sources only, and used by the MistNet server.
+local sources only. Used by the Federated EMNIST dataset and the MistNet server.
 """
-import random
 
-from torch._C import parse_schema
 from plato.samplers import base
 from plato.config import Config
 
@@ -15,6 +13,8 @@ class Sampler(base.Sampler):
     """
     def __init__(self, dataset, client_id):
         super().__init__()
+        self.client_id = client_id
+
         self.all_inclusive = range(dataset.num_train_examples())
 
     def get(self):
