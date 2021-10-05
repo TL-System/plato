@@ -84,14 +84,14 @@ class Client(simple.Client):
 
         # Train a personalized model and test it
         self.trainer.test_personalization = True
-        personlization_accuracy = self.trainer.test(self.testset)
+        personalization_accuracy = self.trainer.test(self.testset)
         self.trainer.test_personalization = False
 
-        if personlization_accuracy == 0:
+        if personalization_accuracy == 0:
             # The testing process failed, disconnect from the server
             await self.sio.disconnect()
 
         logging.info("[Client #{:d}] Personlization accuracy: {:.2f}%".format(
-            self.client_id, 100 * personlization_accuracy))
+            self.client_id, 100 * personalization_accuracy))
 
-        return personlization_accuracy
+        return personalization_accuracy
