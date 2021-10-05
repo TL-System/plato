@@ -76,6 +76,7 @@ class Server:
         self.updates = []
         self.client_payload = {}
         self.client_chunks = {}
+        self.s3_client = None
 
     def run(self,
             client=None,
@@ -128,11 +129,8 @@ class Server:
         self.sio.register_namespace(
             ServerEvents(namespace='/', plato_server=self))
 
-        self.s3_client = None
-        try:
+        if hasattr(Config().server, 's3_endpoint_url'):
             self.s3_client = s3.S3()
-        except:
-            self.s3_client = None
 
         app = web.Application()
         self.sio.attach(app)
