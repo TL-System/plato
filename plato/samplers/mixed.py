@@ -12,10 +12,11 @@ class Sampler(dirichlet.Sampler):
     """Create a data sampler for each client to use a divided partition of the dataset,
     either biased across labels according to the Dirichlet distribution, or in an iid fashion."""
     def __init__(self, datasource, client_id):
+        super().__init__(datasource, client_id)
 
         assert hasattr(Config().data, 'non_iid_clients')
-
         non_iid_clients = Config().data.non_iid_clients
+
         if isinstance(non_iid_clients, int):
             # If only one client's dataset is non-iid
             self.non_iid_clients_list = [int(non_iid_clients)]
@@ -23,8 +24,6 @@ class Sampler(dirichlet.Sampler):
             self.non_iid_clients_list = [
                 int(x.strip()) for x in non_iid_clients.split(',')
             ]
-
-        super().__init__(datasource, client_id)
 
         if int(client_id) not in self.non_iid_clients_list:
             target_list = datasource.targets()
