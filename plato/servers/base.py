@@ -78,6 +78,15 @@ class Server:
         self.client_chunks = {}
         self.s3_client = None
 
+        # Used for asynchronous FL where the server aggregates periodically
+        self.elapsed_time_since_last_agg = None
+        # Clients whose reports were received before aggregation
+        # For synchronous FL, this list is always empty
+        self.aggregated_clients = []
+        # Clients who are still training for a previous iteration
+        # For synchronous FL, this list is always empty
+        self.training_clients = []
+
     def run(self,
             client=None,
             edge_server=None,
@@ -225,6 +234,7 @@ class Server:
             # the current set of clients that have contacted the server
             self.clients_pool = list(self.clients)
 
+        self.elapsed_time_since_last_agg = time.perf_counter()
         self.selected_clients = self.choose_clients()
 
         if len(self.selected_clients) > 0:
@@ -235,28 +245,34 @@ class Server:
                 else:
                     client_id = selected_client_id
 
-                sid = self.clients[client_id]['sid']
+                # Aviod sending the current model to a client who is still
+                # conducting local training in a previous iteration
+                if selected_client_id not in self.training_clients:
+                    sid = self.clients[client_id]['sid']
 
-                logging.info("[Server #%d] Selecting client #%d for training.",
-                             os.getpid(), selected_client_id)
+                    logging.info(
+                        "[Server #%d] Selecting client #%d for training.",
+                        os.getpid(), selected_client_id)
 
-                server_response = {'id': selected_client_id}
-                server_response = await self.customize_server_response(
-                    server_response)
+                    server_response = {'id': selected_client_id}
+                    server_response = await self.customize_server_response(
+                        server_response)
 
-                # Sending the server response as metadata to the clients (payload to follow)
-                await self.sio.emit('payload_to_arrive',
-                                    {'response': server_response},
-                                    room=sid)
+                    # Sending the server response as metadata to the clients (payload to follow)
+                    await self.sio.emit('payload_to_arrive',
+                                        {'response': server_response},
+                                        room=sid)
 
-                payload = self.algorithm.extract_weights()
-                payload = self.customize_server_payload(payload)
+                    payload = self.algorithm.extract_weights()
+                    payload = self.customize_server_payload(payload)
 
-                # Sending the server payload to the client
-                logging.info(
-                    "[Server #%d] Sending the current model to client #%d.",
-                    os.getpid(), selected_client_id)
-                await self.send(sid, payload, selected_client_id)
+                    # Sending the server payload to the client
+                    logging.info(
+                        "[Server #%d] Sending the current model to client #%d.",
+                        os.getpid(), selected_client_id)
+                    await self.send(sid, payload, selected_client_id)
+
+            self.aggregated_clients = []
 
     async def send_in_chunks(self, data, sid, client_id) -> None:
         """ Sending a bytes object in fixed-sized chunks to the client. """
@@ -349,8 +365,14 @@ class Server:
 
         self.updates.append((self.reports[sid], self.client_payload[sid]))
 
-        if len(self.updates) > 0 and len(self.updates) >= len(
-                self.selected_clients):
+        self.aggregated_clients.append(client_id)
+
+        if len(self.updates) > 0 and (
+                len(self.updates) >= len(self.selected_clients) or
+            (hasattr(Config().server, 'synchronous')
+             and not Config().server.synchronous
+             and time.perf_counter() - self.elapsed_time_since_last_agg >=
+             Config().server.aggregation_interval)):
             logging.info(
                 "[Server #%d] All %d client reports received. Processing.",
                 os.getpid(), len(self.updates))
@@ -370,9 +392,14 @@ class Server:
 
                 if client_id in self.selected_clients:
                     self.selected_clients.remove(client_id)
+                    self.aggregated_clients.append(client_id)
 
-                    if len(self.updates) > 0 and len(self.updates) >= len(
-                            self.selected_clients):
+                    if len(self.updates) > 0 and (
+                            len(self.updates) >= len(self.selected_clients) or
+                        (hasattr(Config().server, 'synchronous')
+                         and not Config().server.synchronous and
+                         time.perf_counter() - self.elapsed_time_since_last_agg
+                         >= Config().server.aggregation_interval)):
                         logging.info(
                             "[Server #%d] All %d client reports received. Processing.",
                             os.getpid(), len(self.updates))
