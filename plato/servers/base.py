@@ -58,7 +58,7 @@ class ServerEvents(socketio.AsyncNamespace):
 
 
 class Server:
-    """The base class for federated learning servers."""
+    """ The base class for federated learning servers. """
     def __init__(self):
         self.sio = None
         self.client = None
@@ -78,13 +78,16 @@ class Server:
         self.client_chunks = {}
         self.s3_client = None
 
-        # Used for asynchronous FL where the server aggregates periodically
-        self.elapsed_time_since_last_agg = None
-        # Clients whose reports were received before aggregation
-        # For synchronous FL, this list is always empty
-        self.aggregated_clients = []
-        # Clients who are still training for a previous iteration
-        # For synchronous FL, this list is always empty
+        # states that need to be maintained for asynchronous FL
+
+        # The time when clients were last selected in asynchronous FL, where the server
+        # aggregates client updates periodically
+        self.clients_last_selected = None
+
+        # Clients whose new reports were received since the last round of aggregation
+        self.reporting_clients = []
+
+        # Clients who are still training since the last round of aggregation
         self.training_clients = []
 
     def run(self,
@@ -92,7 +95,7 @@ class Server:
             edge_server=None,
             edge_client=None,
             trainer=None):
-        """Start a run loop for the server. """
+        """ Start a run loop for the server. """
         # Remove the running trainers table from previous runs.
         if not Config().is_edge_server() and hasattr(Config().trainer,
                                                      'max_concurrency'):
@@ -146,7 +149,7 @@ class Server:
         web.run_app(app, host=Config().server.address, port=port)
 
     async def register_client(self, sid, client_id):
-        """Adding a newly arrived client to the list of clients."""
+        """ Adding a newly arrived client to the list of clients. """
         if not client_id in self.clients:
             # The last contact time is stored for each client
             self.clients[client_id] = {
@@ -171,7 +174,7 @@ class Server:
                       edge_server=None,
                       edge_client=None,
                       trainer=None):
-        """Starting all the clients as separate processes."""
+        """ Starting all the clients as separate processes. """
         starting_id = 1
 
         if hasattr(Config().clients,
@@ -209,13 +212,13 @@ class Server:
                 proc.start()
 
     async def close_connections(self):
-        """Closing all socket.io connections after training completes."""
+        """ Closing all socket.io connections after training completes. """
         for client_id, client in dict(self.clients).items():
             logging.info("Closing the connection to client #%d.", client_id)
             await self.sio.emit('disconnect', room=client['sid'])
 
     async def select_clients(self):
-        """Select a subset of the clients and send messages to them to start training."""
+        """ Select a subset of the clients and send messages to them to start training. """
         self.updates = []
         self.current_round += 1
 
@@ -234,7 +237,7 @@ class Server:
             # the current set of clients that have contacted the server
             self.clients_pool = list(self.clients)
 
-        self.elapsed_time_since_last_agg = time.perf_counter()
+        self.clients_last_selected = time.perf_counter()
         self.selected_clients = self.choose_clients()
 
         if len(self.selected_clients) > 0:
@@ -245,8 +248,9 @@ class Server:
                 else:
                     client_id = selected_client_id
 
-                # Aviod sending the current model to a client who is still
-                # conducting local training in a previous iteration
+                # Avoid sending the current model to a client who is still
+                # conducting local training and has not sent an update since
+                # the last round of aggregation
                 if selected_client_id not in self.training_clients:
                     sid = self.clients[client_id]['sid']
 
@@ -272,7 +276,7 @@ class Server:
                         os.getpid(), selected_client_id)
                     await self.send(sid, payload, selected_client_id)
 
-            self.aggregated_clients = []
+            self.reporting_clients = []
 
     async def send_in_chunks(self, data, sid, client_id) -> None:
         """ Sending a bytes object in fixed-sized chunks to the client. """
@@ -365,13 +369,13 @@ class Server:
 
         self.updates.append((self.reports[sid], self.client_payload[sid]))
 
-        self.aggregated_clients.append(client_id)
+        self.reporting_clients.append(client_id)
 
         if len(self.updates) > 0 and (
                 len(self.updates) >= len(self.selected_clients) or
             (hasattr(Config().server, 'synchronous')
              and not Config().server.synchronous
-             and time.perf_counter() - self.elapsed_time_since_last_agg >=
+             and time.perf_counter() - self.clients_last_selected >=
              Config().server.aggregation_interval)):
             logging.info(
                 "[Server #%d] All %d client reports received. Processing.",
@@ -392,13 +396,13 @@ class Server:
 
                 if client_id in self.selected_clients:
                     self.selected_clients.remove(client_id)
-                    self.aggregated_clients.append(client_id)
+                    self.reporting_clients.append(client_id)
 
                     if len(self.updates) > 0 and (
                             len(self.updates) >= len(self.selected_clients) or
                         (hasattr(Config().server, 'synchronous')
-                         and not Config().server.synchronous and
-                         time.perf_counter() - self.elapsed_time_since_last_agg
+                         and not Config().server.synchronous
+                         and time.perf_counter() - self.clients_last_selected
                          >= Config().server.aggregation_interval)):
                         logging.info(
                             "[Server #%d] All %d client reports received. Processing.",
