@@ -44,7 +44,8 @@ class Server(fedavg.Server):
         # Test the updated model
         if not Config().clients.do_test:
             self.accuracy = self.trainer.test(self.testset)
-            logging.info('[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(
-                os.getpid(), 100 * self.accuracy))
+            logging.info(
+                '[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(
+                    os.getpid(), 100 * self.accuracy))
 
         await self.wrap_up_processing_reports()
