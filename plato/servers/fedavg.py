@@ -91,36 +91,6 @@ class Server(base.Server):
         if self.algorithm is None:
             self.algorithm = algorithms_registry.get(self.trainer)
 
-    def choose_clients(self):
-        """Choose a subset of the clients to participate in each round."""
-        assert self.clients_per_round <= len(self.clients_pool)
-
-        # In asychronous FL, avoid selecting clients who are still training for
-        # a previous iteration. The number of newly selected clients is the number
-        # of clients whose updates were aggregated in the last iteration
-        if hasattr(Config().server, 'synchronous') and not Config(
-        ).server.synchronous and self.selected_clients is not None and len(
-                self.reporting_clients) != Config().clients.per_round:
-            # self.selected_clients is None means that it is the first iteration
-            # len(self.reporting_clients) == Config().clients.per_round means that
-            # updates of all selected clients in the last iteration were aggregated
-            # In these two cases, we go to the 'else' branch
-            training_clients_ids = [
-                self.training_clients[client_id]
-                for client_id in list(self.training_clients.keys())
-            ]
-
-            selectable_clients = [
-                client for client in self.clients_pool
-                if client not in training_clients_ids
-            ]
-            return random.sample(selectable_clients,
-                                 len(self.reporting_clients))
-
-        # Select clients randomly among all connected clients
-        else:
-            return random.sample(self.clients_pool, self.clients_per_round)
-
     def extract_client_updates(self, updates):
         """Extract the model weight updates from client updates."""
         weights_received = [payload for (__, payload) in updates]
