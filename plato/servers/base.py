@@ -2,6 +2,7 @@
 The base class for federated learning servers.
 """
 
+import asyncio
 import logging
 import multiprocessing as mp
 import os
@@ -79,15 +80,10 @@ class Server:
         self.client_chunks = {}
         self.s3_client = None
 
-        # states that need to be maintained for asynchronous FL
-
-        # The time when clients were last selected in asynchronous FL, where the server
-        # aggregates client updates periodically
-        self.clients_last_selected = None
+        # States that need to be maintained for asynchronous FL
 
         # Clients whose new reports were received since the last round of aggregation
         self.reporting_clients = []
-
         # Clients who are still training since the last round of aggregation
         self.training_clients = {}
 
@@ -125,6 +121,7 @@ class Server:
         else:
             Server.start_clients(client=self.client)
 
+        asyncio.get_event_loop().create_task(self.periodic())
         self.start()
 
     def start(self, port=Config().server.port):
@@ -238,8 +235,6 @@ class Server:
             # the current set of clients that have contacted the server
             self.clients_pool = list(self.clients)
 
-        self.clients_last_selected = time.perf_counter()
-
         # In asychronous FL, avoid selecting new clients to replace those that are still
         # training at this time
         if hasattr(Config().server, 'synchronous') and not Config(
@@ -311,6 +306,31 @@ class Server:
 
         # Select clients randomly
         return random.sample(clients_pool, clients_count)
+
+    async def periodic(self):
+        """ Runs periodic_task() periodically on the server. The time interval between 
+            its execution is defined in 'server:periodic_interval'.
+        """
+        if hasattr(Config().server, 'periodic_interval'):
+            while True:
+                await self.periodic_task()
+                await asyncio.sleep(Config().server.periodic_interval)
+
+    async def periodic_task(self):
+        """ If we are operating in asynchronous mode, aggregate the model updates received so far. """
+        if hasattr(Config().server,
+                   'synchronous') and not Config().server.synchronous:
+            if len(self.updates) > 0:
+                logging.info(
+                    "[Server #%d] %d client reports received in asynchronous mode. Processing.",
+                    os.getpid(), len(self.updates))
+                await self.process_reports()
+                await self.wrap_up()
+                await self.select_clients()
+            else:
+                logging.info(
+                    "[Server #%d] No client reports have been received. Nothing to process."
+                )
 
     async def send_in_chunks(self, data, sid, client_id) -> None:
         """ Sending a bytes object in fixed-sized chunks to the client. """
@@ -406,12 +426,10 @@ class Server:
         self.reporting_clients.append(client_id)
         del self.training_clients[client_id]
 
-        if len(self.updates) > 0 and (
-                len(self.updates) >= self.clients_per_round or
-            (hasattr(Config().server, 'synchronous')
-             and not Config().server.synchronous
-             and time.perf_counter() - self.clients_last_selected >=
-             Config().server.aggregation_interval)):
+        if len(self.updates) > 0 and len(
+                self.updates) >= self.clients_per_round and not (
+                    hasattr(Config().server, 'synchronous')
+                    and not Config().server.synchronous):
             logging.info(
                 "[Server #%d] All %d client reports received. Processing.",
                 os.getpid(), len(self.updates))
