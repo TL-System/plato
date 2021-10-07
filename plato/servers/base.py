@@ -396,14 +396,9 @@ class Server:
 
                 if client_id in self.selected_clients:
                     self.selected_clients.remove(client_id)
-                    self.reporting_clients.append(client_id)
 
-                    if len(self.updates) > 0 and (
-                            len(self.updates) >= len(self.selected_clients) or
-                        (hasattr(Config().server, 'synchronous')
-                         and not Config().server.synchronous
-                         and time.perf_counter() - self.clients_last_selected
-                         >= Config().server.aggregation_interval)):
+                    if len(self.updates) > 0 and len(self.updates) >= len(
+                            self.selected_clients):
                         logging.info(
                             "[Server #%d] All %d client reports received. Processing.",
                             os.getpid(), len(self.updates))
