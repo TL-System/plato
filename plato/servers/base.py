@@ -424,7 +424,9 @@ class Server:
         for client_id, client in dict(self.clients).items():
             if client['sid'] == sid:
                 del self.clients[client_id]
-                del self.training_clients[client_id]
+
+                if client_id in self.training_clients:
+                    del self.training_clients[client_id]
 
                 logging.info(
                     "[Server #%d] Client #%d disconnected and removed from this server.",
