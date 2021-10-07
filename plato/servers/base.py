@@ -317,7 +317,14 @@ class Server:
                 await asyncio.sleep(Config().server.periodic_interval)
 
     async def periodic_task(self):
-        """ If we are operating in asynchronous mode, aggregate the model updates received so far. """
+        """ A periodic task that is executed from time to time, determine by
+        'server:periodic_interval' in the configuration. """
+        # Call the async function that defines a customized periodic task, if any
+        _task = getattr(self, "customize_periodic_task", None)
+        if callable(_task):
+            await self.customize_periodic_task()
+
+        # If we are operating in asynchronous mode, aggregate the model updates received so far.
         if hasattr(Config().server,
                    'synchronous') and not Config().server.synchronous:
             if len(self.updates) > 0:
