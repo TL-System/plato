@@ -240,21 +240,24 @@ class Server:
 
         self.clients_last_selected = time.perf_counter()
 
-        # In asychronous FL, avoid selecting clients who are still training for a previous iteration.
+        # In asychronous FL, avoid selecting new clients to replace those that are still
+        # training at this time
         if hasattr(Config().server, 'synchronous') and not Config(
         ).server.synchronous and self.selected_clients is not None and len(
-                self.reporting_clients) != self.clients_per_round:
-            # self.selected_clients is None means that it is the first iteration
-            # len(self.reporting_clients) == self.clients_per_round means that
-            # updates of all selected clients in the last iteration were aggregated
-            # In these two cases, we go to the 'else' branch
-            training_clients_ids = [
+                self.reporting_clients) < self.clients_per_round:
+            # If self.selected_clients is None, it implies that it is the first iteration;
+            # If len(self.reporting_clients) == self.clients_per_round, it implies that
+            # all selected clients have already reported.
+
+            # Except for these two cases, we need to exclude the clients who are still
+            # traing.
+            training_client_ids = [
                 self.training_clients[client_id]
                 for client_id in list(self.training_clients.keys())
             ]
             selectable_clients = [
                 client for client in self.clients_pool
-                if client not in training_clients_ids
+                if client not in training_client_ids
             ]
 
             self.selected_clients = self.choose_clients(
@@ -305,6 +308,7 @@ class Server:
     def choose_clients(self, clients_pool, clients_count):
         """ Choose a subset of the clients to participate in each round. """
         assert self.clients_per_round <= len(self.clients_pool)
+
         # Select clients randomly
         return random.sample(clients_pool, clients_count)
 
@@ -376,7 +380,7 @@ class Server:
             self.client_payload[sid].append(_data)
 
     async def client_payload_done(self, sid, client_id, object_key):
-        """ Upon receiving all the payload from a client, eithe via S3 or socket.io. """
+        """ Upon receiving all the payload from a client, either via S3 or socket.io. """
         if object_key is None:
             assert self.client_payload[sid] is not None
 
@@ -420,6 +424,7 @@ class Server:
         for client_id, client in dict(self.clients).items():
             if client['sid'] == sid:
                 del self.clients[client_id]
+                del self.training_clients[client_id]
 
                 logging.info(
                     "[Server #%d] Client #%d disconnected and removed from this server.",
@@ -438,7 +443,7 @@ class Server:
                         await self.select_clients()
 
     async def wrap_up(self):
-        """Wrapping up when each round of training is done."""
+        """ Wrapping up when each round of training is done. """
         # Break the loop when the target accuracy is achieved
         target_accuracy = Config().trainer.target_accuracy
 
@@ -452,19 +457,19 @@ class Server:
 
     # pylint: disable=protected-access
     async def close(self):
-        """Closing the server."""
+        """ Closing the server. """
         logging.info("[Server #%d] Training concluded.", os.getpid())
         self.trainer.save_model()
         await self.close_connections()
         os._exit(0)
 
     async def customize_server_response(self, server_response):
-        """Wrap up generating the server response with any additional information."""
+        """ Wrap up generating the server response with any additional information. """
         return server_response
 
     @abstractmethod
     def customize_server_payload(self, payload):
-        """Wrap up generating the server payload with any additional information."""
+        """ Wrap up generating the server payload with any additional information. """
 
     @abstractmethod
     def configure(self):
