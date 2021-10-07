@@ -231,6 +231,12 @@ Plato supports a *client simulation mode*, in which the actual number of client 
 
 To turn on the client simulation mode, add `simulation: true` to the `clients` section in the configuration file.
 
+### Server asynchronous mode
+
+Plato supports an *asynchronous mode* for the federated learning servers. With traditional federated learning, client-side training and server-side processing proceed in a synchronous iterative fashion, where the next round of training will not commence before the current round is complete. In each round, the server would select a number of clients for training, send them the latest model, and the clients would commence training with their local data. As each client finishes its client training process, it will send its model updates to the server. The server will wait for all the clients to finish training before aggregating their model updates.
+
+In contrast, if server asynchronous mode is activated (`server:synchronous` set to `false`), the server run its aggregation process periodically. The interval between periodic runs is defined in `server:periodic_interval` in the configuration). When the server runs its aggregation process, all model updates received so far will be aggregated, and new clients will be selected to replace the clients who have already sent their updates. Clients who have not sent their model updates yet will be allowed to continue their training processes. It may be the case that asynchronous mode is more efficient for cases where clients have very different training performance across the board, as faster clients may not need to wait for the slower ones (known as **stragglers** in the academic literature) to receive their freshly aggregated models from the server.
+
 ### Plotting runtime results
 
 If the configuration file contains a `results` section, the selected performance metrics, such as accuracy, will be saved in a `.csv` file in the `results/` directory. By default, the `results/` directory is under the path to the used configuration file, but it can be easily changed by modifying `Config.result_dir` in [`config.py`](config.py).

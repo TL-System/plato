@@ -317,7 +317,7 @@ class Server:
                 await asyncio.sleep(Config().server.periodic_interval)
 
     async def periodic_task(self):
-        """ A periodic task that is executed from time to time, determine by
+        """ A periodic task that is executed from time to time, determined by
         'server:periodic_interval' in the configuration. """
         # Call the async function that defines a customized periodic task, if any
         _task = getattr(self, "customize_periodic_task", None)
