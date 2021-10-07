@@ -3,7 +3,7 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 30
+    total_clients: 10
 
     # The number of clients selected in each round
     per_round: 5
@@ -17,8 +17,8 @@ clients:
 server:
     address: 127.0.0.1
     port: 8000
-    synchronous: true
-    aggregation_interval: 20
+    synchronous: false
+    periodic_interval: 20
 
 data:
     # The training and testing dataset
