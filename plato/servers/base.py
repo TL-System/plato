@@ -88,7 +88,7 @@ class Server:
         self.reporting_clients = []
 
         # Clients who are still training since the last round of aggregation
-        self.training_clients = []
+        self.training_clients = {}
 
     def run(self,
             client=None,
@@ -244,37 +244,38 @@ class Server:
             for i, selected_client_id in enumerate(self.selected_clients):
                 if hasattr(Config().clients, 'simulation') and Config(
                 ).clients.simulation and not Config().is_central_server:
-                    client_id = i + 1
+                    if hasattr(Config().server, 'synchronous') and not Config(
+                    ).server.synchronous and self.reporting_clients is not None:
+                        client_id = self.reporting_clients[i]
+                    else:
+                        client_id = i + 1
                 else:
                     client_id = selected_client_id
 
-                # Avoid sending the current model to a client who is still
-                # conducting local training and has not sent an update since
-                # the last round of aggregation
-                if selected_client_id not in self.training_clients:
-                    sid = self.clients[client_id]['sid']
+                sid = self.clients[client_id]['sid']
 
-                    logging.info(
-                        "[Server #%d] Selecting client #%d for training.",
-                        os.getpid(), selected_client_id)
+                logging.info("[Server #%d] Selecting client #%d for training.",
+                             os.getpid(), selected_client_id)
 
-                    server_response = {'id': selected_client_id}
-                    server_response = await self.customize_server_response(
-                        server_response)
+                server_response = {'id': selected_client_id}
+                server_response = await self.customize_server_response(
+                    server_response)
 
-                    # Sending the server response as metadata to the clients (payload to follow)
-                    await self.sio.emit('payload_to_arrive',
-                                        {'response': server_response},
-                                        room=sid)
+                # Sending the server response as metadata to the clients (payload to follow)
+                await self.sio.emit('payload_to_arrive',
+                                    {'response': server_response},
+                                    room=sid)
 
-                    payload = self.algorithm.extract_weights()
-                    payload = self.customize_server_payload(payload)
+                payload = self.algorithm.extract_weights()
+                payload = self.customize_server_payload(payload)
 
-                    # Sending the server payload to the client
-                    logging.info(
-                        "[Server #%d] Sending the current model to client #%d.",
-                        os.getpid(), selected_client_id)
-                    await self.send(sid, payload, selected_client_id)
+                # Sending the server payload to the client
+                logging.info(
+                    "[Server #%d] Sending the current model to client #%d.",
+                    os.getpid(), selected_client_id)
+                await self.send(sid, payload, selected_client_id)
+
+                self.training_clients[client_id] = selected_client_id
 
             self.reporting_clients = []
 
@@ -331,7 +332,7 @@ class Server:
     async def client_payload_arrived(self, sid, client_id):
         """ Upon receiving a portion of the payload from a client. """
         assert len(
-            self.client_chunks[sid]) > 0 and client_id in self.selected_clients
+            self.client_chunks[sid]) > 0 and client_id in self.training_clients
 
         payload = b''.join(self.client_chunks[sid])
         _data = pickle.loads(payload)
@@ -370,9 +371,10 @@ class Server:
         self.updates.append((self.reports[sid], self.client_payload[sid]))
 
         self.reporting_clients.append(client_id)
+        del self.training_clients[client_id]
 
         if len(self.updates) > 0 and (
-                len(self.updates) >= len(self.selected_clients) or
+                len(self.updates) >= Config().clients.per_round or
             (hasattr(Config().server, 'synchronous')
              and not Config().server.synchronous
              and time.perf_counter() - self.clients_last_selected >=
