@@ -100,33 +100,22 @@ class Server(base.Server):
         # of clients whose updates were aggregated in the last iteration
         if hasattr(Config().server, 'synchronous') and not Config(
         ).server.synchronous and self.selected_clients is not None and len(
-                self.aggregated_clients) != Config().clients.per_round:
+                self.reporting_clients) != Config().clients.per_round:
             # self.selected_clients is None means that it is the first iteration
-            # len(self.aggregated_clients) == Config().clients.per_round means that
+            # len(self.reporting_clients) == Config().clients.per_round means that
             # updates of all selected clients in the last iteration were aggregated
             # In these two cases, we go to the 'else' branch
-            self.training_clients = [
-                client for client in self.selected_clients
-                if client not in self.aggregated_clients
+            training_clients_ids = [
+                self.training_clients[client_id]
+                for client_id in list(self.training_clients.keys())
             ]
+
             selectable_clients = [
                 client for client in self.clients_pool
-                if client not in self.training_clients
+                if client not in training_clients_ids
             ]
-            newly_selected_clients = random.sample(
-                selectable_clients, len(self.aggregated_clients))
-
-            selected_clients = []
-            i = 0
-            for client in self.selected_clients:
-                if client in self.aggregated_clients:
-                    selected_clients.append(newly_selected_clients[i])
-                    i += 1
-                else:
-                    selected_clients.append(client)
-            # The selected clients of this iteration is the newly selected clients
-            # and clients who are still doing local training
-            return selected_clients
+            return random.sample(selectable_clients,
+                                 len(self.reporting_clients))
 
         # Select clients randomly among all connected clients
         else:
