@@ -6,6 +6,7 @@ import logging
 import multiprocessing as mp
 import os
 import pickle
+import random
 import sys
 import time
 from abc import abstractmethod
@@ -238,7 +239,29 @@ class Server:
             self.clients_pool = list(self.clients)
 
         self.clients_last_selected = time.perf_counter()
-        self.selected_clients = self.choose_clients()
+
+        # In asychronous FL, avoid selecting clients who are still training for a previous iteration.
+        if hasattr(Config().server, 'synchronous') and not Config(
+        ).server.synchronous and self.selected_clients is not None and len(
+                self.reporting_clients) != self.clients_per_round:
+            # self.selected_clients is None means that it is the first iteration
+            # len(self.reporting_clients) == self.clients_per_round means that
+            # updates of all selected clients in the last iteration were aggregated
+            # In these two cases, we go to the 'else' branch
+            training_clients_ids = [
+                self.training_clients[client_id]
+                for client_id in list(self.training_clients.keys())
+            ]
+            selectable_clients = [
+                client for client in self.clients_pool
+                if client not in training_clients_ids
+            ]
+
+            self.selected_clients = self.choose_clients(
+                selectable_clients, len(self.reporting_clients))
+        else:
+            self.selected_clients = self.choose_clients(
+                self.clients_pool, self.clients_per_round)
 
         if len(self.selected_clients) > 0:
             for i, selected_client_id in enumerate(self.selected_clients):
@@ -278,6 +301,12 @@ class Server:
                 self.training_clients[client_id] = selected_client_id
 
             self.reporting_clients = []
+
+    def choose_clients(self, clients_pool, clients_count):
+        """ Choose a subset of the clients to participate in each round. """
+        assert self.clients_per_round <= len(self.clients_pool)
+        # Select clients randomly
+        return random.sample(clients_pool, clients_count)
 
     async def send_in_chunks(self, data, sid, client_id) -> None:
         """ Sending a bytes object in fixed-sized chunks to the client. """
@@ -374,7 +403,7 @@ class Server:
         del self.training_clients[client_id]
 
         if len(self.updates) > 0 and (
-                len(self.updates) >= Config().clients.per_round or
+                len(self.updates) >= self.clients_per_round or
             (hasattr(Config().server, 'synchronous')
              and not Config().server.synchronous
              and time.perf_counter() - self.clients_last_selected >=
@@ -444,7 +473,3 @@ class Server:
     @abstractmethod
     async def process_reports(self) -> None:
         """ Process a client report. """
-
-    @abstractmethod
-    def choose_clients(self) -> list:
-        """ Choose a subset of the clients to participate in each round. """

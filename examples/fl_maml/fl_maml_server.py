@@ -38,7 +38,8 @@ class Server(fedavg.Server):
             # the current set of clients that have contacted the server
             self.clients_pool = list(self.clients)
 
-        self.selected_clients = self.choose_clients()
+        self.selected_clients = self.choose_clients(self.clients_pool,
+                                                    self.clients_per_round)
 
         if len(self.selected_clients) > 0:
             for i, selected_client_id in enumerate(self.selected_clients):
