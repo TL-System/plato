@@ -69,16 +69,16 @@ class Server(fedavg.Server):
             self.local_values[client_id]["prob"] = math.exp(
                 self.alpha2 * self.local_values[client_id]["valuation"])
 
-    def choose_clients(self, _, _):
+    def choose_clients(self, clients_pool, clients_count):
         """Choose a subset of the clients to participate in each round."""
         # Update the clients sampling distribution
         self.calc_sample_distribution()
 
         # 1. Sample a subset of the clients according to the sampling distribution
-        num1 = int(math.floor((1 - self.alpha3) * self.clients_per_round))
+        num1 = int(math.floor((1 - self.alpha3) * clients_count))
         probs = np.array([
             self.local_values[client_id]["prob"]
-            for client_id in self.clients_pool
+            for client_id in clients_pool
         ])
 
         if probs.sum() != 0.0:
@@ -86,7 +86,7 @@ class Server(fedavg.Server):
         else:
             probs = None
 
-        subset1 = np.random.choice(self.clients_pool,
+        subset1 = np.random.choice(clients_pool,
                                    num1,
                                    p=probs,
                                    replace=False).tolist()

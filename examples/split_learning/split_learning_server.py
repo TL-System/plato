@@ -20,14 +20,14 @@ class Server(fedavg.Server):
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
 
-        self.clients_running_queue = [
-        ]  # a FIFO queue(list) for choosing the running client
+        # a FIFO queue(list) for choosing the running client
+        self.clients_running_queue = []
 
-    def choose_clients(self, _, _):
-        assert self.clients_per_round == 1
+    def choose_clients(self, clients_pool, clients_count):
+        assert len(clients_pool) > 0 and clients_count == 1
 
         # fist step: make sure that the sl running queue sync with the clients pool
-        new_client_id_set = set(self.clients_pool)
+        new_client_id_set = set(clients_pool)
         old_client_id_set = set(self.clients_running_queue)
         # delete the disconnected clients
         remove_clients = old_client_id_set - new_client_id_set
