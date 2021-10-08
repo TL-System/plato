@@ -11,7 +11,7 @@ class Sampler(base.Sampler):
     """Create a data sampler that samples all the data in the dataset.
        Used by the MistNet server.
     """
-    def __init__(self, dataset, client_id):
+    def __init__(self, dataset, client_id=0):
         super().__init__()
         self.client_id = client_id
 

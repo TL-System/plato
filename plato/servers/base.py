@@ -2,10 +2,12 @@
 The base class for federated learning servers.
 """
 
+import asyncio
 import logging
 import multiprocessing as mp
 import os
 import pickle
+import random
 import sys
 import time
 from abc import abstractmethod
@@ -58,7 +60,7 @@ class ServerEvents(socketio.AsyncNamespace):
 
 
 class Server:
-    """The base class for federated learning servers."""
+    """ The base class for federated learning servers. """
     def __init__(self):
         self.sio = None
         self.client = None
@@ -78,12 +80,19 @@ class Server:
         self.client_chunks = {}
         self.s3_client = None
 
+        # States that need to be maintained for asynchronous FL
+
+        # Clients whose new reports were received since the last round of aggregation
+        self.reporting_clients = []
+        # Clients who are still training since the last round of aggregation
+        self.training_clients = {}
+
     def run(self,
             client=None,
             edge_server=None,
             edge_client=None,
             trainer=None):
-        """Start a run loop for the server. """
+        """ Start a run loop for the server. """
         # Remove the running trainers table from previous runs.
         if not Config().is_edge_server() and hasattr(Config().trainer,
                                                      'max_concurrency'):
@@ -112,6 +121,7 @@ class Server:
         else:
             Server.start_clients(client=self.client)
 
+        asyncio.get_event_loop().create_task(self.periodic())
         self.start()
 
     def start(self, port=Config().server.port):
@@ -137,7 +147,7 @@ class Server:
         web.run_app(app, host=Config().server.address, port=port)
 
     async def register_client(self, sid, client_id):
-        """Adding a newly arrived client to the list of clients."""
+        """ Adding a newly arrived client to the list of clients. """
         if not client_id in self.clients:
             # The last contact time is stored for each client
             self.clients[client_id] = {
@@ -162,7 +172,7 @@ class Server:
                       edge_server=None,
                       edge_client=None,
                       trainer=None):
-        """Starting all the clients as separate processes."""
+        """ Starting all the clients as separate processes. """
         starting_id = 1
 
         if hasattr(Config().clients,
@@ -200,13 +210,13 @@ class Server:
                 proc.start()
 
     async def close_connections(self):
-        """Closing all socket.io connections after training completes."""
+        """ Closing all socket.io connections after training completes. """
         for client_id, client in dict(self.clients).items():
             logging.info("Closing the connection to client #%d.", client_id)
             await self.sio.emit('disconnect', room=client['sid'])
 
     async def select_clients(self):
-        """Select a subset of the clients and send messages to them to start training."""
+        """ Select a subset of the clients and send messages to them to start training. """
         self.updates = []
         self.current_round += 1
 
@@ -225,13 +235,41 @@ class Server:
             # the current set of clients that have contacted the server
             self.clients_pool = list(self.clients)
 
-        self.selected_clients = self.choose_clients()
+        # In asychronous FL, avoid selecting new clients to replace those that are still
+        # training at this time
+        if hasattr(Config().server, 'synchronous') and not Config(
+        ).server.synchronous and self.selected_clients is not None and len(
+                self.reporting_clients) < self.clients_per_round:
+            # If self.selected_clients is None, it implies that it is the first iteration;
+            # If len(self.reporting_clients) == self.clients_per_round, it implies that
+            # all selected clients have already reported.
+
+            # Except for these two cases, we need to exclude the clients who are still
+            # traing.
+            training_client_ids = [
+                self.training_clients[client_id]
+                for client_id in list(self.training_clients.keys())
+            ]
+            selectable_clients = [
+                client for client in self.clients_pool
+                if client not in training_client_ids
+            ]
+
+            self.selected_clients = self.choose_clients(
+                selectable_clients, len(self.reporting_clients))
+        else:
+            self.selected_clients = self.choose_clients(
+                self.clients_pool, self.clients_per_round)
 
         if len(self.selected_clients) > 0:
             for i, selected_client_id in enumerate(self.selected_clients):
                 if hasattr(Config().clients, 'simulation') and Config(
                 ).clients.simulation and not Config().is_central_server:
-                    client_id = i + 1
+                    if hasattr(Config().server, 'synchronous') and not Config(
+                    ).server.synchronous and self.reporting_clients is not None:
+                        client_id = self.reporting_clients[i]
+                    else:
+                        client_id = i + 1
                 else:
                     client_id = selected_client_id
 
@@ -257,6 +295,49 @@ class Server:
                     "[Server #%d] Sending the current model to client #%d.",
                     os.getpid(), selected_client_id)
                 await self.send(sid, payload, selected_client_id)
+
+                self.training_clients[client_id] = selected_client_id
+
+            self.reporting_clients = []
+
+    def choose_clients(self, clients_pool, clients_count):
+        """ Choose a subset of the clients to participate in each round. """
+        assert self.clients_per_round <= len(self.clients_pool)
+
+        # Select clients randomly
+        return random.sample(clients_pool, clients_count)
+
+    async def periodic(self):
+        """ Runs periodic_task() periodically on the server. The time interval between 
+            its execution is defined in 'server:periodic_interval'.
+        """
+        if hasattr(Config().server, 'periodic_interval'):
+            while True:
+                await self.periodic_task()
+                await asyncio.sleep(Config().server.periodic_interval)
+
+    async def periodic_task(self):
+        """ A periodic task that is executed from time to time, determined by
+        'server:periodic_interval' in the configuration. """
+        # Call the async function that defines a customized periodic task, if any
+        _task = getattr(self, "customize_periodic_task", None)
+        if callable(_task):
+            await self.customize_periodic_task()
+
+        # If we are operating in asynchronous mode, aggregate the model updates received so far.
+        if hasattr(Config().server,
+                   'synchronous') and not Config().server.synchronous:
+            if len(self.updates) > 0:
+                logging.info(
+                    "[Server #%d] %d client reports received in asynchronous mode. Processing.",
+                    os.getpid(), len(self.updates))
+                await self.process_reports()
+                await self.wrap_up()
+                await self.select_clients()
+            else:
+                logging.info(
+                    "[Server #%d] No client reports have been received. Nothing to process."
+                )
 
     async def send_in_chunks(self, data, sid, client_id) -> None:
         """ Sending a bytes object in fixed-sized chunks to the client. """
@@ -311,7 +392,7 @@ class Server:
     async def client_payload_arrived(self, sid, client_id):
         """ Upon receiving a portion of the payload from a client. """
         assert len(
-            self.client_chunks[sid]) > 0 and client_id in self.selected_clients
+            self.client_chunks[sid]) > 0 and client_id in self.training_clients
 
         payload = b''.join(self.client_chunks[sid])
         _data = pickle.loads(payload)
@@ -326,7 +407,7 @@ class Server:
             self.client_payload[sid].append(_data)
 
     async def client_payload_done(self, sid, client_id, object_key):
-        """ Upon receiving all the payload from a client, eithe via S3 or socket.io. """
+        """ Upon receiving all the payload from a client, either via S3 or socket.io. """
         if object_key is None:
             assert self.client_payload[sid] is not None
 
@@ -349,8 +430,13 @@ class Server:
 
         self.updates.append((self.reports[sid], self.client_payload[sid]))
 
-        if len(self.updates) > 0 and len(self.updates) >= len(
-                self.selected_clients):
+        self.reporting_clients.append(client_id)
+        del self.training_clients[client_id]
+
+        if len(self.updates) > 0 and len(
+                self.updates) >= self.clients_per_round and not (
+                    hasattr(Config().server, 'synchronous')
+                    and not Config().server.synchronous):
             logging.info(
                 "[Server #%d] All %d client reports received. Processing.",
                 os.getpid(), len(self.updates))
@@ -363,6 +449,9 @@ class Server:
         for client_id, client in dict(self.clients).items():
             if client['sid'] == sid:
                 del self.clients[client_id]
+
+                if client_id in self.training_clients:
+                    del self.training_clients[client_id]
 
                 logging.info(
                     "[Server #%d] Client #%d disconnected and removed from this server.",
@@ -381,7 +470,7 @@ class Server:
                         await self.select_clients()
 
     async def wrap_up(self):
-        """Wrapping up when each round of training is done."""
+        """ Wrapping up when each round of training is done. """
         # Break the loop when the target accuracy is achieved
         target_accuracy = Config().trainer.target_accuracy
 
@@ -395,19 +484,19 @@ class Server:
 
     # pylint: disable=protected-access
     async def close(self):
-        """Closing the server."""
+        """ Closing the server. """
         logging.info("[Server #%d] Training concluded.", os.getpid())
         self.trainer.save_model()
         await self.close_connections()
         os._exit(0)
 
     async def customize_server_response(self, server_response):
-        """Wrap up generating the server response with any additional information."""
+        """ Wrap up generating the server response with any additional information. """
         return server_response
 
     @abstractmethod
     def customize_server_payload(self, payload):
-        """Wrap up generating the server payload with any additional information."""
+        """ Wrap up generating the server payload with any additional information. """
 
     @abstractmethod
     def configure(self):
@@ -416,7 +505,3 @@ class Server:
     @abstractmethod
     async def process_reports(self) -> None:
         """ Process a client report. """
-
-    @abstractmethod
-    def choose_clients(self) -> list:
-        """ Choose a subset of the clients to participate in each round. """
