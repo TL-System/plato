@@ -20,13 +20,14 @@ class Server(fedavg.Server):
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
 
-        self.clients_running_queue = [] # a FIFO queue(list) for choosing the running client
+        # a FIFO queue(list) for choosing the running client
+        self.clients_running_queue = []
 
-    def choose_clients(self):
-        assert self.clients_per_round == 1
+    def choose_clients(self, clients_pool, clients_count):
+        assert len(clients_pool) > 0 and clients_count == 1
 
         # fist step: make sure that the sl running queue sync with the clients pool
-        new_client_id_set = set(self.clients_pool)
+        new_client_id_set = set(clients_pool)
         old_client_id_set = set(self.clients_running_queue)
         # delete the disconnected clients
         remove_clients = old_client_id_set - new_client_id_set
@@ -82,15 +83,17 @@ class Server(fedavg.Server):
             feature_dataset = list(chain.from_iterable(features))
             sampler = all_inclusive.Sampler(feature_dataset)
             self.algorithm.train(feature_dataset, sampler,
-                             Config().algorithm.cut_layer)
+                                 Config().algorithm.cut_layer)
             # Test the updated model
             self.accuracy = self.trainer.test(self.testset)
-            logging.info('[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(os.getpid(), 100 * self.accuracy))
+            logging.info(
+                '[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(
+                    os.getpid(), 100 * self.accuracy))
 
             payload = self.load_gradients()
             logging.info("[Server #%d] Reporting gradients to client #%d.",
                          os.getpid(), client_id)
-            
+
             sid = self.clients[client_id]['sid']
             # Sending the server payload to the clients
             payload = self.load_gradients()
@@ -98,7 +101,7 @@ class Server(fedavg.Server):
             return
 
         self.updates.append((self.reports[sid], self.client_payload[sid]))
-        
+
         if len(self.updates) > 0 and len(self.updates) >= len(
                 self.selected_clients):
             logging.info(

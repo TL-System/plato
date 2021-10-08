@@ -91,12 +91,6 @@ class Server(base.Server):
         if self.algorithm is None:
             self.algorithm = algorithms_registry.get(self.trainer)
 
-    def choose_clients(self):
-        """Choose a subset of the clients to participate in each round."""
-        # Select clients randomly
-        assert self.clients_per_round <= len(self.clients_pool)
-        return random.sample(self.clients_pool, self.clients_per_round)
-
     def extract_client_updates(self, updates):
         """Extract the model weight updates from client updates."""
         weights_received = [payload for (__, payload) in updates]
