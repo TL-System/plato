@@ -121,7 +121,9 @@ class Server:
         else:
             Server.start_clients(client=self.client)
 
-        asyncio.get_event_loop().create_task(self.periodic())
+        if hasattr(Config().server, 'periodic_interval'):
+            asyncio.get_event_loop().create_task(self.periodic())
+
         self.start()
 
     def start(self, port=Config().server.port):
@@ -308,13 +310,12 @@ class Server:
         return random.sample(clients_pool, clients_count)
 
     async def periodic(self):
-        """ Runs periodic_task() periodically on the server. The time interval between 
+        """ Runs periodic_task() periodically on the server. The time interval between
             its execution is defined in 'server:periodic_interval'.
         """
-        if hasattr(Config().server, 'periodic_interval'):
-            while True:
-                await self.periodic_task()
-                await asyncio.sleep(Config().server.periodic_interval)
+        while True:
+            await self.periodic_task()
+            await asyncio.sleep(Config().server.periodic_interval)
 
     async def periodic_task(self):
         """ A periodic task that is executed from time to time, determined by
@@ -433,10 +434,12 @@ class Server:
         self.reporting_clients.append(client_id)
         del self.training_clients[client_id]
 
+        # If all updates have been received from selected clients, the aggregation process
+        # proceeds regardless of synchronous or asynchronous modes. This guarantees that
+        # if asynchronous mode uses an excessively long aggregation interval, it will not
+        # unnecessarily delay the aggregation process.
         if len(self.updates) > 0 and len(
-                self.updates) >= self.clients_per_round and not (
-                    hasattr(Config().server, 'synchronous')
-                    and not Config().server.synchronous):
+                self.updates) >= self.clients_per_round:
             logging.info(
                 "[Server #%d] All %d client reports received. Processing.",
                 os.getpid(), len(self.updates))
