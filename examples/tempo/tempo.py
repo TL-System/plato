@@ -1,19 +1,18 @@
 """
 A federated learning training session using Tempo.
 """
-import os
-
-os.environ['config_file'] = 'tempo_MNIST_lenet5.yml'
-
-import tempo_client
 import tempo_server
+import tempo_client
+import tempo_edge
 
 
 def main():
     """ A Plato federated learning training session using the Tempo algorithm. """
     server = tempo_server.Server()
     client = tempo_client.Client()
-    server.run(client)
+    edge_server = tempo_server.Server
+    edge_client = tempo_edge.Client
+    server.run(client, edge_server, edge_client)
 
 
 if __name__ == "__main__":

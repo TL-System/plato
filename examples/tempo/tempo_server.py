@@ -4,7 +4,6 @@ clients' local epoch numbers of each institution.
 """
 
 import math
-import statistics
 
 import torch
 from plato.config import Config
@@ -20,7 +19,7 @@ class Server(fedavg_cs.Server):
     def __init__(self):
         super().__init__()
 
-        # The central server uses a list to store clients' local epoch numbers of each institution
+        # The central server uses a list to store each institution's clients' local epoch numbers
         self.local_epoch_list = None
         if Config().is_central_server():
             self.local_epoch_list = [
@@ -62,58 +61,26 @@ class Server(fedavg_cs.Server):
         """
         weights_diff_list = self.get_weights_differences()
 
-        self.use_min_max(weights_diff_list)
-        #self.use_median(weights_diff_list)
+        self.compute_local_epoch(weights_diff_list)
 
-    def use_min_max(self, weights_diff_list):
+    def compute_local_epoch(self, weights_diff_list):
         """A method to compute local epochs."""
-        log_list = [-1 * math.log(i) for i in weights_diff_list]
-        min_value = min(log_list)
-        max_value = max(log_list)
+        log_list = [math.log(i) for i in weights_diff_list]
+        min_log = min(log_list)
+        max_log = max(log_list)
 
-        if min_value == max_value:
+        if min_log == max_log:
             self.local_epoch_list = [
                 Config().trainer.epochs
                 for i in range(Config().algorithm.total_silos)
             ]
         else:
-            max_epoch = 2 * Config().trainer.epochs
-            min_epoch = max(int(Config().trainer.epochs / 2), 1)
-            a_value = (max_epoch - min_epoch) / (max_value - min_value)
-            b_value = min_epoch - a_value * min_value
+            a_value = Config().algorithm.total_silos / 2 / (min_log - max_log)
+            b_value = min_log - 4 * max_log
             self.local_epoch_list = [
-                max(1, int(i * a_value + b_value)) for i in log_list
+                max(1, math.ceil(a_value * (3 * i + b_value)))
+                for i in log_list
             ]
-
-    def use_median(self, weights_diff_list):
-        """A method to compute local epochs."""
-        log_list = [-1 * math.log(i) for i in weights_diff_list]
-        median = statistics.median(log_list)
-
-        diff = 1
-
-        for i, epoch in enumerate(self.local_epoch_list):
-            if epoch > median:
-                self.local_epoch_list[i] += diff
-            else:
-                if self.local_epoch_list[i] > diff:
-                    self.local_epoch_list[i] -= diff
-
-    def compute_accuracy_difference(self):
-        """
-        Compute the absulute value of each edge server's aggregated model accuarcy
-        - global model accuracy.
-        """
-        accuracy_diff_list = []
-        for i in range(Config().algorithm.total_silos):
-            client_id = i + 1 + Config().clients.total_clients
-            accuracy = [
-                report.accuracy for (report, __) in self.updates
-                if report.client_id == client_id
-            ][0]
-            accuracy_diff = abs(accuracy - self.accuracy)
-            accuracy_diff_list.append(accuracy_diff)
-        return accuracy_diff_list
 
     def get_weights_differences(self):
         """
@@ -122,7 +89,11 @@ class Server(fedavg_cs.Server):
         """
         weights_diff_list = []
         for i in range(Config().algorithm.total_silos):
-            client_id = i + 1 + Config().clients.total_clients
+            if hasattr(Config().clients,
+                       'simulation') and Config().clients.simulation:
+                client_id = i + 1 + Config().clients.per_round
+            else:
+                client_id = i + 1 + Config().clients.total_clients
             (report, weights) = [(report, payload)
                                  for (report, payload) in self.updates
                                  if int(report.client_id) == client_id][0]
@@ -137,8 +108,8 @@ class Server(fedavg_cs.Server):
 
     def compute_weights_difference(self, local_weights, num_samples):
         """
-        Compute the weights divergence of an edge server's aggregated model
-        and the global model accuracy.
+        Compute the weight difference of an edge server's aggregated model
+        and the global model.
         """
         weights_diff = 0
 
@@ -148,16 +119,9 @@ class Server(fedavg_cs.Server):
         for name, local_weight in local_weights.items():
             global_weight = global_weights[name]
             delta = local_weight - global_weight
+            delta = delta.float()
             weights_diff += torch.norm(delta).item()
 
         weights_diff = weights_diff * (num_samples / self.total_samples)
-
-        # global_weights_norm = 0
-        # for name, global_weight in global_weights.items():
-        #     global_weight = global_weights[name]
-        #     global_weights_norm += torch.norm(global_weight).item()
-
-        # weights_diff = weights_diff / global_weights_norm * (
-        #     num_samples / self.total_samples)
 
         return weights_diff
