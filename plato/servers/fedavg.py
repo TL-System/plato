@@ -91,6 +91,10 @@ class Server(base.Server):
         if self.algorithm is None:
             self.algorithm = algorithms_registry.get(self.trainer)
 
+    async def select_clients(self):
+        self.round_start_time = time.perf_counter()
+        await super().select_clients()
+
     def extract_client_updates(self, updates):
         """Extract the model weight updates from client updates."""
         weights_received = [payload for (__, payload) in updates]
