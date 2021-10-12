@@ -304,7 +304,7 @@ class Server:
 
     def choose_clients(self, clients_pool, clients_count):
         """ Choose a subset of the clients to participate in each round. """
-        assert self.clients_per_round <= len(self.clients_pool)
+        assert clients_count <= len(clients_pool)
 
         # Select clients randomly
         return random.sample(clients_pool, clients_count)
