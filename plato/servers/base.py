@@ -247,7 +247,7 @@ class Server:
             # all selected clients have already reported.
 
             # Except for these two cases, we need to exclude the clients who are still
-            # traing.
+            # training.
             training_client_ids = [
                 self.training_clients[client_id]
                 for client_id in list(self.training_clients.keys())

@@ -218,7 +218,6 @@ class Trainer(base.Trainer):
         cut_layer (optional): The layer which training should start from.
 
         Returns:
-        bool: Whether training was successfully completed.
         float: Elapsed time during training.
         """
         config = Config().trainer._asdict()
