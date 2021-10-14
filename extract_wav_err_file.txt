@@ -1,0 +1,7 @@
+./data/Kinetics/Kinetics700/train/video/climbing_a_rope/DBhqWlYwMIQ.mp4
+./data/Kinetics/Kinetics700/train/video/javelin_throw/aQMyn0eNxNs.mp4
+./data/Kinetics/Kinetics700/train/video/climbing_a_rope/x3n1cUjSTf8.mp4
+./data/Kinetics/Kinetics700/train/video/climbing_a_rope/LmkWTUAIXqs.mp4
+./data/Kinetics/Kinetics700/train/video/news_anchoring/9EvgW74gqwQ.mp4
+./data/Kinetics/Kinetics700/train/video/sipping_cup/2N89BupWVx8.mp4
+./data/Kinetics/Kinetics700/train/video/sipping_cup/IFqoacdjw80.mp4

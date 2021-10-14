@@ -8,10 +8,11 @@ os.environ['config_file'] = 'configs/TestConfigs/dis_noniid_sampler_test.yml'
 
 import torch
 from plato.datasources.cifar10 import DataSource
-from plato.samplers.distribution_noniid import Sampler
+from plato.samplers import modality_registry
 
 if __name__ == "__main__":
     cifar10_datasource = DataSource()
+    defined_sampler = modality_registry
     dis_noniid_sampler = Sampler(datasource=cifar10_datasource, client_id=0)
 
     print("sampled size: ", dis_noniid_sampler.trainset_size())

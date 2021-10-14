@@ -6,11 +6,17 @@ from collections import OrderedDict
 
 from plato.config import Config
 
-from plato.samplers import (modality_iid, quantity_modality_noniid)
+from plato.samplers.multimodal import (modality_iid, sample_quantity_noniid,
+                                       quantity_label_noniid,
+                                       quantity_modality_noniid,
+                                       distribution_noniid)
 
 registered_samplers = OrderedDict([
     ('modality_iid', modality_iid.Sampler),
+    ('sample_quantity_noniid', sample_quantity_noniid.Sampler),
+    ('quantity_label_noniid', quantity_label_noniid.Sampler),
     ('quantity_modality_noniid', quantity_modality_noniid.Sampler),
+    ('distribution_noniid', distribution_noniid.Sampler),
 ])
 
 

@@ -152,3 +152,6 @@ logs/
 
 # macOS
 .DS_Store
+download_log.txt
+download_log.txt
+extract_wav_err_file.txt

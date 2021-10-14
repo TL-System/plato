@@ -9,7 +9,7 @@ import numpy as np
 import torch
 from plato.config import Config
 
-from plato.samplers import modality_base
+from plato.samplers.multimodal import modality_base
 
 
 class Sampler(modality_base.Sampler):
