@@ -1,0 +1,67 @@
+clients:
+    # The total number of clients
+    total_clients: 1
+
+    # The number of clients selected in each round
+    per_round: 1
+
+    # Should the clients compute test accuracy locally?
+    do_test: true
+
+server:
+    type: fedavg
+
+    address: 127.0.0.1
+    port: 8000
+
+data:
+    # The training and testing dataset
+    datasource: CIFAR10 
+
+    # Where the dataset is located
+    data_path: ./data
+
+    # Number of samples in each partition
+    partition_size: 20000
+
+    # IID or non-IID?
+    sampler: iid
+
+trainer:
+    # The type of the trainer
+    type: basic
+
+    # The maximum number of training rounds
+    rounds: 20
+
+    # The maximum number of clients running concurrently
+    max_concurrency: 2
+
+    # Whether the training should use multiple GPUs if available
+    parallelized: false
+
+    # The target accuracy
+    target_accuracy: 0.80
+
+    # Number of epoches for local training in each communication round
+    epochs: 1
+    batch_size: 128
+    optimizer: SGD
+    learning_rate: 0.1
+    momentum: 0.9
+    weight_decay: 0.0001
+
+    # Learning rate schedule
+    lr_schedule: LambdaLR
+    lr_gamma: 0.1
+    lr_milestone_steps: 80ep,120ep
+
+    # The machine learning model
+    model_name: resnet_18
+
+algorithm:
+    moving_average_alpha: 0.99
+    stability_threshold: 0.05
+    tight_threshold: 0.8
+    random_freezing: true
+

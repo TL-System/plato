@@ -3,13 +3,16 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 3
+    total_clients: 10
 
     # The number of clients selected in each round
-    per_round: 3
+    per_round: 2
 
     # Should the clients compute test accuracy locally?
     do_test: true
+
+    # Whether simulate clients or not
+    simulation: true
 
 server:
     address: 127.0.0.1
@@ -45,10 +48,10 @@ trainer:
     max_concurrency: 1
 
     # The target accuracy
-    target_accuracy: 0.94
+    target_accuracy: 0.98
 
     # Number of epoches for local training in each communication round
-    epochs: 5
+    epochs: 1
     batch_size: 32
     optimizer: SGD
     learning_rate: 0.01
@@ -58,6 +61,14 @@ trainer:
     # The machine learning model
     model_name: lenet5
 
+
 algorithm:
     # Aggregation algorithm
     type: fedavg
+
+results:
+    # Write the following parameter(s) into a CSV
+    types: accuracy, training_time, round_time
+
+    # Plot results (x_axis&y_axis)
+    plot: round&accuracy, round&training_time

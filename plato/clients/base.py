@@ -73,9 +73,7 @@ class Client:
 
         if hasattr(Config().algorithm,
                    'cross_silo') and not Config().is_edge_server():
-            # Contact one of the edge servers
-            self.edge_server_id = int(Config().clients.total_clients) + (
-                self.client_id - 1) % int(Config().algorithm.total_silos) + 1
+            self.edge_server_id = None
 
             assert hasattr(Config().algorithm, 'total_silos')
 
@@ -85,6 +83,15 @@ class Client:
         if hasattr(Config().algorithm,
                    'cross_silo') and not Config().is_edge_server():
             # Contact one of the edge servers
+            if hasattr(Config().clients,
+                       'simulation') and Config().clients.simulation:
+                self.edge_server_id = int(
+                    Config().clients.per_round) + (self.client_id - 1) % int(
+                        Config().algorithm.total_silos) + 1
+            else:
+                self.edge_server_id = int(Config().clients.total_clients) + (
+                    self.client_id - 1) % int(
+                        Config().algorithm.total_silos) + 1
             logging.info("[Client #%d] Contacting Edge server #%d.",
                          self.client_id, self.edge_server_id)
         else:
@@ -123,6 +130,13 @@ class Client:
     async def payload_to_arrive(self, response) -> None:
         """ Upon receiving a response from the server. """
         self.process_server_response(response)
+
+        # Update (virtual) client id for client, trainer and algorithm
+        if hasattr(Config().clients,
+                   'simulation') and Config().clients.simulation:
+            self.client_id = response['id']
+            self.configure()
+
         logging.info("[Client #%d] Selected by the server.", self.client_id)
 
         if not self.data_loaded:

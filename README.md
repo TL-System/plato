@@ -75,7 +75,7 @@ It goes without saying that `/absolute/path/to/project/home/directory` should be
 
 ### Running Plato in a Docker container
 
-Most of the codebase in *Plato* is designed to be framework-agnostic, so that it is relatively straightfoward to use *Plato* with a variety of deep learning frameworks beyond PyTorch, which is the default framwork it is using. One example of such deep learning frameworks that *Plato* currently supports is [MindSpore](https://www.mindspore.cn). Due to the wide variety of tricks that need to be followed correctly for running *Plato* without Docker, it is strongly recommended to run Plato in a Docker container, on either a CPU-only or a GPU-enabled server.
+Most of the codebase in *Plato* is designed to be framework-agnostic, so that it is relatively straightfoward to use *Plato* with a variety of deep learning frameworks beyond PyTorch, which is the default framwork it is using. One example of such deep learning frameworks that *Plato* currently supports is [MindSpore 1.1.1](https://www.mindspore.cn). Due to the wide variety of tricks that need to be followed correctly for running *Plato* without Docker, it is strongly recommended to run Plato in a Docker container, on either a CPU-only or a GPU-enabled server.
 
 To build such a Docker image, use the provided `Dockerfile` for PyTorch and `Dockerfile_MindSpore` for MindSpore:
 
@@ -115,8 +115,18 @@ docker rmi plato
 
 On Ubuntu Linux, you may need to add `sudo` before these `docker` commands.
 
-The provided `Dockerfile` helps to build a Docker image running Ubuntu 20.04, with a virtual environment called `federated` pre-configured to support PyTorch 1.8.1 and Python 3.8. If MindSpore support is needed, the provided `Dockerfile_MindSpore` contains a pre-configured environment, also called `federated`, that supports [MindSpore 1.1.1](https://github.com/mindspore-ai/mindspore) and Python 3.7.5 (which is the Python version that MindSpore requires). Both Dockerfiles have GPU support enabled. Once an image is built and a Docker container is running, one can use Visual Studio Code to connect to it and start development within the container.
+The provided `Dockerfile` helps to build a Docker image running Ubuntu 20.04, with a virtual environment called `plato` pre-configured to support PyTorch 1.8.1 and Python 3.8. 
 
+If MindSpore support is needed, the provided `Dockerfile_MindSpore` contains two pre-configured environments for CPU and GPU environments, respectively, called `plato_cpu` or `plato_gpu`. They support [MindSpore 1.1.1](https://github.com/mindspore-ai/mindspore) and Python 3.7.5 (which is the Python version that MindSpore requires). Both Dockerfiles have GPU support enabled. Once an image is built and a Docker container is running, one can use Visual Studio Code to connect to it and start development within the container.
+
+### Installing YOLOv5 as a Python package
+
+If object detection using the YOLOv5 model and any of the COCO datasets is needed, it is necessary to install YOLOv5 as a Python package first:
+
+```shell
+cd packages/yolov5
+pip install .
+```
 ### Running Plato
 
 To start a federated learning training workload, run [`run`](run) from the repository's root directory. For example:
@@ -130,18 +140,31 @@ To start a federated learning training workload, run [`run`](run) from the repos
 
 *Plato* uses the YAML format for its configuration files to manage the runtime configuration parameters. Example configuration files have been provided in the `configs` directory.
 
-*Plato* can opt to use `wandb` to produce and collect logs in the cloud. If this is needed, add `use_wandb: true` to the `trainer` section of a configuration file.
+*Plato* can opt to use `wandb` to produce and collect logs in the cloud. If this is needed, add `use_wandb: true` to the `trainer` section in your configuration file.
 
-If there are issues in the code that prevented it from running to completion, there could be running processes from previous runs. Use the command `pkill python` to terminate them so that there will not be CUDA errors in the upcoming run.
+### Potential Runtime Errors
 
-### Installing YOLOv5 as a Python package
+If runtime exceptions occur that prevent a federated learning session from running to completion, the potential issues could be:
 
-If object detection using the YOLOv5 model and any of the COCO datasets is needed, it is required to install YOLOv5 as a Python package first:
+* Out of CUDA memory.
 
-```shell
-cd packages/yolov5
-pip install .
-```
+  *Potential solutions:* Decrease the number of clients selected in each round (with the *client simulation mode* turned on); decrease the `max_concurrency` value in the `trainer` section in your configuration file; decrease the  `batch_size` used in the `trainer` section.
+ 
+* The time that a client waits for the server to respond before disconnecting is too short. This could happen when training with large neural network models. If you get an `AssertionError` saying that there are not enough launched clients for the server to select, this could be the reason. But make sure you first check if it is due to the *out of CUDA memory* error.
+
+  *Potential solutions:* Add `ping_timeout` in the `server` section in your configuration file. The default value for `ping_timeout` is 20 (seconds). You could specify a larger timeout value, such as 120.
+
+  For example, to run a training session with the CIFAR-10 dataset and the ResNet-18 model, and if 10 clients are selected per round, `ping_timeout` needs to be 120. Consider an even larger number if you run with larger models and more clients.
+
+* Running processes have not been terminated from previous runs. 
+
+  *Potential solutions:* Use the command `pkill python` to terminate them so that there will not be CUDA errors in the upcoming run.
+
+### Client Simulation Mode
+
+Plato supports a *client simulation mode*, in which the actual number of client processes launched equals the number of clients to be selected by the server per round, rather than the total number of clients. This supports a simulated federated learning environment, where the set of selected clients by the server will be simulated by the set of client processes actually running. For example, with a total of 10000 clients, if the server only needs to select 100 of them to train their models in each round, only 100 client processes will be launched in client simulation mode, and a client process may assume a different client ID in each round.
+
+To turn on the client simulation mode, add `simulation: true` to the `clients` section in the configuration file.
 
 ### Plotting Runtime Results
 
@@ -161,19 +184,16 @@ All unit tests are in the `tests/` directory. These tests are designed to be sta
 
 ### Installing Plato with MindSpore
 
-Though we provided a `Dockerfile` for building a Docker container that supports MindSpore 1.1, in rare cases it may still be necessary to install Plato with MindSpore in a GPU server running Ubuntu Linux 18.04 (which MindSpore requires). Similar to a PyTorch installation, we need to first create a new environment with Python 3.7.5 (which MindSpore 1.1 requires), and then install the required packages:
+Plato is designed to support multiple deep learning frameworks, including PyTorch, TensorFlow, and MindSpore. For MindSpore support, Plato currently supports MindSpore 1.1.1 (1.2.1 and 1.3.0 are not supported, as [they do not support `Tensor` objects to be pickled](https://gitee.com/mindspore/mindspore/issues/I43RPP?from=project-issue) and sent over a network). Though we provided a `Dockerfile` for building a Docker container that supports MindSpore 1.1.1, in rare cases it may still be necessary to install Plato with MindSpore in a GPU server running Ubuntu Linux 18.04 (which MindSpore requires). Similar to a PyTorch installation, we need to first create a new environment with Python 3.7.5 (which MindSpore 1.1.1 requires), and then install the required packages:
 
 ```shell
 conda create -n mindspore python=3.7.5
 pip install -r requirements.txt
 ```
 
-We should now install MindSpore 1.1 with the following command:
-```shell
-pip install https://ms-release.obs.cn-north-4.myhuaweicloud.com/1.1.1/MindSpore/gpu/ubuntu_x86/cuda-10.1/mindspore_gpu-1.1.1-cp37-cp37m-linux_x86_64.whl
-```
+We should now install MindSpore 1.1.1 with the command provided by the [official MindSpore website](https://mindspore.cn/install).
 
-MindSpore may need additional packages that need to be installed if they do not exist:
+MindSpore 1.1.1 may also need additional packages, which should installed if they do not exist:
 
 ```shell
 sudo apt-get install libssl-dev
@@ -199,9 +219,13 @@ function check() { lib_installed $1 && echo "$1 is installed" || echo "ERROR: $1
 check libcudnn
 ```
 
-To check if MindSpore is correctly installed on the GPU server, try to `import mindspore` with a Python interpreter.
+To check if MindSpore is correctly installed on the GPU server, try to run the command:
 
-Finally, to use trainers and servers based on MindSpore, assign `true` to `use_mindspore` in the `trainer` section of the configuration file. This variable is unassigned by default, and *Plato* would use PyTorch as its default framework.
+```shell
+python -c "import mindspore"
+```
+
+Finally, to use trainers and servers based on MindSpore, assign `true` to `use_mindspore` in the `trainer` section of the configuration file. If GPU is not available when MindSpore is used, assign `true` to `cpuonly` in the `trainer` section as well. These variables are unassigned by default, and *Plato* would use PyTorch as its default framework.
 
 ### Deploying Plato Servers in a Production Environment in the Cloud
 
@@ -218,7 +242,7 @@ rm -rf plato/
 
 where `federated` (or `mindspore`) is the name of the `conda` environment that *Plato* runs in.
 
-For more specific documentation on how Plato can be run on GPU cluster environments such as Lambda Labs' GPU cloud or Compute Canada, refer to `docs/Running.md`.
+For more specific documentation on how Plato can be run on GPU cluster environments such as Google Colaboratory or Compute Canada, refer to `docs/Running.md`.
 
 ### Technical support
 

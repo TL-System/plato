@@ -28,7 +28,7 @@ def read_csv_to_dict(result_csv_file: str) -> Dict[str, List]:
         reader = csv.DictReader(f)
         for row in reader:
             for item in result_dict:
-                if item == 'gloabl_round':
+                if item in ('round', 'global_round'):
                     result_dict[item].append(int(row[item]))
                 else:
                     result_dict[item].append(float(row[item]))
@@ -60,8 +60,12 @@ def plot_figures_from_dict(result_csv_file: str, result_dir: str):
         for item in pair:
             label = {
                 'global_round': 'Global training round',
+                'round': 'Training round',
+                'local_epoch_num': 'Local epochs',
                 'accuracy': 'Accuracy (%)',
+                'average_accuracy': 'Average Accuracy (%)',
                 'training_time': 'Training time (s)',
+                'round_time': 'Round time (s)',
                 'edge_agg_num': 'Aggregation rounds on edge servers'
             }[item]
             x_y_labels.append(label)
@@ -79,13 +83,9 @@ def main():
     __ = Config()
 
     if hasattr(Config(), 'results'):
-        datasource = Config().data.datasource
-        model = Config().trainer.model_name
-        server_type = Config().algorithm.type
-        result_dir = f'./results/{datasource}/{model}/{server_type}/'
-        result_csv_file = result_dir + 'result.csv'
+        result_csv_file = Config().result_dir + 'result.csv'
         print(f"Plotting results located at {result_csv_file}.")
-        plot_figures_from_dict(result_csv_file, result_dir)
+        plot_figures_from_dict(result_csv_file, Config().result_dir)
     else:
         print("No results to be plotted according to the configuration file.")
 

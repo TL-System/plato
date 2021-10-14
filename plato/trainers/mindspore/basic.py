@@ -4,18 +4,20 @@ The training and testing loop.
 
 import logging
 import os
+import time
+from typing import Tuple
+
 import numpy as np
 
 import mindspore
 import mindspore.nn as nn
-from mindspore.train.callback import LossMonitor
-from mindspore.nn.metrics import Accuracy
 from mindspore.nn.loss import SoftmaxCrossEntropyWithLogits
+from mindspore.nn.metrics import Accuracy
+from mindspore.train.callback import LossMonitor
 
 from plato.config import Config
-from plato.trainers import base
 from plato.models import registry as models_registry
-
+from plato.trainers import base
 
 class Trainer(base.Trainer):
     """A basic federated learning trainer for MindSpore, used by both
@@ -30,8 +32,12 @@ class Trainer(base.Trainer):
         """
         super().__init__()
 
-        mindspore.context.set_context(mode=mindspore.context.PYNATIVE_MODE,
-                                      device_target='GPU')
+        if hasattr(Config().trainer, 'cpuonly') and Config().trainer.cpuonly:
+            mindspore.context.set_context(mode=mindspore.context.PYNATIVE_MODE,
+                                        device_target='CPU')
+        else:
+            mindspore.context.set_context(mode=mindspore.context.PYNATIVE_MODE,
+                                        device_target='GPU')
 
         if model is None:
             self.model = models_registry.get()
@@ -99,13 +105,14 @@ class Trainer(base.Trainer):
         param_dict = mindspore.load_checkpoint(model_path)
         mindspore.load_param_into_net(self.model, param_dict)
 
-    def train(self, trainset, *args):
+    def train(self, trainset, *args)  -> Tuple[bool, float]:
         """The main training loop in a federated learning workload.
 
         Arguments:
         trainset: The training dataset.
         """
         self.start_training()
+        tic = time.perf_counter()
 
         self.mindspore_model.train(
             Config().trainer.epochs,
@@ -113,8 +120,11 @@ class Trainer(base.Trainer):
             callbacks=[LossMonitor(per_print_times=300)],
             dataset_sink_mode=False)
 
+        toc = time.perf_counter()
         self.pause_training()
-        return True
+        training_time = toc - tic
+
+        return True, training_time
 
     def test(self, testset):
         """Testing the model using the provided test dataset.

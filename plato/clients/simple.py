@@ -56,7 +56,7 @@ class Client(base.Client):
 
     def load_data(self) -> None:
         """Generating data and loading them onto this client."""
-        data_loading_start_time = time.time()
+        data_loading_start_time = time.perf_counter()
         logging.info("[Client #%d] Loading its data source...", self.client_id)
 
         if self.datasource is None:
@@ -82,7 +82,7 @@ class Client(base.Client):
             # Set the testset if local testing is needed
             self.testset = self.datasource.get_test_set()
 
-        self.data_loading_time = time.time() - data_loading_start_time
+        self.data_loading_time = time.perf_counter() - data_loading_start_time
 
     def load_payload(self, server_payload) -> None:
         """Loading the server model onto this client."""
@@ -90,12 +90,12 @@ class Client(base.Client):
 
     async def train(self):
         """The machine learning training workload on a client."""
-        training_start_time = time.time()
         logging.info("[Client #%d] Started training.", self.client_id)
 
         # Perform model training
-        if not self.trainer.train(self.trainset, self.sampler):
-            # Training failed
+        train_succeeded, training_time = self.trainer.train(self.trainset, self.sampler)
+
+        if not train_succeeded:
             await self.sio.disconnect()
 
         # Extract model weights and biases
@@ -114,7 +114,6 @@ class Client(base.Client):
         else:
             accuracy = 0
 
-        training_time = time.time() - training_start_time
         data_loading_time = 0
 
         if not self.data_loading_time_sent:

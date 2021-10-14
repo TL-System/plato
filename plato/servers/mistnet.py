@@ -14,11 +14,18 @@ from plato.samplers import all_inclusive
 
 from plato.servers import fedavg
 
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+os.environ["MKL_THREADING_LAYER"] = "GNU"
+
+import torch.multiprocessing
+
+torch.multiprocessing.set_sharing_strategy('file_system')
+
 
 class Server(fedavg.Server):
     """The MistNet server for federated learning."""
-    def __init__(self):
-        super().__init__()
+    def __init__(self, model=None, algorithm=None, trainer=None):
+        super().__init__(model=model, algorithm=algorithm, trainer=trainer)
 
         # MistNet requires one round of client-server communication
         assert Config().trainer.rounds == 1

@@ -16,8 +16,8 @@ from plato.servers import fedavg
 
 class Server(fedavg.Server):
     """Cross-silo federated learning server using federated averaging."""
-    def __init__(self):
-        super().__init__()
+    def __init__(self, model=None, algorithm=None, trainer=None):
+        super().__init__(model=None, algorithm=None, trainer=None)
 
         self.current_global_round = None
         # Average accuracy from client reports
@@ -150,7 +150,7 @@ class Server(fedavg.Server):
                         report.training_time for (report, __) in self.updates
                     ]),
                     'round_time':
-                    time.time() - self.round_start_time
+                    time.perf_counter() - self.round_start_time
                 }[item]
                 new_row.append(item_value)
 

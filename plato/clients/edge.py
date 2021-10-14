@@ -64,7 +64,7 @@ class Client(base.Client):
 
     async def train(self):
         """The aggregation workload on an edge client."""
-        training_start_time = time.time()
+        training_start_time = time.perf_counter()
         # Signal edge server to select clients to start a new round of local aggregation
         self.server.new_global_round_begins.set()
 
@@ -81,7 +81,7 @@ class Client(base.Client):
         else:
             accuracy = 0
 
-        training_time = time.time() - training_start_time
+        training_time = time.perf_counter() - training_start_time
 
         return Report(self.client_id, self.server.total_samples, accuracy,
                       training_time, 0), weights

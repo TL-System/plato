@@ -3,11 +3,11 @@ The training and testing loop.
 """
 
 import logging
-import multiprocessing as mp
 import os
+import time
+from typing import Tuple
 
 import tensorflow as tf
-import tensorflow_datasets as tfds
 import wandb
 
 from plato.config import Config
@@ -78,7 +78,7 @@ class Trainer(base.Trainer):
 
         self.model.load_weights(model_path)
 
-    def train(self, trainset, sampler, cut_layer=None):
+    def train(self, trainset, sampler, cut_layer=None) -> Tuple[bool, float]:
         """The main training loop in a federated learning workload.
 
         Arguments:
@@ -87,6 +87,7 @@ class Trainer(base.Trainer):
         cut_layer (optional): The layer which training should start from.
         """
         self.start_training()
+        tic = time.perf_counter()
 
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']
@@ -125,8 +126,11 @@ class Trainer(base.Trainer):
         if 'use_wandb' in config:
             run.finish()
 
+        toc = time.perf_counter()
         self.pause_training()
-        return True
+        training_time = toc - tic
+
+        return True, training_time
 
     def test(self, testset):
         """Testing the model on the client using the provided test dataset.

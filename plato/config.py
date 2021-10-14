@@ -8,7 +8,6 @@ import os
 import random
 import sqlite3
 from collections import OrderedDict, namedtuple
-from mmcv import Config as mmcvConfig
 
 import yaml
 
@@ -42,6 +41,11 @@ class Config:
                                 type=str,
                                 default=None,
                                 help='The server hostname and port number.')
+            parser.add_argument(
+                '-d',
+                '--download',
+                action='store_true',
+                help='Download the dataset to prepare for a training session.')
             parser.add_argument('-l',
                                 '--log',
                                 type=str,
@@ -79,47 +83,18 @@ class Config:
             else:
                 filename = args.config
 
-            # with open(filename, 'r') as config_file:
-            #     config = yaml.load(config_file, Loader=yaml.FullLoader)
-            # Config.clients = Config.namedtuple_from_dict(config['clients'])
-            # Config.server = Config.namedtuple_from_dict(config['server'])
-            # Config.data = Config.namedtuple_from_dict(config['data'])
-            # Config.trainer = Config.namedtuple_from_dict(config['trainer'])
-            # Config.algorithm = Config.namedtuple_from_dict(config['algorithm'])
+            if os.path.isfile(filename):
+                with open(filename, 'r') as config_file:
+                    config = yaml.load(config_file, Loader=yaml.SafeLoader)
+            else:
+                # if the configuration file does not exist, use a default one
+                config = Config.default_config()
 
-            # mmcv support a wider range of file types
-            mmcv_cfg = mmcvConfig.fromfile(filename)
-            Config.clients = Config.namedtuple_from_dict(mmcv_cfg.clients)
-            Config.server = Config.namedtuple_from_dict(mmcv_cfg.server)
-            Config.data = Config.namedtuple_from_dict(mmcv_cfg.data)
-            Config.trainer = Config.namedtuple_from_dict(mmcv_cfg.trainer)
-            Config.algorithm = Config.namedtuple_from_dict(mmcv_cfg.algorithm)
-
-            # adding necessary configuration to the multimodal part
-            supported_multimodal_data_names = ["rgb", "flow", "audio", "text"]
-            multimodal_data_configs = dict()
-            multimodal_nets_configs = dict()
-            for modality_name in supported_multimodal_data_names:
-                mm_data_name = modality_name + "_data"
-                mm_net_name = modality_name + "_model"
-
-                if mm_data_name in mmcv_cfg.keys():
-                    data_config = mmcv_cfg[mm_data_name]
-
-                    data_config["videos_per_gpu"] = Config.data.videos_per_gpu
-                    data_config[
-                        "workers_per_gpu"] = Config.data.workers_per_gpu
-                    multimodal_data_configs[mm_data_name] = data_config
-
-                if mm_net_name in mmcv_cfg.keys():
-                    model_config = mmcv_cfg[mm_net_name]
-                    multimodal_nets_configs[mm_net_name] = model_config
-
-            if "fuse_model" in mmcv_cfg.keys():
-                multimodal_nets_configs['fuse_model'] = mmcv_cfg.fuse_model
-
-            Config.multimodal_data_configs = multimodal_data_configs
-            Config.multimodal_nets_configs = multimodal_nets_configs
+            Config.clients = Config.namedtuple_from_dict(config['clients'])
+            Config.server = Config.namedtuple_from_dict(config['server'])
+            Config.data = Config.namedtuple_from_dict(config['data'])
+            Config.trainer = Config.namedtuple_from_dict(config['trainer'])
+            Config.algorithm = Config.namedtuple_from_dict(config['algorithm'])
 
             if Config.args.server is not None:
                 Config.server = Config.server._replace(
@@ -127,16 +102,26 @@ class Config:
                 Config.server = Config.server._replace(
                     port=args.server.split(':')[1])
 
-            if 'results' in mmcv_cfg:
-                Config.results = Config.namedtuple_from_dict(
-                    mmcv_cfg['results'])
-                Config.result_dir = os.path.dirname(__file__) + '/results/'
+            if Config.args.download:
+                Config.clients = Config.clients._replace(total_clients=1)
+                Config.clients = Config.clients._replace(per_round=1)
 
-            # Used to limit the maximum number of concurrent trainers
-            Config.sql_connection = sqlite3.connect(
-                os.path.dirname(__file__) + '/running_trainers.sqlitedb')
+            if 'results' in config:
+                Config.results = Config.namedtuple_from_dict(config['results'])
+                if hasattr(Config().results, 'results_dir'):
+                    Config.result_dir = Config.results.results_dir
+                else:
+                    datasource = Config.data.datasource
+                    model = Config.trainer.model_name
+                    server_type = Config.algorithm.type
+                    Config.result_dir = f'./results/{datasource}/{model}/{server_type}/'
 
-            Config().cursor = Config.sql_connection.cursor()
+            if hasattr(Config().trainer, 'max_concurrency'):
+                # Using a temporary SQLite database to limit the maximum number of concurrent
+                # trainers
+                Config.sql_connection = sqlite3.connect(
+                    "/tmp/running_trainers.sqlitedb")
+                Config().cursor = Config.sql_connection.cursor()
 
             # Customizable dictionary of global parameters
             Config.params: dict = {}
@@ -146,6 +131,7 @@ class Config:
 
             # Pretrained models
             Config.params['model_dir'] = "./models/pretrained/"
+            Config.params['pretrained_model_dir'] = "./models/pretrained/"
 
         return cls._instance
 
@@ -184,18 +170,28 @@ class Config:
     @staticmethod
     def device() -> str:
         """Returns the device to be used for training."""
-        import torch
-
-        if torch.cuda.is_available() and torch.cuda.device_count() > 0:
-            if hasattr(Config().trainer,
-                       'parallelized') and Config().trainer.parallelized:
-                device = 'cuda'
-            else:
-                device = 'cuda:' + str(
-                    random.randint(0,
-                                   torch.cuda.device_count() - 1))
+        device = 'cpu'
+        if hasattr(Config().trainer, 'use_mindspore'):
+            pass
+        elif hasattr(Config().trainer, 'use_tensorflow'):
+            import tensorflow as tf
+            gpus = tf.config.experimental.list_physical_devices('GPU')
+            if len(gpus) > 0:
+                device = 'GPU'
+                tf.config.experimental.set_visible_devices(
+                    gpus[random.randint(0,
+                                        len(gpus) - 1)], 'GPU')
         else:
-            device = 'cpu'
+            import torch
+
+            if torch.cuda.is_available() and torch.cuda.device_count() > 0:
+                if hasattr(Config().trainer,
+                           'parallelized') and Config().trainer.parallelized:
+                    device = 'cuda'
+                else:
+                    device = 'cuda:' + str(
+                        random.randint(0,
+                                       torch.cuda.device_count() - 1))
 
         return device
 
@@ -208,3 +204,50 @@ class Config:
         ).trainer.parallelized and torch.cuda.is_available(
         ) and torch.distributed.is_available(
         ) and torch.cuda.device_count() > 1
+
+    @staticmethod
+    def default_config() -> dict:
+        ''' Supply a default configuration when the config file is missing. '''
+        config = {}
+        config['clients'] = {}
+        config['clients']['type'] = 'simple'
+        config['clients']['total_clients'] = 1
+        config['clients']['per_round'] = 1
+        config['clients']['do_test'] = False
+        config['server'] = {}
+        config['server']['address'] = '127.0.0.1'
+        config['server']['port'] = 8000
+        config['server']['disable_clients'] = True
+        config['data'] = {}
+        config['data']['datasource'] = 'MNIST'
+        config['data']['data_path'] = './data'
+        config['data']['partition_size'] = 20000
+        config['data']['sampler'] = 'iid'
+        config['data']['random_seed'] = 1
+        config['trainer'] = {}
+        config['trainer']['type'] = 'basic'
+        config['trainer']['rounds'] = 5
+        config['trainer']['parallelized'] = False
+        config['trainer']['target_accuracy'] = 0.94
+        config['trainer']['epochs'] = 5
+        config['trainer']['batch_size'] = 32
+        config['trainer']['optimizer'] = 'SGD'
+        config['trainer']['learning_rate'] = 0.01
+        config['trainer']['momentum'] = 0.9
+        config['trainer']['weight_decay'] = 0.0
+        config['trainer']['model_name'] = 'lenet5'
+        config['algorithm'] = {}
+        config['algorithm']['type'] = 'fedavg'
+
+        return config
+
+    @staticmethod
+    def store() -> None:
+        data = {}
+        data['clients'] = Config.clients._asdict()
+        data['server'] = Config.server._asdict()
+        data['data'] = Config.data._asdict()
+        data['trainer'] = Config.trainer._asdict()
+        data['algorithm'] = Config.algorithm._asdict()
+        with open(Config.args.config, "w") as out:
+            yaml.dump(data, out, default_flow_style=False)

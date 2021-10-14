@@ -61,6 +61,8 @@ class Server:
         self.client = None
         self.clients = {}
         self.total_clients = 0
+        # The client ids are stored for client selection
+        self.clients_pool = []
         self.clients_per_round = 0
         self.selected_clients = None
         self.current_round = 0
@@ -72,7 +74,7 @@ class Server:
         self.client_payload = {}
         self.client_chunks = {}
 
-    def run(self, client=None):
+    def run(self, client=None, edge_server=None, edge_client=None):
         """Start a run loop for the server. """
         # Remove the running trainers table from previous runs.
         if not Config().is_edge_server():
@@ -85,12 +87,16 @@ class Server:
         if Config().is_central_server():
             # In cross-silo FL, the central server lets edge servers start first
             # Then starts their clients
-            Server.start_clients(as_server=True)
+            Server.start_clients(as_server=True,
+                                 client=self.client,
+                                 edge_server=edge_server,
+                                 edge_client=edge_client)
 
             # Allowing some time for the edge servers to start
             time.sleep(5)
 
-        Server.start_clients(client=self.client)
+        if Config().server.simulation:
+            Server.start_clients(client=self.client)
 
         self.start()
 
@@ -101,8 +107,11 @@ class Server:
 
         ping_interval = Config().server.ping_interval if hasattr(
             Config().server, 'ping_interval') else 3600
+        ping_timeout = Config().server.ping_timeout if hasattr(
+            Config().server, 'ping_timeout') else 20
         self.sio = socketio.AsyncServer(ping_interval=ping_interval,
-                                        max_http_buffer_size=2**31)
+                                        max_http_buffer_size=2**31,
+                                        ping_timeout=ping_timeout)
         self.sio.register_namespace(
             ServerEvents(namespace='/', plato_server=self))
         app = web.Application()
@@ -115,12 +124,12 @@ class Server:
             # The last contact time is stored for each client
             self.clients[client_id] = {
                 'sid': sid,
-                'last_contacted': time.time()
+                'last_contacted': time.perf_counter()
             }
             logging.info("[Server #%d] New client with id #%d arrived.",
                          os.getpid(), client_id)
         else:
-            self.clients[client_id]['last_contacted'] = time.time()
+            self.clients[client_id]['last_contacted'] = time.perf_counter()
             logging.info("[Server #%d] New contact from Client #%d received.",
                          os.getpid(), client_id)
 
@@ -130,15 +139,26 @@ class Server:
             await self.select_clients()
 
     @staticmethod
-    def start_clients(client=None, as_server=False):
+    def start_clients(client=None,
+                      as_server=False,
+                      edge_server=None,
+                      edge_client=None):
         """Starting all the clients as separate processes."""
         starting_id = 1
 
+        if hasattr(Config().clients,
+                   'simulation') and Config().clients.simulation:
+            # In the client simulation mode, we only need to launch a limited
+            # number of client objects (same as the number of clients per round)
+            client_processes = Config().clients.per_round
+        else:
+            client_processes = Config().clients.total_clients
+
         if as_server:
             total_processes = Config().algorithm.total_silos
-            starting_id += Config().clients.total_clients
+            starting_id += client_processes
         else:
-            total_processes = Config().clients.total_clients
+            total_processes = client_processes
 
         if mp.get_start_method(allow_none=True) != 'spawn':
             mp.set_start_method('spawn', force=True)
@@ -149,11 +169,14 @@ class Server:
                 logging.info(
                     "Starting client #%d as an edge server on port %s.",
                     client_id, port)
-                proc = mp.Process(target=run, args=(client_id, port, client))
+                proc = mp.Process(target=run,
+                                  args=(client_id, port, client, edge_server,
+                                        edge_client))
                 proc.start()
             else:
                 logging.info("Starting client #%d's process.", client_id)
-                proc = mp.Process(target=run, args=(client_id, None, client))
+                proc = mp.Process(target=run,
+                                  args=(client_id, None, client, None, None))
                 proc.start()
 
     async def close_connections(self):
@@ -171,17 +194,33 @@ class Server:
                      self.current_round,
                      Config().trainer.rounds)
 
+        if hasattr(Config().clients, 'simulation') and Config(
+        ).clients.simulation and not Config().is_central_server:
+            # In the client simulation mode, the client pool for client selection contains
+            # all the virtual clients to be simulated
+            self.clients_pool = list(range(1, 1 + self.total_clients))
+
+        else:
+            # If no clients are simulated, the client pool for client selection consists of
+            # the current set of clients that have contacted the server
+            self.clients_pool = list(self.clients)
+
         self.selected_clients = self.choose_clients()
 
         if len(self.selected_clients) > 0:
-            for client_id in self.selected_clients:
+            for i, selected_client_id in enumerate(self.selected_clients):
+                if hasattr(Config().clients, 'simulation') and Config(
+                ).clients.simulation and not Config().is_central_server:
+                    client_id = i + 1
+                else:
+                    client_id = selected_client_id
+
                 sid = self.clients[client_id]['sid']
-                await self.register_client(sid, client_id)
 
                 logging.info("[Server #%d] Selecting client #%d for training.",
-                             os.getpid(), client_id)
+                             os.getpid(), selected_client_id)
 
-                server_response = {'id': client_id}
+                server_response = {'id': selected_client_id}
                 server_response = await self.customize_server_response(
                     server_response)
 
@@ -196,8 +235,8 @@ class Server:
                 # Sending the server payload to the client
                 logging.info(
                     "[Server #%d] Sending the current model to client #%d.",
-                    os.getpid(), client_id)
-                await self.send(sid, payload, client_id)
+                    os.getpid(), selected_client_id)
+                await self.send(sid, payload, selected_client_id)
 
     async def send_in_chunks(self, data, sid, client_id) -> None:
         """ Sending a bytes object in fixed-sized chunks to the client. """

@@ -4,21 +4,20 @@
 
 Go to [Google Colaboratory](https://colab.research.google.com/notebooks/intro.ipynb).
 
-Click `File` on the menu (upper left of the page), select `Upload Notebook`, and upload `plato_colab.ipynb`, which is under `plato/examples/` directory.
+Click `File` on the menu (upper left of the page), select `Upload Notebook`, and upload `plato_colab.ipynb`, which is under the `plato/examples/` directory.
 
 ### Option 2
 
 Click [this link](https://colab.research.google.com/drive/1boDurcQF5X9jq25-DsKDTus3h50NBn8h?usp=sharing).
 
-
 ## Running Plato on Compute Canada
 
 ### Installation
 
-SSH into a cluster on Compute Canada. Here we take [Cedar]((https://docs.computecanada.ca/wiki/Cedar)) as an example, while [Graham](https://docs.computecanada.ca/wiki/Graham) and [Béluga](https://docs.computecanada.ca/wiki/Béluga/en) are also available. Then clone the *Plato* repository to your own directory:
+SSH into a cluster on Compute Canada. Here we take [Béluga](https://docs.computecanada.ca/wiki/Béluga/en) as an example, while [Graham](https://docs.computecanada.ca/wiki/Graham) and [Cedar]((https://docs.computecanada.ca/wiki/Cedar)) are also available. Then clone the *Plato* repository to your own directory:
 
 ```shell
-$ ssh <CCDB username>@cedar.computecanada.ca
+$ ssh <CCDB username>@beluga.computecanada.ca
 $ cd projects/def-baochun/<CCDB username>
 $ git clone https://github.com/TL-System/plato.git
 ```
@@ -81,7 +80,7 @@ def get_requirements():
 The next step is to install the required Python packages. PyTorch should be installed following the advice of its [getting started website](https://pytorch.org/get-started/locally/). Currently Compute Canada provides GPU with CUDA version 11.2, so the command would be:
 
 ```shell
-$ pip3 install torch==1.8.1+cu111 torchvision==0.9.1+cu111 torchaudio==0.8.1 -f https://download.pytorch.org/whl/torch_stable.html
+$ pip3 install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
 ```
 
 To double-check the CUDA version used in the command above, use the following command:
@@ -150,12 +149,12 @@ Then add your configuration parameters in the job script. The following is an ex
 
 ```
 #!/bin/bash
-#SBATCH --time=15:00:00       # Request a job to be executed for 15 hours
-#SBATCH --nodes=1 
-#SBATCH --gres=gpu:p100l:4   
+#SBATCH --time=20:00:00  # Request a job to be executed for 20 hours
+#SBATCH --gres=gpu:4
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=24    # There are 24 CPU cores on P100 Cedar GPU nodes
-#SBATCH --mem=0               # Request the full memory of the node
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=191000M
+#SBATCH --nodes=1
 #SBATCH --account=def-baochun
 #SBATCH --output=cifar_wideresnet.out # The name of the output file
 module load python/3.8
@@ -163,7 +162,7 @@ source ~/.federated/bin/activate
 ./run --config=configs/CIFAR10/fedavg_wideresnet.yml --log=info
 ```
 
-**Note:** the GPU resources requested in this example is a special group of GPU nodes on Compute Canada's `Cedar` cluster. You may only request these nodes as whole nodes, therefore you must specify `--gres=gpu:p100l:4`.
+**Note:** The above example requests a type of GPU on Compute Canada's `Béluga` cluster that requires a very short waiting time (as for July 2021, but things may change.)
 
 You may use any type of [GPUs available on Compute Canada](https://docs.computecanada.ca/wiki/Using_GPUs_with_Slurm).
 
@@ -192,7 +191,7 @@ where `./cifar_wideresnet.out` is the output file that needs to be monitored, an
 If there is a need to start an interactive session (for debugging purposes, for example), it is also supported by Compute Canada using the `salloc` command:
 
 ```shell
-$ salloc --time=0:15:0 --ntasks=1 --cpus-per-task=4 --gres=gpu:p100l:4 --mem=32G --account=def-baochun
+$ salloc --time=0:20:0 --ntasks=1 --cpus-per-task=4 --gres=gpu:4 --account=def-baochun --mem=191000M
 ```
 
 The job will then be queued and waiting for resources:
@@ -218,6 +217,24 @@ $ ./run --config=configs/CIFAR10/fedavg_wideresnet.yml
 ```
 
 After the job is done, use `exit` at the command to relinquish the job allocation.
+
+**Note:** On Compute Canada, if there are issues in the code that prevented it from running to completion, the two most possible reasons are:
+
+If runtime exceptions occur that prevent a federated learning session from running to completion, the potential issues could be:
+
+* Out of CUDA memory.
+
+  *Potential solutions:* Decrease the number of clients selected in each round (with the *client simulation mode* turned on); decrease the `max_concurrency` value in the `trainer` section in your configuration file; decrease the  `batch_size` used in the `trainer` section.
+ 
+* The time that a client waits for the server to respond before disconnecting is too short. This could happen when training with large neural network models. If you get an `AssertionError` saying that there are not enough launched clients for the server to select, this could be the reason. But make sure you first check if it is due to the *out of CUDA memory* error.
+
+  *Potential solutions:* Add `ping_timeout` in the `server` section in your configuration file. The default value for `ping_timeout` is 20 (seconds). You could specify a larger timeout value, such as 120.
+  
+  For example, to run a training session with the CIFAR-10 dataset and the ResNet-18 model, and if 10 clients are selected per round, `ping_timeout` needs to be 120. Consider an even larger number if you run with larger models and more clients.
+
+* Running processes have not been terminated from previous runs. 
+
+  *Potential solutions:* Use the command `pkill python` to terminate them so that there will not be CUDA errors in the upcoming run.
 
 ### Removing the Python virtual environment
 

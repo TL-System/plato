@@ -8,7 +8,7 @@ class Algorithm(base.Algorithm):
     """PyTorch-based federated averaging algorithm, used by both the client and the server."""
     def extract_weights(self):
         """Extract weights from the model."""
-        return self.model.state_dict()
+        return self.model.cpu().state_dict()
 
     def load_weights(self, weights):
         """Load the model weights passed in as a parameter."""
