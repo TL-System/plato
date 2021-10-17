@@ -81,7 +81,10 @@ class RLAgent:
 
         logging.info("[RL Agent] Connecting to the server at %s.", uri)
         await self.sio.connect(uri)
-        await self.sio.emit('agent_alive', {'agent': self.agent, 'current_rl_episode': self.current_episode})
+        await self.sio.emit('agent_alive', {
+            'agent': self.agent,
+            'current_rl_episode': self.current_episode
+        })
 
         logging.info("[RL Agent] Waiting to be updated with new state.")
         await self.sio.wait()
@@ -145,7 +148,7 @@ class RLAgent:
         await self.sio.emit('agent_update', {'agent': self.agent})
 
     async def send_update(self, update) -> None:
-        """Sending the agent update to the server using socket.io."""
+        """ Sending the agent update to the server using socket.io. """
         if isinstance(update, list):
             data_size: int = 0
 
@@ -165,12 +168,12 @@ class RLAgent:
 
     @abstractmethod
     def process_env_response(self, response) -> None:
-        """Additional RL-specific processing upon the server response."""
+        """ Additional RL-specific processing upon the server response. """
 
     @abstractmethod
     def process_env_update(self) -> None:
-        """Process update from FL Env to RL Agent."""
+        """ Process update from FL Env to RL Agent. """
 
     @abstractmethod
     async def prep_agent_update(self):
-        """Update RL Agent."""
+        """ Update RL Agent. """

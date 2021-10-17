@@ -6,7 +6,7 @@ os.environ['config_file'] = 'plato/utils/rlfl/rl_MNIST_lenet5.yml'
 
 dirname = os.path.dirname(os.path.dirname(__file__))
 
-NUM_OF_STATE_FEATURES = 4
+NUM_OF_STATE_FEATURES = 5
 
 
 class RLConfig:

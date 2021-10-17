@@ -14,12 +14,12 @@ import numpy as np
 from gym import spaces
 
 import base_rl_agent
-from plato.utils import csv_processor
 from config import RLConfig
+from plato.utils import csv_processor
 
 
 class RandomPolicy(object):
-    """The world's simplest agent!"""
+    """ The world's simplest agent. """
     def __init__(self, action_space):
         self.action_space = action_space
 
@@ -28,7 +28,7 @@ class RandomPolicy(object):
 
 
 class RLAgent(base_rl_agent.RLAgent, gym.Env):
-    """A basic RL environment for FL server using Gym for RL control."""
+    """ A basic RL environment for FL server using Gym for RL control. """
     def __init__(self, config):
         super().__init__()
         self.agent = 'simple'
@@ -61,7 +61,7 @@ class RLAgent(base_rl_agent.RLAgent, gym.Env):
         self.is_done = False
 
     def step(self, action):
-        """Update the followings using server update."""
+        """ Update the followings using server update. """
         self.next_state = self.get_state()
         self.is_done = self.get_done()
         self.reward = self.get_reward()
@@ -70,7 +70,7 @@ class RLAgent(base_rl_agent.RLAgent, gym.Env):
         return self.next_state, self.reward, self.is_done, info
 
     async def reset(self):
-        """Reset RL environment"""
+        """ Reset RL environment. """
         # Start a new training session
         logging.info("[RL Agent] Reseting RL environment.")
 
@@ -90,56 +90,56 @@ class RLAgent(base_rl_agent.RLAgent, gym.Env):
         return
 
     async def prep_action(self):
-        """Get action from RL policy."""
+        """ Get action from RL policy. """
         logging.info("[RL Agent] Selecting action...")
         self.action = self.policy.select_action(self.state)
         return self.action
 
     def get_state(self):
-        """Get state for agent"""
+        """ Get state for agent. """
         if self.server_update:
             return self.server_update
         # Initial state is random when env resets
         return [round(random.random(), 4) for i in range(self.config.n_states)]
 
     def get_reward(self):
-        """Get reward for agent"""
+        """ Get reward for agent. """
         return 0.0
 
     def get_done(self):
-        """Get done condition for agent"""
+        """ Get done condition for agent. """
         if self.config.mode == 'train' and self.current_step >= self.config.steps_per_episode:
             logging.info("[RL Agent] Episode #%d ended.", self.current_episode)
             return True
         return False
 
     def get_info(self):
-        """Get info used for benchmarking"""
+        """ Get info used for benchmarking. """
         return {}
 
     def render(self, mode="human"):
-        """Render the Gym env."""
+        """ Render the Gym env. """
         pass
 
     def close(self):
-        """Closing the RL Agent."""
+        """ Closing the RL Agent. """
         logging.info("[RL Agent] RL control concluded.")
 
     async def wrap_up(self):
-        """Wrap up when RL control concluded."""
+        """ Wrap up when RL control is concluded. """
         # Close FL environment
         await self.sio.emit('agent_dead', {'agent': self.agent})
 
     # Implement methods for communication between RL agent and env
     def process_env_response(self, response):
-        """Additional RL-specific processing upon the server response."""
+        """ Additional RL-specific processing upon the server response. """
         if 'current_round' in response:
             assert self.current_step == response['current_round']
         if 'current_rl_episode' in response:
             assert self.current_episode == response['current_rl_episode']
 
     def process_env_update(self):
-        """Process state update to RL Agent."""
+        """ Process state update to RL Agent. """
         if self.current_step == 0:
             self.state = self.get_state()
         else:
@@ -189,13 +189,13 @@ class RLAgent(base_rl_agent.RLAgent, gym.Env):
             await self.send_update(action)
 
     async def customize_agent_response(self, response):
-        """Wrap up generating the agent response with any additional information."""
+        """ Wrap up generating the agent response with any additional information. """
         return response
 
     @abstractmethod
     def update_policy(self):
-        """Update policy if needed in training mode."""
+        """ Update policy if needed in training mode. """
 
     @abstractmethod
     def process_experience(self):
-        """Process step experience if needed in training mode."""
+        """ Process step experience if needed in training mode. """

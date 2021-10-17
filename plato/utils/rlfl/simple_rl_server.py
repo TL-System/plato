@@ -1,5 +1,5 @@
 """
-A federated learning server with RL Agent
+A federated learning server with RL Agent.
 """
 
 import logging
@@ -59,7 +59,7 @@ class RLServerEvents(base.ServerEvents):
 
 
 class RLServer(fedavg.Server):
-    """A federated learning server with RL Agent."""
+    """ A federated learning server with RL Agent. """
     def __init__(self, trainer=None):
         super().__init__(trainer=trainer)
         self.rl_agent = None
@@ -150,7 +150,7 @@ class RLServer(fedavg.Server):
         await self.process_agent_update()
 
     def process_agent_response(self, response):
-        """Additional RL-specific processing upon the RL Agent response."""
+        """ Additional RL-specific processing upon the RL Agent response. """
         if 'current_step' in response:
             assert self.current_round + 1 == response['current_step']
         if 'current_episode' in response:
@@ -167,7 +167,7 @@ class RLServer(fedavg.Server):
         await self.step()
 
     async def step(self):
-        """Carry on with the current round of FL training using RL action."""
+        """ Carry on with the current round of FL training using RL action. """
         if self.action_applied and not self.clients_selected and len(
                 self.clients) >= self.clients_per_round:
             logging.info(
@@ -189,7 +189,7 @@ class RLServer(fedavg.Server):
             self.clients_selected = False
 
     async def prep_env_update(self):
-        """ Update FL Env. """
+        """ Update the FL Env for the next time step. """
         env_response = {'current_round': self.current_round}
         env_response['current_rl_episode'] = self.current_rl_episode
         env_response = await self.customize_env_response(env_response)
@@ -207,11 +207,12 @@ class RLServer(fedavg.Server):
         await self.send_update(self.rl_agent['sid'], state)
 
     async def customize_env_response(self, response):
-        """Wrap up generating the env response with any additional information."""
+        """ Wrap up generating the env response with any additional information. """
         return response
 
     # Implement RL-related methods of simple RL server
     async def register_agent(self, sid, agent, current_rl_episode):
+        """ Add an RL agent to the server's contacts. """
         if not self.rl_agent:
             self.rl_agent = {
                 'agent': agent,
@@ -225,21 +226,22 @@ class RLServer(fedavg.Server):
         await self.prep_env_update()
 
     async def reset_env(self, sid, current_episode):
-        """Reboot for the following episodes"""
+        """ Reboot for the following episodes. """
         self.current_rl_episode = current_episode
         self.configure()
         # Wrap up current env
         await self.wrap_up()
 
     def prep_state(self):
-        """Wrap up the state update to RL Agent."""
+        """ Wrap up the state update to RL Agent. """
         return None
 
     @abstractmethod
     def apply_action(self):
         """ Apply action update from RL Agent to FL Env. """
 
-    # Override the response for clients; let RL agent control the training rounds
+    # Override the response for clients.
+    # Let RL agent take control of the training rounds.
     def start(self, port=Config().server.port):
         """ Start running the socket.io server. """
         logging.info("Starting a server at address %s and port %s.",
@@ -252,6 +254,7 @@ class RLServer(fedavg.Server):
         self.sio = socketio.AsyncServer(ping_interval=ping_interval,
                                         max_http_buffer_size=2**31,
                                         ping_timeout=ping_timeout)
+        # Rewrite the namespace
         self.sio.register_namespace(
             RLServerEvents(namespace='/', plato_server=self))
 
@@ -263,7 +266,7 @@ class RLServer(fedavg.Server):
         web.run_app(app, host=Config().server.address, port=port)
 
     async def register_client(self, sid, client_id):
-        """Adding a newly arrived client to the list of clients."""
+        """ Adding a newly arrived client to the list of clients. """
         if not client_id in self.clients:
             # The last contact time is stored for each client
             self.clients[client_id] = {
@@ -327,13 +330,13 @@ class RLServer(fedavg.Server):
                     await self.step()
 
     async def wrap_up(self):
-        """Wrapping up when each round of training is done."""
+        """ Wrapping up when each round of training is done. """
         # Loop is controlled by RL Agent instead
         # Update state to RL agent at end of each round
         await self.prep_env_update()
 
     async def close_connections(self):
-        """Closing all socket.io connections after training completes."""
+        """ Closing all socket.io connections after training completes. """
         for client_id, client in dict(self.clients).items():
             logging.info("Closing the connection to client #%d.", client_id)
             await self.sio.emit('disconnect', room=client['sid'])
@@ -341,11 +344,8 @@ class RLServer(fedavg.Server):
         await self.sio.emit('disconnect', room=self.rl_agent['sid'])
 
     def configure(self):
-        """
-        Booting the federated learning server by setting up the data, model, and
-        creating the clients.
-        """
-
+        """ Booting the federated learning server by setting up 
+        the data, model, and creating the clients. """
         logging.info("[Server #%d] Configuring the server for episode %d",
                      os.getpid(), self.current_rl_episode)
 
@@ -364,7 +364,7 @@ class RLServer(fedavg.Server):
                                          Config().result_dir)
 
     def load_trainer(self):
-        """Setting up the global model to be trained via federated learning."""
+        """ Setting up the global model to be trained via federated learning. """
         if self.trainer is None:
             self.trainer = trainers_registry.get(model=self.model)
 
@@ -374,3 +374,31 @@ class RLServer(fedavg.Server):
         self.trainer.model = models_registry.get()
 
         self.algorithm = algorithms_registry.get(self.trainer)
+
+    async def periodic_task(self):
+        """ A periodic task that is executed from time to time, determined by
+        'server:periodic_interval' in the configuration. """
+        # Call the async function that defines a customized periodic task, if any
+        _task = getattr(self, "customize_periodic_task", None)
+        if callable(_task):
+            await self.customize_periodic_task()
+
+        # If we are operating in asynchronous mode, aggregate the model updates received so far.
+        if hasattr(Config().server,
+                   'synchronous') and not Config().server.synchronous:
+            if len(self.updates) > 0:
+                logging.info(
+                    "[Server #%d] %d client reports received in asynchronous mode. Processing.",
+                    os.getpid(), len(self.updates))
+                if self.action_applied and not self.clients_selected:
+                    await self.select_clients()
+                    self.clients_selected = True
+                if self.action_applied and self.clients_selected:
+                    await self.process_reports()
+                    await self.wrap_up()
+                    self.action_applied = False
+                    self.clients_selected = False
+            else:
+                logging.info(
+                    "[Server #%d] No client reports have been received. Nothing to process."
+                )

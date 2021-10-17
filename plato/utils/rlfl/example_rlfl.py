@@ -11,10 +11,9 @@ import simple_rl_server
 from config import RLConfig
 from plato.clients import simple
 
-os.environ['config_file'] = 'plato/utils/rlfl/rl_MNIST_lenet5.yml'
 
 def run():
-    """Starting an RL Agent to connect to the server."""
+    """ Starting an RL Agent to connect to the server. """
     logging.info("Starting an RL Agent.")
     config = RLConfig()
     agent = simple_rl_agent.RLAgent(config)
