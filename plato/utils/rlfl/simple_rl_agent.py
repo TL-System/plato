@@ -13,8 +13,9 @@ import gym
 import numpy as np
 from gym import spaces
 
-import base_rl_agent as base_rl_agent
+import base_rl_agent
 from plato.utils import csv_processor
+from config import RLConfig
 
 
 class RandomPolicy(object):
