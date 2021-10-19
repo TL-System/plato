@@ -121,7 +121,7 @@ class Trainer(ABC):
             os.remove(accuracy_file)
 
     @abstractmethod
-    def train(self, trainset, sampler, cut_layer=None) -> Tuple[bool, float]:
+    def train(self, trainset, sampler, cut_layer=None) -> float:
         """The main training loop in a federated learning workload.
 
         Arguments:
@@ -130,7 +130,6 @@ class Trainer(ABC):
         cut_layer (optional): The layer which training should start from.
 
         Returns:
-        bool: Whether training was successfully completed.
         float: The training time.
         """
 
