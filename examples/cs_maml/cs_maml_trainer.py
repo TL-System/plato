@@ -69,8 +69,7 @@ class Trainer(basic.Trainer):
                 else:
                     loss_criterion = nn.CrossEntropyLoss()
 
-                # Initializing the optimizer
-                # This optimizer is for the second stage of MAML
+                # Initializing the optimizer for the second stage of MAML
                 # The learning rate here is the meta learning rate (beta)
                 optimizer = torch.optim.SGD(
                     self.model.parameters(),
@@ -109,91 +108,19 @@ class Trainer(basic.Trainer):
 
                     # The first stage of MAML
                     # Use half of the training dataset
-                    for batch_id, (examples,
-                                   labels) in enumerate(train_loader):
-                        if batch_id < int(len(train_loader) / 2):
-                            examples, labels = examples.to(
-                                self.device), labels.to(self.device)
-                            optimizer.zero_grad()
-
-                            temp_optimizer.zero_grad()
-
-                            if cut_layer is None:
-                                outputs = current_model(examples)
-                            else:
-                                outputs = current_model.forward_from(
-                                    examples, cut_layer)
-
-                            temp_loss = loss_criterion(outputs, labels)
-
-                            temp_loss.backward()
-
-                            # Get the weights in the first stage of MAML
-                            temp_optimizer.step()
-
-                            if lr_schedule is not None:
-                                lr_schedule.step()
-
-                            if batch_id % log_interval == 0:
-                                if self.client_id == 0:
-                                    logging.info(
-                                        "[Server #{}] Epoch: [{}/{}][{}/{}]\tLoss of stage 1: {:.6f}"
-                                        .format(os.getpid(), epoch, epochs,
-                                                batch_id, len(train_loader),
-                                                temp_loss.data.item()))
-                                else:
-                                    if hasattr(config, 'use_wandb'):
-                                        wandb.log(
-                                            {"batch loss": loss.data.item()})
-
-                                    logging.info(
-                                        "[Client #{}] Epoch: [{}/{}][{}/{}]\tLoss of stage 1: {:.6f}"
-                                        .format(self.client_id, epoch, epochs,
-                                                batch_id, len(train_loader),
-                                                temp_loss.data.item()))
+                    self.training_per_stage(1, temp_optimizer, lr_schedule,
+                                            train_loader, cut_layer,
+                                            current_model, loss_criterion,
+                                            log_interval, config, epoch,
+                                            epochs)
 
                     # The second stage of MAML
                     # Use the other half of the training dataset
-                    for batch_id, (examples,
-                                   labels) in enumerate(train_loader):
-                        if batch_id >= int(len(train_loader) / 2):
-                            examples, labels = examples.to(
-                                self.device), labels.to(self.device)
-                            optimizer.zero_grad()
-
-                            # Use the adapted model from the first stage to compute loss
-                            if cut_layer is None:
-                                outputs = current_model(examples)
-                            else:
-                                outputs = current_model.forward_from(
-                                    examples, cut_layer)
-
-                            loss = loss_criterion(outputs, labels)
-
-                            loss.backward()
-
-                            optimizer.step()
-
-                            if meta_lr_schedule is not None:
-                                meta_lr_schedule.step()
-
-                            if batch_id % log_interval == 0:
-                                if self.client_id == 0:
-                                    logging.info(
-                                        "[Server #{}] Epoch: [{}/{}][{}/{}]\tLoss of Stage 2: {:.6f}"
-                                        .format(os.getpid(), epoch, epochs,
-                                                batch_id, len(train_loader),
-                                                loss.data.item()))
-                                else:
-                                    if hasattr(config, 'use_wandb'):
-                                        wandb.log(
-                                            {"batch loss": loss.data.item()})
-
-                                    logging.info(
-                                        "[Client #{}] Epoch: [{}/{}][{}/{}]\tLoss of Stage 2: {:.6f}"
-                                        .format(self.client_id, epoch, epochs,
-                                                batch_id, len(train_loader),
-                                                loss.data.item()))
+                    self.training_per_stage(2, optimizer, meta_lr_schedule,
+                                            train_loader, cut_layer,
+                                            self.model, loss_criterion,
+                                            log_interval, config, epoch,
+                                            epochs)
 
                     if hasattr(optimizer, "params_state_update"):
                         optimizer.params_state_update()
@@ -210,6 +137,56 @@ class Trainer(basic.Trainer):
 
         if 'use_wandb' in config:
             run.finish()
+
+    def training_per_stage(self, stage_id, optimizer, lr_schedule,
+                           train_loader, cut_layer, training_model,
+                           loss_criterion, log_interval, config, epoch,
+                           epochs):
+        """The training process of the two stages of MAML."""
+        if stage_id == 1:
+            batch_id_range = [i for i in range(int(len(train_loader) / 2))]
+        elif stage_id == 2:
+            batch_id_range = [
+                i for i in range(int(len(train_loader) / 2), len(train_loader))
+            ]
+
+        for batch_id, (examples, labels) in enumerate(train_loader):
+            if batch_id in batch_id_range:
+                examples, labels = examples.to(self.device), labels.to(
+                    self.device)
+
+                optimizer.zero_grad()
+
+                if cut_layer is None:
+                    outputs = training_model(examples)
+                else:
+                    outputs = training_model.forward_from(examples, cut_layer)
+
+                loss = loss_criterion(outputs, labels)
+
+                loss.backward()
+
+                optimizer.step()
+
+                if lr_schedule is not None:
+                    lr_schedule.step()
+
+                if batch_id % log_interval == 0:
+                    if self.client_id == 0:
+                        logging.info(
+                            "[Server #{}] Epoch: [{}/{}][{}/{}]\tLoss of stage {}: {:.6f}"
+                            .format(os.getpid(), epoch, epochs, batch_id,
+                                    len(train_loader), stage_id,
+                                    loss.data.item()))
+                    else:
+                        if hasattr(config, 'use_wandb'):
+                            wandb.log({"batch loss": loss.data.item()})
+
+                        logging.info(
+                            "[Client #{}] Epoch: [{}/{}][{}/{}]\tLoss of stage {}: {:.6f}"
+                            .format(self.client_id, epoch, epochs, batch_id,
+                                    len(train_loader), stage_id,
+                                    loss.data.item()))
 
     def test_process(self, config, testset):
         """The testing loop, run in a separate process with a new CUDA context,
@@ -254,7 +231,7 @@ class Trainer(basic.Trainer):
                     with torch.no_grad():
                         for batch_id, (examples,
                                        labels) in enumerate(test_loader):
-                            # Aviod using the batch used to personalized model when testing
+                            # Aviod using the batch used to generate the personalized model
                             if batch_id != random_batch_id:
                                 examples, labels = examples.to(
                                     self.device), labels.to(self.device)
