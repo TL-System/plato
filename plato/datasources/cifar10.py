@@ -1,5 +1,5 @@
 """
-The CIFAR-10 dataset.
+The CIFAR-10 dataset from the torchvision package.
 """
 
 from torchvision import datasets, transforms

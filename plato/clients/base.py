@@ -7,11 +7,14 @@ import logging
 import os
 import pickle
 import sys
+import uuid
 from abc import abstractmethod
 from dataclasses import dataclass
 
 import socketio
+
 from plato.config import Config
+from plato.utils import s3
 
 
 @dataclass
@@ -59,7 +62,7 @@ class ClientEvents(socketio.AsyncClientNamespace):
 
     async def on_payload_done(self, data):
         """ All of the new payload sent from the server arrived. """
-        await self.plato_client.payload_done(data['id'])
+        await self.plato_client.payload_done(data['id'], data['obkey'])
 
 
 class Client:
@@ -70,6 +73,7 @@ class Client:
         self.chunks = []
         self.server_payload = None
         self.data_loaded = False  # is training data already loaded from the disk?
+        self.s3_client = None
 
         if hasattr(Config().algorithm,
                    'cross_silo') and not Config().is_edge_server():
@@ -103,7 +107,9 @@ class Client:
         self.sio.register_namespace(
             ClientEvents(namespace='/', plato_client=self))
 
-        uri = ""
+        if hasattr(Config().server, 's3_endpoint_url'):
+            self.s3_client = s3.S3()
+
         if hasattr(Config().server, 'use_https'):
             uri = 'https://{}'.format(Config().server.address)
         else:
@@ -162,17 +168,21 @@ class Client:
             self.server_payload = [self.server_payload]
             self.server_payload.append(_data)
 
-    async def payload_done(self, client_id) -> None:
+    async def payload_done(self, client_id, object_key) -> None:
         """ Upon receiving all the new payload from the server. """
         payload_size = 0
 
-        if isinstance(self.server_payload, list):
-            for _data in self.server_payload:
-                payload_size += sys.getsizeof(pickle.dumps(_data))
-        elif isinstance(self.server_payload, dict):
-            for key, value in self.server_payload.items():
-                payload_size += sys.getsizeof(pickle.dumps({key: value}))
+        if object_key is None:
+            if isinstance(self.server_payload, list):
+                for _data in self.server_payload:
+                    payload_size += sys.getsizeof(pickle.dumps(_data))
+            elif isinstance(self.server_payload, dict):
+                for key, value in self.server_payload.items():
+                    payload_size += sys.getsizeof(pickle.dumps({key: value}))
+            else:
+                payload_size = sys.getsizeof(pickle.dumps(self.server_payload))
         else:
+            self.server_payload = self.s3_client.receive_from_s3(object_key)
             payload_size = sys.getsizeof(pickle.dumps(self.server_payload))
 
         assert client_id == self.client_id
@@ -210,20 +220,27 @@ class Client:
         await self.sio.emit('client_payload', {'id': self.client_id})
 
     async def send(self, payload) -> None:
-        """Sending the client payload to the server using socket.io."""
-        if isinstance(payload, list):
-            data_size: int = 0
-
-            for data in payload:
-                _data = pickle.dumps(data)
-                await self.send_in_chunks(_data)
-                data_size += sys.getsizeof(_data)
+        """Sending the client payload to the server using either S3 or socket.io."""
+        if self.s3_client != None:
+            unique_key = uuid.uuid4().hex[:6].upper()
+            payload_key = f'client_payload_{self.client_id}_{unique_key}'
+            self.s3_client.send_to_s3(payload_key, payload)
+            data_size = sys.getsizeof(pickle.dumps(payload))
         else:
-            _data = pickle.dumps(payload)
-            await self.send_in_chunks(_data)
-            data_size = sys.getsizeof(_data)
+            payload_key = None
+            if isinstance(payload, list):
+                data_size: int = 0
 
-        await self.sio.emit('client_payload_done', {'id': self.client_id})
+                for data in payload:
+                    _data = pickle.dumps(data)
+                    await self.send_in_chunks(_data)
+                    data_size += sys.getsizeof(_data)
+            else:
+                _data = pickle.dumps(payload)
+                await self.send_in_chunks(_data)
+                data_size = sys.getsizeof(_data)
+
+        await self.sio.emit('client_payload_done', {'id': self.client_id, 'obkey': payload_key})
 
         logging.info("[Client #%d] Sent %s MB of payload data to the server.",
                      self.client_id, round(data_size / 1024**2, 2))

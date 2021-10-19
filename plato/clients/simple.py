@@ -60,7 +60,7 @@ class Client(base.Client):
         logging.info("[Client #%d] Loading its data source...", self.client_id)
 
         if self.datasource is None:
-            self.datasource = datasources_registry.get()
+            self.datasource = datasources_registry.get(client_id=self.client_id)
 
         self.data_loaded = True
 
@@ -93,9 +93,9 @@ class Client(base.Client):
         logging.info("[Client #%d] Started training.", self.client_id)
 
         # Perform model training
-        train_succeeded, training_time = self.trainer.train(self.trainset, self.sampler)
-
-        if not train_succeeded:
+        try:
+            training_time = self.trainer.train(self.trainset, self.sampler)
+        except ValueError:
             await self.sio.disconnect()
 
         # Extract model weights and biases

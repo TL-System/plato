@@ -2,8 +2,8 @@ clients:
     # Type
     type: simple
 
-    # The total number of clients, server
-    total_clients: 0
+    # The total number of clients
+    total_clients: 1
 
     # The number of clients selected in each round
     per_round: 1
@@ -14,6 +14,9 @@ clients:
 server:
     address: 127.0.0.1
     port: 8000
+
+    # No client processes will be launched by the server
+    disable_clients: true
 
 data:
     # The training and testing dataset

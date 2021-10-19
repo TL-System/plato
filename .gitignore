@@ -134,15 +134,13 @@ dmypy.json
 # Configuration files
 /*.yml
 
-# Runtime files
-running_trainers.sqlitedb
-
 # Data files
 data/
 tests/data/
 
 # Result files
 results/
+result.csv
 
 # Models
 pretrained/

@@ -5,11 +5,6 @@ based on a configuration at run-time.
 import logging
 from collections import OrderedDict
 
-from plato.trainers import (
-    basic,
-    pascal_voc,
-)
-
 from plato.config import Config
 
 if hasattr(Config().trainer, 'use_mindspore'):
@@ -27,6 +22,11 @@ elif hasattr(Config().trainer, 'use_tensorflow'):
         ('basic', basic_tensorflow.Trainer),
     ])
 else:
+    
+    from plato.trainers import (
+        basic,
+        pascal_voc,
+    )
     registered_trainers = OrderedDict([
         ('basic', basic.Trainer),
         ('pascal_voc', pascal_voc.Trainer),

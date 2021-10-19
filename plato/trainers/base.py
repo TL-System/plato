@@ -34,15 +34,17 @@ class Trainer(ABC):
                         return return_value[0]
                 break
             except sqlite3.OperationalError:
-                time.sleep(random.random())
+                time.sleep(random.random() * 2)
 
     def set_client_id(self, client_id):
         """ Setting the client ID and initialize the shared database table for controlling
             the maximum concurrency with respect to the number of training clients.
         """
         self.client_id = client_id
-        Trainer.run_sql_statement(
-            "CREATE TABLE IF NOT EXISTS trainers (run_id int)")
+
+        if hasattr(Config().trainer, 'max_concurrency'):
+            Trainer.run_sql_statement(
+                "CREATE TABLE IF NOT EXISTS trainers (run_id int)")
 
     @abstractmethod
     def save_model(self, filename=None):
@@ -90,12 +92,12 @@ class Trainer(ABC):
     def start_training(self):
         """Add to the list of running trainers if max_concurrency has not yet
         been reached."""
-        time.sleep(random.random())
+        time.sleep(random.random() * 2)
         trainer_count = Trainer.run_sql_statement(
             "SELECT COUNT(*) FROM trainers")
 
         while trainer_count >= Config().trainer.max_concurrency:
-            time.sleep(random.random())
+            time.sleep(random.random() * 2)
             trainer_count = Trainer.run_sql_statement(
                 "SELECT COUNT(*) FROM trainers")
 
@@ -119,7 +121,7 @@ class Trainer(ABC):
             os.remove(accuracy_file)
 
     @abstractmethod
-    def train(self, trainset, sampler, cut_layer=None) -> Tuple[bool, float]:
+    def train(self, trainset, sampler, cut_layer=None) -> float:
         """The main training loop in a federated learning workload.
 
         Arguments:
@@ -128,7 +130,6 @@ class Trainer(ABC):
         cut_layer (optional): The layer which training should start from.
 
         Returns:
-        bool: Whether training was successfully completed.
         float: The training time.
         """
 

@@ -8,7 +8,6 @@ import os
 import random
 import time
 
-import wandb
 from plato.algorithms import registry as algorithms_registry
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
@@ -24,6 +23,8 @@ class Server(base.Server):
         super().__init__()
 
         if hasattr(Config().trainer, 'use_wandb'):
+            import wandb
+
             wandb.init(project="plato", reinit=True)
 
         self.model = model
@@ -71,7 +72,7 @@ class Server(base.Server):
         self.load_trainer()
 
         if not Config().clients.do_test:
-            dataset = datasources_registry.get()
+            dataset = datasources_registry.get(client_id=0)
             self.testset = dataset.get_test_set()
 
         # Initialize the csv file which will record results
@@ -90,11 +91,9 @@ class Server(base.Server):
         if self.algorithm is None:
             self.algorithm = algorithms_registry.get(self.trainer)
 
-    def choose_clients(self):
-        """Choose a subset of the clients to participate in each round."""
-        # Select clients randomly
-        assert self.clients_per_round <= len(self.clients_pool)
-        return random.sample(self.clients_pool, self.clients_per_round)
+    async def select_clients(self):
+        self.round_start_time = time.perf_counter()
+        await super().select_clients()
 
     def extract_client_updates(self, updates):
         """Extract the model weight updates from client updates."""

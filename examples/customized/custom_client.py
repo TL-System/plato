@@ -8,7 +8,7 @@ from torch import nn
 from torchvision.datasets import MNIST
 from torchvision.transforms import ToTensor
 
-# os.environ['config_file'] = 'examples/configs/client.yml'
+os.environ['config_file'] = './client.yml'
 
 from plato.clients import simple
 from plato.datasources import base
@@ -16,8 +16,7 @@ from plato.trainers import basic
 
 
 class DataSource(base.DataSource):
-    """A custom datasource with custom training and validation
-       datasets.
+    """A custom datasource with custom training and validation datasets.
     """
     def __init__(self):
         super().__init__()
@@ -82,6 +81,7 @@ class Trainer(basic.Trainer):
 
 
 class CustomClient(simple.Client):
+    """ An example for customizing the client. """
     def __init__(self, model=None, datasource=None, trainer=None):
         super().__init__(model=model, datasource=datasource, trainer=trainer)
         logging.info("A customized client has been initialized.")
@@ -101,13 +101,13 @@ def main():
         nn.ReLU(),
         nn.Linear(128, 10),
     )
-    # datasource = DataSource()
-    # trainer = Trainer(model=model)
+    datasource = DataSource()
+    trainer = Trainer(model=model)
 
-    # client = CustomClient(model=model, trainer=trainer)
-    client = CustomClient()
+    client = CustomClient(model=model, datasource=datasource, trainer=trainer)
     client.configure()
-    asyncio.run(client.start_client())
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(client.start_client())
 
 if __name__ == "__main__":
     main()

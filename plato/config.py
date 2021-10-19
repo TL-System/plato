@@ -41,6 +41,11 @@ class Config:
                                 type=str,
                                 default=None,
                                 help='The server hostname and port number.')
+            parser.add_argument(
+                '-d',
+                '--download',
+                action='store_true',
+                help='Download the dataset to prepare for a training session.')
             parser.add_argument('-l',
                                 '--log',
                                 type=str,
@@ -78,16 +83,12 @@ class Config:
             else:
                 filename = args.config
 
-            # if the configuration file not exist, create a fake config object
             if os.path.isfile(filename):
                 with open(filename, 'r') as config_file:
-                    config = yaml.load(config_file, Loader=yaml.FullLoader)
-                    # A temporary solution for config['server']['simulation']
-                    if 'simulation' not in config['server']:
-                        config['server']['simulation'] = True
+                    config = yaml.load(config_file, Loader=yaml.SafeLoader)
             else:
-                # create a default configured config
-                config = Config.defaultConfig()
+                # if the configuration file does not exist, use a default one
+                config = Config.default_config()
 
             Config.clients = Config.namedtuple_from_dict(config['clients'])
             Config.server = Config.namedtuple_from_dict(config['server'])
@@ -101,6 +102,10 @@ class Config:
                 Config.server = Config.server._replace(
                     port=args.server.split(':')[1])
 
+            if Config.args.download:
+                Config.clients = Config.clients._replace(total_clients=1)
+                Config.clients = Config.clients._replace(per_round=1)
+
             if 'results' in config:
                 Config.results = Config.namedtuple_from_dict(config['results'])
                 if hasattr(Config().results, 'results_dir'):
@@ -111,19 +116,12 @@ class Config:
                     server_type = Config.algorithm.type
                     Config.result_dir = f'./results/{datasource}/{model}/{server_type}/'
 
-            if 'results' in config and hasattr(Config().results,
-                                               'trainer_counter_dir'):
-                trainer_counter_dir = Config.results.trainer_counter_dir
-                if not os.path.exists(trainer_counter_dir):
-                    os.makedirs(trainer_counter_dir)
-            else:
-                trainer_counter_dir = os.path.dirname(__file__)
-
-            # Used to limit the maximum number of concurrent trainers
-            Config.sql_connection = sqlite3.connect(
-                trainer_counter_dir + '/running_trainers.sqlitedb')
-
-            Config().cursor = Config.sql_connection.cursor()
+            if hasattr(Config().trainer, 'max_concurrency'):
+                # Using a temporary SQLite database to limit the maximum number of concurrent
+                # trainers
+                Config.sql_connection = sqlite3.connect(
+                    "/tmp/running_trainers.sqlitedb")
+                Config().cursor = Config.sql_connection.cursor()
 
             # Customizable dictionary of global parameters
             Config.params: dict = {}
@@ -133,6 +131,7 @@ class Config:
 
             # Pretrained models
             Config.params['model_dir'] = "./models/pretrained/"
+            Config.params['pretrained_model_dir'] = "./models/pretrained/"
 
         return cls._instance
 
@@ -171,18 +170,28 @@ class Config:
     @staticmethod
     def device() -> str:
         """Returns the device to be used for training."""
-        import torch
-
-        if torch.cuda.is_available() and torch.cuda.device_count() > 0:
-            if hasattr(Config().trainer,
-                       'parallelized') and Config().trainer.parallelized:
-                device = 'cuda'
-            else:
-                device = 'cuda:' + str(
-                    random.randint(0,
-                                   torch.cuda.device_count() - 1))
+        device = 'cpu'
+        if hasattr(Config().trainer, 'use_mindspore'):
+            pass
+        elif hasattr(Config().trainer, 'use_tensorflow'):
+            import tensorflow as tf
+            gpus = tf.config.experimental.list_physical_devices('GPU')
+            if len(gpus) > 0:
+                device = 'GPU'
+                tf.config.experimental.set_visible_devices(
+                    gpus[random.randint(0,
+                                        len(gpus) - 1)], 'GPU')
         else:
-            device = 'cpu'
+            import torch
+
+            if torch.cuda.is_available() and torch.cuda.device_count() > 0:
+                if hasattr(Config().trainer,
+                           'parallelized') and Config().trainer.parallelized:
+                    device = 'cuda'
+                else:
+                    device = 'cuda:' + str(
+                        random.randint(0,
+                                       torch.cuda.device_count() - 1))
 
         return device
 
@@ -197,18 +206,18 @@ class Config:
         ) and torch.cuda.device_count() > 1
 
     @staticmethod
-    def defaultConfig() -> dict:
-        ''' list a default configuration when the config file is missing'''
+    def default_config() -> dict:
+        ''' Supply a default configuration when the config file is missing. '''
         config = {}
         config['clients'] = {}
         config['clients']['type'] = 'simple'
         config['clients']['total_clients'] = 1
         config['clients']['per_round'] = 1
-        config['clients']['do_test'] = True
+        config['clients']['do_test'] = False
         config['server'] = {}
-        config['server']['simulation'] = False
         config['server']['address'] = '127.0.0.1'
         config['server']['port'] = 8000
+        config['server']['disable_clients'] = True
         config['data'] = {}
         config['data']['datasource'] = 'MNIST'
         config['data']['data_path'] = './data'
@@ -219,7 +228,6 @@ class Config:
         config['trainer']['type'] = 'basic'
         config['trainer']['rounds'] = 5
         config['trainer']['parallelized'] = False
-        config['trainer']['max_concurrency'] = 1
         config['trainer']['target_accuracy'] = 0.94
         config['trainer']['epochs'] = 5
         config['trainer']['batch_size'] = 32
@@ -232,3 +240,14 @@ class Config:
         config['algorithm']['type'] = 'fedavg'
 
         return config
+
+    @staticmethod
+    def store() -> None:
+        data = {}
+        data['clients'] = Config.clients._asdict()
+        data['server'] = Config.server._asdict()
+        data['data'] = Config.data._asdict()
+        data['trainer'] = Config.trainer._asdict()
+        data['algorithm'] = Config.algorithm._asdict()
+        with open(Config.args.config, "w") as out:
+            yaml.dump(data, out, default_flow_style=False)
