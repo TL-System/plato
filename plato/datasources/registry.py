@@ -24,6 +24,12 @@ elif hasattr(Config().trainer, 'use_tensorflow'):
     registered_datasources = OrderedDict([('MNIST', mnist_tensorflow),
                                           ('FashionMNIST',
                                            fashion_mnist_tensorflow)])
+elif hasattr(Config().trainer, 'use_nnrt'):
+    from plato.datasources.nnrt import (
+        yolo as yolo_nnrt
+    )
+
+    registered_datasources = OrderedDict([('yolo', yolo_nnrt)])
 else:
     from plato.datasources import (
         mnist,
