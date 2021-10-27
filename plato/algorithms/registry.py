@@ -26,6 +26,16 @@ elif hasattr(Config().trainer, 'use_tensorflow'):
     registered_algorithms = OrderedDict([
         ('fedavg', fedavg_tensorflow.Algorithm),
     ])
+elif hasattr(Config().trainer, 'use_nnrt'):
+    from plato.algorithms.nnrt import (
+        fedavg,
+        mistnet
+    )
+
+    registered_algorithms = OrderedDict([
+        ('fedavg', fedavg.Algorithm),
+        ('mistnet', mistnet.Algorithm),
+    ])
 else:
     from plato.algorithms import (
         fedavg,
