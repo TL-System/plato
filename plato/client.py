@@ -10,7 +10,12 @@ from plato.clients import registry as client_registry
 from plato.config import Config
 
 
-def run(client_id, port, client=None, edge_server=None, edge_client=None):
+def run(client_id,
+        port,
+        client=None,
+        edge_server=None,
+        edge_client=None,
+        trainer=None):
     """Starting a client to connect to the server."""
     Config().args.id = client_id
     if port is not None:
@@ -27,9 +32,13 @@ def run(client_id, port, client=None, edge_server=None, edge_client=None):
             server = fedavg_cs.Server()
             client = edge.Client(server)
         else:
-            # A custom edge server
-            server = edge_server()
-            client = edge_client(server)
+            # A customized edge server
+            if trainer is not None:
+                server = edge_server(trainer=trainer())
+                client = edge_client(server, trainer=trainer())
+            else:
+                server = edge_server()
+                client = edge_client(server)
 
         server.configure()
         client.configure()
@@ -54,7 +63,9 @@ def run(client_id, port, client=None, edge_server=None, edge_client=None):
             logging.info("Starting a custom client #%d", client_id)
 
         client.configure()
-        asyncio.run(client.start_client())
+
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(client.start_client())
 
 
 if __name__ == "__main__":

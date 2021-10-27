@@ -2,28 +2,32 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 2
+    total_clients: 200
 
     # The number of clients selected in each round
-    per_round: 2
+    per_round: 20
 
     # Should the clients compute test accuracy locally?
-    do_test: false
+    do_test: true
+
+    simulation: true
 
 server:
     type: fedavg_cross_silo
     address: 127.0.0.1
     port: 8000
+    do_test: true
+    ping_timeout: 120
 
 data:
     # The training and testing dataset
     datasource: MNIST
 
     # Where the dataset is located
-    data_path: ./data
+    data_path: ../../data
 
     # Number of samples in each partition
-    partition_size: 2
+    partition_size: 600
 
     # IID or non-IID?
     sampler: iid
@@ -33,7 +37,7 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 2
+    rounds: 200
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -45,8 +49,8 @@ trainer:
     target_accuracy: 0.95
 
     # Number of epoches for local training in each communication round
-    epochs: 1
-    batch_size: 1
+    epochs: 6
+    batch_size: 10
     optimizer: SGD
     learning_rate: 0.01
     momentum: 0.9
@@ -63,8 +67,9 @@ algorithm:
     cross_silo: true
 
     # The total number of silos (edge servers)
-    total_silos: 2
+    total_silos: 5
 
     # The number of local aggregation rounds on edge servers before sending
     # aggregated weights to the central server
-    local_rounds: 2
+    local_rounds: 4
+

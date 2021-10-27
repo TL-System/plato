@@ -6,3 +6,4 @@ scipy
 wandb
 gym
 transformers
+boto3

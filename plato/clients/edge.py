@@ -24,18 +24,20 @@ class Report:
 
 class Client(base.Client):
     """A federated learning client at the edge server in a cross-silo training workload."""
-    def __init__(self, server):
+    def __init__(self, server, algorithm=None, trainer=None):
         super().__init__()
         self.server = server
-        self.trainer = None
-        self.algorithm = None
+        self.algorithm = algorithm
+        self.trainer = trainer
 
     def configure(self):
         """Prepare this edge client for training."""
-        self.trainer = trainers_registry.get()
+        if self.trainer is None:
+            self.trainer = trainers_registry.get()
         self.trainer.set_client_id(self.client_id)
 
-        self.algorithm = algorithms_registry.get(self.trainer)
+        if self.algorithm is None:
+            self.algorithm = algorithms_registry.get(self.trainer)
         self.algorithm.set_client_id(self.client_id)
 
     def load_data(self):
@@ -49,18 +51,6 @@ class Client(base.Client):
         if 'current_global_round' in server_response:
             self.server.current_global_round = server_response[
                 'current_global_round']
-
-        if 'local_agg_rounds' in server_response:
-            # Update the number of local aggregation rounds
-            Config().algorithm = Config().algorithm._replace(
-                local_rounds=server_response['local_agg_rounds'])
-
-        if 'local_epoch_num' in server_response:
-            # Update the number of local epochs
-            local_epoch_num = server_response['local_epoch_num'][
-                int(self.client_id) - Config().clients.total_clients - 1]
-            Config().trainer = Config().trainer._replace(
-                epochs=local_epoch_num)
 
     async def train(self):
         """The aggregation workload on an edge client."""

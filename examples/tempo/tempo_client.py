@@ -1,5 +1,5 @@
 """
-A federated learning client of fedcy.
+A federated learning client of Tempo.
 """
 
 from plato.config import Config
@@ -8,7 +8,7 @@ from plato.clients import simple
 
 
 class Client(simple.Client):
-    """A federated learning client of fedcy."""
+    """A federated learning client of Tempo."""
     def process_server_response(self, server_response):
         """Additional client-specific processing on the server response."""
         if 'local_epoch_num' in server_response:

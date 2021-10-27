@@ -5,10 +5,8 @@ The training and testing loop.
 import logging
 import os
 import time
-from typing import Tuple
 
 import tensorflow as tf
-import wandb
 
 from plato.config import Config
 from plato.trainers import base
@@ -30,6 +28,8 @@ class Trainer(base.Trainer):
 
         if model is None:
             self.model = models_registry.get()
+        else:
+            self.model = model
 
     def zeros(self, shape):
         """Returns a TensorFlow zero tensor with the given shape."""
@@ -62,7 +62,7 @@ class Trainer(base.Trainer):
     def load_model(self, filename=None):
         """Loading pre-trained model weights from a file."""
         model_name = Config().trainer.model_name
-        model_dir = Config().params['model_dir']
+        model_dir = Config().params['pretrained_model_dir']
 
         if filename is not None:
             model_path = f'{model_dir}{filename}'
@@ -78,7 +78,57 @@ class Trainer(base.Trainer):
 
         self.model.load_weights(model_path)
 
-    def train(self, trainset, sampler, cut_layer=None) -> Tuple[bool, float]:
+    def train_process(self, config, trainset, sampler, cut_layer=None):
+        if 'use_wandb' in config:
+            import wandb
+
+            run = wandb.init(project="plato",
+                             group=str(config['run_id']),
+                             reinit=True)
+
+        custom_train = getattr(self, "train_model", None)
+        try:
+            if callable(custom_train):
+                self.train_model(config, trainset, sampler.get(), cut_layer)
+            else:
+                if 'is_compiled' not in config:
+                    # Initializing the loss criterion
+                    logging.info("Get loss_criterion on client #%d.",
+                                 self.client_id)
+                    _loss_criterion = getattr(self, "loss_criterion", None)
+                    if callable(_loss_criterion):
+                        loss_criterion = self.loss_criterion(self.model)
+                    else:
+                        loss_criterion = tf.keras.losses.SparseCategoricalCrossentropy(
+                        )
+
+                    # Initializing the optimizer
+                    logging.info("Get_optimizer on client #%d.",
+                                 self.client_id)
+                    get_optimizer = getattr(self, "get_optimizer", None)
+                    if callable(get_optimizer):
+                        optimizer = self.get_optimizer(self.model)
+                    else:
+                        optimizer = tf.keras.optimizers.Adam(
+                            config['learning_rate'])
+
+                    self.model.compile(
+                        optimizer=optimizer,
+                        loss=loss_criterion,
+                        metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
+
+                logging.info("Begining training on client #%d.",
+                             self.client_id)
+                self.model.fit(trainset, epochs=config['epochs'])
+        except Exception as training_exception:
+            logging.info("Training on client #%d failed: %s", self.client_id,
+                         training_exception)
+            raise training_exception
+
+        if 'use_wandb' in config:
+            run.finish()
+
+    def train(self, trainset, sampler, cut_layer=None) -> float:
         """The main training loop in a federated learning workload.
 
         Arguments:
@@ -86,51 +136,23 @@ class Trainer(base.Trainer):
         sampler: the sampler that extracts a partition for this client.
         cut_layer (optional): The layer which training should start from.
         """
-        self.start_training()
-        tic = time.perf_counter()
-
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']
-
-        if 'use_wandb' in config:
-            run = wandb.init(project="plato",
-                             group=str(config['run_id']),
-                             reinit=True)
-
-        custom_train = getattr(self, "train_model", None)
-
-        if callable(custom_train):
-            self.train_model(config, trainset, sampler.get(), cut_layer)
+        if hasattr(Config().trainer, 'max_concurrency'):
+            # reserved for mp.Process
+            self.start_training()
+            tic = time.perf_counter()
+            self.train_process(config, trainset, sampler, cut_layer)
+            toc = time.perf_counter()
+            self.pause_training()
         else:
-            # Initializing the loss criterion
-            _loss_criterion = getattr(self, "loss_criterion", None)
-            if callable(_loss_criterion):
-                loss_criterion = self.loss_criterion(self.model)
-            else:
-                loss_criterion = tf.keras.losses.SparseCategoricalCrossentropy(
-                )
+            tic = time.perf_counter()
+            self.train_process(config, trainset, sampler, cut_layer)
+            toc = time.perf_counter()
 
-            # Initializing the optimizer
-            get_optimizer = getattr(self, "get_optimizer", None)
-            if callable(get_optimizer):
-                optimizer = self.get_optimizer(self.model)
-            else:
-                optimizer = tf.keras.optimizers.Adam(config['learning_rate'])
-
-            self.model.compile(
-                optimizer=optimizer,
-                loss=loss_criterion,
-                metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
-            self.model.fit(trainset, epochs=config['epochs'])
-
-        if 'use_wandb' in config:
-            run.finish()
-
-        toc = time.perf_counter()
-        self.pause_training()
         training_time = toc - tic
 
-        return True, training_time
+        return training_time
 
     def test(self, testset):
         """Testing the model on the client using the provided test dataset.
@@ -154,9 +176,11 @@ class Trainer(base.Trainer):
         Arguments:
         testset: The test dataset.
         """
-        self.model.compile(
-            optimizer=tf.keras.optimizers.Adam(Config().trainer.learning_rate),
-            loss=tf.keras.losses.SparseCategoricalCrossentropy(),
-            metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
+        if not hasattr(Config().trainer, 'is_compiled'):
+            self.model.compile(
+                optimizer=tf.keras.optimizers.Adam(
+                    Config().trainer.learning_rate),
+                loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+                metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
 
         return self.test(testset)

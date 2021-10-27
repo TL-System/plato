@@ -17,9 +17,9 @@ from plato.servers import fedavg
 class Server(fedavg.Server):
     """Cross-silo federated learning server using federated averaging."""
     def __init__(self, model=None, algorithm=None, trainer=None):
-        super().__init__(model=None, algorithm=None, trainer=None)
+        super().__init__(model=model, algorithm=algorithm, trainer=trainer)
 
-        self.current_global_round = None
+        self.current_global_round = 0
         # Average accuracy from client reports
         self.average_accuracy = 0
 
@@ -94,6 +94,7 @@ class Server(fedavg.Server):
                 # to avoid the edge server selects clients and clients begin training
                 # before the edge server is selected
                 await self.new_global_round_begins.wait()
+                self.new_global_round_begins.clear()
 
         await super().select_clients()
 
@@ -119,9 +120,14 @@ class Server(fedavg.Server):
             if not Config().clients.do_test or Config().server.do_test:
                 # Test the updated model directly at the server
                 self.accuracy = self.trainer.test(self.testset)
-                logging.info(
-                    '[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(
-                        os.getpid(), 100 * self.accuracy))
+                if Config().is_central_server():
+                    logging.info(
+                        '[Server #{:d}] Global model accuracy: {:.2f}%\n'.
+                        format(os.getpid(), 100 * self.accuracy))
+                else:
+                    logging.info(
+                        '[Edge Server #{:d}] Aggregated model accuracy: {:.2f}%\n'
+                        .format(os.getpid(), 100 * self.accuracy))
         else:
             self.accuracy = self.average_accuracy
 
@@ -172,10 +178,7 @@ class Server(fedavg.Server):
                 self.model_aggregated.set()
 
                 self.current_round = 0
-                self.new_global_round_begins.clear()
-                # Wait until a new global round begins
-                # to avoid selecting clients before a new global round begins
-                await self.new_global_round_begins.wait()
+                self.current_global_round += 1
 
     async def wrap_up(self):
         """Wrapping up when each round of training is done."""

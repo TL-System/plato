@@ -83,23 +83,10 @@ The next step is to install the required Python packages. PyTorch should be inst
 $ pip3 install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
 ```
 
-To double-check the CUDA version used in the command above, use the following command:
+To double-check the CUDA version used in the command above, start an interactive session and use the following command:
 
 ```shell
 nvidia-smi
-```
-
-Install `python-socketio` package:
-
-```
-$ curl -O https://files.pythonhosted.org/packages/4a/c0/78ca7a1d905fd8a5fc13f75fc5516af3a35e5cb37ce593f6fc249ab13cc3/python-socketio-5.3.0.tar.gz
-$ pip install python-socketio-5.3.0.tar.gz
-```
-
-Install `aiohttp` package:
-
-```
-$ pip install aiohttp
 ```
 
 Finally, install Plato as a pip package:
@@ -228,9 +215,9 @@ If runtime exceptions occur that prevent a federated learning session from runni
  
 * The time that a client waits for the server to respond before disconnecting is too short. This could happen when training with large neural network models. If you get an `AssertionError` saying that there are not enough launched clients for the server to select, this could be the reason. But make sure you first check if it is due to the *out of CUDA memory* error.
 
-  *Potential solutions:* Add `ping_timeout` in the `server` section in your configuration file. The default value for `ping_timeout` is 20 (seconds). You could specify a larger timeout value, such as 120.
-  
-  For example, to run a training session with the CIFAR-10 dataset and the ResNet-18 model, and if 10 clients are selected per round, `ping_timeout` needs to be 120. Consider an even larger number if you run with larger models and more clients.
+  *Potential solutions:* Add `ping_timeout` in the `server` section in your configuration file. The default value for `ping_timeout` is 360 (seconds). 
+
+  For example, to run a training session with the CIFAR-10 dataset and the ResNet-18 model, and if 10 clients are selected per round, `ping_timeout` needs to be 360 when clients' local datasets are non-iid by symmetric Dirichlet distribution with the concentration of 0.01. Consider an even larger number if you run with larger models and more clients.
 
 * Running processes have not been terminated from previous runs. 
 

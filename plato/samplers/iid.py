@@ -14,7 +14,6 @@ class Sampler(base.Sampler):
     dataset."""
     def __init__(self, datasource, client_id):
         super().__init__()
-        self.client_id = client_id
         dataset = datasource.get_train_set()
         self.dataset_size = len(dataset)
         indices = list(range(self.dataset_size))
@@ -34,15 +33,19 @@ class Sampler(base.Sampler):
         assert len(indices) == total_size
 
         # Compute the indices of data in the subset for this client
-        self.subset_indices = indices[(int(self.client_id) -
+        self.subset_indices = indices[(int(client_id) -
                                        1):total_size:total_clients]
 
     def get(self):
         """Obtains an instance of the sampler. """
         gen = torch.Generator()
         gen.manual_seed(self.random_seed)
+        version = torch.__version__
+        if int(version[0]) <= 1 and int(version[2]) <= 5:
+            return SubsetRandomSampler(self.subset_indices)
         return SubsetRandomSampler(self.subset_indices, generator=gen)
 
     def trainset_size(self):
         """Returns the length of the dataset after sampling. """
         return len(self.subset_indices)
+    

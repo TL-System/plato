@@ -1,6 +1,4 @@
-yapf
-mypy
-pylint
+numpy
 python-socketio
 aiohttp
 requests
@@ -11,6 +9,3 @@ scipy
 wandb
 gym
 datasets
-transformers
-tensorflow
-tensorflow-datasets

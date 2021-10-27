@@ -1,6 +1,8 @@
 """
 The CINIC-10 dataset.
-For more information about CINIC-10, refer to
+
+For more information about CINIC-10, refer to:
+
 https://github.com/BayesWatch/cinic-10
 """
 

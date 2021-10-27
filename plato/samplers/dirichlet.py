@@ -26,7 +26,6 @@ class Sampler(base.Sampler):
     dataset, biased across labels according to the Dirichlet distribution."""
     def __init__(self, datasource, client_id):
         super().__init__()
-        self.client_id = client_id
 
         # Different clients should have a different bias across the labels
         np.random.seed(self.random_seed * int(client_id))
