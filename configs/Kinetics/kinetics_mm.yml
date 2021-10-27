@@ -1,5 +1,11 @@
 
-# base not defined
+# include basic settings for the models and the learning process
+rgb: !include Pipeline/kinetics_csn_rgb.yml
+flow: !include Pipeline/kinetics_tsn_flow.yml
+audio: !include Pipeline/kinetics_audio_feature.yml
+full_models: !include Models/kinetics_full_models.yml
+
+
 
 # clients settings
 clients:
@@ -16,11 +22,11 @@ server:
 # dataset settings for the multimodal data, frames, flow, and audio
 data:
   datasource: kinetics700
-  path: ./data/Kinetics
+  data_path: ./data/Kinetics
   download_url: https://storage.googleapis.com/deepmind-media/Datasets/kinetics700_2020.tar.gz
   num_workers: 4
-  failed_save_file: !file failed_record.txt
-  log_file: !file download_log.txt
+  failed_save_file: failed_record.txt
+  log_file: download_log.txt
   compress: False
   verbose: False
   skip: False
@@ -28,6 +34,9 @@ data:
   workers_per_gpu: 4
   sampler: dis_noniid
   modality_sampler: modality_iid
+
+  # The random seed for sampling data
+  random_seed: 1
 
 # Train settings
 
@@ -47,8 +56,8 @@ optimizer_config: &optimizer_config
 lr_configs: &lr_config
   policy: step
   step:
-    1. 32
-    2. 48
+    - 32
+    - 48
 
   warmup: linear
   warmup_ratio: 0.1
@@ -61,8 +70,8 @@ total_epochs: &total_epochs
 log_config:
   interval: 20
   hooks:
-    1. type: TextLoggerHook
-    2. type: TensorboardLoggerHook
+    - type: TextLoggerHook
+    - type: TensorboardLoggerHook
 
 trainer:
   type: basic
@@ -72,7 +81,7 @@ trainer:
   learning_rate_config: *lr_config
   rounds: *total_epochs
   parallelized: False
-  max_accuracy: clients.per_round
+  max_accuracy: 3
   target_accuracy: 0.67
 
 checkpoint_config:
@@ -81,8 +90,8 @@ checkpoint_config:
 evaluation:
   interval: 5
   metrics:
-    1. top_k_accuracy
-    2. mean_class_accuracy
+    - top_k_accuracy
+    - mean_class_accuracy
   
 algorithm:
   type: fedavg
@@ -100,6 +109,6 @@ runner_setting:
     load_from: null
     resume_from: null
     workflow:
-      1. train
-      2. 1
+        - train
+        - 1
     find_unused_parameters: True

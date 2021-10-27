@@ -3,15 +3,15 @@
 rgb_img_norm_cfg: &rgb_img_norm_cfg
   - 
     mean:
-      1. 123.675
-      2. 116.28
-      3. 103.53
+      - 123.675
+      - 116.28
+      - 103.53
 
   - 
     std:
-      1. 58.395
-      2. 57.12
-      3. 57.375
+      - 58.395
+      - 57.12
+      - 57.375
 
   - to_bgr: False
 
@@ -20,7 +20,7 @@ rgb_train_pipeline: &rgb_train_pipeline
   -
     type: SampleFrames
     clip_len: 32
-    frame_interval:: 2
+    frame_interval: 2
     num_clips: 1
 
   - type: FrameSelector
@@ -28,16 +28,16 @@ rgb_train_pipeline: &rgb_train_pipeline
   -
     type: Resize
     scale:
-      1. -1
-      2. 256
+      - -1
+      - 256
 
   - type: RandomResizedCrop
 
   -
     type: Resize
     scale:
-      1. 224
-      2. 224
+      - 224
+      - 224
     keep_ratio: False
 
   -
@@ -57,25 +57,25 @@ rgb_train_pipeline: &rgb_train_pipeline
     type: Collect
 
     keys:
-      1. imgs
-      2. label
+      - imgs
+      - label
 
     meta_keys:
-      1. null
+      - null
 
   -
     type: ToTensor
     
     keys:
-      1. imgs
-      2. label
+      - imgs
+      - label
 
 
 rgb_val_pipeline: &rgb_val_pipeline
   -
     type: SampleFrames
     clip_len: 32
-    frame_interval:: 2
+    frame_interval: 2
     num_clips: 1
     test_mode: True
 
@@ -84,8 +84,8 @@ rgb_val_pipeline: &rgb_val_pipeline
   -
     type: Resize
     scale:
-      1. -1
-      2. 256
+      - -1
+      - 256
 
   - 
     type: CenterCrop
@@ -108,24 +108,24 @@ rgb_val_pipeline: &rgb_val_pipeline
     type: Collect
 
     keys:
-      1. imgs
-      2. label
+      - imgs
+      - label
 
     meta_keys:
-      1. null
+      - null
 
   -
     type: ToTensor
     
     keys:
-      1. imgs
+      - imgs
 
 
 rgb_test_pipeline: &rgb_test_pipeline
   -
     type: SampleFrames
     clip_len: 32
-    frame_interval:: 2
+    frame_interval: 2
     num_clips: 10
     test_mode: True
 
@@ -134,8 +134,8 @@ rgb_test_pipeline: &rgb_test_pipeline
   -
     type: Resize
     scale:
-      1. -1
-      2. 256
+      - -1
+      - 256
 
   - 
     type: ThreeCrop
@@ -158,38 +158,38 @@ rgb_test_pipeline: &rgb_test_pipeline
     type: Collect
 
     keys:
-      1. imgs
-      2. label
+      - imgs
+      - label
 
     meta_keys:
-      1. null
+      - null
 
   -
     type: ToTensor
     
     keys:
-      1. imgs
+      - imgs
 
 
 rgb_data_train: &rgb_data_train
   type: RawframeDataset
-  ann_file: !file train_list_rawframes.txt
+  ann_file: train_list_rawframes.txt
   data_prefix: rawframes_train
   pipeline: *rgb_train_pipeline
 
 
 rgb_data_val: &rgb_data_val
   type: RawframeDataset
-  ann_file: !file val_list_rawframes.txt
+  ann_file: val_list_rawframes.txt
   data_prefix: rawframes_val
   pipeline: *rgb_val_pipeline
 
 
 rgb_data_test: &rgb_data_test
   type: RawframeDataset
-  ann_file: !file val_list_rawframes.txt
+  ann_file: val_list_rawframes.txt
   data_prefix: rawframes_val
-  pipeline: &rgb_test_pipeline
+  pipeline: *rgb_test_pipeline
 
 
 rgb_data:
