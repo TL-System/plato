@@ -94,6 +94,7 @@ class Server(fedavg.Server):
                 # to avoid the edge server selects clients and clients begin training
                 # before the edge server is selected
                 await self.new_global_round_begins.wait()
+                self.new_global_round_begins.clear()
 
         await super().select_clients()
 
@@ -178,10 +179,6 @@ class Server(fedavg.Server):
 
                 self.current_round = 0
                 self.current_global_round += 1
-                self.new_global_round_begins.clear()
-                # Wait until a new global round begins
-                # to avoid selecting clients before a new global round begins
-                await self.new_global_round_begins.wait()
 
     async def wrap_up(self):
         """Wrapping up when each round of training is done."""
