@@ -10,7 +10,7 @@ clients:
 
     # Should the clients compute test accuracy locally?
     do_test: true
-        
+
 server:
     type: fedavg_cross_silo
     address: 127.0.0.1
