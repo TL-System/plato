@@ -1,14 +1,10 @@
-
 """
 Base class for multimodal datasets.
 """
 
 import logging
 import os
-import sys
-import requests
 
-import numpy as np
 import torch
 from torchvision.datasets.utils import download_url
 from torchvision.datasets.utils import download_and_extract_archive
@@ -95,8 +91,7 @@ class MultiModalDataSource(base.DataSource):
             put_data_dir, download_extracted_file_name)
         # download the raw data if necessary
         if not self._exist_judgement(download_extracted_dir_path):
-            logging.info(
-                ("Downloading the {} data.....").format(download_file_name))
+            logging.info("Downloading the %s data.....", download_file_name)
             if ".zip" in download_file_name or ".tar.gz" in download_file_name:
                 download_and_extract_archive(url=download_url_address,
                                              download_root=put_data_dir,
@@ -125,8 +120,7 @@ class MultiModalDataSource(base.DataSource):
         extract_data_path = os.path.join(put_data_dir,
                                          extract_download_file_name)
         if not self._exist_judgement(extract_data_path):
-            logging.info(
-                ("Downloading the data.....").format(download_data_path))
+            logging.info("Downloading the data to %s.....", download_data_path)
             download_file_from_google_drive(file_id=download_file_id,
                                             root=put_data_dir,
                                             filename=download_data_file_name)
@@ -137,25 +131,27 @@ class MultiModalDataSource(base.DataSource):
     def _exist_judgement(self, target_path):
         """ Judeg whether the input file/dir existed and whether it contains useful data """
         if not os.path.exists(target_path):
-            logging.info(("The path {} does not exist").format(target_path))
+            logging.info("The path %s does not exist", target_path)
             return False
 
         if os.path.isdir(target_path):
             if len(os.listdir(target_path)) == 0:
-                logging.info(("The path {} does exist but contains no data"
-                              ).format(target_path))
+                logging.info("The path %s does exist but contains no data",
+                             target_path)
                 return False
             else:
                 return True
 
-        logging.info(("The file {} does exist ").format(target_path))
+        logging.info("The file %s does exist", target_path)
         return True
 
     def num_modalities(self) -> int:
+        """ Number of modalities """
         return len(self.modality_names)
 
 
 class MultiModalDataset(torch.utils.data.Dataset):
+    """ The base interface for the multimodal data """
     def __init__(self, modality_datasets):
         self.datasets = modality_datasets  # a dict that holds the corresponding built dataset.
 

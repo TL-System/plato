@@ -1,45 +1,44 @@
 """
 The Kinetics700 dataset.
 
-Note that the setting for the data loader is obtained from the github repo provided by the official workers:
+Note that the setting for the data loader is obtained from the github
+repo provided by the official workers:
 https://github.com/pytorch/vision/references/video_classification/train.py
 """
 
 import logging
 import os
-import sys
 import shutil
 
 import torch
 from torch.utils.data.dataloader import default_collate
-from torchvision import datasets
+
 from mmaction.datasets import build_dataset
-from mmaction.datasets import rawframe_dataset
-from mmaction.datasets import audio_feature_dataset
 
 from plato.config import Config
 from plato.datasources.multimodal import multimodal_base
 
 from plato.datasources.datalib.kinetics_utils import download_tools
 from plato.datasources.datalib.kinetics_utils import utils as kine_utils
-from plato.datasources.datalib import video_transform
 from plato.datasources.datalib import frames_extraction_tools
 from plato.datasources.datalib import audio_extraction_tools
 from plato.datasources.datalib import modality_data_anntation_tools
 from plato.datasources.datalib import data_utils
-""" 
-We consider three modalities: RGB, optical flow and audio. 
-    - For RGB and flow, we use input clips of 16×224×224 as input. We fol- low [1] for visual pre-processing and augmentation. 
-    - For audio, we use log-Mel with 100 temporal frames by 40 Mel filters. Audio and visual are temporally aligned.
+"""
+We consider three modalities: RGB, optical flow and audio.
+    For RGB and flow, we use input clips of 16×224×224 as input.
+        We follow [1] for visual pre-processing and augmentation.
+    For audio, we use log-Mel with 100 temporal frames by 40 Mel filters.
+        Audio and visual are temporally aligned.
 
-[1]. Video classification with channel-separated convolutional networks. In ICCV, 2019. (CSN network)
-    This is actually the csn network in the mmaction packet
-
+[1]. Video classification with channel-separated convolutional networks.
+    In ICCV, 2019. (CSN network)
+    This is actually the csn network in the mmaction packet.
 """
 
 
 class DataSource(multimodal_base.MultiModalDataSource):
-    """The Kinetics700 dataset."""
+    """The datasource for the Kinetics700 dataset."""
     def __init__(self):
         super().__init__()
 
@@ -62,9 +61,8 @@ class DataSource(multimodal_base.MultiModalDataSource):
                                               extracted_dir_name)
         # convert the Kinetics data dir structure to the typical one shown in
         #   https://github.com/open-mmlab/mmaction2/blob/master/tools/data/kinetics/README.md
-        Kinetics_annotation_dir_name = "annotations"
-        ann_dst_path = os.path.join(base_data_path,
-                                    Kinetics_annotation_dir_name)
+        kinetics_anno_dir_name = "annotations"
+        ann_dst_path = os.path.join(base_data_path, kinetics_anno_dir_name)
         if not self._exist_judgement(ann_dst_path):
             shutil.copytree(download_info_dir_path, ann_dst_path)
 
@@ -134,10 +132,12 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         logging.info("The Kinetics700 dataset has been prepared")
 
-    def get_modality_name():
+    def get_modality_name(self):
+        """ Get all supports modalities """
         return ["rgb", "flow", "audio"]
 
-    def extract_videos_rgb_flow_audio(self, mode="train", device="CPU"):
+    def extract_videos_rgb_flow_audio(self, mode="train"):
+        """ Extract rgb, optical flow, and audio from videos """
         src_mode_videos_dir = os.path.join(
             self.splits_info[mode]["video_path"])
         rgb_out_dir_path = self.splits_info[mode]["rawframes_path"]
@@ -182,7 +182,8 @@ class DataSource(multimodal_base.MultiModalDataSource):
                 audio_src_path=audio_out_dir_path,
                 to_dir=audio_feature_dir_path)
 
-    def extract_split_list_files(self):
+    def extract_split_list_files(self, mode):
+        """ Extract and generate the split information of current mode/phase """
         gen_annots_op = modality_data_anntation_tools.GenerateMDataAnnotation(
             data_src_dir=self.splits_info[mode]["rawframes_path"],
             data_annos_files_info=self.
@@ -195,6 +196,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
         gen_annots_op.generate_data_splits_info_file(data_name=self.data_name)
 
     def get_train_set(self, modality_sampler):
+        """ Get the train dataset """
         modality_dataset = []
         if "rgb" in modality_sampler:
             train_rgb_config = Config().multimodal_data["rgb_data"]["train"]
@@ -212,7 +214,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
             train_audio_config = Config(
             ).multimodal_data["audio_data"]["train"]
             train_audio_config = data_utils.dict_list2tuple(train_audio_config)
-            flow_train_dataset = build_dataset(train_audio_config)
+            audio_feature_train_dataset = build_dataset(train_audio_config)
 
             modality_dataset.append(audio_feature_train_dataset)
 
@@ -237,6 +239,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
         return mm_test_dataset
 
     def get_val_set(self):
+        """ Get the validation set """
         val_rgb_config = Config().multimodal_data["rgb_data"]["val"]
         val_rgb_config = data_utils.dict_list2tuple(val_rgb_config)
         val_flow_config = Config().multimodal_data["flow_data"]["val"]
@@ -253,8 +256,9 @@ class DataSource(multimodal_base.MultiModalDataSource):
         return mm_val_dataset
 
     @staticmethod
-    def get_data_loader(self, batch_size, dataset, sampler):
-        def collate_fn(batch):
+    def get_data_loader(batch_size, dataset, sampler):
+        """ Get the dataset loader """
+        def collate_fn():
             return default_collate
 
         return torch.utils.data.DataLoader(dataset,

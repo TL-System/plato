@@ -1,22 +1,7 @@
+"""
+The backup interface for the kinetics dataset for a easier way to prepare the dataset
 
-
-import re
-
-import json
-import logging
-import os
-import sys
-import shutil
-
-import torch
-from torch.utils.data.dataloader import default_collate
-from torchvision import datasets
-from mmaction.tools.data.kinetics import download as kinetics_downloader
-from mmaction.tools.data.gym import download as gym_downloader
-
-from plato.config import Config
-from plato.datasources.multimodal import multimodal_base
-'''
+The data structure is:
 ├── data
 │   ├── ${DATASET}
 │   │   ├── ${DATASET}_train_list_videos.txt
@@ -33,7 +18,18 @@ from plato.datasources.multimodal import multimodal_base
 │   │   │   ├── zumba
 │   │   ├── rawframes_train
 │   │   ├── rawframes_val
-'''
+"""
+
+import re
+
+import logging
+import os
+import shutil
+
+from mmaction.tools.data.kinetics import download as kinetics_downloader
+
+from plato.config import Config
+from plato.datasources.multimodal import multimodal_base
 
 
 class DataSource(multimodal_base.MultiModalDataSource):
@@ -54,9 +50,9 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         base_data_path = self.mm_data_info["base_data_dir_path"]
         # define all the dir here
-        Kinetics_annotation_dir_name = "annotations"
+        kinetics_anno_dir_name = "annotations"
         self.data_anno_dir_path = os.path.join(base_data_path,
-                                               Kinetics_annotation_dir_name)
+                                               kinetics_anno_dir_name)
 
         anno_download_url = (
             "https://storage.googleapis.com/deepmind-media/Datasets/{}.tar.gz"
@@ -82,9 +78,9 @@ class DataSource(multimodal_base.MultiModalDataSource):
             split_name = split if split != "validation" else "val"
             video_dir = os.path.join(base_data_path, "video_" + split_name)
             if not self._exist_judgement(video_dir):
-                logging.info((
-                    "Downloading the raw {} videos for the {} dataset. This may take a long time."
-                ).format(split, self.data_name))
+                logging.info(
+                    "Downloading the raw videos for the %s dataset. This may take a long time.",
+                    self.data_name)
                 kinetics_downloader.main(input_csv=split_anno_path,
                                          output_dir=video_dir,
                                          trim_format='%06d',
@@ -92,5 +88,4 @@ class DataSource(multimodal_base.MultiModalDataSource):
                                          tmp_dir='/tmp/kinetics')
         logging.info("Done.")
 
-        logging.info(
-            ("The {} dataset has been prepared").format(self.data_name))
+        logging.info("The %s dataset has been prepared", self.data_name)

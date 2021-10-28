@@ -1,32 +1,12 @@
 """
 The Gym dataset.
 
-Note that the setting for the data loader is obtained from the github repo provided by the official workers:
-Finegym: A hierarchical video dataset for fine-grained action understanding
-"""
+Note that the setting for the data loader is obtained from the github repo provided
+by the official workers:
+    Finegym: A hierarchical video dataset for fine-grained action understanding
 
-import json
-import logging
-import os
-import sys
-import shutil
+The data structure should be:
 
-import torch
-from torch.utils.data.dataloader import default_collate
-from torchvision import datasets
-from mmaction.tools.data.gym import download as gym_downloader
-from mmaction.datasets import build_dataset
-from mmaction.datasets import rawframe_dataset
-from mmaction.datasets import audio_feature_dataset
-
-from plato.config import Config
-from plato.datasources.datalib.gym_utils import gym_trim
-from plato.datasources.multimodal import multimodal_base
-from plato.datasources.datalib import video_transform
-from plato.datasources.datalib import frames_extraction_tools
-from plato.datasources.datalib import audio_extraction_tools
-from plato.datasources.datalib import modality_data_anntation_tools
-'''
 ├── data
 │   ├── gym99
 |   |   ├── annotations
@@ -50,7 +30,21 @@ from plato.datasources.datalib import modality_data_anntation_tools
 |   |   |   └── zfqS-wCJSsw_E_006244_006252_A_0000_0007.mp4
 |   |   └── subaction_frames
 |   |   |── subaction_audios
-'''
+
+"""
+
+import logging
+import os
+
+import torch
+
+from mmaction.tools.data.gym import download as gym_downloader
+
+from plato.config import Config
+from plato.datasources.datalib.gym_utils import gym_trim
+from plato.datasources.multimodal import multimodal_base
+from plato.datasources.datalib import frames_extraction_tools
+from plato.datasources.datalib import audio_extraction_tools
 
 
 class DataSource(multimodal_base.MultiModalDataSource):
@@ -70,9 +64,9 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         base_data_path = self.mm_data_info["base_data_dir_path"]
         # define all the dir here
-        Kinetics_annotation_dir_name = "annotations"
+        kinetics_anno_dir_name = "annotations"
         self.data_anno_dir_path = os.path.join(base_data_path,
-                                               Kinetics_annotation_dir_name)
+                                               kinetics_anno_dir_name)
         self.data_anno_file_path = os.path.join(self.data_anno_dir_path,
                                                 "annotation.json")
         self.raw_videos_path = os.path.join(base_data_path, "videos")
@@ -89,24 +83,26 @@ class DataSource(multimodal_base.MultiModalDataSource):
         self.event_subsection_audios_fea_dir_path = os.path.join(
             base_data_path, "subaction_audios_features")
 
-        anno_download_url = "https://sdolivia.github.io/FineGym/resources/dataset/finegym_annotation_info_v1.0.json"
-        train_element_download_url = "https://sdolivia.github.io/FineGym/resources/dataset/gym99_train_element_v1.0.txt"
-        eval_element_download_url = "https://sdolivia.github.io/FineGym/resources/dataset/gym99_val_element.txt"
+        anno_url = "https://sdolivia.github.io/FineGym/resources/ \
+                    dataset/finegym_annotation_info_v1.0.json"
 
-        extracted_anno_file_name = self._download_arrange_data(
-            download_url_address=anno_download_url,
-            put_data_dir=self.data_anno_dir_path,
-            obtained_file_name="annotation.json")
+        train_url = "https://sdolivia.github.io/FineGym/resources/ \
+                    dataset/gym99_train_element_v1.0.txt"
 
-        extracted_tr_elem_file_name = self._download_arrange_data(
-            download_url_address=train_element_download_url,
+        eval_url = "https://sdolivia.github.io/FineGym/resources/dataset/gym99_val_element.txt"
+
+        _ = self._download_arrange_data(download_url_address=anno_url,
+                                        put_data_dir=self.data_anno_dir_path,
+                                        obtained_file_name="annotation.json")
+
+        _ = self._download_arrange_data(
+            download_url_address=train_url,
             put_data_dir=self.data_anno_dir_path,
             obtained_file_name="gym99_train_org.txt")
 
-        extracted_val_elem_file_name = self._download_arrange_data(
-            download_url_address=eval_element_download_url,
-            put_data_dir=self.data_anno_dir_path,
-            obtained_file_name="gym99_val_org.txt")
+        _ = self._download_arrange_data(download_url_address=eval_url,
+                                        put_data_dir=self.data_anno_dir_path,
+                                        obtained_file_name="gym99_val_org.txt")
 
         if not self._exist_judgement(self.raw_videos_path):
 
@@ -122,29 +118,26 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         # Trim Videos into Events
         if not self._exist_judgement(self.event_dir_path):
-            gym_trim.trim_event(data_root=base_data_path,
-                                video_root=self.raw_videos_path,
-                                anno_root=self.data_anno_dir_path,
+            gym_trim.trim_event(video_root=self.raw_videos_path,
                                 anno_file=self.data_anno_file_path,
                                 event_anno_file=self.data_event_anno_file_path,
                                 event_root=self.event_dir_path)
         if not self._exist_judgement(self.event_subsection_dir_path):
             gym_trim.trim_subsection(
-                data_root=base_data_path,
-                anno_root=self.data_anno_dir_path,
                 event_anno_file=self.data_event_anno_file_path,
                 event_root=self.event_dir_path,
                 subaction_root=self.event_subsection_dir_path)
 
         logging.info("The Gym dataset has been prepared")
 
-    def extract_videos_rgb_flow_audio(self, device="CPU"):
+    def extract_videos_rgb_flow_audio(self):
+        """ Extract the rgb optical flow audios from the video """
         src_videos_dir = self.event_subsection_dir_path
         frames_out_dir_path = self.event_subsection_frames_dir_path
         rgb_out_dir_path = self.event_subsection_frames_dir_path
         flow_our_dir_path = self.event_subsection_frames_dir_path
         audio_out_dir_path = self.event_subsection_audios_dir_path
-        audio_feature_dir_path = self.event_subsection_audios_fea_dir_path
+        # audio_feature_dir_path = self.event_subsection_audios_fea_dir_path
 
         # define the modalities extractor
         vdf_extractor = frames_extraction_tools.VideoFramesExtractor(

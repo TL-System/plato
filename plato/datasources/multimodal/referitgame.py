@@ -1,13 +1,16 @@
+"""
+This is the interface for the ReferitGame dataset that includes refer+, refer, referg sub-datasets.
 
+http://tamaraberg.com/referitgame/
+"""
 
-import json
 import logging
 import os
-import sys
+
 import collections
 
 import torch
-from torchvision import datasets
+
 import cv2
 
 from plato.config import Config
@@ -92,7 +95,7 @@ class ReferItGameDataset(torch.utils.data.Dataset):
             caption_phrase_bboxs = transformed["bboxes"]
 
         if self.transform_text_func is not None:
-            caption_phrase = self.transform_text_func(caption_phrase)
+            caption_phrases = self.transform_text_func(caption_phrases)
 
         caption_phrase_bboxs = [caption_phrase_bboxs
                                 ]  # convert to the standard structure
@@ -141,7 +144,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
         download_split_url = Config(
         ).data.download_splits_base_url + self.split_config + ".zip"
         for dd_url in [download_split_url]:
-            self._download_arrange_data(download_url=dd_url,
+            self._download_arrange_data(download_url_address=dd_url,
                                         put_data_dir=base_data_path)
 
         # raw coco images path

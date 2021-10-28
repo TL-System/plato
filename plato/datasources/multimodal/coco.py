@@ -1,18 +1,11 @@
+"""
+The MSCOCO dataset
+"""
 
-
-import json
-import logging
 import os
-import sys
-
-from torch.utils.data.dataloader import default_collate
-from torchvision.datasets.utils import download_and_extract_archive
-from torchvision.datasets.utils import download_file_from_google_drive, extract_archive
-from torchvision import datasets
 
 from plato.config import Config
 from plato.datasources.multimodal import multimodal_base
-from plato.datasources.datalib import data_utils
 
 
 class DataSource(multimodal_base.MultiModalDataSource):
@@ -38,9 +31,8 @@ class DataSource(multimodal_base.MultiModalDataSource):
         download_val_url = Config().data.download_val_url
         download_annotation_url = Config().data.download_annotation_url
 
-        raw_data_names = []
         for raw_url in [
                 download_train_url, download_val_url, download_annotation_url
         ]:
-            self._download_arrange_data(download_url=raw_url,
+            self._download_arrange_data(download_url_address=raw_url,
                                         put_data_dir=raw_data_path)
