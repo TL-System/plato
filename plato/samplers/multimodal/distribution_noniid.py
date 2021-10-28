@@ -1,20 +1,19 @@
-
 """
-Samples data from a dataset, biased across labels according to the Dirichlet distribution and quantity skew.
+Samples data from a dataset, biased across labels according to the Dirichlet 
+distribution and quantity skew.
 
 This sampler is the most hard noniid, because it contains:
 
     - the label noniid according to the Dirichlet distribution
     - the unbalance between numbers of samples in classes assigned to one client. 
         It is achieved according to the Dirichlet distribution
-
 """
-import random
 import numpy as np
 import torch
-from torch.utils.data import WeightedRandomSampler
-from plato.config import Config
 
+from torch.utils.data import WeightedRandomSampler
+
+from plato.config import Config
 from plato.samplers import base
 from plato.samplers.multimodal import sampler_utils
 

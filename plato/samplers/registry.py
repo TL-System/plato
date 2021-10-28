@@ -33,6 +33,12 @@ elif hasattr(Config().trainer, 'use_nnrt'):
         ('iid', base.Sampler),
         ('noniid', base.Sampler),
         ('mixed', base.Sampler),
+        ('iid', iid.Sampler),
+        ('modality_iid', modality_iid.Sampler),
+        ('sample_quantity_noniid', sample_quantity_noniid.Sampler),
+        ('quantity_label_noniid', quantity_label_noniid.Sampler),
+        ('quantity_modality_noniid', quantity_modality_noniid.Sampler),
+        ('distribution_noniid', distribution_noniid.Sampler),
     ])
 
 elif hasattr(Config.data, 'use_multimodal'):
@@ -42,15 +48,7 @@ elif hasattr(Config.data, 'use_multimodal'):
                                            quantity_label_noniid,
                                            quantity_modality_noniid,
                                            distribution_noniid)
-    registered_samplers = OrderedDict([
-        ('iid', iid.Sampler),
-        ('modality_iid', modality_iid.Sampler),
-        ('sample_quantity_noniid', sample_quantity_noniid.Sampler),
-        ('quantity_label_noniid', quantity_label_noniid.Sampler),
-        ('quantity_modality_noniid', quantity_modality_noniid.Sampler),
-        ('distribution_noniid', distribution_noniid.Sampler),
-    ])
-
+    registered_samplers = OrderedDict([])
 else:
     from plato.samplers import (iid, dirichlet, mixed, all_inclusive)
 

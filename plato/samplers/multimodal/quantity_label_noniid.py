@@ -1,12 +1,3 @@
-
-
-import random
-import numpy as np
-import torch
-from torch.utils.data import SubsetRandomSampler
-from plato.config import Config
-
-from plato.samplers import base
 '''
 Label Distribution Skew:
 
@@ -14,9 +5,15 @@ This sampler is one type of label distribution skew, that is:
 
     Quantity-based label imbalance: each party owns data samples of a fixed number of labels.
 
-For one client, it contain the defined number of classes while the samples in each class is almost the same. 
-
+For one client, it contain the defined number of classes while the samples in each 
+class is almost the same.
 '''
+import numpy as np
+import torch
+from torch.utils.data import SubsetRandomSampler
+
+from plato.config import Config
+from plato.samplers import base
 
 
 class Sampler(base.Sampler):
