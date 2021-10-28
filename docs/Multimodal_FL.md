@@ -51,6 +51,12 @@ There are several types of non-IID samplers for multi-modal federated learning.
 
 `distribution_noniid.py`: a combination of label distribution and quantity skew.
 
-## References
+## Additional Information
 
 The multi-modal environment relays on **mmaction2**. Therefore, we recommend you referece to the [mmaction site](https://github.com/open-mmlab/mmaction2) for additional information.
+
+For more detailed description on SampleFrames in the frames configuration files (`configs/Kinetics`) you can access:
+
+https://github.com/open-mmlab/mmaction2/discussions/655
+https://mmaction2.readthedocs.io/en/latest/tutorials/1_config.html
+https://congee524-mmaction2.readthedocs.io/en/stable/config.html
