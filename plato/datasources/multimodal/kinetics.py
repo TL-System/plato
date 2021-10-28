@@ -26,6 +26,7 @@ from plato.datasources.datalib import video_transform
 from plato.datasources.datalib import frames_extraction_tools
 from plato.datasources.datalib import audio_extraction_tools
 from plato.datasources.datalib import modality_data_anntation_tools
+from plato.datasources.datalib import data_utils
 """ 
 We consider three modalities: RGB, optical flow and audio. 
     - For RGB and flow, we use input clips of 16×224×224 as input. We fol- low [1] for visual pre-processing and augmentation. 
@@ -134,7 +135,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
         logging.info("The Kinetics700 dataset has been prepared")
 
     def get_modality_name():
-        return ["RGB", "Flow", "Audio"]
+        return ["rgb", "flow", "audio"]
 
     def extract_videos_rgb_flow_audio(self, mode="train", device="CPU"):
         src_mode_videos_dir = os.path.join(
@@ -195,41 +196,57 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
     def get_train_set(self, modality_sampler):
         modality_dataset = []
-        if "RGB" in modality_sampler:
-            rgb_train_dataset = build_dataset(
-                Config().multimodal_data.rgb_data.train)
+        if "rgb" in modality_sampler:
+            train_rgb_config = Config().multimodal_data["rgb_data"]["train"]
+            train_rgb_config = data_utils.dict_list2tuple(train_rgb_config)
+            rgb_train_dataset = build_dataset(train_rgb_config)
+
             modality_dataset.append(rgb_train_dataset)
-        if "Flow" in modality_sampler:
-            flow_train_dataset = build_dataset(
-                Config().multimodal_data.flow_data.train)
+        if "flow" in modality_sampler:
+            train_flow_config = Config().multimodal_data["flow_data"]["train"]
+            train_flow_config = data_utils.dict_list2tuple(train_flow_config)
+            flow_train_dataset = build_dataset(train_flow_config)
+
             modality_dataset.append(flow_train_dataset)
-        if "Audio" in modality_sampler:
-            audio_feature_train_dataset = build_dataset(
-                Config().multimodal_data.audio_data.train)
+        if "audio" in modality_sampler:
+            train_audio_config = Config(
+            ).multimodal_data["audio_data"]["train"]
+            train_audio_config = data_utils.dict_list2tuple(train_audio_config)
+            flow_train_dataset = build_dataset(train_audio_config)
+
             modality_dataset.append(audio_feature_train_dataset)
 
         mm_train_dataset = multimodal_base.MultiModalDataset(modality_dataset)
         return mm_train_dataset
 
     def get_test_set(self):
-        rgb_test_dataset = build_dataset(
-            Config().multimodal_data.rgb_data.test)
-        flow_test_dataset = build_dataset(
-            Config().multimodal_data.flow_data.test)
-        audio_feature_test_dataset = build_dataset(
-            Config().multimodal_data.audio_data.test)
+
+        test_rgb_config = Config().multimodal_data["rgb_data"]["test"]
+        test_rgb_config = data_utils.dict_list2tuple(test_rgb_config)
+        test_flow_config = Config().multimodal_data["flow_data"]["test"]
+        test_flow_config = data_utils.dict_list2tuple(test_flow_config)
+        test_audio_config = Config().multimodal_data["audio_data"]["test"]
+        test_audio_config = data_utils.dict_list2tuple(test_audio_config)
+
+        rgb_test_dataset = build_dataset(test_rgb_config)
+        flow_test_dataset = build_dataset(test_flow_config)
+        audio_feature_test_dataset = build_dataset(test_audio_config)
 
         mm_test_dataset = multimodal_base.MultiModalDataset(
             [rgb_test_dataset, flow_test_dataset, audio_feature_test_dataset])
         return mm_test_dataset
 
     def get_val_set(self):
-        rgb_val_dataset = build_dataset(Config().multimodal_data.rgb_data.val)
-        flow_val_dataset = build_dataset(
-            Config().multimodal_data.flow_data.val)
-        audio_feature_val_dataset = build_dataset(
-            Config().multimodal_data.audio_data.val)
+        val_rgb_config = Config().multimodal_data["rgb_data"]["val"]
+        val_rgb_config = data_utils.dict_list2tuple(val_rgb_config)
+        val_flow_config = Config().multimodal_data["flow_data"]["val"]
+        val_flow_config = data_utils.dict_list2tuple(val_flow_config)
+        val_audio_config = Config().multimodal_data["audio_data"]["val"]
+        val_audio_config = data_utils.dict_list2tuple(val_audio_config)
 
+        rgb_val_dataset = build_dataset(val_rgb_config)
+        flow_val_dataset = build_dataset(val_flow_config)
+        audio_feature_val_dataset = build_dataset(val_audio_config)
         # one sample of this dataset contains three part of data
         mm_val_dataset = multimodal_base.MultiModalDataset(
             [rgb_val_dataset, flow_val_dataset, audio_feature_val_dataset])

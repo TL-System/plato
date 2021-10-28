@@ -11,7 +11,7 @@ full_models: !include Models/kinetics_full_models.yml
 clients:
   type: simple # type
   total_clients: 50 # total number of clients
-  per_round: 40 # number of clients selected in each round
+  per_round: 30 # number of clients selected in each round
   do_test: False # Should clients compute test accuracy locally?
 
 # server settings
@@ -21,6 +21,7 @@ server:
 
 # dataset settings for the multimodal data, frames, flow, and audio
 data:
+  use_multimodal: True
   datasource: kinetics700
   data_path: ./data/Kinetics
   download_url: https://storage.googleapis.com/deepmind-media/Datasets/kinetics700_2020.tar.gz
@@ -32,7 +33,7 @@ data:
   skip: False
   videos_per_gpu: 3
   workers_per_gpu: 4
-  sampler: dis_noniid
+  sampler: distribution_noniid
   modality_sampler: modality_iid
 
   # The random seed for sampling data
@@ -95,6 +96,7 @@ evaluation:
   
 algorithm:
   type: fedavg
+
 # Aggregation algorithm
 # The number of local aggregation rounds on edge servers before sending
 # aggreagted weights to the central server 

@@ -9,7 +9,8 @@ audio_train_pipeline: &audio_train_pipeline
     frame_interval: 1
     num_clips: 1
 
-  - type: AudioFeatureSelector
+  - 
+    type: AudioFeatureSelector
 
   - 
     type: FormatAudioShape
@@ -40,7 +41,8 @@ audio_val_pipeline: &audio_val_pipeline
     num_clips: 1
     test_mode: True
     
-  - type: AudioFeatureSelector
+  - 
+    type: AudioFeatureSelector
 
   -
     type: FormatAudioShape
@@ -71,7 +73,8 @@ audio_test_pipeline: &audio_test_pipeline
     num_clips: 1
     test_mode: True
     
-  - type: AudioFeatureSelector
+  - 
+    type: AudioFeatureSelector
 
   -
     type: FormatAudioShape

@@ -160,7 +160,7 @@ class MultiModalDataset(torch.utils.data.Dataset):
     def __init__(self, modality_datasets):
         self.datasets = modality_datasets  # a dict that holds the corresponding built dataset.
 
-        self.supported_modalities = ["RGB", "Flow", "Audio"]
+        self.supported_modalities = ["rgb", "flow", "audio"]
 
     def __getitem__(self, idx):
         """Get the sample for either training or testing given index."""

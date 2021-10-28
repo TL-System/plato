@@ -15,6 +15,8 @@ if hasattr(Config().trainer, 'use_mindspore'):
     registered_datasources = OrderedDict([
         ('MNIST', mnist_mindspore),
     ])
+    registered_partitioned_datasources = OrderedDict()
+
 elif hasattr(Config().trainer, 'use_tensorflow'):
     from plato.datasources.tensorflow import (
         mnist as mnist_tensorflow,
@@ -25,11 +27,23 @@ elif hasattr(Config().trainer, 'use_tensorflow'):
                                           ('FashionMNIST',
                                            fashion_mnist_tensorflow)])
 elif hasattr(Config().trainer, 'use_nnrt'):
-    from plato.datasources.nnrt import (
-        yolo as yolo_nnrt
-    )
+    from plato.datasources.nnrt import (yolo as yolo_nnrt)
 
     registered_datasources = OrderedDict([('yolo', yolo_nnrt)])
+    registered_partitioned_datasources = OrderedDict()
+
+elif hasattr(Config.data, 'use_multimodal'):
+    from plato.datasources.multimodal import kinetics, gym, flickr30k_entities, referitgame
+
+    registered_datasources = OrderedDict([
+        ('kinetics700', kinetics),
+        ('kinetics400', kinetics),
+        ('Gym', gym),
+        ('Flickr30E', flickr30k_entities),
+        ('Referitgame', referitgame),
+    ])
+    registered_partitioned_datasources = OrderedDict()
+
 else:
     from plato.datasources import (
         mnist,
@@ -42,14 +56,15 @@ else:
         femnist,
     )
 
-    registered_datasources = OrderedDict([('MNIST', mnist),
-                                          ('FashionMNIST', fashion_mnist),
-                                          ('CIFAR10', cifar10),
-                                          ('CINIC10', cinic10),
-                                          ('HuggingFace', huggingface),
-                                          ('PASCAL_VOC', pascal_voc),
-                                          ('TinyImageNet', tiny_imagenet),
-                                          ])
+    registered_datasources = OrderedDict([
+        ('MNIST', mnist),
+        ('FashionMNIST', fashion_mnist),
+        ('CIFAR10', cifar10),
+        ('CINIC10', cinic10),
+        ('HuggingFace', huggingface),
+        ('PASCAL_VOC', pascal_voc),
+        ('TinyImageNet', tiny_imagenet),
+    ])
 
     registered_partitioned_datasources = OrderedDict([('FEMNIST', femnist)])
 
@@ -66,7 +81,8 @@ def get(client_id=0):
     elif datasource_name in registered_datasources:
         dataset = registered_datasources[datasource_name].DataSource()
     elif datasource_name in registered_partitioned_datasources:
-        dataset = registered_partitioned_datasources[datasource_name].DataSource(client_id)
+        dataset = registered_partitioned_datasources[
+            datasource_name].DataSource(client_id)
     else:
         raise ValueError('No such data source: {}'.format(datasource_name))
 

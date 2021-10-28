@@ -8,6 +8,23 @@ import xml.etree.ElementTree as ET
 import numpy as np
 
 
+def dict_list2tuple(dict_obj):
+    for key, value in dict_obj.items():
+        if isinstance(value, dict):
+            for k, v in values.items():
+                if isinstance(v, list):
+                    dict_obj[key][k] = tuple(v)
+        else:
+            if isinstance(value, list):
+                dict_obj[key] = tuple(value)
+                for idx in range(len(value)):
+                    item = value[idx]
+                    if isinstance(item, dict):
+                        value[idx] = dict_list2tuple(item)
+
+    return dict_obj
+
+
 def phrase_boxes_alignment(flatten_boxes, ori_phrases_boxes):
     phrases_boxes = list()
 

@@ -18,7 +18,6 @@ from plato.algorithms import registry as algorithms_registry
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
 from plato.samplers import registry as samplers_registry
-from plato.samplers import modality_registry as modality_samplers_registry
 from plato.trainers import registry as trainers_registry
 
 from plato.clients import base
@@ -98,7 +97,7 @@ class Client(simple.Client):
         self.sampler = samplers_registry.get(self.datasource, self.client_id)
 
         # Setting up the modality sampler
-        self.modality_sampler = modality_samplers_registry.get(
+        self.modality_sampler = samplers_registry.multimodal_get(
             datasource=self.datasource, client_id=self.client_id)
 
         # PyTorch uses samplers when loading data with a data loader

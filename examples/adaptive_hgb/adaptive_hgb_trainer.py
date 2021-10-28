@@ -6,9 +6,9 @@ import torch
 import torch.nn as nn
 import wandb
 from plato.config import Config
-from plato.models import registry as models_registry
 from plato.utils import optimizers
 from plato.trainers import basic
+
 # basic.Trainer
 #   arguments: model=None
 #       One can either set the model in the initialization or the trainer will
@@ -129,9 +129,7 @@ class Trainer(basic.Trainer):
         for batch_id, (examples, labels) in enumerate(eval_data_loader):
             examples, labels = examples.to(self.device), labels.to(self.device)
 
-            losses = model(rgb_imgs=examples["RGB"],
-                           flow_imgs=examples["Flow"],
-                           audio_features=examples["Audio"],
+            losses = model(data_container=examples,
                            label=labels,
                            return_loss=True)
             for loss_key in list(losses.keys()):
@@ -264,13 +262,9 @@ class Trainer(basic.Trainer):
 
                 optimizer.zero_grad()
 
-                losses = self.model.forward_from(
-                    rgb_imgs=multimodal_examples["RGB"].to(self.device),
-                    flow_imgs=multimodal_examples["Flow"].to(self.device),
-                    audio_features=multimodal_examples["Audio"].to(
-                        self.device),
-                    label=labels,
-                    return_loss=True)
+                losses = self.model.forward(data_container=multimodal_examples,
+                                            label=labels,
+                                            return_loss=True)
 
                 weighted_losses = self.reweight_losses(blending_weights,
                                                        losses)

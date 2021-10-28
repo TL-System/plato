@@ -76,8 +76,6 @@ class DynamicMultimodalModule(nn.Module):
                     fea_dims = net_config["cls_head"]["in_channels"]
                     self.modality_fea_dims_mapper[modality_name] = fea_dims
 
-                print("net_config: ", net_config)
-
                 self.name_net_mapper[
                     modality_name] = base_net.BaseClassificationNet(
                         net_configs=net_config,

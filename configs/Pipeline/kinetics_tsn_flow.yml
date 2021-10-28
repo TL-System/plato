@@ -4,16 +4,15 @@
       # Converted the SampleFrames to the one used in the kinetics_csn_rgb
       # because we want to train a multimodal model
 
-flow_img_norm_cfg: &flow_img_norm_cfg
-  -
-    mean:
-      - 128
-      - 128
+
+flow_mean: &flow_mean
+  - 128
+  - 128
   
-  -
-    std:
-      - 128
-      - 128
+
+flow_std: &flow_std
+  - 128
+  - 128
 
   
 flow_train_pipeline: &flow_train_pipeline
@@ -23,7 +22,8 @@ flow_train_pipeline: &flow_train_pipeline
     frame_interval: 2
     num_clips: 1
 
-  - type: RawFrameDecode
+  - 
+    type: RawFrameDecode
 
   -
     type: Resize
@@ -31,7 +31,8 @@ flow_train_pipeline: &flow_train_pipeline
       - -1
       - 256
 
-  - type: RandomResizedCrop
+  - 
+    type: RandomResizedCrop
 
   -
     type: Resize
@@ -46,8 +47,8 @@ flow_train_pipeline: &flow_train_pipeline
 
   -
     type: Normalize
-    # a new key "normalize_ratio" is created since yaml values must have keys
-    normalize_ratio: *flow_img_norm_cfg
+    mean: *flow_mean
+    std: *flow_std
 
   -
     type: FormatShape
@@ -79,7 +80,8 @@ flow_val_pipeline: &flow_val_pipeline
     num_clips: 1
     test_mode: True
 
-  - type: RawFrameDecode
+  - 
+    type: RawFrameDecode
 
   -
     type: Resize
@@ -97,8 +99,8 @@ flow_val_pipeline: &flow_val_pipeline
 
   -
     type: Normalize
-    # a new key "normalize_ratio" is created since yaml values must have keys
-    normalize_ratio: *flow_img_norm_cfg
+    mean: *flow_mean
+    std: *flow_std
 
   -
     type: FormatShape
@@ -129,7 +131,8 @@ flow_test_pipeline: &flow_test_pipeline
     num_clips: 10
     test_mode: True
 
-  - type: RawFrameDecode
+  - 
+    type: RawFrameDecode
 
   -
     type: Resize
@@ -147,8 +150,8 @@ flow_test_pipeline: &flow_test_pipeline
 
   -
     type: Normalize
-    # a new key "normalize_ratio" is created since yaml values must have keys
-    normalize_ratio: *flow_img_norm_cfg
+    mean: *flow_mean
+    std: *flow_std
 
   -
     type: FormatShape

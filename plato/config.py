@@ -101,9 +101,11 @@ class Config:
             Config.algorithm = Config.namedtuple_from_dict(config['algorithm'])
 
             # add the multimodal configs if possible
-            Config.multimodal_data_configs, \
-                Config.multimodal_nets_configs = Config.extract_multimodal_config(
+            multimodal_data_configs, multimodal_nets_configs = Config.extract_multimodal_config(
                 config)
+
+            Config.multimodal_data = multimodal_data_configs
+            Config.multimodal_nets_configs = multimodal_nets_configs
 
             if Config.args.server is not None:
                 Config.server = Config.server._replace(

@@ -1,20 +1,18 @@
 # the data configuration for the rgb dataset
 
-rgb_img_norm_cfg: &rgb_img_norm_cfg
-  - 
-    mean:
-      - 123.675
-      - 116.28
-      - 103.53
 
-  - 
-    std:
-      - 58.395
-      - 57.12
-      - 57.375
+rgb_mean: &rgb_mean
+  - 123.675
+  - 116.28
+  - 103.53
 
-  - to_bgr: False
 
+rgb_std: &rgb_std
+  - 58.395
+  - 57.12
+  - 57.375
+
+rgb_to_bgr:  &rgb_to_bgr False
 
 rgb_train_pipeline: &rgb_train_pipeline
   -
@@ -23,21 +21,19 @@ rgb_train_pipeline: &rgb_train_pipeline
     frame_interval: 2
     num_clips: 1
 
-  - type: FrameSelector
+  - 
+    type: RawFrameDecode
 
   -
     type: Resize
-    scale:
-      - -1
-      - 256
+    scale: [-1, 256]
 
-  - type: RandomResizedCrop
+  - 
+    type: RandomResizedCrop
 
   -
     type: Resize
-    scale:
-      - 224
-      - 224
+    scale: [224, 224]
     keep_ratio: False
 
   -
@@ -46,8 +42,9 @@ rgb_train_pipeline: &rgb_train_pipeline
 
   - 
     type: Normalize
-    # a key named "normalize_ratio" is created as yaml values must have keys
-    normalize_ratio: *rgb_img_norm_cfg
+    mean: *rgb_mean
+    std: *rgb_std
+    to_bgr: *rgb_to_bgr
 
   -
     type: FormatShape
@@ -79,7 +76,8 @@ rgb_val_pipeline: &rgb_val_pipeline
     num_clips: 1
     test_mode: True
 
-  - type: FrameSelector
+  - 
+    type: RawFrameDecode
 
   -
     type: Resize
@@ -97,8 +95,9 @@ rgb_val_pipeline: &rgb_val_pipeline
 
   - 
     type: Normalize
-    # a key named "normalize_ratio" is created as yaml values must have keys
-    normalize_ratio: *rgb_img_norm_cfg
+    mean: *rgb_mean
+    std: *rgb_std
+    to_bgr: *rgb_to_bgr
 
   -
     type: FormatShape
@@ -129,7 +128,8 @@ rgb_test_pipeline: &rgb_test_pipeline
     num_clips: 10
     test_mode: True
 
-  - type: FrameSelector
+  - 
+    type: RawFrameDecode
 
   -
     type: Resize
@@ -147,8 +147,9 @@ rgb_test_pipeline: &rgb_test_pipeline
 
   - 
     type: Normalize
-    # a key named "normalize_ratio" is created as yaml values must have keys
-    normalize_ratio: *rgb_img_norm_cfg
+    mean: *rgb_mean
+    std: *rgb_std
+    to_bgr: *rgb_to_bgr
 
   -
     type: FormatShape
