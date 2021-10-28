@@ -1,5 +1,5 @@
 
-There are several types of noniid sampler.
+There are several types of noniid samplers.
 
 
 # label noniid - Label Distribution Skew
