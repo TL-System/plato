@@ -11,18 +11,9 @@ three different networks:
     followed by one prediction layer.
 """
 
-import os
-import json
 import logging
 
-import numpy
-
-import torch
 import torch.nn as nn
-
-from mmaction.models import backbones
-from mmaction.models import heads
-from mmaction.models import losses
 
 from plato.models.multimodal import base_net
 from plato.models.multimodal import fusion_net
