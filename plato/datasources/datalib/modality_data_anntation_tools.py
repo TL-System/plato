@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+
 """
 The class in this file is supported by the mmaction/tools/data/build_file_list
 """

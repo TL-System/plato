@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+
 """
 Samples data from a dataset, biased across labels according to the Dirichlet distribution and quantity skew.
 

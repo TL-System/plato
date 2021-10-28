@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+
 """
 Assign modalities to clients in an quantity-based nonIID fashion.
 We achieve this by directly working on each sample. 

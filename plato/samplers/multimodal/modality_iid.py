@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+
 """
 Assign modalities to clients in an independent and identically distributed fashion.
 We achieve this by directly working on each sample. 

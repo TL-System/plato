@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+
 # @Date    : 2021-06-27 13:23:05
 """
 This multimodal network is the core network used in our paper. 

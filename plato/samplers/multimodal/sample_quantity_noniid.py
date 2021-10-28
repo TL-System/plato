@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+
 """
 Samples data from a dataset in an independent and identically distributed fashion.
 This sampler achieves the sample quantity noniid. Nmber of samples of each class in each party follows Dirichlet

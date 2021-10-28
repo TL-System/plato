@@ -1,29 +1,17 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """
 A federated learning client with support for Adaptive gradient blending.
-
 """
-import os
 
 import copy
-
 import logging
+import os
 import time
 from dataclasses import dataclass
 
-import torch
-
-from plato.algorithms import registry as algorithms_registry
+from plato.clients import base, simple
 from plato.config import Config
-from plato.datasources import registry as datasources_registry
-from plato.samplers import registry as samplers_registry
-from plato.trainers import registry as trainers_registry
-
-from plato.clients import base
-from plato.clients import simple
-
 from plato.models.multimodal import blending
+from plato.samplers import registry as samplers_registry
 
 #   simple.Client
 #   arguments: model=None, datasource=None, algorithm=None, trainer=None

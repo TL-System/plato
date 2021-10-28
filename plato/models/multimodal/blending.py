@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+
 
 # the overfitting value is the gap between the train loss L_i^T and
 #   the groundtruth L_i^* w.r.t the hypothetical target distribution

@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Date    : 2021-06-27 13:23:05
 """
 This multimodal network is the core network used in our paper. 
     It can receives three datasets from three modalities(RGB, optical flow, and audio) and then process them with 
