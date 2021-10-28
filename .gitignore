@@ -150,6 +150,6 @@ logs/
 
 # macOS
 .DS_Store
-download_log.txt
-download_log.txt
-extract_wav_err_file.txt
+
+# Plain text files in the root working directory are most likely temporary
+/*.txt

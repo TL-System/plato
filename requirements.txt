@@ -2,10 +2,6 @@ numpy
 python-socketio
 aiohttp
 requests
-pyyaml>=5.4.1
-pyyaml-include
-matplotlib
-scipy
-wandb
-gym
+boto3
+pyyaml
 datasets
