@@ -21,15 +21,7 @@ elif hasattr(Config().trainer, 'use_tensorflow'):
     registered_trainers = OrderedDict([
         ('basic', basic_tensorflow.Trainer),
     ])
-elif hasattr(Config().trainer, 'use_nnrt'):
-    from plato.trainers.nnrt import (
-        yolo as basic_nnrt
-    )
-    registered_trainers = OrderedDict([
-        ('basic', basic_nnrt.Trainer),
-    ])
 else:
-    
     from plato.trainers import (
         basic,
         pascal_voc,
