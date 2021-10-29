@@ -1,27 +1,31 @@
-import numpy as np
-from typing import Tuple
+"""A trainer for NNRT."""
+
 import copy
+from typing import Tuple
+import numpy as np
 from plato.trainers import base
 from plato.utils import unary_encoding
 
+
 class Trainer(base.Trainer):
+    """A trainer for NNRT."""
     def __init__(self, model=None):
         super().__init__()
 
         # TODO: if the model is none, we get model from registry
-        self.model = model 
-    
+        self.model = model
+
     def save_model(self, filename=None):
-        pass 
+        pass
 
     def load_model(self, filename=None):
         pass
-    
+
     def train(self, trainset, sampler, cut_layer=None) -> Tuple[bool, float]:
         pass
 
     def test(self, testset) -> float:
-        pass 
+        pass
 
     async def server_test(self, testset):
         pass

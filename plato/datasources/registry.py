@@ -24,12 +24,6 @@ elif hasattr(Config().trainer, 'use_tensorflow'):
     registered_datasources = OrderedDict([('MNIST', mnist_tensorflow),
                                           ('FashionMNIST',
                                            fashion_mnist_tensorflow)])
-elif hasattr(Config().trainer, 'use_nnrt'):
-    from plato.datasources.nnrt import (
-        yolo as yolo_nnrt
-    )
-
-    registered_datasources = OrderedDict([('yolo', yolo_nnrt)])
 else:
     from plato.datasources import (
         mnist,
@@ -42,14 +36,15 @@ else:
         femnist,
     )
 
-    registered_datasources = OrderedDict([('MNIST', mnist),
-                                          ('FashionMNIST', fashion_mnist),
-                                          ('CIFAR10', cifar10),
-                                          ('CINIC10', cinic10),
-                                          ('HuggingFace', huggingface),
-                                          ('PASCAL_VOC', pascal_voc),
-                                          ('TinyImageNet', tiny_imagenet),
-                                          ])
+    registered_datasources = OrderedDict([
+        ('MNIST', mnist),
+        ('FashionMNIST', fashion_mnist),
+        ('CIFAR10', cifar10),
+        ('CINIC10', cinic10),
+        ('HuggingFace', huggingface),
+        ('PASCAL_VOC', pascal_voc),
+        ('TinyImageNet', tiny_imagenet),
+    ])
 
     registered_partitioned_datasources = OrderedDict([('FEMNIST', femnist)])
 
@@ -66,7 +61,8 @@ def get(client_id=0):
     elif datasource_name in registered_datasources:
         dataset = registered_datasources[datasource_name].DataSource()
     elif datasource_name in registered_partitioned_datasources:
-        dataset = registered_partitioned_datasources[datasource_name].DataSource(client_id)
+        dataset = registered_partitioned_datasources[
+            datasource_name].DataSource(client_id)
     else:
         raise ValueError('No such data source: {}'.format(datasource_name))
 
