@@ -1,8 +1,13 @@
+"""
+NNRT does not support dataLoader, there is no use of sampler.
+"""
+
 import os
 from abc import abstractmethod
 
 from plato.config import Config
 from plato.samplers import base
+
 
 class Sampler(base.Sampler):
     """Base class for data samplers so that the dataset is divided into

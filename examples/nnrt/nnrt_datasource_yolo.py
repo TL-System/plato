@@ -1,20 +1,29 @@
+"""
+The COCO dataset or other datasets for the YOLOv5 model with using NNRT.
+"""
+
 import logging
 import os
 import math
 from plato.config import Config
-from plato.datasources.nnrt.yolo_utils import LoadImagesAndLabels
 from plato.datasources import base
+from nnrt_datasource_yolo_utils import LoadImagesAndLabels
+
 
 def make_divisible(x, divisor):
     # Returns x evenly divisible by divisor
     return math.ceil(x / divisor) * divisor
 
+
 def check_img_size(img_size, s=32):
     # Verify img_size is a multiple of stride s
     new_size = make_divisible(img_size, int(s))  # ceil gs-multiple
     if new_size != img_size:
-        print('WARNING: --img-size %g must be multiple of max stride %g, updating to %g' % (img_size, s, new_size))
+        print(
+            'WARNING: --img-size %g must be multiple of max stride %g, updating to %g'
+            % (img_size, s, new_size))
     return new_size
+
 
 class DataSource(base.DataSource):
     """The YOLO dataset."""

@@ -134,7 +134,7 @@ data:
     partition_size: 128
 
     # IID or non-IID?
-    sampler: iid
+    sampler: nnrt_base
 
     # Input height
     input_height: 640

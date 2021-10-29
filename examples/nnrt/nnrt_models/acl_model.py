@@ -1,5 +1,5 @@
 """
-The NNRT-based client inference model, used by only client. 
+The NNRT-based client inference model, used by only client.
 
 The OM model is precompiled and it can only deal with static input shape.
 """
@@ -8,25 +8,26 @@ import struct
 import numpy as np
 import acl
 
-from plato.models.nnrt.constant import ACL_MEM_MALLOC_NORMAL_ONLY, \
+from nnrt_models.constant import ACL_MEM_MALLOC_NORMAL_ONLY, \
     ACL_MEMCPY_DEVICE_TO_HOST, NPY_BYTE
-from plato.models.nnrt.acl_util import check_ret
+from nnrt_models.acl_util import check_ret
 
 
 class Model(object):
     """ This class provides resource management for inference model. """
-    def __init__(self,
-                 context,
-                 stream,
-                 model_path,
-                 ):
-        self.model_path = model_path    
-        self.model_id = None            
-        self.context = context  
+    def __init__(
+        self,
+        context,
+        stream,
+        model_path,
+    ):
+        self.model_path = model_path
+        self.model_id = None
+        self.context = context
         self.stream = stream
         self.input_data = None
         self.output_data = None
-        self.model_desc = None          
+        self.model_desc = None
 
         self.init_resource()
 
@@ -53,8 +54,7 @@ class Model(object):
         self._gen_output_dataset(output_size)
 
     def _gen_output_dataset(self, size):
-        """ Create Output dataset buffer. 
-        
+        """ Create Output dataset buffer.
         size: The number of elements in input batch (minibatch size).
         """
         dataset = acl.mdl.create_dataset()
@@ -87,13 +87,11 @@ class Model(object):
 
     def _gen_input_dataset(self, input_buffer, input_size):
         """ Create input dataset buffer for inference model.
-        
         input_buffer: The memory holds the input data on device.
         input_size:   The size of device memory holding the input data.
         """
         self.input_dataset = acl.mdl.create_dataset()
-        input_dataset_buffer = acl.create_data_buffer(input_buffer,
-                                                      input_size)
+        input_dataset_buffer = acl.create_data_buffer(input_buffer, input_size)
         _, ret = acl.mdl.add_dataset_buffer(self.input_dataset,
                                             input_dataset_buffer)
         if ret:
@@ -101,9 +99,8 @@ class Model(object):
             check_ret("acl.destroy_data_buffer", ret)
 
     def _get_result(self, infer_output):
-        """ Transfer output result from device to host and decode it as 
+        """ Transfer output result from device to host and decode it as
         numpy array.
-        
         infer_output: The output dataset buffer for inference model.
         """
         output = []
@@ -115,10 +112,11 @@ class Model(object):
             output_host, _ = acl.rt.malloc_host(infer_output_size)
             acl.rt.memcpy(output_host, infer_output_size, infer_output_ptr,
                           infer_output_size, ACL_MEMCPY_DEVICE_TO_HOST)
-            result = acl.util.ptr_to_numpy(output_host,
-                                           (infer_output_size,), NPY_BYTE)
+            result = acl.util.ptr_to_numpy(output_host, (infer_output_size, ),
+                                           NPY_BYTE)
             "TODO: The unpack size depends on the cutlayer parameter. "
-            result = struct.unpack("{:d}f".format(int(infer_output_size/4)), bytearray(result)) # this is the ouput size
+            result = struct.unpack("{:d}f".format(int(infer_output_size / 4)),
+                                   bytearray(result))  # this is the ouput size
             output.append(result)
             ret = acl.rt.free_host(output_host)
             check_ret("acl.rt.free_host", ret)
