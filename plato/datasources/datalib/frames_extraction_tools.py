@@ -1,27 +1,21 @@
+"""
+Tools for extracting and processing the frames
+    The classes in this tool aim to extract different modalities,
+    including rgb, optical flow, and audio
+    from the raw video dataset.
+"""
 
-
-import argparse
 import glob
-import logging
 import os
-import sys
-import warnings
 from multiprocessing import Pool
 
-import mmaction
-from mmaction.tools.data import build_rawframes, build_audio_features
 from mmaction.tools.flow_extraction import extract_dense_flow
-import numpy as np
 
 from plato.datasources.datalib import modality_extraction_base
-"""
-    The classes in this tool aim to extract different modalities, including rgb, optical flow, and audio 
-from the raw video dataset. 
-"""
 
 
 def obtain_video_dest_dir(out_dir, video_path):
-
+    """ Get the destination path for the video """
     if '/' in video_path:
         class_name = os.path.basename(os.path.dirname(video_path))
         head, tail = os.path.split(video_path)
@@ -59,14 +53,8 @@ def extract_rgb_frame(videos_extraction_items):
     Returns:
         bool: Whether generate optical flow successfully.
     """
-    full_path, vid_path, vid_id, out_dir, new_width, new_height, new_short = videos_extraction_items
-    # if '/' in vid_path:
-    #     act_name = os.path.basename(os.path.dirname(vid_path))
-    #     out_full_path = os.path.join(out_dir, act_name)
-    # else:
-    #     out_full_path = out_dir
-
-    out_full_path = obtain_video_dest_dir(vid_path)
+    full_path, vid_path, _, out_dir, new_width, new_height, new_short = videos_extraction_items
+    out_full_path = obtain_video_dest_dir(out_dir=out_dir, video_path=vid_path)
 
     if new_short == 0:
         cmd = os.path.join(
@@ -80,16 +68,9 @@ def extract_rgb_frame(videos_extraction_items):
 
 
 def extract_optical_flow(videos_items):
-
-    full_path, vid_path, vid_id, method, out_dir, new_short, new_width, new_height = videos_items
-
-    # if '/' in vid_path:
-    #     act_name = os.path.basename(os.path.dirname(vid_path))
-    #     out_full_path = os.path.join(out_dir, act_name)
-    # else:
-    #     out_full_path = out_dir
-
-    out_full_path = obtain_video_dest_dir(vid_path)
+    """ Extract optical flow from the video """
+    full_path, vid_path, _, method, out_dir, new_short, new_width, new_height = videos_items
+    out_full_path = obtain_video_dest_dir(out_dir=out_dir, video_path=vid_path)
 
     if new_short == 0:
         cmd = os.path.join(
@@ -104,6 +85,7 @@ def extract_optical_flow(videos_items):
 
 
 class VideoFramesExtractor(modality_extraction_base.VideoExtractorBase):
+    """ The class for extracting the frame the video """
     def __init__(self,
                  video_src_dir,
                  dir_level=2,
@@ -114,10 +96,11 @@ class VideoFramesExtractor(modality_extraction_base.VideoExtractorBase):
                          mixed_ext)
 
     def build_rgb_frames(self, to_dir, new_short=0, new_width=0, new_height=0):
+        """ Obtain the RGB frame """
         sourc_video_dir = self.video_src_dir
         if self.dir_level == 2:
             self.organize_modality_dir(src_dir=sourc_video_dir, to_dir=to_dir)
-        done_fullpath_list = glob.glob(to_dir + '/*' * self.dir_level)
+        _ = glob.glob(to_dir + '/*' * self.dir_level)
 
         pool = Pool(self.num_worker)
         pool.map(
@@ -136,10 +119,11 @@ class VideoFramesExtractor(modality_extraction_base.VideoExtractorBase):
             new_short=0,  # resize image short side length keeping ratio
             new_width=0,
             new_height=0):
+        """ Get the optical flow frame based on the CPU """
         sourc_video_dir = self.video_src_dir
         if self.dir_level == 2:
             self.organize_modality_dir(src_dir=sourc_video_dir, to_dir=to_dir)
-        done_fullpath_list = glob.glob(to_dir + '/*' * self.dir_level)
+        _ = glob.glob(to_dir + '/*' * self.dir_level)
 
         pool = Pool(self.num_worker)
         pool.map(
@@ -158,7 +142,7 @@ class VideoFramesExtractor(modality_extraction_base.VideoExtractorBase):
                          new_short=1,
                          new_width=0,
                          new_height=0):
-
+        """ Get the optical flow frame based on the GPU  """
         self.build_rgb_frames(rgb_out_dir_path,
                               new_short=new_short,
                               new_width=new_width,
@@ -173,6 +157,7 @@ class VideoFramesExtractor(modality_extraction_base.VideoExtractorBase):
                               new_short=1,
                               new_width=0,
                               new_height=0):
+        """ The interface from extracting all frames based on the GPU  """
         self.build_frames_gpu(rgb_out_dir_path=to_dir_path,
                               flow_our_dir_path=to_dir_path,
                               new_short=new_short,
@@ -188,11 +173,11 @@ class VideoFramesExtractor(modality_extraction_base.VideoExtractorBase):
         rgb_tmpl="img_{:05d}.jpg",  # template filename of rgb frames
         flow_tmpl="{}_{:05d}.jpg",  # template filename of flow frames
         method="tvl1"):  # use which method to generate the flow
-
+        """ Get the full frames, including RGB and optical flow based on the GPU """
         sourc_video_dir = self.video_src_dir
         if self.dir_level == 2:
             self.organize_modality_dir(src_dir=sourc_video_dir, to_dir=to_dir)
-        done_fullpath_list = glob.glob(to_dir + '/*' * self.dir_level)
+        _ = glob.glob(to_dir + '/*' * self.dir_level)
 
         pool = Pool(self.num_worker)
         pool.map(

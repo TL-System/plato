@@ -4,6 +4,17 @@ The Kinetics700 dataset.
 Note that the setting for the data loader is obtained from the github
 repo provided by the official workers:
 https://github.com/pytorch/vision/references/video_classification/train.py
+
+We consider three modalities: RGB, optical flow and audio.
+    For RGB and flow, we use input clips of 16×224×224 as input.
+        We follow [1] for visual pre-processing and augmentation.
+    For audio, we use log-Mel with 100 temporal frames by 40 Mel filters.
+        Audio and visual are temporally aligned.
+
+[1]. Video classification with channel-separated convolutional networks.
+    In ICCV, 2019. (CSN network)
+    This is actually the csn network in the mmaction packet.
+§§
 """
 
 import logging
@@ -24,17 +35,6 @@ from plato.datasources.datalib import frames_extraction_tools
 from plato.datasources.datalib import audio_extraction_tools
 from plato.datasources.datalib import modality_data_anntation_tools
 from plato.datasources.datalib import data_utils
-"""
-We consider three modalities: RGB, optical flow and audio.
-    For RGB and flow, we use input clips of 16×224×224 as input.
-        We follow [1] for visual pre-processing and augmentation.
-    For audio, we use log-Mel with 100 temporal frames by 40 Mel filters.
-        Audio and visual are temporally aligned.
-
-[1]. Video classification with channel-separated convolutional networks.
-    In ICCV, 2019. (CSN network)
-    This is actually the csn network in the mmaction packet.
-"""
 
 
 class DataSource(multimodal_base.MultiModalDataSource):

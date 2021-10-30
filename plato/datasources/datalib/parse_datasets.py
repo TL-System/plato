@@ -1,16 +1,15 @@
+""" This part of the code heavily depends on the
+    tools/data/build_file_lists.py provided by the mmaction
+
+"""
 
 import csv
-import fnmatch
-import glob
-import json
-import os
-import os.path as osp
+import random
 
 from mmaction.tools.data.parse_file_list import (
-    parse_directory, parse_diving48_splits, parse_hmdb51_split,
-    parse_jester_splits, parse_mit_splits, parse_mmit_splits,
-    parse_sthv1_splits, parse_sthv2_splits, parse_ucf101_splits)
-""" This part of the code heavily depends on the tools/data/build_file_lists.py provided by the mmaction """
+    parse_diving48_splits, parse_hmdb51_split, parse_jester_splits,
+    parse_mit_splits, parse_mmit_splits, parse_sthv1_splits,
+    parse_sthv2_splits, parse_ucf101_splits)
 
 
 def build_list(split, frame_info, shuffle=False):
@@ -74,9 +73,10 @@ def parse_kinetics_splits(kinetics_anntation_files_info, level, dataset_name):
     """Parse Kinetics dataset into "train", "val", "test" splits.
 
     Args:
-        kinetics_anntation_files_info (dict): The file path of the original annotation file. 
-                                        The file should be the "*.csv" provided in the official website. 
-                                        For example: 
+        kinetics_anntation_files_info (dict): The file path of the original annotation file.
+                                        The file should be the "*.csv" provided in the
+                                        official website.
+                                        For example:
                                             {"train": ""}
         level (int): Directory level of data. 1 for the single-level directory,
             2 for the two-level directory.
@@ -86,28 +86,28 @@ def parse_kinetics_splits(kinetics_anntation_files_info, level, dataset_name):
     Returns:
         list: "train", "val", "test" splits of Kinetics.
     """
-    def convert_label(s, keep_whitespaces=False):
+    def convert_label(label_str, keep_whitespaces=False):
         """Convert label name to a formal string.
 
         Remove redundant '"' and convert whitespace to '_'.
 
         Args:
-            s (str): String to be converted.
+            label_str (str): String to be converted.
             keep_whitespaces(bool): Whether to keep whitespace. Default: False.
 
         Returns:
             str: Converted string.
         """
         if not keep_whitespaces:
-            return s.replace('"', '').replace(' ', '_')
+            return label_str.replace('"', '').replace(' ', '_')
         else:
-            return s.replace('"', '')
+            return label_str.replace('"', '')
 
-    def line_to_map(x, test=False):
+    def line_to_map(line_str, test=False):
         """A function to map line string to video and label.
 
         Args:
-            x (str): A single line from Kinetics csv file.
+            line_str (str): A single line from Kinetics csv file.
             test (bool): Indicate whether the line comes from test
                 annotation file.
 
@@ -118,16 +118,16 @@ def parse_kinetics_splits(kinetics_anntation_files_info, level, dataset_name):
         if test:  # x:  ['---v8pgm1eQ', '0', '10', 'test']
             # video = f'{x[0]}_{int(x[1]):06d}_{int(x[2]):06d}'
             # video = f'{x[1]}_{int(float(x[2])):06d}_{int(float(x[3])):06d}'
-            video = f'{x[0]}_{int(float(x[1])):06d}_{int(float(x[2])):06d}'
+            video = f'{line_str[0]}_{int(float(line_str[1])):06d}_{int(float(line_str[2])):06d}'
             label = -1  # label unknown
             return video, label
         else:  # ['clay pottery making', '---0dWlqevI', '19', '29', 'train']
-            video = f'{x[1]}_{int(float(x[2])):06d}_{int(float(x[3])):06d}'
+            video = f'{line_str[1]}_{int(float(line_str[2])):06d}_{int(float(line_str[3])):06d}'
             if level == 2:
-                video = f'{convert_label(x[0])}/{video}'
+                video = f'{convert_label(line_str[0])}/{video}'
             else:
                 assert level == 1
-            label = class_mapping[convert_label(x[0])]
+            label = class_mapping[convert_label(line_str[0])]
             return video, label
 
     assert "train" in list(kinetics_anntation_files_info.keys())
@@ -165,6 +165,7 @@ def obtain_data_splits_info(
         data_annos_files_info,  # a dict containing the data original splits' file path
         data_fir_level=2,
         data_name="kinetics700"):
+    """ Parse the raw data file to obtain different splits info """
     if data_name == 'ucf101':
         splits = parse_ucf101_splits(data_fir_level)
     elif data_name == 'sthv1':

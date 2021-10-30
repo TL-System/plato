@@ -1,33 +1,17 @@
-
 """
 The class in this file is supported by the mmaction/tools/data/build_file_list
+
+
 """
-import argparse
+
+import os
 import glob
 import json
-import os.path as osp
-import random
 
-from mmcv.runner import set_random_seed
 from mmaction.tools.data.anno_txt2json import lines2dictlist
 from mmaction.tools.data.parse_file_list import parse_directory
 
 from plato.datasources.datalib.parse_datasets import build_list, obtain_data_splits_info
-"""
-#from mmaction.tools.data.build_file_list import build_file_list
-# this function (build_file_list) only processes the first two split - train, val
-#   the main reason is that test split do not contain lable for each sample
-train_val_split_info = [
-    data_splits_info["train"], data_splits_info["val"]
-]
-# obtain the rgb and flow separately
-# list[0] = (train_rgb_list, val_rgb_list)
-# list[1] = (train_flow_list, va_flow_list)
-lists = build_file_list(splits=train_val_split_info,
-                        frame_info=self.frame_info,
-                        shuffle=False)
-
-"""
 
 
 class GenerateMDataAnnotation(object):
@@ -43,7 +27,7 @@ class GenerateMDataAnnotation(object):
         rgb_prefix="img_'",  # prefix of rgb frames
         flow_x_prefix="flow_x_",  # prefix of flow x frames
         flow_y_prefix="flow_y_",  # prefix of flow y frames
-        shuffle=False,  # whether to shuffle the file list
+        # shuffle=False,  # whether to shuffle the file list
         output_format="json"):  # txt or json
 
         self.data_src_dir = data_src_dir
@@ -67,10 +51,10 @@ class GenerateMDataAnnotation(object):
         elif data_format == 'videos':
             if data_dir_level == 1:
                 # search for one-level directory
-                video_list = glob.glob(osp.join(data_src_dir, '*'))
+                video_list = glob.glob(os.path.join(data_src_dir, '*'))
             elif data_dir_level == 2:
                 # search for two-level directory
-                video_list = glob.glob(osp.join(data_src_dir, '*', '*'))
+                video_list = glob.glob(os.path.join(data_src_dir, '*', '*'))
             else:
                 raise ValueError(
                     f'level must be 1 or 2, but got {self.data_dir_level}')
@@ -86,6 +70,7 @@ class GenerateMDataAnnotation(object):
         self.frame_info = frame_info
 
     def generate_data_splits_info_file(self, data_name="kinetics700"):
+        """ Generate the data split information and write the info to file """
         data_splits_info = obtain_data_splits_info(
             data_annos_files_info=self.data_annos_files_info,
             data_fir_level=2,
@@ -101,12 +86,12 @@ class GenerateMDataAnnotation(object):
 
             if self.output_format == 'txt':
                 with open(os.path.join(self.annotations_out_path, filename),
-                          'w') as f:
-                    f.writelines(split_built_list[0])
+                          'w') as anno_file:
+                    anno_file.writelines(split_built_list[0])
             elif self.output_format == 'json':
                 data_list = lines2dictlist(split_built_list[0],
                                            self.data_format)
                 filename = filename.replace('.txt', '.json')
                 with open(os.path.join(self.annotations_out_path, filename),
-                          'w') as f:
-                    json.dump(data_list, f)
+                          'w') as anno_file:
+                    json.dump(data_list, anno_file)
