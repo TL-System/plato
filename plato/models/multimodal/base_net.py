@@ -1,20 +1,15 @@
+"""
+The base class used for all following classes
 
-
-import os
-
-import numpy
+"""
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-
-from mmaction.models import backbones
-from mmaction.models import heads
-from mmaction.models import losses
 
 from mmaction.models import build_model
 
 
 class BaseClassificationNet(nn.Module):
+    """ Base class for classification networks """
     def __init__(self, net_configs, is_head_included=True):
         super(BaseClassificationNet, self).__init__()
 
@@ -27,9 +22,12 @@ class BaseClassificationNet(nn.Module):
         # the features must be forwarded the avg pool
         self.avg_pool = nn.AdaptiveAvgPool2d((1, 1))
 
+    def get_net(self):
+        """ Get the built network """
+        return self._net
+
     def forward_train(self, ipt_data, labels, **kwargs):
         """Defines the computation performed at every call when training."""
-        outputs = []
 
         ipt_data_sz = ipt_data.reshape((-1, ) + ipt_data.shape[2:])
 
@@ -51,7 +49,7 @@ class BaseClassificationNet(nn.Module):
 
             return [immediate_feat, cls_score, loss_cls]
 
-        return [immediate_feat, _, _]
+        return [immediate_feat]
 
     def forward_test(self, ipt_data, **kwargs):
         """Defines the computation performed at every call when training."""
@@ -64,9 +62,9 @@ class BaseClassificationNet(nn.Module):
         if self.is_head_included:
             cls_score = self._net.cls_head(data_feat)
 
-            return [data_feat, cls_score, _]
+            return [data_feat, cls_score]
 
-        return [data_feat, _, _]
+        return [data_feat]
 
     def forward(self, ipt_data, label=None, return_loss=True, **kwargs):
         """Defines the computation performed at every call.
@@ -88,4 +86,4 @@ class BaseClassificationNet(nn.Module):
                 blended_ipt_data = ipt_data
             return self.forward_train(blended_ipt_data, label, **kwargs)
 
-        return self.forward_test(blended_ipt_data, **kwargs)
+        return self.forward_test(ipt_data, **kwargs)
