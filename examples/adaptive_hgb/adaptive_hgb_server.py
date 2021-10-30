@@ -1,12 +1,9 @@
+"""
+The defined server for the Adaptive hierarchical gradient blending method
 
+"""
 
 import asyncio
-import logging
-import sys
-import time
-
-from plato.config import Config
-from plato.utils import csv_processor, rl_env
 
 from plato.servers import fedavg
 
@@ -21,11 +18,11 @@ class Server(fedavg.Server):
         self.total_samples = sum(
             [report.num_samples for (report, __) in updates])
 
-        clients_delta_OGs = [(report.delta_O, report.delta_G)
+        clients_delta_ogs = [(report.delta_O, report.delta_G)
                              for (report, __) in updates]
 
         clients_optimal_weights = self.get_optimal_gradient_blend_weights_OG(
-            delta_OGs=clients_delta_OGs)
+            delta_OGs=clients_delta_ogs)
 
         # Perform weighted averaging
         avg_update = {
@@ -35,7 +32,6 @@ class Server(fedavg.Server):
 
         for i, update in enumerate(weights_received):
             report, __ = updates[i]
-            num_samples = report.num_samples
 
             for name, delta in update.items():
                 # Use weighted average by the number of samples

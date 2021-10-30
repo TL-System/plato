@@ -1,8 +1,15 @@
+"""
+The trainer defined for the adaptive Adaptive hierarchical gradient blending method
 
+"""
+
+import os
+import logging
+import multiprocessing as mp
 
 import numpy as np
 import torch
-import torch.nn as nn
+
 import wandb
 from plato.config import Config
 from plato.utils import optimizers
@@ -40,6 +47,7 @@ class Trainer(basic.Trainer):
         self.init_trajectory_items()
 
     def init_trajectory_items(self):
+        """ Initialize the containers to hold the train trajectory"""
         # mm is the abbreviation of multimodal
         # For the Overfitting:
         # record the training losse:
@@ -66,12 +74,13 @@ class Trainer(basic.Trainer):
         }
 
     def backtrack_gradient_trajectory(self, trajectory_idx):
-        assert gradient_idx < len(self.gradients_trajectory)
+        """ Record the gradient """
+        assert trajectory_idx < len(self.gradients_trajectory)
 
         return self.gradients_trajectory[trajectory_idx]
 
     def backtrack_loss_trajectory(self, mode, modality_name, trajectory_idx):
-
+        """ Record the loss for the required modality """
         assert mode in list(self.losses_trajectory.keys())
         mode_trajs = self.losses_trajectory[mode]
         assert modality_name in list(mode_trajs.keys())
@@ -82,6 +91,7 @@ class Trainer(basic.Trainer):
 
     def backtrack_loss_trajectories(self, mode, modality_name,
                                     trajectory_idxs):
+        """ Record the modality multi-steps loss """
         assert mode in list(self.losses_trajectory.keys())
         mode_trajs = self.losses_trajectory[mode]
         assert modality_name in list(mode_trajs.keys())
@@ -98,6 +108,7 @@ class Trainer(basic.Trainer):
 
     def backtrack_multimodal_loss_trajectory(self, mode, modality_names,
                                              trajectory_idx):
+        """ Record multiple modalities' losses in the step trajectory_idx """
         assert mode in list(self.losses_trajectory.keys())
         mode_trajs = self.losses_trajectory[mode]
 
@@ -118,13 +129,14 @@ class Trainer(basic.Trainer):
 
     @torch.no_grad()
     def eval_step(self, eval_data_loader, num_iters=None, model=None):
-        if model == None:
+        """ Perfome the evaluation """
+        if model is None:
             model = self.model
 
         model.eval()
-        mode = 'val'
+
         eval_avg_losses = dict()
-        eval_data_loader = eval_data_loader
+
         for batch_id, (examples, labels) in enumerate(eval_data_loader):
             examples, labels = examples.to(self.device), labels.to(self.device)
 
@@ -146,7 +158,7 @@ class Trainer(basic.Trainer):
 
         return eval_avg_losses
 
-    def obtain_local_global_OGR_items(self, trainset, evalset):
+    def obtain_local_global_ogr_items(self, trainset, evalset):
         """ We can directly call the self.model in this function to get the global model
             because the weights from the server are assigned to the client before training """
 
@@ -155,8 +167,7 @@ class Trainer(basic.Trainer):
         eval_loader = torch.utils.data.DataLoader(dataset=evalset,
                                                   shuffle=False,
                                                   batch_size=1,
-                                                  sampler=sampler.get(),
-                                                  num_workers=config.data.get(
+                                                  num_workers=Config.data.get(
                                                       'workers_per_gpu', 1))
         # 1. obtain the eval loss of the received global model
         eval_avg_losses = self.eval_step(eval_data_loader=eval_loader)
@@ -166,8 +177,7 @@ class Trainer(basic.Trainer):
             dataset=trainset,
             shuffle=False,
             batch_size=1,
-            sampler=sampler.get(),
-            num_workers=config.data.get('workers_per_gpu', 1))
+            num_workers=Config.data.get('workers_per_gpu', 1))
 
         # get the averaged loss on 50 batch size
         eval_subtrainset_avg_losses = self.eval_step(
@@ -185,15 +195,16 @@ class Trainer(basic.Trainer):
             modality_names=["RGB", "Flow", "Audio", "Fused"],
             trajectory_idx=-1)
 
-        return eval_avg_losses, eval_subtrainset_avg_losses, local_eval_avg_losses, local_train_avg_losses
+        return eval_avg_losses, eval_subtrainset_avg_losses, \
+                local_eval_avg_losses, local_train_avg_losses
 
     def reweight_losses(self, blending_weights, losses):
         """[Reweight the losses to achieve the gradient blending]
 
         Args:
-            blending_weights ([dict]): contains the blending weight of each modality network 
+            blending_weights ([dict]): contains the blending weight of each modality network
                                         {"RGB": float, "Flow": float}
-            losses ([dict]): contains the loss of each modality network 
+            losses ([dict]): contains the loss of each modality network
                                         {"RGB": float, "Flow": float}
         """
         modality_names = list(blending_weights.keys())
@@ -344,6 +355,11 @@ class Trainer(basic.Trainer):
         self.save_model(filename)
 
         if 'use_wandb' in config:
+
+            run = wandb.init(project="plato",
+                             group=str(config['run_id']),
+                             reinit=True)
+        if 'use_wandb' in config:
             run.finish()
 
     def train(self, trainset, evalset, sampler, blending_weights) -> bool:
@@ -354,7 +370,7 @@ class Trainer(basic.Trainer):
         sampler: the sampler that extracts a partition for this client.
 
         Returns:
-        Whether training was successfully completed.
+            Whether training was successfully completed.
         """
         self.start_training()
 

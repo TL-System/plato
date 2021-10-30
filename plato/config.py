@@ -148,6 +148,7 @@ class Config:
 
     @staticmethod
     def extract_multimodal_config(loaded_config):
+        """ Extract the multimodal configuration settings """
         # adding necessary configuration to the multimodal part
         supported_multimodal_data_names = ["rgb", "flow", "audio", "text"]
         multimodal_data_configs = dict()

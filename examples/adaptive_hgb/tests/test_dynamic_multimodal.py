@@ -1,20 +1,22 @@
+"""
+Test the dynamic multimodal model definition
 
+"""
 
 import os
 import logging
 
-import numpy as np
-
-os.environ['config_file'] = 'configs/Kinetics/kinetics_mm.py'
+from mmaction.tests import test_models
+from mmaction.models import build_model
 
 from plato.config import Config
 from plato.models.multimodal import multimodal_module
 
-from mmaction.tests import test_models
+os.environ['config_file'] = 'configs/Kinetics/kinetics_mm.py'
 
 
 def test_full_multimodal_model():
-
+    """ Test the multimodal model with all modalities """
     # support_modalities = ['rgb']
     # support_modalities = ['rgb', 'flow']
     support_modalities = ['rgb', "flow", "audio"]
@@ -51,10 +53,10 @@ def test_full_multimodal_model():
     audio_feas = audio_demo_inputs['imgs']
     gt_labels = rgb_demo_inputs['gt_labels']
 
-    logging.debug(("rgb_imgs: ").format(rgb_imgs.shape))
-    logging.debug(("flow_imgs: ").format(flow_imgs.shape))
-    logging.debug(("audio_feas: ").format(audio_feas.shape))
-    logging.debug(("gt_labels: ").format(gt_labels.shape))
+    logging.debug("rgb_imgs: %s", rgb_imgs.shape)
+    logging.debug("flow_imgs: %s", flow_imgs.shape)
+    logging.debug("audio_feas: %s", audio_feas.shape)
+    logging.debug("gt_labels: %s", gt_labels.shape)
 
     mm_data_container = {
         "rgb": rgb_imgs,
@@ -78,7 +80,8 @@ def test_full_multimodal_model():
 
 
 def test_rgb_build():
-    from mmaction.models import build_model
+    """ Test the code for building the rgb model"""
+
     # define the test data
 
     rgb_input_shape = (1, 3, 3, 8, 32, 32)
@@ -98,6 +101,7 @@ def test_rgb_build():
     print("gt_labels: ", gt_labels.shape)
 
     losses = rbg_model(rgb_imgs, gt_labels)
+    print("the rgb losses: ", losses)
 
 
 if __name__ == "__main__":

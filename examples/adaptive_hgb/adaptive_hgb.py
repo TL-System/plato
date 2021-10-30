@@ -3,20 +3,21 @@ Hierarchical Gradient Blending (HGB)
 
 Reference:
 
-This is source code of the work "Towards Optimal Multi-modal Federated Learning on Non-IID Data with Hierarchical Gradient Blending"
+This is source code of the work "Towards Optimal Multi-modal Federated Learning on
+    Non-IID Data with Hierarchical Gradient Blending"
 
 """
 import os
 
-os.environ['config_file'] = 'configs/Kinetics/kinetics_mm.yml'
+import adaptive_hgb_client
+import adaptive_hgb_server
+import adaptive_hgb_trainer
 
 from plato.config import Config
 from plato.models.multimodal import multimodal_module
 from plato.datasources.multimodal import kinetics
 
-import adaptive_hgb_client
-import adaptive_hgb_server
-import adaptive_hgb_trainer
+os.environ['config_file'] = 'configs/Kinetics/kinetics_mm.yml'
 
 
 def main():
