@@ -1,19 +1,16 @@
-
 """
 Assign modalities to clients in an independent and identically distributed fashion.
-We achieve this by directly working on each sample. 
-Thus, the non-IID can be achieved just keep each modality in each sample. 
+We achieve this by directly working on each sample.
+Thus, the non-IID can be achieved just keep each modality in each sample.
 """
 import numpy as np
-import torch
-from plato.config import Config
 
 from plato.samplers.multimodal import modality_base
 
 
 class Sampler(modality_base.Sampler):
     """Create a data sampler for each client to use a randomly divided partition of the
-    dataset."""
+        dataset."""
     def __init__(self, datasource, client_id):
         super().__init__()
         self.client_id = client_id
@@ -31,3 +28,6 @@ class Sampler(modality_base.Sampler):
     def trainset_size(self):
         """Returns the length of the dataset after sampling. """
         return len(self.subset_indices)
+
+    def modality_size(self):
+        return len(self.subset_modalities)

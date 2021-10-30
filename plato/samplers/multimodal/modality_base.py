@@ -1,4 +1,3 @@
-
 """
 Base class for sampling modality so that a multi-modal data can be divided across the clients.
 """

@@ -1,12 +1,9 @@
-
 """
 Assign modalities to clients in an quantity-based nonIID fashion.
-We achieve this by directly working on each sample. 
-Thus, the quantity non-IID can be achieved by just keeping one subset of modalities in each sample. 
+We achieve this by directly working on each sample.
+Thus, the quantity non-IID can be achieved by just keeping one subset of modalities in each sample.
 """
 import numpy as np
-import torch
-from plato.config import Config
 
 from plato.samplers.multimodal import modality_base
 
@@ -37,3 +34,6 @@ class Sampler(modality_base.Sampler):
     def trainset_size(self):
         """Returns the length of the dataset after sampling. """
         return len(self.subset_indices)
+
+    def modality_size(self):
+        return len(self.subset_modalities)

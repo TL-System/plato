@@ -5,9 +5,10 @@ This sampler is one type of label distribution skew, that is:
 
     Quantity-based label imbalance: each party owns data samples of a fixed number of labels.
 
-For one client, it contain the defined number of classes while the samples in each 
-class is almost the same.
+For one client, it contain the defined number of classes while samples in each
+class are almost the same.
 '''
+
 import numpy as np
 import torch
 from torch.utils.data import SubsetRandomSampler
@@ -49,19 +50,19 @@ class Sampler(base.Sampler):
 
     def quantity_label_skew(self, dataset_labels, dataset_classes, num_clients,
                             per_client_classes_size):
-
+        """ Achieve the quantity-based lable skewness """
         # each client contains the full classes
         if per_client_classes_size == len(dataset_classes):
             self.fully_classes_assigned(dataset_labels, dataset_classes,
-                                        num_clients, per_client_classes_size)
+                                        num_clients)
         else:
             self.specific_classes_assigned(dataset_labels, dataset_classes,
                                            num_clients,
                                            per_client_classes_size)
 
     def fully_classes_assigned(self, dataset_labels, dataset_classes,
-                               num_clients, per_client_classes_size):
-
+                               num_clients):
+        """ Assign full classes to each client """
         dataset_labels = np.array(dataset_labels)
         for class_id in dataset_classes:
             idx_k = np.where(dataset_labels == class_id)[0]
@@ -74,7 +75,7 @@ class Sampler(base.Sampler):
 
     def specific_classes_assigned(self, dataset_labels, dataset_classes,
                                   num_clients, per_client_classes_size):
-
+        """ Assign specific number of classes to each client """
         dataset_labels = np.array(dataset_labels)
 
         max_class_id = np.max(dataset_classes)
@@ -85,10 +86,10 @@ class Sampler(base.Sampler):
             current_assigned_cls = [client_id % max_class_id]
             classes_assigned_count[client_id % max_class_id] += 1
             j = 1
-            while (j < per_client_classes_size):
+            while j < per_client_classes_size:
                 # ind = random.randint(0, max_class_id - 1)
                 ind = np.random.choice(dataset_classes, size=1)[0]
-                if (ind not in current_assigned_cls):
+                if ind not in current_assigned_cls:
                     j = j + 1
                     current_assigned_cls.append(ind)
                     classes_assigned_count[ind] += 1
@@ -122,6 +123,7 @@ class Sampler(base.Sampler):
         return len(self.subset_indices)
 
     def get_trainset_condition(self):
+        """ Obtain the detailed information in the trainser """
         targets_array = np.array(self.targets_list)
         client_sampled_subset_labels = targets_array[self.subset_indices]
         unique, counts = np.unique(client_sampled_subset_labels,

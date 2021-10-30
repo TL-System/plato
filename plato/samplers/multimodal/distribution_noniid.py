@@ -1,11 +1,11 @@
 """
-Samples data from a dataset, biased across labels according to the Dirichlet 
+Samples data from a dataset, biased across labels according to the Dirichlet
 distribution and quantity skew.
 
 This sampler is the most hard noniid, because it contains:
 
     - the label noniid according to the Dirichlet distribution
-    - the unbalance between numbers of samples in classes assigned to one client. 
+    - the unbalance between numbers of samples in classes assigned to one client.
         It is achieved according to the Dirichlet distribution
 """
 import numpy as np
@@ -20,7 +20,8 @@ from plato.samplers.multimodal import sampler_utils
 
 class Sampler(base.Sampler):
     """Create a data sampler for each client to use a divided partition of the
-    dataset, biased across labels according to the Dirichlet distribution and biased partition size."""
+    dataset, biased across labels according to the Dirichlet distribution
+    and biased partition size."""
     def __init__(self, datasource, client_id):
         super().__init__()
         self.client_id = client_id
@@ -82,4 +83,5 @@ class Sampler(base.Sampler):
         return self.client_partition_size
 
     def get_trainset_condition(self):
+        """ Obtain the label ratio and the sampler configuration """
         return self.client_label_proportions, self.sample_weights

@@ -3,9 +3,10 @@ Samples data from a dataset in an independent and identically distributed fashio
 """
 import numpy as np
 import torch
-from plato.config import Config
+
 from torch.utils.data import SubsetRandomSampler
 
+from plato.config import Config
 from plato.samplers import base
 
 
@@ -48,4 +49,3 @@ class Sampler(base.Sampler):
     def trainset_size(self):
         """Returns the length of the dataset after sampling. """
         return len(self.subset_indices)
-    
