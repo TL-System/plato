@@ -1,0 +1,71 @@
+clients:
+    # The total number of clients
+    total_clients: 1
+
+    # The number of clients selected in each round
+    per_round: 1
+
+    # Should the clients compute test accuracy locally?
+    do_test: true
+
+server:
+    address: 127.0.0.1
+    port: 8000
+
+data:
+    # The training and testing dataset
+    datasource: MNIST
+
+    # Where the dataset is located
+    data_path: ./data
+
+    # Number of samples in each partition
+    partition_size: 20000
+
+    # IID or non-IID?
+    sampler: iid
+
+    # ratio of labeled training data (for supervised learning)to unsupervised training data
+    ratio_s2u: 5
+
+    # semi_supervised_learning?
+    semi_supervised_learning: true
+
+trainer:
+
+    # The type of the trainer 
+    type: fedmatch
+
+    # The maximum number of training rounds
+    rounds: 100
+
+    # Whether the training should use multiple GPUs if available
+    parallelized: false
+
+    # The maximum number of clients running concurrently
+    max_concurrency: 3
+
+    # The target accuracy
+    target_accuracy: 0.98
+
+    # Number of epoches for local training in each communication round
+    epochs: 1
+    batch_size: 32
+    optimizer: SGD
+    learning_rate: 0.01
+    momentum: 0.9
+    weight_decay: 0.0
+
+    # The machine learning model
+    model_name: lenet5
+
+    # lambdas
+    lambda_s: 10
+    lambda_i: 1e-2
+    lambda_l1: 1e-4
+    labmda_l2: 10
+
+algorithm:
+    # Aggregation algorithm
+    type: fedmatch
+
