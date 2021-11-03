@@ -1,12 +1,9 @@
 """
-The implementation of the work:
+The implementation of my recent work:
 
-Reference:
-Fallah, Alireza, Aryan Mokhtari, and Asuman Ozdaglar.
-"Personalized Federated Learning with Theoretical Guarantees: \
-    A Model-Agnostic Meta-Learning Approach."
-Advances in Neural Information Processing Systems, NIPS, 2020.
-https://proceedings.neurips.cc/paper/2020/file/24389bfe4fe2eba8bf9aa9203a44cdad-Paper.pdf
+Personalized Federated Learning with Multi-step Model-Agnostic 
+    Meta-Learning Approach
+
 """
 
 import os

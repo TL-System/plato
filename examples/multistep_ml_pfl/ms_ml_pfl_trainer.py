@@ -1,10 +1,11 @@
 """
-The training and testing loops for PyTorch.
+The training and testing loops for PFL with Multi-step MAML.
 """
 import copy
 import logging
 import os
 import random
+import multiprocessing as mp
 
 import numpy as np
 import wandb
@@ -185,7 +186,7 @@ class Trainer(basic.Trainer):
             # initialize the loss criterion
             loss_criterion = nn.CrossEntropyLoss()
 
-            utilized_batches_range, num_splits = self.generate_train_batch_range(
+            utilized_batches_range, _ = self.generate_train_batch_range(
                 train_loader, local_update_steps, adaptation_steps)
 
             batch_idx_flag = 0
@@ -259,24 +260,28 @@ class Trainer(basic.Trainer):
         if 'use_wandb' in config:
             run.finish()
 
-    def test_process(self, config, testset):
+    def test_process(self, config, testset, sampler):
         """The testing loop, run in a separate process with a new CUDA context,
         so that CUDA memory can be released after the training completes.
 
         Arguments:
         config: a dictionary of configuration parameters.
         testset: The test dataset.
+        sampler: sampler for the testset
         """
-        if not self.test_meta_personalization:
+        if not self.test_meta_personalization or self.do_separate_local_train_test:
             self.model.to(self.device)
             self.model.eval()
 
         try:
             test_loader = torch.utils.data.DataLoader(
-                testset, batch_size=config['batch_size'], shuffle=False)
+                testset,
+                batch_size=config['batch_size'],
+                shuffle=False,
+                sampler=sampler.get())
             # Test its personalized model during personalization test
             if self.test_meta_personalization:
-                logging.info("[Client #%d] Personalizing its model.",
+                logging.info("[Client #%d] meta Personalizing its model.",
                              self.client_id)
                 # Generate a training set for personalization
                 # by randomly choose one batch from test set
@@ -299,9 +304,9 @@ class Trainer(basic.Trainer):
 
             # Directly test the trained global model on the local dataset
             else:
-                accuracy = self.test_model(model=self.model,
-                                           test_loader=test_loader,
-                                           masked_batches_idx=[])
+                accuracy = self.operate_test_model(model=self.model,
+                                                   test_loader=test_loader,
+                                                   masked_batches_idx=[])
 
         except Exception as testing_exception:
             logging.info("Testing on client #%d failed.", self.client_id)
@@ -353,8 +358,76 @@ class Trainer(basic.Trainer):
 
         return meta_personalized_model, test_accuracy
 
-    def test_model(self, model, test_loader, masked_batches_idx):
+    def perform_local_personalization_test(self, config, trainset, testset,
+                                           sampler):
+        """ Perform the local personalization by training a local model based
+            only on the client's local dataset """
+        local_pers_personalized_model = copy.deepcopy(self.model)
+        local_pers_personalized_model.to(self.device)
+
+        def weight_reset(sub_module):
+            if isinstance(sub_module, nn.Conv2d) or isinstance(
+                    sub_module, nn.Linear):
+                sub_module.reset_parameters()
+
+        local_pers_personalized_model.apply(weight_reset)
+
+        local_pers_personalized_model.train()
+
+        train_loader = torch.utils.data.DataLoader(
+            dataset=trainset,
+            shuffle=False,
+            batch_size=Config().trainer.batch_size,
+            sampler=sampler.get())
+        # initialize the loss criterion
+        loss_criterion = nn.CrossEntropyLoss()
+        inner_optimizer = torch.optim.SGD(
+            local_pers_personalized_model.parameters(),
+            lr=Config().trainer.learning_rate,
+            momentum=Config().trainer.momentum,
+            weight_decay=Config().trainer.weight_decay)
+
+        for _ in range(Config().trainer.local_personalization_epoches):
+
+            for _, (examples, labels) in enumerate(train_loader):
+
+                examples, labels = examples.to(self.device), labels.to(
+                    self.device)
+                inner_optimizer.zero_grad()
+
+                logits = local_pers_personalized_model(examples)
+
+                loss = loss_criterion(logits, labels)
+
+                loss.backward()
+
+                inner_optimizer.step()
+
+        # save the local personalzied model
+        local_pers_personalized_model.cpu()
+        model_type = "local_personalized_model"
+        filename = f"{model_type}_{self.client_id}_{config['run_id']}.pth"
+        self.save_specific_model(model=local_pers_personalized_model,
+                                 model_name=model_type,
+                                 filename=filename)
+
+        local_pers_personalized_model.eval()
+        test_loader = torch.utils.data.DataLoader(
+            dataset=testset,
+            shuffle=False,
+            batch_size=Config().trainer.batch_size,
+            sampler=sampler.get())
+
+        local_pers_accuracy = self.operate_test_model(
+            model=local_pers_personalized_model,
+            test_loader=test_loader,
+            masked_batches_idx=[])
+
+        return local_pers_accuracy
+
+    def operate_test_model(self, model, test_loader, masked_batches_idx):
         """ Test the initial model received from the server directly """
+        model.eval()
         accuracy = torch.tensor(0., device=self.device)
         with torch.no_grad():
             for batch_id, (examples, labels) in enumerate(test_loader):
@@ -369,5 +442,39 @@ class Trainer(basic.Trainer):
                 accuracy += get_accuracy(test_logits, labels)
 
         accuracy.div_(len(test_loader))
+
+        return accuracy
+
+    def test(self, testset, sampler) -> float:
+        """Testing the model using the provided test dataset.
+
+        Arguments:
+        testset: The test dataset.
+        """
+        config = Config().trainer._asdict()
+        config['run_id'] = Config().params['run_id']
+
+        if hasattr(Config().trainer, 'max_concurrency'):
+            self.start_training()
+
+            if mp.get_start_method(allow_none=True) != 'spawn':
+                mp.set_start_method('spawn', force=True)
+
+            proc = mp.Process(target=self.test_process,
+                              args=(config, testset, sampler))
+            proc.start()
+            proc.join()
+
+            try:
+                model_name = Config().trainer.model_name
+                filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
+                accuracy = self.load_accuracy(filename)
+            except OSError as error:  # the model file is not found, training failed
+                raise ValueError(
+                    f"Testing on client #{self.client_id} failed.") from error
+
+            self.pause_training()
+        else:
+            accuracy = self.test_process(config, testset, sampler)
 
         return accuracy
