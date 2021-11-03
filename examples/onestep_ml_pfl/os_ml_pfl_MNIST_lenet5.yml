@@ -1,0 +1,83 @@
+clients:
+    # The total number of clients
+    total_clients: 20
+
+    # The number of clients selected in each round
+    per_round: 10
+
+    # Should the clients compute test accuracy locally?
+    # we set it false here because we implement other
+    #   test methods. And, we do not want to use 
+    #   the test code in the simple Client
+    do_test: false
+
+    # selected clients for test
+    test_clients: 20
+    
+    # Whether simulate clients or not
+    simulation: true
+
+server:
+    address: 127.0.0.1
+    port: 8000
+
+data:
+    # The training and testing dataset
+    datasource: MNIST
+
+    # Where the dataset is located
+    data_path: ../../data
+
+    # Number of samples in each partition
+    partition_size: 1000
+
+    # IID or non-IID?
+    sampler: iid
+
+    # The random seed for sampling data
+    random_seed: 1
+
+trainer:
+    # The maximum number of training rounds
+    rounds: 1000
+
+    # the number of rounds to compute the meta personalization once
+    meta_test_round_interval: 50
+
+    # which round to perform the local personalization
+    ## Set to 1 means that we need to get the local personalized model in the first round
+    local_personalization_round_idx: 1
+    local_personalization_epoches: 20
+    
+    # the local update steps that is the tau in the paper
+    local_update_steps: 4
+
+    # Whether the training should use multiple GPUs if available
+    parallelized: false
+
+    # The maximum number of clients running concurrently
+    max_concurrency: 1
+
+    # The target accuracy
+    target_accuracy: 0.98
+
+    # Number of epoches for local training in each communication round
+    epochs: 4
+    batch_size: 10
+    optimizer: SGD
+    learning_rate: 0.01
+    momentum: 0.9
+    weight_decay: 0.0
+
+    meta_learning_rate: 0.01
+
+    # The machine learning model
+    model_name: lenet5
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg
+
+results:
+    # Write the following parameter(s) into a CSV
+    types: accuracy, personalization_accuracy, training_time, round_time
