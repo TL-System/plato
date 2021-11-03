@@ -61,7 +61,8 @@ class Server(fedavg.Server):
             server_response['meta_personalization_test'] = True
         elif self.do_local_personalization:
             server_response['local_personalization'] = True
-
+        else:
+            pass
         return server_response
 
     async def process_reports(self):
@@ -75,7 +76,10 @@ class Server(fedavg.Server):
                 self.local_personalization_test_updates)
             await self.wrap_up_processing_reports()
         else:
-            await super().process_reports()
+            """Process the client reports by aggregating their weights."""
+            await self.aggregate_weights(self.updates)
+
+            await self.wrap_up_processing_reports()
 
     def compute_personalization_accuracy(self, personalization_test_updates):
         """"Average accuracy of clients' personalized models."""
@@ -199,11 +203,11 @@ class Server(fedavg.Server):
             self.do_local_personalization = False
 
         else:  # we received the personalization reports in the previous round
-            if self.do_meta_personalization_test:
+            if is_meta_test_updates:
                 logging.info(
                     "[Server #%d] All %d meta personalization test results received.",
                     os.getpid(), len(self.meta_personalization_test_updates))
-            else:
+            if is_local_pers_test_updates:
                 logging.info(
                     "[Server #%d] All %d local personalization test results received.",
                     os.getpid(), len(self.local_personalization_test_updates))

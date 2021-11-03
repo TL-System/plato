@@ -10,7 +10,9 @@ https://proceedings.neurips.cc/paper/2020/file/24389bfe4fe2eba8bf9aa9203a44cdad-
 """
 
 import os
+import warnings
 
+warnings.filterwarnings('ignore')
 os.environ[
     'config_file'] = 'examples/onestep_ml_pfl/os_ml_pfl_MNIST_lenet5.yml'
 

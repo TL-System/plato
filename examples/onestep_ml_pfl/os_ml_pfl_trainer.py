@@ -156,22 +156,13 @@ class Trainer(basic.Trainer):
             #   all separated sub datasets
             batch_size = config['batch_size']
 
-            logging.info("[Client #%d] Loading the dataset.", self.client_id)
-            _train_loader = getattr(self, "train_loader", None)
+            logging.info("[Client #%d] Loading the dataset for training.",
+                         self.client_id)
 
-            if callable(_train_loader):
-                train_loader = self.train_loader(batch_size, trainset,
-                                                 sampler.get(), cut_layer)
-            else:
-                train_loader = torch.utils.data.DataLoader(
-                    dataset=trainset,
-                    shuffle=False,
-                    batch_size=batch_size,
-                    sampler=sampler.get())
-
-            # define the sub-dataset used for learning
-            if not self.adaption_data_batches_idx:
-                self.generate_separated_subbatches_idx(train_loader)
+            train_loader = torch.utils.data.DataLoader(dataset=trainset,
+                                                       shuffle=False,
+                                                       batch_size=batch_size,
+                                                       sampler=sampler.get())
 
             local_update_steps, meta_lr_schedule, lr_schedule = self.define_train_items(
                 config)
@@ -179,12 +170,13 @@ class Trainer(basic.Trainer):
             # initialize the loss criterion
             loss_criterion = nn.CrossEntropyLoss()
 
-            utilized_batches_range, num_splits = self.generate_train_batch_range(
+            utilized_batches_range, _ = self.generate_train_batch_range(
                 train_loader, local_update_steps)
 
             batch_idx_flag = 0
             inner_iter_id = 0
             train_loader_iter = iter(train_loader)
+            meta_train_accuracy = 0
             for _ in range(len(train_loader)):
 
                 if batch_idx_flag == 0:
@@ -193,16 +185,10 @@ class Trainer(basic.Trainer):
 
                 if inner_iter_id in utilized_batches_range:
                     batch_idx_flag = 1
-                    utilized_batches = [
-                        next(train_loader_iter) for _ in num_splits
-                    ]
-                    # this is actually the D^i in the algorithm
-                    adap_batch_data = utilized_batches[0]
-                    # this is actually the D^{prime_i} in the algorithm
-                    meta_batch_data = utilized_batches[1]
+
                     # this is actually the D^{prime prime}_i in the algorithm
                     ## pers_update_data_batch = adap_batch_data
-                    inner_iter_id += num_splits
+                    inner_iter_id += len(utilized_batches_range)
 
                     self.model.zero_grad()
                     meta_loss = torch.tensor(0., device=self.device)
@@ -210,6 +196,8 @@ class Trainer(basic.Trainer):
                             self.model,
                             self.inner_optimizer,
                             track_higher_grads=False) as (fmodel, diffopt):
+                        # this is actually the D^i in the algorithm
+                        adap_batch_data = next(train_loader_iter)
                         adap_batch_samples = adap_batch_data[0].to(self.device)
                         adap_batch_labels = adap_batch_data[1].to(self.device)
                         adap_logits = fmodel(adap_batch_samples)
@@ -220,12 +208,15 @@ class Trainer(basic.Trainer):
                         if lr_schedule is not None:
                             lr_schedule.step()
                         # perform one meta-train step
+                        # this is actually the D^{prime_i} in the algorithm
+                        meta_batch_data = next(train_loader_iter)
                         meta_batch_samples = meta_batch_data[0].to(self.device)
                         meta_batch_labels = meta_batch_data[1].to(self.device)
                         meta_logits = fmodel(meta_batch_samples)
                         meta_loss = loss_criterion(meta_logits,
                                                    meta_batch_labels)
-
+                        meta_train_accuracy += get_accuracy(
+                            logits=meta_logits, targets=meta_batch_labels)
                     meta_loss.backward()
                     self.meta_optimizer.step()
                     if meta_lr_schedule is not None:
@@ -234,6 +225,10 @@ class Trainer(basic.Trainer):
                 # stop the iteration if the local train is finished
                 if inner_iter_id > utilized_batches_range[-1]:
                     break
+            ave_accu = float(meta_train_accuracy / local_update_steps)
+            logging.info(
+                "Training on client #%d generates %.5f meta accuracy.",
+                self.client_id, ave_accu)
 
         except Exception as training_exception:
             logging.info("Training on client #%d failed.", self.client_id)
@@ -346,12 +341,14 @@ class Trainer(basic.Trainer):
 
         return meta_personalized_model, test_accuracy
 
-    def perform_local_personalization_test(self, config, trainset, testset,
-                                           sampler):
+    def perform_local_personalization_test(self, trainset, testset, sampler):
         """ Perform the local personalization by training a local model based
             only on the client's local dataset """
         local_pers_personalized_model = copy.deepcopy(self.model)
         local_pers_personalized_model.to(self.device)
+
+        config = Config().trainer._asdict()
+        config['run_id'] = Config().params['run_id']
 
         def weight_reset(sub_module):
             if isinstance(sub_module, nn.Conv2d) or isinstance(

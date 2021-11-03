@@ -175,10 +175,6 @@ class Trainer(basic.Trainer):
                     batch_size=batch_size,
                     sampler=sampler.get())
 
-            # define the sub-dataset used for learning
-            if not self.adaption_data_batches_idx:
-                self.generate_separated_subbatches_idx(train_loader)
-
             local_update_steps, adaptation_steps, \
                     meta_lr_schedule, lr_schedule = self.define_train_items(
                 config)

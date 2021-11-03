@@ -1,9 +1,9 @@
 clients:
     # The total number of clients
-    total_clients: 20
+    total_clients: 3
 
     # The number of clients selected in each round
-    per_round: 10
+    per_round: 2
 
     # Should the clients compute test accuracy locally?
     # we set it false here because we implement other
@@ -12,7 +12,7 @@ clients:
     do_test: false
 
     # selected clients for test
-    test_clients: 20
+    test_clients: 2
     
     # Whether simulate clients or not
     simulation: true
@@ -46,7 +46,7 @@ trainer:
 
     # which round to perform the local personalization
     ## Set to 1 means that we need to get the local personalized model in the first round
-    local_personalization_round_idx: 1
+    local_personalization_round_idx: 1000
     local_personalization_epoches: 20
     
     # the local update steps that is the tau in the paper
@@ -56,7 +56,7 @@ trainer:
     parallelized: false
 
     # The maximum number of clients running concurrently
-    max_concurrency: 1
+    max_concurrency: 2
 
     # The target accuracy
     target_accuracy: 0.98
