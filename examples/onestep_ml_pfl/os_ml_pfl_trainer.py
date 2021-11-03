@@ -353,9 +353,10 @@ class Trainer(basic.Trainer):
         local_pers_personalized_model = copy.deepcopy(self.model)
         local_pers_personalized_model.to(self.device)
 
-        def weight_reset(m):
-            if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
-                m.reset_parameters()
+        def weight_reset(sub_module):
+            if isinstance(sub_module, nn.Conv2d) or isinstance(
+                    sub_module, nn.Linear):
+                sub_module.reset_parameters()
 
         local_pers_personalized_model.apply(weight_reset)
 

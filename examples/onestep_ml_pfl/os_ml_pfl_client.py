@@ -127,7 +127,7 @@ class Client(simple.Client):
         """A client performs the personalization by first updating the
             received meta-model with one-step of SGD and then testing
             the fine-tuned model based on the rest of data.
-            This function actually belongs to the test part as the meta-model is 
+            This function actually belongs to the test part as the meta-model is
             needed to be updated on the test set.
         """
         logging.info(
@@ -157,8 +157,8 @@ class Client(simple.Client):
             we assign this local personalization to the test phase.
         """
         logging.info(
-            "[Client #%d] Started training a personalized model direclty based on its local trainset.",
-            self.client_id)
+            "[Client #%d] Started training a personalized model direclty \
+            based on its local trainset.", self.client_id)
 
         local_personalization_accuracy = self.trainer.perform_local_personalization_test(
             config=Config().trainer._asdict(),
