@@ -26,15 +26,6 @@ elif hasattr(Config().trainer, 'use_tensorflow'):
         ('noniid', base.Sampler),
         ('mixed', base.Sampler),
     ])
-elif hasattr(Config().trainer, 'use_nnrt'):
-    # NNRT does not support dataLoader, there is no use of sampler
-    from plato.samplers.nnrt import base
-    registered_samplers = OrderedDict([
-        ('iid', base.Sampler),
-        ('noniid', base.Sampler),
-        ('mixed', base.Sampler),
-    ])
-
 else:
     from plato.samplers import (iid, dirichlet, mixed, all_inclusive)
     from plato.samplers.multimodal import (modality_iid,

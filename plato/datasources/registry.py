@@ -26,11 +26,6 @@ elif hasattr(Config().trainer, 'use_tensorflow'):
     registered_datasources = OrderedDict([('MNIST', mnist_tensorflow),
                                           ('FashionMNIST',
                                            fashion_mnist_tensorflow)])
-elif hasattr(Config().trainer, 'use_nnrt'):
-    from plato.datasources.nnrt import (yolo as yolo_nnrt)
-
-    registered_datasources = OrderedDict([('yolo', yolo_nnrt)])
-    registered_partitioned_datasources = OrderedDict()
 
 elif hasattr(Config.data, 'use_multimodal'):
     from plato.datasources.multimodal import kinetics, gym, flickr30k_entities, referitgame
