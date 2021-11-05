@@ -8,6 +8,7 @@ import collections
 
 
 def equal_dics(dict1, dict2):
+    """ Whether two dicts are same with each other """
     is_equal = False
     for key in dict1.keys():
         if key in dict2.keys():
@@ -51,7 +52,8 @@ def extract_assigend_data_info(dataset,
                                sampler,
                                num_of_batches=None,
                                batch_size=5):
-    """ Obtain the data information including the classes contained and the samples assigned to each class """
+    """ Obtain the data information including the classes
+    contained and the samples assigned to each class """
 
     data_loader = torch.utils.data.DataLoader(dataset=dataset,
                                               shuffle=False,
@@ -137,6 +139,7 @@ def verify_difference_between_clients(clients_id,
                                       num_of_batches=None,
                                       batch_size=5,
                                       is_presented=False):
+    """ Check the difference between the clients """
     assert isinstance(clients_id, list)
     dataset = dataset_source.get_train_set()
 

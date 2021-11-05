@@ -1,3 +1,9 @@
+"""
+Test the quantity-based label nonIID sampler
+
+
+"""
+
 import os
 
 os.environ['config_file'] = 'examples/adaptive_hgb/tests/sampler_config.yml'

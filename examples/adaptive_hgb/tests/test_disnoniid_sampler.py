@@ -36,9 +36,8 @@ if __name__ == "__main__":
         batch_size=5,
         is_presented=True)
     if verify_flag:
-        print((
-            "Ensure that the local data assigned to the client {} maintains the same in different runs"
-        ).format(client_id))
+        print(("Ensure that the local data assigned to the client {} maintains\
+                 the same in different runs").format(client_id))
     print("-" * 20)
     verify_difference_between_clients([0, 1, 2],
                                       Sampler,

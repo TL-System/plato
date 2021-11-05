@@ -6,7 +6,7 @@ This sampler is one type of label distribution skew, that is:
     Quantity-based label imbalance: each party owns data samples of a fixed number of labels.
 
 For one client, it contain the defined number of classes while samples in each
-class are almost the same. The main reason is that all samples for one class are 
+class are almost the same. The main reason is that all samples for one class are
 randomly assigned to clients that contain this class.
 '''
 
