@@ -1,38 +1,43 @@
-
-
 import os
-import sys
 
-os.environ[
-    'config_file'] = 'configs/TestConfigs/quantity_label_noniid_sampler_test.yml'
+os.environ['config_file'] = 'examples/adaptive_hgb/tests/sampler_config.yml'
 
-import torch
+from utils import verify_working_correcness, verify_client_local_data_correcness, \
+    verify_difference_between_clients
+
+from plato.config import Config
 from plato.datasources.cifar10 import DataSource
-from plato.samplers.quantity_label_noniid import Sampler
+from plato.samplers.multimodal.quantity_label_noniid import Sampler
 
 if __name__ == "__main__":
+    _ = Config()
+
+    print(Config().data.per_client_classes_size)
+
     cifar10_datasource = DataSource()
-    q_label_noniid_sampler = Sampler(datasource=cifar10_datasource,
-                                     client_id=2)
-    print("sampled size: ", q_label_noniid_sampler.trainset_size())
-    print("sampled distribution: ",
-          q_label_noniid_sampler.get_trainset_condition())
-    trainset = cifar10_datasource.get_train_set()
-    train_loader = torch.utils.data.DataLoader(
-        dataset=trainset,
-        shuffle=False,
+
+    client_id = 1
+    verify_working_correcness(Sampler,
+                              dataset_source=cifar10_datasource,
+                              client_id=client_id,
+                              num_of_batches=3,
+                              batch_size=5)
+    print("-" * 20)
+    verify_flag = verify_client_local_data_correcness(
+        Sampler,
+        dataset_source=cifar10_datasource,
+        client_id=client_id,
+        num_of_iterations=2,
         batch_size=5,
-        sampler=q_label_noniid_sampler.get())
-
-    num_sow = 10
-    show_id = 0
-    for examples, labels in train_loader:
-
-        examples = examples.view(len(examples), -1)
-
-        print("labels: ", labels)
-
-        if show_id > num_sow:
-            break
-
-        show_id += 1
+        is_presented=True)
+    if verify_flag:
+        print(
+            ("Ensure that the local data assigned to the client {} maintains \
+                the same local data in different runs").format(client_id))
+    print("-" * 20)
+    verify_difference_between_clients([0, 1, 2],
+                                      Sampler,
+                                      cifar10_datasource,
+                                      num_of_batches=None,
+                                      batch_size=5,
+                                      is_presented=True)
