@@ -42,11 +42,14 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |**sampler**|How to divide the entire dataset to the clients|`iid`||
 |||`iid_mindspore`||
 |||`noniid`|Could have *concentration* attribute to specify the concentration parameter in the Dirichlet distribution|
+|||`orthogonal`|Each insitution's clients have data of different classes. Could have *institution_class_ids* and *label_distribution* attributes|
 |||`mixed`|Some data are iid, while others are non-iid. Must have *non_iid_clients* attributes|
 |random_seed|Use a fixed random seed so that experiments are reproducible (clients always have the same datasets)||
 |**partition_size**|Number of samples in each client's dataset|Any positive integer||
 |concentration| The concentration parameter of symmetric Dirichlet distribution, used by `noniid` **sampler** || Default value is 1|
 |*non_iid_clients*|Indexs of clients whose datasets are non-iid. Other clients' datasets are iid|e.g., 4|Must have this attribute if the **sampler** is `mixed`|
+|*institution_class_ids*|Indexs of classes of local data of each institution's clients|e.g., 0,1;2,3 (the first institution's clients only have data of class #0 and #1; the second institution's clients only have data of class #2 and #3) |Could have this attribute if the **sampler** is `orthogonal`|
+|*label_distribution*|The class distribution of every client's local data|`iid` or `noniid` |Could have this attribute if the **sampler** is `orthogonal`. Default is `iid`|
 
 ### trainer
 
