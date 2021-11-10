@@ -10,7 +10,6 @@ from dataclasses import dataclass
 import ml_pfl_sampler
 
 from plato.datasources import registry as datasources_registry
-from plato.samplers import registry as samplers_registry
 
 from plato.config import Config
 from plato.clients import simple

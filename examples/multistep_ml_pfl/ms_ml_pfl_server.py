@@ -6,7 +6,6 @@ import os
 import pickle
 import sys
 import time
-from collections import defaultdict
 
 from plato.config import Config
 from plato.servers import fedavg
