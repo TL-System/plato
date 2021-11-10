@@ -179,7 +179,7 @@ class Client(simple.Client):
 
         logging.info(
             "[Client #{:d}] meta Personlization accuracy: {:.2f}%".format(
-                self.client_id, personalization_accuracy))
+                self.client_id, personalization_accuracy * 100))
 
         return personalization_accuracy
 
