@@ -1,11 +1,13 @@
 """
-A personalized federated learning client based on the multi-step meta-learning.
+A personalized federated learning client based on the one-step meta-learning.
 """
 import logging
 import pickle
 import sys
 import time
 from dataclasses import dataclass
+
+import ml_pfl_sampler
 
 from plato.datasources import registry as datasources_registry
 from plato.samplers import registry as samplers_registry
@@ -16,7 +18,9 @@ from plato.clients import simple
 
 @dataclass
 class Report(simple.Report):
-    """A client report."""
+    """Report from a one-step ml pfl client, to be sent to the federated learning server."""
+    training_time: float
+    data_loading_time: float
 
 
 class Client(simple.Client):
@@ -32,8 +36,8 @@ class Client(simple.Client):
                          trainer=trainer)
         # whether to perform the personalization test in each client
         self.do_meta_personalization_test = False
-        # whether to let each client performs the local training based on its own data
-        self.do_local_personalization = False
+
+        self.test_sampler = None
 
     # we rewrite the load_data function because each client must have
     #   the test data locally
@@ -52,7 +56,19 @@ class Client(simple.Client):
                      self.datasource.num_train_examples())
 
         # Setting up the data sampler
-        self.sampler = samplers_registry.get(self.datasource, self.client_id)
+
+        # to not include my sampler into the source code
+        #   we do not resigter our own sampler, but
+        #   define it and assign the sampler to the client directly
+        if self.sampler is None:
+            self.sampler = ml_pfl_sampler.Sampler(self.datasource,
+                                                  self.client_id,
+                                                  sampler_type="train")
+            self.test_sampler = ml_pfl_sampler.Sampler(self.datasource,
+                                                       self.client_id,
+                                                       sampler_type="test")
+            # self.sampler = samplers_registry.get(self.datasource,
+            #                                      self.client_id)
 
         if hasattr(Config().trainer, 'use_mindspore'):
             # MindSpore requires samplers to be used while constructing
@@ -72,9 +88,6 @@ class Client(simple.Client):
         """Additional client-specific processing on the server response."""
         if 'meta_personalization_test' in server_response:
             self.do_meta_personalization_test = True
-
-        elif 'local_personalization' in server_response:
-            self.do_local_personalization = True
 
     async def payload_done(self, client_id, object_key) -> None:
         """ Upon receiving all the new payload from the server. """
@@ -108,10 +121,6 @@ class Client(simple.Client):
             report = await self.perform_meta_personalization()
             payload = 'meta_personalization_accuracy'
             self.do_meta_personalization_test = False
-        elif self.do_local_personalization:
-            report = await self.perform_local_personalization()
-            payload = 'local_personalization_accuracy'
-            self.do_local_personalization = False
         else:
             # Regular local training of FL
             report, payload = await self.train()
@@ -122,6 +131,30 @@ class Client(simple.Client):
 
         # Sending the client training payload to the server
         await self.send(payload)
+
+    async def train(self):
+        """The machine learning training workload on a client."""
+        logging.info("[Client #%d] Started training.", self.client_id)
+
+        # Perform model training
+        try:
+            training_time = self.trainer.train(self.trainset, self.sampler)
+        except ValueError:
+            await self.sio.disconnect()
+
+        # Extract model weights and biases
+        weights = self.algorithm.extract_weights()
+
+        accuracy = 0
+
+        data_loading_time = 0
+
+        if not self.data_loading_time_sent:
+            data_loading_time = self.data_loading_time
+            self.data_loading_time_sent = True
+
+        return Report(self.sampler.trainset_size(), accuracy, training_time,
+                      data_loading_time), weights
 
     async def perform_meta_personalization(self):
         """A client performs the personalization by first updating the
@@ -137,7 +170,7 @@ class Client(simple.Client):
         # Train a personalized model and test it
         self.trainer.test_meta_personalization = True
         personalization_accuracy = self.trainer.test(self.testset,
-                                                     self.sampler)
+                                                     self.test_sampler)
         self.trainer.test_meta_personalization = False
 
         if personalization_accuracy == 0:
@@ -161,10 +194,9 @@ class Client(simple.Client):
             based on its local trainset.", self.client_id)
 
         local_personalization_accuracy = self.trainer.perform_local_personalization_test(
-            config=Config().trainer._asdict(),
             trainset=self.trainset,
             testset=self.testset,
-            sampler=self.sampler)
+            sampler=self.test_sampler)
         if local_personalization_accuracy == 0:
             # The testing process failed, disconnect from the server
             await self.sio.disconnect()

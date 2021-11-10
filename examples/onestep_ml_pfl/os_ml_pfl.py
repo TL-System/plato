@@ -15,7 +15,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 os.environ[
-    'config_file'] = 'examples/onestep_ml_pfl/os_ml_pfl_CIFAR10_lenet5.yml'
+    'config_file'] = 'examples/onestep_ml_pfl/os_ml_pfl_fashionmnist_lenet5.yml'
 
 import os_ml_pfl_server
 import os_ml_pfl_client

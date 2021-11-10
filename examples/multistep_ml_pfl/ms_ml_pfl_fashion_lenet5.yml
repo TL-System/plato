@@ -1,18 +1,19 @@
 clients:
     # The total number of clients
-    total_clients: 20
+    total_clients: 5 # 50
 
     # The number of clients selected in each round
-    per_round: 10
-
+    per_round: 3 # 20
+    
     # Should the clients compute test accuracy locally?
-    do_test: true
+    # we set it false here because we implement other
+    #   test methods. And, we do not want to use 
+    #   the test code in the simple Client
+    do_test: false
 
     # selected clients for test
-    test_clients: 20
+    test_clients: 2 # 20
     
-    # Whether simulate clients or not
-    simulation: true
 
 server:
     address: 127.0.0.1
@@ -20,50 +21,51 @@ server:
 
 data:
     # The training and testing dataset
-    datasource: MNIST
+    datasource: FashionMNIST
 
     # Where the dataset is located
     data_path: ../../data
 
     # Number of samples in each partition
-    partition_size: 1000
+    partition_size: 20000
 
     # IID or non-IID?
-    sampler: iid
+    sampler: quantity_label_nonIID
 
     # The random seed for sampling data
     random_seed: 1
 
+    # this is for the quantity label noniid
+    per_client_classes_size: 4
+
+    # The number of consistent clients
+    consistent_clients_size: 2 # 20
+
 trainer:
-    
     # The maximum number of training rounds
     rounds: 1000
 
     # the number of rounds to compute the meta personalization once
-    meta_test_round_interval: 50
-
-    # which round to perform the local personalization
-    ## Set to 1 means that we need to get the local personalized model in the first round
-    local_personalization_round_idx: 1
-
-    # the local update steps that is the tau in the paper
-    local_update_steps: 4
+    meta_test_round_interval: 2
 
     # number of adaptation steps in the multi-step meta-learning
     adaptation_steps: 10
+
+    # the local update steps that is the tau in the paper
+    local_update_steps: 4
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
 
     # The maximum number of clients running concurrently
-    max_concurrency: 1
+    max_concurrency: 2 
 
     # The target accuracy
     target_accuracy: 0.98
 
     # Number of epoches for local training in each communication round
     epochs: 4
-    batch_size: 10
+    batch_size: 40
     optimizer: SGD
     learning_rate: 0.01
     momentum: 0.9
