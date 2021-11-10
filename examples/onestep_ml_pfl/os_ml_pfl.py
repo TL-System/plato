@@ -13,19 +13,25 @@ import os
 import warnings
 
 warnings.filterwarnings('ignore')
+
 os.environ[
-    'config_file'] = 'examples/onestep_ml_pfl/os_ml_pfl_MNIST_lenet5.yml'
+    'config_file'] = 'examples/onestep_ml_pfl/os_ml_pfl_CIFAR10_lenet5.yml'
 
 import os_ml_pfl_server
 import os_ml_pfl_client
 import os_ml_pfl_trainer
 
+from fashion_mnist import DataSource
+
 
 def main():
     """ A Plato federated learning training session using the one-step MAML algorithm. """
 
+    fashionmnist_datasource = DataSource()
+
     trainer = os_ml_pfl_trainer.Trainer()
-    client = os_ml_pfl_client.Client(trainer=trainer)
+    client = os_ml_pfl_client.Client(trainer=trainer,
+                                     datasource=fashionmnist_datasource)
     server = os_ml_pfl_server.Server(trainer=trainer)
 
     server.run(client)

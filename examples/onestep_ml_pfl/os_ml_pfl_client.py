@@ -36,8 +36,8 @@ class Client(simple.Client):
                          trainer=trainer)
         # whether to perform the personalization test in each client
         self.do_meta_personalization_test = False
-        # whether to let each client performs the local training based on its own data
-        self.do_local_personalization = False
+
+        self.test_sampler = None
 
     # we rewrite the load_data function because each client must have
     #   the test data locally
@@ -62,8 +62,11 @@ class Client(simple.Client):
         #   define it and assign the sampler to the client directly
         if self.sampler is None:
             self.sampler = ml_pfl_sampler.Sampler(self.datasource,
-                                                  self.client_id)
-
+                                                  self.client_id,
+                                                  sampler_type="train")
+            self.test_sampler = ml_pfl_sampler.Sampler(self.datasource,
+                                                       self.client_id,
+                                                       sampler_type="test")
             # self.sampler = samplers_registry.get(self.datasource,
             #                                      self.client_id)
 
@@ -85,9 +88,6 @@ class Client(simple.Client):
         """Additional client-specific processing on the server response."""
         if 'meta_personalization_test' in server_response:
             self.do_meta_personalization_test = True
-
-        elif 'local_personalization' in server_response:
-            self.do_local_personalization = True
 
     async def payload_done(self, client_id, object_key) -> None:
         """ Upon receiving all the new payload from the server. """
@@ -121,10 +121,6 @@ class Client(simple.Client):
             report = await self.perform_meta_personalization()
             payload = 'meta_personalization_accuracy'
             self.do_meta_personalization_test = False
-        elif self.do_local_personalization:
-            report = await self.perform_local_personalization()
-            payload = 'local_personalization_accuracy'
-            self.do_local_personalization = False
         else:
             # Regular local training of FL
             report, payload = await self.train()
@@ -174,7 +170,7 @@ class Client(simple.Client):
         # Train a personalized model and test it
         self.trainer.test_meta_personalization = True
         personalization_accuracy = self.trainer.test(self.testset,
-                                                     self.sampler)
+                                                     self.test_sampler)
         self.trainer.test_meta_personalization = False
 
         if personalization_accuracy == 0:
@@ -198,7 +194,9 @@ class Client(simple.Client):
             based on its local trainset.", self.client_id)
 
         local_personalization_accuracy = self.trainer.perform_local_personalization_test(
-            trainset=self.trainset, testset=self.testset, sampler=self.sampler)
+            trainset=self.trainset,
+            testset=self.testset,
+            sampler=self.test_sampler)
         if local_personalization_accuracy == 0:
             # The testing process failed, disconnect from the server
             await self.sio.disconnect()

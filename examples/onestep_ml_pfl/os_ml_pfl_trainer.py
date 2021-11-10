@@ -43,7 +43,6 @@ class Trainer(basic.Trainer):
         """Initializing the trainer with the provided model."""
         super().__init__(model=model)
         self.test_meta_personalization = False
-        self.do_separate_local_train_test = False
 
         # the author in the paper make first-order approximation
         #   thus the D^i = ^{prime prime}_i
@@ -198,6 +197,7 @@ class Trainer(basic.Trainer):
                             track_higher_grads=False) as (fmodel, diffopt):
                         # this is actually the D^i in the algorithm
                         adap_batch_data = next(train_loader_iter)
+
                         adap_batch_samples = adap_batch_data[0].to(self.device)
                         adap_batch_labels = adap_batch_data[1].to(self.device)
                         adap_logits = fmodel(adap_batch_samples)
@@ -252,7 +252,7 @@ class Trainer(basic.Trainer):
         testset: The test dataset.
         sampler: sampler for the testset
         """
-        if not self.test_meta_personalization or self.do_separate_local_train_test:
+        if not self.test_meta_personalization:
             self.model.to(self.device)
             self.model.eval()
 
@@ -276,7 +276,6 @@ class Trainer(basic.Trainer):
                     test_loader=test_loader,
                     loss_criterion=loss_criterion,
                     adaptive_batch_idx=random_batch_id)
-
                 # save the meta personalzied model once the test finished
                 meta_personalized_model.cpu()
                 model_type = "meat_personalized_model"
@@ -302,6 +301,8 @@ class Trainer(basic.Trainer):
                          self.client_id)
 
         if 'max_concurrency' in config:
+            accuracy = accuracy.item()
+
             model_name = config['model_name']
             filename = f"{model_name}_{self.client_id}_{config['run_id']}.acc"
             self.save_accuracy(accuracy, filename)
@@ -312,32 +313,36 @@ class Trainer(basic.Trainer):
                                    loss_criterion, adaptive_batch_idx):
         """ Perform the meta-learning test by performing one-step of SGB
             to update the initial model to the personalized model """
-        meta_personalized_model = copy.deepcopy(self.model)
+        meta_personalized_model = copy.deepcopy(initial_model)
         meta_personalized_model.to(self.device)
         meta_personalized_model.train()
 
         inner_optimizer = torch.optim.SGD(
-            initial_model.parameters(),
+            meta_personalized_model.parameters(),
             lr=Config().trainer.learning_rate,
             momentum=Config().trainer.momentum,
             weight_decay=Config().trainer.weight_decay)
+
+        adap_batch = None
+        for batch_id, (examples, labels) in enumerate(test_loader):
+            if batch_id == adaptive_batch_idx:
+                adap_batch = (examples, labels)
+                break
 
         with higher.innerloop_ctx(meta_personalized_model,
                                   inner_optimizer,
                                   track_higher_grads=False) as (fnet, diffopt):
 
             # we perform one-step of meta update
-            for batch_id, (examples, labels) in enumerate(test_loader):
-                if batch_id == adaptive_batch_idx:
-                    spt_logits = fnet(examples)
-                    spt_loss = loss_criterion(spt_logits, labels)
-                    diffopt.step(spt_loss)
-                    break
+            (examples, labels) = adap_batch
+            spt_logits = fnet(examples)
+            spt_loss = loss_criterion(spt_logits, labels)
+            diffopt.step(spt_loss)
 
-            test_accuracy = self.test_model(
-                model=meta_personalized_model,
-                test_loader=test_loader,
-                masked_batches_idx=[adaptive_batch_idx])
+        test_accuracy = self.operate_test_model(
+            model=meta_personalized_model,
+            test_loader=test_loader,
+            masked_batches_idx=[adaptive_batch_idx])
 
         return meta_personalized_model, test_accuracy
 
@@ -426,7 +431,7 @@ class Trainer(basic.Trainer):
 
                 accuracy += get_accuracy(test_logits, labels)
 
-        accuracy.div_(len(test_loader))
+        accuracy.div_(len(test_loader) - len(masked_batches_idx))
 
         return accuracy
 

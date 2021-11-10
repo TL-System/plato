@@ -21,27 +21,18 @@ class Server(fedavg.Server):
         self.do_local_personalization = False
 
         # A list to store accuracy of clients' personalized models with meta-learning
-        self.meta_personalization_test_updates = defaultdict(lambda: 0.0)
+        self.meta_personalization_test_updates = []
         self.meta_personalization_accuracy = 0
-        # A list to store accuracy of clients' personalized models trained locally
-        self.local_personalization_test_updates = defaultdict(lambda: 0.0)
-        self.local_personalization_accuracy = 0
 
         self.training_time = 0
 
-    def reset_pers_updates(self):
-        """ Reset the updates of the meta personalization """
-        self.meta_personalization_test_updates.clear()
-        self.local_personalization_test_updates.clear()
-
-    async def select_testing_clients(self, test_type="meta"):
+    async def select_testing_clients(self):
         """Select a subset of the clients to test personalization."""
-        if test_type == "meta":
-            self.do_meta_personalization_test = True
-        else:
-            self.do_local_personalization = True
-        logging.info("\n[Server #%d] Starting %s testing personalization.",
-                     os.getpid(), test_type)
+
+        self.do_meta_personalization_test = True
+
+        logging.info("\n[Server #%d] Starting meta testing personalization.",
+                     os.getpid())
 
         self.current_round -= 1
         # set the clients used in next round for testing
@@ -59,10 +50,7 @@ class Server(fedavg.Server):
         """Wrap up generating the server response with any additional information."""
         if self.do_meta_personalization_test:
             server_response['meta_personalization_test'] = True
-        elif self.do_local_personalization:
-            server_response['local_personalization'] = True
-        else:
-            pass
+
         return server_response
 
     async def process_reports(self):
@@ -71,20 +59,14 @@ class Server(fedavg.Server):
             self.meta_personalization_accuracy = self.compute_personalization_accuracy(
                 self.meta_personalization_test_updates)
             await self.wrap_up_processing_reports()
-        elif self.do_local_personalization:
-            self.local_personalization_accuracy = self.compute_personalization_accuracy(
-                self.local_personalization_test_updates)
-            await self.wrap_up_processing_reports()
         else:
-            """Process the client reports by aggregating their weights."""
             await self.aggregate_weights(self.updates)
-
             await self.wrap_up_processing_reports()
 
     def compute_personalization_accuracy(self, personalization_test_updates):
         """"Average accuracy of clients' personalized models."""
         accuracy = 0
-        total_reports = personalization_test_updates.values()
+        total_reports = personalization_test_updates
         total_num_reported_clients = len(total_reports)
         for report in total_reports:
             accuracy += report
@@ -100,7 +82,9 @@ class Server(fedavg.Server):
                     item_value = {
                         'round':
                         self.current_round,
-                        'meta_personalization_accuracy':
+                        'accuracy':
+                        self.meta_personalization_accuracy * 100,
+                        'personalization_accuracy':
                         self.meta_personalization_accuracy * 100,
                         'training_time':
                         self.training_time,
@@ -116,29 +100,6 @@ class Server(fedavg.Server):
                 csv_processor.write_csv(result_csv_file, new_row)
 
             self.do_meta_personalization_test = False
-
-        elif self.do_local_personalization:
-            if hasattr(Config(), 'results'):
-                new_row = []
-                for item in self.recorded_items:
-                    item_value = {
-                        'round':
-                        self.current_round,
-                        'local_personalization_accuracy':
-                        self.local_personalization_accuracy * 100,
-                        'training_time':
-                        self.training_time,
-                        'round_time':
-                        time.perf_counter() - self.round_start_time
-                    }[item]
-                    new_row.append(item_value)
-                test_name = "local_personalization"
-                save_file_name = f"{self.current_round}_{test_name}_{Config().params['run_id']}.pth"
-                result_csv_file = os.path.join(Config().result_dir,
-                                               save_file_name + '_result.csv')
-
-                csv_processor.write_csv(result_csv_file, new_row)
-            self.do_local_personalization = False
         else:
             self.training_time = max(
                 [report.training_time for (report, __) in self.updates])
@@ -166,65 +127,37 @@ class Server(fedavg.Server):
             os.getpid(), round(payload_size / 1024**2, 2), client_id)
 
         if self.client_payload[sid] == 'meta_personalization_accuracy':
-            self.meta_personalization_test_updates[client_id] = self.reports[
-                sid]
-        if self.client_payload[sid] == 'local_personalization_accuracy':
-            self.local_personalization_test_updates[client_id] = self.reports[
-                sid]
+            self.meta_personalization_test_updates.append(self.reports[sid])
         else:
             self.updates.append((self.reports[sid], self.client_payload[sid]))
 
-        meta_interval = Config.trainer.meta_test_round_interval
+        logging.info(
+            "[Server #%d] Received %s MB of payload data from client #%d.",
+            os.getpid(), round(payload_size / 1024**2, 2), client_id)
 
-        is_useful_normal_updates = len(self.updates) > 0 and len(
-            self.updates) >= len(self.selected_clients)
-        is_meta_test_updates = len(self.meta_personalization_test_updates) > 0 and \
-                            len(self.meta_personalization_test_updates) >= len(
-                        self.selected_clients)
-        is_local_pers_test_updates = len(self.local_personalization_test_updates) > 0 and \
-                            len(self.local_personalization_test_updates) >= len(
-                        self.selected_clients)
+        if len(self.meta_personalization_test_updates) == 0:
+            if len(self.updates) > 0 and len(self.updates) >= len(
+                    self.selected_clients):
+                logging.info(
+                    "[Server #%d] All %d client reports received. Processing.",
+                    os.getpid(), len(self.updates))
+                self.do_meta_personalization_test = False
+                await self.process_reports()
 
-        is_meta_pers_required = self.current_round > 0 \
-                            and self.current_round % meta_interval == 0
+                # Start testing the global meta model w.r.t. personalization
+                await self.select_testing_clients()
 
-        is_local_pers_required = self.current_round == Config(
-        ).trainer.local_personalization_round_idx
-
-        # we received the general fl training reports
-        if is_useful_normal_updates and (not is_meta_test_updates
-                                         or is_local_pers_test_updates):
+        if len(self.meta_personalization_test_updates) > 0 and len(
+                self.meta_personalization_test_updates) >= len(
+                    self.selected_clients):
             logging.info(
-                "[Server #%d] All %d client reports received. Processing.",
-                os.getpid(), len(self.updates))
-            # set them to false to make sure the process function
-            #   to process the normal fl reports
-            self.do_meta_personalization_test = False
-            self.do_local_personalization = False
+                "[Server #%d] All %d personalization test results received.",
+                os.getpid(), len(self.meta_personalization_test_updates))
 
-        else:  # we received the personalization reports in the previous round
-            if is_meta_test_updates:
-                logging.info(
-                    "[Server #%d] All %d meta personalization test results received.",
-                    os.getpid(), len(self.meta_personalization_test_updates))
-            if is_local_pers_test_updates:
-                logging.info(
-                    "[Server #%d] All %d local personalization test results received.",
-                    os.getpid(), len(self.local_personalization_test_updates))
-                # we set all personalization as false in this process report
+            await self.process_reports()
 
-        await self.process_reports()
-
-        if is_meta_pers_required or is_local_pers_required:
-            test_type = "meta" if is_meta_pers_required else "local"
-            self.reset_pers_updates()
-            # Start testing the global meta model w.r.t. personalization
-            await self.select_testing_clients(test_type=test_type)
-        else:
-            # Perform the general fl training
             await self.wrap_up()
-
-            self.reset_pers_updates()
+            self.meta_personalization_test_updates = []
 
             # Start a new round of FL training
             await self.select_clients()
