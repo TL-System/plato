@@ -1,4 +1,4 @@
-# Plato: A New Framework for Federated Learning Research
+# Plato: A New Framework for Scalable Federated Learning Research
 
 Welcome to *Plato*, a new software framework to facilitate scalable federated learning research.
 
