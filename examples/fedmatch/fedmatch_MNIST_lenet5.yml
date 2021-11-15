@@ -1,6 +1,6 @@
 clients:
     # The total number of clients
-    total_clients: 1
+    total_clients: 2
 
     # The number of clients selected in each round
     per_round: 1
@@ -11,6 +11,7 @@ clients:
 server:
     address: 127.0.0.1
     port: 8000
+    disable_clients: false
 
 data:
     # The training and testing dataset
@@ -57,7 +58,7 @@ trainer:
     weight_decay: 0.0
 
     # The machine learning model
-    model_name: lenet5
+    model_name: lenet5_decomposed
 
     # lambdas
     lambda_s: 10
@@ -67,5 +68,5 @@ trainer:
 
 algorithm:
     # Aggregation algorithm
-    type: fedmatch
+    type: fedavg
 
