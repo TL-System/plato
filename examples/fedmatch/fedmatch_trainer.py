@@ -37,10 +37,10 @@ class Trainer(basic.Trainer):
         # variables to be added when used
         super().__init__(model)
         self.confident = 0
-        self.lambda_s = Config().trainer.lambda_s
-        self.lambda_i = Config().trainer.lambada_i
-        self.lambda_l1 = Config().trainer.lambda_l1
-        self.lambda_l2 = Config().trainer.lambda_l2
+        self.lambda_s = 10
+        self.lambda_i = 1e-2
+        self.lambda_l1 = 1e-4
+        self.lambda_l2 = 10
         #self.kl_divergence = nn.functional.kl_div()
 
     def train_process(self, config, trainset, sampler, cut_layer=None):
@@ -67,7 +67,7 @@ class Trainer(basic.Trainer):
             else:
                 log_interval = 10
                 batch_size = config['batch_size']
-                
+
                 logging.info("[Client #%d] Loading the dataset.",
                              self.client_id)
                 _train_loader = getattr(self, "train_loader", None)
@@ -81,14 +81,15 @@ class Trainer(basic.Trainer):
                         shuffle=False,
                         batch_size=batch_size,
                         sampler=sampler.get())
-                        
-
                 """obtain labeled and unlabeled dataset"""
-                train_loader_s, train_loader_u = torch.utils.data.random_split(train_loader, [500,4500]) # rewrite with ratio
+                #print('===========len of train loader is : ',
+                #len(train_loader))
+                #print('type of train_loader is : ', type(train_loader))
+                train_loader_s, train_loader_u = torch.utils.data.random_split(
+                    train_loader, [125, 500])  # rewrite with ratio
 
-                
                 # iterations_per_epoch = np.ceil(len(trainset) /
-                #                               batch_size).astype(int) # variable iterations_per_epoch is computed for lr_scheduler; 
+                #                               batch_size).astype(int) # variable iterations_per_epoch is computed for lr_scheduler;
                 epochs = config['epochs']
 
                 # Sending the model to the device used for training
@@ -113,9 +114,8 @@ class Trainer(basic.Trainer):
                 get_optimizer = getattr(self, "get_optimizer",
                                         optimizers.get_optimizer)
 
-                optimizer_s = get_optimizer(self.model.psi)
-                optimizer_u = get_optimizer(self.model.sigma)
-                
+                optimizer_s = get_optimizer(self.model.psis)
+                optimizer_u = get_optimizer(self.model.sigmas)
                 """
                 # Initializing the learning rate schedule, if necessary
                 if hasattr(config, 'lr_schedule'):
@@ -124,14 +124,14 @@ class Trainer(basic.Trainer):
                 else:
                     lr_schedule = None
                 """
-                
+
                 for epoch in range(1, epochs + 1):
                     self.confident = 0
-                    for batch_id, (examples,
-                                   labels) in enumerate(train_loader_s): # batch_id is used for logging
-                                   #(examples_unlabeled, discards) in zip(train_loader_s, train_loader_u):
+                    for batch_id, (examples, labels) in enumerate(
+                            train_loader_s):  # batch_id is used for logging
+                        #(examples_unlabeled, discards) in zip(train_loader_s, train_loader_u):
                         #######################
-                        # supervised learning 
+                        # supervised learning
                         #######################
                         examples, labels = examples.to(self.device), labels.to(
                             self.device)
@@ -143,17 +143,18 @@ class Trainer(basic.Trainer):
                             outputs_s = self.model.forward_from(
                                 examples, cut_layer)
 
-                        loss_s = loss_criterion_s(outputs_s, labels) * self.lambda_s# lambda to be added
+                        loss_s = loss_criterion_s(outputs_s,
+                                                  labels) * self.lambda_s
 
                         loss_s.backward()
 
                         optimizer_s.step()
 
                         #######################
-                        # unsupervised learning 
+                        # unsupervised learning
                         #######################
-                    for batch_id, (examples_unlabeled,
-                                   labels) in enumerate(train_loader_u): #why not accessiable
+                    for batch_id, (examples_unlabeled, labels) in enumerate(
+                            train_loader_u):  #why not accessiable
                         #pseduo_labels = self.model(self.loader.scale(examples_unlabeled))
                         optimizer_u.zero_grad()
                         """
@@ -163,7 +164,8 @@ class Trainer(basic.Trainer):
                             outputs_u = self.model.forward_from(
                                 examples, cut_layer)
                         """
-                        loss_u, _confident = self.loss_unsupervised(examples_unlabeled,loss_criterion_u)
+                        loss_u, _confident = self.loss_unsupervised(
+                            examples_unlabeled, loss_criterion_u)
 
                         loss_u.backward()
 
@@ -194,10 +196,9 @@ class Trainer(basic.Trainer):
                     #if hasattr(optimizer, "params_state_update"):
                     #   optimizer.params_state_update()
 
-
-            except Exception as training_exception:
-                logging.info("Training on client #%d failed.", self.client_id)
-                raise training_exception
+        except Exception as training_exception:
+            logging.info("Training on client #%d failed.", self.client_id)
+            raise training_exception
 
         self.model.cpu()
 
@@ -208,8 +209,10 @@ class Trainer(basic.Trainer):
         if 'use_wandb' in config:
             run.finish()
 
-    
-    def loss_unsupervised(self, unlabled_samples, loss_criterion_u, cut_layer=None):
+    def loss_unsupervised(self,
+                          unlabled_samples,
+                          loss_criterion_u,
+                          cut_layer=None):
 
         loss_u = 0
         """
@@ -221,63 +224,89 @@ class Trainer(basic.Trainer):
             loss_criterion_u = nn.CrossEntropyLoss()
         """
         # Make predictions with local model
-        if cut_layer is None: 
+        if cut_layer is None:
             y_pred = self.model(self.scale(unlabled_samples))
         else:
-            y_pred = self.model.forward_from(self.scale(unlabled_samples), cut_layer)
+            y_pred = self.model.forward_from(self.scale(unlabled_samples),
+                                             cut_layer)
 
-        _confident = np.where(np.max(y_pred.numpy(), axis=1)>=self.confidence)[0]
-        
-        if len(_confident) > 0: 
+        _confident = np.where(
+            np.max(y_pred.numpy(), axis=1) >= self.confident)[0]
+
+        if len(_confident) > 0:
             # Inter-client consistency
-            samples_confident = self.scale(unlabled_samples[_confident]) 
+            samples_confident = self.scale(unlabled_samples[_confident])
             y_pred = torch.gather(y_pred, 1, _confident)
-            
-            y_preds = [rm(samples_confident).numpy() for rid, rm in enumerate(self.helpers)] # where find helpers
-            
-            for _, pred in enumerate(y_preds):
-                loss_u += (nn.functional.kl_div(pred, y_pred)/len(y_preds)) * self.lambda_i
-            
-            # Agreement-based Pseudo Labeling
-            if cut_layer is None: 
-                y_hard = self.model(self.scale(self.augment(unlabled_samples[_confident], soft=False)))
-            else:
-                y_hard = self.model.forward_from(self.scale(self.augment(unlabled_samples[_confident], soft=False)), cut_layer)
 
-            y_pseu = self.agreement_based_labeling(y_pred, y_preds) 
+            y_preds = [
+                rm(samples_confident).numpy()
+                for rid, rm in enumerate(self.helpers)
+            ]  # where find helpers
+
+            for _, pred in enumerate(y_preds):
+                loss_u += (nn.functional.kl_div(pred, y_pred) /
+                           len(y_preds)) * self.lambda_i
+
+            # Agreement-based Pseudo Labeling
+            if cut_layer is None:
+                y_hard = self.model(
+                    self.scale(
+                        self.augment(unlabled_samples[_confident],
+                                     soft=False)))
+            else:
+                y_hard = self.model.forward_from(
+                    self.scale(
+                        self.augment(unlabled_samples[_confident],
+                                     soft=False)), cut_layer)
+
+            y_pseu = self.agreement_based_labeling(y_pred, y_preds)
             loss_u += loss_criterion_u(y_pseu, y_hard) * self.lambda_a
 
-        # Regularization 
-        for lid, psi in enumerate(self.psi): # psi & sig? where are they from?
+        # Regularization
+        for lid, psi in enumerate(self.psi):  # psi & sig?
             # l1 regularization
             loss_u += torch.reduce_sum(torch.abs(psi)) * self.lambda_l1
             # l2 regularization
-            loss_u += torch.reduce_sum(torch.math.square(self.sig[lid]-psi)) * self.lambda_l2
-        
-        return loss_u, len(_confident)
+            loss_u += torch.reduce_sum(
+                torch.math.square(self.sig[lid] - psi)) * self.lambda_l2
+
+        return loss_u, len(
+            _confident
+        )  # confident is only used for logging in orignal code so we can get rid of it here.
 
     def scale(self, x):
-        x = x.astype(np.float32)/255
+        x = x.astype(np.float32) / 255
 
-    def augment(self, images, soft = True):
+    def augment(self, images, soft=True):
         if soft:
-            indices = np.arange(len(images)).tolist() 
-            sampled = random.sample(indices, int(round(0.5*len(indices)))) # flip horizontally 50% 
+            indices = np.arange(len(images)).tolist()
+            sampled = random.sample(indices, int(round(
+                0.5 * len(indices))))  # flip horizontally 50%
             images[sampled] = np.fliplr(images[sampled])
-            sampled = random.sample(sampled, int(round(0.25*len(sampled)))) # flip vertically 25% from above
+            sampled = random.sample(sampled, int(round(
+                0.25 * len(sampled))))  # flip vertically 25% from above
             images[sampled] = np.flipud(images[sampled])
-            return np.array([shift(img, [random.randint(-2, 2), random.randint(-2, 2), 0]) for img in images]) # random shift
+            return np.array([
+                shift(img, [random.randint(-2, 2),
+                            random.randint(-2, 2), 0]) for img in images
+            ])  # random shift
         else:
-            return np.array([np.array(self.rand_augment(Image.fromarray(np.reshape(img, self.shape)), M=random.randint(2,5))) for img in images])
+            return np.array([
+                np.array(
+                    self.rand_augment(Image.fromarray(
+                        np.reshape(img, self.shape)),
+                                      M=random.randint(2, 5)))
+                for img in images
+            ])
 
     def agreement_based_labeling(self, y_pre, y_preds=None):
         y_pseudo = np.array(y_pre)
         num = self.num_classes
 
         y_vote = np.eye(num, np.argmax(y_pseudo, axis=1))
-        y_votes = np.sum([np.eye(num, np.argmax(y_rm, axis=1)) for y_rm in y_preds], axis=0)
+        y_votes = np.sum(
+            [np.eye(num, np.argmax(y_rm, axis=1)) for y_rm in y_preds], axis=0)
         y_vote = np.sum([y_vote, y_votes], axis=0)
         y_pseudo = np.eye(num, np.argmax(y_vote, axis=1))
 
         return y_pseudo
-

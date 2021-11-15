@@ -6,7 +6,7 @@ https://arxiv.org/pdf/2006.12097.pdf
 """
 import os
 
-os.environ['config_file'] = 'fedmatch_MNIST_lenet5.yml'
+os.environ['config_file'] = 'examples/fedmatch/fedmatch_MNIST_lenet5.yml'
 
 import fedmatch_client
 import fedmatch_server
@@ -19,7 +19,7 @@ def main():
     client = fedmatch_client.Client(trainer=trainer)
     server = fedmatch_server.Server(trainer=trainer)
 
-    server.run(client)
+    server.run(client=client, trainer=trainer)
 
 
 if __name__ == "__main__":

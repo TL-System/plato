@@ -6,11 +6,12 @@ https://arxiv.org/pdf/2006.12097.pdf
 """
 from scipy import spatial
 from plato.servers import fedavg
+import numpy as np
 
 
 class Server(fedavg.Server):
     """A federated learning server using the FedMatch algorithm."""
-    def __init__(self):
+    def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__()
         self.num_helpers = 5
         self.helper_flag = 0
