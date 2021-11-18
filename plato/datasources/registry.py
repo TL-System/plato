@@ -34,17 +34,17 @@ else:
         pascal_voc,
         tiny_imagenet,
         femnist,
+        feature,
     )
 
-    registered_datasources = OrderedDict([
-        ('MNIST', mnist),
-        ('FashionMNIST', fashion_mnist),
-        ('CIFAR10', cifar10),
-        ('CINIC10', cinic10),
-        ('HuggingFace', huggingface),
-        ('PASCAL_VOC', pascal_voc),
-        ('TinyImageNet', tiny_imagenet),
-    ])
+    registered_datasources = OrderedDict([('MNIST', mnist),
+                                          ('FashionMNIST', fashion_mnist),
+                                          ('CIFAR10', cifar10),
+                                          ('CINIC10', cinic10),
+                                          ('HuggingFace', huggingface),
+                                          ('PASCAL_VOC', pascal_voc),
+                                          ('TinyImageNet', tiny_imagenet),
+                                          ('Feature', feature)])
 
     registered_partitioned_datasources = OrderedDict([('FEMNIST', femnist)])
 
