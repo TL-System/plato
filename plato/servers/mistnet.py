@@ -10,6 +10,7 @@ import os
 from itertools import chain
 
 from plato.config import Config
+from plato.datasources import feature
 from plato.samplers import all_inclusive
 from plato.servers import fedavg
 
@@ -32,9 +33,7 @@ class Server(fedavg.Server):
     async def process_reports(self):
         """Process the features extracted by the client and perform server-side training."""
         features = [features for (__, features) in self.updates]
-
-        # Faster way to deep flatten a list of lists compared to list comprehension
-        feature_dataset = list(chain.from_iterable(features))
+        feature_dataset = feature.DataSource(features)
 
         # Training the model using all the features received from the client
         sampler = all_inclusive.Sampler(feature_dataset)

@@ -11,6 +11,7 @@ from itertools import chain
 
 import torch
 from plato.config import Config
+from plato.datasources import feature
 from plato.samplers import all_inclusive
 from plato.servers import fedavg
 
@@ -80,7 +81,7 @@ class Server(fedavg.Server):
                 "[Server #%d] client #%d features received. Processing.",
                 os.getpid(), client_id)
             features = [self.client_payload[sid]]
-            feature_dataset = list(chain.from_iterable(features))
+            feature_dataset = feature.DataSource(features)
             sampler = all_inclusive.Sampler(feature_dataset)
             self.algorithm.train(feature_dataset, sampler,
                                  Config().algorithm.cut_layer)
