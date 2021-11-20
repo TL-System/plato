@@ -39,7 +39,7 @@ else:
     ])
 
 
-def get(datasource, client_id):
+def get(datasource, client_id, testing=False):
     """Get an instance of the sampler."""
     if hasattr(Config().data, 'sampler'):
         sampler_type = Config().data.sampler
@@ -50,7 +50,8 @@ def get(datasource, client_id):
 
     if sampler_type in registered_samplers:
         registered_sampler = registered_samplers[sampler_type](datasource,
-                                                               client_id)
+                                                               client_id,
+                                                               testing=testing)
     else:
         raise ValueError('No such sampler: {}'.format(sampler_type))
 
