@@ -18,6 +18,7 @@ class Report:
     client_id: str
     num_samples: int
     accuracy: float
+    average_accuracy: float
     training_time: float
     data_loading_time: float
 
@@ -66,12 +67,18 @@ class Client(base.Client):
         weights = self.algorithm.extract_weights()
 
         # Generate a report for the server, performing model testing if applicable
-        if Config().clients.do_test:
+        if hasattr(Config().server,
+                   'edge_do_test') and Config().server.edge_do_test:
             accuracy = self.server.accuracy
         else:
             accuracy = 0
 
+        if Config().clients.do_test:
+            average_accuracy = self.server.average_client_accuracy
+        else:
+            average_accuracy = 0
+
         training_time = time.perf_counter() - training_start_time
 
         return Report(self.client_id, self.server.total_samples, accuracy,
-                      training_time, 0), weights
+                      average_accuracy, training_time, 0), weights
