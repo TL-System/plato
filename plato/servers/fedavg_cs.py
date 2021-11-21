@@ -30,7 +30,7 @@ class Server(fedavg.Server):
         if hasattr(Config().server,
                    'edge_do_test') and Config().server.edge_do_test:
             self.test_edge_model = True
-            self.test_sampler = None
+            self.test_set_sampler = None
         else:
             self.test_edge_model = False
 
@@ -88,10 +88,10 @@ class Server(fedavg.Server):
             if self.test_edge_model:
                 datasource = datasources_registry.get()
                 self.testset = datasource.get_test_set()
-                # Setting up the data sampler
-                self.test_sampler = samplers_registry.get(datasource,
-                                                          Config().args.id,
-                                                          testing=True)
+                # Set up the sampler of test set
+                if hasattr(Config().data, 'test_set_sampler'):
+                    self.test_set_sampler = samplers_registry.get(
+                        datasource, Config().args.id, testing=True)
 
             self.load_trainer()
 
@@ -164,7 +164,7 @@ class Server(fedavg.Server):
             if self.test_edge_model:
                 # Test the aggregated model directly at the edge server
                 self.accuracy = self.trainer.test(self.testset,
-                                                  self.test_sampler)
+                                                  self.test_set_sampler)
                 logging.info(
                     '[Edge Server #{:d}] Aggregated model accuracy: {:.2f}%\n'.
                     format(os.getpid(), 100 * self.accuracy))
