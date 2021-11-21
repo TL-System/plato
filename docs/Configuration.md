@@ -32,6 +32,8 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |ping_timeout| The time in seconds that the client waits for the server to respond before disconnecting. The default is 360 (seconds).||Increase this number when your session stops running when training larger models (but make sure it is not due to the *out of CUDA memory* error)|
 |synchronous|Synchronous or asynchronous federated learning|`true` or `false`|If `false`, must have **periodic_interval** attribute|
 |*periodic_interval*|The time interval for a server operating in asynchronous mode to aggregate received updates|Any positive integer||
+|do_test|Should the central server compute test accuracy locally?| `true` or `false`|| 
+|edge_do_test|Should an edge server compute test accuracy of its aggregated model locally?| `true` or `false`||
 
 ### data
 
@@ -44,6 +46,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |||`noniid`|Could have *concentration* attribute to specify the concentration parameter in the Dirichlet distribution|
 |||`orthogonal`|Each insitution's clients have data of different classes. Could have *institution_class_ids* and *label_distribution* attributes|
 |||`mixed`|Some data are iid, while others are non-iid. Must have *non_iid_clients* attributes|
+|test_set_sampler|How to sample the test set when clients test locally|Could be any **sampler**|Without this parameter, every client's test set is the test set of the datasource|
 |random_seed|Use a fixed random seed so that experiments are reproducible (clients always have the same datasets)||
 |**partition_size**|Number of samples in each client's dataset|Any positive integer||
 |concentration| The concentration parameter of symmetric Dirichlet distribution, used by `noniid` **sampler** || Default value is 1|

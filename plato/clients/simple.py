@@ -37,6 +37,7 @@ class Client(base.Client):
         self.trainset = None  # Training dataset
         self.testset = None  # Testing dataset
         self.sampler = None
+        self.test_set_sampler = None  # Sampler for the test set
 
         self.data_loading_time = None
         self.data_loading_time_sent = False
@@ -60,7 +61,8 @@ class Client(base.Client):
         logging.info("[Client #%d] Loading its data source...", self.client_id)
 
         if self.datasource is None:
-            self.datasource = datasources_registry.get(client_id=self.client_id)
+            self.datasource = datasources_registry.get(
+                client_id=self.client_id)
 
         self.data_loaded = True
 
@@ -81,6 +83,11 @@ class Client(base.Client):
         if Config().clients.do_test:
             # Set the testset if local testing is needed
             self.testset = self.datasource.get_test_set()
+            if hasattr(Config().data, 'test_set_sampler'):
+                # Set the sampler for test set
+                self.test_set_sampler = samplers_registry.get(self.datasource,
+                                                              self.client_id,
+                                                              testing=True)
 
         self.data_loading_time = time.perf_counter() - data_loading_start_time
 
@@ -103,7 +110,7 @@ class Client(base.Client):
 
         # Generate a report for the server, performing model testing if applicable
         if Config().clients.do_test:
-            accuracy = self.trainer.test(self.testset)
+            accuracy = self.trainer.test(self.testset, self.test_set_sampler)
 
             if accuracy == 0:
                 # The testing process failed, disconnect from the server

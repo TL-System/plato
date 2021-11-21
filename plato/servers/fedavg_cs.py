@@ -9,6 +9,7 @@ import time
 
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
+from plato.samplers import registry as samplers_registry
 from plato.utils import csv_processor
 
 from plato.servers import fedavg
@@ -21,7 +22,25 @@ class Server(fedavg.Server):
 
         self.current_global_round = 0
         # Average accuracy from client reports
-        self.average_accuracy = 0
+        self.average_client_accuracy = 0
+        # Average accuracy from edge server reports
+        self.average_edge_accuracy = 0
+
+        # Should an edge server has its own testset to test the accuracy of its aggregated model
+        if hasattr(Config().server,
+                   'edge_do_test') and Config().server.edge_do_test:
+            self.test_edge_model = True
+            self.test_set_sampler = None
+        else:
+            self.test_edge_model = False
+
+        # Should the central server has its own testset to test the current global model
+        if (hasattr(Config().server, 'do_test')
+                and Config().server.do_test) or (not Config().clients.do_test
+                                                 and not self.do_edge_test):
+            self.test_central_model = True
+        else:
+            self.test_central_model = False
 
         if Config().is_edge_server():
             # An edge client waits for the event that a certain number of
@@ -66,10 +85,13 @@ class Server(fedavg.Server):
             logging.info("Training with %s local aggregation rounds.",
                          Config().algorithm.local_rounds)
 
-            if hasattr(Config().server, 'do_test'):
-                if not Config().clients.do_test or Config().server.do_test:
-                    datasource = datasources_registry.get()
-                    self.testset = datasource.get_test_set()
+            if self.test_edge_model:
+                datasource = datasources_registry.get()
+                self.testset = datasource.get_test_set()
+                # Set up the sampler of test set
+                if hasattr(Config().data, 'test_set_sampler'):
+                    self.test_set_sampler = samplers_registry.get(
+                        datasource, Config().args.id, testing=True)
 
             self.load_trainer()
 
@@ -82,10 +104,9 @@ class Server(fedavg.Server):
         else:
             super().configure()
 
-            if hasattr(Config().server, 'do_test'):
-                if Config().clients.do_test and Config().server.do_test:
-                    datasource = datasources_registry.get()
-                    self.testset = datasource.get_test_set()
+            if self.test_central_model:
+                datasource = datasources_registry.get()
+                self.testset = datasource.get_test_set()
 
     async def select_clients(self):
         if Config().is_edge_server():
@@ -109,27 +130,44 @@ class Server(fedavg.Server):
         await self.aggregate_weights(self.updates)
 
         # Testing the global model accuracy
-        if Config().clients.do_test:
-            # Compute the average accuracy from client reports
-            self.average_accuracy = self.accuracy_averaging(self.updates)
-            logging.info(
-                '[Server #{:d}] Average client accuracy: {:.2f}%.'.format(
-                    os.getpid(), 100 * self.average_accuracy))
+        if Config().is_central_server():
+            if Config().clients.do_test:
+                # Compute the average accuracy from client reports
+                self.average_client_accuracy = self.client_accuracy_averaging(
+                    self.updates)
+                logging.info(
+                    '[Server #{:d}] Average client accuracy: {:.2f}%.'.format(
+                        os.getpid(), 100 * self.average_client_accuracy))
+            if self.test_edge_model:
+                # Compute the average accuracy from edge server reports
+                self.average_edge_accuracy = self.accuracy_averaging(
+                    self.updates)
+                logging.info(
+                    '[Server #{:d}] Average edge server accuracy: {:.2f}%.'.
+                    format(os.getpid(), 100 * self.average_edge_accuracy))
+            if self.test_central_model:
+                # Test the updated model directly at the central server
+                self.accuracy = await self.trainer.server_test(self.testset)
+                logging.info(
+                    '[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(
+                        os.getpid(), 100 * self.accuracy))
 
-        if hasattr(Config().server, 'do_test'):
-            if not Config().clients.do_test or Config().server.do_test:
-                # Test the updated model directly at the server
-                self.accuracy = self.trainer.test(self.testset)
-                if Config().is_central_server():
-                    logging.info(
-                        '[Server #{:d}] Global model accuracy: {:.2f}%\n'.
-                        format(os.getpid(), 100 * self.accuracy))
-                else:
-                    logging.info(
-                        '[Edge Server #{:d}] Aggregated model accuracy: {:.2f}%\n'
-                        .format(os.getpid(), 100 * self.accuracy))
-        else:
-            self.accuracy = self.average_accuracy
+        # Testing the aggregated model accuracy
+        elif Config().is_edge_server():
+            if Config().clients.do_test:
+                # Compute the average accuracy from client reports
+                self.average_client_accuracy = self.accuracy_averaging(
+                    self.updates)
+                logging.info(
+                    '[Server #{:d}] Average client accuracy: {:.2f}%.'.format(
+                        os.getpid(), 100 * self.average_client_accuracy))
+            if self.test_edge_model:
+                # Test the aggregated model directly at the edge server
+                self.accuracy = self.trainer.test(self.testset,
+                                                  self.test_set_sampler)
+                logging.info(
+                    '[Edge Server #{:d}] Aggregated model accuracy: {:.2f}%\n'.
+                    format(os.getpid(), 100 * self.accuracy))
 
         await self.wrap_up_processing_reports()
 
@@ -145,8 +183,10 @@ class Server(fedavg.Server):
                     self.current_round,
                     'accuracy':
                     self.accuracy * 100,
-                    'average_accuracy':
-                    self.average_accuracy * 100,
+                    'average_edge_accuracy':
+                    self.average_edge_accuracy * 100,
+                    'average_client_accuracy':
+                    self.average_client_accuracy * 100,
                     'edge_agg_num':
                     Config().algorithm.local_rounds,
                     'local_epoch_num':
@@ -184,3 +224,17 @@ class Server(fedavg.Server):
         """Wrapping up when each round of training is done."""
         if Config().is_central_server():
             await super().wrap_up()
+
+    @staticmethod
+    def client_accuracy_averaging(reports):
+        """Compute the average accuracy of averaged client accuracy on edge servers."""
+        # Get total number of samples
+        total_samples = sum([report.num_samples for (report, __) in reports])
+
+        # Perform weighted averaging
+        average_client_accuracy = 0
+        for (report, __) in reports:
+            average_client_accuracy += report.average_accuracy * (
+                report.num_samples / total_samples)
+
+        return average_client_accuracy
