@@ -86,6 +86,11 @@ class DataSource:
                 "Re-run the experiment without '-d' or '--download'.")
             sys.exit()
 
+    @staticmethod
+    def input_shape():
+        raise NotImplementedError(
+            "Input shape not specified for this data source.")
+
     def num_train_examples(self) -> int:
         """ Obtains the number of training examples. """
         return len(self.trainset)

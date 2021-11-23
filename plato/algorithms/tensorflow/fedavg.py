@@ -20,8 +20,7 @@ class Algorithm(base.Algorithm):
         """
         super().__init__(trainer)
         if hasattr(self.model, 'build_model'):
-            datasource = datasources_registry.get()
-            self.model.build_model(datasource.input_shape())
+            self.model.build_model(datasources_registry.get_input_shape())
         else:
             self.model = trainer.model
 
