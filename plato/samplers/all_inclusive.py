@@ -11,17 +11,16 @@ class Sampler(base.Sampler):
     """Create a data sampler that samples all the data in the dataset.
        Used by the MistNet server.
     """
-    def __init__(self, dataset, client_id=0, testing=False):
+    def __init__(self, datasource, client_id=0, testing=False):
         super().__init__()
         self.client_id = client_id
 
         if testing:
-            self.all_inclusive = range(dataset.num_test_examples())
+            self.all_inclusive = range(datasource.num_test_examples())
         else:
-            self.all_inclusive = range(dataset.num_train_examples())
+            self.all_inclusive = range(datasource.num_train_examples())
 
     def get(self):
-        # return random.shuffle(self.all_inclusive)
         if hasattr(Config().trainer, 'use_mindspore'):
             return list(self.all_inclusive)
         elif hasattr(Config().trainer, 'use_tensorflow'):
