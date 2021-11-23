@@ -1,14 +1,32 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+"""
+Useful tools for processing the data
 
-import os
+"""
 import shutil
 
-import xml.etree.ElementTree as ET
 import numpy as np
 
 
+def dict_list2tuple(dict_obj):
+    """ Convert all list element in the dict to tuple """
+    for key, value in dict_obj.items():
+        if isinstance(value, dict):
+            for inner_key, inner_v in value.items():
+                if isinstance(inner_v, list):
+                    dict_obj[key][inner_key] = tuple(inner_v)
+        else:
+            if isinstance(value, list):
+                dict_obj[key] = tuple(value)
+                for idx, item in enumerate(value):
+                    item = value[idx]
+                    if isinstance(item, dict):
+                        value[idx] = dict_list2tuple(item)
+
+    return dict_obj
+
+
 def phrase_boxes_alignment(flatten_boxes, ori_phrases_boxes):
+    """ Align the phase and its corresponding boxes """
     phrases_boxes = list()
 
     ori_pb_boxes_count = list()
@@ -34,6 +52,7 @@ def phrase_boxes_alignment(flatten_boxes, ori_phrases_boxes):
 
 
 def list_inorder(listed_files, flag_str):
+    """" List the files in order based on the file name """
     filtered_listed_files = [fn for fn in listed_files if flag_str in fn]
     listed_files = sorted(filtered_listed_files,
                           key=lambda x: x.strip().split(".")[0])
@@ -41,13 +60,15 @@ def list_inorder(listed_files, flag_str):
 
 
 def copy_files(src_files, dst_dir):
+    """ copy files from src to dst """
     for file in src_files:
         shutil.copy(file, dst_dir)
 
 
 def union_shuffled_lists(src_lists):
+    """ shuffle the lists """
     for i in range(1, len(src_lists)):
         assert len(src_lists[i]) == len(src_lists[i - 1])
-    p = np.random.permutation(len(src_lists[0]))
+    processed = np.random.permutation(len(src_lists[0]))
 
-    return [np.array(ele)[p] for ele in src_lists]
+    return [np.array(ele)[processed] for ele in src_lists]

@@ -5,7 +5,7 @@ The functions for downloading the datasets in parallel.
 import os
 from multiprocessing import Process, Queue
 
-from plato.datasources.datalib import downloader
+from plato.datasources.datalib.kinetics_utils import downloader
 
 
 class VideoDownloaderPool:

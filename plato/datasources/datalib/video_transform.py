@@ -1,4 +1,4 @@
-""" 
+"""
 The transformers for the video classification task
 """
 
@@ -11,17 +11,19 @@ class ConvertBHWCtoBCHW(nn.Module):
     """Convert tensor from (B, H, W, C) to (B, C, H, W)
     """
     def forward(self, vid: torch.Tensor) -> torch.Tensor:
+        """ Change the order of tensor dims """
         return vid.permute(0, 3, 1, 2)
 
 
 class ConvertBCHWtoCBHW(nn.Module):
-    """Convert tensor from (B, C, H, W) to (C, B, H, W)
-    """
+    """Convert tensor from (B, C, H, W) to (C, B, H, W) """
     def forward(self, vid: torch.Tensor) -> torch.Tensor:
+        """ Change the order of tensor dims """
         return vid.permute(1, 0, 2, 3)
 
 
 class VideoClassificationTrainTransformer:
+    """ The transformer to process the data for video classification model training """
     def __init__(self,
                  resize_size,
                  crop_size,
@@ -42,11 +44,12 @@ class VideoClassificationTrainTransformer:
         ])
         self.transforms = transforms.Compose(trans)
 
-    def __call__(self, x):
-        return self.transforms(x)
+    def __call__(self, video_data):
+        return self.transforms(video_data)
 
 
 class VideoClassificationEvalTransformer:
+    """ The transformer to process the data for video classification model evaluation """
     def __init__(self,
                  resize_size,
                  crop_size,
@@ -61,5 +64,5 @@ class VideoClassificationEvalTransformer:
             ConvertBCHWtoCBHW()
         ])
 
-    def __call__(self, x):
-        return self.transforms(x)
+    def __call__(self, video_data):
+        return self.transforms(video_data)
