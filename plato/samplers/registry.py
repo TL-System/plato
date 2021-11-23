@@ -29,14 +29,11 @@ elif hasattr(Config().trainer, 'use_tensorflow'):
 else:
     from plato.samplers import (iid, dirichlet, mixed, orthogonal,
                                 all_inclusive)
-<<<<<<< HEAD
     from plato.samplers.multimodal import (modality_iid,
                                            sample_quantity_noniid,
                                            quantity_label_noniid,
                                            quantity_modality_noniid,
                                            distribution_noniid)
-=======
->>>>>>> main
 
     registered_samplers = OrderedDict([
         ('iid', iid.Sampler),
