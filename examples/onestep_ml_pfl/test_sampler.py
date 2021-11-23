@@ -1,7 +1,7 @@
 import os
 
 os.environ[
-    'config_file'] = 'examples/onestep_ml_pfl/os_ml_pfl_CIFAR10_lenet5.yml'
+    'config_file'] = 'examples/onestep_ml_pfl/os_ml_pfl_fashionmnist_lenet5.yml'
 
 from utils import verify_working_correcness, verify_client_local_data_correcness, \
     verify_difference_between_clients
