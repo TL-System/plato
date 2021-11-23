@@ -3,7 +3,6 @@ Samples data from a dataset in an independent and identically distributed fashio
 """
 import numpy as np
 import torch
-
 from torch.utils.data import SubsetRandomSampler
 
 from plato.config import Config

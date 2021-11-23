@@ -27,7 +27,8 @@ elif hasattr(Config().trainer, 'use_tensorflow'):
         ('mixed', base.Sampler),
     ])
 else:
-    from plato.samplers import (iid, dirichlet, mixed, all_inclusive)
+    from plato.samplers import (iid, dirichlet, mixed, orthogonal,
+                                all_inclusive)
     from plato.samplers.multimodal import (modality_iid,
                                            sample_quantity_noniid,
                                            quantity_label_noniid,
