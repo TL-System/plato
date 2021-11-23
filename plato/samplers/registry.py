@@ -34,6 +34,7 @@ else:
                                            quantity_label_noniid,
                                            quantity_modality_noniid,
                                            distribution_noniid)
+
     registered_samplers = OrderedDict([
         ('iid', iid.Sampler),
         ('noniid', dirichlet.Sampler),
