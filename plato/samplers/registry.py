@@ -29,6 +29,11 @@ elif hasattr(Config().trainer, 'use_tensorflow'):
 else:
     from plato.samplers import (iid, dirichlet, mixed, orthogonal,
                                 all_inclusive)
+    from plato.samplers.multimodal import (modality_iid,
+                                           sample_quantity_noniid,
+                                           quantity_label_noniid,
+                                           quantity_modality_noniid,
+                                           distribution_noniid)
 
     registered_samplers = OrderedDict([
         ('iid', iid.Sampler),
@@ -36,6 +41,11 @@ else:
         ('mixed', mixed.Sampler),
         ('orthogonal', orthogonal.Sampler),
         ('all_inclusive', all_inclusive.Sampler),
+        ('modality_iid', modality_iid.Sampler),
+        ('sample_quantity_noniid', sample_quantity_noniid.Sampler),
+        ('quantity_label_noniid', quantity_label_noniid.Sampler),
+        ('quantity_modality_noniid', quantity_modality_noniid.Sampler),
+        ('distribution_noniid', distribution_noniid.Sampler),
     ])
 
 
@@ -63,6 +73,25 @@ def get(datasource, client_id, testing=False):
         registered_sampler = registered_samplers[sampler_type](datasource,
                                                                client_id,
                                                                testing=testing)
+    else:
+        raise ValueError('No such sampler: {}'.format(sampler_type))
+
+    return registered_sampler
+
+
+def multimodal_get(datasource, client_id):
+    """Get an instance of the multimodal sampler."""
+    if hasattr(Config().data, 'modality_sampler'):
+        sampler_type = Config().data.modality_sampler
+    else:
+        sampler_type = 'modality_iid'
+
+    logging.info("[Client #%d] Multimodal Sampler: %s", client_id,
+                 sampler_type)
+
+    if sampler_type in registered_samplers:
+        registered_sampler = registered_samplers[sampler_type](datasource,
+                                                               client_id)
     else:
         raise ValueError('No such sampler: {}'.format(sampler_type))
 
