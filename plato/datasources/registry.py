@@ -49,17 +49,17 @@ else:
         pascal_voc,
         tiny_imagenet,
         femnist,
+        feature,
     )
 
-    registered_datasources = OrderedDict([
-        ('MNIST', mnist),
-        ('FashionMNIST', fashion_mnist),
-        ('CIFAR10', cifar10),
-        ('CINIC10', cinic10),
-        ('HuggingFace', huggingface),
-        ('PASCAL_VOC', pascal_voc),
-        ('TinyImageNet', tiny_imagenet),
-    ])
+    registered_datasources = OrderedDict([('MNIST', mnist),
+                                          ('FashionMNIST', fashion_mnist),
+                                          ('CIFAR10', cifar10),
+                                          ('CINIC10', cinic10),
+                                          ('HuggingFace', huggingface),
+                                          ('PASCAL_VOC', pascal_voc),
+                                          ('TinyImageNet', tiny_imagenet),
+                                          ('Feature', feature)])
 
     registered_partitioned_datasources = OrderedDict([('FEMNIST', femnist)])
 
@@ -82,3 +82,24 @@ def get(client_id=0):
         raise ValueError('No such data source: {}'.format(datasource_name))
 
     return dataset
+
+
+def get_input_shape():
+    """Get the input shape of data source with the provided name."""
+    datasource_name = Config().data.datasource
+
+    logging.info("Data source: %s", Config().data.datasource)
+
+    if Config().data.datasource == 'YOLO':
+        from plato.datasources import yolo
+        return yolo.DataSource.input_shape()
+    elif datasource_name in registered_datasources:
+        input_shape = registered_datasources[
+            datasource_name].DataSource.input_shape()
+    elif datasource_name in registered_partitioned_datasources:
+        input_shape = registered_partitioned_datasources[
+            datasource_name].DataSource.input_shape()
+    else:
+        raise ValueError('No such data source: {}'.format(datasource_name))
+
+    return input_shape

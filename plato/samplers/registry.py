@@ -29,16 +29,20 @@ elif hasattr(Config().trainer, 'use_tensorflow'):
 else:
     from plato.samplers import (iid, dirichlet, mixed, orthogonal,
                                 all_inclusive)
+<<<<<<< HEAD
     from plato.samplers.multimodal import (modality_iid,
                                            sample_quantity_noniid,
                                            quantity_label_noniid,
                                            quantity_modality_noniid,
                                            distribution_noniid)
+=======
+>>>>>>> main
 
     registered_samplers = OrderedDict([
         ('iid', iid.Sampler),
         ('noniid', dirichlet.Sampler),
         ('mixed', mixed.Sampler),
+        ('orthogonal', orthogonal.Sampler),
         ('all_inclusive', all_inclusive.Sampler),
         ('modality_iid', modality_iid.Sampler),
         ('sample_quantity_noniid', sample_quantity_noniid.Sampler),
@@ -48,18 +52,30 @@ else:
     ])
 
 
-def get(datasource, client_id):
+def get(datasource, client_id, testing=False):
     """Get an instance of the sampler."""
-    if hasattr(Config().data, 'sampler'):
-        sampler_type = Config().data.sampler
+    if testing == True:
+        if hasattr(Config().data, 'test_set_sampler'):
+            sampler_type = Config().data.test_set_sampler
+            logging.info("[Client #%d] Test set sampler: %s", client_id,
+                         sampler_type)
+    elif testing == 'edge':
+        if hasattr(Config().data, 'edge_test_set_sampler'):
+            sampler_type = Config().data.edge_test_set_sampler
+            logging.info("[Edge Server #%d] Test set sampler: %s", client_id,
+                         sampler_type)
     else:
-        sampler_type = 'iid'
+        if hasattr(Config().data, 'sampler'):
+            sampler_type = Config().data.sampler
+        else:
+            sampler_type = 'iid'
 
-    logging.info("[Client #%d] Sampler: %s", client_id, sampler_type)
+        logging.info("[Client #%d] Sampler: %s", client_id, sampler_type)
 
     if sampler_type in registered_samplers:
         registered_sampler = registered_samplers[sampler_type](datasource,
-                                                               client_id)
+                                                               client_id,
+                                                               testing=testing)
     else:
         raise ValueError('No such sampler: {}'.format(sampler_type))
 

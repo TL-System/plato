@@ -12,9 +12,13 @@ from plato.samplers import base
 class Sampler(base.Sampler):
     """Create a data sampler for each client to use a randomly divided partition of the
     dataset."""
-    def __init__(self, datasource, client_id):
+    def __init__(self, datasource, client_id, testing):
         super().__init__()
-        dataset = datasource.get_train_set()
+        if testing:
+            dataset = datasource.get_test_set()
+        else:
+            dataset = datasource.get_train_set()
+
         self.dataset_size = len(dataset)
         indices = list(range(self.dataset_size))
         np.random.seed(self.random_seed)
