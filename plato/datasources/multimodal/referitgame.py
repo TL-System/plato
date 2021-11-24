@@ -1,27 +1,28 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+"""
+This is the interface for the ReferitGame dataset that includes refer+, refer, referg sub-datasets.
 
-import json
+http://tamaraberg.com/referitgame/
+"""
+
 import logging
 import os
-import sys
+
 import collections
 
 import torch
-from torchvision import datasets
+
 import cv2
 
 from plato.config import Config
-from plato.datasources import multimodal_base
-from plato.datasources.datalib import data_utils
-from plato.datasources.datalib import referitgame_utils
+from plato.datasources.multimodal import multimodal_base
+from plato.datasources.datalib.refer_utils import referitgame_utils
 
 DataAnnos = collections.namedtuple('annos', [
     'caption', 'caption_phrases', 'caption_phrase_bboxs',
     'caption_phrases_cate', 'caption_phrases_cate_id'
 ])
 
-Splited_Datasets = collections.namedtuple('Splited_Datasets', [
+SplitedDatasets = collections.namedtuple('SplitedDatasets', [
     'train_ref_ids', 'val_ref_ids', 'test_ref_ids', 'testA_ref_ids',
     'testB_ref_ids', 'testC_ref_ids'
 ])
@@ -33,7 +34,8 @@ def collate_fn(batch):
     Args:
         batch ([list]): [a list in which each element contains the data for one task,
                         assert len(batch) == number of tasks,
-                        assert len(batch[i]) == 6 that is the output of create_task_examples_data function]
+                        assert len(batch[i]) == 6 that is the output of \
+                            create_task_examples_data function]
 
     Returns:
         [batch]: [return the original batch of data directly]
@@ -58,8 +60,8 @@ class ReferItGameDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, sample_idx):
         [
-            image_id, image_file_path, caption, caption_phrases,
-            caption_phrase_bboxs, caption_phrases_cate, caption_phrases_cate_id
+            image_id, _, caption, caption_phrases, caption_phrase_bboxs,
+            caption_phrases_cate, caption_phrases_cate_id
         ] = self.phase_data[sample_idx]
 
         sample_name = image_id
@@ -71,13 +73,17 @@ class ReferItGameDataset(torch.utils.data.Dataset):
 
         caption = caption if any(isinstance(boxes_i, list) for boxes_i in caption) \
                                             else [caption]
-        caption_phrase_bboxs = caption_phrase_bboxs if any(isinstance(boxes_i, list) for boxes_i in caption_phrase_bboxs) \
+        caption_phrase_bboxs = caption_phrase_bboxs if any(isinstance(boxes_i, list) \
+                                                for boxes_i in caption_phrase_bboxs) \
                                                     else [caption_phrase_bboxs]
-        caption_phrases = caption_phrases if any(isinstance(boxes_i, list) for boxes_i in caption_phrases) \
+        caption_phrases = caption_phrases if any(isinstance(boxes_i, list) \
+                                        for boxes_i in caption_phrases) \
                                             else [caption_phrases]
-        caption_phrases_cate = caption_phrases_cate if any(isinstance(boxes_i, list) for boxes_i in caption_phrases_cate) \
+        caption_phrases_cate = caption_phrases_cate if any(isinstance(boxes_i, list) \
+                                        for boxes_i in caption_phrases_cate) \
                                             else [[caption_phrases_cate]]
-        caption_phrases_cate_id = caption_phrases_cate_id if isinstance(caption_phrases_cate_id, list) \
+        caption_phrases_cate_id = caption_phrases_cate_id \
+                                            if isinstance(caption_phrases_cate_id, list) \
                                             else [caption_phrases_cate_id]
 
         assert len(caption_phrase_bboxs) == len(caption_phrases)
@@ -93,7 +99,7 @@ class ReferItGameDataset(torch.utils.data.Dataset):
             caption_phrase_bboxs = transformed["bboxes"]
 
         if self.transform_text_func is not None:
-            caption_phrase = self.transform_text_func(caption_phrase)
+            caption_phrases = self.transform_text_func(caption_phrases)
 
         caption_phrase_bboxs = [caption_phrase_bboxs
                                 ]  # convert to the standard structure
@@ -120,9 +126,10 @@ class DataSource(multimodal_base.MultiModalDataSource):
         self.split_config = Config().data.split_config
         self.split_name = Config().data.split_name
         if self.split_config not in self.split_configs:
-            logging.info(
-                ("{} does not exsit in the official configs {}.....").format(
-                    self.split_config, self.split_configs))
+            info_msg = (
+                "{} does not exsit in the official configs {}.....").format(
+                    self.split_config, self.split_configs)
+            logging.info(info_msg)
 
         self.modality_names = ["image", "text"]
 
@@ -133,25 +140,26 @@ class DataSource(multimodal_base.MultiModalDataSource):
         # the source data is required
         source_data_path = os.path.join(_path, self.data_source)
         if not self._exist_judgement(source_data_path):
-            logging.info((
+            info_msg = (
                 "The source data {} must be downloaded first to the directory {} "
-            ).format(self.data_source, self.split_configs))
-            exit
+            ).format(self.data_source, self.split_configs)
+            logging.info(info_msg)
+            exit()
 
         # download the public official code and the required config
         download_split_url = Config(
         ).data.download_splits_base_url + self.split_config + ".zip"
         for dd_url in [download_split_url]:
-            self._download_arrange_data(download_url=dd_url,
+            self._download_arrange_data(download_url_address=dd_url,
                                         put_data_dir=base_data_path)
 
         # raw coco images path
         coco_raw_imgs_path = os.path.join(source_data_path, "COCO2017Raw",
                                           "train2017")
         if self._exist_judgement(coco_raw_imgs_path):
-            logging.info((
-                "Successfully connecting the source COCO2017 images data from the path {}"
-            ).format(coco_raw_imgs_path))
+            logging.info(
+                "Successfully connecting the source COCO2017 images data from the path %s",
+                coco_raw_imgs_path)
         self._dataset_refer = referitgame_utils.REFER(
             data_root=base_data_path,
             image_dataroot=coco_raw_imgs_path,
@@ -162,22 +170,21 @@ class DataSource(multimodal_base.MultiModalDataSource):
         self._connect_to_splits()
 
     def _connect_to_splits(self):
-        split_types = Splited_Datasets._fields
+        split_types = SplitedDatasets._fields
         for split_type in split_types:
-            formatted_split_type = split_type.strip().split("_")[0]
+            formatted_split_type = split_type.split("_", maxsplit=1)[0]
             self._splited_referids_holder[
                 formatted_split_type] = self._dataset_refer.getRefIds(
                     split=formatted_split_type)
 
     def get_phase_data(self, phase):
+        """ Get phrases from the raw data """
         mode_refer_ids = self._splited_referids_holder[phase]
 
         mode_elements_holder = dict()
         mode_flatten_emelemts = list()
 
         for refer_id in mode_refer_ids:
-
-            refer_elements = list()
 
             ref = self._dataset_refer.loadRefs(refer_id)[0]
             image_id = ref['image_id']
@@ -223,9 +230,9 @@ class DataSource(multimodal_base.MultiModalDataSource):
         return mode_elements_holder, mode_flatten_emelemts
 
     def get_train_loader(self, batch_size):
+        """ Get the train loader """
         phase = "train"
-        mode_elements_holder, mode_flatten_emelemts = self.get_phase_data(
-            phase)
+        _, mode_flatten_emelemts = self.get_phase_data(phase)
         self.trainset = ReferItGameDataset(dataset=mode_flatten_emelemts,
                                            base_refer_data=self._dataset_refer)
         train_loader = torch.utils.data.DataLoader(dataset=self.trainset,
@@ -235,9 +242,9 @@ class DataSource(multimodal_base.MultiModalDataSource):
         return train_loader
 
     def get_test_loader(self, batch_size):
+        """ Get the test loader """
         phase = "test"
-        mode_elements_holder, mode_flatten_emelemts = self.get_phase_data(
-            phase)
+        _, mode_flatten_emelemts = self.get_phase_data(phase)
         self.testset = ReferItGameDataset(dataset=mode_flatten_emelemts,
                                           base_refer_data=self._dataset_refer)
         test_loader = torch.utils.data.DataLoader(dataset=self.testset,

@@ -7,13 +7,18 @@ from abc import abstractmethod
 from plato.config import Config
 from plato.samplers import base
 
+
 class Sampler(base.Sampler):
     """Base class for data samplers so that the dataset is divided into
     partitions across the clients."""
-    def __init__(self, datasource, client_id):
+    def __init__(self, datasource, client_id=0, testing=False):
         super().__init__()
-        dataset = datasource.get_train_set()
-        self.all_inclusive = range(len(dataset))
+        self.client_id = client_id
+
+        if testing:
+            self.all_inclusive = range(datasource.num_test_examples())
+        else:
+            self.all_inclusive = range(datasource.num_train_examples())
 
     @abstractmethod
     def get(self):
