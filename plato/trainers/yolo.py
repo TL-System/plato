@@ -1,5 +1,6 @@
 """The YOLOV5 model for PyTorch."""
 import logging
+import time
 
 import numpy as np
 import torch
@@ -14,8 +15,9 @@ from plato.trainers import basic
 from plato.utils import unary_encoding
 from torch.cuda import amp
 from tqdm import tqdm
-from yolov5.utils.general import (box_iou, check_dataset, one_cycle,
-                                  non_max_suppression, scale_coords, xywh2xyxy)
+
+from yolov5.utils.general import (box_iou, check_dataset, non_max_suppression,
+                                  one_cycle, scale_coords, xywh2xyxy)
 from yolov5.utils.loss import ComputeLoss
 from yolov5.utils.metrics import ap_per_class
 
@@ -140,31 +142,33 @@ class Trainer(basic.Trainer):
         nw = max(
             round(hyp['warmup_epochs'] * nb),
             1000)  # number of warmup iterations, max(3 epochs, 1k iterations)
+        last_opt_step = -1
         scaler = amp.GradScaler(enabled=cuda)
-        compute_loss = ComputeLoss(self.model)
+        compute_loss = ComputeLoss(self.model)  # init loss class
 
         for epoch in range(1, epochs + 1):
             self.model.train()
             logging.info(
-                ('\n' + '%10s' * 8) % ('Epoch', 'gpu_mem', 'box', 'obj', 'cls',
-                                       'total', 'targets', 'img_size'))
+                ('\n' + '%10s' * 7) % ('Epoch', 'gpu_mem', 'box', 'obj', 'cls',
+                                       'labels', 'img_size'))
             pbar = enumerate(train_loader)
             pbar = tqdm(pbar, total=nb)
-            mloss = torch.zeros(4,
-                                device=self.device)  # Initializing mean losses
+            mloss = torch.zeros(3, device=self.device)  # mean losses
             optimizer.zero_grad()
 
             for i, (imgs, targets, *__) in pbar:
                 ni = i + nb * epoch  # number integrated batches (since train start)
-                imgs, targets = imgs.to(self.device), targets.to(self.device)
+                imgs = imgs.to(self.device, non_blocking=True).float(
+                ) / 255  # uint8 to float32, 0-255 to 0.0-1.0
 
                 # Warmup
                 if ni <= nw:
                     xi = [0, nw]  # x interp
                     accumulate = max(
                         1,
-                        np.interp(ni, xi, [1, nbs / total_batch_size]).round())
+                        np.interp(ni, xi, [1, nbs / batch_size]).round())
                     for j, x in enumerate(optimizer.param_groups):
+                        # bias lr falls from 0.1 to lr0, all other lrs rise from 0.0 to lr0
                         x['lr'] = np.interp(ni, xi, [
                             hyp['warmup_bias_lr'] if j == 2 else 0.0,
                             x['initial_lr'] * lf(epoch)
@@ -182,26 +186,26 @@ class Trainer(basic.Trainer):
                         pred = self.model.forward_from(imgs, cut_layer)
 
                     loss, loss_items = compute_loss(
-                        pred, targets)  # loss scaled by batch_size
+                        pred,
+                        targets.to(self.device))  # loss scaled by batch_size
 
                 # Backward
                 scaler.scale(loss).backward()
 
                 # Optimize
-                if ni % accumulate == 0:
+                if ni - last_opt_step >= accumulate:
                     scaler.step(optimizer)  # optimizer.step
                     scaler.update()
                     optimizer.zero_grad()
+                    last_opt_step = ni
 
                 # Print
                 mloss = (mloss * i + loss_items) / (i + 1
                                                     )  # update mean losses
-                mem = '%.3gG' % (torch.cuda.memory_reserved() / 1E9
-                                 if torch.cuda.is_available() else 0)  # (GB)
-                s = ('%10s' * 2 +
-                     '%10.4g' * 6) % ('%g/%g' % (epoch, epochs), mem, *mloss,
-                                      targets.shape[0], imgs.shape[-1])
-                pbar.set_description(s)
+                mem = f'{torch.cuda.memory_reserved() / 1E9 if torch.cuda.is_available() else 0:.3g}G'  # (GB)
+                pbar.set_description(('%10s' * 2 + '%10.4g' * 5) %
+                                     (f'{epoch}/{epochs - 1}', mem, *mloss,
+                                      targets.shape[0], imgs.shape[-1]))
 
             lr_schedule.step()
 

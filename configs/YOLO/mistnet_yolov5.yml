@@ -161,7 +161,7 @@ trainer:
     # The machine learning model
     model_name: yolov5
     model_config: packages/yolov5/yolov5/models/yolov5s.yaml
-    train_params: packages/yolov5/yolov5/data/hyp.scratch.yaml
+    train_params: packages/yolov5/yolov5/data/hyps/hyp.scratch.yaml
 
 algorithm:
     # Aggregation algorithm
