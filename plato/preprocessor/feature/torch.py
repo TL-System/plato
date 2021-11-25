@@ -11,8 +11,8 @@ class Preprocessor(reversable.Preprocessor):
 
     def process(self, data):
         """Format pytorch tensor into numpy array"""
-        return data.detach().numpy()
+        return data
 
     def unprocess(self, data):
         """Format numpy array into pytorch tensor"""
-        return data.detach().numpy()
+        return data
