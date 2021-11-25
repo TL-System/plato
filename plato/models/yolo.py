@@ -3,7 +3,6 @@
 from yolov5.models import yolo
 from yolov5.models.common import *
 from yolov5.models.experimental import *
-from yolov5.utils.torch_utils import time_sync
 
 from plato.config import Config
 
