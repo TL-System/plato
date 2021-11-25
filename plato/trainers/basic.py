@@ -265,7 +265,7 @@ class Trainer(base.Trainer):
 
         return training_time
 
-    def test_process(self, config, testset, sampler):
+    def test_process(self, config, testset, sampler=None):
         """The testing loop, run in a separate process with a new CUDA context,
         so that CUDA memory can be released after the training completes.
 
