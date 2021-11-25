@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+  
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    # Runs a set of commands using the runners shell
+    - name: Install dependences and run
+      run: |
+        mkdir -p ./models/pretrained
+        sudo apt install -y python3-pip git
+        pip3 install torch==1.10.0+cpu torchvision==0.11.1+cpu torchaudio==0.10.0+cpu -f https://download.pytorch.org/whl/cpu/torch_stable.html
+        pip3 install -r requirements.txt --upgrade
+        cd packages/yolov5
+        pip3 install -r requirements.txt --upgrade
+        pip install .
+        cd ../..
+        wget https://kubeedge.obs.cn-north-1.myhuaweicloud.com/examples/yolov5_coco128_mistnet/yolov5.pth 
+        mv yolov5.pth ./models/pretrained/
+        ./run --config=configs/MNIST/fedavg_lenet5.yml
+        ./run --config=configs/MNIST/mistnet_lenet5.yml
+        ./run --config=configs/YOLO/fedavg_yolov5.yml
+        ./run --config=configs/YOLO/mistnet_yolov5.yml
+        

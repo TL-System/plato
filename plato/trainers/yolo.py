@@ -204,7 +204,7 @@ class Trainer(basic.Trainer):
                                                     )  # update mean losses
                 mem = f'{torch.cuda.memory_reserved() / 1E9 if torch.cuda.is_available() else 0:.3g}G'  # (GB)
                 pbar.set_description(('%10s' * 2 + '%10.4g' * 5) %
-                                     (f'{epoch}/{epochs - 1}', mem, *mloss,
+                                     (f'{epoch}/{epochs}', mem, *mloss,
                                       targets.shape[0], imgs.shape[-1]))
 
             lr_schedule.step()
@@ -339,20 +339,18 @@ class Trainer(basic.Trainer):
         # Compute statistics
         stats = [np.concatenate(x, 0) for x in zip(*stats)]  # to numpy
         if len(stats) and stats[0].any():
-            p, r, ap, __, __ = ap_per_class(*stats,
-                                            plot=False,
-                                            save_dir='',
-                                            names=names)
+            tp, fp, p, r, f1, ap, ap_class = ap_per_class(*stats, plot=plots, save_dir=save_dir, names=names)
             ap50, ap = ap[:, 0], ap.mean(1)  # AP@0.5, AP@0.5:0.95
             mp, mr, map50, map = p.mean(), r.mean(), ap50.mean(), ap.mean()
-            nt = np.bincount(stats[3].astype(np.int64),
-                             minlength=nc)  # number of targets per class
+            nt = np.bincount(stats[3].astype(np.int64), minlength=nc)  # number of targets per class
         else:
             nt = torch.zeros(1)
 
         # Print results
-        pf = '%20s' + '%12.3g' * 6  # print format
+        pf = '%20s' + '%11i' * 2 + '%11.3g' * 4  # print format
         print(pf % ('all', seen, nt.sum(), mp, mr, map50, map))
+        # pf = '%20s' + '%12.3g' * 6  # print format
+        # print(pf % ('all', seen, nt.sum(), mp, mr, map50, map))
 
         return map50
 
