@@ -5,7 +5,7 @@ from abc import abstractmethod
 
 class Preprocessor:
     """Base preprocessor class."""
-    def __init__(self) -> None:
+    def __init__(self):
         pass
 
     @abstractmethod
