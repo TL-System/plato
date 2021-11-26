@@ -31,4 +31,5 @@ class DataSource(base.DataSource):
         self.testset = []
 
     def torch_dataset(self):
+        """ Prepare the feature dataset when PyTorch is used. """
         return FeatureDataset(self.trainset)

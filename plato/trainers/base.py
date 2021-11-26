@@ -92,33 +92,35 @@ class Trainer(ABC):
     def start_training(self):
         """Add to the list of running trainers if max_concurrency has not yet
         been reached."""
-        time.sleep(random.random() * 2)
-        trainer_count = Trainer.run_sql_statement(
-            "SELECT COUNT(*) FROM trainers")
-
-        while trainer_count >= Config().trainer.max_concurrency:
+        if hasattr(Config().trainer, 'max_concurrency'):
             time.sleep(random.random() * 2)
             trainer_count = Trainer.run_sql_statement(
                 "SELECT COUNT(*) FROM trainers")
 
-        Trainer.run_sql_statement("INSERT INTO trainers VALUES (?)",
-                                  (self.client_id, ))
+            while trainer_count >= Config().trainer.max_concurrency:
+                time.sleep(random.random() * 2)
+                trainer_count = Trainer.run_sql_statement(
+                    "SELECT COUNT(*) FROM trainers")
+
+            Trainer.run_sql_statement("INSERT INTO trainers VALUES (?)",
+                                      (self.client_id, ))
 
     def pause_training(self):
         """Remove from the list of running trainers."""
-        Trainer.run_sql_statement("DELETE FROM trainers WHERE run_id = (?)",
-                                  (self.client_id, ))
+        if hasattr(Config().trainer, 'max_concurrency'):
+            Trainer.run_sql_statement(
+                "DELETE FROM trainers WHERE run_id = (?)", (self.client_id, ))
 
-        model_name = Config().trainer.model_name
-        model_dir = Config().params['model_dir']
-        model_file = f"{model_dir}{model_name}_{self.client_id}_{Config().params['run_id']}.pth"
-        accuracy_file = f"{model_dir}{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
+            model_name = Config().trainer.model_name
+            model_dir = Config().params['model_dir']
+            model_file = f"{model_dir}{model_name}_{self.client_id}_{Config().params['run_id']}.pth"
+            accuracy_file = f"{model_dir}{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
 
-        if os.path.exists(model_file):
-            os.remove(model_file)
+            if os.path.exists(model_file):
+                os.remove(model_file)
 
-        if os.path.exists(accuracy_file):
-            os.remove(accuracy_file)
+            if os.path.exists(accuracy_file):
+                os.remove(accuracy_file)
 
     @abstractmethod
     def train(self, trainset, sampler, cut_layer=None) -> float:

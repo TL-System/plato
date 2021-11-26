@@ -1,5 +1,5 @@
 # Download base image from NVIDIA's Docker Hub
-FROM nvidia/cuda:10.1-cudnn7-devel-ubuntu18.04
+FROM nvidia/cuda:11.1.1-cudnn8-runtime-ubuntu20.04
 LABEL maintainer="Baochun Li"
 
 ADD .bashrc /root/
@@ -17,14 +17,14 @@ RUN apt-get update \
     && rm -rf ~/miniconda3/miniconda.sh \
     && ~/miniconda3/bin/conda update -n base -c defaults conda \
     && ~/miniconda3/bin/conda init bash \
-    && ~/miniconda3/bin/conda create -n plato_gpu python=3.7.5 \
+    && ~/miniconda3/bin/conda create -n plato_gpu -c conda-forge python=3.9.0 \
     && ~/miniconda3/bin/conda install pytorch torchvision cpuonly -c pytorch -n plato_gpu \
-    && ~/miniconda3/envs/plato_gpu/bin/pip install https://ms-release.obs.cn-north-4.myhuaweicloud.com/1.1.1/MindSpore/gpu/ubuntu_x86/cuda-10.1/mindspore_gpu-1.1.1-cp37-cp37m-linux_x86_64.whl \
+    && ~/miniconda3/bin/conda install mindspore-gpu=1.5.0 cudatoolkit=11.1 -c mindspore -c conda-forge -y \
     && ~/miniconda3/envs/plato_gpu/bin/pip install -r ~/requirements.txt \
     && ~/miniconda3/envs/plato_gpu/bin/pip install plato-learn \
-    && ~/miniconda3/bin/conda create -n plato_cpu python=3.7.5 \
+    && ~/miniconda3/bin/conda create -n plato_cpu -c conda-forge python=3.9.0 \
     && ~/miniconda3/bin/conda install pytorch torchvision cpuonly -c pytorch -n plato_cpu \
-    && ~/miniconda3/envs/plato_cpu/bin/pip install pip install https://ms-release.obs.cn-north-4.myhuaweicloud.com/1.1.1/MindSpore/cpu/ubuntu_x86/mindspore-1.1.1-cp37-cp37m-linux_x86_64.whl \
+    && ~/miniconda3/bin/conda install mindspore-cpu=1.5.0 -c mindspore -c conda-forge -y \
     && ~/miniconda3/envs/plato_cpu/bin/pip install -r ~/requirements.txt \
     && ~/miniconda3/envs/plato_cpu/bin/pip install plato-learn
 
