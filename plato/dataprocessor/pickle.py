@@ -2,11 +2,11 @@
 transfer."""
 
 import pickle
-from plato.preprocessor import reversable
+from plato.DataProcessor import base
 
 
-class Preprocessor(reversable.Preprocessor):
-    """Serializer class for serializing preprocessed NumPy array into ByteArray
+class Serializer(base.DataProcessor):
+    """Serializer class for serializing NumPy array into ByteArray
     for transfer."""
     def __init__(self):
         """Constructor for Serializer"""
@@ -16,6 +16,14 @@ class Preprocessor(reversable.Preprocessor):
         """Serializing NumPy Array into ByteArray"""
         return pickle.dumps(data)
 
-    def unprocess(self, data):
+
+class Deserializer(base.DataProcessor):
+    """Deserializer class for serializing ByteArray into NumPy array
+    for transfer."""
+    def __init__(self):
+        """Constructor for Serializer"""
+        super().__init__()
+
+    def process(self, data):
         """Deserializing ByteArray into NumPy Array"""
         return pickle.loads(data)

@@ -1,10 +1,10 @@
-"""The base class of preprocessors"""
+"""The base class of DataProcessors"""
 
 from abc import abstractmethod
 
 
-class Preprocessor:
-    """Base preprocessor class."""
+class DataProcessor:
+    """Base DataProcessor class."""
     def __init__(self):
         pass
 
