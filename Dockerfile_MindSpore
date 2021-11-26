@@ -2,9 +2,9 @@
 FROM nvidia/cuda:11.1.1-cudnn8-runtime-ubuntu20.04
 LABEL maintainer="Baochun Li"
 
-ADD .bashrc /root/
-COPY requirements.txt /root/
-WORKDIR /root
+ADD ./.bashrc /root/
+COPY ./requirements.txt /root/
+WORKDIR /root/plato
 
 RUN apt-get update \
     && apt-get install -y wget \

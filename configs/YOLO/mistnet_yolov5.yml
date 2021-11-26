@@ -13,7 +13,7 @@ clients:
 
 server:
     type: mistnet
-
+    ping_timeout: 36000
     address: 127.0.0.1
     port: 8000
 

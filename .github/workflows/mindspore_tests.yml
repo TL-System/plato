@@ -1,0 +1,39 @@
+name: MindSpore Continuous Integration Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    branches: [main]
+
+jobs:
+  MindSpore-Tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+      - uses: actions/checkout@v2
+
+      # Runs a set of commands using the runners shell
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt install -y python3-pip wget
+          pip3 install -r requirements.txt --upgrade
+          mkdir -p ~/miniconda3
+          wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
+          bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
+          rm -rf ~/miniconda3/miniconda.sh
+          ~/miniconda3/bin/conda update -n base -c defaults conda -y
+          ~/miniconda3/bin/conda init bash
+          ~/miniconda3/bin/conda install mindspore-gpu=1.5.0 cudatoolkit=11.1 -c mindspore -c conda-forge -y
+          pip3 install torch==1.10.0+cpu torchvision==0.11.1+cpu -f https://download.pytorch.org/whl/cpu/torch_stable.html
+
+      - name: Test runs
+        run: |
+          ./run --config=configs/MNIST/fedavg_lenet5.yml
+          ./run --config=configs/MNIST/mistnet_lenet5.yml
+          ./run --config=configs/YOLO/fedavg_yolov5.yml
