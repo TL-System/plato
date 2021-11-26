@@ -95,54 +95,17 @@ cd packages/yolov5
 pip install .
 ```
 
-### Installing Plato with MindSpore or TensorFlow
+### Running Plato with MindSpore or TensorFlow
 
 Plato is designed to support multiple deep learning frameworks, including PyTorch, TensorFlow, and MindSpore. 
 
-For TensorFlow support, please install the `tensorflow` and `tensorflow-datasets` pip packages first. 
-
-For MindSpore support, Plato currently supports MindSpore 1.1.1 (1.2.1 and 1.3.0 are not supported, as [they do not support `Tensor` objects to be pickled](https://gitee.com/mindspore/mindspore/issues/I43RPP?from=project-issue) and sent over a network). Though we provided a `Dockerfile` for building a Docker container that supports MindSpore 1.1.1, in rare cases it may still be necessary to install Plato with MindSpore in a GPU server running Ubuntu Linux 18.04 (which MindSpore requires). Similar to a PyTorch installation, we need to first create a new environment with Python 3.7.5 (which MindSpore 1.1.1 requires), and then install the required packages:
+**TensorFlow.** Install the `tensorflow` and `tensorflow-datasets` pip packages first:
 
 ```shell
-conda create -n mindspore python=3.7.5
-pip install -r requirements.txt
+pip install tensorflow tensorflow-datasets
 ```
 
-We should now install MindSpore 1.1.1 with the command provided by the [official MindSpore website](https://mindspore.cn/install).
-
-MindSpore 1.1.1 may also need additional packages, which should installed if they do not exist:
-
-```shell
-sudo apt-get install libssl-dev
-sudo apt-get install build-essential
-```
-
-If CuDNN has not yet been installed, it needs to be installed with the following commands:
-
-```shell
-wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-ubuntu1804.pin
-sudo mv cuda-ubuntu1804.pin /etc/apt/preferences.d/cuda-repository-pin-600
-sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub
-sudo add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/ /"
-sudo apt-get update
-sudo apt-get install libcudnn8=8.0.5.39-1+cuda10.1
-```
-
-To check the current CuDNN version, the following commands are helpful:
-
-```shell
-function lib_installed() { /sbin/ldconfig -N -v $(sed 's/:/ /' <<< $LD_LIBRARY_PATH) 2>/dev/null | grep $1; }
-function check() { lib_installed $1 && echo "$1 is installed" || echo "ERROR: $1 is NOT installed"; }
-check libcudnn
-```
-
-To check if MindSpore is correctly installed on the GPU server, try to run the command:
-
-```shell
-python -c "import mindspore"
-```
-
-Finally, to use trainers and servers based on MindSpore, assign `true` to `use_mindspore` in the `trainer` section of the configuration file. If GPU is not available when MindSpore is used, assign `true` to `cpuonly` in the `trainer` section as well. These variables are unassigned by default, and *Plato* would use PyTorch as its default framework.
+**MindSpore.** Plato currently supports the latest MindSpore release, 1.5.0. We have provided a `Dockerfile_MindSpore` file for building a Docker container that supports MindSpore 1.5.0. To use trainers and servers based on MindSpore, assign `true` to `use_mindspore` in the `trainer` section of the configuration file. If GPU is not available when MindSpore is used, assign `true` to `cpuonly` in the `trainer` section as well. These variables are unassigned by default, and *Plato* would use PyTorch as its default framework. As examples of using MindSpore as its underlying deep learning framework, two configuration files have been provided: `configs/MNIST/fedavg_lenet5_mindspore.yml` and `configs/MNIST/mistnet_lenet5_mindspore.yml`.
 
 ## Running Plato
 
