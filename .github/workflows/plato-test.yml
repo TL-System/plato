@@ -19,7 +19,7 @@ jobs:
       - name: Install CUDA
         env:
           cuda: "11.3"
-        run: ./scripts/actions/install_cuda_ubuntu.sh
+        run: bash ./scripts/actions/install_cuda_ubuntu.sh
         shell: bash
 
       # Runs a set of commands using the runners shell
