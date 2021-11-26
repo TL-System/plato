@@ -1,0 +1,39 @@
+name: PyTorch Continuous Integration Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    branches: [main]
+
+jobs:
+  PyTorch-Tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+      - uses: actions/checkout@v2
+
+      # Runs a set of commands using the runners shell
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt install -y python3-pip
+          pip3 install torch==1.10.0+cpu torchvision==0.11.1+cpu -f https://download.pytorch.org/whl/cpu/torch_stable.html
+          pip3 install -r requirements.txt --upgrade
+          cd packages/yolov5
+          pip3 install -r requirements.txt --upgrade
+          pip install .
+          cd ../..
+          wget https://kubeedge.obs.cn-north-1.myhuaweicloud.com/examples/yolov5_coco128_mistnet/yolov5.pth 
+          mkdir -p ./models/pretrained
+          mv yolov5.pth ./models/pretrained/
+
+      - name: Test runs
+        run: |
+          ./run --config=configs/MNIST/fedavg_lenet5.yml
+          ./run --config=configs/MNIST/mistnet_lenet5.yml
+          ./run --config=configs/YOLO/fedavg_yolov5.yml

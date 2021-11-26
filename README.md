@@ -6,11 +6,11 @@ Welcome to *Plato*, a new software framework to facilitate scalable federated le
 
 ### Setting up your Python environment
 
-It is recommended that [Miniconda](https://docs.conda.io/en/latest/miniconda.html) is used to manage Python packages. Before using *Plato*, first install [Miniconda](https://docs.conda.io/en/latest/miniconda.html), update your `conda` environment, and then create a new `conda` environment with Python 3.8 using the command:
+It is recommended that [Miniconda](https://docs.conda.io/en/latest/miniconda.html) is used to manage Python packages. Before using *Plato*, first install [Miniconda](https://docs.conda.io/en/latest/miniconda.html), update your `conda` environment, and then create a new `conda` environment with Python 3.9 using the command:
 
 ```shell
 $ conda update conda -y
-$ conda create -n federated python=3.8
+$ conda create -n federated python=3.9
 $ conda activate federated
 ```
 
@@ -166,7 +166,7 @@ docker rmi plato
 
 On Ubuntu Linux, you may need to add `sudo` before these `docker` commands.
 
-The provided `Dockerfile` helps to build a Docker image running Ubuntu 20.04, with a virtual environment called `plato` pre-configured to support PyTorch 1.9.0 and Python 3.8. 
+The provided `Dockerfile` helps to build a Docker image running Ubuntu 20.04, with a virtual environment called `plato` pre-configured to support PyTorch 1.9.0 and Python 3.9.
 
 If MindSpore support is needed, the provided `Dockerfile_MindSpore` contains two pre-configured environments for CPU and GPU environments, respectively, called `plato_cpu` or `plato_gpu`. They support [MindSpore 1.1.1](https://github.com/mindspore-ai/mindspore) and Python 3.7.5 (which is the Python version that MindSpore requires). Both Dockerfiles have GPU support enabled. Once an image is built and a Docker container is running, one can use Visual Studio Code to connect to it and start development within the container.
 
@@ -215,6 +215,16 @@ python plot.py --config=config.yml
 ### Running unit tests
 
 All unit tests are in the `tests/` directory. These tests are designed to be standalone and executed separately. For example, the command `python lr_schedule_tests.py` runs the unit tests for learning rate schedules.
+
+### Running continuous integration tests as GitHub actions
+
+Continuous Integration tests have been set up for the PyTorch, TensorFlow, and MindSpore frameworks in `.github/workflows/`, and will be activated on every push and Pull Request. To run these tests locally, first install [`act`](https://github.com/nektos/act). For example, use the following command to install `act` on macOS:
+
+```shell
+brew install act
+```
+
+Then use the `act` command to start these tests one at a time.
 
 ## Deploying Plato
 

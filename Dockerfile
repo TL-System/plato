@@ -2,9 +2,9 @@
 FROM nvidia/cuda:11.1.1-cudnn8-devel-ubuntu20.04
 LABEL maintainer="Baochun Li"
 
-ADD .bashrc /root/
-COPY requirements.txt /root/
-WORKDIR /root
+ADD ./.bashrc /root/
+COPY ./requirements.txt /root/
+WORKDIR /root/plato
 
 RUN apt-get update \
     && apt-get install -y wget \
@@ -18,8 +18,8 @@ RUN apt-get update \
     && rm -rf ~/miniconda3/miniconda.sh \
     && ~/miniconda3/bin/conda update -n base -c defaults conda \
     && ~/miniconda3/bin/conda init bash \
-    && ~/miniconda3/bin/conda create -n plato python=3.8 \
-    && ~/miniconda3/bin/conda install pytorch torchvision cudatoolkit=11.1 -c pytorch -c conda-forge -n plato \
+    && ~/miniconda3/bin/conda create -n plato python=3.9 \
+    && ~/miniconda3/bin/conda install pytorch torchvision cudatoolkit=11.1 -c pytorch -c conda-forge -n plato -y \
     && ~/miniconda3/envs/plato/bin/pip install -r ~/requirements.txt \
     && ~/miniconda3/envs/plato/bin/pip install plato-learn
 
