@@ -25,6 +25,6 @@ jobs:
                   pip3 install torch==1.10.0+cpu torchvision==0.11.1+cpu -f https://download.pytorch.org/whl/cpu/torch_stable.html
                   pip3 install tensorflow tensorflow-datasets
 
-            - name: Test runs
+            - name: Training workloads
               run: |
                   ./run --config=configs/MNIST/fedavg_lenet5_tensorflow.yml
