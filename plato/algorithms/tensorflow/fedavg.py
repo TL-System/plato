@@ -3,6 +3,8 @@ The federated averaging algorithm for TensorFlow.
 """
 from collections import OrderedDict
 
+import numpy
+
 from plato.algorithms import base
 from plato.datasources import registry as datasources_registry
 from plato.trainers.base import Trainer
@@ -60,3 +62,13 @@ class Algorithm(base.Algorithm):
     def load_weights(self, weights):
         """Load the model weights passed in as a parameter."""
         self.model.set_weights(weights)
+
+    @staticmethod
+    def weights_to_numpy(weights):
+        """Converts weights from a model into numpy format."""
+        return OrderedDict(enumerate(weights))
+
+    @staticmethod
+    def numpy_to_weight(weights: OrderedDict):
+        """Converts numpy formatted weights into model weight."""
+        return list(weights.values())

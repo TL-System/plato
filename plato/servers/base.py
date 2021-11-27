@@ -508,3 +508,11 @@ class Server:
     @abstractmethod
     async def process_reports(self) -> None:
         """ Process a client report. """
+
+    def receive_dataprocess(self, payload):
+        """Apply DataProcessor on client payload"""
+        return payload
+
+    def send_dataprocess(self, payload):
+        """Apply DataProcessor on payload to be sent"""
+        return payload

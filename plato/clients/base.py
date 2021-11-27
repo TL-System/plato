@@ -240,7 +240,10 @@ class Client:
                 await self.send_in_chunks(_data)
                 data_size = sys.getsizeof(_data)
 
-        await self.sio.emit('client_payload_done', {'id': self.client_id, 'obkey': payload_key})
+        await self.sio.emit('client_payload_done', {
+            'id': self.client_id,
+            'obkey': payload_key
+        })
 
         logging.info("[Client #%d] Sent %s MB of payload data to the server.",
                      self.client_id, round(data_size / 1024**2, 2))
@@ -263,3 +266,11 @@ class Client:
     @abstractmethod
     async def train(self):
         """The machine learning training workload on a client."""
+
+    def receive_preprocess(self):
+        """Apply DataProcessor to self.server_payload received from server"""
+        self.server_payload = self.server_payload
+
+    def send_preprocess(self, payload):
+        """Apply DataProcessor to payload for sending to server"""
+        return payload

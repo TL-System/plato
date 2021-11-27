@@ -1,6 +1,7 @@
 """
 The federated averaging algorithm for MindSpore.
 """
+from typing import OrderedDict
 import mindspore
 
 from plato.algorithms import base
@@ -26,3 +27,14 @@ class Algorithm(base.Algorithm):
         # seems to be equivalent to mindspore.load_param_into_net() in its effects
 
         mindspore.load_param_into_net(self.model, weights, strict_load=True)
+
+    @staticmethod
+    def weights_to_numpy(weights):
+        """Converts weights from a model into numpy format."""
+        return OrderedDict([(k, v.asnumpy()) for k, v in weights.items()])
+
+    @staticmethod
+    def numpy_to_weight(weights):
+        """Converts numpy formatted weights into model weight."""
+        return OrderedDict([(k, mindspore.Parameter(v, name=k))
+                            for k, v in weights.items()])

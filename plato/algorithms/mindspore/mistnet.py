@@ -74,3 +74,20 @@ class Algorithm(fedavg.Algorithm):
                                               column_names=["image", "label"])
 
         self.trainer.train(feature_dataset)
+
+    @staticmethod
+    def features_to_numpy(features):
+        """Converts weights from a model into numpy format."""
+        features_new = []
+        for logit, target in features:
+            features_new.append((logit.asnumpy(), target.asnumpy()))
+        return features_new
+
+    @staticmethod
+    def numpy_to_features(features):
+        """Converts numpy formatted weights into model weight."""
+        features_new = []
+        for logit, target in features:
+            features_new.append(
+                (mindspore.Tensor(logit), mindspore.Tensor(target)))
+        return features_new

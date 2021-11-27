@@ -81,3 +81,20 @@ class Algorithm(fedavg.Algorithm):
     def train(self, trainset, sampler, cut_layer=None):
         """ Train the neural network model after the cut layer. """
         self.trainer.train(trainset.torch_dataset(), sampler, cut_layer)
+
+    @staticmethod
+    def features_to_numpy(features):
+        """Converts weights from a model into numpy format."""
+        features_new = []
+        for logit, target in features:
+            features_new.append(
+                (logit.detach().numpy(), target.detach().numpy()))
+        return features_new
+
+    @staticmethod
+    def numpy_to_features(features):
+        """Converts numpy formatted weights into model weight."""
+        features_new = []
+        for logit, target in features:
+            features_new.append((torch.Tensor(logit), torch.Tensor(target)))
+        return features_new

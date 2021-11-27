@@ -62,3 +62,13 @@ class Algorithm(ABC):
     @abstractmethod
     def load_weights(self, weights):
         """Load the model weights passed in as a parameter."""
+
+    @abstractmethod
+    @staticmethod
+    def weights_to_numpy():
+        """Converts weights from a model into numpy format."""
+
+    @abstractmethod
+    @staticmethod
+    def numpy_to_weight():
+        """Converts numpy formatted weights into model weight."""
