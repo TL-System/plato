@@ -13,6 +13,7 @@ clients:
 
 server:
     address: 127.0.0.1
+    ping_timeout: 36000
     port: 8000
 
 data:
