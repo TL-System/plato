@@ -39,6 +39,10 @@ jobs:
       - name: Training workloads
         shell: bash -l {0}
         run: |
+          mkdir ./models/pretrained
+          wget https://kubeedge.obs.cn-north-1.myhuaweicloud.com/model/yolov5.pth
+          mv yolov5.pth ./models/pretrained
           ./run --config=configs/MNIST/fedavg_lenet5.yml
           ./run --config=configs/MNIST/mistnet_lenet5.yml
           ./run --config=configs/YOLO/fedavg_yolov5.yml
+          ./run --config=.github/workflows/testconf/mistnet_yolov5.yml
