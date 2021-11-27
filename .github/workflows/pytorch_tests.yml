@@ -1,4 +1,4 @@
-name: PyTorch Continuous Integration Tests
+name: PyTorch CI Tests
 
 on:
   push:
@@ -28,11 +28,13 @@ jobs:
           pip3 install -r requirements.txt --upgrade
           pip install .
           cd ../..
-          wget https://kubeedge.obs.cn-north-1.myhuaweicloud.com/examples/yolov5_coco128_mistnet/yolov5.pth 
-          mkdir -p ./models/pretrained
-          mv yolov5.pth ./models/pretrained/
 
-      - name: Test runs
+      - name: Unit tests
+        run: |
+          cd tests
+          find . -name '*.py' -exec python {} \;
+
+      - name: Training workloads
         run: |
           ./run --config=configs/MNIST/fedavg_lenet5.yml
           ./run --config=configs/MNIST/mistnet_lenet5.yml
