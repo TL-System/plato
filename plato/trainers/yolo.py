@@ -360,7 +360,7 @@ class Trainer(basic.Trainer):
 
         # Print results
         pf = '%20s' + '%11i' * 2 + '%11.3g' * 4  # print format
-        logging.info(pf % ('all', seen, nt.sum(), mp, mr, map50, map))
+        print(pf % ('all', seen, nt.sum(), mp, mr, map50, map))
 
         return map50
 
