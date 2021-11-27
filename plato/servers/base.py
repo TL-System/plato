@@ -291,6 +291,7 @@ class Server:
 
                 payload = self.algorithm.extract_weights()
                 payload = self.customize_server_payload(payload)
+                payload = self.send_preprocess(payload)
 
                 # Sending the server payload to the client
                 logging.info(
@@ -429,6 +430,9 @@ class Server:
             "[Server #%d] Received %s MB of payload data from client #%d.",
             os.getpid(), round(payload_size / 1024**2, 2), client_id)
 
+        self.client_payload[sid] = self.receive_preprocess(
+            self.client_payload[sid])
+
         self.updates.append((self.reports[sid], self.client_payload[sid]))
 
         self.reporting_clients.append(client_id)
@@ -509,10 +513,10 @@ class Server:
     async def process_reports(self) -> None:
         """ Process a client report. """
 
-    def receive_dataprocess(self, payload):
+    def receive_preprocess(self, payload):
         """Apply DataProcessor on client payload"""
         return payload
 
-    def send_dataprocess(self, payload):
+    def send_preprocess(self, payload):
         """Apply DataProcessor on payload to be sent"""
         return payload

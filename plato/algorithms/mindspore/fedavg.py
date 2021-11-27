@@ -34,7 +34,7 @@ class Algorithm(base.Algorithm):
         return OrderedDict([(k, v.asnumpy()) for k, v in weights.items()])
 
     @staticmethod
-    def numpy_to_weight(weights):
+    def numpy_to_weights(weights):
         """Converts numpy formatted weights into model weight."""
         return OrderedDict([(k, mindspore.Parameter(v, name=k))
                             for k, v in weights.items()])

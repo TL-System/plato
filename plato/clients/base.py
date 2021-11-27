@@ -191,6 +191,7 @@ class Client:
             "[Client #%d] Received %s MB of payload data from the server.",
             client_id, round(payload_size / 1024**2, 2))
 
+        self.receive_preprocess()
         self.load_payload(self.server_payload)
         self.server_payload = None
 
@@ -207,6 +208,7 @@ class Client:
         await self.sio.emit('client_report', {'report': pickle.dumps(report)})
 
         # Sending the client training payload to the server
+        payload = self.send_preprocess(payload)
         await self.send(payload)
 
     async def send_in_chunks(self, data) -> None:

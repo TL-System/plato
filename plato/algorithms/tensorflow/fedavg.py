@@ -69,6 +69,6 @@ class Algorithm(base.Algorithm):
         return OrderedDict(enumerate(weights))
 
     @staticmethod
-    def numpy_to_weight(weights: OrderedDict):
+    def numpy_to_weights(weights: OrderedDict):
         """Converts numpy formatted weights into model weight."""
         return list(weights.values())
