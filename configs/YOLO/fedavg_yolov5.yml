@@ -13,7 +13,6 @@ clients:
 
 server:
     address: 127.0.0.1
-    ping_timeout: 36000
     port: 8000
 
 data:
@@ -155,7 +154,7 @@ trainer:
     target_accuracy: 0.99
 
     # Number of epoches for local training in each communication round
-    epochs: 10
+    epochs: 1
     batch_size: 4
     optimizer: Adam
     linear_lr: false

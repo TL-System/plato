@@ -112,7 +112,7 @@ class Client(base.Client):
         if Config().clients.do_test:
             accuracy = self.trainer.test(self.testset, self.test_set_sampler)
 
-            if accuracy == 0:
+            if accuracy == -1:
                 # The testing process failed, disconnect from the server
                 await self.sio.disconnect()
 
