@@ -21,7 +21,6 @@ jobs:
         uses: conda-incubator/setup-miniconda@v2
         with:
           miniconda-version: "latest"
-          activate-environment: base
 
       - name: Install dependencies
         run: |
