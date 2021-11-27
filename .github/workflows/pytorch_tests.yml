@@ -19,6 +19,7 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Install dependencies
+        shell: bash -l {0}
         run: |
           sudo apt-get update
           sudo apt install -y python3-pip
@@ -30,11 +31,13 @@ jobs:
           cd ../..
 
       - name: Unit tests
+        shell: bash -l {0}
         run: |
           cd tests
           find . -name '*.py' -exec python {} \;
 
       - name: Training workloads
+        shell: bash -l {0}
         run: |
           ./run --config=configs/MNIST/fedavg_lenet5.yml
           ./run --config=configs/MNIST/mistnet_lenet5.yml
