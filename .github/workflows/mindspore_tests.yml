@@ -27,8 +27,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt install -y python3-pip
-          conda install pytorch torchvision cpuonly -c pytorch -n plato_cpu -y
-          conda install mindspore-cpu=1.5.0 -c mindspore -c conda-forge -n plato_cpu -y
+          conda install pytorch torchvision cpuonly -c pytorch -y
+          conda install mindspore-cpu=1.5.0 -c mindspore -c conda-forge -y
           pip3 install -r requirements.txt --upgrade
 
       - name: Training workloads
