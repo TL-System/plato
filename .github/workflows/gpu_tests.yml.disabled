@@ -22,24 +22,32 @@ jobs:
         run: bash ./scripts/actions/install_cuda_ubuntu.sh
         shell: bash
 
-      # Runs a set of commands using the runners shell
       - name: Install dependencies
         run: |
-          mkdir -p ./models/pretrained
-          sudo apt install -y python3-pip git
+          sudo apt-get update
+          sudo apt install -y python3-pip
           pip3 install torch==1.10.0+cu113 torchvision==0.11.1+cu113 torchaudio==0.10.0+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
           pip3 install -r requirements.txt --upgrade
           cd packages/yolov5
           pip3 install -r requirements.txt --upgrade
           pip install .
           cd ../..
-          wget https://kubeedge.obs.cn-north-1.myhuaweicloud.com/examples/yolov5_coco128_mistnet/yolov5.pth 
-          mv yolov5.pth ./models/pretrained/
-      - name: Test runs
+
+      - name: Unit tests
+        shell: bash -l {0}
         run: |
+          cd tests
+          find . -name '*.py' -exec python {} \;
+
+      - name: Training workloads
+        run: |
+          mkdir ./models/pretrained
+          wget https://kubeedge.obs.cn-north-1.myhuaweicloud.com/model/yolov5.pth
+          mv yolov5.pth ./models/pretrained
           ./run --config=configs/MNIST/fedavg_lenet5.yml
           ./run --config=configs/MNIST/mistnet_lenet5.yml
-          ./run --config=configs/YOLO/fedavg_yolov5.yml
+          ./run --config=.github/workflows/configs/fedavg_yolov5.yml
+          ./run --config=.github/workflows/configs/mistnet_yolov5.yml
 
   MindSpore-tests:
     runs-on: Dockerfile_MindSpore

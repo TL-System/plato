@@ -95,18 +95,6 @@ cd packages/yolov5
 pip install .
 ```
 
-### Running Plato with MindSpore or TensorFlow
-
-Plato is designed to support multiple deep learning frameworks, including PyTorch, TensorFlow, and MindSpore. 
-
-**TensorFlow.** Install the `tensorflow` and `tensorflow-datasets` pip packages first:
-
-```shell
-pip install tensorflow tensorflow-datasets
-```
-
-**MindSpore.** Plato currently supports the latest MindSpore release, 1.5.0. We have provided a `Dockerfile_MindSpore` file for building a Docker container that supports MindSpore 1.5.0. To use trainers and servers based on MindSpore, assign `true` to `use_mindspore` in the `trainer` section of the configuration file. If GPU is not available when MindSpore is used, assign `true` to `cpuonly` in the `trainer` section as well. These variables are unassigned by default, and *Plato* would use PyTorch as its default framework. As examples of using MindSpore as its underlying deep learning framework, two configuration files have been provided: `configs/MNIST/fedavg_lenet5_mindspore.yml` and `configs/MNIST/mistnet_lenet5_mindspore.yml`.
-
 ## Running Plato
 
 ### Running Plato using a configuration file
@@ -123,6 +111,23 @@ To start a federated learning training workload, run [`run`](run) from the repos
 *Plato* uses the YAML format for its configuration files to manage the runtime configuration parameters. Example configuration files have been provided in the `configs` directory.
 
 *Plato* can opt to use `wandb` to produce and collect logs in the cloud. If this is needed, add `use_wandb: true` to the `trainer` section in your configuration file, and install the `wandb` pip package in your `conda` environment.
+
+### Running Plato with MindSpore or TensorFlow
+
+Plato is designed to support multiple deep learning frameworks, including PyTorch, TensorFlow, and MindSpore. 
+
+**TensorFlow.** Install the `tensorflow` and `tensorflow-datasets` pip packages first:
+
+```shell
+pip install tensorflow tensorflow-datasets
+./run --config=configs/MNIST/fedavg_lenet5_tensorflow.yml
+```
+
+**MindSpore.** Plato currently supports the latest MindSpore release, 1.5.0. We have provided a `Dockerfile_MindSpore` file for building a Docker container that supports MindSpore 1.5.0. To use trainers and servers based on MindSpore, assign `true` to `use_mindspore` in the `trainer` section of the configuration file. If GPU is not available when MindSpore is used, assign `true` to `cpuonly` in the `trainer` section as well. These variables are unassigned by default, and *Plato* would use PyTorch as its default framework. As examples of using MindSpore as its underlying deep learning framework, two configuration files have been provided: `configs/MNIST/fedavg_lenet5_mindspore.yml` and `configs/MNIST/mistnet_lenet5_mindspore.yml`. For example:
+
+```shell
+./run --config=configs/MNIST/fedavg_lenet5_mindspore.yml
+```
 
 ### Running Plato in a Docker container
 

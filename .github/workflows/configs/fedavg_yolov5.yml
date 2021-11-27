@@ -3,7 +3,7 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 2
+    total_clients: 1
 
     # The number of clients selected in each round
     per_round: 1
@@ -154,7 +154,7 @@ trainer:
     target_accuracy: 0.99
 
     # Number of epoches for local training in each communication round
-    epochs: 10
+    epochs: 1
     batch_size: 4
     optimizer: Adam
     linear_lr: false
