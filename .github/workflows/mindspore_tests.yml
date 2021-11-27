@@ -36,6 +36,7 @@ jobs:
 
       - name: Training workloads
         run: |
+          ~/miniconda3/bin/conda init bash
           ~/miniconda3/bin/conda activate plato_cpu
           ./run --config=configs/MNIST/fedavg_lenet5_mindspore.yml
           ./run --config=configs/MNIST/mistnet_lenet5_mindspore.yml
