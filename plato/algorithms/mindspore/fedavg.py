@@ -14,9 +14,10 @@ class Algorithm(base.Algorithm):
     def extract_weights(self):
         """Extract weights from the model."""
 
-        # In MindSpore releases later than 1.1.3, including 1.5.0, do not support `pickle.load()`
-        # on `Tensor` objects (https://gitee.com/mindspore/mindspore/issues/I43RPP?from=project-issue).
-        # Therefore, Tensor objects must be converted to numpy arrays first
+        # It turns out that recent MindSpore releases later than 1.1.3, including 1.5.0, do not support
+        # `pickle.load()` on `Tensor` objects (https://gitee.com/mindspore/mindspore/issues/I43RPP?from=project-issue).
+        # Therefore, Tensor objects must be converted to numpy arrays first before being pickled.
+
         numpy_weights = OrderedDict()
 
         for name, weight in self.model.parameters_dict().items():

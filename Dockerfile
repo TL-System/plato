@@ -1,5 +1,5 @@
 # Download base image from NVIDIA's Docker Hub
-FROM nvidia/cuda:11.1.1-cudnn8-devel-ubuntu20.04
+FROM nvidia/cuda:11.3.0-cudnn8-devel-ubuntu20.04
 LABEL maintainer="Baochun Li"
 
 ADD ./.bashrc /root/
@@ -19,7 +19,7 @@ RUN apt-get update \
     && ~/miniconda3/bin/conda update -n base -c defaults conda \
     && ~/miniconda3/bin/conda init bash \
     && ~/miniconda3/bin/conda create -n plato python=3.9 \
-    && ~/miniconda3/bin/conda install pytorch torchvision cudatoolkit=11.1 -c pytorch -c conda-forge -n plato -y \
+    && ~/miniconda3/bin/conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch -n plato -y \
     && ~/miniconda3/envs/plato/bin/pip install -r ~/requirements.txt \
     && ~/miniconda3/envs/plato/bin/pip install plato-learn
 

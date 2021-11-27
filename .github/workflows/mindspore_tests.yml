@@ -1,4 +1,4 @@
-name: MindSpore Continuous Integration Tests
+name: MindSpore CI Tests
 
 on:
   push:
@@ -34,6 +34,5 @@ jobs:
 
       - name: Test runs
         run: |
-          ./run --config=configs/MNIST/fedavg_lenet5.yml
-          ./run --config=configs/MNIST/mistnet_lenet5.yml
-          ./run --config=configs/YOLO/fedavg_yolov5.yml
+          ./run --config=configs/MNIST/fedavg_lenet5_mindspore.yml
+          ./run --config=configs/MNIST/mistnet_lenet5_mindspore.yml

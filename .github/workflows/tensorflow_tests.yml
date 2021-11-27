@@ -1,4 +1,4 @@
-name: TensorFlow Continuous Integration Tests
+name: TensorFlow CI Tests
 
 on:
     push:

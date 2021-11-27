@@ -126,7 +126,7 @@ To start a federated learning training workload, run [`run`](run) from the repos
 
 ### Running Plato in a Docker container
 
-Most of the codebase in *Plato* is designed to be framework-agnostic, so that it is relatively straightfoward to use *Plato* with a variety of deep learning frameworks beyond PyTorch, which is the default framwork it is using. One example of such deep learning frameworks that *Plato* currently supports is [MindSpore 1.1.1](https://www.mindspore.cn). Due to the wide variety of tricks that need to be followed correctly for running *Plato* without Docker, it is strongly recommended to run Plato in a Docker container, on either a CPU-only or a GPU-enabled server.
+Most of the codebase in *Plato* is designed to be framework-agnostic, so that it is relatively straightfoward to use *Plato* with a variety of deep learning frameworks beyond PyTorch, which is the default framwork it is using. One example of such deep learning frameworks that *Plato* currently supports is [MindSpore 1.5.0](https://www.mindspore.cn). Due to the wide variety of tricks that need to be followed correctly for running *Plato* without Docker, it is strongly recommended to run Plato in a Docker container, on either a CPU-only or a GPU-enabled server.
 
 To build such a Docker image, use the provided `Dockerfile` for PyTorch and `Dockerfile_MindSpore` for MindSpore:
 
@@ -168,7 +168,7 @@ On Ubuntu Linux, you may need to add `sudo` before these `docker` commands.
 
 The provided `Dockerfile` helps to build a Docker image running Ubuntu 20.04, with a virtual environment called `plato` pre-configured to support PyTorch 1.9.0 and Python 3.9.
 
-If MindSpore support is needed, the provided `Dockerfile_MindSpore` contains two pre-configured environments for CPU and GPU environments, respectively, called `plato_cpu` or `plato_gpu`. They support [MindSpore 1.1.1](https://github.com/mindspore-ai/mindspore) and Python 3.7.5 (which is the Python version that MindSpore requires). Both Dockerfiles have GPU support enabled. Once an image is built and a Docker container is running, one can use Visual Studio Code to connect to it and start development within the container.
+If MindSpore support is needed, the provided `Dockerfile_MindSpore` contains two pre-configured environments for CPU and GPU environments, respectively, called `plato_cpu` or `plato_gpu`. They support [MindSpore 1.5.0](https://github.com/mindspore-ai/mindspore) and Python 3.9.0 (which is the Python version that MindSpore 1.5.0 requires). Both Dockerfiles have GPU support enabled. Once an image is built and a Docker container is running, one can use Visual Studio Code to connect to it and start development within the container.
 
 ### Potential runtime errors
 
@@ -216,15 +216,9 @@ python plot.py --config=config.yml
 
 All unit tests are in the `tests/` directory. These tests are designed to be standalone and executed separately. For example, the command `python lr_schedule_tests.py` runs the unit tests for learning rate schedules.
 
-### Running continuous integration tests as GitHub actions
+### Running Continuous Integration tests as GitHub actions
 
-Continuous Integration tests have been set up for the PyTorch, TensorFlow, and MindSpore frameworks in `.github/workflows/`, and will be activated on every push and Pull Request. To run these tests locally, first install [`act`](https://github.com/nektos/act). For example, use the following command to install `act` on macOS:
-
-```shell
-brew install act
-```
-
-Then use the `act` command to start these tests one at a time.
+Continuous Integration (CI) tests have been set up for the PyTorch, TensorFlow, and MindSpore frameworks in `.github/workflows/`, and will be activated on every push and Pull Request. To run these tests manually, visit the `Actions` tab at GitHub, select the job, and then click `Run workflow`.
 
 ## Deploying Plato
 
