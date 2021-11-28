@@ -96,5 +96,5 @@ class Algorithm(fedavg.Algorithm):
         """Converts numpy formatted weights into model weight."""
         features_new = []
         for logit, target in features:
-            features_new.append((torch.Tensor(logit), torch.Tensor(target)))
+            features_new.append((torch.Tensor(logit), torch.tensor(target)))
         return features_new

@@ -357,7 +357,7 @@ class Trainer(base.Trainer):
 
             self.pause_training()
         else:
-            accuracy = self.test_process(config, testset)
+            accuracy = self.test_process(config, testset, sampler)
 
         return accuracy
 

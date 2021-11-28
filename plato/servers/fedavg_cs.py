@@ -238,13 +238,3 @@ class Server(fedavg.Server):
                 report.num_samples / total_samples)
 
         return average_client_accuracy
-
-    def receive_preprocess(self, payload):
-        """Apply DataProcessor on client payload"""
-        payload = super().receive_preprocess(payload)
-        return self.algorithm.numpy_to_weights(payload)
-
-    def send_preprocess(self, payload):
-        """Apply DataProcessor on payload to be sent"""
-        payload = self.algorithm.weights_to_numpy(payload)
-        return super().send_preprocess(payload)

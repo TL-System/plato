@@ -200,10 +200,8 @@ class Server(base.Server):
 
     def receive_preprocess(self, payload):
         """Apply DataProcessor on client payload"""
-        payload = super().receive_preprocess(payload)
         return self.algorithm.numpy_to_weights(payload)
 
     def send_preprocess(self, payload):
         """Apply DataProcessor on payload to be sent"""
-        payload = self.algorithm.weights_to_numpy(payload)
-        return super().send_preprocess(payload)
+        return self.algorithm.weights_to_numpy(payload)
