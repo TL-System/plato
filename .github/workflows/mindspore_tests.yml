@@ -1,0 +1,42 @@
+name: MindSpore CI Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    branches: [main]
+
+jobs:
+  MindSpore-Tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setting up Conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniconda-version: "latest"
+          auto-update-conda: true
+          activate-environment: "plato"
+
+      - name: Install dependencies
+        shell: bash -l {0}
+        run: |
+          sudo apt-get update
+          sudo apt install -y python3-pip
+          conda activate plato
+          conda install pytorch torchvision cpuonly -c pytorch -y
+          conda install mindspore-cpu=1.5.0 -c mindspore -c conda-forge -y
+          pip3 install numpy python-socketio aiohttp requests boto3 pyyaml pyyaml-include datasets
+
+      - name: Training workloads
+        shell: bash -l {0}
+        run: |
+          conda activate plato
+          ./run --config=configs/MNIST/fedavg_lenet5_mindspore.yml
+          ./run --config=configs/MNIST/mistnet_lenet5_mindspore.yml

@@ -1,0 +1,32 @@
+name: TensorFlow CI Tests
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+    # Allows you to run this workflow manually from the Actions tab
+    workflow_dispatch:
+        branches: [main]
+
+jobs:
+    TensorFlow-Tests:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v2
+
+            # Runs a set of commands using the runners shell
+            - name: Install dependencies
+              shell: bash -l {0}
+              run: |
+                  sudo apt-get update
+                  sudo apt install -y python3-pip
+                  pip3 install -r requirements.txt --upgrade
+                  pip3 install torch==1.10.0+cpu torchvision==0.11.1+cpu -f https://download.pytorch.org/whl/cpu/torch_stable.html
+                  pip3 install tensorflow tensorflow-datasets
+
+            - name: Training workloads
+              shell: bash -l {0}
+              run: |
+                  ./run --config=configs/MNIST/fedavg_lenet5_tensorflow.yml

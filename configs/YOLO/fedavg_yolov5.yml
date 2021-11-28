@@ -3,7 +3,7 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 1
+    total_clients: 2
 
     # The number of clients selected in each round
     per_round: 1

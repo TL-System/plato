@@ -265,7 +265,7 @@ class Trainer(base.Trainer):
 
         return training_time
 
-    def test_process(self, config, testset, sampler):
+    def test_process(self, config, testset, sampler=None):
         """The testing loop, run in a separate process with a new CUDA context,
         so that CUDA memory can be released after the training completes.
 
@@ -275,6 +275,10 @@ class Trainer(base.Trainer):
         """
         self.model.to(self.device)
         self.model.eval()
+
+        # Initialize accuracy to be returned to -1, so that the client can disconnect
+        # from the server when testing fails
+        accuracy = -1
 
         try:
             custom_test = getattr(self, "test_model", None)
@@ -347,6 +351,7 @@ class Trainer(base.Trainer):
             proc.start()
             proc.join()
 
+            accuracy = -1
             try:
                 model_name = Config().trainer.model_name
                 filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.acc"

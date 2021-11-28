@@ -1,6 +1,6 @@
 clients:
     # Type
-    type: mistnet
+    type: simple
 
     # The total number of clients
     total_clients: 1
@@ -9,11 +9,9 @@ clients:
     per_round: 1
 
     # Should the clients compute test accuracy locally?
-    do_test: false
+    do_test: true
 
 server:
-    type: mistnet
-    ping_timeout: 36000
     address: 127.0.0.1
     port: 8000
 
@@ -140,6 +138,9 @@ trainer:
     # The type of the trainer
     type: yolov5
 
+    # test function
+    testtype: map
+
     # The maximum number of training rounds
     rounds: 1
 
@@ -153,9 +154,9 @@ trainer:
     target_accuracy: 0.99
 
     # Number of epoches for local training in each communication round
-    epochs: 500
-    batch_size: 16
-    optimizer: SGD
+    epochs: 1
+    batch_size: 4
+    optimizer: Adam
     linear_lr: false
 
     # The machine learning model
@@ -165,7 +166,4 @@ trainer:
 
 algorithm:
     # Aggregation algorithm
-    type: mistnet
-
-    cut_layer: 4
-    epsilon: 100
+    type: fedavg

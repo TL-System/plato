@@ -7,7 +7,6 @@ Differential Privacy," found in docs/papers.
 
 import logging
 import os
-from itertools import chain
 
 from plato.config import Config
 from plato.datasources import feature

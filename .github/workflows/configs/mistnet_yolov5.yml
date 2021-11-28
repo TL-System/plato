@@ -153,7 +153,7 @@ trainer:
     target_accuracy: 0.99
 
     # Number of epoches for local training in each communication round
-    epochs: 500
+    epochs: 5
     batch_size: 16
     optimizer: SGD
     linear_lr: false

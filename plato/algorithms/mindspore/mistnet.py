@@ -21,7 +21,7 @@ class Algorithm(fedavg.Algorithm):
     """The PyTorch-based MistNet algorithm, used by both the client and the
     server.
     """
-    def extract_features(self, dataset, cut_layer, epsilon=None):
+    def extract_features(self, dataset, sampler, cut_layer, epsilon=None):
         """Extracting features using layers before the cut_layer.
 
         dataset: The training or testing dataset.
@@ -47,7 +47,7 @@ class Algorithm(fedavg.Algorithm):
                 logits = unary_encoding.randomize(logits, epsilon)
                 logits = mindspore.Tensor(logits.astype('float32'))
 
-            feature_dataset.append((logits, targets))
+            feature_dataset.append((logits.asnumpy(), targets.asnumpy()))
 
         toc = time.perf_counter()
         logging.info("[Client #%d] Features extracted from %s examples.",
@@ -58,10 +58,10 @@ class Algorithm(fedavg.Algorithm):
         return feature_dataset
 
     @staticmethod
-    def dataset_generator(trainset):
+    def dataset_generator(feature_dataset):
         """The generator used to produce a suitable Dataset for the MineSpore trainer."""
-        for logit, target in trainset:
-            yield logit.asnumpy(), target.asnumpy()
+        for logit, target in feature_dataset.trainset:
+            yield logit, target
 
     def train(self, trainset, *args):
         """The main training loop used in the MistNet server.
