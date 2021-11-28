@@ -25,4 +25,4 @@ class Algorithm(base.Algorithm):
     @staticmethod
     def numpy_to_weights(weights):
         """Converts numpy formatted weights into model weight."""
-        return OrderedDict([(k, torch.Tensor(v)) for k, v in weights.items()])
+        return OrderedDict([(k, torch.tensor(v)) for k, v in weights.items()])
