@@ -1,13 +1,9 @@
 """
 The federated averaging algorithm for MindSpore.
 """
-<<<<<<< HEAD
-from typing import OrderedDict
-=======
 from collections import OrderedDict
 import numpy as np
 
->>>>>>> 1e66d37844d087cca0b91238bd3ee9e82bafb21b
 import mindspore
 
 from plato.algorithms import base
@@ -48,10 +44,9 @@ class Algorithm(base.Algorithm):
     @staticmethod
     def weights_to_numpy(weights):
         """Converts weights from a model into numpy format."""
-        return OrderedDict([(k, v.asnumpy()) for k, v in weights.items()])
+        return weights
 
     @staticmethod
     def numpy_to_weights(weights):
         """Converts numpy formatted weights into model weight."""
-        return OrderedDict([(k, mindspore.Parameter(v, name=k))
-                            for k, v in weights.items()])
+        return weights
