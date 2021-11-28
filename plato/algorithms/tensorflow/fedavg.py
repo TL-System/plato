@@ -3,8 +3,6 @@ The federated averaging algorithm for TensorFlow.
 """
 from collections import OrderedDict
 
-import numpy
-
 from plato.algorithms import base
 from plato.datasources import registry as datasources_registry
 from plato.trainers.base import Trainer

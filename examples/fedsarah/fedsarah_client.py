@@ -55,3 +55,8 @@ class Client(simple.Client):
         """ Load model weights and server control vairates from server payload onto this client. """
         self.algorithm.load_weights(server_payload[0])
         self.server_control_variates = server_payload[1]
+
+    def receive_preprocess(self):
+        """Apply DataProcessor to self.server_payload received from server"""
+        self.server_payload[0] = self.algorithm.numpy_to_weights(
+            self.server_payload[0])

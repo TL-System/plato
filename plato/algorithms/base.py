@@ -65,10 +65,10 @@ class Algorithm(ABC):
 
     @staticmethod
     @abstractmethod
-    def weights_to_numpy():
+    def weights_to_numpy(weights):
         """Converts weights from a model into numpy format."""
 
     @staticmethod
     @abstractmethod
-    def numpy_to_weights():
+    def numpy_to_weights(weights):
         """Converts numpy formatted weights into model weight."""

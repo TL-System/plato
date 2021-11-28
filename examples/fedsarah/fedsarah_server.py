@@ -45,3 +45,7 @@ class Server(fedavg.Server):
     def customize_server_payload(self, payload):
         "Add server control variates into the server payload."
         return [payload, self.server_control_variates]
+
+    def send_preprocess(self, payload):
+        """Apply DataProcessor on payload to be sent"""
+        return [self.algorithm.weights_to_numpy(payload[0]), payload[1]]

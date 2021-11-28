@@ -47,4 +47,4 @@ def get(trainer=None):
         registered_alg = registered_algorithms[algorithm_type](trainer)
         return registered_alg
     else:
-        raise ValueError('No such model: {}'.format(algorithm_type))
+        raise ValueError(f'No such model: {algorithm_type}')
