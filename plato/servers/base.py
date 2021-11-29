@@ -80,8 +80,8 @@ class Server:
         self.client_payload = {}
         self.client_chunks = {}
         self.s3_client = None
-        self.send_processor = None
-        self.receive_processor = None
+        self.outbound_processor = None
+        self.inbound_processor = None
 
         # States that need to be maintained for asynchronous FL
 
@@ -356,7 +356,7 @@ class Server:
 
     async def send(self, sid, payload, client_id) -> None:
         """ Sending a new data payload to the client using either S3 or socket.io. """
-        payload = self.send_processor.process(payload)
+        payload = self.outbound_processor.process(payload)
         if self.s3_client is not None:
             payload_key = f'server_payload_{os.getpid()}_{self.current_round}'
             self.s3_client.send_to_s3(payload_key, payload)
@@ -434,7 +434,7 @@ class Server:
             "[Server #%d] Received %s MB of payload data from client #%d.",
             os.getpid(), round(payload_size / 1024**2, 2), client_id)
 
-        self.client_payload[sid] = self.receive_processor.process(
+        self.client_payload[sid] = self.inbound_processor.process(
             self.client_payload[sid])
         self.updates.append((self.reports[sid], self.client_payload[sid]))
 
@@ -513,9 +513,11 @@ class Server:
         """ Configuring the server with initialization work. """
 
     def set_processors(self):
-        """Set processors for this server"""
-        self.send_processor, self.receive_processor = processor_registry.get(
-            "server")
+        """
+        Prepare this server for processors that processes outbound and inbound data payloads.
+        """
+        self.outbound_processor, self.inbound_processor = processor_registry.get(
+            "Server")
 
     @abstractmethod
     async def process_reports(self) -> None:

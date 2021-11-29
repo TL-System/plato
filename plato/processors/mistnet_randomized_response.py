@@ -1,20 +1,17 @@
 """
-Processor for randomized response.
-Only used for features in mistnet in pytorch.
+Implements a Processor for applying local differential privacy using randomized response.
 """
-from typing import Any
 import logging
+from typing import Any
 
 import torch
-
 from plato.processors import base
 from plato.utils import unary_encoding
 
 
 class Processor(base.Processor):
     """
-    Processor class.
-    Base Processor class implementation do nothing on the data.
+    Implements a Processor for applying local differential privacy using randomized response.
     """
     def __init__(self,
                  *args,
@@ -22,15 +19,16 @@ class Processor(base.Processor):
                  epsilon=None,
                  client_id=None,
                  **kwargs) -> None:
-        """Constructor for Processor"""
+        super().__init__(*args, **kwargs)
+
         self.trainer = trainer
         self.epsilon = epsilon
         self.client_id = client_id
 
     def process(self, data: Any) -> Any:
         """
-        Data processing implementation.
-        Implement this method while inheriting the class.
+        Implements a Processor for applying random response as the local differential privacy
+        mechanism.
         """
         if self.epsilon is None:
             return data
@@ -53,7 +51,8 @@ class Processor(base.Processor):
 
             new_data.append((logits, targets))
 
-        logging.info("[Client #%d] Randomized response applied.",
-                     self.client_id)
+        logging.info(
+            "[Client #%d] Local differential privacy (using randomized response) applied.",
+            self.client_id)
 
         return data
