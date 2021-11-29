@@ -17,6 +17,19 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |**total_clients**|The total number of clients|A positive number||
 |**per_round**|The number of clients selected in each round| Any positive integer that is not larger than **total_clients**||
 |**do_test**|Should the clients compute test accuracy locally?| `true` or `false`|| 
+|send_dataprocessors|A list of dataprocessors to apply on the payload before sending| A list of dataprocessor names || 
+|receive_dataprocessors|A list of dataprocessors to apply on the payload right after receiving| A list of dataprocessor names || 
+
+#### Valid dataprocessors for `clients.send_dataprocessors`
+
+- `base`: Do nothing
+- `mistnet_torch_randomized_response`: Activate randomized response on features for PyTorch MistNet, must also set `algorithm.epsilon` to activate. Must be placed before `mistnet_torch_unbatch` if used.
+- `mistnet_torch_unbatch`: Unbatch features for for PyTorch MistNet client, must use this dataprocessor for every PyTorch MistNet client before sending.
+- `mistnet_torch_send_ndarray_feature`: Convert PyTorch tensor features into NumPy array before sending to server. Can save significant transfer size if the feature dataset is large comparing to individual feature. Must be placed after `mistnet_torch_unbatch` if used.
+
+#### Valid dataprocessors for `clients.receive_dataprocessors`
+
+- `base`: Do nothing
 
 ### server
 
@@ -34,6 +47,17 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |*periodic_interval*|The time interval for a server operating in asynchronous mode to aggregate received updates|Any positive integer||
 |do_test|Should the central server compute test accuracy locally?| `true` or `false`|| 
 |edge_do_test|Should an edge server compute test accuracy of its aggregated model locally?| `true` or `false`||
+|send_dataprocessors|A list of dataprocessors to apply on the payload before sending| A list of dataprocessor names || 
+|receive_dataprocessors|A list of dataprocessors to apply on the payload right after receiving| A list of dataprocessor names || 
+
+#### Valid dataprocessors for `server.send_dataprocessors`
+
+- `base`: Do nothing
+
+#### Valid dataprocessors for `server.receive_dataprocessors`
+
+- `base`: Do nothing
+- `mistnet_torch_receive_ndarray_feature`: Convert PyTorch tensor features into NumPy array before sending to server. Can save significant transfer size if the feature dataset is large comparing to individual feature. Must be used if `clients.send_dataprocessors` has used `mistnet_torch_send_ndarray_feature`.
 
 ### data
 
