@@ -23,6 +23,7 @@ if __name__ == '__main__':
             '.github/workflows/configs/fedavg_yolov5',
             '.github/workflows/configs/mistnet_yolov5',
     ]:
+        print(f"Running config: {t}.yml")
         log_root = '.log'
         log_folder = os.path.join(log_root,
                                   t.replace("/", "__").replace(".", ""))
