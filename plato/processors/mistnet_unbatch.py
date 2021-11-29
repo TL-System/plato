@@ -1,22 +1,19 @@
 """
-Processor for unbatching mistnet pytorch features into dataset form.
-Only used for features in mistnet in pytorch.
+Implements a Processor for unbatching MistNet PyTorch features into the dataset form.
 """
-from typing import Any
 import logging
+from typing import Any
 
 import numpy as np
-
 from plato.processors import base
 
 
 class Processor(base.Processor):
     """
-    Processor class.
-    Base Processor class implementation do nothing on the data.
+    Implements a Processor for unbatching MistNet PyTorch features into the dataset form.
     """
     def __init__(self, *args, client_id=None, **kwargs) -> None:
-        """Constructor for Processor"""
+        super().__init__(*args, **kwargs)
         self.client_id = client_id
 
     def process(self, data: Any) -> Any:

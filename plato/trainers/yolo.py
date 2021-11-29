@@ -4,17 +4,16 @@ from pathlib import Path
 
 import numpy as np
 import torch
-from torch import nn
-from torch import optim
-import torch.optim.lr_scheduler as lr_scheduler
+from torch import nn, optim
+from torch.optim import lr_scheduler
+from torch.cuda import amp
 import yaml
+from tqdm import tqdm
 
 from plato.config import Config
 from plato.datasources import yolo
 from plato.trainers import basic
 from plato.utils import unary_encoding
-from torch.cuda import amp
-from tqdm import tqdm
 
 from yolov5.utils.general import (NCOLS, box_iou, check_dataset, one_cycle,
                                   scale_coords, xywh2xyxy)
@@ -106,7 +105,7 @@ class Trainer(basic.Trainer):
         })  # add pg1 with weight_decay
         optimizer.add_param_group({'params': pg2})  # add pg2 (biases)
         logging.info(
-            '[Client %s] Optimizer groups: %g .bias, %g conv.weight, %g other',
+            '[Client #%s] Optimizer groups: %g .bias, %g conv.weight, %g other',
             self.client_id, len(pg2), len(pg1), len(pg0))
         del pg0, pg1, pg2
 
@@ -203,7 +202,7 @@ class Trainer(basic.Trainer):
                 # Print
                 mloss = (mloss * i + loss_items) / (i + 1
                                                     )  # update mean losses
-                mem = f'{torch.cuda.memory_reserved() / 1E9 if torch.cuda.is_available() else 0:.3g}G'  # (GB)
+                mem = f'{torch.cuda.memory_reserved() / 1E9 if torch.cuda.is_available() else 0:.3g}G'
                 pbar.set_description(('%10s' * 2 + '%10.4g' * 5) %
                                      (f'{epoch}/{epochs}', mem, *mloss,
                                       targets.shape[0], imgs.shape[-1]))
@@ -369,22 +368,24 @@ class Trainer(basic.Trainer):
         The object detection unary encoding method.
         """
         assert isinstance(bit_array, np.ndarray)
+
         img = unary_encoding.symmetric_unary_encoding(bit_array, 1)
         label = unary_encoding.symmetric_unary_encoding(bit_array, epsilon)
-        targets_new = targets.clone().detach()
-        targets_new = targets_new.detach().numpy()
+        targets_new = targets.clone().detach().numpy()
+
         for i in range(targets_new.shape[1]):
-            box = self.convert(bit_array.shape[2:], targets_new[0][i][2:])
+            box = Trainer.convert(bit_array.shape[2:], targets_new[0][i][2:])
             img[:, :, box[0]:box[2],
                 box[1]:box[3]] = label[:, :, box[0]:box[2], box[1]:box[3]]
+
         return img
 
-    def convert(self, size, box):
-        """The convert for YOLOv5.
-              Arguments:
-                  size: Input feature size(w,h)
-                  box:(xmin,xmax,ymin,ymax).
-              """
+    @staticmethod
+    def convert(size, box):
+        """ Converts YOLOv5 input features.
+            size: The input feature size (w, h).
+            box: (xmin, xmax, ymin, ymax).
+        """
         x = box[0]
         y = box[1]
         w = box[2]

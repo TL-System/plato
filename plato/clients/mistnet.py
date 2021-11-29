@@ -44,8 +44,8 @@ class Client(simple.Client):
 
     def set_processors(self) -> None:
         """Prepare this client for training."""
-        self.send_processor, self.receive_processor = processor_registry.get(
-            "client",
+        self.outbound_processor, self.inbound_processor = processor_registry.get(
+            "Client",
             trainer=self.trainer,
             epsilon=Config().algorithm.epsilon,
             client_id=self.client_id)

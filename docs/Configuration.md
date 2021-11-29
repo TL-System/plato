@@ -17,17 +17,17 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |**total_clients**|The total number of clients|A positive number||
 |**per_round**|The number of clients selected in each round| Any positive integer that is not larger than **total_clients**||
 |**do_test**|Should the clients compute test accuracy locally?| `true` or `false`|| 
-|send_processors|A list of processors to apply on the payload before sending| A list of processor names || 
-|receive_processors|A list of processors to apply on the payload right after receiving| A list of processor names || 
+|outbound_processors|A list of processors to apply on the payload before sending| A list of processor names || 
+|inbound_processors|A list of processors to apply on the payload right after receiving| A list of processor names || 
 
-#### Valid processors for `clients.send_processors`
+#### Valid processors for `clients.outbound_processors`
 
 - `base`: Do nothing
-- `mistnet_torch_randomized_response`: Activate randomized response on features for PyTorch MistNet, must also set `algorithm.epsilon` to activate. Must be placed before `mistnet_torch_unbatch` if used.
-- `mistnet_torch_unbatch`: Unbatch features for for PyTorch MistNet client, must use this processor for every PyTorch MistNet client before sending.
-- `mistnet_torch_send_ndarray_feature`: Convert PyTorch tensor features into NumPy array before sending to server. Can save significant transfer size if the feature dataset is large comparing to individual feature. Must be placed after `mistnet_torch_unbatch` if used.
+- `mistnet_randomized_response`: Activate randomized response on features for PyTorch MistNet, must also set `algorithm.epsilon` to activate. Must be placed before `mistnet_unbatch` if used.
+- `mistnet_unbatch`: Unbatch features for for PyTorch MistNet client, must use this processor for every PyTorch MistNet client before sending.
+- `mistnet_outbound_features`: Convert PyTorch tensor features into NumPy array before sending to server. Can save significant transfer size if the feature dataset is large comparing to individual feature. Must be placed after `mistnet_unbatch` if used.
 
-#### Valid processors for `clients.receive_processors`
+#### Valid processors for `clients.inbound_processors`
 
 - `base`: Do nothing
 
@@ -47,17 +47,17 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |*periodic_interval*|The time interval for a server operating in asynchronous mode to aggregate received updates|Any positive integer||
 |do_test|Should the central server compute test accuracy locally?| `true` or `false`|| 
 |edge_do_test|Should an edge server compute test accuracy of its aggregated model locally?| `true` or `false`||
-|send_processors|A list of processors to apply on the payload before sending| A list of processor names || 
-|receive_processors|A list of processors to apply on the payload right after receiving| A list of processor names || 
+|outbound_processors|A list of processors to apply on the payload before sending| A list of processor names || 
+|inbound_processors|A list of processors to apply on the payload right after receiving| A list of processor names || 
 
-#### Valid processors for `server.send_processors`
-
-- `base`: Do nothing
-
-#### Valid processors for `server.receive_processors`
+#### Valid processors for `server.outbound_processors`
 
 - `base`: Do nothing
-- `mistnet_torch_receive_ndarray_feature`: Convert PyTorch tensor features into NumPy array before sending to server. Can save significant transfer size if the feature dataset is large comparing to individual feature. Must be used if `clients.send_processors` has used `mistnet_torch_send_ndarray_feature`.
+
+#### Valid processors for `server.inbound_processors`
+
+- `base`: Do nothing
+- `mistnet_inbound_features`: Convert PyTorch tensor features into NumPy array before sending to server. Can save significant transfer size if the feature dataset is large comparing to individual feature. Must be used if `clients.outbound_processors` has used `mistnet_outbound_features`.
 
 ### data
 

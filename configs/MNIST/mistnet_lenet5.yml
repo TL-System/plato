@@ -10,10 +10,12 @@ clients:
 
     # Should the clients compute test accuracy locally?
     do_test: false
-    send_processors:
-        - mistnet_torch_randomized_response
-        - mistnet_torch_unbatch
-        - mistnet_torch_send_ndarray_feature
+
+    # Processors for outbound data payloads
+    outbound_processors:
+        - mistnet_randomized_response
+        - mistnet_unbatch
+        - mistnet_outbound_features
 
 server:
     type: mistnet
@@ -21,8 +23,9 @@ server:
     address: 127.0.0.1
     port: 8000
 
-    receive_processors:
-        - mistnet_torch_receive_ndarray_feature
+    # Processors for inbound data payloads
+    inbound_processors:
+        - mistnet_inbound_features
 
 data:
     # The training and testing dataset

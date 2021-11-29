@@ -21,7 +21,6 @@ class Processor:
         """
         return data
 
-    @abstractmethod
     def process_iterable(self, data: Iterable) -> Iterable:
         """
         Processing an Iterable of data payload.
