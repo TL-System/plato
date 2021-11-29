@@ -10,7 +10,7 @@ class DataProcessor:
     DataProcessor class.
     Base DataProcessor class implementation do nothing on the data.
     """
-    def __init__(self) -> None:
+    def __init__(self, *args, **kwargs) -> None:
         """Constructor for DataProcessor"""
         pass
 

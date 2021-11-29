@@ -133,9 +133,6 @@ class Client:
         await self.sio.connect(uri)
         await self.sio.emit('client_alive', {'id': self.client_id})
 
-        self.send_dataprocessor, self.receive_dataprocessor = dataprocessor_registry.get(
-            "client")
-
         logging.info("[Client #%d] Waiting to be selected.", self.client_id)
         await self.sio.wait()
 
@@ -148,6 +145,7 @@ class Client:
                    'simulation') and Config().clients.simulation:
             self.client_id = response['id']
             self.configure()
+        self.set_dataprocessors()
 
         logging.info("[Client #%d] Selected by the server.", self.client_id)
 
@@ -263,6 +261,11 @@ class Client:
     @abstractmethod
     def configure(self) -> None:
         """Prepare this client for training."""
+
+    def set_dataprocessors(self) -> None:
+        """Set dataprocessors for client"""
+        self.send_dataprocessor, self.receive_dataprocessor = dataprocessor_registry.get(
+            "client")
 
     @abstractmethod
     def load_data(self) -> None:

@@ -12,6 +12,7 @@ from dataclasses import dataclass
 
 from plato.config import Config
 from plato.clients import simple
+from plato.dataprocessor import registry as dataprocessor_registry
 
 
 @dataclass
@@ -40,3 +41,11 @@ class Client(simple.Client):
 
         # Generate a report for the server, performing model testing if applicable
         return Report(self.sampler.trainset_size(), len(features)), features
+
+    def set_dataprocessors(self) -> None:
+        """Prepare this client for training."""
+        self.send_dataprocessor, self.receive_dataprocessor = dataprocessor_registry.get(
+            "client",
+            trainer=self.trainer,
+            epsilon=Config().algorithm.epsilon,
+            client_id=self.client_id)

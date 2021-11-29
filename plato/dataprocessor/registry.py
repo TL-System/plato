@@ -7,12 +7,23 @@ import logging
 from collections import OrderedDict
 from typing import Literal, Tuple
 
-from plato.dataprocessor import (base, pipeline)
+from plato.dataprocessor import (base, pipeline,
+                                 mistnet_torch_randomized_response,
+                                 mistnet_torch_unbatch,
+                                 mistnet_torch_send_ndarray_feature,
+                                 mistnet_torch_receive_ndarray_feature)
 
 from plato.config import Config
 
 registered_dataprocessors = OrderedDict([
     ('base', base.DataProcessor),
+    ('mistnet_torch_randomized_response',
+     mistnet_torch_randomized_response.DataProcessor),
+    ('mistnet_torch_unbatch', mistnet_torch_unbatch.DataProcessor),
+    ('mistnet_torch_send_ndarray_feature',
+     mistnet_torch_send_ndarray_feature.DataProcessor),
+    ('mistnet_torch_receive_ndarray_feature',
+     mistnet_torch_receive_ndarray_feature.DataProcessor),
 ])
 
 
