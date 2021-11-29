@@ -11,7 +11,8 @@ class DataProcessor(base.DataProcessor):
     DataPipeline class
     Pipelining a list of DataProcessors from config
     """
-    def __init__(self, dataprocessors: List[base.DataProcessor]) -> None:
+    def __init__(self, dataprocessors: List[base.DataProcessor], *args,
+                 **kwargs) -> None:
         """Constructor for DataPipeline"""
         self.processors = dataprocessors
 

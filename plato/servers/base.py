@@ -103,9 +103,8 @@ class Server:
                 Config().cursor.execute("DROP TABLE IF EXISTS trainers")
 
         self.client = client
-        self.send_dataprocessor, self.receive_dataprocessor = dataprocessor_registry.get(
-            "server")
         self.configure()
+        self.set_dataprocessors()
 
         if Config().is_central_server():
             # In cross-silo FL, the central server lets edge servers start first
@@ -512,6 +511,11 @@ class Server:
     @abstractmethod
     def configure(self):
         """ Configuring the server with initialization work. """
+
+    def set_dataprocessors(self):
+        """Set dataprocessors for this server"""
+        self.send_dataprocessor, self.receive_dataprocessor = dataprocessor_registry.get(
+            "server")
 
     @abstractmethod
     async def process_reports(self) -> None:
