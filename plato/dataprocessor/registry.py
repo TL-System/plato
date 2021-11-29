@@ -17,7 +17,7 @@ registered_dataprocessors = OrderedDict([
 
 
 def get(user: Literal["client", "server"], *args,
-        **kwargs) -> Tuple[pipeline.DataPipeline, pipeline.DataPipeline]:
+        **kwargs) -> Tuple[pipeline.DataProcessor, pipeline.DataProcessor]:
     """Get an instance of the dataprocessor."""
 
     send_dataprocessors = []
