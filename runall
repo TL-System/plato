@@ -26,7 +26,7 @@ if __name__ == '__main__':
         log_root = '.log'
         log_folder = os.path.join(log_root,
                                   t.replace("/", "__").replace(".", ""))
-        log_name = time.strftime("%Y%m%d%H%M%S", time.localtime()) + '.txt'
+        log_name = time.strftime("%Y_%m_%d__%H_%M_%S.txt", time.localtime())
         try:
             os.mkdir(log_root)
         except FileExistsError:
