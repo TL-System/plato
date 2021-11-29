@@ -49,30 +49,12 @@ class Algorithm(fedavg.Algorithm):
 
         feature_dataset = []
 
-        _randomize = getattr(self.trainer, "randomize", None)
-
         for inputs, targets, *__ in data_loader:
             with torch.no_grad():
                 logits = self.model.forward_to(inputs, cut_layer)
-                if epsilon is not None:
-                    logits = logits.detach().numpy()
-                    logits = unary_encoding.encode(logits)
-                    if callable(_randomize):
-                        logits = self.trainer.randomize(
-                            logits, targets, epsilon)
-                    else:
-                        logits = unary_encoding.randomize(logits, epsilon)
-                    if self.trainer.device != 'cpu':
-                        logits = torch.from_numpy(logits.astype('float16'))
-                    else:
-                        logits = torch.from_numpy(logits.astype('float32'))
-
-            for i in np.arange(logits.shape[0]):  # each sample in the batch
-                feature_dataset.append((logits[i], targets[i]))
+            feature_dataset.append((logits, targets))
 
         toc = time.perf_counter()
-        logging.info("[Client #%d] Features extracted from %s examples.",
-                     self.client_id, len(feature_dataset))
         logging.info("[Client #{}] Time used: {:.2f} seconds.".format(
             self.client_id, toc - tic))
 
