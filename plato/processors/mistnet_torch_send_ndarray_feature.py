@@ -1,5 +1,5 @@
 """
-DataProcessor for converting mistnet pytorch features into ndarray.
+Processor for converting mistnet pytorch features into ndarray.
 Only used for features in mistnet in pytorch.
 """
 from typing import Any
@@ -7,16 +7,16 @@ import logging
 
 import numpy as np
 
-from plato.dataprocessor import base
+from plato.processors import base
 
 
-class DataProcessor(base.DataProcessor):
+class Processor(base.Processor):
     """
-    DataProcessor class.
-    DataProcessor for converting mistnet pytorch features into ndarray.
+    Processor class.
+    Processor for converting mistnet pytorch features into ndarray.
     """
     def __init__(self, *args, client_id=None, **kwargs) -> None:
-        """Constructor for DataProcessor"""
+        """Constructor for Processor"""
         self.client_id = client_id
 
     def process(self, data: Any) -> Any:

@@ -18,7 +18,7 @@ from aiohttp import web
 from plato.client import run
 from plato.config import Config
 from plato.utils import s3
-from plato.dataprocessor import registry as dataprocessor_registry
+from plato.processors import registry as processor_registry
 
 
 class ServerEvents(socketio.AsyncNamespace):
@@ -80,8 +80,8 @@ class Server:
         self.client_payload = {}
         self.client_chunks = {}
         self.s3_client = None
-        self.send_dataprocessor = None
-        self.receive_dataprocessor = None
+        self.send_processor = None
+        self.receive_processor = None
 
         # States that need to be maintained for asynchronous FL
 
@@ -104,7 +104,7 @@ class Server:
 
         self.client = client
         self.configure()
-        self.set_dataprocessors()
+        self.set_processors()
 
         if Config().is_central_server():
             # In cross-silo FL, the central server lets edge servers start first
@@ -356,7 +356,7 @@ class Server:
 
     async def send(self, sid, payload, client_id) -> None:
         """ Sending a new data payload to the client using either S3 or socket.io. """
-        payload = self.send_dataprocessor.process(payload)
+        payload = self.send_processor.process(payload)
         if self.s3_client is not None:
             payload_key = f'server_payload_{os.getpid()}_{self.current_round}'
             self.s3_client.send_to_s3(payload_key, payload)
@@ -434,7 +434,7 @@ class Server:
             "[Server #%d] Received %s MB of payload data from client #%d.",
             os.getpid(), round(payload_size / 1024**2, 2), client_id)
 
-        self.client_payload[sid] = self.receive_dataprocessor.process(
+        self.client_payload[sid] = self.receive_processor.process(
             self.client_payload[sid])
         self.updates.append((self.reports[sid], self.client_payload[sid]))
 
@@ -512,9 +512,9 @@ class Server:
     def configure(self):
         """ Configuring the server with initialization work. """
 
-    def set_dataprocessors(self):
-        """Set dataprocessors for this server"""
-        self.send_dataprocessor, self.receive_dataprocessor = dataprocessor_registry.get(
+    def set_processors(self):
+        """Set processors for this server"""
+        self.send_processor, self.receive_processor = processor_registry.get(
             "server")
 
     @abstractmethod

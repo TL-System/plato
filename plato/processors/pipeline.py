@@ -1,20 +1,20 @@
 """
-DataPipeline for passing data through all DataProcessors
+DataPipeline for passing data through all Processors
 """
 from typing import Any, List
 
-from plato.dataprocessor import base
+from plato.processors import base
 
 
-class DataProcessor(base.DataProcessor):
+class Processor(base.Processor):
     """
     DataPipeline class
-    Pipelining a list of DataProcessors from config
+    Pipelining a list of Processors from config
     """
-    def __init__(self, dataprocessors: List[base.DataProcessor], *args,
+    def __init__(self, processors: List[base.Processor], *args,
                  **kwargs) -> None:
         """Constructor for DataPipeline"""
-        self.processors = dataprocessors
+        self.processors = processors
 
     def process(self, data: Any) -> Any:
         """

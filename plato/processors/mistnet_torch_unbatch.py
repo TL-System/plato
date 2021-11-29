@@ -1,5 +1,5 @@
 """
-DataProcessor for unbatching mistnet pytorch features into dataset form.
+Processor for unbatching mistnet pytorch features into dataset form.
 Only used for features in mistnet in pytorch.
 """
 from typing import Any
@@ -7,16 +7,16 @@ import logging
 
 import numpy as np
 
-from plato.dataprocessor import base
+from plato.processors import base
 
 
-class DataProcessor(base.DataProcessor):
+class Processor(base.Processor):
     """
-    DataProcessor class.
-    Base DataProcessor class implementation do nothing on the data.
+    Processor class.
+    Base Processor class implementation do nothing on the data.
     """
     def __init__(self, *args, client_id=None, **kwargs) -> None:
-        """Constructor for DataProcessor"""
+        """Constructor for Processor"""
         self.client_id = client_id
 
     def process(self, data: Any) -> Any:

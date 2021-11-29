@@ -10,7 +10,7 @@ clients:
 
     # Should the clients compute test accuracy locally?
     do_test: false
-    send_dataprocessors:
+    send_processors:
         - mistnet_torch_randomized_response
         - mistnet_torch_unbatch
         - mistnet_torch_send_ndarray_feature
@@ -21,7 +21,7 @@ server:
     address: 127.0.0.1
     port: 8000
 
-    receive_dataprocessors:
+    receive_processors:
         - mistnet_torch_receive_ndarray_feature
 
 data:
