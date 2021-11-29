@@ -197,7 +197,8 @@ class Client:
             "[Client #%d] Received %s MB of payload data from the server.",
             client_id, round(payload_size / 1024**2, 2))
 
-        self.server_payload = self.receive_dataprocessor(self.server_payload)
+        self.server_payload = self.receive_dataprocessor.process(
+            self.server_payload)
         self.load_payload(self.server_payload)
         self.server_payload = None
 
@@ -228,7 +229,7 @@ class Client:
 
     async def send(self, payload) -> None:
         """Sending the client payload to the server using either S3 or socket.io."""
-        payload = self.send_dataprocessor(payload)
+        payload = self.send_dataprocessor.process(payload)
         if self.s3_client != None:
             unique_key = uuid.uuid4().hex[:6].upper()
             payload_key = f'client_payload_{self.client_id}_{unique_key}'
