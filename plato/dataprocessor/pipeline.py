@@ -20,5 +20,5 @@ class DataProcessor(base.DataProcessor):
         Data pipelining implementation.
         """
         for processor in self.processors:
-            data = processor(data)
+            data = processor.process(data)
         return data

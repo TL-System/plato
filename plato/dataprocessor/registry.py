@@ -48,7 +48,7 @@ def get(user: Literal["client", "server"], *args,
             send_dataprocessors))
     receive_dataprocessors = list(
         map(lambda name: registered_dataprocessors[name](*args, **kwargs),
-            send_dataprocessors))
+            receive_dataprocessors))
 
     return pipeline.DataProcessor(send_dataprocessors), pipeline.DataProcessor(
         receive_dataprocessors)
