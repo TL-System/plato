@@ -10,7 +10,7 @@ clients:
 
     # Should the clients compute test accuracy locally?
     do_test: false
-    send_dataprocessors:
+    send_processors:
         - mistnet_torch_randomized_response
         - mistnet_torch_unbatch
 

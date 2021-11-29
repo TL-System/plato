@@ -1,5 +1,5 @@
 """
-DataProcessor for randomized response.
+Processor for randomized response.
 Only used for features in mistnet in pytorch.
 """
 from typing import Any
@@ -7,14 +7,14 @@ import logging
 
 import torch
 
-from plato.dataprocessor import base
+from plato.processors import base
 from plato.utils import unary_encoding
 
 
-class DataProcessor(base.DataProcessor):
+class Processor(base.Processor):
     """
-    DataProcessor class.
-    Base DataProcessor class implementation do nothing on the data.
+    Processor class.
+    Base Processor class implementation do nothing on the data.
     """
     def __init__(self,
                  *args,
@@ -22,7 +22,7 @@ class DataProcessor(base.DataProcessor):
                  epsilon=None,
                  client_id=None,
                  **kwargs) -> None:
-        """Constructor for DataProcessor"""
+        """Constructor for Processor"""
         self.trainer = trainer
         self.epsilon = epsilon
         self.client_id = client_id

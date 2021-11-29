@@ -1,5 +1,5 @@
 """
-DataProcessor for converting features in ndarray into pytorch tensors.
+Processor for converting features in ndarray into pytorch tensors.
 Only used for features in mistnet in pytorch.
 """
 from typing import Any
@@ -8,16 +8,16 @@ import os
 
 import torch
 
-from plato.dataprocessor import base
+from plato.processors import base
 
 
-class DataProcessor(base.DataProcessor):
+class Processor(base.Processor):
     """
-    DataProcessor class.
-    DataProcessor for converting features in ndarray into pytorch tensors.
+    Processor class.
+    Processor for converting features in ndarray into pytorch tensors.
     """
     def __init__(self, *args, server_id=None, **kwargs) -> None:
-        """Constructor for DataProcessor"""
+        """Constructor for Processor"""
         self.server_id = server_id
         if server_id is None:
             self.server_id = os.getpid()
