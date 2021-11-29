@@ -15,6 +15,7 @@ import socketio
 
 from plato.config import Config
 from plato.utils import s3
+from plato.dataprocessor import registry as dataprocessor_registry
 
 
 @dataclass
@@ -74,6 +75,8 @@ class Client:
         self.server_payload = None
         self.data_loaded = False  # is training data already loaded from the disk?
         self.s3_client = None
+        self.send_dataprocessor = None
+        self.receive_dataprocessor = None
 
         if hasattr(Config().algorithm,
                    'cross_silo') and not Config().is_edge_server():
@@ -129,6 +132,9 @@ class Client:
                      self.client_id, uri)
         await self.sio.connect(uri)
         await self.sio.emit('client_alive', {'id': self.client_id})
+
+        self.send_dataprocessor, self.receive_dataprocessor = dataprocessor_registry.get(
+            "client")
 
         logging.info("[Client #%d] Waiting to be selected.", self.client_id)
         await self.sio.wait()
@@ -191,6 +197,7 @@ class Client:
             "[Client #%d] Received %s MB of payload data from the server.",
             client_id, round(payload_size / 1024**2, 2))
 
+        self.server_payload = self.receive_dataprocessor(self.server_payload)
         self.load_payload(self.server_payload)
         self.server_payload = None
 
@@ -221,6 +228,7 @@ class Client:
 
     async def send(self, payload) -> None:
         """Sending the client payload to the server using either S3 or socket.io."""
+        payload = self.send_dataprocessor(payload)
         if self.s3_client != None:
             unique_key = uuid.uuid4().hex[:6].upper()
             payload_key = f'client_payload_{self.client_id}_{unique_key}'
@@ -240,7 +248,10 @@ class Client:
                 await self.send_in_chunks(_data)
                 data_size = sys.getsizeof(_data)
 
-        await self.sio.emit('client_payload_done', {'id': self.client_id, 'obkey': payload_key})
+        await self.sio.emit('client_payload_done', {
+            'id': self.client_id,
+            'obkey': payload_key
+        })
 
         logging.info("[Client #%d] Sent %s MB of payload data to the server.",
                      self.client_id, round(data_size / 1024**2, 2))

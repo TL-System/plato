@@ -1,0 +1,25 @@
+#!/usr/bin/env python
+"""
+Test running a lot of selected configs.
+"""
+
+import subprocess
+
+if __name__ == '__main__':
+    with open('log', 'a') as fp:
+        for t in [
+                # 'MNIST/fedavg_async_lenet5',
+                # 'MNIST/fedavg_cross_silo_lenet5',
+                'configs/MNIST/fedavg_lenet5_noniid',
+                'configs/MNIST/fedavg_lenet5',
+                'configs/MNIST/fedprox_lenet5',
+                'configs/MNIST/mistnet_lenet5',
+                'configs/MNIST/mistnet_pretrain_lenet5',
+                '.github/workflows/configs.fedavg_yolov5.yml',
+                '.github/workflows/configs.mistnet_yolov5.yml'
+        ]:
+            fp.write(f'\n\n\n\n\n\n\n\n\n\n{t}\n\n\n\n\n\n\n\n\n\n')
+            fp.flush()
+            subprocess.call(['./run', f'--config={t}.yml'],
+                            stdout=fp,
+                            stderr=fp)

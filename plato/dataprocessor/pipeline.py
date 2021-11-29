@@ -1,31 +1,24 @@
 """
 DataPipeline for passing data through all DataProcessors
 """
-from typing import Iterable, Literal
+from typing import Any, List
 
-from plato.dataprocessor import registry
+from plato.dataprocessor import base
 
 
-class DataPipeline:
+class DataProcessor(base.DataProcessor):
     """
     DataPipeline class
     Pipelining a list of DataProcessors from config
     """
-    def __init__(self, user: Literal["server", "client"], *args,
-                 **kwargs) -> None:
+    def __init__(self, dataprocessors: List[base.DataProcessor]) -> None:
         """Constructor for DataPipeline"""
-        self.processors = registry.get(user, *args, **kwargs)
+        self.processors = dataprocessors
 
-    def process(self, data):
+    def process(self, data: Any) -> Any:
         """
         Data pipelining implementation.
         """
         for processor in self.processors:
             data = processor(data)
         return data
-
-    def process_iterable(self, data: Iterable):
-        """
-        Data processing for an Iterable of data.
-        """
-        return map(lambda d: self.process(d), data)
