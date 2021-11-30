@@ -104,7 +104,6 @@ class Server:
 
         self.client = client
         self.configure()
-        self.set_processors()
 
         if Config().is_central_server():
             # In cross-silo FL, the central server lets edge servers start first
@@ -500,6 +499,13 @@ class Server:
         await self.close_connections()
         os._exit(0)
 
+    def configure(self):
+        """ Configuring the server with initialization work. """
+        # Prepares this server for processors that processes outbound and inbound
+        # data payloads
+        self.outbound_processor, self.inbound_processor = processor_registry.get(
+            "Server")
+
     async def customize_server_response(self, server_response):
         """ Wrap up generating the server response with any additional information. """
         return server_response
@@ -507,17 +513,6 @@ class Server:
     @abstractmethod
     def customize_server_payload(self, payload):
         """ Wrap up generating the server payload with any additional information. """
-
-    @abstractmethod
-    def configure(self):
-        """ Configuring the server with initialization work. """
-
-    def set_processors(self):
-        """
-        Prepare this server for processors that processes outbound and inbound data payloads.
-        """
-        self.outbound_processor, self.inbound_processor = processor_registry.get(
-            "Server")
 
     @abstractmethod
     async def process_reports(self) -> None:
