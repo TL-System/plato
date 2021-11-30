@@ -42,8 +42,12 @@ class Client(simple.Client):
         # Generate a report for the server, performing model testing if applicable
         return Report(self.sampler.trainset_size(), len(features)), features
 
-    def set_processors(self) -> None:
-        """Prepare this client for training."""
+    def configure(self) -> None:
+        """ Prepare this client for training. """
+        super().configure()
+
+        # Pass inbound and outbound data payloads through processors for
+        # additional data processing
         self.outbound_processor, self.inbound_processor = processor_registry.get(
             "Client",
             trainer=self.trainer,

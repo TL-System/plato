@@ -25,7 +25,7 @@ class Algorithm(fedavg.Algorithm):
         """Extracting features using layers before the cut_layer.
 
         dataset: The training or testing dataset. This datasets does not based on
-                 torch.utils.data.Datasets
+                torch.utils.data.Datasets.
         cut_layer: Layers before this one will be used for extracting features.
                 TODO: This cannot be changed dynamically due to the static properties of OM file.
         epsilon: If epsilon is not None, local differential privacy should be
