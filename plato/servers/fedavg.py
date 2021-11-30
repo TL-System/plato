@@ -57,6 +57,7 @@ class Server(base.Server):
         Booting the federated learning server by setting up the data, model, and
         creating the clients.
         """
+        super().configure()
 
         logging.info("[Server #%d] Configuring the server...", os.getpid())
 

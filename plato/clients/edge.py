@@ -33,6 +33,8 @@ class Client(base.Client):
 
     def configure(self):
         """Prepare this edge client for training."""
+        super().configure()
+
         if self.trainer is None:
             self.trainer = trainers_registry.get()
         self.trainer.set_client_id(self.client_id)

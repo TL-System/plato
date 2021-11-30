@@ -145,7 +145,6 @@ class Client:
                    'simulation') and Config().clients.simulation:
             self.client_id = response['id']
             self.configure()
-        self.set_processors()
 
         logging.info("[Client #%d] Selected by the server.", self.client_id)
 
@@ -258,14 +257,10 @@ class Client:
     def process_server_response(self, server_response) -> None:
         """Additional client-specific processing on the server response."""
 
-    @abstractmethod
     def configure(self) -> None:
         """ Prepare this client for training. """
-
-    def set_processors(self) -> None:
-        """
-        Prepare this client for processors that processes outbound and inbound data payloads.
-        """
+        # Pass inbound and outbound data payloads through processors for
+        # additional data processing
         self.outbound_processor, self.inbound_processor = processor_registry.get(
             "Client")
 
