@@ -34,8 +34,7 @@ jobs:
       - name: Unit tests
         shell: bash -l {0}
         run: |
-          cd tests
-          find . -name '*.py' -exec python {} \;
+          find tests -name '*.py' -exec python {} \;
 
       - name: Training workloads
         shell: bash -l {0}
