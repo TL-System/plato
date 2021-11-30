@@ -10,12 +10,9 @@ Differential Privacy," found in docs/papers.
 import logging
 import time
 
-import numpy as np
 import torch
-from plato.config import Config
-from plato.utils import unary_encoding
-
 from plato.algorithms import fedavg
+from plato.config import Config
 
 
 class Algorithm(fedavg.Algorithm):
