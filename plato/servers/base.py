@@ -18,7 +18,6 @@ from aiohttp import web
 from plato.client import run
 from plato.config import Config
 from plato.utils import s3
-from plato.processors import registry as processor_registry
 
 
 class ServerEvents(socketio.AsyncNamespace):
@@ -501,12 +500,9 @@ class Server:
         await self.close_connections()
         os._exit(0)
 
+    @abstractmethod
     def configure(self):
         """ Configuring the server with initialization work. """
-        # Prepares this server for processors that processes outbound and inbound
-        # data payloads
-        self.outbound_processor, self.inbound_processor = processor_registry.get(
-            "Server", trainer=self.trainer, server_id=os.getpid())
 
     async def customize_server_response(self, server_response):
         """ Wrap up generating the server response with any additional information. """

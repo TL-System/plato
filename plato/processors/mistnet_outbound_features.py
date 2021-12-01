@@ -14,6 +14,7 @@ class Processor(base.Processor):
     """
     def __init__(self, *args, client_id=None, **kwargs) -> None:
         super().__init__(*args, **kwargs)
+
         self.client_id = client_id
 
     def process(self, data: Any) -> Any:

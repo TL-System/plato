@@ -15,7 +15,6 @@ import socketio
 
 from plato.config import Config
 from plato.utils import s3
-from plato.processors import registry as processor_registry
 
 
 @dataclass
@@ -259,12 +258,9 @@ class Client:
     def process_server_response(self, server_response) -> None:
         """Additional client-specific processing on the server response."""
 
+    @abstractmethod
     def configure(self) -> None:
         """ Prepare this client for training. """
-        # Pass inbound and outbound data payloads through processors for
-        # additional data processing
-        self.outbound_processor, self.inbound_processor = processor_registry.get(
-            "Client", trainer=self.trainer, client_id=self.client_id)
 
     @abstractmethod
     def load_data(self) -> None:
