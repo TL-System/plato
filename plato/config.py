@@ -88,7 +88,7 @@ class Config:
                 loader_class=yaml.SafeLoader, base_dir='./configs')
 
             if os.path.isfile(filename):
-                with open(filename, 'r') as config_file:
+                with open(filename, 'r', encoding="utf8") as config_file:
                     config = yaml.load(config_file, Loader=yaml.SafeLoader)
             else:
                 # if the configuration file does not exist, use a default one
@@ -214,7 +214,7 @@ class Config:
 
     @staticmethod
     def default_config() -> dict:
-        ''' Supply a default configuration when the config file is missing. '''
+        ''' Supply a default configuration when the configuration file is missing. '''
         config = {}
         config['clients'] = {}
         config['clients']['type'] = 'simple'
@@ -250,11 +250,12 @@ class Config:
 
     @staticmethod
     def store() -> None:
+        """ Saving the current run-time configuration to a file. """
         data = {}
         data['clients'] = Config.clients._asdict()
         data['server'] = Config.server._asdict()
         data['data'] = Config.data._asdict()
         data['trainer'] = Config.trainer._asdict()
         data['algorithm'] = Config.algorithm._asdict()
-        with open(Config.args.config, "w") as out:
+        with open(Config.args.config, "w", encoding="utf8") as out:
             yaml.dump(data, out, default_flow_style=False)
