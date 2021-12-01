@@ -12,8 +12,8 @@ class Processor(base.Processor):
     """
     Implements a Processor for converting MistNet features from numpy ndarrays to PyTorch tensors.
     """
-    def __init__(self, *args, server_id=None, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
+    def __init__(self, server_id=None, **kwargs) -> None:
+        super().__init__(**kwargs)
 
         self.server_id = server_id
 
