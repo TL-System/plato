@@ -9,11 +9,11 @@ import logging
 from collections import OrderedDict
 from typing import Tuple
 
-from plato.processors import (base, pipeline, mistnet_random_response,
-                              mistnet_unbatch, mistnet_outbound_features,
-                              mistnet_inbound_features)
-
 from plato.config import Config
+from plato.processors import (base, mistnet_inbound_features,
+                              mistnet_outbound_features,
+                              mistnet_random_response, mistnet_unbatch,
+                              pipeline)
 
 registered_processors = OrderedDict([
     ('base', base.Processor),

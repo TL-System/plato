@@ -226,7 +226,9 @@ class Client:
 
     async def send(self, payload) -> None:
         """Sending the client payload to the server using either S3 or socket.io."""
+        # First apply outbound processors, if any
         payload = self.outbound_processor.process(payload)
+
         if self.s3_client != None:
             unique_key = uuid.uuid4().hex[:6].upper()
             payload_key = f'client_payload_{self.client_id}_{unique_key}'
@@ -262,7 +264,7 @@ class Client:
         # Pass inbound and outbound data payloads through processors for
         # additional data processing
         self.outbound_processor, self.inbound_processor = processor_registry.get(
-            "Client")
+            "Client", trainer=self.trainer, client_id=self.client_id)
 
     @abstractmethod
     def load_data(self) -> None:

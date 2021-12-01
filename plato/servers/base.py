@@ -355,7 +355,9 @@ class Server:
 
     async def send(self, sid, payload, client_id) -> None:
         """ Sending a new data payload to the client using either S3 or socket.io. """
+        # First apply outbound processors, if any
         payload = self.outbound_processor.process(payload)
+
         if self.s3_client is not None:
             payload_key = f'server_payload_{os.getpid()}_{self.current_round}'
             self.s3_client.send_to_s3(payload_key, payload)
@@ -504,7 +506,7 @@ class Server:
         # Prepares this server for processors that processes outbound and inbound
         # data payloads
         self.outbound_processor, self.inbound_processor = processor_registry.get(
-            "Server")
+            "Server", trainer=self.trainer, server_id=os.getpid())
 
     async def customize_server_response(self, server_response):
         """ Wrap up generating the server response with any additional information. """

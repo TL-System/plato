@@ -13,13 +13,11 @@ class Processor(base.Processor):
     """
     Implements a Processor for converting MistNet features from numpy ndarrays to PyTorch tensors.
     """
-    def __init__(self, *args, server_id=None, **kwargs) -> None:
+    def __init__(self, *args, trainer=None, server_id=None, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
+        self.trainer = trainer
         self.server_id = server_id
-
-        if server_id is None:
-            self.server_id = os.getpid()
 
     def process(self, data: Any) -> Any:
         """
