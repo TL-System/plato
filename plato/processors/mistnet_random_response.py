@@ -14,10 +14,9 @@ class Processor(base.Processor):
     """
     Implements a Processor for applying local differential privacy using random response.
     """
-    def __init__(self, *args, trainer=None, client_id=None, **kwargs) -> None:
+    def __init__(self, *args, client_id=None, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
-        self.trainer = trainer
         self.client_id = client_id
 
     def process(self, data: Any) -> Any:

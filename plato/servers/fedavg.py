@@ -11,10 +11,10 @@ import time
 from plato.algorithms import registry as algorithms_registry
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
+from plato.processors import registry as processor_registry
+from plato.servers import base
 from plato.trainers import registry as trainers_registry
 from plato.utils import csv_processor
-
-from plato.servers import base
 
 
 class Server(base.Server):
@@ -57,8 +57,6 @@ class Server(base.Server):
         Booting the federated learning server by setting up the data, model, and
         creating the clients.
         """
-        super().configure()
-
         logging.info("[Server #%d] Configuring the server...", os.getpid())
 
         total_rounds = Config().trainer.rounds
@@ -71,6 +69,11 @@ class Server(base.Server):
             logging.info("Training: %s rounds\n", total_rounds)
 
         self.load_trainer()
+
+        # Prepares this server for processors that processes outbound and inbound
+        # data payloads
+        self.outbound_processor, self.inbound_processor = processor_registry.get(
+            "Server", server_id=os.getpid(), trainer=self.trainer)
 
         if not Config().clients.do_test:
             dataset = datasources_registry.get(client_id=0)
