@@ -1,6 +1,5 @@
 """
-Useful tools used for samplers
-
+Useful tools used for implementing samplers
 
 """
 
