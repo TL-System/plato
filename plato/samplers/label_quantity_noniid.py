@@ -6,9 +6,9 @@ This sampler implements one type of label distribution skew called:
 
     Quantity-based label imbalance:
         Each client contains a fixed number of classes parameterized by the
-        "per_client_classes_size", while the number of samples in each class
-        is almost the same. Besides, the classes assigned to each client are
-        randomly selected from all classes.
+         "per_client_classes_size", while the number of samples in each class
+         is almost the same. Besides, the classes assigned to each client are
+         randomly selected from all classes.
 
         The samples of one class are equally divided and assigned to clients
          who contain this class. Thus, the samples of different clients

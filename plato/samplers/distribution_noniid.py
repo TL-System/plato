@@ -19,7 +19,8 @@ This sampler can introduce the hardest non-IID data scenarios because it contain
                 client2 4      108      7       9     6
                 ...
                 clientN 3       10      11      99    2
-        2. Setting client_quantity_concentration = 0.1 will induce extreme data scale unbalance between clients.
+        2. Setting client_quantity_concentration = 0.1 will induce extreme data scale
+         unbalance between clients.
         The sample sizes of clients follow the Dirichlet distribution.
                 classes 1       2       3 ...   8     9
                 client1 5       6       7       5     8

@@ -1,5 +1,5 @@
 """
-Testing a federated learning configuration.
+Testing samplers in Plato framework.
 """
 
 import os
@@ -7,9 +7,9 @@ import unittest
 
 # os.environ['config_file'] = 'configs/Kinetics/kinetics_mm.yml'
 
-# os.environ['config_file'] = 'configs/Tests/test_kinetics_dis_sampler.yml'
+# os.environ['config_file'] = 'configs/Tests/distribution_noniid_sampler.yml'
 
-os.environ['config_file'] = 'configs/Tests/label_quan_sampler.yml'
+os.environ['config_file'] = 'configs/Tests/label_quantity_noniid_sampler.yml'
 
 import utils
 
@@ -28,7 +28,7 @@ class SamplersTest(unittest.TestCase):
         self.cifar10_datasource = DataSource()
 
     def test_client_data_consistency(self):
-        """ Test that the sampler always assignes same data distribution of one client """
+        """ Test that the sampler always assignes same data distribution for one client """
         assert utils.verify_client_local_data_correcness(
             Sampler=samplers_registry,
             dataset_source=self.cifar10_datasource,
