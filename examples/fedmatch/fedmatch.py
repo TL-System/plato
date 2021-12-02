@@ -11,6 +11,7 @@ os.environ['config_file'] = 'examples/fedmatch/fedmatch_MNIST_lenet5.yml'
 import fedmatch_client
 import fedmatch_server
 import fedmatch_trainer
+from plato.config import Config
 
 
 def main():

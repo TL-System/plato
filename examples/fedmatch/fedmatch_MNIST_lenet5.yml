@@ -10,8 +10,8 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8000
-    disable_clients: false
+    port: 5000
+
 
 data:
     # The training and testing dataset

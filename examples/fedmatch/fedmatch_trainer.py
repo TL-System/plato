@@ -6,7 +6,7 @@ https://arxiv.org/pdf/2006.12097.pdf
 """
 
 import torch
-
+from torch import optim
 from plato.config import Config
 from plato.trainers import basic
 import asyncio
@@ -87,6 +87,9 @@ class Trainer(basic.Trainer):
                 #print('type of train_loader is : ', type(train_loader))
                 train_loader_s, train_loader_u = torch.utils.data.random_split(
                     train_loader, [125, 500])  # rewrite with ratio
+                print("==========================Type of train_loader: ",
+                      type(train_loader))
+                print("Type of train_loader_s: ", type(train_loader_s))
 
                 # iterations_per_epoch = np.ceil(len(trainset) /
                 #                               batch_size).astype(int) # variable iterations_per_epoch is computed for lr_scheduler;
@@ -111,11 +114,27 @@ class Trainer(basic.Trainer):
                     loss_criterion_u = nn.CrossEntropyLoss()
 
                 # Initializing the optimizer
-                get_optimizer = getattr(self, "get_optimizer",
-                                        optimizers.get_optimizer)
+                #get_optimizer = getattr(self, "get_optimizer",
+                #                        optimizers.get_optimizer)
+                """
+                print("Params of disjoint model: ", self.model.parameters())
+                for name, param in self.model.named_parameters():
+                    if param.requires_grad:
+                        print(name, param.data)
+                """
 
-                optimizer_s = get_optimizer(self.model.psis)
-                optimizer_u = get_optimizer(self.model.sigmas)
+                optimizer_s = optim.SGD(
+                    [list(self.model.parameters())[0]],
+                    lr=Config().trainer.learning_rate,
+                    momentum=Config().trainer.momentum,
+                    weight_decay=Config(
+                    ).trainer.weight_decay)  #get_optimizer(self.model.psis)
+                optimizer_u = optim.SGD(
+                    [list(self.model.parameters())[1]],
+                    lr=Config().trainer.learning_rate,
+                    momentum=Config().trainer.momentum,
+                    weight_decay=Config(
+                    ).trainer.weight_decay)  #get_optimizer(self.model.sigmas)
                 """
                 # Initializing the learning rate schedule, if necessary
                 if hasattr(config, 'lr_schedule'):
@@ -124,11 +143,12 @@ class Trainer(basic.Trainer):
                 else:
                     lr_schedule = None
                 """
+                #self.model.acho()
 
                 for epoch in range(1, epochs + 1):
                     self.confident = 0
                     for batch_id, (examples, labels) in enumerate(
-                            train_loader_s):  # batch_id is used for logging
+                            train_loader):  # batch_id is used for logging
                         #(examples_unlabeled, discards) in zip(train_loader_s, train_loader_u):
                         #######################
                         # supervised learning
