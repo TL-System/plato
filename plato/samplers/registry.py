@@ -28,7 +28,8 @@ elif hasattr(Config().trainer, 'use_tensorflow'):
     ])
 else:
     from plato.samplers import (iid, dirichlet, mixed, orthogonal,
-                                all_inclusive, distribution_noniid)
+                                all_inclusive, distribution_noniid,
+                                label_quantity_noniid)
 
     registered_samplers = OrderedDict([
         ('iid', iid.Sampler),
@@ -37,12 +38,13 @@ else:
         ('orthogonal', orthogonal.Sampler),
         ('all_inclusive', all_inclusive.Sampler),
         ('distribution_noniid', distribution_noniid.Sampler),
+        ('label_quantity_noniid', label_quantity_noniid.Sampler),
     ])
 
 
 def get(datasource, client_id, testing=False):
     """Get an instance of the sampler."""
-    if testing == True:
+    if testing:
         if hasattr(Config().data, 'test_set_sampler'):
             sampler_type = Config().data.test_set_sampler
             logging.info("[Client #%d] Test set sampler: %s", client_id,

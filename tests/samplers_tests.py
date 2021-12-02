@@ -5,7 +5,11 @@ Testing a federated learning configuration.
 import os
 import unittest
 
-os.environ['config_file'] = 'configs/Kinetics/kinetics_mm.yml'
+# os.environ['config_file'] = 'configs/Kinetics/kinetics_mm.yml'
+
+# os.environ['config_file'] = 'configs/Tests/test_kinetics_dis_sampler.yml'
+
+os.environ['config_file'] = 'configs/Tests/label_quan_sampler.yml'
 
 import utils
 
@@ -36,14 +40,28 @@ class SamplersTest(unittest.TestCase):
     def test_clients_data_discrepancy(self):
         """ Test that different clients are assigned different local datasets """
 
-        selected_clients = [0, 2, 4, 5]
+        test_clients = [0, 2, 4, 5]
         assert utils.verify_difference_between_clients(
-            clients_id=selected_clients,
+            clients_id=test_clients,
             Sampler=samplers_registry,
             dataset_source=self.cifar10_datasource,
             num_of_batches=None,
             batch_size=5,
             is_presented=False)
+
+    def test_clients_classes_size(self):
+        """ Test whether the client contains specific number of classes
+            This test is for the label quantity noniid sampler """
+        test_clients = list(range(10))
+        if Config().data.sampler == "label_quantity_noniid":
+            assert utils.verify_clients_fixed_classes(
+                clients_id=test_clients,
+                Sampler=samplers_registry,
+                dataset_source=self.cifar10_datasource,
+                required_classes_size=Config().data.per_client_classes_size,
+                num_of_batches=None,
+                batch_size=5,
+                is_presented=False)
 
 
 if __name__ == '__main__':

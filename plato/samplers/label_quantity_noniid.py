@@ -1,13 +1,31 @@
 '''
-Label Distribution Skew:
+Samples data from a dataset, biased across labels, and the number of labels
+(corresponding classes) in different clients is the same.
 
-This sampler is one type of label distribution skew, that is:
+This sampler implements one type of label distribution skew called:
 
-    Quantity-based label imbalance: each party owns data samples of a fixed number of labels.
+    Quantity-based label imbalance:
+        Each client contains a fixed number of classes parameterized by the
+        "per_client_classes_size", while the number of samples in each class
+        is almost the same. Besides, the classes assigned to each client are
+        randomly selected from all classes.
 
-For one client, it contain the defined number of classes while samples in each
-class are almost the same. The main reason is that all samples for one class are
-randomly assigned to clients that contain this class.
+        The samples of one class are equally divided and assigned to clients
+         who contain this class. Thus, the samples of different clients
+         are mutual-exclusive.
+
+    For Example:
+        Setting per_client_classes_size = 2 will induce the condition that each client
+         only contains two classes.
+                classes 1       2       3 ...       8     9
+                client1 100     0       100         0     0
+                client2 0      108      100         0     0
+                ...
+                clientN 0       0       0           100   100
+
+        We have N clients while K clients contain class c. As class c contains D_c samples,
+         each client in K will contain D_c / K samples of this class.
+
 '''
 
 import numpy as np
@@ -20,8 +38,8 @@ from plato.samplers import base
 
 class Sampler(base.Sampler):
     """Create a data sampler for each client to use a divided partition of the
-    dataset, biased across labels according to the Dirichlet distribution."""
-    def __init__(self, datasource, client_id):
+    dataset, biased across classes according to the parameter per_client_classes_size."""
+    def __init__(self, datasource, client_id, testing):
         super().__init__()
         self.client_id = client_id
 
@@ -31,8 +49,14 @@ class Sampler(base.Sampler):
         per_client_classes_size = Config().data.per_client_classes_size
         total_clients = Config().clients.total_clients
 
-        # The list of labels (targets) for all the examples
-        self.targets_list = datasource.targets()
+        # obtain the dataset information
+        if testing:
+            target_list = datasource.get_test_set().targets
+        else:
+            # the list of labels (targets) for all the examples
+            target_list = datasource.targets()
+
+        self.targets_list = target_list
         classes_text_list = datasource.classes()
         classes_id_list = list(range(len(classes_text_list)))
 
@@ -79,13 +103,16 @@ class Sampler(base.Sampler):
         """ Assign specific number of classes to each client """
         dataset_labels = np.array(dataset_labels)
 
-        max_class_id = np.max(dataset_classes)
         classes_assigned_count = {cls_i: 0 for cls_i in dataset_classes}
         clients_contain_classes = {cli_i: [] for cli_i in range(num_clients)}
 
         for client_id in range(num_clients):
-            current_assigned_cls = [client_id % max_class_id]
-            classes_assigned_count[client_id % max_class_id] += 1
+            num_classes = len(dataset_classes)
+            current_assigned_cls_idx = client_id % num_classes
+            assigned_cls = dataset_classes[current_assigned_cls_idx]
+            current_assigned_cls = [assigned_cls]
+            classes_assigned_count[assigned_cls] += 1
+
             j = 1
             while j < per_client_classes_size:
                 # ind = random.randint(0, max_class_id - 1)
