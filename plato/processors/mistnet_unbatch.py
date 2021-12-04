@@ -12,16 +12,15 @@ class Processor(base.Processor):
     """
     Implements a Processor for unbatching MistNet PyTorch features into the dataset form.
     """
-    def __init__(self, *args, client_id=None, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
+    def __init__(self, client_id=None, **kwargs) -> None:
+        super().__init__(**kwargs)
+
         self.client_id = client_id
 
     def process(self, data: Any) -> Any:
         """
-        Data processing implementation.
-        Implement this method while inheriting the class.
+        Implements a Processor for unbatching MistNet PyTorch features into the dataset form.
         """
-
         feature_dataset = []
 
         for logits, targets in data:

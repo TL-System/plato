@@ -12,7 +12,6 @@ from dataclasses import dataclass
 
 from plato.config import Config
 from plato.clients import simple
-from plato.processors import registry as processor_registry
 
 
 @dataclass
@@ -34,18 +33,8 @@ class Client(simple.Client):
 
         # Perform a forward pass till the cut layer in the model
         features = self.algorithm.extract_features(
-            self.trainset,
-            self.sampler,
-            Config().algorithm.cut_layer,
-            epsilon=Config().algorithm.epsilon)
+            self.trainset, self.sampler,
+            Config().algorithm.cut_layer)
 
         # Generate a report for the server, performing model testing if applicable
         return Report(self.sampler.trainset_size(), len(features)), features
-
-    def set_processors(self) -> None:
-        """Prepare this client for training."""
-        self.outbound_processor, self.inbound_processor = processor_registry.get(
-            "Client",
-            trainer=self.trainer,
-            epsilon=Config().algorithm.epsilon,
-            client_id=self.client_id)

@@ -7,18 +7,17 @@ based on a configuration at run-time.
 """
 import logging
 from collections import OrderedDict
-from typing import Literal, Tuple
-
-from plato.processors import (base, pipeline, mistnet_randomized_response,
-                              mistnet_unbatch, mistnet_outbound_features,
-                              mistnet_inbound_features, mistnet_gaussian,
-                              mistnet_laplace)
+from typing import Tuple
 
 from plato.config import Config
+from plato.processors import (base, mistnet_inbound_features,
+                              mistnet_outbound_features,
+                              mistnet_random_response, mistnet_gaussian,
+                              mistnet_laplace, mistnet_unbatch, pipeline)
 
 registered_processors = OrderedDict([
     ('base', base.Processor),
-    ('mistnet_randomized_response', mistnet_randomized_response.Processor),
+    ('mistnet_random_response', mistnet_random_response.Processor),
     ('mistnet_unbatch', mistnet_unbatch.Processor),
     ('mistnet_outbound_features', mistnet_outbound_features.Processor),
     ('mistnet_inbound_features', mistnet_inbound_features.Processor),
@@ -27,13 +26,13 @@ registered_processors = OrderedDict([
 ])
 
 
-def get(user: Literal["Client", "Server"], *args,
+def get(user: str, *args,
         **kwargs) -> Tuple[pipeline.Processor, pipeline.Processor]:
     """ Get an instance of the processor. """
     outbound_processors = []
     inbound_processors = []
 
-    assert user == "Server" or user == "Client"
+    assert user in ("Server", "Client")
 
     if user == "Server":
         config = Config().server

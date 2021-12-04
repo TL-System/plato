@@ -15,7 +15,6 @@ import socketio
 
 from plato.config import Config
 from plato.utils import s3
-from plato.processors import registry as processor_registry
 
 
 @dataclass
@@ -145,7 +144,6 @@ class Client:
                    'simulation') and Config().clients.simulation:
             self.client_id = response['id']
             self.configure()
-        self.set_processors()
 
         logging.info("[Client #%d] Selected by the server.", self.client_id)
 
@@ -227,7 +225,9 @@ class Client:
 
     async def send(self, payload) -> None:
         """Sending the client payload to the server using either S3 or socket.io."""
+        # First apply outbound processors, if any
         payload = self.outbound_processor.process(payload)
+
         if self.s3_client != None:
             unique_key = uuid.uuid4().hex[:6].upper()
             payload_key = f'client_payload_{self.client_id}_{unique_key}'
@@ -261,13 +261,6 @@ class Client:
     @abstractmethod
     def configure(self) -> None:
         """ Prepare this client for training. """
-
-    def set_processors(self) -> None:
-        """
-        Prepare this client for processors that processes outbound and inbound data payloads.
-        """
-        self.outbound_processor, self.inbound_processor = processor_registry.get(
-            "Client")
 
     @abstractmethod
     def load_data(self) -> None:

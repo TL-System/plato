@@ -88,7 +88,7 @@ class Config:
                 loader_class=yaml.SafeLoader, base_dir='./configs')
 
             if os.path.isfile(filename):
-                with open(filename, 'r') as config_file:
+                with open(filename, 'r', encoding="utf8") as config_file:
                     config = yaml.load(config_file, Loader=yaml.SafeLoader)
             else:
                 # if the configuration file does not exist, use a default one
@@ -99,13 +99,6 @@ class Config:
             Config.data = Config.namedtuple_from_dict(config['data'])
             Config.trainer = Config.namedtuple_from_dict(config['trainer'])
             Config.algorithm = Config.namedtuple_from_dict(config['algorithm'])
-
-            # add the multimodal configs if possible
-            multimodal_data_configs, multimodal_nets_configs = Config.extract_multimodal_config(
-                config)
-
-            Config.multimodal_data = multimodal_data_configs
-            Config.multimodal_nets_configs = multimodal_nets_configs
 
             if Config.args.server is not None:
                 Config.server = Config.server._replace(
@@ -127,6 +120,9 @@ class Config:
                     server_type = Config.algorithm.type
                     Config.result_dir = f'./results/{datasource}/{model}/{server_type}/'
 
+            if 'model' in config:
+                Config.model = Config.namedtuple_from_dict(config['model'])
+
             if hasattr(Config().trainer, 'max_concurrency'):
                 # Using a temporary SQLite database to limit the maximum number of concurrent
                 # trainers
@@ -145,38 +141,6 @@ class Config:
             Config.params['pretrained_model_dir'] = "./models/pretrained/"
 
         return cls._instance
-
-    @staticmethod
-    def extract_multimodal_config(loaded_config):
-        """ Extract the multimodal configuration settings """
-        # adding necessary configuration to the multimodal part
-        supported_multimodal_data_names = ["rgb", "flow", "audio", "text"]
-        multimodal_data_configs = dict()
-        multimodal_nets_configs = dict()
-        config_keys = loaded_config.keys()
-
-        for modality_name in supported_multimodal_data_names:
-            mm_data_name = modality_name + "_data"
-            mm_net_name = modality_name + "_model"
-
-            if modality_name in config_keys:
-                data_config = loaded_config[modality_name][mm_data_name]
-
-                data_config["videos_per_gpu"] = Config.data.videos_per_gpu
-                data_config["workers_per_gpu"] = Config.data.workers_per_gpu
-                multimodal_data_configs[mm_data_name] = data_config
-
-            if "full_models" in config_keys:
-                if mm_net_name in loaded_config["full_models"].keys():
-                    model_config = loaded_config["full_models"][mm_net_name]
-                    multimodal_nets_configs[mm_net_name] = model_config
-
-        if "full_models" in config_keys:
-            if "fuse_model" in loaded_config["full_models"].keys():
-                full_model_config = loaded_config["full_models"]["fuse_model"]
-                multimodal_nets_configs['fuse_model'] = full_model_config
-
-        return multimodal_data_configs, multimodal_nets_configs
 
     @staticmethod
     def namedtuple_from_dict(obj):
@@ -250,7 +214,7 @@ class Config:
 
     @staticmethod
     def default_config() -> dict:
-        ''' Supply a default configuration when the config file is missing. '''
+        ''' Supply a default configuration when the configuration file is missing. '''
         config = {}
         config['clients'] = {}
         config['clients']['type'] = 'simple'
@@ -286,11 +250,12 @@ class Config:
 
     @staticmethod
     def store() -> None:
+        """ Saving the current run-time configuration to a file. """
         data = {}
         data['clients'] = Config.clients._asdict()
         data['server'] = Config.server._asdict()
         data['data'] = Config.data._asdict()
         data['trainer'] = Config.trainer._asdict()
         data['algorithm'] = Config.algorithm._asdict()
-        with open(Config.args.config, "w") as out:
+        with open(Config.args.config, "w", encoding="utf8") as out:
             yaml.dump(data, out, default_flow_style=False)

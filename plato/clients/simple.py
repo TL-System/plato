@@ -7,12 +7,12 @@ import time
 from dataclasses import dataclass
 
 from plato.algorithms import registry as algorithms_registry
+from plato.clients import base
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
+from plato.processors import registry as processor_registry
 from plato.samplers import registry as samplers_registry
 from plato.trainers import registry as trainers_registry
-
-from plato.clients import base
 
 
 @dataclass
@@ -47,6 +47,8 @@ class Client(base.Client):
 
     def configure(self) -> None:
         """Prepare this client for training."""
+        super().configure()
+
         if self.trainer is None:
             self.trainer = trainers_registry.get(self.model)
         self.trainer.set_client_id(self.client_id)
@@ -54,6 +56,11 @@ class Client(base.Client):
         if self.algorithm is None:
             self.algorithm = algorithms_registry.get(self.trainer)
         self.algorithm.set_client_id(self.client_id)
+
+        # Pass inbound and outbound data payloads through processors for
+        # additional data processing
+        self.outbound_processor, self.inbound_processor = processor_registry.get(
+            "Client", client_id=self.client_id, trainer=self.trainer)
 
     def load_data(self) -> None:
         """Generating data and loading them onto this client."""

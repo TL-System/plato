@@ -10,25 +10,20 @@ Differential Privacy," found in docs/papers.
 import logging
 import time
 
-import numpy as np
 import torch
-from plato.config import Config
-from plato.utils import unary_encoding
-
 from plato.algorithms import fedavg
+from plato.config import Config
 
 
 class Algorithm(fedavg.Algorithm):
     """The PyTorch-based MistNet algorithm, used by both the client and the
     server.
     """
-    def extract_features(self, dataset, sampler, cut_layer: str, epsilon=None):
+    def extract_features(self, dataset, sampler, cut_layer: str):
         """Extracting features using layers before the cut_layer.
 
         dataset: The training or testing dataset.
         cut_layer: Layers before this one will be used for extracting features.
-        epsilon: If epsilon is not None, local differential privacy should be
-                applied to the features extracted.
         """
         self.model.eval()
 
@@ -55,8 +50,8 @@ class Algorithm(fedavg.Algorithm):
             feature_dataset.append((logits, targets))
 
         toc = time.perf_counter()
-        logging.info("[Client #{}] Time used: {:.2f} seconds.".format(
-            self.client_id, toc - tic))
+        logging.info("[Client #%s] Time used: %.2f seconds.", self.client_id,
+                     toc - tic)
 
         return feature_dataset
 

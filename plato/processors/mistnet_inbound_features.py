@@ -2,7 +2,6 @@
 Implements a Processor for converting MistNet features from numpy ndarrays to PyTorch tensors.
 """
 import logging
-import os
 from typing import Any
 
 import torch
@@ -13,19 +12,15 @@ class Processor(base.Processor):
     """
     Implements a Processor for converting MistNet features from numpy ndarrays to PyTorch tensors.
     """
-    def __init__(self, *args, server_id=None, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
+    def __init__(self, server_id=None, **kwargs) -> None:
+        super().__init__(**kwargs)
 
         self.server_id = server_id
-
-        if server_id is None:
-            self.server_id = os.getpid()
 
     def process(self, data: Any) -> Any:
         """
         Converts MistNet features from numpy ndarrays to PyTorch tensors.
         """
-
         feature_dataset = []
 
         for logit, target in data:

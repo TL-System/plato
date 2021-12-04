@@ -18,7 +18,6 @@ from aiohttp import web
 from plato.client import run
 from plato.config import Config
 from plato.utils import s3
-from plato.processors import registry as processor_registry
 
 
 class ServerEvents(socketio.AsyncNamespace):
@@ -104,7 +103,6 @@ class Server:
 
         self.client = client
         self.configure()
-        self.set_processors()
 
         if Config().is_central_server():
             # In cross-silo FL, the central server lets edge servers start first
@@ -356,7 +354,9 @@ class Server:
 
     async def send(self, sid, payload, client_id) -> None:
         """ Sending a new data payload to the client using either S3 or socket.io. """
+        # First apply outbound processors, if any
         payload = self.outbound_processor.process(payload)
+
         if self.s3_client is not None:
             payload_key = f'server_payload_{os.getpid()}_{self.current_round}'
             self.s3_client.send_to_s3(payload_key, payload)
@@ -500,6 +500,10 @@ class Server:
         await self.close_connections()
         os._exit(0)
 
+    @abstractmethod
+    def configure(self):
+        """ Configuring the server with initialization work. """
+
     async def customize_server_response(self, server_response):
         """ Wrap up generating the server response with any additional information. """
         return server_response
@@ -507,17 +511,6 @@ class Server:
     @abstractmethod
     def customize_server_payload(self, payload):
         """ Wrap up generating the server payload with any additional information. """
-
-    @abstractmethod
-    def configure(self):
-        """ Configuring the server with initialization work. """
-
-    def set_processors(self):
-        """
-        Prepare this server for processors that processes outbound and inbound data payloads.
-        """
-        self.outbound_processor, self.inbound_processor = processor_registry.get(
-            "Server")
 
     @abstractmethod
     async def process_reports(self) -> None:
