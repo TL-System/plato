@@ -29,17 +29,17 @@ def randomize(bit_array: np.ndarray, epsilon):
 def symmetric_unary_encoding(bit_array: np.ndarray, epsilon):
     p = np.e**(epsilon / 2) / (np.e**(epsilon / 2) + 1)
     q = 1 / (np.e**(epsilon / 2) + 1)
-    return produce_random_response(bit_array, p, q)
+    return produce_randomized_response(bit_array, p, q)
 
 
 def optimized_unary_encoding(bit_array: np.ndarray, epsilon):
     p = 1 / 2
     q = 1 / (np.e**epsilon + 1)
-    return produce_random_response(bit_array, p, q)
+    return produce_randomized_response(bit_array, p, q)
 
 
-def produce_random_response(bit_array: np.ndarray, p, q=None):
-    """Implements random response as the perturbation method."""
+def produce_randomized_response(bit_array: np.ndarray, p, q=None):
+    """Implements randomized response as the perturbation method."""
     q = 1 - p if q is None else q
 
     p_binomial = np.random.binomial(1, p, bit_array.shape)
