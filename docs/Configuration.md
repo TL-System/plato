@@ -24,6 +24,10 @@ Attributes in **bold** must be included in a configuration file, while attribute
 
 - `mistnet_random_response`: Activate randomized response on features for PyTorch MistNet, must also set `algorithm.epsilon` to activate. Must be placed before `mistnet_unbatch` if used.
 
+- `mistnet_laplace`: Add random noise with laplace distribution to features for PyTorch MistNet.
+
+- `mistnet_gaussian`: Add random noise with gaussian distribution to features for PyTorch MistNet.
+
 - `mistnet_unbatch`: Unbatch features for PyTorch MistNet clients, must use this processor for every PyTorch MistNet client before sending.
 
 - `mistnet_outbound_features`: Convert PyTorch tensor features into NumPy arrays before sending to the server, for the benefit of saving a substantial amount of communication overhead if the feature dataset is large. Must be placed after `mistnet_unbatch` if used.
