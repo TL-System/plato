@@ -11,7 +11,8 @@ from typing import Literal, Tuple
 
 from plato.processors import (base, pipeline, mistnet_randomized_response,
                               mistnet_unbatch, mistnet_outbound_features,
-                              mistnet_inbound_features)
+                              mistnet_inbound_features, mistnet_exponantial,
+                              mistnet_gaussian, mistnet_laplace)
 
 from plato.config import Config
 
@@ -21,6 +22,9 @@ registered_processors = OrderedDict([
     ('mistnet_unbatch', mistnet_unbatch.Processor),
     ('mistnet_outbound_features', mistnet_outbound_features.Processor),
     ('mistnet_inbound_features', mistnet_inbound_features.Processor),
+    ('mistnet_exponantial', mistnet_exponantial.Processor),
+    ('mistnet_gaussian', mistnet_gaussian.Processor),
+    ('mistnet_laplace', mistnet_laplace.Processor),
 ])
 
 
