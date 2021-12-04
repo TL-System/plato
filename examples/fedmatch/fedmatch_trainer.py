@@ -6,7 +6,7 @@ https://arxiv.org/pdf/2006.12097.pdf
 """
 
 import torch
-from torch import optim
+from torch import _load_global_deps, optim
 from plato.config import Config
 from plato.trainers import basic
 import asyncio
@@ -18,6 +18,7 @@ from typing import Tuple
 import random
 import numpy as np
 import torch.nn as nn
+from torch.utils.data import DataLoader, dataloader
 import wandb
 from plato.models import registry as models_registry
 from plato.utils import optimizers
@@ -82,14 +83,13 @@ class Trainer(basic.Trainer):
                         batch_size=batch_size,
                         sampler=sampler.get())
                 """obtain labeled and unlabeled dataset"""
-                #print('===========len of train loader is : ',
-                #len(train_loader))
-                #print('type of train_loader is : ', type(train_loader))
-                train_loader_s, train_loader_u = torch.utils.data.random_split(
-                    train_loader, [125, 500])  # rewrite with ratio
-                print("==========================Type of train_loader: ",
-                      type(train_loader))
-                print("Type of train_loader_s: ", type(train_loader_s))
+
+                #len_train_set = len(trainset)
+
+                trainset_s, trainset_u = torch.utils.data.random_split(
+                    trainset, [10000, 50000])  # rewrite with ratio
+                train_loader_s = DataLoader(trainset_s)
+                train_loader_u = DataLoader(trainset_u)
 
                 # iterations_per_epoch = np.ceil(len(trainset) /
                 #                               batch_size).astype(int) # variable iterations_per_epoch is computed for lr_scheduler;
@@ -143,13 +143,11 @@ class Trainer(basic.Trainer):
                 else:
                     lr_schedule = None
                 """
-                #self.model.acho()
-
+                #print("=========Supervised Training==========")
                 for epoch in range(1, epochs + 1):
                     self.confident = 0
                     for batch_id, (examples, labels) in enumerate(
-                            train_loader):  # batch_id is used for logging
-                        #(examples_unlabeled, discards) in zip(train_loader_s, train_loader_u):
+                            train_loader_s):  # batch_id is used for logging
                         #######################
                         # supervised learning
                         #######################
@@ -173,6 +171,7 @@ class Trainer(basic.Trainer):
                         #######################
                         # unsupervised learning
                         #######################
+                    print("=========Unsupervised Training==========")
                     for batch_id, (examples_unlabeled, labels) in enumerate(
                             train_loader_u):  #why not accessiable
                         #pseduo_labels = self.model(self.loader.scale(examples_unlabeled))
@@ -195,23 +194,30 @@ class Trainer(basic.Trainer):
 
                         #if lr_schedule is not None:
                         #    lr_schedule.step()
-                        """
+
                         if batch_id % log_interval == 0:
                             if self.client_id == 0:
                                 logging.info(
                                     "[Server #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}"
-                                    .format(os.getpid(), epoch, epochs,
-                                            batch_id, len(train_loader),
-                                            loss_s.data.item()+loss_u.data.item()))
+                                    .format(
+                                        os.getpid(), epoch, epochs, batch_id,
+                                        len(train_loader),
+                                        loss_s.data.item() +
+                                        loss_u.data.item()))
                             else:
                                 if hasattr(config, 'use_wandb'):
-                                    wandb.log({"batch loss": loss_s.data.item()+loss_u.data.item()})
+                                    wandb.log({
+                                        "batch loss":
+                                        loss_s.data.item() +
+                                        loss_u.data.item()
+                                    })
                                 logging.info(
                                     "[Client #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}"
-                                    .format(self.client_id, epoch, epochs,
-                                            batch_id, len(train_loader),
-                                            loss_s.data.item()+loss_u.data.item()))
-                        """
+                                    .format(
+                                        self.client_id, epoch, epochs,
+                                        batch_id, len(train_loader),
+                                        loss_s.data.item() +
+                                        loss_u.data.item()))
 
                     #if hasattr(optimizer, "params_state_update"):
                     #   optimizer.params_state_update()
@@ -245,13 +251,16 @@ class Trainer(basic.Trainer):
         """
         # Make predictions with local model
         if cut_layer is None:
-            y_pred = self.model(self.scale(unlabled_samples))
+            y_pred = self.model(
+                unlabled_samples)  #(self.scale(unlabled_samples))
         else:
-            y_pred = self.model.forward_from(self.scale(unlabled_samples),
-                                             cut_layer)
+            y_pred = self.model.forward_from(
+                unlabled_samples, cut_layer)  #self.scale(unlabled_samples),
+            #cut_layer)
 
         _confident = np.where(
-            np.max(y_pred.numpy(), axis=1) >= self.confident)[0]
+            np.max(y_pred.detach().numpy(), axis=1) >= self.confident)[0]
+        #np.max(y_pred.numpy(), axis=1) >= self.confident)[0]
 
         if len(_confident) > 0:
             # Inter-client consistency
@@ -283,19 +292,24 @@ class Trainer(basic.Trainer):
             loss_u += loss_criterion_u(y_pseu, y_hard) * self.lambda_a
 
         # Regularization
-        for lid, psi in enumerate(self.psi):  # psi & sig?
+        self.psi = self.model.get_psi()
+        self.sigma = self.model.get_sigma()
+        #print("========after get_psi=======")
+
+        for lid, psi in enumerate(self.psi):  # psi & sig?#self means trainer
             # l1 regularization
-            loss_u += torch.reduce_sum(torch.abs(psi)) * self.lambda_l1
+            loss_u += torch.sum(torch.abs(psi.flatten())) * self.lambda_l1
+            #print("The loss_u for first iter is: ", loss_u)
             # l2 regularization
-            loss_u += torch.reduce_sum(
-                torch.math.square(self.sig[lid] - psi)) * self.lambda_l2
+            loss_u += torch.sum(torch.square(
+                (self.sigma[lid] - psi).flatten())) * self.lambda_l2
 
         return loss_u, len(
             _confident
         )  # confident is only used for logging in orignal code so we can get rid of it here.
 
     def scale(self, x):
-        x = x.astype(np.float32) / 255
+        x = x.numpy() / 255  #astype(np.float32) / 255
 
     def augment(self, images, soft=True):
         if soft:
