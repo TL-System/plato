@@ -1,5 +1,5 @@
 """
-Implements a Processor for applying local differential privacy using random response.
+Implements a Processor for applying local differential privacy using randomized response.
 """
 import logging
 from typing import Any
@@ -12,7 +12,7 @@ from plato.utils import unary_encoding
 
 class Processor(base.Processor):
     """
-    Implements a Processor for applying local differential privacy using random response.
+    Implements a Processor for applying local differential privacy using randomized response.
     """
     def __init__(self, client_id=None, **kwargs) -> None:
         super().__init__(**kwargs)
@@ -21,7 +21,7 @@ class Processor(base.Processor):
 
     def process(self, data: Any) -> Any:
         """
-        Implements a Processor for applying random response as the
+        Implements a Processor for applying randomized response as the
         local differential privacy mechanism.
         """
         if Config().algorithm.epsilon is None:

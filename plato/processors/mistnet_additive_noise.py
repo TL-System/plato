@@ -39,7 +39,7 @@ class Processor(base.Processor):
 
     def process(self, data: Any) -> Any:
         """
-        Implements a Processor for applying random response as the local differential privacy
+        Implements a Processor for applying randomized response as the local differential privacy
         mechanism.
         """
 

@@ -13,7 +13,7 @@ clients:
 
     # Processors for outbound data payloads
     outbound_processors:
-        - mistnet_random_response
+        - mistnet_randomized_response
         - mistnet_unbatch
         - mistnet_outbound_features
 

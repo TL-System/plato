@@ -12,12 +12,12 @@ from typing import Tuple
 from plato.config import Config
 from plato.processors import (base, mistnet_inbound_features,
                               mistnet_outbound_features,
-                              mistnet_random_response, mistnet_gaussian,
+                              mistnet_randomized_response, mistnet_gaussian,
                               mistnet_laplace, mistnet_unbatch, pipeline)
 
 registered_processors = OrderedDict([
     ('base', base.Processor),
-    ('mistnet_random_response', mistnet_random_response.Processor),
+    ('mistnet_randomized_response', mistnet_randomized_response.Processor),
     ('mistnet_unbatch', mistnet_unbatch.Processor),
     ('mistnet_outbound_features', mistnet_outbound_features.Processor),
     ('mistnet_inbound_features', mistnet_inbound_features.Processor),
