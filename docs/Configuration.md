@@ -22,7 +22,11 @@ Attributes in **bold** must be included in a configuration file, while attribute
 
 #### Valid processors for `clients.outbound_processors`
 
-- `mistnet_random_response`: Activate randomized response on features for PyTorch MistNet, must also set `algorithm.epsilon` to activate. Must be placed before `mistnet_unbatch` if used.
+- `mistnet_randomized_response`: Activate randomized response on features for PyTorch MistNet, must also set `algorithm.epsilon` to activate. Must be placed before `mistnet_unbatch` if used.
+
+- `mistnet_laplace`: Add random noise with laplace distribution to features for PyTorch MistNet.
+
+- `mistnet_gaussian`: Add random noise with gaussian distribution to features for PyTorch MistNet.
 
 - `mistnet_laplace`: Add random noise with laplace distribution to features for PyTorch MistNet.
 
