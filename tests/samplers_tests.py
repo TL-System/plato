@@ -5,13 +5,14 @@ Testing samplers in Plato framework.
 import os
 import unittest
 
-# os.environ['config_file'] = 'configs/Kinetics/kinetics_mm.yml'
+os.environ['config_file'] = 'configs/Tests/distribution_noniid_sampler.yml'
 
-# os.environ['config_file'] = 'configs/Tests/distribution_noniid_sampler.yml'
+# os.environ['config_file'] = 'configs/Tests/label_quantity_noniid_sampler.yml'
 
-os.environ['config_file'] = 'configs/Tests/label_quantity_noniid_sampler.yml'
+# os.environ['config_file'] = 'configs/Tests/sample_quantity_noniid_sampler.yml'
 
 import utils
+import numpy as np
 
 from plato.config import Config
 from plato.datasources.cifar10 import DataSource
@@ -25,11 +26,28 @@ class SamplersTest(unittest.TestCase):
 
         _ = Config()
 
+        self.total_clients = Config().clients.total_clients
         self.cifar10_datasource = DataSource()
 
+    def test_client_sampler_working(self):
+        """ Test the client sampler works well, i.e., smoothly loading batches """
+        clients_id = list(range(self.total_clients))
+        client_id = np.random.choice(clients_id, 1)[0]
+        utils.verify_working_correcness(Sampler=samplers_registry,
+                                        dataset_source=self.cifar10_datasource,
+                                        client_id=client_id,
+                                        num_of_batches=10,
+                                        batch_size=5,
+                                        is_test_phase=False)
+
     def test_client_data_consistency(self):
-        """ Test that the sampler always assignes same data distribution for one client """
-        assert utils.verify_client_local_data_correcness(
+        """ Test that the sampler always assignes same data distribution for one client
+            It mainly verify:
+             1- the assigned classes
+             2- the assigned sample size for each class
+             3- the samples index assigned to the client
+        """
+        assert utils.verify_client_data_correcness(
             Sampler=samplers_registry,
             dataset_source=self.cifar10_datasource,
             client_id=1,

@@ -8,6 +8,7 @@ import logging
 from collections import OrderedDict
 
 from plato.config import Config
+from plato.samplers import sample_quantity_noniid
 
 if hasattr(Config().trainer, 'use_mindspore'):
     from plato.samplers.mindspore import (
@@ -39,6 +40,7 @@ else:
         ('all_inclusive', all_inclusive.Sampler),
         ('distribution_noniid', distribution_noniid.Sampler),
         ('label_quantity_noniid', label_quantity_noniid.Sampler),
+        ('sample_quantity_noniid', sample_quantity_noniid.Sampler),
     ])
 
 

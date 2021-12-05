@@ -6,8 +6,6 @@ Useful functions to test the correcness of samplers
 import collections
 import logging
 
-import numpy as np
-
 import torch
 
 
@@ -78,9 +76,36 @@ def extract_assigend_data_info(dataset,
 
     assigned_classes_sample = dict(
         collections.Counter(assigned_samples_labels))
-    assigned_classes = list(set(assigned_samples_labels))
+    assigned_classes = sorted(list(set(assigned_samples_labels)))
     return len(
         assigned_samples_labels), assigned_classes, assigned_classes_sample
+
+
+def extract_assigend_sample_indexs_info(dataset,
+                                        sampler,
+                                        num_of_batches=None,
+                                        batch_size=5):
+    """ Extracting the samples index that are sampled """
+    samples_index = list(range(len(dataset)))
+    data_loader = torch.utils.data.DataLoader(dataset=samples_index,
+                                              shuffle=False,
+                                              batch_size=batch_size,
+                                              sampler=sampler.get())
+    if num_of_batches is None:
+        num_of_batches = len(data_loader)
+
+    # record the obtained samples index
+    assigend_samples_index = list()
+    extract_idx = 0
+    for sample_index in data_loader:
+        sample_index = sample_index.numpy().tolist()
+        assigend_samples_index.append(sample_index)
+
+        extract_idx += 1
+        if extract_idx > num_of_batches:
+            break
+
+    return assigend_samples_index
 
 
 def collect_clients_data_info(clients_id,
@@ -93,7 +118,8 @@ def collect_clients_data_info(clients_id,
     """ Collect the required 'clients_id' data information
 
     Outputs:
-        clients_classes_info [dict]: Contains client_id: [assigned_classes]
+        clients_samples_info [dict]: Contains client_id: [assigned samples index]
+        clients_classes_info [dict]: Contains client_id: [assigned classes]
         clients_classes_sample_info [dict]: Contains client_id: {class_id: sample_size}]
         clients_global_info [dict]: Contains the global information
                                     classes_number: [assigned classes of required classes]
@@ -109,6 +135,9 @@ def collect_clients_data_info(clients_id,
     assert isinstance(clients_id, list)
 
     dataset = get_phase_dataset(dataset_source, is_test_phase)
+
+    clients_samples_info = dict()
+    clients_classes_info = dict()
 
     clients_classes_info = dict()
     clients_classes_sample_info = dict()
@@ -127,6 +156,15 @@ def collect_clients_data_info(clients_id,
             num_of_batches=num_of_batches,
             batch_size=batch_size)
 
+        assigend_samples_index = extract_assigend_sample_indexs_info(
+            dataset,
+            sampler=defined_sampler,
+            num_of_batches=num_of_batches,
+            batch_size=batch_size)
+
+        clients_samples_info[client_id] = assigend_samples_index
+        clients_classes_info[client_id] = assigned_classes
+        clients_classes_sample_info[client_id] = assigned_classes_sample
         clients_global_info["classes_number"].append(len(assigned_classes))
         clients_global_info["samples_number"].append(client_total_samples)
 
@@ -138,9 +176,6 @@ def collect_clients_data_info(clients_id,
             logging.info("Client's classes sample: {}".format(' '.join(
                 map(str, assigned_classes_sample))))
 
-        clients_classes_info[client_id] = assigned_classes
-        clients_classes_sample_info[client_id] = assigned_classes_sample
-
     if is_presented:
         logging.info("Clients' classes sample: {}".format(' '.join(
             map(str, clients_global_info["classes_number"]))))
@@ -148,7 +183,8 @@ def collect_clients_data_info(clients_id,
         logging.info("Clients' samples size: {}".format(' '.join(
             map(str, clients_global_info["samples_number"]))))
 
-    return clients_classes_info, clients_classes_sample_info, clients_global_info
+    return clients_classes_info, clients_classes_sample_info, \
+        clients_samples_info, clients_global_info
 
 
 def verify_working_correcness(Sampler,
@@ -169,50 +205,67 @@ def verify_working_correcness(Sampler,
                                               sampler=defined_sampler.get())
 
     extract_idx = 0
-    for examples, labels in data_loader:
+    for examples, _ in data_loader:
 
         examples = examples.view(len(examples), -1)
-
-        print("labels: ", labels)
 
         extract_idx += 1
         if extract_idx > num_of_batches:
             break
 
 
-def verify_client_local_data_correcness(Sampler,
-                                        dataset_source,
-                                        client_id,
-                                        num_of_iterations=5,
-                                        batch_size=5,
-                                        is_test_phase=False,
-                                        is_presented=False):
-    """ Verify the local data generated for this client by the sampler is same all the time """
+def verify_client_data_correcness(Sampler,
+                                  dataset_source,
+                                  client_id,
+                                  num_of_iterations=5,
+                                  batch_size=5,
+                                  is_test_phase=False,
+                                  is_presented=False):
+    """ Verify the data information generated for this client by the sampler is same all the time
+
+        It mainly verify:
+         1- the assigned classes
+         2- the assigned sample size for each class
+         3- the samples index assigned to the client
+    """
 
     assert num_of_iterations > 1  # several steps required to ensure the verify
     verify_flag = False
     verify_count = 0
-    clients_classes_info, \
-        clients_classes_sample_info, clients_global_info \
-             = collect_clients_data_info(clients_id=[client_id] * num_of_iterations,
-                              Sampler=Sampler,
-                              dataset_source=dataset_source,
-                              num_of_batches=None,
-                              batch_size=batch_size,
-                              is_test_phase=is_test_phase,
-                              is_presented=is_presented)
+    client_anchor_classes = None
+    client_anchor_classes_sample_size = None
+    client_anchor_samples_index = None
 
-    client_anchor_classes_size = len(clients_classes_info[client_id])
-    client_anchor_samples_size = np.sum(
-        list(clients_classes_sample_info[client_id].values()))
+    for itera_idx in range(num_of_iterations):
 
-    for idx in range(num_of_iterations):
-        iter_client_classes_size = clients_global_info["classes_number"][idx]
-        iter_client_samples_size = clients_global_info["samples_number"][idx]
-
-        if client_anchor_classes_size == iter_client_classes_size \
-            and client_anchor_samples_size == iter_client_samples_size:
+        clients_classes_info, \
+            clients_classes_sample_info, clients_samples_info, \
+                _ \
+                = collect_clients_data_info(clients_id=[client_id],
+                                Sampler=Sampler,
+                                dataset_source=dataset_source,
+                                num_of_batches=None,
+                                batch_size=batch_size,
+                                is_test_phase=is_test_phase,
+                                is_presented=is_presented)
+        if itera_idx == 0:  # the first iteration
+            client_anchor_classes = clients_classes_info[client_id]
+            client_anchor_classes_sample_size = clients_classes_sample_info[
+                client_id]
+            client_anchor_samples_index = clients_samples_info[client_id]
             verify_count += 1
+        else:
+
+            is_same_classes = client_anchor_classes == \
+                                clients_classes_info[client_id]
+            is_same_cls_sample_size = equal_dics(
+                client_anchor_classes_sample_size,
+                clients_classes_sample_info[client_id])
+            is_same_samples_index = client_anchor_samples_index == \
+                                        clients_samples_info[client_id]
+
+            if is_same_classes and is_same_cls_sample_size and is_same_samples_index:
+                verify_count += 1
 
     if verify_count == num_of_iterations:
         verify_flag = True
@@ -232,7 +285,7 @@ def verify_difference_between_clients(clients_id,
     verify_flag = True
     clients_classes_info, \
         clients_classes_sample_info, \
-            _ = collect_clients_data_info(clients_id=clients_id,
+            _, _ = collect_clients_data_info(clients_id=clients_id,
                               Sampler=Sampler,
                               dataset_source=dataset_source,
                               num_of_batches=num_of_batches,
@@ -267,8 +320,7 @@ def verify_clients_fixed_classes(clients_id,
     """ Check the clients are assigned required number of classes """
     verify_flag = True
     clients_classes_info, \
-        _, \
-            _ = collect_clients_data_info(clients_id=clients_id,
+        _, _, _ = collect_clients_data_info(clients_id=clients_id,
                               Sampler=Sampler,
                               dataset_source=dataset_source,
                               num_of_batches=num_of_batches,

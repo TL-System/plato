@@ -54,7 +54,7 @@ class Sampler(base.Sampler):
             target_list = datasource.get_test_set().targets
         else:
             # the list of labels (targets) for all the examples
-            target_list = datasource.targets()
+            target_list = datasource.get_train_set().targets
 
         self.targets_list = target_list
         classes_text_list = datasource.classes()

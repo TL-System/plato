@@ -7,7 +7,7 @@ This sampler can introduce the hardest non-IID data scenarios because it contain
     - Label skewness - equals to the sampler called dirichlet, i.e., dirichlet.py
         The number of classes contained in clients follows the Dirichlet distribution
         that is parameterized by the "label_concentration".
-    - Quantity skewness
+    - Quantity skewness - equals to the sampler called "sample_quantity_noniid.py".
 	    The local dataset sizes of clients follow the  Dirichlet distribution that is
         parameterized by the "client_quantity_concentration".
 
@@ -60,7 +60,8 @@ class Sampler(base.Sampler):
             target_list = datasource.get_test_set().targets
         else:
             # the list of labels (targets) for all the examples
-            target_list = datasource.targets()
+            target_list = datasource.get_train_set().targets
+
         class_list = datasource.classes()
         total_data_size = len(target_list)
 
