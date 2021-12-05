@@ -11,7 +11,7 @@ class Processor:
     """
     The base Processor class does nothing on the data payload.
     """
-    def __init__(self, trainer=None) -> None:
+    def __init__(self, trainer=None, **kwargs) -> None:
         """ Constructor for Processor. """
         self.trainer = trainer
 

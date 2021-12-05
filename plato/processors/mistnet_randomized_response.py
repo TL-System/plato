@@ -4,48 +4,40 @@ Implements a Processor for applying local differential privacy using randomized 
 import logging
 from typing import Any
 
-import torch
 from plato.config import Config
-from plato.processors import base
+from plato.processors import mistnet_feature
 from plato.utils import unary_encoding
 
 
-class Processor(base.Processor):
+class Processor(mistnet_feature.Processor):
     """
     Implements a Processor for applying local differential privacy using randomized response.
     """
-    def __init__(self, client_id=None, **kwargs) -> None:
-        super().__init__(**kwargs)
+    def __init__(self, **kwargs) -> None:
+        def func(logits, targets):
+            if Config().algorithm.epsilon is None:
+                return logits, targets
 
-        self.client_id = client_id
+            _randomize = getattr(self.trainer, "randomize", None)
+            epsilon = Config().algorithm.epsilon
+
+            logits = unary_encoding.encode(logits)
+            if callable(_randomize):
+                logits = self.trainer.randomize(logits, targets, epsilon)
+            else:
+                logits = unary_encoding.randomize(logits, epsilon)
+
+            return logits, targets
+
+        super().__init__(method=func, **kwargs)
 
     def process(self, data: Any) -> Any:
         """
         Implements a Processor for applying randomized response as the
         local differential privacy mechanism.
         """
-        if Config().algorithm.epsilon is None:
-            return data
 
-        _randomize = getattr(self.trainer, "randomize", None)
-        epsilon = Config().algorithm.epsilon
-        output = []
-
-        for logits, targets in data:
-            logits = logits.detach().numpy()
-            logits = unary_encoding.encode(logits)
-
-            if callable(_randomize):
-                logits = self.trainer.randomize(logits, targets, epsilon)
-            else:
-                logits = unary_encoding.randomize(logits, epsilon)
-
-            if self.trainer.device != 'cpu':
-                logits = torch.from_numpy(logits.astype('float16'))
-            else:
-                logits = torch.from_numpy(logits.astype('float32'))
-
-            output.append((logits, targets))
+        output = super().process(data)
 
         logging.info(
             "[Client #%d] Local differential privacy (using randomized response) applied.",

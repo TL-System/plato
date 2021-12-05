@@ -13,7 +13,8 @@ from plato.config import Config
 from plato.processors import (base, mistnet_inbound_features,
                               mistnet_outbound_features,
                               mistnet_randomized_response, mistnet_gaussian,
-                              mistnet_laplace, mistnet_unbatch, pipeline)
+                              mistnet_laplace, mistnet_unbatch,
+                              mistnet_quantize, mistnet_dequantize, pipeline)
 
 registered_processors = OrderedDict([
     ('base', base.Processor),
@@ -23,6 +24,8 @@ registered_processors = OrderedDict([
     ('mistnet_inbound_features', mistnet_inbound_features.Processor),
     ('mistnet_gaussian', mistnet_gaussian.Processor),
     ('mistnet_laplace', mistnet_laplace.Processor),
+    ('mistnet_quantize', mistnet_quantize.Processor),
+    ('mistnet_dequantize', mistnet_dequantize.Processor),
 ])
 
 
