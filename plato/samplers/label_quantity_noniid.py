@@ -76,27 +76,32 @@ class Sampler(base.Sampler):
     def quantity_label_skew(self, dataset_labels, dataset_classes, num_clients,
                             per_client_classes_size):
         """ Achieve the quantity-based lable skewness """
+        client_id = self.client_id
         # each client contains the full classes
         if per_client_classes_size == len(dataset_classes):
             self.fully_classes_assigned(dataset_labels, dataset_classes,
-                                        num_clients)
+                                        num_clients, client_id)
         else:
             self.specific_classes_assigned(dataset_labels, dataset_classes,
                                            num_clients,
                                            per_client_classes_size)
 
     def fully_classes_assigned(self, dataset_labels, dataset_classes,
-                               num_clients):
+                               num_clients, client_id):
         """ Assign full classes to each client """
         dataset_labels = np.array(dataset_labels)
+
         for class_id in dataset_classes:
             idx_k = np.where(dataset_labels == class_id)[0]
 
-            # the samples of each class is evenly assigned to different clients
+            # the samples of each class is evenly assigned to this client
             split = np.array_split(idx_k, num_clients)
-            for client_id in range(num_clients):
-                self.clients_dataidx_map[client_id] = np.append(
-                    self.clients_dataidx_map[client_id], split[client_id])
+            self.clients_dataidx_map[client_id] = np.append(
+                self.clients_dataidx_map[client_id], split[client_id])
+
+            # for client_id in range(num_clients):
+            #     self.clients_dataidx_map[client_id] = np.append(
+            #         self.clients_dataidx_map[client_id], split[client_id])
 
     def specific_classes_assigned(self, dataset_labels, dataset_classes,
                                   num_clients, per_client_classes_size):

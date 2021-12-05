@@ -35,7 +35,7 @@ data:
   sampler: label_quantity_noniid
   modality_sampler: modality_iid
 
-  per_client_classes_size: 5
+  per_client_classes_size: 6
   
 
   min_partition_size: 200
