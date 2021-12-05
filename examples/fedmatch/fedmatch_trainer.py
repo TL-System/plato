@@ -88,8 +88,8 @@ class Trainer(basic.Trainer):
 
                 trainset_s, trainset_u = torch.utils.data.random_split(
                     trainset, [10000, 50000])  # rewrite with ratio
-                train_loader_s = DataLoader(trainset_s)
-                train_loader_u = DataLoader(trainset_u)
+                train_loader_s = DataLoader(trainset_s, 100)
+                train_loader_u = DataLoader(trainset_u, 100)
 
                 # iterations_per_epoch = np.ceil(len(trainset) /
                 #                               batch_size).astype(int) # variable iterations_per_epoch is computed for lr_scheduler;
@@ -146,6 +146,7 @@ class Trainer(basic.Trainer):
                 #print("=========Supervised Training==========")
                 for epoch in range(1, epochs + 1):
                     self.confident = 0
+                    print("=========Supervised Training==========")
                     for batch_id, (examples, labels) in enumerate(
                             train_loader_s):  # batch_id is used for logging
                         #######################
@@ -167,6 +168,23 @@ class Trainer(basic.Trainer):
                         loss_s.backward()
 
                         optimizer_s.step()
+
+                        if batch_id % log_interval == 0:
+                            if self.client_id == 0:
+                                logging.info(
+                                    "[Server #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}"
+                                    .format(os.getpid(), epoch, epochs,
+                                            batch_id, len(train_loader_s),
+                                            loss_s.data.item()))
+                            else:
+                                if hasattr(config, 'use_wandb'):
+                                    wandb.log(
+                                        {"batch loss": loss_s.data.item()})
+                                logging.info(
+                                    "[Client #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}"
+                                    .format(self.client_id, epoch, epochs,
+                                            batch_id, len(train_loader_s),
+                                            loss_s.data.item()))
 
                         #######################
                         # unsupervised learning
@@ -199,25 +217,18 @@ class Trainer(basic.Trainer):
                             if self.client_id == 0:
                                 logging.info(
                                     "[Server #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}"
-                                    .format(
-                                        os.getpid(), epoch, epochs, batch_id,
-                                        len(train_loader),
-                                        loss_s.data.item() +
-                                        loss_u.data.item()))
+                                    .format(os.getpid(), epoch, epochs,
+                                            batch_id, len(train_loader_u),
+                                            loss_u.data.item()))
                             else:
                                 if hasattr(config, 'use_wandb'):
-                                    wandb.log({
-                                        "batch loss":
-                                        loss_s.data.item() +
-                                        loss_u.data.item()
-                                    })
+                                    wandb.log(
+                                        {"batch loss": loss_u.data.item()})
                                 logging.info(
                                     "[Client #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}"
-                                    .format(
-                                        self.client_id, epoch, epochs,
-                                        batch_id, len(train_loader),
-                                        loss_s.data.item() +
-                                        loss_u.data.item()))
+                                    .format(self.client_id, epoch, epochs,
+                                            batch_id, len(train_loader_u),
+                                            loss_u.data.item()))
 
                     #if hasattr(optimizer, "params_state_update"):
                     #   optimizer.params_state_update()
