@@ -11,11 +11,21 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
+    # Processors for outbound data payloads
+    outbound_processors:
+        - mistnet_randomized_response
+        - mistnet_unbatch
+        - mistnet_outbound_features
+
 server:
     type: mistnet
-
+    ping_timeout: 36000
     address: 127.0.0.1
     port: 8000
+
+    # Processors for inbound data payloads
+    inbound_processors:
+        - mistnet_inbound_features
 
 data:
     # The training and testing dataset
@@ -161,7 +171,7 @@ trainer:
     # The machine learning model
     model_name: yolov5
     model_config: packages/yolov5/yolov5/models/yolov5s.yaml
-    train_params: packages/yolov5/yolov5/data/hyp.scratch.yaml
+    train_params: packages/yolov5/yolov5/data/hyps/hyp.scratch.yaml
 
 algorithm:
     # Aggregation algorithm

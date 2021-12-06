@@ -3,7 +3,7 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 1
+    total_clients: 2
 
     # The number of clients selected in each round
     per_round: 1
@@ -162,7 +162,7 @@ trainer:
     # The machine learning model
     model_name: yolov5
     model_config: packages/yolov5/yolov5/models/yolov5s.yaml
-    train_params: packages/yolov5/yolov5/data/hyp.scratch.yaml
+    train_params: packages/yolov5/yolov5/data/hyps/hyp.scratch.yaml
 
 algorithm:
     # Aggregation algorithm

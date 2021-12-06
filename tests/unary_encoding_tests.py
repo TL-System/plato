@@ -9,7 +9,7 @@ from plato.utils import unary_encoding
 
 
 class UnaryEncodingTest(unittest.TestCase):
-    """Tests for unary encoding and random response."""
+    """Tests for unary encoding and randomized response."""
     @staticmethod
     def unary_epsilon(p, q):
         """Computes epsilon from p and q.
@@ -32,15 +32,17 @@ class UnaryEncodingTest(unittest.TestCase):
             arr, computed_epsilon)
 
         np.random.seed(1)
-        random_response = unary_encoding.produce_random_response(arr, p, q)
-        self.assertSequenceEqual(symmetric.tolist(), random_response.tolist())
+        randomized_response = unary_encoding.produce_randomized_response(
+            arr, p, q)
+        self.assertSequenceEqual(symmetric.tolist(),
+                                 randomized_response.tolist())
 
     def test_distribution_probability(self):
         """Test the distribution probability of the results."""
         p = 0.75
         runs = 100000
         arr = np.array([1] * runs)
-        symmetric = unary_encoding.produce_random_response(arr, p)
+        symmetric = unary_encoding.produce_randomized_response(arr, p)
         total_ones = (symmetric == 1).sum()
         print(f"Probability of ones = {total_ones / len(symmetric.tolist())}")
         self.assertAlmostEqual(total_ones / len(symmetric.tolist()),

@@ -13,7 +13,7 @@ from plato.samplers import base
 class Sampler(base.Sampler):
     """Create a data sampler for each client to use a divided partition of the dataset.
     A client only has data of certain classes."""
-    def __init__(self, datasource, client_id):
+    def __init__(self, datasource, client_id, testing):
         super().__init__()
 
         # Different clients should have a different bias across the labels
@@ -21,11 +21,26 @@ class Sampler(base.Sampler):
 
         self.partition_size = Config().data.partition_size
 
-        # The list of labels (targets) for all the examples
-        target_list = datasource.targets()
+        if testing:
+            target_list = datasource.get_test_set().targets
+        else:
+            # The list of labels (targets) for all the examples
+            target_list = datasource.targets()
         class_list = datasource.classes()
 
-        institution_id = (client_id - 1) % int(Config().algorithm.total_silos)
+        if hasattr(Config().clients,
+                   'simulation') and Config().clients.simulation:
+            max_client_id = int(Config().clients.per_round)
+        else:
+            max_client_id = int(Config().clients.total_clients)
+
+        if client_id > max_client_id:
+            # This client is an edge server
+            institution_id = client_id - 1 - max_client_id
+        else:
+            institution_id = (client_id - 1) % int(
+                Config().algorithm.total_silos)
+
         if hasattr(Config().data, 'institution_class_ids'):
             institution_class_ids = Config().data.institution_class_ids
             class_ids = [x.strip() for x in institution_class_ids.split(';')

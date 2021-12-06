@@ -4,4 +4,5 @@ aiohttp
 requests
 boto3
 pyyaml
+pyyaml-include
 datasets
