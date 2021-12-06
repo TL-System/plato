@@ -1,0 +1,139 @@
+
+# include basic settings for the models and the learning process
+
+
+# clients settings
+clients:
+  type: simple # type
+  total_clients: 50 # total number of clients
+  per_round: 30 # number of clients selected in each round
+
+  do_test: False # Should clients compute test accuracy locally?
+
+# server settings
+server:
+  address: 127.0.0.1
+  port: 8000
+
+# dataset settings for the original dataset and the corresponding multimodal data processor
+data:
+  use_multimodal: True
+  datasource: kinetics700
+  data_path: ./data/Kinetics
+  download_url: https://storage.googleapis.com/deepmind-media/Datasets/kinetics700_2020.tar.gz
+
+  downloader:
+    num_workers: 4
+    failed_save_file: failed_record.txt
+    log_file: download_log.txt
+    compress: False
+    verbose: False
+    skip: False
+    videos_per_gpu: 3
+    workers_per_gpu: 4
+
+  sampler: mixed_label_quantity_noniid
+  modality_sampler: modality_iid
+
+  per_client_classes_size: 3
+  anchor_classes:
+    - 0
+    - 1
+    - 2
+  consistent_clients_size: 10
+  keep_anchor_classes_size: 1
+
+  min_partition_size: 200
+  
+  # The random seed for sampling data
+  random_seed: 1
+
+  multi_modal_pipeliner:
+    rgb: !include Pipeline/kinetics_csn_rgb.yml
+    flow: !include Pipeline/kinetics_tsn_flow.yml
+    audio: !include Pipeline/kinetics_audio_feature.yml
+    
+  
+# Train settings
+
+# optimizer
+optimizer: &optimizer
+  type: SGD
+  lr: 0.000125 # this lr is used for 8 gpus
+  momentum: 0.9
+  weight_decay: 0.0001
+
+optimizer_config: &optimizer_config
+  grad_clip:
+    max_norm: 40
+    norm_type: 2
+
+# learning policy
+lr_configs: &lr_config
+  policy: step
+  step:
+    - 32
+    - 48
+
+  warmup: linear
+  warmup_ratio: 0.1
+  warmup_by_epoch: True
+  warmup_iters: 16
+
+total_epochs: &total_epochs
+  1000
+
+log_config: &log_config
+  interval: 20
+  hooks:
+    - type: TextLoggerHook
+    - type: TensorboardLoggerHook
+
+checkpoint_config: &checkpoint_config
+  interval: 2
+
+trainer:
+  type: basic
+  batch_size: 24
+  optimizer: *optimizer
+  optimizer_config: *optimizer_config
+  learning_rate_config: *lr_config
+  rounds: *total_epochs
+  parallelized: False
+  max_accuracy: 3
+  target_accuracy: 0.67
+
+  log_config: *log_config
+  checkpoint_config: *checkpoint_config
+
+
+model:
+  model_name: rgb_flow_audio_model
+  model_config: !include Models/kinetics_full_models.yml
+
+evaluation:
+  interval: 5
+  metrics:
+    - top_k_accuracy
+    - mean_class_accuracy
+  
+algorithm:
+  type: fedavg
+
+# Aggregation algorithm
+# The number of local aggregation rounds on edge servers before sending
+# aggreagted weights to the central server 
+
+
+# runtime setting
+runner_setting:
+  dist_params:
+    backend: nccl
+    log_level: INFO
+    work_dir: ./work_dirs/mmf # noqa: E501
+    load_from: null
+    resume_from: null
+    workflow:
+        - train
+        - 1
+    find_unused_parameters: True
