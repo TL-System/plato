@@ -12,7 +12,6 @@ server:
     address: 127.0.0.1
     port: 5000
 
-
 data:
     # The training and testing dataset
     datasource: MNIST
@@ -33,9 +32,8 @@ data:
     semi_supervised_learning: true
 
 trainer:
-
-    # The type of the trainer 
-    type: fedmatch
+    # The type of the trainer
+    type: basic
 
     # The maximum number of training rounds
     rounds: 100
@@ -69,4 +67,3 @@ trainer:
 algorithm:
     # Aggregation algorithm
     type: fedavg
-

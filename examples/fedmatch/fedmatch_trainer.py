@@ -1,31 +1,25 @@
 """
 A federated semi-supervised learning trainer using FedMatch.
+
 Reference:
 Jeong et al., "Federated Semi-supervised learning with inter-client consistency & disjoint learning", in the Proceedings of ICLR 2021.
 https://arxiv.org/pdf/2006.12097.pdf 
 """
 
-import torch
-from torch import _load_global_deps, optim
-from torch import autograd
-from plato.config import Config
-from plato.trainers import basic
-import asyncio
 import logging
-import multiprocessing as mp
 import os
-import time
-from typing import Tuple
 import random
+
 import numpy as np
+import torch
 import torch.nn as nn
-from torch.utils.data import DataLoader, dataloader
 import wandb
-from plato.models import registry as models_registry
-from plato.utils import optimizers
-from scipy.ndimage.interpolation import shift
 from PIL import Image
 from plato.config import Config
+from plato.trainers import basic
+from scipy.ndimage.interpolation import shift
+from torch import _load_global_deps, autograd, optim
+from torch.utils.data import DataLoader
 
 
 class Trainer(basic.Trainer):
@@ -99,7 +93,7 @@ class Trainer(basic.Trainer):
                 # Sending the model to the device used for training
                 self.model.to(self.device)
                 self.model.train()
-                """"""
+
                 # Initializing the loss criterion for supervised learning
                 _loss_criterion_s = getattr(self, "loss_criterion_s", None)
                 if callable(_loss_criterion_s):
