@@ -8,15 +8,15 @@ disjoint learning", in the Proceedings of ICLR 2021.
 
 https://arxiv.org/pdf/2006.12097.pdf
 """
-from scipy import spatial
-from plato.servers import fedavg
 import numpy as np
+from plato.servers import fedavg
+from scipy import spatial
 
 
 class Server(fedavg.Server):
     """A federated learning server using the FedMatch algorithm."""
     def __init__(self, model=None, algorithm=None, trainer=None):
-        super().__init__()
+        super().__init__(model=model, algorithm=algorithm, trainer=trainer)
         self.num_helpers = 5
         self.helper_flag = 0
 
