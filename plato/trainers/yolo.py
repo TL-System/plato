@@ -1,23 +1,25 @@
 """The YOLOV5 model for PyTorch."""
 import logging
+from pathlib import Path
 
 import numpy as np
 import torch
-import torch.nn as nn
-import torch.optim as optim
-import torch.optim.lr_scheduler as lr_scheduler
+from torch import nn, optim
+from torch.optim import lr_scheduler
+from torch.cuda import amp
 import yaml
+from tqdm import tqdm
 
 from plato.config import Config
 from plato.datasources import yolo
 from plato.trainers import basic
 from plato.utils import unary_encoding
-from torch.cuda import amp
-from tqdm import tqdm
-from yolov5.utils.general import (box_iou, check_dataset, one_cycle,
-                                  non_max_suppression, scale_coords, xywh2xyxy)
+
+from yolov5.utils.general import (NCOLS, box_iou, check_dataset, one_cycle,
+                                  scale_coords, xywh2xyxy)
 from yolov5.utils.loss import ComputeLoss
 from yolov5.utils.metrics import ap_per_class
+from yolov5.utils.torch_utils import time_sync
 
 
 class Trainer(basic.Trainer):
@@ -103,7 +105,7 @@ class Trainer(basic.Trainer):
         })  # add pg1 with weight_decay
         optimizer.add_param_group({'params': pg2})  # add pg2 (biases)
         logging.info(
-            '[Client %s] Optimizer groups: %g .bias, %g conv.weight, %g other',
+            '[Client #%s] Optimizer groups: %g .bias, %g conv.weight, %g other',
             self.client_id, len(pg2), len(pg1), len(pg0))
         del pg0, pg1, pg2
 
@@ -140,31 +142,33 @@ class Trainer(basic.Trainer):
         nw = max(
             round(hyp['warmup_epochs'] * nb),
             1000)  # number of warmup iterations, max(3 epochs, 1k iterations)
+        last_opt_step = -1
         scaler = amp.GradScaler(enabled=cuda)
-        compute_loss = ComputeLoss(self.model)
+        compute_loss = ComputeLoss(self.model)  # init loss class
 
         for epoch in range(1, epochs + 1):
             self.model.train()
             logging.info(
-                ('\n' + '%10s' * 8) % ('Epoch', 'gpu_mem', 'box', 'obj', 'cls',
-                                       'total', 'targets', 'img_size'))
+                ('\n' + '%10s' * 7) % ('Epoch', 'gpu_mem', 'box', 'obj', 'cls',
+                                       'labels', 'img_size'))
             pbar = enumerate(train_loader)
             pbar = tqdm(pbar, total=nb)
-            mloss = torch.zeros(4,
-                                device=self.device)  # Initializing mean losses
+            mloss = torch.zeros(3, device=self.device)  # mean losses
             optimizer.zero_grad()
 
             for i, (imgs, targets, *__) in pbar:
                 ni = i + nb * epoch  # number integrated batches (since train start)
-                imgs, targets = imgs.to(self.device), targets.to(self.device)
+                imgs = imgs.to(self.device, non_blocking=True).float(
+                ) / 255  # uint8 to float32, 0-255 to 0.0-1.0
 
                 # Warmup
                 if ni <= nw:
                     xi = [0, nw]  # x interp
                     accumulate = max(
                         1,
-                        np.interp(ni, xi, [1, nbs / total_batch_size]).round())
+                        np.interp(ni, xi, [1, nbs / batch_size]).round())
                     for j, x in enumerate(optimizer.param_groups):
+                        # bias lr falls from 0.1 to lr0, all other lrs rise from 0.0 to lr0
                         x['lr'] = np.interp(ni, xi, [
                             hyp['warmup_bias_lr'] if j == 2 else 0.0,
                             x['initial_lr'] * lf(epoch)
@@ -182,28 +186,61 @@ class Trainer(basic.Trainer):
                         pred = self.model.forward_from(imgs, cut_layer)
 
                     loss, loss_items = compute_loss(
-                        pred, targets)  # loss scaled by batch_size
+                        pred,
+                        targets.to(self.device))  # loss scaled by batch_size
 
                 # Backward
                 scaler.scale(loss).backward()
 
                 # Optimize
-                if ni % accumulate == 0:
+                if ni - last_opt_step >= accumulate:
                     scaler.step(optimizer)  # optimizer.step
                     scaler.update()
                     optimizer.zero_grad()
+                    last_opt_step = ni
 
                 # Print
                 mloss = (mloss * i + loss_items) / (i + 1
                                                     )  # update mean losses
-                mem = '%.3gG' % (torch.cuda.memory_reserved() / 1E9
-                                 if torch.cuda.is_available() else 0)  # (GB)
-                s = ('%10s' * 2 +
-                     '%10.4g' * 6) % ('%g/%g' % (epoch, epochs), mem, *mloss,
-                                      targets.shape[0], imgs.shape[-1])
-                pbar.set_description(s)
+                mem = f'{torch.cuda.memory_reserved() / 1E9 if torch.cuda.is_available() else 0:.3g}G'
+                pbar.set_description(('%10s' * 2 + '%10.4g' * 5) %
+                                     (f'{epoch}/{epochs}', mem, *mloss,
+                                      targets.shape[0], imgs.shape[-1]))
 
             lr_schedule.step()
+
+    @staticmethod
+    def process_batch(detections, labels, iouv):
+        """
+        Return correct predictions matrix. Both sets of boxes are in (x1, y1, x2, y2) format.
+        Arguments:
+            detections (Array[N, 6]), x1, y1, x2, y2, conf, class
+            labels (Array[M, 5]), class, x1, y1, x2, y2
+        Returns:
+            correct (Array[N, 10]), for 10 IoU levels
+        """
+        correct = torch.zeros(detections.shape[0],
+                              iouv.shape[0],
+                              dtype=torch.bool,
+                              device=iouv.device)
+        iou = box_iou(labels[:, 1:], detections[:, :4])
+        x = torch.where(
+            (iou >= iouv[0]) &
+            (labels[:, 0:1]
+             == detections[:, 5]))  # IoU above threshold and classes match
+        if x[0].shape[0]:
+            matches = torch.cat((torch.stack(x, 1), iou[x[0], x[1]][:, None]),
+                                1).cpu().numpy()  # [label, detection, iou]
+            if x[0].shape[0] > 1:
+                matches = matches[matches[:, 2].argsort()[::-1]]
+                matches = matches[np.unique(matches[:, 1],
+                                            return_index=True)[1]]
+                # matches = matches[matches[:, 2].argsort()[::-1]]
+                matches = matches[np.unique(matches[:, 0],
+                                            return_index=True)[1]]
+            matches = torch.Tensor(matches).to(iouv.device)
+            correct[matches[:, 1].long()] = matches[:, 2:3] >= iouv
+        return correct
 
     def test_model(self, config, testset):  # pylint: disable=unused-argument
         """The testing loop for YOLOv5.
@@ -236,15 +273,24 @@ class Trainer(basic.Trainer):
         }
         s = ('%20s' + '%11s' * 6) % ('Class', 'Images', 'Labels', 'P', 'R',
                                      'mAP@.5', 'mAP@.5:.95')
-        mp, map50 = 0., 0.
+        dt, p, r, __, mp, mr, map50, map = [
+            0.0, 0.0, 0.0
+        ], 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
         stats, ap = [], []
+        pbar = tqdm(
+            test_loader,
+            desc=s,
+            ncols=NCOLS,
+            bar_format='{l_bar}{bar:10}{r_bar}{bar:-10b}')  # progress bar
 
-        for __, (img, targets, __,
-                 shapes) in enumerate(tqdm(test_loader, desc=s)):
+        for __, (img, targets, paths, shapes) in enumerate(pbar):
+            t1 = time_sync()
             img = img.to(device, non_blocking=True).float()
             img /= 255.0  # 0 - 255 to 0.0 - 1.0
             targets = targets.to(device)
             __, __, height, width = img.shape  # batch size, channels, height, width
+            t2 = time_sync()
+            dt[0] += t2 - t1
 
             with torch.no_grad():
                 # Run model
@@ -261,18 +307,13 @@ class Trainer(basic.Trainer):
                 targets[:,
                         2:] *= torch.Tensor([width, height, width,
                                              height]).to(device)  # to pixels
-                lb = []  # for autolabelling
-                out = non_max_suppression(out,
-                                          conf_thres=0.001,
-                                          iou_thres=0.6,
-                                          labels=lb,
-                                          multi_label=True)
 
-            # Statistics per image
+            # Metrics
             for si, pred in enumerate(out):
                 labels = targets[targets[:, 0] == si, 1:]
                 nl = len(labels)
                 tcls = labels[:, 0].tolist() if nl else []  # target class
+                __, shape = Path(paths[si]), shapes[si][0]
                 seen += 1
 
                 if len(pred) == 0:
@@ -283,62 +324,32 @@ class Trainer(basic.Trainer):
 
                 # Predictions
                 predn = pred.clone()
-                scale_coords(img[si].shape[1:], predn[:, :4], shapes[si][0],
+                scale_coords(img[si].shape[1:], predn[:, :4], shape,
                              shapes[si][1])  # native-space pred
 
-                # Assign all predictions as incorrect
-                correct = torch.zeros(pred.shape[0],
-                                      niou,
-                                      dtype=torch.bool,
-                                      device=device)
-
+                # Evaluate
                 if nl:
-                    detected = []  # target indices
-                    tcls_tensor = labels[:, 0]
-
-                    # target boxes
-                    tbox = xywh2xyxy(labels[:, 1:5])
-                    scale_coords(img[si].shape[1:], tbox, shapes[si][0],
+                    tbox = xywh2xyxy(labels[:, 1:5])  # target boxes
+                    scale_coords(img[si].shape[1:], tbox, shape,
                                  shapes[si][1])  # native-space labels
+                    labelsn = torch.cat((labels[:, 0:1], tbox),
+                                        1)  # native-space labels
+                    correct = self.process_batch(predn, labelsn, iouv)
+                else:
+                    correct = torch.zeros(pred.shape[0],
+                                          niou,
+                                          dtype=torch.bool)
+                stats.append((correct.cpu(), pred[:, 4].cpu(), pred[:,
+                                                                    5].cpu(),
+                              tcls))  # (correct, conf, pcls, tcls)
 
-                    # Per target class
-                    for cls in torch.unique(tcls_tensor):
-                        ti = (cls == tcls_tensor).nonzero(as_tuple=False).view(
-                            -1)  # target indices
-                        pi = (cls == pred[:, 5]).nonzero(as_tuple=False).view(
-                            -1)  # prediction indices
-
-                        # Search for detections
-                        if pi.shape[0]:
-                            # Prediction to target ious
-                            ious, i = box_iou(predn[pi, :4], tbox[ti]).max(
-                                1)  # best ious, indices
-
-                            # Append detections
-                            detected_set = set()
-                            for j in (ious > iouv[0]).nonzero(as_tuple=False):
-                                d = ti[i[j]]  # detected target
-                                if d.item() not in detected_set:
-                                    detected_set.add(d.item())
-                                    detected.append(d)
-                                    correct[pi[j]] = ious[
-                                        j] > iouv  # iou_thres is 1xn
-                                    if len(
-                                            detected
-                                    ) == nl:  # all targets already located in image
-                                        break
-
-                # Append statistics (correct, conf, pcls, tcls)
-                stats.append(
-                    (correct.cpu(), pred[:, 4].cpu(), pred[:, 5].cpu(), tcls))
-
-        # Compute statistics
+        # Compute metrics
         stats = [np.concatenate(x, 0) for x in zip(*stats)]  # to numpy
         if len(stats) and stats[0].any():
-            p, r, ap, __, __ = ap_per_class(*stats,
-                                            plot=False,
-                                            save_dir='',
-                                            names=names)
+            __, __, p, r, __, ap, __ = ap_per_class(*stats,
+                                                    plot=False,
+                                                    save_dir='',
+                                                    names=names)
             ap50, ap = ap[:, 0], ap.mean(1)  # AP@0.5, AP@0.5:0.95
             mp, mr, map50, map = p.mean(), r.mean(), ap50.mean(), ap.mean()
             nt = np.bincount(stats[3].astype(np.int64),
@@ -347,7 +358,7 @@ class Trainer(basic.Trainer):
             nt = torch.zeros(1)
 
         # Print results
-        pf = '%20s' + '%12.3g' * 6  # print format
+        pf = '%20s' + '%11i' * 2 + '%11.3g' * 4  # print format
         print(pf % ('all', seen, nt.sum(), mp, mr, map50, map))
 
         return map50
@@ -357,22 +368,24 @@ class Trainer(basic.Trainer):
         The object detection unary encoding method.
         """
         assert isinstance(bit_array, np.ndarray)
+
         img = unary_encoding.symmetric_unary_encoding(bit_array, 1)
         label = unary_encoding.symmetric_unary_encoding(bit_array, epsilon)
-        targets_new = targets.clone().detach()
-        targets_new = targets_new.detach().numpy()
+        targets_new = targets.clone().detach().numpy()
+
         for i in range(targets_new.shape[1]):
-            box = self.convert(bit_array.shape[2:], targets_new[0][i][2:])
+            box = Trainer.convert(bit_array.shape[2:], targets_new[0][i][2:])
             img[:, :, box[0]:box[2],
                 box[1]:box[3]] = label[:, :, box[0]:box[2], box[1]:box[3]]
+
         return img
 
-    def convert(self, size, box):
-        """The convert for YOLOv5.
-              Arguments:
-                  size: Input feature size(w,h)
-                  box:(xmin,xmax,ymin,ymax).
-              """
+    @staticmethod
+    def convert(size, box):
+        """ Converts YOLOv5 input features.
+            size: The input feature size (w, h).
+            box: (xmin, xmax, ymin, ymax).
+        """
         x = box[0]
         y = box[1]
         w = box[2]

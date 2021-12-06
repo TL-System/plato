@@ -18,6 +18,7 @@ from plato.config import Config
 from plato.models import registry as models_registry
 from plato.trainers import base
 
+
 class Trainer(base.Trainer):
     """A basic federated learning trainer for MindSpore, used by both
     the client and the server.
@@ -33,10 +34,10 @@ class Trainer(base.Trainer):
 
         if hasattr(Config().trainer, 'cpuonly') and Config().trainer.cpuonly:
             mindspore.context.set_context(mode=mindspore.context.PYNATIVE_MODE,
-                                        device_target='CPU')
+                                          device_target='CPU')
         else:
             mindspore.context.set_context(mode=mindspore.context.PYNATIVE_MODE,
-                                        device_target='GPU')
+                                          device_target='GPU')
 
         if model is None:
             self.model = models_registry.get()
@@ -57,10 +58,10 @@ class Trainer(base.Trainer):
             metrics={"Accuracy": Accuracy()})
 
     def zeros(self, shape):
-        """Returns a MindSpore zero tensor with the given shape."""
+        """Returns a zero numpy array with the given shape."""
         # This should only be called from a server
         assert self.client_id == 0
-        return mindspore.Tensor(np.zeros(shape), mindspore.float32)
+        return np.zeros(shape)
 
     def save_model(self, filename=None):
         """Saving the model to a file."""
@@ -104,7 +105,7 @@ class Trainer(base.Trainer):
         param_dict = mindspore.load_checkpoint(model_path)
         mindspore.load_param_into_net(self.model, param_dict)
 
-    def train(self, trainset, *args)  -> float:
+    def train(self, trainset, *args) -> float:
         """The main training loop in a federated learning workload.
 
         Arguments:
@@ -125,7 +126,7 @@ class Trainer(base.Trainer):
 
         return training_time
 
-    def test(self, testset):
+    def test(self, testset, sampler=None):
         """Testing the model using the provided test dataset.
 
         Arguments:

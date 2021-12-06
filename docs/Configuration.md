@@ -17,6 +17,26 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |**total_clients**|The total number of clients|A positive number||
 |**per_round**|The number of clients selected in each round| Any positive integer that is not larger than **total_clients**||
 |**do_test**|Should the clients compute test accuracy locally?| `true` or `false`|| 
+|outbound_processors|A list of processors to apply on the payload before sending| A list of processor names || 
+|inbound_processors|A list of processors to apply on the payload right after receiving| A list of processor names || 
+
+#### Valid processors for `clients.outbound_processors`
+
+- `mistnet_randomized_response`: Activate randomized response on features for PyTorch MistNet, must also set `algorithm.epsilon` to activate. Must be placed before `mistnet_unbatch`.
+
+- `mistnet_laplace`: Add random noise with laplace distribution to features for PyTorch MistNet. Must be placed before `mistnet_unbatch`.
+
+- `mistnet_gaussian`: Add random noise with gaussian distribution to features for PyTorch MistNet. Must be placed before `mistnet_unbatch`.
+
+- `mistnet_quantize`: Quantize features for PyTorch MistNet. Must not be used together with `mistnet_outbound_features`.
+
+- `mistnet_unbatch`: Unbatch features for PyTorch MistNet clients, must use this processor for every PyTorch MistNet client before sending.
+
+- `mistnet_outbound_features`: Convert PyTorch tensor features into NumPy arrays before sending to the server, for the benefit of saving a substantial amount of communication overhead if the feature dataset is large. Must be placed after `mistnet_unbatch`.
+
+#### Valid processors for `clients.inbound_processors`
+
+None.
 
 ### server
 
@@ -32,6 +52,20 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |ping_timeout| The time in seconds that the client waits for the server to respond before disconnecting. The default is 360 (seconds).||Increase this number when your session stops running when training larger models (but make sure it is not due to the *out of CUDA memory* error)|
 |synchronous|Synchronous or asynchronous federated learning|`true` or `false`|If `false`, must have **periodic_interval** attribute|
 |*periodic_interval*|The time interval for a server operating in asynchronous mode to aggregate received updates|Any positive integer||
+|do_test|Should the central server compute test accuracy locally?| `true` or `false`|| 
+|edge_do_test|Should an edge server compute test accuracy of its aggregated model locally?| `true` or `false`||
+|outbound_processors|A list of processors to apply on the payload before sending| A list of processor names || 
+|inbound_processors|A list of processors to apply on the payload right after receiving| A list of processor names || 
+
+#### Valid processors for `server.outbound_processors`
+
+None.
+
+#### Valid processors for `server.inbound_processors`
+
+- `mistnet_inbound_features`: Convert PyTorch tensor features into NumPy arrays before sending to client, for the benefit of saving a substantial amount of communication overhead if the feature dataset is large. Must be used if `clients.outbound_processors` includes `mistnet_outbound_features`.
+
+- `mistnet_dequantize`: Dequantize features for PyTorch MistNet. Must not be used together with `mistnet_inbound_features`.
 
 ### data
 
@@ -44,6 +78,8 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |||`noniid`|Could have *concentration* attribute to specify the concentration parameter in the Dirichlet distribution|
 |||`orthogonal`|Each insitution's clients have data of different classes. Could have *institution_class_ids* and *label_distribution* attributes|
 |||`mixed`|Some data are iid, while others are non-iid. Must have *non_iid_clients* attributes|
+|test_set_sampler|How to sample the test set when clients test locally|Could be any **sampler**|Without this parameter, every client's test set is the test set of the datasource|
+|edge_test_set_sampler|How to sample the test set when edge servers test locally|Could be any **sampler**|Without this parameter, edge servers' test sets are the test set of the datasource if they locally test their aggregated models in cross-silo FL|
 |random_seed|Use a fixed random seed so that experiments are reproducible (clients always have the same datasets)||
 |**partition_size**|Number of samples in each client's dataset|Any positive integer||
 |concentration| The concentration parameter of symmetric Dirichlet distribution, used by `noniid` **sampler** || Default value is 1|

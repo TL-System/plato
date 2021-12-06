@@ -154,7 +154,7 @@ class Trainer(base.Trainer):
 
         return training_time
 
-    def test(self, testset):
+    def test(self, testset, sampler=None):
         """Testing the model on the client using the provided test dataset.
 
         Arguments:

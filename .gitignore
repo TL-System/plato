@@ -150,3 +150,6 @@ logs/
 
 # macOS
 .DS_Store
+
+# Plain text files in the root working directory are most likely temporary
+/*.txt

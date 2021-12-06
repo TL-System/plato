@@ -7,12 +7,12 @@ import time
 from dataclasses import dataclass
 
 from plato.algorithms import registry as algorithms_registry
+from plato.clients import base
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
+from plato.processors import registry as processor_registry
 from plato.samplers import registry as samplers_registry
 from plato.trainers import registry as trainers_registry
-
-from plato.clients import base
 
 
 @dataclass
@@ -37,6 +37,7 @@ class Client(base.Client):
         self.trainset = None  # Training dataset
         self.testset = None  # Testing dataset
         self.sampler = None
+        self.test_set_sampler = None  # Sampler for the test set
 
         self.data_loading_time = None
         self.data_loading_time_sent = False
@@ -46,6 +47,8 @@ class Client(base.Client):
 
     def configure(self) -> None:
         """Prepare this client for training."""
+        super().configure()
+
         if self.trainer is None:
             self.trainer = trainers_registry.get(self.model)
         self.trainer.set_client_id(self.client_id)
@@ -54,13 +57,19 @@ class Client(base.Client):
             self.algorithm = algorithms_registry.get(self.trainer)
         self.algorithm.set_client_id(self.client_id)
 
+        # Pass inbound and outbound data payloads through processors for
+        # additional data processing
+        self.outbound_processor, self.inbound_processor = processor_registry.get(
+            "Client", client_id=self.client_id, trainer=self.trainer)
+
     def load_data(self) -> None:
         """Generating data and loading them onto this client."""
         data_loading_start_time = time.perf_counter()
         logging.info("[Client #%d] Loading its data source...", self.client_id)
 
         if self.datasource is None:
-            self.datasource = datasources_registry.get(client_id=self.client_id)
+            self.datasource = datasources_registry.get(
+                client_id=self.client_id)
 
         self.data_loaded = True
 
@@ -81,6 +90,11 @@ class Client(base.Client):
         if Config().clients.do_test:
             # Set the testset if local testing is needed
             self.testset = self.datasource.get_test_set()
+            if hasattr(Config().data, 'test_set_sampler'):
+                # Set the sampler for test set
+                self.test_set_sampler = samplers_registry.get(self.datasource,
+                                                              self.client_id,
+                                                              testing=True)
 
         self.data_loading_time = time.perf_counter() - data_loading_start_time
 
@@ -103,9 +117,9 @@ class Client(base.Client):
 
         # Generate a report for the server, performing model testing if applicable
         if Config().clients.do_test:
-            accuracy = self.trainer.test(self.testset)
+            accuracy = self.trainer.test(self.testset, self.test_set_sampler)
 
-            if accuracy == 0:
+            if accuracy == -1:
                 # The testing process failed, disconnect from the server
                 await self.sio.disconnect()
 

@@ -33,10 +33,8 @@ class Client(simple.Client):
 
         # Perform a forward pass till the cut layer in the model
         features = self.algorithm.extract_features(
-            self.trainset,
-            self.sampler,
-            Config().algorithm.cut_layer,
-            epsilon=Config().algorithm.epsilon)
+            self.trainset, self.sampler,
+            Config().algorithm.cut_layer)
 
         # Generate a report for the server, performing model testing if applicable
         return Report(self.sampler.trainset_size(), len(features)), features

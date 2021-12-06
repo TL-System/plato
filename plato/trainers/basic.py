@@ -10,6 +10,7 @@ import time
 import numpy as np
 import torch
 import torch.nn as nn
+from plato import samplers
 from plato.config import Config
 from plato.models import registry as models_registry
 from plato.trainers import base
@@ -264,7 +265,7 @@ class Trainer(base.Trainer):
 
         return training_time
 
-    def test_process(self, config, testset):
+    def test_process(self, config, testset, sampler=None):
         """The testing loop, run in a separate process with a new CUDA context,
         so that CUDA memory can be released after the training completes.
 
@@ -275,14 +276,28 @@ class Trainer(base.Trainer):
         self.model.to(self.device)
         self.model.eval()
 
+        # Initialize accuracy to be returned to -1, so that the client can disconnect
+        # from the server when testing fails
+        accuracy = -1
+
         try:
             custom_test = getattr(self, "test_model", None)
 
             if callable(custom_test):
                 accuracy = self.test_model(config, testset)
             else:
-                test_loader = torch.utils.data.DataLoader(
-                    testset, batch_size=config['batch_size'], shuffle=False)
+                if sampler is None:
+                    test_loader = torch.utils.data.DataLoader(
+                        testset,
+                        batch_size=config['batch_size'],
+                        shuffle=False)
+                # Use a testing set following the same distribution as the training set
+                else:
+                    test_loader = torch.utils.data.DataLoader(
+                        testset,
+                        batch_size=config['batch_size'],
+                        shuffle=False,
+                        sampler=sampler.get())
 
                 correct = 0
                 total = 0
@@ -312,7 +327,7 @@ class Trainer(base.Trainer):
         else:
             return accuracy
 
-    def test(self, testset) -> float:
+    def test(self, testset, sampler=None) -> float:
         """Testing the model using the provided test dataset.
 
         Arguments:
@@ -331,10 +346,12 @@ class Trainer(base.Trainer):
                               args=(
                                   config,
                                   testset,
+                                  sampler,
                               ))
             proc.start()
             proc.join()
 
+            accuracy = -1
             try:
                 model_name = Config().trainer.model_name
                 filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.acc"

@@ -1,51 +1,75 @@
 """
 The Kinetics700 dataset.
 
-Note that the setting for the data loader is obtained from the github repo provided by the official workers:
+Note that the setting for the data loader is obtained from the github
+repo provided by the official workers:
 https://github.com/pytorch/vision/references/video_classification/train.py
+
+We consider three modalities: RGB, optical flow and audio.
+    For RGB and flow, we use input clips of 16×224×224 as input.
+        We follow [1] for visual pre-processing and augmentation.
+    For audio, we use log-Mel with 100 temporal frames by 40 Mel filters.
+        Audio and visual are temporally aligned.
+
+[1]. Video classification with channel-separated convolutional networks.
+    In ICCV, 2019. (CSN network)
+    This is actually the csn network in the mmaction packet.
+§§
 """
 
-import json
 import logging
 import os
-import sys
+import shutil
 
+import torch
 from torch.utils.data.dataloader import default_collate
-from torchvision import datasets
+
+from mmaction.datasets import build_dataset
 
 from plato.config import Config
-from plato.datasources import multimodal_base
-from plato.datasources.datalib import parallel_downloader as parallel
-from plato.datasources.datalib import video_transform
+from plato.datasources.multimodal import multimodal_base
+
+from plato.datasources.datalib.kinetics_utils import download_tools
+from plato.datasources.datalib.kinetics_utils import utils as kine_utils
+from plato.datasources.datalib import frames_extraction_tools
+from plato.datasources.datalib import audio_extraction_tools
+from plato.datasources.datalib import modality_data_anntation_tools
+from plato.datasources.datalib import data_utils
 
 
 class DataSource(multimodal_base.MultiModalDataSource):
-    """The Kinetics700 dataset."""
+    """The datasource for the Kinetics700 dataset."""
     def __init__(self):
         super().__init__()
 
         self.data_name = Config().data.datasource
 
-        self.modality_names = ["video", "audio"]
+        # the rawframes contains the "flow", "rgb"
+        # thus, the flow and rgb will be put in in same directory rawframes/
+        self.modality_names = ["video", "audio", "rawframes", "audio_feature"]
 
         _path = Config().data.data_path
-        self._data_path_process(data_path=_path, data_source=self.data_name)
+        self._data_path_process(data_path=_path, base_data_name=self.data_name)
+        self._create_modalities_path(modality_names=self.modality_names)
 
+        base_data_path = self.mm_data_info["base_data_dir_path"]
         download_url = Config().data.download_url
-        download_dir_name = download_url.split('/')[-1].split('.')[0]
-        download_info_dir_path = os.path.join(self.source_data_path,
-                                              download_dir_name)
-        if not os.path.exists(download_info_dir_path):
-            logging.info(
-                "Downloading the Kinetics700 dataset. This may take a while.")
-            DataSource.download(download_url, self.source_data_path)
-            logging.info("Done.")
+        extracted_dir_name = self._download_arrange_data(
+            download_url_address=download_url, put_data_dir=base_data_path)
+
+        download_info_dir_path = os.path.join(base_data_path,
+                                              extracted_dir_name)
+        # convert the Kinetics data dir structure to the typical one shown in
+        #   https://github.com/open-mmlab/mmaction2/blob/master/tools/data/kinetics/README.md
+        kinetics_anno_dir_name = "annotations"
+        ann_dst_path = os.path.join(base_data_path, kinetics_anno_dir_name)
+        if not self._exist_judgement(ann_dst_path):
+            shutil.copytree(download_info_dir_path, ann_dst_path)
 
         # obtain the path of the data information
-        self.data_categories_file = os.path.join(self.source_data_path,
+        self.data_categories_file = os.path.join(base_data_path,
                                                  "categories.json")
-        self.data_classes_file = os.path.join(self.source_data_path,
-                                              "classes.json")
+        self.data_classes_file = os.path.join(base_data_path, "classes.json")
         self.train_info_data_path = os.path.join(download_info_dir_path,
                                                  "train.json")
         self.test_info_data_path = os.path.join(download_info_dir_path,
@@ -53,7 +77,16 @@ class DataSource(multimodal_base.MultiModalDataSource):
         self.val_info_data_path = os.path.join(download_info_dir_path,
                                                "validate.json")
 
-        self.data_classes = self.extract_data_classes()
+        self.data_splits_file_info = {
+            "train": os.path.join(download_info_dir_path, "train.csv"),
+            "test": os.path.join(download_info_dir_path, "test.csv"),
+            "val": os.path.join(download_info_dir_path, "validate.csv")
+        }
+
+        self.data_classes = kine_utils.extract_data_classes(
+            data_classes_file=self.data_classes_file,
+            train_info_data_path=self.train_info_data_path,
+            val_info_data_path=self.test_info_data_path)
 
         # get the download hyper-parameters
         num_workers = Config().data.num_workers
@@ -63,223 +96,169 @@ class DataSource(multimodal_base.MultiModalDataSource):
         skip = Config().data.skip
         log_file = Config().data.log_file
 
-        failed_save_file = os.path.join(self.source_data_path,
-                                        failed_save_file)
+        failed_save_file = os.path.join(base_data_path, failed_save_file)
 
-        # download the raw dataset if necessary
-        if not os.path.exists(self.train_root_path):
+        # download the raw video dataset if necessary
+        if not self._exist_judgement(self.splits_info["train"]["video_path"]):
+
             logging.info(
                 "Downloading the raw videos for the Kinetics700 dataset. This may take a long time."
             )
+            download_tools.download_train_val_sets(
+                splits_info=zip(
+                    [self.train_info_data_path, self.val_info_data_path], [
+                        self.splits_info["train"]["video_path"],
+                        self.splits_info["val"]["video_path"]
+                    ]),
+                data_classes=self.data_classes,
+                data_categories_file=self.data_categories_file,
+                num_workers=num_workers,
+                failed_log=failed_save_file,
+                compress=compress,
+                verbose=verbose,
+                skip=skip,
+                log_file=log_file)
 
-            self.download_train_val_sets(num_workers=num_workers,
-                                         failed_log=failed_save_file,
-                                         compress=compress,
-                                         verbose=verbose,
-                                         skip=skip,
-                                         log_file=os.path.join(
-                                             self.source_data_path, log_file))
-
-            self.download_test_set(num_workers=num_workers,
-                                   failed_log=failed_save_file,
-                                   compress=compress,
-                                   verbose=verbose,
-                                   skip=skip,
-                                   log_file=os.path.join(
-                                       self.source_data_path, log_file))
+            download_tools.download_test_set(
+                test_info_data_path=self.test_info_data_path,
+                test_video_des_path=self.splits_info["test"]["video_path"],
+                num_workers=num_workers,
+                failed_log=failed_save_file,
+                compress=compress,
+                verbose=verbose,
+                skip=skip,
+                log_file=log_file)
             logging.info("Done.")
 
-        # obtain the data loader settings
-        self.clip_len = Config().data.clip_len
-        self.clips_per_video = Config().data.clips_per_video
+        logging.info("The Kinetics700 dataset has been prepared")
 
-    def download_category(self, category, num_workers, failed_save_file,
-                          compress, verbose, skip, log_file):
-        """[Download all videos that belong to the given category.]
+    def get_modality_name(self):
+        """ Get all supports modalities """
+        return ["rgb", "flow", "audio"]
 
-        Args:
-            category ([str]): [The category to download.]
-            num_workers ([int]): [Number of downloads in parallel.]
-            failed_save_file ([str]): [Where to save failed video ids.]
-            compress ([bool]): [Decides if the videos should be compressed.]
-            verbose ([bool]): [Print status.]
-            skip ([bool]): [Skip classes that already have folders (i.e. at least one video was downloaded).]
-            log_file ([str]): [Path to log file for youtube-dl.]
+    def extract_videos_rgb_flow_audio(self, mode="train"):
+        """ Extract rgb, optical flow, and audio from videos """
+        src_mode_videos_dir = os.path.join(
+            self.splits_info[mode]["video_path"])
+        rgb_out_dir_path = self.splits_info[mode]["rawframes_path"]
+        flow_our_dir_path = self.splits_info[mode]["rawframes_path"]
+        audio_out_dir_path = self.splits_info[mode]["audio_path"]
+        audio_feature_dir_path = self.splits_info[mode]["audio_feature_path"]
 
-        Raises:
-            ValueError: [description]
-        """
-        if os.path.exists(self.data_classes_file):
-            with open(self.data_classes_file, "r") as file:
-                categories = json.load(file)
+        # define the modalities extractor
+        vdf_extractor = frames_extraction_tools.VideoFramesExtractor(
+            video_src_dir=src_mode_videos_dir,
+            dir_level=2,
+            num_worker=8,
+            video_ext="mp4",
+            mixed_ext=False)
+        vda_extractor = audio_extraction_tools.VideoAudioExtractor(
+            video_src_dir=src_mode_videos_dir,
+            dir_level=2,
+            num_worker=8,
+            video_ext="mp4",
+            mixed_ext=False)
 
-            if category not in categories:
-                raise ValueError("Category {} not found.".format(category))
+        if torch.cuda.is_available():
+            if not self._exist_judgement(
+                    rgb_out_dir_path) and not self._exist_judgement(
+                        flow_our_dir_path):
+                vdf_extractor.build_frames_gpu(rgb_out_dir_path,
+                                               flow_our_dir_path,
+                                               new_short=1,
+                                               new_width=0,
+                                               new_height=0)
+        else:
+            if not self._exist_judgement(
+                    self.splits_info[mode]["rawframes_path"]):
+                vdf_extractor.build_frames_cpu(
+                    to_dir=self.splits_info[mode]["rawframes_path"])
 
-        classes = categories[category]
-        self.download_classes(classes, num_workers, failed_save_file, compress,
-                              verbose, skip, log_file)
+        if not self._exist_judgement(audio_out_dir_path):
+            vda_extractor.build_audios(to_dir=audio_out_dir_path)
 
-    def download_classes(self, classes, num_workers, failed_save_file,
-                         compress, verbose, skip, log_file):
-        """ Download the specific classes """
-        for list_path, save_root in zip(
-            [self.train_info_data_path, self.val_info_data_path],
-            [self.train_root_path, self.val_root_path]):
-            with open(list_path) as file:
-                data = json.load(file)
-            print("save_root: ", save_root)
-            pool = parallel.VideoDownloaderPool(classes,
-                                                data,
-                                                save_root,
-                                                num_workers,
-                                                failed_save_file,
-                                                compress,
-                                                verbose,
-                                                skip,
-                                                log_file=log_file)
-            pool.start_workers()
-            pool.feed_videos()
-            pool.stop_workers()
+        if not self._exist_judgement(audio_feature_dir_path):
+            vda_extractor.build_audios_features(
+                audio_src_path=audio_out_dir_path,
+                to_dir=audio_feature_dir_path)
 
-    def download_train_val_sets(self,
-                                num_workers=4,
-                                failed_log="train_val_failed_log.txt",
-                                compress=False,
-                                verbose=False,
-                                skip=False,
-                                log_file=None):
-        """ Download all categories => all videos for train and the val set. """
+    def extract_split_list_files(self, mode):
+        """ Extract and generate the split information of current mode/phase """
+        gen_annots_op = modality_data_anntation_tools.GenerateMDataAnnotation(
+            data_src_dir=self.splits_info[mode]["rawframes_path"],
+            data_annos_files_info=self.
+            data_splits_file_info,  # a dict that contains the data splits' file path
+            dataset_name=self.dataset_name,
+            data_format="rawframes",  # 'rawframes', 'videos'
+            out_path=self.
+            mm_data_info["base_data_dir_path"],  # put to the base dir
+        )
+        gen_annots_op.generate_data_splits_info_file(data_name=self.data_name)
 
-        # # download the required categories in class-wise
-        if os.path.exists(self.data_categories):
-            with open(self.data_categories, "r") as file:
-                categories = json.load(file)
+    def get_train_set(self, modality_sampler):
+        """ Get the train dataset """
+        modality_dataset = []
+        if "rgb" in modality_sampler:
+            train_rgb_config = Config().multimodal_data["rgb_data"]["train"]
+            train_rgb_config = data_utils.dict_list2tuple(train_rgb_config)
+            rgb_train_dataset = build_dataset(train_rgb_config)
 
-            for category in categories:
-                self.download_category(category,
-                                       num_workers,
-                                       failed_log,
-                                       compress=compress,
-                                       verbose=verbose,
-                                       skip=skip,
-                                       log_file=log_file)
-        else:  # download all the classes in the training and val data files
+            modality_dataset.append(rgb_train_dataset)
+        if "flow" in modality_sampler:
+            train_flow_config = Config().multimodal_data["flow_data"]["train"]
+            train_flow_config = data_utils.dict_list2tuple(train_flow_config)
+            flow_train_dataset = build_dataset(train_flow_config)
 
-            self.download_classes(self.data_classes, num_workers, failed_log,
-                                  compress, verbose, skip, log_file)
+            modality_dataset.append(flow_train_dataset)
+        if "audio" in modality_sampler:
+            train_audio_config = Config(
+            ).multimodal_data["audio_data"]["train"]
+            train_audio_config = data_utils.dict_list2tuple(train_audio_config)
+            audio_feature_train_dataset = build_dataset(train_audio_config)
 
-    def download_test_set(self, num_workers, failed_log, compress, verbose,
-                          skip, log_file):
-        """ Download the test set. """
+            modality_dataset.append(audio_feature_train_dataset)
 
-        with open(self.test_meta_data_path) as file:
-            data = json.load(file)
-
-        pool = parallel.VideoDownloaderPool(None,
-                                            data,
-                                            self.test_root_path,
-                                            num_workers,
-                                            failed_log,
-                                            compress,
-                                            verbose,
-                                            skip,
-                                            log_file=log_file)
-        pool.start_workers()
-        pool.feed_videos()
-        pool.stop_workers()
-
-    def extract_data_classes(self):
-        """ Obtain a list of class names in the dataset. """
-
-        classes_container = list()
-        if os.path.exists(self.data_classes_file):
-            with open(self.data_classes_file, "r") as class_file:
-                lines = class_file.readlines()
-                classes_container = [line.replace("\n", "") for line in lines]
-
-            return classes_container
-
-        if not os.path.exists(self.train_info_data_path) or not os.path.exists(
-                self.val_info_data_path):
-            logging.info(
-                "The json files of the dataset are not completed. Download it first."
-            )
-            sys.exit()
-
-        for list_path in [self.train_info_data_path, self.val_info_data_path]:
-            with open(list_path) as file:
-                videos_data = json.load(file)
-            for key in videos_data.keys():
-                metadata = videos_data[key]
-                annotations = metadata["annotations"]
-                label = annotations["label"]
-                class_name = label.replace("_", " ")
-                if class_name not in classes_container:
-                    classes_container.append(class_name)
-        with open(self.data_classes_file, "w") as file:
-            for class_name in classes_container:
-                file.write(class_name)
-                file.write('\n')
-
-        return classes_container
-
-    def num_train_examples(self):
-        if not os.path.exists(self.train_root_path):
-            return 0
-        return len(os.listdir(self.train_root_path))
-
-    def num_test_examples(self):
-        if not os.path.exists(self.test_root_path):
-            return 0
-        return len(os.listdir(self.test_root_path))
-
-    def get_train_set(self):
-        transform_train = video_transform.VideoClassificationTrainTransformer(
-            (128, 171), (112, 112))
-        kinetics_train_data = datasets.Kinetics400(
-            root=self.train_root_path,
-            frames_per_clip=self.clip_len,
-            step_between_clips=1,
-            transform=transform_train,
-            frame_rate=15,
-            extensions=(
-                'avi',
-                'mp4',
-            ))
-        return kinetics_train_data
-
-    def get_val_set(self):
-        transform_val = video_transform.VideoClassificationEvalTransformer(
-            (128, 171), (112, 112))
-        kinetics_val_data = datasets.Kinetics400(root=self.val_root_path,
-                                                 frames_per_clip=self.clip_len,
-                                                 step_between_clips=1,
-                                                 transform=transform_val,
-                                                 frame_rate=15,
-                                                 extensions=(
-                                                     'avi',
-                                                     'mp4',
-                                                 ))
-        return kinetics_val_data
+        mm_train_dataset = multimodal_base.MultiModalDataset(modality_dataset)
+        return mm_train_dataset
 
     def get_test_set(self):
-        transform_test = video_transform.VideoClassificationEvalTransformer(
-            (128, 171), (112, 112))
-        kinetics_test_data = datasets.Kinetics400(
-            root=self.test_root_path,
-            frames_per_clip=self.clip_len,
-            step_between_clips=1,
-            transform=transform_test,
-            frame_rate=15,
-            extensions=(
-                'avi',
-                'mp4',
-            ))
+
+        test_rgb_config = Config().multimodal_data["rgb_data"]["test"]
+        test_rgb_config = data_utils.dict_list2tuple(test_rgb_config)
+        test_flow_config = Config().multimodal_data["flow_data"]["test"]
+        test_flow_config = data_utils.dict_list2tuple(test_flow_config)
+        test_audio_config = Config().multimodal_data["audio_data"]["test"]
+        test_audio_config = data_utils.dict_list2tuple(test_audio_config)
+
+        rgb_test_dataset = build_dataset(test_rgb_config)
+        flow_test_dataset = build_dataset(test_flow_config)
+        audio_feature_test_dataset = build_dataset(test_audio_config)
+
+        mm_test_dataset = multimodal_base.MultiModalDataset(
+            [rgb_test_dataset, flow_test_dataset, audio_feature_test_dataset])
+        return mm_test_dataset
+
+    def get_val_set(self):
+        """ Get the validation set """
+        val_rgb_config = Config().multimodal_data["rgb_data"]["val"]
+        val_rgb_config = data_utils.dict_list2tuple(val_rgb_config)
+        val_flow_config = Config().multimodal_data["flow_data"]["val"]
+        val_flow_config = data_utils.dict_list2tuple(val_flow_config)
+        val_audio_config = Config().multimodal_data["audio_data"]["val"]
+        val_audio_config = data_utils.dict_list2tuple(val_audio_config)
+
+        rgb_val_dataset = build_dataset(val_rgb_config)
+        flow_val_dataset = build_dataset(val_flow_config)
+        audio_feature_val_dataset = build_dataset(val_audio_config)
+        # one sample of this dataset contains three part of data
+        mm_val_dataset = multimodal_base.MultiModalDataset(
+            [rgb_val_dataset, flow_val_dataset, audio_feature_val_dataset])
+        return mm_val_dataset
 
     @staticmethod
-    def get_data_loader(self, batch_size, dataset, sampler):
-        def collate_fn(batch):
+    def get_data_loader(batch_size, dataset, sampler):
+        """ Get the dataset loader """
+        def collate_fn():
             return default_collate
 
         return torch.utils.data.DataLoader(dataset,
