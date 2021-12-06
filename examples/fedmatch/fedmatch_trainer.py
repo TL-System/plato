@@ -7,6 +7,7 @@ https://arxiv.org/pdf/2006.12097.pdf
 
 import torch
 from torch import _load_global_deps, optim
+from torch import autograd
 from plato.config import Config
 from plato.trainers import basic
 import asyncio
@@ -152,22 +153,27 @@ class Trainer(basic.Trainer):
                         #######################
                         # supervised learning
                         #######################
-                        examples, labels = examples.to(self.device), labels.to(
-                            self.device)
-                        optimizer_s.zero_grad()
+                        with autograd.detect_anomaly():
+                            examples, labels = examples.to(
+                                self.device), labels.to(self.device)
+                            optimizer_s.zero_grad()
 
-                        if cut_layer is None:
-                            outputs_s = self.model(examples)
-                        else:
-                            outputs_s = self.model.forward_from(
-                                examples, cut_layer)
+                            if cut_layer is None:
+                                outputs_s = self.model(examples)
+                            else:
+                                outputs_s = self.model.forward_from(
+                                    examples, cut_layer)
 
-                        loss_s = loss_criterion_s(outputs_s,
-                                                  labels) * self.lambda_s
+                            loss_s = loss_criterion_s(outputs_s,
+                                                      labels) * self.lambda_s
+                            print("here's the sigma's grad: ",
+                                  self.model.conv1.sigma.grad)
+                            #print("Loss_criterion_s: ",
+                            #      loss_criterion_s(outputs_s, labels))
 
-                        loss_s.backward()
+                            loss_s.backward()
 
-                        optimizer_s.step()
+                            optimizer_s.step()
 
                         if batch_id % log_interval == 0:
                             if self.client_id == 0:
@@ -190,8 +196,8 @@ class Trainer(basic.Trainer):
                         # unsupervised learning
                         #######################
                     print("=========Unsupervised Training==========")
-                    for batch_id, (examples_unlabeled, labels) in enumerate(
-                            train_loader_u):  #why not accessiable
+                    for batch_id, (examples_unlabeled,
+                                   labels) in enumerate(train_loader_u):
                         #pseduo_labels = self.model(self.loader.scale(examples_unlabeled))
                         optimizer_u.zero_grad()
                         """
