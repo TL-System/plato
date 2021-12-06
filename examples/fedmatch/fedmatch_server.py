@@ -1,8 +1,12 @@
 """
 A federated semi-supervised learning server using FedMatch.
+
 Reference:
-Jeong et al., "Federated Semi-supervised learning with inter-client consistency & disjoint learning", in the Proceedings of ICLR 2021.
-https://arxiv.org/pdf/2006.12097.pdf 
+
+Jeong et al., "Federated Semi-supervised learning with inter-client consistency and
+disjoint learning", in the Proceedings of ICLR 2021.
+
+https://arxiv.org/pdf/2006.12097.pdf
 """
 from scipy import spatial
 from plato.servers import fedavg

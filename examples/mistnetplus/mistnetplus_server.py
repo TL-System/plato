@@ -64,7 +64,7 @@ class MistnetplusServer(fedavg.Server):
                          os.getpid(), client_id)
 
             sid = self.clients[client_id]['sid']
-            # payload = await self.customize_server_payload(pickle.dumps(payload))
+
             # Sending the server payload to the clients
             payload = self.load_gradients()
             await self.send(sid, payload, client_id)
