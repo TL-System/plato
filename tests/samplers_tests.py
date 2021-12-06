@@ -5,13 +5,18 @@ Testing samplers in Plato framework.
 import os
 import unittest
 
-# os.environ['config_file'] = 'configs/Tests/distribution_noniid_sampler.yml'
+# os.environ['config_file'] = 'tests/TestsConfig/distribution_noniid_sampler.yml'
 
-# os.environ['config_file'] = 'configs/Tests/label_quantity_noniid_sampler.yml'
+os.environ[
+    'config_file'] = 'tests/TestsConfig/label_quantity_noniid_sampler.yml'
 
-os.environ['config_file'] = 'configs/Tests/sample_quantity_noniid_sampler.yml'
+# os.environ[
+#     'config_file'] = 'tests/TestsConfig/mixed_label_quantity_noniid_sampler.yml'
 
-import utils
+# os.environ[
+#     'config_file'] = 'tests/TestsConfig/sample_quantity_noniid_sampler.yml'
+
+import test_utils
 import numpy as np
 
 from plato.config import Config
@@ -33,12 +38,13 @@ class SamplersTest(unittest.TestCase):
         """ Test the client sampler works well, i.e., smoothly loading batches """
         clients_id = list(range(self.total_clients))
         client_id = np.random.choice(clients_id, 1)[0]
-        utils.verify_working_correcness(Sampler=samplers_registry,
-                                        dataset_source=self.utest_datasource,
-                                        client_id=client_id,
-                                        num_of_batches=10,
-                                        batch_size=5,
-                                        is_test_phase=False)
+        test_utils.verify_working_correcness(
+            Sampler=samplers_registry,
+            dataset_source=self.utest_datasource,
+            client_id=client_id,
+            num_of_batches=10,
+            batch_size=5,
+            is_test_phase=False)
 
     def test_client_data_consistency(self):
         """ Test that the sampler always assignes same data distribution for one client
@@ -47,7 +53,7 @@ class SamplersTest(unittest.TestCase):
              2- the assigned sample size for each class
              3- the samples index assigned to the client
         """
-        assert utils.verify_client_data_correcness(
+        assert test_utils.verify_client_data_correcness(
             Sampler=samplers_registry,
             dataset_source=self.utest_datasource,
             client_id=1,
@@ -65,7 +71,7 @@ class SamplersTest(unittest.TestCase):
         #   each client is assigned full classes
         if Config().data.sampler == "label_quantity_noniid" \
             and Config().data.per_client_classes_size == len(dataset_classes):
-            assert utils.verify_difference_between_clients(
+            assert test_utils.verify_difference_between_clients(
                 clients_id=test_clients,
                 Sampler=samplers_registry,
                 dataset_source=self.utest_datasource,
@@ -74,7 +80,7 @@ class SamplersTest(unittest.TestCase):
                 batch_size=5,
                 is_presented=False)
         else:
-            assert utils.verify_difference_between_clients(
+            assert test_utils.verify_difference_between_clients(
                 clients_id=test_clients,
                 Sampler=samplers_registry,
                 dataset_source=self.utest_datasource,
@@ -88,7 +94,7 @@ class SamplersTest(unittest.TestCase):
             This test is for the label quantity noniid sampler """
         test_clients = list(range(10))
         if Config().data.sampler == "label_quantity_noniid":
-            assert utils.verify_clients_fixed_classes(
+            assert test_utils.verify_clients_fixed_classes(
                 clients_id=test_clients,
                 Sampler=samplers_registry,
                 dataset_source=self.utest_datasource,

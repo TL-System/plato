@@ -1,27 +1,25 @@
 '''
-Samples data from a dataset, biased across labels, and the number of labels
-(corresponding classes) in different clients is the same.
+Samples data from a dataset, 1). biased across labels, and 2). the number of labels
+ (corresponding classes) in different clients is the same, and 3). part of clients
+ share same classes 4) the classes shared by these clients are partly used by other
+ clients.
 
-This sampler implements one type of label distribution skew called:
-
-    Quantity-based label imbalance:
-        Each client contains a fixed number of classes parameterized by the
-         "per_client_classes_size", while the number of samples in each class
-         is almost the same. Besides, the classes assigned to each client are
-         randomly selected from all classes.
-
-        The samples of one class are equally divided and assigned to clients
-         who contain this class. Thus, the samples of different clients
-         are mutual-exclusive.
+This sampler implements the basic label quantity noniid as that in "label_quantity_noniid.py".
+ However, part of clients "consistent_clients_size" contain same classes "anchor_classes". Then, 
+ the "keep_anchor_classes_size" classes of "consistent_clients" are also used in classes pool
+ to complete the class assignment.
 
     For Example:
-        Setting per_client_classes_size = 2 will induce the condition that each client
-         only contains two classes.
-                classes 1       2       3 ...       8     9
-                client1 100     0       100         0     0
-                client2 0      108      100         0     0
+        Setting per_client_classes_size = 3, anchor_classes=[2, 3, 9], consistent_clients=[0,1,N], 
+         keep_anchor_classes_size=1 will induce the condition:
+
+                classes 1       2       3 ...     7       8     9
+                client1 0      350      350       0       0     350
+                client2 0      350      350       0       0     350
+                client3 100     20      0         0      100    0
+                client4 100     0       0         100    100    0
                 ...
-                clientN 0       0       0           100   100
+                clientN 0       350     350     0       0      350
 
         We have N clients while K clients contain class c. As class c contains D_c samples,
          each client in K will contain D_c / K samples of this class.
@@ -51,7 +49,19 @@ class Sampler(base.Sampler):
         np.random.seed(self.random_seed)
 
         per_client_classes_size = Config().data.per_client_classes_size
+        anchor_classes = Config().data.anchor_classes
+        consistent_clients_size = Config().data.consistent_clients_size
+        keep_anchor_classes_size = Config().data.keep_anchor_classes_size
         total_clients = Config().clients.total_clients
+
+        assert per_client_classes_size == len(anchor_classes)
+
+        self.consistent_clients = np.random.choice(
+            list(range(total_clients)),
+            size=consistent_clients_size,
+            replace=False)
+        self.anchor_classes = anchor_classes
+        self.keep_anchor_classes_size = keep_anchor_classes_size
 
         # obtain the dataset information
         if testing:
@@ -91,9 +101,9 @@ class Sampler(base.Sampler):
                 dataset_classes,
                 num_clients,
                 per_client_classes_size,
-                anchor_classes=[],
-                consistent_clients=[],
-                keep_anchor_classes_size=1)
+                anchor_classes=self.anchor_classes,
+                consistent_clients=self.consistent_clients,
+                keep_anchor_classes_size=self.keep_anchor_classes_size)
 
     def get(self):
         """Obtains an instance of the sampler. """

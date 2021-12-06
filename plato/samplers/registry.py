@@ -30,7 +30,8 @@ elif hasattr(Config().trainer, 'use_tensorflow'):
 else:
     from plato.samplers import (iid, dirichlet, mixed, orthogonal,
                                 all_inclusive, distribution_noniid,
-                                label_quantity_noniid)
+                                label_quantity_noniid,
+                                mixed_label_quantity_noniid)
 
     registered_samplers = OrderedDict([
         ('iid', iid.Sampler),
@@ -40,6 +41,7 @@ else:
         ('all_inclusive', all_inclusive.Sampler),
         ('distribution_noniid', distribution_noniid.Sampler),
         ('label_quantity_noniid', label_quantity_noniid.Sampler),
+        ('mixed_label_quantity_noniid', mixed_label_quantity_noniid.Sampler),
         ('sample_quantity_noniid', sample_quantity_noniid.Sampler),
     ])
 

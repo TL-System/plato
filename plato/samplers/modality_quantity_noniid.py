@@ -43,7 +43,7 @@ class Sampler(base.Sampler):
     def get(self):
         """Obtains the modality sampler.
             Note: the sampler here is utilized as the mask to
-             remove modalities not included.
+             remove modalities.
         """
         return self.subset_modalities
 
