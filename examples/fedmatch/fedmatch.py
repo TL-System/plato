@@ -1,8 +1,12 @@
 """
 A federated learning training session using FedMatch.
+
 Reference:
-Jeong et al., "Federated Semi-supervised learning with inter-client consistency & disjoint learning", in the Proceedings of ICLR 2021.
-https://arxiv.org/pdf/2006.12097.pdf 
+
+Jeong et al., "Federated Semi-supervised learning with inter-client consistency and
+disjoint learning", in the Proceedings of ICLR 2021.
+
+https://arxiv.org/pdf/2006.12097.pdf
 """
 import os
 
@@ -11,7 +15,6 @@ os.environ['config_file'] = 'examples/fedmatch/fedmatch_MNIST_lenet5.yml'
 import fedmatch_client
 import fedmatch_server
 import fedmatch_trainer
-from plato.config import Config
 
 
 def main():
