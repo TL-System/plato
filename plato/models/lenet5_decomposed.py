@@ -5,8 +5,7 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 from torch.nn.parameter import Parameter
 import torch
-#import torch.nn.Linear as Linear
-#import torch.nn.Conv2d as Conv2d
+from torch.nn.modules.utils import _pair
 
 
 class Model(nn.Module):
@@ -73,15 +72,13 @@ class Model(nn.Module):
         self.layers.append('relu4')
         self.layers.append('fc5')
 
-        #self.psi = self.get_psi()  # read psi_s from each layer
-        #self.sigma = self.get_sigma()  # read sigma_s from each layer
-
     def flatten(self, x):
         """Flatten the tensor."""
         return x.view(x.size(0), -1)
 
     def forward(self, x):
         """Forward pass."""
+
         x = self.conv1(x)
         x = self.relu1(x)
         x = self.pool1(x)
@@ -91,11 +88,14 @@ class Model(nn.Module):
         x = self.conv3(x)
         x = self.relu3(x)
         x = self.flatten(x)
+        print("===========any nan before logsoftmax:4", x.isnan().any())
+        print(x)
         x = self.fc4(x)
+        print("===========any nan before logsoftmax5:", x.isnan().any())
+        print(x)
         x = self.relu4(x)
         x = self.fc5(x)
-        print("==============", self.fc5.parameters())
-
+        print("===========any nan before logsoftmax6:", x.isnan().any())
         return F.log_softmax(x, dim=1)
 
     def forward_to(self, x, cut_layer):
@@ -123,30 +123,38 @@ class Model(nn.Module):
 
     def get_psi(self):
         # extract psi from each decomposed layer as variables and return a list of them
-        #self.psi = Variable( ,requires_grad=True)
+        self.psi = []
+        for key in self.layerdict:
+            if ('pool' not in key) & ('flatten' not in key) & ('relu'
+                                                               not in key):
+                self.psi.append(self.layerdict[key].psi)
+
         return self.psi
 
     def get_sigma(self):
         # extract psi from each decomposed layer as variables and return a list of them
+        self.sigma = []
+        for key in self.layerdict:
+            if ('pool' not in key) & ('flatten' not in key) & ('relu'
+                                                               not in key):
+                self.sigma.append(self.layerdict[key].sigma)
         return self.sigma
 
 
-class Decomposed_Linear(nn.Module):
+class Decomposed_Linear(nn.Linear):
     def __init__(self,
                  in_features,
                  out_features,
                  bias=True,
                  device=None,
                  dtype=None) -> None:
-        #sigma=None,
-        #psi=None,
-        #l1_thres=None) -> None:
-        """
-        super().__init__(self, in_features, out_features, bias, device, dtype)
+
+        super().__init__(in_features, out_features, bias, device, dtype)
         factory_kwargs = {'device': device, 'dtype': dtype}
-        self.psi = Parameter(torch.randn(()))  #psi
-        self.sigma = Parameter(torch.randn(()))  #sigma
-        self.l1_thres = l1_thres
+        self.sigma = Parameter(
+            torch.empty((out_features, in_features), **factory_kwargs))
+        self.psi = Parameter(
+            torch.empty((out_features, in_features), **factory_kwargs))
         """
         factory_kwargs = {'device': device, 'dtype': dtype}
         super(Decomposed_Linear, self).__init__()
@@ -162,14 +170,12 @@ class Decomposed_Linear(nn.Module):
             self.bias = Parameter(torch.empty(out_features, **factory_kwargs))
         else:
             self.register_parameter('bias', None)
-        print("++++++")
-        self.reset_parameters()
+        """
 
     def forward(self, input):
 
-        #self.weight1 = self.sigma + self.psi
-        self.weight = F.linear(torch.ones(self.sigma.size()), self.sigma,
-                               self.psi)
+        self.weight = Parameter(self.sigma.add(self.psi))
+
         return F.linear(input, self.weight, self.bias)
 
 
@@ -186,25 +192,22 @@ class Decomposed_Conv2d(nn.Conv2d):
                  padding_mode='zeros',
                  device=None,
                  dtype=None) -> None:
-        #psi=None,
-        #sigma=None,
-        #l1_thres=None
-
-        super().__init__(self, in_channels, out_channels, kernel_size, stride,
+        super().__init__(in_channels, out_channels, kernel_size, stride,
                          padding, dilation, groups, bias, padding_mode, device,
                          dtype)
 
-        #self.psi = psi
-        #self.sigma = sigma
-        #self.l1_thres = l1_thres
+        kernel_size = _pair(kernel_size)
         factory_kwargs = {'device': device, 'dtype': dtype}
         self.sigma = Parameter(
-            torch.empty((out_channels, in_channels), **factory_kwargs))
+            torch.empty((out_channels, in_channels, *kernel_size),
+                        **factory_kwargs))
         self.psi = Parameter(
-            torch.empty((out_channels, in_channels), **factory_kwargs))
+            torch.empty((out_channels, in_channels, *kernel_size),
+                        **factory_kwargs))
 
     def forward(self, input):
-        #self.weight = self.sigma + self.psi
-        self.weight = F.linear(torch.ones(self.sigma.size()), self.sigma,
-                               self.psi)
+        # self.weight = self.sigma + self.psi
+
+        self.weight = Parameter(self.sigma.add(self.psi))
+
         return super()._conv_forward(input, self.weight, self.bias)
