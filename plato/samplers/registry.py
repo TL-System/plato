@@ -31,7 +31,8 @@ else:
                                 all_inclusive, distribution_noniid,
                                 label_quantity_noniid,
                                 mixed_label_quantity_noniid,
-                                sample_quantity_noniid)
+                                sample_quantity_noniid, modality_iid,
+                                modality_quantity_noniid)
 
     registered_samplers = OrderedDict([
         ('iid', iid.Sampler),
@@ -43,6 +44,8 @@ else:
         ('label_quantity_noniid', label_quantity_noniid.Sampler),
         ('mixed_label_quantity_noniid', mixed_label_quantity_noniid.Sampler),
         ('sample_quantity_noniid', sample_quantity_noniid.Sampler),
+        ('modality_iid', modality_iid.Sampler),
+        ('modality_quantity_noniid', modality_quantity_noniid.Sampler),
     ])
 
 
@@ -70,25 +73,6 @@ def get(datasource, client_id, testing=False):
         registered_sampler = registered_samplers[sampler_type](datasource,
                                                                client_id,
                                                                testing=testing)
-    else:
-        raise ValueError('No such sampler: {}'.format(sampler_type))
-
-    return registered_sampler
-
-
-def multimodal_get(datasource, client_id):
-    """Get an instance of the multimodal sampler."""
-    if hasattr(Config().data, 'modality_sampler'):
-        sampler_type = Config().data.modality_sampler
-    else:
-        sampler_type = 'modality_iid'
-
-    logging.info("[Client #%d] Multimodal Sampler: %s", client_id,
-                 sampler_type)
-
-    if sampler_type in registered_samplers:
-        registered_sampler = registered_samplers[sampler_type](datasource,
-                                                               client_id)
     else:
         raise ValueError('No such sampler: {}'.format(sampler_type))
 
