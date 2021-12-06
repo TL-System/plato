@@ -91,9 +91,9 @@ class Sampler(base.Sampler):
                 dataset_classes,
                 num_clients,
                 per_client_classes_size,
-                anchor_classes=[],
-                consistent_clients=[],
-                keep_anchor_classes_size=1)
+                anchor_classes=None,
+                consistent_clients=None,
+                keep_anchor_classes_size=None)
 
     def get(self):
         """Obtains an instance of the sampler. """
