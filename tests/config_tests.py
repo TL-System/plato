@@ -3,13 +3,10 @@ Testing a federated learning configuration.
 """
 
 import os
-
-os.environ['config_file'] = 'configs/Kinetics/kinetics_mm.yml'
-
 import unittest
 import warnings
-from collections import OrderedDict, namedtuple
-import numpy as np
+
+os.environ['config_file'] = 'configs/Kinetics/kinetics_mm.yml'
 
 from plato.config import Config
 
@@ -73,6 +70,7 @@ class ConfigTest(unittest.TestCase):
         self.assertEqual(src_value, dst_value)
 
     def test_dataconfig(self):
+        """ Test the structure and necessary parameters of the data configuration """
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -108,6 +106,7 @@ class ConfigTest(unittest.TestCase):
                 train.type)
 
     def test_modelconfig(self):
+        """ Test the structure and necessary parameters of the model configuration """
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=UserWarning)
 
