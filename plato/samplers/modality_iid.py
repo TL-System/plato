@@ -4,6 +4,7 @@ Samples data from a dataset, biased across modalities in an
 
     Thus, all modalities of one sample are utilized as the input.
 
+    There is no difference between the train sampler and test sampler.
 """
 import numpy as np
 

@@ -5,12 +5,12 @@ Samples data from a dataset, 1). biased across labels, and 2). the number of lab
  clients.
 
 This sampler implements the basic label quantity noniid as that in "label_quantity_noniid.py".
- However, part of clients "consistent_clients_size" contain same classes "anchor_classes". Then, 
+ However, part of clients "consistent_clients_size" contain same classes "anchor_classes". Then,
  the "keep_anchor_classes_size" classes of "consistent_clients" are also used in classes pool
  to complete the class assignment.
 
     For Example:
-        Setting per_client_classes_size = 3, anchor_classes=[2, 3, 9], consistent_clients=[0,1,N], 
+        Setting per_client_classes_size = 3, anchor_classes=[2, 3, 9], consistent_clients=[0,1,N],
          keep_anchor_classes_size=1 will induce the condition:
 
                 classes 1       2       3 ...     7       8     9

@@ -76,7 +76,7 @@ def assign_sub_classes(dataset_labels,
                        consistent_clients=None,
                        keep_anchor_classes_size=None):
     """ Assign subset of classes to each client and assign corresponding samples of classes
-    
+
         Args:
             dataset_labels (list): a list of lables of global samples
             dataset_classes (list): a list containing classes of the dataset
@@ -85,7 +85,8 @@ def assign_sub_classes(dataset_labels,
             anchor_classes (list, default []): subset of classes assigned to "consistent_clients"
             consistent_clients (list, default []): subset of classes containing same classes
             keep_anchor_classes_size (list, default None): how many classes in anchor are utilized
-                                                        in the class pool for global class assignment
+                                                        in the class pool for global classes
+                                                        assignment.
     """
     # define the client_id to sample index mapper
     clients_dataidx_map = {
@@ -149,11 +150,11 @@ def create_dirichlet_skew(
         min_partition_size=None,  # minimum required size for partitions
         is_extend_total_size=False):
     """ Create the distribution skewness based on the dirichlet distribution
-    
+
         Note:
             is_extend_total_size (boolean) determines whether to generate the
              partitions satisfying min_partition_size by directly extending
-             the total data size. 
+             the total data size.
     """
     if min_partition_size is not None:
         if not is_extend_total_size:
