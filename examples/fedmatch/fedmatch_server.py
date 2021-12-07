@@ -63,16 +63,6 @@ class Server(fedavg.Server):
         self.vectors = list(self.cid_to_vectors.values())
         self.tree = spatial.KDTree(self.vectors)
 
-    def _compute_similarity(self, updates):
-        "compute similarity among clients and build tree for finding helpers"
-        # sum up the psi and sigma from local update and get model weights of all clients
-        embeded_model = []
-        for cid, psi, sigma in enumerate(updates):
-            weight = psi + sigma
-            prediction = np.squeeze(weight(self.gauss))
-
-        #
-
     def find_helpers(self, client_id):
         cout = self.cid_to_vectors[client_id]
         sims = self.tree.query(cout, self.args.num_helpers + 1)
