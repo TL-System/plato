@@ -27,6 +27,11 @@ class MultiModalDataSource(base.DataSource):
         self.modality_names = []
 
         # define the information container for the source data
+        #  - source_data_path: the original downloaded data
+        #  - base_data_dir_path: the source data used for the model
+        # For some datasets, we directly utilize the base_data_dir_path as
+        #  there is no need to process the original downloaded data to put them
+        #  in the base_data_dir_path dir.
         self.mm_data_info = {"source_data_path": "", "base_data_dir_path": ""}
 
         # define the paths for the splited root data - train, test, and val
@@ -63,7 +68,9 @@ class MultiModalDataSource(base.DataSource):
         self,
         data_path,  # the base directory for the data
         base_data_name=None):  # the directory name of the working data
+        """ Generate the data structure based on the defined data path """
         base_data_path = os.path.join(data_path, base_data_name)
+
         if not os.path.exists(base_data_path):
             os.makedirs(base_data_path)
 

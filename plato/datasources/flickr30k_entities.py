@@ -1,5 +1,20 @@
 """
-The Flickr30K Entities dataset following "http://bryanplummer.com/Flickr30kEntities/"
+The Flickr30K Entities dataset.
+
+The data structure and setting follows:
+ "http://bryanplummer.com/Flickr30kEntities/".
+
+
+We utilize the official splits that contains;
+ 29783, 1000, and 1000 images for train,
+ validation, and test, respectively.
+
+The data structure under the 'data/' is:
+├── Flickr30KEntities           # root dir of Flickr30K Entities dataset
+│   ├── Flickr30KEntitiesRaw    # Raw images/annotations and the official splits
+│   ├── train     # End-to-end, integration tests (alternatively `e2e`)
+│   └── test
+│   └── val
 
 """
 
@@ -13,7 +28,7 @@ import skimage.io as io
 import cv2
 
 from plato.config import Config
-from plato.datasources.multimodal import multimodal_base
+from plato.datasources import multimodal_base
 from plato.datasources.datalib import data_utils
 from plato.datasources.datalib.flicker30k_utils import flickr30k_utils
 
@@ -135,7 +150,7 @@ class Flickr30KEDataset(torch.utils.data.Dataset):
 
 
 class DataSource(multimodal_base.MultiModalDataSource):
-    """The ReferItGame dataset."""
+    """The Flickr30K Entities dataset."""
     def __init__(self):
         super().__init__()
 
@@ -163,6 +178,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
         self.raw_data_file_format = [".jpg", ".xml", ".txt"]
         self.data_types = ["Images", "Annotations", "Sentences"]
 
+        # extract the data information and structure
         for raw_type_idx, raw_type in enumerate(self.raw_data_types):
             raw_file_format = self.raw_data_file_format[raw_type_idx]
             data_type = self.data_types[raw_type_idx]
@@ -176,6 +192,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
             self.mm_data_info[data_type]["num_samples"] = len(
                 os.listdir(raw_type_path))
 
+        # generate path/type information for splits
         for split_type in list(self.splits_info.keys()):
             self.splits_info[split_type]["split_file"] = os.path.join(
                 base_data_path, raw_data_name, split_type + ".txt")
@@ -189,7 +206,8 @@ class DataSource(multimodal_base.MultiModalDataSource):
                 self.splits_info[split_type][dt_type][
                     "format"] = dt_type_format
 
-        print(self.mm_data_info)
+        # distribution data to splits
+        self.create_splits_data()
 
     def create_splits_data(self):
         """ Create datasets for different splits """
@@ -237,6 +255,26 @@ class DataSource(multimodal_base.MultiModalDataSource):
         with open(save_path, 'r') as outfile:
             phase_data = json.load(outfile)
         return phase_data
+
+    def get_train_set(self):
+        """ Obtains the training dataset. """
+        phase = "train"
+        phase_data = self.get_phase_data(phase)
+        self.trainset = Flickr30KEDataset(dataset=phase_data,
+                                          splits_info=self.splits_info,
+                                          data_types=self.data_types,
+                                          phase=phase)
+        return self.trainset
+
+    def get_test_set(self):
+        """ Obtains the validation dataset. """
+        phase = "test"
+        phase_data = self.get_phase_data(phase)
+        self.testset = Flickr30KEDataset(dataset=phase_data,
+                                         splits_info=self.splits_info,
+                                         data_types=self.data_types,
+                                         phase=phase)
+        return self.testset
 
     def get_train_loader(self, batch_size):
         """ Obtain the train loader """

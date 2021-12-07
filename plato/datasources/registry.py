@@ -27,39 +27,34 @@ elif hasattr(Config().trainer, 'use_tensorflow'):
                                           ('FashionMNIST',
                                            fashion_mnist_tensorflow)])
 
-elif hasattr(Config.data, 'use_multimodal'):
-    from plato.datasources.multimodal import kinetics, gym, flickr30k_entities, referitgame
+# elif hasattr(Config.data, 'use_multimodal'):
+#     from plato.datasources.multimodal import kinetics, gym, flickr30k_entities, referitgame
 
-    registered_datasources = OrderedDict([
-        ('kinetics700', kinetics),
-        ('kinetics400', kinetics),
-        ('Gym', gym),
-        ('Flickr30E', flickr30k_entities),
-        ('Referitgame', referitgame),
-    ])
-    registered_partitioned_datasources = OrderedDict()
+#     registered_datasources = OrderedDict([
+#         ('kinetics700', kinetics),
+#         ('kinetics400', kinetics),
+#         ('Gym', gym),
+#         ('Flickr30KE', flickr30k_entities),
+#         ('Referitgame', referitgame),
+#     ])
+#     registered_partitioned_datasources = OrderedDict()
 
 else:
-    from plato.datasources import (
-        mnist,
-        fashion_mnist,
-        cifar10,
-        cinic10,
-        huggingface,
-        pascal_voc,
-        tiny_imagenet,
-        femnist,
-        feature,
-    )
+    from plato.datasources import (mnist, fashion_mnist, cifar10, cinic10,
+                                   huggingface, pascal_voc, tiny_imagenet,
+                                   femnist, feature, flickr30k_entities)
 
-    registered_datasources = OrderedDict([('MNIST', mnist),
-                                          ('FashionMNIST', fashion_mnist),
-                                          ('CIFAR10', cifar10),
-                                          ('CINIC10', cinic10),
-                                          ('HuggingFace', huggingface),
-                                          ('PASCAL_VOC', pascal_voc),
-                                          ('TinyImageNet', tiny_imagenet),
-                                          ('Feature', feature)])
+    registered_datasources = OrderedDict([
+        ('MNIST', mnist),
+        ('FashionMNIST', fashion_mnist),
+        ('CIFAR10', cifar10),
+        ('CINIC10', cinic10),
+        ('HuggingFace', huggingface),
+        ('PASCAL_VOC', pascal_voc),
+        ('TinyImageNet', tiny_imagenet),
+        ('Feature', feature),
+        ('Flickr30KE', flickr30k_entities),
+    ])
 
     registered_partitioned_datasources = OrderedDict([('FEMNIST', femnist)])
 
