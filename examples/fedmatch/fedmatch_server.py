@@ -36,8 +36,8 @@ class Server(fedavg.Server):
         # compute similarity for clients
         self.compute_similarity(updates)
 
-        # find helpers for each client # only deltas received as updates, so server have to compute for the models
-        helpers = find_helpers(updates)
+        # find helpers for each client
+        helpers = self.find_helpers(updates)
 
         # later do averaging
         update = await super().federated_averaging(updates)
@@ -49,9 +49,8 @@ class Server(fedavg.Server):
         if self.helper_flag == 0:
             return payload
 
-        else:
-            helpers = self.find_helpers(selected_client_id)
-            return helpers.insert(0, payload)
+        helpers = self.find_helpers(selected_client_id)
+        return helpers.insert(0, payload)
 
     def compute_similarity(self, updates):
         "compute similarity among clients"
@@ -64,7 +63,7 @@ class Server(fedavg.Server):
         self.vectors = list(self.cid_to_vectors.values())
         self.tree = spatial.KDTree(self.vectors)
 
-    def compute_similarity(self, updates):
+    def _compute_similarity(self, updates):
         "compute similarity among clients and build tree for finding helpers"
         # sum up the psi and sigma from local update and get model weights of all clients
         embeded_model = []

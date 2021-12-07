@@ -15,14 +15,14 @@ import random
 
 import numpy as np
 import torch
-import torch.nn as nn
+from torch import nn
+from torch import _load_global_deps, autograd, optim
+from torch.utils.data import DataLoader
 import wandb
 from PIL import Image
 from plato.config import Config
 from plato.trainers import basic
 from scipy.ndimage.interpolation import shift
-from torch import _load_global_deps, autograd, optim
-from torch.utils.data import DataLoader
 
 
 class Trainer(basic.Trainer):
@@ -69,20 +69,8 @@ class Trainer(basic.Trainer):
 
                 logging.info("[Client #%d] Loading the dataset.",
                              self.client_id)
-                _train_loader = getattr(self, "train_loader", None)
-
-                if callable(_train_loader):
-                    train_loader = self.train_loader(batch_size, trainset,
-                                                     sampler.get(), cut_layer)
-                else:
-                    train_loader = torch.utils.data.DataLoader(
-                        dataset=trainset,
-                        shuffle=False,
-                        batch_size=batch_size,
-                        sampler=sampler.get())
+                #_train_loader = getattr(self, "train_loader", None)
                 """obtain labeled and unlabeled dataset"""
-
-                #len_train_set = len(trainset)
 
                 trainset_s, trainset_u = torch.utils.data.random_split(
                     trainset, [10000, 50000])  # rewrite with ratio
@@ -90,7 +78,8 @@ class Trainer(basic.Trainer):
                 train_loader_u = DataLoader(trainset_u, 100)
 
                 # iterations_per_epoch = np.ceil(len(trainset) /
-                #                               batch_size).astype(int) # variable iterations_per_epoch is computed for lr_scheduler;
+                # batch_size).astype(int)
+                # variable iterations_per_epoch is computed for lr_scheduler;
                 epochs = config['epochs']
 
                 # Sending the model to the device used for training
@@ -114,12 +103,6 @@ class Trainer(basic.Trainer):
                 # Initializing the optimizer
                 #get_optimizer = getattr(self, "get_optimizer",
                 #                        optimizers.get_optimizer)
-                """
-                print("Params of disjoint model: ", self.model.parameters())
-                for name, param in self.model.named_parameters():
-                    if param.requires_grad:
-                        print(name, param.data)
-                """
 
                 optimizer_s = optim.SGD(
                     [list(self.model.parameters())[0]],
@@ -141,7 +124,7 @@ class Trainer(basic.Trainer):
                 else:
                     lr_schedule = None
                 """
-                #print("=========Supervised Training==========")
+
                 for epoch in range(1, epochs + 1):
                     self.confident = 0
                     print("=========Supervised Training==========")
@@ -338,14 +321,12 @@ class Trainer(basic.Trainer):
                 shift(img, [random.randint(-2, 2),
                             random.randint(-2, 2), 0]) for img in images
             ])  # random shift
-        else:
-            return np.array([
-                np.array(
-                    self.rand_augment(Image.fromarray(
-                        np.reshape(img, self.shape)),
-                                      M=random.randint(2, 5)))
-                for img in images
-            ])
+
+        return np.array([
+            np.array(
+                self.rand_augment(Image.fromarray(np.reshape(img, self.shape)),
+                                  M=random.randint(2, 5))) for img in images
+        ])
 
     def agreement_based_labeling(self, y_pre, y_preds=None):
         y_pseudo = np.array(y_pre)
