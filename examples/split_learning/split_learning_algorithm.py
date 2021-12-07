@@ -8,10 +8,10 @@ from copy import deepcopy
 
 import numpy as np
 import torch
-from plato.config import Config
-from plato.utils import optimizers
-
 from plato.algorithms import fedavg
+from plato.config import Config
+from plato.datasources.pytorch import feature_dataset
+from plato.utils import optimizers
 
 
 class Algorithm(fedavg.Algorithm):
@@ -111,4 +111,5 @@ class Algorithm(fedavg.Algorithm):
             self.client_id, toc - tic))
 
     def train(self, trainset, sampler, cut_layer=None):
-        self.trainer.train(trainset.torch_dataset(), sampler, cut_layer)
+        self.trainer.train(feature_dataset.FeatureDataset(trainset), sampler,
+                           cut_layer)

@@ -12,6 +12,7 @@ import time
 
 import torch
 from plato.algorithms import fedavg
+from plato.datasources.pytorch import feature_dataset
 from plato.config import Config
 
 
@@ -57,4 +58,6 @@ class Algorithm(fedavg.Algorithm):
 
     def train(self, trainset, sampler, cut_layer=None):
         """ Train the neural network model after the cut layer. """
-        self.trainer.train(trainset.torch_dataset(), sampler, cut_layer)
+        self.trainer.train(
+            feature_dataset.FeatureDataset(trainset.feature_dataset), sampler,
+            cut_layer)
