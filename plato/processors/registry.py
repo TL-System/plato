@@ -14,12 +14,19 @@ from plato.processors import pipeline
 
 if not (hasattr(Config().trainer, 'use_tensorflow')
         or hasattr(Config().trainer, 'use_mindspore')):
-    from plato.processors import (base, mistnet_inbound_features,
-                                  mistnet_outbound_features,
-                                  mistnet_randomized_response,
-                                  mistnet_gaussian, mistnet_laplace,
-                                  mistnet_unbatch, mistnet_quantize,
-                                  mistnet_dequantize)
+    from plato.processors import (
+        base,
+        mistnet_inbound_features,
+        mistnet_outbound_features,
+        mistnet_randomized_response,
+        mistnet_gaussian,
+        mistnet_laplace,
+        mistnet_unbatch,
+        mistnet_quantize,
+        mistnet_dequantize,
+        gradient_gaussian,
+        gradient_laplace,
+    )
 
     registered_processors = OrderedDict([
         ('base', base.Processor),
@@ -31,16 +38,6 @@ if not (hasattr(Config().trainer, 'use_tensorflow')
         ('mistnet_laplace', mistnet_laplace.Processor),
         ('mistnet_quantize', mistnet_quantize.Processor),
         ('mistnet_dequantize', mistnet_dequantize.Processor),
-    ])
-
-if not (hasattr(Config().trainer, 'use_tensorflow')
-        and not hasattr(Config().trainer, 'use_mindspore')):
-    from plato.processors import (
-        gradient_gaussian,
-        gradient_laplace,
-    )
-
-    registered_processors = OrderedDict([
         ('gradient_gaussian', gradient_gaussian.Processor),
         ('gradient_laplace', gradient_laplace.Processor),
     ])
