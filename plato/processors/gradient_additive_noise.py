@@ -45,7 +45,7 @@ class Processor(base.Processor):
             # Compute gradients
             gradients[name] = new_weight - previous_weight
 
-        clipped_gradients, clipping_bound = self.clip_gradients(gradients)
+        clipped_gradients, clipping_bound = Processor.clip_gradients(gradients)
 
         processed_weights = OrderedDict()
 
@@ -66,8 +66,9 @@ class Processor(base.Processor):
 
         return processed_weights
 
-    def clip_gradients(self, gradients):
-        """ Clip gradients for adding noise. """
+    @staticmethod
+    def clip_gradients(gradients):
+        """ Clips the gradients in preparation for adding noise. """
         clipped_gradients = OrderedDict()
 
         norm_list = [
@@ -80,6 +81,7 @@ class Processor(base.Processor):
         # Compute clipped gradients
         for name, gradient in gradients.items():
             gradient_norm = torch.linalg.norm(gradient.float()).item()
+
             if clipping_bound == 0:
                 clipped_gradients[name] = gradient
             else:
