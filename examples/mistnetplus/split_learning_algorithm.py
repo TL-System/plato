@@ -11,7 +11,7 @@ import torch
 import torch.nn as nn
 from plato.algorithms import fedavg
 from plato.config import Config
-from plato.datasources.pytorch import feature_dataset
+from plato.datasources import feature_dataset
 from plato.utils import optimizers
 
 

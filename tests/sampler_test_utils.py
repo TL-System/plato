@@ -1,5 +1,5 @@
 """
-Useful functions to test the correcness of samplers
+Useful functions to test the correctness of samplers
 
 """
 
@@ -10,23 +10,13 @@ import numpy as np
 import torch
 
 
-def equal_dics(dict1, dict2):
-    """ Whether two dicts are same with each other """
-    is_equal = False
-    for key in dict1.keys():
-        if key in dict2.keys():
-            if dict1[key] == dict2[key]:
-                is_equal = True
-            else:
-                is_equal = False
-        else:
-            is_equal = False
-
-    return is_equal
+def dicts_equal(dict1, dict2):
+    """ Whether two dicts are identical. """
+    return dict1.keys() == dict2.keys() and dict1.values() == dict2.values()
 
 
 def align_lists(collected_data_list):
-    """ Cut the list elem in collected_data_list by using its minimum list length """
+    """ Cut the list elem in collected_data_list by using its minimum list length. """
     min_size = np.min([len(elem) for elem in collected_data_list])
     aligned_list = [elem[:min_size] for elem in collected_data_list]
 
@@ -34,9 +24,9 @@ def align_lists(collected_data_list):
 
 
 def extract_equality_info(collected_data_info):
-    """ Extract the keys that have a similar value by using matrix operation
+    """ Extract the keys that have a similar value by using matrix operation.
 
-        Return:
+        Returns:
             non_equality_count (array): 1d array, each elem presents how many
                                         clients are different from current
                                         correponding  client
@@ -45,7 +35,8 @@ def extract_equality_info(collected_data_info):
     if isinstance(collected_data_info, list):
         collected_data_info = align_lists(collected_data_info)
         collected_data_info = np.array(collected_data_info)
-    # convert to the 2D
+
+    # Converting to 2D
     if collected_data_info.ndim == 1:
         collected_data_info = np.reshape(collected_data_info, (1, -1))
 
@@ -61,7 +52,7 @@ def extract_equality_info(collected_data_info):
 
 
 def define_sampler(Sampler, dataset_source, client_id):
-    """ Define the sampler based on the received argument """
+    """ Define the sampler based on the received argument. """
     if isinstance(Sampler, type):
         defined_sampler = Sampler(datasource=dataset_source,
                                   client_id=client_id)
@@ -72,7 +63,7 @@ def define_sampler(Sampler, dataset_source, client_id):
 
 
 def get_phase_dataset(dataset_source, is_test_phase):
-    """ Obtain the dataset of the required phase train/test """
+    """ Obtain the dataset of the required phase train/test. """
     if not is_test_phase:
         dataset = dataset_source.get_train_set()
     else:
@@ -86,7 +77,7 @@ def extract_assigend_data_info(dataset,
                                num_of_batches=None,
                                batch_size=5):
     """ Obtain the data information including the classes
-    contained and the samples assigned to each class
+        contained and the samples assigned to each class.
 
         Returns:
             data_size (int): size of the dataset
@@ -100,6 +91,7 @@ def extract_assigend_data_info(dataset,
                                               sampler=sampler.get())
     if num_of_batches is None:
         num_of_batches = len(data_loader)
+
     # record all the classes that are assigned to this client
     assigned_samples_labels = list()
     # record information of classes assigned to this client
@@ -125,7 +117,7 @@ def extract_assigend_sample_indexs_info(dataset,
                                         sampler,
                                         num_of_batches=None,
                                         batch_size=5):
-    """ Extracting the samples index that are sampled """
+    """ Extract the samples index that are sampled. """
     samples_index = list(range(len(dataset)))
     data_loader = torch.utils.data.DataLoader(dataset=samples_index,
                                               shuffle=False,
@@ -155,7 +147,7 @@ def collect_clients_data_info(clients_id,
                               batch_size=5,
                               is_test_phase=False,
                               is_presented=False):
-    """ Collect the required 'clients_id' data information
+    """ Collect the required 'clients_id' data information.
 
     Outputs:
         clients_samples_info [dict]: Contains client_id: [assigned samples index]
@@ -224,13 +216,13 @@ def collect_clients_data_info(clients_id,
     return clients_classes_info, clients_samples_info, clients_global_info
 
 
-def verify_working_correcness(Sampler,
-                              dataset_source,
-                              client_id,
-                              num_of_batches=10,
-                              batch_size=5,
-                              is_test_phase=False):
-    """ Ensure the sampler can work well in this dataset """
+def verify_working_correctness(Sampler,
+                               dataset_source,
+                               client_id,
+                               num_of_batches=10,
+                               batch_size=5,
+                               is_test_phase=False):
+    """ Ensure that a provided sampler can work well in a provided dataset. """
 
     defined_sampler = define_sampler(Sampler, dataset_source, client_id)
 
@@ -251,16 +243,17 @@ def verify_working_correcness(Sampler,
             break
 
 
-def verify_client_data_correcness(Sampler,
-                                  dataset_source,
-                                  client_id,
-                                  num_of_iterations=5,
-                                  batch_size=5,
-                                  is_test_phase=False,
-                                  is_presented=False):
-    """ Verify the data information generated for this client by the sampler is same all the time
+def verify_client_data_correctness(Sampler,
+                                   dataset_source,
+                                   client_id,
+                                   num_of_iterations=5,
+                                   batch_size=5,
+                                   is_test_phase=False,
+                                   is_presented=False):
+    """ Verify that the data information generated for this client by the sampler is same
+        all the time.
 
-        It mainly verify:
+        It mainly verifies:
          1- the assigned classes
          2- the assigned sample size for each class
          3- the samples index assigned to the client
@@ -290,7 +283,7 @@ def verify_client_data_correcness(Sampler,
                                        client_classes_sample_size)
         iter_clients_sample_info.append(client_sample_info)
 
-    # extract the equality info by using the matrix computation
+    # Extracting the equality info by using the matrix computation
     classes_diff_clients_count = extract_equality_info(iter_clients_class_info)
     samples_diff_clients_count = extract_equality_info(
         iter_clients_sample_info)
@@ -311,7 +304,7 @@ def verify_difference_between_clients(clients_id,
                                       is_force_class_diff=False,
                                       is_test_phase=False,
                                       is_presented=False):
-    """ Check the difference between the clients
+    """ Check the difference between the clients.
 
         Args:
             clients_id (list): a list of clients id to be verfied
@@ -370,7 +363,7 @@ def verify_clients_fixed_classes(clients_id,
                                  batch_size=5,
                                  is_test_phase=False,
                                  is_presented=False):
-    """ Check the clients are assigned required number of classes """
+    """ Check whether the clients are assigned required number of classes """
     verify_flag = True
     clients_classes_info, _, _ = collect_clients_data_info(
         clients_id=clients_id,
