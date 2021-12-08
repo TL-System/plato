@@ -16,8 +16,9 @@ import random
 import numpy as np
 import torch
 from torch import nn
-from torch import autograd, optim
+from torch import _load_global_deps, autograd, optim
 from torch.utils.data import DataLoader
+import wandb
 from PIL import Image
 from plato.config import Config
 from plato.trainers import basic
@@ -45,15 +46,18 @@ class Trainer(basic.Trainer):
         """The main training loop in a federated learning workload, run in
           a separate process with a new CUDA context, so that CUDA memory
           can be released after the training completes.
-
         Arguments:
-
         self: the trainer itself.
         config: a dictionary of configuration parameters.
         trainset: The training dataset.
         sampler: the sampler that extracts a partition for this client.
         cut_layer (optional): The layer which training should start from.
         """
+        if 'use_wandb' in config:
+            run = wandb.init(project="plato",
+                             group=str(config['run_id']),
+                             reinit=True)
+
         try:
             custom_train = getattr(self, "train_model", None)
 
@@ -126,8 +130,9 @@ class Trainer(basic.Trainer):
                     print("=========Supervised Training==========")
                     for batch_id, (examples, labels) in enumerate(
                             train_loader_s):  # batch_id is used for logging
-
+                        #######################
                         # supervised learning
+                        #######################
                         with autograd.detect_anomaly():
                             examples, labels = examples.to(
                                 self.device), labels.to(self.device)
@@ -141,8 +146,8 @@ class Trainer(basic.Trainer):
 
                             loss_s = loss_criterion_s(outputs_s,
                                                       labels) * self.lambda_s
-                            print("here's the sigma's grad: ",
-                                  self.model.conv1.sigma.grad)
+                            #print("here's the sigma's grad: ",
+                            #self.model.conv1.sigma.grad)
                             #print("Loss_criterion_s: ",
                             #      loss_criterion_s(outputs_s, labels))
 
@@ -158,13 +163,18 @@ class Trainer(basic.Trainer):
                                             batch_id, len(train_loader_s),
                                             loss_s.data.item()))
                             else:
+                                if hasattr(config, 'use_wandb'):
+                                    wandb.log(
+                                        {"batch loss": loss_s.data.item()})
                                 logging.info(
                                     "[Client #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}"
                                     .format(self.client_id, epoch, epochs,
                                             batch_id, len(train_loader_s),
                                             loss_s.data.item()))
 
-                    # unsupervised learning
+                        #######################
+                        # unsupervised learning
+                        #######################
                     print("=========Unsupervised Training==========")
                     for batch_id, (examples_unlabeled,
                                    labels) in enumerate(train_loader_u):
@@ -197,6 +207,9 @@ class Trainer(basic.Trainer):
                                             batch_id, len(train_loader_u),
                                             loss_u.data.item()))
                             else:
+                                if hasattr(config, 'use_wandb'):
+                                    wandb.log(
+                                        {"batch loss": loss_u.data.item()})
                                 logging.info(
                                     "[Client #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}"
                                     .format(self.client_id, epoch, epochs,
@@ -215,6 +228,9 @@ class Trainer(basic.Trainer):
         model_type = config['model_name']
         filename = f"{model_type}_{self.client_id}_{config['run_id']}.pth"
         self.save_model(filename)
+
+        if 'use_wandb' in config:
+            run.finish()
 
     def loss_unsupervised(self,
                           unlabled_samples,

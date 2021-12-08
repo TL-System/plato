@@ -11,6 +11,13 @@ https://arxiv.org/pdf/2006.12097.pdf
 """
 from plato.clients import simple
 from plato.clients import base
+from dataclasses import dataclass
+
+
+@dataclass
+class Report(simple.Report):
+    """Report from a simple client, to be sent to the federated learning server."""
+    client_id: int
 
 
 class Client(simple.Client):
@@ -37,7 +44,9 @@ class Client(simple.Client):
         #variance =
 
         # send them back to server
-        return base.Report(report.num_samples, report.accuracy), weights
+        return base.Report(report.num_samples, report.accuracy,
+                           report.training_time, report.data_loading_time,
+                           self.client_id), weights
 
     def load_payload(self, server_payload):
         """ Load model weights and helpers from server payload onto this client. """
