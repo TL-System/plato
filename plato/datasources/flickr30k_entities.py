@@ -183,6 +183,9 @@ class Flickr30KEDataset(multimodal_base.MultiModalDataset):
             caption_phrase_bboxs = flickr30kE_utils.phrase_boxes_alignment(
                 flatten_caption_phrase_bboxs, sentence_phrases_boxes)
 
+        else:
+            caption_phrase_bboxs = sentence_phrases_boxes
+
         if self.transform_text_func is not None:
             caption_phrases = self.transform_text_func(caption_phrases)
 

@@ -11,6 +11,32 @@ import logging
 from plato.datasources.datalib import data_utils
 
 
+def phrase_boxes_alignment(flatten_boxes, ori_phrases_boxes):
+    """ align the bounding boxes with corresponding phrases. """
+    phrases_boxes = list()
+
+    ori_pb_boxes_count = list()
+    for ph_boxes in ori_phrases_boxes:
+        ori_pb_boxes_count.append(len(ph_boxes))
+
+    strat_point = 0
+    for pb_boxes_num in ori_pb_boxes_count:
+        sub_boxes = list()
+        for i in range(strat_point, strat_point + pb_boxes_num):
+            sub_boxes.append(flatten_boxes[i])
+
+        strat_point += pb_boxes_num
+        phrases_boxes.append(sub_boxes)
+
+    pb_boxes_count = list()
+    for ph_boxes in phrases_boxes:
+        pb_boxes_count.append(len(ph_boxes))
+
+    assert pb_boxes_count == ori_pb_boxes_count
+
+    return phrases_boxes
+
+
 def filter_bad_boxes(boxes_coor):
     """ Filter the boxes with wrong coordinates """
     filted_boxes = list()

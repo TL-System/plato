@@ -53,7 +53,8 @@ class DatasetsTest(unittest.TestCase):
             datasource=self.utest_datasource, client_id=self.client_id)
         testset = self.utest_datasource.get_test_set(modality_sampler)
 
-        testset.get_one_sample(sample_idx=10)
+        obtained_data = testset.get_one_sample(sample_idx=10)
+        print(obtained_data)
         # create the test dataset loader
 
         print(testset)
