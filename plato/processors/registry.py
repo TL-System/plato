@@ -33,6 +33,18 @@ if not (hasattr(Config().trainer, 'use_tensorflow')
         ('mistnet_dequantize', mistnet_dequantize.Processor),
     ])
 
+if not (hasattr(Config().trainer, 'use_tensorflow')
+        and not hasattr(Config().trainer, 'use_mindspore')):
+    from plato.processors import (
+        gradient_gaussian,
+        gradient_laplace,
+    )
+
+    registered_processors = OrderedDict([
+        ('gradient_gaussian', gradient_gaussian.Processor),
+        ('gradient_laplace', gradient_laplace.Processor),
+    ])
+
 
 def get(user: str, *args,
         **kwargs) -> Tuple[pipeline.Processor, pipeline.Processor]:

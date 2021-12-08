@@ -106,6 +106,11 @@ class Client(base.Client):
         """The machine learning training workload on a client."""
         logging.info("[Client #%d] Started training.", self.client_id)
 
+        for processor in self.outbound_processor.processors:
+            if hasattr(processor, 'previous_model_weights'):
+                processor.previous_model_weights = self.algorithm.extract_weights(
+                )
+
         # Perform model training
         try:
             training_time = self.trainer.train(self.trainset, self.sampler)
