@@ -12,7 +12,7 @@ import time
 
 import torch
 from plato.algorithms import fedavg
-from plato.datasources.pytorch import feature_dataset
+from plato.datasources import feature_dataset
 from plato.config import Config
 
 
