@@ -34,7 +34,8 @@ if not (hasattr(Config().trainer, 'use_tensorflow')
     ])
 
 
-def get(user: str, *args,
+def get(user: str,
+        processor_kwargs={},
         **kwargs) -> Tuple[pipeline.Processor, pipeline.Processor]:
     """ Get an instance of the processor. """
     outbound_processors = []
@@ -62,12 +63,16 @@ def get(user: str, *args,
         logging.info("%s: Using Processor for receiving payload: %s", user,
                      processor)
 
-    outbound_processors = list(
-        map(lambda name: registered_processors[name](*args, **kwargs),
-            outbound_processors))
-    inbound_processors = list(
-        map(lambda name: registered_processors[name](*args, **kwargs),
-            inbound_processors))
+    def map_f(name):
+        if name in processor_kwargs:
+            this_kwargs = {**kwargs, **(processor_kwargs[name])}
+        else:
+            this_kwargs = kwargs
+
+        return registered_processors[name](**this_kwargs)
+
+    outbound_processors = list(map(map_f, outbound_processors))
+    inbound_processors = list(map(map_f, inbound_processors))
 
     return pipeline.Processor(outbound_processors), pipeline.Processor(
         inbound_processors)
