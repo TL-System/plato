@@ -5,6 +5,7 @@ clip and add noise on gradients of model weights.
 
 from collections import OrderedDict
 import logging
+import os
 from typing import Any
 import torch
 import numpy as np
@@ -29,6 +30,9 @@ class Processor(base.Processor):
         """
         Clip and add noise on gradients to guarantee differential privacy.
         """
+        # Server does not add noise in the first training iteration
+        if self.previous_model_weights is None:
+            return data
 
         gradients = OrderedDict()
 
@@ -49,8 +53,12 @@ class Processor(base.Processor):
                 name] = old_weight + clipped_gradient + self.compute_additive_noise(
                     clipped_gradient, clipping_bound)
 
-        logging.info("[Client #%d] Local differential privacy applied.",
-                     self.client_id)
+        if self.client_id is None:
+            logging.info("[Server #%d] Applied local differential privacy.",
+                         os.getpid())
+        else:
+            logging.info("[Client #%d] Applied local differential privacy.",
+                         self.client_id)
 
         return processed_weights
 
