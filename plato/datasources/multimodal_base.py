@@ -2,6 +2,7 @@
 Base class for multimodal datasets.
 """
 
+from abc import abstractmethod
 import logging
 import os
 
@@ -159,32 +160,48 @@ class MultiModalDataSource(base.DataSource):
 
 class MultiModalDataset(torch.utils.data.Dataset):
     """ The base interface for the multimodal data """
-    def __init__(self, modality_datasets):
-        self.datasets = modality_datasets  # a dict that holds the corresponding built dataset.
+    def __init__(self):
+        self.phase = None
+        self.phase_data_record = None
+        self.phase_split_info = None
+        self.data_types = None
+        self.modality_sampler = None
+        self.transform_image_dec_func = None
+        self.transform_text_func = None
 
-        self.supported_modalities = ["rgb", "flow", "audio"]
+        self.basic_modalities = ["rgb", "flow", "text", "audio"]
 
-    def __getitem__(self, idx):
+        self.basic_items = ["box", "target"]
+
+    @abstractmethod
+    def get_modality_sample(self, sample_idx):
+        """ Get the sample containing different modalities
+        
+            Args:
+                sample_idx (int): the index of the sample
+            
+            Output:
+                a dict containing different modalities, the
+                 key of the dict is the modality name
+         """
+        raise NotImplementedError("Please Implement this method")
+
+    def __getitem__(self, sample_idx):
         """Get the sample for either training or testing given index."""
-        obtained_mm_sample = dict()
-        for dataset in self.datasets:
-            dataset_modality = dataset.modality
-            obtained_mm_sample[dataset_modality] = list()
-            if dataset.test_mode:
-                obtained_mm_sample[dataset_modality].append(
-                    dataset.prepare_test_frames(idx))
-            else:
-                obtained_mm_sample[dataset_modality].append(
-                    dataset.prepare_train_frames(idx))
+        sampled_data = self.get_one_sample(sample_idx)
 
-        return obtained_mm_sample
+        # utilize the modality to mask specific modalities
+        sampled_modality_data = dict()
+        for item_name, item_data in sampled_data.items():
+            # maintain the modality data based on the sampler
+            # maintain the external data
+            if item_name in self.modality_sampler or \
+                item_name in self.basic_items:
+                sampled_modality_data[item_name] = item_data
 
+        return sampled_modality_data
+
+    @abstractmethod
     def __len__(self):
-        """ obtain the length of the multi-modal data"""
-        mm_datas_lens = [len(dt) for dt in self.datasets]
-
-        result = all(element == mm_datas_lens[0] for element in mm_datas_lens)
-        if result:
-            return mm_datas_lens[0]
-        else:
-            return min(mm_datas_lens)
+        """ obtain the length of the multi-modal data """
+        raise NotImplementedError("Please Implement this method")

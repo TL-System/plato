@@ -194,16 +194,33 @@ def align_anno_sent(image_sents, image_annos):
     return aligned_items
 
 
-def integrate_data_to_json(self,
-                           splits_info,
+def integrate_data_to_json(splits_info,
                            mm_data_info,
                            data_types,
                            split_wise=True,
                            globally=True):
     """ Integrate the data into one json file that contains aligned
-        annotation-sentence for each image """
+         annotation-sentence for each image.
+        The integrated data info is presented as the dict type.
+         Each item in dict contains image and one of its annotation.
+
+        For example, one randomly item:
+            {
+            ...,
+                "./data/Flickr30KEntities/test/test_Images/1011572216.jpg0"
+                 {"sentence": "bride and groom",
+                 "sentence_phrases": ["bride", "groom"],
+                "sentence_phrases_type": [["people"], ["people"]],
+                "sentence_phrases_id": ["370", "372"],
+                "sentence_phrases_boxes": [[[161, 21, 330, 357]], 
+                                            [[195, 82, 327, 241]]],
+                },
+            ....
+            }
+        """
     def operate_integration(images_name, images_annotations_path,
                             images_sentences_path):
+        """ Obtain the integrated for images """
         integrated_data = dict()
         for image_name_idx, image_name in enumerate(images_name):
             image_sent_path = images_sentences_path[image_name_idx]
@@ -232,8 +249,8 @@ def integrate_data_to_json(self,
                 logging.info(warn_info)
                 continue
 
-            split_data_types_samples_path = ()
-            for data_type_idx, data_type in enumerate(data_types):
+            split_data_types_samples_path = []
+            for _, data_type in enumerate(data_types):
                 data_type_format = splits_info[split_type][data_type]["format"]
                 split_data_type_path = splits_info[split_type][data_type][
                     "path"]
@@ -267,8 +284,7 @@ def integrate_data_to_json(self,
             return
 
         raw_data_types_samples_path = []
-        for data_type_idx in range(len(self.data_types)):
-            data_type = data_types[data_type_idx]
+        for _, data_type in enumerate(data_types):
             data_type_format = mm_data_info[data_type]["format"]
             raw_data_type_path = mm_data_info[data_type]["path"]
 
