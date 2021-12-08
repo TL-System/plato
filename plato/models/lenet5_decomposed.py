@@ -1,4 +1,5 @@
 import collections
+import math
 
 import torch.nn as nn
 import torch.nn.functional as F
@@ -6,6 +7,7 @@ from torch.autograd import Variable
 from torch.nn.parameter import Parameter
 import torch
 from torch.nn.modules.utils import _pair
+from torch.nn import init
 
 
 class Model(nn.Module):
@@ -155,6 +157,9 @@ class Decomposed_Linear(nn.Linear):
             torch.empty((out_features, in_features), **factory_kwargs))
         self.psi = Parameter(
             torch.empty((out_features, in_features), **factory_kwargs))
+
+        init.kaiming_uniform_(self.sigma, a=math.sqrt(5))
+        init.kaiming_uniform_(self.psi, a=math.sqrt(5))
         """
         factory_kwargs = {'device': device, 'dtype': dtype}
         super(Decomposed_Linear, self).__init__()
@@ -204,6 +209,9 @@ class Decomposed_Conv2d(nn.Conv2d):
         self.psi = Parameter(
             torch.empty((out_channels, in_channels, *kernel_size),
                         **factory_kwargs))
+
+        init.kaiming_uniform_(self.sigma, a=math.sqrt(5))
+        init.kaiming_uniform_(self.psi, a=math.sqrt(5))
 
     def forward(self, input):
         # self.weight = self.sigma + self.psi
