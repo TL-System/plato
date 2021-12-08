@@ -5,6 +5,7 @@ A basic federated learning client who sends weight updates to the server.
 import logging
 import time
 from dataclasses import dataclass
+from copy import deepcopy
 
 from plato.algorithms import registry as algorithms_registry
 from plato.clients import base
@@ -108,8 +109,10 @@ class Client(base.Client):
 
         for processor in self.outbound_processor.processors:
             if hasattr(processor, 'previous_model_weights'):
-                processor.previous_model_weights = self.algorithm.extract_weights(
-                )
+                processor.previous_model_weights = deepcopy(
+                    self.algorithm.extract_weights())
+                print("Previous model weights in client.train():")
+                print(processor.previous_model_weights)
 
         # Perform model training
         try:

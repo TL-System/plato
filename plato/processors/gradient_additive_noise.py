@@ -1,6 +1,5 @@
 """
-A Processor of differential privacy to
-clip and add noise on gradients of model weights.
+A Processor of differential privacy to clip and add noise on gradients of model weights.
 """
 
 from collections import OrderedDict
@@ -36,10 +35,15 @@ class Processor(base.Processor):
 
         gradients = OrderedDict()
 
-        for (name, new_weight), (_, old_weight) in zip(
+        print("in process()")
+        print("Previous model weights:")
+        print(self.previous_model_weights)
+        print("New model weights:")
+        print(data)
+        for (name, new_weight), (__, previous_weight) in zip(
                 data.items(), self.previous_model_weights.items()):
-            # Compute gradient
-            gradients[name] = new_weight - old_weight
+            # Compute gradients
+            gradients[name] = new_weight - previous_weight
 
         clipped_gradients, clipping_bound = self.clip_gradients(gradients)
 
@@ -63,8 +67,7 @@ class Processor(base.Processor):
         return processed_weights
 
     def clip_gradients(self, gradients):
-        """Clip gradients for adding noise."""
-
+        """ Clip gradients for adding noise. """
         clipped_gradients = OrderedDict()
 
         norm_list = [

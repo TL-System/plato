@@ -34,9 +34,9 @@ Attributes in **bold** must be included in a configuration file, while attribute
 
 - `mistnet_outbound_features`: Convert PyTorch tensor features into NumPy arrays before sending to the server, for the benefit of saving a substantial amount of communication overhead if the feature dataset is large. Must be placed after `mistnet_unbatch`.
 
-- `gradient_laplace`: Clip and add random noise with laplace distribution to gradients.
+- `gradient_laplace`: Clip and add random noise with laplace distribution to gradients. This processor requires `dp_epsilon` and `dp_delta` to be specified in the `algorithm` section.
 
-- `gradient_gaussian`: Clip and add random noise with gaussian distribution to gradients. 
+- `gradient_gaussian`: Clip and add random noise with gaussian distribution to gradients. This processor requires `dp_epsilon` and `dp_delta` to be specified in the `algorithm` section.
 
 #### Valid processors for `clients.inbound_processors`
 
@@ -63,9 +63,9 @@ None.
 
 #### Valid processors for `server.outbound_processors`
 
-- `gradient_laplace`: Clip and add random noise with laplace distribution to gradients.
+- `gradient_laplace`: Clip and add random noise with laplace distribution to gradients. This processor requires `dp_epsilon` and `dp_delta` to be specified in the `algorithm` section.
 
-- `gradient_gaussian`: Clip and add random noise with gaussian distribution to gradients. 
+- `gradient_gaussian`: Clip and add random noise with gaussian distribution to gradients. This processor requires `dp_epsilon` and `dp_delta` to be specified in the `algorithm` section.
 
 #### Valid processors for `server.inbound_processors`
 
