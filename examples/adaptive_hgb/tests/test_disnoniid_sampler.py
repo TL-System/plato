@@ -7,7 +7,7 @@ import os
 
 os.environ['config_file'] = 'examples/adaptive_hgb/tests/sampler_config.yml'
 
-from utils import verify_working_correcness, verify_client_local_data_correcness, \
+from utils import verify_working_correctness, verify_client_local_data_correctness, \
     verify_difference_between_clients
 
 from plato.config import Config
@@ -22,13 +22,13 @@ if __name__ == "__main__":
     cifar10_datasource = DataSource()
 
     client_id = 1
-    verify_working_correcness(Sampler,
-                              dataset_source=cifar10_datasource,
-                              client_id=client_id,
-                              num_of_batches=3,
-                              batch_size=5)
+    verify_working_correctness(Sampler,
+                               dataset_source=cifar10_datasource,
+                               client_id=client_id,
+                               num_of_batches=3,
+                               batch_size=5)
     print("-" * 20)
-    verify_flag = verify_client_local_data_correcness(
+    verify_flag = verify_client_local_data_correctness(
         Sampler,
         dataset_source=cifar10_datasource,
         client_id=client_id,

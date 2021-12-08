@@ -1,5 +1,5 @@
 """
-Useful functions to test the correcness of samplers
+Useful functions to test the correctness of samplers
 
 
 """
@@ -7,26 +7,16 @@ import torch
 import collections
 
 
-def equal_dics(dict1, dict2):
+def dicts_equal(dict1, dict2):
     """ Whether two dicts are same with each other """
-    is_equal = False
-    for key in dict1.keys():
-        if key in dict2.keys():
-            if dict1[key] == dict2[key]:
-                is_equal = True
-            else:
-                is_equal = False
-        else:
-            is_equal = False
-
-    return is_equal
+    return dict1.keys() == dict2.keys() and dict1.values() == dict2.values()
 
 
-def verify_working_correcness(Sampler,
-                              dataset_source,
-                              client_id,
-                              num_of_batches=10,
-                              batch_size=5):
+def verify_working_correctness(Sampler,
+                               dataset_source,
+                               client_id,
+                               num_of_batches=10,
+                               batch_size=5):
     """ Ensure the sampler can work well in this dataset """
     test_sampler = Sampler(datasource=dataset_source, client_id=client_id)
     dataset = dataset_source.get_train_set()
@@ -84,12 +74,12 @@ def extract_assigend_data_info(dataset,
         assigned_samples_labels), assigned_classes, assigned_classes_sample
 
 
-def verify_client_local_data_correcness(Sampler,
-                                        dataset_source,
-                                        client_id,
-                                        num_of_iterations=5,
-                                        batch_size=5,
-                                        is_presented=False):
+def verify_client_local_data_correctness(Sampler,
+                                         dataset_source,
+                                         client_id,
+                                         num_of_iterations=5,
+                                         batch_size=5,
+                                         is_presented=False):
     """ Verify the local data generated for this client by the sampler is same all the time """
 
     dataset = dataset_source.get_train_set()
@@ -120,7 +110,7 @@ def verify_client_local_data_correcness(Sampler,
 
             continue
 
-        if pervios_iter_classes == assigned_classes and equal_dics(
+        if pervios_iter_classes == assigned_classes and dicts_equal(
                 pervios_iter_classes_sample, assigned_classes_sample):
             verify_count += 1
 
