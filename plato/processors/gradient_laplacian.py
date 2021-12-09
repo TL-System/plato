@@ -17,7 +17,7 @@ class Processor(gradient_additive_noise.Processor):
         self.epsilon = Config().algorithm.dp_epsilon
 
     def compute_additive_noise(self, gradient, clipping_bound):
-        """ Computes Laplace noise. """
+        """ Computes Laplacian noise. """
         scale = clipping_bound / self.epsilon
 
         additive_noise = Laplace(loc=0, scale=scale).sample(gradient.shape)

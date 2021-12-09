@@ -19,7 +19,7 @@ class Processor(gradient_additive_noise.Processor):
         self.epsilon = Config().algorithm.dp_epsilon
 
     def compute_additive_noise(self, gradient, clipping_bound):
-        """Computes Gaussian noise."""
+        """ Computes Gaussian noise. """
 
         scale = math.sqrt(
             2 * math.log(1.25 / self.delta)) * clipping_bound / self.epsilon

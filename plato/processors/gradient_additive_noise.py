@@ -83,7 +83,6 @@ class Processor(base.Processor):
                 clipped_gradients[name] = gradient / max(
                     1, gradient_norm / clipping_bound)
 
-        print(clipped_gradients)
         print(clipping_bound)
         return clipped_gradients, clipping_bound
 
