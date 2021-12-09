@@ -14,12 +14,11 @@ from plato.processors import pipeline
 
 if not (hasattr(Config().trainer, 'use_tensorflow')
         or hasattr(Config().trainer, 'use_mindspore')):
-    from plato.processors import (base, mistnet_inbound_features,
-                                  mistnet_outbound_features,
-                                  mistnet_randomized_response,
-                                  mistnet_gaussian, mistnet_laplace,
-                                  mistnet_unbatch, mistnet_quantize,
-                                  mistnet_dequantize)
+    from plato.processors import (
+        base, mistnet_inbound_features, mistnet_outbound_features,
+        mistnet_randomized_response, mistnet_gaussian, mistnet_laplace,
+        mistnet_unbatch, mistnet_quantize, mistnet_dequantize, torch_deepcopy,
+        torch_quantize, torch_dequantize, torch_randomized_response)
 
     registered_processors = OrderedDict([
         ('base', base.Processor),
@@ -31,10 +30,15 @@ if not (hasattr(Config().trainer, 'use_tensorflow')
         ('mistnet_laplace', mistnet_laplace.Processor),
         ('mistnet_quantize', mistnet_quantize.Processor),
         ('mistnet_dequantize', mistnet_dequantize.Processor),
+        ('torch_deepcopy', torch_deepcopy.Processor),
+        ('torch_quantize', torch_quantize.Processor),
+        ('torch_dequantize', torch_dequantize.Processor),
+        ('torch_randomized_response', torch_randomized_response.Processor),
     ])
 
 
-def get(user: str, *args,
+def get(user: str,
+        processor_kwargs={},
         **kwargs) -> Tuple[pipeline.Processor, pipeline.Processor]:
     """ Get an instance of the processor. """
     outbound_processors = []
@@ -62,12 +66,16 @@ def get(user: str, *args,
         logging.info("%s: Using Processor for receiving payload: %s", user,
                      processor)
 
-    outbound_processors = list(
-        map(lambda name: registered_processors[name](*args, **kwargs),
-            outbound_processors))
-    inbound_processors = list(
-        map(lambda name: registered_processors[name](*args, **kwargs),
-            inbound_processors))
+    def map_f(name):
+        if name in processor_kwargs:
+            this_kwargs = {**kwargs, **(processor_kwargs[name])}
+        else:
+            this_kwargs = kwargs
+
+        return registered_processors[name](**this_kwargs)
+
+    outbound_processors = list(map(map_f, outbound_processors))
+    inbound_processors = list(map(map_f, inbound_processors))
 
     return pipeline.Processor(outbound_processors), pipeline.Processor(
         inbound_processors)
