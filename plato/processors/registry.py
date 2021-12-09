@@ -10,18 +10,21 @@ from collections import OrderedDict
 from typing import Tuple
 
 from plato.config import Config
-from plato.processors import feature_dequantize, feature_unbatch, model_deepcopy, pipeline
+from plato.processors import pipeline
 
 if not (hasattr(Config().trainer, 'use_tensorflow')
         or hasattr(Config().trainer, 'use_mindspore')):
     from plato.processors import (
         base,
+        gradient_gaussian,
+        gradient_laplace,
+        feature_randomized_response,
+        feature_quantize,
+        feature_dequantize,
+        feature_unbatch,
         inbound_feature_tensors,
         outbound_feature_ndarrays,
-        feature_randomized_response,
-        feature_gaussian,
-        feature_laplace,
-        feature_quantize,
+        model_deepcopy,
         model_quantize,
         model_dequantize,
         model_randomized_response,
@@ -29,14 +32,14 @@ if not (hasattr(Config().trainer, 'use_tensorflow')
 
     registered_processors = OrderedDict([
         ('base', base.Processor),
+        ('gradient_gaussian', gradient_gaussian.Processor),
+        ('gradient_laplace', gradient_laplace.Processor),
         ('feature_randomized_response', feature_randomized_response.Processor),
-        ('feature_unbatch', feature_unbatch.Processor),
-        ('outbound_feature_ndarrays', outbound_feature_ndarrays.Processor),
-        ('inbound_feature_tensors', inbound_feature_tensors.Processor),
-        ('feature_gaussian', feature_gaussian.Processor),
-        ('feature_laplace', feature_laplace.Processor),
         ('feature_quantize', feature_quantize.Processor),
         ('feature_dequantize', feature_dequantize.Processor),
+        ('feature_unbatch', feature_unbatch.Processor),
+        ('inbound_feature_tensors', inbound_feature_tensors.Processor),
+        ('outbound_feature_ndarrays', outbound_feature_ndarrays.Processor),
         ('model_deepcopy', model_deepcopy.Processor),
         ('model_quantize', model_quantize.Processor),
         ('model_dequantize', model_dequantize.Processor),
