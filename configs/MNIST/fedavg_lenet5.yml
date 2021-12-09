@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 3
+    total_clients: 1
 
     # The number of clients selected in each round
-    per_round: 3
+    per_round: 1
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -16,16 +16,11 @@ clients:
 
     # Processors for outbound data payloads
     outbound_processors:
-        - model_deepcopy
-        - model_quantize
+        - gradient_gaussian
 
 server:
     address: 127.0.0.1
     port: 8000
-
-    # Processors for inbound data payloads
-    inbound_processors:
-        - model_dequantize
 
 data:
     # The training and testing dataset
@@ -73,4 +68,5 @@ trainer:
 algorithm:
     # Aggregation algorithm
     type: fedavg
-    epsilon: 100
+    dp_epsilon: 1
+    dp_delta: 0.00001

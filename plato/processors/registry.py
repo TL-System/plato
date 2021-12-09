@@ -35,7 +35,7 @@ if not (hasattr(Config().trainer, 'use_tensorflow')
     registered_processors = OrderedDict([
         ('base', base.Processor),
         ('gradient_gaussian', gradient_gaussian.Processor),
-        ('gradient_laplace', gradient_laplacian.Processor),
+        ('gradient_laplacian', gradient_laplacian.Processor),
         ('feature_randomized_response', feature_randomized_response.Processor),
         ('feature_gaussian', feature_gaussian.Processor),
         ('feature_laplace', feature_laplacian.Processor),
