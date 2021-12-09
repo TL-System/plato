@@ -34,6 +34,12 @@ Attributes in **bold** must be included in a configuration file, while attribute
 
 - `mistnet_outbound_features`: Convert PyTorch tensor features into NumPy arrays before sending to the server, for the benefit of saving a substantial amount of communication overhead if the feature dataset is large. Must be placed after `mistnet_unbatch`.
 
+- `torch_deepcopy`: Returns a deepcopy of the state_dict to prevent changing internal parameters of the model within clients.
+
+- `torch_randomized_response`: Activate randomized response on model parameters for PyTorch, must also set `algorithm.epsilon` to activate.
+
+- `mistnet_quantize`: Quantize features for model parameters for PyTorch.
+
 #### Valid processors for `clients.inbound_processors`
 
 None.
@@ -66,6 +72,8 @@ None.
 - `mistnet_inbound_features`: Convert PyTorch tensor features into NumPy arrays before sending to client, for the benefit of saving a substantial amount of communication overhead if the feature dataset is large. Must be used if `clients.outbound_processors` includes `mistnet_outbound_features`.
 
 - `mistnet_dequantize`: Dequantize features for PyTorch MistNet. Must not be used together with `mistnet_inbound_features`.
+
+- `torch_dequantize`: Dequantize features for PyTorch model parameters.
 
 ### data
 

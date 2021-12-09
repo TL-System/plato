@@ -14,9 +14,18 @@ clients:
     # Whether simulate clients or not
     simulation: false
 
+    # Processors for outbound data payloads
+    outbound_processors:
+        - torch_deepcopy
+        - torch_quantize
+
 server:
     address: 127.0.0.1
     port: 8000
+
+    # Processors for inbound data payloads
+    inbound_processors:
+        - torch_dequantize
 
 data:
     # The training and testing dataset
@@ -64,3 +73,4 @@ trainer:
 algorithm:
     # Aggregation algorithm
     type: fedavg
+    epsilon: 100
