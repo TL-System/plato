@@ -10,17 +10,12 @@ import os
 import collections
 
 import torch
-
 import cv2
 
 from plato.config import Config
-from plato.datasources.multimodal import multimodal_base
+from plato.datasources import multimodal_base
+from plato.datasources.multimodal_base import TextData, BoxData, TargetData
 from plato.datasources.datalib.refer_utils import referitgame_utils
-
-DataAnnos = collections.namedtuple('annos', [
-    'caption', 'caption_phrases', 'caption_phrase_bboxs',
-    'caption_phrases_cate', 'caption_phrases_cate_id'
-])
 
 SplitedDatasets = collections.namedtuple('SplitedDatasets', [
     'train_ref_ids', 'val_ref_ids', 'test_ref_ids', 'testA_ref_ids',
@@ -43,29 +38,46 @@ def collate_fn(batch):
     return batch
 
 
-class ReferItGameDataset(torch.utils.data.Dataset):
-    """Prepares the ReferItGame dataset for use in the model."""
+class ReferItGameDataset(multimodal_base.MultiModalDataset):
+    """Prepares the Flickr30K Entities dataset."""
     def __init__(self,
-                 dataset,
-                 base_refer_data,
+                 dataset_info,
+                 phase,
+                 phase_split,
+                 data_types,
+                 modality_sampler=None,
                  transform_image_dec_func=None,
                  transform_text_func=None):
-        self.phase_data = dataset
-        self.base_refer_data = base_refer_data
+        super().__init__()
+
+        self.phase = phase
+        self.phase_data_record = dataset_info
+        self.phase_split = phase_split
+        self.data_types = data_types
         self.transform_image_dec_func = transform_image_dec_func
         self.transform_text_func = transform_text_func
 
+        self.phase_samples_name = list(self.phase_data_record.keys())
+
+        self.supported_modalities = ["rgb", "text"]
+
+        # default utilizing the full modalities
+        if modality_sampler is None:
+            self.modality_sampler = self.supported_modalities
+        else:
+            self.modality_sampler = modality_sampler
+
     def __len__(self):
-        return len(self.phase_data)
+        return len(self.phase_data_record)
 
     def __getitem__(self, sample_idx):
         [
             image_id, _, caption, caption_phrases, caption_phrase_bboxs,
             caption_phrases_cate, caption_phrases_cate_id
-        ] = self.phase_data[sample_idx]
+        ] = self.phase_data_record[sample_idx]
 
         sample_name = image_id
-        image_data = self.base_refer_data.loadImgsData(image_id)[0]
+        image_data = self.phase_split.loadImgsData(image_id)[0]
 
         image_data = cv2.cvtColor(image_data, cv2.COLOR_BGR2RGB)
 
@@ -104,14 +116,18 @@ class ReferItGameDataset(torch.utils.data.Dataset):
         caption_phrase_bboxs = [caption_phrase_bboxs
                                 ]  # convert to the standard structure
 
-        sample_annos = DataAnnos(
-            caption=caption,
-            caption_phrases=caption_phrases,
-            caption_phrase_bboxs=caption_phrase_bboxs,
+        text_data = TextData(caption=caption, caption_phrases=caption_phrases)
+        box_data = BoxData(caption_phrase_bboxs=caption_phrase_bboxs)
+        taget_data = TargetData(
             caption_phrases_cate=caption_phrases_cate,
             caption_phrases_cate_id=caption_phrases_cate_id)
 
-        return sample_name, ori_image_data, image_data, sample_annos
+        return {
+            "rgb": image_data,
+            "text": text_data,
+            "box": box_data,
+            "target": taget_data
+        }
 
 
 class DataSource(multimodal_base.MultiModalDataSource):
@@ -229,26 +245,27 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         return mode_elements_holder, mode_flatten_emelemts
 
-    def get_train_loader(self, batch_size):
-        """ Get the train loader """
-        phase = "train"
+    def get_phase_dataset(self, phase, modality_sampler):
+        """ Obtain the dataset for the specific phase """
         _, mode_flatten_emelemts = self.get_phase_data(phase)
-        self.trainset = ReferItGameDataset(dataset=mode_flatten_emelemts,
-                                           base_refer_data=self._dataset_refer)
-        train_loader = torch.utils.data.DataLoader(dataset=self.trainset,
-                                                   batch_size=batch_size,
-                                                   shuffle=True,
-                                                   collate_fn=collate_fn)
-        return train_loader
 
-    def get_test_loader(self, batch_size):
-        """ Get the test loader """
+        dataset = ReferItGameDataset(dataset_info=mode_flatten_emelemts,
+                                     phase_split=self._dataset_refer,
+                                     data_types=self.data_types,
+                                     phase=phase,
+                                     modality_sampler=modality_sampler)
+        return dataset
+
+    def get_train_set(self, modality_sampler=None):
+        """ Obtains the training dataset. """
+        phase = "train"
+
+        self.trainset = self.get_phase_dataset(phase, modality_sampler)
+        return self.trainset
+
+    def get_test_set(self, modality_sampler=None):
+        """ Obtains the validation dataset. """
         phase = "test"
-        _, mode_flatten_emelemts = self.get_phase_data(phase)
-        self.testset = ReferItGameDataset(dataset=mode_flatten_emelemts,
-                                          base_refer_data=self._dataset_refer)
-        test_loader = torch.utils.data.DataLoader(dataset=self.testset,
-                                                  batch_size=batch_size,
-                                                  shuffle=True,
-                                                  collate_fn=collate_fn)
-        return test_loader
+
+        self.testset = self.get_phase_dataset(phase, modality_sampler)
+        return self.testset

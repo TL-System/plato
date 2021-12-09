@@ -5,6 +5,7 @@ Base class for multimodal datasets.
 from abc import abstractmethod
 import logging
 import os
+from collections import namedtuple
 
 import torch
 from torchvision.datasets.utils import download_url
@@ -12,6 +13,11 @@ from torchvision.datasets.utils import download_and_extract_archive
 from torchvision.datasets.utils import download_file_from_google_drive, extract_archive
 
 from plato.datasources import base
+
+TextData = namedtuple('TextData', ['caption', 'caption_phrases'])
+BoxData = namedtuple('BoxData', ['caption_phrase_bboxs'])
+TargetData = namedtuple('TargetData',
+                        ['caption_phrases_cate', 'caption_phrases_cate_id'])
 
 
 class MultiModalDataSource(base.DataSource):
@@ -174,21 +180,25 @@ class MultiModalDataset(torch.utils.data.Dataset):
         self.basic_items = ["box", "target"]
 
     @abstractmethod
-    def get_modality_sample(self, sample_idx):
-        """ Get the sample containing different modalities
-        
+    def get_one_modality_sample(self, sample_idx):
+        """ Get the sample containing different modalities.
+            Different multi-modal datasets should have their
+             personal get modality sampler method.
+
+
             Args:
                 sample_idx (int): the index of the sample
-            
+
             Output:
                 a dict containing different modalities, the
                  key of the dict is the modality name
          """
-        raise NotImplementedError("Please Implement this method")
+        raise NotImplementedError(
+            "Please Implement the get modality sample function")
 
     def __getitem__(self, sample_idx):
         """Get the sample for either training or testing given index."""
-        sampled_data = self.get_one_sample(sample_idx)
+        sampled_data = self.get_one_modality_sample(sample_idx)
 
         # utilize the modality to mask specific modalities
         sampled_modality_data = dict()

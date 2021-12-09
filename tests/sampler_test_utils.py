@@ -51,14 +51,16 @@ def extract_equality_info(collected_data_info):
     return non_equality_count
 
 
-def define_sampler(Sampler, dataset_source, client_id):
+def define_sampler(Sampler, dataset_source, client_id, is_testing=False):
     """ Define the sampler based on the received argument. """
     if isinstance(Sampler, type):
         defined_sampler = Sampler(datasource=dataset_source,
-                                  client_id=client_id)
+                                  client_id=client_id,
+                                  testing=is_testing)
     else:
         defined_sampler = Sampler.get(datasource=dataset_source,
-                                      client_id=client_id)
+                                      client_id=client_id,
+                                      testing=is_testing)
     return defined_sampler
 
 

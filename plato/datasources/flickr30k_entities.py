@@ -25,39 +25,43 @@ The data structure under the 'data/' is:
 │   └── val
 
 
-Detailed loaded DataAnnos structure
- - caption : a nested list,
-    such as [['The woman is applying mascara while looking in the mirror .']],
- - caption_phrases: a nested list, each item is a list that contains
-  the phrases of the caption
-    such as [['Military personnel'], ['greenish gray uniforms'], ['matching hats']]
+Detailed loaded sample structure:
 
-- caption_phrases_cate: a nested list, each item is a string that
- presents the categories of the phrase,
-    such as [['people'], ['bodyparts'], ['other']]
-- caption_phrases_cate_id: a list, each item is a int that shows
- the integar/str of the phrase,
-    such as ['121973', '121976', '121975']
-- caption_phrase_bboxs: a 2-depth nested list, each item is a list that
- contains boxes of the corresponding phrase
-    such as [[[295, 130, 366, 244], [209, 123, 300, 246], [347, 1, 439, 236]],
+    One sample is presented as the dict type:
+    - rgb: the image data.
+    - text:
+        - caption : a nested list, such as
+            [['The woman is applying mascara while looking in the mirror.']],
+        - caption_phrases: a nested list, each item is the list contains
+            the phrases of the caption, such as:
+            [['Military personnel'], ['greenish gray uniforms'], ['matching hats']]
+    - box:
+        - caption_phrase_bboxs: a 2-depth nested list, each item is a list that
+            contains boxes of the corresponding phrase, such as:
+            [[[295, 130, 366, 244], [209, 123, 300, 246], [347, 1, 439, 236]],
                 [[0, 21, 377, 220]], [[0, 209, 214, 332]]]
-    there are three phrases, the first phrase contains three boxes
-     while others contain only one box
+    - target:
+        - caption_phrases_cate: a nested list, each item is a string that
+            presents the categories of the phrase, such as:
+            [['people'], ['bodyparts'], ['other']].
 
-Also, for one batch of data, the corresponding images_caption_phrase_bboxs is:
+        - caption_phrases_cate_id: a list, each item is a int that shows
+            the integar/str of the phrase, such as:
+            ['121973', '121976', '121975']
+
+    One batch of samples is presented as a list,
+        For example, the corresponding caption_phrase_bboxs in one batch is:
 [
     [[[295, 130, 366, 244], [209, 123, 300, 246], [347, 1, 439, 236]], [[0, 21, 377, 220]],
         [[0, 209, 214, 332]]], - batch-1
-    [[[90, 68, 325, 374]], [[118, 64, 192, 128]]],
-    [[[1, 0, 148, 451]], [[153, 148, 400, 413]], [[374, 320, 450, 440]]]
+    [[[90, 68, 325, 374]], [[118, 64, 192, 128]]], - batch-1
+    [[[1, 0, 148, 451]], [[153, 148, 400, 413]], [[374, 320, 450, 440]]], - batch-1
 ]
 """
 
 import json
 import logging
 import os
-from collections import namedtuple
 
 import torch
 import skimage.io as io
@@ -65,13 +69,9 @@ import cv2
 
 from plato.config import Config
 from plato.datasources import multimodal_base
+from plato.datasources.multimodal_base import TextData, BoxData, TargetData
 from plato.datasources.datalib import data_utils
 from plato.datasources.datalib import flickr30kE_utils
-
-TextData = namedtuple('TextData', ['caption', 'caption_phrases'])
-BoxData = namedtuple('BoxData', ['caption_phrase_bboxs'])
-TargetData = namedtuple('TargetData',
-                        ['caption_phrases_cate', 'caption_phrases_cate_id'])
 
 
 def collate_fn(batch):
@@ -89,11 +89,11 @@ def collate_fn(batch):
 
 
 class Flickr30KEDataset(multimodal_base.MultiModalDataset):
-    """Prepares the Flickr30K Entities dataset."""
+    """ Prepare the Flickr30K Entities dataset."""
     def __init__(self,
                  dataset_info,
                  phase,
-                 phase_split_info,
+                 phase_split,
                  data_types,
                  modality_sampler=None,
                  transform_image_dec_func=None,
@@ -102,7 +102,7 @@ class Flickr30KEDataset(multimodal_base.MultiModalDataset):
 
         self.phase = phase
         self.phase_data_record = dataset_info
-        self.phase_split_info = phase_split_info
+        self.phase_split = phase_split
         self.data_types = data_types
         self.transform_image_dec_func = transform_image_dec_func
         self.transform_text_func = transform_text_func
@@ -118,14 +118,13 @@ class Flickr30KEDataset(multimodal_base.MultiModalDataset):
             self.modality_sampler = modality_sampler
 
     def __len__(self):
-        return len(self.phase_data)
+        return len(self.phase_data_record)
 
     def get_sample_image_data(self, image_id):
         """ Get one image data as the sample """
         # get the image data
-        image_phase_path = self.phase_split_info[self.data_types[0]]["path"]
-        image_phase_format = self.phase_split_info[
-            self.data_types[0]]["format"]
+        image_phase_path = self.phase_split[self.data_types[0]]["path"]
+        image_phase_format = self.phase_split[self.data_types[0]]["format"]
 
         image_data = io.imread(
             os.path.join(image_phase_path,
@@ -135,7 +134,7 @@ class Flickr30KEDataset(multimodal_base.MultiModalDataset):
         return image_data
 
     def extract_sample_anno_data(self, image_anno_sent):
-        """ Extract the annotation """
+        """ Extract the annotation. """
         sentence = image_anno_sent["sentence"]  # a string
         sentence_phrases = image_anno_sent["sentence_phrases"]  # a list
         sentence_phrases_type = image_anno_sent[
@@ -147,7 +146,8 @@ class Flickr30KEDataset(multimodal_base.MultiModalDataset):
         return sentence, sentence_phrases, sentence_phrases_type, \
                 sentence_phrases_id, sentence_phrases_boxes
 
-    def get_one_sample(self, sample_idx):
+    def get_one_modality_sample(self, sample_idx):
+        """ Obtain one sample from the Flickr30K Entities dataset. """
         samle_retrieval_name = self.phase_samples_name[sample_idx]
         image_file_name = os.path.basename(samle_retrieval_name)
         image_id = os.path.splitext(image_file_name)[0]
@@ -322,20 +322,20 @@ class DataSource(multimodal_base.MultiModalDataSource):
         phase_data_info = self.get_phase_data_info(phase)
         phase_split_info = self.splits_info[phase]
         dataset = Flickr30KEDataset(dataset_info=phase_data_info,
-                                    phase_split_info=phase_split_info,
+                                    phase_split=phase_split_info,
                                     data_types=self.data_types,
                                     phase=phase,
                                     modality_sampler=modality_sampler)
         return dataset
 
-    def get_train_set(self, modality_sampler):
+    def get_train_set(self, modality_sampler=None):
         """ Obtains the training dataset. """
         phase = "train"
 
         self.trainset = self.get_phase_dataset(phase, modality_sampler)
         return self.trainset
 
-    def get_test_set(self, modality_sampler):
+    def get_test_set(self, modality_sampler=None):
         """ Obtains the validation dataset. """
         phase = "test"
 

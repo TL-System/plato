@@ -27,7 +27,8 @@ data:
     num_workers: 4
 
 
-  sampler: label_quantity_noniid
+  sampler: sample_quantity_noniid
+  test_set_sampler: sample_quantity_noniid
   modality_sampler: modality_iid
 
   per_client_classes_size: 6
@@ -84,7 +85,7 @@ checkpoint_config: &checkpoint_config
 
 trainer:
   type: basic
-  batch_size: 24
+  batch_size: 2
   optimizer: *optimizer
   optimizer_config: *optimizer_config
   learning_rate_config: *lr_config
