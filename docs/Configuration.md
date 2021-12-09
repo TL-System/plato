@@ -38,7 +38,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 
 - `model_randomized_response`: Activate randomized response on model parameters for PyTorch, must also set `algorithm.epsilon` to activate.
 
-- `feature_quantize`: Quantize features for model parameters for PyTorch.
+- `model_quantize`: Quantize features for model parameters for PyTorch.
 
 - `gradient_laplace`: Clip and add random noise with laplace distribution to gradients. This processor requires `dp_epsilon` and `dp_delta` to be specified in the `algorithm` section.
 
@@ -69,7 +69,7 @@ None.
 
 #### Valid processors for `server.outbound_processors`
 
-- `gradient_laplace`: Clip and add random noise with laplace distribution to gradients. This processor requires `dp_epsilon` and `dp_delta` to be specified in the `algorithm` section.
+- `gradient_laplace`: Clip and add random noise with laplace distribution to gradients. This processor requires `dp_epsilon` to be specified in the `algorithm` section.
 
 - `gradient_gaussian`: Clip and add random noise with gaussian distribution to gradients. This processor requires `dp_epsilon` and `dp_delta` to be specified in the `algorithm` section.
 
