@@ -13,9 +13,8 @@ class Processor(torch_model.Processor):
     """
     Implements a Processor for dequantizing model parameters.
     """
-    def __init__(self, server_id=None, **kwargs) -> None:
+    def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
-        self.server_id = server_id
 
     def process(self, data: Any) -> Any:
         """

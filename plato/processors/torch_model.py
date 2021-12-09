@@ -11,8 +11,10 @@ from plato.processors import base
 
 class Processor(base.Processor):
     """Base processor for processing PyTorch models."""
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, client_id=None, server_id=None, **kwargs) -> None:
         super().__init__(**kwargs)
+        self.client_id = client_id
+        self.server_id = server_id
 
     def process(self, data: OrderedDict) -> OrderedDict:
         """

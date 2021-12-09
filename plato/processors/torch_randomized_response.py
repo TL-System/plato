@@ -39,7 +39,11 @@ class Processor(torch_model.Processor):
 
         epsilon = Config().algorithm.epsilon
 
+        layer = layer.detach().cpu().numpy()
+
         layer = unary_encoding.encode(layer)
         layer = unary_encoding.randomize(layer, epsilon)
+
+        layer = torch.tensor(layer, dtype=torch.float32)
 
         return layer
