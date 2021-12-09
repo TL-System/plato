@@ -22,17 +22,23 @@ Attributes in **bold** must be included in a configuration file, while attribute
 
 #### Valid processors for `clients.outbound_processors`
 
-- `mistnet_randomized_response`: Activate randomized response on features for PyTorch MistNet, must also set `algorithm.epsilon` to activate. Must be placed before `mistnet_unbatch`.
+- `feature_randomized_response`: Activate randomized response on features for PyTorch MistNet, must also set `algorithm.epsilon` to activate. Must be placed before `feature_unbatch`.
 
-- `mistnet_laplace`: Add random noise with laplace distribution to features for PyTorch MistNet. Must be placed before `mistnet_unbatch`.
+- `feature_laplace`: Add random noise with laplace distribution to features for PyTorch MistNet. Must be placed before `feature_unbatch`.
 
-- `mistnet_gaussian`: Add random noise with gaussian distribution to features for PyTorch MistNet. Must be placed before `mistnet_unbatch`.
+- `feature_gaussian`: Add random noise with gaussian distribution to features for PyTorch MistNet. Must be placed before `feature_unbatch`.
 
-- `mistnet_quantize`: Quantize features for PyTorch MistNet. Must not be used together with `mistnet_outbound_features`.
+- `feature_quantize`: Quantize features for PyTorch MistNet. Must not be used together with `outbound_feature_ndarrays`.
 
-- `mistnet_unbatch`: Unbatch features for PyTorch MistNet clients, must use this processor for every PyTorch MistNet client before sending.
+- `feature_unbatch`: Unbatch features for PyTorch MistNet clients, must use this processor for every PyTorch MistNet client before sending.
 
-- `mistnet_outbound_features`: Convert PyTorch tensor features into NumPy arrays before sending to the server, for the benefit of saving a substantial amount of communication overhead if the feature dataset is large. Must be placed after `mistnet_unbatch`.
+- `outbound_feature_ndarrays`: Convert PyTorch tensor features into NumPy arrays before sending to the server, for the benefit of saving a substantial amount of communication overhead if the feature dataset is large. Must be placed after `feature_unbatch`.
+
+- `model_deepcopy`: Returns a deepcopy of the state_dict to prevent changing internal parameters of the model within clients.
+
+- `model_randomized_response`: Activate randomized response on model parameters for PyTorch, must also set `algorithm.epsilon` to activate.
+
+- `feature_quantize`: Quantize features for model parameters for PyTorch.
 
 - `gradient_laplace`: Clip and add random noise with laplace distribution to gradients. This processor requires `dp_epsilon` and `dp_delta` to be specified in the `algorithm` section.
 
@@ -69,9 +75,11 @@ None.
 
 #### Valid processors for `server.inbound_processors`
 
-- `mistnet_inbound_features`: Convert PyTorch tensor features into NumPy arrays before sending to client, for the benefit of saving a substantial amount of communication overhead if the feature dataset is large. Must be used if `clients.outbound_processors` includes `mistnet_outbound_features`.
+- `inbound_feature_tensors`: Convert PyTorch tensor features into NumPy arrays before sending to client, for the benefit of saving a substantial amount of communication overhead if the feature dataset is large. Must be used if `clients.outbound_processors` includes `outbound_feature_ndarrays`.
 
-- `mistnet_dequantize`: Dequantize features for PyTorch MistNet. Must not be used together with `mistnet_inbound_features`.
+- `feature_dequantize`: Dequantize features for PyTorch MistNet. Must not be used together with `inbound_feature_tensors`.
+
+- `model_dequantize`: Dequantize features for PyTorch model parameters.
 
 ### data
 
