@@ -5,10 +5,10 @@ Processor for creating a deep copy of the PyTorch model state_dict.
 import copy
 
 import torch
-from plato.processors import torch_model
+from plato.processors import model
 
 
-class Processor(torch_model.Processor):
+class Processor(model.Processor):
     """
     Processor for creating a deep copy of the PyTorch model state_dict.
     """

@@ -10,30 +10,37 @@ from collections import OrderedDict
 from typing import Tuple
 
 from plato.config import Config
-from plato.processors import pipeline
+from plato.processors import feature_dequantize, feature_unbatch, model_deepcopy, pipeline
 
 if not (hasattr(Config().trainer, 'use_tensorflow')
         or hasattr(Config().trainer, 'use_mindspore')):
     from plato.processors import (
-        base, mistnet_inbound_features, mistnet_outbound_features,
-        mistnet_randomized_response, mistnet_gaussian, mistnet_laplace,
-        mistnet_unbatch, mistnet_quantize, mistnet_dequantize, torch_deepcopy,
-        torch_quantize, torch_dequantize, torch_randomized_response)
+        base,
+        inbound_feature_tensors,
+        outbound_feature_ndarrays,
+        feature_randomized_response,
+        feature_gaussian,
+        feature_laplace,
+        feature_quantize,
+        model_quantize,
+        model_dequantize,
+        model_randomized_response,
+    )
 
     registered_processors = OrderedDict([
         ('base', base.Processor),
-        ('mistnet_randomized_response', mistnet_randomized_response.Processor),
-        ('mistnet_unbatch', mistnet_unbatch.Processor),
-        ('mistnet_outbound_features', mistnet_outbound_features.Processor),
-        ('mistnet_inbound_features', mistnet_inbound_features.Processor),
-        ('mistnet_gaussian', mistnet_gaussian.Processor),
-        ('mistnet_laplace', mistnet_laplace.Processor),
-        ('mistnet_quantize', mistnet_quantize.Processor),
-        ('mistnet_dequantize', mistnet_dequantize.Processor),
-        ('torch_deepcopy', torch_deepcopy.Processor),
-        ('torch_quantize', torch_quantize.Processor),
-        ('torch_dequantize', torch_dequantize.Processor),
-        ('torch_randomized_response', torch_randomized_response.Processor),
+        ('feature_randomized_response', feature_randomized_response.Processor),
+        ('feature_unbatch', feature_unbatch.Processor),
+        ('outbound_feature_ndarrays', outbound_feature_ndarrays.Processor),
+        ('inbound_feature_tensors', inbound_feature_tensors.Processor),
+        ('feature_gaussian', feature_gaussian.Processor),
+        ('feature_laplace', feature_laplace.Processor),
+        ('feature_quantize', feature_quantize.Processor),
+        ('feature_dequantize', feature_dequantize.Processor),
+        ('model_deepcopy', model_deepcopy.Processor),
+        ('model_quantize', model_quantize.Processor),
+        ('model_dequantize', model_dequantize.Processor),
+        ('model_randomized_response', model_randomized_response.Processor),
     ])
 
 

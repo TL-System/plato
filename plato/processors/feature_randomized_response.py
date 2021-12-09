@@ -5,11 +5,11 @@ import logging
 from typing import Any
 
 from plato.config import Config
-from plato.processors import mistnet_feature
+from plato.processors import feature
 from plato.utils import unary_encoding
 
 
-class Processor(mistnet_feature.Processor):
+class Processor(feature.Processor):
     """
     Implements a Processor for applying local differential privacy using randomized response.
     """
