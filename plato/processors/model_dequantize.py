@@ -6,10 +6,10 @@ from typing import Any
 
 import torch
 
-from plato.processors import torch_model
+from plato.processors import model
 
 
-class Processor(torch_model.Processor):
+class Processor(model.Processor):
     """
     Implements a Processor for dequantizing model parameters.
     """

@@ -7,11 +7,11 @@ from typing import Any
 import torch
 
 from plato.config import Config
-from plato.processors import torch_model
+from plato.processors import model
 from plato.utils import unary_encoding
 
 
-class Processor(torch_model.Processor):
+class Processor(model.Processor):
     """
     Implements a Processor for applying local differential privacy using randomized response.
     """
