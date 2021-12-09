@@ -111,8 +111,6 @@ class Client(base.Client):
             if hasattr(processor, 'previous_model_weights'):
                 processor.previous_model_weights = deepcopy(
                     self.algorithm.extract_weights())
-                print("Previous model weights in client.train():")
-                print(processor.previous_model_weights)
 
         # Perform model training
         try:

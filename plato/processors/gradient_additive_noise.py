@@ -2,6 +2,7 @@
 A Processor of differential privacy to clip and add noise on gradients of model weights.
 """
 
+from abc import abstractmethod
 from collections import OrderedDict
 import logging
 import os
@@ -35,11 +36,6 @@ class Processor(base.Processor):
 
         gradients = OrderedDict()
 
-        print("in process()")
-        print("Previous model weights:")
-        print(self.previous_model_weights)
-        print("New model weights:")
-        print(data)
         for (name, new_weight), (__, previous_weight) in zip(
                 data.items(), self.previous_model_weights.items()):
             # Compute gradients
@@ -49,13 +45,12 @@ class Processor(base.Processor):
 
         processed_weights = OrderedDict()
 
-        for (name, old_weight), (_, clipped_gradient) in zip(
-                self.previous_model_weights.items(),
-                clipped_gradients.items()):
+        for (name,
+             weight), (__, clipped_gradient) in zip(data.items(),
+                                                    clipped_gradients.items()):
             # Add noise to updated weights
-            processed_weights[
-                name] = old_weight + clipped_gradient + self.compute_additive_noise(
-                    clipped_gradient, clipping_bound)
+            processed_weights[name] = weight + self.compute_additive_noise(
+                clipped_gradient, clipping_bound)
 
         if self.client_id is None:
             logging.info("[Server #%d] Applied local differential privacy.",
@@ -73,7 +68,7 @@ class Processor(base.Processor):
 
         norm_list = [
             torch.linalg.norm(gradient.float()).item()
-            for _, gradient in gradients.items()
+            for __, gradient in gradients.items()
         ]
         # Set the clipping bound as the median of the L2 norm of gradients
         clipping_bound = np.median(norm_list)
@@ -88,4 +83,10 @@ class Processor(base.Processor):
                 clipped_gradients[name] = gradient / max(
                     1, gradient_norm / clipping_bound)
 
+        print(clipped_gradients)
+        print(clipping_bound)
         return clipped_gradients, clipping_bound
+
+    @abstractmethod
+    def compute_additive_noise(self, gradient, clipping_bound):
+        """ Compute additive noise using the Laplace or Gaussian mechanism. """

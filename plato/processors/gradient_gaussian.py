@@ -2,7 +2,7 @@
 A Processor for applying local differential privacy using the Gaussian mechanism.
 """
 import math
-import numpy as np
+import torch
 
 from plato.processors import gradient_additive_noise
 from plato.config import Config
@@ -24,8 +24,6 @@ class Processor(gradient_additive_noise.Processor):
         scale = math.sqrt(
             2 * math.log(1.25 / self.delta)) * clipping_bound / self.epsilon
 
-        additive_noise = np.random.normal(loc=0.0,
-                                          scale=scale,
-                                          size=gradient.shape)
+        additive_noise = torch.normal(mean=0.0, std=scale, size=gradient.shape)
 
         return additive_noise
