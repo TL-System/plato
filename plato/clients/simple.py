@@ -107,14 +107,17 @@ class Client(base.Client):
         """The machine learning training workload on a client."""
         logging.info("[Client #%d] Started training.", self.client_id)
 
+        training_processor = None
         for processor in self.outbound_processor.processors:
-            if hasattr(processor, 'previous_model_weights'):
-                processor.previous_model_weights = deepcopy(
-                    self.algorithm.extract_weights())
+            if hasattr(processor,
+                       'used_by_trainer') and processor.used_by_trainer:
+                training_processor = processor
 
         # Perform model training
         try:
-            training_time = self.trainer.train(self.trainset, self.sampler)
+            training_time = self.trainer.train(self.trainset,
+                                               self.sampler,
+                                               processor=training_processor)
         except ValueError:
             await self.sio.disconnect()
 

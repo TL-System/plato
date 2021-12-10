@@ -86,7 +86,12 @@ class Trainer(base.Trainer):
 
         self.model.load_state_dict(torch.load(model_path))
 
-    def train_process(self, config, trainset, sampler, cut_layer=None):
+    def train_process(self,
+                      config,
+                      trainset,
+                      sampler,
+                      cut_layer=None,
+                      processor=None):
         """The main training loop in a federated learning workload, run in
           a separate process with a new CUDA context, so that CUDA memory
           can be released after the training completes.
@@ -107,6 +112,9 @@ class Trainer(base.Trainer):
 
         try:
             custom_train = getattr(self, "train_model", None)
+
+            if processor:
+                processor.process('')
 
             if callable(custom_train):
                 self.train_model(config, trainset, sampler.get(), cut_layer)
@@ -210,7 +218,11 @@ class Trainer(base.Trainer):
         if 'use_wandb' in config:
             run.finish()
 
-    def train(self, trainset, sampler, cut_layer=None) -> float:
+    def train(self,
+              trainset,
+              sampler,
+              cut_layer=None,
+              processor=None) -> float:
         """The main training loop in a federated learning workload.
 
         Arguments:
@@ -237,6 +249,7 @@ class Trainer(base.Trainer):
                                         trainset,
                                         sampler,
                                         cut_layer,
+                                        processor,
                                     ))
             train_proc.start()
             train_proc.join()
