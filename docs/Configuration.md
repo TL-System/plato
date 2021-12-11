@@ -40,9 +40,6 @@ Attributes in **bold** must be included in a configuration file, while attribute
 
 - `model_quantize`: Quantize features for model parameters for PyTorch.
 
-- `gradient_laplace`: Clip and add random noise with laplace distribution to gradients. This processor requires `dp_epsilon` and `dp_delta` to be specified in the `algorithm` section.
-
-- `gradient_gaussian`: Clip and add random noise with gaussian distribution to gradients. This processor requires `dp_epsilon` and `dp_delta` to be specified in the `algorithm` section.
 
 #### Valid processors for `clients.inbound_processors`
 
@@ -69,9 +66,7 @@ None.
 
 #### Valid processors for `server.outbound_processors`
 
-- `gradient_laplace`: Clip and add random noise with laplace distribution to gradients. This processor requires `dp_epsilon` to be specified in the `algorithm` section.
-
-- `gradient_gaussian`: Clip and add random noise with gaussian distribution to gradients. This processor requires `dp_epsilon` and `dp_delta` to be specified in the `algorithm` section.
+None
 
 #### Valid processors for `server.inbound_processors`
 
@@ -119,6 +114,10 @@ None.
 |lr_schedule|Learning rate scheduler|`CosineAnnealingLR`, `LambdaLR`, `StepLR`, `ReduceLROnPlateau`|| 
 |**model_name**|The machine learning model|`lenet5`, `resnet_x`, `vgg_x`,`wideresnet`, `feedback_transformer`, `yolov5`, `HuggingFace_CausalLM`, `inceptionv3`, `googlenet`, `unet`, `alexnet`, `squeezenet_x`, `shufflenet_x`|For `resnet_x`, x = 18, 34, 50, 101, or 152; For `vgg_x`, x = 11, 13, 16, or 19; For `squeezenet_x`, x = 0 or 1; For `shufflenet_x`, x = 0.5, 1.0, 1.5, or 2.0|
 |pretrained|Use a model pretrained on ImageNet or not|`true` or `false`. Default is `false`|Can be used for `inceptionv3`, `alexnet`, and `squeezenet_x` models.|
+|differential_privacy|Whether to apply differential privacy|`true` or `false`. Default is `false`||
+|dp_epsilon|Total privacy budget of epsilon|Default is 0.5|
+|dp_delta|Total privacy budget of delta|Default is 1e-5|
+|dp_max_grad_norm|The maximum norm of the per-sample gradients. Any gradient with norm higher than this will be clipped to this value.|Default is 1.0|
 
 ### algorithm
 

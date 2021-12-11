@@ -14,10 +14,6 @@ clients:
     # Whether simulate clients or not
     simulation: false
 
-    # Processors for outbound data payloads
-    outbound_processors:
-        - gradient_gaussian
-
 server:
     address: 127.0.0.1
     port: 8000
@@ -48,6 +44,12 @@ trainer:
     # Whether the training should use multiple GPUs if available
     parallelized: false
 
+    # Whether to apply differential privacy
+    differential_privacy: true
+    # dp_epsilon: 1
+    # dp_delta: 0.00001
+    # dp_max_grad_norm: 1
+
     # The maximum number of clients running concurrently
     max_concurrency: 1
 
@@ -68,5 +70,3 @@ trainer:
 algorithm:
     # Aggregation algorithm
     type: fedavg
-    dp_epsilon: 1
-    dp_delta: 0.00001

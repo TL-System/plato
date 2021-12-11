@@ -172,8 +172,8 @@ class Trainer(base.Trainer):
                         target_delta=config['dp_delta']
                         if 'dp_delta' in config else 1e-5,
                         epochs=epochs,
-                        max_grad_norm=config['max_grad_norm']
-                        if 'max_grad_norm' in config else 100,
+                        max_grad_norm=config['dp_max_grad_norm']
+                        if 'max_grad_norm' in config else 1.0,
                     )
 
                 for epoch in range(1, epochs + 1):

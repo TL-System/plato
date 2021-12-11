@@ -16,8 +16,6 @@ if not (hasattr(Config().trainer, 'use_tensorflow')
         or hasattr(Config().trainer, 'use_mindspore')):
     from plato.processors import (
         base,
-        gradient_gaussian,
-        gradient_laplacian,
         feature_randomized_response,
         feature_gaussian,
         feature_laplacian,
@@ -34,8 +32,6 @@ if not (hasattr(Config().trainer, 'use_tensorflow')
 
     registered_processors = OrderedDict([
         ('base', base.Processor),
-        ('gradient_gaussian', gradient_gaussian.Processor),
-        ('gradient_laplacian', gradient_laplacian.Processor),
         ('feature_randomized_response', feature_randomized_response.Processor),
         ('feature_gaussian', feature_gaussian.Processor),
         ('feature_laplace', feature_laplacian.Processor),
