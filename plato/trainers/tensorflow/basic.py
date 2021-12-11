@@ -78,7 +78,12 @@ class Trainer(base.Trainer):
 
         self.model.load_weights(model_path)
 
-    def train_process(self, config, trainset, sampler, cut_layer=None):
+    def train_process(self,
+                      config,
+                      trainset,
+                      sampler,
+                      cut_layer=None,
+                      processor=None):
         if 'use_wandb' in config:
             import wandb
 
@@ -128,7 +133,11 @@ class Trainer(base.Trainer):
         if 'use_wandb' in config:
             run.finish()
 
-    def train(self, trainset, sampler, cut_layer=None) -> float:
+    def train(self,
+              trainset,
+              sampler,
+              cut_layer=None,
+              processor=None) -> float:
         """The main training loop in a federated learning workload.
 
         Arguments:
@@ -142,12 +151,12 @@ class Trainer(base.Trainer):
             # reserved for mp.Process
             self.start_training()
             tic = time.perf_counter()
-            self.train_process(config, trainset, sampler, cut_layer)
+            self.train_process(config, trainset, sampler, cut_layer, processor)
             toc = time.perf_counter()
             self.pause_training()
         else:
             tic = time.perf_counter()
-            self.train_process(config, trainset, sampler, cut_layer)
+            self.train_process(config, trainset, sampler, cut_layer, processor)
             toc = time.perf_counter()
 
         training_time = toc - tic
