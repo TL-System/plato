@@ -10,7 +10,7 @@ import time
 import numpy as np
 import torch
 import torch.nn as nn
-from plato import samplers
+from opacus.privacy_engine import PrivacyEngine
 from plato.config import Config
 from plato.models import registry as models_registry
 from plato.trainers import base
@@ -86,12 +86,7 @@ class Trainer(base.Trainer):
 
         self.model.load_state_dict(torch.load(model_path))
 
-    def train_process(self,
-                      config,
-                      trainset,
-                      sampler,
-                      cut_layer=None,
-                      processor=None):
+    def train_process(self, config, trainset, sampler, cut_layer=None):
         """The main training loop in a federated learning workload, run in
           a separate process with a new CUDA context, so that CUDA memory
           can be released after the training completes.
@@ -160,9 +155,26 @@ class Trainer(base.Trainer):
                 else:
                     lr_schedule = None
 
-                if processor:
-                    self.model, optimizer, train_loader = processor.configure(
-                        self.model, optimizer, train_loader, epochs)
+                if 'differential_privacy' in config and config[
+                        'differential_privacy']:
+                    privacy_engine = PrivacyEngine(accountant='rdp',
+                                                   secure_mode=False)
+                    # accountant: Accounting mechanism. Currently supported:
+                    #         - rdp (:class:`~opacus.accountants.RDPAccountant`)
+                    #         - gdp (:class:`~opacus.accountants.GaussianAccountant`)
+
+                    self.model, optimizer, train_loader = privacy_engine.make_private_with_epsilon(
+                        module=self.model,
+                        optimizer=optimizer,
+                        data_loader=train_loader,
+                        target_epsilon=config['dp_epsilon']
+                        if 'dp_epsilon' in config else 0.5,
+                        target_delta=config['dp_delta']
+                        if 'dp_delta' in config else 1e-5,
+                        epochs=epochs,
+                        max_grad_norm=config['max_grad_norm']
+                        if 'max_grad_norm' in config else 100,
+                    )
 
                 for epoch in range(1, epochs + 1):
                     for batch_id, (examples,
@@ -206,7 +218,8 @@ class Trainer(base.Trainer):
                     if hasattr(optimizer, "params_state_update"):
                         optimizer.params_state_update()
 
-                if processor:
+                if 'differential_privacy' in config and config[
+                        'differential_privacy']:
                     self.model = self.model._module
 
         except Exception as training_exception:
@@ -240,7 +253,7 @@ class Trainer(base.Trainer):
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']
 
-        if hasattr(Config().trainer, 'max_concurrency'):
+        if 'max_concurrency' in config:
             self.start_training()
             tic = time.perf_counter()
 
@@ -264,7 +277,7 @@ class Trainer(base.Trainer):
             try:
                 self.load_model(filename)
             except OSError as error:  # the model file is not found, training failed
-                if hasattr(Config().trainer, 'max_concurrency'):
+                if 'max_concurrency' in config:
                     self.run_sql_statement(
                         "DELETE FROM trainers WHERE run_id = (?)",
                         (self.client_id, ))

@@ -20,7 +20,7 @@ class Processor(base.Processor):
 
         self.client_id = client_id
 
-        # this processor is used when training model, not for processing data
+        # this processor is used when training a model, not for processing data
         self.used_by_trainer = True
 
     def configure(self, model, optimizer, train_loader, epochs):
@@ -38,7 +38,7 @@ class Processor(base.Processor):
             data_loader=train_loader,
             target_epsilon=Config().algorithm.dp_epsilon,
             target_delta=Config().algorithm.dp_delta if hasattr(
-                Config().algorithm, 'dp_delta') else 0.01,
+                Config().algorithm, 'dp_delta') else 1e-5,
             epochs=epochs,
             max_grad_norm=100,
         )
