@@ -2,15 +2,13 @@
 A Processor of differential privacy to clip and add noise on gradients of model weights.
 """
 
-from abc import abstractmethod
-from collections import OrderedDict
 import logging
 import os
 from typing import Any
-import torch
-import numpy as np
+from opacus.privacy_engine import PrivacyEngine
 
 from plato.processors import base
+from plato.config import Config
 
 
 class Processor(base.Processor):
@@ -24,6 +22,26 @@ class Processor(base.Processor):
 
         # this processor is used when training model, not for processing data
         self.used_by_trainer = True
+
+    def configure(self, model, optimizer, train_loader, epochs):
+        """
+        Configures the privacy engine to apply differential privacy.
+        """
+        privacy_engine = PrivacyEngine(accountant='rdp', secure_mode=False)
+        # accountant: Accounting mechanism. Currently supported:
+        #         - rdp (:class:`~opacus.accountants.RDPAccountant`)
+        #         - gdp (:class:`~opacus.accountants.GaussianAccountant`)
+
+        return privacy_engine.make_private_with_epsilon(
+            module=model,
+            optimizer=optimizer,
+            data_loader=train_loader,
+            target_epsilon=Config().algorithm.dp_epsilon,
+            target_delta=Config().algorithm.dp_delta if hasattr(
+                Config().algorithm, 'dp_delta') else 0.01,
+            epochs=epochs,
+            max_grad_norm=100,
+        )
 
     def process(self, data: Any) -> Any:
         """

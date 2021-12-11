@@ -113,9 +113,6 @@ class Trainer(base.Trainer):
         try:
             custom_train = getattr(self, "train_model", None)
 
-            if processor:
-                processor.process('')
-
             if callable(custom_train):
                 self.train_model(config, trainset, sampler.get(), cut_layer)
             else:
@@ -163,6 +160,10 @@ class Trainer(base.Trainer):
                 else:
                     lr_schedule = None
 
+                if processor:
+                    self.model, optimizer, train_loader = processor.configure(
+                        self.model, optimizer, train_loader, epochs)
+
                 for epoch in range(1, epochs + 1):
                     for batch_id, (examples,
                                    labels) in enumerate(train_loader):
@@ -204,6 +205,9 @@ class Trainer(base.Trainer):
 
                     if hasattr(optimizer, "params_state_update"):
                         optimizer.params_state_update()
+
+                if processor:
+                    self.model = self.model._module
 
         except Exception as training_exception:
             logging.info("Training on client #%d failed.", self.client_id)
