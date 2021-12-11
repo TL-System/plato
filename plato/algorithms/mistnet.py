@@ -56,8 +56,8 @@ class Algorithm(fedavg.Algorithm):
 
         return feature_dataset
 
-    def train(self, trainset, sampler, cut_layer=None, processor=None):
+    def train(self, trainset, sampler, cut_layer=None):
         """ Train the neural network model after the cut layer. """
         self.trainer.train(
             feature_dataset.FeatureDataset(trainset.feature_dataset), sampler,
-            cut_layer, processor)
+            cut_layer)

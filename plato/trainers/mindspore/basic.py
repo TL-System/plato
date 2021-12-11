@@ -118,7 +118,8 @@ class Trainer(base.Trainer):
             Config().trainer.epochs,
             trainset,
             callbacks=[LossMonitor(per_print_times=300)],
-            dataset_sink_mode=False)
+            dataset_sink_mode=False,
+            processor=None)
 
         toc = time.perf_counter()
         self.pause_training()
