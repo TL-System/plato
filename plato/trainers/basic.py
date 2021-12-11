@@ -235,11 +235,7 @@ class Trainer(base.Trainer):
         if 'use_wandb' in config:
             run.finish()
 
-    def train(self,
-              trainset,
-              sampler,
-              cut_layer=None,
-              processor=None) -> float:
+    def train(self, trainset, sampler, cut_layer=None) -> float:
         """The main training loop in a federated learning workload.
 
         Arguments:
