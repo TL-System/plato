@@ -15,17 +15,22 @@ server:
   address: 127.0.0.1
   port: 8000
 
+
 # dataset settings for the original dataset and the corresponding multimodal data processor
 data:
-  dataname: Flickr30KEntities
-  datasource: Flickr30K
+  dataname: ReferItGame
+  datasource: COCO2017
   data_path: ./data
 
-  download_file_id: 1mJ-Y0gLFyCLbB6C-M49dUtEsbfVkK4F-
+  base_coco_images_path: ./data/COCO2017/train/images
+
+  split_config: refcoco
+  split_name: google
+
+  download_splits_base_url: https://bvisionweb1.cs.unc.edu/licheng/referit/data/
 
   downloader:
     num_workers: 4
-
 
   sampler: sample_quantity_noniid
   test_set_sampler: sample_quantity_noniid
@@ -85,7 +90,7 @@ checkpoint_config: &checkpoint_config
 
 trainer:
   type: basic
-  batch_size: 1 # currently, only support batch size 1
+  batch_size: 1
   optimizer: *optimizer
   optimizer_config: *optimizer_config
   learning_rate_config: *lr_config

@@ -5,7 +5,11 @@ Testing datasources of Plato framework.
 import os
 import unittest
 
-os.environ['config_file'] = 'tests/TestsConfig/flickr30k_entities.yml'
+# os.environ['config_file'] = 'tests/TestsConfig/flickr30k_entities.yml'
+
+# os.environ['config_file'] = 'tests/TestsConfig/coco.yml'
+
+os.environ['config_file'] = 'tests/TestsConfig/referitgame.yml'
 
 import numpy as np
 import torch
@@ -14,6 +18,8 @@ from plato.config import Config
 
 from plato.datasources.flickr30k_entities import DataSource as f30ke_DataSource
 from plato.datasources.referitgame import DataSource as refer_Datasource
+from plato.datasources.coco import DataSource as coco_Datasource
+
 from plato.datasources import registry as data_registry
 from plato.samplers import registry as samplers_registry
 
@@ -57,7 +63,7 @@ class DatasetsTest(unittest.TestCase):
             datasource=self.utest_datasource, client_id=self.client_id)
         testset = self.utest_datasource.get_test_set(modality_sampler.get())
 
-        _ = testset.get_one_sample(sample_idx=10)
+        _ = testset.get_one_modality_sample(sample_idx=10)
 
         batch_size = Config().trainer.batch_size
         # Define the sampler
@@ -76,16 +82,24 @@ class DatasetsTest(unittest.TestCase):
 
         return True
 
-    def test_f30ke_datasource(self):
-        """ Test the flickr30k entities dataset. """
-        self.utest_datasource = f30ke_DataSource()
-        assert self.assertDataSourceDefinition(self.utest_datasource)
-
-    # def test_ref_datasource(self):
+    # def test_f30ke_datasource(self):
     #     """ Test the flickr30k entities dataset. """
-    #     # set the specific
-    #     self.utest_datasource = refer_Datasource()
+    #     self.utest_datasource = f30ke_DataSource()
     #     assert self.assertDataSourceDefinition(self.utest_datasource)
+
+    # def test_coco_datasource(self):
+    #     """ Test the MSCOCO dataset. """
+    #     # set the specific
+
+    #     self.utest_datasource = coco_Datasource()
+    #     # assert self.assertDataSourceDefinition(self.utest_datasource)
+
+    def test_ref_datasource(self):
+        """ Test the flickr30k entities dataset. """
+        # set the specific
+
+        self.utest_datasource = refer_Datasource()
+        assert self.assertDataSourceDefinition(self.utest_datasource)
 
 
 if __name__ == '__main__':

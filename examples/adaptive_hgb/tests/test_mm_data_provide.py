@@ -11,7 +11,7 @@ from plato.datasources.multimodal import kinetics
 
 from plato.datasources.multimodal import gym
 from plato.datasources.multimodal import flickr30k_entities
-from plato.datasources.multimodal import coco
+from plato.datasources import coco
 from plato.datasources import referitgame
 
 # put the configuration file here:

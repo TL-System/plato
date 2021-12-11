@@ -4,15 +4,15 @@ The Flickr30K Entities dataset.
 The data structure and setting follows:
  "http://bryanplummer.com/Flickr30kEntities/".
 
-
-We utilize the official splits that contains;
- 29783, 1000, and 1000 images for train,
- validation, and test, respectively.
+We utilize the official splits that contains:
+ - train: 29783 images,
+ - val: 1000 images,
+ - test: 1000 images
 
 The file structure of this dataset is:
  - Images (jpg): the raw images
  - Annotations (xml): the bounding boxes
- - Sentence (txt): the captions of the image
+ - Sentence (txt): captions of the image
 
 The data structure under the 'data/' is:
 ├── Flickr30KEntities           # root dir of Flickr30K Entities dataset

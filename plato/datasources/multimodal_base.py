@@ -8,7 +8,7 @@ import os
 from collections import namedtuple
 
 import torch
-from torchvision.datasets.utils import download_url
+from torchvision.datasets.utils import download_url, extract_archive
 from torchvision.datasets.utils import download_and_extract_archive
 from torchvision.datasets.utils import download_file_from_google_drive, extract_archive
 
@@ -81,6 +81,7 @@ class MultiModalDataSource(base.DataSource):
         if not os.path.exists(base_data_path):
             os.makedirs(base_data_path)
 
+        #
         self.mm_data_info["base_data_dir_path"] = base_data_path
 
         # create the split dirs for current dataset
@@ -97,29 +98,35 @@ class MultiModalDataSource(base.DataSource):
         self,
         download_url_address,
         put_data_dir,
+        extract_to_dir=None,
         obtained_file_name=None,
     ):
-        download_file_name = download_url_address.split("/")[-1]
+        """ Download the raw data and arrange the data """
+        # Extract to the same dir as the download dir
+        if extract_to_dir is None:
+            extract_to_dir = put_data_dir
+
+        download_file_name = os.path.basename(download_url_address)
+        download_file_path = os.path.join(put_data_dir, download_file_name)
+
         download_extracted_file_name = download_file_name.split(".")[0]
         download_extracted_dir_path = os.path.join(
-            put_data_dir, download_extracted_file_name)
-        # download the raw data if necessary
-        if not self._exist_judgement(download_extracted_dir_path):
+            extract_to_dir, download_extracted_file_name)
+        # Download the raw data if necessary
+        if not self._exist_judgement(download_file_path):
             logging.info("Downloading the %s data.....", download_file_name)
-            if ".zip" in download_file_name or ".tar.gz" in download_file_name:
-                download_and_extract_archive(url=download_url_address,
-                                             download_root=put_data_dir,
-                                             extract_root=put_data_dir,
-                                             filename=download_file_name,
-                                             remove_finished=True)
-            else:
-                if obtained_file_name is not None:
-                    download_url(url=download_url_address,
-                                 root=put_data_dir,
-                                 filename=obtained_file_name)
-                    download_extracted_file_name = obtained_file_name
-                else:
-                    download_url(url=download_url_address, root=put_data_dir)
+            download_url(url=download_url_address,
+                         root=put_data_dir,
+                         filename=obtained_file_name)
+
+        # Extract the data to the specific dir
+        if ".zip" in download_file_name or ".tar.gz" in download_file_name:
+            if not self._exist_judgement(download_extracted_dir_path):
+                logging.info("Extracting data to %s dir.....", extract_to_dir)
+                extract_archive(from_path=download_file_path,
+                                to_path=extract_to_dir,
+                                remove_finished=False)
+
         return download_extracted_file_name
 
     def _download_google_driver_arrange_data(
