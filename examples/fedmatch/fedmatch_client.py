@@ -29,7 +29,7 @@ class Client(simple.Client):
                  algorithm=None,
                  trainer=None):
         super().__init__(model, datasource, algorithm, trainer)
-        self.helpers = None
+        self.helper_flag = False
         self.sup_train = None
         self.unsup_train = None
 
@@ -44,15 +44,23 @@ class Client(simple.Client):
         #variance =
 
         # send them back to server
-        return base.Report(report.num_samples, report.accuracy,
-                           report.training_time, report.data_loading_time,
-                           self.client_id), weights
+        return Report(report.num_samples, report.accuracy,
+                      report.training_time, report.data_loading_time,
+                      self.client_id), weights
 
     def load_payload(self, server_payload):
         """ Load model weights and helpers from server payload onto this client. """
+        if self.helper_flag is False:
+            self.algorithm.load_weights(server_payload)
+            self.helper_flag = True
+        else:
+            self.algorithm.load_weights(server_payload[0])
+            self.helpers = server_payload[1:]
+        """
         if isinstance(server_payload, list):
             self.algorithm.load_weights(server_payload[0])
             self.helpers = server_payload[1:]  # download helpers from server
         else:
             self.algorithm.load_weights(server_payload)
             self.helpers = None
+        """

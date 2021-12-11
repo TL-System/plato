@@ -12,27 +12,25 @@ import numpy as np
 from plato.servers import fedavg
 from scipy import spatial
 from scipy.stats import truncnorm
+from plato.models import lenet5_decomposed
+import torch
 
 
 class Server(fedavg.Server):
     """A federated learning server using the FedMatch algorithm."""
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
-        self.num_helpers = 5
-        self.helper_flag = 0
+        self.num_helpers = 1
+        self.helper = [False, False]
         mu, std, lower, upper = 125, 125, 0, 255
         self.gauss_samples = (truncnorm(
             (lower - mu) / std, (upper - mu) / std, loc=mu, scale=std).rvs(
-                (1, 32, 32, 3))) / 255
+                (1, 1, 28, 28)))  #32, 32, 3)))  #/ 255
 
     def extract_client_updates(self, updates):
         """ Extract the model weights and control variates from clients updates. """
-        weights_received = [payload[0] for (__, payload) in updates]
 
-        self.control_variates_received = [
-            payload[1] for (__, payload) in updates
-        ]
-
+        weights_received = [payload for (__, payload) in updates]
         return self.algorithm.compute_weight_updates(weights_received)
 
     async def federated_averaging(self, updates):
@@ -54,19 +52,34 @@ class Server(fedavg.Server):
 
     def customize_server_payload(self, payload, selected_client_id):
         "Add helpers models to payload for each client"
-        helpers = self.helpers[selected_client_id]
+        if self.helper[selected_client_id - 1] is True:
 
-        return [payload, helpers]
+            helpers = self.helpers[selected_client_id]
+            print("Select helpers for client #", selected_client_id)
+
+            return [payload, helpers]
+        self.helper[selected_client_id - 1] = True
+        print("self.helper is false")
+        return payload
 
     def compute_similarity(self, models_received, client_ids):
         "compute similarity among clients"
 
         # initialize vector as an empty dictionary with length of client_ids
         self.models_dict = {}
+        out_list = []
 
-        for cid, model in zip(client_ids, models_received):
-            self.models_dict[cid] = np.squeeze(model(self.gauss_samples))
-        self.tree = spatial.KDTree(list(self.models_dict.values()))
+        for cid, model_dict in zip(client_ids, models_received):
+            model = lenet5_decomposed.Model()
+            model.load_state_dict(model_dict)
+            out = model(torch.from_numpy(self.gauss_samples).float())
+            self.models_dict[cid] = np.squeeze(out)
+            out_list.append(np.squeeze(out.detach().numpy()))
+
+        self.tree = spatial.KDTree(out_list)
+
+        #print("Type of values: ", type(self.models_dict.values()))
+        #self.tree = spatial.KDTree(np.array(list(self.models_dict.values())))
         """
         for cid, update in enumerate(updates_all):
             for model_weight in update:
@@ -77,13 +90,22 @@ class Server(fedavg.Server):
         """
 
     def find_helpers(self, client_id, models_received):
+        print("The coming clients are: ", client_id)
+
         helper_dict = {}
         for id in client_id:
             distances, similiar_model_ids = self.tree.query(
-                self.models_dict[id], self.num_helpers + 1)
-            similiar_model_ids = similiar_model_ids[1:]  # remove itself
+                self.models_dict[id].detach().numpy(), self.num_helpers + 1)
+            similiar_model_ids = similiar_model_ids + 1
+            print("Current id is: ", id)
+
+            sim_ids = similiar_model_ids.tolist()
+            sim_ids.remove(id)
+            print("Sim_ids is : ", sim_ids)
             weights = []
-            for sim_id in similiar_model_ids:
+            for sim_id in sim_ids:
+                print("Sim_id is:", sim_id)
+                print("Client_id.index is: ", client_id.index(sim_id))
                 weights.append(models_received[client_id.index(sim_id)])
             helper_dict[id] = weights
         return helper_dict
