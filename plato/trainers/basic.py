@@ -257,13 +257,8 @@ class Trainer(base.Trainer):
                 mp.set_start_method('spawn', force=True)
 
             train_proc = mp.Process(target=self.train_process,
-                                    args=(
-                                        config,
-                                        trainset,
-                                        sampler,
-                                        cut_layer,
-                                        processor,
-                                    ))
+                                    args=(config, trainset, sampler,
+                                          cut_layer))
             train_proc.start()
             train_proc.join()
 

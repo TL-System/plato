@@ -142,12 +142,12 @@ class Trainer(base.Trainer):
             # reserved for mp.Process
             self.start_training()
             tic = time.perf_counter()
-            self.train_process(config, trainset, sampler, cut_layer, processor)
+            self.train_process(config, trainset, sampler, cut_layer)
             toc = time.perf_counter()
             self.pause_training()
         else:
             tic = time.perf_counter()
-            self.train_process(config, trainset, sampler, cut_layer, processor)
+            self.train_process(config, trainset, sampler, cut_layer)
             toc = time.perf_counter()
 
         training_time = toc - tic
