@@ -179,7 +179,7 @@ class Trainer(base.Trainer):
                         optimizer=optimizer,
                         data_loader=train_loader,
                         target_epsilon=config['dp_epsilon']
-                        if 'dp_epsilon' in config else 0.5,
+                        if 'dp_epsilon' in config else 10.0,
                         target_delta=config['dp_delta']
                         if 'dp_delta' in config else 1e-5,
                         epochs=epochs,
