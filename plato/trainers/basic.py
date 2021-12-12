@@ -42,7 +42,8 @@ class Trainer(base.Trainer):
         else:
             self.model = model
 
-        if Config().trainer.differential_privacy:
+        if hasattr(Config().trainer, 'differential_privacy') and Config(
+        ).trainer.differential_privacy:
             logging.info("Using differential privacy during training.")
 
             errors = ModuleValidator.validate(self.model, strict=False)
@@ -192,7 +193,8 @@ class Trainer(base.Trainer):
                                    labels) in enumerate(train_loader):
                         examples, labels = examples.to(self.device), labels.to(
                             self.device)
-                        if 'differential_privacy' in config and config['differential_privacy']:
+                        if 'differential_privacy' in config and config[
+                                'differential_privacy']:
                             optimizer.zero_grad(set_to_none=True)
                         else:
                             optimizer.zero_grad()
