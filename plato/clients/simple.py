@@ -5,6 +5,7 @@ A basic federated learning client who sends weight updates to the server.
 import logging
 import time
 from dataclasses import dataclass
+from copy import deepcopy
 
 from plato.algorithms import registry as algorithms_registry
 from plato.clients import base

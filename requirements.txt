@@ -6,3 +6,4 @@ boto3
 pyyaml
 pyyaml-include
 datasets
+opacus

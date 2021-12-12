@@ -34,7 +34,7 @@ class Processor(feature.Processor):
         output = super().process(data)
 
         logging.info(
-            "[Client #%d] Local differential privacy (using %s mechanism) applied.",
+            "[Client #%d] Local differential privacy (using the %s mechanism) applied.",
             self.client_id, self._method)
 
         return output

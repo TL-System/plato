@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 3
+    total_clients: 1
 
     # The number of clients selected in each round
-    per_round: 3
+    per_round: 1
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -14,18 +14,9 @@ clients:
     # Whether simulate clients or not
     simulation: false
 
-    # Processors for outbound data payloads
-    outbound_processors:
-        - model_deepcopy
-        - model_quantize
-
 server:
     address: 127.0.0.1
     port: 8000
-
-    # Processors for inbound data payloads
-    inbound_processors:
-        - model_dequantize
 
 data:
     # The training and testing dataset
@@ -53,6 +44,12 @@ trainer:
     # Whether the training should use multiple GPUs if available
     parallelized: false
 
+    # Whether to apply differential privacy
+    differential_privacy: true
+    # dp_epsilon: 1
+    # dp_delta: 0.00001
+    # dp_max_grad_norm: 1
+
     # The maximum number of clients running concurrently
     max_concurrency: 1
 
@@ -73,4 +70,3 @@ trainer:
 algorithm:
     # Aggregation algorithm
     type: fedavg
-    epsilon: 100
