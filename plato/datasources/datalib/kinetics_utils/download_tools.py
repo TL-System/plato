@@ -1,5 +1,3 @@
-
-
 import os
 import json
 import logging
@@ -48,10 +46,9 @@ def download_category(data_category_classes, category, num_workers,
 
     if category not in list(data_category_classes.keys()):
         raise ValueError("Category {} not found.".format(category))
-
     classes = data_category_classes[category]
-    download_classes(classes, num_workers, failed_save_file, compress, verbose,
-                     skip, log_file)
+    download_classes(data_category_classes, classes, num_workers,
+                     failed_save_file, compress, verbose, skip, log_file)
 
 
 def download_train_val_sets(splits_info,

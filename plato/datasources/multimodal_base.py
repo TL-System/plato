@@ -61,7 +61,12 @@ class MultiModalDataSource(base.DataSource):
         for split_type in list(self.splits_info.keys()):
             split_path = self.splits_info[split_type]["path"]
             for modality_nm in modality_names:
-                split_modality_path = os.path.join(split_path, modality_nm)
+                if modality_nm in ["rgb", "flow"]:
+                    modality_frame = "rawframes"
+                else:
+                    modality_frame = modality_nm
+
+                split_modality_path = os.path.join(split_path, modality_frame)
                 # modality data dir
                 self.splits_info[split_type][modality_nm + "_" +
                                              "path"] = split_modality_path

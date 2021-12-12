@@ -27,7 +27,7 @@ from torch.utils.data.dataloader import default_collate
 from mmaction.datasets import build_dataset
 
 from plato.config import Config
-from plato.datasources.multimodal import multimodal_base
+from plato.datasources import multimodal_base
 
 from plato.datasources.datalib.kinetics_utils import download_tools
 from plato.datasources.datalib.kinetics_utils import utils as kine_utils

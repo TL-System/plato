@@ -9,7 +9,7 @@ import glob
 import os
 from multiprocessing import Pool
 
-from mmaction.tools.flow_extraction import extract_dense_flow
+from mmaction.tools.misc.flow_extraction import extract_dense_flow
 
 from plato.datasources.datalib import modality_extraction_base
 

@@ -38,11 +38,13 @@ import os
 
 import torch
 
+from mmaction import tools
+
 from mmaction.tools.data.gym import download as gym_downloader
 
 from plato.config import Config
 from plato.datasources.datalib.gym_utils import gym_trim
-from plato.datasources.multimodal import multimodal_base
+from plato.datasources import multimodal_base
 from plato.datasources.datalib import frames_extraction_tools
 from plato.datasources.datalib import audio_extraction_tools
 
