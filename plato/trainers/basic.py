@@ -10,7 +10,10 @@ import time
 import numpy as np
 import torch
 import torch.nn as nn
+from opacus import GradSampleModule
 from opacus.privacy_engine import PrivacyEngine
+from opacus.validators import ModuleValidator
+
 from plato.config import Config
 from plato.models import registry as models_registry
 from plato.trainers import base
@@ -38,6 +41,9 @@ class Trainer(base.Trainer):
             self.model = nn.DataParallel(model)
         else:
             self.model = model
+        if Config().trainer.differential_privacy:
+            logging.info("Using differential privacy during training.")
+            self.model = GradSampleModule(model)
 
     def zeros(self, shape):
         """Returns a PyTorch zero tensor with the given shape."""
@@ -157,11 +163,14 @@ class Trainer(base.Trainer):
 
                 if 'differential_privacy' in config and config[
                         'differential_privacy']:
+                    errors = ModuleValidator.validate(self.model, strict=False)
+                    if len(errors) > 0:
+                        self.model = ModuleValidator.fix(self.model)
+                        errors = ModuleValidator.validate(self.model, strict=False)
+                        assert len(errors) == 0
+
                     privacy_engine = PrivacyEngine(accountant='rdp',
                                                    secure_mode=False)
-                    # accountant: Accounting mechanism. Currently supported:
-                    #         - rdp (:class:`~opacus.accountants.RDPAccountant`)
-                    #         - gdp (:class:`~opacus.accountants.GaussianAccountant`)
 
                     self.model, optimizer, train_loader = privacy_engine.make_private_with_epsilon(
                         module=self.model,
@@ -181,7 +190,10 @@ class Trainer(base.Trainer):
                                    labels) in enumerate(train_loader):
                         examples, labels = examples.to(self.device), labels.to(
                             self.device)
-                        optimizer.zero_grad()
+                        if 'differential_privacy' in config and config['differential_privacy']:
+                            optimizer.zero_grad(set_to_none=True)
+                        else:
+                            optimizer.zero_grad()
 
                         if cut_layer is None:
                             outputs = self.model(examples)
@@ -192,11 +204,7 @@ class Trainer(base.Trainer):
                         loss = loss_criterion(outputs, labels)
 
                         loss.backward()
-
                         optimizer.step()
-
-                        if lr_schedule is not None:
-                            lr_schedule.step()
 
                         if batch_id % log_interval == 0:
                             if self.client_id == 0:
@@ -215,12 +223,15 @@ class Trainer(base.Trainer):
                                             batch_id, len(train_loader),
                                             loss.data.item()))
 
+                    if lr_schedule is not None:
+                        lr_schedule.step()
+
                     if hasattr(optimizer, "params_state_update"):
                         optimizer.params_state_update()
 
-                if 'differential_privacy' in config and config[
-                        'differential_privacy']:
-                    self.model = self.model._module
+                #if 'differential_privacy' in config and config[
+                #        'differential_privacy']:
+                #    self.model = self.model._module
 
         except Exception as training_exception:
             logging.info("Training on client #%d failed.", self.client_id)
