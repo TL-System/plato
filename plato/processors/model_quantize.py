@@ -36,7 +36,7 @@ class Processor(model.Processor):
 
     def _process_layer(self, layer: torch.Tensor) -> torch.Tensor:
 
-        layer = torch.quantize_per_tensor(layer, self.scale, self.zero_point,
-                                          self.dtype)
+        layer = torch.quantize_per_tensor(layer.float(), self.scale,
+                                          self.zero_point, self.dtype)
 
         return layer
