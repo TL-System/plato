@@ -5,10 +5,10 @@ import logging
 from typing import Any
 import torch
 
-from plato.processors import mistnet_feature
+from plato.processors import feature
 
 
-class Processor(mistnet_feature.Processor):
+class Processor(feature.Processor):
     """
     Implements a Processor for applying quantization to MistNet PyTorch features.
     """
