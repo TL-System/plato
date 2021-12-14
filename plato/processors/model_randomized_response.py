@@ -4,32 +4,19 @@ Implements a Processor for applying local differential privacy using randomized 
 import logging
 from typing import Any
 
+import torch
+
 from plato.config import Config
-from plato.processors import mistnet_feature
+from plato.processors import model
 from plato.utils import unary_encoding
 
 
-class Processor(mistnet_feature.Processor):
+class Processor(model.Processor):
     """
     Implements a Processor for applying local differential privacy using randomized response.
     """
     def __init__(self, **kwargs) -> None:
-        def func(logits, targets):
-            if Config().algorithm.epsilon is None:
-                return logits, targets
-
-            _randomize = getattr(self.trainer, "randomize", None)
-            epsilon = Config().algorithm.epsilon
-
-            logits = unary_encoding.encode(logits)
-            if callable(_randomize):
-                logits = self.trainer.randomize(logits, targets, epsilon)
-            else:
-                logits = unary_encoding.randomize(logits, epsilon)
-
-            return logits, targets
-
-        super().__init__(method=func, **kwargs)
+        super().__init__(**kwargs)
 
     def process(self, data: Any) -> Any:
         """
@@ -44,3 +31,19 @@ class Processor(mistnet_feature.Processor):
             self.client_id)
 
         return output
+
+    def _process_layer(self, layer: torch.Tensor) -> torch.Tensor:
+
+        if Config().algorithm.epsilon is None:
+            return layer
+
+        epsilon = Config().algorithm.epsilon
+
+        layer = layer.detach().cpu().numpy()
+
+        layer = unary_encoding.encode(layer)
+        layer = unary_encoding.randomize(layer, epsilon)
+
+        layer = torch.tensor(layer, dtype=torch.float32)
+
+        return layer

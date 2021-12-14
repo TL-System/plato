@@ -12,9 +12,9 @@ from plato.config import Config
 
 
 class ConfigTest(unittest.TestCase):
-    """ Aiming to test the correcness of configuration file loading """
-    def setUp(self):
-        super().setUp()
+    """ Testing the correctness of loading a configuration file. """
+    def setup(self):
+        super().setup()
 
         self.addTypeEqualityFunc(Config, 'assertConfigEqual')
 

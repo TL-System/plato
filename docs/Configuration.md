@@ -22,17 +22,24 @@ Attributes in **bold** must be included in a configuration file, while attribute
 
 #### Valid processors for `clients.outbound_processors`
 
-- `mistnet_randomized_response`: Activate randomized response on features for PyTorch MistNet, must also set `algorithm.epsilon` to activate. Must be placed before `mistnet_unbatch`.
+- `feature_randomized_response`: Activate randomized response on features for PyTorch MistNet, must also set `algorithm.epsilon` to activate. Must be placed before `feature_unbatch`.
 
-- `mistnet_laplace`: Add random noise with laplace distribution to features for PyTorch MistNet. Must be placed before `mistnet_unbatch`.
+- `feature_laplace`: Add random noise with laplace distribution to features for PyTorch MistNet. Must be placed before `feature_unbatch`.
 
-- `mistnet_gaussian`: Add random noise with gaussian distribution to features for PyTorch MistNet. Must be placed before `mistnet_unbatch`.
+- `feature_gaussian`: Add random noise with gaussian distribution to features for PyTorch MistNet. Must be placed before `feature_unbatch`.
 
-- `mistnet_quantize`: Quantize features for PyTorch MistNet. Must not be used together with `mistnet_outbound_features`.
+- `feature_quantize`: Quantize features for PyTorch MistNet. Must not be used together with `outbound_feature_ndarrays`.
 
-- `mistnet_unbatch`: Unbatch features for PyTorch MistNet clients, must use this processor for every PyTorch MistNet client before sending.
+- `feature_unbatch`: Unbatch features for PyTorch MistNet clients, must use this processor for every PyTorch MistNet client before sending.
 
-- `mistnet_outbound_features`: Convert PyTorch tensor features into NumPy arrays before sending to the server, for the benefit of saving a substantial amount of communication overhead if the feature dataset is large. Must be placed after `mistnet_unbatch`.
+- `outbound_feature_ndarrays`: Convert PyTorch tensor features into NumPy arrays before sending to the server, for the benefit of saving a substantial amount of communication overhead if the feature dataset is large. Must be placed after `feature_unbatch`.
+
+- `model_deepcopy`: Returns a deepcopy of the state_dict to prevent changing internal parameters of the model within clients.
+
+- `model_randomized_response`: Activate randomized response on model parameters for PyTorch, must also set `algorithm.epsilon` to activate.
+
+- `model_quantize`: Quantize features for model parameters for PyTorch.
+
 
 #### Valid processors for `clients.inbound_processors`
 
@@ -63,9 +70,11 @@ None.
 
 #### Valid processors for `server.inbound_processors`
 
-- `mistnet_inbound_features`: Convert PyTorch tensor features into NumPy arrays before sending to client, for the benefit of saving a substantial amount of communication overhead if the feature dataset is large. Must be used if `clients.outbound_processors` includes `mistnet_outbound_features`.
+- `inbound_feature_tensors`: Convert PyTorch tensor features into NumPy arrays before sending to client, for the benefit of saving a substantial amount of communication overhead if the feature dataset is large. Must be used if `clients.outbound_processors` includes `outbound_feature_ndarrays`.
 
-- `mistnet_dequantize`: Dequantize features for PyTorch MistNet. Must not be used together with `mistnet_inbound_features`.
+- `feature_dequantize`: Dequantize features for PyTorch MistNet. Must not be used together with `inbound_feature_tensors`.
+
+- `model_dequantize`: Dequantize features for PyTorch model parameters.
 
 ### data
 
@@ -105,6 +114,10 @@ None.
 |lr_schedule|Learning rate scheduler|`CosineAnnealingLR`, `LambdaLR`, `StepLR`, `ReduceLROnPlateau`|| 
 |**model_name**|The machine learning model|`lenet5`, `resnet_x`, `vgg_x`,`wideresnet`, `feedback_transformer`, `yolov5`, `HuggingFace_CausalLM`, `inceptionv3`, `googlenet`, `unet`, `alexnet`, `squeezenet_x`, `shufflenet_x`|For `resnet_x`, x = 18, 34, 50, 101, or 152; For `vgg_x`, x = 11, 13, 16, or 19; For `squeezenet_x`, x = 0 or 1; For `shufflenet_x`, x = 0.5, 1.0, 1.5, or 2.0|
 |pretrained|Use a model pretrained on ImageNet or not|`true` or `false`. Default is `false`|Can be used for `inceptionv3`, `alexnet`, and `squeezenet_x` models.|
+|differential_privacy|Whether differential privacy is to be applied during training|`true` or `false`. Default is `false`||
+|dp_epsilon|Total privacy budget of epsilon|Default is 10.0|
+|dp_delta|Total privacy budget of delta|Default is 1e-5|
+|dp_max_grad_norm|The maximum norm of the per-sample gradients. Any gradient with norm higher than this will be clipped to this value.|Default is 1.0|
 
 ### algorithm
 
