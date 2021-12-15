@@ -4,31 +4,32 @@ import random
 import torch.nn.functional as F
 import torch.nn as nn
 from torch.nn.parameter import Parameter
+from torch.nn import init
 
 
-class Decomposed_Linear(nn.Module):
-    def __init__(
-            self,
-            in_features,
-            out_features,
-            bias=True,
-            device=None,
-            dtype=None,
-            #sigma=None,
-            #psi=None,
-            l1_thres=None) -> None:
-        """
-        super().__init__(self, in_features, out_features, bias, device, dtype)
+class Decomposed_Linear(nn.Linear):
+    def __init__(self,
+                 in_features,
+                 out_features,
+                 bias=True,
+                 device=None,
+                 dtype=None) -> None:
+
+        super().__init__(in_features, out_features, bias, device, dtype)
         factory_kwargs = {'device': device, 'dtype': dtype}
-        self.psi = Parameter(torch.randn(()))  #psi
-        self.sigma = Parameter(torch.randn(()))  #sigma
-        self.l1_thres = l1_thres
+        self.sigma = Parameter(
+            torch.empty((out_features, in_features), **factory_kwargs))
+        self.psi = Parameter(
+            torch.empty((out_features, in_features), **factory_kwargs))
+
+        init.kaiming_uniform_(self.sigma, a=math.sqrt(5))
+        init.kaiming_uniform_(self.psi, a=math.sqrt(5))
         """
         factory_kwargs = {'device': device, 'dtype': dtype}
         super(Decomposed_Linear, self).__init__()
         self.in_features = in_features
         self.out_features = out_features
-        #self.weight = Parameter(
+        #self.weight1 = Parameter(
         #    torch.empty((out_features, in_features), **factory_kwargs))
         self.sigma = Parameter(
             torch.empty((out_features, in_features), **factory_kwargs))
@@ -38,17 +39,12 @@ class Decomposed_Linear(nn.Module):
             self.bias = Parameter(torch.empty(out_features, **factory_kwargs))
         else:
             self.register_parameter('bias', None)
-        print("++++++")
-        #self.reset_parameters()
+        """
 
     def forward(self, input):
-        # print("size of sigma", self.sigma.size())
-        # print("size of psi", self.psi.size())
-        # print("size of bias", self.bias.size())
-        self.weight = F.linear(torch.ones(self.sigma.size()), self.sigma,
-                               self.psi)
-        #  print("size of weights", self.weight.size())
-        # print("size of inputs", input.size())
+
+        self.weight = Parameter(self.sigma.add(self.psi))
+
         return F.linear(input, self.weight, self.bias)
 
 
@@ -103,17 +99,18 @@ for t in range(30000):
     # Compute and print loss
     loss = criterion(y_pred, y)
     if t % 2000 == 1999:
-        print(t, loss.item())
+        #print(t, loss.item())
         for name, param in model.named_parameters():
             if param.requires_grad:
-                print(name, param.data)
+                print(name)  #, param.data)
 
     # Zero gradients, perform a backward pass, and update the weights.
     optimizer.zero_grad()
     loss.backward()
     optimizer.step()
-
+ct = 0
 for name, param in model.named_parameters():
     if param.requires_grad:
-        print(name, param.data)
+        ct = ct + 1
+        print(name, "----", ct)  #, param.data)
 #print("list of params", list(model.parameters())[2])  # 0 is sigma ; 1 is psi

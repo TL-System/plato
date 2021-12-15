@@ -17,6 +17,7 @@ import numpy as np
 import torch
 from torch import nn
 from torch import _load_global_deps, autograd, optim
+from torch.nn.modules import loss
 from torch.utils.data import DataLoader
 import wandb
 from PIL import Image
@@ -53,6 +54,7 @@ class Trainer(basic.Trainer):
         sampler: the sampler that extracts a partition for this client.
         cut_layer (optional): The layer which training should start from.
         """
+
         if 'use_wandb' in config:
             run = wandb.init(project="plato",
                              group=str(config['run_id']),
@@ -73,19 +75,23 @@ class Trainer(basic.Trainer):
                 """obtain labeled and unlabeled dataset"""
 
                 trainset_s, trainset_u = torch.utils.data.random_split(
-                    trainset, [10000, 50000])  # rewrite with ratio
-                train_loader_s = DataLoader(trainset_s, 100)
-                train_loader_u = DataLoader(trainset_u, 100)
+                    trainset, [50000, 10000])  # rewrite with ratio
+                train_loader_s = DataLoader(trainset_s,
+                                            batch_size=batch_size)  #,
+                #shuffle=False,
+                #batch_size=batch_size,
+                #sampler=sampler.get())
+                train_loader_u = DataLoader(trainset_u, batch_size)
 
-                # iterations_per_epoch = np.ceil(len(trainset) /
-                # batch_size).astype(int)
+                #iterations_per_epoch = np.ceil(len(trainset_s) /
+                #                               batch_size).astype(int)
                 # variable iterations_per_epoch is computed for lr_scheduler;
                 epochs = config['epochs']
 
                 # Sending the model to the device used for training
                 self.model.to(self.device)
                 self.model.train()
-
+                print("++++++++++++++", [list(self.model.parameters())[2]])
                 # Initializing the loss criterion for supervised learning
                 _loss_criterion_s = getattr(self, "loss_criterion_s", None)
                 if callable(_loss_criterion_s):
@@ -105,17 +111,18 @@ class Trainer(basic.Trainer):
                 #                        optimizers.get_optimizer)
 
                 optimizer_s = optim.SGD(
-                    [list(self.model.parameters())[0]],
+                    #self.model.parameters(),
+                    [list(self.model.parameters())[3]],  # 3 is sigma
                     lr=Config().trainer.learning_rate,
                     momentum=Config().trainer.momentum,
-                    weight_decay=Config(
-                    ).trainer.weight_decay)  #get_optimizer(self.model.psis)
+                    weight_decay=Config().trainer.weight_decay
+                )  #get_optimizer(self.model.psis)
                 optimizer_u = optim.SGD(
-                    [list(self.model.parameters())[1]],
+                    [list(self.model.parameters())[4]],  #4 is psi
                     lr=Config().trainer.learning_rate,
                     momentum=Config().trainer.momentum,
-                    weight_decay=Config(
-                    ).trainer.weight_decay)  #get_optimizer(self.model.sigmas)
+                    weight_decay=Config().trainer.weight_decay
+                )  #get_optimizer(self.model.sigmas)
                 """
                 # Initializing the learning rate schedule, if necessary
                 if hasattr(config, 'lr_schedule'):
@@ -144,8 +151,11 @@ class Trainer(basic.Trainer):
                                 outputs_s = self.model.forward_from(
                                     examples, cut_layer)
 
-                            loss_s = loss_criterion_s(outputs_s,
-                                                      labels) * self.lambda_s
+                            loss_s = loss_criterion_s(
+                                outputs_s, labels)  # * self.lambda_s
+                            print("Supervised learning outpus_s are: ",
+                                  outputs_s)
+                            print("Supervised learning labels are: ", labels)
                             #print("here's the sigma's grad: ",
                             #self.model.conv1.sigma.grad)
                             #print("Loss_criterion_s: ",
@@ -254,24 +264,33 @@ class Trainer(basic.Trainer):
             y_pred = self.model.forward_from(
                 unlabled_samples, cut_layer)  #self.scale(unlabled_samples),
             #cut_layer)
+        print("The y_pred is: ", y_pred)
 
         _confident = np.where(
             np.max(y_pred.detach().numpy(), axis=1) >= self.confident)[0]
+        print(
+            "Before confident is: ",
+            np.where(
+                np.max(y_pred.detach().numpy(), axis=1) >= self.confident))
+        print("The confident is: ", _confident)
         #np.max(y_pred.numpy(), axis=1) >= self.confident)[0]
 
         if len(_confident) > 0:
             # Inter-client consistency
             samples_confident = self.scale(unlabled_samples[_confident])
             y_pred = torch.gather(y_pred, 1, _confident)
+            print("Y_pred is: ", y_pred)
 
             y_preds = [
                 rm(samples_confident).numpy()
                 for rid, rm in enumerate(self.helpers)
             ]  # where find helpers
+            print("Y_preds are: ", y_preds)
 
             for _, pred in enumerate(y_preds):
                 loss_u += (nn.functional.kl_div(pred, y_pred) /
                            len(y_preds)) * self.lambda_i
+                print("Current loss is: ", loss)
 
             # Agreement-based Pseudo Labeling
             if cut_layer is None:
