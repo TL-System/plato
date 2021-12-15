@@ -10,7 +10,6 @@ disjoint learning", in the Proceedings of ICLR 2021.
 https://arxiv.org/pdf/2006.12097.pdf
 """
 from plato.clients import simple
-from plato.clients import base
 from dataclasses import dataclass
 
 
@@ -35,6 +34,7 @@ class Client(simple.Client):
 
     async def train(self):
         """ Fedmatch clients use different number of local epochs. """
+
         report, weights = await super().train(
         )  # obtain update from local trainer,
         # loss in the trainer should be changed due to semi-supervised learning property
