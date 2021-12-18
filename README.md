@@ -47,7 +47,7 @@ python attn_visualize.py
 The pickle file of the [vit baseline model](https://drive.google.com/file/d/1s3oJreoeJZKpxbUpgQXAfiEb13r6af7H/view?usp=sharing) can be downloaded [here](https://drive.google.com/file/d/1rE659WiR775gj-44Ez6mTnuWGrvb5RPA/view?usp=sharing). The visualization rsults is shown below:
 
 <div align="center">
-  <img width="100%" alt="Self-attention map visualization a Vision Transformer with 16x16 patches trained with basic training hyper-parameter" src="https://github.com/zhoudaquan/DeepViT_ICCV21/blob/master/figures/attention_map_visualization.png">
+  <img width="100%" alt="Self-attention map visualization a Vision Transformer with 16x16 patches trained with basic training hyper-parameter" src="https://github.com/zhoudaquan/dvit_repo/blob/master/figures/attention_map_visualization.png">
 </div>
 
 ## Citing DeepVit
