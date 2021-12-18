@@ -37,6 +37,18 @@ To evaluate a pre-trained DeepViT models on ImageNet val run:
 ```
 bash eval.sh
 ```
+## Attention Map Visualization
+To visualize the self-attention map, first save the attention map matrix into a pickle file and run 
+
+```
+python attn_visualize.py
+```
+
+The pickle file of the [vit baseline model](https://drive.google.com/file/d/1s3oJreoeJZKpxbUpgQXAfiEb13r6af7H/view?usp=sharing) can be downloaded [here](https://drive.google.com/file/d/1rE659WiR775gj-44Ez6mTnuWGrvb5RPA/view?usp=sharing). The visualization rsults is shown below:
+
+<div align="center">
+  <img width="100%" alt="Self-attention map visualization a Vision Transformer with 16x16 patches trained with basic training hyper-parameter" src="https://drive.google.com/file/d/1WND7wlYvJFv62_p7g7-PNnAsN3k_yD8J/view?usp=sharing">
+</div>
 
 ## Citing DeepVit
 
