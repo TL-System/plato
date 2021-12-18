@@ -14,27 +14,41 @@ from plato.processors import pipeline
 
 if not (hasattr(Config().trainer, 'use_tensorflow')
         or hasattr(Config().trainer, 'use_mindspore')):
-    from plato.processors import (base, mistnet_inbound_features,
-                                  mistnet_outbound_features,
-                                  mistnet_randomized_response,
-                                  mistnet_gaussian, mistnet_laplace,
-                                  mistnet_unbatch, mistnet_quantize,
-                                  mistnet_dequantize)
+    from plato.processors import (
+        base,
+        feature_randomized_response,
+        feature_gaussian,
+        feature_laplace,
+        feature_quantize,
+        feature_dequantize,
+        feature_unbatch,
+        inbound_feature_tensors,
+        outbound_feature_ndarrays,
+        model_deepcopy,
+        model_quantize,
+        model_dequantize,
+        model_randomized_response,
+    )
 
     registered_processors = OrderedDict([
         ('base', base.Processor),
-        ('mistnet_randomized_response', mistnet_randomized_response.Processor),
-        ('mistnet_unbatch', mistnet_unbatch.Processor),
-        ('mistnet_outbound_features', mistnet_outbound_features.Processor),
-        ('mistnet_inbound_features', mistnet_inbound_features.Processor),
-        ('mistnet_gaussian', mistnet_gaussian.Processor),
-        ('mistnet_laplace', mistnet_laplace.Processor),
-        ('mistnet_quantize', mistnet_quantize.Processor),
-        ('mistnet_dequantize', mistnet_dequantize.Processor),
+        ('feature_randomized_response', feature_randomized_response.Processor),
+        ('feature_gaussian', feature_gaussian.Processor),
+        ('feature_laplace', feature_laplace.Processor),
+        ('feature_quantize', feature_quantize.Processor),
+        ('feature_dequantize', feature_dequantize.Processor),
+        ('feature_unbatch', feature_unbatch.Processor),
+        ('inbound_feature_tensors', inbound_feature_tensors.Processor),
+        ('outbound_feature_ndarrays', outbound_feature_ndarrays.Processor),
+        ('model_deepcopy', model_deepcopy.Processor),
+        ('model_quantize', model_quantize.Processor),
+        ('model_dequantize', model_dequantize.Processor),
+        ('model_randomized_response', model_randomized_response.Processor),
     ])
 
 
-def get(user: str, *args,
+def get(user: str,
+        processor_kwargs={},
         **kwargs) -> Tuple[pipeline.Processor, pipeline.Processor]:
     """ Get an instance of the processor. """
     outbound_processors = []
@@ -62,12 +76,16 @@ def get(user: str, *args,
         logging.info("%s: Using Processor for receiving payload: %s", user,
                      processor)
 
-    outbound_processors = list(
-        map(lambda name: registered_processors[name](*args, **kwargs),
-            outbound_processors))
-    inbound_processors = list(
-        map(lambda name: registered_processors[name](*args, **kwargs),
-            inbound_processors))
+    def map_f(name):
+        if name in processor_kwargs:
+            this_kwargs = {**kwargs, **(processor_kwargs[name])}
+        else:
+            this_kwargs = kwargs
+
+        return registered_processors[name](**this_kwargs)
+
+    outbound_processors = list(map(map_f, outbound_processors))
+    inbound_processors = list(map(map_f, inbound_processors))
 
     return pipeline.Processor(outbound_processors), pipeline.Processor(
         inbound_processors)

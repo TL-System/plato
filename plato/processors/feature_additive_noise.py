@@ -5,10 +5,10 @@ import logging
 from typing import Any
 import numpy
 
-from plato.processors import mistnet_feature
+from plato.processors import feature
 
 
-class Processor(mistnet_feature.Processor):
+class Processor(feature.Processor):
     """
     Implements a Processor for applying local differential privacy using additive noise mechanism.
     """
@@ -34,7 +34,7 @@ class Processor(mistnet_feature.Processor):
         output = super().process(data)
 
         logging.info(
-            "[Client #%d] Local differential privacy (using %s mechanism) applied.",
+            "[Client #%d] Local differential privacy (using the %s mechanism) applied.",
             self.client_id, self._method)
 
         return output

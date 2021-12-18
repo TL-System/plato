@@ -13,9 +13,9 @@ clients:
 
     # Processors for outbound data payloads
     outbound_processors:
-        - mistnet_randomized_response
-        - mistnet_unbatch
-        - mistnet_outbound_features
+        - feature_randomized_response
+        - feature_unbatch
+        - outbound_feature_ndarrays
 
 server:
     type: mistnet
@@ -25,7 +25,7 @@ server:
 
     # Processors for inbound data payloads
     inbound_processors:
-        - mistnet_inbound_features
+        - inbound_feature_tensors
 
 data:
     # The training and testing dataset
