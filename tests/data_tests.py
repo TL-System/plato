@@ -11,7 +11,9 @@ import unittest
 
 # os.environ['config_file'] = 'tests/TestsConfig/referitgame.yml'
 
-os.environ['config_file'] = 'tests/TestsConfig/kinetics.yml'
+# os.environ['config_file'] = 'tests/TestsConfig/kinetics.yml'
+
+os.environ['config_file'] = 'tests/TestsConfig/gym.yml'
 
 import numpy as np
 import torch
@@ -22,7 +24,7 @@ from plato.datasources.flickr30k_entities import DataSource as f30ke_DataSource
 from plato.datasources.referitgame import DataSource as refer_Datasource
 from plato.datasources.coco import DataSource as coco_Datasource
 from plato.datasources.kinetics_mm import DataSource as kinetics_Datasource
-
+from plato.datasources.gym import DataSource as GymDataSource
 from plato.datasources import registry as data_registry
 from plato.samplers import registry as samplers_registry
 
@@ -104,11 +106,18 @@ class DatasetsTest(unittest.TestCase):
     #     self.utest_datasource = refer_Datasource()
     #     assert self.assertDataSourceDefinition(self.utest_datasource)
 
-    def test_kinetics_datasource(self):
-        """ Test the kinetics700 dataset. """
+    # def test_kinetics_datasource(self):
+    #     """ Test the kinetics700 dataset. """
+    #     # set the specific
+
+    #     self.utest_datasource = kinetics_Datasource()
+    #     # assert self.assertDataSourceDefinition(self.utest_datasource)
+
+    def test_gym_datasource(self):
+        """ Test the Gym dataset. """
         # set the specific
 
-        self.utest_datasource = kinetics_Datasource()
+        self.utest_datasource = GymDataSource()
         # assert self.assertDataSourceDefinition(self.utest_datasource)
 
 

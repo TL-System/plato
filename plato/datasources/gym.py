@@ -58,7 +58,10 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         # the rawframes contains the "flow", "rgb"
         # thus, the flow and rgb will be put in in same directory rawframes/
-        self.modality_names = ["video", "audio", "rawframes", "audio_feature"]
+        # self.modality_names = ["video", "audio", "rawframes", "audio_feature"]
+        self.modality_names = [
+            "video", "audio", "rgb", "flow", "audio_feature"
+        ]
 
         _path = Config().data.data_path
         self._data_path_process(data_path=_path, base_data_name=self.data_name)
@@ -85,11 +88,9 @@ class DataSource(multimodal_base.MultiModalDataSource):
         self.event_subsection_audios_fea_dir_path = os.path.join(
             base_data_path, "subaction_audios_features")
 
-        anno_url = "https://sdolivia.github.io/FineGym/resources/ \
-                    dataset/finegym_annotation_info_v1.0.json"
+        anno_url = "https://sdolivia.github.io/FineGym/resources/dataset/finegym_annotation_info_v1.0.json"
 
-        train_url = "https://sdolivia.github.io/FineGym/resources/ \
-                    dataset/gym99_train_element_v1.0.txt"
+        train_url = "https://sdolivia.github.io/FineGym/resources/dataset/gym99_train_element_v1.0.txt"
 
         eval_url = "https://sdolivia.github.io/FineGym/resources/dataset/gym99_val_element.txt"
 
@@ -116,7 +117,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
             gym_downloader.main(input=self.data_anno_file_path,
                                 output_dir=self.raw_videos_path,
-                                num_jobs=Config().data.num_workers)
+                                num_jobs=Config().data.downloader.num_workers)
 
         # Trim Videos into Events
         if not self._exist_judgement(self.event_dir_path):
@@ -175,3 +176,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
         gym_trim.generate_splits_list(data_root=self.event_subsection_dir_path,
                                       annotation_root=self.data_anno_dir_path,
                                       frame_data_root=frames_out_dir_path)
+
+    def get_modality_name(self):
+        """ Get all supports modalities """
+        return ["rgb", "flow", "audio"]

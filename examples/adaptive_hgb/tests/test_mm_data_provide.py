@@ -9,7 +9,7 @@ from plato.config import Config
 # from plato.mmconfig import mmConfig
 from plato.datasources.multimodal import kinetics
 
-from plato.datasources.multimodal import gym
+from plato.datasources import gym
 from plato.datasources.multimodal import flickr30k_entities
 from plato.datasources import coco
 from plato.datasources import referitgame
