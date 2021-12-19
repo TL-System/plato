@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 2
+    total_clients: 1
 
     # The number of clients selected in each round
-    per_round: 2
+    per_round: 1
 
     # Should the clients compute test accuracy locally?
     do_test: true
@@ -14,27 +14,21 @@ clients:
     # Whether simulate clients or not
     simulation: true
 
-    outbound_processors:
-        - model_quantize
-
 server:
     type: fedavg_cross_silo
     address: 127.0.0.1
     port: 8000
     do_test: true
 
-    inbound_processors:
-        - model_dequantize
-
 data:
     # The training and testing dataset
     datasource: MNIST
 
     # Where the dataset is located
-    data_path: ../../data
+    data_path: ./data
 
     # Number of samples in each partition
-    partition_size: 100
+    partition_size: 2
 
     # IID or non-IID?
     sampler: iid
@@ -47,7 +41,7 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 2
+    rounds: 1
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -60,7 +54,7 @@ trainer:
 
     # Number of epoches for local training in each communication round
     epochs: 1
-    batch_size: 10
+    batch_size: 1
     optimizer: SGD
     learning_rate: 0.01
     momentum: 0.9
@@ -69,13 +63,11 @@ trainer:
     # The machine learning model
     model_name: lenet5
 
-    differential_privacy: true
-
 algorithm:
     # Aggregation algorithm
     type: fedavg
 
-    dp_epsilon: 1
+    dp_epsilon: 60
 
     dp_delta: 0.01
 
@@ -83,11 +75,11 @@ algorithm:
     cross_silo: true
 
     # The total number of silos (edge servers)
-    total_silos: 2
+    total_silos: 1
 
     # The number of local aggregation rounds on edge servers before sending
     # aggregated weights to the central server
-    local_rounds: 2
+    local_rounds: 1
 
 results:
     # Write the following parameter(s) into a CSV
