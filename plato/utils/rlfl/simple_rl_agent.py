@@ -16,6 +16,7 @@ from gym import spaces
 import base_rl_agent
 from config import RLConfig
 from plato.utils import csv_processor
+from policies import ddpg, sac, td3
 
 
 class RandomPolicy(object):
@@ -47,7 +48,6 @@ class RLAgent(base_rl_agent.RLAgent, gym.Env):
                                             shape=(self.config.n_states, ),
                                             dtype=np.float32)
 
-        self.policy = RandomPolicy(self.action_space)
 
         self.state = None
         self.next_state = None
@@ -78,6 +78,8 @@ class RLAgent(base_rl_agent.RLAgent, gym.Env):
         self.current_step = 0
         self.is_done = False
         self.episode_reward = 0
+        if self.policy.recurrent:
+            self.h, self.c = self.policy.get_initial_states()
 
         self.current_episode += 1
         logging.info("[RL Agent] Starting RL episode #%d.",
@@ -148,6 +150,8 @@ class RLAgent(base_rl_agent.RLAgent, gym.Env):
                 self.process_experience()
             self.state = self.next_state
             self.episode_reward += self.reward
+            if self.policy.recurrent:
+                self.h, self.c = self.nh, self.nc
             step_result_csv_file = self.config.result_dir + 'step_result.csv'
             csv_processor.write_csv(step_result_csv_file,
                                     [self.current_episode, self.current_step] +
