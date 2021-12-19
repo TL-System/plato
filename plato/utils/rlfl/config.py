@@ -2,12 +2,9 @@ import os
 
 from plato.config import Config
 
-os.environ['config_file'] = 'fei_FMNIST_lenet5.yml'
+os.environ['config_file'] = 'plato/utils/rlfl/fei_FMNIST_lenet5.yml'
 
 dirname = os.path.dirname(os.path.dirname(__file__))
-
-# num_samples + training_time + valuation + correlation
-
 
 class RLConfig:
     """Configuration for RL control"""
@@ -31,13 +28,10 @@ class RLConfig:
         self.result_dir = Config().result_dir
         self.log_interval = 10
 
-        self.mode = 'test'  # or 'test'
+        self.mode = 'train'  # or 'test'
         self.test_step = 100
-        self.pretrained = True
-        self.pretrained_iter = 60
-        # self.mode = 'train'  # or 'test'
-        # self.test_step = 30
-        # self.pretrained = False
+        self.pretrained = False
+        self.pretrained_iter = 0
 
 
 class DDPGConfig(RLConfig):

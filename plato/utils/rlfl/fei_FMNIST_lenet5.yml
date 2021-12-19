@@ -1,12 +1,12 @@
 clients:
-    # Type
-    type: simple
-
     # The total number of clients
-    total_clients: 5
+    total_clients: 10
 
     # The number of clients selected in each round
-    per_round: 5
+    per_round: 10
+
+    # Whether select variable number of clients per round
+    varied: true
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -16,30 +16,33 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8000
+    port: 8080
 
 data:
     # The training and testing dataset
-    datasource: MNIST
+    datasource: FashionMNIST
 
     # Where the dataset is located
     data_path: ./data
 
     # Number of samples in each partition
-    partition_size: 600
+    partition_size: 200
+
+    # Whether use varied partition per client or not?
+    varied: false
 
     # IID or non-IID?
     sampler: noniid
+
+    # The concentration parameter for the Dirichlet distribution
+    concentration: 0.5
 
     # The random seed for sampling data
     random_seed: 1
 
 trainer:
-    # The type of the trainer
-    type: basic
-    
     # The maximum number of training rounds
-    rounds: 10
+    rounds: 50
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -48,11 +51,15 @@ trainer:
     max_concurrency: 4
 
     # The target accuracy
-    target_accuracy: 0.98
+    target_accuracy: 1.0
 
     # Number of epoches for local training in each communication round
-    epochs: 4
-    batch_size: 10
+    epochs: 10
+
+    # Whether use varied epochs per client or not?
+    varied: false
+
+    batch_size: 32
     optimizer: SGD
     learning_rate: 0.01
     momentum: 0.9
