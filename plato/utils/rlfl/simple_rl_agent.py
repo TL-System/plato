@@ -17,16 +17,6 @@ from plato.utils.rlfl import base_rl_agent
 from plato.utils.rlfl.config import RLConfig
 from plato.utils import csv_processor
 
-
-class RandomPolicy(object):
-    """ The world's simplest agent. """
-    def __init__(self, action_space):
-        self.action_space = action_space
-
-    def select_action(self, state):
-        return self.action_space.sample()
-
-
 class RLAgent(base_rl_agent.RLAgent, gym.Env):
     """ A basic RL environment for FL server using Gym for RL control. """
     def __init__(self, config):
@@ -46,7 +36,6 @@ class RLAgent(base_rl_agent.RLAgent, gym.Env):
                                             high=np.inf,
                                             shape=(self.config.n_states, ),
                                             dtype=np.float32)
-
 
         self.state = None
         self.next_state = None
