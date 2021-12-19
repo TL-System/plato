@@ -18,6 +18,7 @@ from plato.algorithms import registry as algorithms_registry
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
 from plato.models import registry as models_registry
+from plato.processors import registry as processor_registry
 from plato.servers import base, fedavg
 from plato.trainers import registry as trainers_registry
 from plato.utils import csv_processor, s3
@@ -352,6 +353,12 @@ class RLServer(fedavg.Server):
         self.current_round = 0
 
         self.load_trainer()
+
+        # Prepares this server for processors that processes outbound and inbound
+        # data payloads
+        self.outbound_processor, self.inbound_processor = processor_registry.get(
+            "Server", server_id=os.getpid(), trainer=self.trainer)
+
 
         if not Config().clients.do_test:
             dataset = datasources_registry.get(client_id=0)
