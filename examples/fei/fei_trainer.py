@@ -9,7 +9,7 @@ import torch
 import torch.nn as nn
 import wandb
 
-from examples.afl import afl_trainer
+from afl import afl_trainer
 from plato.config import Config
 from plato.trainers import basic
 from plato.utils import optimizers

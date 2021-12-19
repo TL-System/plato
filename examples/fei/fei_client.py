@@ -5,7 +5,7 @@ import logging
 import math
 from dataclasses import dataclass
 
-from examples.afl import afl_client
+from afl import afl_client
 from plato.clients import simple
 from plato.config import Config
 
