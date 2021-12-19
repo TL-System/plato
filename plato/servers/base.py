@@ -79,6 +79,8 @@ class Server:
         self.client_payload = {}
         self.client_chunks = {}
         self.s3_client = None
+        self.outbound_processor = None
+        self.inbound_processor = None
 
         # States that need to be maintained for asynchronous FL
 
@@ -352,6 +354,9 @@ class Server:
 
     async def send(self, sid, payload, client_id) -> None:
         """ Sending a new data payload to the client using either S3 or socket.io. """
+        # First apply outbound processors, if any
+        payload = self.outbound_processor.process(payload)
+
         if self.s3_client is not None:
             payload_key = f'server_payload_{os.getpid()}_{self.current_round}'
             self.s3_client.send_to_s3(payload_key, payload)
@@ -429,6 +434,8 @@ class Server:
             "[Server #%d] Received %s MB of payload data from client #%d.",
             os.getpid(), round(payload_size / 1024**2, 2), client_id)
 
+        self.client_payload[sid] = self.inbound_processor.process(
+            self.client_payload[sid])
         self.updates.append((self.reports[sid], self.client_payload[sid]))
 
         self.reporting_clients.append(client_id)
@@ -493,6 +500,10 @@ class Server:
         await self.close_connections()
         os._exit(0)
 
+    @abstractmethod
+    def configure(self):
+        """ Configuring the server with initialization work. """
+
     async def customize_server_response(self, server_response):
         """ Wrap up generating the server response with any additional information. """
         return server_response
@@ -500,10 +511,6 @@ class Server:
     @abstractmethod
     def customize_server_payload(self, payload):
         """ Wrap up generating the server payload with any additional information. """
-
-    @abstractmethod
-    def configure(self):
-        """ Configuring the server with initialization work. """
 
     @abstractmethod
     async def process_reports(self) -> None:

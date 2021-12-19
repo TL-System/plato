@@ -28,12 +28,11 @@ class DataSource:
         """downloads a dataset from a URL."""
         if not os.path.exists(data_path):
             if Config().clients.total_clients > 1:
-                if not hasattr(Config().data,
-                    'concurrent_download') or not Config().data.concurrent_download:
+                if not hasattr(Config().data, 'concurrent_download'
+                               ) or not Config().data.concurrent_download:
                     raise ValueError(
                         "The dataset has not yet been downloaded from the Internet. "
-                        "Please re-run with '-d' or '--download' first. "
-                    )
+                        "Please re-run with '-d' or '--download' first. ")
 
             os.makedirs(data_path, exist_ok=True)
 
@@ -52,8 +51,8 @@ class DataSource:
                     downloaded_size += len(chunk)
                     file.write(chunk)
                     file.flush()
-                    sys.stdout.write("\r{:.1f}%".format(
-                        100 * downloaded_size / total_size))
+                    sys.stdout.write("\r{:.1f}%".format(100 * downloaded_size /
+                                                        total_size))
                     sys.stdout.flush()
                 sys.stdout.write("\n")
 
@@ -81,10 +80,15 @@ class DataSource:
                 sys.exit()
 
         if Config().args.download:
-            logging.info(
-                "The dataset has been successfully downloaded. "
-                "Re-run the experiment without '-d' or '--download'.")
+            logging.info("The dataset has been successfully downloaded. "
+                         "Re-run the experiment without '-d' or '--download'.")
             sys.exit()
+
+    @staticmethod
+    def input_shape():
+        """ Obtains the input shape of this data source. """
+        raise NotImplementedError(
+            "Input shape not specified for this data source.")
 
     def num_train_examples(self) -> int:
         """ Obtains the number of training examples. """

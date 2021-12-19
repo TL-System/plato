@@ -1,5 +1,5 @@
 """
-A cross-silo personalized federated learning server using MAML algorithm, 
+A cross-silo personalized federated learning server using MAML algorithm,
 as either edge or central servers.
 """
 
@@ -26,6 +26,8 @@ class Server(fedavg_cs.Server):
         self.personalization_test_updates = []
         self.personalization_accuracy = 0
 
+        self.training_time = 0
+
         if Config().is_edge_server():
             # An edge client waits for the event that a certain number of clients
             # compute accuracy of their personalized models
@@ -33,56 +35,23 @@ class Server(fedavg_cs.Server):
 
     async def select_testing_clients(self):
         """Select a subset of the clients to test personalization."""
-
+        self.do_personalization_test = True
         logging.info("\n[Server #%d] Starting testing personalization.",
                      os.getpid())
 
-        if hasattr(Config().clients, 'simulation') and Config(
-        ).clients.simulation and not Config().is_central_server:
-            # In the client simulation mode, the client pool for client selection contains
-            # all the virtual clients to be simulated
-            self.clients_pool = list(range(1, 1 + self.total_clients))
-
-        else:
-            # If no clients are simulated, the client pool for client selection consists of
-            # the current set of clients that have contacted the server
-            self.clients_pool = list(self.clients)
-
-        self.selected_clients = self.choose_clients(self.clients_pool,
-                                                    self.clients_per_round)
+        self.current_round -= 1
+        await super().select_clients()
 
         if len(self.selected_clients) > 0:
-            for i, selected_client_id in enumerate(self.selected_clients):
-                if hasattr(Config().clients, 'simulation') and Config(
-                ).clients.simulation and not Config().is_central_server:
-                    client_id = i + 1
-                else:
-                    client_id = selected_client_id
+            logging.info(
+                "[Server #%d] Sent the current meta model to %d clients for personalization test.",
+                os.getpid(), len(self.selected_clients))
 
-                sid = self.clients[client_id]['sid']
-
-                logging.info(
-                    "[Server #%d] Selecting client #%d for personalization testing.",
-                    os.getpid(), selected_client_id)
-
-                server_response = {
-                    'id': selected_client_id,
-                    'personalization_test': True
-                }
-
-                # Sending the server response as metadata to the clients (payload to follow)
-                await self.sio.emit('payload_to_arrive',
-                                    {'response': server_response},
-                                    room=sid)
-
-                payload = self.algorithm.extract_weights()
-                payload = self.customize_server_payload(payload)
-
-                # Sending the server payload to the client
-                logging.info(
-                    "[Server #%d] Sending the meta model to client #%d.",
-                    os.getpid(), selected_client_id)
-                await self.send(sid, payload, selected_client_id)
+    async def customize_server_response(self, server_response):
+        """Wrap up generating the server response with any additional information."""
+        if self.do_personalization_test:
+            server_response['personalization_test'] = True
+        return server_response
 
     async def process_reports(self):
         """Process the client reports by aggregating their weights."""
@@ -122,10 +91,7 @@ class Server(fedavg_cs.Server):
                         'local_epoch_num':
                         Config().trainer.epochs,
                         'training_time':
-                        max([
-                            report.training_time
-                            for (report, __) in self.updates
-                        ]),
+                        self.training_time,
                         'round_time':
                         time.perf_counter() - self.round_start_time
                     }[item]
@@ -141,6 +107,7 @@ class Server(fedavg_cs.Server):
             if Config().is_edge_server():
                 if self.do_personalization_test:
                     self.per_accuracy_aggregated.set()
+                    self.current_global_round += 1
                 else:
                     # When a certain number of aggregations are completed, an edge client
                     # needs to be signaled to send a report to the central server
@@ -152,10 +119,10 @@ class Server(fedavg_cs.Server):
                         self.model_aggregated.set()
 
                         self.current_round = 0
-                        self.new_global_round_begins.clear()
-                        # Wait until a new global round begins
-                        # to avoid selecting clients before a new global round begins
-                        await self.new_global_round_begins.wait()
+
+        if not self.do_personalization_test:
+            self.training_time = max(
+                [report.training_time for (report, __) in self.updates])
 
     async def client_payload_done(self, sid, client_id, object_key):
         """ Upon receiving all the payload from a client, eithe via S3 or socket.io. """
@@ -195,8 +162,6 @@ class Server(fedavg_cs.Server):
                 logging.info(
                     "[Edge Server #%d] All %d client reports received. Processing.",
                     os.getpid(), len(self.updates))
-                self.do_personalization_test = False
-                self.personalization_accuracy = 0
                 await super().process_reports()
                 await self.wrap_up()
                 await self.select_clients()
@@ -208,25 +173,25 @@ class Server(fedavg_cs.Server):
                     logging.info(
                         "[Server #%d] All %d client reports received. Processing.",
                         os.getpid(), len(self.updates))
-                    self.do_personalization_test = False
                     await self.process_reports()
 
-                    # Start testing the global meta model w.r.t. personalization
-                    await self.select_testing_clients()
+                    if Config().is_central_server():
+                        # Start testing the global meta model w.r.t. personalization
+                        await self.select_testing_clients()
 
-            if len(self.personalization_test_updates) > 0 and len(
-                    self.personalization_test_updates) >= len(
+            else:
+                if len(self.personalization_test_updates) >= len(
                         self.selected_clients):
-                logging.info(
-                    "[Server #%d] All %d personalization test results received.",
-                    os.getpid(), len(self.personalization_test_updates))
+                    logging.info(
+                        "[Server #%d] All %d personalization test results received.",
+                        os.getpid(), len(self.personalization_test_updates))
 
-                self.do_personalization_test = True
-                await self.process_reports()
+                    await self.process_reports()
 
-                await self.wrap_up()
-                self.personalization_test_updates = []
+                    await self.wrap_up()
+                    self.personalization_test_updates = []
+                    self.do_personalization_test = False
 
-                # Start a new round of FL training
-                if Config().is_central_server():
-                    await self.select_clients()
+                    # Start a new round of FL training
+                    if Config().is_central_server():
+                        await self.select_clients()

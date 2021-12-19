@@ -1,6 +1,8 @@
 """The YOLOV5 model for PyTorch."""
+
 from yolov5.models import yolo
-from yolov5.utils.torch_utils import time_synchronized
+from yolov5.models.common import *
+from yolov5.models.experimental import *
 
 from plato.config import Config
 
@@ -27,48 +29,30 @@ class Model(yolo.Model):
                 x = y[m.f] if isinstance(
                     m.f, int) else [x if j == -1 else y[j]
                                     for j in m.f]  # from earlier layers
-
             if profile:
-                o = thop.profile(m, inputs=(
-                    x, ), verbose=False)[0] / 1E9 * 2 if thop else 0  # FLOPS
-                t = time_synchronized()
-                for _ in range(10):
-                    _ = m(x)
-                dt.append((time_synchronized() - t) * 100)
-                print('%10.1f%10.0f%10.1fms %-40s' % (o, m.np, dt[-1], m.type))
-
+                self._profile_one_layer(m, x, dt)
             x = m(x)  # run
             y.append(x if m.i in self.save else None)  # save output
-
-        if profile:
-            print('%.1fms total' % sum(dt))
         return x
 
     def forward_from(self, x, cut_layer=4, profile=False):
         y, dt = [], []  # outputs
+
         for m in self.model:
             if m.i < cut_layer:
                 y.append(None)
                 continue
+
             if m.f != -1:  # if not from previous layer
                 x = y[m.f] if isinstance(
                     m.f, int) else [x if j == -1 else y[j]
                                     for j in m.f]  # from earlier layers
-
             if profile:
-                o = thop.profile(m, inputs=(
-                    x, ), verbose=False)[0] / 1E9 * 2 if thop else 0  # FLOPS
-                t = time_synchronized()
-                for _ in range(10):
-                    _ = m(x)
-                dt.append((time_synchronized() - t) * 100)
-                print('%10.1f%10.0f%10.1fms %-40s' % (o, m.np, dt[-1], m.type))
+                self._profile_one_layer(m, x, dt)
 
             x = m(x)  # run
             y.append(x if m.i in self.save else None)  # save output
 
-        if profile:
-            print('%.1fms total' % sum(dt))
         return x
 
     @staticmethod

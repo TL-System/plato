@@ -10,6 +10,10 @@ import time
 import numpy as np
 import torch
 import torch.nn as nn
+from opacus import GradSampleModule
+from opacus.privacy_engine import PrivacyEngine
+from opacus.validators import ModuleValidator
+
 from plato.config import Config
 from plato.models import registry as models_registry
 from plato.trainers import base
@@ -37,6 +41,18 @@ class Trainer(base.Trainer):
             self.model = nn.DataParallel(model)
         else:
             self.model = model
+
+        if hasattr(Config().trainer, 'differential_privacy') and Config(
+        ).trainer.differential_privacy:
+            logging.info("Using differential privacy during training.")
+
+            errors = ModuleValidator.validate(self.model, strict=False)
+            if len(errors) > 0:
+                self.model = ModuleValidator.fix(self.model)
+                errors = ModuleValidator.validate(self.model, strict=False)
+                assert len(errors) == 0
+
+            self.model = GradSampleModule(self.model)
 
     def zeros(self, shape):
         """Returns a PyTorch zero tensor with the given shape."""
@@ -154,12 +170,34 @@ class Trainer(base.Trainer):
                 else:
                     lr_schedule = None
 
+                if 'differential_privacy' in config and config[
+                        'differential_privacy']:
+                    privacy_engine = PrivacyEngine(accountant='rdp',
+                                                   secure_mode=False)
+
+                    self.model, optimizer, train_loader = privacy_engine.make_private_with_epsilon(
+                        module=self.model,
+                        optimizer=optimizer,
+                        data_loader=train_loader,
+                        target_epsilon=config['dp_epsilon']
+                        if 'dp_epsilon' in config else 10.0,
+                        target_delta=config['dp_delta']
+                        if 'dp_delta' in config else 1e-5,
+                        epochs=epochs,
+                        max_grad_norm=config['dp_max_grad_norm']
+                        if 'max_grad_norm' in config else 1.0,
+                    )
+
                 for epoch in range(1, epochs + 1):
                     for batch_id, (examples,
                                    labels) in enumerate(train_loader):
                         examples, labels = examples.to(self.device), labels.to(
                             self.device)
-                        optimizer.zero_grad()
+                        if 'differential_privacy' in config and config[
+                                'differential_privacy']:
+                            optimizer.zero_grad(set_to_none=True)
+                        else:
+                            optimizer.zero_grad()
 
                         if cut_layer is None:
                             outputs = self.model(examples)
@@ -170,11 +208,7 @@ class Trainer(base.Trainer):
                         loss = loss_criterion(outputs, labels)
 
                         loss.backward()
-
                         optimizer.step()
-
-                        if lr_schedule is not None:
-                            lr_schedule.step()
 
                         if batch_id % log_interval == 0:
                             if self.client_id == 0:
@@ -192,6 +226,9 @@ class Trainer(base.Trainer):
                                     .format(self.client_id, epoch, epochs,
                                             batch_id, len(train_loader),
                                             loss.data.item()))
+
+                    if lr_schedule is not None:
+                        lr_schedule.step()
 
                     if hasattr(optimizer, "params_state_update"):
                         optimizer.params_state_update()
@@ -223,7 +260,7 @@ class Trainer(base.Trainer):
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']
 
-        if hasattr(Config().trainer, 'max_concurrency'):
+        if 'max_concurrency' in config:
             self.start_training()
             tic = time.perf_counter()
 
@@ -231,12 +268,8 @@ class Trainer(base.Trainer):
                 mp.set_start_method('spawn', force=True)
 
             train_proc = mp.Process(target=self.train_process,
-                                    args=(
-                                        config,
-                                        trainset,
-                                        sampler,
-                                        cut_layer,
-                                    ))
+                                    args=(config, trainset, sampler,
+                                          cut_layer))
             train_proc.start()
             train_proc.join()
 
@@ -246,7 +279,7 @@ class Trainer(base.Trainer):
             try:
                 self.load_model(filename)
             except OSError as error:  # the model file is not found, training failed
-                if hasattr(Config().trainer, 'max_concurrency'):
+                if 'max_concurrency' in config:
                     self.run_sql_statement(
                         "DELETE FROM trainers WHERE run_id = (?)",
                         (self.client_id, ))
@@ -264,7 +297,7 @@ class Trainer(base.Trainer):
 
         return training_time
 
-    def test_process(self, config, testset):
+    def test_process(self, config, testset, sampler=None):
         """The testing loop, run in a separate process with a new CUDA context,
         so that CUDA memory can be released after the training completes.
 
@@ -275,14 +308,28 @@ class Trainer(base.Trainer):
         self.model.to(self.device)
         self.model.eval()
 
+        # Initialize accuracy to be returned to -1, so that the client can disconnect
+        # from the server when testing fails
+        accuracy = -1
+
         try:
             custom_test = getattr(self, "test_model", None)
 
             if callable(custom_test):
                 accuracy = self.test_model(config, testset)
             else:
-                test_loader = torch.utils.data.DataLoader(
-                    testset, batch_size=config['batch_size'], shuffle=False)
+                if sampler is None:
+                    test_loader = torch.utils.data.DataLoader(
+                        testset,
+                        batch_size=config['batch_size'],
+                        shuffle=False)
+                # Use a testing set following the same distribution as the training set
+                else:
+                    test_loader = torch.utils.data.DataLoader(
+                        testset,
+                        batch_size=config['batch_size'],
+                        shuffle=False,
+                        sampler=sampler.get())
 
                 correct = 0
                 total = 0
@@ -312,7 +359,7 @@ class Trainer(base.Trainer):
         else:
             return accuracy
 
-    def test(self, testset) -> float:
+    def test(self, testset, sampler=None) -> float:
         """Testing the model using the provided test dataset.
 
         Arguments:
@@ -331,10 +378,12 @@ class Trainer(base.Trainer):
                               args=(
                                   config,
                                   testset,
+                                  sampler,
                               ))
             proc.start()
             proc.join()
 
+            accuracy = -1
             try:
                 model_name = Config().trainer.model_name
                 filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.acc"

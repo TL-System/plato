@@ -22,7 +22,6 @@ elif hasattr(Config().trainer, 'use_tensorflow'):
         ('basic', basic_tensorflow.Trainer),
     ])
 else:
-    
     from plato.trainers import (
         basic,
         pascal_voc,

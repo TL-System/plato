@@ -10,6 +10,7 @@ import sqlite3
 from collections import OrderedDict, namedtuple
 
 import yaml
+from yamlinclude import YamlIncludeConstructor
 
 
 class Config:
@@ -60,21 +61,16 @@ class Config:
             if Config.args.port is not None:
                 Config.args.port = int(args.port)
 
-            try:
-                log_level = {
-                    'critical': logging.CRITICAL,
-                    'error': logging.ERROR,
-                    'warn': logging.WARN,
-                    'info': logging.INFO,
-                    'debug': logging.DEBUG
-                }[args.log]
-            except KeyError:
-                log_level = logging.INFO
+            numeric_level = getattr(logging, args.log.upper(), None)
+
+            if not isinstance(numeric_level, int):
+                raise ValueError(f'Invalid log level: {args.log}')
 
             logging.basicConfig(
                 format='[%(levelname)s][%(asctime)s]: %(message)s',
-                level=log_level,
                 datefmt='%H:%M:%S')
+            root_logger = logging.getLogger()
+            root_logger.setLevel(numeric_level)
 
             cls._instance = super(Config, cls).__new__(cls)
 
@@ -83,8 +79,11 @@ class Config:
             else:
                 filename = args.config
 
+            YamlIncludeConstructor.add_to_loader_class(
+                loader_class=yaml.SafeLoader, base_dir='./configs')
+
             if os.path.isfile(filename):
-                with open(filename, 'r') as config_file:
+                with open(filename, 'r', encoding="utf8") as config_file:
                     config = yaml.load(config_file, Loader=yaml.SafeLoader)
             else:
                 # if the configuration file does not exist, use a default one
@@ -115,6 +114,9 @@ class Config:
                     model = Config.trainer.model_name
                     server_type = Config.algorithm.type
                     Config.result_dir = f'./results/{datasource}/{model}/{server_type}/'
+
+            if 'model' in config:
+                Config.model = Config.namedtuple_from_dict(config['model'])
 
             if hasattr(Config().trainer, 'max_concurrency'):
                 # Using a temporary SQLite database to limit the maximum number of concurrent
@@ -207,7 +209,7 @@ class Config:
 
     @staticmethod
     def default_config() -> dict:
-        ''' Supply a default configuration when the config file is missing. '''
+        ''' Supply a default configuration when the configuration file is missing. '''
         config = {}
         config['clients'] = {}
         config['clients']['type'] = 'simple'
@@ -243,11 +245,12 @@ class Config:
 
     @staticmethod
     def store() -> None:
+        """ Saving the current run-time configuration to a file. """
         data = {}
         data['clients'] = Config.clients._asdict()
         data['server'] = Config.server._asdict()
         data['data'] = Config.data._asdict()
         data['trainer'] = Config.trainer._asdict()
         data['algorithm'] = Config.algorithm._asdict()
-        with open(Config.args.config, "w") as out:
+        with open(Config.args.config, "w", encoding="utf8") as out:
             yaml.dump(data, out, default_flow_style=False)

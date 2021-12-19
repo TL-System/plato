@@ -1,4 +1,4 @@
-# Plato: A New Framework for Federated Learning Research
+# Plato: A New Framework for Scalable Federated Learning Research
 
 Welcome to *Plato*, a new software framework to facilitate scalable federated learning research.
 
@@ -6,11 +6,11 @@ Welcome to *Plato*, a new software framework to facilitate scalable federated le
 
 ### Setting up your Python environment
 
-It is recommended that [Miniconda](https://docs.conda.io/en/latest/miniconda.html) is used to manage Python packages. Before using *Plato*, first install [Miniconda](https://docs.conda.io/en/latest/miniconda.html), update your `conda` environment, and then create a new `conda` environment with Python 3.8 using the command:
+It is recommended that [Miniconda](https://docs.conda.io/en/latest/miniconda.html) is used to manage Python packages. Before using *Plato*, first install [Miniconda](https://docs.conda.io/en/latest/miniconda.html), update your `conda` environment, and then create a new `conda` environment with Python 3.9 using the command:
 
 ```shell
 $ conda update conda -y
-$ conda create -n federated python=3.8
+$ conda create -n federated python=3.9
 $ conda activate federated
 ```
 
@@ -95,55 +95,6 @@ cd packages/yolov5
 pip install .
 ```
 
-### Installing Plato with MindSpore or TensorFlow
-
-Plato is designed to support multiple deep learning frameworks, including PyTorch, TensorFlow, and MindSpore. 
-
-For TensorFlow support, please install the `tensorflow` and `tensorflow-datasets` pip packages first. 
-
-For MindSpore support, Plato currently supports MindSpore 1.1.1 (1.2.1 and 1.3.0 are not supported, as [they do not support `Tensor` objects to be pickled](https://gitee.com/mindspore/mindspore/issues/I43RPP?from=project-issue) and sent over a network). Though we provided a `Dockerfile` for building a Docker container that supports MindSpore 1.1.1, in rare cases it may still be necessary to install Plato with MindSpore in a GPU server running Ubuntu Linux 18.04 (which MindSpore requires). Similar to a PyTorch installation, we need to first create a new environment with Python 3.7.5 (which MindSpore 1.1.1 requires), and then install the required packages:
-
-```shell
-conda create -n mindspore python=3.7.5
-pip install -r requirements.txt
-```
-
-We should now install MindSpore 1.1.1 with the command provided by the [official MindSpore website](https://mindspore.cn/install).
-
-MindSpore 1.1.1 may also need additional packages, which should installed if they do not exist:
-
-```shell
-sudo apt-get install libssl-dev
-sudo apt-get install build-essential
-```
-
-If CuDNN has not yet been installed, it needs to be installed with the following commands:
-
-```shell
-wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-ubuntu1804.pin
-sudo mv cuda-ubuntu1804.pin /etc/apt/preferences.d/cuda-repository-pin-600
-sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub
-sudo add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/ /"
-sudo apt-get update
-sudo apt-get install libcudnn8=8.0.5.39-1+cuda10.1
-```
-
-To check the current CuDNN version, the following commands are helpful:
-
-```shell
-function lib_installed() { /sbin/ldconfig -N -v $(sed 's/:/ /' <<< $LD_LIBRARY_PATH) 2>/dev/null | grep $1; }
-function check() { lib_installed $1 && echo "$1 is installed" || echo "ERROR: $1 is NOT installed"; }
-check libcudnn
-```
-
-To check if MindSpore is correctly installed on the GPU server, try to run the command:
-
-```shell
-python -c "import mindspore"
-```
-
-Finally, to use trainers and servers based on MindSpore, assign `true` to `use_mindspore` in the `trainer` section of the configuration file. If GPU is not available when MindSpore is used, assign `true` to `cpuonly` in the `trainer` section as well. These variables are unassigned by default, and *Plato* would use PyTorch as its default framework.
-
 ## Running Plato
 
 ### Running Plato using a configuration file
@@ -161,9 +112,26 @@ To start a federated learning training workload, run [`run`](run) from the repos
 
 *Plato* can opt to use `wandb` to produce and collect logs in the cloud. If this is needed, add `use_wandb: true` to the `trainer` section in your configuration file, and install the `wandb` pip package in your `conda` environment.
 
+### Running Plato with MindSpore or TensorFlow
+
+Plato is designed to support multiple deep learning frameworks, including PyTorch, TensorFlow, and MindSpore. 
+
+**TensorFlow.** Install the `tensorflow` and `tensorflow-datasets` pip packages first:
+
+```shell
+pip install tensorflow tensorflow-datasets
+./run --config=configs/MNIST/fedavg_lenet5_tensorflow.yml
+```
+
+**MindSpore.** Plato currently supports the latest MindSpore release, 1.5.0. We have provided a `Dockerfile_MindSpore` file for building a Docker container that supports MindSpore 1.5.0. To use trainers and servers based on MindSpore, assign `true` to `use_mindspore` in the `trainer` section of the configuration file. If GPU is not available when MindSpore is used, assign `true` to `cpuonly` in the `trainer` section as well. These variables are unassigned by default, and *Plato* would use PyTorch as its default framework. As examples of using MindSpore as its underlying deep learning framework, two configuration files have been provided: `configs/MNIST/fedavg_lenet5_mindspore.yml` and `configs/MNIST/mistnet_lenet5_mindspore.yml`. For example:
+
+```shell
+./run --config=configs/MNIST/fedavg_lenet5_mindspore.yml
+```
+
 ### Running Plato in a Docker container
 
-Most of the codebase in *Plato* is designed to be framework-agnostic, so that it is relatively straightfoward to use *Plato* with a variety of deep learning frameworks beyond PyTorch, which is the default framwork it is using. One example of such deep learning frameworks that *Plato* currently supports is [MindSpore 1.1.1](https://www.mindspore.cn). Due to the wide variety of tricks that need to be followed correctly for running *Plato* without Docker, it is strongly recommended to run Plato in a Docker container, on either a CPU-only or a GPU-enabled server.
+Most of the codebase in *Plato* is designed to be framework-agnostic, so that it is relatively straightfoward to use *Plato* with a variety of deep learning frameworks beyond PyTorch, which is the default framwork it is using. One example of such deep learning frameworks that *Plato* currently supports is [MindSpore 1.5.0](https://www.mindspore.cn). Due to the wide variety of tricks that need to be followed correctly for running *Plato* without Docker, it is strongly recommended to run Plato in a Docker container, on either a CPU-only or a GPU-enabled server.
 
 To build such a Docker image, use the provided `Dockerfile` for PyTorch and `Dockerfile_MindSpore` for MindSpore:
 
@@ -203,9 +171,9 @@ docker rmi plato
 
 On Ubuntu Linux, you may need to add `sudo` before these `docker` commands.
 
-The provided `Dockerfile` helps to build a Docker image running Ubuntu 20.04, with a virtual environment called `plato` pre-configured to support PyTorch 1.9.0 and Python 3.8. 
+The provided `Dockerfile` helps to build a Docker image running Ubuntu 20.04, with a virtual environment called `plato` pre-configured to support PyTorch 1.9.0 and Python 3.9.
 
-If MindSpore support is needed, the provided `Dockerfile_MindSpore` contains two pre-configured environments for CPU and GPU environments, respectively, called `plato_cpu` or `plato_gpu`. They support [MindSpore 1.1.1](https://github.com/mindspore-ai/mindspore) and Python 3.7.5 (which is the Python version that MindSpore requires). Both Dockerfiles have GPU support enabled. Once an image is built and a Docker container is running, one can use Visual Studio Code to connect to it and start development within the container.
+If MindSpore support is needed, the provided `Dockerfile_MindSpore` contains two pre-configured environments for CPU and GPU environments, respectively, called `plato_cpu` or `plato_gpu`. They support [MindSpore 1.5.0](https://github.com/mindspore-ai/mindspore) and Python 3.9.0 (which is the Python version that MindSpore 1.5.0 requires). Both Dockerfiles have GPU support enabled. Once an image is built and a Docker container is running, one can use Visual Studio Code to connect to it and start development within the container.
 
 ### Potential runtime errors
 
@@ -252,6 +220,10 @@ python plot.py --config=config.yml
 ### Running unit tests
 
 All unit tests are in the `tests/` directory. These tests are designed to be standalone and executed separately. For example, the command `python lr_schedule_tests.py` runs the unit tests for learning rate schedules.
+
+### Running Continuous Integration tests as GitHub actions
+
+Continuous Integration (CI) tests have been set up for the PyTorch, TensorFlow, and MindSpore frameworks in `.github/workflows/`, and will be activated on every push and Pull Request. To run these tests manually, visit the `Actions` tab at GitHub, select the job, and then click `Run workflow`.
 
 ## Deploying Plato
 

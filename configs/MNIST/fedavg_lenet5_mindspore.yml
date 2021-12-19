@@ -31,7 +31,7 @@ data:
 trainer:
     # Should MindSpore be used instead of PyTorch?
     use_mindspore: true
-    
+
     # Should MindSpore be used with CPU as its target?
     cpuonly: true
 

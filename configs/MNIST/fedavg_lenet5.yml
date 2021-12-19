@@ -3,13 +3,13 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 3
+    total_clients: 1
 
     # The number of clients selected in each round
-    per_round: 3
+    per_round: 1
 
     # Should the clients compute test accuracy locally?
-    do_test: false 
+    do_test: false
 
     # Whether simulate clients or not
     simulation: false
@@ -43,6 +43,12 @@ trainer:
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
+
+    # Whether to apply differential privacy
+    differential_privacy: true
+    # dp_epsilon: 1
+    # dp_delta: 0.00001
+    # dp_max_grad_norm: 1
 
     # The maximum number of clients running concurrently
     max_concurrency: 1
