@@ -4,12 +4,10 @@ A federated learning training session using RL control.
 import asyncio
 import logging
 import multiprocessing as mp
-import os
 
-import simple_rl_agent
-import simple_rl_server
-from config import RLConfig
-from plato.clients import simple
+from plato.utils.rlfl import simple_rl_agent
+from plato.utils.rlfl import simple_rl_server
+from plato.utils.rlfl.config import RLConfig
 
 
 def run():
