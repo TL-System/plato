@@ -25,5 +25,5 @@ class Client(edge.Client):
         # Might apply Gaussian mechanism
 
         return Report(report.client_id, report.num_samples, report.accuracy,
-                      report.training_time, 0,
+                      report.average_accuracy, 0,
                       report.data_loading_time), weights
