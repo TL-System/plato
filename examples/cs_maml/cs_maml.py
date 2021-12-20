@@ -1,14 +1,11 @@
 """
 Personalized cross-silo federated learning using the MAML algorithm
 """
-import os
 
 import cs_maml_server
 import cs_maml_client
 import cs_maml_edge
 import cs_maml_trainer
-
-os.environ['config_file'] = './cs_maml_MNIST_lenet5.yml'
 
 
 def main():
