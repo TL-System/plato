@@ -1,21 +1,17 @@
 """
 A basic RL environment for FL server using Gym for RL control.
 """
-import asyncio
 import logging
-import os
 import random
-import time
 from abc import abstractmethod
-from dataclasses import dataclass
 
 import gym
 import numpy as np
 from gym import spaces
 
 from plato.utils.rlfl import base_rl_agent
-from plato.utils.rlfl.config import RLConfig
 from plato.utils import csv_processor
+
 
 class RLAgent(base_rl_agent.RLAgent, gym.Env):
     """ A basic RL environment for FL server using Gym for RL control. """

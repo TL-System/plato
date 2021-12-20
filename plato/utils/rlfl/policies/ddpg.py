@@ -3,20 +3,14 @@ Reference:
 
 https://github.com/sweetice/Deep-reinforcement-learning-with-pytorch
 """
-import argparse
 import logging
 import os
-import random
-import sys
-from itertools import count
 
-import gym
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from tensorboardX import SummaryWriter
 from torch.distributions import Normal
 
 from rlfl.config import DDPGConfig as Config
@@ -102,7 +96,6 @@ class Policy(object):
         self.critic_target.load_state_dict(self.critic.state_dict())
         self.critic_optimizer = optim.Adam(self.critic.parameters(), lr=1e-3)
         self.replay_buffer = Replay_buffer()
-        self.writer = SummaryWriter(Config().result_dir)
 
         self.num_critic_update_iteration = 0
         self.num_actor_update_iteration = 0
@@ -132,10 +125,6 @@ class Policy(object):
 
             # Compute critic loss
             critic_loss = F.mse_loss(current_Q, target_Q)
-            self.writer.add_scalar(
-                'Loss/critic_loss',
-                critic_loss,
-                global_step=self.num_critic_update_iteration)
             # Optimize the critic
             self.critic_optimizer.zero_grad()
             critic_loss.backward()
@@ -143,9 +132,6 @@ class Policy(object):
 
             # Compute actor loss
             actor_loss = -self.critic(state, self.actor(state)).mean()
-            self.writer.add_scalar('Loss/actor_loss',
-                                   actor_loss,
-                                   global_step=self.num_actor_update_iteration)
 
             # Optimize the actor
             self.actor_optimizer.zero_grad()
@@ -175,7 +161,7 @@ class Policy(object):
         if not os.path.exists(model_path):
             os.makedirs(model_path)
         if ep is not None:
-            model_path += 'iter' + str(ep) +'_'
+            model_path += 'iter' + str(ep) + '_'
 
         torch.save(self.actor.state_dict(), model_path + 'actor.pth')
         torch.save(self.critic.state_dict(), model_path + 'critic.pth')
@@ -189,7 +175,7 @@ class Policy(object):
 
         model_path = f'{model_dir}{model_name}'
         if ep is not None:
-            model_path += 'iter' + str(ep) +'_'
+            model_path += 'iter' + str(ep) + '_'
 
         logging.info("[RL Agent] Loading a model from %s.", model_path)
 
