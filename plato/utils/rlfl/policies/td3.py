@@ -1,23 +1,14 @@
 import copy
 import logging
-import math
 import os
-import random
 
-import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.autograd import Variable
-from torch.distributions import Normal
-from torch.nn.utils.rnn import (pack_padded_sequence, pad_packed_sequence,
-                                pad_sequence)
-from torch.optim import Adam
-from torch.utils.tensorboard import SummaryWriter
-
-from plato.utils import csv_processor
 from plato.utils.rlfl.config import TD3Config as Config
 from plato.utils.rlfl.policies.memory import ReplayMemory
+from torch.nn.utils.rnn import (pack_padded_sequence, pad_packed_sequence,
+                                pad_sequence)
 
 
 class Actor(nn.Module):
@@ -240,7 +231,6 @@ class Policy(object):
                                           Config().replay_size,
                                           Config().seed, self.recurrent,
                                           self.varied_per_round)
-        self.writer = SummaryWriter(Config().result_dir)
 
     def get_initial_states(self):
         h_0, c_0 = None, None
@@ -375,10 +365,6 @@ class Policy(object):
                 target_param.data.copy_(self.tau * param.data +
                                         (1 - self.tau) * target_param.data)
 
-            self.writer.add_scalar('loss/critic', critic_loss.item(),
-                                   self.total_it)
-            self.writer.add_scalar('loss/policy', actor_loss.item(),
-                                   self.total_it)
         return critic_loss.item(), actor_loss.item()
 
     def save(self, filename):
