@@ -9,6 +9,7 @@ import time
 
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
+from plato.processors import registry as processor_registry
 from plato.samplers import registry as samplers_registry
 from plato.utils import csv_processor
 
@@ -94,6 +95,11 @@ class Server(fedavg.Server):
                         datasource, Config().args.id, testing='edge')
 
             self.load_trainer()
+
+            # Prepares this server for processors that processes outbound and inbound
+            # data payloads
+            self.outbound_processor, self.inbound_processor = processor_registry.get(
+                "Server", server_id=os.getpid(), trainer=self.trainer)
 
             if hasattr(Config(), 'results'):
                 result_dir = Config().result_dir
