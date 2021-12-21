@@ -9,28 +9,32 @@ import gym
 import numpy as np
 from gym import spaces
 
+from plato.config import Config
 from plato.utils import csv_processor
 from plato.utils.reinforcement_learning import base_rl_agent
 
 
 class RLAgent(base_rl_agent.RLAgent, gym.Env):
     """ A basic RL environment for FL server using Gym for RL control. """
-    def __init__(self, config):
+    def __init__(self):
         super().__init__()
         self.agent = 'simple'
-        self.config = config
+        self.n_actions = Config().clients.per_round
+        self.n_states = Config().clients.per_round * Config(
+        ).algorithm.n_features
 
-        if self.config.discrete_action_space:
-            self.action_space = spaces.Discrete(self.config.n_actions)
+        if Config().algorithm.discrete_action_space:
+            self.action_space = spaces.Discrete(self.n_actions)
         else:
-            self.action_space = spaces.Box(low=self.config.min_action,
-                                           high=self.config.max_action,
-                                           shape=(self.config.n_actions, ),
+            self.action_space = spaces.Box(low=int(
+                Config().algorithm.min_action),
+                                           high=Config().algorithm.max_action,
+                                           shape=(self.n_actions, ),
                                            dtype=np.float32)
 
         self.observation_space = spaces.Box(low=-np.inf,
                                             high=np.inf,
-                                            shape=(self.config.n_states, ),
+                                            shape=(self.n_states, ),
                                             dtype=np.float32)
 
         self.state = None
@@ -68,8 +72,7 @@ class RLAgent(base_rl_agent.RLAgent, gym.Env):
                      self.current_episode)
 
         # Reboot/reconfigure the FL server
-        self.sio.emit('env_reset',
-                            {'current_episode': self.current_episode})
+        self.sio.emit('env_reset', {'current_episode': self.current_episode})
 
         return
 
@@ -84,7 +87,7 @@ class RLAgent(base_rl_agent.RLAgent, gym.Env):
         if self.server_update:
             return self.server_update
         # Initial state is random when env resets
-        return [round(random.random(), 4) for i in range(self.config.n_states)]
+        return [round(random.random(), 4) for i in range(self.n_states)]
 
     def get_reward(self):
         """ Get reward for agent. """
@@ -92,7 +95,8 @@ class RLAgent(base_rl_agent.RLAgent, gym.Env):
 
     def get_done(self):
         """ Get done condition for agent. """
-        if self.config.mode == 'train' and self.current_step >= self.config.steps_per_episode:
+        if Config().algorithm.mode == 'train' and self.current_step >= Config(
+        ).algorithm.steps_per_episode:
             logging.info("[RL Agent] Episode #%d ended.", self.current_episode)
             return True
         return False
@@ -127,27 +131,28 @@ class RLAgent(base_rl_agent.RLAgent, gym.Env):
             self.state = self.get_state()
         else:
             self.step(self.action)
-            if self.config.mode == 'train':
+            if Config().algorithm.mode == 'train':
                 self.process_experience()
             self.state = self.next_state
             self.episode_reward += self.reward
 
-            step_result_csv_file = self.config.result_dir + 'step_result.csv'
+            step_result_csv_file = Config(
+            ).algorithm.result_dir + 'step_result.csv'
             csv_processor.write_csv(step_result_csv_file,
                                     [self.current_episode, self.current_step] +
                                     list(self.state) + list(self.action))
 
     async def prep_agent_update(self):
         """ Update RL Agent. """
-        if self.is_done and self.config.mode == 'train':
+        if self.is_done and Config().algorithm.mode == 'train':
             self.update_policy()
 
             # Break the loop when RL training is concluded
-            if self.current_episode >= self.config.max_episode:
+            if self.current_episode >= Config().algorithm.max_episode:
                 await self.wrap_up()
             else:
                 self.reset()
-        elif self.current_step >= self.config.test_step:
+        elif self.current_step >= Config().algorithm.test_step:
             # Break the loop when RL testing is concluded
             await self.wrap_up()
         else:

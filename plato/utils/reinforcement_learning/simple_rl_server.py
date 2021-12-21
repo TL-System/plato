@@ -1,7 +1,6 @@
 """
 A federated learning server with RL Agent.
 """
-
 import logging
 import os
 import pickle

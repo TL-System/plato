@@ -16,7 +16,7 @@ class Report(simple.Report):
 
 
 class Client(simple.Client):
-    """A federated learning client for FEI."""
+    """ A federated learning client for FEI. """
     async def train(self):
         logging.info("Training on FEI client #%d", self.client_id)
 
@@ -26,8 +26,9 @@ class Client(simple.Client):
         loss = self.get_loss()
         valuation = self.calc_valuation(report.num_samples, loss)
 
-        return Report(report.num_samples, report.accuracy, report.training_time,
-                      report.data_loading_time, valuation), weights
+        return Report(report.num_samples, report.accuracy,
+                      report.training_time, report.data_loading_time,
+                      valuation), weights
 
     def get_loss(self):
         """ Retrieve the loss value from the training process. """

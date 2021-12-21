@@ -10,36 +10,26 @@ import random
 
 import numpy as np
 import torch
-from torch import nn
 import torch.nn.functional as F
+from torch import nn
 from torch.nn.utils.rnn import (pack_padded_sequence, pad_packed_sequence,
                                 pad_sequence)
 
-from policies.config import TD3Config as Config
+from plato.config import Config
 
 
 class ReplayMemory:
-    def __init__(self,
-                 state_dim,
-                 action_dim,
-                 hidden_size,
-                 capacity,
-                 seed,
-                 recurrent=False,
-                 varied_per_round=False):
+    def __init__(self, state_dim, action_dim, hidden_size, capacity, seed):
         random.seed(seed)
         self.capacity = int(capacity)
         self.ptr = 0
         self.size = 0
-        self.recurrent = recurrent
-        self.varied_per_round = varied_per_round
 
-        if self.recurrent:
+        if Config().algorithm.recurrent_actor:
             self.h = np.zeros((self.capacity, hidden_size))
             self.nh = np.zeros((self.capacity, hidden_size))
             self.c = np.zeros((self.capacity, hidden_size))
             self.nc = np.zeros((self.capacity, hidden_size))
-            # if varied_per_round:
             self.state = [0] * self.capacity
             self.action = [0] * self.capacity
             self.reward = [0] * self.capacity
@@ -52,8 +42,7 @@ class ReplayMemory:
             self.next_state = np.zeros((self.capacity, state_dim))
             self.done = np.zeros((self.capacity, 1))
 
-        self.device = torch.device(
-            "cuda" if torch.cuda.is_available() else "cpu")
+        self.device = Config().device
 
     def push(self, data):
         self.state[self.ptr] = data[0]
@@ -62,7 +51,7 @@ class ReplayMemory:
         self.next_state[self.ptr] = data[3]
         self.done[self.ptr] = data[4]
 
-        if self.recurrent:
+        if Config().algorithm.recurrent_actor:
             self.h[self.ptr] = data[5].detach().cpu()
             self.c[self.ptr] = data[6].detach().cpu()
             self.nh[self.ptr] = data[7].detach().cpu()
@@ -72,9 +61,11 @@ class ReplayMemory:
         self.size = min(self.size + 1, self.capacity)
 
     def sample(self):
-        ind = np.random.randint(0, self.size, size=int(Config().batch_size))
+        ind = np.random.randint(0,
+                                self.size,
+                                size=int(Config().algorithm.batch_size))
 
-        if not self.recurrent:
+        if not Config().algorithm.recurrent_actor:
             state = self.state[ind]
             action = self.action[ind]
             reward = self.reward[ind]
@@ -96,12 +87,6 @@ class ReplayMemory:
                           requires_grad=True,
                           dtype=torch.float).to(self.device)
 
-        # state = torch.FloatTensor([self.state[i] for i in ind]).to(self.device)
-        # action = torch.FloatTensor([self.action[i] for i in ind]).to(self.device)
-        # reward = torch.FloatTensor([self.reward[i] for i in ind]).to(self.device)
-        # next_state = torch.FloatTensor([self.next_state[i] for i in ind]).to(
-        #     self.device)
-        # done = torch.FloatTensor([self.done[i] for i in ind]).to(self.device)
         state = [torch.FloatTensor(self.state[i]).to(self.device) for i in ind]
         action = [
             torch.FloatTensor(self.action[i]).to(self.device) for i in ind
@@ -119,36 +104,27 @@ class ReplayMemory:
 
 
 class Actor(nn.Module):
-    def __init__(self,
-                 state_dim,
-                 action_dim,
-                 hidden_dim,
-                 max_action,
-                 is_recurrent=False,
-                 varied_per_round=False):
+    def __init__(self, state_dim, action_dim, hidden_size, max_action):
         super(Actor, self).__init__()
-        self.recurrent = is_recurrent
-        self.varied_per_round = varied_per_round
         self.action_dim = action_dim
 
-        if self.recurrent:
-            self.l1 = nn.LSTM(state_dim, hidden_dim, batch_first=True)
+        if Config().algorithm.recurrent_actor:
+            self.l1 = nn.LSTM(state_dim, hidden_size, batch_first=True)
         else:
-            self.l1 = nn.Linear(state_dim, hidden_dim)
+            self.l1 = nn.Linear(state_dim, hidden_size)
 
-        self.l2 = nn.Linear(hidden_dim, hidden_dim)
-        if self.recurrent:
-            self.l3 = nn.Linear(hidden_dim, 1)
+        self.l2 = nn.Linear(hidden_size, hidden_size)
+        if Config().algorithm.recurrent_actor:
+            self.l3 = nn.Linear(hidden_size, 1)
         else:
-            self.l3 = nn.Linear(hidden_dim, action_dim)
+            self.l3 = nn.Linear(hidden_size, action_dim)
 
         self.max_action = max_action
 
     def forward(self, state, hidden):
-        if self.recurrent:
-            # if self.varied_per_round and len(state) != 1:
-            if self.varied_per_round:
-                # # Pad the first state to full dims
+        if Config().algorithm.recurrent_actor:
+            if hasattr(Config().clients, 'varied') and Config().clients.varied:
+                # Pad the first state to full dims
                 if len(state) != 1:
                     pilot = state[0]
                 else:
@@ -176,7 +152,9 @@ class Actor(nn.Module):
             a, h = F.relu(self.l1(state)), None
 
         # mini-batch update
-        if self.recurrent and self.varied_per_round and len(state) != 1:
+        if Config().algorithm.recurrent_actor and hasattr(
+                Config().clients,
+                'varied') and Config().clients.varied and len(state) != 1:
             a, _ = pad_packed_sequence(a, batch_first=True)
 
         a = F.relu(self.l2(a))
@@ -185,35 +163,29 @@ class Actor(nn.Module):
 
 
 class Critic(nn.Module):
-    def __init__(self,
-                 state_dim,
-                 action_dim,
-                 hidden_dim,
-                 is_recurrent=False,
-                 varied_per_round=False):
+    def __init__(self, state_dim, action_dim, hidden_size):
         super(Critic, self).__init__()
-        self.recurrent = is_recurrent
-        self.varied_per_round = varied_per_round
         self.action_dim = action_dim
 
-        if self.recurrent:
-            self.l1 = nn.LSTM(state_dim + 1, hidden_dim, batch_first=True)
-            self.l4 = nn.LSTM(state_dim + 1, hidden_dim, batch_first=True)
+        if Config().algorithm.recurrent_actor:
+            self.l1 = nn.LSTM(state_dim + 1, hidden_size, batch_first=True)
+            self.l4 = nn.LSTM(state_dim + 1, hidden_size, batch_first=True)
 
         else:
-            self.l1 = nn.Linear(state_dim + action_dim, hidden_dim)
-            self.l4 = nn.Linear(state_dim + action_dim, hidden_dim)
+            self.l1 = nn.Linear(state_dim + action_dim, hidden_size)
+            self.l4 = nn.Linear(state_dim + action_dim, hidden_size)
 
         # Q1 architecture
-        self.l2 = nn.Linear(hidden_dim, hidden_dim)
-        self.l3 = nn.Linear(hidden_dim, 1)
+        self.l2 = nn.Linear(hidden_size, hidden_size)
+        self.l3 = nn.Linear(hidden_size, 1)
 
         # Q2 architecture
-        self.l5 = nn.Linear(hidden_dim, hidden_dim)
-        self.l6 = nn.Linear(hidden_dim, 1)
+        self.l5 = nn.Linear(hidden_size, hidden_size)
+        self.l6 = nn.Linear(hidden_size, 1)
 
     def forward(self, state, action, hidden1, hidden2):
-        if self.recurrent and self.varied_per_round:
+        if Config().algorithm.recurrent_actor and hasattr(
+                Config().clients, 'varied') and Config().clients.varied:
             # Pad the first state to full dims
             if len(state) != 1:
                 pilot = state[0]
@@ -235,8 +207,8 @@ class Critic(nn.Module):
             state = padded
         sa = torch.cat([state, action], -1)
 
-        if self.recurrent:
-            if self.varied_per_round:
+        if Config().algorithm.recurrent_actor:
+            if hasattr(Config().clients, 'varied') and Config().clients.varied:
                 sa = pack_padded_sequence(sa,
                                           lengths=lens,
                                           batch_first=True,
@@ -249,7 +221,8 @@ class Critic(nn.Module):
             q1, hidden1 = F.relu(self.l1(sa)), None
             q2, hidden2 = F.relu(self.l4(sa)), None
 
-        if self.recurrent and self.varied_per_round:
+        if Config().algorithm.recurrent_actor and hasattr(
+                Config().clients, 'varied') and Config().clients.varied:
             q1, _ = pad_packed_sequence(q1, batch_first=True)
             q2, _ = pad_packed_sequence(q2, batch_first=True)
 
@@ -264,7 +237,8 @@ class Critic(nn.Module):
         return q1, q2
 
     def Q1(self, state, action, hidden1):
-        if self.recurrent and self.varied_per_round:
+        if Config().algorithm.recurrent_actor and hasattr(
+                Config().clients, 'varied') and Config().clients.varied:
             # Pad variable states
             # Get the length explicitly for later packing sequences
             lens = list(map(len, state))
@@ -273,8 +247,8 @@ class Critic(nn.Module):
             state = padded
 
         sa = torch.cat([state, action], -1)
-        if self.recurrent:
-            if self.varied_per_round:
+        if Config().algorithm.recurrent_actor:
+            if hasattr(Config().clients, 'varied') and Config().clients.varied:
                 sa = pack_padded_sequence(sa,
                                           lengths=lens,
                                           batch_first=True,
@@ -284,7 +258,8 @@ class Critic(nn.Module):
         else:
             q1, hidden1 = F.relu(self.l1(sa)), None
 
-        if self.recurrent and self.varied_per_round:
+        if Config().algorithm.recurrent_actor and hasattr(
+                Config().clients, 'varied') and Config().clients.varied:
             q1, _ = pad_packed_sequence(q1, batch_first=True)
 
         q1 = F.relu(self.l2(q1))
@@ -296,67 +271,51 @@ class Critic(nn.Module):
 
 class Policy(object):
     def __init__(self, state_dim, action_space):
-        self.max_action = Config().max_action
-        self.hidden_dim = Config().hidden_size
-        self.discount = Config().gamma
-        self.tau = Config().tau
-        self.policy_noise = Config().policy_noise
-        self.noise_clip = Config().noise_clip
-        self.policy_freq = Config().policy_freq
-        self.lr = Config().learning_rate
+        self.max_action = Config().algorithm.max_action
+        self.hidden_size = Config().algorithm.hidden_size
+        self.discount = Config().algorithm.gamma
+        self.tau = Config().algorithm.tau
+        self.policy_noise = Config().algorithm.policy_noise * self.max_action
+        self.noise_clip = Config().algorithm.noise_clip * self.max_action
+        self.policy_freq = Config().algorithm.policy_freq
+        self.lr = Config().algorithm.learning_rate
 
         self.device = Config().device
         self.on_policy = False
-        self.recurrent = Config().recurrent_actor
-        self.varied_per_round = Config().varied_per_round
-        # self.action_len = action_space.shape[0]
 
-        self.actor = Actor(state_dim,
-                           action_space.shape[0],
-                           self.hidden_dim,
-                           self.max_action,
-                           is_recurrent=Config().recurrent_actor,
-                           varied_per_round=Config().varied_per_round).to(
-                               self.device)
+        self.actor = Actor(state_dim, action_space.shape[0], self.hidden_size,
+                           self.max_action)
         self.actor_target = copy.deepcopy(self.actor)
         self.actor_optimizer = torch.optim.Adam(self.actor.parameters(),
                                                 lr=self.lr)
 
-        self.critic = Critic(state_dim,
-                             action_space.shape[0],
-                             self.hidden_dim,
-                             is_recurrent=Config().recurrent_critic,
-                             varied_per_round=Config().varied_per_round).to(
-                                 self.device)
+        self.critic = Critic(state_dim, action_space.shape[0],
+                             self.hidden_size)
         self.critic_target = copy.deepcopy(self.critic)
         self.critic_optimizer = torch.optim.Adam(self.critic.parameters(),
                                                  lr=self.lr)
 
         self.total_it = 0
         self.replay_buffer = ReplayMemory(state_dim, action_space.shape[0],
-                                          self.hidden_dim,
-                                          Config().replay_size,
-                                          Config().seed, self.recurrent,
-                                          self.varied_per_round)
+                                          self.hidden_size,
+                                          Config().algorithm.replay_size,
+                                          Config().algorithm.seed)
 
     def get_initial_states(self):
         h_0, c_0 = None, None
-        if self.actor.recurrent:
+        if Config().algorithm.recurrent_actor:
             h_0 = torch.zeros(
                 (self.actor.l1.num_layers, 1, self.actor.l1.hidden_size),
                 dtype=torch.float)
-            h_0 = h_0.to(device=self.device)
+            # h_0 = h_0.to(self.device)
 
             c_0 = torch.zeros(
                 (self.actor.l1.num_layers, 1, self.actor.l1.hidden_size),
                 dtype=torch.float)
-            c_0 = c_0.to(device=self.device)
+            # c_0 = c_0.to(self.device)
         return (h_0, c_0)
 
     def select_action(self, state, hidden=None, test=True):
-        # if self.recurrent:
-        #     state = np.array(torch.FloatTensor(state).to(self.device).unsqueeze(0))
-        # else:
         state = torch.FloatTensor(state).to(self.device).unsqueeze(0)
 
         action, hidden = self.actor(state, hidden)
@@ -366,13 +325,11 @@ class Policy(object):
         self.total_it += 1
 
         # Sample replay buffer
-        if self.recurrent:
+        if Config().algorithm.recurrent_actor:
             state, action, reward, next_state, done, h, c, nh, nc = self.replay_buffer.sample(
             )
-            if self.varied_per_round:
-                # Pad variable states
-                # Get the length explicitly for later packing sequences
-                lens = list(map(len, action))
+            if hasattr(Config().clients, 'varied') and Config().clients.varied:
+                # Pad variable actions
                 padded = pad_sequence(action, batch_first=True)
                 action = padded
             reward = torch.FloatTensor(reward).to(self.device).unsqueeze(1)
@@ -470,10 +427,8 @@ class Policy(object):
 
     def save_model(self, ep=None):
         """Saving the model to a file."""
-        model_name = Config().model_name
-        model_dir = Config().model_dir
-
-        model_path = f'{model_dir}/{model_name}/'
+        model_name = Config().algorithm.model_name
+        model_path = f'./models/{model_name}/'
         if not os.path.exists(model_path):
             os.makedirs(model_path)
         if ep is not None:
@@ -490,10 +445,8 @@ class Policy(object):
 
     def load_model(self, ep=None):
         """Loading pre-trained model weights from a file."""
-        model_name = Config().model_name
-        model_dir = Config().model_dir
-
-        model_path = f'{model_dir}/{model_name}/'
+        model_name = Config().algorithm.model_name
+        model_path = f'./models/{model_name}/'
         if ep is not None:
             model_path += 'iter' + str(ep) + '_'
 

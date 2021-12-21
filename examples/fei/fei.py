@@ -10,16 +10,15 @@ import fei_agent
 import fei_client
 import fei_server
 import fei_trainer
-from policies.config import TD3Config as Config
+
+os.environ['config_file'] = 'examples/fei/fei_FMNIST_lenet5.yml'
 
 
 def run():
     """Starting an RL Agent (client) to connect to the server."""
 
     logging.info("Starting an RL Agent.")
-    config = Config()
-    # Or a custom agent
-    agent = fei_agent.RLAgent(config)
+    agent = fei_agent.RLAgent()
     asyncio.run(agent.start_agent())
 
 

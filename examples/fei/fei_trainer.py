@@ -14,8 +14,9 @@ from plato.utils import optimizers
 
 
 class Trainer(basic.Trainer):
+    """ A federated learning trainer for FEI. """
     def train_model(self, config, trainset, sampler, cut_layer=None):
-        """A custom trainer reporting training loss. """
+        """ A custom trainer reporting training loss. """
         log_interval = 10
         batch_size = config['batch_size']
 

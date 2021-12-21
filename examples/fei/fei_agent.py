@@ -3,49 +3,62 @@ An RL agent for FL training.
 """
 import logging
 import math
+import os
 import random
 from collections import deque
 from statistics import mean, stdev
 
 import numpy as np
 
+from plato.config import Config
 from plato.utils import csv_processor
 from plato.utils.reinforcement_learning import simple_rl_agent
-from policies import td3
+from plato.utils.reinforcement_learning.policies import td3
+
+os.environ['config_file'] = 'examples/fei/fei_FMNIST_lenet5.yml'
 
 
 class RLAgent(simple_rl_agent.RLAgent):
     """ An RL agent for FL training using FEI. """
-    def __init__(self, config):
-        super().__init__(config)
+    def __init__(self):
+        super().__init__()
         self.agent = 'FEI'
 
-        self.policy = td3.Policy(self.config.n_features, self.action_space)
+        # Or use other policies such as ddpg, sac
+        self.policy = td3.Policy(Config().algorithm.n_features,
+                                 self.action_space)
 
-        if self.policy.recurrent:
+        if Config().algorithm.recurrent_actor:
             self.h, self.c = self.policy.get_initial_states()
             self.nh, self.nc = self.h, self.c
 
-        if self.config.mode == 'train' and self.config.pretrained or self.config.mode == 'test':
-            self.policy.load_model(self.config.pretrained_iter)
-            self.current_episode = self.config.pretrained_iter + 1
-            self.total_steps = self.config.pretrained_iter * self.config.steps_per_episode + 1
+        if Config().algorithm.mode == 'train' and Config(
+        ).algorithm.pretrained or Config().algorithm.mode == 'test':
+            self.policy.load_model(Config().algorithm.pretrained_iter)
+            self.current_episode = Config().algorithm.pretrained_iter + 1
+            # BUG: varibale episode length
+            self.total_steps = Config().algorithm.pretrained_iter * Config(
+            ).algorithm.steps_per_episode + 1
+
+        self.recorded_rl_items = ['episode', 'actor_loss', 'critic_loss']
 
         if self.current_episode == 0:
-            episode_result_csv_file = self.config.result_dir + 'episode_result.csv'
+            episode_result_csv_file = Config(
+            ).result_dir + 'episode_result.csv'
             csv_processor.initialize_csv(episode_result_csv_file,
-                                         self.config.recorded_rl_items,
-                                         self.config.result_dir)
-            episode_reward_csv_file = self.config.result_dir + 'episode_reward.csv'
+                                         self.recorded_rl_items,
+                                         Config().result_dir)
+            episode_reward_csv_file = Config(
+            ).result_dir + 'episode_reward.csv'
             csv_processor.initialize_csv(
                 episode_reward_csv_file,
                 ['Episode #', 'Steps', 'Final accuracy', 'Reward'],
-                self.config.result_dir)
-            step_result_csv_file = self.config.result_dir + 'step_result.csv'
+                Config().result_dir)
+            step_result_csv_file = Config().result_dir + 'step_result.csv'
             csv_processor.initialize_csv(
                 step_result_csv_file,
                 ['Episode #', 'Step #', 'state', 'action'],
-                self.config.result_dir)
+                Config().result_dir)
 
         self.test_accuracy = None
         # Record test accuracy of the latest 5 rounds/steps
@@ -61,7 +74,7 @@ class RLAgent(simple_rl_agent.RLAgent):
         self.current_step = 0
         self.is_done = False
         self.episode_reward = 0
-        if self.policy.recurrent:
+        if Config().algorithm.recurrent_actor:
             self.h, self.c = self.policy.get_initial_states()
 
         self.current_episode += 1
@@ -69,20 +82,19 @@ class RLAgent(simple_rl_agent.RLAgent):
                      self.current_episode)
 
         # Reboot/reconfigure the FL server
-        self.sio.emit('env_reset',
-                            {'current_episode': self.current_episode})
+        self.sio.emit('env_reset', {'current_episode': self.current_episode})
 
         return
 
     async def prep_action(self):
         """ Get action from RL policy. """
-        if self.config.start_steps > self.total_steps:
+        if Config().algorithm.start_steps > self.total_steps:
             self.action = np.array(
                 self.action_space.sample())  # Sample random action
-            if self.policy.recurrent:
+            if Config().algorithm.recurrent_actor:
                 self.action = np.reshape(self.action, (-1, 1))
         else:  # Sample action from policy
-            if self.policy.recurrent:
+            if Config().algorithm.recurrent_actor:
                 self.action, (self.nh, self.nc) = self.policy.select_action(
                     self.state, (self.h, self.c))
                 self.action = np.reshape(np.array(self.action), (-1, 1))
@@ -96,8 +108,9 @@ class RLAgent(simple_rl_agent.RLAgent):
             return self.server_update
         # Initial state is random when env resets
         return np.array([[
-            round(random.random(), 4) for i in range(self.config.n_features)
-        ] for j in range(self.config.per_round)])
+            round(random.random(), 4)
+            for i in range(Config().algorithm.n_features)
+        ] for j in range(Config().clients.per_round)])
 
     def get_reward(self):
         """ Get reward for agent. """
@@ -111,7 +124,7 @@ class RLAgent(simple_rl_agent.RLAgent):
 
     def get_done(self):
         """ Get done condition for agent. """
-        if self.config.mode == 'train':
+        if Config().algorithm.mode == 'train':
             self.pre_acc.append(self.test_accuracy)
             if stdev(self.pre_acc) < 0.005:
                 logging.info("[RL Agent] Episode #%d ended.",
@@ -125,13 +138,13 @@ class RLAgent(simple_rl_agent.RLAgent):
             self.state = self.get_state()
         else:
             self.step(self.action)
-            if self.config.mode == 'train':
+            if Config().algorithm.mode == 'train':
                 self.process_experience()
             self.state = self.next_state
             self.episode_reward += self.reward
-            if self.policy.recurrent:
+            if Config().algorithm.recurrent_actor:
                 self.h, self.c = self.nh, self.nc
-            step_result_csv_file = self.config.result_dir + 'step_result.csv'
+            step_result_csv_file = Config().result_dir + 'step_result.csv'
             csv_processor.write_csv(step_result_csv_file,
                                     [self.current_episode, self.current_step] +
                                     list(self.state) + list(self.action))
@@ -150,22 +163,23 @@ class RLAgent(simple_rl_agent.RLAgent):
     def update_policy(self):
         """ Update agent if needed in training mode. """
         logging.info("[RL Agent] Updating the policy.")
-        if len(self.policy.replay_buffer) > self.config.batch_size:
+        if len(self.policy.replay_buffer) > Config().algorithm.batch_size:
             # TD3-LSTM
             critic_loss, actor_loss = self.policy.update()
 
             new_row = []
-            for item in self.config.recorded_rl_items:
+            for item in self.recorded_rl_items:
                 item_value = {
                     'episode': self.current_episode,
                     'actor_loss': actor_loss,
                     'critic_loss': critic_loss
                 }[item]
                 new_row.append(item_value)
-            episode_result_csv_file = self.config.result_dir + 'episode_result.csv'
+            episode_result_csv_file = Config(
+            ).result_dir + 'episode_result.csv'
             csv_processor.write_csv(episode_result_csv_file, new_row)
 
-        episode_reward_csv_file = self.config.result_dir + 'episode_reward.csv'
+        episode_reward_csv_file = Config().result_dir + 'episode_reward.csv'
         csv_processor.write_csv(episode_reward_csv_file, [
             self.current_episode, self.current_step,
             mean(self.pre_acc), self.episode_reward
@@ -175,13 +189,13 @@ class RLAgent(simple_rl_agent.RLAgent):
         for _ in range(5):
             self.pre_acc.append(0)
 
-        if self.current_episode % self.config.log_interval == 0:
+        if self.current_episode % Config().algorithm.log_interval == 0:
             self.policy.save_model(self.current_episode)
 
     def process_experience(self):
         """ Process step experience if needed in training mode. """
         logging.info("[RL Agent] Saving the experience into replay buffer.")
-        if self.policy.recurrent:
+        if Config().algorithm.recurrent_actor:
             self.policy.replay_buffer.push(
                 (self.state, self.action, self.reward, self.next_state,
                  np.float(self.is_done), self.h, self.c, self.nh, self.nc))
