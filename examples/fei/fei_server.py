@@ -4,7 +4,7 @@ A federated learning server with RL Agent FEI
 import math
 
 import numpy as np
-from sklearn.preprocessing import normalize
+
 from plato.utils.reinforcement_learning import simple_rl_server
 
 
@@ -138,6 +138,6 @@ class RLServer(simple_rl_server.RLServer):
 
     @staticmethod
     def normalize_state(feature):
-        """ Normalize/Scaling state features. """
-        normed = normalize([feature], norm="max")
-        return normed.tolist()[0]
+        """Normalize/Scaling state features."""
+        norm = np.linalg.norm(feature)
+        return [x / norm for x in feature]
