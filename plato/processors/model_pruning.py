@@ -6,7 +6,6 @@ from typing import Any
 import copy
 
 import torch
-from torch import nn
 import torch.nn.utils.prune as prune
 
 from plato.processors import model
@@ -21,13 +20,14 @@ class Processor(model.Processor):
                  parameters_to_prune=[],
                  pruning_method=prune.L1Unstructured,
                  amount=0.2,
-                 copy=True,
+                 keep_model=True,
                  **kwargs) -> None:
         super().__init__(**kwargs)
         self.model = model
         self.parameters_to_prune = parameters_to_prune
         self.pruning_method = pruning_method
         self.amount = amount
+        self.keep_model = keep_model
         if len(self.parameters_to_prune) == 0:
             for _, module in model.named_modules():
                 if isinstance(module, torch.nn.Conv2d) or isinstance(
@@ -42,7 +42,7 @@ class Processor(model.Processor):
         if self.model is None:
             return data
 
-        if self.copy:
+        if self.keep_model:
             original_state_dict = copy.deepcopy(self.model.cpu().state_dict())
 
         prune.global_unstructured(
@@ -56,7 +56,7 @@ class Processor(model.Processor):
 
         output = self.model.cpu().state_dict()
 
-        if self.copy:
+        if self.keep_model:
             self.model.load_state_dict(original_state_dict)
 
         logging.info("[Client #%d] Global pruning applied.", self.client_id)
