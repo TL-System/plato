@@ -448,8 +448,7 @@ class Server:
         # proceeds regardless of synchronous or asynchronous modes. This guarantees that
         # if asynchronous mode uses an excessively long aggregation interval, it will not
         # unnecessarily delay the aggregation process.
-        if len(self.updates) > 0 and len(
-                self.updates) >= self.clients_per_round:
+        if len(self.updates) >= self.clients_per_round:
             logging.info(
                 "[Server #%d] All %d client reports received. Processing.",
                 os.getpid(), len(self.updates))
