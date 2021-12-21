@@ -5,8 +5,6 @@ import math
 
 import numpy as np
 from sklearn.preprocessing import normalize
-
-from plato.config import Config
 from plato.utils.reinforcement_learning import simple_rl_server
 
 
@@ -47,9 +45,6 @@ class RLServer(simple_rl_server.RLServer):
 
     def apply_action(self):
         """ Apply action update from RL Agent to FL Env. """
-        # self.smart_weighting = list(
-        #     self.normalize_weights(
-        #         np.array(self.agent_update[:self.clients_per_round])))
         self.smart_weighting = np.array(self.agent_update)
 
     async def federated_averaging(self, updates):
@@ -64,6 +59,7 @@ class RLServer(simple_rl_server.RLServer):
         }
         self.smart_weighting = self.normalize_weights(
             self.smart_weighting[:self.clients_per_round])
+
         # Use adaptive weighted average
         for i, update in enumerate(weights_received):
             for name, delta in update.items():

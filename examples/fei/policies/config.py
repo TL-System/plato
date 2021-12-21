@@ -1,9 +1,8 @@
 import os
 
-from plato.config import Config
+os.environ['config_file'] = 'examples/fei/fei_FMNIST_lenet5.yml'
 
-os.environ[
-    'config_file'] = 'examples/fei/fei_FMNIST_lenet5.yml'
+from plato.config import Config
 
 dirname = os.path.dirname(os.path.dirname(__file__))
 
@@ -74,4 +73,3 @@ class TD3Config(RLConfig):
         # whether use LSTM or FC nets
         self.recurrent_actor = True
         self.recurrent_critic = True
-
