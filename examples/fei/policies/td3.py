@@ -1,3 +1,8 @@
+"""
+Reference:
+
+https://github.com/AntoineTheb/RNN-RL
+"""
 import copy
 import logging
 import os
