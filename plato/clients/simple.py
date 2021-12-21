@@ -60,7 +60,10 @@ class Client(base.Client):
         # Pass inbound and outbound data payloads through processors for
         # additional data processing
         self.outbound_processor, self.inbound_processor = processor_registry.get(
-            "Client", client_id=self.client_id, trainer=self.trainer)
+            "Client",
+            client_id=self.client_id,
+            trainer=self.trainer,
+            model=self.algorithm.model)
 
     def load_data(self) -> None:
         """Generating data and loading them onto this client."""
