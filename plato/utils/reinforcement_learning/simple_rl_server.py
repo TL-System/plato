@@ -10,8 +10,6 @@ import time
 from abc import abstractmethod
 
 import socketio
-import torch
-import torch.nn.functional as F
 from aiohttp import web
 
 from plato.algorithms import registry as algorithms_registry
@@ -39,24 +37,23 @@ class RLServerEvents(base.ServerEvents):
 
     async def on_env_reset(self, sid, data):
         """ RL Agent arrived or it sends a heartbeat. """
-        await self.plato_server.reset_env(sid, data['current_episode'])
+        await self.plato_server.reset_env(data['current_episode'])
 
     async def on_update_to_arrive(self, sid, data):
         """ RL Agent sends a new report. """
-        await self.plato_server.agent_update_to_arrive(sid,
-                                                       data['agent_response'])
+        await self.plato_server.agent_update_to_arrive(data['agent_response'])
 
     async def on_agent_chunk(self, sid, data):
         """ A chunk of data from the server arrived. """
-        await self.plato_server.agent_chunk_arrived(sid, data['data'])
+        await self.plato_server.agent_chunk_arrived(data['data'])
 
     async def on_agent_update(self, sid, data):
         """ RL Agent sends a new update. """
-        await self.plato_server.agent_update_arrived(sid, data['agent'])
+        await self.plato_server.agent_update_arrived(data['agent'])
 
     async def on_agent_update_done(self, sid, data):
         """ RL Agent finished sending its updates. """
-        await self.plato_server.agent_update_done(sid, data['agent'])
+        await self.plato_server.agent_update_done(data['agent'])
 
 
 class RLServer(fedavg.Server):
@@ -104,18 +101,19 @@ class RLServer(fedavg.Server):
         logging.info("[Server #%d] Sent %s B of update data to RL Agent.",
                      os.getpid(), round(data_size, 2))
 
-    async def agent_update_to_arrive(self, sid, response):
+    async def agent_update_to_arrive(self, response):
         """ New update is about to arrive from the RL Agent. """
         self.process_agent_response(response)
 
         logging.info("[Server #%d] Updated by the RL Agent.", os.getpid())
 
-    async def agent_chunk_arrived(self, sid, data) -> None:
+    async def agent_chunk_arrived(self, data) -> None:
         """ Upon receiving a chunk of data from a client. """
         self.agent_chunks.append(data)
 
-    async def agent_update_arrived(self, sid, agent):
+    async def agent_update_arrived(self, agent):
         """ Upon receiving a portion of the update from RL Agent. """
+        assert agent == self.rl_agent['agent']
         assert len(self.agent_chunks) > 0
 
         update = b''.join(self.agent_chunks)
@@ -130,8 +128,9 @@ class RLServer(fedavg.Server):
             self.agent_update = [self.agent_update]
             self.agent_update.append(_data)
 
-    async def agent_update_done(self, sid, agent):
+    async def agent_update_done(self, agent):
         """ Upon receiving all the update from RL Agent. """
+        assert agent == self.rl_agent['agent']
         update_size = 0
 
         if isinstance(self.agent_update, list):
@@ -226,16 +225,17 @@ class RLServer(fedavg.Server):
         # Initial state for the 1st RL control episode
         await self.prep_env_update()
 
-    async def reset_env(self, sid, current_episode):
+    async def reset_env(self, current_episode):
         """ Reboot for the following episodes. """
         self.current_rl_episode = current_episode
         self.configure()
         # Wrap up current env
         await self.wrap_up()
 
+    @abstractmethod
     def prep_state(self):
         """ Wrap up the state update to RL Agent. """
-        return None
+        return
 
     @abstractmethod
     def apply_action(self):
@@ -345,7 +345,7 @@ class RLServer(fedavg.Server):
         await self.sio.emit('disconnect', room=self.rl_agent['sid'])
 
     def configure(self):
-        """ Booting the federated learning server by setting up 
+        """ Booting the federated learning server by setting up
         the data, model, and creating the clients. """
         logging.info("[Server #%d] Configuring the server for episode %d",
                      os.getpid(), self.current_rl_episode)
@@ -359,11 +359,9 @@ class RLServer(fedavg.Server):
         self.outbound_processor, self.inbound_processor = processor_registry.get(
             "Server", server_id=os.getpid(), trainer=self.trainer)
 
-
         if not Config().clients.do_test:
             dataset = datasources_registry.get(client_id=0)
             self.testset = dataset.get_test_set()
-
         # Initialize the csv file which will record results
         if self.current_rl_episode == 1 and hasattr(Config(), 'results'):
             result_csv_file = Config().result_dir + 'result.csv'

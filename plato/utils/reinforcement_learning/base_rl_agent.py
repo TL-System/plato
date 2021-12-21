@@ -99,8 +99,9 @@ class RLAgent:
         """ Upon receiving a chunk of data from the server. """
         self.chunks.append(data)
 
-    async def update_arrived(self, data) -> None:
+    async def update_arrived(self, agent) -> None:
         """ Upon receiving a portion of the update from the server. """
+        assert agent == self.agent
 
         update = b''.join(self.chunks)
         _data = pickle.loads(update)
@@ -116,6 +117,8 @@ class RLAgent:
 
     async def update_done(self, agent) -> None:
         """ Upon receiving all the update from the server. """
+        assert agent == self.agent
+ 
         update_size = 0
 
         if isinstance(self.server_update, list):

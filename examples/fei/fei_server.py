@@ -1,28 +1,17 @@
 """
 A federated learning server with RL Agent FEI
 """
-
-import logging
 import math
-import os
-import pickle
-import sys
-import time
-from abc import abstractmethod
 
 import numpy as np
-import socketio
-import torch
-import torch.nn.functional as F
-from aiohttp import web
 from sklearn.preprocessing import normalize
 
-from plato.utils.rlfl import simple_rl_server
 from plato.config import Config
+from plato.utils.reinforcement_learning import simple_rl_server
 
 
 class RLServer(simple_rl_server.RLServer):
-    """A federated learning server with RL Agent."""
+    """ A federated learning server with RL Agent. """
     def __init__(self, trainer=None):
         super().__init__(trainer)
         # alpha controls the decreasing rate of the mapping function
@@ -34,7 +23,7 @@ class RLServer(simple_rl_server.RLServer):
 
     # Overwrite RL-related methods of simple RL server
     def prep_state(self):
-        """Wrap up the state update to RL Agent."""
+        """ Wrap up the state update to RL Agent. """
         # Initial state when env resets
         if self.current_round == 0 and not self.action_applied:
             return None
@@ -52,7 +41,7 @@ class RLServer(simple_rl_server.RLServer):
         return state
 
     async def customize_env_response(self, response):
-        """Wrap up generating the env response with any additional information."""
+        """ Wrap up generating the env response with any additional information. """
         response['test_accuracy'] = self.accuracy
         return response
 
@@ -73,7 +62,8 @@ class RLServer(simple_rl_server.RLServer):
             name: self.trainer.zeros(weights.shape)
             for name, weights in weights_received[0].items()
         }
-        self.smart_weighting = self.normalize_weights(self.smart_weighting[:self.clients_per_round])
+        self.smart_weighting = self.normalize_weights(
+            self.smart_weighting[:self.clients_per_round])
         # Use adaptive weighted average
         for i, update in enumerate(weights_received):
             for name, delta in update.items():
@@ -91,7 +81,9 @@ class RLServer(simple_rl_server.RLServer):
         return self.algorithm.compute_weight_updates(weights_received)
 
     def calc_corr(self, updates):
-        """Calculate the node contribution based on the angle between local gradient and global gradient."""
+        """ Calculate the node contribution based on the angle
+            between local gradient and global gradient.
+        """
         correlations, contribs = [None] * len(updates), [None] * len(updates)
 
         # Update the baseline model weights
@@ -127,7 +119,7 @@ class RLServer(simple_rl_server.RLServer):
 
     @staticmethod
     def process_grad(grads):
-        """Convert gradients to a flattened 1-D array."""
+        """ Convert gradients to a flattened 1-D array. """
         grads = list(
             dict(sorted(grads.items(), key=lambda x: x[0].lower())).values())
 
@@ -139,7 +131,7 @@ class RLServer(simple_rl_server.RLServer):
 
     @staticmethod
     def normalize_weights(weights):
-        """Normalize/Scaling aggregation weights so that the sum is 1."""
+        """ Normalize/Scaling aggregation weights so that the sum is 1. """
         # 1st method: scaling only
         weights += 1  # [-1, 1] -> [0, 2]
         normalized_weights = weights / weights.sum()
@@ -150,10 +142,6 @@ class RLServer(simple_rl_server.RLServer):
 
     @staticmethod
     def normalize_state(feature):
-        """Normalize/Scaling state features."""
-        # norm = np.linalg.norm(feature)
-        # return [x / norm for x in feature]
-
-        # normed =  normalize(feature, norm="l1")
+        """ Normalize/Scaling state features. """
         normed = normalize([feature], norm="max")
         return normed.tolist()[0]

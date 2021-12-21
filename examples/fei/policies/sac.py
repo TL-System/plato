@@ -14,10 +14,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.distributions import Normal
 from torch.optim import Adam
-from torch.utils.tensorboard import SummaryWriter
 
-from plato.utils import csv_processor
-from rlfl.config import SACConfig as Config
+from fei.config import SACConfig as Config
 
 LOG_SIG_MAX = 2
 LOG_SIG_MIN = -20
@@ -264,7 +262,6 @@ class Policy(object):
                                     lr=Config().learning_rate)
 
         self.replay_buffer = ReplayMemory(Config().replay_size, Config().seed)
-        self.writer = SummaryWriter(Config().result_dir)
 
         self.num_update_iteration = 0
 
@@ -299,8 +296,8 @@ class Policy(object):
                 min_qf_next_target = torch.min(
                     qf1_next_target,
                     qf2_next_target) - self.alpha * next_state_log_pi
-                next_q_value = reward_batch + (1 - mask_batch) * Config().gamma * (
-                    min_qf_next_target)
+                next_q_value = reward_batch + (
+                    1 - mask_batch) * Config().gamma * (min_qf_next_target)
             qf1, qf2 = self.critic(
                 state_batch, action_batch
             )  # Two Q-functions to mitigate positive bias in the policy improvement step
@@ -338,18 +335,6 @@ class Policy(object):
                 alpha_tlogs = torch.tensor(self.alpha)  # For TensorboardX logs
 
             soft_update(self.critic_target, self.critic, Config().tau)
-
-            self.writer.add_scalar('loss/critic_1', qf1_loss.item(),
-                                   self.num_update_iteration)
-            self.writer.add_scalar('loss/critic_2', qf2_loss.item(),
-                                   self.num_update_iteration)
-            self.writer.add_scalar('loss/policy', policy_loss.item(),
-                                   self.num_update_iteration)
-            self.writer.add_scalar('loss/entropy_loss', alpha_loss.item(),
-                                   self.num_update_iteration)
-            self.writer.add_scalar('loss/alpha',
-                                   alpha_tlogs.item(),
-                                   self.num_update_iteration)
 
             self.num_update_iteration += 1
 

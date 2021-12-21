@@ -9,8 +9,8 @@ import gym
 import numpy as np
 from gym import spaces
 
-from plato.utils.rlfl import base_rl_agent
 from plato.utils import csv_processor
+from plato.utils.reinforcement_learning import base_rl_agent
 
 
 class RLAgent(base_rl_agent.RLAgent, gym.Env):
@@ -62,10 +62,8 @@ class RLAgent(base_rl_agent.RLAgent, gym.Env):
         self.current_step = 0
         self.is_done = False
         self.episode_reward = 0
-        if self.policy.recurrent:
-            self.h, self.c = self.policy.get_initial_states()
-
         self.current_episode += 1
+
         logging.info("[RL Agent] Starting RL episode #%d.",
                      self.current_episode)
 
@@ -105,7 +103,6 @@ class RLAgent(base_rl_agent.RLAgent, gym.Env):
 
     def render(self, mode="human"):
         """ Render the Gym env. """
-        pass
 
     def close(self):
         """ Closing the RL Agent. """
@@ -134,8 +131,7 @@ class RLAgent(base_rl_agent.RLAgent, gym.Env):
                 self.process_experience()
             self.state = self.next_state
             self.episode_reward += self.reward
-            if self.policy.recurrent:
-                self.h, self.c = self.nh, self.nc
+
             step_result_csv_file = self.config.result_dir + 'step_result.csv'
             csv_processor.write_csv(step_result_csv_file,
                                     [self.current_episode, self.current_step] +

@@ -10,13 +10,14 @@ import fei_agent
 import fei_client
 import fei_server
 import fei_trainer
-from plato.utils.rlfl.config import TD3Config
+from policies.config import TD3Config as Config
+
 
 def run():
     """Starting an RL Agent (client) to connect to the server."""
 
     logging.info("Starting an RL Agent.")
-    config = TD3Config()
+    config = Config()
     # Or a custom agent
     agent = fei_agent.RLAgent(config)
     asyncio.run(agent.start_agent())
