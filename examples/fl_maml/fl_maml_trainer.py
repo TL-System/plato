@@ -127,9 +127,6 @@ class Trainer(basic.Trainer):
             filename = f"{model_type}_{self.client_id}_{config['run_id']}.pth"
             self.save_model(filename)
 
-        if 'use_wandb' in config:
-            run.finish()
-
     def training_per_stage(self, stage_id, optimizer, lr_schedule,
                            train_loader, cut_layer, training_model,
                            loss_criterion, log_interval, config, epoch,
