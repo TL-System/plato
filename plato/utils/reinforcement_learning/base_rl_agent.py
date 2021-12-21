@@ -71,13 +71,12 @@ class RLAgent:
         self.sio.register_namespace(
             RLAgentEvents(namespace='/', plato_rl_agent=self))
 
-        uri = ""
         if hasattr(Config().server, 'use_https'):
-            uri = 'https://{}'.format(Config().server.address)
+            uri = f'https://{Config().server.address}'
         else:
-            uri = 'http://{}'.format(Config().server.address)
+            uri = f'http://{Config().server.address}'
 
-        uri = '{}:{}'.format(uri, Config().server.port)
+        uri = f'{uri}:{Config().server.port}'
 
         logging.info("[RL Agent] Connecting to the server at %s.", uri)
         await self.sio.connect(uri)
@@ -118,7 +117,7 @@ class RLAgent:
     async def update_done(self, agent) -> None:
         """ Upon receiving all the update from the server. """
         assert agent == self.agent
- 
+
         update_size = 0
 
         if isinstance(self.server_update, list):

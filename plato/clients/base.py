@@ -113,19 +113,18 @@ class Client:
             self.s3_client = s3.S3()
 
         if hasattr(Config().server, 'use_https'):
-            uri = 'https://{}'.format(Config().server.address)
+            uri = f'https://{Config().server.address}'
         else:
-            uri = 'http://{}'.format(Config().server.address)
+            uri = f'http://{Config().server.address}'
 
         if hasattr(Config().server, 'port'):
             # If we are not using a production server deployed in the cloud
             if hasattr(Config().algorithm,
                        'cross_silo') and not Config().is_edge_server():
-                uri = '{}:{}'.format(
-                    uri,
-                    int(Config().server.port) + int(self.edge_server_id))
+                uri = f'{uri}:{int(Config().server.port) + int(self.edge_server_id)}'
+
             else:
-                uri = '{}:{}'.format(uri, Config().server.port)
+                uri = f'{uri}:{Config().server.port}'
 
         logging.info("[Client #%d] Connecting to the server at %s.",
                      self.client_id, uri)
