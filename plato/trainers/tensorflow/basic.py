@@ -79,13 +79,17 @@ class Trainer(base.Trainer):
         self.model.load_weights(model_path)
 
     def train_process(self, config, trainset, sampler, cut_layer=None):
-        if 'use_wandb' in config:
-            import wandb
+        """The main training loop in a federated learning workload, run in
+          a separate process with a new CUDA context, so that CUDA memory
+          can be released after the training completes.
 
-            run = wandb.init(project="plato",
-                             group=str(config['run_id']),
-                             reinit=True)
-
+        Arguments:
+        self: the trainer itself.
+        config: a dictionary of configuration parameters.
+        trainset: The training dataset.
+        sampler: the sampler that extracts a partition for this client.
+        cut_layer (optional): The layer which training should start from.
+        """
         custom_train = getattr(self, "train_model", None)
         try:
             if callable(custom_train):
@@ -124,9 +128,6 @@ class Trainer(base.Trainer):
             logging.info("Training on client #%d failed: %s", self.client_id,
                          training_exception)
             raise training_exception
-
-        if 'use_wandb' in config:
-            run.finish()
 
     def train(self, trainset, sampler, cut_layer=None) -> float:
         """The main training loop in a federated learning workload.

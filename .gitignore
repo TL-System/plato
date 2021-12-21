@@ -144,7 +144,6 @@ result.csv
 
 # Models
 pretrained/
-wandb/
 logs/
 *.pth
 

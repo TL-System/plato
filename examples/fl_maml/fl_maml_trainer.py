@@ -23,14 +23,6 @@ class Trainer(basic.Trainer):
 
     def train_process(self, config, trainset, sampler, cut_layer=None):
         """The main training loop in a federated learning workload."""
-
-        if 'use_wandb' in config:
-            import wandb
-
-            run = wandb.init(project="plato",
-                             group=str(config['run_id']),
-                             reinit=True)
-
         try:
             custom_train = getattr(self, "train_model", None)
 
@@ -179,9 +171,6 @@ class Trainer(basic.Trainer):
                                     len(train_loader), stage_id,
                                     loss.data.item()))
                     else:
-                        if hasattr(config, 'use_wandb'):
-                            wandb.log({"batch loss": loss.data.item()})
-
                         logging.info(
                             "[Client #{}] Epoch: [{}/{}][{}/{}]\tLoss of stage {}: {:.6f}"
                             .format(self.client_id, epoch, epochs, batch_id,
