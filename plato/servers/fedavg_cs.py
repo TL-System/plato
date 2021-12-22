@@ -4,6 +4,7 @@ A cross-silo federated learning server using federated averaging, as either edge
 
 import asyncio
 import logging
+import numpy as np
 import os
 import time
 
@@ -53,10 +54,18 @@ class Server(fedavg.Server):
             self.new_global_round_begins = asyncio.Event()
 
             # Compute the number of clients in each silo for edge servers
-            self.total_clients = int(self.total_clients /
-                                     Config().algorithm.total_silos)
-            self.clients_per_round = int(self.clients_per_round /
-                                         Config().algorithm.total_silos)
+            self.total_clients = [
+                len(i) for i in np.array_split(
+                    np.arange(Config().clients.total_clients),
+                    Config().algorithm.total_silos)
+            ][Config().args.id - Config().clients.total_clients - 1]
+
+            self.clients_per_round = [
+                len(i)
+                for i in np.array_split(np.arange(Config().clients.per_round),
+                                        Config().algorithm.total_silos)
+            ][Config().args.id - Config().clients.total_clients - 1]
+
             logging.info(
                 "[Edge server #%d (#%d)] Started training on %d clients with %d per round.",
                 Config().args.id, os.getpid(), self.total_clients,
