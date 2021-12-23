@@ -69,15 +69,15 @@ trainer:
     # The machine learning model
     model_name: lenet5
 
+    # Whether to apply differential privacy
     differential_privacy: true
+    # dp_epsilon: 1
+    # dp_delta: 0.01
+    # dp_max_grad_norm: 1
 
 algorithm:
     # Aggregation algorithm
     type: fedavg
-
-    dp_epsilon: 1
-
-    dp_delta: 0.01
 
     # Cross-silo training
     cross_silo: true
