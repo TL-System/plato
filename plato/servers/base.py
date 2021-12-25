@@ -128,7 +128,11 @@ class Server:
             Server.start_clients(client=self.client)
 
         if hasattr(Config().server, 'periodic_interval'):
-            asyncio.get_event_loop().create_task(self.periodic())
+            periodic_interval = Config().server.periodic_interval
+        else
+            periodic_interval = 5
+
+        asyncio.get_event_loop().create_task(self.periodic(periodic_interval))
 
         self.start()
 
@@ -321,17 +325,17 @@ class Server:
         # Select clients randomly
         return random.sample(clients_pool, clients_count)
 
-    async def periodic(self):
+    async def periodic(self, periodic_interval):
         """ Runs periodic_task() periodically on the server. The time interval between
             its execution is defined in 'server:periodic_interval'.
         """
         while True:
             await self.periodic_task()
-            await asyncio.sleep(Config().server.periodic_interval)
+            await asyncio.sleep(periodic_interval)
 
     async def periodic_task(self):
         """ A periodic task that is executed from time to time, determined by
-        'server:periodic_interval' in the configuration. """
+        'server:periodic_interval' with a default value of 5 seconds, in the configuration. """
         # Call the async function that defines a customized periodic task, if any
         _task = getattr(self, "customize_periodic_task", None)
         if callable(_task):
