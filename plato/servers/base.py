@@ -129,7 +129,7 @@ class Server:
 
         if hasattr(Config().server, 'periodic_interval'):
             periodic_interval = Config().server.periodic_interval
-        else
+        else:
             periodic_interval = 5
 
         asyncio.get_event_loop().create_task(self.periodic(periodic_interval))
