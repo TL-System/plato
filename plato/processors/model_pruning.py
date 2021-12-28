@@ -16,20 +16,22 @@ class Processor(model.Processor):
     Implements a Processor for global pruning of model weights.
     """
     def __init__(self,
-                 model=None,
                  parameters_to_prune=[],
                  pruning_method=prune.L1Unstructured,
                  amount=0.2,
                  keep_model=True,
                  **kwargs) -> None:
         super().__init__(**kwargs)
-        self.model = model
+
         self.parameters_to_prune = parameters_to_prune
         self.pruning_method = pruning_method
         self.amount = amount
         self.keep_model = keep_model
+
+        self.model = self.trainer.model
+
         if len(self.parameters_to_prune) == 0:
-            for _, module in model.named_modules():
+            for _, module in self.model.named_modules():
                 if isinstance(module, torch.nn.Conv2d) or isinstance(
                         module, torch.nn.Linear):
                     self.parameters_to_prune.append((module, 'weight'))

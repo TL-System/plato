@@ -49,7 +49,7 @@ trainer:
     parallelized: false
 
     # Whether to apply differential privacy
-    differential_privacy: true
+    # differential_privacy: true
     # dp_epsilon: 1
     # dp_delta: 0.00001
     # dp_max_grad_norm: 1
