@@ -14,6 +14,10 @@ clients:
     # Whether simulate clients or not
     simulation: false
 
+    # Processors for outbound data payloads
+    outbound_processors:
+        - model_pruning
+
 server:
     address: 127.0.0.1
     port: 8000
