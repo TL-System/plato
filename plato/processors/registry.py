@@ -14,13 +14,22 @@ from plato.processors import pipeline
 
 if not (hasattr(Config().trainer, 'use_tensorflow')
         or hasattr(Config().trainer, 'use_mindspore')):
-    from plato.processors import (base, feature_randomized_response,
-                                  feature_gaussian, feature_laplace,
-                                  feature_quantize, feature_dequantize,
-                                  feature_unbatch, inbound_feature_tensors,
-                                  outbound_feature_ndarrays, model_deepcopy,
-                                  model_quantize, model_dequantize,
-                                  model_randomized_response, model_pruning)
+    from plato.processors import (
+        base,
+        feature_randomized_response,
+        feature_gaussian,
+        feature_laplace,
+        feature_quantize,
+        feature_dequantize,
+        feature_unbatch,
+        inbound_feature_tensors,
+        outbound_feature_ndarrays,
+        model_deepcopy,
+        model_quantize,
+        model_dequantize,
+        model_randomized_response,
+        model_pruning,
+    )
 
     registered_processors = OrderedDict([
         ('base', base.Processor),
