@@ -81,7 +81,7 @@ class Client(base.Client):
             accuracy = 0
 
         if Config().clients.do_test:
-            average_accuracy = self.server.average_client_accuracy
+            average_accuracy = self.server.accuracy
         else:
             average_accuracy = 0
 

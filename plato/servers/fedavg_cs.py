@@ -143,7 +143,7 @@ class Server(fedavg.Server):
         # Testing the global model accuracy
         if Config().clients.do_test:
             # Compute the average accuracy from client reports
-            self.accuracy = self.client_accuracy_averaging(self.updates)
+            self.accuracy = self.accuracy_averaging(self.updates)
             logging.info(
                 '[Server #{:d}] Average client accuracy: {:.2f}%.'.format(
                     os.getpid(), 100 * self.accuracy))
@@ -220,17 +220,3 @@ class Server(fedavg.Server):
         """Wrapping up when each round of training is done."""
         if Config().is_central_server():
             await super().wrap_up()
-
-    @staticmethod
-    def client_accuracy_averaging(reports):
-        """Compute the average accuracy of averaged client accuracy on edge servers."""
-        # Get total number of samples
-        total_samples = sum([report.num_samples for (report, __) in reports])
-
-        # Perform weighted averaging
-        average_client_accuracy = 0
-        for (report, __) in reports:
-            average_client_accuracy += report.average_accuracy * (
-                report.num_samples / total_samples)
-
-        return average_client_accuracy
