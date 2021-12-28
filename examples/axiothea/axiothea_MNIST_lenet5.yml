@@ -91,6 +91,6 @@ algorithm:
 
 results:
     # Write the following parameter(s) into a CSV
-    types: accuracy, average_edge_accuracy, average_client_accuracy, training_time, round_time, edge_agg_num
+    types: accuracy, training_time, round_time, edge_agg_num
 
     results_dir: ./results/test/

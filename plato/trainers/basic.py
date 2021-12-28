@@ -304,6 +304,7 @@ class Trainer(base.Trainer):
         Arguments:
         config: a dictionary of configuration parameters.
         testset: The test dataset.
+        sampler: The sampler that extracts a partition of the test dataset.
         """
         self.model.to(self.device)
         self.model.eval()
@@ -364,6 +365,7 @@ class Trainer(base.Trainer):
 
         Arguments:
         testset: The test dataset.
+        sampler: The sampler that extracts a partition of the test dataset.
         """
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']
@@ -398,11 +400,12 @@ class Trainer(base.Trainer):
 
         return accuracy
 
-    async def server_test(self, testset):
+    async def server_test(self, testset, sampler=None):
         """Testing the model on the server using the provided test dataset.
 
         Arguments:
         testset: The test dataset.
+        sampler: The sampler that extracts a partition of the test dataset.
         """
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']
@@ -415,8 +418,16 @@ class Trainer(base.Trainer):
         if callable(custom_test):
             return self.test_model(config, testset)
 
-        test_loader = torch.utils.data.DataLoader(
-            testset, batch_size=config['batch_size'], shuffle=False)
+        if sampler is None:
+            test_loader = torch.utils.data.DataLoader(
+                testset, batch_size=config['batch_size'], shuffle=False)
+        # Use a testing set following the same distribution as the training set
+        else:
+            test_loader = torch.utils.data.DataLoader(
+                testset,
+                batch_size=config['batch_size'],
+                shuffle=False,
+                sampler=sampler.get())
 
         correct = 0
         total = 0
