@@ -3,7 +3,6 @@ An RL agent for FL training.
 """
 import logging
 import math
-import os
 import random
 from collections import deque
 from statistics import mean, stdev
@@ -14,8 +13,6 @@ from plato.config import Config
 from plato.utils import csv_processor
 from plato.utils.reinforcement_learning import simple_rl_agent
 from plato.utils.reinforcement_learning.policies import td3
-
-os.environ['config_file'] = 'examples/fei/fei_FMNIST_lenet5.yml'
 
 
 class RLAgent(simple_rl_agent.RLAgent):
@@ -36,7 +33,7 @@ class RLAgent(simple_rl_agent.RLAgent):
         ).algorithm.pretrained or Config().algorithm.mode == 'test':
             self.policy.load_model(Config().algorithm.pretrained_iter)
             self.current_episode = Config().algorithm.pretrained_iter + 1
-            # BUG: varibale episode length
+            # BUG: variable episode length
             self.total_steps = Config().algorithm.pretrained_iter * Config(
             ).algorithm.steps_per_episode + 1
 
@@ -84,8 +81,6 @@ class RLAgent(simple_rl_agent.RLAgent):
         # Reboot/reconfigure the FL server
         self.sio.emit('env_reset', {'current_episode': self.current_episode})
 
-        return
-
     async def prep_action(self):
         """ Get action from RL policy. """
         if Config().algorithm.start_steps > self.total_steps:
@@ -109,8 +104,8 @@ class RLAgent(simple_rl_agent.RLAgent):
         # Initial state is random when env resets
         return np.array([[
             round(random.random(), 4)
-            for i in range(Config().algorithm.n_features)
-        ] for j in range(Config().clients.per_round)])
+            for __ in range(Config().algorithm.n_features)
+        ] for __ in range(Config().clients.per_round)])
 
     def get_reward(self):
         """ Get reward for agent. """
