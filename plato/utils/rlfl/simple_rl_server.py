@@ -282,9 +282,9 @@ class RLServer(fedavg.Server):
 
         await self.step()
 
-    async def client_payload_done(self, sid, client_id, object_key):
+    async def client_payload_done(self, sid, client_id, s3_key=None):
         """ Upon receiving all the payload from a client, either via S3 or socket.io. """
-        if object_key is None:
+        if s3_key is None:
             assert self.client_payload[sid] is not None
 
             payload_size = 0
@@ -295,8 +295,7 @@ class RLServer(fedavg.Server):
                 payload_size = sys.getsizeof(
                     pickle.dumps(self.client_payload[sid]))
         else:
-            self.client_payload[sid] = self.s3_client.receive_from_s3(
-                object_key)
+            self.client_payload[sid] = self.s3_client.receive_from_s3(s3_key)
             payload_size = sys.getsizeof(pickle.dumps(
                 self.client_payload[sid]))
 
