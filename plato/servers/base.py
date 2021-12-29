@@ -347,7 +347,7 @@ class Server:
 
             # What is the minimum number of clients that must have reported before aggregation
             # takes place?
-            minimum_clients = 0
+            minimum_clients = 1
             if hasattr(Config().server, 'minimum_clients_aggregated'):
                 minimum_clients = Config().server.minimum_clients_aggregated
 
@@ -358,15 +358,18 @@ class Server:
                 staleness = Config().server.staleness
 
             for __, client_data in self.training_clients.items():
+                # The client is still working at an early round, early enough to stop the aggregation
+                # process as determined by 'staleness'
                 if client_data['round'] < self.current_round - staleness:
                     logging.info(
                         "[Server #%d] Client %s is still working at round %s, which is "
                         "beyond the staleness threshold %s compared to the current round %s. "
                         "Nothing to process.", os.getpid(), client_data['id'],
                         client_data['round'], staleness, self.current_round)
-                return
 
-            if len(self.updates) > minimum_clients:
+                    return
+
+            if len(self.updates) >= minimum_clients:
                 logging.info(
                     "[Server #%d] %d client reports received in asynchronous mode. Processing.",
                     os.getpid(), len(self.updates))
