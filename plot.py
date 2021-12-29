@@ -63,7 +63,6 @@ def plot_figures_from_dict(result_csv_file: str, result_dir: str):
                 'round': 'Training round',
                 'local_epoch_num': 'Local epochs',
                 'accuracy': 'Accuracy (%)',
-                'average_accuracy': 'Average Accuracy (%)',
                 'training_time': 'Training time (s)',
                 'round_time': 'Round time (s)',
                 'edge_agg_num': 'Aggregation rounds on edge servers'
