@@ -82,8 +82,6 @@ class Server(fedavg_cs.Server):
                         self.current_round,
                         'accuracy':
                         self.accuracy * 100,
-                        'average_accuracy':
-                        self.average_accuracy * 100,
                         'personalization_accuracy':
                         self.personalization_accuracy * 100,
                         'edge_agg_num':
