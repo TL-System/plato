@@ -28,6 +28,7 @@ if not (hasattr(Config().trainer, 'use_tensorflow')
         model_quantize,
         model_dequantize,
         model_randomized_response,
+        model_pruning,
     )
 
     registered_processors = OrderedDict([
@@ -44,6 +45,7 @@ if not (hasattr(Config().trainer, 'use_tensorflow')
         ('model_quantize', model_quantize.Processor),
         ('model_dequantize', model_dequantize.Processor),
         ('model_randomized_response', model_randomized_response.Processor),
+        ('model_pruning', model_pruning.Processor),
     ])
 
 
