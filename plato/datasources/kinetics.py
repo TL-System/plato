@@ -61,22 +61,7 @@ from plato.datasources.datalib import frames_extraction_tools
 from plato.datasources.datalib import audio_extraction_tools
 from plato.datasources.datalib import modality_data_anntation_tools
 from plato.datasources.datalib import data_utils
-
-
-def creat_tiny_kinetics(anno_file_path, num_fist_videos):
-    """ Create the tiny kinetics by using the first {num_fist_videos} 
-         in the {anno_file}.
-    """
-    anno_file_base_dir = os.path.dirname(anno_file_path)
-    anno_file_base_name, ext_type = os.path.basename(anno_file_path).split(".")
-
-    anno_df = pd.read_csv(anno_file_path)
-    tiny_annos = anno_df[:num_fist_videos]
-    tiny_anno_file_path = os.path.join(
-        anno_file_base_dir, anno_file_base_name + "_tiny." + ext_type)
-    tiny_annos.to_csv(path_or_buf=tiny_anno_file_path, index=False)
-
-    return tiny_anno_file_path
+from plato.datasources.datalib import tiny_data_tools
 
 
 def obtain_required_anno_files(splits_info):
@@ -214,10 +199,17 @@ class DataSource(multimodal_base.MultiModalDataSource):
         for split in ["train", "test", "validate"]:
             split_name = split if split != "validate" else "val"
             split_anno_path = self.splits_info[split_name]["split_anno_file"]
-            if hasattr(Config().data, 'tiny_data') and Config().data.tiny_data:
-                creat_tiny_kinetics(
-                    anno_file_path=split_anno_path,
-                    num_fist_videos=Config().data.tiny_data_number)
+
+        if hasattr(Config().data, 'tiny_data') and Config().data.tiny_data:
+            anno_files_info = {
+                "train": self.splits_info["train"]["split_anno_file"],
+                "test": self.splits_info["test"]["split_anno_file"],
+                "val": self.splits_info["val"]["split_anno_file"]
+            }
+            tiny_data_tools.create_tiny_kinetics_anno(
+                kinetics_annotation_files_info=anno_files_info,
+                num_samples=Config().data.tiny_data_number,
+                random_seed=Config().data.random_seed)
 
         # Download the raw datasets for splits
         # There is no need to download data for test as the test dataset of kinetics does not
@@ -246,6 +238,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
         # Rename of class name
         for split in ["train", "val"]:
             self.rename_classes(mode=split)
+
         logging.info("Done.")
 
         logging.info("The %s dataset has been prepared", self.data_name)
@@ -257,7 +250,8 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         # Extract the splits information into the
         #   list corresponding files
-        self.extract_splits_list_files(data_format="video")
+        self.extract_splits_list_files(data_format="video",
+                                       splits=['train', 'val'])
 
     def get_modality_name(self):
         """ Get all supports modalities """
@@ -301,18 +295,21 @@ class DataSource(multimodal_base.MultiModalDataSource):
         audio_feature_dir_path = self.splits_info[mode]["audio_feature_path"]
 
         # define the modalities extractor
-        vdf_extractor = frames_extraction_tools.VideoFramesExtractor(
-            video_src_dir=src_mode_videos_dir,
-            dir_level=2,
-            num_worker=8,
-            video_ext="mp4",
-            mixed_ext=False)
-        vda_extractor = audio_extraction_tools.VideoAudioExtractor(
-            video_src_dir=src_mode_videos_dir,
-            dir_level=2,
-            num_worker=8,
-            video_ext="mp4",
-            mixed_ext=False)
+        if not self._exist_judgement(rgb_out_dir_path):
+            vdf_extractor = frames_extraction_tools.VideoFramesExtractor(
+                video_src_dir=src_mode_videos_dir,
+                dir_level=2,
+                num_worker=8,
+                video_ext="mp4",
+                mixed_ext=False)
+        if not self._exist_judgement(audio_out_dir_path) \
+            or not self._exist_judgement(audio_feature_dir_path):
+            vda_extractor = audio_extraction_tools.VideoAudioExtractor(
+                video_src_dir=src_mode_videos_dir,
+                dir_level=2,
+                num_worker=8,
+                video_ext="mp4",
+                mixed_ext=False)
 
         if torch.cuda.is_available():
             if not self._exist_judgement(rgb_out_dir_path):
@@ -347,7 +344,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
                 fft_size=512,  # fft_size / sample_rate is window size
                 hop_size=256)
 
-    def extract_splits_list_files(self, data_format):
+    def extract_splits_list_files(self, data_format, splits):
         """ Extract and generate the split information of current mode/phase """
         output_format = "json"
         out_path = self.mm_data_info["base_data_dir_path"]
@@ -361,12 +358,12 @@ class DataSource(multimodal_base.MultiModalDataSource):
             gen_annots_op = modality_data_anntation_tools.GenerateMDataAnnotation(
                 data_src_dir=self.mm_data_info["base_data_dir_path"],
                 data_annos_files_info=data_splits_file_info,
-                dataset_name=self.dataset_name,
+                dataset_name=self.data_name,
                 data_format=data_format,  # 'rawframes', 'videos'
                 out_path=out_path,
                 output_format=output_format)
 
-            for split_name in ['train', 'val']:
+            for split_name in splits:
                 gen_annots_op.generate_data_splits_info_file(
                     split_name=split_name)
 

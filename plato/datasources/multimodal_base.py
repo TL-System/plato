@@ -192,9 +192,8 @@ class MultiModalDataSource(base.DataSource):
             is_included_fuc = lambda src_f_name: tg_file_name in src_f_name
         else:
             is_included_fuc = lambda src_f_name: tg_file_name == src_f_name
-        is_existed = [
-            is_included_fuc(f_name) for f_name in os.listdir(search_dir)
-        ].any()
+        is_existed = any(
+            [is_included_fuc(f_name) for f_name in os.listdir(search_dir)])
 
         return is_existed
 
