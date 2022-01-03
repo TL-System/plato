@@ -79,6 +79,21 @@ def creat_tiny_kinetics(anno_file_path, num_fist_videos):
     return tiny_anno_file_path
 
 
+def obtain_required_anno_files(splits_info):
+    """ Obtain the general full/tiny annotation files for splits """
+    required_anno_files = {"train": '', "test": '', "val": ''}
+    for split in ['train', 'test', 'val']:
+        split_info = splits_info[split]
+        # Obtain the annotation files for the whole dataset
+        if hasattr(Config().data, 'tiny_data') and Config().data.tiny_data:
+            split_anno_path = split_info["split_tiny_anno_file"]
+        else:  # Obtain the annotation files for the tiny dataset
+            split_anno_path = split_info["split_anno_file"]
+
+        required_anno_files[split] = split_anno_path
+    return required_anno_files
+
+
 class KineticsDataset(multimodal_base.MultiModalDataset):
     """ Prepare the Flickr30K Entities dataset."""
     def __init__(self,
@@ -207,14 +222,10 @@ class DataSource(multimodal_base.MultiModalDataSource):
         # Download the raw datasets for splits
         # There is no need to download data for test as the test dataset of kinetics does not
         #   contain labels.
+        required_anno_files = obtain_required_anno_files(self.splits_info)
         for split in ["train", "val"]:
-            # Download the full dataset
-            if hasattr(Config().data, 'tiny_data') and Config().data.tiny_data:
-                split_anno_path = self.splits_info[split][
-                    "split_tiny_anno_file"]
-            else:  # Download the tiny dataset
-                split_anno_path = self.splits_info[split]["split_anno_file"]
-            video_path_format = self.set_modality_path_format(
+            split_anno_path = required_anno_files[split]
+            video_path_format = self.set_modality_path_key_format(
                 modality_name="video")
             video_dir = self.splits_info[split][video_path_format]
             if not self._exist_judgement(video_dir):
@@ -239,18 +250,14 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         logging.info("The %s dataset has been prepared", self.data_name)
 
-        # for k, v in self.splits_info.items():
-        #     print("key: ", k)
-        #     print("values: ", v)
-
         # print(ok)
         # Extract rgb, flow, audio, audio_feature from the video
-        for split in ["train"]:
+        for split in ["train", "val"]:
             self.extract_videos_rgb_flow_audio(mode=split)
 
-        # Extract the splits information into the corresponding files
-        # for split_name in ["train", "test", "validation"]:
-        #     self.extract_split_list_files(mode=split_name)
+        # Extract the splits information into the
+        #   list corresponding files
+        self.extract_splits_list_files(data_format="video")
 
     def get_modality_name(self):
         """ Get all supports modalities """
@@ -283,8 +290,13 @@ class DataSource(multimodal_base.MultiModalDataSource):
         """ Extract rgb, optical flow, and audio from videos """
         src_mode_videos_dir = os.path.join(
             self.splits_info[mode]["video_path"])
-        rgb_out_dir_path = self.splits_info[mode]["rgb_path"]
-        flow_our_dir_path = self.splits_info[mode]["flow_path"]
+
+        rgb_format_path_key = self.set_modality_path_key_format(
+            modality_name="rgb")
+        flow_format_path_key = self.set_modality_path_key_format(
+            modality_name="flow")
+        rgb_out_dir_path = self.splits_info[mode][rgb_format_path_key]
+        flow_our_dir_path = self.splits_info[mode][flow_format_path_key]
         audio_out_dir_path = self.splits_info[mode]["audio_path"]
         audio_feature_dir_path = self.splits_info[mode]["audio_feature_path"]
 
@@ -335,19 +347,28 @@ class DataSource(multimodal_base.MultiModalDataSource):
                 fft_size=512,  # fft_size / sample_rate is window size
                 hop_size=256)
 
-    def extract_splits_list_files(self, data_format, mode):
+    def extract_splits_list_files(self, data_format):
         """ Extract and generate the split information of current mode/phase """
-        data_src_path_name = self.set_modality_path_format(data_format)
-        # a dict that contains the data splits' file path
+        output_format = "json"
+        out_path = self.mm_data_info["base_data_dir_path"]
+        target_list_regu = f'_{data_format}.{output_format}'
+        if not self._exist_file_in_dir(tg_file_name=target_list_regu,
+                                       search_dir=out_path,
+                                       is_partial_name=True):
+            # obtained a dict that contains the required data splits' file path
+            required_anno_files = obtain_required_anno_files(self.splits_info)
+            data_splits_file_info = required_anno_files
+            gen_annots_op = modality_data_anntation_tools.GenerateMDataAnnotation(
+                data_src_dir=self.mm_data_info["base_data_dir_path"],
+                data_annos_files_info=data_splits_file_info,
+                dataset_name=self.dataset_name,
+                data_format=data_format,  # 'rawframes', 'videos'
+                out_path=out_path,
+                output_format=output_format)
 
-        gen_annots_op = modality_data_anntation_tools.GenerateMDataAnnotation(
-            data_src_dir=self.splits_info[mode][data_src_path_name],
-            data_annos_files_info=data_splits_file_info,
-            dataset_name=self.dataset_name,
-            data_format=data_format,  # 'rawframes', 'videos'
-            out_path=self.mm_data_info["base_data_dir_path"],
-        )
-        gen_annots_op.generate_data_splits_info_file(data_name=self.data_name)
+            for split_name in ['train', 'val']:
+                gen_annots_op.generate_data_splits_info_file(
+                    split_name=split_name)
 
     def get_phase_data_info(self, phase):
         """ Obtain the data information for the required phrase """

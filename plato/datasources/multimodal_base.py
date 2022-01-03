@@ -58,25 +58,39 @@ class MultiModalDataSource(base.DataSource):
             }
         }
 
-    def set_modality_path_format(self, modality_name):
+    def set_modality_format(self, modality_name):
+        """ An interface to set the modality name
+            Thus, calling this func to obtain the modality name
+             in all parts of the class to achieve the consistency
+        """
+        if modality_name in ["rgb", "flow"]:
+            modality_format = "rawframes"
+        else:
+            modality_format = modality_name
+
+        return modality_format
+
+    def set_modality_path_key_format(self, modality_name):
         """ An interface to set the modality path
             Thus, calling this func to obtain the modality path
              in all parts of the class to achieve the consistency
-         """
-        return modality_name + "_" + "path"
+        """
+        modality_format = self.set_modality_format(modality_name)
 
-    def _create_modalities_path(self, modality_names):
+        return modality_format + "_" + "path"
+
+    def _create_modalities_path(self, modality_names=None):
+        if modality_names is None:
+            assert len(self.modality_names) != 0
+            modality_names = self.modality_names
+
         for split_type in list(self.splits_info.keys()):
             split_path = self.splits_info[split_type]["path"]
             for modality_nm in modality_names:
-                if modality_nm in ["rgb", "flow"]:
-                    modality_frame = "rawframes"
-                else:
-                    modality_frame = modality_nm
-
-                split_modality_path = os.path.join(split_path, modality_frame)
+                modality_format = self.set_modality_format(modality_nm)
+                split_modality_path = os.path.join(split_path, modality_format)
                 # modality data dir
-                modality_path_format = self.set_modality_path_format(
+                modality_path_format = self.set_modality_path_key_format(
                     modality_nm)
                 self.splits_info[split_type][
                     modality_path_format] = split_modality_path
@@ -167,6 +181,22 @@ class MultiModalDataSource(base.DataSource):
             extract_archive(from_path=download_data_path,
                             to_path=put_data_dir,
                             remove_finished=True)
+
+    def _exist_file_in_dir(self,
+                           tg_file_name,
+                           search_dir,
+                           is_partial_name=True):
+        """ Judge whether the input file exists in the search_dir. """
+        # the tg_file_name matches one file if it match part of the file name
+        if is_partial_name:
+            is_included_fuc = lambda src_f_name: tg_file_name in src_f_name
+        else:
+            is_included_fuc = lambda src_f_name: tg_file_name == src_f_name
+        is_existed = [
+            is_included_fuc(f_name) for f_name in os.listdir(search_dir)
+        ].any()
+
+        return is_existed
 
     def _exist_judgement(self, target_path):
         """ Judeg whether the input file/dir existed and whether it contains useful data """
