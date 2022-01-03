@@ -57,6 +57,14 @@ class MultiModalDataSource(base.DataSource):
             }
         }
 
+    def set_modality_path_format(self, modality_name):
+        """ An interface to set the modality path
+            Thus, calling this func to obtain the modality path
+             in all parts of the class to achieve the consistency
+         """
+        return modality_name + "_" + "path"
+
+
     def _create_modalities_path(self, modality_names):
         for split_type in list(self.splits_info.keys()):
             split_path = self.splits_info[split_type]["path"]
@@ -68,8 +76,8 @@ class MultiModalDataSource(base.DataSource):
 
                 split_modality_path = os.path.join(split_path, modality_frame)
                 # modality data dir
-                self.splits_info[split_type][modality_nm + "_" +
-                                             "path"] = split_modality_path
+                modality_path_format = self.set_modality_path_format(modality_nm)
+                self.splits_info[split_type][modality_path_format] = split_modality_path
                 if not os.path.exists(split_modality_path):
                     try:
                         os.makedirs(split_modality_path)
@@ -179,23 +187,34 @@ class MultiModalDataSource(base.DataSource):
 class MultiModalDataset(torch.utils.data.Dataset):
     """ The base interface for the multimodal data """
     def __init__(self):
-        self.phase = None
+        self.phase = None # the 'train' , 'test', 'val'
+        # the recorded samples
+        #   this is a dict in which key is the 'sample name/id' ...
+        #   the values are the sample's information,
+        #   for example: the annotation with its bounding boxes ... 
         self.phase_data_record = None
+        # the detailed info in selected split
+        #   i.e., path, path for different modalities, et. al
         self.phase_split_info = None
+        # the data types included, e.g. rgb, text...
         self.data_types = None
+        # the sampler for modalities,
+        #   specific modalities can be masked by this sampler
         self.modality_sampler = None
+        # transformation func for image and text if provided
         self.transform_image_dec_func = None
         self.transform_text_func = None
 
+        # the basic modalities
         self.basic_modalities = ["rgb", "flow", "text", "audio"]
-
+        # the additional data/annotations
         self.basic_items = ["box", "target"]
 
     @abstractmethod
-    def get_one_modality_sample(self, sample_idx):
+    def get_one_multimodal_sample(self, sample_idx):
         """ Get the sample containing different modalities.
             Different multi-modal datasets should have their
-             personal get modality sampler method.
+             personal 'get_one_multimodal_sample' method.
 
 
             Args:
@@ -203,14 +222,15 @@ class MultiModalDataset(torch.utils.data.Dataset):
 
             Output:
                 a dict containing different modalities, the
-                 key of the dict is the modality name
+                 key of the dict is the modality name that should
+                 be included in the basic_modalities and basic_items.
          """
         raise NotImplementedError(
             "Please Implement the get modality sample function")
 
     def __getitem__(self, sample_idx):
         """Get the sample for either training or testing given index."""
-        sampled_data = self.get_one_modality_sample(sample_idx)
+        sampled_data = self.get_one_multimodal_sample(sample_idx)
 
         # utilize the modality to mask specific modalities
         sampled_modality_data = dict()

@@ -146,7 +146,7 @@ class Flickr30KEDataset(multimodal_base.MultiModalDataset):
         return sentence, sentence_phrases, sentence_phrases_type, \
                 sentence_phrases_id, sentence_phrases_boxes
 
-    def get_one_modality_sample(self, sample_idx):
+    def get_one_multimodal_sample(self, sample_idx):
         """ Obtain one sample from the Flickr30K Entities dataset. """
         samle_retrieval_name = self.phase_samples_name[sample_idx]
         image_file_name = os.path.basename(samle_retrieval_name)

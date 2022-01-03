@@ -11,9 +11,9 @@ import unittest
 
 # os.environ['config_file'] = 'tests/TestsConfig/referitgame.yml'
 
-# os.environ['config_file'] = 'tests/TestsConfig/kinetics.yml'
+os.environ['config_file'] = 'tests/TestsConfig/kinetics.yml'
 
-os.environ['config_file'] = 'tests/TestsConfig/gym.yml'
+# os.environ['config_file'] = 'tests/TestsConfig/gym.yml'
 
 import numpy as np
 import torch
@@ -106,12 +106,12 @@ class DatasetsTest(unittest.TestCase):
     #     self.utest_datasource = refer_Datasource()
     #     assert self.assertDataSourceDefinition(self.utest_datasource)
 
-    # def test_kinetics_datasource(self):
-    #     """ Test the kinetics700 dataset. """
-    #     # set the specific
+    def test_kinetics_datasource(self):
+        """ Test the kinetics700 dataset. """
+        # set the specific
 
-    #     self.utest_datasource = kinetics_Datasource()
-    #     # assert self.assertDataSourceDefinition(self.utest_datasource)
+        self.utest_datasource = kinetics_Datasource()
+        # assert self.assertDataSourceDefinition(self.utest_datasource)
 
     # def test_gym_datasource(self):
     #     """ Test the Gym dataset. """

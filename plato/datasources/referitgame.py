@@ -89,7 +89,7 @@ class ReferItGameDataset(multimodal_base.MultiModalDataset):
     def __len__(self):
         return len(self.phase_data_record)
 
-    def get_one_modality_sample(self, sample_idx):
+    def get_one_multimodal_sample(self, sample_idx):
         [
             image_id, _, caption, caption_phrases, caption_phrase_bboxs,
             caption_phrases_cate, caption_phrases_cate_id
