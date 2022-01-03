@@ -5,6 +5,7 @@ Base class for multimodal datasets.
 from abc import abstractmethod
 import logging
 import os
+import subprocess
 from collections import namedtuple
 
 import torch
@@ -173,8 +174,32 @@ class MultiModalDataSource(base.DataSource):
             logging.info("The path %s does not exist", target_path)
             return False
 
+        # remove all .DS_Store files
+        command = ['find', '.', '-name', '".DS_Store"', '-delete']
+        command = ' '.join(command)
+        #cmd = f"find . -name ".DS_Store" -delete"
+        subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT)
+
+        def get_size(folder):
+            # get size
+            size = 0
+            for ele in os.scandir(folder):
+                if not ele.name.startswith('.'):
+                    size += os.path.getsize(ele)
+            return size
+
+        def is_contain_useful_file(target_dir):
+            """ Return True once reaching one useful file """
+            for _, _, files in os.walk(target_dir):
+                for file in files:
+                    # whether a useful file
+                    if not file.startswith('.'):
+                        return True
+            return False
+
         if os.path.isdir(target_path):
-            if len(os.listdir(target_path)) == 0:
+            if get_size(target_path
+                        ) == 0 or not is_contain_useful_file(target_path):
                 logging.info("The path %s does exist but contains no data",
                              target_path)
                 return False

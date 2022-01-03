@@ -39,6 +39,8 @@ The data structure is:
 │   │   ├── rawframes_val
 """
 
+from genericpath import isdir
+from posixpath import join
 import re
 import json
 import logging
@@ -203,7 +205,9 @@ class DataSource(multimodal_base.MultiModalDataSource):
                     num_fist_videos=Config().data.tiny_data_number)
 
         # Download the raw datasets for splits
-        for split in ["train", "test", "val"]:
+        # There is no need to download data for test as the test dataset of kinetics does not
+        #   contain labels.
+        for split in ["train", "val"]:
             # Download the full dataset
             if hasattr(Config().data, 'tiny_data') and Config().data.tiny_data:
                 split_anno_path = self.splits_info[split][
@@ -221,54 +225,66 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
                 tmp_dir = os.path.join(video_dir, "tmp")
                 logging.info(
-                    "Downloading the raw videos for the %s dataset. This may take a long time.",
-                    self.data_name)
+                    "Downloading the raw videos for the %s %s dataset. This may take a long time.",
+                    self.data_name, split)
                 kinetics_downloader.main(input_csv=split_anno_path,
                                          output_dir=video_dir,
                                          trim_format='%06d',
                                          num_jobs=num_workers,
                                          tmp_dir=tmp_dir)
+        # Rename of class name
+        for split in ["train", "val"]:
+            self.rename_classes(mode=split)
         logging.info("Done.")
 
         logging.info("The %s dataset has been prepared", self.data_name)
+
+        # for k, v in self.splits_info.items():
+        #     print("key: ", k)
+        #     print("values: ", v)
+
+        # print(ok)
+        # Extract rgb, flow, audio, audio_feature from the video
+        for split in ["train"]:
+            self.extract_videos_rgb_flow_audio(mode=split)
 
         # Extract the splits information into the corresponding files
         # for split_name in ["train", "test", "validation"]:
         #     self.extract_split_list_files(mode=split_name)
 
-    def extract_split_list_files(self, data_format, mode):
-        """ Extract and generate the split information of current mode/phase """
-        data_src_path_name = self.set_modality_path_format(data_format)
-        gen_annots_op = modality_data_anntation_tools.GenerateMDataAnnotation(
-            data_src_dir=self.splits_info[mode][data_src_path_name],
-            data_annos_files_info=self.
-            data_splits_file_info,  # a dict that contains the data splits' file path
-            dataset_name=self.dataset_name,
-            data_format=data_format,  # 'rawframes', 'videos'
-            out_path=self.mm_data_info["base_data_dir_path"],
-        )
-        gen_annots_op.generate_data_splits_info_file(data_name=self.data_name)
-
-        gen_annots_op = modality_data_anntation_tools.GenerateMDataAnnotation(
-            data_src_dir=self.splits_info[mode]["rawframes_path"],
-            data_annos_files_info=self.
-            data_splits_file_info,  # a dict that contains the data splits' file path
-            dataset_name=self.dataset_name,
-            data_format="rawframes",  # 'rawframes', 'videos'
-            out_path=self.mm_data_info["base_data_dir_path"],
-        )
-        gen_annots_op.generate_data_splits_info_file(data_name=self.data_name)
-
     def get_modality_name(self):
         """ Get all supports modalities """
         return ["rgb", "flow", "audio"]
+
+    def rename_classes(self, mode):
+        """ Rename classes by replacing whitespace to  'Underscore' """
+        videos_root_dir_path = self.splits_info[mode]["video_path"]
+        videos_dirs_name = [
+            dir_name for dir_name in os.listdir(videos_root_dir_path)
+            if os.path.isdir(os.path.join(videos_root_dir_path, dir_name))
+        ]
+
+        new_videos_dirs_name = [
+            dir_name.replace(" ", "_") for dir_name in videos_dirs_name
+        ]
+
+        videos_dirs_path = [
+            os.path.join(videos_root_dir_path, dir_name)
+            for dir_name in videos_dirs_name
+        ]
+        new_videos_dirs_path = [
+            os.path.join(videos_root_dir_path, dir_name)
+            for dir_name in new_videos_dirs_name
+        ]
+        for i in range(len(videos_dirs_path)):
+            os.rename(videos_dirs_path[i], new_videos_dirs_path[i])
 
     def extract_videos_rgb_flow_audio(self, mode="train"):
         """ Extract rgb, optical flow, and audio from videos """
         src_mode_videos_dir = os.path.join(
             self.splits_info[mode]["video_path"])
-        rgb_out_dir_path = self.splits_info[mode]["rawframes_path"]
-        flow_our_dir_path = self.splits_info[mode]["rawframes_path"]
+        rgb_out_dir_path = self.splits_info[mode]["rgb_path"]
+        flow_our_dir_path = self.splits_info[mode]["flow_path"]
         audio_out_dir_path = self.splits_info[mode]["audio_path"]
         audio_feature_dir_path = self.splits_info[mode]["audio_feature_path"]
 
@@ -287,27 +303,51 @@ class DataSource(multimodal_base.MultiModalDataSource):
             mixed_ext=False)
 
         if torch.cuda.is_available():
-            if not self._exist_judgement(
-                    rgb_out_dir_path) and not self._exist_judgement(
-                        flow_our_dir_path):
+            if not self._exist_judgement(rgb_out_dir_path):
+                logging.info(
+                    "Extracting frames by GPU from videos in %s to %s.",
+                    src_mode_videos_dir, rgb_out_dir_path)
                 vdf_extractor.build_frames_gpu(rgb_out_dir_path,
                                                flow_our_dir_path,
                                                new_short=1,
                                                new_width=0,
                                                new_height=0)
         else:
-            if not self._exist_judgement(
-                    self.splits_info[mode]["rawframes_path"]):
-                vdf_extractor.build_frames_cpu(
-                    to_dir=self.splits_info[mode]["rawframes_path"])
+            if not self._exist_judgement(rgb_out_dir_path):
+                logging.info(
+                    "Extracting frames by CPU from videos in %s to %s.",
+                    src_mode_videos_dir, rgb_out_dir_path)
+                vdf_extractor.build_frames_cpu(to_dir=rgb_out_dir_path)
 
         if not self._exist_judgement(audio_out_dir_path):
+            logging.info("Extracting audios by CPU from videos in %s to %s.",
+                         src_mode_videos_dir, audio_out_dir_path)
             vda_extractor.build_audios(to_dir=audio_out_dir_path)
 
         if not self._exist_judgement(audio_feature_dir_path):
+            logging.info(
+                "Extracting audios feature by CPU from audios in %s to %s.",
+                audio_out_dir_path, audio_feature_dir_path)
+            # # window_size:32ms hop_size:16ms
             vda_extractor.build_audios_features(
                 audio_src_path=audio_out_dir_path,
-                to_dir=audio_feature_dir_path)
+                to_dir=audio_feature_dir_path,
+                fft_size=512,  # fft_size / sample_rate is window size
+                hop_size=256)
+
+    def extract_splits_list_files(self, data_format, mode):
+        """ Extract and generate the split information of current mode/phase """
+        data_src_path_name = self.set_modality_path_format(data_format)
+        # a dict that contains the data splits' file path
+
+        gen_annots_op = modality_data_anntation_tools.GenerateMDataAnnotation(
+            data_src_dir=self.splits_info[mode][data_src_path_name],
+            data_annos_files_info=data_splits_file_info,
+            dataset_name=self.dataset_name,
+            data_format=data_format,  # 'rawframes', 'videos'
+            out_path=self.mm_data_info["base_data_dir_path"],
+        )
+        gen_annots_op.generate_data_splits_info_file(data_name=self.data_name)
 
     def get_phase_data_info(self, phase):
         """ Obtain the data information for the required phrase """
