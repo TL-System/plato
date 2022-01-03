@@ -25,7 +25,7 @@ data:
   tiny_data_number: 10
 
   downloader:
-    num_workers: 8
+    num_workers: 1
 
     videos_per_gpu: 3
     workers_per_gpu: 4

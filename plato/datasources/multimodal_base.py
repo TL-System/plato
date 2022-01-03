@@ -64,7 +64,6 @@ class MultiModalDataSource(base.DataSource):
          """
         return modality_name + "_" + "path"
 
-
     def _create_modalities_path(self, modality_names):
         for split_type in list(self.splits_info.keys()):
             split_path = self.splits_info[split_type]["path"]
@@ -76,8 +75,10 @@ class MultiModalDataSource(base.DataSource):
 
                 split_modality_path = os.path.join(split_path, modality_frame)
                 # modality data dir
-                modality_path_format = self.set_modality_path_format(modality_nm)
-                self.splits_info[split_type][modality_path_format] = split_modality_path
+                modality_path_format = self.set_modality_path_format(
+                    modality_nm)
+                self.splits_info[split_type][
+                    modality_path_format] = split_modality_path
                 if not os.path.exists(split_modality_path):
                     try:
                         os.makedirs(split_modality_path)
@@ -89,7 +90,11 @@ class MultiModalDataSource(base.DataSource):
         data_path,  # the base directory for the data
         base_data_name=None):  # the directory name of the working data
         """ Generate the data structure based on the defined data path """
-        base_data_path = os.path.join(data_path, base_data_name)
+
+        # Create the full path by introducing the project path
+        proj_root_path = os.path.abspath(os.curdir)
+        base_data_path = os.path.join(proj_root_path, data_path,
+                                      base_data_name)
 
         if not os.path.exists(base_data_path):
             os.makedirs(base_data_path)
@@ -187,11 +192,11 @@ class MultiModalDataSource(base.DataSource):
 class MultiModalDataset(torch.utils.data.Dataset):
     """ The base interface for the multimodal data """
     def __init__(self):
-        self.phase = None # the 'train' , 'test', 'val'
+        self.phase = None  # the 'train' , 'test', 'val'
         # the recorded samples
         #   this is a dict in which key is the 'sample name/id' ...
         #   the values are the sample's information,
-        #   for example: the annotation with its bounding boxes ... 
+        #   for example: the annotation with its bounding boxes ...
         self.phase_data_record = None
         # the detailed info in selected split
         #   i.e., path, path for different modalities, et. al

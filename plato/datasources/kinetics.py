@@ -142,6 +142,9 @@ class DataSource(multimodal_base.MultiModalDataSource):
         #    as they belong to the same prototype "rawframes".
         self._create_modalities_path(modality_names=self.modality_names)
 
+        # print("self.mm_data_info: ", self.mm_data_info)
+        # print("self.splits_info: ", self.splits_info)
+        # print(ok)
         # Set the annotation file path
         base_data_path = self.mm_data_info["base_data_dir_path"]
 
