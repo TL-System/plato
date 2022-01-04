@@ -43,6 +43,7 @@ jobs:
           wget https://kubeedge.obs.cn-north-1.myhuaweicloud.com/model/yolov5.pth
           mv yolov5.pth ./models/pretrained
           ./run --config=configs/MNIST/fedavg_lenet5.yml
+          ./run --config=configs/MNIST/fedavg_cross_silo_lenet5.yml
           ./run --config=configs/MNIST/fedavg_async_lenet5.yml
           ./run --config=configs/MNIST/fedavg_lenet5_noniid.yml
           ./run --config=configs/MNIST/mistnet_lenet5.yml

@@ -14,6 +14,10 @@ clients:
     # Whether simulate clients or not
     simulation: false
 
+    # Processors for outbound data payloads
+    outbound_processors:
+        - model_pruning
+
 server:
     address: 127.0.0.1
     port: 8000
@@ -45,7 +49,7 @@ trainer:
     parallelized: false
 
     # Whether to apply differential privacy
-    differential_privacy: true
+    # differential_privacy: true
     # dp_epsilon: 1
     # dp_delta: 0.00001
     # dp_max_grad_norm: 1

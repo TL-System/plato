@@ -61,21 +61,16 @@ class Config:
             if Config.args.port is not None:
                 Config.args.port = int(args.port)
 
-            try:
-                log_level = {
-                    'critical': logging.CRITICAL,
-                    'error': logging.ERROR,
-                    'warn': logging.WARN,
-                    'info': logging.INFO,
-                    'debug': logging.DEBUG
-                }[args.log]
-            except KeyError:
-                log_level = logging.INFO
+            numeric_level = getattr(logging, args.log.upper(), None)
+
+            if not isinstance(numeric_level, int):
+                raise ValueError(f'Invalid log level: {args.log}')
 
             logging.basicConfig(
                 format='[%(levelname)s][%(asctime)s]: %(message)s',
-                level=log_level,
                 datefmt='%H:%M:%S')
+            root_logger = logging.getLogger()
+            root_logger.setLevel(numeric_level)
 
             cls._instance = super(Config, cls).__new__(cls)
 

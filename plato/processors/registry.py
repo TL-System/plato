@@ -18,7 +18,7 @@ if not (hasattr(Config().trainer, 'use_tensorflow')
         base,
         feature_randomized_response,
         feature_gaussian,
-        feature_laplacian,
+        feature_laplace,
         feature_quantize,
         feature_dequantize,
         feature_unbatch,
@@ -28,13 +28,14 @@ if not (hasattr(Config().trainer, 'use_tensorflow')
         model_quantize,
         model_dequantize,
         model_randomized_response,
+        model_pruning,
     )
 
     registered_processors = OrderedDict([
         ('base', base.Processor),
         ('feature_randomized_response', feature_randomized_response.Processor),
         ('feature_gaussian', feature_gaussian.Processor),
-        ('feature_laplace', feature_laplacian.Processor),
+        ('feature_laplace', feature_laplace.Processor),
         ('feature_quantize', feature_quantize.Processor),
         ('feature_dequantize', feature_dequantize.Processor),
         ('feature_unbatch', feature_unbatch.Processor),
@@ -44,6 +45,7 @@ if not (hasattr(Config().trainer, 'use_tensorflow')
         ('model_quantize', model_quantize.Processor),
         ('model_dequantize', model_dequantize.Processor),
         ('model_randomized_response', model_randomized_response.Processor),
+        ('model_pruning', model_pruning.Processor),
     ])
 
 

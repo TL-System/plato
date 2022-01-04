@@ -10,7 +10,7 @@ import os
 if __name__ == '__main__':
     for t in [
             'configs/MNIST/fedavg_async_lenet5',
-            # 'configs/MNIST/fedavg_cross_silo_lenet5',
+            'configs/MNIST/fedavg_cross_silo_lenet5',
             # 'configs/MNIST/fedavg_lenet5_mindspore',
             'configs/MNIST/fedavg_lenet5_noniid',
             # 'configs/MNIST/fedavg_lenet5_tensorflow',

@@ -40,6 +40,8 @@ Attributes in **bold** must be included in a configuration file, while attribute
 
 - `model_quantize`: Quantize features for model parameters for PyTorch.
 
+- `model_pruning`: Pruning model weights for PyTorch. Must be placed as the first processor.
+
 
 #### Valid processors for `clients.inbound_processors`
 

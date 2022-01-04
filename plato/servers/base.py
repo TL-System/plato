@@ -55,8 +55,12 @@ class ServerEvents(socketio.AsyncNamespace):
 
     async def on_client_payload_done(self, sid, data):
         """ An existing client finished sending its payloads from local training. """
-        await self.plato_server.client_payload_done(sid, data['id'],
-                                                    data['obkey'])
+        if 's3_key' in data:
+            await self.plato_server.client_payload_done(sid,
+                                                        data['id'],
+                                                        s3_key=data['s3_key'])
+        else:
+            await self.plato_server.client_payload_done(sid, data['id'])
 
 
 class Server:
@@ -124,7 +128,11 @@ class Server:
             Server.start_clients(client=self.client)
 
         if hasattr(Config().server, 'periodic_interval'):
-            asyncio.get_event_loop().create_task(self.periodic())
+            periodic_interval = Config().server.periodic_interval
+        else:
+            periodic_interval = 5
+
+        asyncio.get_event_loop().create_task(self.periodic(periodic_interval))
 
         self.start()
 
@@ -148,7 +156,10 @@ class Server:
 
         app = web.Application()
         self.sio.attach(app)
-        web.run_app(app, host=Config().server.address, port=port)
+        web.run_app(app,
+                    host=Config().server.address,
+                    port=port,
+                    loop=asyncio.get_event_loop())
 
     async def register_client(self, sid, client_id):
         """ Adding a newly arrived client to the list of clients. """
@@ -251,7 +262,7 @@ class Server:
             # Except for these two cases, we need to exclude the clients who are still
             # training.
             training_client_ids = [
-                self.training_clients[client_id]
+                self.training_clients[client_id]['id']
                 for client_id in list(self.training_clients.keys())
             ]
             selectable_clients = [
@@ -300,7 +311,10 @@ class Server:
                     os.getpid(), selected_client_id)
                 await self.send(sid, payload, selected_client_id)
 
-                self.training_clients[client_id] = selected_client_id
+                self.training_clients[client_id] = {
+                    'id': selected_client_id,
+                    'round': self.current_round
+                }
 
             self.reporting_clients = []
 
@@ -311,17 +325,17 @@ class Server:
         # Select clients randomly
         return random.sample(clients_pool, clients_count)
 
-    async def periodic(self):
+    async def periodic(self, periodic_interval):
         """ Runs periodic_task() periodically on the server. The time interval between
             its execution is defined in 'server:periodic_interval'.
         """
         while True:
             await self.periodic_task()
-            await asyncio.sleep(Config().server.periodic_interval)
+            await asyncio.sleep(periodic_interval)
 
     async def periodic_task(self):
         """ A periodic task that is executed from time to time, determined by
-        'server:periodic_interval' in the configuration. """
+        'server:periodic_interval' with a default value of 5 seconds, in the configuration. """
         # Call the async function that defines a customized periodic task, if any
         _task = getattr(self, "customize_periodic_task", None)
         if callable(_task):
@@ -330,7 +344,32 @@ class Server:
         # If we are operating in asynchronous mode, aggregate the model updates received so far.
         if hasattr(Config().server,
                    'synchronous') and not Config().server.synchronous:
-            if len(self.updates) > 0:
+
+            # What is the minimum number of clients that must have reported before aggregation
+            # takes place?
+            minimum_clients = 1
+            if hasattr(Config().server, 'minimum_clients_aggregated'):
+                minimum_clients = Config().server.minimum_clients_aggregated
+
+            # Is there any training clients who are currently training on models that are too
+            # `stale,` as defined by the staleness threshold?
+            staleness = 0
+            if hasattr(Config().server, 'staleness'):
+                staleness = Config().server.staleness
+
+            for __, client_data in self.training_clients.items():
+                # The client is still working at an early round, early enough to stop the aggregation
+                # process as determined by 'staleness'
+                if client_data['round'] < self.current_round - staleness:
+                    logging.info(
+                        "[Server #%d] Client %s is still working at round %s, which is "
+                        "beyond the staleness threshold %s compared to the current round %s. "
+                        "Nothing to process.", os.getpid(), client_data['id'],
+                        client_data['round'], staleness, self.current_round)
+
+                    return
+
+            if len(self.updates) >= minimum_clients:
                 logging.info(
                     "[Server #%d] %d client reports received in asynchronous mode. Processing.",
                     os.getpid(), len(self.updates))
@@ -339,8 +378,8 @@ class Server:
                 await self.select_clients()
             else:
                 logging.info(
-                    "[Server #%d] No client reports have been received. Nothing to process."
-                )
+                    "[Server #%d] No sufficient number of client reports have been received. "
+                    "Nothing to process.")
 
     async def send_in_chunks(self, data, sid, client_id) -> None:
         """ Sending a bytes object in fixed-sized chunks to the client. """
@@ -357,12 +396,14 @@ class Server:
         # First apply outbound processors, if any
         payload = self.outbound_processor.process(payload)
 
+        metadata = {'id': client_id}
+
         if self.s3_client is not None:
-            payload_key = f'server_payload_{os.getpid()}_{self.current_round}'
-            self.s3_client.send_to_s3(payload_key, payload)
+            s3_key = f'server_payload_{os.getpid()}_{self.current_round}'
+            self.s3_client.send_to_s3(s3_key, payload)
             data_size = sys.getsizeof(pickle.dumps(payload))
+            metadata['s3_key'] = s3_key
         else:
-            payload_key = None
             data_size = 0
 
             if isinstance(payload, list):
@@ -376,11 +417,7 @@ class Server:
                 await self.send_in_chunks(_data, sid, client_id)
                 data_size = sys.getsizeof(_data)
 
-        await self.sio.emit('payload_done', {
-            'id': client_id,
-            'obkey': payload_key
-        },
-                            room=sid)
+        await self.sio.emit('payload_done', metadata, room=sid)
 
         logging.info("[Server #%d] Sent %s MB of payload data to client #%d.",
                      os.getpid(), round(data_size / 1024**2, 2), client_id)
@@ -412,9 +449,9 @@ class Server:
             self.client_payload[sid] = [self.client_payload[sid]]
             self.client_payload[sid].append(_data)
 
-    async def client_payload_done(self, sid, client_id, object_key):
+    async def client_payload_done(self, sid, client_id, s3_key=None):
         """ Upon receiving all the payload from a client, either via S3 or socket.io. """
-        if object_key is None:
+        if s3_key is None:
             assert self.client_payload[sid] is not None
 
             payload_size = 0
@@ -425,8 +462,7 @@ class Server:
                 payload_size = sys.getsizeof(
                     pickle.dumps(self.client_payload[sid]))
         else:
-            self.client_payload[sid] = self.s3_client.receive_from_s3(
-                object_key)
+            self.client_payload[sid] = self.s3_client.receive_from_s3(s3_key)
             payload_size = sys.getsizeof(pickle.dumps(
                 self.client_payload[sid]))
 
@@ -445,8 +481,7 @@ class Server:
         # proceeds regardless of synchronous or asynchronous modes. This guarantees that
         # if asynchronous mode uses an excessively long aggregation interval, it will not
         # unnecessarily delay the aggregation process.
-        if len(self.updates) > 0 and len(
-                self.updates) >= self.clients_per_round:
+        if len(self.updates) >= self.clients_per_round:
             logging.info(
                 "[Server #%d] All %d client reports received. Processing.",
                 os.getpid(), len(self.updates))
@@ -470,8 +505,7 @@ class Server:
                 if client_id in self.selected_clients:
                     self.selected_clients.remove(client_id)
 
-                    if len(self.updates) > 0 and len(self.updates) >= len(
-                            self.selected_clients):
+                    if len(self.updates) >= len(self.selected_clients):
                         logging.info(
                             "[Server #%d] All %d client reports received. Processing.",
                             os.getpid(), len(self.updates))
