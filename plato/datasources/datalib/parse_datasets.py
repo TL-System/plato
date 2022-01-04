@@ -154,6 +154,7 @@ def parse_kinetics_splits(kinetics_anntation_files_info, level, dataset_name):
     test_list = [line_to_map(x, test=True) for x in csv_reader]
 
     splits = ((train_list, val_list, test_list), )
+    splits = {"train": train_list, "test": test_list, "val": val_list}
     return splits
 
 

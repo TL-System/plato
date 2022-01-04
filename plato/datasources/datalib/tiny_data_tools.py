@@ -31,7 +31,7 @@ def create_tiny_kinetics_anno(kinetics_annotation_files_info, num_samples,
 
     train_anno_df = pd.read_csv(train_anno_file_path)
     train_selected_samples_df = train_anno_df.iloc[:num_samples]
-    print("train_selected_samples_df: ", train_selected_samples_df)
+
     train_selected_classes = train_selected_samples_df["label"].tolist()
 
     # select from test/val anno files based on the train classes

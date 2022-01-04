@@ -65,8 +65,8 @@ class MultiModalDataSource(base.DataSource):
         """
         if modality_name in ["rgb", "flow"]:
             modality_format = "rawframes"
-        else:
-            modality_format = modality_name
+        else:  # convert to plurality
+            modality_format = modality_name + "s"
 
         return modality_format
 

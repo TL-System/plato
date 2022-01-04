@@ -25,8 +25,8 @@ class GenerateMDataAnnotation(object):
         dataset_name,
         data_dir_level=2,
         rgb_prefix="img_'",  # prefix of rgb frames
-        flow_x_prefix="flow_x_",  # prefix of flow x frames
-        flow_y_prefix="flow_y_",  # prefix of flow y frames
+        flow_x_prefix="flow_x_",  # prefix of flow x frames [flow_x_ or x_]
+        flow_y_prefix="flow_y_",  # prefix of flow y frames [flow_y_ or y_]
         # shuffle=False,  # whether to shuffle the file list
         output_format="json"):  # txt or json
 
@@ -39,6 +39,7 @@ class GenerateMDataAnnotation(object):
         self.rgb_prefix = rgb_prefix
         self.flow_x_prefix = flow_x_prefix
         self.flow_y_prefix = flow_y_prefix
+
         self.output_format = output_format
 
         self.frame_info = None
@@ -71,6 +72,7 @@ class GenerateMDataAnnotation(object):
                 raise ValueError(
                     f'level must be 1 or 2, but got {self.data_dir_level}')
             frame_info = {}
+
             for video in video_list:
                 video_path = os.path.relpath(video, split_format_data_src_dir)
                 # video_id: (video_relative_path, -1, -1)
@@ -86,10 +88,14 @@ class GenerateMDataAnnotation(object):
         self.parse_dir_files(split_name)
 
         split_info = self.data_splits_info[split_name]
+
         # (rgb_list, flow_list)
         split_built_list = build_list(split=split_info,
                                       frame_info=self.frame_info,
                                       shuffle=False)
+
+        # Our self.data_format is video,
+        # Convert to videos
         filename = f'{self.dataset_name}_{split_name}_list_{self.data_format}.txt'
 
         if self.output_format == 'txt':

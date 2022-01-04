@@ -250,7 +250,9 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         # Extract the splits information into the
         #   list corresponding files
-        self.extract_splits_list_files(data_format="video",
+        self.extract_splits_list_files(data_format="videos",
+                                       splits=['train', 'val'])
+        self.extract_splits_list_files(data_format="rawframes",
                                        splits=['train', 'val'])
 
     def get_modality_name(self):
@@ -259,7 +261,9 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
     def rename_classes(self, mode):
         """ Rename classes by replacing whitespace to  'Underscore' """
-        videos_root_dir_path = self.splits_info[mode]["video_path"]
+        video_format_path_key = self.set_modality_path_key_format(
+            modality_name="video")
+        videos_root_dir_path = self.splits_info[mode][video_format_path_key]
         videos_dirs_name = [
             dir_name for dir_name in os.listdir(videos_root_dir_path)
             if os.path.isdir(os.path.join(videos_root_dir_path, dir_name))
@@ -282,17 +286,24 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
     def extract_videos_rgb_flow_audio(self, mode="train"):
         """ Extract rgb, optical flow, and audio from videos """
+        video_format_path_key = self.set_modality_path_key_format(
+            modality_name="video")
         src_mode_videos_dir = os.path.join(
-            self.splits_info[mode]["video_path"])
+            self.splits_info[mode][video_format_path_key])
 
         rgb_format_path_key = self.set_modality_path_key_format(
             modality_name="rgb")
         flow_format_path_key = self.set_modality_path_key_format(
             modality_name="flow")
+        audio_format_path_key = self.set_modality_path_key_format(
+            modality_name="audio")
+        audio_fea_format_path_key = self.set_modality_path_key_format(
+            modality_name="audio_feature")
         rgb_out_dir_path = self.splits_info[mode][rgb_format_path_key]
         flow_our_dir_path = self.splits_info[mode][flow_format_path_key]
-        audio_out_dir_path = self.splits_info[mode]["audio_path"]
-        audio_feature_dir_path = self.splits_info[mode]["audio_feature_path"]
+        audio_out_dir_path = self.splits_info[mode][audio_format_path_key]
+        audio_feature_dir_path = self.splits_info[mode][
+            audio_fea_format_path_key]
 
         # define the modalities extractor
         if not self._exist_judgement(rgb_out_dir_path):
@@ -352,6 +363,8 @@ class DataSource(multimodal_base.MultiModalDataSource):
         if not self._exist_file_in_dir(tg_file_name=target_list_regu,
                                        search_dir=out_path,
                                        is_partial_name=True):
+            logging.info("Extracting annotation list for %s. ", data_format)
+
             # obtained a dict that contains the required data splits' file path
             required_anno_files = obtain_required_anno_files(self.splits_info)
             data_splits_file_info = required_anno_files
@@ -360,6 +373,9 @@ class DataSource(multimodal_base.MultiModalDataSource):
                 data_annos_files_info=data_splits_file_info,
                 dataset_name=self.data_name,
                 data_format=data_format,  # 'rawframes', 'videos'
+                rgb_prefix="img_",  # prefix of rgb frames
+                flow_x_prefix="x_",  # prefix of flow x frames
+                flow_y_prefix="y_",  # prefix of flow y frames
                 out_path=out_path,
                 output_format=output_format)
 
