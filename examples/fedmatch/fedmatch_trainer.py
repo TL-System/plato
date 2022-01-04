@@ -15,15 +15,13 @@ import random
 
 import numpy as np
 import torch
-from torch import nn
-from torch import _load_global_deps, autograd, optim
-from torch.nn.modules import loss
-from torch.utils.data import DataLoader
-import wandb
 from PIL import Image
+from scipy.ndimage.interpolation import shift
+from torch import autograd, nn, optim
+from torch.utils.data import DataLoader
+
 from plato.config import Config
 from plato.trainers import basic
-from scipy.ndimage.interpolation import shift
 
 
 class Trainer(basic.Trainer):
@@ -54,11 +52,6 @@ class Trainer(basic.Trainer):
         sampler: the sampler that extracts a partition for this client.
         cut_layer (optional): The layer which training should start from.
         """
-
-        if 'use_wandb' in config:
-            run = wandb.init(project="plato",
-                             group=str(config['run_id']),
-                             reinit=True)
 
         try:
             custom_train = getattr(self, "train_model", None)
@@ -173,9 +166,6 @@ class Trainer(basic.Trainer):
                                             batch_id, len(train_loader_s),
                                             loss_s.data.item()))
                             else:
-                                if hasattr(config, 'use_wandb'):
-                                    wandb.log(
-                                        {"batch loss": loss_s.data.item()})
                                 logging.info(
                                     "[Client #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}"
                                     .format(self.client_id, epoch, epochs,
@@ -217,17 +207,11 @@ class Trainer(basic.Trainer):
                                             batch_id, len(train_loader_u),
                                             loss_u.data.item()))
                             else:
-                                if hasattr(config, 'use_wandb'):
-                                    wandb.log(
-                                        {"batch loss": loss_u.data.item()})
                                 logging.info(
                                     "[Client #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}"
                                     .format(self.client_id, epoch, epochs,
                                             batch_id, len(train_loader_u),
                                             loss_u.data.item()))
-
-                    #if hasattr(optimizer, "params_state_update"):
-                    #   optimizer.params_state_update()
 
         except Exception as training_exception:
             logging.info("Training on client #%d failed.", self.client_id)
@@ -238,9 +222,6 @@ class Trainer(basic.Trainer):
         model_type = config['model_name']
         filename = f"{model_type}_{self.client_id}_{config['run_id']}.pth"
         self.save_model(filename)
-
-        if 'use_wandb' in config:
-            run.finish()
 
     def loss_unsupervised(self,
                           unlabled_samples,
