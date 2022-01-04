@@ -54,7 +54,6 @@ else:
 def get():
     """Get the model with the provided name."""
     model_name = Config().trainer.model_name
-    print("++++++we're getting the decomposed model")
     model_type = model_name.split('_')[0]
     model = None
 
