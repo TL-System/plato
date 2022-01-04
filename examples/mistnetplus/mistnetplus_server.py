@@ -29,13 +29,19 @@ class MistnetplusServer(fedavg.Server):
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
 
-    async def client_payload_done(self, sid, client_id):
-        assert self.client_payload[sid] is not None
-        payload_size = 0
-        if isinstance(self.client_payload[sid], list):
-            for _data in self.client_payload[sid]:
-                payload_size += sys.getsizeof(pickle.dumps(_data))
+    async def client_payload_done(self, sid, client_id, s3_key=None):
+        if s3_key is None:
+            assert self.client_payload[sid] is not None
+
+            payload_size = 0
+            if isinstance(self.client_payload[sid], list):
+                for _data in self.client_payload[sid]:
+                    payload_size += sys.getsizeof(pickle.dumps(_data))
+            else:
+                payload_size = sys.getsizeof(
+                    pickle.dumps(self.client_payload[sid]))
         else:
+            self.client_payload[sid] = self.s3_client.receive_from_s3(s3_key)
             payload_size = sys.getsizeof(pickle.dumps(
                 self.client_payload[sid]))
 

@@ -136,17 +136,19 @@ class Trainer(ABC):
         """
 
     @abstractmethod
-    def test(self, testset) -> float:
+    def test(self, testset, sampler=None) -> float:
         """Testing the model using the provided test dataset.
 
         Arguments:
         testset: The test dataset.
+        sampler: The sampler that extracts a partition of the test dataset.
         """
 
     @abstractmethod
-    async def server_test(self, testset):
+    async def server_test(self, testset, sampler=None):
         """Testing the model on the server using the provided test dataset.
 
         Arguments:
         testset: The test dataset.
+        sampler: The sampler that extracts a partition of the test dataset.
         """

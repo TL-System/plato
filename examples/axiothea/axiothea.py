@@ -3,11 +3,9 @@ A federated learning training session using Axiothea.
 
 """
 
-import os
 import axiothea_server
 import axiothea_client
 import axiothea_edge
-os.environ['config_file'] = 'axiothea_MNIST_lenet5.yml'
 
 
 def main():

@@ -139,11 +139,6 @@ class Server(base.Server):
 
     async def process_reports(self):
         """Process the client reports by aggregating their weights."""
-        for processor in self.outbound_processor.processors:
-            if hasattr(processor, 'previous_model_weights'):
-                processor.previous_model_weights = self.algorithm.extract_weights(
-                )
-
         await self.aggregate_weights(self.updates)
 
         # Testing the global model accuracy

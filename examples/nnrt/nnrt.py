@@ -2,16 +2,12 @@
 Federated Learning session with NNRT.
 """
 
-import os
-
 import nnrt_datasource_yolo as nnrt_datasource
 import nnrt_trainer_yolo as nnrt_trainer
 from nnrt_algorithms import mistnet
 from nnrt_models import acl_inference
 from plato.config import Config
 from plato.clients.mistnet import Client
-
-os.environ['config_file'] = './mistnet_yolov5.yml'
 
 
 def main():
