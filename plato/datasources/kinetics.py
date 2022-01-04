@@ -402,6 +402,18 @@ class DataSource(multimodal_base.MultiModalDataSource):
                                   modality_sampler=modality_sampler)
         return dataset
 
+    def get_train_set(self):
+        """ Obtain the trainset for multimodal data. """
+        train_rgb_config = Config().data.multi_modal_config.rgb.train
+        train_flow_config = Config().data.multi_modal_config.rgb.train
+        train_audio_feature_config = Config().data.multi_modal_config.rgb.train
+        #train_rgb_config = data_utils.dict_list2tuple(train_rgb_config)
+
+        # build a RawframeDataset
+        rgb_train_dataset = build_dataset(train_rgb_config)
+        flow_train_dataset = build_dataset(train_flow_config)
+        audio_feature_train_dataset = build_dataset(train_audio_feature_config)
+
     def get_train_set(self, modality_sampler):
         """ Get the train dataset """
         modality_dataset = []
@@ -421,7 +433,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
             modality_dataset.append(flow_train_dataset)
         if "audio" in modality_sampler:
             train_audio_config = Config(
-            ).data.multi_modal_pipeliner.audio.config.train
+            ).data.multi_modal_config.audio.config.train
             train_audio_config = data_utils.dict_list2tuple(train_audio_config)
             audio_feature_train_dataset = build_dataset(train_audio_config)
 

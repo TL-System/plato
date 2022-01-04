@@ -41,7 +41,7 @@ data:
   # The random seed for sampling data
   random_seed: 1
 
-  multi_modal_pipeliner:
+  multi_modal_configs:
     rgb: !include Pipeline/kinetics_csn_rgb.yml
     flow: !include Pipeline/kinetics_tsn_flow.yml
     audio: !include Pipeline/kinetics_audio_feature.yml
