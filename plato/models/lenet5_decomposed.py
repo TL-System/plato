@@ -90,14 +90,10 @@ class Model(nn.Module):
         x = self.conv3(x)
         x = self.relu3(x)
         x = self.flatten(x)
-        #print("===========any nan before logsoftmax:4", x.isnan().any())
-        #print(x)
         x = self.fc4(x)
-        #print("===========any nan before logsoftmax5:", x.isnan().any())
-        #print(x)
         x = self.relu4(x)
         x = self.fc5(x)
-        print("===========any nan before logsoftmax6:", x.isnan().any())
+
         return F.log_softmax(x, dim=1)
 
     def forward_to(self, x, cut_layer):
@@ -121,7 +117,6 @@ class Model(nn.Module):
     @staticmethod
     def get_model(*args):
         """Obtaining an instance of this model."""
-        print("Decomposed Lenet5!!!!!!!!!!!")
         return Model()
 
     def get_psi(self):
