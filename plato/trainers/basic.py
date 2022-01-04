@@ -30,9 +30,7 @@ class Trainer(base.Trainer):
         client_id: The ID of the client using this trainer (optional).
         """
         super().__init__()
-        print("The model is not none")
         if model is None:
-            print("The model is none")
             model = models_registry.get()
 
         # Use data parallelism if multiple GPUs are available and the configuration specifies it
@@ -42,7 +40,6 @@ class Trainer(base.Trainer):
             self.model = nn.DataParallel(model)
         else:
             self.model = model
-        print("The model in basic is:", model)
         if hasattr(Config().trainer, 'differential_privacy') and Config(
         ).trainer.differential_privacy:
             logging.info("Using differential privacy during training.")
