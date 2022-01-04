@@ -91,7 +91,7 @@ class Trainer(basic.Trainer):
                 # Sending the model to the device used for training
                 self.model.to(self.device)
                 self.model.train()
-                print("++++++++++++++", [list(self.model.parameters())[2]])
+                #print("++++++++++++++", [list(self.model.parameters())[2]])
                 # Initializing the loss criterion for supervised learning
                 _loss_criterion_s = getattr(self, "loss_criterion_s", None)
                 if callable(_loss_criterion_s):
@@ -153,9 +153,9 @@ class Trainer(basic.Trainer):
 
                             loss_s = loss_criterion_s(
                                 outputs_s, labels)  # * self.lambda_s
-                            print("Supervised learning outpus_s are: ",
-                                  outputs_s)
-                            print("Supervised learning labels are: ", labels)
+                            #print("Supervised learning outpus_s are: ",
+                            #outputs_s)
+                            #print("Supervised learning labels are: ", labels)
                             #print("here's the sigma's grad: ",
                             #self.model.conv1.sigma.grad)
                             #print("Loss_criterion_s: ",
@@ -185,7 +185,7 @@ class Trainer(basic.Trainer):
                         #######################
                         # unsupervised learning
                         #######################
-                    print("=========Unsupervised Training==========")
+                    #print("=========Unsupervised Training==========")
                     for batch_id, (examples_unlabeled,
                                    labels) in enumerate(train_loader_u):
                         #pseduo_labels = self.model(self.loader.scale(examples_unlabeled))
@@ -264,33 +264,33 @@ class Trainer(basic.Trainer):
             y_pred = self.model.forward_from(
                 unlabled_samples, cut_layer)  #self.scale(unlabled_samples),
             #cut_layer)
-        print("The y_pred is: ", y_pred)
+        #print("The y_pred is: ", y_pred)
 
         _confident = np.where(
             np.max(y_pred.detach().numpy(), axis=1) >= self.confident)[0]
-        print(
-            "Before confident is: ",
-            np.where(
-                np.max(y_pred.detach().numpy(), axis=1) >= self.confident))
-        print("The confident is: ", _confident)
+        #print(
+        #"Before confident is: ",
+        #np.where(
+        #np.max(y_pred.detach().numpy(), axis=1) >= self.confident))
+        #print("The confident is: ", _confident)
         #np.max(y_pred.numpy(), axis=1) >= self.confident)[0]
 
         if len(_confident) > 0:
             # Inter-client consistency
             samples_confident = self.scale(unlabled_samples[_confident])
             y_pred = torch.gather(y_pred, 1, _confident)
-            print("Y_pred is: ", y_pred)
+            #print("Y_pred is: ", y_pred)
 
             y_preds = [
                 rm(samples_confident).numpy()
                 for rid, rm in enumerate(self.helpers)
             ]  # where find helpers
-            print("Y_preds are: ", y_preds)
+            #print("Y_preds are: ", y_preds)
 
             for _, pred in enumerate(y_preds):
                 loss_u += (nn.functional.kl_div(pred, y_pred) /
                            len(y_preds)) * self.lambda_i
-                print("Current loss is: ", loss)
+                #print("Current loss is: ", loss)
 
             # Agreement-based Pseudo Labeling
             if cut_layer is None:
