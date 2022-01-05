@@ -42,12 +42,15 @@ class GenerateMDataAnnotation(object):
 
         self.output_format = output_format
 
+        self.data_splits_info = None
         self.frame_info = None
 
+    def read_data_splits_csv_info(self):
+        """ Get the data splits information from the csv annotation files """
         self.data_splits_info = obtain_data_splits_info(
             data_annos_files_info=self.data_annos_files_info,
             data_fir_level=2,
-            data_name=dataset_name)
+            data_name=self.dataset_name)
 
     def parse_dir_files(self, split):
         split_format_data_src_dir = os.path.join(self.data_src_dir, split,
@@ -83,6 +86,18 @@ class GenerateMDataAnnotation(object):
                 'only rawframes and videos are supported')
         self.frame_info = frame_info
 
+    def get_anno_file_path(self, split_name):
+        """ Get the annotation file path """
+        filename = f'{self.dataset_name}_{split_name}_list_{self.data_format}.txt'
+
+        if self.output_format == 'json':
+            filename = filename.replace('.txt', '.json')
+
+        output_anno_file_path = os.path.join(self.annotations_out_path,
+                                             filename)
+
+        return output_anno_file_path
+
     def generate_data_splits_info_file(self, split_name):
         """ Generate the data split information and write the info to file """
         self.parse_dir_files(split_name)
@@ -94,17 +109,12 @@ class GenerateMDataAnnotation(object):
                                       frame_info=self.frame_info,
                                       shuffle=False)
 
-        # Our self.data_format is video,
-        # Convert to videos
-        filename = f'{self.dataset_name}_{split_name}_list_{self.data_format}.txt'
+        output_file_path = self.get_anno_file_path(split_name=split_name)
 
         if self.output_format == 'txt':
-            with open(os.path.join(self.annotations_out_path, filename),
-                      'w') as anno_file:
+            with open(output_file_path, 'w') as anno_file:
                 anno_file.writelines(split_built_list[0])
         elif self.output_format == 'json':
             data_list = lines2dictlist(split_built_list[0], self.data_format)
-            filename = filename.replace('.txt', '.json')
-            with open(os.path.join(self.annotations_out_path, filename),
-                      'w') as anno_file:
+            with open(output_file_path, 'w') as anno_file:
                 json.dump(data_list, anno_file)

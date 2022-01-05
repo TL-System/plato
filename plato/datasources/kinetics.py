@@ -250,10 +250,10 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         # Extract the splits information into the
         #   list corresponding files
-        self.extract_splits_list_files(data_format="videos",
-                                       splits=['train', 'val'])
-        self.extract_splits_list_files(data_format="rawframes",
-                                       splits=['train', 'val'])
+        self.video_splits_list_files_into = self.extract_splits_list_files(
+            data_format="videos", splits=['train', 'val'])
+        self.rawframes_splits_list_files_into = self.extract_splits_list_files(
+            data_format="rawframes", splits=['train', 'val'])
 
     def get_modality_name(self):
         """ Get all supports modalities """
@@ -359,29 +359,41 @@ class DataSource(multimodal_base.MultiModalDataSource):
         """ Extract and generate the split information of current mode/phase """
         output_format = "json"
         out_path = self.mm_data_info["base_data_dir_path"]
+
+        # obtained a dict that contains the required data splits' file path
+        #   it can be full data or tiny data
+        required_anno_files = obtain_required_anno_files(self.splits_info)
+        data_splits_file_info = required_anno_files
+        gen_annots_op = modality_data_anntation_tools.GenerateMDataAnnotation(
+            data_src_dir=self.mm_data_info["base_data_dir_path"],
+            data_annos_files_info=data_splits_file_info,
+            dataset_name=self.data_name,
+            data_format=data_format,  # 'rawframes', 'videos'
+            rgb_prefix="img_",  # prefix of rgb frames
+            flow_x_prefix="x_",  # prefix of flow x frames
+            flow_y_prefix="y_",  # prefix of flow y frames
+            out_path=out_path,
+            output_format=output_format)
+
         target_list_regu = f'_{data_format}.{output_format}'
         if not self._exist_file_in_dir(tg_file_name=target_list_regu,
                                        search_dir=out_path,
                                        is_partial_name=True):
             logging.info("Extracting annotation list for %s. ", data_format)
 
-            # obtained a dict that contains the required data splits' file path
-            required_anno_files = obtain_required_anno_files(self.splits_info)
-            data_splits_file_info = required_anno_files
-            gen_annots_op = modality_data_anntation_tools.GenerateMDataAnnotation(
-                data_src_dir=self.mm_data_info["base_data_dir_path"],
-                data_annos_files_info=data_splits_file_info,
-                dataset_name=self.data_name,
-                data_format=data_format,  # 'rawframes', 'videos'
-                rgb_prefix="img_",  # prefix of rgb frames
-                flow_x_prefix="x_",  # prefix of flow x frames
-                flow_y_prefix="y_",  # prefix of flow y frames
-                out_path=out_path,
-                output_format=output_format)
+            gen_annots_op.read_data_splits_csv_info()
 
             for split_name in splits:
                 gen_annots_op.generate_data_splits_info_file(
                     split_name=split_name)
+
+        # obtain the extracted files path
+        generated_list_files_info = {}
+        for split_name in splits:
+            generated_list_files_info[
+                split_name] = gen_annots_op.get_anno_file_path(split_name)
+
+        return generated_list_files_info
 
     def get_phase_data_info(self, phase):
         """ Obtain the data information for the required phrase """
@@ -409,35 +421,42 @@ class DataSource(multimodal_base.MultiModalDataSource):
         train_audio_feature_config = Config().data.multi_modal_config.rgb.train
         #train_rgb_config = data_utils.dict_list2tuple(train_rgb_config)
 
+        # using the obtained annotation file replace the user set ones
+        #   in the configuration file
+        # The main reason is that the obtained path here is the full path
+        rawframes_anno_file_path = self.rawframes_splits_list_files_into[
+            "train"]
+        train_rgb_config.ann_file = rawframes_anno_file_path
+        train_flow_config.ann_file = rawframes_anno_file_path
         # build a RawframeDataset
         rgb_train_dataset = build_dataset(train_rgb_config)
         flow_train_dataset = build_dataset(train_flow_config)
         audio_feature_train_dataset = build_dataset(train_audio_feature_config)
 
-    def get_train_set(self, modality_sampler):
-        """ Get the train dataset """
-        modality_dataset = []
-        if "rgb" in modality_sampler:
-            train_rgb_config = Config(
-            ).data.multi_modal_pipeliner.rgb.config.train
-            train_rgb_config = data_utils.dict_list2tuple(train_rgb_config)
-            rgb_train_dataset = build_dataset(train_rgb_config)
+    # def get_train_set(self, modality_sampler):
+    #     """ Get the train dataset """
+    #     modality_dataset = []
+    #     if "rgb" in modality_sampler:
+    #         train_rgb_config = Config(
+    #         ).data.multi_modal_pipeliner.rgb.config.train
+    #         train_rgb_config = data_utils.dict_list2tuple(train_rgb_config)
+    #         rgb_train_dataset = build_dataset(train_rgb_config)
 
-            modality_dataset.append(rgb_train_dataset)
-        if "flow" in modality_sampler:
-            train_flow_config = Config(
-            ).data.multi_modal_pipeliner.flow.config.train
-            train_flow_config = data_utils.dict_list2tuple(train_flow_config)
-            flow_train_dataset = build_dataset(train_flow_config)
+    #         modality_dataset.append(rgb_train_dataset)
+    #     if "flow" in modality_sampler:
+    #         train_flow_config = Config(
+    #         ).data.multi_modal_pipeliner.flow.config.train
+    #         train_flow_config = data_utils.dict_list2tuple(train_flow_config)
+    #         flow_train_dataset = build_dataset(train_flow_config)
 
-            modality_dataset.append(flow_train_dataset)
-        if "audio" in modality_sampler:
-            train_audio_config = Config(
-            ).data.multi_modal_config.audio.config.train
-            train_audio_config = data_utils.dict_list2tuple(train_audio_config)
-            audio_feature_train_dataset = build_dataset(train_audio_config)
+    #         modality_dataset.append(flow_train_dataset)
+    #     if "audio" in modality_sampler:
+    #         train_audio_config = Config(
+    #         ).data.multi_modal_config.audio.config.train
+    #         train_audio_config = data_utils.dict_list2tuple(train_audio_config)
+    #         audio_feature_train_dataset = build_dataset(train_audio_config)
 
-            modality_dataset.append(audio_feature_train_dataset)
+    #         modality_dataset.append(audio_feature_train_dataset)
 
-        mm_train_dataset = multimodal_base.MultiModalDataset(modality_dataset)
-        return mm_train_dataset
+    #     mm_train_dataset = multimodal_base.MultiModalDataset(modality_dataset)
+    #     return mm_train_dataset
