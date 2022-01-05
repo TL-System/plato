@@ -6,8 +6,6 @@ import shutil
 
 import numpy as np
 
-import plato
-
 
 def config_to_dict(plato_config):
     """ Convert the plato config (can be nested one) instance to the dict. """

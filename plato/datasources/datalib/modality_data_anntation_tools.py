@@ -53,10 +53,13 @@ class GenerateMDataAnnotation(object):
             data_name=self.dataset_name)
 
     def parse_dir_files(self, split):
+        # The annotations for audio spectrogram features are identical to those of rawframes.
+
+        data_format = "rawframes" if self.data_format == "audio_features" else self.data_format
         split_format_data_src_dir = os.path.join(self.data_src_dir, split,
-                                                 self.data_format)
+                                                 data_format)
         frame_info = None
-        if self.data_format == 'rawframes':
+        if self.data_format in ['rawframes', "audio_features"]:
             frame_info = parse_directory(split_format_data_src_dir,
                                          rgb_prefix=self.rgb_prefix,
                                          flow_x_prefix=self.flow_x_prefix,
@@ -111,10 +114,11 @@ class GenerateMDataAnnotation(object):
 
         output_file_path = self.get_anno_file_path(split_name=split_name)
 
+        data_format = "rawframes" if self.data_format == "audio_features" else self.data_format
         if self.output_format == 'txt':
             with open(output_file_path, 'w') as anno_file:
                 anno_file.writelines(split_built_list[0])
         elif self.output_format == 'json':
-            data_list = lines2dictlist(split_built_list[0], self.data_format)
+            data_list = lines2dictlist(split_built_list[0], data_format)
             with open(output_file_path, 'w') as anno_file:
                 json.dump(data_list, anno_file)
