@@ -49,8 +49,6 @@ import shutil
 
 import torch
 
-import pandas as pd
-
 from mmaction.tools.data.kinetics import download as kinetics_downloader
 
 from mmaction.datasets import build_dataset
@@ -416,18 +414,27 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
     def get_train_set(self):
         """ Obtain the trainset for multimodal data. """
-        train_rgb_config = Config().data.multi_modal_config.rgb.train
-        train_flow_config = Config().data.multi_modal_config.rgb.train
-        train_audio_feature_config = Config().data.multi_modal_config.rgb.train
-        #train_rgb_config = data_utils.dict_list2tuple(train_rgb_config)
+
+        train_rgb_config = Config().data.multi_modal_configs.rgb.train
+        train_flow_config = Config().data.multi_modal_configs.flow.train
+        train_audio_feature_config = Config(
+        ).data.multi_modal_configs.audio_feature.train
+
+        train_rgb_config = data_utils.config_to_dict(train_rgb_config)
+        train_flow_config = data_utils.config_to_dict(train_flow_config)
+        train_audio_feature_config = data_utils.config_to_dict(
+            train_audio_feature_config)
 
         # using the obtained annotation file replace the user set ones
         #   in the configuration file
         # The main reason is that the obtained path here is the full path
         rawframes_anno_file_path = self.rawframes_splits_list_files_into[
             "train"]
-        train_rgb_config.ann_file = rawframes_anno_file_path
-        train_flow_config.ann_file = rawframes_anno_file_path
+        train_rgb_config["ann_file"] = rawframes_anno_file_path
+        train_flow_config["ann_file"] = rawframes_anno_file_path
+
+        print("train_rgb_config: ")
+        print(train_rgb_config)
         # build a RawframeDataset
         rgb_train_dataset = build_dataset(train_rgb_config)
         flow_train_dataset = build_dataset(train_flow_config)

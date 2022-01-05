@@ -6,6 +6,36 @@ import shutil
 
 import numpy as np
 
+import plato
+
+
+def config_to_dict(plato_config):
+    """ Convert the plato config (can be nested one) instance to the dict. """
+    # convert the whole to dict - OrderedDict
+    plato_config_dict = plato_config._asdict()
+
+    def to_dict(elem):
+
+        for key, value in elem.items():
+            try:
+                value = value._asdict()
+                elem[key] = to_dict(value)
+            except:
+                pass
+            if isinstance(value, list):
+                for idx, value_item in enumerate(value):
+                    try:
+                        value_item = value_item._asdict()
+                        value[idx] = to_dict(value_item)
+                    except:
+                        pass
+                elem[key] = value
+        return elem
+
+    plato_config_dict = to_dict(plato_config_dict)
+
+    return plato_config_dict
+
 
 def dict_list2tuple(dict_obj):
     """ Convert all list element in the dict to tuple """

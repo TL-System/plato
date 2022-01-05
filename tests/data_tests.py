@@ -15,6 +15,9 @@ os.environ['config_file'] = 'tests/TestsConfig/kinetics.yml'
 
 # os.environ['config_file'] = 'tests/TestsConfig/gym.yml'
 
+# Note: the plato will search the dir './config' for Pipeline and other configuration files
+#   directly and by default. This is achieved by the code in line 83 of 'config.py'
+
 import numpy as np
 import torch
 
@@ -111,6 +114,8 @@ class DatasetsTest(unittest.TestCase):
         # set the specific
 
         self.utest_datasource = kinetics_Datasource()
+        self.utest_datasource.get_train_set()
+
         # assert self.assertDataSourceDefinition(self.utest_datasource)
 
     # def test_gym_datasource(self):
