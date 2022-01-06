@@ -69,25 +69,32 @@ class DatasetsTest(unittest.TestCase):
         # Test 2
         modality_sampler = modality_iid.Sampler(
             datasource=self.utest_datasource, client_id=self.client_id)
-        testset = self.utest_datasource.get_test_set(modality_sampler.get())
+        test_dataset = self.utest_datasource.get_test_set(
+            modality_sampler.get())
 
-        _ = testset.get_one_modality_sample(sample_idx=10)
+        _ = test_dataset.get_one_multimodal_sample(sample_idx=0)
+        _ = test_dataset[0]
 
         batch_size = Config().trainer.batch_size
         # Define the sampler
         defined_sampler = define_sampler(Sampler=samplers_registry,
                                          dataset_source=self.utest_datasource,
                                          client_id=self.client_id,
-                                         is_testing=True)
+                                         is_testing=False)
         testset_loader = torch.utils.data.DataLoader(
-            dataset=testset,
+            dataset=test_dataset,
             shuffle=False,
             batch_size=batch_size,
             sampler=defined_sampler.get())
 
-        obtained_sample = next(iter(testset_loader))
-        print("obtained_sample: ", obtained_sample)
-
+        obtained_mm_sample = next(iter(testset_loader))
+        print("obtained_sample: ", obtained_mm_sample)
+        print(obtained_mm_sample["rgb"]["imgs"].shape)
+        print(obtained_mm_sample["rgb"]["label"].shape)
+        print(obtained_mm_sample["flow"]["imgs"].shape)
+        print(obtained_mm_sample["flow"]["label"].shape)
+        # print(obtained_mm_sample["audio"]["imgs"].shape)
+        # print(obtained_mm_sample["audio"]["label"].shape)
         return True
 
     # def test_f30ke_datasource(self):
@@ -114,11 +121,15 @@ class DatasetsTest(unittest.TestCase):
         # set the specific
 
         self.utest_datasource = kinetics_Datasource()
-        kinetics_dataset = self.utest_datasource.get_train_set(
+        kinetics_train_dataset = self.utest_datasource.get_train_set(
             modality_sampler=None)
-        print(kinetics_dataset.get_one_multimodal_sample(sample_idx=0))
-        print(kinetics_dataset[0])
-        # assert self.assertDataSourceDefinition(self.utest_datasource)
+
+        iter_data = kinetics_train_dataset[0]
+        print("rgb: ")
+        print(iter_data["rgb"]["imgs"].shape)
+        print(iter_data["rgb"]["label"].shape)
+
+        assert self.assertDataSourceDefinition(self.utest_datasource)
 
     # def test_gym_datasource(self):
     #     """ Test the Gym dataset. """

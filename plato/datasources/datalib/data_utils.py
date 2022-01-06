@@ -3,7 +3,8 @@ Useful tools for processing the data
 
 """
 import shutil
-
+import os
+import json
 import numpy as np
 
 
@@ -108,3 +109,18 @@ def union_shuffled_lists(src_lists):
     processed = np.random.permutation(len(src_lists[0]))
 
     return [np.array(ele)[processed] for ele in src_lists]
+
+
+def read_anno_file(anno_file_path):
+
+    _, tail = os.path.split(anno_file_path)
+    file_type = tail.split(".")[-1]
+
+    if file_type == "json":
+        with open(anno_file_path, 'r') as anno_file:
+            annos_list = json.load(anno_file)
+    else:
+        with open(anno_file_path, 'r') as anno_file:
+            annos_list = anno_file.readlines()
+
+    return annos_list

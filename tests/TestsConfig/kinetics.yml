@@ -22,7 +22,7 @@ data:
   download_url: https://storage.googleapis.com/deepmind-media/Datasets/kinetics700_2020.tar.gz
 
   tiny_data: True
-  tiny_data_number: 3
+  tiny_data_number: 30
 
   downloader:
     num_workers: 1
@@ -87,7 +87,7 @@ checkpoint_config: &checkpoint_config
 
 trainer:
   type: basic
-  batch_size: 24
+  batch_size: 2
   optimizer: *optimizer
   optimizer_config: *optimizer_config
   learning_rate_config: *lr_config

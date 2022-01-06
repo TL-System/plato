@@ -281,6 +281,11 @@ class MultiModalDataset(torch.utils.data.Dataset):
         self.basic_items = ["box", "target"]
 
     @abstractmethod
+    def get_targets(self):
+        """ Obtain the labels of samples in current phase dataset. """
+        raise NotImplementedError("Please Implement the 'targets' function")
+
+    @abstractmethod
     def get_one_multimodal_sample(self, sample_idx):
         """ Get the sample containing different modalities.
             Different multi-modal datasets should have their
@@ -296,7 +301,8 @@ class MultiModalDataset(torch.utils.data.Dataset):
                  be included in the basic_modalities and basic_items.
          """
         raise NotImplementedError(
-            "Please Implement the get modality sample function")
+            "Please Implement the 'get_one_multimodal_sample(self, sample_idx)' function"
+        )
 
     def __getitem__(self, sample_idx):
         """Get the sample for either training or testing given index."""

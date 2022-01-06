@@ -48,6 +48,7 @@ import re
 import logging
 import os
 import shutil
+from collections import defaultdict
 
 import torch
 
@@ -106,8 +107,22 @@ class KineticsDataset(multimodal_base.MultiModalDataset):
         else:
             self.modality_sampler = modality_sampler
 
+        self.targets = self.get_targets()
+
     def __len__(self):
         return len(self.phase_multimodal_data_record)
+
+    def get_targets(self):
+        """ Obtain the labels of samples in current phase dataset.  """
+        # the order of samples in rgb, flow, or audio annotation files
+        #  is maintained the same, thus obtain either one is great.
+        # Normally, rgb and flow belong to the rawframes
+        rawframes_anno_list_file_path = self.phase_info["rgb"]
+        annos_list = data_utils.read_anno_file(rawframes_anno_list_file_path)
+
+        obtained_targets = [anno_item["label"][0] for anno_item in annos_list]
+
+        return obtained_targets
 
     def get_one_multimodal_sample(self, sample_idx):
         """ Obtain one sample from the Kinetics dataset. """
@@ -442,49 +457,96 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         return loaded_config
 
-    def get_train_set(self, modality_sampler):
-        """ Obtain the trainset for multimodal data. """
+    def get_phase_dataset(self, modality_sampler, mode="train"):
+        """ Get the dataset for the specific phase. """
+        rgb_mode_config = getattr(Config().data.multi_modal_configs.rgb, mode)
+        flow_mode_config = getattr(Config().data.multi_modal_configs.flow,
+                                   mode)
+        audio_feature_mode_config = getattr(
+            Config().data.multi_modal_configs.audio_feature, mode)
 
-        train_rgb_config = Config().data.multi_modal_configs.rgb.train
-        train_flow_config = Config().data.multi_modal_configs.flow.train
-        train_audio_feature_config = Config(
-        ).data.multi_modal_configs.audio_feature.train
-
-        # reset the configs based on current dataset info
-        train_rgb_config = self.correct_current_config(
-            loaded_plato_config=train_rgb_config,
-            mode="train",
+        rgb_mode_config = self.correct_current_config(
+            loaded_plato_config=rgb_mode_config,
+            mode=mode,
             modality_name="rgb")
-        train_flow_config = self.correct_current_config(
-            loaded_plato_config=train_flow_config,
-            mode="train",
+        flow_mode_config = self.correct_current_config(
+            loaded_plato_config=flow_mode_config,
+            mode=mode,
             modality_name="flow")
-        train_audio_feature_config = self.correct_current_config(
-            loaded_plato_config=train_audio_feature_config,
-            mode="train",
+        audio_feature_mode_config = self.correct_current_config(
+            loaded_plato_config=audio_feature_mode_config,
+            mode=mode,
             modality_name="audio_feature")
-
         # build a RawframeDataset
-        rgb_train_dataset = build_dataset(train_rgb_config)
-        flow_train_dataset = build_dataset(train_flow_config)
-        audio_feature_train_dataset = build_dataset(train_audio_feature_config)
+        rgb_mode_dataset = build_dataset(rgb_mode_config)
+        flow_mode_dataset = build_dataset(flow_mode_config)
+        audio_feature_mode_dataset = build_dataset(audio_feature_mode_config)
 
-        multi_modal_data = {
-            "rgb": rgb_train_dataset,
-            "flow": flow_train_dataset,
-            "audio_feature": audio_feature_train_dataset
+        multi_modal_mode_data = {
+            "rgb": rgb_mode_dataset,
+            "flow": flow_mode_dataset,
+            "audio_feature": audio_feature_mode_dataset
         }
 
-        multi_modal_info = {
-            "rgb": train_rgb_config["ann_file"],
-            "flow": train_flow_config["ann_file"],
-            "audio_feature": train_audio_feature_config["ann_file"]
+        multi_modal_mode_info = {
+            "rgb": rgb_mode_config["ann_file"],
+            "flow": flow_mode_config["ann_file"],
+            "audio_feature": audio_feature_mode_config["ann_file"]
         }
 
-        kinetics_dataset = KineticsDataset(
-            multimodal_data_holder=multi_modal_data,
+        kinetics_mode_dataset = KineticsDataset(
+            multimodal_data_holder=multi_modal_mode_data,
             phase="train",
-            phase_info=multi_modal_info,
+            phase_info=multi_modal_mode_info,
             modality_sampler=modality_sampler)
 
-        return kinetics_dataset
+        return kinetics_mode_dataset
+
+    def get_train_set(self, modality_sampler=None):
+        """ Obtain the trainset for multimodal data. """
+        kinetics_train_dataset = self.get_phase_dataset(modality_sampler,
+                                                        mode="train")
+
+        return kinetics_train_dataset
+
+    def get_test_set(self, modality_sampler=None):
+        """ Obtain the testset for multimodal data.
+
+            Note, in the kinetics dataset, there is no testset in which
+             samples contain the groundtruth label.
+             Thus, we utilize the validation set directly.
+        """
+        kinetics_val_dataset = self.get_phase_dataset(modality_sampler,
+                                                      mode="val")
+
+        return kinetics_val_dataset
+
+    def get_class_label_mapper(self):
+        """ Obtain the mapper used to map the text to integer. """
+        textclass_integer_mapper = defaultdict(list)
+        # obtain the classes from the trainset
+        train_anno_list_path = self.rawframes_splits_list_files_into["train"]
+        train_anno_list = data_utils.read_anno_file(train_anno_list_path)
+        # [{"frame_dir": "clay_pottery_making/---0dWlqevI_000019_000029", "total_frames": 300, "label": [0]}
+        for item in train_anno_list:
+            textclass = item["frame_dir"].split("/")[0]
+            integar_label = item["frame_dir"]["label"][0]
+
+            textclass_integer_mapper[textclass].append(integar_label)
+
+        return textclass_integer_mapper
+
+    def classes(self):
+        """ The classes of the dataset. """
+
+        # obtain the classes from the trainset
+        train_anno_list_path = self.rawframes_splits_list_files_into["train"]
+        train_anno_list = data_utils.read_anno_file(train_anno_list_path)
+
+        integer_labels = [
+            anno_elem["label"][0] for anno_elem in train_anno_list
+        ]
+        integer_classes = list(set(integer_labels))
+        integer_classes.sort()
+
+        return integer_classes
