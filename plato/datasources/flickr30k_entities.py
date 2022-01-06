@@ -93,7 +93,7 @@ class Flickr30KEDataset(multimodal_base.MultiModalDataset):
     def __init__(self,
                  dataset_info,
                  phase,
-                 phase_split,
+                 phase_info,
                  data_types,
                  modality_sampler=None,
                  transform_image_dec_func=None,
@@ -101,13 +101,14 @@ class Flickr30KEDataset(multimodal_base.MultiModalDataset):
         super().__init__()
 
         self.phase = phase
-        self.phase_data_record = dataset_info
-        self.phase_split = phase_split
+        self.phase_multimodal_data_record = dataset_info
+        self.phase_info = phase_info
         self.data_types = data_types
         self.transform_image_dec_func = transform_image_dec_func
         self.transform_text_func = transform_text_func
 
-        self.phase_samples_name = list(self.phase_data_record.keys())
+        self.phase_samples_name = list(
+            self.phase_multimodal_data_record.keys())
 
         self.supported_modalities = ["rgb", "text"]
 
@@ -118,13 +119,13 @@ class Flickr30KEDataset(multimodal_base.MultiModalDataset):
             self.modality_sampler = modality_sampler
 
     def __len__(self):
-        return len(self.phase_data_record)
+        return len(self.phase_multimodal_data_record)
 
     def get_sample_image_data(self, image_id):
         """ Get one image data as the sample """
         # get the image data
-        image_phase_path = self.phase_split[self.data_types[0]]["path"]
-        image_phase_format = self.phase_split[self.data_types[0]]["format"]
+        image_phase_path = self.phase_info[self.data_types[0]]["path"]
+        image_phase_format = self.phase_info[self.data_types[0]]["format"]
 
         image_data = io.imread(
             os.path.join(image_phase_path,
@@ -154,7 +155,8 @@ class Flickr30KEDataset(multimodal_base.MultiModalDataset):
 
         image_data = self.get_sample_image_data(image_id)
 
-        image_anno_sent = self.phase_data_record[samle_retrieval_name]
+        image_anno_sent = self.phase_multimodal_data_record[
+            samle_retrieval_name]
 
         sentence, sentence_phrases, \
             sentence_phrases_type, sentence_phrases_id, \

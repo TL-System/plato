@@ -68,7 +68,7 @@ class ReferItGameDataset(multimodal_base.MultiModalDataset):
         super().__init__()
 
         self.phase = phase
-        self.phase_data_record = dataset_info
+        self.phase_multimodal_data_record = dataset_info
         self.phase_split = phase_split
         self.transform_image_dec_func = transform_image_dec_func
         self.transform_text_func = transform_text_func
@@ -76,7 +76,7 @@ class ReferItGameDataset(multimodal_base.MultiModalDataset):
         # The phase data record in referitgame is a list,
         #  each item contains information of one image as
         #  presented in line-258.
-        self.phase_samples_name = self.phase_data_record
+        self.phase_samples_name = self.phase_multimodal_data_record
 
         self.supported_modalities = ["rgb", "text"]
 
@@ -87,13 +87,13 @@ class ReferItGameDataset(multimodal_base.MultiModalDataset):
             self.modality_sampler = modality_sampler
 
     def __len__(self):
-        return len(self.phase_data_record)
+        return len(self.phase_multimodal_data_record)
 
     def get_one_multimodal_sample(self, sample_idx):
         [
             image_id, _, caption, caption_phrases, caption_phrase_bboxs,
             caption_phrases_cate, caption_phrases_cate_id
-        ] = self.phase_data_record[sample_idx]
+        ] = self.phase_multimodal_data_record[sample_idx]
 
         _ = image_id
         image_data = self.phase_split.loadImgsData(image_id)[0]

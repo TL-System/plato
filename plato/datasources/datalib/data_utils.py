@@ -41,10 +41,18 @@ def dict_list2tuple(dict_obj):
         if isinstance(value, dict):
             for inner_key, inner_v in value.items():
                 if isinstance(inner_v, list):
-                    dict_obj[key][inner_key] = tuple(inner_v)
+                    # empty or None list, mainly for meta_keys
+                    if not value or inner_v[0] is None:
+                        dict_obj[key][inner_key] = ()
+                    else:
+                        dict_obj[key][inner_key] = tuple(inner_v)
         else:
             if isinstance(value, list):
-                dict_obj[key] = tuple(value)
+                # empty or None list, mainly for meta_keys
+                if not value or value[0] is None:
+                    dict_obj[key] = ()
+                else:
+                    dict_obj[key] = tuple(value)
                 for idx, item in enumerate(value):
                     item = value[idx]
                     if isinstance(item, dict):

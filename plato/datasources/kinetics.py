@@ -37,12 +37,14 @@ The data structure is:
 │   │   │   ├── zumba
 │   │   ├── rawframes_train
 │   │   ├── rawframes_val
+
+
+For data_formates, we support "videos", "rawframes", "audios", "audio_features"
+for modality, we support "video", "audio", "audio_feature", "rgb", "flow"
+
 """
 
-from genericpath import isdir
-from posixpath import join
 import re
-import json
 import logging
 import os
 import shutil
@@ -80,24 +82,23 @@ def obtain_required_anno_files(splits_info):
 class KineticsDataset(multimodal_base.MultiModalDataset):
     """ Prepare the Flickr30K Entities dataset."""
     def __init__(self,
-                 dataset_info,
+                 multimodal_data_holder,
                  phase,
-                 phase_split,
-                 data_types,
-                 modality_sampler=None,
-                 transform_image_dec_func=None,
-                 transform_text_func=None):
+                 phase_info,
+                 modality_sampler=None):
         super().__init__()
         self.phase = phase
-        self.phase_data_record = dataset_info
-        self.phase_split = phase_split
-        self.data_types = data_types
-        self.transform_image_dec_func = transform_image_dec_func
-        self.transform_text_func = transform_text_func
+        #  multimodal_data_holder is a dict:
+        #    {"rgb": rgb_dataset, "flow": flow_dataset, "audio": audio_dataset}
+        self.phase_multimodal_data_record = multimodal_data_holder
 
-        self.phase_samples_name = list(self.phase_data_record.keys())
+        # a dict presented as:
+        #   "rgb": <rgb_annotation_file_path>
+        self.phase_info = phase_info
 
-        self.supported_modalities = ["rgb", "flow", "audio"]
+        self.modalities_name = list(multimodal_data_holder.keys())
+
+        self.supported_modalities = ["rgb", "flow", "audio_feature"]
 
         # default utilizing the full modalities
         if modality_sampler is None:
@@ -106,11 +107,18 @@ class KineticsDataset(multimodal_base.MultiModalDataset):
             self.modality_sampler = modality_sampler
 
     def __len__(self):
-        return len(self.phase_data_record)
+        return len(self.phase_multimodal_data_record)
 
     def get_one_multimodal_sample(self, sample_idx):
         """ Obtain one sample from the Kinetics dataset. """
-        pass
+        obtained_mm_sample = dict()
+
+        for modality_name in self.modalities_name:
+
+            modality_dataset = self.phase_multimodal_data_record[modality_name]
+            obtained_mm_sample[modality_name] = modality_dataset[sample_idx]
+
+        return obtained_mm_sample
 
 
 class DataSource(multimodal_base.MultiModalDataSource):
@@ -126,7 +134,6 @@ class DataSource(multimodal_base.MultiModalDataSource):
         self.modality_names = [
             "video", "audio", "rgb", "flow", "audio_feature"
         ]
-        # alternative: ["video", "audio", "rawframes", "audio_feature"]
 
         _path = Config().data.data_path
         # Generate the basic path for the dataset, it performs:
@@ -142,9 +149,6 @@ class DataSource(multimodal_base.MultiModalDataSource):
         #    as they belong to the same prototype "rawframes".
         self._create_modalities_path(modality_names=self.modality_names)
 
-        # print("self.mm_data_info: ", self.mm_data_info)
-        # print("self.splits_info: ", self.splits_info)
-        # print(ok)
         # Set the annotation file path
         base_data_path = self.mm_data_info["base_data_dir_path"]
 
@@ -241,19 +245,19 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         logging.info("The %s dataset has been prepared", self.data_name)
 
-        # print(ok)
         # Extract rgb, flow, audio, audio_feature from the video
         for split in ["train", "val"]:
             self.extract_videos_rgb_flow_audio(mode=split)
 
         # Extract the splits information into the
         #   list corresponding files
+        self.audios_splits_list_files_into = self.extract_splits_list_files(
+            data_format="audio_features", splits=['train', 'val'])
+
         self.video_splits_list_files_into = self.extract_splits_list_files(
             data_format="videos", splits=['train', 'val'])
         self.rawframes_splits_list_files_into = self.extract_splits_list_files(
             data_format="rawframes", splits=['train', 'val'])
-        self.audios_splits_list_files_into = self.extract_splits_list_files(
-            data_format="audio_features", splits=['train', 'val'])
 
     def get_modality_name(self):
         """ Get all supports modalities """
@@ -284,26 +288,28 @@ class DataSource(multimodal_base.MultiModalDataSource):
         for i in range(len(videos_dirs_path)):
             os.rename(videos_dirs_path[i], new_videos_dirs_path[i])
 
+    def get_modality_data_path(self, mode, modality_name):
+        """ Obtain the path for the modality data in specific mode """
+
+        modality_key = self.set_modality_path_key_format(
+            modality_name=modality_name)
+
+        return self.splits_info[mode][modality_key]
+
     def extract_videos_rgb_flow_audio(self, mode="train"):
         """ Extract rgb, optical flow, and audio from videos """
-        video_format_path_key = self.set_modality_path_key_format(
-            modality_name="video")
-        src_mode_videos_dir = os.path.join(
-            self.splits_info[mode][video_format_path_key])
+        video_data_path = self.get_modality_data_path(mode=mode,
+                                                      modality_name="video")
+        src_mode_videos_dir = video_data_path
 
-        rgb_format_path_key = self.set_modality_path_key_format(
-            modality_name="rgb")
-        flow_format_path_key = self.set_modality_path_key_format(
-            modality_name="flow")
-        audio_format_path_key = self.set_modality_path_key_format(
-            modality_name="audio")
-        audio_fea_format_path_key = self.set_modality_path_key_format(
-            modality_name="audio_feature")
-        rgb_out_dir_path = self.splits_info[mode][rgb_format_path_key]
-        flow_our_dir_path = self.splits_info[mode][flow_format_path_key]
-        audio_out_dir_path = self.splits_info[mode][audio_format_path_key]
-        audio_feature_dir_path = self.splits_info[mode][
-            audio_fea_format_path_key]
+        rgb_out_dir_path = self.get_modality_data_path(mode=mode,
+                                                       modality_name="rgb")
+        flow_our_dir_path = self.get_modality_data_path(mode=mode,
+                                                        modality_name="flow")
+        audio_out_dir_path = self.get_modality_data_path(mode=mode,
+                                                         modality_name="audio")
+        audio_feature_dir_path = self.get_modality_data_path(
+            mode=mode, modality_name="audio_feature")
 
         # define the modalities extractor
         if not self._exist_judgement(rgb_out_dir_path):
@@ -368,7 +374,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
             data_src_dir=self.mm_data_info["base_data_dir_path"],
             data_annos_files_info=data_splits_file_info,
             dataset_name=self.data_name,
-            data_format=data_format,  # 'rawframes', 'videos'
+            data_format=data_format,  # 'rawframes', 'videos', 'audio_features'
             rgb_prefix="img_",  # prefix of rgb frames
             flow_x_prefix="x_",  # prefix of flow x frames
             flow_y_prefix="y_",  # prefix of flow y frames
@@ -395,6 +401,47 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         return generated_list_files_info
 
+    def correct_current_config(self, loaded_plato_config, mode, modality_name):
+        """ Correct the loaded configuration settings based on
+            on-hand data information """
+
+        # 1.1. convert plato config to dict type
+        loaded_config = data_utils.config_to_dict(loaded_plato_config)
+        # 1.2. convert the list to tuple
+        loaded_config = data_utils.dict_list2tuple(loaded_config)
+
+        # 2. using the obtained annotation file replace the user set ones
+        #   in the configuration file
+        #   The main reason is that the obtained path here is the full path
+        cur_rawframes_anno_file_path = self.rawframes_splits_list_files_into[
+            mode]
+        cur_rawframes_data_path = self.get_modality_data_path(
+            mode=mode, modality_name="rgb")
+        cur_videos_anno_file_path = self.video_splits_list_files_into[mode]
+        cur_video_data_path = self.get_modality_data_path(
+            mode=mode, modality_name="video")
+        cur_audio_feas_anno_file_path = self.audios_splits_list_files_into[
+            mode]
+        cur_audio_feas_data_path = self.get_modality_data_path(
+            mode=mode, modality_name="audio_feature")
+
+        if modality_name == "rgb" or modality_name == "flow":
+            loaded_config["ann_file"] = cur_rawframes_anno_file_path
+        elif modality_name == "audio_feature":
+            loaded_config["ann_file"] = cur_audio_feas_anno_file_path
+        else:
+            loaded_config["ann_file"] = cur_videos_anno_file_path
+
+        # 3. reset the data_prefix by using the modality path
+        if modality_name == "rgb" or modality_name == "flow":
+            loaded_config["data_prefix"] = cur_rawframes_data_path
+        elif modality_name == "audio_feature":
+            loaded_config["data_prefix"] = cur_audio_feas_data_path
+        else:
+            loaded_config["data_prefix"] = cur_video_data_path
+
+        return loaded_config
+
     def get_train_set(self, modality_sampler):
         """ Obtain the trainset for multimodal data. """
 
@@ -403,46 +450,41 @@ class DataSource(multimodal_base.MultiModalDataSource):
         train_audio_feature_config = Config(
         ).data.multi_modal_configs.audio_feature.train
 
-        train_rgb_config = data_utils.config_to_dict(train_rgb_config)
-        train_rgb_config = data_utils.dict_list2tuple(train_rgb_config)
-
-        train_flow_config = data_utils.config_to_dict(train_flow_config)
-        train_flow_config = data_utils.dict_list2tuple(train_flow_config)
-
-        train_audio_feature_config = data_utils.config_to_dict(
-            train_audio_feature_config)
-        train_audio_feature_config = data_utils.dict_list2tuple(
-            train_audio_feature_config)
-        # using the obtained annotation file replace the user set ones
-        #   in the configuration file
-        # The main reason is that the obtained path here is the full path
-        rawframes_anno_file_path = self.rawframes_splits_list_files_into[
-            "train"]
-        train_rgb_config["ann_file"] = rawframes_anno_file_path
-        train_flow_config["ann_file"] = rawframes_anno_file_path
-
-        train_audio_feature_config[
-            "ann_file"] = self.audios_splits_list_files_into["train"]
+        # reset the configs based on current dataset info
+        train_rgb_config = self.correct_current_config(
+            loaded_plato_config=train_rgb_config,
+            mode="train",
+            modality_name="rgb")
+        train_flow_config = self.correct_current_config(
+            loaded_plato_config=train_flow_config,
+            mode="train",
+            modality_name="flow")
+        train_audio_feature_config = self.correct_current_config(
+            loaded_plato_config=train_audio_feature_config,
+            mode="train",
+            modality_name="audio_feature")
 
         # build a RawframeDataset
         rgb_train_dataset = build_dataset(train_rgb_config)
         flow_train_dataset = build_dataset(train_flow_config)
         audio_feature_train_dataset = build_dataset(train_audio_feature_config)
 
-        print("rgb_train_dataset: ", rgb_train_dataset)
-        print("flow_train_dataset: ", flow_train_dataset)
-        print("audio_feature_train_dataset: ", audio_feature_train_dataset)
+        multi_modal_data = {
+            "rgb": rgb_train_dataset,
+            "flow": flow_train_dataset,
+            "audio_feature": audio_feature_train_dataset
+        }
 
-        multi_modal_data = [
-            rgb_train_dataset, flow_train_dataset, audio_feature_train_dataset
-        ]
-        multi_modal_info = [rawframes_anno_file_path] * 3
-        kinetics_dataset = KineticsDataset(dataset_info=multi_modal_data,
-                                           phase="train",
-                                           phase_split=multi_modal_info,
-                                           data_types=['rgb', 'flow', 'audio'],
-                                           modality_sampler=modality_sampler,
-                                           transform_image_dec_func=None,
-                                           transform_text_func=None)
+        multi_modal_info = {
+            "rgb": train_rgb_config["ann_file"],
+            "flow": train_flow_config["ann_file"],
+            "audio_feature": train_audio_feature_config["ann_file"]
+        }
+
+        kinetics_dataset = KineticsDataset(
+            multimodal_data_holder=multi_modal_data,
+            phase="train",
+            phase_info=multi_modal_info,
+            modality_sampler=modality_sampler)
 
         return kinetics_dataset

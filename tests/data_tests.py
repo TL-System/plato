@@ -114,8 +114,10 @@ class DatasetsTest(unittest.TestCase):
         # set the specific
 
         self.utest_datasource = kinetics_Datasource()
-        self.utest_datasource.get_train_set()
-
+        kinetics_dataset = self.utest_datasource.get_train_set(
+            modality_sampler=None)
+        print(kinetics_dataset.get_one_multimodal_sample(sample_idx=0))
+        print(kinetics_dataset[0])
         # assert self.assertDataSourceDefinition(self.utest_datasource)
 
     # def test_gym_datasource(self):

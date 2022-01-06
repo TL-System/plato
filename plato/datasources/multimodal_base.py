@@ -247,16 +247,27 @@ class MultiModalDataset(torch.utils.data.Dataset):
     """ The base interface for the multimodal data """
     def __init__(self):
         self.phase = None  # the 'train' , 'test', 'val'
-        # the recorded samples
-        #   this is a dict in which key is the 'sample name/id' ...
-        #   the values are the sample's information,
-        #   for example: the annotation with its bounding boxes ...
-        self.phase_data_record = None
+
+        # the recorded samples for current dataset
+        #   In flickr20K entities dataset, this presents as:
+        #    this is a dict in which key is the 'sample name/id' ...
+        #    the values are the sample's information,
+        #    for example: the annotation with its bounding boxes ...
+        #   In the Kinetics, this presents as:
+        #    this is a dict:
+        #    {"rgb": rgb_dataset, "flow": flow_dataset, "audio": audio_dataset}
+        self.phase_multimodal_data_record = None
+
         # the detailed info in selected split
         #   i.e., path, path for different modalities, et. al
-        self.phase_split_info = None
-        # the data types included, e.g. rgb, text...
+        self.phase_info = None
+        # the data types included,
+        #  e.g. in flickr30k entities, ["Images", "Annotations", "Sentences"]
         self.data_types = None
+
+        # the name of the modalities in the dataset
+        self.modalities_name = None
+
         # the sampler for modalities,
         #   specific modalities can be masked by this sampler
         self.modality_sampler = None
@@ -289,11 +300,11 @@ class MultiModalDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, sample_idx):
         """Get the sample for either training or testing given index."""
-        sampled_data = self.get_one_multimodal_sample(sample_idx)
+        sampled_multimodal_data = self.get_one_multimodal_sample(sample_idx)
 
         # utilize the modality to mask specific modalities
         sampled_modality_data = dict()
-        for item_name, item_data in sampled_data.items():
+        for item_name, item_data in sampled_multimodal_data.items():
             # maintain the modality data based on the sampler
             # maintain the external data
             if item_name in self.modality_sampler or \
