@@ -25,7 +25,7 @@ elif hasattr(Config().trainer, 'use_tensorflow'):
 else:
     from plato.models import (
         lenet5,
-        lenet5_decomposed,
+        de_lenet5_decomposed,
         resnet,
         wideresnet,
         inceptionv3,
@@ -38,7 +38,7 @@ else:
     )
     registered_models = OrderedDict([
         ('lenet5', lenet5.Model),
-        ('lenet5_decomposed', lenet5_decomposed.Model),
+        ('de_lenet5_decomposed', de_lenet5_decomposed.Model),
         ('resnet', resnet.Model),
         ('wideresnet', wideresnet.Model),
         ('inceptionv3', inceptionv3.Model),
