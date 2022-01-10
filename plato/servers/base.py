@@ -122,6 +122,7 @@ class Server:
 
         if hasattr(Config().server,
                    'disable_clients') and Config().server.disable_clients:
+
             logging.info(
                 "No clients are launched (server:disable_clients = true)")
         else:
@@ -303,7 +304,8 @@ class Server:
                                     room=sid)
 
                 payload = self.algorithm.extract_weights()
-                payload = self.customize_server_payload(payload, selected_client_id)
+                payload = self.customize_server_payload(
+                    payload, selected_client_id)
 
                 # Sending the server payload to the client
                 logging.info(

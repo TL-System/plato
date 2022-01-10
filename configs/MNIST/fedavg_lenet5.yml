@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 1
+    total_clients: 2
 
     # The number of clients selected in each round
-    per_round: 1
+    per_round: 2
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -21,6 +21,7 @@ clients:
 server:
     address: 127.0.0.1
     port: 8000
+    disable_clients : false
 
 data:
     # The training and testing dataset

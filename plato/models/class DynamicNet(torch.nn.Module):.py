@@ -111,6 +111,7 @@ for t in range(30000):
 ct = 0
 for name, param in model.named_parameters():
     if param.requires_grad:
-        ct = ct + 1
+
         print(name, "----", ct)  #, param.data)
+        ct = ct + 1
 #print("list of params", list(model.parameters())[2])  # 0 is sigma ; 1 is psi
