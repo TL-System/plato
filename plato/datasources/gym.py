@@ -113,11 +113,10 @@ class DataSource(multimodal_base.MultiModalDataSource):
                 "Downloading the raw videos for the Gym dataset. This may take a long time."
             )
 
-            logging.info("Done.")
-
             gym_downloader.main(input=self.data_anno_file_path,
                                 output_dir=self.raw_videos_path,
                                 num_jobs=Config().data.downloader.num_workers)
+            logging.info("Done.")
 
         # Trim Videos into Events
         if not self._exist_judgement(self.event_dir_path):

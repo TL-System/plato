@@ -4,10 +4,8 @@ Although the name of this dataset is referitgame, it actually contains four data
  - ReferItGame http://tamaraberg.com/referitgame/.
  Then, refer-based datasets http://vision2.cs.unc.edu/refer/:
  - RefCOCO
- - RefCOCO+ 
+ - RefCOCO+
  - RefCOCOg
-
-
 
 The 'split_config' needed to be set to support the following datasets:
 - referitgame: 130,525 expressions for referring to 96,654 objects in 19,894 images.
@@ -61,7 +59,7 @@ class ReferItGameDataset(multimodal_base.MultiModalDataset):
     def __init__(self,
                  dataset_info,
                  phase,
-                 phase_split,
+                 phase_info,
                  modality_sampler=None,
                  transform_image_dec_func=None,
                  transform_text_func=None):
@@ -69,7 +67,7 @@ class ReferItGameDataset(multimodal_base.MultiModalDataset):
 
         self.phase = phase
         self.phase_multimodal_data_record = dataset_info
-        self.phase_split = phase_split
+        self.phase_info = phase_info
         self.transform_image_dec_func = transform_image_dec_func
         self.transform_text_func = transform_text_func
 
@@ -96,7 +94,7 @@ class ReferItGameDataset(multimodal_base.MultiModalDataset):
         ] = self.phase_multimodal_data_record[sample_idx]
 
         _ = image_id
-        image_data = self.phase_split.loadImgsData(image_id)[0]
+        image_data = self.phase_info.loadImgsData(image_id)[0]
 
         image_data = cv2.cvtColor(image_data, cv2.COLOR_BGR2RGB)
 
@@ -269,7 +267,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
         _, mode_flatten_emelemts = self.get_phase_data(phase)
 
         dataset = ReferItGameDataset(dataset_info=mode_flatten_emelemts,
-                                     phase_split=self._dataset_refer,
+                                     phase_info=self._dataset_refer,
                                      phase=phase,
                                      modality_sampler=modality_sampler)
         return dataset

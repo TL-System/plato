@@ -10,7 +10,6 @@ from collections import namedtuple
 
 import torch
 from torchvision.datasets.utils import download_url, extract_archive
-from torchvision.datasets.utils import download_and_extract_archive
 from torchvision.datasets.utils import download_file_from_google_drive, extract_archive
 
 from plato.datasources import base
@@ -173,11 +172,12 @@ class MultiModalDataSource(base.DataSource):
                                           download_data_file_name)
         extract_data_path = os.path.join(put_data_dir,
                                          extract_download_file_name)
-        if not self._exist_judgement(extract_data_path):
-            logging.info("Downloading the data to %s.....", download_data_path)
+        if not self._exist_judgement(download_data_path):
+            logging.info("Downloading the data to %s", download_data_path)
             download_file_from_google_drive(file_id=download_file_id,
                                             root=put_data_dir,
                                             filename=download_data_file_name)
+        if not self._exist_judgement(extract_data_path):
             extract_archive(from_path=download_data_path,
                             to_path=put_data_dir,
                             remove_finished=True)

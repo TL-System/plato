@@ -19,7 +19,7 @@ server:
 data:
   dataname: Flickr30KEntities
   datasource: Flickr30K
-  data_path: ./data
+  data_path: data
 
   download_file_id: 1mJ-Y0gLFyCLbB6C-M49dUtEsbfVkK4F-
 

@@ -324,7 +324,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
         phase_data_info = self.get_phase_data_info(phase)
         phase_split_info = self.splits_info[phase]
         dataset = Flickr30KEDataset(dataset_info=phase_data_info,
-                                    phase_split=phase_split_info,
+                                    phase_info=phase_split_info,
                                     data_types=self.data_types,
                                     phase=phase,
                                     modality_sampler=modality_sampler)

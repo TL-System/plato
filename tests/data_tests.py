@@ -11,9 +11,9 @@ import unittest
 
 # os.environ['config_file'] = 'tests/TestsConfig/referitgame.yml'
 
-os.environ['config_file'] = 'tests/TestsConfig/kinetics.yml'
+# os.environ['config_file'] = 'tests/TestsConfig/kinetics.yml'
 
-# os.environ['config_file'] = 'tests/TestsConfig/gym.yml'
+os.environ['config_file'] = 'tests/TestsConfig/gym.yml'
 
 # Note: the plato will search the dir './config' for Pipeline and other configuration files
 #   directly and by default. This is achieved by the code in line 83 of 'config.py'
@@ -80,7 +80,7 @@ class DatasetsTest(unittest.TestCase):
         defined_sampler = define_sampler(Sampler=samplers_registry,
                                          dataset_source=self.utest_datasource,
                                          client_id=self.client_id,
-                                         is_testing=False)
+                                         is_testing=True)
         testset_loader = torch.utils.data.DataLoader(
             dataset=test_dataset,
             shuffle=False,
@@ -89,12 +89,7 @@ class DatasetsTest(unittest.TestCase):
 
         obtained_mm_sample = next(iter(testset_loader))
         print("obtained_sample: ", obtained_mm_sample)
-        print(obtained_mm_sample["rgb"]["imgs"].shape)
-        print(obtained_mm_sample["rgb"]["label"].shape)
-        print(obtained_mm_sample["flow"]["imgs"].shape)
-        print(obtained_mm_sample["flow"]["label"].shape)
-        # print(obtained_mm_sample["audio"]["imgs"].shape)
-        # print(obtained_mm_sample["audio"]["label"].shape)
+
         return True
 
     # def test_f30ke_datasource(self):
@@ -116,27 +111,27 @@ class DatasetsTest(unittest.TestCase):
     #     self.utest_datasource = refer_Datasource()
     #     assert self.assertDataSourceDefinition(self.utest_datasource)
 
-    def test_kinetics_datasource(self):
-        """ Test the kinetics700 dataset. """
-        # set the specific
-
-        self.utest_datasource = kinetics_Datasource()
-        kinetics_train_dataset = self.utest_datasource.get_train_set(
-            modality_sampler=None)
-
-        iter_data = kinetics_train_dataset[0]
-        print("rgb: ")
-        print(iter_data["rgb"]["imgs"].shape)
-        print(iter_data["rgb"]["label"].shape)
-
-        assert self.assertDataSourceDefinition(self.utest_datasource)
-
-    # def test_gym_datasource(self):
-    #     """ Test the Gym dataset. """
+    # def test_kinetics_datasource(self):
+    #     """ Test the kinetics700 dataset. """
     #     # set the specific
 
-    #     self.utest_datasource = GymDataSource()
-    #     # assert self.assertDataSourceDefinition(self.utest_datasource)
+    #     self.utest_datasource = kinetics_Datasource()
+    #     kinetics_train_dataset = self.utest_datasource.get_train_set(
+    #         modality_sampler=None)
+
+    #     iter_data = kinetics_train_dataset[0]
+    #     print("rgb: ")
+    #     print(iter_data["rgb"]["imgs"].shape)
+    #     print(iter_data["rgb"]["label"].shape)
+
+    #     assert self.assertDataSourceDefinition(self.utest_datasource)
+
+    def test_gym_datasource(self):
+        """ Test the Gym dataset. """
+        # set the specific
+
+        self.utest_datasource = GymDataSource()
+        # assert self.assertDataSourceDefinition(self.utest_datasource)
 
 
 if __name__ == '__main__':
