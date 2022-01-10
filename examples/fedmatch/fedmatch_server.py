@@ -12,7 +12,7 @@ import numpy as np
 from plato.servers import fedavg
 from scipy import spatial
 from scipy.stats import truncnorm
-from plato.models import lenet5_decomposed
+from plato.models import de_lenet5_decomposed
 import torch
 
 
@@ -70,7 +70,7 @@ class Server(fedavg.Server):
         out_list = []
 
         for cid, model_dict in zip(client_ids, models_received):
-            model = lenet5_decomposed.Model()
+            model = de_lenet5_decomposed.Model()
             model.load_state_dict(model_dict)
             out = model(torch.from_numpy(self.gauss_samples).float())
             self.models_dict[cid] = np.squeeze(out)
