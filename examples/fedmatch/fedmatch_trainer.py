@@ -67,14 +67,20 @@ class Trainer(basic.Trainer):
                 #_train_loader = getattr(self, "train_loader", None)
                 """obtain labeled and unlabeled dataset"""
 
-                trainset_s, trainset_u = torch.utils.data.random_split(
-                    trainset, [50000, 10000])  # rewrite with ratio
-                train_loader_s = DataLoader(trainset_s,
-                                            batch_size=batch_size)  #,
+                #trainset_s, trainset_u = torch.utils.data.random_split(
+                #    trainset, [50000, 10000])  # rewrite with ratio
+                #train_loader_s = DataLoader(trainset_s,
+                #batch_size=batch_size)  #,
+
+                train_loader_s = torch.utils.data.DataLoader(
+                    dataset=trainset,
+                    shuffle=False,
+                    batch_size=batch_size,
+                    sampler=sampler.get())
                 #shuffle=False,
                 #batch_size=batch_size,
                 #sampler=sampler.get())
-                train_loader_u = DataLoader(trainset_u, batch_size)
+                #train_loader_u = DataLoader(trainset_u, batch_size)
 
                 #iterations_per_epoch = np.ceil(len(trainset_s) /
                 #                               batch_size).astype(int)
@@ -84,38 +90,42 @@ class Trainer(basic.Trainer):
                 # Sending the model to the device used for training
                 self.model.to(self.device)
                 self.model.train()
-                #print("++++++++++++++", [list(self.model.parameters())[2]])
+
                 # Initializing the loss criterion for supervised learning
                 _loss_criterion_s = getattr(self, "loss_criterion_s", None)
                 if callable(_loss_criterion_s):
                     loss_criterion_s = self.loss_criterion_s(self.model)
                 else:
                     loss_criterion_s = nn.CrossEntropyLoss()
-
+                """
                 # Initializing the loss criterion for unsupervised learning
                 _loss_criterion_u = getattr(self, "loss_criterion_u", None)
                 if callable(_loss_criterion_u):
                     loss_criterion_u = self.loss_criterion_u(self.model)
                 else:
                     loss_criterion_u = nn.CrossEntropyLoss()
+                """
 
                 # Initializing the optimizer
                 #get_optimizer = getattr(self, "get_optimizer",
                 #                        optimizers.get_optimizer)
 
                 optimizer_s = optim.SGD(
-                    #self.model.parameters(),
-                    [list(self.model.parameters())[3]],  # 3 is sigma
+                    #[list(self.model.parameters())[0]],
+                    #[list(self.model.parameters())[2]],  # 3 is sigma
+                    self.model.parameters(),
                     lr=Config().trainer.learning_rate,
                     momentum=Config().trainer.momentum,
                     weight_decay=Config().trainer.weight_decay
                 )  #get_optimizer(self.model.psis)
+                """
                 optimizer_u = optim.SGD(
                     [list(self.model.parameters())[4]],  #4 is psi
                     lr=Config().trainer.learning_rate,
                     momentum=Config().trainer.momentum,
                     weight_decay=Config().trainer.weight_decay
                 )  #get_optimizer(self.model.sigmas)
+                """
                 """
                 # Initializing the learning rate schedule, if necessary
                 if hasattr(config, 'lr_schedule'):
@@ -176,17 +186,18 @@ class Trainer(basic.Trainer):
                         # unsupervised learning
                         #######################
                     #print("=========Unsupervised Training==========")
+                    """
                     for batch_id, (examples_unlabeled,
                                    labels) in enumerate(train_loader_u):
                         #pseduo_labels = self.model(self.loader.scale(examples_unlabeled))
                         optimizer_u.zero_grad()
-                        """
+                        
                         if cut_layer is None:
                             outputs_u = self.model(examples)
                         else:
                             outputs_u = self.model.forward_from(
                                 examples, cut_layer)
-                        """
+                        
                         loss_u, _confident = self.loss_unsupervised(
                             examples_unlabeled, loss_criterion_u)
 
@@ -212,7 +223,7 @@ class Trainer(basic.Trainer):
                                     .format(self.client_id, epoch, epochs,
                                             batch_id, len(train_loader_u),
                                             loss_u.data.item()))
-
+                    """
         except Exception as training_exception:
             logging.info("Training on client #%d failed.", self.client_id)
             raise training_exception
