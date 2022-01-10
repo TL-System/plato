@@ -109,9 +109,15 @@ class Trainer(basic.Trainer):
                 # Initializing the optimizer
                 #get_optimizer = getattr(self, "get_optimizer",
                 #                        optimizers.get_optimizer)
+                #print("++++++++: ", len(list(self.model.parameters())))
+                for name, param in self.model.named_parameters():
+                    if param.requires_grad and 'weight' in name:
+                        param.requires_grad = False
+                    if param.requires_grad and 'psi' in name:
+                        param.requires_grad = False
 
                 optimizer_s = optim.SGD(
-                    #[list(self.model.parameters())[0]],
+
                     #[list(self.model.parameters())[2]],  # 3 is sigma
                     self.model.parameters(),
                     lr=Config().trainer.learning_rate,

@@ -56,7 +56,7 @@ trainer:
     weight_decay: 0.0
 
     # The machine learning model
-    model_name: lenet5
+    model_name: de_lenet5_decomposed
 
     # lambdas
     lambda_s: 10
