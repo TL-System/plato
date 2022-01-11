@@ -67,20 +67,17 @@ class Trainer(basic.Trainer):
                 #_train_loader = getattr(self, "train_loader", None)
                 """obtain labeled and unlabeled dataset"""
 
-                #trainset_s, trainset_u = torch.utils.data.random_split(
-                #    trainset, [50000, 10000])  # rewrite with ratio
-                #train_loader_s = DataLoader(trainset_s,
-                #batch_size=batch_size)  #,
-
+                trainset_s, trainset_u = torch.utils.data.random_split(
+                    trainset, [50000, 10000])  # rewrite with ratio
+                train_loader_s = DataLoader(trainset_s, batch_size=batch_size)
+                """
                 train_loader_s = torch.utils.data.DataLoader(
                     dataset=trainset,
                     shuffle=False,
                     batch_size=batch_size,
                     sampler=sampler.get())
-                #shuffle=False,
-                #batch_size=batch_size,
-                #sampler=sampler.get())
-                #train_loader_u = DataLoader(trainset_u, batch_size)
+                """
+                train_loader_u = DataLoader(trainset_u, batch_size)
 
                 #iterations_per_epoch = np.ceil(len(trainset_s) /
                 #                               batch_size).astype(int)
@@ -97,41 +94,32 @@ class Trainer(basic.Trainer):
                     loss_criterion_s = self.loss_criterion_s(self.model)
                 else:
                     loss_criterion_s = nn.CrossEntropyLoss()
-                """
+
                 # Initializing the loss criterion for unsupervised learning
                 _loss_criterion_u = getattr(self, "loss_criterion_u", None)
                 if callable(_loss_criterion_u):
                     loss_criterion_u = self.loss_criterion_u(self.model)
                 else:
                     loss_criterion_u = nn.CrossEntropyLoss()
-                """
 
                 # Initializing the optimizer
                 #get_optimizer = getattr(self, "get_optimizer",
                 #                        optimizers.get_optimizer)
-                #print("++++++++: ", len(list(self.model.parameters())))
-                for name, param in self.model.named_parameters():
-                    if param.requires_grad and 'weight' in name:
-                        param.requires_grad = False
-                    if param.requires_grad and 'psi' in name:
-                        param.requires_grad = False
 
                 optimizer_s = optim.SGD(
-
                     #[list(self.model.parameters())[2]],  # 3 is sigma
                     self.model.parameters(),
                     lr=Config().trainer.learning_rate,
                     momentum=Config().trainer.momentum,
                     weight_decay=Config().trainer.weight_decay
                 )  #get_optimizer(self.model.psis)
-                """
+
                 optimizer_u = optim.SGD(
-                    [list(self.model.parameters())[4]],  #4 is psi
+                    self.model.parameters(),  #4 is psi
                     lr=Config().trainer.learning_rate,
                     momentum=Config().trainer.momentum,
                     weight_decay=Config().trainer.weight_decay
                 )  #get_optimizer(self.model.sigmas)
-                """
                 """
                 # Initializing the learning rate schedule, if necessary
                 if hasattr(config, 'lr_schedule'):
@@ -143,6 +131,14 @@ class Trainer(basic.Trainer):
 
                 for epoch in range(1, epochs + 1):
                     self.confident = 0
+
+                    # freeze psi & weight for supervised learning
+                    for name, param in self.model.named_parameters():
+                        if param.requires_grad and 'weight' in name:
+                            param.requires_grad = False
+                        if param.requires_grad and 'psi' in name:
+                            param.requires_grad = False
+
                     print("=========Supervised Training==========")
                     for batch_id, (examples, labels) in enumerate(
                             train_loader_s):  # batch_id is used for logging
@@ -162,13 +158,6 @@ class Trainer(basic.Trainer):
 
                             loss_s = loss_criterion_s(
                                 outputs_s, labels)  # * self.lambda_s
-                            #print("Supervised learning outpus_s are: ",
-                            #outputs_s)
-                            #print("Supervised learning labels are: ", labels)
-                            #print("here's the sigma's grad: ",
-                            #self.model.conv1.sigma.grad)
-                            #print("Loss_criterion_s: ",
-                            #      loss_criterion_s(outputs_s, labels))
 
                             loss_s.backward()
 
@@ -191,19 +180,25 @@ class Trainer(basic.Trainer):
                         #######################
                         # unsupervised learning
                         #######################
-                    #print("=========Unsupervised Training==========")
-                    """
+                    print("=========Unsupervised Training==========")
+                    # freeze sigma & weight for supervised learning
+                    for name, param in self.model.named_parameters():
+                        if param.requires_grad and 'sigma' in name:
+                            param.requires_grad = False
+                        if not param.requires_grad and 'psi' in name:
+                            param.requires_grad = True
+
                     for batch_id, (examples_unlabeled,
                                    labels) in enumerate(train_loader_u):
                         #pseduo_labels = self.model(self.loader.scale(examples_unlabeled))
                         optimizer_u.zero_grad()
-                        
+                        """
                         if cut_layer is None:
                             outputs_u = self.model(examples)
                         else:
                             outputs_u = self.model.forward_from(
                                 examples, cut_layer)
-                        
+                        """
                         loss_u, _confident = self.loss_unsupervised(
                             examples_unlabeled, loss_criterion_u)
 
@@ -229,7 +224,7 @@ class Trainer(basic.Trainer):
                                     .format(self.client_id, epoch, epochs,
                                             batch_id, len(train_loader_u),
                                             loss_u.data.item()))
-                    """
+
         except Exception as training_exception:
             logging.info("Training on client #%d failed.", self.client_id)
             raise training_exception
@@ -266,24 +261,23 @@ class Trainer(basic.Trainer):
 
         _confident = np.where(
             np.max(y_pred.detach().numpy(), axis=1) >= self.confident)[0]
-        #print(
-        #"Before confident is: ",
-        #np.where(
-        #np.max(y_pred.detach().numpy(), axis=1) >= self.confident))
-        #print("The confident is: ", _confident)
-        #np.max(y_pred.numpy(), axis=1) >= self.confident)[0]
+        print("_confident : ", _confident)
 
         if len(_confident) > 0:
             # Inter-client consistency
-            samples_confident = self.scale(unlabled_samples[_confident])
-            y_pred = torch.gather(y_pred, 1, _confident)
-            #print("Y_pred is: ", y_pred)
+            samples_confident = unlabled_samples[
+                _confident]  #self.scale(unlabled_samples[_confident])
+            #y_pred = torch.gather(y_pred, 1, _confident)
+            print("Y_pred is: ", y_pred)
+            print("_confident : ", _confident)
+            y_pred = torch.index_select(y_pred, 0,
+                                        torch.from_numpy(_confident))
+            print("Y_pred is: ", y_pred)
 
             y_preds = [
                 rm(samples_confident).numpy()
                 for rid, rm in enumerate(self.helpers)
             ]  # where find helpers
-            #print("Y_preds are: ", y_preds)
 
             for _, pred in enumerate(y_preds):
                 loss_u += (nn.functional.kl_div(pred, y_pred) /
@@ -324,6 +318,7 @@ class Trainer(basic.Trainer):
 
     def scale(self, x):
         x = x.numpy() / 255  #astype(np.float32) / 255
+        return x
 
     def augment(self, images, soft=True):
         if soft:

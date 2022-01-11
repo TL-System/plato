@@ -154,8 +154,8 @@ class Decomposed_Linear(nn.Linear):
             torch.empty((out_features, in_features), **factory_kwargs))
 
         init.kaiming_uniform_(self.sigma, a=math.sqrt(5))
-        init.zeros_(self.psi)
-        #init.kaiming_uniform_(self.psi, a=math.sqrt(5))
+        #init.zeros_(self.psi)
+        init.kaiming_uniform_(self.psi, a=math.sqrt(5))
         """
         factory_kwargs = {'device': device, 'dtype': dtype}
         super(Decomposed_Linear, self).__init__()
@@ -209,8 +209,8 @@ class Decomposed_Conv2d(nn.Conv2d):
                         **factory_kwargs))
 
         init.kaiming_uniform_(self.sigma, a=math.sqrt(5))
-        init.zeros_(self.psi)
-        #init.kaiming_uniform_(self.psi, a=math.sqrt(5))
+        #init.zeros_(self.psi)
+        init.kaiming_uniform_(self.psi, a=math.sqrt(5))
 
     def forward(self, input):
         # self.weight = self.sigma + self.psi
