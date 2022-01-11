@@ -118,7 +118,7 @@ class Client(base.Client):
             if dist.distribution.lower() == "zipf":
                 return np.random.zipf(dist.s)
         # Default use Zipf distribution with a parameter of 2
-        return np.random.zipf(2)
+        return np.random.zipf(1.5)
 
     async def train(self):
         """The machine learning training workload on a client."""
