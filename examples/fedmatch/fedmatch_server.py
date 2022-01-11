@@ -59,7 +59,7 @@ class Server(fedavg.Server):
 
             return [payload, helpers]
         self.helper[selected_client_id - 1] = True
-        print("self.helper is false")
+
         return payload
 
     def compute_similarity(self, models_received, client_ids):

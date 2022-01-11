@@ -29,11 +29,13 @@ class Client(simple.Client):
                  trainer=None):
         super().__init__(model, datasource, algorithm, trainer)
         self.helper_flag = False
+        self.helpers = None
         self.sup_train = None
         self.unsup_train = None
 
     async def train(self):
         """ Fedmatch clients use different number of local epochs. """
+        self.trainer.helper = self.helpers
 
         report, weights = await super().train(
         )  # obtain update from local trainer,
