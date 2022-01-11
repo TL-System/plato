@@ -117,7 +117,7 @@ class Client(base.Client):
                 return np.random.normal(dist.mean, dist.sd)
             if dist.distribution.lower() == "zipf":
                 return np.random.zipf(dist.s)
-        # Default use Zipf distribution with a parameter of 2
+        # Default use Zipf distribution with a parameter of 1.5
         return np.random.zipf(1.5)
 
     async def train(self):
