@@ -18,6 +18,7 @@ import torch
 from PIL import Image
 from scipy.ndimage.interpolation import shift
 from torch import autograd, nn, optim
+from torch.nn.functional import softmax
 from torch.utils.data import DataLoader
 
 from plato.config import Config
@@ -34,7 +35,7 @@ class Trainer(basic.Trainer):
         """
         # variables to be added when used
         super().__init__(model)
-        self.confident = 0  #0.75
+        self.confident = 0.75  #0.75
         self.lambda_s = 10  # supervised learning
         self.lambda_a = 1e-2  # agreement-based pseudo labeling
         self.lambda_i = 1e-2  # inter-client consistency
@@ -158,8 +159,8 @@ class Trainer(basic.Trainer):
                                 outputs_s = self.model.forward_from(
                                     examples, cut_layer)
 
-                            loss_s = loss_criterion_s(
-                                outputs_s, labels)  # * self.lambda_s
+                            loss_s = loss_criterion_s(outputs_s,
+                                                      labels)  #* self.lambda_s
 
                             loss_s.backward()
 
@@ -259,11 +260,14 @@ class Trainer(basic.Trainer):
             y_pred = self.model.forward_from(
                 unlabled_samples, cut_layer)  #self.scale(unlabled_samples),
             #cut_layer)
-        #print("The y_pred is: ", y_pred)
+        pred_prob = nn.Softmax(dim=1)
+        y_pred = pred_prob(y_pred)
 
         _confident = np.where(
             np.max(y_pred.detach().numpy(), axis=1) >= self.confident)[0]
-        #print("_confident : ", _confident)
+
+        if len(_confident):
+            print("_condfident is : ", _confident)
 
         if len(_confident) > 0:
             # Inter-client consistency
@@ -308,19 +312,16 @@ class Trainer(basic.Trainer):
         # Regularization
         self.psi = self.model.get_psi()
         self.sigma = self.model.get_sigma()
-        #print("========after get_psi=======")
 
-        for lid, psi in enumerate(self.psi):  # psi & sig?#self means trainer
+        for lid, psi in enumerate(self.psi):  #
             # l1 regularization
             loss_u += torch.sum(torch.abs(psi)) * self.lambda_l1
-            #print("The loss_u for first iter is: ", loss_u)
+
             # l2 regularization
             loss_u += torch.sum(torch.square(
                 (self.sigma[lid] - psi))) * self.lambda_l2
 
-        return loss_u, len(
-            _confident
-        )  # confident is only used for logging in orignal code so we can get rid of it here.
+        return loss_u, len(_confident)
 
     def scale(self, x):
         x = x.numpy() / 255  #astype(np.float32) / 255
@@ -347,8 +348,7 @@ class Trainer(basic.Trainer):
         ])
 
     def agreement_based_labeling(self, y_pre, y_preds=None):
-        print("The type of y_pre is: ", type(y_pre))
-        print("The type of y_preds is: ", type(y_preds))
+
         y_pseudo = y_pre.detach().numpy()  #np.array(y_pre)
         num = 10  #self.num_classes
 
@@ -359,7 +359,7 @@ class Trainer(basic.Trainer):
                 axis=0)
             y_vote = np.sum([y_vote, y_votes], axis=0)
             y_pseudo = np.eye(num)[np.argmax(y_vote, axis=1)]
-        else:
-            y_pseudo = np.eye(num)[np.argmax(y_pseudo, axis=1)]
+        #else:
+        #np.eye(num)[np.argmax(y_pseudo, axis=1)]
 
         return y_pseudo

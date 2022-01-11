@@ -78,7 +78,6 @@ class Server(fedavg.Server):
 
         self.tree = spatial.KDTree(out_list)
 
-        #print("Type of values: ", type(self.models_dict.values()))
         #self.tree = spatial.KDTree(np.array(list(self.models_dict.values())))
         """
         for cid, update in enumerate(updates_all):
