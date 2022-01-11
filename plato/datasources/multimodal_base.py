@@ -242,6 +242,25 @@ class MultiModalDataSource(base.DataSource):
         """ Number of modalities """
         return len(self.modality_names)
 
+    @abstractmethod
+    def get_phase_dataset(self, phase, modality_sampler):
+        """ Obtain the dataset with the modaltiy_sampler for the 
+            specific phase (train/test/val) """
+        raise NotImplementedError(
+            "Please Implement 'get_phase_dataset' method")
+
+    @abstractmethod
+    def get_train_set(self, modality_sampler):
+        """ Obtain the train dataset with the modaltiy_sampler """
+        raise NotImplementedError(
+            "Please Implement 'get_train_set' method")
+
+    @abstractmethod
+    def get_test_set(self, modality_sampler):
+        """ btain the test dataset with the modaltiy_sampler """
+        raise NotImplementedError(
+            "Please Implement 'get_test_set' method")
+
 
 class MultiModalDataset(torch.utils.data.Dataset):
     """ The base interface for the multimodal data """
