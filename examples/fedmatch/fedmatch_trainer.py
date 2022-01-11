@@ -34,11 +34,13 @@ class Trainer(basic.Trainer):
         """
         # variables to be added when used
         super().__init__(model)
-        self.confident = 0
-        self.lambda_s = 10
-        self.lambda_i = 1e-2
+        self.confident = 0  #0.75
+        self.lambda_s = 10  # supervised learning
+        self.lambda_a = 1e-2  # agreement-based pseudo labeling
+        self.lambda_i = 1e-2  # inter-client consistency
         self.lambda_l1 = 1e-4
         self.lambda_l2 = 10
+        self.helpers = None
         #self.kl_divergence = nn.functional.kl_div()
 
     def train_process(self, config, trainset, sampler, cut_layer=None):
@@ -68,7 +70,7 @@ class Trainer(basic.Trainer):
                 """obtain labeled and unlabeled dataset"""
 
                 trainset_s, trainset_u = torch.utils.data.random_split(
-                    trainset, [50000, 10000])  # rewrite with ratio
+                    trainset, [40000, 20000])  # rewrite with ratio
                 train_loader_s = DataLoader(trainset_s, batch_size=batch_size)
                 """
                 train_loader_s = torch.utils.data.DataLoader(
@@ -261,42 +263,46 @@ class Trainer(basic.Trainer):
 
         _confident = np.where(
             np.max(y_pred.detach().numpy(), axis=1) >= self.confident)[0]
-        print("_confident : ", _confident)
+        #print("_confident : ", _confident)
 
         if len(_confident) > 0:
             # Inter-client consistency
             samples_confident = unlabled_samples[
                 _confident]  #self.scale(unlabled_samples[_confident])
             #y_pred = torch.gather(y_pred, 1, _confident)
-            print("Y_pred is: ", y_pred)
-            print("_confident : ", _confident)
+
             y_pred = torch.index_select(y_pred, 0,
                                         torch.from_numpy(_confident))
-            print("Y_pred is: ", y_pred)
+            print("trainer.helpers are: ", self.helpers)
+            if self.helpers is not None:
 
-            y_preds = [
-                rm(samples_confident).numpy()
-                for rid, rm in enumerate(self.helpers)
-            ]  # where find helpers
+                y_preds = [
+                    rm(samples_confident).numpy()
+                    for rid, rm in enumerate(self.helpers)
+                ]
+                #inter-client consistency loss
+                for _, pred in enumerate(y_preds):
+                    loss_u += (nn.functional.kl_div(pred, y_pred) /
+                               len(y_preds)) * self.lambda_i
 
-            for _, pred in enumerate(y_preds):
-                loss_u += (nn.functional.kl_div(pred, y_pred) /
-                           len(y_preds)) * self.lambda_i
-                #print("Current loss is: ", loss)
+            else:
+                y_preds = None
 
             # Agreement-based Pseudo Labeling
             if cut_layer is None:
                 y_hard = self.model(
-                    self.scale(
-                        self.augment(unlabled_samples[_confident],
-                                     soft=False)))
+                    unlabled_samples[_confident]
+                )  #self.scale(unlabled_samples[_confident]))
+                #self.augment(unlabled_samples[_confident],
+                #soft=False)))
             else:
-                y_hard = self.model.forward_from(
-                    self.scale(
-                        self.augment(unlabled_samples[_confident],
-                                     soft=False)), cut_layer)
+                y_hard = self.model.forward_from(unlabled_samples[_confident])
+                #self.scale(unlabled_samples[_confident]))
+                #self.augment(unlabled_samples[_confident],
+                #soft=False)), cut_layer)
 
-            y_pseu = self.agreement_based_labeling(y_pred, y_preds)
+            y_pseu = torch.from_numpy(
+                self.agreement_based_labeling(y_pred, y_preds))
             loss_u += loss_criterion_u(y_pseu, y_hard) * self.lambda_a
 
         # Regularization
@@ -306,11 +312,11 @@ class Trainer(basic.Trainer):
 
         for lid, psi in enumerate(self.psi):  # psi & sig?#self means trainer
             # l1 regularization
-            loss_u += torch.sum(torch.abs(psi.flatten())) * self.lambda_l1
+            loss_u += torch.sum(torch.abs(psi)) * self.lambda_l1
             #print("The loss_u for first iter is: ", loss_u)
             # l2 regularization
             loss_u += torch.sum(torch.square(
-                (self.sigma[lid] - psi).flatten())) * self.lambda_l2
+                (self.sigma[lid] - psi))) * self.lambda_l2
 
         return loss_u, len(
             _confident
@@ -336,18 +342,24 @@ class Trainer(basic.Trainer):
 
         return np.array([
             np.array(
-                self.rand_augment(Image.fromarray(np.reshape(img, self.shape)),
-                                  M=random.randint(2, 5))) for img in images
+                RandAugment(Image.fromarray(np.reshape(img, self.shape)),
+                            M=random.randint(2, 5))) for img in images
         ])
 
     def agreement_based_labeling(self, y_pre, y_preds=None):
-        y_pseudo = np.array(y_pre)
-        num = self.num_classes
+        print("The type of y_pre is: ", type(y_pre))
+        print("The type of y_preds is: ", type(y_preds))
+        y_pseudo = y_pre.detach().numpy()  #np.array(y_pre)
+        num = 10  #self.num_classes
 
-        y_vote = np.eye(num, np.argmax(y_pseudo, axis=1))
-        y_votes = np.sum(
-            [np.eye(num, np.argmax(y_rm, axis=1)) for y_rm in y_preds], axis=0)
-        y_vote = np.sum([y_vote, y_votes], axis=0)
-        y_pseudo = np.eye(num, np.argmax(y_vote, axis=1))
+        if y_preds is not None:
+            y_vote = np.eye(num)[np.argmax(y_pseudo, axis=1)]
+            y_votes = np.sum(
+                [np.eye(num)[np.argmax(y_rm, axis=1)] for y_rm in y_preds],
+                axis=0)
+            y_vote = np.sum([y_vote, y_votes], axis=0)
+            y_pseudo = np.eye(num)[np.argmax(y_vote, axis=1)]
+        else:
+            y_pseudo = np.eye(num)[np.argmax(y_pseudo, axis=1)]
 
         return y_pseudo
