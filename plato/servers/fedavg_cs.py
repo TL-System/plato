@@ -4,14 +4,12 @@ A cross-silo federated learning server using federated averaging, as either edge
 
 import asyncio
 import logging
-import numpy as np
 import os
 import time
+import numpy as np
 
 from plato.config import Config
-from plato.datasources import registry as datasources_registry
 from plato.processors import registry as processor_registry
-from plato.samplers import registry as samplers_registry
 from plato.utils import csv_processor
 
 from plato.servers import fedavg
@@ -23,22 +21,6 @@ class Server(fedavg.Server):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
 
         self.current_global_round = 0
-
-        # Should an edge server has its own testset to test the accuracy of its aggregated model?
-        if hasattr(Config().server,
-                   'edge_do_test') and Config().server.edge_do_test:
-            self.test_edge_model = True
-            self.edge_test_set_sampler = None
-        else:
-            self.test_edge_model = False
-
-        # Should the central server has its own testset to test the current global model?
-        if (hasattr(Config().server, 'do_test')
-                and Config().server.do_test) or (not Config().clients.do_test
-                                                 and not self.do_edge_test):
-            self.test_central_model = True
-        else:
-            self.test_central_model = False
 
         if Config().is_edge_server():
             # An edge client waits for the event that a certain number of
@@ -91,14 +73,6 @@ class Server(fedavg.Server):
             logging.info("Training with %s local aggregation rounds.",
                          Config().algorithm.local_rounds)
 
-            if self.test_edge_model:
-                datasource = datasources_registry.get()
-                self.testset = datasource.get_test_set()
-                # Set up the sampler of test set
-                if hasattr(Config().data, 'edge_test_set_sampler'):
-                    self.edge_test_set_sampler = samplers_registry.get(
-                        datasource, Config().args.id, testing='edge')
-
             self.load_trainer()
 
             # Prepares this server for processors that processes outbound and inbound
@@ -114,10 +88,6 @@ class Server(fedavg.Server):
 
         else:
             super().configure()
-
-            if self.test_central_model:
-                datasource = datasources_registry.get()
-                self.testset = datasource.get_test_set()
 
     async def select_clients(self):
         if Config().is_edge_server():
@@ -147,27 +117,13 @@ class Server(fedavg.Server):
             logging.info(
                 '[Server #{:d}] Average client accuracy: {:.2f}%.'.format(
                     os.getpid(), 100 * self.accuracy))
-
-        elif self.test_edge_model:
-            # Compute the average accuracy from edge server reports
+        else:
             if Config().is_central_server():
-                self.accuracy = self.accuracy_averaging(self.updates)
+                # Test the updated model directly at the central server
+                self.accuracy = await self.trainer.server_test(self.testset)
                 logging.info(
-                    '[Server #{:d}] Average edge server accuracy: {:.2f}%.'.
-                    format(os.getpid(), 100 * self.accuracy))
-            else:  # Test the aggregated model directly at the edge server
-                self.accuracy = await self.trainer.server_test(
-                    self.testset, self.edge_test_set_sampler)
-                logging.info(
-                    '[Edge Server #{:d}] Aggregated model accuracy: {:.2f}%\n'.
-                    format(os.getpid(), 100 * self.accuracy))
-
-        elif self.test_central_model:
-            # Test the updated model directly at the central server
-            self.accuracy = await self.trainer.server_test(self.testset)
-            logging.info(
-                '[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(
-                    os.getpid(), 100 * self.accuracy))
+                    '[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(
+                        os.getpid(), 100 * self.accuracy))
 
         await self.wrap_up_processing_reports()
 
