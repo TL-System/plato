@@ -5,8 +5,6 @@ A basic federated learning client who sends weight updates to the server.
 import logging
 import time
 from dataclasses import dataclass
-import asyncio
-import numpy as np
 
 from plato.algorithms import registry as algorithms_registry
 from plato.clients import base
@@ -44,8 +42,6 @@ class Client(base.Client):
 
         self.data_loading_time = None
         self.data_loading_time_sent = False
-
-        self._sleep_time = None  # Client's expected sleep time in simulation
 
     def __repr__(self):
         return 'Client #{}.'.format(self.client_id)
@@ -107,19 +103,6 @@ class Client(base.Client):
         """Loading the server model onto this client."""
         self.algorithm.load_weights(server_payload)
 
-    @staticmethod
-    def _simulate_sleep_time() -> float:
-        """Simulate and return a sleep time (in seconds) for the client."""
-        if hasattr(Config().clients, "simulation_distribution"):
-            dist = Config.clients.simulation_distribution
-            # Determine the distribution of client's simulate sleep time
-            if dist.distribution.lower() == "normal":
-                return np.random.normal(dist.mean, dist.sd)
-            if dist.distribution.lower() == "zipf":
-                return np.random.zipf(dist.s)
-        # Default use Zipf distribution with a parameter of 1.5
-        return np.random.zipf(1.5)
-
     async def train(self):
         """The machine learning training workload on a client."""
         logging.info("[Client #%d] Started training.", self.client_id)
@@ -129,25 +112,6 @@ class Client(base.Client):
             training_time = self.trainer.train(self.trainset, self.sampler)
         except ValueError:
             await self.sio.disconnect()
-
-        # Simulate client's speed
-        if hasattr(Config().clients,
-                   "simulation") and Config().clients.simulation:
-            np.random.seed(self.client_id)
-            if self._sleep_time is None:
-                # Get an expected sleep time
-                self._sleep_time = Client._simulate_sleep_time()
-            # Introduce some randomness to the sleep time
-            deviation = 0.05
-            sleep_seconds = np.random.uniform(
-                self._sleep_time * (1 - deviation),
-                self._sleep_time * (1 + deviation))
-            sleep_seconds = max(sleep_seconds, 0)
-            # Put client to sleep
-            logging.info("[Client #%d] Going to sleep for %f seconds.",
-                         self.client_id, sleep_seconds)
-            await asyncio.sleep(sleep_seconds)
-            logging.info("[Client #%d] Woke up.", self.client_id)
 
         # Extract model weights and biases
         weights = self.algorithm.extract_weights()

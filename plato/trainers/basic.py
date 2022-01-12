@@ -22,6 +22,7 @@ from plato.utils import optimizers
 
 class Trainer(base.Trainer):
     """A basic federated learning trainer, used by both the client and the server."""
+
     def __init__(self, model=None):
         """Initializing the trainer with the provided model.
 
@@ -53,6 +54,9 @@ class Trainer(base.Trainer):
                 assert len(errors) == 0
 
             self.model = GradSampleModule(self.model)
+
+        # Store parameters used for client simulation
+        self._simulation_param = mp.Manager().dict()
 
     def zeros(self, shape):
         """Returns a PyTorch zero tensor with the given shape."""
@@ -101,7 +105,38 @@ class Trainer(base.Trainer):
 
         self.model.load_state_dict(torch.load(model_path))
 
-    def train_process(self, config, trainset, sampler, cut_layer=None):
+    @staticmethod
+    def _simulate_sleep_time() -> float:
+        """Simulate and return a sleep time (in seconds) for the client."""
+        if hasattr(Config().clients, "simulation_distribution"):
+            dist = Config.clients.simulation_distribution
+            # Determine the distribution of client's simulate sleep time
+            if dist.distribution.lower() == "normal":
+                return np.random.normal(dist.mean, dist.sd)
+            if dist.distribution.lower() == "zipf":
+                return np.random.zipf(dist.s)
+        # Default use Zipf distribution with a parameter of 1.5
+        return np.random.zipf(1.5)
+
+    async def _simulate_client_speed(self):
+        """Simulate client's speed by putting it to sleep."""
+        if 'client_speed' not in self._simulation_param:
+            # Get an expected sleep time
+            self._simulation_param[
+                'client_speed'] = Trainer._simulate_sleep_time()
+        sleep_time = self._simulation_param['client_speed']
+        # Introduce some randomness to the sleep time
+        deviation = 0.05
+        sleep_seconds = np.random.uniform(sleep_time * (1 - deviation),
+                                          sleep_time * (1 + deviation))
+        sleep_seconds = max(sleep_seconds, 0)
+        # Put client to sleep
+        logging.info("[Client #%d] Going to sleep for %f seconds.",
+                     self.client_id, sleep_seconds)
+        await asyncio.sleep(sleep_seconds)
+        logging.info("[Client #%d] Woke up.", self.client_id)
+
+    async def train_process(self, config, trainset, sampler, cut_layer=None):
         """The main training loop in a federated learning workload, run in
           a separate process with a new CUDA context, so that CUDA memory
           can be released after the training completes.
@@ -233,6 +268,12 @@ class Trainer(base.Trainer):
                     if hasattr(optimizer, "params_state_update"):
                         optimizer.params_state_update()
 
+                    # Simulate client's speed
+                    if self.client_id != 0 and hasattr(
+                            Config().clients,
+                            "simulation") and Config().clients.simulation:
+                        await self._simulate_client_speed()
+
         except Exception as training_exception:
             logging.info("Training on client #%d failed.", self.client_id)
             raise training_exception
@@ -245,6 +286,13 @@ class Trainer(base.Trainer):
 
         if 'use_wandb' in config:
             run.finish()
+
+    def train_proc_wrapper(self, config, trainset, sampler, cut_layer=None):
+        """A wrapper function of train_process() such that this function
+        can be passed as a target process to run for multiprocessing
+        in train().
+        """
+        asyncio.run(self.train_process(config, trainset, sampler, cut_layer))
 
     def train(self, trainset, sampler, cut_layer=None) -> float:
         """The main training loop in a federated learning workload.
@@ -267,7 +315,7 @@ class Trainer(base.Trainer):
             if mp.get_start_method(allow_none=True) != 'spawn':
                 mp.set_start_method('spawn', force=True)
 
-            train_proc = mp.Process(target=self.train_process,
+            train_proc = mp.Process(target=self.train_proc_wrapper,
                                     args=(config, trainset, sampler,
                                           cut_layer))
             train_proc.start()
@@ -290,7 +338,7 @@ class Trainer(base.Trainer):
             self.pause_training()
         else:
             tic = time.perf_counter()
-            self.train_process(config, trainset, sampler, cut_layer)
+            self.train_proc_wrapper(config, trainset, sampler, cut_layer)
             toc = time.perf_counter()
 
         training_time = toc - tic
