@@ -1,0 +1,199 @@
+# the data configuration for the rgb dataset
+
+
+rgb_mean: &rgb_mean
+  - 123.675
+  - 116.28
+  - 103.53
+
+
+rgb_std: &rgb_std
+  - 58.395
+  - 57.12
+  - 57.375
+
+rgb_to_bgr:  &rgb_to_bgr False
+
+rgb_train_pipeline: &rgb_train_pipeline
+  -
+    type: SampleFrames
+    clip_len: 32
+    frame_interval: 2
+    num_clips: 1
+
+  - 
+    type: RawFrameDecode
+
+  -
+    type: Resize
+    scale: [-1, 256]
+
+  - 
+    type: RandomResizedCrop
+
+  -
+    type: Resize
+    scale: [224, 224]
+    keep_ratio: False
+
+  -
+    type: Flip
+    flip_ratio: 0.5
+
+  - 
+    type: Normalize
+    mean: *rgb_mean
+    std: *rgb_std
+    to_bgr: *rgb_to_bgr
+
+  -
+    type: FormatShape
+    input_format: NCTHW
+
+  -
+    type: Collect
+
+    keys:
+      - imgs
+      - label
+
+    meta_keys:
+      - null
+
+  -
+    type: ToTensor
+    
+    keys:
+      - imgs
+      - label
+
+
+rgb_val_pipeline: &rgb_val_pipeline
+  -
+    type: SampleFrames
+    clip_len: 32
+    frame_interval: 2
+    num_clips: 1
+    test_mode: True
+
+  - 
+    type: RawFrameDecode
+
+  -
+    type: Resize
+    scale:
+      - -1
+      - 256
+
+  - 
+    type: CenterCrop
+    crop_size: 224
+
+  -
+    type: Flip
+    flip_ratio: 0
+
+  - 
+    type: Normalize
+    mean: *rgb_mean
+    std: *rgb_std
+    to_bgr: *rgb_to_bgr
+
+  -
+    type: FormatShape
+    input_format: NCTHW
+
+  -
+    type: Collect
+
+    keys:
+      - imgs
+      - label
+
+    meta_keys:
+      - null
+
+  -
+    type: ToTensor
+    
+    keys:
+      - imgs
+
+
+rgb_test_pipeline: &rgb_test_pipeline
+  -
+    type: SampleFrames
+    clip_len: 32
+    frame_interval: 2
+    num_clips: 10
+    test_mode: True
+
+  - 
+    type: RawFrameDecode
+
+  -
+    type: Resize
+    scale:
+      - -1
+      - 256
+
+  - 
+    type: ThreeCrop
+    crop_size: 256
+
+  -
+    type: Flip
+    flip_ratio: 0
+
+  - 
+    type: Normalize
+    mean: *rgb_mean
+    std: *rgb_std
+    to_bgr: *rgb_to_bgr
+
+  -
+    type: FormatShape
+    input_format: NCTHW
+
+  -
+    type: Collect
+
+    keys:
+      - imgs
+      - label
+
+    meta_keys:
+      - null
+
+  -
+    type: ToTensor
+    
+    keys:
+      - imgs
+
+
+rgb_data_train: &rgb_data_train
+  type: RawframeDataset
+  ann_file: train_list_rawframes.txt
+  data_prefix: rawframes_train
+  pipeline: *rgb_train_pipeline
+
+
+rgb_data_val: &rgb_data_val
+  type: RawframeDataset
+  ann_file: val_list_rawframes.txt
+  data_prefix: rawframes_val
+  pipeline: *rgb_val_pipeline
+
+
+rgb_data_test: &rgb_data_test
+  type: RawframeDataset
+  ann_file: val_list_rawframes.txt
+  data_prefix: rawframes_val
+  pipeline: *rgb_test_pipeline
+
+
+
+train: *rgb_data_train
+val: *rgb_data_val
+test: *rgb_data_test

@@ -35,6 +35,7 @@ The data structure should be:
 
 import logging
 import os
+import shutil
 
 import torch
 
@@ -83,15 +84,9 @@ class GymDataset(multimodal_base.MultiModalDataset):
 
     def get_targets(self):
         """ Obtain the labels of samples in current phase dataset.  """
-        # the order of samples in rgb, flow, or audio annotation files
-        #  is maintained the same, thus obtain either one is great.
-        # Normally, rgb and flow belong to the rawframes
-        rawframes_anno_list_file_path = self.phase_info["rgb"]
-        annos_list = data_utils.read_anno_file(rawframes_anno_list_file_path)
-
-        obtained_targets = [anno_item["label"][0] for anno_item in annos_list]
-
-        return obtained_targets
+        # There is no label provided in the fine gym dataset currently
+        #  This part will be added afterward
+        return [0]
 
     def get_one_multimodal_sample(self, sample_idx):
         """ Obtain one sample from the Kinetics dataset. """
@@ -125,11 +120,15 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         base_data_path = self.mm_data_info["base_data_dir_path"]
         # define all the dir here
-        kinetics_anno_dir_name = "annotations"
+        gym_anno_dir_name = "annotations"
         self.data_anno_dir_path = os.path.join(base_data_path,
-                                               kinetics_anno_dir_name)
+                                               gym_anno_dir_name)
+
         self.data_anno_file_path = os.path.join(self.data_anno_dir_path,
                                                 "annotation.json")
+        self.categoty_anno_file_path = os.path.join(self.data_anno_dir_path,
+                                                    "gym99_categories.txt")
+
         self.raw_videos_path = os.path.join(base_data_path, "videos")
         self.event_dir_path = os.path.join(base_data_path, "event")
         self.event_subsection_dir_path = os.path.join(base_data_path,
@@ -144,14 +143,46 @@ class DataSource(multimodal_base.MultiModalDataSource):
         self.event_subsection_audios_fea_dir_path = os.path.join(
             base_data_path, "subaction_audios_features")
 
-        anno_url = "https://sdolivia.github.io/FineGym/resources/dataset/\
-            finegym_annotation_info_v1.0.json"
+        self.rawframes_splits_list_files_into = {
+            "train":
+            os.path.join(self.data_anno_dir_path, "gym99_train_rawframes.txt"),
+            "val":
+            os.path.join(self.data_anno_dir_path, "gym99_val_rawframes.txt")
+        }
 
-        train_url = "https://sdolivia.github.io/FineGym/resources/dataset/\
-            gym99_train_element_v1.0.txt"
+        self.audios_splits_list_files_into = {
+            "train":
+            os.path.join(self.data_anno_dir_path, "gym99_train_audios.txt"),
+            "val":
+            os.path.join(self.data_anno_dir_path, "gym99_val_audios.txt")
+        }
+        self.audio_features_splits_list_files_into = {
+            "train":
+            os.path.join(self.data_anno_dir_path,
+                         "gym99_train_audio_features.txt"),
+            "val":
+            os.path.join(self.data_anno_dir_path,
+                         "gym99_val_audio_features.txt")
+        }
 
-        eval_url = "https://sdolivia.github.io/FineGym/resources/\
-            dataset/gym99_val_element.txt"
+        set_level_category_url = "https://sdolivia.github.io/FineGym/resources/dataset/set_categories.txt"
+        g99_categoty_url = "https://sdolivia.github.io/FineGym/resources/dataset/gym99_categories.txt"
+
+        anno_url = "https://sdolivia.github.io/FineGym/resources/dataset/finegym_annotation_info_v1.0.json"
+
+        train_url = "https://sdolivia.github.io/FineGym/resources/dataset/gym99_train_element_v1.0.txt"
+
+        eval_url = "https://sdolivia.github.io/FineGym/resources/dataset/gym99_val_element.txt"
+
+        _ = self._download_arrange_data(
+            download_url_address=set_level_category_url,
+            put_data_dir=self.data_anno_dir_path,
+            obtained_file_name="set_categories.txt")
+
+        _ = self._download_arrange_data(
+            download_url_address=g99_categoty_url,
+            put_data_dir=self.data_anno_dir_path,
+            obtained_file_name="gym99_categories.txt")
 
         _ = self._download_arrange_data(download_url_address=anno_url,
                                         put_data_dir=self.data_anno_dir_path,
@@ -244,15 +275,67 @@ class DataSource(multimodal_base.MultiModalDataSource):
                 "Extracting audios feature by CPU from audios in %s to %s.",
                 audio_out_dir_path, audio_feature_dir_path)
             # # window_size:32ms hop_size:16ms
+
             vda_extractor.build_audios_features(
                 audio_src_path=audio_out_dir_path,
                 to_dir=audio_feature_dir_path,
                 fft_size=512,  # fft_size / sample_rate is window size
                 hop_size=256)
-        # split the data based on the frames information
+        # extract the splits data into list files based on the frames information
         gym_trim.generate_splits_list(data_root=self.event_subsection_dir_path,
                                       annotation_root=self.data_anno_dir_path,
                                       frame_data_root=frames_out_dir_path)
+
+        # generate the audio and audio features splits file
+        # just copy the frame files to the audio ones
+        for split in list(self.rawframes_splits_list_files_into.keys()):
+            rawframes_split_file_path = self.rawframes_splits_list_files_into[
+                split]
+            audios_split_file_path = self.audios_splits_list_files_into[split]
+            audio_features_split_file_path = self.audios_splits_list_files_into[
+                split]
+            shutil.copy(src=rawframes_split_file_path,
+                        dst=audios_split_file_path)
+            shutil.copy(src=rawframes_split_file_path,
+                        dst=audio_features_split_file_path)
+
+    def correct_current_config(self, loaded_plato_config, mode, modality_name):
+        """ Correct the loaded configuration settings based on
+            on-hand data information """
+
+        # 1.1. convert plato config to dict type
+        loaded_config = data_utils.config_to_dict(loaded_plato_config)
+        # 1.2. convert the list to tuple
+        loaded_config = data_utils.dict_list2tuple(loaded_config)
+
+        # 2. using the obtained annotation file replace the user set ones
+        #   in the configuration file
+        #   The main reason is that the obtained path here is the full path
+        cur_rawframes_anno_file_path = self.rawframes_splits_list_files_into[
+            mode]
+        cur_rawframes_data_path = self.event_subsection_frames_dir_path
+        cur_videos_anno_file_path = None
+        cur_video_data_path = self.event_subsection_dir_path
+        cur_audio_feas_anno_file_path = self.audios_splits_list_files_into[
+            mode]
+        cur_audio_feas_data_path = self.event_subsection_audios_dir_path
+
+        if modality_name == "rgb" or modality_name == "flow":
+            loaded_config["ann_file"] = cur_rawframes_anno_file_path
+        elif modality_name == "audio_feature":
+            loaded_config["ann_file"] = cur_audio_feas_anno_file_path
+        else:
+            loaded_config["ann_file"] = cur_videos_anno_file_path
+
+        # 3. reset the data_prefix by using the modality path
+        if modality_name == "rgb" or modality_name == "flow":
+            loaded_config["data_prefix"] = cur_rawframes_data_path
+        elif modality_name == "audio_feature":
+            loaded_config["data_prefix"] = cur_audio_feas_data_path
+        else:
+            loaded_config["data_prefix"] = cur_video_data_path
+
+        return loaded_config
 
     def get_phase_dataset(self, phase, modality_sampler):
         """ Get the dataset for the specific phase. """
@@ -288,7 +371,8 @@ class DataSource(multimodal_base.MultiModalDataSource):
         multi_modal_mode_info = {
             "rgb": rgb_mode_config["ann_file"],
             "flow": flow_mode_config["ann_file"],
-            "audio_feature": audio_feature_mode_config["ann_file"]
+            "audio_feature": audio_feature_mode_config["ann_file"],
+            "categories": self.categoty_anno_file_path
         }
 
         gym_mode_dataset = GymDataset(

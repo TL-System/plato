@@ -26,7 +26,7 @@ data:
     videos_per_gpu: 3
     workers_per_gpu: 4
 
-  sampler: distribution_noniid
+  sampler: sample_quantity_noniid
   modality_sampler: modality_iid
 
   client_quantity_concentration: 0.1
@@ -37,10 +37,10 @@ data:
   # The random seed for sampling data
   random_seed: 1
 
-  multi_modal_pipeliner:
-    rgb: !include Pipeline/kinetics_csn_rgb.yml
-    flow: !include Pipeline/kinetics_tsn_flow.yml
-    audio: !include Pipeline/kinetics_audio_feature.yml
+  multi_modal_configs:
+    rgb: !include Pipeline/gym_csn_rgb.yml
+    flow: !include Pipeline/gym_tsn_flow.yml
+    audio_feature: !include Pipeline/gym_audio_feature.yml
     
   
 # Train settings

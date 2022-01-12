@@ -201,12 +201,12 @@ def collect_clients_data_info(clients_id,
         clients_global_info["samples_number"].append(client_sample_size)
 
         if is_presented:
-            logging.info("Client: %d", client_id)
-            logging.info("Client's total samples: %d", client_sample_size)
-            logging.info("Client's classes: {}".format(' '.join(
-                map(str, client_classes))))
-            logging.info("Client's classes sample: {}".format(' '.join(
-                map(str, client_classes_info))))
+            logging.info("Client: %s", client_id)
+            logging.info("Client's total samples: %s", client_sample_size)
+            logging.info("Client's classes: %s",
+                         ' '.join(map(str, client_classes)))
+            logging.info("Client's classes sample: %s",
+                         ' '.join(map(str, client_classes_info)))
 
     if is_presented:
         logging.info("Clients' classes sample: {}".format(' '.join(

@@ -91,10 +91,10 @@ class DatasetsTest(unittest.TestCase):
 
         return True
 
-    # def test_f30ke_datasource(self):
-    #     """ Test the flickr30k entities dataset. """
-    #     self.utest_datasource = f30ke_DataSource()
-    #     assert self.assertDataSourceDefinition(self.utest_datasource)
+    def test_f30ke_datasource(self):
+        """ Test the flickr30k entities dataset. """
+        self.utest_datasource = f30ke_DataSource()
+        assert self.assertDataSourceDefinition(self.utest_datasource)
 
     # def test_coco_datasource(self):
     #     """ Test the MSCOCO dataset. """
@@ -125,12 +125,12 @@ class DatasetsTest(unittest.TestCase):
 
     #     assert self.assertDataSourceDefinition(self.utest_datasource)
 
-    def test_gym_datasource(self):
-        """ Test the Gym dataset. """
-        # set the specific
+    # def test_gym_datasource(self):
+    #     """ Test the Gym dataset. """
+    #     # set the specific
 
-        self.utest_datasource = GymDataSource()
-        # assert self.assertDataSourceDefinition(self.utest_datasource)
+    #     self.utest_datasource = GymDataSource()
+    #     assert self.assertDataSourceDefinition(self.utest_datasource)
 
 
 if __name__ == '__main__':
