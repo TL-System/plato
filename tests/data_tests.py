@@ -16,7 +16,7 @@ os.environ['config_file'] = 'tests/TestsConfig/flickr30k_entities.yml'
 # os.environ['config_file'] = 'tests/TestsConfig/gym.yml'
 
 # Note: the plato will search the dir './config' for Pipeline and other configuration files
-#   directly and by default. This is achieved by the code in line 83 of 'config.py'
+#   directly by default. This is achieved by the code in line 83 of 'config.py'
 
 import numpy as np
 import torch
@@ -36,7 +36,7 @@ from sampler_test_utils import define_sampler
 
 
 class DatasetsTest(unittest.TestCase):
-    """ Aiming to test the correcness of implemented samplers """
+    """ Aiming to test the correcness of implemented samplers and datasets """
     def setUp(self):
         super().setUp()
 
@@ -48,7 +48,7 @@ class DatasetsTest(unittest.TestCase):
         clients_id = list(range(self.total_clients))
         self.client_id = np.random.choice(clients_id, 1)[0]
 
-        # self.utest_datasource = data_registry.get(client_id=client_id)
+        # the datasource being tested
         self.utest_datasource = None
 
     def assertDataSourceDefinition(self, data_source):
@@ -58,7 +58,7 @@ class DatasetsTest(unittest.TestCase):
             1.2- The raw data can be downloaded
             1.3- The correct data store structure can be set.
 
-            2.1- The datasource can work with quantity-based samplers
+            2.1- The datasource can work with defined samplers
             2.2- The defined data loader can load correct samples
             2.4- The visualization of samples are correct.
         """
@@ -104,7 +104,7 @@ class DatasetsTest(unittest.TestCase):
     #     # assert self.assertDataSourceDefinition(self.utest_datasource)
 
     # def test_ref_datasource(self):
-    #     """ Test the flickr30k entities dataset. """
+    #     """ Test the ReferItGmae dataset. """
     #     # set the specific
 
     #     self.utest_datasource = refer_Datasource()
