@@ -8,7 +8,6 @@ Multi-modal federated learning involves using several sensory modalities such as
  - ffmpeg
  - av
  - torchvision
- - mmaction2
 
 You can install them using the following commands:
 
@@ -16,6 +15,7 @@ You can install them using the following commands:
 pip install youtube-dl
 pip install ffmpeg
 pip install av
+pip install torchvision
 ```
 
 ### Preparing the Environment
