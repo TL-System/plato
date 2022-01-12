@@ -118,7 +118,7 @@ class Trainer(base.Trainer):
         # Default use Zipf distribution with a parameter of 1.5
         return np.random.zipf(1.5)
 
-    async def _simulate_client_speed(self):
+    def _simulate_client_speed(self):
         """Simulate client's speed by putting it to sleep."""
         if 'client_speed' not in self._simulation_param:
             # Get an expected sleep time
@@ -133,10 +133,10 @@ class Trainer(base.Trainer):
         # Put client to sleep
         logging.info("[Client #%d] Going to sleep for %f seconds.",
                      self.client_id, sleep_seconds)
-        await asyncio.sleep(sleep_seconds)
+        time.sleep(sleep_seconds)
         logging.info("[Client #%d] Woke up.", self.client_id)
 
-    async def train_process(self, config, trainset, sampler, cut_layer=None):
+    def train_process(self, config, trainset, sampler, cut_layer=None):
         """The main training loop in a federated learning workload, run in
           a separate process with a new CUDA context, so that CUDA memory
           can be released after the training completes.
@@ -272,7 +272,7 @@ class Trainer(base.Trainer):
                     if self.client_id != 0 and hasattr(
                             Config().clients,
                             "simulation") and Config().clients.simulation:
-                        await self._simulate_client_speed()
+                        self._simulate_client_speed()
 
         except Exception as training_exception:
             logging.info("Training on client #%d failed.", self.client_id)
@@ -286,13 +286,6 @@ class Trainer(base.Trainer):
 
         if 'use_wandb' in config:
             run.finish()
-
-    def train_proc_wrapper(self, config, trainset, sampler, cut_layer=None):
-        """A wrapper function of train_process() such that this function
-        can be passed as a target process to run for multiprocessing
-        in train().
-        """
-        asyncio.run(self.train_process(config, trainset, sampler, cut_layer))
 
     def train(self, trainset, sampler, cut_layer=None) -> float:
         """The main training loop in a federated learning workload.
@@ -315,7 +308,7 @@ class Trainer(base.Trainer):
             if mp.get_start_method(allow_none=True) != 'spawn':
                 mp.set_start_method('spawn', force=True)
 
-            train_proc = mp.Process(target=self.train_proc_wrapper,
+            train_proc = mp.Process(target=self.train_process,
                                     args=(config, trainset, sampler,
                                           cut_layer))
             train_proc.start()
@@ -338,7 +331,7 @@ class Trainer(base.Trainer):
             self.pause_training()
         else:
             tic = time.perf_counter()
-            self.train_proc_wrapper(config, trainset, sampler, cut_layer)
+            self.train_process(config, trainset, sampler, cut_layer)
             toc = time.perf_counter()
 
         training_time = toc - tic
