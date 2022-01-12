@@ -29,7 +29,8 @@ elif hasattr(Config().trainer, 'use_tensorflow'):
 else:
     from plato.datasources import (mnist, fashion_mnist, cifar10, cinic10,
                                    huggingface, pascal_voc, tiny_imagenet,
-                                   femnist, feature, flickr30k_entities)
+                                   femnist, feature, flickr30k_entities,
+                                   referitgame, coco, kinetics, gym)
 
     registered_datasources = OrderedDict([
         ('MNIST', mnist),
@@ -41,6 +42,10 @@ else:
         ('TinyImageNet', tiny_imagenet),
         ('Feature', feature),
         ('Flickr30KE', flickr30k_entities),
+        ('COCO2017', referitgame),
+        ('COCO', coco),
+        ('kinetics700', kinetics),
+        ('Gym', gym),
     ])
 
     registered_partitioned_datasources = OrderedDict([('FEMNIST', femnist)])
