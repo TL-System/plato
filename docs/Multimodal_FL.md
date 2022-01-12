@@ -21,7 +21,7 @@ pip install torchvision
 ### Preparing the Environment
 
  1. Create a conda virtual environment.
-  `conda create -n MMPlato python=3.7`
+  `conda create -n MMPlato python=3.8`
 
  2. Install PyTorch.
 	`conda install pytorch cudatoolkit=10.1 torchvision -c pytorch`
