@@ -4,20 +4,21 @@
 
 Go to [Google Colaboratory](https://colab.research.google.com/notebooks/intro.ipynb).
 
-Click `File` on the menu (upper left of the page), select `Upload Notebook`, and upload `plato_colab.ipynb`, which is under the `plato/examples/` directory.
+Click `File` on the menu (upper left of the page), select `Upload Notebook`, and upload `plato_colab.ipynb`, which is under the `plato/examples/colab/` directory.
 
 ### Option 2
 
-Click [this link](https://colab.research.google.com/drive/1boDurcQF5X9jq25-DsKDTus3h50NBn8h?usp=sharing).
+Under directory `plato/examples/colab/`, the notebook `colab_use_terminal.ipynb` provides step-by-step instructions on running *Plato* on Google Colaboratory but in a terminal of Visual Studio Code.
+
 
 ## Running Plato on Compute Canada
 
 ### Installation
 
-SSH into a cluster on Compute Canada. Here we take [Béluga](https://docs.computecanada.ca/wiki/Béluga/en) as an example, while [Graham](https://docs.computecanada.ca/wiki/Graham) and [Cedar]((https://docs.computecanada.ca/wiki/Cedar)) are also available. Then clone the *Plato* repository to your own directory:
+SSH into a cluster on Compute Canada. Here we take [Graham](https://docs.computecanada.ca/wiki/Graham) as an example, while [Cedar]((https://docs.computecanada.ca/wiki/Cedar)) and [Narval](https://docs.computecanada.ca/wiki/Narval/en) are also available. Then clone the *Plato* repository to your own directory:
 
 ```shell
-$ ssh <CCDB username>@beluga.computecanada.ca
+$ ssh <CCDB username>@graham.computecanada.ca
 $ cd projects/def-baochun/<CCDB username>
 $ git clone https://github.com/TL-System/plato.git
 ```
@@ -32,13 +33,13 @@ $chmod 777 -R plato/
 
 ### Preparing the Python Runtime Environment
 
-First, you need to load version 3.8 of the Python programming language:
+First, load version 3.9 of the Python programming language:
 
 ```shell
-$ module load python/3.8
+$ module load python/3.9
 ```
 
-Then, you need to create the directory that contains your own Python virtual environment using `virtualenv`:
+Then create the directory that contains your own Python virtual environment using `virtualenv`:
 
 ```shell
 $ virtualenv --no-download ~/.federated
@@ -52,7 +53,7 @@ You can now activate your environment:
 $ source ~/.federated/bin/activate
 ```
 
-Currently there is no feasiable way to install the `datasets` package with `virtualenvs` (Compute Canada asks users to not use Conda.) So we cannot run *Plato* with HuggingFace datasets on Compute Canada right now. If you want to do experiments with HuggingFace datasets, you could do it on Google Colaboratory.
+Currently, there is no feasiable way to install the `datasets` package with `virtualenvs` (Compute Canada asks users to not use Conda.) So we cannot run *Plato* with HuggingFace datasets on Compute Canada right now. If you want to do experiments with HuggingFace datasets, you could do it on Google Colaboratory.
 
 To bypass installing the `datasets` package, please comment out the following 2 lines of code related to `huggingface` in `plato/datasources/huggingface.py`:
 
@@ -77,10 +78,27 @@ def get_requirements():
         return f.read().splitlines()
 ```
 
-The next step is to install the required Python packages. PyTorch should be installed following the advice of its [getting started website](https://pytorch.org/get-started/locally/). Currently Compute Canada provides GPU with CUDA version 11.2, so the command would be:
+As Compute Canada only supports `aiohttp==3.7.4` but not `aiohttp>=3.8`, please modify `plato/servers/base.py`. Change
+
+```
+web.run_app(app,
+            host=Config().server.address,
+            port=port,
+            loop=asyncio.get_event_loop())
+```
+
+to
+
+```
+web.run_app(app,
+            host=Config().server.address,
+            port=port)
+```
+
+The next step is to install the required Python packages. PyTorch should be installed following the advice of its [getting started website](https://pytorch.org/get-started/locally/). As for Jan 2022, Compute Canada provides GPU with CUDA version 11.2, so the command would be:
 
 ```shell
-$ pip3 install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
+$ pip3 install torch==1.10.1+cu113 torchvision==0.11.2+cu113 torchaudio==0.10.1+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
 ```
 
 To double-check the CUDA version used in the command above, start an interactive session and use the following command:
@@ -104,7 +122,7 @@ $ vim ~/.bashrc
 Then add 
 
 ```
-alias plato='cd ~/projects/def-baochun/<CCDB username>/plato/; module load python/3.8; source ~/.federated/bin/activate'
+alias plato='cd ~/projects/def-baochun/<CCDB username>/plato/; module load python/3.9; source ~/.federated/bin/activate'
 ```
 
 After saving this change and exiting `vim`, 
@@ -137,19 +155,19 @@ Then add your configuration parameters in the job script. The following is an ex
 ```
 #!/bin/bash
 #SBATCH --time=20:00:00  # Request a job to be executed for 20 hours
-#SBATCH --gres=gpu:4
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=4
-#SBATCH --mem=191000M
 #SBATCH --nodes=1
+#SBATCH --gres=gpu:2
+#SBATCH --ntasks-per-node=32
+#SBATCH --mem=127000M
 #SBATCH --account=def-baochun
 #SBATCH --output=cifar_wideresnet.out # The name of the output file
-module load python/3.8
+
+module load python/3.9
 source ~/.federated/bin/activate
 ./run --config=configs/CIFAR10/fedavg_wideresnet.yml --log=info
 ```
 
-**Note:** The above example requests a type of GPU on Compute Canada's `Béluga` cluster that requires a very short waiting time (as for July 2021, but things may change.)
+**Note:** The above example requests a type of GPU on Compute Canada's `Graham` cluster that requires a very short waiting time (as for Jan 2022, but it may change.)
 
 You may use any type of [GPUs available on Compute Canada](https://docs.computecanada.ca/wiki/Using_GPUs_with_Slurm).
 
@@ -178,7 +196,7 @@ where `./cifar_wideresnet.out` is the output file that needs to be monitored, an
 If there is a need to start an interactive session (for debugging purposes, for example), it is also supported by Compute Canada using the `salloc` command:
 
 ```shell
-$ salloc --time=0:20:0 --ntasks=1 --cpus-per-task=4 --gres=gpu:4 --account=def-baochun --mem=191000M
+$ salloc --time=2:00:0 --nodes=1 --ntasks-per-node=32 --gres=gpu:2 --mem=127000M --account=def-baochun
 ```
 
 The job will then be queued and waiting for resources:
@@ -198,7 +216,7 @@ salloc: Granted job allocation 53923456
 Then you can run *Plato*:
 
 ```shell
-$ module load python/3.8
+$ module load python/3.9
 $ virtualenv --no-download ~/.federated
 $ ./run --config=configs/CIFAR10/fedavg_wideresnet.yml
 ```
