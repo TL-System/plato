@@ -1,11 +1,11 @@
 """
-Testing datasources of Plato framework.
+Testing multi-modal datasources of Plato framework.
 """
 
 import os
 import unittest
 
-# os.environ['config_file'] = 'tests/TestsConfig/flickr30k_entities.yml'
+os.environ['config_file'] = 'tests/TestsConfig/flickr30k_entities.yml'
 
 # os.environ['config_file'] = 'tests/TestsConfig/coco.yml'
 
@@ -13,7 +13,7 @@ import unittest
 
 # os.environ['config_file'] = 'tests/TestsConfig/kinetics.yml'
 
-os.environ['config_file'] = 'tests/TestsConfig/gym.yml'
+# os.environ['config_file'] = 'tests/TestsConfig/gym.yml'
 
 # Note: the plato will search the dir './config' for Pipeline and other configuration files
 #   directly and by default. This is achieved by the code in line 83 of 'config.py'
@@ -28,7 +28,6 @@ from plato.datasources.referitgame import DataSource as refer_Datasource
 from plato.datasources.coco import DataSource as coco_Datasource
 from plato.datasources.kinetics import DataSource as kinetics_Datasource
 from plato.datasources.gym import DataSource as GymDataSource
-from plato.datasources import registry as data_registry
 from plato.samplers import registry as samplers_registry
 
 from plato.samplers import modality_iid
@@ -76,7 +75,7 @@ class DatasetsTest(unittest.TestCase):
         _ = test_dataset[0]
 
         batch_size = Config().trainer.batch_size
-        # Define the sampler
+        # define the sampler
         defined_sampler = define_sampler(Sampler=samplers_registry,
                                          dataset_source=self.utest_datasource,
                                          client_id=self.client_id,
