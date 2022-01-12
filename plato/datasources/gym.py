@@ -39,12 +39,70 @@ import os
 import torch
 
 from mmaction.tools.data.gym import download as gym_downloader
+from mmaction.datasets import build_dataset
 
 from plato.config import Config
 from plato.datasources.datalib.gym_utils import gym_trim
 from plato.datasources import multimodal_base
 from plato.datasources.datalib import frames_extraction_tools
 from plato.datasources.datalib import audio_extraction_tools
+from plato.datasources.datalib import data_utils
+
+
+class GymDataset(multimodal_base.MultiModalDataset):
+    """ Prepare the Gym dataset."""
+    def __init__(self,
+                 multimodal_data_holder,
+                 phase,
+                 phase_info,
+                 modality_sampler=None):
+        super().__init__()
+        self.phase = phase
+        #  multimodal_data_holder is a dict:
+        #    {"rgb": rgb_dataset, "flow": flow_dataset, "audio": audio_dataset}
+        self.phase_multimodal_data_record = multimodal_data_holder
+
+        # a dict presented as:
+        #   "rgb": <rgb_annotation_file_path>
+        self.phase_info = phase_info
+
+        self.modalities_name = list(multimodal_data_holder.keys())
+
+        self.supported_modalities = ["rgb", "flow", "audio_feature"]
+
+        # default utilizing the full modalities
+        if modality_sampler is None:
+            self.modality_sampler = self.supported_modalities
+        else:
+            self.modality_sampler = modality_sampler
+
+        self.targets = self.get_targets()
+
+    def __len__(self):
+        return len(self.phase_multimodal_data_record)
+
+    def get_targets(self):
+        """ Obtain the labels of samples in current phase dataset.  """
+        # the order of samples in rgb, flow, or audio annotation files
+        #  is maintained the same, thus obtain either one is great.
+        # Normally, rgb and flow belong to the rawframes
+        rawframes_anno_list_file_path = self.phase_info["rgb"]
+        annos_list = data_utils.read_anno_file(rawframes_anno_list_file_path)
+
+        obtained_targets = [anno_item["label"][0] for anno_item in annos_list]
+
+        return obtained_targets
+
+    def get_one_multimodal_sample(self, sample_idx):
+        """ Obtain one sample from the Kinetics dataset. """
+        obtained_mm_sample = dict()
+
+        for modality_name in self.modalities_name:
+
+            modality_dataset = self.phase_multimodal_data_record[modality_name]
+            obtained_mm_sample[modality_name] = modality_dataset[sample_idx]
+
+        return obtained_mm_sample
 
 
 class DataSource(multimodal_base.MultiModalDataSource):
@@ -86,11 +144,14 @@ class DataSource(multimodal_base.MultiModalDataSource):
         self.event_subsection_audios_fea_dir_path = os.path.join(
             base_data_path, "subaction_audios_features")
 
-        anno_url = "https://sdolivia.github.io/FineGym/resources/dataset/finegym_annotation_info_v1.0.json"
+        anno_url = "https://sdolivia.github.io/FineGym/resources/dataset/\
+            finegym_annotation_info_v1.0.json"
 
-        train_url = "https://sdolivia.github.io/FineGym/resources/dataset/gym99_train_element_v1.0.txt"
+        train_url = "https://sdolivia.github.io/FineGym/resources/dataset/\
+            gym99_train_element_v1.0.txt"
 
-        eval_url = "https://sdolivia.github.io/FineGym/resources/dataset/gym99_val_element.txt"
+        eval_url = "https://sdolivia.github.io/FineGym/resources/\
+            dataset/gym99_val_element.txt"
 
         _ = self._download_arrange_data(download_url_address=anno_url,
                                         put_data_dir=self.data_anno_dir_path,
@@ -192,6 +253,70 @@ class DataSource(multimodal_base.MultiModalDataSource):
         gym_trim.generate_splits_list(data_root=self.event_subsection_dir_path,
                                       annotation_root=self.data_anno_dir_path,
                                       frame_data_root=frames_out_dir_path)
+
+    def get_phase_dataset(self, phase, modality_sampler):
+        """ Get the dataset for the specific phase. """
+        rgb_mode_config = getattr(Config().data.multi_modal_configs.rgb, phase)
+        flow_mode_config = getattr(Config().data.multi_modal_configs.flow,
+                                   phase)
+        audio_feature_mode_config = getattr(
+            Config().data.multi_modal_configs.audio_feature, phase)
+
+        rgb_mode_config = self.correct_current_config(
+            loaded_plato_config=rgb_mode_config,
+            mode=phase,
+            modality_name="rgb")
+        flow_mode_config = self.correct_current_config(
+            loaded_plato_config=flow_mode_config,
+            mode=phase,
+            modality_name="flow")
+        audio_feature_mode_config = self.correct_current_config(
+            loaded_plato_config=audio_feature_mode_config,
+            mode=phase,
+            modality_name="audio_feature")
+        # build a RawframeDataset
+        rgb_mode_dataset = build_dataset(rgb_mode_config)
+        flow_mode_dataset = build_dataset(flow_mode_config)
+        audio_feature_mode_dataset = build_dataset(audio_feature_mode_config)
+
+        multi_modal_mode_data = {
+            "rgb": rgb_mode_dataset,
+            "flow": flow_mode_dataset,
+            "audio_feature": audio_feature_mode_dataset
+        }
+
+        multi_modal_mode_info = {
+            "rgb": rgb_mode_config["ann_file"],
+            "flow": flow_mode_config["ann_file"],
+            "audio_feature": audio_feature_mode_config["ann_file"]
+        }
+
+        gym_mode_dataset = GymDataset(
+            multimodal_data_holder=multi_modal_mode_data,
+            phase="train",
+            phase_info=multi_modal_mode_info,
+            modality_sampler=modality_sampler)
+
+        return gym_mode_dataset
+
+    def get_train_set(self, modality_sampler=None):
+        """ Obtain the trainset for multimodal data. """
+        gym_train_dataset = self.get_phase_dataset(
+            phase="train", modality_sampler=modality_sampler)
+
+        return gym_train_dataset
+
+    def get_test_set(self, modality_sampler=None):
+        """ Obtain the testset for multimodal data.
+
+            Note, in the kinetics dataset, there is no testset in which
+             samples contain the groundtruth label.
+             Thus, we utilize the validation set directly.
+        """
+        gym_val_dataset = self.get_phase_dataset(
+            phase="val", modality_sampler=modality_sampler)
+
+        return gym_val_dataset
 
     def get_modality_name(self):
         """ Get all supports modalities """

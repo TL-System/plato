@@ -53,7 +53,6 @@ from collections import defaultdict
 import torch
 
 from mmaction.tools.data.kinetics import download as kinetics_downloader
-
 from mmaction.datasets import build_dataset
 
 from plato.config import Config
@@ -81,7 +80,7 @@ def obtain_required_anno_files(splits_info):
 
 
 class KineticsDataset(multimodal_base.MultiModalDataset):
-    """ Prepare the Flickr30K Entities dataset."""
+    """ Prepare the Kinetics dataset."""
     def __init__(self,
                  multimodal_data_holder,
                  phase,
@@ -300,7 +299,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
             os.path.join(videos_root_dir_path, dir_name)
             for dir_name in new_videos_dirs_name
         ]
-        for i in range(len(videos_dirs_path)):
+        for i, _ in enumerate(videos_dirs_path):
             os.rename(videos_dirs_path[i], new_videos_dirs_path[i])
 
     def get_modality_data_path(self, mode, modality_name):
@@ -457,25 +456,25 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         return loaded_config
 
-    def get_phase_dataset(self, modality_sampler, mode="train"):
+    def get_phase_dataset(self, phase, modality_sampler):
         """ Get the dataset for the specific phase. """
-        rgb_mode_config = getattr(Config().data.multi_modal_configs.rgb, mode)
+        rgb_mode_config = getattr(Config().data.multi_modal_configs.rgb, phase)
         flow_mode_config = getattr(Config().data.multi_modal_configs.flow,
-                                   mode)
+                                   phase)
         audio_feature_mode_config = getattr(
-            Config().data.multi_modal_configs.audio_feature, mode)
+            Config().data.multi_modal_configs.audio_feature, phase)
 
         rgb_mode_config = self.correct_current_config(
             loaded_plato_config=rgb_mode_config,
-            mode=mode,
+            mode=phase,
             modality_name="rgb")
         flow_mode_config = self.correct_current_config(
             loaded_plato_config=flow_mode_config,
-            mode=mode,
+            mode=phase,
             modality_name="flow")
         audio_feature_mode_config = self.correct_current_config(
             loaded_plato_config=audio_feature_mode_config,
-            mode=mode,
+            mode=phase,
             modality_name="audio_feature")
         # build a RawframeDataset
         rgb_mode_dataset = build_dataset(rgb_mode_config)
@@ -504,8 +503,8 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
     def get_train_set(self, modality_sampler=None):
         """ Obtain the trainset for multimodal data. """
-        kinetics_train_dataset = self.get_phase_dataset(modality_sampler,
-                                                        mode="train")
+        kinetics_train_dataset = self.get_phase_dataset(
+            phase="train", modality_sampler=modality_sampler)
 
         return kinetics_train_dataset
 
@@ -516,8 +515,8 @@ class DataSource(multimodal_base.MultiModalDataSource):
              samples contain the groundtruth label.
              Thus, we utilize the validation set directly.
         """
-        kinetics_val_dataset = self.get_phase_dataset(modality_sampler,
-                                                      mode="val")
+        kinetics_val_dataset = self.get_phase_dataset(
+            phase="val", modality_sampler=modality_sampler)
 
         return kinetics_val_dataset
 
@@ -527,7 +526,8 @@ class DataSource(multimodal_base.MultiModalDataSource):
         # obtain the classes from the trainset
         train_anno_list_path = self.rawframes_splits_list_files_into["train"]
         train_anno_list = data_utils.read_anno_file(train_anno_list_path)
-        # [{"frame_dir": "clay_pottery_making/---0dWlqevI_000019_000029", "total_frames": 300, "label": [0]}
+        # [{"frame_dir": "clay_pottery_making/---0dWlqevI_000019_000029",
+        #   "total_frames": 300, "label": [0]}
         for item in train_anno_list:
             textclass = item["frame_dir"].split("/")[0]
             integar_label = item["frame_dir"]["label"][0]

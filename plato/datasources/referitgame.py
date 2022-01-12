@@ -21,7 +21,6 @@ The output sample structure of this data is consistent with that
 """
 
 import logging
-import os
 
 import collections
 
