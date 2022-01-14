@@ -223,7 +223,7 @@ class DeterministicPolicy(nn.Module):
 
 class Policy(object):
     def __init__(self, state_dim, action_space):
-        self.device = Config().device
+        self.device = Config().device()
         self.alpha = Config().algorithm.alpha
         self.automatic_entropy_tuning = Config(
         ).algorithm.automatic_entropy_tuning

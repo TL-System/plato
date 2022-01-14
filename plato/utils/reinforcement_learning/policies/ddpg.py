@@ -83,7 +83,7 @@ class Critic(nn.Module):
 
 class Policy(object):
     def __init__(self, state_dim, action_dim, max_action):
-        self.device = Config().device
+        self.device = Config().device()
         self.actor = Actor(state_dim, action_dim, max_action).to(self.device)
         self.actor_target = Actor(state_dim, action_dim,
                                   max_action).to(self.device)

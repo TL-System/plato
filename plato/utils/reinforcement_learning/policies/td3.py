@@ -42,7 +42,7 @@ class ReplayMemory:
             self.next_state = np.zeros((self.capacity, state_dim))
             self.done = np.zeros((self.capacity, 1))
 
-        self.device = Config().device
+        self.device = Config().device()
 
     def push(self, data):
         self.state[self.ptr] = data[0]
@@ -280,7 +280,7 @@ class Policy(object):
         self.policy_freq = Config().algorithm.policy_freq
         self.lr = Config().algorithm.learning_rate
 
-        self.device = Config().device
+        self.device = Config().device()
         self.on_policy = False
 
         self.actor = Actor(state_dim, action_space.shape[0], self.hidden_size,
