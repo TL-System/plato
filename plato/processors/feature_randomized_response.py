@@ -15,13 +15,14 @@ class Processor(feature.Processor):
     """
     def __init__(self, **kwargs) -> None:
         def func(logits, targets):
+            logits = unary_encoding.encode(logits)
+            
             if Config().algorithm.epsilon is None:
                 return logits, targets
 
             _randomize = getattr(self.trainer, "randomize", None)
             epsilon = Config().algorithm.epsilon
 
-            logits = unary_encoding.encode(logits)
             if callable(_randomize):
                 logits = self.trainer.randomize(logits, targets, epsilon)
             else:
