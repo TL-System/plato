@@ -79,7 +79,7 @@ algorithm:
     min_action: -1
     max_episode: 2000
     steps_per_episode: 20
-    beta: 0.5  # threshold for stdev(pre_acc)
+    beta: 0.005  # threshold for stdev(pre_acc)
     log_interval: 10
     mode: train  # test
     pretrained: false
