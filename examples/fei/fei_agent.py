@@ -121,7 +121,7 @@ class RLAgent(simple_rl_agent.RLAgent):
         """ Get done condition for agent. """
         if Config().algorithm.mode == 'train':
             self.pre_acc.append(self.test_accuracy)
-            if stdev(self.pre_acc) < 0.005:
+            if stdev(self.pre_acc) < Config().algorithm.beta:
                 logging.info("[RL Agent] Episode #%d ended.",
                              self.current_episode)
                 return True

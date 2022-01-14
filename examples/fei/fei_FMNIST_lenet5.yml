@@ -29,7 +29,7 @@ data:
     partition_size: 200
 
     # Whether use varied partition per client or not?
-    varied: false
+    varied: true
 
     # IID or non-IID?
     sampler: noniid
@@ -57,7 +57,7 @@ trainer:
     epochs: 10
 
     # Whether use varied epochs per client or not?
-    varied: false
+    varied: true
 
     batch_size: 32
     optimizer: SGD
@@ -79,6 +79,7 @@ algorithm:
     min_action: -1
     max_episode: 2000
     steps_per_episode: 20
+    beta: 0.5  # threshold for stdev(pre_acc)
     log_interval: 10
     mode: train  # test
     pretrained: false
