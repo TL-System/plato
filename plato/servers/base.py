@@ -379,7 +379,7 @@ class Server:
             else:
                 logging.info(
                     "[Server #%d] No sufficient number of client reports have been received. "
-                    "Nothing to process.")
+                    "Nothing to process.", os.getpid())
 
     async def send_in_chunks(self, data, sid, client_id) -> None:
         """ Sending a bytes object in fixed-sized chunks to the client. """
