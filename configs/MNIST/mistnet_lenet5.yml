@@ -14,9 +14,10 @@ clients:
     # Processors for outbound data payloads
     outbound_processors:
         - feature_randomized_response
-        - feature_quantize
+        # - feature_quantize
         - feature_unbatch
-        # - outbound_feature_ndarrays
+        - outbound_feature_ndarrays
+        - compress
 
 server:
     type: mistnet
@@ -26,8 +27,9 @@ server:
 
     # Processors for inbound data payloads
     inbound_processors:
-        - feature_dequantize
-        # - inbound_feature_tensors
+        - decompress
+        - inbound_feature_tensors
+        # - feature_dequantize
 
 data:
     # The training and testing dataset
