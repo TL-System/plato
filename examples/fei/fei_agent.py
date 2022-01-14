@@ -62,7 +62,7 @@ class RLAgent(simple_rl_agent.RLAgent):
         self.pre_acc = deque(5 * [0], maxlen=5)
 
     # Override RL-related methods of simple RL agent
-    def reset(self):
+    async def reset(self):
         """ Reset RL environment. """
         # Start a new training session
         logging.info("[RL Agent] Reseting RL environment.")
@@ -79,7 +79,7 @@ class RLAgent(simple_rl_agent.RLAgent):
                      self.current_episode)
 
         # Reboot/reconfigure the FL server
-        self.sio.emit('env_reset', {'current_episode': self.current_episode})
+        await self.sio.emit('env_reset', {'current_episode': self.current_episode})
 
     async def prep_action(self):
         """ Get action from RL policy. """

@@ -57,7 +57,7 @@ class RLAgent(base_rl_agent.RLAgent, gym.Env):
 
         return self.next_state, self.reward, self.is_done, info
 
-    def reset(self):
+    async def reset(self):
         """ Reset RL environment. """
         # Start a new training session
         logging.info("[RL Agent] Reseting RL environment.")
@@ -72,7 +72,7 @@ class RLAgent(base_rl_agent.RLAgent, gym.Env):
                      self.current_episode)
 
         # Reboot/reconfigure the FL server
-        self.sio.emit('env_reset', {'current_episode': self.current_episode})
+        await self.sio.emit('env_reset', {'current_episode': self.current_episode})
 
         return
 
@@ -151,7 +151,7 @@ class RLAgent(base_rl_agent.RLAgent, gym.Env):
             if self.current_episode >= Config().algorithm.max_episode:
                 await self.wrap_up()
             else:
-                self.reset()
+                await self.reset()
         elif self.current_step >= Config().algorithm.test_step:
             # Break the loop when RL testing is concluded
             await self.wrap_up()
