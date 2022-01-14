@@ -10,10 +10,12 @@ https://arxiv.org/pdf/2006.12097.pdf
 """
 
 import logging
+from math import fabs
 import os
 import random
 
 import numpy as np
+from numpy.random.mtrand import f
 import torch
 from PIL import Image
 from scipy.ndimage.interpolation import shift
@@ -22,6 +24,7 @@ from torch.nn.functional import softmax
 from torch.utils.data import DataLoader
 
 from plato.config import Config
+from plato.models import de_lenet5_decomposed
 from plato.trainers import basic
 
 
@@ -141,6 +144,8 @@ class Trainer(basic.Trainer):
                             param.requires_grad = False
                         if param.requires_grad and 'psi' in name:
                             param.requires_grad = False
+                        if param.requires_grad and "sigma" in name:
+                            param.requires_grad = True
 
                     print("=========Supervised Training==========")
                     for batch_id, (examples, labels) in enumerate(
@@ -193,23 +198,24 @@ class Trainer(basic.Trainer):
 
                     for batch_id, (examples_unlabeled,
                                    labels) in enumerate(train_loader_u):
-                        #pseduo_labels = self.model(self.loader.scale(examples_unlabeled))
-                        optimizer_u.zero_grad()
-                        """
-                        if cut_layer is None:
-                            outputs_u = self.model(examples)
-                        else:
-                            outputs_u = self.model.forward_from(
-                                examples, cut_layer)
-                        """
-                        loss_u, _confident = self.loss_unsupervised(
-                            examples_unlabeled, loss_criterion_u)
+                        with autograd.detect_anomaly():
+                            #pseduo_labels = self.model(self.loader.scale(examples_unlabeled))
+                            optimizer_u.zero_grad()
+                            """
+                            if cut_layer is None:
+                                outputs_u = self.model(examples)
+                            else:
+                                outputs_u = self.model.forward_from(
+                                    examples, cut_layer)
+                            """
+                            loss_u, _confident = self.loss_unsupervised(
+                                examples_unlabeled, loss_criterion_u)
 
-                        loss_u.backward()
+                            loss_u.backward()
 
-                        optimizer_u.step()
+                            optimizer_u.step()
 
-                        self.confident += _confident
+                            self.confident += _confident
 
                         #if lr_schedule is not None:
                         #    lr_schedule.step()
@@ -277,16 +283,20 @@ class Trainer(basic.Trainer):
 
             y_pred = torch.index_select(y_pred, 0,
                                         torch.from_numpy(_confident))
-            print("trainer.helpers are: ", self.helpers)
-            if self.helpers is not None:
 
-                y_preds = [
-                    rm(samples_confident).numpy()
-                    for rid, rm in enumerate(self.helpers)
-                ]
+            if self.helpers is not None:
+                print("The type of rm is: ", type(self.helpers[0]))
+                y_preds = []
+                rm_model = de_lenet5_decomposed.Model()  #self.model
+                for rm in self.helpers:
+                    rm_model.load_state_dict(rm, strict=True)
+                    rm_pred = pred_prob(rm_model(samples_confident))
+                    y_preds.append(rm_pred)
+
                 #inter-client consistency loss
                 for _, pred in enumerate(y_preds):
-                    loss_u += (nn.functional.kl_div(pred, y_pred) /
+                    loss_u += (nn.functional.kl_div(
+                        pred, y_pred, reduction='batchmean') /
                                len(y_preds)) * self.lambda_i
 
             else:
@@ -347,12 +357,18 @@ class Trainer(basic.Trainer):
                             M=random.randint(2, 5))) for img in images
         ])
 
-    def agreement_based_labeling(self, y_pre, y_preds=None):
+    def agreement_based_labeling(self, y_pre, y_preds_tensor=None):
 
         y_pseudo = y_pre.detach().numpy()  #np.array(y_pre)
+
         num = 10  #self.num_classes
 
-        if y_preds is not None:
+        if y_preds_tensor is not None:
+            y_preds = []
+            for y in y_preds_tensor:
+                y_array = y.detach().numpy()
+                y_preds.append(y_array)
+
             y_vote = np.eye(num)[np.argmax(y_pseudo, axis=1)]
             y_votes = np.sum(
                 [np.eye(num)[np.argmax(y_rm, axis=1)] for y_rm in y_preds],

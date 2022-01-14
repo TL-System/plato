@@ -35,7 +35,7 @@ class Client(simple.Client):
 
     async def train(self):
         """ Fedmatch clients use different number of local epochs. """
-        self.trainer.helper = self.helpers
+        self.trainer.helpers = self.helpers
 
         report, weights = await super().train(
         )  # obtain update from local trainer,
@@ -57,12 +57,4 @@ class Client(simple.Client):
             self.helper_flag = True
         else:
             self.algorithm.load_weights(server_payload[0])
-            self.helpers = server_payload[1:]
-        """
-        if isinstance(server_payload, list):
-            self.algorithm.load_weights(server_payload[0])
-            self.helpers = server_payload[1:]  # download helpers from server
-        else:
-            self.algorithm.load_weights(server_payload)
-            self.helpers = None
-        """
+            self.helpers = server_payload[1]
