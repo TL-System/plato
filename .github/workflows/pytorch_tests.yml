@@ -22,7 +22,7 @@ jobs:
         shell: bash -l {0}
         run: |
           sudo apt-get update
-          sudo apt install -y python3-pip
+          sudo apt install -y python3-pip python3-dev
           pip3 install torch==1.10.0+cpu torchvision==0.11.1+cpu -f https://download.pytorch.org/whl/cpu/torch_stable.html
           pip3 install -r requirements.txt --upgrade
           pip3 install .
