@@ -30,9 +30,9 @@ class RLServerEvents(base.ServerEvents):
         await self.plato_server.register_agent(sid, data['agent'],
                                                data['current_rl_episode'])
 
-    async def on_agent_dead(self, sid, data):
+    def on_agent_dead(self, sid, data):
         """ RL training or playing finished. """
-        await self.plato_server.close()
+        self.plato_server.close()
 
     async def on_env_reset(self, sid, data):
         """ RL Agent arrived or it sends a heartbeat. """

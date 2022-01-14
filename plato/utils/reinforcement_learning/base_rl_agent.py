@@ -26,10 +26,10 @@ class RLAgentEvents(socketio.AsyncClientNamespace):
         logging.info("[RL Agent] Connected to the server.")
 
     # pylint: disable=protected-access
-    async def on_disconnect(self):
+    def on_disconnect(self):
         """ Upon a disconnection event. """
         logging.info("[RL Agent] The server disconnected the connection.")
-        await self.plato_rl_agent.close()
+        self.plato_rl_agent.close()
         os._exit(0)
 
     async def on_connect_error(self, data):
