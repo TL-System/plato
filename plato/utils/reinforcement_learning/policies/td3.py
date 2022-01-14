@@ -125,21 +125,23 @@ class Actor(nn.Module):
         if Config().algorithm.recurrent_actor:
             if hasattr(Config().clients, 'varied') and Config().clients.varied:
                 # Pad the first state to full dims
-                if len(state) != 1:
-                    pilot = state[0]
-                else:
+                if len(state) == 1:
                     pilot = state
+                else:
+                    pilot = state[0]
                 pilot = F.pad(input=pilot,
                               pad=(0, 0, 0, self.action_dim - pilot.shape[-2]),
                               mode='constant',
                               value=0)
-                if len(state) != 1:
-                    state[0] = pilot
-                else:
+                if len(state) == 1:
                     state = pilot
+                else:
+                    state[0] = pilot
                 # Pad variable states
                 # Get the length explicitly for later packing sequences
                 lens = list(map(len, state))
+                if len(state) == 1:
+                    state = [torch.squeeze(state)]
                 # Pad and pack
                 padded = pad_sequence(state, batch_first=True)
                 state = pack_padded_sequence(padded,
@@ -187,21 +189,23 @@ class Critic(nn.Module):
         if Config().algorithm.recurrent_actor and hasattr(
                 Config().clients, 'varied') and Config().clients.varied:
             # Pad the first state to full dims
-            if len(state) != 1:
-                pilot = state[0]
-            else:
+            if len(state) == 1:
                 pilot = state
-            pilot = F.pad(input=pilot,
-                          pad=(0, 0, 0, self.action_dim - pilot.shape[-2]),
-                          mode='constant',
-                          value=0)
-            if len(state) != 1:
-                state[0] = pilot
             else:
+                pilot = state[0]
+            pilot = F.pad(input=pilot,
+                            pad=(0, 0, 0, self.action_dim - pilot.shape[-2]),
+                            mode='constant',
+                            value=0)
+            if len(state) == 1:
                 state = pilot
+            else:
+                state[0] = pilot
             # Pad variable states
             # Get the length explicitly for later packing sequences
             lens = list(map(len, state))
+            if len(state) == 1:
+                state = [torch.squeeze(state)]
             # Pad and pack
             padded = pad_sequence(state, batch_first=True)
             state = padded
