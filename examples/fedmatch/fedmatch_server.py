@@ -9,6 +9,7 @@ disjoint learning", in the Proceedings of ICLR 2021.
 https://arxiv.org/pdf/2006.12097.pdf
 """
 import numpy as np
+from scipy.stats.stats import mode
 from plato.servers import fedavg
 from scipy import spatial
 from scipy.stats import truncnorm
@@ -37,6 +38,7 @@ class Server(fedavg.Server):
         """Aggregate weight updates from the clients using FedMatch."""
         # sigmas and psis received from clients
         models_received = [payload for (__, payload) in updates]
+
         # clients' ids received
         client_ids = [report.client_id for (report, __) in updates]
         # compute similarity for clients
