@@ -251,8 +251,14 @@ class Client:
                     data_size += sys.getsizeof(_data)
                     # print(data[0].dtype, data[1].dtype)
                     # print(data[0].shape, data[0].dtype, sys.getsizeof(data[0].storage()))
-                    original_data_size += sys.getsizeof(data[0].storage())
-                    original_data_size += sys.getsizeof(data[1].storage())
+                    # original_data_size += sys.getsizeof(data[0].storage())
+                    # original_data_size += sys.getsizeof(data[1].storage())
+                    original_data_size += sys.getsizeof(data[0])
+                    # original_data_size += sys.getsizeof(data[1])
+                    # if len(data) > 2:
+                    #     original_data_size += sys.getsizeof(data[2])
+                    #     original_data_size += sys.getsizeof(data[3])
+                    # print(sys.getsizeof(data[0]))
                     # original_data_size += data[0].nbytes
                     # original_data_size += data[1].nbytes
             else:

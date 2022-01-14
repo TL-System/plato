@@ -17,7 +17,7 @@ clients:
         # - feature_quantize
         - feature_unbatch
         - outbound_feature_ndarrays
-        - data_compress
+        - compress
 
 server:
     type: mistnet
@@ -27,7 +27,7 @@ server:
 
     # Processors for inbound data payloads
     inbound_processors:
-        - data_decompress
+        - decompress
         - inbound_feature_tensors
         # - feature_dequantize
 
