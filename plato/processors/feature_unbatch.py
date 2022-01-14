@@ -25,7 +25,7 @@ class Processor(base.Processor):
 
         for logits, targets in data:
             for i in np.arange(logits.shape[0]):  # each sample in the batch
-                feature_dataset.append((logits[i], targets[i]))
+                feature_dataset.append((logits[i].clone(), targets[i].clone()))
 
         logging.info("[Client #%d] Features extracted from %s examples.",
                      self.client_id, len(feature_dataset))
