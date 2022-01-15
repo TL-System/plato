@@ -268,9 +268,6 @@ class Trainer(basic.Trainer):
         _confident = np.where(
             np.max(y_pred.detach().numpy(), axis=1) >= self.confident)[0]
 
-        if len(_confident):
-            print("_condfident is : ", _confident)
-
         if len(_confident) > 0:
             # Inter-client consistency
             samples_confident = unlabled_samples[
@@ -294,6 +291,7 @@ class Trainer(basic.Trainer):
                     loss_u += (nn.functional.kl_div(
                         pred, y_pred, reduction='batchmean') /
                                len(y_preds)) * self.lambda_i
+                print("Loss after inter-client consistency is: ", loss_u)
 
             else:
                 y_preds = None
@@ -314,7 +312,7 @@ class Trainer(basic.Trainer):
             y_pseu = torch.from_numpy(
                 self.agreement_based_labeling(y_pred, y_preds))
             loss_u += loss_criterion_u(y_pseu, y_hard) * self.lambda_a
-
+            print("loss after agreement_based labelng is: ", loss_u)
         # Regularization
         self.psi = self.model.get_psi()
         self.sigma = self.model.get_sigma()
