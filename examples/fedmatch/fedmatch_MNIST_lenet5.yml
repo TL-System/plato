@@ -1,9 +1,9 @@
 clients:
     # The total number of clients
-    total_clients: 2
+    total_clients: 5
 
     # The number of clients selected in each round
-    per_round: 2
+    per_round: 5
 
     # Should the clients compute test accuracy locally?
     do_test: true
@@ -26,7 +26,7 @@ data:
     sampler: iid
 
     # ratio of labeled training data (for supervised learning)to unsupervised training data
-    ratio_s2u: 5
+    ratio_s2u: 1
 
     # semi_supervised_learning?
     semi_supervised_learning: true
@@ -45,10 +45,10 @@ trainer:
     max_concurrency: 3
 
     # The target accuracy
-    target_accuracy: 0.98
+    target_accuracy: 0.999
 
     # Number of epoches for local training in each communication round
-    epochs: 5
+    epochs: 1
     batch_size: 32
     optimizer: SGD
     learning_rate: 0.01
