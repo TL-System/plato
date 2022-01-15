@@ -114,14 +114,14 @@ class RLAgent(simple_rl_agent.RLAgent):
         # reward for average accuracy in the last a few time steps
         if self.is_done:
             avg_accuracy = mean(self.pre_acc)
-            reward += math.log(avg_accuracy / (1 - avg_accuracy)) * 20
+            reward += math.log(avg_accuracy / (1 - avg_accuracy)) * Config().algorithm.beta
         return reward
 
     def get_done(self):
         """ Get done condition for agent. """
         if Config().algorithm.mode == 'train':
             self.pre_acc.append(self.test_accuracy)
-            if stdev(self.pre_acc) < Config().algorithm.beta:
+            if stdev(self.pre_acc) < Config().algorithm.theta:
                 logging.info("[RL Agent] Episode #%d ended.",
                              self.current_episode)
                 return True
