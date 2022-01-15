@@ -120,8 +120,8 @@ class Trainer(base.Trainer):
 
     def _simulate_client_speed(self):
         """Simulate client's speed by putting it to sleep."""
-        np.random.seed(self.client_id)  # Reset the seed
         if 'client_speed' not in self._simulation_param:
+            np.random.seed(self.client_id)  # Reset the seed
             # Get an expected sleep time
             self._simulation_param[
                 'client_speed'] = Trainer._simulate_sleep_time()
