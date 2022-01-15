@@ -36,16 +36,15 @@ class Trainer(basic.Trainer):
         model: The model to train.
         client_id: The ID of the client using this trainer (optional).
         """
-        # variables to be added when used
+
         super().__init__(model)
-        self.confident = 0.75  #0.75
+        self.confident = 0.75
         self.lambda_s = 10  # supervised learning
         self.lambda_a = 1e-2  # agreement-based pseudo labeling
         self.lambda_i = 1e-2  # inter-client consistency
         self.lambda_l1 = 1e-4
         self.lambda_l2 = 10
         self.helpers = None
-        #self.kl_divergence = nn.functional.kl_div()
 
     def train_process(self, config, trainset, sampler, cut_layer=None):
         """The main training loop in a federated learning workload, run in
@@ -65,12 +64,11 @@ class Trainer(basic.Trainer):
             if callable(custom_train):
                 self.train_model(config, trainset, sampler.get(), cut_layer)
             else:
-                log_interval = 10
+                log_interval = 200
                 batch_size = config['batch_size']
 
                 logging.info("[Client #%d] Loading the dataset.",
                              self.client_id)
-                #_train_loader = getattr(self, "train_loader", None)
                 """obtain labeled and unlabeled dataset"""
 
                 trainset_s, trainset_u = torch.utils.data.random_split(
@@ -87,7 +85,7 @@ class Trainer(basic.Trainer):
 
                 #iterations_per_epoch = np.ceil(len(trainset_s) /
                 #                               batch_size).astype(int)
-                # variable iterations_per_epoch is computed for lr_scheduler;
+
                 epochs = config['epochs']
 
                 # Sending the model to the device used for training
@@ -113,12 +111,10 @@ class Trainer(basic.Trainer):
                 #                        optimizers.get_optimizer)
 
                 optimizer_s = optim.SGD(
-                    #[list(self.model.parameters())[2]],  # 3 is sigma
                     self.model.parameters(),
                     lr=Config().trainer.learning_rate,
                     momentum=Config().trainer.momentum,
-                    weight_decay=Config().trainer.weight_decay
-                )  #get_optimizer(self.model.psis)
+                    weight_decay=Config().trainer.weight_decay)
 
                 optimizer_u = optim.SGD(
                     self.model.parameters(),  #4 is psi
@@ -279,16 +275,16 @@ class Trainer(basic.Trainer):
             # Inter-client consistency
             samples_confident = unlabled_samples[
                 _confident]  #self.scale(unlabled_samples[_confident])
-            #y_pred = torch.gather(y_pred, 1, _confident)
 
             y_pred = torch.index_select(y_pred, 0,
                                         torch.from_numpy(_confident))
 
             if self.helpers is not None:
-                print("The type of rm is: ", type(self.helpers[0]))
+
                 y_preds = []
-                rm_model = de_lenet5_decomposed.Model()  #self.model
+
                 for rm in self.helpers:
+                    rm_model = de_lenet5_decomposed.Model()
                     rm_model.load_state_dict(rm, strict=True)
                     rm_pred = pred_prob(rm_model(samples_confident))
                     y_preds.append(rm_pred)
@@ -375,7 +371,5 @@ class Trainer(basic.Trainer):
                 axis=0)
             y_vote = np.sum([y_vote, y_votes], axis=0)
             y_pseudo = np.eye(num)[np.argmax(y_vote, axis=1)]
-        #else:
-        #np.eye(num)[np.argmax(y_pseudo, axis=1)]
 
         return y_pseudo

@@ -37,15 +37,7 @@ class Client(simple.Client):
         """ Fedmatch clients use different number of local epochs. """
         self.trainer.helpers = self.helpers
 
-        report, weights = await super().train(
-        )  # obtain update from local trainer,
-        # loss in the trainer should be changed due to semi-supervised learning property
-
-        # compute for mean, and variance that should be sent to server for further clustering
-        #mean =
-        #variance =
-
-        # send them back to server
+        report, weights = await super().train()
         return Report(report.num_samples, report.accuracy,
                       report.training_time, report.data_loading_time,
                       self.client_id), weights
