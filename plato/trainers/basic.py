@@ -55,8 +55,10 @@ class Trainer(base.Trainer):
 
             self.model = GradSampleModule(self.model)
 
-        # Store parameters used for client simulation
-        self._simulation_param = mp.Manager().dict()
+        if hasattr(Config().clients,
+                   "simulation") and Config().clients.simulation:
+            # Store parameters used for client simulation
+            self._simulation_param = mp.Manager().dict()
 
     def zeros(self, shape):
         """Returns a PyTorch zero tensor with the given shape."""
