@@ -21,8 +21,8 @@ class Server(fedavg.Server):
     """A federated learning server using the FedMatch algorithm."""
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
-        self.num_helpers = 1
-        self.helper = [False, False]
+        self.num_helpers = 4
+        self.helper = [False] * (self.num_helpers + 1)
         mu, std, lower, upper = 125, 125, 0, 255
         self.gauss_samples = (truncnorm(
             (lower - mu) / std, (upper - mu) / std, loc=mu, scale=std).rvs(
@@ -80,16 +80,6 @@ class Server(fedavg.Server):
 
         self.tree = spatial.KDTree(out_list)
 
-        #self.tree = spatial.KDTree(np.array(list(self.models_dict.values())))
-        """
-        for cid, update in enumerate(updates_all):
-            for model_weight in update:
-                self.cid_to_vectors[cid] = np.squeeze(rmodel(self.rgauss))  #
-        self.vid_to_cid = list(self.cid_to_vectors.keys())
-        self.vectors = list(self.cid_to_vectors.values())
-        self.tree = spatial.KDTree(self.vectors)
-        """
-
     def find_helpers(self, client_id, models_received):
         print("The coming clients are: ", client_id)
 
@@ -98,33 +88,13 @@ class Server(fedavg.Server):
             distances, similiar_model_ids = self.tree.query(
                 self.models_dict[id].detach().numpy(), self.num_helpers + 1)
             similiar_model_ids = similiar_model_ids + 1
-            print("Current id is: ", id)
+            #print("Current id is: ", id)
 
             sim_ids = similiar_model_ids.tolist()
             sim_ids.remove(id)
-            print("Sim_ids is : ", sim_ids)
+            #print("Sim_ids is : ", sim_ids)
             weights = []
             for sim_id in sim_ids:
-                print("Sim_id is:", sim_id)
-                print("Client_id.index is: ", client_id.index(sim_id))
                 weights.append(models_received[client_id.index(sim_id)])
             helper_dict[id] = weights
         return helper_dict
-        """
-
-        cout = self.cid_to_vectors[client_id]
-        sims = self.tree.query(cout, self.args.num_helpers + 1)
-        hids = []
-        weights = []
-        for vid in sims[1]:
-            selected_cid = self.vid_to_cid[vid]
-            if selected_cid == cid:
-                continue
-            w = self.cid_to_weights[selected_cid]
-            if self.args.scenario == 'labels-at-client':
-                half = len(w) // 2
-                w = w[half:]
-            weights.append(w)
-            hids.append(selected_cid)
-        return weights[:self.num_helpers]
-        """
