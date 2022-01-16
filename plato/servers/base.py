@@ -546,6 +546,34 @@ class Server:
         # selected clients
         if asynchronous_mode and simulate_wall_time and len(
                 self.current_reporting_clients) >= len(self.selected_clients):
+            # Sanity checks to see if there are any stale clients; if so, send them
+            # an urgent request for model updates at the current simulated wall clock time
+            staleness = 0
+            if hasattr(Config().server, 'staleness'):
+                staleness = Config().server.staleness
+
+            if hasattr(Config().server,
+                       'request_update') and Config().server.request_update:
+                request_sent = False
+                for client_info in self.reporting_clients:
+                    if client_info[2] < self.current_round - staleness:
+                        client_id = client_info[1]
+                        sid = self.clients[client_id]['sid']
+
+                        # Sending the server response as metadata to the clients (payload to follow)
+                        await self.sio.emit('request_update',
+                                            {'time': self.wall_time},
+                                            room=sid)
+                        request_sent = True
+
+                        # Remove the client information from the list of reporting clients since
+                        # this client will report again soon with another model update upon receiving
+                        # the request from the server
+                        self.reporting_clients.remove(client_info)
+
+                if request_sent:
+                    return
+
             for __ in range(0, minimum_clients):
                 # Extract a client with the earliest finish time in wall clock time
                 client_info = heapq.heappop(self.reporting_clients)
@@ -564,10 +592,6 @@ class Server:
             # Is there any reporting clients who are currently training on models that are too
             # `stale,` as defined by the staleness threshold? If so, we need to advance the wall
             # clock time until no stale clients exist in the future
-            staleness = 0
-            if hasattr(Config().server, 'staleness'):
-                staleness = Config().server.staleness
-
             for __ in range(0, len(self.reporting_clients)):
                 # Extract a client with the earliest finish time in wall clock time
                 client_info = heapq.heappop(self.reporting_clients)

@@ -24,7 +24,6 @@ class Report(base.Report):
 
 class Client(base.Client):
     """A basic federated learning client who sends simple weight updates."""
-
     def __init__(self,
                  model=None,
                  datasource=None,
@@ -42,6 +41,8 @@ class Client(base.Client):
 
         self.data_loading_time = None
         self.data_loading_time_sent = False
+
+        self.report = None
 
     def __repr__(self):
         return 'Client #{}.'.format(self.client_id)
@@ -135,5 +136,12 @@ class Client(base.Client):
             data_loading_time = self.data_loading_time
             self.data_loading_time_sent = True
 
-        return Report(self.sampler.trainset_size(), accuracy, training_time,
-                      data_loading_time), weights
+        self.report = Report(self.sampler.trainset_size(), accuracy,
+                             training_time, data_loading_time)
+        return self.report, weights
+
+    def obtain_model_update(self, wall_time):
+        """Retrieving a model update corrsponding to a particular wall clock time."""
+        model = self.trainer.obtain_model_update(wall_time)
+        weights = self.algorithm.extract_weights(model)
+        return self.report, weights

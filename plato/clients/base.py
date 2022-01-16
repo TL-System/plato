@@ -52,6 +52,10 @@ class ClientEvents(socketio.AsyncClientNamespace):
         """ New payload is about to arrive from the server. """
         await self.plato_client.payload_to_arrive(data['response'])
 
+    async def on_request_update(self, data):
+        """ The server is requesting an urgent model update. """
+        await self.plato_client.request_update(data)
+
     async def on_chunk(self, data):
         """ A chunk of data from the server arrived. """
         await self.plato_client.chunk_arrived(data['data'])
@@ -157,6 +161,20 @@ class Client:
     async def chunk_arrived(self, data) -> None:
         """ Upon receiving a chunk of data from the server. """
         self.chunks.append(data)
+
+    async def request_update(self, data) -> None:
+        """ Upon receiving a request for an urgent model update. """
+        logging.info(
+            "Urgent message received at client #%s for wall clock time %s",
+            self.client_id, data['time'])
+
+        report, payload = self.obtain_model_update(data['time'])
+
+        # Sending the client report as metadata to the server (payload to follow)
+        await self.sio.emit('client_report', {'report': pickle.dumps(report)})
+
+        # Sending the client training payload to the server
+        await self.send(payload)
 
     async def payload_arrived(self, client_id) -> None:
         """ Upon receiving a portion of the new payload from the server. """
@@ -278,3 +296,7 @@ class Client:
     @abstractmethod
     async def train(self):
         """The machine learning training workload on a client."""
+
+    @abstractmethod
+    async def obtain_model_update(self, wall_time):
+        """Retrieving a model update corrsponding to a particular wall clock time."""

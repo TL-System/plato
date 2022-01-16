@@ -2,6 +2,7 @@
 The training and testing loops for PyTorch.
 """
 import asyncio
+import copy
 import logging
 import multiprocessing as mp
 import os
@@ -13,7 +14,6 @@ import torch.nn as nn
 from opacus import GradSampleModule
 from opacus.privacy_engine import PrivacyEngine
 from opacus.validators import ModuleValidator
-
 from plato.config import Config
 from plato.models import registry as models_registry
 from plato.trainers import base
@@ -30,6 +30,9 @@ class Trainer(base.Trainer):
         client_id: The ID of the client using this trainer (optional).
         """
         super().__init__()
+
+        self.tic = 0
+        self.models_per_epoch = []
 
         if model is None:
             model = models_registry.get()
@@ -276,6 +279,13 @@ class Trainer(base.Trainer):
                             ).clients.speed_simulation:
                         self._simulate_client_speed()
 
+                    self.models_per_epoch.append({
+                        'time':
+                        time.perf_counter() - self.tic,
+                        'model':
+                        copy.deepcopy(self.model.cpu())
+                    })
+
         except Exception as training_exception:
             logging.info("Training on client #%d failed.", self.client_id)
             raise training_exception
@@ -312,7 +322,7 @@ class Trainer(base.Trainer):
 
         if 'max_concurrency' in config:
             self.start_training()
-            tic = time.perf_counter()
+            self.tic = time.perf_counter()
 
             if mp.get_start_method(allow_none=True) != 'spawn':
                 mp.set_start_method('spawn', force=True)
@@ -336,14 +346,14 @@ class Trainer(base.Trainer):
                 raise ValueError(
                     f"Training on client {self.client_id} failed.") from error
 
-            toc = time.perf_counter()
+            self.toc = time.perf_counter()
             self.pause_training()
         else:
-            tic = time.perf_counter()
+            self.tic = time.perf_counter()
             self.train_process(config, trainset, sampler, cut_layer)
-            toc = time.perf_counter()
+            self.toc = time.perf_counter()
 
-        training_time = toc - tic
+        training_time = self.toc - self.tic
 
         return training_time
 
@@ -497,3 +507,12 @@ class Trainer(base.Trainer):
                 await asyncio.sleep(0)
 
         return correct / total
+
+    def obtain_model_update(self, wall_time):
+        """ 
+            Obtain a saved model for a particular epoch that finishes just after the provided
+            wall clock time elapsed.
+        """
+        for epoch in self.models_per_epoch:
+            if epoch['time'] + self.tic > wall_time:
+                return epoch['model']
