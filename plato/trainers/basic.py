@@ -22,7 +22,6 @@ from plato.utils import optimizers
 
 class Trainer(base.Trainer):
     """A basic federated learning trainer, used by both the client and the server."""
-
     def __init__(self, model=None):
         """Initializing the trainer with the provided model.
 
@@ -58,7 +57,7 @@ class Trainer(base.Trainer):
         if hasattr(Config().clients,
                    "simulation") and Config().clients.simulation:
             # Simulated speed of client
-            self._client_speed = None
+            self._sleep_time = None
 
     def zeros(self, shape):
         """Returns a PyTorch zero tensor with the given shape."""
@@ -110,6 +109,7 @@ class Trainer(base.Trainer):
     def _simulate_sleep_time(self) -> float:
         """Simulate and return a sleep time (in seconds) for the client."""
         np.random.seed(self.client_id)
+
         if hasattr(Config().clients, "simulation_distribution"):
             dist = Config.clients.simulation_distribution
             # Determine the distribution of client's simulate sleep time
@@ -117,19 +117,22 @@ class Trainer(base.Trainer):
                 return np.random.normal(dist.mean, dist.sd)
             if dist.distribution.lower() == "zipf":
                 return np.random.zipf(dist.s)
+
         # Default use Zipf distribution with a parameter of 1.5
         return np.random.zipf(1.5)
 
     def _simulate_client_speed(self):
         """Simulate client's speed by putting it to sleep."""
-        sleep_time = self._client_speed
+        sleep_time = self._sleep_time
+
         # Introduce some randomness to the sleep time
         np.random.seed()  # Set seed to system clock to allow randomness
         deviation = 0.05
         sleep_seconds = np.random.uniform(sleep_time * (1 - deviation),
                                           sleep_time * (1 + deviation))
         sleep_seconds = max(sleep_seconds, 0)
-        # Put client to sleep
+
+        # Put this client to sleep
         logging.info("[Client #%d] Going to sleep for %f seconds.",
                      self.client_id, sleep_seconds)
         time.sleep(sleep_seconds)
@@ -304,8 +307,8 @@ class Trainer(base.Trainer):
         if self.client_id != 0 and hasattr(
                 Config().clients,
                 "simulation") and Config().clients.simulation:
-            if self._client_speed is None:
-                self._client_speed = self._simulate_sleep_time()
+            if self._sleep_time is None:
+                self._sleep_time = self._simulate_sleep_time()
 
         if 'max_concurrency' in config:
             self.start_training()
