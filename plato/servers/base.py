@@ -261,9 +261,13 @@ class Server:
 
         # In asychronous FL, avoid selecting new clients to replace those that are still
         # training at this time
+
+        # When simulating the wall clock time, if len(self.reporting_clients) is 0, the
+        # server has aggregated all reporting clients already
         if hasattr(Config().server, 'synchronous') and not Config(
         ).server.synchronous and self.selected_clients is not None and len(
-                self.reporting_clients) < self.clients_per_round:
+                self.reporting_clients) > 0 and len(
+                    self.reporting_clients) < self.clients_per_round:
             # If self.selected_clients is None, it implies that it is the first iteration;
             # If len(self.reporting_clients) == self.clients_per_round, it implies that
             # all selected clients have already reported.
@@ -274,6 +278,10 @@ class Server:
                 self.training_clients[client_id]['id']
                 for client_id in list(self.training_clients.keys())
             ]
+
+            # If the server is simulating the wall clock time, some of the clients who
+            # reported may not have been aggregated; they should be excluded from the next
+            # round of client selection
             reporting_client_ids = [
                 client[1] for client in self.reporting_clients
             ]
@@ -367,9 +375,15 @@ class Server:
         if callable(_task):
             await self.customize_periodic_task()
 
+        if hasattr(
+                Config().server,
+                'simulate_wall_time') and Config().server.simulate_wall_time:
+            simulate_wall_time = True
+
         # If we are operating in asynchronous mode, aggregate the model updates received so far.
-        if hasattr(Config().server,
-                   'synchronous') and not Config().server.synchronous:
+        if not simulate_wall_time and hasattr(
+                Config().server,
+                'synchronous') and not Config().server.synchronous:
 
             # What is the minimum number of clients that must have reported before aggregation
             # takes place?
@@ -397,11 +411,7 @@ class Server:
 
                     return
 
-            if hasattr(Config().server, 'simulate_wall_time') and Config(
-            ).server.simulate_wall_time:
-                simulate_wall_time = True
-
-            if not simulate_wall_time and len(self.updates) >= minimum_clients:
+            if len(self.updates) >= minimum_clients:
                 logging.info(
                     "[Server #%d] %d client reports received in asynchronous mode. Processing.",
                     os.getpid(), len(self.updates))
@@ -530,9 +540,6 @@ class Server:
         if hasattr(Config().server, 'minimum_clients_aggregated'):
             minimum_clients = Config().server.minimum_clients_aggregated
 
-        for i in self.reporting_clients:
-            print(i[0], i[1], i[2], i[3])
-
         # In asynchronous mode with simulated wall clock time, we need to extract
         # the minimum number of clients from the list of all reporting clients, and then
         # proceed with report processing and replace these clients with a new set of
@@ -547,8 +554,37 @@ class Server:
 
                 # Add the report and payload of the extracted reporting client into updates
                 self.updates.append((client_info[3], client_info[4]))
-                print("client ID = ", client_info[1])
-                print(client_info[3])
+
+            # If there are more clients in the list of reporting clients that violate the
+            # staleness bound, the server needs to wait for these clients even when the minimum
+            # number of clients has been reached, by simply advancing its simulated wall clock
+            # time ahead to include the remaining clients, until no stale clients exist
+            possibly_stale_clients = []
+
+            # Is there any reporting clients who are currently training on models that are too
+            # `stale,` as defined by the staleness threshold? If so, we need to advance the wall
+            # clock time until no stale clients exist in the future
+            staleness = 0
+            if hasattr(Config().server, 'staleness'):
+                staleness = Config().server.staleness
+
+            for __ in range(0, len(self.reporting_clients)):
+                # Extract a client with the earliest finish time in wall clock time
+                client_info = heapq.heappop(self.reporting_clients)
+                heapq.heappush(possibly_stale_clients, client_info)
+
+                if client_info[2] < self.current_round - staleness:
+                    for __ in range(0, len(possibly_stale_clients)):
+                        stale_client_info = heapq.heappop(
+                            possibly_stale_clients)
+                        # Update the simulated wall clock time to be the finish time of this client
+                        self.wall_time = stale_client_info[0]
+
+                        # Add the report and payload of the extracted reporting client into updates
+                        self.updates.append(
+                            (stale_client_info[3], stale_client_info[4]))
+
+            self.reporting_clients = possibly_stale_clients
 
             await self.process_reports()
             await self.wrap_up()

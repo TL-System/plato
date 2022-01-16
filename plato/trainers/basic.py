@@ -55,7 +55,7 @@ class Trainer(base.Trainer):
             self.model = GradSampleModule(self.model)
 
         if hasattr(Config().clients,
-                   "simulation") and Config().clients.simulation:
+                   "speed_simulation") and Config().clients.speed_simulation:
             # Simulated speed of client
             self._sleep_time = None
 
@@ -116,10 +116,10 @@ class Trainer(base.Trainer):
             if dist.distribution.lower() == "normal":
                 return np.random.normal(dist.mean, dist.sd)
             if dist.distribution.lower() == "zipf":
-                return np.random.zipf(dist.s)
+                return min(np.random.zipf(dist.s), 50)
 
         # Default use Zipf distribution with a parameter of 1.5
-        return np.random.zipf(1.5)
+        return min(np.random.zipf(1.5), 50)
 
     def _simulate_client_speed(self):
         """Simulate client's speed by putting it to sleep."""
@@ -272,8 +272,8 @@ class Trainer(base.Trainer):
 
                     # Simulate client's speed
                     if self.client_id != 0 and hasattr(
-                            Config().clients,
-                            "simulation") and Config().clients.simulation:
+                            Config().clients, "speed_simulation") and Config(
+                            ).clients.speed_simulation:
                         self._simulate_client_speed()
 
         except Exception as training_exception:
@@ -306,7 +306,7 @@ class Trainer(base.Trainer):
         # Generate a simulated client's speed
         if self.client_id != 0 and hasattr(
                 Config().clients,
-                "simulation") and Config().clients.simulation:
+                "speed_simulation") and Config().clients.speed_simulation:
             if self._sleep_time is None:
                 self._sleep_time = self._simulate_sleep_time()
 

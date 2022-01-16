@@ -12,7 +12,13 @@ clients:
     do_test: false
 
     # Whether simulate clients or not
-    simulation: false
+    simulation: false 
+    speed_simulation: true 
+
+    # The simulation distribution
+    simulation_distribution:
+        distribution: zipf 
+        s: 1.5 
 
     # Processors for outbound data payloads
     outbound_processors:
@@ -24,6 +30,7 @@ server:
     synchronous: false
     simulate_wall_time: true
     minimum_clients_aggregated: 2
+    staleness: 0
 
 data:
     # The training and testing dataset
@@ -61,7 +68,7 @@ trainer:
     max_concurrency: 1
 
     # The target accuracy
-    target_accuracy: 0.98
+    target_accuracy: 0.99
 
     # Number of epoches for local training in each communication round
     epochs: 1 
