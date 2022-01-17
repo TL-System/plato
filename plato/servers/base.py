@@ -512,6 +512,7 @@ class Server:
             "[Server #%d] Received %s MB of payload data from client #%d.",
             os.getpid(), round(payload_size / 1024**2, 2), client_id)
 
+        # Pass through the inbound_processor(s), if any
         self.client_payload[sid] = self.inbound_processor.process(
             self.client_payload[sid])
 
@@ -521,16 +522,32 @@ class Server:
 
         client_info = (
             finish_time,  # sorted by the client's finish time
-            client_id,
-            starting_round,
-            start_time,
-            self.reports[sid],
-            self.client_payload[sid],
-        )
+            {
+                'client_id': client_id,
+                'starting_round': starting_round,
+                'start_time': start_time,
+                'report': self.reports[sid],
+                'payload': self.client_payload[sid],
+            })
+        print(finish_time)
+
+        for client in self.reporting_clients:
+            print(client[0])
+            print(client[1]['client_id'])
+
         heapq.heappush(self.reporting_clients, client_info)
         self.current_reporting_clients.append(client_info)
         del self.training_clients[client_id]
 
+        await self.process_clients(sid, client_id)
+
+    async def process_clients(self, sid, client_id):
+        """ Determine whether it is time to process the client reports and
+            proceed with the aggregation process.
+
+            When in asynchronous mode, additional processing is needed to simulate
+            the wall clock time.
+        """
         asynchronous_mode = hasattr(
             Config().server, "synchronous") and not Config().server.synchronous
         simulate_wall_time = hasattr(
@@ -556,13 +573,9 @@ class Server:
                        'request_update') and Config().server.request_update:
                 request_sent = False
                 for client_info in self.reporting_clients:
-                    if client_info[
-                            2] < self.current_round - staleness and not client_info[
-                                4].update_response:
-                        client_id = client_info[1]
-                        starting_round = client_info[2]
-                        start_time = client_info[3]
-                        sid = self.clients[client_id]['sid']
+                    if client_info[1][
+                            'starting_round'] < self.current_round - staleness and not client_info[
+                                1]['report'].update_response:
 
                         # Sending an urgent request to the client for a model update at the
                         # currently simulated wall clock time
@@ -571,9 +584,9 @@ class Server:
                             os.getpid(), client_id)
 
                         self.training_clients[client_id] = {
-                            'id': client_id,
-                            'starting_round': starting_round,
-                            'start_time': start_time
+                            'id': client_info[1]['client_id'],
+                            'starting_round': client_info[1]['starting_round'],
+                            'start_time': client_info[1]['start_time']
                         }
 
                         await self.sio.emit('request_update',
@@ -601,9 +614,10 @@ class Server:
                 # Add the report and payload of the extracted reporting client into updates
                 logging.info(
                     "[Server #%s] Adding client #%s to the list of clients for aggregation.",
-                    os.getpid(), client_info[1])
+                    os.getpid(), client_info[1]['client_id'])
 
-                self.updates.append((client_info[4], client_info[5]))
+                self.updates.append(
+                    (client_info[1]['report'], client_info[1]['payload']))
 
             # Step 3: Processing stale clients that exceed a staleness threshold
 
@@ -621,7 +635,8 @@ class Server:
                 client_info = heapq.heappop(self.reporting_clients)
                 heapq.heappush(possibly_stale_clients, client_info)
 
-                if client_info[2] < self.current_round - staleness:
+                if client_info[1][
+                        'starting_round'] < self.current_round - staleness:
                     for __ in range(0, len(possibly_stale_clients)):
                         stale_client_info = heapq.heappop(
                             possibly_stale_clients)
@@ -631,9 +646,10 @@ class Server:
                         # Add the report and payload of the extracted reporting client into updates
                         logging.info(
                             "[Server #%s] Adding client #%s to the list of clients for "
-                            "aggregation.", os.getpid(), stale_client_info[1])
-                        self.updates.append(
-                            (stale_client_info[4], stale_client_info[5]))
+                            "aggregation.", os.getpid(),
+                            stale_client_info[1]['client_id'])
+                        self.updates.append((stale_client_info[1]['report'],
+                                             stale_client_info[1]['payload']))
 
             self.reporting_clients = possibly_stale_clients
             logging.info("[Server #%s] Aggregating %s clients in total.",
@@ -654,7 +670,8 @@ class Server:
 
             # Add the report and payload of all reporting clients into updates
             for client_info in self.reporting_clients:
-                self.updates.append((client_info[4], client_info[5]))
+                self.updates.append(
+                    (client_info[1]['report'], client_info[1]['payload']))
 
             await self.process_reports()
             await self.wrap_up()
