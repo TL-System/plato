@@ -38,7 +38,7 @@ class Client(simple.Client):
             self.trainset, self.sampler,
             Config().algorithm.cut_layer)
 
-        training_time = time.perf_count() - tic
+        training_time = time.perf_counter() - tic
 
         # Generate a report for the server, performing model testing if applicable
         return Report(self.sampler.trainset_size(), 0, training_time, False,
