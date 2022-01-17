@@ -375,10 +375,9 @@ class Server:
         if callable(_task):
             await self.customize_periodic_task()
 
-        if hasattr(
-                Config().server,
-                'simulate_wall_time') and Config().server.simulate_wall_time:
-            simulate_wall_time = True
+        simulate_wall_time = hasattr(
+            Config().server,
+            'simulate_wall_time') and Config().server.simulate_wall_time
 
         # If we are operating in asynchronous mode, aggregate the model updates received so far.
         if not simulate_wall_time and hasattr(
@@ -591,7 +590,9 @@ class Server:
                     return
 
             # Step 2: Processing clients in chronological order of finish times in wall clock time
-            for __ in range(0, minimum_clients):
+            for __ in range(
+                    0, min(len(self.current_reporting_clients),
+                           minimum_clients)):
                 # Extract a client with the earliest finish time in wall clock time
                 client_info = heapq.heappop(self.reporting_clients)
                 # Update the simulated wall clock time to be the finish time of this client

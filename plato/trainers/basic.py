@@ -33,7 +33,7 @@ class Trainer(base.Trainer):
 
         self.tic = 0
         self.toc = 0
-        self.models_per_epoch = []
+        self.models_per_epoch = {}
 
         if model is None:
             model = models_registry.get()
@@ -280,12 +280,10 @@ class Trainer(base.Trainer):
                             ).clients.speed_simulation:
                         self._simulate_client_speed()
 
-                    self.models_per_epoch.append({
-                        'time':
-                        time.perf_counter() - self.tic,
-                        'model':
-                        copy.deepcopy(self.model.cpu())
-                    })
+                    self.models_per_epoch[epoch] = {
+                        'time': time.perf_counter() - self.tic,
+                        'model': copy.deepcopy(self.model.cpu())
+                    }
 
         except Exception as training_exception:
             logging.info("Training on client #%d failed.", self.client_id)
@@ -510,10 +508,11 @@ class Trainer(base.Trainer):
         return correct / total
 
     def obtain_model_update(self, wall_time):
-        """ 
-            Obtain a saved model for a particular epoch that finishes just after the provided
-            wall clock time elapsed.
         """
-        for epoch in self.models_per_epoch:
-            if epoch['time'] + self.tic > wall_time:
-                return epoch['model']
+            Obtain a saved model for a particular epoch that finishes just after the provided
+            wall clock time is reached.
+        """
+        for epoch in sorted(self.models_per_epoch):
+            model = self.models_per_epoch[epoch]
+            if model['time'] + self.tic > wall_time:
+                return model['model']
