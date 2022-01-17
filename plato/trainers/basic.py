@@ -32,6 +32,7 @@ class Trainer(base.Trainer):
         super().__init__()
 
         self.tic = 0
+        self.toc = 0
         self.models_per_epoch = []
 
         if model is None:

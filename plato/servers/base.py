@@ -524,6 +524,7 @@ class Server:
             finish_time,  # sorted by the client's finish time
             client_id,
             starting_round,
+            start_time,
             self.reports[sid],
             self.client_payload[sid],
         )
@@ -546,7 +547,7 @@ class Server:
         # selected clients
         if asynchronous_mode and simulate_wall_time and len(
                 self.current_reporting_clients) >= len(self.selected_clients):
-            # Sanity checks to see if there are any stale clients; if so, send them
+            # Step 1: Sanity checks to see if there are any stale clients; if so, send them
             # an urgent request for model updates at the current simulated wall clock time
             staleness = 0
             if hasattr(Config().server, 'staleness'):
@@ -556,24 +557,40 @@ class Server:
                        'request_update') and Config().server.request_update:
                 request_sent = False
                 for client_info in self.reporting_clients:
-                    if client_info[2] < self.current_round - staleness:
+                    if client_info[
+                            2] < self.current_round - staleness and not client_info[
+                                4].update_response:
                         client_id = client_info[1]
+                        starting_round = client_info[2]
+                        start_time = client_info[3]
                         sid = self.clients[client_id]['sid']
 
-                        # Sending the server response as metadata to the clients (payload to follow)
+                        # Sending an urgent request to the client for a model update at the
+                        # currently simulated wall clock time
+                        logging.info(
+                            "[Server #%s] Requesting urgent model update from client %s.",
+                            os.getpid(), client_id)
+
+                        self.training_clients[client_id] = {
+                            'id': client_id,
+                            'starting_round': starting_round,
+                            'start_time': start_time
+                        }
+
                         await self.sio.emit('request_update',
                                             {'time': self.wall_time},
                                             room=sid)
                         request_sent = True
 
                         # Remove the client information from the list of reporting clients since
-                        # this client will report again soon with another model update upon receiving
-                        # the request from the server
+                        # this client will report again soon with another model update upon
+                        # receiving the request from the server
                         self.reporting_clients.remove(client_info)
 
                 if request_sent:
                     return
 
+            # Step 2: Processing clients in chronological order of finish times in wall clock time
             for __ in range(0, minimum_clients):
                 # Extract a client with the earliest finish time in wall clock time
                 client_info = heapq.heappop(self.reporting_clients)
@@ -581,7 +598,13 @@ class Server:
                 self.wall_time = client_info[0]
 
                 # Add the report and payload of the extracted reporting client into updates
-                self.updates.append((client_info[3], client_info[4]))
+                logging.info(
+                    "[Server #%s] Adding client #%s to the list of clients for aggregation.",
+                    os.getpid(), client_info[1])
+
+                self.updates.append((client_info[4], client_info[5]))
+
+            # Step 3: Processing stale clients that exceed a staleness threshold
 
             # If there are more clients in the list of reporting clients that violate the
             # staleness bound, the server needs to wait for these clients even when the minimum
@@ -605,10 +628,15 @@ class Server:
                         self.wall_time = stale_client_info[0]
 
                         # Add the report and payload of the extracted reporting client into updates
+                        logging.info(
+                            "[Server #%s] Adding client #%s to the list of clients for "
+                            "aggregation.", os.getpid(), stale_client_info[1])
                         self.updates.append(
-                            (stale_client_info[3], stale_client_info[4]))
+                            (stale_client_info[4], stale_client_info[5]))
 
             self.reporting_clients = possibly_stale_clients
+            logging.info("[Server #%s] Aggregating %s clients in total.",
+                         os.getpid(), len(self.updates))
 
             await self.process_reports()
             await self.wrap_up()
@@ -625,7 +653,7 @@ class Server:
 
             # Add the report and payload of all reporting clients into updates
             for client_info in self.reporting_clients:
-                self.updates.append((client_info[3], client_info[4]))
+                self.updates.append((client_info[4], client_info[5]))
 
             await self.process_reports()
             await self.wrap_up()

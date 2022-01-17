@@ -3,22 +3,16 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 20 
+    total_clients: 1
 
     # The number of clients selected in each round
-    per_round: 4 
+    per_round: 1
 
     # Should the clients compute test accuracy locally?
     do_test: false
 
     # Whether simulate clients or not
-    simulation: false 
-    speed_simulation: true 
-
-    # The simulation distribution
-    simulation_distribution:
-        distribution: zipf 
-        s: 1.5 
+    simulation: false
 
     # Processors for outbound data payloads
     outbound_processors:
@@ -27,10 +21,6 @@ clients:
 server:
     address: 127.0.0.1
     port: 8000
-    synchronous: false
-    simulate_wall_time: true
-    minimum_clients_aggregated: 2
-    staleness: 0
 
 data:
     # The training and testing dataset
@@ -68,10 +58,10 @@ trainer:
     max_concurrency: 1
 
     # The target accuracy
-    target_accuracy: 0.99
+    target_accuracy: 0.94
 
     # Number of epoches for local training in each communication round
-    epochs: 1 
+    epochs: 5
     batch_size: 32
     optimizer: SGD
     learning_rate: 0.01

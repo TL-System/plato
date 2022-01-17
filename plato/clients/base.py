@@ -165,10 +165,10 @@ class Client:
     async def request_update(self, data) -> None:
         """ Upon receiving a request for an urgent model update. """
         logging.info(
-            "Urgent message received at client #%s for wall clock time %s",
+            "[Client #%s] Urgent request received for model update at time %s.",
             self.client_id, data['time'])
 
-        report, payload = self.obtain_model_update(data['time'])
+        report, payload = await self.obtain_model_update(data['time'])
 
         # Sending the client report as metadata to the server (payload to follow)
         await self.sio.emit('client_report', {'report': pickle.dumps(report)})

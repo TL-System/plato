@@ -20,6 +20,7 @@ class Report(base.Report):
     """Report from a simple client, to be sent to the federated learning server."""
     training_time: float
     data_loading_time: float
+    update_response: bool
 
 
 class Client(base.Client):
@@ -137,11 +138,13 @@ class Client(base.Client):
             self.data_loading_time_sent = True
 
         self.report = Report(self.sampler.trainset_size(), accuracy,
-                             training_time, data_loading_time)
+                             training_time, data_loading_time, False)
         return self.report, weights
 
-    def obtain_model_update(self, wall_time):
+    async def obtain_model_update(self, wall_time):
         """Retrieving a model update corrsponding to a particular wall clock time."""
         model = self.trainer.obtain_model_update(wall_time)
         weights = self.algorithm.extract_weights(model)
+        self.report.update_response = True
+
         return self.report, weights
