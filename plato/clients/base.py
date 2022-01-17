@@ -22,6 +22,7 @@ class Report:
     """Client report, to be sent to the federated learning server."""
     num_samples: int
     accuracy: float
+    training_time: float
 
 
 class ClientEvents(socketio.AsyncClientNamespace):
