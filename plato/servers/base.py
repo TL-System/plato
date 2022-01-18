@@ -572,7 +572,7 @@ class Server:
             if hasattr(Config().server,
                        'request_update') and Config().server.request_update:
                 request_sent = False
-                for client_info in self.reporting_clients:
+                for i, client_info in enumerate(self.reporting_clients):
                     if client_info[1][
                             'starting_round'] < self.current_round - staleness and not client_info[
                                 1]['report'].update_response:
@@ -597,7 +597,7 @@ class Server:
                         # Remove the client information from the list of reporting clients since
                         # this client will report again soon with another model update upon
                         # receiving the request from the server
-                        self.reporting_clients.remove(client_info)
+                        del self.reporting_clients[i]
 
                 if request_sent:
                     return
