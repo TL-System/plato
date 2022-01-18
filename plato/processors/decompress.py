@@ -26,7 +26,7 @@ class Processor(base.Processor):
             for datacom_feature, datacom_target, datashape_target, datatype_target in data[1:]:
                 datacom_feature = zstd.decompress(datacom_feature)
                 datacom_feature = np.frombuffer(datacom_feature, datatype_feature).reshape(datashape_feature)
-                if datashape_target[0] == 0:
+                if len(datashape_target) > 0 and datashape_target[0] == 0:
                     datacom_target = np.zeros(datashape_target)
                 else:
                     datacom_target = zstd.decompress(datacom_target)
