@@ -1,25 +1,21 @@
 """
-Implements a Processor for unbatching MistNet PyTorch features into the dataset form.
+Implements a Processor for decompressing a numpy array.
 """
-import logging
 from typing import Any
 
 import numpy as np
-from plato.processors import base
 import zstd
+from plato.processors import base
+
 
 class Processor(base.Processor):
-    """
-    Implements a Processor for decompressing numpy array
-    """
+    """ Implements a Processor for decompressing a numpy array. """
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
 
     def process(self, data: Any) -> Any:
-        """
-        Implements a Processor for compressring numpy array
-        """
-        if type(data) == list:
+        """ Implements a Processor for decompressing a numpy array. """
+        if isinstance(data, list):
             ret = []
             datashape_feature = data[0][0]
             datatype_feature = data[0][1]
