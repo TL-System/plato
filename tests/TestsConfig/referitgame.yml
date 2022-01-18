@@ -20,9 +20,9 @@ server:
 data:
   dataname: ReferItGame
   datasource: ReferItGame
-  data_path: ./data
+  data_path: data/
 
-  base_coco_images_path: ./data/COCO2017/train/images
+  base_coco_images_path: data/COCO2017/train/images
 
   split_config: refcoco
   split_name: google

@@ -23,7 +23,7 @@ import torch
 
 from plato.config import Config
 
-# from plato.datasources.flickr30k_entities import DataSource as f30ke_DataSource
+from plato.datasources.flickr30k_entities import DataSource as f30ke_DataSource
 # from plato.datasources.referitgame import DataSource as refer_Datasource
 # from plato.datasources.coco import DataSource as coco_Datasource
 # from plato.datasources.kinetics import DataSource as kinetics_Datasource
@@ -91,10 +91,10 @@ class DatasetsTest(unittest.TestCase):
 
         return True
 
-    # def test_f30ke_datasource(self):
-    #     """ Test the flickr30k entities dataset. """
-    #     self.utest_datasource = f30ke_DataSource()
-    #     assert self.assertDataSourceDefinition(self.utest_datasource)
+    def test_f30ke_datasource(self):
+        """ Test the flickr30k entities dataset. """
+        self.utest_datasource = f30ke_DataSource()
+        assert self.assertDataSourceDefinition(self.utest_datasource)
 
     # def test_coco_datasource(self):
     #     """ Test the MSCOCO dataset. """
