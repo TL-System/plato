@@ -690,6 +690,11 @@ class Server:
             for client_info in self.reporting_clients:
                 self.updates.append(
                     (client_info[1]['report'], client_info[1]['payload']))
+                if self.simulate_wall_time and self.wall_time < client_info[0]:
+                    self.wall_time = client_info[0]
+                    logging.info(
+                        "[Server #%d] Advancing the wall clock time to %s.",
+                        os.getpid(), self.wall_time)
 
             await self.process_reports()
             await self.wrap_up()
@@ -739,10 +744,6 @@ class Server:
         self.trainer.save_model()
         await self.close_connections()
         os._exit(0)
-
-    @abstractmethod
-    def configure(self):
-        """ Configuring the server with initialization work. """
 
     async def customize_server_response(self, server_response):
         """ Wrap up generating the server response with any additional information. """
