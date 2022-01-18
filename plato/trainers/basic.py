@@ -512,6 +512,8 @@ class Trainer(base.Trainer):
             Obtain a saved model for a particular epoch that finishes just after the provided
             wall clock time is reached.
         """
+        print("len of models per epoch = ", len(self.models_per_epoch))
+        print(self.models_per_epoch)
         for epoch in sorted(self.models_per_epoch):
             model = self.models_per_epoch[epoch]
             if model['time'] + self.tic > wall_time:
