@@ -476,8 +476,6 @@ class Server:
 
     async def client_payload_arrived(self, sid, client_id):
         """ Upon receiving a portion of the payload from a client. """
-        print("client id = ", client_id)
-        print(self.training_clients)
         assert len(
             self.client_chunks[sid]) > 0 and client_id in self.training_clients
 
@@ -531,12 +529,6 @@ class Server:
                 'report': self.reports[sid],
                 'payload': self.client_payload[sid],
             })
-        print('finish time = ', finish_time)
-        print('client_id = ', client_id)
-
-        for client in self.reporting_clients:
-            print(client[0])
-            print(client[1]['client_id'])
 
         heapq.heappush(self.reporting_clients, client_info)
         self.current_reporting_clients.append(client_info)
@@ -588,18 +580,10 @@ class Server:
                             "[Server #%s] Requesting urgent model update from client %s.",
                             os.getpid(), client_id)
 
-                        for client in self.reporting_clients:
-                            print(client[0])
-                            print(client[1]['client_id'])
-
                         # Remove the client information from the list of reporting clients since
                         # this client will report again soon with another model update upon
                         # receiving the request from the server
                         del self.reporting_clients[i]
-                        print(f"client {client_info[1]['client_id']} deleted")
-                        for client in self.reporting_clients:
-                            print(client[0])
-                            print(client[1]['client_id'])
 
                         sid = self.clients[client_id]['sid']
 
