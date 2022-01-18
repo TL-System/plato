@@ -12,19 +12,6 @@ from mmaction.tools.data import build_audio_features
 
 from plato.datasources.datalib import modality_extraction_base
 
-# def obtain_video_dest_dir(out_dir, video_path, is_classname_contained=True):
-#     """ Get the destination path for the video """
-
-#     class_name = os.path.basename(os.path.dirname(video_path))
-#     _, tail = os.path.split(video_path)
-#     video_name = tail.split(".")[0]
-#     if is_classname_contained:
-#         out_full_path = os.path.join(out_dir, class_name, video_name)
-#     else:
-#         out_full_path = os.path.join(out_dir, video_name)
-
-#     return out_full_path
-
 
 def obtain_audio_dest_dir(out_dir, audio_path, dir_level):
     """ Get the destination path to save the audio """
