@@ -19,7 +19,7 @@ server:
 # dataset settings for the original dataset and the corresponding multimodal data processor
 data:
   dataname: ReferItGame
-  datasource: COCO2017
+  datasource: ReferItGame
   data_path: ./data
 
   base_coco_images_path: ./data/COCO2017/train/images

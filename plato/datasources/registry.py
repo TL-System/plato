@@ -30,7 +30,7 @@ else:
     from plato.datasources import (mnist, fashion_mnist, cifar10, cinic10,
                                    huggingface, pascal_voc, tiny_imagenet,
                                    femnist, feature, flickr30k_entities,
-                                   referitgame, coco, kinetics, gym)
+                                   referitgame, coco)
 
     registered_datasources = OrderedDict([
         ('MNIST', mnist),
@@ -42,10 +42,8 @@ else:
         ('TinyImageNet', tiny_imagenet),
         ('Feature', feature),
         ('Flickr30KE', flickr30k_entities),
-        ('COCO2017', referitgame),
+        ('ReferItGame', referitgame),
         ('COCO', coco),
-        ('kinetics700', kinetics),
-        ('Gym', gym),
     ])
 
     registered_partitioned_datasources = OrderedDict([('FEMNIST', femnist)])
@@ -56,6 +54,14 @@ def get(client_id=0):
     datasource_name = Config().data.datasource
 
     logging.info("Data source: %s", Config().data.datasource)
+
+    if datasource_name in ["kinetics700", "Gym"]:
+        from plato.datasources import (kinetics, gym)
+
+        multi_modal_registered_datasources = OrderedDict([('kinetics700',
+                                                           kinetics),
+                                                          ('Gym', gym)])
+        registered_datasources.update(multi_modal_registered_datasources)
 
     if Config().data.datasource == 'YOLO':
         from plato.datasources import yolo

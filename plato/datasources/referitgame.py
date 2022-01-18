@@ -156,7 +156,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         self.data_name = Config().data.dataname
         self.base_coco = Config().data.base_coco_images_path
-        self.data_source = Config().data.datasource
+        self.data_source = "COCO2017"
 
         # Obtain which split to use:
         #  refclef, refcoco, refcoco+ and refcocog
