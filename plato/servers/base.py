@@ -476,6 +476,8 @@ class Server:
 
     async def client_payload_arrived(self, sid, client_id):
         """ Upon receiving a portion of the payload from a client. """
+        print("client id = ", client_id)
+        print(self.training_clients)
         assert len(
             self.client_chunks[sid]) > 0 and client_id in self.training_clients
 
@@ -529,7 +531,8 @@ class Server:
                 'report': self.reports[sid],
                 'payload': self.client_payload[sid],
             })
-        print(finish_time)
+        print('finish time = ', finish_time)
+        print('client_id = ', client_id)
 
         for client in self.reporting_clients:
             print(client[0])
@@ -539,9 +542,9 @@ class Server:
         self.current_reporting_clients.append(client_info)
         del self.training_clients[client_id]
 
-        await self.process_clients(sid, client_id)
+        await self.process_clients()
 
-    async def process_clients(self, sid, client_id):
+    async def process_clients(self):
         """ Determine whether it is time to process the client reports and
             proceed with the aggregation process.
 
@@ -579,12 +582,29 @@ class Server:
 
                         # Sending an urgent request to the client for a model update at the
                         # currently simulated wall clock time
+                        client_id = client_info[1]['client_id']
+
                         logging.info(
                             "[Server #%s] Requesting urgent model update from client %s.",
                             os.getpid(), client_id)
 
+                        for client in self.reporting_clients:
+                            print(client[0])
+                            print(client[1]['client_id'])
+
+                        # Remove the client information from the list of reporting clients since
+                        # this client will report again soon with another model update upon
+                        # receiving the request from the server
+                        del self.reporting_clients[i]
+                        print(f"client {client_info[1]['client_id']} deleted")
+                        for client in self.reporting_clients:
+                            print(client[0])
+                            print(client[1]['client_id'])
+
+                        sid = self.clients[client_id]['sid']
+
                         self.training_clients[client_id] = {
-                            'id': client_info[1]['client_id'],
+                            'id': client_id,
                             'starting_round': client_info[1]['starting_round'],
                             'start_time': client_info[1]['start_time']
                         }
@@ -593,11 +613,6 @@ class Server:
                                             {'time': self.wall_time},
                                             room=sid)
                         request_sent = True
-
-                        # Remove the client information from the list of reporting clients since
-                        # this client will report again soon with another model update upon
-                        # receiving the request from the server
-                        del self.reporting_clients[i]
 
                 if request_sent:
                     return
