@@ -114,16 +114,19 @@ class Trainer(base.Trainer):
         """Simulate and return a sleep time (in seconds) for the client."""
         np.random.seed(self.client_id)
 
+        sleep_time = 0
         if hasattr(Config().clients, "simulation_distribution"):
             dist = Config.clients.simulation_distribution
             # Determine the distribution of client's simulate sleep time
             if dist.distribution.lower() == "normal":
-                return np.random.normal(dist.mean, dist.sd)
+                sleep_time = np.random.normal(dist.mean, dist.sd)
             if dist.distribution.lower() == "zipf":
-                return min(np.random.zipf(dist.s), 50)
-
-        # Default use Zipf distribution with a parameter of 1.5
-        return min(np.random.zipf(1.5), 50)
+                sleep_time = np.random.zipf(dist.s)
+        else:
+            # Default use Zipf distribution with a parameter of 1.5
+            sleep_time = np.random.zipf(1.5)
+        # Limit the simulated sleep time below a threshold
+        return min(sleep_time, 50)
 
     def _simulate_client_speed(self):
         """Simulate client's speed by putting it to sleep."""

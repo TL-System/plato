@@ -128,7 +128,7 @@ class Client(base.Client):
         return self.report, weights
 
     async def obtain_model_update(self, wall_time):
-        """Retrieving a model update corrsponding to a particular wall clock time."""
+        """Retrieving a model update corresponding to a particular wall clock time."""
         model = self.trainer.obtain_model_update(wall_time)
         weights = self.algorithm.extract_weights(model)
         self.report.update_response = True

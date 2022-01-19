@@ -616,6 +616,8 @@ class Server:
                                             room=sid)
                         request_sent = True
 
+                # If an urgent request was sent, we will wait until client gets back to proceed
+                # to aggregation.
                 if request_sent:
                     return
 
