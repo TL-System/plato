@@ -15,6 +15,7 @@ os.environ['config_file'] = 'examples/fedmatch/fedmatch_MNIST_lenet5.yml'
 import fedmatch_client
 import fedmatch_server
 import fedmatch_trainer
+import fedmatch_decomposition
 from plato.models import registry as models_registry
 
 
@@ -22,6 +23,9 @@ def main():
     """ A Plato federated learning training session using the SCAFFOLD algorithm. """
 
     model = models_registry.get()
+    model = fedmatch_decomposition.Decomposed_Model.get_decomposed_model(
+        model)  # transfer normal one to decomposed version
+
     trainer = fedmatch_trainer.Trainer(model)
     client = fedmatch_client.Client(model=model, trainer=trainer)
     server = fedmatch_server.Server(trainer=trainer)
