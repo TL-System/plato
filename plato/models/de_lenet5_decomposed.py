@@ -154,29 +154,10 @@ class Decomposed_Linear(nn.Linear):
             torch.empty((out_features, in_features), **factory_kwargs))
 
         init.kaiming_uniform_(self.sigma, a=math.sqrt(5))
-        #init.zeros_(self.psi)
         init.kaiming_uniform_(self.psi, a=math.sqrt(5))
-        """
-        factory_kwargs = {'device': device, 'dtype': dtype}
-        super(Decomposed_Linear, self).__init__()
-        self.in_features = in_features
-        self.out_features = out_features
-        #self.weight1 = Parameter(
-        #    torch.empty((out_features, in_features), **factory_kwargs))
-        self.sigma = Parameter(
-            torch.empty((out_features, in_features), **factory_kwargs))
-        self.psi = Parameter(
-            torch.empty((out_features, in_features), **factory_kwargs))
-        if bias:
-            self.bias = Parameter(torch.empty(out_features, **factory_kwargs))
-        else:
-            self.register_parameter('bias', None)
-        """
 
     def forward(self, input):
 
-        #self.weight = Parameter(self.sigma.add(self.psi))
-        #self.sigma.add_(self.psi)
         self.weight = Parameter(torch.add(self.sigma, self.psi))
 
         return F.linear(input, self.sigma, self.bias)
@@ -209,13 +190,11 @@ class Decomposed_Conv2d(nn.Conv2d):
                         **factory_kwargs))
 
         init.kaiming_uniform_(self.sigma, a=math.sqrt(5))
-        #init.zeros_(self.psi)
+
         init.kaiming_uniform_(self.psi, a=math.sqrt(5))
 
     def forward(self, input):
-        # self.weight = self.sigma + self.psi
 
-        #self.weight = Parameter(self.sigma.add(self.psi))
-        #self.sigma.add_(self.psi)
         self.weight = Parameter(torch.add(self.sigma, self.psi))
+
         return super()._conv_forward(input, self.sigma, self.bias)
