@@ -17,39 +17,30 @@ server:
 
 # dataset settings for the original dataset and the corresponding multimodal data processor
 data:
-  datasource: CIFAR10
-  data_path: ./data
-  
+  datasource: Gym
+  data_path: data/
+
   downloader:
-    num_workers: 4
-    failed_save_file: failed_record.txt
-    log_file: download_log.txt
-    compress: False
-    verbose: False
-    skip: False
+    num_workers: 8
+
     videos_per_gpu: 3
     workers_per_gpu: 4
 
-  sampler: mixed_label_quantity_noniid
+  sampler: sample_quantity_noniid
   modality_sampler: modality_iid
 
-  per_client_classes_size: 3
-  anchor_classes:
-    - 0
-    - 1
-    - 2
-  consistent_clients_size: 10
-  keep_anchor_classes_size: 1
+  client_quantity_concentration: 0.1
+  label_concentration: 0.1
 
   min_partition_size: 200
   
   # The random seed for sampling data
   random_seed: 1
 
-  multi_modal_pipeliner:
-    rgb: !include Pipeline/kinetics_csn_rgb.yml
-    flow: !include Pipeline/kinetics_tsn_flow.yml
-    audio: !include Pipeline/kinetics_audio_feature.yml
+  multi_modal_configs:
+    rgb: !include Pipeline/gym_csn_rgb.yml
+    flow: !include Pipeline/gym_tsn_flow.yml
+    audio_feature: !include Pipeline/gym_audio_feature.yml
     
   
 # Train settings

@@ -17,39 +17,34 @@ server:
 
 # dataset settings for the original dataset and the corresponding multimodal data processor
 data:
-  datasource: CIFAR10
-  data_path: ./data
-  
+  datasource: kinetics700
+  data_path: data/Kinetics
+  download_url: https://storage.googleapis.com/deepmind-media/Datasets/kinetics700_2020.tar.gz
+
+  tiny_data: True
+  tiny_data_number: 30
+
   downloader:
-    num_workers: 4
-    failed_save_file: failed_record.txt
-    log_file: download_log.txt
-    compress: False
-    verbose: False
-    skip: False
+    num_workers: 1
+
     videos_per_gpu: 3
     workers_per_gpu: 4
 
-  sampler: mixed_label_quantity_noniid
+  sampler: distribution_noniid
   modality_sampler: modality_iid
 
-  per_client_classes_size: 3
-  anchor_classes:
-    - 0
-    - 1
-    - 2
-  consistent_clients_size: 10
-  keep_anchor_classes_size: 1
+  client_quantity_concentration: 0.1
+  label_concentration: 0.1
 
   min_partition_size: 200
   
   # The random seed for sampling data
   random_seed: 1
 
-  multi_modal_pipeliner:
+  multi_modal_configs:
     rgb: !include Pipeline/kinetics_csn_rgb.yml
     flow: !include Pipeline/kinetics_tsn_flow.yml
-    audio: !include Pipeline/kinetics_audio_feature.yml
+    audio_feature: !include Pipeline/kinetics_audio_feature.yml
     
   
 # Train settings
@@ -92,7 +87,7 @@ checkpoint_config: &checkpoint_config
 
 trainer:
   type: basic
-  batch_size: 24
+  batch_size: 2
   optimizer: *optimizer
   optimizer_config: *optimizer_config
   learning_rate_config: *lr_config

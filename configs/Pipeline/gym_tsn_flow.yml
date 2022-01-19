@@ -1,0 +1,207 @@
+# the data configuration for the flow dataset
+
+#  Note: we did one slightly modification to the original configuration from the tsn config file
+      # Converted the SampleFrames to the one used in the kinetics_csn_rgb
+      # because we want to train a multimodal model
+
+
+flow_mean: &flow_mean
+  - 128
+  - 128
+  
+
+flow_std: &flow_std
+  - 128
+  - 128
+
+  
+flow_train_pipeline: &flow_train_pipeline
+  -
+    type: SampleFrames
+    clip_len: 32
+    frame_interval: 2
+    num_clips: 1
+
+  - 
+    type: RawFrameDecode
+
+  -
+    type: Resize
+    scale:
+      - -1
+      - 256
+
+  - 
+    type: RandomResizedCrop
+
+  -
+    type: Resize
+    scale:
+      - 224
+      - 224
+    keep_ratio: False
+
+  -
+    type: Flip 
+    flip_ratio: 0.5
+
+  -
+    type: Normalize
+    mean: *flow_mean
+    std: *flow_std
+
+  -
+    type: FormatShape
+    input_format: NCHW_Flow
+
+  -
+    type: Collect
+
+    keys:
+      - imgs
+      - label
+
+    meta_keys:
+      - null
+
+  -
+    type: ToTensor
+
+    keys:
+      - imgs
+      - label
+
+
+flow_val_pipeline: &flow_val_pipeline
+  -
+    type: SampleFrames
+    clip_len: 32
+    frame_interval: 2
+    num_clips: 1
+    test_mode: True
+
+  - 
+    type: RawFrameDecode
+
+  -
+    type: Resize
+    scale:
+      - -1
+      - 256
+
+  - 
+    type: CenterCrop
+    crop_size: 224
+
+  -
+    type: Flip 
+    flip_ratio: 0
+
+  -
+    type: Normalize
+    mean: *flow_mean
+    std: *flow_std
+
+  -
+    type: FormatShape
+    input_format: NCHW_Flow
+
+  -
+    type: Collect
+
+    keys:
+      - imgs
+      - label
+
+    meta_keys:
+      - null
+
+  -
+    type: ToTensor
+
+    keys:
+      - imgs
+
+
+flow_test_pipeline: &flow_test_pipeline
+  -
+    type: SampleFrames
+    clip_len: 32
+    frame_interval: 2
+    num_clips: 10
+    test_mode: True
+
+  - 
+    type: RawFrameDecode
+
+  -
+    type: Resize
+    scale:
+      - -1
+      - 256
+
+  - 
+    type: TenCrop
+    crop_size: 224
+
+  -
+    type: Flip 
+    flip_ratio: 0
+
+  -
+    type: Normalize
+    mean: *flow_mean
+    std: *flow_std
+
+  -
+    type: FormatShape
+    input_format: NCHW_Flow
+
+  -
+    type: Collect
+
+    keys:
+      - imgs
+      - label
+
+    meta_keys:
+      - null
+
+  -
+    type: ToTensor
+
+    keys:
+      - imgs
+
+
+flow_data_train: &flow_data_train
+  type: RawframeDataset
+  ann_file: train_list_rawframes.txt
+  data_prefix: rawframes_train
+  filename_tmpl: '{}_{:05d}.jpg'
+  modality: Flow
+  pipeline: *flow_train_pipeline
+
+
+flow_data_val: &flow_data_val
+  type: RawframeDataset
+  ann_file: val_list_rawframes.txt
+  data_prefix: rawframes_val
+  filename_tmpl: '{}_{:05d}.jpg'
+  modality: Flow
+  pipeline: *flow_val_pipeline
+
+
+flow_data_test: &flow_data_test
+  type: RawframeDataset
+  ann_file: val_list_rawframes.txt
+  data_prefix: rawframes_test
+  filename_tmpl: '{}_{:05d}.jpg'
+  modality: Flow
+  pipeline: *flow_test_pipeline
+
+
+
+train: *flow_data_train
+val: *flow_data_val
+test: *flow_data_test
