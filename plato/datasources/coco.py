@@ -3,7 +3,7 @@ The MS COCO- dataset stands for Common Objects in Context, and is
   designed to represent a vast array of objects that we 
   regularly encounter in everyday life.
 
-We mainly utilize the COCO-17 (25.20 GB):
+We mainly utilize COCO-17 (25.20 GB):
  - COCO has 121,408 images in total.
  - has 883,331 object annotations
  - COCO defines 91 classes but the data only uses 80 classes.
@@ -18,7 +18,7 @@ The data structure and setting follows:
 Then, the download urls are obtained from:
  "https://gist.github.com/mkocabas/a6177fc00315403d31572e17700d7fd9".
 
-We utilize the official splits that contains:
+We utilize the official splits that contain:
  - train: 118,287 images
  - val: 5,000 images
  - test: 40,670 images
@@ -39,7 +39,6 @@ The data structure under the 'data/' is:
 │   ├── train       # images for the train phase
 │   └── test        # images for the test phase
 │   └── val         # images for the validation phase
-
 
 Note:
     Currently, we have not utilize the COCO dataset to train the model.

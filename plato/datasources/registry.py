@@ -56,7 +56,7 @@ def get(client_id=0):
     logging.info("Data source: %s", Config().data.datasource)
 
     if datasource_name in ["kinetics700", "Gym"]:
-        from plato.datasources import (kinetics, gym)
+        from plato.datasources import kinetics, gym
 
         multi_modal_registered_datasources = OrderedDict([('kinetics700',
                                                            kinetics),
@@ -72,7 +72,7 @@ def get(client_id=0):
         dataset = registered_partitioned_datasources[
             datasource_name].DataSource(client_id)
     else:
-        raise ValueError('No such data source: {}'.format(datasource_name))
+        raise ValueError(f'No such data source: {datasource_name}')
 
     return dataset
 
@@ -93,6 +93,6 @@ def get_input_shape():
         input_shape = registered_partitioned_datasources[
             datasource_name].DataSource.input_shape()
     else:
-        raise ValueError('No such data source: {}'.format(datasource_name))
+        raise ValueError(f'No such data source: {datasource_name}')
 
     return input_shape
