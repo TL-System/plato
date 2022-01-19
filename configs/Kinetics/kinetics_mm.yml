@@ -17,7 +17,7 @@ server:
 
 # dataset settings for the original dataset and the corresponding multimodal data processor
 data:
-  use_multimodal: True
+
   datasource: kinetics700
   data_path: ./data/Kinetics
   download_url: https://storage.googleapis.com/deepmind-media/Datasets/kinetics700_2020.tar.gz
@@ -43,7 +43,7 @@ data:
   # The random seed for sampling data
   random_seed: 1
 
-  multi_modal_pipeliner:
+  multi_modal_configs:
     rgb: !include Pipeline/kinetics_csn_rgb.yml
     flow: !include Pipeline/kinetics_tsn_flow.yml
     audio: !include Pipeline/kinetics_audio_feature.yml

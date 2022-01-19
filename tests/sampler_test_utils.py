@@ -51,14 +51,16 @@ def extract_equality_info(collected_data_info):
     return non_equality_count
 
 
-def define_sampler(Sampler, dataset_source, client_id):
+def define_sampler(Sampler, dataset_source, client_id, is_testing=False):
     """ Define the sampler based on the received argument. """
     if isinstance(Sampler, type):
         defined_sampler = Sampler(datasource=dataset_source,
-                                  client_id=client_id)
+                                  client_id=client_id,
+                                  testing=is_testing)
     else:
         defined_sampler = Sampler.get(datasource=dataset_source,
-                                      client_id=client_id)
+                                      client_id=client_id,
+                                      testing=is_testing)
     return defined_sampler
 
 
@@ -199,12 +201,12 @@ def collect_clients_data_info(clients_id,
         clients_global_info["samples_number"].append(client_sample_size)
 
         if is_presented:
-            logging.info("Client: %d", client_id)
-            logging.info("Client's total samples: %d", client_sample_size)
-            logging.info("Client's classes: {}".format(' '.join(
-                map(str, client_classes))))
-            logging.info("Client's classes sample: {}".format(' '.join(
-                map(str, client_classes_info))))
+            logging.info("Client: %s", client_id)
+            logging.info("Client's total samples: %s", client_sample_size)
+            logging.info("Client's classes: %s",
+                         ' '.join(map(str, client_classes)))
+            logging.info("Client's classes sample: %s",
+                         ' '.join(map(str, client_classes_info)))
 
     if is_presented:
         logging.info("Clients' classes sample: {}".format(' '.join(

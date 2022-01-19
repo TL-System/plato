@@ -17,29 +17,22 @@ server:
 
 # dataset settings for the original dataset and the corresponding multimodal data processor
 data:
-  datasource: CIFAR10
-  data_path: ./data
-  
+  dataname: Flickr30KEntities
+  datasource: Flickr30K
+  data_path: data
+
+  download_file_id: 1mJ-Y0gLFyCLbB6C-M49dUtEsbfVkK4F-
+
   downloader:
     num_workers: 4
-    failed_save_file: failed_record.txt
-    log_file: download_log.txt
-    compress: False
-    verbose: False
-    skip: False
-    videos_per_gpu: 3
-    workers_per_gpu: 4
 
-  sampler: mixed_label_quantity_noniid
+
+  sampler: sample_quantity_noniid
+  test_set_sampler: sample_quantity_noniid
   modality_sampler: modality_iid
 
-  per_client_classes_size: 3
-  anchor_classes:
-    - 0
-    - 1
-    - 2
-  consistent_clients_size: 10
-  keep_anchor_classes_size: 1
+  per_client_classes_size: 6
+  
 
   min_partition_size: 200
   
@@ -92,7 +85,7 @@ checkpoint_config: &checkpoint_config
 
 trainer:
   type: basic
-  batch_size: 24
+  batch_size: 1 # currently, only support batch size 1
   optimizer: *optimizer
   optimizer_config: *optimizer_config
   learning_rate_config: *lr_config
