@@ -136,7 +136,7 @@ class KineticsDataset(multimodal_base.MultiModalDataset):
 
 
 class DataSource(multimodal_base.MultiModalDataSource):
-    """The Gym dataset."""
+    """The Kinetics datasource."""
     def __init__(self):
         super().__init__()
 

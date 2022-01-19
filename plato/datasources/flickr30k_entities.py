@@ -1,10 +1,10 @@
 """
 The Flickr30K Entities dataset.
 
-The data structure and setting follows:
+The data structure and setting follow:
  "http://bryanplummer.com/Flickr30kEntities/".
 
-We utilize the official splits that contains:
+We utilize the official splits that contain:
  - train: 29783 images,
  - val: 1000 images,
  - test: 1000 images
