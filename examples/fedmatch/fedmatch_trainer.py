@@ -11,6 +11,7 @@ https://arxiv.org/pdf/2006.12097.pdf
 
 import logging
 from math import fabs
+from operator import le
 import os
 import random
 
@@ -72,7 +73,7 @@ class Trainer(basic.Trainer):
                 """obtain labeled and unlabeled dataset"""
 
                 trainset_s, trainset_u = torch.utils.data.random_split(
-                    trainset, [40000, 20000])  # rewrite with ratio
+                    trainset, [20000, 40000])  # rewrite with ratio
                 train_loader_s = DataLoader(trainset_s, batch_size=batch_size)
                 """
                 train_loader_s = torch.utils.data.DataLoader(
@@ -149,23 +150,23 @@ class Trainer(basic.Trainer):
                         #######################
                         # supervised learning
                         #######################
-                        with autograd.detect_anomaly():
-                            examples, labels = examples.to(
-                                self.device), labels.to(self.device)
-                            optimizer_s.zero_grad()
 
-                            if cut_layer is None:
-                                outputs_s = self.model(examples)
-                            else:
-                                outputs_s = self.model.forward_from(
-                                    examples, cut_layer)
+                        examples, labels = examples.to(self.device), labels.to(
+                            self.device)
+                        optimizer_s.zero_grad()
 
-                            loss_s = loss_criterion_s(outputs_s,
-                                                      labels)  #* self.lambda_s
+                        if cut_layer is None:
+                            outputs_s = self.model(examples)
+                        else:
+                            outputs_s = self.model.forward_from(
+                                examples, cut_layer)
 
-                            loss_s.backward()
+                        loss_s = loss_criterion_s(outputs_s,
+                                                  labels)  #* self.lambda_s
 
-                            optimizer_s.step()
+                        loss_s.backward()
+
+                        optimizer_s.step()
 
                         if batch_id % log_interval == 0:
                             if self.client_id == 0:
@@ -194,24 +195,24 @@ class Trainer(basic.Trainer):
 
                     for batch_id, (examples_unlabeled,
                                    labels) in enumerate(train_loader_u):
-                        with autograd.detect_anomaly():
-                            #pseduo_labels = self.model(self.loader.scale(examples_unlabeled))
-                            optimizer_u.zero_grad()
-                            """
-                            if cut_layer is None:
-                                outputs_u = self.model(examples)
-                            else:
-                                outputs_u = self.model.forward_from(
-                                    examples, cut_layer)
-                            """
-                            loss_u, _confident = self.loss_unsupervised(
-                                examples_unlabeled, loss_criterion_u)
 
-                            loss_u.backward()
+                        #pseduo_labels = self.model(self.loader.scale(examples_unlabeled))
+                        optimizer_u.zero_grad()
+                        """
+                        if cut_layer is None:
+                            outputs_u = self.model(examples)
+                        else:
+                            outputs_u = self.model.forward_from(
+                                examples, cut_layer)
+                        """
+                        loss_u, _confident = self.loss_unsupervised(
+                            examples_unlabeled, loss_criterion_u)
 
-                            optimizer_u.step()
+                        loss_u.backward()
 
-                            self.confident += _confident
+                        optimizer_u.step()
+
+                        #self.confident += _confident count for confident number
 
                         #if lr_schedule is not None:
                         #    lr_schedule.step()
@@ -267,14 +268,17 @@ class Trainer(basic.Trainer):
 
         _confident = np.where(
             np.max(y_pred.detach().numpy(), axis=1) >= self.confident)[0]
+        if len(_confident) <= 0:
+            print("no confident sample!")
 
         if len(_confident) > 0:
             # Inter-client consistency
             samples_confident = unlabled_samples[
                 _confident]  #self.scale(unlabled_samples[_confident])
 
-            y_pred = torch.index_select(y_pred, 0,
-                                        torch.from_numpy(_confident))
+            y_pred = torch.index_select(
+                y_pred, 0,
+                torch.from_numpy(_confident))  # calculation of y_pred check
 
             if self.helpers is not None:
 
@@ -291,7 +295,6 @@ class Trainer(basic.Trainer):
                     loss_u += (nn.functional.kl_div(
                         pred, y_pred, reduction='batchmean') /
                                len(y_preds)) * self.lambda_i
-                print("Loss after inter-client consistency is: ", loss_u)
 
             else:
                 y_preds = None
@@ -299,7 +302,7 @@ class Trainer(basic.Trainer):
             # Agreement-based Pseudo Labeling
             if cut_layer is None:
                 y_hard = self.model(
-                    unlabled_samples[_confident]
+                    samples_confident
                 )  #self.scale(unlabled_samples[_confident]))
                 #self.augment(unlabled_samples[_confident],
                 #soft=False)))
@@ -308,11 +311,13 @@ class Trainer(basic.Trainer):
                 #self.scale(unlabled_samples[_confident]))
                 #self.augment(unlabled_samples[_confident],
                 #soft=False)), cut_layer)
+            pred_prob = nn.Softmax(dim=1)
+            y_hard = pred_prob(y_hard)
 
             y_pseu = torch.from_numpy(
                 self.agreement_based_labeling(y_pred, y_preds))
+
             loss_u += loss_criterion_u(y_pseu, y_hard) * self.lambda_a
-            print("loss after agreement_based labelng is: ", loss_u)
         # Regularization
         self.psi = self.model.get_psi()
         self.sigma = self.model.get_sigma()
@@ -320,7 +325,6 @@ class Trainer(basic.Trainer):
         for lid, psi in enumerate(self.psi):  #
             # l1 regularization
             loss_u += torch.sum(torch.abs(psi)) * self.lambda_l1
-
             # l2 regularization
             loss_u += torch.sum(torch.square(
                 (self.sigma[lid] - psi))) * self.lambda_l2

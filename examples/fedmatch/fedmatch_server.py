@@ -57,7 +57,7 @@ class Server(fedavg.Server):
         if self.helper[selected_client_id - 1] is True:
 
             helpers = self.helpers[selected_client_id]
-            print("Select helpers for client #", selected_client_id)
+            #print("Select helpers for client #", selected_client_id)
 
             return [payload, helpers]
         self.helper[selected_client_id - 1] = True
@@ -81,7 +81,7 @@ class Server(fedavg.Server):
         self.tree = spatial.KDTree(out_list)
 
     def find_helpers(self, client_id, models_received):
-        print("The coming clients are: ", client_id)
+        #print("The coming clients are: ", client_id)
 
         helper_dict = {}
         for id in client_id:
