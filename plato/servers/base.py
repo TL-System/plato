@@ -352,7 +352,10 @@ class Server:
                 if self.client_simulation_mode and not Config(
                 ).is_central_server:
                     if self.asynchronous_mode and self.reporting_clients is not None:
-                        client_id = self.reporting_clients[i]
+                        if self.simulate_wall_time:
+                            client_id = self.current_reporting_clients[i]
+                        else:
+                            client_id = self.reporting_clients[i]
                     else:
                         client_id = i + 1
                 else:
@@ -692,6 +695,7 @@ class Server:
             for client_info in self.reporting_clients:
                 self.updates.append(
                     (client_info[1]['report'], client_info[1]['payload']))
+
                 if self.simulate_wall_time and self.wall_time < client_info[0]:
                     self.wall_time = client_info[0]
                     logging.info(

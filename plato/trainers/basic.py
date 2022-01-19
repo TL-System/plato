@@ -2,10 +2,10 @@
 The training and testing loops for PyTorch.
 """
 import asyncio
-import copy
 import logging
 import multiprocessing as mp
 import os
+import re
 import time
 
 import numpy as np
@@ -157,6 +157,8 @@ class Trainer(base.Trainer):
         sampler: the sampler that extracts a partition for this client.
         cut_layer (optional): The layer which training should start from.
         """
+        self.tic = time.perf_counter()
+
         if 'use_wandb' in config:
             import wandb
 
@@ -283,10 +285,14 @@ class Trainer(base.Trainer):
                             ).clients.speed_simulation:
                         self._simulate_client_speed()
 
-                    self.models_per_epoch[epoch] = {
-                        'time': time.perf_counter() - self.tic,
-                        'model': copy.deepcopy(self.model.cpu())
-                    }
+                    # Saving the model at the end of this epoch to a file so that
+                    # it can later be retrieved to respond to server requests
+                    # in asynchronous mode when the wall clock time is simulated
+                    self.model.cpu()
+                    training_time = time.perf_counter() - self.tic
+                    filename = f"{self.client_id}_{epoch}_{training_time}.pth"
+                    self.save_model(filename)
+                    self.model.to(self.device)
 
         except Exception as training_exception:
             logging.info("Training on client #%d failed.", self.client_id)
@@ -515,9 +521,31 @@ class Trainer(base.Trainer):
             Obtain a saved model for a particular epoch that finishes just after the provided
             wall clock time is reached.
         """
-        print("len of models per epoch = ", len(self.models_per_epoch))
-        print(self.models_per_epoch)
+        # Constructing a list of epochs and training times
+        for filename in os.listdir(Config().params['model_dir']):
+            split = re.match(
+                r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+).pth",
+                filename)
+
+            if split is not None:
+                epoch = split.group('epoch')
+                training_time = split.group('training_time')
+                if self.client_id == int(split.group('client_id')):
+                    self.models_per_epoch[epoch] = {
+                        'training_time': float(training_time),
+                        'model_checkpoint': filename
+                    }
+
+        # Locate the model at a specific wall clock time
         for epoch in sorted(self.models_per_epoch):
-            model = self.models_per_epoch[epoch]
-            if model['time'] + self.tic > wall_time:
-                return model['model']
+            training_time = self.models_per_epoch[epoch]['training_time']
+            model_checkpoint = self.models_per_epoch[epoch]['model_checkpoint']
+            if training_time + self.tic > wall_time:
+                self.load_model(model_checkpoint)
+                logging.info(
+                    "[Client #%s] Responding to the server with the model after "
+                    "epoch %s finished, at time %s.", self.client_id, epoch,
+                    training_time + self.tic)
+                return self.model
+
+        return self.model
