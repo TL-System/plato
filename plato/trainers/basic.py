@@ -22,6 +22,7 @@ from plato.utils import optimizers
 
 class Trainer(base.Trainer):
     """A basic federated learning trainer, used by both the client and the server."""
+
     def __init__(self, model=None):
         """Initializing the trainer with the provided model.
 
@@ -288,11 +289,13 @@ class Trainer(base.Trainer):
                     # Saving the model at the end of this epoch to a file so that
                     # it can later be retrieved to respond to server requests
                     # in asynchronous mode when the wall clock time is simulated
-                    self.model.cpu()
-                    training_time = time.perf_counter() - self.tic
-                    filename = f"{self.client_id}_{epoch}_{training_time}.pth"
-                    self.save_model(filename)
-                    self.model.to(self.device)
+                    if hasattr(Config().server, 'request_update') and Config(
+                    ).server.request_update:
+                        self.model.cpu()
+                        training_time = time.perf_counter() - self.tic
+                        filename = f"{self.client_id}_{epoch}_{training_time}.pth"
+                        self.save_model(filename)
+                        self.model.to(self.device)
 
         except Exception as training_exception:
             logging.info("Training on client #%d failed.", self.client_id)
@@ -535,7 +538,6 @@ class Trainer(base.Trainer):
                         'training_time': float(training_time),
                         'model_checkpoint': filename
                     }
-
         # Locate the model at a specific wall clock time
         for epoch in sorted(self.models_per_epoch):
             training_time = self.models_per_epoch[epoch]['training_time']
