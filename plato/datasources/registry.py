@@ -26,40 +26,25 @@ elif hasattr(Config().trainer, 'use_tensorflow'):
     registered_datasources = OrderedDict([('MNIST', mnist_tensorflow),
                                           ('FashionMNIST',
                                            fashion_mnist_tensorflow)])
-
-elif hasattr(Config.data, 'use_multimodal'):
-    from plato.datasources.multimodal import kinetics, gym, flickr30k_entities, referitgame
+else:
+    from plato.datasources import (mnist, fashion_mnist, cifar10, cinic10,
+                                   huggingface, pascal_voc, tiny_imagenet,
+                                   femnist, feature, flickr30k_entities,
+                                   referitgame, coco)
 
     registered_datasources = OrderedDict([
-        ('kinetics700', kinetics),
-        ('kinetics400', kinetics),
-        ('Gym', gym),
-        ('Flickr30E', flickr30k_entities),
-        ('Referitgame', referitgame),
+        ('MNIST', mnist),
+        ('FashionMNIST', fashion_mnist),
+        ('CIFAR10', cifar10),
+        ('CINIC10', cinic10),
+        ('HuggingFace', huggingface),
+        ('PASCAL_VOC', pascal_voc),
+        ('TinyImageNet', tiny_imagenet),
+        ('Feature', feature),
+        ('Flickr30KE', flickr30k_entities),
+        ('ReferItGame', referitgame),
+        ('COCO', coco),
     ])
-    registered_partitioned_datasources = OrderedDict()
-
-else:
-    from plato.datasources import (
-        mnist,
-        fashion_mnist,
-        cifar10,
-        cinic10,
-        huggingface,
-        pascal_voc,
-        tiny_imagenet,
-        femnist,
-        feature,
-    )
-
-    registered_datasources = OrderedDict([('MNIST', mnist),
-                                          ('FashionMNIST', fashion_mnist),
-                                          ('CIFAR10', cifar10),
-                                          ('CINIC10', cinic10),
-                                          ('HuggingFace', huggingface),
-                                          ('PASCAL_VOC', pascal_voc),
-                                          ('TinyImageNet', tiny_imagenet),
-                                          ('Feature', feature)])
 
     registered_partitioned_datasources = OrderedDict([('FEMNIST', femnist)])
 
@@ -70,6 +55,14 @@ def get(client_id=0):
 
     logging.info("Data source: %s", Config().data.datasource)
 
+    if datasource_name in ["kinetics700", "Gym"]:
+        from plato.datasources import kinetics, gym
+
+        multi_modal_registered_datasources = OrderedDict([('kinetics700',
+                                                           kinetics),
+                                                          ('Gym', gym)])
+        registered_datasources.update(multi_modal_registered_datasources)
+
     if Config().data.datasource == 'YOLO':
         from plato.datasources import yolo
         return yolo.DataSource()
@@ -79,7 +72,7 @@ def get(client_id=0):
         dataset = registered_partitioned_datasources[
             datasource_name].DataSource(client_id)
     else:
-        raise ValueError('No such data source: {}'.format(datasource_name))
+        raise ValueError(f'No such data source: {datasource_name}')
 
     return dataset
 
@@ -100,6 +93,6 @@ def get_input_shape():
         input_shape = registered_partitioned_datasources[
             datasource_name].DataSource.input_shape()
     else:
-        raise ValueError('No such data source: {}'.format(datasource_name))
+        raise ValueError(f'No such data source: {datasource_name}')
 
     return input_shape

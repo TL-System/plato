@@ -3,8 +3,37 @@ Useful tools for processing the data
 
 """
 import shutil
-
+import os
+import json
 import numpy as np
+
+
+def config_to_dict(plato_config):
+    """ Convert the plato config (can be nested one) instance to the dict. """
+    # convert the whole to dict - OrderedDict
+    plato_config_dict = plato_config._asdict()
+
+    def to_dict(elem):
+
+        for key, value in elem.items():
+            try:
+                value = value._asdict()
+                elem[key] = to_dict(value)
+            except:
+                pass
+            if isinstance(value, list):
+                for idx, value_item in enumerate(value):
+                    try:
+                        value_item = value_item._asdict()
+                        value[idx] = to_dict(value_item)
+                    except:
+                        pass
+                elem[key] = value
+        return elem
+
+    plato_config_dict = to_dict(plato_config_dict)
+
+    return plato_config_dict
 
 
 def dict_list2tuple(dict_obj):
@@ -13,10 +42,18 @@ def dict_list2tuple(dict_obj):
         if isinstance(value, dict):
             for inner_key, inner_v in value.items():
                 if isinstance(inner_v, list):
-                    dict_obj[key][inner_key] = tuple(inner_v)
+                    # empty or None list, mainly for meta_keys
+                    if not value or inner_v[0] is None:
+                        dict_obj[key][inner_key] = ()
+                    else:
+                        dict_obj[key][inner_key] = tuple(inner_v)
         else:
             if isinstance(value, list):
-                dict_obj[key] = tuple(value)
+                # empty or None list, mainly for meta_keys
+                if not value or value[0] is None:
+                    dict_obj[key] = ()
+                else:
+                    dict_obj[key] = tuple(value)
                 for idx, item in enumerate(value):
                     item = value[idx]
                     if isinstance(item, dict):
@@ -72,3 +109,18 @@ def union_shuffled_lists(src_lists):
     processed = np.random.permutation(len(src_lists[0]))
 
     return [np.array(ele)[processed] for ele in src_lists]
+
+
+def read_anno_file(anno_file_path):
+
+    _, tail = os.path.split(anno_file_path)
+    file_type = tail.split(".")[-1]
+
+    if file_type == "json":
+        with open(anno_file_path, 'r') as anno_file:
+            annos_list = json.load(anno_file)
+    else:
+        with open(anno_file_path, 'r') as anno_file:
+            annos_list = anno_file.readlines()
+
+    return annos_list
