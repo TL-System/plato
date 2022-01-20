@@ -6,6 +6,8 @@ based on a configuration at run-time.
 import logging
 from collections import OrderedDict
 
+from aiohttp import FlowControlDataQueue
+
 from plato.config import Config
 
 if hasattr(Config().trainer, 'use_mindspore'):
@@ -29,8 +31,7 @@ elif hasattr(Config().trainer, 'use_tensorflow'):
 else:
     from plato.datasources import (mnist, fashion_mnist, cifar10, cinic10,
                                    huggingface, pascal_voc, tiny_imagenet,
-                                   femnist, feature, flickr30k_entities,
-                                   referitgame, coco)
+                                   femnist, feature)
 
     registered_datasources = OrderedDict([
         ('MNIST', mnist),
@@ -41,9 +42,6 @@ else:
         ('PASCAL_VOC', pascal_voc),
         ('TinyImageNet', tiny_imagenet),
         ('Feature', feature),
-        ('Flickr30KE', flickr30k_entities),
-        ('ReferItGame', referitgame),
-        ('COCO', coco),
     ])
 
     registered_partitioned_datasources = OrderedDict([('FEMNIST', femnist)])
@@ -55,15 +53,27 @@ def get(client_id=0):
 
     logging.info("Data source: %s", Config().data.datasource)
 
-    if datasource_name in ["kinetics700", "Gym"]:
-        from plato.datasources import kinetics, gym
+    if datasource_name == 'kinetics700':
+        from plato.datasources import kinetics
+        return kinetics.DataSource()
 
-        multi_modal_registered_datasources = OrderedDict([('kinetics700',
-                                                           kinetics),
-                                                          ('Gym', gym)])
-        registered_datasources.update(multi_modal_registered_datasources)
+    if datasource_name == 'Gym':
+        from plato.datasources import gym
+        return gym.DataSource()
 
-    if Config().data.datasource == 'YOLO':
+    if datasource_name == 'Flickr30KE':
+        from plato.datasources import flickr30k_entities
+        return flickr30k_entities.DataSource()
+
+    if datasource_name == 'ReferItGame':
+        from plato.datasources import referitgame
+        return referitgame.DataSource()
+
+    if datasource_name == 'COCO':
+        from plato.datasources import coco
+        return coco.DataSource()
+
+    if datasource_name == 'YOLO':
         from plato.datasources import yolo
         return yolo.DataSource()
     elif datasource_name in registered_datasources:
