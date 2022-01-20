@@ -22,7 +22,6 @@ from plato.utils import optimizers
 
 class Trainer(base.Trainer):
     """A basic federated learning trainer, used by both the client and the server."""
-
     def __init__(self, model=None):
         """Initializing the trainer with the provided model.
 
@@ -32,10 +31,7 @@ class Trainer(base.Trainer):
         """
         super().__init__()
 
-        self.tic = 0
-        self.toc = 0
         self.training_start_time = time.time()
-        self.models_per_epoch = {}
 
         if model is None:
             model = models_registry.get()
@@ -159,7 +155,7 @@ class Trainer(base.Trainer):
         sampler: the sampler that extracts a partition for this client.
         cut_layer (optional): The layer which training should start from.
         """
-        self.tic = time.perf_counter()
+        tic = time.perf_counter()
 
         if 'use_wandb' in config:
             import wandb
@@ -293,7 +289,7 @@ class Trainer(base.Trainer):
                     if hasattr(Config().server, 'request_update') and Config(
                     ).server.request_update:
                         self.model.cpu()
-                        training_time = time.perf_counter() - self.tic
+                        training_time = time.perf_counter() - tic
                         filename = f"{self.client_id}_{epoch}_{training_time}.pth"
                         self.save_model(filename)
                         self.model.to(self.device)
@@ -337,7 +333,7 @@ class Trainer(base.Trainer):
 
         if 'max_concurrency' in config:
             self.start_training()
-            self.tic = time.perf_counter()
+            tic = time.perf_counter()
 
             if mp.get_start_method(allow_none=True) != 'spawn':
                 mp.set_start_method('spawn', force=True)
@@ -361,14 +357,14 @@ class Trainer(base.Trainer):
                 raise ValueError(
                     f"Training on client {self.client_id} failed.") from error
 
-            self.toc = time.perf_counter()
+            toc = time.perf_counter()
             self.pause_training()
         else:
-            self.tic = time.perf_counter()
+            tic = time.perf_counter()
             self.train_process(config, trainset, sampler, cut_layer)
-            self.toc = time.perf_counter()
+            toc = time.perf_counter()
 
-        training_time = self.toc - self.tic
+        training_time = toc - tic
 
         return training_time
 
@@ -529,6 +525,8 @@ class Trainer(base.Trainer):
             wall clock time is reached.
         """
         # Constructing a list of epochs and training times
+        self.models_per_epoch = {}
+
         for filename in os.listdir(Config().params['model_dir']):
             split = re.match(
                 r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+).pth",
