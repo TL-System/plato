@@ -126,8 +126,8 @@ def generate_splits_list(data_root, annotation_root, frame_data_root):
     val_file_org = osp.join(annotation_root, 'gym99_val_org.txt')
     train_file = osp.join(annotation_root, 'gym99_train.txt')
     val_file = osp.join(annotation_root, 'gym99_val.txt')
-    train_frame_file = osp.join(annotation_root, 'gym99_train_frame.txt')
-    val_frame_file = osp.join(annotation_root, 'gym99_val_frame.txt')
+    train_frame_file = osp.join(annotation_root, 'gym99_train_rawframes.txt')
+    val_frame_file = osp.join(annotation_root, 'gym99_val_rawframes.txt')
 
     train_org = open(train_file_org).readlines()
 

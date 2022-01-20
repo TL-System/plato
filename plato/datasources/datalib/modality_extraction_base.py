@@ -37,7 +37,7 @@ class VideoExtractorBase:
                                       '/*' * self.dir_level + '.' +
                                       self.video_ext)
 
-        logging.info("Total number of videos found: %s", fullpath_list)
+        logging.info("Total number of videos found: %s", len(fullpath_list))
 
         # the full path list is the full path of the video,
         # for example: ./data/Kinetics/Kinetics700/train/video/clay_pottery_making/RE6YNPccYK4.mp4',
