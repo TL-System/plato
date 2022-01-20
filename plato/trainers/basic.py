@@ -34,6 +34,7 @@ class Trainer(base.Trainer):
 
         self.tic = 0
         self.toc = 0
+        self.training_start_time = time.time()
         self.models_per_epoch = {}
 
         if model is None:
@@ -331,6 +332,9 @@ class Trainer(base.Trainer):
             if self._sleep_time is None:
                 self._sleep_time = self._simulate_sleep_time()
 
+        # Set the start time of training in absolute time
+        self.training_start_time = time.time()
+
         if 'max_concurrency' in config:
             self.start_training()
             self.tic = time.perf_counter()
@@ -542,12 +546,12 @@ class Trainer(base.Trainer):
         for epoch in sorted(self.models_per_epoch):
             training_time = self.models_per_epoch[epoch]['training_time']
             model_checkpoint = self.models_per_epoch[epoch]['model_checkpoint']
-            if training_time + self.tic > wall_time:
+            if training_time + self.training_start_time > wall_time:
                 self.load_model(model_checkpoint)
                 logging.info(
                     "[Client #%s] Responding to the server with the model after "
                     "epoch %s finished, at time %s.", self.client_id, epoch,
-                    training_time + self.tic)
+                    training_time + self.training_start_time)
                 return self.model
 
         return self.model
