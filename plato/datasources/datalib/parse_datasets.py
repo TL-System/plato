@@ -130,35 +130,32 @@ def parse_kinetics_splits(kinetics_anntation_files_info, level, dataset_name):
             label = class_mapping[convert_label(line_str[0])]
             return video, label
 
-    assert "train" in list(kinetics_anntation_files_info.keys())
+    train_file = kinetics_anntation_files_info['train']
+    test_file = kinetics_anntation_files_info['test']
+    val_file = kinetics_anntation_files_info['val']
 
-    splits = dict()
-    for split_name in ["train", "val", "test"]:
-        if split_name not in list(kinetics_anntation_files_info.keys()):
-            continue
-        split_anno_info = kinetics_anntation_files_info[split_name]
+    csv_reader = csv.reader(open(train_file))
+    # skip the first line
+    next(csv_reader)
 
-        # obtain the class map information
-        if split_name == "train:":
-            csv_reader = csv.reader(open(split_anno_info))
-            # skip the first line
-            next(csv_reader)
-            labels_sorted = sorted(
-                set([convert_label(row[0]) for row in csv_reader]))
-            class_mapping = {label: i for i, label in enumerate(labels_sorted)}
+    labels_sorted = sorted({convert_label(row[0]) for row in csv_reader})
+    class_mapping = {label: i for i, label in enumerate(labels_sorted)}
 
-        csv_reader = csv.reader(open(split_anno_info))
-        next(csv_reader)
-        if split_name == "test:":
-            obtained_split_list = [
-                line_to_map(x, test=True) for x in csv_reader
-            ]
-        else:
-            obtained_split_list = [line_to_map(x) for x in csv_reader]
+    csv_reader = csv.reader(open(train_file))
+    next(csv_reader)
+    train_list = [line_to_map(x) for x in csv_reader]
 
-        splits[split_name] = obtained_split_list
+    csv_reader = csv.reader(open(val_file))
+    next(csv_reader)
+    val_list = [line_to_map(x) for x in csv_reader]
 
-    return (splits, )
+    csv_reader = csv.reader(open(test_file))
+    next(csv_reader)
+    test_list = [line_to_map(x, test=True) for x in csv_reader]
+
+    splits = ((train_list, val_list, test_list), )
+    splits = {"train": train_list, "test": test_list, "val": val_list}
+    return splits
 
 
 def obtain_data_splits_info(

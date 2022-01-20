@@ -1,26 +1,36 @@
 """
-This is the interface for the ReferitGame dataset that includes refer+, refer, referg sub-datasets.
 
-http://tamaraberg.com/referitgame/
+Although the name of this dataset is referitgame, it actually contains four datasets:
+ - ReferItGame http://tamaraberg.com/referitgame/.
+ Then, refer-based datasets http://vision2.cs.unc.edu/refer/:
+ - RefCOCO
+ - RefCOCO+
+ - RefCOCOg
+
+The 'split_config' needed to be set to support the following datasets:
+- referitgame: 130,525 expressions for referring to 96,654 objects in 19,894 images.
+                The samples are splited into three subsets.  train/54,127 referring expressions.
+                test/5,842, val/60,103 referring expressions.
+- refcoco: 142,209 refer expressions for 50,000 objects.
+- refcoco+: 141,564 expressions for 49,856 objects.
+- refcocog (google):  25,799 images with 49,856 referred objects and expressions.
+
+The output sample structure of this data is consistent with that
+ in the flickr30k entities dataset.
+
 """
 
 import logging
-import os
 
 import collections
 
 import torch
-
 import cv2
 
 from plato.config import Config
-from plato.datasources.multimodal import multimodal_base
+from plato.datasources import multimodal_base
+from plato.datasources.multimodal_base import TextData, BoxData, TargetData
 from plato.datasources.datalib.refer_utils import referitgame_utils
-
-DataAnnos = collections.namedtuple('annos', [
-    'caption', 'caption_phrases', 'caption_phrase_bboxs',
-    'caption_phrases_cate', 'caption_phrases_cate_id'
-])
 
 SplitedDatasets = collections.namedtuple('SplitedDatasets', [
     'train_ref_ids', 'val_ref_ids', 'test_ref_ids', 'testA_ref_ids',
@@ -43,33 +53,51 @@ def collate_fn(batch):
     return batch
 
 
-class ReferItGameDataset(torch.utils.data.Dataset):
-    """Prepares the ReferItGame dataset for use in the model."""
+class ReferItGameDataset(multimodal_base.MultiModalDataset):
+    """Prepares the Flickr30K Entities dataset."""
     def __init__(self,
-                 dataset,
-                 base_refer_data,
+                 dataset_info,
+                 phase,
+                 phase_info,
+                 modality_sampler=None,
                  transform_image_dec_func=None,
                  transform_text_func=None):
-        self.phase_data = dataset
-        self.base_refer_data = base_refer_data
+        super().__init__()
+
+        self.phase = phase
+        self.phase_multimodal_data_record = dataset_info
+        self.phase_info = phase_info
         self.transform_image_dec_func = transform_image_dec_func
         self.transform_text_func = transform_text_func
 
-    def __len__(self):
-        return len(self.phase_data)
+        # The phase data record in referitgame is a list,
+        #  each item contains information of one image as
+        #  presented in line-258.
+        self.phase_samples_name = self.phase_multimodal_data_record
 
-    def __getitem__(self, sample_idx):
+        self.supported_modalities = ["rgb", "text"]
+
+        # Default, utilizing the full modalities
+        if modality_sampler is None:
+            self.modality_sampler = self.supported_modalities
+        else:
+            self.modality_sampler = modality_sampler
+
+    def __len__(self):
+        return len(self.phase_multimodal_data_record)
+
+    def get_one_multimodal_sample(self, sample_idx):
         [
             image_id, _, caption, caption_phrases, caption_phrase_bboxs,
             caption_phrases_cate, caption_phrases_cate_id
-        ] = self.phase_data[sample_idx]
+        ] = self.phase_multimodal_data_record[sample_idx]
 
-        sample_name = image_id
-        image_data = self.base_refer_data.loadImgsData(image_id)[0]
+        _ = image_id
+        image_data = self.phase_info.loadImgsData(image_id)[0]
 
         image_data = cv2.cvtColor(image_data, cv2.COLOR_BGR2RGB)
 
-        ori_image_data = image_data.copy()
+        _ = image_data.copy()
 
         caption = caption if any(isinstance(boxes_i, list) for boxes_i in caption) \
                                             else [caption]
@@ -104,14 +132,18 @@ class ReferItGameDataset(torch.utils.data.Dataset):
         caption_phrase_bboxs = [caption_phrase_bboxs
                                 ]  # convert to the standard structure
 
-        sample_annos = DataAnnos(
-            caption=caption,
-            caption_phrases=caption_phrases,
-            caption_phrase_bboxs=caption_phrase_bboxs,
+        text_data = TextData(caption=caption, caption_phrases=caption_phrases)
+        box_data = BoxData(caption_phrase_bboxs=caption_phrase_bboxs)
+        taget_data = TargetData(
             caption_phrases_cate=caption_phrases_cate,
             caption_phrases_cate_id=caption_phrases_cate_id)
 
-        return sample_name, ori_image_data, image_data, sample_annos
+        return {
+            "rgb": image_data,
+            "text": text_data,
+            "box": box_data,
+            "target": taget_data
+        }
 
 
 class DataSource(multimodal_base.MultiModalDataSource):
@@ -120,10 +152,17 @@ class DataSource(multimodal_base.MultiModalDataSource):
         super().__init__()
 
         self.split_configs = ["refcoco", "refcoco+", "refcocog"]
+        self.modality_names = ["image", "text"]
 
         self.data_name = Config().data.dataname
-        self.data_source = Config().data.datasource
+        self.base_coco = Config().data.base_coco_images_path
+        self.data_source = "COCO2017"
+
+        # Obtain which split to use:
+        #  refclef, refcoco, refcoco+ and refcocog
         self.split_config = Config().data.split_config
+        # Obtain which specific setting to use:
+        #  unc, google
         self.split_name = Config().data.split_name
         if self.split_config not in self.split_configs:
             info_msg = (
@@ -131,20 +170,20 @@ class DataSource(multimodal_base.MultiModalDataSource):
                     self.split_config, self.split_configs)
             logging.info(info_msg)
 
-        self.modality_names = ["image", "text"]
-
         _path = Config().data.data_path
         self._data_path_process(data_path=_path, base_data_name=self.data_name)
         base_data_path = self.mm_data_info["base_data_dir_path"]
 
-        # the source data is required
-        source_data_path = os.path.join(_path, self.data_source)
-        if not self._exist_judgement(source_data_path):
-            info_msg = (
-                "The source data {} must be downloaded first to the directory {} "
-            ).format(self.data_source, self.split_configs)
-            logging.info(info_msg)
-            exit()
+        # raw coco images path
+        coco_raw_imgs_path = self.base_coco
+        if self._exist_judgement(coco_raw_imgs_path):
+            logging.info(
+                "Successfully connecting the source COCO2017 images data from the path %s",
+                coco_raw_imgs_path)
+        else:
+            logging.info(
+                "Fail to connect the source COCO2017 images data from the path %s",
+                coco_raw_imgs_path)
 
         # download the public official code and the required config
         download_split_url = Config(
@@ -153,13 +192,6 @@ class DataSource(multimodal_base.MultiModalDataSource):
             self._download_arrange_data(download_url_address=dd_url,
                                         put_data_dir=base_data_path)
 
-        # raw coco images path
-        coco_raw_imgs_path = os.path.join(source_data_path, "COCO2017Raw",
-                                          "train2017")
-        if self._exist_judgement(coco_raw_imgs_path):
-            logging.info(
-                "Successfully connecting the source COCO2017 images data from the path %s",
-                coco_raw_imgs_path)
         self._dataset_refer = referitgame_utils.REFER(
             data_root=base_data_path,
             image_dataroot=coco_raw_imgs_path,
@@ -229,26 +261,26 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         return mode_elements_holder, mode_flatten_emelemts
 
-    def get_train_loader(self, batch_size):
-        """ Get the train loader """
-        phase = "train"
+    def get_phase_dataset(self, phase, modality_sampler):
+        """ Obtain the dataset for the specific phase """
         _, mode_flatten_emelemts = self.get_phase_data(phase)
-        self.trainset = ReferItGameDataset(dataset=mode_flatten_emelemts,
-                                           base_refer_data=self._dataset_refer)
-        train_loader = torch.utils.data.DataLoader(dataset=self.trainset,
-                                                   batch_size=batch_size,
-                                                   shuffle=True,
-                                                   collate_fn=collate_fn)
-        return train_loader
 
-    def get_test_loader(self, batch_size):
-        """ Get the test loader """
+        dataset = ReferItGameDataset(dataset_info=mode_flatten_emelemts,
+                                     phase_info=self._dataset_refer,
+                                     phase=phase,
+                                     modality_sampler=modality_sampler)
+        return dataset
+
+    def get_train_set(self, modality_sampler=None):
+        """ Obtains the training dataset. """
+        phase = "train"
+
+        self.trainset = self.get_phase_dataset(phase, modality_sampler)
+        return self.trainset
+
+    def get_test_set(self, modality_sampler=None):
+        """ Obtains the validation dataset. """
         phase = "test"
-        _, mode_flatten_emelemts = self.get_phase_data(phase)
-        self.testset = ReferItGameDataset(dataset=mode_flatten_emelemts,
-                                          base_refer_data=self._dataset_refer)
-        test_loader = torch.utils.data.DataLoader(dataset=self.testset,
-                                                  batch_size=batch_size,
-                                                  shuffle=True,
-                                                  collate_fn=collate_fn)
-        return test_loader
+
+        self.testset = self.get_phase_dataset(phase, modality_sampler)
+        return self.testset

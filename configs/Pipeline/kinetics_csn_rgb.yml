@@ -193,7 +193,7 @@ rgb_data_test: &rgb_data_test
   pipeline: *rgb_test_pipeline
 
 
-rgb_data:
-  train: *rgb_data_train
-  val: *rgb_data_val
-  test: *rgb_data_test
+
+train: *rgb_data_train
+val: *rgb_data_val
+test: *rgb_data_test

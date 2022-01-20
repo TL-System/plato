@@ -15,7 +15,7 @@ from plato.datasources import yolo
 from plato.trainers import basic
 from plato.utils import unary_encoding
 
-from yolov5.utils.general import (NCOLS, box_iou, check_dataset, one_cycle,
+from yolov5.utils.general import (NCOLS, box_iou, check_dataset, one_cycle,non_max_suppression,
                                   scale_coords, xywh2xyxy)
 from yolov5.utils.loss import ComputeLoss
 from yolov5.utils.metrics import ap_per_class
@@ -158,8 +158,7 @@ class Trainer(basic.Trainer):
 
             for i, (imgs, targets, *__) in pbar:
                 ni = i + nb * epoch  # number integrated batches (since train start)
-                imgs = imgs.to(self.device, non_blocking=True).float(
-                ) / 255  # uint8 to float32, 0-255 to 0.0-1.0
+                imgs, targets = imgs.to(self.device), targets.to(self.device)
 
                 # Warmup
                 if ni <= nw:
@@ -307,6 +306,13 @@ class Trainer(basic.Trainer):
                 targets[:,
                         2:] *= torch.Tensor([width, height, width,
                                              height]).to(device)  # to pixels
+
+                lb = []  # for autolabelling
+                out = non_max_suppression(out,
+                                          conf_thres=0.001,
+                                          iou_thres=0.6,
+                                          labels=lb,
+                                          multi_label=True)
 
             # Metrics
             for si, pred in enumerate(out):

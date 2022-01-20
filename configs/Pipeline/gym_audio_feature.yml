@@ -1,0 +1,123 @@
+# the configuration file for the audio dataset of the kinetics700
+
+audio_train_pipeline: &audio_train_pipeline
+  - type: LoadAudioFeature
+
+  - 
+    type: SampleFrames
+    clip_len: 64
+    frame_interval: 1
+    num_clips: 1
+
+  - 
+    type: AudioFeatureSelector
+
+  - 
+    type: FormatAudioShape
+    input_format: NCTF
+
+  -
+    type: Collect
+
+    keys:
+      - audios 
+      - label
+
+    meta_keys:
+      - null
+
+  -
+    type: ToTensor
+    keys:
+      - audios
+
+audio_val_pipeline: &audio_val_pipeline
+  - type: LoadAudioFeature
+
+  - 
+    type: SampleFrames
+    clip_len: 64
+    frame_interval: 1
+    num_clips: 1
+    test_mode: True
+    
+  - 
+    type: AudioFeatureSelector
+
+  -
+    type: FormatAudioShape
+    input_format: NCTF
+
+  -
+    type: Collect
+
+    keys:
+      - audios 
+      - label
+
+    meta_keys:
+      - null
+
+  -
+    type: ToTensor
+    keys:
+      - audios
+
+audio_test_pipeline: &audio_test_pipeline
+  - type: LoadAudioFeature
+
+  - 
+    type: SampleFrames
+    clip_len: 64
+    frame_interval: 1
+    num_clips: 1
+    test_mode: True
+    
+  - 
+    type: AudioFeatureSelector
+
+  -
+    type: FormatAudioShape
+    input_format: NCTF
+
+  -
+    type: Collect
+
+    keys:
+      - audios 
+      - label
+
+    meta_keys:
+      - null
+
+  -
+    type: ToTensor
+    keys:
+      - audios
+
+
+audio_data_train: &audio_data_train
+  type: AudioFeatureDataset
+  ann_file: gym99_train_list_audio_feature.txt
+  data_prefix: audio_feature_train
+  pipeline: *audio_train_pipeline
+
+
+audio_data_val: &audio_data_val
+  type: AudioFeatureDataset
+  ann_file: gym99_val_list_audio_feature.txt
+  data_prefix: audio_feature_val
+  pipeline: *audio_val_pipeline
+
+
+audio_data_test: &audio_data_test
+  type: AudioFeatureDataset
+  ann_file: gym99_val_list_audio_feature.txt
+  data_prefix: audio_feature_val
+  pipeline: *audio_test_pipeline
+
+
+
+train: *audio_data_train
+val: *audio_data_val
+test: *audio_data_test

@@ -243,6 +243,7 @@ class Client:
         else:
             if isinstance(payload, list):
                 data_size: int = 0
+                original_data_size: int = 0
 
                 for data in payload:
                     _data = pickle.dumps(data)
@@ -252,6 +253,7 @@ class Client:
                 _data = pickle.dumps(payload)
                 await self.send_in_chunks(_data)
                 data_size = sys.getsizeof(_data)
+                original_data_size = sys.getsizeof(payload)
 
         await self.sio.emit('client_payload_done', metadata)
 

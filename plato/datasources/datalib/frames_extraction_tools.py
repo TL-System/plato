@@ -9,25 +9,20 @@ import glob
 import os
 from multiprocessing import Pool
 
-from mmaction.tools.flow_extraction import extract_dense_flow
+from mmaction.tools.misc.flow_extraction import extract_dense_flow
 
 from plato.datasources.datalib import modality_extraction_base
 
 
-def obtain_video_dest_dir(out_dir, video_path):
+def obtain_video_dest_dir(out_dir, video_path, is_classname_contained=True):
     """ Get the destination path for the video """
-    if '/' in video_path:
-        class_name = os.path.basename(os.path.dirname(video_path))
-        head, tail = os.path.split(video_path)
-        video_name = tail.split(".")[0]
 
-        if class_name not in head:
-            out_full_path = os.path.join(out_dir, class_name, video_name)
-        else:
-            out_full_path = os.path.join(out_dir, video_name)
-    else:  # the class name is not contained
-        video_name = video_path.split(".")[0]
-
+    class_name = os.path.basename(os.path.dirname(video_path))
+    _, tail = os.path.split(video_path)
+    video_name = tail.split(".")[0]
+    if is_classname_contained:
+        out_full_path = os.path.join(out_dir, class_name, video_name)
+    else:
         out_full_path = os.path.join(out_dir, video_name)
 
     return out_full_path
@@ -35,9 +30,13 @@ def obtain_video_dest_dir(out_dir, video_path):
 
 def extract_dense_flow_wrapper(items):
     """ This function can extract the frame based on the cpu hardware"""
-    input_video_path, dest_dir, bound, save_rgb, start_idx, rgb_tmpl, flow_tmpl, method = items
+    input_video_path, dest_dir, bound, save_rgb, \
+        start_idx, rgb_tmpl, flow_tmpl, method, is_classname_contained = items
 
-    out_full_path = obtain_video_dest_dir(dest_dir, input_video_path)
+    out_full_path = obtain_video_dest_dir(
+        dest_dir,
+        input_video_path,
+        is_classname_contained=is_classname_contained)
 
     extract_dense_flow(input_video_path, out_full_path, bound, save_rgb,
                        start_idx, rgb_tmpl, flow_tmpl, method)
@@ -53,8 +52,12 @@ def extract_rgb_frame(videos_extraction_items):
     Returns:
         bool: Whether generate optical flow successfully.
     """
-    full_path, vid_path, _, out_dir, new_width, new_height, new_short = videos_extraction_items
-    out_full_path = obtain_video_dest_dir(out_dir=out_dir, video_path=vid_path)
+    full_path, vid_path, _, out_dir, new_width, \
+        new_height, new_short, is_classname_contained = videos_extraction_items
+    out_full_path = obtain_video_dest_dir(
+        out_dir=out_dir,
+        video_path=vid_path,
+        is_classname_contained=is_classname_contained)
 
     if new_short == 0:
         cmd = os.path.join(
@@ -69,8 +72,12 @@ def extract_rgb_frame(videos_extraction_items):
 
 def extract_optical_flow(videos_items):
     """ Extract optical flow from the video """
-    full_path, vid_path, _, method, out_dir, new_short, new_width, new_height = videos_items
-    out_full_path = obtain_video_dest_dir(out_dir=out_dir, video_path=vid_path)
+    full_path, vid_path, _, method, out_dir, \
+        new_short, new_width, new_height, is_classname_contained = videos_items
+    out_full_path = obtain_video_dest_dir(
+        out_dir=out_dir,
+        video_path=vid_path,
+        is_classname_contained=is_classname_contained)
 
     if new_short == 0:
         cmd = os.path.join(
@@ -94,6 +101,10 @@ class VideoFramesExtractor(modality_extraction_base.VideoExtractorBase):
                  mixed_ext=False):
         super().__init__(video_src_dir, dir_level, num_worker, video_ext,
                          mixed_ext)
+        self.is_classname_contained = False
+        # the videos are categorized by the classes
+        if dir_level == 2:
+            self.is_classname_contained = True
 
     def build_rgb_frames(self, to_dir, new_short=0, new_width=0, new_height=0):
         """ Obtain the RGB frame """
@@ -110,7 +121,8 @@ class VideoFramesExtractor(modality_extraction_base.VideoExtractorBase):
                 len(self.videos_path_list) * [to_dir],
                 len(self.videos_path_list) * [new_short],
                 len(self.videos_path_list) * [new_width],
-                len(self.videos_path_list) * [new_height]))
+                len(self.videos_path_list) * [new_height],
+                len(self.videos_path_list) * [self.is_classname_contained]))
 
     def build_optical_flow_frames(
             self,
@@ -134,7 +146,8 @@ class VideoFramesExtractor(modality_extraction_base.VideoExtractorBase):
                 len(self.videos_path_list) * [to_dir],
                 len(self.videos_path_list) * [new_short],
                 len(self.videos_path_list) * [new_width],
-                len(self.videos_path_list) * [new_height]))
+                len(self.videos_path_list) * [new_height],
+                len(self.videos_path_list) * [self.is_classname_contained]))
 
     def build_frames_gpu(self,
                          rgb_out_dir_path,
@@ -157,7 +170,7 @@ class VideoFramesExtractor(modality_extraction_base.VideoExtractorBase):
                               new_short=1,
                               new_width=0,
                               new_height=0):
-        """ The interface from extracting all frames based on the GPU  """
+        """ The interface for extracting all frames based on the GPU  """
         self.build_frames_gpu(rgb_out_dir_path=to_dir_path,
                               flow_our_dir_path=to_dir_path,
                               new_short=new_short,
@@ -189,4 +202,5 @@ class VideoFramesExtractor(modality_extraction_base.VideoExtractorBase):
                 len(self.videos_path_list) * [start_idx],
                 len(self.videos_path_list) * [rgb_tmpl],
                 len(self.videos_path_list) * [flow_tmpl],
-                len(self.videos_path_list) * [method]))
+                len(self.videos_path_list) * [method],
+                len(self.videos_path_list) * [self.is_classname_contained]))
