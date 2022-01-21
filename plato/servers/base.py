@@ -367,9 +367,6 @@ class Server:
                     sid = self.clients[client_id]['sid']
                     self.simulated_clients[selected_client_id] = sid
 
-                logging.info("[Server #%d] Selecting client #%d for training.",
-                             os.getpid(), selected_client_id)
-
                 server_response = {'id': selected_client_id}
                 server_response = await self.customize_server_response(
                     server_response)
