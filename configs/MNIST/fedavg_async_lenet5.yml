@@ -3,7 +3,7 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 20
+    total_clients: 20 
 
     # The number of clients selected in each round
     per_round: 4
@@ -12,7 +12,7 @@ clients:
     do_test: false
 
     # Whether simulate clients or not
-    simulation: false
+    simulation: true 
     speed_simulation: true
 
     # The simulation distribution

@@ -113,6 +113,7 @@ class Server:
         self.disable_clients = False
 
         Server.client_simulation_mode = False
+        self.simulated_clients = {}
 
     def configure(self):
         """ Initializing configuration settings based on the configuration file. """
@@ -299,7 +300,7 @@ class Server:
                      self.current_round,
                      Config().trainer.rounds)
 
-        if Server.client_simulation_mode and not Config().is_central_server:
+        if Server.client_simulation_mode:
             # In the client simulation mode, the client pool for client selection contains
             # all the virtual clients to be simulated
             self.clients_pool = list(range(1, 1 + self.total_clients))
@@ -332,7 +333,7 @@ class Server:
             # reported may not have been aggregated; they should be excluded from the next
             # round of client selection
             reporting_client_ids = [
-                client[1] for client in self.reporting_clients
+                client[1]['client_id'] for client in self.reporting_clients
             ]
 
             selectable_clients = [
@@ -341,27 +342,43 @@ class Server:
                 and client not in reporting_client_ids
             ]
 
-            self.selected_clients = self.choose_clients(
-                selectable_clients, len(self.reporting_clients))
+            if self.simulate_wall_time:
+                self.selected_clients = self.choose_clients(
+                    selectable_clients, len(self.current_reporting_clients))
+            else:
+                self.selected_clients = self.choose_clients(
+                    selectable_clients, len(self.reporting_clients))
         else:
             self.selected_clients = self.choose_clients(
                 self.clients_pool, self.clients_per_round)
 
         if len(self.selected_clients) > 0:
             for i, selected_client_id in enumerate(self.selected_clients):
-                if self.client_simulation_mode and not Config(
-                ).is_central_server:
-                    if self.asynchronous_mode and self.reporting_clients is not None:
-                        if self.simulate_wall_time:
-                            client_id = self.current_reporting_clients[i]
-                        else:
-                            client_id = self.reporting_clients[i]
+                if self.asynchronous_mode and len(self.reporting_clients) > 0:
+                    if self.simulate_wall_time:
+                        selected_client_id = self.current_reporting_clients[i][
+                            1]['client_id']
                     else:
-                        client_id = i + 1
-                else:
-                    client_id = selected_client_id
+                        selected_client_id = self.reporting_clients[i][1][
+                            'client_id']
 
-                sid = self.clients[client_id]['sid']
+                if self.client_simulation_mode:
+                    client_id = i + 1
+                    sid = self.clients[client_id]['sid']
+                    self.simulated_clients[selected_client_id] = sid
+
+                logging.info("[Server #%d] Selecting client #%d for training.",
+                             os.getpid(), selected_client_id)
+
+                server_response = {'id': selected_client_id}
+                server_response = await self.customize_server_response(
+                    server_response)
+
+                self.training_clients[selected_client_id] = {
+                    'id': selected_client_id,
+                    'starting_round': self.current_round,
+                    'start_time': self.wall_time
+                }
 
                 logging.info("[Server #%d] Selecting client #%d for training.",
                              os.getpid(), selected_client_id)
@@ -384,11 +401,7 @@ class Server:
                     os.getpid(), selected_client_id)
                 await self.send(sid, payload, selected_client_id)
 
-                self.training_clients[client_id] = {
-                    'id': selected_client_id,
-                    'starting_round': self.current_round,
-                    'start_time': self.wall_time
-                }
+            self.current_reporting_clients = []
 
             # There is no need to clear the list of reporting clients if we are
             # simulating the wall clock time on the server. This is because
@@ -397,7 +410,6 @@ class Server:
             # replacement, and all remaining reporting clients will be processed
             # in the next round
             if self.simulate_wall_time:
-                self.current_reporting_clients = []
                 return
 
             self.reporting_clients = []
@@ -509,8 +521,6 @@ class Server:
 
     async def client_payload_arrived(self, sid, client_id):
         """ Upon receiving a portion of the payload from a client. """
-        print(self.training_clients)
-        print("client_id = ", client_id)
         assert len(
             self.client_chunks[sid]) > 0 and client_id in self.training_clients
 
@@ -606,13 +616,24 @@ class Server:
                         # receiving the request from the server
                         del self.reporting_clients[i]
 
-                        sid = self.clients[client_id]['sid']
+                        # Remove the client information from the list of current reporting clients
+                        # as well
+                        for j, reporting_client in enumerate(
+                                self.current_reporting_clients):
+                            if reporting_client[1]['client_id'] == client_info[
+                                    1]['client_id']:
+                                del self.current_reporting_clients[j]
 
                         self.training_clients[client_id] = {
                             'id': client_id,
                             'starting_round': client_info[1]['starting_round'],
                             'start_time': client_info[1]['start_time']
                         }
+
+                        if self.client_simulation_mode:
+                            sid = self.simulated_clients[client_id]
+                        else:
+                            sid = self.clients[client_id]['sid']
 
                         await self.sio.emit('request_update',
                                             {'time': self.wall_time},
@@ -631,6 +652,14 @@ class Server:
                         self.minimum_clients)):
                 # Extract a client with the earliest finish time in wall clock time
                 client_info = heapq.heappop(self.reporting_clients)
+
+                # Removing from the list of current reporting clients as well
+                for j, reporting_client in enumerate(
+                        self.current_reporting_clients):
+                    if reporting_client[1]['client_id'] == client_info[1][
+                            'client_id']:
+                        del self.current_reporting_clients[j]
+
                 # Update the simulated wall clock time to be the finish time of this client
                 self.wall_time = client_info[0]
 
