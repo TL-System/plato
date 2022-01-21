@@ -367,6 +367,8 @@ class Server:
                     client_id = i + 1
                     sid = self.clients[client_id]['sid']
                     self.simulated_clients[selected_client_id] = sid
+                else:
+                    sid = self.clients[selected_client_id]['sid']
 
                 server_response = {'id': selected_client_id}
                 server_response = await self.customize_server_response(
