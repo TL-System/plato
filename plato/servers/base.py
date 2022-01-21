@@ -100,7 +100,7 @@ class Server:
 
         # When simulating the wall clock time, the server needs to remember the
         # set of reporting clients received since the previous round of aggregation
-        self.current_reporting_clients = []
+        self.current_reporting_clients = {}
 
         self.ping_interval = 3600
         self.ping_timeout = 360
@@ -356,8 +356,9 @@ class Server:
             for i, selected_client_id in enumerate(self.selected_clients):
                 if self.asynchronous_mode and len(self.reporting_clients) > 0:
                     if self.simulate_wall_time:
-                        selected_client_id = self.current_reporting_clients[i][
-                            1]['client_id']
+                        current_reporting_clients = list(
+                            self.current_reporting_clients.keys())
+                        selected_client_id = current_reporting_clients[i]
                     else:
                         selected_client_id = self.reporting_clients[i][1][
                             'client_id']
@@ -398,7 +399,7 @@ class Server:
                     os.getpid(), selected_client_id)
                 await self.send(sid, payload, selected_client_id)
 
-            self.current_reporting_clients = []
+            self.current_reporting_clients = {}
 
             # There is no need to clear the list of reporting clients if we are
             # simulating the wall clock time on the server. This is because
@@ -573,7 +574,7 @@ class Server:
             })
 
         heapq.heappush(self.reporting_clients, client_info)
-        self.current_reporting_clients.append(client_info)
+        self.current_reporting_clients[client_info[1]['client_id']] = True
         del self.training_clients[client_id]
 
         await self.process_clients()
@@ -615,11 +616,7 @@ class Server:
 
                         # Remove the client information from the list of current reporting clients
                         # as well
-                        for j, reporting_client in enumerate(
-                                self.current_reporting_clients):
-                            if reporting_client[1]['client_id'] == client_info[
-                                    1]['client_id']:
-                                del self.current_reporting_clients[j]
+                        del self.current_reporting_clients[client_id]
 
                         self.training_clients[client_id] = {
                             'id': client_id,
@@ -651,11 +648,7 @@ class Server:
                 client_info = heapq.heappop(self.reporting_clients)
 
                 # Removing from the list of current reporting clients as well
-                for j, reporting_client in enumerate(
-                        self.current_reporting_clients):
-                    if reporting_client[1]['client_id'] == client_info[1][
-                            'client_id']:
-                        del self.current_reporting_clients[j]
+                del self.current_reporting_clients[client_info[1]['client_id']]
 
                 # Update the simulated wall clock time to be the finish time of this client
                 self.wall_time = client_info[0]
