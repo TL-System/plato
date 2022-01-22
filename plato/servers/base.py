@@ -464,9 +464,8 @@ class Server:
                 await self.select_clients()
             else:
                 logging.info(
-                    "[Server #%d] Simulating wall clock time or there are no sufficient number "
-                    "of client reports have been received. Nothing to process.",
-                    os.getpid())
+                    "[Server #%d] No sufficient number of client reports have been received. "
+                    "Nothing to process.", os.getpid())
 
     async def send_in_chunks(self, data, sid, client_id) -> None:
         """ Sending a bytes object in fixed-sized chunks to the client. """
