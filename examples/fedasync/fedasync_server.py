@@ -3,13 +3,14 @@ A federated learning server using FedAsync.
 
 Reference:
 
-Xie, C., Koyejo, S., & Gupta, I. (2019). "Asynchronous federated optimization." 
-arXiv preprint arXiv:1903.03934.
+Xie, C., Koyejo, S., Gupta, I. (2019). "Asynchronous federated optimization,"
+in Proc. 12th Annual Workshop on Optimization for Machine Learning (OPT 2020).
 
 https://opt-ml.org/papers/2020/paper_28.pdf
 """
 import logging
 import os
+from collections import OrderedDict
 
 from plato.config import Config
 from plato.servers import fedavg
@@ -17,11 +18,10 @@ from plato.servers import fedavg
 
 class Server(fedavg.Server):
     """A federated learning server using the FedAsync algorithm. """
-
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
 
-        # The hyperparameter of FedAsync with a range of (0,1)
+        # The hyperparameter of FedAsync with a range of (0, 1)
         self.mixing_hyperparam = 1
         # Whether adjust mixing hyperparameter after each round
         self.adaptive_mixing = False
@@ -37,17 +37,18 @@ class Server(fedavg.Server):
 
         if not hasattr(Config().server, 'mixing_hyperparameter'):
             logging.warning(
-                "FedAsync: Variable mixing hyperparameter is required for FedAsync server"
+                "FedAsync: Variable mixing hyperparameter is required for the FedAsync server. "
             )
         else:
             self.mixing_hyperparam = Config().server.mixing_hyperparameter
             if 0 < self.mixing_hyperparam < 1:
-                logging.info("FedAsync: Mixing hyperparameter set to %s",
+                logging.info("FedAsync: Mixing hyperparameter is set to %s",
                              self.mixing_hyperparam)
             else:
                 logging.warning(
-                    "FedAsync: Invalid mixing hyperparameter. " +
-                    "The hyperparameter needs to be within 0 and 1, exclusive")
+                    "FedAsync: Invalid mixing hyperparameter. "
+                    "The hyperparameter needs to be between 0 and 1 (exclusive)."
+                )
 
     async def process_clients(self):
         """ Determine whether it is time to process the client reports and
@@ -73,6 +74,7 @@ class Server(fedavg.Server):
         """Process the client reports by aggregating their weights."""
         # Calculate the new mixing hyperparameter with client's staleness
         __, __, client_staleness = self.updates[0]
+
         if self.adaptive_mixing:
             self.mixing_hyperparam *= self.staleness_function(client_staleness)
 
@@ -80,18 +82,16 @@ class Server(fedavg.Server):
         payload_received = [payload for (__, payload, __) in self.updates]
         weights_received = self.algorithm.compute_weight_updates(
             payload_received)
-        fedasync_update = {
-            name: self.trainer.zeros(weights.shape)
-            for name, weights in weights_received[0].items()
-        }
 
-        for update in weights_received:
-            for name, delta in update.items():
-                # Use mixing parameter to update weights
-                fedasync_update[name] += delta * self.mixing_hyperparam
+        # Actually update the global model's weights (PyTorch only)
+        baseline_weights = self.extract_weights()
 
-        # Actually update the global model's weight
-        updated_weights = self.algorithm.update_weights(fedasync_update)
+        updated_weights = OrderedDict()
+        for name, weight in baseline_weights.items():
+            updated_weights[name] = weight * (
+                1 - self.mixing_hyperparam
+            ) + weights_received[0][name] * self.mixing_hyperparam
+
         self.algorithm.load_weights(updated_weights)
 
         # Testing the global model accuracy
@@ -109,13 +109,14 @@ class Server(fedavg.Server):
                     os.getpid(), 100 * self.accuracy))
 
     async def periodic_task(self):
-        """ A periodic task that is executed from time to time"""
-        # Because in FedAsync, the server aggregates weights whenever a client
-        # reports back, so there is no need to check from time to time for
+        """ A periodic task that is executed from time to time. """
+        # In FedAsync, the server aggregates weights whenever a client
+        # reports back. There is no need to check from time to time for
         # un-processed clients.
         return
 
     @staticmethod
     def staleness_function(staleness) -> float:
+        """ Polynomial staleness function as proposed in Sec. 5.2, Evaluation Setup. """
         a = 2
-        return (staleness + 1) ** -a
+        return (staleness + 1)**-a
