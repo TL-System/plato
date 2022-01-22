@@ -610,7 +610,7 @@ class Server:
                     client_staleness = self.current_round - client[
                         'starting_round']
 
-                    if client_staleness > self.staleness and not client[
+                    if client_staleness > self.staleness_bound and not client[
                             'report'].update_response:
 
                         # Sending an urgent request to the client for a model update at the
@@ -686,7 +686,7 @@ class Server:
                 heapq.heappush(possibly_stale_clients, client_info)
 
                 if client_info[1][
-                        'starting_round'] < self.current_round - self.staleness:
+                        'starting_round'] < self.current_round - self.staleness_bound:
                     for __ in range(0, len(possibly_stale_clients)):
                         stale_client_info = heapq.heappop(
                             possibly_stale_clients)
