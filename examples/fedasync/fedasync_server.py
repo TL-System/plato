@@ -37,12 +37,12 @@ class Server(fedavg.Server):
 
         if not hasattr(Config().server, 'mixing_hyperparameter'):
             logging.warning(
-                "FedAsync: Variable mixing hyperparameter is required for the FedAsync server. "
+                "FedAsync: Variable mixing hyperparameter is required for the FedAsync server."
             )
         else:
             self.mixing_hyperparam = Config().server.mixing_hyperparameter
             if 0 < self.mixing_hyperparam < 1:
-                logging.info("FedAsync: Mixing hyperparameter is set to %s",
+                logging.info("FedAsync: Mixing hyperparameter is set to %s.",
                              self.mixing_hyperparam)
             else:
                 logging.warning(
@@ -84,7 +84,7 @@ class Server(fedavg.Server):
             payload_received)
 
         # Actually update the global model's weights (PyTorch only)
-        baseline_weights = self.extract_weights()
+        baseline_weights = self.algorithm.extract_weights()
 
         updated_weights = OrderedDict()
         for name, weight in baseline_weights.items():
