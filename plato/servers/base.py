@@ -113,7 +113,6 @@ class Server:
         self.disable_clients = False
 
         Server.client_simulation_mode = False
-        self.simulated_clients = {}
 
     def configure(self):
         """ Initializing configuration settings based on the configuration file. """
@@ -354,19 +353,20 @@ class Server:
 
         if len(self.selected_clients) > 0:
             for i, selected_client_id in enumerate(self.selected_clients):
-                if self.asynchronous_mode and len(self.reporting_clients) > 0:
-                    if self.simulate_wall_time:
-                        current_reporting_clients = list(
-                            self.current_reporting_clients.keys())
-                        selected_client_id = current_reporting_clients[i]
-                    else:
-                        selected_client_id = self.reporting_clients[i][1][
-                            'client_id']
-
                 if self.client_simulation_mode:
                     client_id = i + 1
                     sid = self.clients[client_id]['sid']
-                    self.simulated_clients[selected_client_id] = sid
+
+                    if self.asynchronous_mode and self.simulate_wall_time:
+                        # skip if this sid is currently `training' with reporting clients
+                        training_sids = []
+                        for client_info in self.reporting_clients:
+                            training_sids.append(client_info[1]['sid'])
+                        while sid in training_sids:
+                            client_id = (client_id +
+                                         1) % self.clients_per_round
+                            sid = self.clients[client_id]['sid']
+
                 else:
                     sid = self.clients[selected_client_id]['sid']
 
@@ -569,6 +569,7 @@ class Server:
             finish_time,  # sorted by the client's finish time
             {
                 'client_id': client_id,
+                'sid': sid,
                 'starting_round': starting_round,
                 'start_time': start_time,
                 'report': self.reports[sid],
@@ -616,20 +617,13 @@ class Server:
                         # receiving the request from the server
                         del self.reporting_clients[i]
 
-                        # Remove the client information from the list of current reporting clients
-                        # as well
-                        del self.current_reporting_clients[client_id]
-
                         self.training_clients[client_id] = {
                             'id': client_id,
                             'starting_round': client_info[1]['starting_round'],
                             'start_time': client_info[1]['start_time']
                         }
 
-                        if self.client_simulation_mode:
-                            sid = self.simulated_clients[client_id]
-                        else:
-                            sid = self.clients[client_id]['sid']
+                        sid = client_info[1]['sid']
 
                         await self.sio.emit('request_update',
                                             {'time': self.wall_time},
@@ -735,6 +729,9 @@ class Server:
 
                 if client_id in self.training_clients:
                     del self.training_clients[client_id]
+
+                if client_id in self.current_reporting_clients:
+                    del self.current_reporting_clients[client_id]
 
                 logging.info(
                     "[Server #%d] Client #%d disconnected and removed from this server.",
