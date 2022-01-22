@@ -106,7 +106,7 @@ class Server:
         self.ping_timeout = 360
         self.asynchronous_mode = False
         self.periodic_interval = 5
-        self.staleness = 0
+        self.staleness_bound = 0
         self.minimum_clients = 1
         self.simulate_wall_time = False
         self.request_update = False
@@ -133,8 +133,8 @@ class Server:
         # The staleness threshold is used to determine if a training clients should be
         # considered 'stale', if their starting round is too much behind the current round
         # on the server
-        self.staleness = Config().server.staleness if hasattr(
-            Config().server, 'staleness') else 0
+        self.staleness_bound = Config().server.staleness_bound if hasattr(
+            Config().server, 'staleness_bound') else 0
 
         # What is the minimum number of clients that must have reported before aggregation
         # takes place?
@@ -444,20 +444,21 @@ class Server:
             for __, client_data in self.training_clients.items():
                 # The client is still working at an early round, early enough to stop the
                 # aggregation process as determined by 'staleness'
-                if client_data[
-                        'starting_round'] < self.current_round - self.staleness:
+                client_staleness = self.current_round - client_data[
+                    'starting_round']
+                if client_staleness > self.staleness_bound:
                     logging.info(
                         "[Server #%d] Client %s is still working at round %s, which is "
-                        "beyond the staleness threshold %s compared to the current round %s. "
+                        "beyond the staleness bound %s compared to the current round %s. "
                         "Nothing to process.", os.getpid(), client_data['id'],
-                        client_data['starting_round'], self.staleness,
+                        client_data['starting_round'], self.staleness_bound,
                         self.current_round)
 
                     return
 
             if len(self.updates) >= self.minimum_clients:
                 logging.info(
-                    "[Server #%d] %d client reports received in asynchronous mode. Processing.",
+                    "[Server #%d] %d client report(s) received in asynchronous mode. Processing.",
                     os.getpid(), len(self.updates))
                 await self.process_reports()
                 await self.wrap_up()
@@ -579,9 +580,9 @@ class Server:
         self.current_reporting_clients[client_info[1]['client_id']] = True
         del self.training_clients[client_id]
 
-        await self.process_clients()
+        await self.process_clients(client_info)
 
-    async def process_clients(self):
+    async def process_clients(self, client_info):
         """ Determine whether it is time to process the client reports and
             proceed with the aggregation process.
 
@@ -605,11 +606,12 @@ class Server:
 
                 request_sent = False
                 for i, client_info in enumerate(self.reporting_clients):
-                    earliest_possible_round = self.current_round - self.staleness
                     client = client_info[1]
-                    if client[
-                            'starting_round'] < earliest_possible_round and not client[
-                                'report'].update_response:
+                    client_staleness = self.current_round - client[
+                        'starting_round']
+
+                    if client_staleness > self.staleness and not client[
+                            'report'].update_response:
 
                         # Sending an urgent request to the client for a model update at the
                         # currently simulated wall clock time
@@ -663,7 +665,9 @@ class Server:
                     "[Server #%s] Adding client #%s to the list of clients for aggregation.",
                     os.getpid(), client['client_id'])
 
-                self.updates.append((client['report'], client['payload']))
+                client_staleness = self.current_round - client['starting_round']
+                self.updates.append(
+                    (client['report'], client['payload'], client_staleness))
 
             # Step 3: Processing stale clients that exceed a staleness threshold
 
@@ -694,8 +698,12 @@ class Server:
                         logging.info(
                             "[Server #%s] Adding client #%s to the list of clients for "
                             "aggregation.", os.getpid(), client['client_id'])
+
+                        client_staleness = self.current_round - client[
+                            'starting_round']
                         self.updates.append(
-                            (client['report'], client['payload']))
+                            (client['report'], client['payload'],
+                             client_staleness))
 
             self.reporting_clients = possibly_stale_clients
             logging.info("[Server #%s] Aggregating %s clients in total.",
@@ -705,29 +713,30 @@ class Server:
             await self.wrap_up()
             await self.select_clients()
 
-        # If all updates have been received from selected clients, the aggregation process
-        # proceeds regardless of synchronous or asynchronous modes. This guarantees that
-        # if asynchronous mode uses an excessively long aggregation interval, it will not
-        # unnecessarily delay the aggregation process.
-        elif len(self.reporting_clients) >= self.clients_per_round:
-            logging.info(
-                "[Server #%d] All %d client reports received. Processing.",
-                os.getpid(), len(self.reporting_clients))
+        else:
+            client = client_info[1]
+            client_staleness = self.current_round - client['starting_round']
 
-            # Add the report and payload of all reporting clients into updates
-            for client_info in self.reporting_clients:
-                self.updates.append(
-                    (client_info[1]['report'], client_info[1]['payload']))
+            self.updates.append(
+                (client['report'], client['payload'], client_staleness))
 
-                if self.simulate_wall_time and self.wall_time < client_info[0]:
-                    self.wall_time = client_info[0]
-                    logging.info(
-                        "[Server #%d] Advancing the wall clock time to %s.",
-                        os.getpid(), self.wall_time)
+            if self.simulate_wall_time and self.wall_time < client_info[0]:
+                self.wall_time = client_info[0]
+                logging.info(
+                    "[Server #%d] Advancing the wall clock time to %s.",
+                    os.getpid(), self.wall_time)
 
-            await self.process_reports()
-            await self.wrap_up()
-            await self.select_clients()
+            # If all updates have been received from selected clients, the aggregation process
+            # proceeds regardless of synchronous or asynchronous modes. This guarantees that
+            # if asynchronous mode uses an excessively long aggregation interval, it will not
+            # unnecessarily delay the aggregation process.
+            if len(self.updates) >= self.clients_per_round:
+                logging.info(
+                    "[Server #%d] All %d client report(s) received. Processing.",
+                    os.getpid(), len(self.reporting_clients))
+                await self.process_reports()
+                await self.wrap_up()
+                await self.select_clients()
 
     async def client_disconnected(self, sid):
         """ When a client disconnected it should be removed from its internal states. """
@@ -750,7 +759,7 @@ class Server:
 
                     if len(self.updates) >= len(self.selected_clients):
                         logging.info(
-                            "[Server #%d] All %d client reports received. Processing.",
+                            "[Server #%d] All %d client report(s) received. Processing.",
                             os.getpid(), len(self.updates))
                         await self.process_reports()
                         await self.wrap_up()

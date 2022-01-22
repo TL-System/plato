@@ -50,26 +50,6 @@ class Server(fedavg.Server):
                     "The hyperparameter needs to be between 0 and 1 (exclusive)."
                 )
 
-    async def process_clients(self):
-        """ Determine whether it is time to process the client reports and
-            proceed with the aggregation process. """
-        if len(self.reporting_clients) >= 1:
-            logging.info("[Server #%d] %d client reports received.",
-                         os.getpid(), len(self.reporting_clients))
-
-            # Add client's report, payload, and staleness into updates
-            client_info = self.reporting_clients[0]
-            client_staleness = self.current_round - client_info[1][
-                'starting_round']
-            logging.info("[Server #%d] Processing received client report.",
-                         os.getpid())
-            self.updates.append((client_info[1]['report'],
-                                 client_info[1]['payload'], client_staleness))
-
-            await self.process_reports()
-            await self.wrap_up()
-            await self.select_clients()
-
     async def process_reports(self):
         """Process the client reports by aggregating their weights."""
         # Calculate the new mixing hyperparameter with client's staleness
@@ -107,13 +87,6 @@ class Server(fedavg.Server):
             logging.info(
                 '[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(
                     os.getpid(), 100 * self.accuracy))
-
-    async def periodic_task(self):
-        """ A periodic task that is executed from time to time. """
-        # In FedAsync, the server aggregates weights whenever a client
-        # reports back. There is no need to check from time to time for
-        # un-processed clients.
-        return
 
     @staticmethod
     def staleness_function(staleness) -> float:

@@ -102,7 +102,7 @@ class Server(base.Server):
 
     def extract_client_updates(self, updates):
         """Extract the model weight updates from client updates."""
-        weights_received = [payload for (__, payload) in updates]
+        weights_received = [payload for (__, payload, __) in updates]
         return self.algorithm.compute_weight_updates(weights_received)
 
     async def aggregate_weights(self, updates):
@@ -117,7 +117,7 @@ class Server(base.Server):
 
         # Extract the total number of samples
         self.total_samples = sum(
-            [report.num_samples for (report, __) in updates])
+            [report.num_samples for (report, __, __) in updates])
 
         # Perform weighted averaging
         avg_update = {
@@ -126,7 +126,7 @@ class Server(base.Server):
         }
 
         for i, update in enumerate(weights_received):
-            report, __ = updates[i]
+            report, __, __ = updates[i]
             num_samples = report.num_samples
 
             for name, delta in update.items():

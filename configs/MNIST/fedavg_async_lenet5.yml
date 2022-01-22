@@ -26,7 +26,7 @@ server:
     synchronous: false
     simulate_wall_time: true
     minimum_clients_aggregated: 2
-    staleness: 0
+    staleness_bound: 0
     request_update: true
 
 data:

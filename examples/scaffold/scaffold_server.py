@@ -21,10 +21,10 @@ class Server(fedavg.Server):
 
     def extract_client_updates(self, updates):
         """ Extract the model weights and update directions from clients updates. """
-        weights_received = [payload[0] for (__, payload) in updates]
+        weights_received = [payload[0] for (__, payload, __) in updates]
 
         self.update_directions_received = [
-            payload[1] for (__, payload) in updates
+            payload[1] for (__, payload, __) in updates
         ]
 
         return self.algorithm.compute_weight_updates(weights_received)
