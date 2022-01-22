@@ -438,7 +438,7 @@ class Server:
             await self.customize_periodic_task()
 
         # If we are operating in asynchronous mode, aggregate the model updates received so far.
-        if not self.simulate_wall_time and self.asynchronous_mode:
+        if self.asynchronous_mode and not self.simulate_wall_time:
             # Is there any training clients who are currently training on models that are too
             # `stale,` as defined by the staleness threshold?
             for __, client_data in self.training_clients.items():
@@ -714,13 +714,25 @@ class Server:
             await self.select_clients()
 
         else:
-            client = client_info[1]
-            client_staleness = self.current_round - client['starting_round']
+            if self.asynchronous_mode and not self.simulate_wall_time:
+                # In asynchronous mode without simulating wall clock time, we only
+                # need to add the client report to the list of updates so far
+                client = client_info[1]
+                client_staleness = self.current_round - client['starting_round']
 
-            self.updates.append(
-                (client['report'], client['payload'], client_staleness))
+                self.updates.append(
+                    (client['report'], client['payload'], client_staleness))
 
-            if self.simulate_wall_time and self.wall_time < client_info[0]:
+            if not self.asynchronous_mode and self.simulate_wall_time and self.wall_time < client_info[
+                    0]:
+                # In synchronous mode with the wall clock time simulated, we will
+                # need to advance the wall clock time to the finish time of the reporting client
+                client = client_info[1]
+                client_staleness = self.current_round - client['starting_round']
+
+                self.updates.append(
+                    (client['report'], client['payload'], client_staleness))
+
                 self.wall_time = client_info[0]
                 logging.info(
                     "[Server #%d] Advancing the wall clock time to %s.",
