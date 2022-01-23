@@ -655,8 +655,9 @@ class Server:
                 client_info = heapq.heappop(self.reporting_clients)
                 client = client_info[1]
 
-                # Removing from the list of current reporting clients as well
-                del self.current_reporting_clients[client['client_id']]
+                # Removing from the list of current reporting clients as well, if needed
+                if client['client_id'] in self.current_reporting_clients:
+                    del self.current_reporting_clients[client['client_id']]
 
                 # Update the simulated wall clock time to be the finish time of this client
                 self.wall_time = client_info[0]
