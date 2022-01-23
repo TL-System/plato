@@ -11,8 +11,8 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    # Whether simulate clients or not
-    simulation: false
+    # Client simulation mode
+    simulation: false 
 
     # Processors for outbound data payloads
     outbound_processors:
@@ -21,7 +21,7 @@ clients:
 server:
     address: 127.0.0.1
     port: 8000
-    simulate_wall_time: true
+    simulate_wall_time: true 
 
 data:
     # The training and testing dataset
@@ -59,7 +59,7 @@ trainer:
     max_concurrency: 1
 
     # The target accuracy
-    target_accuracy: 0.96
+    target_accuracy: 0.97
 
     # Number of epoches for local training in each communication round
     epochs: 1
