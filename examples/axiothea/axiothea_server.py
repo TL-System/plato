@@ -11,7 +11,7 @@ class Server(fedavg_cs.Server):
     def customize_server_payload(self, payload):
         """ Customize the server payload before sending to its clients. """
         if Config().is_edge_server():
-            # might add noise to aggreagted models
+            # might add noise to aggregated models
             pass
 
         return payload
