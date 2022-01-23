@@ -24,9 +24,12 @@ class Algorithm(base.Algorithm):
         else:
             self.model = trainer.model
 
-    def extract_weights(self):
+    def extract_weights(self, model=None):
         """ Extract weights from the model. """
-        return self.model.get_weights()
+        if model is None:
+            return self.model.get_weights()
+        else:
+            return model.get_weights()
 
     def compute_weight_updates(self, weights_received):
         """ Extract the weights received from a client and compute the updates. """

@@ -18,6 +18,7 @@ from plato.config import Config
 from plato.clients import simple
 from plato.clients import base
 
+
 @dataclass
 class Report(base.Report):
     """A client report containing the number of local epochs."""
@@ -27,7 +28,12 @@ class Report(base.Report):
 class Client(simple.Client):
     """A fednova federated learning client who sends weight updates
     and the number of local epochs."""
-    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
+
+    def __init__(self,
+                 model=None,
+                 datasource=None,
+                 algorithm=None,
+                 trainer=None):
         super().__init__(model, datasource, algorithm, trainer)
         self.pattern = None
         self.max_local_iter = None
@@ -54,4 +60,5 @@ class Client(simple.Client):
 
         report, weights = await super().train()
 
-        return Report(report.num_samples, report.accuracy, local_epochs), weights
+        return Report(report.num_samples, report.accuracy,
+                      report.training_time, local_epochs), weights

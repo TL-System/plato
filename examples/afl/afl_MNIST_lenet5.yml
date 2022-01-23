@@ -1,13 +1,13 @@
 clients:
     # The total number of clients
-    total_clients: 10 
+    total_clients: 10
 
     # The number of clients selected in each round
     per_round: 2
 
     # Should the clients compute test accuracy locally?
     do_test: false
-    
+
     # Whether simulate clients or not
     simulation: true
 
@@ -61,7 +61,7 @@ algorithm:
 
 results:
     # Write the following parameter(s) into a CSV
-    types: accuracy, training_time, round_time
+    types: accuracy, elapsed_time, round_time
 
-    # Plot results (x_axis&y_axis)
-    plot: round&accuracy, round&training_time
+    # Plot results (x_axis-y_axis)
+    plot: round-accuracy, round-elapsed_time

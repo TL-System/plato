@@ -10,7 +10,7 @@ clients:
 
     # Should the clients compute test accuracy locally?
     do_test: false
-    
+
     # Whether simulate clients or not
     simulation: false
 
@@ -37,7 +37,7 @@ data:
 trainer:
     # The type of the trainer
     type: basic
-    
+
     # The maximum number of training rounds
     rounds: 10
 
@@ -67,7 +67,7 @@ algorithm:
 
 results:
     # Write the following parameter(s) into a CSV
-    types: accuracy, training_time, round_time
+    types: accuracy, elapsed_time, round_time
 
-    # Plot results (x_axis&y_axis)
-    plot: round&accuracy, round&training_time, round_time&accuracy, round_time&training_time
+    # Plot results (x_axis-y_axis)
+    plot: round-accuracy, round-elapsed_time, round_time-accuracy, round_time-elapsed_time
