@@ -6,6 +6,7 @@ import csv
 from typing import Dict, List, Any
 
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 
 from plato.config import Config
 
@@ -19,7 +20,7 @@ def read_csv_to_dict(result_csv_file: str) -> Dict[str, List]:
     plot_pairs = [x.strip() for x in plot_pairs.split(',')]
 
     for pairs in plot_pairs:
-        pair = [x.strip() for x in pairs.split('&')]
+        pair = [x.strip() for x in pairs.split('-')]
         for item in pair:
             if item not in result_dict:
                 result_dict[item] = []
@@ -46,6 +47,7 @@ def plot(x_label: str, x_value: List[Any], y_label: str, y_value: List[Any],
     fig, ax = plt.subplots()
     ax.plot(x_value, y_value)
     ax.set(xlabel=x_label, ylabel=y_label)
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
     fig.savefig(figure_file_name)
 
 
