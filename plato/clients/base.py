@@ -22,6 +22,7 @@ class Report:
     """Client report, to be sent to the federated learning server."""
     num_samples: int
     accuracy: float
+    training_time: float
 
 
 class ClientEvents(socketio.AsyncClientNamespace):
@@ -41,6 +42,7 @@ class ClientEvents(socketio.AsyncClientNamespace):
         """ Upon a disconnection event. """
         logging.info("[Client #%d] The server disconnected the connection.",
                      self.client_id)
+        self.plato_client.clear_checkpoint_files()
         os._exit(0)
 
     async def on_connect_error(self, data):
@@ -51,6 +53,10 @@ class ClientEvents(socketio.AsyncClientNamespace):
     async def on_payload_to_arrive(self, data):
         """ New payload is about to arrive from the server. """
         await self.plato_client.payload_to_arrive(data['response'])
+
+    async def on_request_update(self, data):
+        """ The server is requesting an urgent model update. """
+        await self.plato_client.request_update(data)
 
     async def on_chunk(self, data):
         """ A chunk of data from the server arrived. """
@@ -158,6 +164,20 @@ class Client:
         """ Upon receiving a chunk of data from the server. """
         self.chunks.append(data)
 
+    async def request_update(self, data) -> None:
+        """ Upon receiving a request for an urgent model update. """
+        logging.info(
+            "[Client #%s] Urgent request received for model update at time %s.",
+            self.client_id, data['time'])
+
+        report, payload = await self.obtain_model_update(data['time'])
+
+        # Sending the client report as metadata to the server (payload to follow)
+        await self.sio.emit('client_report', {'report': pickle.dumps(report)})
+
+        # Sending the client training payload to the server
+        await self.send(payload)
+
     async def payload_arrived(self, client_id) -> None:
         """ Upon receiving a portion of the new payload from the server. """
         assert client_id == self.client_id
@@ -263,6 +283,22 @@ class Client:
     def process_server_response(self, server_response) -> None:
         """Additional client-specific processing on the server response."""
 
+    def clear_checkpoint_files(self):
+        """Delete all the temporary checkpoint files created by the client"""
+        if hasattr(Config().server,
+                   'request_update') and Config().server.request_update:
+            import re
+
+            model_dir = Config().params['model_dir']
+            for filename in os.listdir(model_dir):
+                split = re.match(
+                    r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+).pth",
+                    filename)
+                if split is not None and self.client_id == int(
+                        split.group('client_id')):
+                    file_path = f'{model_dir}{filename}'
+                    os.remove(file_path)
+
     @abstractmethod
     def configure(self) -> None:
         """ Prepare this client for training. """
@@ -278,3 +314,7 @@ class Client:
     @abstractmethod
     async def train(self):
         """The machine learning training workload on a client."""
+
+    @abstractmethod
+    async def obtain_model_update(self, wall_time):
+        """Retrieving a model update corrsponding to a particular wall clock time."""

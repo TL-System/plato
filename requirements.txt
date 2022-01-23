@@ -7,5 +7,4 @@ pyyaml
 pyyaml-include
 datasets
 opacus
-scikit-image
 zstd

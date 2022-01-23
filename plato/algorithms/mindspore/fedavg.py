@@ -11,17 +11,15 @@ from plato.algorithms import base
 
 class Algorithm(base.Algorithm):
     """MindSpore-based federated averaging algorithm, used by both the client and the server."""
-    def extract_weights(self):
+    def extract_weights(self, model=None):
         """Extract weights from the model."""
-
-        # It turns out that recent MindSpore releases later than 1.1.3, including 1.5.0, do not support
-        # `pickle.load()` on `Tensor` objects (https://gitee.com/mindspore/mindspore/issues/I43RPP?from=project-issue).
-        # Therefore, Tensor objects must be converted to numpy arrays first before being pickled.
-
         numpy_weights = OrderedDict()
-
-        for name, weight in self.model.parameters_dict().items():
-            numpy_weights[name] = weight.asnumpy()
+        if model is None:
+            for name, weight in self.model.parameters_dict().items():
+                numpy_weights[name] = weight.asnumpy()
+        else:
+            for name, weight in model.parameters_dict().items():
+                numpy_weights[name] = weight.asnumpy()
 
         return numpy_weights
 

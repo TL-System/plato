@@ -41,12 +41,9 @@ class Server(base.Server):
             "[Server #%d] Started training on %s clients with %s per round.",
             os.getpid(), self.total_clients, self.clients_per_round)
 
-        # starting time of a global training round
-        self.round_start_time = 0
-
         if hasattr(Config(), 'results'):
             recorded_items = Config().results.types
-            self.recorded_items = ['round'] + [
+            self.recorded_items = [
                 x.strip() for x in recorded_items.split(',')
             ]
 
@@ -58,6 +55,7 @@ class Server(base.Server):
         creating the clients.
         """
         logging.info("[Server #%d] Configuring the server...", os.getpid())
+        super().configure()
 
         total_rounds = Config().trainer.rounds
         target_accuracy = Config().trainer.target_accuracy
@@ -96,12 +94,11 @@ class Server(base.Server):
             self.algorithm = algorithms_registry.get(self.trainer)
 
     async def select_clients(self):
-        self.round_start_time = time.perf_counter()
         await super().select_clients()
 
     def extract_client_updates(self, updates):
         """Extract the model weight updates from client updates."""
-        weights_received = [payload for (__, payload) in updates]
+        weights_received = [payload for (__, payload, __) in updates]
         return self.algorithm.compute_weight_updates(weights_received)
 
     async def aggregate_weights(self, updates):
@@ -116,7 +113,7 @@ class Server(base.Server):
 
         # Extract the total number of samples
         self.total_samples = sum(
-            [report.num_samples for (report, __) in updates])
+            [report.num_samples for (report, __, __) in updates])
 
         # Perform weighted averaging
         avg_update = {
@@ -125,7 +122,7 @@ class Server(base.Server):
         }
 
         for i, update in enumerate(weights_received):
-            report, __ = updates[i]
+            report, __, __ = updates[i]
             num_samples = report.num_samples
 
             for name, delta in update.items():
@@ -162,22 +159,23 @@ class Server(base.Server):
         await self.wrap_up_processing_reports()
 
     async def wrap_up_processing_reports(self):
-        """Wrap up processing the reports with any additional work."""
-
+        """ Wrap up processing the reports with any additional work. """
         if hasattr(Config(), 'results'):
             new_row = []
+
             for item in self.recorded_items:
                 item_value = {
                     'round':
                     self.current_round,
                     'accuracy':
                     self.accuracy * 100,
-                    'training_time':
-                    max([
-                        report.training_time for (report, __) in self.updates
-                    ]),
+                    'elapsed_time':
+                    self.wall_time - self.initial_wall_time,
                     'round_time':
-                    time.perf_counter() - self.round_start_time
+                    max([
+                        report.training_time
+                        for (report, __, __) in self.updates
+                    ]),
                 }[item]
                 new_row.append(item_value)
 
@@ -186,14 +184,15 @@ class Server(base.Server):
             csv_processor.write_csv(result_csv_file, new_row)
 
     @staticmethod
-    def accuracy_averaging(reports):
+    def accuracy_averaging(updates):
         """Compute the average accuracy across clients."""
         # Get total number of samples
-        total_samples = sum([report.num_samples for (report, __) in reports])
+        total_samples = sum(
+            [report.num_samples for (report, __, __) in updates])
 
         # Perform weighted averaging
         accuracy = 0
-        for (report, __) in reports:
+        for (report, __, __) in updates:
             accuracy += report.accuracy * (report.num_samples / total_samples)
 
         return accuracy
