@@ -120,7 +120,7 @@ class Server(fedavg_cs.Server):
 
         if not self.do_personalization_test:
             self.training_time = max(
-                [report.training_time for (report, __) in self.updates])
+                [report.training_time for (report, __, __) in self.updates])
 
     async def client_payload_done(self, sid, client_id, s3_key=None):
         """ Upon receiving all the payload from a client, eithe via S3 or socket.io. """

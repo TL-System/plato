@@ -145,7 +145,7 @@ class Server(fedavg.Server):
                     Config().trainer.epochs,
                     'training_time':
                     max([
-                        report.training_time for (report, __) in self.updates
+                        report.training_time for (report, __, __) in self.updates
                     ]),
                     'round_time':
                     time.perf_counter() - self.round_start_time

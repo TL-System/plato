@@ -175,7 +175,8 @@ class Server(base.Server):
                     self.accuracy * 100,
                     'training_time':
                     max([
-                        report.training_time for (report, __) in self.updates
+                        report.training_time
+                        for (report, __, __) in self.updates
                     ]),
                     'round_time':
                     time.perf_counter() - self.round_start_time
@@ -187,14 +188,15 @@ class Server(base.Server):
             csv_processor.write_csv(result_csv_file, new_row)
 
     @staticmethod
-    def accuracy_averaging(reports):
+    def accuracy_averaging(updates):
         """Compute the average accuracy across clients."""
         # Get total number of samples
-        total_samples = sum([report.num_samples for (report, __) in reports])
+        total_samples = sum(
+            [report.num_samples for (report, __, __) in updates])
 
         # Perform weighted averaging
         accuracy = 0
-        for (report, __) in reports:
+        for (report, __, __) in updates:
             accuracy += report.accuracy * (report.num_samples / total_samples)
 
         return accuracy
