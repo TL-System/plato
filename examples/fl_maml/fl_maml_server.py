@@ -5,7 +5,6 @@ import logging
 import os
 import pickle
 import sys
-import time
 from plato.config import Config
 from plato.servers import fedavg
 from plato.utils import csv_processor
@@ -72,10 +71,13 @@ class Server(fedavg.Server):
                         self.accuracy * 100,
                         'personalization_accuracy':
                         self.personalization_accuracy * 100,
-                        'training_time':
-                        self.training_time,
+                        'elapsed_time':
+                        self.wall_time - self.initial_wall_time,
                         'round_time':
-                        time.perf_counter() - self.round_start_time
+                        max([
+                            report.training_time
+                            for (report, __, __) in self.updates
+                        ]),
                     }[item]
                     new_row.append(item_value)
 
