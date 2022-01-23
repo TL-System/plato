@@ -18,8 +18,7 @@ from plato.trainers import registry as trainers_registry
 @dataclass
 class Report(base.Report):
     """Report from a simple client, to be sent to the federated learning server."""
-    training_time: float
-    data_loading_time: float
+    update_response: bool
 
 
 class Client(base.Client):
@@ -39,8 +38,7 @@ class Client(base.Client):
         self.sampler = None
         self.test_set_sampler = None  # Sampler for the test set
 
-        self.data_loading_time = None
-        self.data_loading_time_sent = False
+        self.report = None
 
     def __repr__(self):
         return 'Client #{}.'.format(self.client_id)
@@ -64,7 +62,6 @@ class Client(base.Client):
 
     def load_data(self) -> None:
         """Generating data and loading them onto this client."""
-        data_loading_start_time = time.perf_counter()
         logging.info("[Client #%d] Loading its data source...", self.client_id)
 
         if self.datasource is None:
@@ -96,8 +93,6 @@ class Client(base.Client):
                                                               self.client_id,
                                                               testing=True)
 
-        self.data_loading_time = time.perf_counter() - data_loading_start_time
-
     def load_payload(self, server_payload) -> None:
         """Loading the server model onto this client."""
         self.algorithm.load_weights(server_payload)
@@ -128,11 +123,14 @@ class Client(base.Client):
         else:
             accuracy = 0
 
-        data_loading_time = 0
+        self.report = Report(self.sampler.trainset_size(), accuracy,
+                             training_time, False)
+        return self.report, weights
 
-        if not self.data_loading_time_sent:
-            data_loading_time = self.data_loading_time
-            self.data_loading_time_sent = True
+    async def obtain_model_update(self, wall_time):
+        """Retrieving a model update corresponding to a particular wall clock time."""
+        model = self.trainer.obtain_model_update(wall_time)
+        weights = self.algorithm.extract_weights(model)
+        self.report.update_response = True
 
-        return Report(self.sampler.trainset_size(), accuracy, training_time,
-                      data_loading_time), weights
+        return self.report, weights

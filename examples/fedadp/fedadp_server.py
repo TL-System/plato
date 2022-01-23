@@ -29,12 +29,13 @@ class Server(fedavg.Server):
 
     def extract_client_updates(self, updates):
         """ Extract the model weights and update directions from clients updates. """
-        weights_received = [payload for (__, payload) in updates]
+        weights_received = [payload for (__, payload, __) in updates]
 
-        num_samples = [report.num_samples for (report, __) in updates]
+        num_samples = [report.num_samples for (report, __, __) in updates]
 
         # Get adaptive weighting based on both node contribution and date size
-        self.adaptive_weighting = self.calc_adaptive_weighting(weights_received, num_samples)
+        self.adaptive_weighting = self.calc_adaptive_weighting(
+            weights_received, num_samples)
 
         return self.algorithm.compute_weight_updates(weights_received)
 
@@ -49,7 +50,7 @@ class Server(fedavg.Server):
             for name, weights in weights_received[0].items()
         }
 
-        # Use adaptive weighted average  
+        # Use adaptive weighted average
         for i, update in enumerate(weights_received):
             for name, delta in update.items():
                 avg_update[name] += delta * self.adaptive_weighting[i]
@@ -68,7 +69,8 @@ class Server(fedavg.Server):
         for i, contrib in enumerate(contribs):
             total_weight += num_samples[i] * math.exp(contrib)
         for i, contrib in enumerate(contribs):
-            adaptive_weighting[i] = (num_samples[i] * math.exp(contrib)) / total_weight
+            adaptive_weighting[i] = (num_samples[i] *
+                                     math.exp(contrib)) / total_weight
 
         return adaptive_weighting
 
@@ -97,23 +99,27 @@ class Server(fedavg.Server):
             # Update the smoothed angle for all clients
             if client_id not in self.local_correlations.keys():
                 self.local_correlations[client_id] = correlation
-            self.local_correlations[client_id] = ((self.current_round - 1) 
-            / self.current_round) * self.local_correlations[client_id] 
-            + (1 / self.current_round) * correlation
+            self.local_correlations[client_id] = (
+                (self.current_round - 1) /
+                self.current_round) * self.local_correlations[client_id]
+            +(1 / self.current_round) * correlation
 
             # Non-linear mapping to node contribution
-            contribs[i] = self.alpha * (1 - math.exp(-math.exp(-self.alpha 
-                          * (self.local_correlations[client_id] - 1))))
+            contribs[i] = self.alpha * (
+                1 -
+                math.exp(-math.exp(-self.alpha *
+                                   (self.local_correlations[client_id] - 1))))
 
         return contribs
 
     @staticmethod
     def process_grad(grads):
         """Convert gradients to a flattened 1-D array."""
-        grads = list(dict(sorted(grads.items(), key=lambda x: x[0].lower())).values())
+        grads = list(
+            dict(sorted(grads.items(), key=lambda x: x[0].lower())).values())
 
         flattened = grads[0]
         for i in range(1, len(grads)):
-            flattened = np.append(flattened, grads[i]) 
+            flattened = np.append(flattened, grads[i])
 
         return flattened

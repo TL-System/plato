@@ -6,6 +6,7 @@ import csv
 from typing import Dict, List, Any
 
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 
 from plato.config import Config
 
@@ -19,7 +20,7 @@ def read_csv_to_dict(result_csv_file: str) -> Dict[str, List]:
     plot_pairs = [x.strip() for x in plot_pairs.split(',')]
 
     for pairs in plot_pairs:
-        pair = [x.strip() for x in pairs.split('&')]
+        pair = [x.strip() for x in pairs.split('-')]
         for item in pair:
             if item not in result_dict:
                 result_dict[item] = []
@@ -28,7 +29,11 @@ def read_csv_to_dict(result_csv_file: str) -> Dict[str, List]:
         reader = csv.DictReader(f)
         for row in reader:
             for item in result_dict:
-                if item in ('round', 'global_round'):
+                if item in (
+                        'round',
+                        'global_round',
+                        'local_epochs',
+                ):
                     result_dict[item].append(int(row[item]))
                 else:
                     result_dict[item].append(float(row[item]))
@@ -42,6 +47,7 @@ def plot(x_label: str, x_value: List[Any], y_label: str, y_value: List[Any],
     fig, ax = plt.subplots()
     ax.plot(x_value, y_value)
     ax.set(xlabel=x_label, ylabel=y_label)
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
     fig.savefig(figure_file_name)
 
 
@@ -54,17 +60,17 @@ def plot_figures_from_dict(result_csv_file: str, result_dir: str):
 
     for pairs in plot_pairs:
         figure_file_name = result_dir + pairs + '.pdf'
-        pair = [x.strip() for x in pairs.split('&')]
+        pair = [x.strip() for x in pairs.split('-')]
         x_y_labels: List = []
         x_y_values: Dict[str, List] = {}
         for item in pair:
             label = {
-                'global_round': 'Global training round',
-                'round': 'Training round',
-                'local_epoch_num': 'Local epochs',
+                'round': 'Round',
                 'accuracy': 'Accuracy (%)',
-                'training_time': 'Training time (s)',
-                'round_time': 'Round time (s)',
+                'elapsed_time': 'Wall clock time elapsed (s)',
+                'round_time': 'Training time in each round (s)',
+                'global_round': 'Global training round',
+                'local_epoch_num': 'Local epochs',
                 'edge_agg_num': 'Aggregation rounds on edge servers'
             }[item]
             x_y_labels.append(label)
