@@ -23,6 +23,8 @@ class Server(fedavg.Server):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
         self.num_helpers = 4
         self.helper = [False] * (self.num_helpers + 1)
+        self.models_dict = {}
+
         mu, std, lower, upper = 125, 125, 0, 255
         self.gauss_samples = (truncnorm(
             (lower - mu) / std, (upper - mu) / std, loc=mu, scale=std).rvs(
@@ -52,21 +54,18 @@ class Server(fedavg.Server):
 
         return update
 
-    def customize_server_payload(self, payload, selected_client_id):
-        "Add helpers models to payload for each client"
-        if self.helper[selected_client_id - 1] is True:
-
-            helpers = self.helpers[selected_client_id]
-            #print("Select helpers for client #", selected_client_id)
-
+    def customize_server_payload(self, payload):
+        " Add helper models to the server payload for each client. "
+        if self.helper[self.selected_client_id - 1] is True:
+            helpers = self.helpers[self.selected_client_id]
             return [payload, helpers]
-        self.helper[selected_client_id - 1] = True
+
+        self.helper[self.selected_client_id - 1] = True
 
         return payload
 
     def compute_similarity(self, models_received, client_ids):
-        "compute similarity among clients"
-
+        " Compute similarity among clients. "
         # initialize vector as an empty dictionary with length of client_ids
         self.models_dict = {}
         out_list = []
