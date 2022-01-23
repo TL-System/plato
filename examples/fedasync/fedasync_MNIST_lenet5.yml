@@ -1,22 +1,33 @@
 clients:
-    # Type
-    type: simple
-
     # The total number of clients
-    total_clients: 10
+    total_clients: 20
 
     # The number of clients selected in each round
-    per_round: 2
+    per_round: 4
 
     # Should the clients compute test accuracy locally?
-    do_test: true
+    do_test: false
 
     # Whether simulate clients or not
-    simulation: true
+    simulation: false 
+    speed_simulation: true
+
+    # The simulation distribution
+    simulation_distribution:
+        distribution: zipf
+        s: 1.5
 
 server:
     address: 127.0.0.1
     port: 8000
+    synchronous: false
+    simulate_wall_time: true
+
+    # Parameter for FedAsync
+    staleness_bound: 1000 # FedAsync doesn't have any staleness bound
+    minimum_clients_aggregated: 1
+    mixing_hyperparameter: 0.9
+    adaptive_mixing: true
 
 data:
     # The training and testing dataset
@@ -31,15 +42,12 @@ data:
     # IID or non-IID?
     sampler: iid
 
-    # The random seed for sampling data
-    random_seed: 1
-
 trainer:
     # The type of the trainer
     type: basic
 
     # The maximum number of training rounds
-    rounds: 5
+    rounds: 20
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -67,7 +75,8 @@ algorithm:
 
 results:
     # Write the following parameter(s) into a CSV
-    types: accuracy, elapsed_time, round_time
+    types: round, elapsed_time, accuracy
 
     # Plot results (x_axis-y_axis)
-    plot: round-accuracy, round-elapsed_time
+    plot: round-accuracy, elapsed_time-accuracy
+
