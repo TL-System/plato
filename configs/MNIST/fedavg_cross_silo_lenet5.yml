@@ -72,7 +72,7 @@ algorithm:
 
 results:
     # Write the following parameter(s) into a CSV
-    types: accuracy, training_time, round_time, edge_agg_num
+    types: accuracy, elapsed_time, round_time, edge_agg_num
 
-    # Plot results (x_axis&y_axis)
-    plot: global_round&accuracy, global_round&training_time
+    # Plot results (x_axis-y_axis)
+    plot: global_round-accuracy, global_round-elapsed_time

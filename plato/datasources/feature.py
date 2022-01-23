@@ -15,3 +15,9 @@ class DataSource(base.DataSource):
         self.feature_dataset = list(chain.from_iterable(features))
         self.trainset = self.feature_dataset
         self.testset = []
+
+    def __len__(self):
+        return len(self.trainset)
+
+    def __getitem__(self, item):
+        return self.trainset[item]

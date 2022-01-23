@@ -117,7 +117,7 @@ audio_data_test: &audio_data_test
   pipeline: *audio_test_pipeline
 
 
-audio_data:
-  train: *audio_data_train
-  val: *audio_data_val
-  test: *audio_data_test
+
+train: *audio_data_train
+val: *audio_data_val
+test: *audio_data_test

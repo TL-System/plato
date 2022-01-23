@@ -1,26 +1,77 @@
 """
-The Flickr30K Entities dataset following "http://bryanplummer.com/Flickr30kEntities/"
+The Flickr30K Entities dataset.
 
+The data structure and setting follow:
+ "http://bryanplummer.com/Flickr30kEntities/".
+
+We utilize the official splits that contain:
+ - train: 29783 images,
+ - val: 1000 images,
+ - test: 1000 images
+
+The file structure of this dataset is:
+ - Images (jpg): the raw images
+ - Annotations (xml): the bounding boxes
+ - Sentence (txt): captions of the image
+
+The data structure under the 'data/' is:
+├── Flickr30KEntities           # root dir of Flickr30K Entities dataset
+│   ├── Flickr30KEntitiesRaw    # Raw images/annotations and the official splits
+│   ├── train     # data dir for the train phase
+│   │   └── train_Annotations
+│   │   └── train_Images
+│   │   └── train_Sentences
+│   └── test
+│   └── val
+
+
+Detailed loaded sample structure:
+
+    One sample is presented as the dict type:
+    - rgb: the image data.
+    - text:
+        - caption : a nested list, such as
+            [['The woman is applying mascara while looking in the mirror.']],
+        - caption_phrases: a nested list, each item is the list contains
+            the phrases of the caption, such as:
+            [['Military personnel'], ['greenish gray uniforms'], ['matching hats']]
+    - box:
+        - caption_phrase_bboxs: a 2-depth nested list, each item is a list that
+            contains boxes of the corresponding phrase, such as:
+            [[[295, 130, 366, 244], [209, 123, 300, 246], [347, 1, 439, 236]],
+                [[0, 21, 377, 220]], [[0, 209, 214, 332]]]
+    - target:
+        - caption_phrases_cate: a nested list, each item is a string that
+            presents the categories of the phrase, such as:
+            [['people'], ['bodyparts'], ['other']].
+
+        - caption_phrases_cate_id: a list, each item is a int that shows
+            the integar/str of the phrase, such as:
+            ['121973', '121976', '121975']
+
+    One batch of samples is presented as a list,
+        For example, the corresponding caption_phrase_bboxs in one batch is:
+[
+    [[[295, 130, 366, 244], [209, 123, 300, 246], [347, 1, 439, 236]], [[0, 21, 377, 220]],
+        [[0, 209, 214, 332]]], - batch-1
+    [[[90, 68, 325, 374]], [[118, 64, 192, 128]]], - batch-1
+    [[[1, 0, 148, 451]], [[153, 148, 400, 413]], [[374, 320, 450, 440]]], - batch-1
+]
 """
 
 import json
 import logging
 import os
-from collections import namedtuple
 
 import torch
 import skimage.io as io
 import cv2
 
 from plato.config import Config
-from plato.datasources.multimodal import multimodal_base
+from plato.datasources import multimodal_base
+from plato.datasources.multimodal_base import TextData, BoxData, TargetData
 from plato.datasources.datalib import data_utils
-from plato.datasources.datalib.flicker30k_utils import flickr30k_utils
-
-DataAnnos = namedtuple('annos', [
-    'caption', 'caption_phrases', 'caption_phrase_bboxs',
-    'caption_phrases_cate', 'caption_phrases_cate_id'
-])
+from plato.datasources.datalib import flickr30kE_utils
 
 
 def collate_fn(batch):
@@ -37,31 +88,44 @@ def collate_fn(batch):
     return batch
 
 
-class Flickr30KEDataset(torch.utils.data.Dataset):
-    """Prepares the Flickr30K Entities dataset."""
+class Flickr30KEDataset(multimodal_base.MultiModalDataset):
+    """ Prepare the Flickr30K Entities dataset."""
     def __init__(self,
-                 dataset,
-                 splits_info,
-                 data_types,
+                 dataset_info,
                  phase,
+                 phase_info,
+                 data_types,
+                 modality_sampler=None,
                  transform_image_dec_func=None,
                  transform_text_func=None):
+        super().__init__()
+
         self.phase = phase
-        self.phase_data = dataset
-        self.splits_info = splits_info
+        self.phase_multimodal_data_record = dataset_info
+        self.phase_info = phase_info
         self.data_types = data_types
         self.transform_image_dec_func = transform_image_dec_func
         self.transform_text_func = transform_text_func
 
-    def __len__(self):
-        return len(self.phase_data)
+        self.phase_samples_name = list(
+            self.phase_multimodal_data_record.keys())
 
-    def get_sample_image_data(self, phase, image_id):
+        self.supported_modalities = ["rgb", "text"]
+
+        # default utilizing the full modalities
+        if modality_sampler is None:
+            self.modality_sampler = self.supported_modalities
+        else:
+            self.modality_sampler = modality_sampler
+
+    def __len__(self):
+        return len(self.phase_multimodal_data_record)
+
+    def get_sample_image_data(self, image_id):
         """ Get one image data as the sample """
         # get the image data
-        image_phase_path = self.splits_info[phase][self.data_types[0]]["path"]
-        image_phase_format = self.splits_info[phase][
-            self.data_types[0]]["format"]
+        image_phase_path = self.phase_info[self.data_types[0]]["path"]
+        image_phase_format = self.phase_info[self.data_types[0]]["format"]
 
         image_data = io.imread(
             os.path.join(image_phase_path,
@@ -71,7 +135,7 @@ class Flickr30KEDataset(torch.utils.data.Dataset):
         return image_data
 
     def extract_sample_anno_data(self, image_anno_sent):
-        """ Extract the annotation """
+        """ Extract the annotation. """
         sentence = image_anno_sent["sentence"]  # a string
         sentence_phrases = image_anno_sent["sentence_phrases"]  # a list
         sentence_phrases_type = image_anno_sent[
@@ -83,16 +147,16 @@ class Flickr30KEDataset(torch.utils.data.Dataset):
         return sentence, sentence_phrases, sentence_phrases_type, \
                 sentence_phrases_id, sentence_phrases_boxes
 
-    def __getitem__(self, sample_idx):
+    def get_one_multimodal_sample(self, sample_idx):
+        """ Obtain one sample from the Flickr30K Entities dataset. """
         samle_retrieval_name = self.phase_samples_name[sample_idx]
-        image_id = samle_retrieval_name.split(".")[0]
-        sample_name = image_id
+        image_file_name = os.path.basename(samle_retrieval_name)
+        image_id = os.path.splitext(image_file_name)[0]
 
-        image_data = self.get_sample_image_data(self.phase, image_id)
+        image_data = self.get_sample_image_data(image_id)
 
-        ori_image_data = image_data.copy()
-
-        image_anno_sent = self.phase_data[samle_retrieval_name]
+        image_anno_sent = self.phase_multimodal_data_record[
+            samle_retrieval_name]
 
         sentence, sentence_phrases, \
             sentence_phrases_type, sentence_phrases_id, \
@@ -118,24 +182,31 @@ class Flickr30KEDataset(torch.utils.data.Dataset):
             image_data = transformed["image"]
             image_data = torch.from_numpy(image_data)
             flatten_caption_phrase_bboxs = transformed["bboxes"]
-            caption_phrase_bboxs = flickr30k_utils.phrase_boxes_alignment(
+            caption_phrase_bboxs = flickr30kE_utils.phrase_boxes_alignment(
                 flatten_caption_phrase_bboxs, sentence_phrases_boxes)
+
+        else:
+            caption_phrase_bboxs = sentence_phrases_boxes
 
         if self.transform_text_func is not None:
             caption_phrases = self.transform_text_func(caption_phrases)
 
-        sample_annos = DataAnnos(
-            caption=caption,
-            caption_phrases=caption_phrases,
-            caption_phrase_bboxs=caption_phrase_bboxs,
+        text_data = TextData(caption=caption, caption_phrases=caption_phrases)
+        box_data = BoxData(caption_phrase_bboxs=caption_phrase_bboxs)
+        taget_data = TargetData(
             caption_phrases_cate=caption_phrases_cate,
             caption_phrases_cate_id=caption_phrases_cate_id)
 
-        return sample_name, ori_image_data, image_data, sample_annos
+        return {
+            "rgb": image_data,
+            "text": text_data,
+            "box": box_data,
+            "target": taget_data
+        }
 
 
 class DataSource(multimodal_base.MultiModalDataSource):
-    """The ReferItGame dataset."""
+    """The Flickr30K Entities dataset."""
     def __init__(self):
         super().__init__()
 
@@ -163,6 +234,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
         self.raw_data_file_format = [".jpg", ".xml", ".txt"]
         self.data_types = ["Images", "Annotations", "Sentences"]
 
+        # extract the data information and structure
         for raw_type_idx, raw_type in enumerate(self.raw_data_types):
             raw_file_format = self.raw_data_file_format[raw_type_idx]
             data_type = self.data_types[raw_type_idx]
@@ -176,6 +248,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
             self.mm_data_info[data_type]["num_samples"] = len(
                 os.listdir(raw_type_path))
 
+        # generate path/type information for splits
         for split_type in list(self.splits_info.keys()):
             self.splits_info[split_type]["split_file"] = os.path.join(
                 base_data_path, raw_data_name, split_type + ".txt")
@@ -189,7 +262,15 @@ class DataSource(multimodal_base.MultiModalDataSource):
                 self.splits_info[split_type][dt_type][
                     "format"] = dt_type_format
 
-        print(self.mm_data_info)
+        # distribution data to splits
+        self.create_splits_data()
+
+        # generate the splits information txt for further utilization
+        flickr30kE_utils.integrate_data_to_json(splits_info=self.splits_info,
+                                                mm_data_info=self.mm_data_info,
+                                                data_types=self.data_types,
+                                                split_wise=True,
+                                                globally=True)
 
     def create_splits_data(self):
         """ Create datasets for different splits """
@@ -230,38 +311,35 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         logging.info(" Done!")
 
-    def get_phase_data(self, phase):
+    def get_phase_data_info(self, phase):
         """ Obtain the data information for the required phrase """
         path = self.splits_info[phase]["path"]
         save_path = os.path.join(path, phase + "_integrated_data.json")
         with open(save_path, 'r') as outfile:
-            phase_data = json.load(outfile)
-        return phase_data
+            phase_data_info = json.load(outfile)
+        return phase_data_info
 
-    def get_train_loader(self, batch_size):
-        """ Obtain the train loader """
+    def get_phase_dataset(self, phase, modality_sampler):
+        """ Obtain the dataset for the specific phase """
+        phase_data_info = self.get_phase_data_info(phase)
+        phase_split_info = self.splits_info[phase]
+        dataset = Flickr30KEDataset(dataset_info=phase_data_info,
+                                    phase_info=phase_split_info,
+                                    data_types=self.data_types,
+                                    phase=phase,
+                                    modality_sampler=modality_sampler)
+        return dataset
+
+    def get_train_set(self, modality_sampler=None):
+        """ Obtains the training dataset. """
         phase = "train"
-        phase_data = self.get_phase_data(phase)
-        self.trainset = Flickr30KEDataset(dataset=phase_data,
-                                          splits_info=self.splits_info,
-                                          data_types=self.data_types,
-                                          phase=phase)
-        train_loader = torch.utils.data.DataLoader(dataset=self.trainset,
-                                                   batch_size=batch_size,
-                                                   shuffle=True,
-                                                   collate_fn=collate_fn)
-        return train_loader
 
-    def get_test_loader(self, batch_size):
-        """ Obtain the test loader """
+        self.trainset = self.get_phase_dataset(phase, modality_sampler)
+        return self.trainset
+
+    def get_test_set(self, modality_sampler=None):
+        """ Obtains the validation dataset. """
         phase = "test"
-        phase_data = self.get_phase_data(phase)
-        self.testset = Flickr30KEDataset(dataset=phase_data,
-                                         splits_info=self.splits_info,
-                                         data_types=self.data_types,
-                                         phase=phase)
-        test_loader = torch.utils.data.DataLoader(dataset=self.testset,
-                                                  batch_size=batch_size,
-                                                  shuffle=True,
-                                                  collate_fn=collate_fn)
-        return test_loader
+
+        self.testset = self.get_phase_dataset(phase, modality_sampler)
+        return self.testset

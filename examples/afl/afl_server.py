@@ -42,7 +42,7 @@ class Server(fedavg.Server):
 
         # Update the local valuations from the updates
         for i, update in enumerate(weights_received):
-            report, __ = updates[i]
+            report, __, __ = updates[i]
             client_id = self.selected_clients[i]
             self.local_values[client_id]["valuation"] = report.valuation
 

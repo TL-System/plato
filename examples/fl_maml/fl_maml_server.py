@@ -5,7 +5,6 @@ import logging
 import os
 import pickle
 import sys
-import time
 from plato.config import Config
 from plato.servers import fedavg
 from plato.utils import csv_processor
@@ -72,10 +71,13 @@ class Server(fedavg.Server):
                         self.accuracy * 100,
                         'personalization_accuracy':
                         self.personalization_accuracy * 100,
-                        'training_time':
-                        self.training_time,
+                        'elapsed_time':
+                        self.wall_time - self.initial_wall_time,
                         'round_time':
-                        time.perf_counter() - self.round_start_time
+                        max([
+                            report.training_time
+                            for (report, __, __) in self.updates
+                        ]),
                     }[item]
                     new_row.append(item_value)
 
@@ -87,11 +89,11 @@ class Server(fedavg.Server):
 
         else:
             self.training_time = max(
-                [report.training_time for (report, __) in self.updates])
+                [report.training_time for (report, __, __) in self.updates])
 
-    async def client_payload_done(self, sid, client_id, object_key):
+    async def client_payload_done(self, sid, client_id, s3_key=None):
         """ Upon receiving all the payload from a client, either via S3 or socket.io. """
-        if object_key is None:
+        if s3_key is None:
             assert self.client_payload[sid] is not None
 
             payload_size = 0
@@ -102,8 +104,7 @@ class Server(fedavg.Server):
                 payload_size = sys.getsizeof(
                     pickle.dumps(self.client_payload[sid]))
         else:
-            self.client_payload[sid] = self.s3_client.receive_from_s3(
-                object_key)
+            self.client_payload[sid] = self.s3_client.receive_from_s3(s3_key)
             payload_size = sys.getsizeof(pickle.dumps(
                 self.client_payload[sid]))
 
