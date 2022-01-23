@@ -14,6 +14,7 @@ from plato.config import Config
 from plato.clients import base
 from plato.clients import simple
 
+
 @dataclass
 class Report(base.Report):
     """Client report sent to the federated learning server."""
@@ -21,11 +22,12 @@ class Report(base.Report):
 
 class Client(simple.Client):
     """A federated learning client with Adaptive Parameter Freezing."""
+
     async def train(self):
         """Adaptive Parameter Freezing will be applied after training the model."""
 
         # Perform model training
-        self.trainer.train(self.trainset, self.sampler)
+        training_time = self.trainer.train(self.trainset, self.sampler)
 
         # Extract model weights and biases, with some weights frozen
         weights = self.algorithm.compress_weights()
@@ -36,4 +38,5 @@ class Client(simple.Client):
         else:
             accuracy = 0
 
-        return Report(self.sampler.trainset_size(), accuracy), weights
+        return Report(self.sampler.trainset_size(), accuracy,
+                      training_time), weights

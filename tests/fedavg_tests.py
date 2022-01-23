@@ -44,7 +44,7 @@ async def test_fedavg_aggregation(self):
 
     weights = copy.deepcopy(self.algorithm.extract_weights())
     print(f"Report 1 weights: {weights}")
-    updates.append((simple.Report(1, 100, 0, 0), weights))
+    updates.append((simple.Report(1, 100, 0, 0), weights, 0))
 
     self.model.train()
 
@@ -54,7 +54,7 @@ async def test_fedavg_aggregation(self):
     self.assertEqual(44.0, self.model(self.example).item())
     weights = copy.deepcopy(self.algorithm.extract_weights())
     print(f"Report 2 weights: {weights}")
-    updates.append((simple.Report(1, 100, 0, 0), weights))
+    updates.append((simple.Report(1, 100, 0, 0), weights, 0))
 
     self.optimizer.zero_grad()
     self.model.loss_criterion(self.model(self.example), self.label).backward()
@@ -62,7 +62,7 @@ async def test_fedavg_aggregation(self):
     self.assertEqual(43.2, np.round(self.model(self.example).item(), 4))
     weights = copy.deepcopy(self.algorithm.extract_weights())
     print(f"Report 3 Weights: {weights}")
-    updates.append((simple.Report(1, 100, 0, 0), weights))
+    updates.append((simple.Report(1, 100, 0, 0), weights, 0))
 
     self.optimizer.zero_grad()
     self.model.loss_criterion(self.model(self.example), self.label).backward()
@@ -70,7 +70,7 @@ async def test_fedavg_aggregation(self):
     self.assertEqual(42.56, np.round(self.model(self.example).item(), 4))
     weights = copy.deepcopy(self.algorithm.extract_weights())
     print(f"Report 4 Weights: {weights}")
-    updates.append((simple.Report(1, 100, 0, 0), weights))
+    updates.append((simple.Report(1, 100, 0, 0), weights, 0))
 
     print(
         f"Weights before federated averaging: {server.model.layer.weight.data}"

@@ -120,9 +120,6 @@ class Server(fedavg_cs.Server):
         # Configure the FL central server
         super().configure()
 
-        # starting time of a gloabl training round
-        self.round_start_time = 0
-
     async def wrap_up(self):
         """Wrapping up when one RL time step (one FL round) is done."""
         if Config().is_central_server():
@@ -192,8 +189,10 @@ class Server(fedavg_cs.Server):
             new_row = []
             for item in self.rl_recorded_items:
                 item_value = {
-                    'episode': self.rl_episode,
-                    'cumulative_reward': self.cumulative_reward,
+                    'episode':
+                    self.rl_episode,
+                    'cumulative_reward':
+                    self.cumulative_reward,
                     'rl_training_time':
                     time.perf_counter() - self.rl_episode_start_time
                 }[item]

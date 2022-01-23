@@ -3,15 +3,15 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 1
+    total_clients: 10
 
     # The number of clients selected in each round
-    per_round: 1
+    per_round: 2
 
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    # Whether simulate clients or not
+    # Client simulation mode
     simulation: false
 
     # Processors for outbound data payloads
@@ -21,6 +21,7 @@ clients:
 server:
     address: 127.0.0.1
     port: 8000
+    simulate_wall_time: true
 
 data:
     # The training and testing dataset
@@ -58,10 +59,10 @@ trainer:
     max_concurrency: 1
 
     # The target accuracy
-    target_accuracy: 0.94
+    target_accuracy: 0.97
 
     # Number of epoches for local training in each communication round
-    epochs: 5
+    epochs: 1
     batch_size: 32
     optimizer: SGD
     learning_rate: 0.01
@@ -74,3 +75,10 @@ trainer:
 algorithm:
     # Aggregation algorithm
     type: fedavg
+
+results:
+    # Write the following parameter(s) into a CSV
+    types: round, elapsed_time, accuracy
+
+    # Plot results (x_axis-y_axis)
+    plot: round-accuracy, elapsed_time-accuracy

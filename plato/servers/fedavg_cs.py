@@ -143,12 +143,13 @@ class Server(fedavg.Server):
                     Config().algorithm.local_rounds,
                     'local_epoch_num':
                     Config().trainer.epochs,
-                    'training_time':
-                    max([
-                        report.training_time for (report, __) in self.updates
-                    ]),
+                    'elapsed_time':
+                    self.wall_time - self.initial_wall_time,
                     'round_time':
-                    time.perf_counter() - self.round_start_time
+                    max([
+                        report.training_time
+                        for (report, __, __) in self.updates
+                    ]),
                 }[item]
                 new_row.append(item_value)
 

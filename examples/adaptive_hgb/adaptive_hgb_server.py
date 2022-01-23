@@ -16,10 +16,10 @@ class Server(fedavg.Server):
 
         # Extract the total number of samples
         self.total_samples = sum(
-            [report.num_samples for (report, __) in updates])
+            [report.num_samples for (report, __, __) in updates])
 
         clients_delta_ogs = [(report.delta_O, report.delta_G)
-                             for (report, __) in updates]
+                             for (report, __, __) in updates]
 
         clients_optimal_weights = self.get_optimal_gradient_blend_weights_OG(
             delta_OGs=clients_delta_ogs)
@@ -31,7 +31,7 @@ class Server(fedavg.Server):
         }
 
         for i, update in enumerate(weights_received):
-            report, __ = updates[i]
+            report, __, __ = updates[i]
 
             for name, delta in update.items():
                 # Use weighted average by the number of samples

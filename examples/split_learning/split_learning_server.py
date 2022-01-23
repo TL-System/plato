@@ -6,8 +6,6 @@ import logging
 import os
 import pickle
 import sys
-import time
-from itertools import chain
 
 import torch
 from plato.config import Config
@@ -46,7 +44,6 @@ class Server(fedavg.Server):
             queue_head = self.clients_running_queue.pop(0)
             res_list.append(queue_head)
             self.clients_running_queue.append(queue_head)
-            self.round_start_time = time.time()
 
         return res_list
 

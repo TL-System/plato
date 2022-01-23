@@ -5,6 +5,7 @@ import asyncio
 import logging
 import multiprocessing as mp
 import os
+import re
 import time
 
 import numpy as np
@@ -13,7 +14,6 @@ import torch.nn as nn
 from opacus import GradSampleModule
 from opacus.privacy_engine import PrivacyEngine
 from opacus.validators import ModuleValidator
-
 from plato.config import Config
 from plato.models import registry as models_registry
 from plato.trainers import base
@@ -30,6 +30,8 @@ class Trainer(base.Trainer):
         client_id: The ID of the client using this trainer (optional).
         """
         super().__init__()
+
+        self.training_start_time = time.time()
 
         if model is None:
             model = models_registry.get()
@@ -53,6 +55,11 @@ class Trainer(base.Trainer):
                 assert len(errors) == 0
 
             self.model = GradSampleModule(self.model)
+
+        if hasattr(Config().clients,
+                   "speed_simulation") and Config().clients.speed_simulation:
+            # Simulated speed of client
+            self._sleep_time = None
 
     def zeros(self, shape):
         """Returns a PyTorch zero tensor with the given shape."""
@@ -101,6 +108,41 @@ class Trainer(base.Trainer):
 
         self.model.load_state_dict(torch.load(model_path))
 
+    def _simulate_sleep_time(self) -> float:
+        """Simulate and return a sleep time (in seconds) for the client."""
+        np.random.seed(self.client_id)
+
+        sleep_time = 0
+        if hasattr(Config().clients, "simulation_distribution"):
+            dist = Config.clients.simulation_distribution
+            # Determine the distribution of client's simulate sleep time
+            if dist.distribution.lower() == "normal":
+                sleep_time = np.random.normal(dist.mean, dist.sd)
+            if dist.distribution.lower() == "zipf":
+                sleep_time = np.random.zipf(dist.s)
+        else:
+            # Default use Zipf distribution with a parameter of 1.5
+            sleep_time = np.random.zipf(1.5)
+        # Limit the simulated sleep time below a threshold
+        return min(sleep_time, 50)
+
+    def _simulate_client_speed(self):
+        """Simulate client's speed by putting it to sleep."""
+        sleep_time = self._sleep_time
+
+        # Introduce some randomness to the sleep time
+        np.random.seed()  # Set seed to system clock to allow randomness
+        deviation = 0.05
+        sleep_seconds = np.random.uniform(sleep_time * (1 - deviation),
+                                          sleep_time * (1 + deviation))
+        sleep_seconds = max(sleep_seconds, 0)
+
+        # Put this client to sleep
+        logging.info("[Client #%d] Going to sleep for %f seconds.",
+                     self.client_id, sleep_seconds)
+        time.sleep(sleep_seconds)
+        logging.info("[Client #%d] Woke up.", self.client_id)
+
     def train_process(self, config, trainset, sampler, cut_layer=None):
         """The main training loop in a federated learning workload, run in
           a separate process with a new CUDA context, so that CUDA memory
@@ -113,6 +155,8 @@ class Trainer(base.Trainer):
         sampler: the sampler that extracts a partition for this client.
         cut_layer (optional): The layer which training should start from.
         """
+        tic = time.perf_counter()
+
         if 'use_wandb' in config:
             import wandb
 
@@ -233,6 +277,23 @@ class Trainer(base.Trainer):
                     if hasattr(optimizer, "params_state_update"):
                         optimizer.params_state_update()
 
+                    # Simulate client's speed
+                    if self.client_id != 0 and hasattr(
+                            Config().clients, "speed_simulation") and Config(
+                            ).clients.speed_simulation:
+                        self._simulate_client_speed()
+
+                    # Saving the model at the end of this epoch to a file so that
+                    # it can later be retrieved to respond to server requests
+                    # in asynchronous mode when the wall clock time is simulated
+                    if hasattr(Config().server, 'request_update') and Config(
+                    ).server.request_update:
+                        self.model.cpu()
+                        training_time = time.perf_counter() - tic
+                        filename = f"{self.client_id}_{epoch}_{training_time}.pth"
+                        self.save_model(filename)
+                        self.model.to(self.device)
+
         except Exception as training_exception:
             logging.info("Training on client #%d failed.", self.client_id)
             raise training_exception
@@ -259,6 +320,16 @@ class Trainer(base.Trainer):
         """
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']
+
+        # Generate a simulated client's speed
+        if self.client_id != 0 and hasattr(
+                Config().clients,
+                "speed_simulation") and Config().clients.speed_simulation:
+            if self._sleep_time is None:
+                self._sleep_time = self._simulate_sleep_time()
+
+        # Set the start time of training in absolute time
+        self.training_start_time = time.time()
 
         if 'max_concurrency' in config:
             self.start_training()
@@ -447,3 +518,38 @@ class Trainer(base.Trainer):
                 await asyncio.sleep(0)
 
         return correct / total
+
+    def obtain_model_update(self, wall_time):
+        """
+            Obtain a saved model for a particular epoch that finishes just after the provided
+            wall clock time is reached.
+        """
+        # Constructing a list of epochs and training times
+        self.models_per_epoch = {}
+
+        for filename in os.listdir(Config().params['model_dir']):
+            split = re.match(
+                r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+).pth",
+                filename)
+
+            if split is not None:
+                epoch = split.group('epoch')
+                training_time = split.group('training_time')
+                if self.client_id == int(split.group('client_id')):
+                    self.models_per_epoch[epoch] = {
+                        'training_time': float(training_time),
+                        'model_checkpoint': filename
+                    }
+        # Locate the model at a specific wall clock time
+        for epoch in sorted(self.models_per_epoch):
+            training_time = self.models_per_epoch[epoch]['training_time']
+            model_checkpoint = self.models_per_epoch[epoch]['model_checkpoint']
+            if training_time + self.training_start_time > wall_time:
+                self.load_model(model_checkpoint)
+                logging.info(
+                    "[Client #%s] Responding to the server with the model after "
+                    "epoch %s finished, at time %s.", self.client_id, epoch,
+                    training_time + self.training_start_time)
+                return self.model
+
+        return self.model

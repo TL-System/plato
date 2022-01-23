@@ -74,5 +74,5 @@ algorithm:
 
 results:
     results_dir: ./
-    types: accuracy, training_time, round_time
-    plot: training_time&accuracy
+    types: accuracy, elapsed_time, round_time
+    plot: elapsed_time & accuracy

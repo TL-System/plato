@@ -11,20 +11,20 @@ class fedReIdServer(fedavg.Server):
     def __init__(self, model=None, trainer=None):
         super().__init__(model, trainer)
         self.clients_belive = None
-        
+
     def extract_client_updates(self, updates):
         """ Extract the model weights and update directions from clients updates. """
-        weights_received = [payload[0] for (__, payload) in updates]
-        
-        self.clients_belive = [payload[1] for (__, payload) in updates]
-        
+        weights_received = [payload[0] for (__, payload, __) in updates]
+
+        self.clients_belive = [payload[1] for (__, payload, __) in updates]
+
         return self.algorithm.compute_weight_updates(weights_received)
-    
+
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using federated averaging."""
         # Extract weights from the updates
         weights_received = self.extract_client_updates(updates)
-        
+
         self.total_belive = sum(self.clients_belive)
         if self.total_belive == 0.0:
             self.total_belive = 1.0

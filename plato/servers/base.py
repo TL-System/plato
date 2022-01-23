@@ -3,6 +3,7 @@ The base class for federated learning servers.
 """
 
 import asyncio
+import heapq
 import logging
 import multiprocessing as mp
 import os
@@ -14,7 +15,6 @@ from abc import abstractmethod
 
 import socketio
 from aiohttp import web
-
 from plato.client import run
 from plato.config import Config
 from plato.utils import s3
@@ -88,10 +88,81 @@ class Server:
 
         # States that need to be maintained for asynchronous FL
 
-        # Clients whose new reports were received since the last round of aggregation
+        # Clients whose new reports were received but not yet processed
         self.reporting_clients = []
+
         # Clients who are still training since the last round of aggregation
         self.training_clients = {}
+
+        # The wall clock time that is simulated to accommodate the fact that
+        # clients can only run a batch at a time, controlled by `max_concurrency`
+        self.initial_wall_time = time.time()
+        self.wall_time = time.time()
+
+        # When simulating the wall clock time, the server needs to remember the
+        # set of reporting clients received since the previous round of aggregation
+        self.current_reporting_clients = {}
+
+        self.ping_interval = 3600
+        self.ping_timeout = 360
+        self.asynchronous_mode = False
+        self.periodic_interval = 5
+        self.staleness_bound = 0
+        self.minimum_clients = 1
+        self.simulate_wall_time = False
+        self.request_update = False
+        self.disable_clients = False
+
+        Server.client_simulation_mode = False
+
+    def configure(self):
+        """ Initializing configuration settings based on the configuration file. """
+        # Ping interval and timeout setup for the server
+        self.ping_interval = Config().server.ping_interval if hasattr(
+            Config().server, 'ping_interval') else 3600
+        self.ping_timeout = Config().server.ping_timeout if hasattr(
+            Config().server, 'ping_timeout') else 360
+
+        # Are we operating in asynchronous mode?
+        self.asynchronous_mode = hasattr(
+            Config().server, 'synchronous') and not Config().server.synchronous
+
+        # What is the periodic interval for running our periodic task in asynchronous mode?
+        self.periodic_interval = Config().server.periodic_interval if hasattr(
+            Config().server, 'periodic_interval') else 5
+
+        # The staleness threshold is used to determine if a training clients should be
+        # considered 'stale', if their starting round is too much behind the current round
+        # on the server
+        self.staleness_bound = Config().server.staleness_bound if hasattr(
+            Config().server, 'staleness_bound') else 0
+
+        # What is the minimum number of clients that must have reported before aggregation
+        # takes place?
+        self.minimum_clients = Config(
+        ).server.minimum_clients_aggregated if hasattr(
+            Config().server, 'minimum_clients_aggregated') else 1
+
+        # Are we simulating the wall clock time on the server? This is useful when the clients
+        # are training in batches due to a lack of memory on the GPUs
+        self.simulate_wall_time = hasattr(
+            Config().server,
+            'simulate_wall_time') and Config().server.simulate_wall_time
+
+        # Do we wish to send urgent requests for model updates to the slow clients?
+        self.request_update = hasattr(
+            Config().server,
+            'request_update') and Config().server.request_update
+
+        # Are we disabling all clients and prevent them from running?
+        self.disable_clients = hasattr(
+            Config().server,
+            'disable_clients') and Config().server.disable_clients
+
+        # Are we simulating the clients rather than running all selected clients as separate
+        # processes?
+        Server.client_simulation_mode = hasattr(
+            Config().clients, 'simulation') and Config().clients.simulation
 
     def run(self,
             client=None,
@@ -120,19 +191,14 @@ class Server:
             # Allowing some time for the edge servers to start
             time.sleep(5)
 
-        if hasattr(Config().server,
-                   'disable_clients') and Config().server.disable_clients:
+        if self.disable_clients:
             logging.info(
                 "No clients are launched (server:disable_clients = true)")
         else:
             Server.start_clients(client=self.client)
 
-        if hasattr(Config().server, 'periodic_interval'):
-            periodic_interval = Config().server.periodic_interval
-        else:
-            periodic_interval = 5
-
-        asyncio.get_event_loop().create_task(self.periodic(periodic_interval))
+        asyncio.get_event_loop().create_task(
+            self.periodic(self.periodic_interval))
 
         self.start()
 
@@ -141,13 +207,9 @@ class Server:
         logging.info("Starting a server at address %s and port %s.",
                      Config().server.address, port)
 
-        ping_interval = Config().server.ping_interval if hasattr(
-            Config().server, 'ping_interval') else 3600
-        ping_timeout = Config().server.ping_timeout if hasattr(
-            Config().server, 'ping_timeout') else 360
-        self.sio = socketio.AsyncServer(ping_interval=ping_interval,
+        self.sio = socketio.AsyncServer(ping_interval=self.ping_interval,
                                         max_http_buffer_size=2**31,
-                                        ping_timeout=ping_timeout)
+                                        ping_timeout=self.ping_timeout)
         self.sio.register_namespace(
             ServerEvents(namespace='/', plato_server=self))
 
@@ -190,8 +252,7 @@ class Server:
         """ Starting all the clients as separate processes. """
         starting_id = 1
 
-        if hasattr(Config().clients,
-                   'simulation') and Config().clients.simulation:
+        if Server.client_simulation_mode:
             # In the client simulation mode, we only need to launch a limited
             # number of client objects (same as the number of clients per round)
             client_processes = Config().clients.per_round
@@ -239,8 +300,7 @@ class Server:
                      self.current_round,
                      Config().trainer.rounds)
 
-        if hasattr(Config().clients, 'simulation') and Config(
-        ).clients.simulation and not Config().is_central_server:
+        if Server.client_simulation_mode:
             # In the client simulation mode, the client pool for client selection contains
             # all the virtual clients to be simulated
             self.clients_pool = list(range(1, 1 + self.total_clients))
@@ -252,9 +312,12 @@ class Server:
 
         # In asychronous FL, avoid selecting new clients to replace those that are still
         # training at this time
-        if hasattr(Config().server, 'synchronous') and not Config(
-        ).server.synchronous and self.selected_clients is not None and len(
-                self.reporting_clients) < self.clients_per_round:
+
+        # When simulating the wall clock time, if len(self.reporting_clients) is 0, the
+        # server has aggregated all reporting clients already
+        if self.asynchronous_mode and self.selected_clients is not None and len(
+                self.reporting_clients) > 0 and len(
+                    self.reporting_clients) < self.clients_per_round:
             # If self.selected_clients is None, it implies that it is the first iteration;
             # If len(self.reporting_clients) == self.clients_per_round, it implies that
             # all selected clients have already reported.
@@ -265,30 +328,58 @@ class Server:
                 self.training_clients[client_id]['id']
                 for client_id in list(self.training_clients.keys())
             ]
+
+            # If the server is simulating the wall clock time, some of the clients who
+            # reported may not have been aggregated; they should be excluded from the next
+            # round of client selection
+            reporting_client_ids = [
+                client[1]['client_id'] for client in self.reporting_clients
+            ]
+
             selectable_clients = [
                 client for client in self.clients_pool
                 if client not in training_client_ids
+                and client not in reporting_client_ids
             ]
 
-            self.selected_clients = self.choose_clients(
-                selectable_clients, len(self.reporting_clients))
+            if self.simulate_wall_time:
+                self.selected_clients = self.choose_clients(
+                    selectable_clients, len(self.current_reporting_clients))
+            else:
+                self.selected_clients = self.choose_clients(
+                    selectable_clients, len(self.reporting_clients))
         else:
             self.selected_clients = self.choose_clients(
                 self.clients_pool, self.clients_per_round)
 
         if len(self.selected_clients) > 0:
             for i, selected_client_id in enumerate(self.selected_clients):
-                if hasattr(Config().clients, 'simulation') and Config(
-                ).clients.simulation and not Config().is_central_server:
-                    if hasattr(Config().server, 'synchronous') and not Config(
-                    ).server.synchronous and self.reporting_clients is not None:
-                        client_id = self.reporting_clients[i]
-                    else:
-                        client_id = i + 1
-                else:
-                    client_id = selected_client_id
+                if self.client_simulation_mode:
+                    client_id = i + 1
+                    sid = self.clients[client_id]['sid']
 
-                sid = self.clients[client_id]['sid']
+                    if self.asynchronous_mode and self.simulate_wall_time:
+                        # skip if this sid is currently `training' with reporting clients
+                        training_sids = []
+                        for client_info in self.reporting_clients:
+                            training_sids.append(client_info[1]['sid'])
+                        while sid in training_sids:
+                            client_id = client_id % self.clients_per_round + 1
+                            sid = self.clients[client_id]['sid']
+
+                else:
+                    sid = self.clients[selected_client_id]['sid']
+
+                server_response = {'id': selected_client_id}
+                server_response = await self.customize_server_response(
+                    server_response)
+
+                self.training_clients[selected_client_id] = {
+                    'id': selected_client_id,
+                    'starting_round': self.current_round,
+                    'start_time': self.wall_time,
+                    'update_requested': False
+                }
 
                 logging.info("[Server #%d] Selecting client #%d for training.",
                              os.getpid(), selected_client_id)
@@ -311,10 +402,16 @@ class Server:
                     os.getpid(), selected_client_id)
                 await self.send(sid, payload, selected_client_id)
 
-                self.training_clients[client_id] = {
-                    'id': selected_client_id,
-                    'round': self.current_round
-                }
+            self.current_reporting_clients = {}
+
+            # There is no need to clear the list of reporting clients if we are
+            # simulating the wall clock time on the server. This is because
+            # when wall clock time is simulated, the server needs to wait for
+            # all the clients to report before selecting a subset of clients for
+            # replacement, and all remaining reporting clients will be processed
+            # in the next round
+            if self.simulate_wall_time:
+                return
 
             self.reporting_clients = []
 
@@ -342,36 +439,27 @@ class Server:
             await self.customize_periodic_task()
 
         # If we are operating in asynchronous mode, aggregate the model updates received so far.
-        if hasattr(Config().server,
-                   'synchronous') and not Config().server.synchronous:
-
-            # What is the minimum number of clients that must have reported before aggregation
-            # takes place?
-            minimum_clients = 1
-            if hasattr(Config().server, 'minimum_clients_aggregated'):
-                minimum_clients = Config().server.minimum_clients_aggregated
-
+        if self.asynchronous_mode and not self.simulate_wall_time:
             # Is there any training clients who are currently training on models that are too
             # `stale,` as defined by the staleness threshold?
-            staleness = 0
-            if hasattr(Config().server, 'staleness'):
-                staleness = Config().server.staleness
-
             for __, client_data in self.training_clients.items():
-                # The client is still working at an early round, early enough to stop the aggregation
-                # process as determined by 'staleness'
-                if client_data['round'] < self.current_round - staleness:
+                # The client is still working at an early round, early enough to stop the
+                # aggregation process as determined by 'staleness'
+                client_staleness = self.current_round - client_data[
+                    'starting_round']
+                if client_staleness > self.staleness_bound:
                     logging.info(
                         "[Server #%d] Client %s is still working at round %s, which is "
-                        "beyond the staleness threshold %s compared to the current round %s. "
+                        "beyond the staleness bound %s compared to the current round %s. "
                         "Nothing to process.", os.getpid(), client_data['id'],
-                        client_data['round'], staleness, self.current_round)
+                        client_data['starting_round'], self.staleness_bound,
+                        self.current_round)
 
                     return
 
-            if len(self.updates) >= minimum_clients:
+            if len(self.updates) >= self.minimum_clients:
                 logging.info(
-                    "[Server #%d] %d client reports received in asynchronous mode. Processing.",
+                    "[Server #%d] %d client report(s) received in asynchronous mode. Processing.",
                     os.getpid(), len(self.updates))
                 await self.process_reports()
                 await self.wrap_up()
@@ -379,7 +467,7 @@ class Server:
             else:
                 logging.info(
                     "[Server #%d] No sufficient number of client reports have been received. "
-                    "Nothing to process.")
+                    "Nothing to process.", os.getpid())
 
     async def send_in_chunks(self, data, sid, client_id) -> None:
         """ Sending a bytes object in fixed-sized chunks to the client. """
@@ -470,12 +558,182 @@ class Server:
             "[Server #%d] Received %s MB of payload data from client #%d.",
             os.getpid(), round(payload_size / 1024**2, 2), client_id)
 
+        # Pass through the inbound_processor(s), if any
         self.client_payload[sid] = self.inbound_processor.process(
             self.client_payload[sid])
-        self.updates.append((self.reports[sid], self.client_payload[sid]))
 
-        self.reporting_clients.append(client_id)
+        start_time = self.training_clients[client_id]['start_time']
+        finish_time = self.reports[sid].training_time + start_time
+        starting_round = self.training_clients[client_id]['starting_round']
+
+        client_info = (
+            finish_time,  # sorted by the client's finish time
+            {
+                'client_id': client_id,
+                'sid': sid,
+                'starting_round': starting_round,
+                'start_time': start_time,
+                'report': self.reports[sid],
+                'payload': self.client_payload[sid],
+            })
+
+        heapq.heappush(self.reporting_clients, client_info)
+        self.current_reporting_clients[client_info[1]['client_id']] = True
         del self.training_clients[client_id]
+
+        await self.process_clients(client_info)
+
+    async def process_clients(self, client_info):
+        """ Determine whether it is time to process the client reports and
+            proceed with the aggregation process.
+
+            When in asynchronous mode, additional processing is needed to simulate
+            the wall clock time.
+        """
+        # In asynchronous mode with simulated wall clock time, we need to extract
+        # the minimum number of clients from the list of all reporting clients, and then
+        # proceed with report processing and replace these clients with a new set of
+        # selected clients
+        if self.asynchronous_mode and self.simulate_wall_time and len(
+                self.current_reporting_clients) >= len(self.selected_clients):
+            # Step 1: Sanity checks to see if there are any stale clients; if so, send them
+            # an urgent request for model updates at the current simulated wall clock time
+            if self.request_update:
+                # We should not proceed with further processing if there are outstanding requests
+                # for urgent client updates
+                for __, client_data in self.training_clients.items():
+                    if client_data['update_requested']:
+                        return
+
+                request_sent = False
+                for i, client_info in enumerate(self.reporting_clients):
+                    client = client_info[1]
+                    client_staleness = self.current_round - client[
+                        'starting_round']
+
+                    if client_staleness > self.staleness_bound and not client[
+                            'report'].update_response:
+
+                        # Sending an urgent request to the client for a model update at the
+                        # currently simulated wall clock time
+                        client_id = client['client_id']
+
+                        logging.info(
+                            "[Server #%s] Requesting urgent model update from client #%s.",
+                            os.getpid(), client_id)
+
+                        # Remove the client information from the list of reporting clients since
+                        # this client will report again soon with another model update upon
+                        # receiving the request from the server
+                        del self.reporting_clients[i]
+
+                        self.training_clients[client_id] = {
+                            'id': client_id,
+                            'starting_round': client['starting_round'],
+                            'start_time': client['start_time'],
+                            'update_requested': True
+                        }
+
+                        sid = client['sid']
+
+                        await self.sio.emit('request_update',
+                                            {'time': self.wall_time},
+                                            room=sid)
+                        request_sent = True
+
+                # If an urgent request was sent, we will wait until the client gets back to proceed
+                # with aggregation.
+                if request_sent:
+                    return
+
+            # Step 2: Processing clients in chronological order of finish times in wall clock time
+            for __ in range(
+                    0,
+                    min(len(self.current_reporting_clients),
+                        self.minimum_clients)):
+                # Extract a client with the earliest finish time in wall clock time
+                client_info = heapq.heappop(self.reporting_clients)
+                client = client_info[1]
+
+                # Removing from the list of current reporting clients as well, if needed
+                if client['client_id'] in self.current_reporting_clients:
+                    del self.current_reporting_clients[client['client_id']]
+
+                # Update the simulated wall clock time to be the finish time of this client
+                self.wall_time = client_info[0]
+
+                # Add the report and payload of the extracted reporting client into updates
+                logging.info(
+                    "[Server #%s] Adding client #%s to the list of clients for aggregation.",
+                    os.getpid(), client['client_id'])
+
+                client_staleness = self.current_round - client['starting_round']
+                self.updates.append(
+                    (client['report'], client['payload'], client_staleness))
+
+            # Step 3: Processing stale clients that exceed a staleness threshold
+
+            # If there are more clients in the list of reporting clients that violate the
+            # staleness bound, the server needs to wait for these clients even when the minimum
+            # number of clients has been reached, by simply advancing its simulated wall clock
+            # time ahead to include the remaining clients, until no stale clients exist
+            possibly_stale_clients = []
+
+            # Is there any reporting clients who are currently training on models that are too
+            # `stale,` as defined by the staleness threshold? If so, we need to advance the wall
+            # clock time until no stale clients exist in the future
+            for __ in range(0, len(self.reporting_clients)):
+                # Extract a client with the earliest finish time in wall clock time
+                client_info = heapq.heappop(self.reporting_clients)
+                heapq.heappush(possibly_stale_clients, client_info)
+
+                if client_info[1][
+                        'starting_round'] < self.current_round - self.staleness_bound:
+                    for __ in range(0, len(possibly_stale_clients)):
+                        stale_client_info = heapq.heappop(
+                            possibly_stale_clients)
+                        # Update the simulated wall clock time to be the finish time of this client
+                        self.wall_time = stale_client_info[0]
+                        client = stale_client_info[1]
+
+                        # Add the report and payload of the extracted reporting client into updates
+                        logging.info(
+                            "[Server #%s] Adding client #%s to the list of clients for "
+                            "aggregation.", os.getpid(), client['client_id'])
+
+                        client_staleness = self.current_round - client[
+                            'starting_round']
+                        self.updates.append(
+                            (client['report'], client['payload'],
+                             client_staleness))
+
+            self.reporting_clients = possibly_stale_clients
+            logging.info("[Server #%s] Aggregating %s clients in total.",
+                         os.getpid(), len(self.updates))
+
+            await self.process_reports()
+            await self.wrap_up()
+            await self.select_clients()
+            return
+
+        if not self.simulate_wall_time or not self.asynchronous_mode:
+            # In both synchronous and asynchronous modes, if we are not simulating the wall clock
+            # time, we need to add the client report to the list of updates so far;
+            # the same applies when we are running in synchronous mode.
+            client = client_info[1]
+            client_staleness = self.current_round - client['starting_round']
+
+            self.updates.append(
+                (client['report'], client['payload'], client_staleness))
+
+        if not self.asynchronous_mode and self.simulate_wall_time:
+            # In synchronous mode with the wall clock time simulated, in addition to adding
+            # the client report to the list of updates, we will also need to advance the wall
+            # clock time to the finish time of the reporting client
+            client_finish_time = client_info[0]
+            self.wall_time = max(client_finish_time, self.wall_time)
+            logging.info("[Server #%d] Advancing the wall clock time to %s.",
+                         os.getpid(), self.wall_time)
 
         # If all updates have been received from selected clients, the aggregation process
         # proceeds regardless of synchronous or asynchronous modes. This guarantees that
@@ -483,8 +741,8 @@ class Server:
         # unnecessarily delay the aggregation process.
         if len(self.updates) >= self.clients_per_round:
             logging.info(
-                "[Server #%d] All %d client reports received. Processing.",
-                os.getpid(), len(self.updates))
+                "[Server #%d] All %d client report(s) received. Processing.",
+                os.getpid(), len(self.reporting_clients))
             await self.process_reports()
             await self.wrap_up()
             await self.select_clients()
@@ -498,6 +756,9 @@ class Server:
                 if client_id in self.training_clients:
                     del self.training_clients[client_id]
 
+                if client_id in self.current_reporting_clients:
+                    del self.current_reporting_clients[client_id]
+
                 logging.info(
                     "[Server #%d] Client #%d disconnected and removed from this server.",
                     os.getpid(), client_id)
@@ -507,7 +768,7 @@ class Server:
 
                     if len(self.updates) >= len(self.selected_clients):
                         logging.info(
-                            "[Server #%d] All %d client reports received. Processing.",
+                            "[Server #%d] All %d client report(s) received. Processing.",
                             os.getpid(), len(self.updates))
                         await self.process_reports()
                         await self.wrap_up()
@@ -533,10 +794,6 @@ class Server:
         self.trainer.save_model()
         await self.close_connections()
         os._exit(0)
-
-    @abstractmethod
-    def configure(self):
-        """ Configuring the server with initialization work. """
 
     async def customize_server_response(self, server_response):
         """ Wrap up generating the server response with any additional information. """

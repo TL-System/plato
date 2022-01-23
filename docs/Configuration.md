@@ -17,6 +17,12 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |**total_clients**|The total number of clients|A positive number||
 |**per_round**|The number of clients selected in each round| Any positive integer that is not larger than **total_clients**||
 |**do_test**|Should the clients compute test accuracy locally?| `true` or `false`|| 
+|simulation|Should we turn on the client simulation mode? When this is turned on, the number of client processes started is equal to the number of clients per round, rather than the total number of clients.|
+|speed_simulation|Should we simulate client heterogeneity in training speed?|
+|simulation_distribution|Parameters for simulating client heterogeneity in training speed|`distribution`|`normal` for normal or `zipf` for Zipf|
+|||`s`|the parameter `s` in Zipf distribution|
+|||`mean`|The mean in normal distribution|
+|||`sd`|The standard deviation in normal distribution|
 |outbound_processors|A list of processors to apply on the payload before sending| A list of processor names || 
 |inbound_processors|A list of processors to apply on the payload right after receiving| A list of processor names || 
 
@@ -59,10 +65,12 @@ None.
 |s3_bucket|The bucket name for an S3-compatible storage service, used for transferring payloads between clients and servers.||
 |ping_interval|The interval in seconds at which the server pings the client. The default is 3600 seconds. |||
 |ping_timeout| The time in seconds that the client waits for the server to respond before disconnecting. The default is 360 (seconds).||Increase this number when your session stops running when training larger models (but make sure it is not due to the *out of CUDA memory* error)|
-|synchronous|Synchronous or asynchronous federated learning|`true` or `false`|If `false`, must have **periodic_interval** attribute|
-|*periodic_interval*|The time interval for a server operating in asynchronous mode to aggregate received updates|Any positive integer||
+|synchronous|Synchronous or asynchronous mode|`true` or `false`||
+|periodic_interval|The time interval for a server operating in asynchronous mode to aggregate received updates|Any positive integer|default: 5 seconds|
+|simulate_wall_time|Should we simulate the wall clock time on the server?|`true` or `false`||
+|staleness_bound|In asynchronous mode, should we wait for stale clients who are behind the current round by more than this bound?|Any positive integer|default: 0|
+|minimum_clients_aggregated|The minimum number of clients that need to arrive before aggregation and processing by the server when operating in asynchronous mode|`true` or `false`|default: 1|
 |do_test|Should the central server compute test accuracy locally?| `true` or `false`|| 
-|edge_do_test|Should an edge server compute test accuracy of its aggregated model locally?| `true` or `false`||
 |outbound_processors|A list of processors to apply on the payload before sending| A list of processor names || 
 |inbound_processors|A list of processors to apply on the payload right after receiving| A list of processor names || 
 
@@ -83,7 +91,7 @@ None.
 | Attribute | Meaning | Valid Value | Note |
 |:---------:|:-------:|:-----------:|:----:|
 |**dataset**| The training and testing dataset|`MNIST`, `FashionMNIST`, `CIFAR10`, `CINIC10`, `YOLO`, `HuggingFace`, `PASCAL_VOC`, or `TinyImageNet`||
-|**data_path**|Where the dataset is located|e.g.,`./data`|For the `CINIC10` dataset, the default `data_path` is `./data/CINIC-10`, For the `TingImageNet` dataset, the default `data_path` is `./data/ting-imagenet-200`|
+|**data_path**|Where the dataset is located|e.g.,`./data`|For the `CINIC10` dataset, the default `data_path` is `./data/CINIC-10`, For the `TinyImageNet` dataset, the default `data_path` is `./data/tiny-imagenet-200`|
 |**sampler**|How to divide the entire dataset to the clients|`iid`||
 |||`iid_mindspore`||
 |||`noniid`|Could have *concentration* attribute to specify the concentration parameter in the Dirichlet distribution|
@@ -135,6 +143,6 @@ None.
 
 | Attribute | Meaning | Valid Value | Note |
 |:---------:|:-------:|:-----------:|:----:|
-|types|Which parameter(s) will be written into a CSV file|`accuracy`, `training_time`, `round_time`, `local_epoch_num`, `edge_agg_num`|Use comma `,` to seperate parameters|
+|types|Which parameter(s) will be written into a CSV file|`round`, `accuracy`, `elapsed_time`, `round_time`, `local_epoch_num`, `edge_agg_num`|Use comma `,` to seperate parameters|
 |plot|Plot results ||Format: x\_axis&y\_axis. Use comma `,` to seperate multiple plots|
 |results_dir|The directory of results||If not specify, results will be stored under `./results/<datasource>/<model>/<server_type>/`|

@@ -7,19 +7,15 @@ from dataclasses import dataclass
 
 from plato.algorithms import registry as algorithms_registry
 from plato.clients import base
-from plato.config import Config
+from plato.clients import simple
 from plato.processors import registry as processor_registry
 from plato.trainers import registry as trainers_registry
 
 
 @dataclass
-class Report:
+class Report(simple.Report):
     """ Client report, to be sent to the federated learning server. """
     client_id: str
-    num_samples: int
-    accuracy: float
-    training_time: float
-    data_loading_time: float
 
 
 class Client(base.Client):
@@ -77,5 +73,5 @@ class Client(base.Client):
 
         training_time = time.perf_counter() - training_start_time
 
-        return Report(self.client_id, self.server.total_samples, accuracy,
-                      training_time, 0), weights
+        return Report(self.server.total_samples, accuracy, training_time,
+                      False, self.client_id), weights
