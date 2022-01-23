@@ -58,14 +58,14 @@ def plot_figures_from_dict(result_csv_file: str, result_dir: str):
 
     for pairs in plot_pairs:
         figure_file_name = result_dir + pairs + '.pdf'
-        pair = [x.strip() for x in pairs.split('&')]
+        pair = [x.strip() for x in pairs.split('-')]
         x_y_labels: List = []
         x_y_values: Dict[str, List] = {}
         for item in pair:
             label = {
                 'round': 'Round',
                 'accuracy': 'Accuracy (%)',
-                'elapsed_time': 'Wall clock time elapsed (%)',
+                'elapsed_time': 'Wall clock time elapsed (s)',
                 'round_time': 'Training time in each round (s)',
                 'global_round': 'Global training round',
                 'local_epoch_num': 'Local epochs',

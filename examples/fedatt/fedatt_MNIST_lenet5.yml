@@ -61,14 +61,13 @@ trainer:
     # The machine learning model
     model_name: lenet5
 
-
 algorithm:
     # Aggregation algorithm
     type: fedavg
 
 results:
     # Write the following parameter(s) into a CSV
-    types: accuracy, training_time, round_time
+    types: accuracy, elapsed_time, round_time
 
-    # Plot results (x_axis&y_axis)
-    plot: round&accuracy, round&training_time
+    # Plot results (x_axis-y_axis)
+    plot: round-accuracy, round-elapsed_time

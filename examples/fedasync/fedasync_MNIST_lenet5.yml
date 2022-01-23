@@ -1,6 +1,6 @@
 clients:
     # The total number of clients
-    total_clients: 10
+    total_clients: 20
 
     # The number of clients selected in each round
     per_round: 4
@@ -8,10 +8,20 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
+    # Whether simulate clients or not
+    simulation: false 
+    speed_simulation: true
+
+    # The simulation distribution
+    simulation_distribution:
+        distribution: zipf
+        s: 1.5
+
 server:
     address: 127.0.0.1
     port: 8000
     synchronous: false
+    simulate_wall_time: true
 
     # Parameter for FedAsync
     staleness_bound: 1000 # FedAsync doesn't have any staleness bound
@@ -37,7 +47,7 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 5
+    rounds: 20
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -46,10 +56,10 @@ trainer:
     max_concurrency: 1
 
     # The target accuracy
-    target_accuracy: 0.99
+    target_accuracy: 0.98
 
     # Number of epoches for local training in each communication round
-    epochs: 2
+    epochs: 1
     batch_size: 32
     optimizer: SGD
     learning_rate: 0.01
@@ -62,3 +72,11 @@ trainer:
 algorithm:
     # Aggregation algorithm
     type: fedavg
+
+results:
+    # Write the following parameter(s) into a CSV
+    types: round, elapsed_time, accuracy
+
+    # Plot results (x_axis-y_axis)
+    plot: round-accuracy, elapsed_time-accuracy
+

@@ -50,7 +50,7 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 5
+    rounds: 20 
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -65,7 +65,7 @@ trainer:
     max_concurrency: 1
 
     # The target accuracy
-    target_accuracy: 0.99
+    target_accuracy: 0.98
 
     # Number of epoches for local training in each communication round
     epochs: 1
@@ -86,5 +86,5 @@ results:
     # Write the following parameter(s) into a CSV
     types: round, elapsed_time, accuracy
 
-    # Plot results (x_axis&y_axis)
-    plot: round&accuracy, elapsed_time&accuracy
+    # Plot results (x_axis-y_axis)
+    plot: round-accuracy, elapsed_time-accuracy
