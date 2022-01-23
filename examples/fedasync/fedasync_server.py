@@ -88,6 +88,8 @@ class Server(fedavg.Server):
                 '[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(
                     os.getpid(), 100 * self.accuracy))
 
+        await self.wrap_up_processing_reports()
+
     @staticmethod
     def staleness_function(staleness) -> float:
         """ Polynomial staleness function as proposed in Sec. 5.2, Evaluation Setup. """
