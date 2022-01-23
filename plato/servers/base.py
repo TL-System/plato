@@ -712,43 +712,36 @@ class Server:
             await self.process_reports()
             await self.wrap_up()
             await self.select_clients()
+            return
 
-        else:
-            if self.asynchronous_mode and not self.simulate_wall_time:
-                # In asynchronous mode without simulating wall clock time, we only
-                # need to add the client report to the list of updates so far
-                client = client_info[1]
-                client_staleness = self.current_round - client['starting_round']
+        if not self.simulate_wall_time:
+            # In both synchronous and asynchronous modes, if we are not simulating the wall clock
+            # time, we need to add the client report to the list of updates so far
+            client = client_info[1]
+            client_staleness = self.current_round - client['starting_round']
 
-                self.updates.append(
-                    (client['report'], client['payload'], client_staleness))
+            self.updates.append(
+                (client['report'], client['payload'], client_staleness))
 
-            if not self.asynchronous_mode and self.simulate_wall_time and self.wall_time < client_info[
-                    0]:
-                # In synchronous mode with the wall clock time simulated, we will
-                # need to advance the wall clock time to the finish time of the reporting client
-                client = client_info[1]
-                client_staleness = self.current_round - client['starting_round']
+        if not self.asynchronous_mode and self.simulate_wall_time:
+            # In synchronous mode with the wall clock time simulated, we will
+            # need to advance the wall clock time to the finish time of the reporting client
+            client_finish_time = client_info[0]
+            self.wall_time = max(client_finish_time, self.wall_time)
+            logging.info("[Server #%d] Advancing the wall clock time to %s.",
+                         os.getpid(), self.wall_time)
 
-                self.updates.append(
-                    (client['report'], client['payload'], client_staleness))
-
-                self.wall_time = client_info[0]
-                logging.info(
-                    "[Server #%d] Advancing the wall clock time to %s.",
-                    os.getpid(), self.wall_time)
-
-            # If all updates have been received from selected clients, the aggregation process
-            # proceeds regardless of synchronous or asynchronous modes. This guarantees that
-            # if asynchronous mode uses an excessively long aggregation interval, it will not
-            # unnecessarily delay the aggregation process.
-            if len(self.updates) >= self.clients_per_round:
-                logging.info(
-                    "[Server #%d] All %d client report(s) received. Processing.",
-                    os.getpid(), len(self.reporting_clients))
-                await self.process_reports()
-                await self.wrap_up()
-                await self.select_clients()
+        # If all updates have been received from selected clients, the aggregation process
+        # proceeds regardless of synchronous or asynchronous modes. This guarantees that
+        # if asynchronous mode uses an excessively long aggregation interval, it will not
+        # unnecessarily delay the aggregation process.
+        if len(self.updates) >= self.clients_per_round:
+            logging.info(
+                "[Server #%d] All %d client report(s) received. Processing.",
+                os.getpid(), len(self.reporting_clients))
+            await self.process_reports()
+            await self.wrap_up()
+            await self.select_clients()
 
     async def client_disconnected(self, sid):
         """ When a client disconnected it should be removed from its internal states. """
