@@ -74,6 +74,8 @@ class Server:
         self.clients_pool = []
         self.clients_per_round = 0
         self.selected_clients = None
+        self.selected_client_id = 0
+        self.selected_sids = []
         self.current_round = 0
         self.algorithm = None
         self.trainer = None
@@ -353,38 +355,45 @@ class Server:
                 self.clients_pool, self.clients_per_round)
 
         if len(self.selected_clients) > 0:
+            self.selected_sids = []
+
             for i, selected_client_id in enumerate(self.selected_clients):
+                self.selected_client_id = selected_client_id
+
                 if self.client_simulation_mode:
                     client_id = i + 1
                     sid = self.clients[client_id]['sid']
 
                     if self.asynchronous_mode and self.simulate_wall_time:
-                        # skip if this sid is currently `training' with reporting clients
                         training_sids = []
                         for client_info in self.reporting_clients:
                             training_sids.append(client_info[1]['sid'])
-                        while sid in training_sids:
+
+                        # skip if this sid is currently `training' with reporting clients
+                        # or it has already been selected in this round
+                        while sid in training_sids or sid in self.selected_sids:
                             client_id = client_id % self.clients_per_round + 1
                             sid = self.clients[client_id]['sid']
 
+                        self.selected_sids.append(sid)
                 else:
-                    sid = self.clients[selected_client_id]['sid']
+                    sid = self.clients[self.selected_client_id]['sid']
 
-                server_response = {'id': selected_client_id}
+                server_response = {'id': self.selected_client_id}
                 server_response = await self.customize_server_response(
                     server_response)
 
-                self.training_clients[selected_client_id] = {
-                    'id': selected_client_id,
+                self.training_clients[self.selected_client_id] = {
+                    'id': self.selected_client_id,
                     'starting_round': self.current_round,
                     'start_time': self.wall_time,
                     'update_requested': False
                 }
 
                 logging.info("[Server #%d] Selecting client #%d for training.",
-                             os.getpid(), selected_client_id)
+                             os.getpid(), self.selected_client_id)
 
-                server_response = {'id': selected_client_id}
+                server_response = {'id': self.selected_client_id}
                 server_response = await self.customize_server_response(
                     server_response)
 
