@@ -96,6 +96,7 @@ class Server:
 
         # The wall clock time that is simulated to accommodate the fact that
         # clients can only run a batch at a time, controlled by `max_concurrency`
+        self.initial_wall_time = time.time()
         self.wall_time = time.time()
 
         # When simulating the wall clock time, the server needs to remember the

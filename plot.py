@@ -28,7 +28,11 @@ def read_csv_to_dict(result_csv_file: str) -> Dict[str, List]:
         reader = csv.DictReader(f)
         for row in reader:
             for item in result_dict:
-                if item in ('round', 'global_round'):
+                if item in (
+                        'round',
+                        'global_round',
+                        'local_epochs',
+                ):
                     result_dict[item].append(int(row[item]))
                 else:
                     result_dict[item].append(float(row[item]))
@@ -59,12 +63,12 @@ def plot_figures_from_dict(result_csv_file: str, result_dir: str):
         x_y_values: Dict[str, List] = {}
         for item in pair:
             label = {
-                'global_round': 'Global training round',
-                'round': 'Training round',
-                'local_epoch_num': 'Local epochs',
+                'round': 'Round',
                 'accuracy': 'Accuracy (%)',
-                'training_time': 'Training time (s)',
-                'round_time': 'Round time (s)',
+                'elapsed_time': 'Wall clock time elapsed (%)',
+                'round_time': 'Training time in each round (s)',
+                'global_round': 'Global training round',
+                'local_epoch_num': 'Local epochs',
                 'edge_agg_num': 'Aggregation rounds on edge servers'
             }[item]
             x_y_labels.append(label)

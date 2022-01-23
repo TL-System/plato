@@ -41,12 +41,9 @@ class Server(base.Server):
             "[Server #%d] Started training on %s clients with %s per round.",
             os.getpid(), self.total_clients, self.clients_per_round)
 
-        # starting time of a global training round
-        self.round_start_time = 0
-
         if hasattr(Config(), 'results'):
             recorded_items = Config().results.types
-            self.recorded_items = ['round'] + [
+            self.recorded_items = [
                 x.strip() for x in recorded_items.split(',')
             ]
 
@@ -97,7 +94,6 @@ class Server(base.Server):
             self.algorithm = algorithms_registry.get(self.trainer)
 
     async def select_clients(self):
-        self.round_start_time = time.perf_counter()
         await super().select_clients()
 
     def extract_client_updates(self, updates):
@@ -163,23 +159,23 @@ class Server(base.Server):
         await self.wrap_up_processing_reports()
 
     async def wrap_up_processing_reports(self):
-        """Wrap up processing the reports with any additional work."""
-
+        """ Wrap up processing the reports with any additional work. """
         if hasattr(Config(), 'results'):
             new_row = []
+
             for item in self.recorded_items:
                 item_value = {
                     'round':
                     self.current_round,
                     'accuracy':
                     self.accuracy * 100,
-                    'training_time':
+                    'elapsed_time':
+                    self.wall_time - self.initial_wall_time,
+                    'round_time':
                     max([
                         report.training_time
                         for (report, __, __) in self.updates
                     ]),
-                    'round_time':
-                    time.perf_counter() - self.round_start_time
                 }[item]
                 new_row.append(item_value)
 

@@ -3,7 +3,7 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 10 
+    total_clients: 10
 
     # The number of clients selected in each round
     per_round: 2
@@ -12,7 +12,7 @@ clients:
     do_test: false
 
     # Client simulation mode
-    simulation: false 
+    simulation: false
 
     # Processors for outbound data payloads
     outbound_processors:
@@ -21,7 +21,7 @@ clients:
 server:
     address: 127.0.0.1
     port: 8000
-    simulate_wall_time: true 
+    simulate_wall_time: true
 
 data:
     # The training and testing dataset
@@ -75,3 +75,10 @@ trainer:
 algorithm:
     # Aggregation algorithm
     type: fedavg
+
+results:
+    # Write the following parameter(s) into a CSV
+    types: round, elapsed_time, accuracy
+
+    # Plot results (x_axis&y_axis)
+    plot: round&accuracy, elapsed_time&accuracy
