@@ -6,6 +6,8 @@ Reference:
 "How Asynchronous can Federated Learning Be?"
 
 """
+
+import asyncio
 import logging
 import os
 from collections import OrderedDict
