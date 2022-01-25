@@ -735,12 +735,18 @@ class Server:
             self.updates.append(
                 (client['report'], client['payload'], client_staleness))
 
+        if not self.simulate_wall_time:
+            # In both synchronous and asynchronous modes, if we are not simulating the wall clock
+            # time, it will need to be updated to the real wall clock time
+            self.wall_time = time.time()
+
         if not self.asynchronous_mode and self.simulate_wall_time:
             # In synchronous mode with the wall clock time simulated, in addition to adding
             # the client report to the list of updates, we will also need to advance the wall
             # clock time to the finish time of the reporting client
             client_finish_time = client_info[0]
             self.wall_time = max(client_finish_time, self.wall_time)
+
             logging.info("[Server #%d] Advancing the wall clock time to %s.",
                          os.getpid(), self.wall_time)
 
