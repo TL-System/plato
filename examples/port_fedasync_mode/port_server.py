@@ -26,18 +26,6 @@ class Server(fedavg.Server):
             [report.num_samples for (report, __, __) in updates])
 
         clients_staleness = [staleness for (__, __, staleness) in updates]
-        # Add a hyperprameters to tune the staleness_function
-        staleness_hyperpara = 0.5
-
-        def staleness_function(staleness):
-            staleness_factor = staleness_hyperpara / (staleness +
-                                                      staleness_hyperpara)
-            print(
-                "***********************enter in staleness function ****************************"
-            )
-            print("staleness is: ", staleness)
-            print("staleness_factor is: ", staleness_factor)
-            return staleness_factor
 
         # Perform weighted averaging
         avg_update = {
@@ -48,7 +36,7 @@ class Server(fedavg.Server):
         for i, update in enumerate(weights_received):
             report, __, __ = updates[i]
             num_samples = report.num_samples
-            staleness_factor = staleness_function(clients_staleness[i])
+            staleness_factor = Server.staleness_function(clients_staleness[i])
 
             for name, delta in update.items():
                 # Use weighted average by the number of samples
@@ -59,3 +47,18 @@ class Server(fedavg.Server):
             await asyncio.sleep(0)
 
         return avg_update
+
+    @staticmethod
+    def staleness_function(staleness):
+
+        # Add a hyperprameters to tune the staleness_function
+        staleness_hyperpara = 0.5
+
+        staleness_factor = staleness_hyperpara / (staleness +
+                                                  staleness_hyperpara)
+        print(
+            "***********************enter in staleness function ****************************"
+        )
+        print("staleness is: ", staleness)
+        print("staleness_factor is: ", staleness_factor)
+        return staleness_factor
