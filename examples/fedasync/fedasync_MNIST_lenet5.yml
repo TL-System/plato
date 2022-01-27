@@ -56,7 +56,6 @@ trainer:
     parallelized: false
 
     # The maximum number of clients running concurrently 
-    # The limitation is CUDA memory
     max_concurrency: 5
 
     # The target accuracy
