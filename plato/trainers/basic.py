@@ -122,25 +122,28 @@ class Trainer(base.Trainer):
                 sleep_time = np.random.zipf(dist.s)
         else:
             # Default use Zipf distribution with a parameter of 1.5
-            sleep_time = np.random.zipf(1.5)
+            # the lower the parameter, the longer tail it has
+            # parameter value must higher than 1
+            sleep_time = np.random.zipf(2)
         # Limit the simulated sleep time below a threshold
-        return min(sleep_time, 50)
+        return min(sleep_time, 0)
 
     def _simulate_client_speed(self):
         """Simulate client's speed by putting it to sleep."""
         sleep_time = self._sleep_time
 
         # Introduce some randomness to the sleep time
+        """
         np.random.seed()  # Set seed to system clock to allow randomness
         deviation = 0.05
         sleep_seconds = np.random.uniform(sleep_time * (1 - deviation),
                                           sleep_time * (1 + deviation))
         sleep_seconds = max(sleep_seconds, 0)
-
+        """
         # Put this client to sleep
         logging.info("[Client #%d] Going to sleep for %f seconds.",
-                     self.client_id, sleep_seconds)
-        time.sleep(sleep_seconds)
+                     self.client_id, sleep_time)
+        time.sleep(sleep_time)
         logging.info("[Client #%d] Woke up.", self.client_id)
 
     def train_process(self, config, trainset, sampler, cut_layer=None):
