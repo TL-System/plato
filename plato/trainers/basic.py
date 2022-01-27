@@ -126,23 +126,20 @@ class Trainer(base.Trainer):
             # parameter value must higher than 1
             sleep_time = np.random.zipf(2)
         # Limit the simulated sleep time below a threshold
-        return min(sleep_time, 0)
+        return min(sleep_time, 30)
 
     def _simulate_client_speed(self):
         """Simulate client's speed by putting it to sleep."""
         sleep_seconds = self._sleep_time
 
         # Introduce some randomness to the sleep time
-        """
-        np.random.seed()  # Set seed to system clock to allow randomness
-        deviation = 0.05
-        sleep_seconds = np.random.uniform(sleep_time * (1 - deviation),
-                                          sleep_time * (1 + deviation))
-        sleep_seconds = max(sleep_seconds, 0)
-        """
-        print(
-            "********************sleep time is %f ***************************",
-            sleep_seconds)
+
+        # np.random.seed()  # Set seed to system clock to allow randomness
+        # deviation = 0.05
+        # sleep_seconds = np.random.uniform(sleep_time * (1 - deviation),
+        #                                   sleep_time * (1 + deviation))
+        # sleep_seconds = max(sleep_seconds, 0)
+
         # Put this client to sleep
         logging.info("[Client #%d] Going to sleep for %f seconds.",
                      self.client_id, sleep_seconds)
