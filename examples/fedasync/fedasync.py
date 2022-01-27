@@ -3,8 +3,8 @@ A federated learning training session using FedAsync.
 
 Reference:
 
-Xie, C., Koyejo, S., & Gupta, I. (2019). "Asynchronous federated optimization." 
-arXiv preprint arXiv:1903.03934.
+Xie, C., Koyejo, S., Gupta, I. (2019). "Asynchronous federated optimization,"
+in Proc. 12th Annual Workshop on Optimization for Machine Learning (OPT 2020).
 
 https://opt-ml.org/papers/2020/paper_28.pdf
 """
