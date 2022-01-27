@@ -130,7 +130,7 @@ class Trainer(base.Trainer):
 
     def _simulate_client_speed(self):
         """Simulate client's speed by putting it to sleep."""
-        sleep_time = self._sleep_time
+        sleep_seconds = self._sleep_time
 
         # Introduce some randomness to the sleep time
         """
@@ -142,8 +142,8 @@ class Trainer(base.Trainer):
         """
         # Put this client to sleep
         logging.info("[Client #%d] Going to sleep for %f seconds.",
-                     self.client_id, sleep_time)
-        time.sleep(sleep_time)
+                     self.client_id, sleep_seconds)
+        time.sleep(sleep_seconds)
         logging.info("[Client #%d] Woke up.", self.client_id)
 
     def train_process(self, config, trainset, sampler, cut_layer=None):
