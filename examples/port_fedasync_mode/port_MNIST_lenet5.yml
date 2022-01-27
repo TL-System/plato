@@ -25,7 +25,7 @@ server:
     port: 8000
     synchronous: false #true: sychronous, false: port
     simulate_wall_time: true
-    minimum_clients_aggregated: 10
+    minimum_clients_aggregated: 20
     staleness_bound: 5
 #    request_update: true
 
