@@ -7,6 +7,9 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+# change the default font family
+plt.rcParams.update({'font.family': 'Source Sans Pro'})
+
 
 def read_csv_to_dict(result_csv_file, plot_pairs=["round", "accuracy"]):
     """Read a CSV file and write the values that need to be plotted
