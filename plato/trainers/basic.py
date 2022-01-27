@@ -140,6 +140,9 @@ class Trainer(base.Trainer):
                                           sleep_time * (1 + deviation))
         sleep_seconds = max(sleep_seconds, 0)
         """
+        print(
+            "********************sleep time is %f ***************************",
+            sleep_seconds)
         # Put this client to sleep
         logging.info("[Client #%d] Going to sleep for %f seconds.",
                      self.client_id, sleep_seconds)
