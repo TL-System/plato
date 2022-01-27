@@ -18,7 +18,7 @@ clients:
     # The simulation distribution
     simulation_distribution:
         distribution: zipf
-        s: 1.5
+        s: 2
 
 server:
     address: 127.0.0.1
