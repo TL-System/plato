@@ -22,7 +22,7 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8000
+    port: 8001
     synchronous: false #true: sychronous, false: port
     simulate_wall_time: true
     minimum_clients_aggregated: 5
