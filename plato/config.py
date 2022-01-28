@@ -112,7 +112,11 @@ class Config:
                 else:
                     datasource = Config.data.datasource
                     model = Config.trainer.model_name
-                    server_type = Config.algorithm.type
+                    server_type = "custom"
+                    if hasattr(Config().server, "type"):
+                        server_type = Config.server.type
+                    elif hasattr(Config().algorithm, "type"):
+                        server_type = Config.algorithm.type
                     Config.result_dir = f'./results/{datasource}/{model}/{server_type}/'
 
             if 'model' in config:
