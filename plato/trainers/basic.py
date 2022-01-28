@@ -22,6 +22,7 @@ from plato.utils import optimizers
 
 class Trainer(base.Trainer):
     """A basic federated learning trainer, used by both the client and the server."""
+
     def __init__(self, model=None):
         """Initializing the trainer with the provided model.
 
@@ -112,7 +113,7 @@ class Trainer(base.Trainer):
         """Simulate and return a sleep time (in seconds) for the client."""
         np.random.seed(self.client_id)
 
-        sleep_time = 0
+        sleep_time = 0.0
         if hasattr(Config().clients, "simulation_distribution"):
             dist = Config.clients.simulation_distribution
             # Determine the distribution of client's simulate sleep time
@@ -124,24 +125,25 @@ class Trainer(base.Trainer):
             # Default use Zipf distribution with a parameter of 1.5
             # the lower the parameter, the longer tail it has
             # parameter value must higher than 1
-            sleep_time = np.random.zipf(2)
+            sleep_time = np.random.zipf(1.5)
+
         # Limit the simulated sleep time below a threshold
         return min(sleep_time, 30)
 
     def _simulate_client_speed(self):
         """Simulate client's speed by putting it to sleep."""
-        sleep_seconds = self._sleep_time
+        sleep_time = self._sleep_time
 
         # Introduce some randomness to the sleep time
 
-        # np.random.seed()  # Set seed to system clock to allow randomness
-        # deviation = 0.05
-        # sleep_seconds = np.random.uniform(sleep_time * (1 - deviation),
-        #                                   sleep_time * (1 + deviation))
-        # sleep_seconds = max(sleep_seconds, 0)
+        np.random.seed()  # Set seed to system clock to allow randomness
+        deviation = 0.02
+        sleep_seconds = np.random.uniform(sleep_time * (1 - deviation),
+                                          sleep_time * (1 + deviation))
+        sleep_seconds = max(sleep_seconds, 0)
 
         # Put this client to sleep
-        logging.info("[Client #%d] Going to sleep for %f seconds.",
+        logging.info("[Client #%d] Going to sleep for %s seconds.",
                      self.client_id, sleep_seconds)
         time.sleep(sleep_seconds)
         logging.info("[Client #%d] Woke up.", self.client_id)

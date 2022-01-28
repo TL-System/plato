@@ -17,6 +17,11 @@ from plato.servers import fedavg
 
 
 class Server(fedavg.Server):
+    """A federated learning server using the FedAsync algorithm. """
+
+    def __init__(self, model=None, algorithm=None, trainer=None):
+        super().__init__(model=model, algorithm=algorithm, trainer=trainer)
+
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using federated averaging."""
         weights_received = self.extract_client_updates(updates)

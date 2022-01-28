@@ -18,15 +18,15 @@ clients:
     # The simulation distribution
     simulation_distribution:
         distribution: zipf
-        s: 2
+        s: 1.7
 
 server:
     address: 127.0.0.1
     port: 8000
     synchronous: false #true: sychronous, false: port
     simulate_wall_time: true
-    minimum_clients_aggregated: 20
-    staleness_bound: 5
+    minimum_clients_aggregated: 5
+    staleness_bound: 3
 #    request_update: true
 
 data:
@@ -90,7 +90,7 @@ algorithm:
     type: fedavg
 
 results:
-    result_dir: /Content/My\ Drive/min20
+    result_dir: /Content/My\ Drive/min5
     # Write the following parameter(s) into a CSV
     types: round, elapsed_time, accuracy
 
