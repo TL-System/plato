@@ -29,4 +29,4 @@ class Client(simple.Client):
         report, weights = await super().train()
 
         return Report(report.num_samples, report.accuracy,
-                      report.training_time, report.data_loading_time), weights
+                      report.training_time, report.update_response), weights
