@@ -8,7 +8,7 @@ Reference:
 """
 import os
 
-os.environ['config_file'] = 'examples/port_fedasync_mode/port_MNIST_lenet5.yml'
+os.environ['config_file'] = './port_MNIST_lenet5.yml'
 
 from plato.trainers import basic
 from plato.clients import simple
