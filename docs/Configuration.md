@@ -63,13 +63,13 @@ None.
 |disable_clients|If this optional setting is enabled as `true`, the server will not launched client processes on the same machine.||
 |s3_endpoint_url|The endpoint URL for an S3-compatible storage service, used for transferring payloads between clients and servers.||
 |s3_bucket|The bucket name for an S3-compatible storage service, used for transferring payloads between clients and servers.||
-|ping_interval|The interval in seconds at which the server pings the client. The default is 3600 seconds. |||
+|ping_interval|The time interval in seconds at which the server pings the client. ||default: 3600|
 |ping_timeout| The time in seconds that the client waits for the server to respond before disconnecting. The default is 360 (seconds).||Increase this number when your session stops running when training larger models (but make sure it is not due to the *out of CUDA memory* error)|
 |synchronous|Synchronous or asynchronous mode|`true` or `false`||
 |periodic_interval|The time interval for a server operating in asynchronous mode to aggregate received updates|Any positive integer|default: 5 seconds|
 |simulate_wall_time|Should we simulate the wall clock time on the server?|`true` or `false`||
 |staleness_bound|In asynchronous mode, should we wait for stale clients who are behind the current round by more than this bound?|Any positive integer|default: 0|
-|minimum_clients_aggregated|The minimum number of clients that need to arrive before aggregation and processing by the server when operating in asynchronous mode|`true` or `false`|default: 1|
+|minimum_clients_aggregated|The minimum number of clients that need to arrive before aggregation and processing by the server when operating in asynchronous mode|Any positive integer|default: 1|
 |do_test|Should the central server compute test accuracy locally?| `true` or `false`|| 
 |outbound_processors|A list of processors to apply on the payload before sending| A list of processor names || 
 |inbound_processors|A list of processors to apply on the payload right after receiving| A list of processor names || 
@@ -101,7 +101,7 @@ None.
 |edge_test_set_sampler|How to sample the test set when edge servers test locally|Could be any **sampler**|Without this parameter, edge servers' test sets are the test set of the datasource if they locally test their aggregated models in cross-silo FL|
 |random_seed|Use a fixed random seed so that experiments are reproducible (clients always have the same datasets)||
 |**partition_size**|Number of samples in each client's dataset|Any positive integer||
-|concentration| The concentration parameter of symmetric Dirichlet distribution, used by `noniid` **sampler** || Default value is 1|
+|concentration| The concentration parameter of symmetric Dirichlet distribution, used by `noniid` **sampler** || default: 1|
 |*non_iid_clients*|Indexs of clients whose datasets are non-iid. Other clients' datasets are iid|e.g., 4|Must have this attribute if the **sampler** is `mixed`|
 |*institution_class_ids*|Indexs of classes of local data of each institution's clients|e.g., 0,1;2,3 (the first institution's clients only have data of class #0 and #1; the second institution's clients only have data of class #2 and #3) |Could have this attribute if the **sampler** is `orthogonal`|
 |*label_distribution*|The class distribution of every client's local data|`iid` or `noniid` |Could have this attribute if the **sampler** is `orthogonal`. Default is `iid`|
@@ -125,9 +125,9 @@ None.
 |**model_name**|The machine learning model|`lenet5`, `resnet_x`, `vgg_x`,`wideresnet`, `feedback_transformer`, `yolov5`, `HuggingFace_CausalLM`, `inceptionv3`, `googlenet`, `unet`, `alexnet`, `squeezenet_x`, `shufflenet_x`|For `resnet_x`, x = 18, 34, 50, 101, or 152; For `vgg_x`, x = 11, 13, 16, or 19; For `squeezenet_x`, x = 0 or 1; For `shufflenet_x`, x = 0.5, 1.0, 1.5, or 2.0|
 |pretrained|Use a model pretrained on ImageNet or not|`true` or `false`. Default is `false`|Can be used for `inceptionv3`, `alexnet`, and `squeezenet_x` models.|
 |differential_privacy|Whether differential privacy is to be applied during training|`true` or `false`. Default is `false`||
-|dp_epsilon|Total privacy budget of epsilon|Default is 10.0|
-|dp_delta|Total privacy budget of delta|Default is 1e-5|
-|dp_max_grad_norm|The maximum norm of the per-sample gradients. Any gradient with norm higher than this will be clipped to this value.|Default is 1.0|
+|dp_epsilon|Total privacy budget of epsilon||default: 10.0|
+|dp_delta|Total privacy budget of delta||default: 1e-5|
+|dp_max_grad_norm|The maximum norm of the per-sample gradients. Any gradient with norm higher than this will be clipped to this value.||default: 1.0|
 
 ### algorithm
 
@@ -144,5 +144,5 @@ None.
 | Attribute | Meaning | Valid Value | Note |
 |:---------:|:-------:|:-----------:|:----:|
 |types|Which parameter(s) will be written into a CSV file|`round`, `accuracy`, `elapsed_time`, `round_time`, `local_epoch_num`, `edge_agg_num`|Use comma `,` to seperate parameters|
-|plot|Plot results ||Format: x\_axis&y\_axis. Use comma `,` to seperate multiple plots|
+|plot|Plot results ||Format: x\_axis-y\_axis. Use hyphen `-` to seperate axis. Use comma `,` to seperate multiple plots|
 |results_dir|The directory of results||If not specify, results will be stored under `./results/<datasource>/<model>/<server_type>/`|

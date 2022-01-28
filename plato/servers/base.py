@@ -74,6 +74,8 @@ class Server:
         self.clients_pool = []
         self.clients_per_round = 0
         self.selected_clients = None
+        self.selected_client_id = 0
+        self.selected_sids = []
         self.current_round = 0
         self.algorithm = None
         self.trainer = None
@@ -89,7 +91,7 @@ class Server:
         # States that need to be maintained for asynchronous FL
 
         # Clients whose new reports were received but not yet processed
-        self.reporting_clients = []
+        self.reported_clients = []
 
         # Clients who are still training since the last round of aggregation
         self.training_clients = {}
@@ -101,7 +103,8 @@ class Server:
 
         # When simulating the wall clock time, the server needs to remember the
         # set of reporting clients received since the previous round of aggregation
-        self.current_reporting_clients = {}
+        self.current_reported_clients = {}
+        self.current_processed_clients = {}
 
         self.ping_interval = 3600
         self.ping_timeout = 360
@@ -313,13 +316,13 @@ class Server:
         # In asychronous FL, avoid selecting new clients to replace those that are still
         # training at this time
 
-        # When simulating the wall clock time, if len(self.reporting_clients) is 0, the
+        # When simulating the wall clock time, if len(self.reported_clients) is 0, the
         # server has aggregated all reporting clients already
         if self.asynchronous_mode and self.selected_clients is not None and len(
-                self.reporting_clients) > 0 and len(
-                    self.reporting_clients) < self.clients_per_round:
+                self.reported_clients) > 0 and len(
+                    self.reported_clients) < self.clients_per_round:
             # If self.selected_clients is None, it implies that it is the first iteration;
-            # If len(self.reporting_clients) == self.clients_per_round, it implies that
+            # If len(self.reported_clients) == self.clients_per_round, it implies that
             # all selected clients have already reported.
 
             # Except for these two cases, we need to exclude the clients who are still
@@ -333,7 +336,7 @@ class Server:
             # reported may not have been aggregated; they should be excluded from the next
             # round of client selection
             reporting_client_ids = [
-                client[1]['client_id'] for client in self.reporting_clients
+                client[1]['client_id'] for client in self.reported_clients
             ]
 
             selectable_clients = [
@@ -344,47 +347,54 @@ class Server:
 
             if self.simulate_wall_time:
                 self.selected_clients = self.choose_clients(
-                    selectable_clients, len(self.current_reporting_clients))
+                    selectable_clients, len(self.current_processed_clients))
             else:
                 self.selected_clients = self.choose_clients(
-                    selectable_clients, len(self.reporting_clients))
+                    selectable_clients, len(self.reported_clients))
         else:
             self.selected_clients = self.choose_clients(
                 self.clients_pool, self.clients_per_round)
 
         if len(self.selected_clients) > 0:
+            self.selected_sids = []
+
             for i, selected_client_id in enumerate(self.selected_clients):
+                self.selected_client_id = selected_client_id
+
                 if self.client_simulation_mode:
                     client_id = i + 1
                     sid = self.clients[client_id]['sid']
 
                     if self.asynchronous_mode and self.simulate_wall_time:
-                        # skip if this sid is currently `training' with reporting clients
                         training_sids = []
-                        for client_info in self.reporting_clients:
+                        for client_info in self.reported_clients:
                             training_sids.append(client_info[1]['sid'])
-                        while sid in training_sids:
+
+                        # skip if this sid is currently `training' with reporting clients
+                        # or it has already been selected in this round
+                        while sid in training_sids or sid in self.selected_sids:
                             client_id = client_id % self.clients_per_round + 1
                             sid = self.clients[client_id]['sid']
 
+                        self.selected_sids.append(sid)
                 else:
-                    sid = self.clients[selected_client_id]['sid']
+                    sid = self.clients[self.selected_client_id]['sid']
 
-                server_response = {'id': selected_client_id}
+                server_response = {'id': self.selected_client_id}
                 server_response = await self.customize_server_response(
                     server_response)
 
-                self.training_clients[selected_client_id] = {
-                    'id': selected_client_id,
+                self.training_clients[self.selected_client_id] = {
+                    'id': self.selected_client_id,
                     'starting_round': self.current_round,
                     'start_time': self.wall_time,
                     'update_requested': False
                 }
 
                 logging.info("[Server #%d] Selecting client #%d for training.",
-                             os.getpid(), selected_client_id)
+                             os.getpid(), self.selected_client_id)
 
-                server_response = {'id': selected_client_id}
+                server_response = {'id': self.selected_client_id}
                 server_response = await self.customize_server_response(
                     server_response)
 
@@ -400,9 +410,11 @@ class Server:
                 logging.info(
                     "[Server #%d] Sending the current model to client #%d.",
                     os.getpid(), selected_client_id)
+
                 await self.send(sid, payload, selected_client_id)
 
-            self.current_reporting_clients = {}
+            self.current_reported_clients = {}
+            self.current_processed_clients = {}
 
             # There is no need to clear the list of reporting clients if we are
             # simulating the wall clock time on the server. This is because
@@ -413,7 +425,7 @@ class Server:
             if self.simulate_wall_time:
                 return
 
-            self.reporting_clients = []
+            self.reported_clients = []
 
     def choose_clients(self, clients_pool, clients_count):
         """ Choose a subset of the clients to participate in each round. """
@@ -577,8 +589,8 @@ class Server:
                 'payload': self.client_payload[sid],
             })
 
-        heapq.heappush(self.reporting_clients, client_info)
-        self.current_reporting_clients[client_info[1]['client_id']] = True
+        heapq.heappush(self.reported_clients, client_info)
+        self.current_reported_clients[client_info[1]['client_id']] = True
         del self.training_clients[client_id]
 
         await self.process_clients(client_info)
@@ -595,7 +607,7 @@ class Server:
         # proceed with report processing and replace these clients with a new set of
         # selected clients
         if self.asynchronous_mode and self.simulate_wall_time and len(
-                self.current_reporting_clients) >= len(self.selected_clients):
+                self.current_reported_clients) >= len(self.selected_clients):
             # Step 1: Sanity checks to see if there are any stale clients; if so, send them
             # an urgent request for model updates at the current simulated wall clock time
             if self.request_update:
@@ -606,7 +618,7 @@ class Server:
                         return
 
                 request_sent = False
-                for i, client_info in enumerate(self.reporting_clients):
+                for i, client_info in enumerate(self.reported_clients):
                     client = client_info[1]
                     client_staleness = self.current_round - client[
                         'starting_round']
@@ -625,7 +637,7 @@ class Server:
                         # Remove the client information from the list of reporting clients since
                         # this client will report again soon with another model update upon
                         # receiving the request from the server
-                        del self.reporting_clients[i]
+                        del self.reported_clients[i]
 
                         self.training_clients[client_id] = {
                             'id': client_id,
@@ -649,15 +661,14 @@ class Server:
             # Step 2: Processing clients in chronological order of finish times in wall clock time
             for __ in range(
                     0,
-                    min(len(self.current_reporting_clients),
+                    min(len(self.current_reported_clients),
                         self.minimum_clients)):
                 # Extract a client with the earliest finish time in wall clock time
-                client_info = heapq.heappop(self.reporting_clients)
+                client_info = heapq.heappop(self.reported_clients)
                 client = client_info[1]
 
                 # Removing from the list of current reporting clients as well, if needed
-                if client['client_id'] in self.current_reporting_clients:
-                    del self.current_reporting_clients[client['client_id']]
+                self.current_processed_clients[client['client_id']] = True
 
                 # Update the simulated wall clock time to be the finish time of this client
                 self.wall_time = client_info[0]
@@ -682,9 +693,9 @@ class Server:
             # Is there any reporting clients who are currently training on models that are too
             # `stale,` as defined by the staleness threshold? If so, we need to advance the wall
             # clock time until no stale clients exist in the future
-            for __ in range(0, len(self.reporting_clients)):
+            for __ in range(0, len(self.reported_clients)):
                 # Extract a client with the earliest finish time in wall clock time
-                client_info = heapq.heappop(self.reporting_clients)
+                client_info = heapq.heappop(self.reported_clients)
                 heapq.heappush(possibly_stale_clients, client_info)
 
                 if client_info[1][
@@ -707,7 +718,7 @@ class Server:
                             (client['report'], client['payload'],
                              client_staleness))
 
-            self.reporting_clients = possibly_stale_clients
+            self.reported_clients = possibly_stale_clients
             logging.info("[Server #%s] Aggregating %s clients in total.",
                          os.getpid(), len(self.updates))
 
@@ -726,12 +737,18 @@ class Server:
             self.updates.append(
                 (client['report'], client['payload'], client_staleness))
 
+        if not self.simulate_wall_time:
+            # In both synchronous and asynchronous modes, if we are not simulating the wall clock
+            # time, it will need to be updated to the real wall clock time
+            self.wall_time = time.time()
+
         if not self.asynchronous_mode and self.simulate_wall_time:
             # In synchronous mode with the wall clock time simulated, in addition to adding
             # the client report to the list of updates, we will also need to advance the wall
             # clock time to the finish time of the reporting client
             client_finish_time = client_info[0]
             self.wall_time = max(client_finish_time, self.wall_time)
+
             logging.info("[Server #%d] Advancing the wall clock time to %s.",
                          os.getpid(), self.wall_time)
 
@@ -742,7 +759,7 @@ class Server:
         if len(self.updates) >= self.clients_per_round:
             logging.info(
                 "[Server #%d] All %d client report(s) received. Processing.",
-                os.getpid(), len(self.reporting_clients))
+                os.getpid(), len(self.reported_clients))
             await self.process_reports()
             await self.wrap_up()
             await self.select_clients()
@@ -756,8 +773,8 @@ class Server:
                 if client_id in self.training_clients:
                     del self.training_clients[client_id]
 
-                if client_id in self.current_reporting_clients:
-                    del self.current_reporting_clients[client_id]
+                if client_id in self.current_reported_clients:
+                    del self.current_reported_clients[client_id]
 
                 logging.info(
                     "[Server #%d] Client #%d disconnected and removed from this server.",
