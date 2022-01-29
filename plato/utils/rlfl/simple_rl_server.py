@@ -358,9 +358,9 @@ class RLServer(fedavg.Server):
 
         # Initialize the csv file which will record results
         if self.current_rl_episode == 1 and hasattr(Config(), 'results'):
-            result_csv_file = Config().result_dir + 'result.csv'
+            result_csv_file = Config().results_dir + 'result.csv'
             csv_processor.initialize_csv(result_csv_file, self.recorded_items,
-                                         Config().result_dir)
+                                         Config().results_dir)
 
     def load_trainer(self):
         """ Setting up the global model to be trained via federated learning. """
