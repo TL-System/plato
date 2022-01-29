@@ -108,7 +108,7 @@ class Trainer(base.Trainer):
 
     def simulate_sleep_time(self):
         """Simulate client's speed by putting it to sleep."""
-        sleep_time = Config().client_sleep_times[self.client_id]
+        sleep_time = Config().client_sleep_times[self.client_id - 1]
 
         # Introduce some randomness to the sleep time
         deviation = 0.05
