@@ -108,7 +108,7 @@ class Config:
             if 'results' in config:
                 Config.results = Config.namedtuple_from_dict(config['results'])
                 if hasattr(Config().results, 'results_dir'):
-                    Config.result_dir = Config.results.results_dir
+                    Config.results_dir = Config.results.results_dir
                 else:
                     datasource = Config.data.datasource
                     model = Config.trainer.model_name
@@ -117,7 +117,7 @@ class Config:
                         server_type = Config.server.type
                     elif hasattr(Config().algorithm, "type"):
                         server_type = Config.algorithm.type
-                    Config.result_dir = f'./results/{datasource}/{model}/{server_type}/'
+                    Config.results_dir = f'./results/{datasource}/{model}/{server_type}/'
 
             if 'model' in config:
                 Config.model = Config.namedtuple_from_dict(config['model'])

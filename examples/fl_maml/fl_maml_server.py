@@ -81,7 +81,7 @@ class Server(fedavg.Server):
                     }[item]
                     new_row.append(item_value)
 
-                result_csv_file = Config().result_dir + 'result.csv'
+                result_csv_file = Config().results_dir + 'result.csv'
 
                 csv_processor.write_csv(result_csv_file, new_row)
 
