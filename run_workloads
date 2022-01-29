@@ -16,7 +16,7 @@ if __name__ == '__main__':
             'configs/port/sync',
     ]:
         print(f"Running config: {t}.yml")
-        log_root = '.log'
+        log_root = '/content/drive/MyDrive/plato_logs'
         log_folder = os.path.join(log_root,
                                   t.replace("/", "__").replace(".", ""))
         log_name = time.strftime("%Y_%m_%d__%H_%M_%S.txt", time.localtime())
