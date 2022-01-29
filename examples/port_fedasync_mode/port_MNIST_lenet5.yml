@@ -90,7 +90,8 @@ algorithm:
     type: fedavg
 
 results:
-    result_dir: /Content/My\ Drive/min5
+    results_dir: /content/drive/MyDrive/
+
     # Write the following parameter(s) into a CSV
     types: round, elapsed_time, accuracy
 
