@@ -68,7 +68,7 @@ trainer:
     # When max_concurrency equals clients per_round, 
     # simulate_wall_time: false
     # Otherwise, simulate_wall_time: true
-    max_concurrency: 1
+    max_concurrency: 10
 
     # The target accuracy
     target_accuracy: 0.97

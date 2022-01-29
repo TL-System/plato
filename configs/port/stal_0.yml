@@ -25,7 +25,7 @@ server:
     port: 8001
     synchronous: false #true: sychronous, false: port
     simulate_wall_time: true
-    minimum_clients_aggregated: 10 
+    minimum_clients_aggregated: 5 
     staleness_bound: 0
 #    request_update: true
 
@@ -68,10 +68,10 @@ trainer:
     # When max_concurrency equals clients per_round, 
     # simulate_wall_time: false
     # Otherwise, simulate_wall_time: true
-    max_concurrency: 1
+    max_concurrency: 10
 
     # The target accuracy
-    target_accuracy: 0.99
+    target_accuracy: 0.97
 
     # Number of epoches for local training in each communication round
     epochs: 3

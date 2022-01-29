@@ -25,8 +25,8 @@ server:
     port: 8001
     synchronous: false #true: sychronous, false: port
     simulate_wall_time: true
-    minimum_clients_aggregated: 1
-    staleness_bound: 1000
+    minimum_clients_aggregated: 5 
+    staleness_bound: 2
 #    request_update: true
 
 data:
@@ -89,7 +89,7 @@ algorithm:
     type: fedavg
 
 results:
-    results_dir: /content/drive/MyDrive/
+    results_dir: /content/drive/MyDrive/stal_6
 
     # Write the following parameter(s) into a CSV
     types: round, elapsed_time, accuracy
