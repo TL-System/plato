@@ -9,11 +9,11 @@ import os
 
 if __name__ == '__main__':
     for t in [
-            'configs/port/min_1.yml',
-            'configs/port/min_5.yml',
-            'configs/port/min_10.yml',
-            'configs/port/min_15.yml',
-            'configs/port/sync.yml',
+            'configs/port/min_1',
+            'configs/port/min_5',
+            'configs/port/min_10',
+            'configs/port/min_15',
+            'configs/port/sync',
     ]:
         print(f"Running config: {t}.yml")
         log_root = '.log'
