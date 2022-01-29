@@ -79,7 +79,7 @@ class Server(base.Server):
 
         # Initialize the csv file which will record results
         if hasattr(Config(), 'results'):
-            result_csv_file = Config().results_dir + os.getpid() + '.csv'
+            result_csv_file = f'{Config().results_dir}/{os.getpid()}.csv'
             csv_processor.initialize_csv(result_csv_file, self.recorded_items,
                                          Config().results_dir)
 
