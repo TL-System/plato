@@ -29,6 +29,7 @@ server:
     staleness_bound: 1000
 #    request_update: true
 
+data:
     datasource: MNIST
 
     # Where the dataset is located
