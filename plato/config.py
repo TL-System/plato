@@ -172,8 +172,10 @@ class Config:
         """Randomly generate a sleep time (in seconds per epoch) for each of the clients."""
         # a random seed must be supplied to make sure that all the clients generate
         # the same set of sleep times per epoch across the board
-        assert hasattr(Config.clients, "random_seed")
-        np.random.seed(Config.clients.random_seed)
+        if hasattr(Config.clients, "random_seed"):
+            np.random.seed(Config.clients.random_seed)
+        else:
+            np.random.seed(1)
 
         # Limit the simulated sleep time by the threshold 'max_sleep_time'
         max_sleep_time = 60
