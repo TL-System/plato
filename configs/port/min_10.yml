@@ -14,6 +14,7 @@ clients:
     # Whether simulate clients or not
     simulation: true
     speed_simulation: true
+    random_seed: 1
 
     # The simulation distribution
     simulation_distribution:
@@ -25,7 +26,7 @@ server:
     port: 8001
     synchronous: false #true: sychronous, false: port
     simulate_wall_time: true
-    minimum_clients_aggregated: 10 
+    minimum_clients_aggregated: 10
     staleness_bound: 1000
 #    request_update: true
 
@@ -65,7 +66,7 @@ trainer:
 
     # The maximum number of clients running concurrently
     # The limitation is CUDA memory
-    # When max_concurrency equals clients per_round, 
+    # When max_concurrency equals clients per_round,
     # simulate_wall_time: false
     # Otherwise, simulate_wall_time: true
     max_concurrency: 10
