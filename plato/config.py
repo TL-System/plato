@@ -9,6 +9,7 @@ import random
 import sqlite3
 from collections import OrderedDict, namedtuple
 
+import numpy as np
 import yaml
 from yamlinclude import YamlIncludeConstructor
 
@@ -105,9 +106,13 @@ class Config:
                 Config.clients = Config.clients._replace(total_clients=1)
                 Config.clients = Config.clients._replace(per_round=1)
 
+            if hasattr(Config.clients,
+                       "speed_simulation") and Config.clients.speed_simulation:
+                Config.simulate_client_speed()
+
             if 'results' in config:
                 Config.results = Config.namedtuple_from_dict(config['results'])
-                if hasattr(Config().results, 'results_dir'):
+                if hasattr(Config.results, 'results_dir'):
                     Config.results_dir = Config.results.results_dir
                 else:
                     datasource = Config.data.datasource
@@ -117,7 +122,7 @@ class Config:
                         server_type = Config.server.type
                     elif hasattr(Config().algorithm, "type"):
                         server_type = Config.algorithm.type
-                    Config.results_dir = f'./results/{datasource}/{model}/{server_type}/'
+                    Config.results_dir = f'./results/{datasource}/{model}/{server_type}'
 
             if 'model' in config:
                 Config.model = Config.namedtuple_from_dict(config['model'])
@@ -161,6 +166,38 @@ class Config:
             return [Config.namedtuple_from_dict(item) for item in obj]
         else:
             return obj
+
+    @staticmethod
+    def simulate_client_speed() -> float:
+        """Randomly generate a sleep time (in seconds per epoch) for each of the clients."""
+        # a random seed must be supplied to make sure that all the clients generate
+        # the same set of sleep times per epoch across the board
+        assert hasattr(Config.clients, "random_seed")
+        np.random.seed(Config.clients.random_seed)
+
+        # Limit the simulated sleep time by the threshold 'max_sleep_time'
+        max_sleep_time = 60
+        if hasattr(Config.clients, "max_sleep_time"):
+            max_sleep_time = Config.clients.max_sleep_time
+
+        dist = Config.clients.simulation_distribution
+        total_clients = Config.clients.total_clients
+        sleep_times = []
+
+        if hasattr(Config.clients, "simulation_distribution"):
+
+            if dist.distribution.lower() == "normal":
+                sleep_times = np.random.normal(dist.mean,
+                                               dist.sd,
+                                               size=total_clients)
+            if dist.distribution.lower() == "zipf":
+                sleep_times = np.random.zipf(dist.s, size=total_clients)
+        else:
+            # By default, use Zipf distribution with a parameter of 1.5
+            sleep_times = np.random.zipf(1.5)
+
+        Config.client_sleep_times = np.minimum(
+            sleep_times, np.repeat(max_sleep_time, total_clients))
 
     @staticmethod
     def is_edge_server() -> bool:
