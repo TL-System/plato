@@ -11,9 +11,9 @@ import os
 if __name__ == '__main__':
     for t in [
             'configs/port/stal_0',
-            'configs/port/stal_2',
-            'configs/port/stal_4',
+            'configs/port/stal_3',
             'configs/port/stal_6',
+            'configs/port/stal_9',
     ]:
         print(f"Running config: {t}.yml")
         log_root = '/content/drive/MyDrive/plato_staleness'
