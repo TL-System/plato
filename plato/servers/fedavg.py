@@ -179,8 +179,7 @@ class Server(base.Server):
                 }[item]
                 new_row.append(item_value)
 
-            result_csv_file = Config().results_dir + os.getpid() + '.csv'
-
+            result_csv_file = f'{Config().results_dir}/{os.getpid()}.csv'
             csv_processor.write_csv(result_csv_file, new_row)
 
     @staticmethod
