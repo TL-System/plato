@@ -25,12 +25,10 @@ server:
     port: 8001
     synchronous: false #true: sychronous, false: port
     simulate_wall_time: true
-    minimum_clients_aggregated: 5
-    staleness_bound: 3
+    minimum_clients_aggregated: 1
+    staleness_bound: 1000
 #    request_update: true
 
-data:
-    # The training and testing dataset
     datasource: MNIST
 
     # Where the dataset is located
@@ -43,7 +41,7 @@ data:
     sampler: noniid
 
     # The concentration parameter for the Dirichlet distribution
-    concentration: 0.9
+    concentration: 0.8
 
     # The random seed for sampling data
     random_seed: 1
@@ -72,7 +70,7 @@ trainer:
     max_concurrency: 1
 
     # The target accuracy
-    target_accuracy: 0.999
+    target_accuracy: 0.97
 
     # Number of epoches for local training in each communication round
     epochs: 3
