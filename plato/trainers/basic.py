@@ -5,6 +5,7 @@ import asyncio
 import logging
 import multiprocessing as mp
 import os
+import random
 import re
 import time
 
@@ -33,6 +34,7 @@ class Trainer(base.Trainer):
         super().__init__()
 
         self.training_start_time = time.time()
+        random.seed()  # Set seed to system clock to allow randomness
 
         if model is None:
             model = models_registry.get()
@@ -56,11 +58,6 @@ class Trainer(base.Trainer):
                 assert len(errors) == 0
 
             self.model = GradSampleModule(self.model)
-
-        if hasattr(Config().clients,
-                   "speed_simulation") and Config().clients.speed_simulation:
-            # Simulated speed of client
-            self._sleep_time = None
 
     def zeros(self, shape):
         """Returns a PyTorch zero tensor with the given shape."""
@@ -109,37 +106,14 @@ class Trainer(base.Trainer):
 
         self.model.load_state_dict(torch.load(model_path))
 
-    def _simulate_sleep_time(self) -> float:
-        """Simulate and return a sleep time (in seconds) for the client."""
-        np.random.seed(self.client_id)
-
-        sleep_time = 0.0
-        if hasattr(Config().clients, "simulation_distribution"):
-            dist = Config.clients.simulation_distribution
-            # Determine the distribution of client's simulate sleep time
-            if dist.distribution.lower() == "normal":
-                sleep_time = np.random.normal(dist.mean, dist.sd)
-            if dist.distribution.lower() == "zipf":
-                sleep_time = np.random.zipf(dist.s)
-        else:
-            # Default use Zipf distribution with a parameter of 1.5
-            # the lower the parameter, the longer tail it has
-            # parameter value must higher than 1
-            sleep_time = np.random.zipf(1.5)
-
-        # Limit the simulated sleep time below a threshold
-        return min(sleep_time, 30)
-
-    def _simulate_client_speed(self):
+    def simulate_sleep_time(self):
         """Simulate client's speed by putting it to sleep."""
-        sleep_time = self._sleep_time
+        sleep_time = Config().client_sleep_times[self.client_id]
 
         # Introduce some randomness to the sleep time
-
-        np.random.seed()  # Set seed to system clock to allow randomness
-        deviation = 0.02
-        sleep_seconds = np.random.uniform(sleep_time * (1 - deviation),
-                                          sleep_time * (1 + deviation))
+        deviation = 0.05
+        sleep_seconds = random.uniform(sleep_time * (1 - deviation),
+                                       sleep_time * (1 + deviation))
         sleep_seconds = max(sleep_seconds, 0)
 
         # Put this client to sleep
@@ -286,7 +260,7 @@ class Trainer(base.Trainer):
                     if self.client_id != 0 and hasattr(
                             Config().clients, "speed_simulation") and Config(
                             ).clients.speed_simulation:
-                        self._simulate_client_speed()
+                        self.simulate_sleep_time()
 
                     # Saving the model at the end of this epoch to a file so that
                     # it can later be retrieved to respond to server requests
@@ -325,13 +299,6 @@ class Trainer(base.Trainer):
         """
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']
-
-        # Generate a simulated client's speed
-        if self.client_id != 0 and hasattr(
-                Config().clients,
-                "speed_simulation") and Config().clients.speed_simulation:
-            if self._sleep_time is None:
-                self._sleep_time = self._simulate_sleep_time()
 
         # Set the start time of training in absolute time
         self.training_start_time = time.time()
