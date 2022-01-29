@@ -22,6 +22,7 @@ from plato.utils import s3
 
 class ServerEvents(socketio.AsyncNamespace):
     """ A custom namespace for socketio.AsyncServer. """
+
     def __init__(self, namespace, plato_server):
         super().__init__(namespace)
         self.plato_server = plato_server
@@ -65,6 +66,7 @@ class ServerEvents(socketio.AsyncNamespace):
 
 class Server:
     """ The base class for federated learning servers. """
+
     def __init__(self):
         self.sio = None
         self.client = None
@@ -759,7 +761,7 @@ class Server:
         if len(self.updates) >= self.clients_per_round:
             logging.info(
                 "[Server #%d] All %d client report(s) received. Processing.",
-                os.getpid(), len(self.reported_clients))
+                os.getpid(), len(self.updates))
             await self.process_reports()
             await self.wrap_up()
             await self.select_clients()
