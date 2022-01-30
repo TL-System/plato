@@ -82,7 +82,7 @@ class Server(fedavg.Server):
 
             if hasattr(Config(), 'results'):
                 results_dir = Config().results_dir
-                result_csv_file = f'{results_dir}/result_{Config().args.id}.csv'
+                result_csv_file = f'{results_dir}/edge_{os.getpid()}.csv'
                 csv_processor.initialize_csv(result_csv_file,
                                              self.recorded_items, results_dir)
 
@@ -154,9 +154,9 @@ class Server(fedavg.Server):
                 new_row.append(item_value)
 
             if Config().is_edge_server():
-                result_csv_file = f'{Config().results_dir}result_{Config().args.id}.csv'
+                result_csv_file = f'{Config().results_dir}/edge_{os.getpid()}.csv'
             else:
-                result_csv_file = f'{Config().results_dir}result.csv'
+                result_csv_file = f'{Config().results_dir}/{os.getpid()}.csv'
 
             csv_processor.write_csv(result_csv_file, new_row)
 
