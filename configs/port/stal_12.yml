@@ -26,8 +26,8 @@ server:
     port: 8001
     synchronous: false #true: sychronous, false: port
     simulate_wall_time: true
-    minimum_clients_aggregated: 10
-    staleness_bound: 9
+    minimum_clients_aggregated: 5
+    staleness_bound: 12
 #    request_update: true
 
 data:
@@ -53,7 +53,7 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 20
+    rounds: 60
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -90,7 +90,7 @@ algorithm:
     type: fedavg
 
 results:
-    results_dir: /content/drive/MyDrive/stal_9
+    results_dir: /content/drive/MyDrive/stal_4
 
     # Write the following parameter(s) into a CSV
     types: round, elapsed_time, accuracy
