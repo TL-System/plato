@@ -53,7 +53,7 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 20
+    rounds: 60
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -72,7 +72,7 @@ trainer:
     max_concurrency: 10
 
     # The target accuracy
-    target_accuracy: 0.97
+    target_accuracy: 0.96
 
     # Number of epoches for local training in each communication round
     epochs: 3
@@ -90,7 +90,7 @@ algorithm:
     type: fedavg
 
 results:
-    results_dir: /content/drive/MyDrive/stal_6
+    results_dir: /content/drive/MyDrive/stal_2
 
     # Write the following parameter(s) into a CSV
     types: round, elapsed_time, accuracy
