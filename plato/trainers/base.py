@@ -14,6 +14,7 @@ from plato.config import Config
 
 class Trainer(ABC):
     """Base class for all the trainers."""
+
     def __init__(self):
         self.device = Config().device()
         self.client_id = 0
@@ -66,9 +67,9 @@ class Trainer(ABC):
             os.makedirs(model_dir)
 
         if filename is not None:
-            accuracy_path = f"{model_dir}{filename}"
+            accuracy_path = f"{model_dir}/{filename}"
         else:
-            accuracy_path = f'{model_dir}{model_name}.acc'
+            accuracy_path = f'{model_dir}/{model_name}.acc'
 
         with open(accuracy_path, 'w') as file:
             file.write(str(accuracy))
@@ -80,9 +81,9 @@ class Trainer(ABC):
         model_name = Config().trainer.model_name
 
         if filename is not None:
-            accuracy_path = f"{model_dir}{filename}"
+            accuracy_path = f"{model_dir}/{filename}"
         else:
-            accuracy_path = f'{model_dir}{model_name}.acc'
+            accuracy_path = f'{model_dir}/{model_name}.acc'
 
         with open(accuracy_path, 'r') as file:
             accuracy = float(file.read())
@@ -113,8 +114,8 @@ class Trainer(ABC):
 
             model_name = Config().trainer.model_name
             model_dir = Config().params['model_dir']
-            model_file = f"{model_dir}{model_name}_{self.client_id}_{Config().params['run_id']}.pth"
-            accuracy_file = f"{model_dir}{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
+            model_file = f"{model_dir}/{model_name}_{self.client_id}_{Config().params['run_id']}.pth"
+            accuracy_file = f"{model_dir}/{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
 
             if os.path.exists(model_file):
                 os.remove(model_file)
