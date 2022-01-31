@@ -10,7 +10,6 @@ import os
 
 if __name__ == '__main__':
     for t in [
-            'configs/port/min_5_stal_1',
             'configs/port/min_5_stal_4',
             'configs/port/min_5_stal_7',
             'configs/port/min_5_stal_10',
