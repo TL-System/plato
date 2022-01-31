@@ -14,6 +14,7 @@ from plato.trainers import basic
 
 
 class Trainer(basic.Trainer):
+
     def __init__(self, model=None):
         super().__init__(model)
 
@@ -28,7 +29,7 @@ class Trainer(basic.Trainer):
 
         if callable(_train_loader):
             train_loader = self.train_loader(batch_size, trainset, sampler,
-                                         cut_layer)
+                                             cut_layer)
         else:
             train_loader = torch.utils.data.DataLoader(dataset=trainset,
                                                        shuffle=False,
@@ -74,8 +75,8 @@ class Trainer(basic.Trainer):
                 outputs = self.model.forward_from(examples, cut_layer)
 
             loss = loss_criterion(outputs, labels)
-            logging.info("[Client #{}] \tLoss: {:.6f}"
-                         .format(self.client_id, loss.data.item()))
+            logging.info("[Client #{}] \tLoss: {:.6f}".format(
+                self.client_id, loss.data.item()))
             loss.backward()
 
             # Record gradients within the cut layer
@@ -99,7 +100,7 @@ class Trainer(basic.Trainer):
         if not os.path.exists(model_dir):
             os.makedirs(model_dir)
 
-        model_path = f'{model_dir}{model_name}_gradients.pth'
+        model_path = f'{model_dir}/{model_name}_gradients.pth'
         if os.path.exists(model_path):
             os.remove(model_path)
         torch.save(self.cut_layer_grad, model_path)

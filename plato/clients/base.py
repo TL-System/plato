@@ -27,6 +27,7 @@ class Report:
 
 class ClientEvents(socketio.AsyncClientNamespace):
     """ A custom namespace for socketio.AsyncServer. """
+
     def __init__(self, namespace, plato_client):
         super().__init__(namespace)
         self.plato_client = plato_client
@@ -77,6 +78,7 @@ class ClientEvents(socketio.AsyncClientNamespace):
 
 class Client:
     """ A basic federated learning client. """
+
     def __init__(self) -> None:
         self.client_id = Config().args.id
         self.sio = None
@@ -281,7 +283,7 @@ class Client:
         """Additional client-specific processing on the server response."""
 
     def clear_checkpoint_files(self):
-        """Delete all the temporary checkpoint files created by the client"""
+        """ Delete all the temporary checkpoint files created by the client. """
         if hasattr(Config().server,
                    'request_update') and Config().server.request_update:
             import re
@@ -293,7 +295,7 @@ class Client:
                     filename)
                 if split is not None and self.client_id == int(
                         split.group('client_id')):
-                    file_path = f'{model_dir}{filename}'
+                    file_path = f'{model_dir}/{filename}'
                     os.remove(file_path)
 
     @abstractmethod
