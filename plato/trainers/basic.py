@@ -23,7 +23,6 @@ from plato.utils import optimizers
 
 class Trainer(base.Trainer):
     """A basic federated learning trainer, used by both the client and the server."""
-
     def __init__(self, model=None):
         """Initializing the trainer with the provided model.
 
@@ -210,7 +209,7 @@ class Trainer(base.Trainer):
                         max_grad_norm=config['dp_max_grad_norm']
                         if 'max_grad_norm' in config else 1.0,
                     )
-
+                loss_dict = {}
                 for epoch in range(1, epochs + 1):
                     for batch_id, (examples,
                                    labels) in enumerate(train_loader):
@@ -229,6 +228,14 @@ class Trainer(base.Trainer):
                                 examples, cut_layer)
 
                         loss = loss_criterion(outputs, labels)
+
+                        # track loss info
+                        if hasattr(Config().server, 'request_update'
+                                   ) and Config().server.request_update:
+                            if epoch == 1:
+                                loss_dict[batch_id] = torch.squre(loss)
+                            else:
+                                loss_dict[batch_id] += torch.squre(loss)
 
                         loss.backward()
                         optimizer.step()
@@ -265,6 +272,7 @@ class Trainer(base.Trainer):
                     # Saving the model at the end of this epoch to a file so that
                     # it can later be retrieved to respond to server requests
                     # in asynchronous mode when the wall clock time is simulated
+
                     if hasattr(Config().server, 'request_update') and Config(
                     ).server.request_update:
                         self.model.cpu()
@@ -272,6 +280,16 @@ class Trainer(base.Trainer):
                         filename = f"{self.client_id}_{epoch}_{training_time}.pth"
                         self.save_model(filename)
                         self.model.to(self.device)
+
+                if hasattr(
+                        Config().server,
+                        'request_update') and Config().server.request_update:
+                    sum_loss = 0
+                    for batch_id in loss_dict:
+                        sum_loss += loss_dict[batch_id]
+                    sum_loss /= epochs
+                    filename = f"{self.client_id}__squred_batch_loss.pth"
+                    torch.save(sum_loss, filename)
 
         except Exception as training_exception:
             logging.info("Training on client #%d failed.", self.client_id)
