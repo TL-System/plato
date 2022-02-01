@@ -48,7 +48,6 @@ class Server(fedavg.Server):
 
             similarity = F.cosine_similarity(current - previous, deltas, dim=0)
 
-        print(f'similarity = {similarity}')
         return similarity
 
     async def federated_averaging(self, updates):
