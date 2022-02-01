@@ -1,0 +1,81 @@
+clients:
+    # Type
+    type: simple
+
+    # The total number of clients
+    total_clients: 10
+
+    # The number of clients selected in each round
+    per_round: 10
+
+    # Should the clients compute test accuracy locally?
+    do_test: false
+    
+    # Whether simulate clients or not
+    simulation: false
+
+server:
+    address: 127.0.0.1
+    port: 8000
+
+data:
+    # The training and testing dataset
+    datasource: QoENFLX
+
+    # Where the dataset is located
+    data_path: ./data
+
+    # Number of samples in each partition
+    partition_size: 30
+
+    # Whether use varied partition per client or not?
+    varied: false
+
+    # IID or non-IID?
+    sampler: iid
+
+    # The random seed for sampling data
+    random_seed: 1
+
+trainer:
+    # The type of the trainer
+    type: qoenflx
+
+    # The maximum number of training rounds
+    rounds: 50
+
+    # Whether the training should use multiple GPUs if available
+    parallelized: false
+
+    # The maximum number of clients running concurrently
+    max_concurrency: 4
+
+    # The target accuracy
+    target_accuracy: 0.99
+
+    # Number of epoches for local training in each communication round
+    epochs: 50
+
+    # Whether use varied epochs per client or not?
+    varied: false
+
+    batch_size: 64
+    optimizer: Adadelta
+    learning_rate: 1.0
+    rho: 0.95
+    eps: 0.00000001
+    weight_decay: 0.000001
+
+    # The machine learning model
+    model_name: hybrid
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg
+
+results:
+    # Write the following parameter(s) into a CSV
+    types: accuracy, training_time, round_time
+
+    # Plot results (x_axis&y_axis)
+    plot: round&accuracy, round&training_time, round_time&accuracy, round_time&training_time
