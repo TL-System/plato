@@ -23,11 +23,8 @@ clients:
 server:
     address: 127.0.0.1
     port: 8000
-    synchronous: true #true: sychronous, false: port
+    synchronous: true
     simulate_wall_time: true
-#    minimum_clients_aggregated: 4
-#    staleness_bound: 0
-#    request_update: true
 
 data:
     # The training and testing dataset
@@ -54,7 +51,7 @@ trainer:
 
     # The maximum number of training rounds
     rounds: 2
- 
+
     # Whether the training should use multiple GPUs if available
     parallelized: false
 
