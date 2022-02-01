@@ -291,7 +291,6 @@ class Trainer(base.Trainer):
                     sum_loss /= epochs
                     filename = f"{self.client_id}__squred_batch_loss.pth"
                     torch.save(sum_loss, filename)
-                    print("save request_update")
 
         except Exception as training_exception:
             logging.info("Training on client #%d failed.", self.client_id)
