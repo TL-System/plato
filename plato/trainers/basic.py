@@ -116,7 +116,7 @@ class Trainer(base.Trainer):
         sleep_seconds = max(sleep_seconds, 0)
 
         # Put this client to sleep
-        logging.info("[Client #%d] Going to sleep for %f seconds.",
+        logging.info("[Client #%d] Going to sleep for %.1f seconds.",
                      self.client_id, sleep_seconds)
         time.sleep(sleep_seconds)
         logging.info("[Client #%d] Woke up.", self.client_id)

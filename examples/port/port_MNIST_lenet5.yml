@@ -18,16 +18,18 @@ clients:
     # The simulation distribution
     simulation_distribution:
         distribution: zipf
-        s: 1.5
+        s: 1.7
 
 server:
     address: 127.0.0.1
-    port: 8000
-    synchronous: true
+    port: 8001
+    synchronous: false #true: sychronous, false: port
     simulate_wall_time: true
+    minimum_clients_aggregated: 5 
+    staleness_bound: 10 
+#    request_update: true
 
 data:
-    # The training and testing dataset
     datasource: MNIST
 
     # Where the dataset is located
@@ -40,7 +42,7 @@ data:
     sampler: noniid
 
     # The concentration parameter for the Dirichlet distribution
-    concentration: 0.3
+    concentration: 0.8
 
     # The random seed for sampling data
     random_seed: 1
@@ -50,7 +52,7 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 2
+    rounds: 20
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -62,13 +64,17 @@ trainer:
     # dp_max_grad_norm: 1
 
     # The maximum number of clients running concurrently
-    max_concurrency: 20
+    # The limitation is CUDA memory
+    # When max_concurrency equals clients per_round,
+    # simulate_wall_time: false
+    # Otherwise, simulate_wall_time: true
+    max_concurrency: 10
 
     # The target accuracy
-    target_accuracy: 0.98
+    target_accuracy: 0.96
 
     # Number of epoches for local training in each communication round
-    epochs: 5
+    epochs: 3
     batch_size: 32
     optimizer: SGD
     learning_rate: 0.01
