@@ -18,10 +18,8 @@ import port_server
 
 def main():
     """ A Plato federated learning training session using FedAsync. """
-    trainer = basic.Trainer()
-    client = simple.Client(trainer=trainer)
-    server = port_server.Server(trainer=trainer)
-    server.run(client)
+    server = port_server.Server()
+    server.run()
 
 
 if __name__ == "__main__":

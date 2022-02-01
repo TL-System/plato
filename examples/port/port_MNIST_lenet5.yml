@@ -6,7 +6,7 @@ clients:
     total_clients: 100
 
     # The number of clients selected in each round
-    per_round: 20
+    per_round: 2
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -25,7 +25,7 @@ server:
     port: 8001
     synchronous: false #true: sychronous, false: port
     simulate_wall_time: true
-    minimum_clients_aggregated: 1
+    minimum_clients_aggregated: 2
     staleness_bound: 1000
 #    request_update: true
 
@@ -39,7 +39,7 @@ data:
     partition_size: 600
 
     # IID or non-IID?
-    sampler: noniid
+    sampler: iid
 
     # The concentration parameter for the Dirichlet distribution
     concentration: 0.8
@@ -65,7 +65,7 @@ trainer:
 
     # The maximum number of clients running concurrently
     # The limitation is CUDA memory
-    # When max_concurrency equals clients per_round, 
+    # When max_concurrency equals clients per_round,
     # simulate_wall_time: false
     # Otherwise, simulate_wall_time: true
     max_concurrency: 1
@@ -74,7 +74,7 @@ trainer:
     target_accuracy: 0.97
 
     # Number of epoches for local training in each communication round
-    epochs: 3
+    epochs: 1
     batch_size: 32
     optimizer: SGD
     learning_rate: 0.01
@@ -89,8 +89,6 @@ algorithm:
     type: fedavg
 
 results:
-    results_dir: /content/drive/MyDrive/
-
     # Write the following parameter(s) into a CSV
     types: round, elapsed_time, accuracy
 
