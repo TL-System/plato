@@ -11,7 +11,7 @@ import numpy as np
 class Report(simple.Report):
     """Client report sent to the FedSarah federated learning server."""
     payload_length: int
-    statistics_utility: float
+    #statistics_utility: float
 
 
 class Client(simple.Client):
@@ -31,7 +31,7 @@ class Client(simple.Client):
         report, weights = await super().train()
         # compute statistical_utility
         filename = f"{self.client_id}__squred_batch_loss.pth"
-        sum_loss = torch.load(filename)
+        sum_loss = torch.load(filename).detach().numpy()
 
         self.statistical_utility = np.abs(report.num_samples) * np.sqrt(
             1.0 / report.num_samples * sum_loss)

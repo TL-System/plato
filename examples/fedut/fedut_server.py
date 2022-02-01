@@ -6,6 +6,7 @@ from tkinter.messagebox import NO
 from plato.config import Config
 from plato.servers import fedavg
 import numpy as np
+import asyncio
 
 
 class Server(fedavg.Server):
@@ -16,8 +17,8 @@ class Server(fedavg.Server):
         self.global_utility = None
         self.system_utility = None
         self.local_training_time = None
-        print(Config.server)
-        #self.expected_duration = Config().server.expected_duration
+        #print(Config.server)
+        self.expected_duration = Config().server.expected_duration
 
     def extract_client_updates(self, updates):
         """ Extract the model weights and statistical utility from clients updates. """
@@ -35,7 +36,7 @@ class Server(fedavg.Server):
 
     async def federated_averaging(self, updates):
         """ Aggregate weight and delta updates from client updates. """
-        avg_update = await super().federated_averaging(updates)
+        weights_received = self.extract_client_updates(updates)
 
         # Adjust expected duration
 
@@ -56,9 +57,26 @@ class Server(fedavg.Server):
             for U in self.global_utility
         ]
 
-        # Update server model
-        agg_update = []
-        for update, uti in zip(avg_update, self.global_utility):
-            agg_update.append(update * uti)
+        # Extract the total number of samples
+        self.total_samples = sum(
+            [report.num_samples for (report, __, __) in updates])
 
-        return agg_update
+        # Perform weighted averaging
+        avg_update = {
+            name: self.trainer.zeros(weights.shape)
+            for name, weights in weights_received[0].items()
+        }
+
+        for i, update in enumerate(weights_received):
+            report, __, __ = updates[i]
+            num_samples = report.num_samples
+
+            for name, delta in update.items():
+                # Use weighted average by the number of samples
+                avg_update[name] += self.global_utility[i] * delta * (
+                    num_samples / self.total_samples)
+
+            # Yield to other tasks in the server
+            await asyncio.sleep(0)
+
+        return avg_update
