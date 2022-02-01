@@ -27,7 +27,7 @@ class Client(simple.Client):
         valuation = self.calc_valuation(report.num_samples, loss)
 
         return Report(report.num_samples, report.accuracy,
-                      report.training_time, report.data_loading_time,
+                      report.training_time, report.update_response,
                       valuation), weights
 
     def get_loss(self):

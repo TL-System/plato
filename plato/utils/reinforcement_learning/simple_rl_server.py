@@ -1,6 +1,7 @@
 """
 A federated learning server with RL Agent.
 """
+import heapq
 import logging
 import os
 import pickle
@@ -10,7 +11,6 @@ from abc import abstractmethod
 
 import socketio
 from aiohttp import web
-
 from plato.algorithms import registry as algorithms_registry
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
@@ -303,9 +303,27 @@ class RLServer(fedavg.Server):
             "[Server #%d] Received %s MB of payload data from client #%d.",
             os.getpid(), round(payload_size / 1024**2, 2), client_id)
 
-        self.updates.append((self.reports[sid], self.client_payload[sid]))
+        # Pass through the inbound_processor(s), if any
+        self.client_payload[sid] = self.inbound_processor.process(
+            self.client_payload[sid])
 
-        self.reporting_clients.append(client_id)
+        start_time = self.training_clients[client_id]['start_time']
+        finish_time = self.reports[sid].training_time + start_time
+        starting_round = self.training_clients[client_id]['starting_round']
+
+        client_info = (
+            finish_time,  # sorted by the client's finish time
+            {
+                'client_id': client_id,
+                'sid': sid,
+                'starting_round': starting_round,
+                'start_time': start_time,
+                'report': self.reports[sid],
+                'payload': self.client_payload[sid],
+            })
+
+        heapq.heappush(self.reported_clients, client_info)
+        self.current_reported_clients[client_info[1]['client_id']] = True
         del self.training_clients[client_id]
 
         await self.step()
@@ -318,6 +336,9 @@ class RLServer(fedavg.Server):
 
                 if client_id in self.training_clients:
                     del self.training_clients[client_id]
+
+                if client_id in self.current_reported_clients:
+                    del self.current_reported_clients[client_id]
 
                 logging.info(
                     "[Server #%d] Client #%d disconnected and removed from this server.",
@@ -378,30 +399,3 @@ class RLServer(fedavg.Server):
 
         self.algorithm = algorithms_registry.get(self.trainer)
 
-    async def periodic_task(self):
-        """ A periodic task that is executed from time to time, determined by
-        'server:periodic_interval' in the configuration. """
-        # Call the async function that defines a customized periodic task, if any
-        _task = getattr(self, "customize_periodic_task", None)
-        if callable(_task):
-            await self.customize_periodic_task()
-
-        # If we are operating in asynchronous mode, aggregate the model updates received so far.
-        if hasattr(Config().server,
-                   'synchronous') and not Config().server.synchronous:
-            if len(self.updates) > 0:
-                logging.info(
-                    "[Server #%d] %d client reports received in asynchronous mode. Processing.",
-                    os.getpid(), len(self.updates))
-                if self.action_applied and not self.clients_selected:
-                    await self.select_clients()
-                    self.clients_selected = True
-                if self.action_applied and self.clients_selected:
-                    await self.process_reports()
-                    await self.wrap_up()
-                    self.action_applied = False
-                    self.clients_selected = False
-            else:
-                logging.info(
-                    "[Server #%d] No client reports have been received. Nothing to process."
-                )
