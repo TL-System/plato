@@ -34,6 +34,7 @@ class Trainer(base.Trainer):
         super().__init__()
 
         self.training_start_time = time.time()
+        self.sleeping_time = 0
         random.seed()  # Set seed to system clock to allow randomness
 
         if model is None:
@@ -117,10 +118,16 @@ class Trainer(base.Trainer):
         sleep_seconds = max(sleep_seconds, 0)
 
         # Put this client to sleep
-        logging.info("[Client #%d] Going to sleep for %f seconds.",
+        logging.info("[Client #%d] Going to sleep for %.2f seconds.",
                      self.client_id, sleep_seconds)
-        time.sleep(sleep_seconds)
-        logging.info("[Client #%d] Woke up.", self.client_id)
+        if hasattr(
+                Config().server,
+                "simulate_wall_time") and Config().server.simulate_wall_time:
+            return sleep_seconds
+        else:
+            time.sleep(sleep_seconds)
+            logging.info("[Client #%d] Woke up.", self.client_id)
+            return 0
 
     def train_process(self, config, trainset, sampler, cut_layer=None):
         """The main training loop in a federated learning workload, run in
@@ -135,6 +142,7 @@ class Trainer(base.Trainer):
         cut_layer (optional): The layer which training should start from.
         """
         tic = time.perf_counter()
+        self.sleeping_time = 0
 
         if 'use_wandb' in config:
             import wandb
@@ -260,7 +268,7 @@ class Trainer(base.Trainer):
                     if self.client_id != 0 and hasattr(
                             Config().clients, "speed_simulation") and Config(
                             ).clients.speed_simulation:
-                        self.simulate_sleep_time()
+                        self.sleeping_time += self.simulate_sleep_time()
 
                     # Saving the model at the end of this epoch to a file so that
                     # it can later be retrieved to respond to server requests
@@ -268,7 +276,8 @@ class Trainer(base.Trainer):
                     if hasattr(Config().server, 'request_update') and Config(
                     ).server.request_update:
                         self.model.cpu()
-                        training_time = time.perf_counter() - tic
+                        training_time = self.sleeping_time + time.perf_counter(
+                        ) - tic
                         filename = f"{self.client_id}_{epoch}_{training_time}.pth"
                         self.save_model(filename)
                         self.model.to(self.device)
