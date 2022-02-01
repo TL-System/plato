@@ -15,6 +15,9 @@ class Server(fedavg.Server):
         self.statistical_utility = None
         self.global_utility = None
         self.system_utility = None
+        self.local_training_time = None
+        print(Config.server)
+        #self.expected_duration = Config().server.expected_duration
 
     def extract_client_updates(self, updates):
         """ Extract the model weights and statistical utility from clients updates. """
@@ -23,6 +26,10 @@ class Server(fedavg.Server):
         self.statistical_utility = [
             payload[1] for (__, payload, __) in updates
         ]
+        # Extract the local training time
+        self.local_training_time = [
+            report.training_time for (report, __, __) in updates
+        ]
 
         return self.algorithm.compute_weight_updates(weights_received)
 
@@ -30,12 +37,12 @@ class Server(fedavg.Server):
         """ Aggregate weight and delta updates from client updates. """
         avg_update = await super().federated_averaging(updates)
 
-        # Initialize global utility
-        self.global_utility = [0] * len(self.statistical_utility[0])
+        # Adjust expected duration
 
         # Compute system utility by t_i
         self.system_utility = [
-            pow(T, t) * np.maximum(np.sign(T - t), 0)
+            pow(self.expected_duration, t) *
+            np.maximum(np.sign(self.expected_duration - t), 0)
             for t in self.local_training_time
         ]
         # Compute global utility

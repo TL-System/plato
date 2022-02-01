@@ -230,12 +230,14 @@ class Trainer(base.Trainer):
                         loss = loss_criterion(outputs, labels)
 
                         # track loss info
-                        if hasattr(Config().server, 'request_update'
-                                   ) and Config().server.request_update:
+
+                        if hasattr(Config().server, 'request_loss') and Config(
+                        ).server.request_loss:
+
                             if epoch == 1:
-                                loss_dict[batch_id] = torch.squre(loss)
+                                loss_dict[batch_id] = torch.square(loss)
                             else:
-                                loss_dict[batch_id] += torch.squre(loss)
+                                loss_dict[batch_id] += torch.square(loss)
 
                         loss.backward()
                         optimizer.step()
@@ -281,15 +283,15 @@ class Trainer(base.Trainer):
                         self.save_model(filename)
                         self.model.to(self.device)
 
-                if hasattr(
-                        Config().server,
-                        'request_update') and Config().server.request_update:
+                if hasattr(Config().server,
+                           'request_loss') and Config().server.request_loss:
                     sum_loss = 0
                     for batch_id in loss_dict:
                         sum_loss += loss_dict[batch_id]
                     sum_loss /= epochs
                     filename = f"{self.client_id}__squred_batch_loss.pth"
                     torch.save(sum_loss, filename)
+                    print("save request_update")
 
         except Exception as training_exception:
             logging.info("Training on client #%d failed.", self.client_id)
