@@ -28,7 +28,7 @@ class Server(fedavg.Server):
         model_dir = Config().params['model_dir']
         model_path = f'{model_dir}/{filename}'
 
-        similarity = 1
+        similarity = 0
 
         if staleness > 0 and os.path.exists(model_path):
             previous_model = copy.deepcopy(self.trainer.model)
@@ -58,12 +58,6 @@ class Server(fedavg.Server):
         self.total_samples = sum(
             [report.num_samples for (report, __, __) in updates])
 
-        # Perform weighted averaging
-        avg_update = {
-            name: self.trainer.zeros(weights.shape)
-            for name, weights in weights_received[0].items()
-        }
-
         # Constructing the aggregation weights to be used
         aggregation_weights = []
 
@@ -73,13 +67,29 @@ class Server(fedavg.Server):
 
             similarity = await self.cosine_similarity(update, staleness)
             staleness_factor = Server.staleness_function(staleness)
+            print(
+                f'similarity = {(similarity + 1 ) / 2.0}, staleness = {staleness}, staleness factor = {staleness_factor}'
+            )
+            print(
+                f'for client {i}, raw weight = {num_samples / self.total_samples * (similarity + 1 ) / 2.0 * staleness_factor}'
+            )
+
             aggregation_weights.append(num_samples / self.total_samples *
-                                       similarity * staleness_factor)
+                                       (similarity + 1) / 2.0 *
+                                       staleness_factor)
 
         # Normalize so that the sum of aggregation weights equals 1
         aggregation_weights = [
             i / sum(aggregation_weights) for i in aggregation_weights
         ]
+
+        print('normalized weights = ', aggregation_weights)
+
+        # Perform weighted averaging
+        avg_update = {
+            name: self.trainer.zeros(weights.shape)
+            for name, weights in weights_received[0].items()
+        }
 
         for i, update in enumerate(weights_received):
             report, __, staleness = updates[i]
