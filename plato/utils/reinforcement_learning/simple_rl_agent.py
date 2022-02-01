@@ -9,7 +9,6 @@ import random
 import sys
 from abc import abstractmethod
 
-import gym
 import numpy as np
 import socketio
 from gym import spaces
@@ -183,7 +182,7 @@ class RLAgentBase(object):
     async def prep_agent_update(self):
         """ Update RL Agent. """
 
-class RLAgent(RLAgentBase, gym.Env):
+class RLAgent(RLAgentBase):
     """ A basic RL environment for FL server using Gym for RL control. """
     def __init__(self):
         super().__init__()
@@ -273,9 +272,6 @@ class RLAgent(RLAgentBase, gym.Env):
     def get_info(self):
         """ Get info used for benchmarking. """
         return {}
-
-    def render(self, mode="human"):
-        """ Render the Gym env. """
 
     def close(self):
         """ Closing the RL Agent. """
