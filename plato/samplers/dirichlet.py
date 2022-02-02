@@ -38,7 +38,7 @@ class Sampler(base.Sampler):
 
         if np.isnan(np.sum(target_proportions)):
             target_proportions = np.repeat(0, len(class_list))
-            target_proportions[np.random.randint(0, len(class_list) - 1)] = 1
+            target_proportions[np.random.randint(0, len(class_list))] = 1
 
         self.sample_weights = target_proportions[target_list]
 

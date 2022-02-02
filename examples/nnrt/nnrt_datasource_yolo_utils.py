@@ -127,6 +127,7 @@ def exif_size(img):
 
 
 class LoadImagesAndLabels(object):  # for training/testing
+
     def __init__(self,
                  path,
                  img_size=640,

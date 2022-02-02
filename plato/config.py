@@ -224,8 +224,7 @@ class Config:
             if len(gpus) > 0:
                 device = 'GPU'
                 tf.config.experimental.set_visible_devices(
-                    gpus[np.random.randint(0,
-                                           len(gpus) - 1)], 'GPU')
+                    gpus[np.random.randint(0, len(gpus))], 'GPU')
         else:
             import torch
 
@@ -235,8 +234,7 @@ class Config:
                     device = 'cuda'
                 else:
                     device = 'cuda:' + str(
-                        np.random.randint(0,
-                                          torch.cuda.device_count() - 1))
+                        np.random.randint(0, torch.cuda.device_count()))
 
         return device
 
