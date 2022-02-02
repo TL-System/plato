@@ -205,6 +205,12 @@ class Server:
         asyncio.get_event_loop().create_task(
             self.periodic(self.periodic_interval))
 
+        if hasattr(Config().server, "random_seed"):
+            seed = Config().server.random_seed
+            logging.info("Setting the random seed for selecting clients: %s",
+                         seed)
+            random.seed(seed)
+
         self.start()
 
     def start(self, port=Config().server.port):
@@ -434,7 +440,11 @@ class Server:
         assert clients_count <= len(clients_pool)
 
         # Select clients randomly
-        return random.sample(clients_pool, clients_count)
+        selected_clients = random.sample(clients_pool, clients_count)
+
+        logging.info("[Server %s] Selected clients: %s", os.getpid(),
+                     selected_clients)
+        return selected_clients
 
     async def periodic(self, periodic_interval):
         """ Runs periodic_task() periodically on the server. The time interval between
