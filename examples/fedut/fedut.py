@@ -11,7 +11,6 @@ import fedut_server
 
 def main():
     """ A Plato federated learning training session using the FedNova algorithm. """
-    print(os.environ['config_file'])
     client = fedut_client.Client()
     server = fedut_server.Server()
     server.run(client)

@@ -148,7 +148,7 @@ class Trainer(base.Trainer):
             if callable(custom_train):
                 self.train_model(config, trainset, sampler.get(), cut_layer)
             else:
-                log_interval = 10
+                log_interval = 100
                 batch_size = config['batch_size']
 
                 logging.info("[Client #%d] Loading the dataset.",

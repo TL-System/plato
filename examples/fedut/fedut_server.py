@@ -41,25 +41,39 @@ class Server(fedavg.Server):
         # Adjust expected duration
 
         # Compute system utility by t_i
+        print(self.local_training_time)
+
         self.system_utility = [
-            pow(self.expected_duration, t) *
-            np.maximum(np.sign(self.expected_duration - t), 0)
+            pow(self.expected_duration / t,
+                np.maximum(np.sign(self.expected_duration - t), 0))
             for t in self.local_training_time
         ]
-        # Compute global utility
-        self.global_utility = [
-            stats * sys for stats, sys in zip(self.statistical_utility,
-                                              self.system_utility)
-        ]
-        # Normalize global utility via softmax
-        self.global_utility = [
-            np.exp(U) / np.sum(np.exp(self.global_utility))
-            for U in self.global_utility
-        ]
+        print("system utility:  ", self.system_utility)
+        print("statis", self.statistical_utility)
 
         # Extract the total number of samples
         self.total_samples = sum(
             [report.num_samples for (report, __, __) in updates])
+
+        # Extract the number of samples and compute basic weight
+        self.basic_weight = [
+            report.num_samples / self.total_samples
+            for (report, __, __) in updates
+        ]
+
+        # Compute global utility
+        self.global_utility = [
+            stats * sys * basic
+            for stats, sys, basic in zip(self.statistical_utility, self.
+                                         system_utility, self.basic_weight)
+        ]
+
+        # Normalize global utility via softmax
+        self.global_utility = [
+            np.exp(u) / np.sum(np.exp(self.global_utility))
+            for u in self.global_utility
+        ]
+        print("----global_utility: ", self.global_utility)
 
         # Perform weighted averaging
         avg_update = {
@@ -73,8 +87,9 @@ class Server(fedavg.Server):
 
             for name, delta in update.items():
                 # Use weighted average by the number of samples
-                avg_update[name] += self.global_utility[i] * delta * (
-                    num_samples / self.total_samples)
+                # print("The global_utility is: ", self.global_utility[i])
+                avg_update[name] += self.global_utility[i] * delta  #* (
+                #num_samples / self.total_samples)
 
             # Yield to other tasks in the server
             await asyncio.sleep(0)
