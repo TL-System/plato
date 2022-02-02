@@ -17,16 +17,19 @@ clients:
 
     # The simulation distribution
     simulation_distribution:
-        distribution: zipf
-        s: 1.7
+        distribution: pareto
+        alpha: 1
+
+    random_seed: 1
 
 server:
     address: 127.0.0.1
     port: 8001
     synchronous: false #true: sychronous, false: port
     simulate_wall_time: true
-    minimum_clients_aggregated: 5 
-    staleness_bound: 10 
+    minimum_clients_aggregated: 5
+    staleness_bound: 10
+    random_seed: 1
 #    request_update: true
 
 data:
@@ -52,7 +55,7 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 20
+    rounds: 60
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -68,10 +71,10 @@ trainer:
     # When max_concurrency equals clients per_round,
     # simulate_wall_time: false
     # Otherwise, simulate_wall_time: true
-    max_concurrency: 10
+    max_concurrency: 20
 
     # The target accuracy
-    target_accuracy: 0.96
+    target_accuracy: 0.95
 
     # Number of epoches for local training in each communication round
     epochs: 3

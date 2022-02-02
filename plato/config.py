@@ -192,11 +192,11 @@ class Config:
                 sleep_times = np.random.normal(dist.mean,
                                                dist.sd,
                                                size=total_clients)
-            if dist.distribution.lower() == "zipf":
-                sleep_times = np.random.zipf(dist.s, size=total_clients)
+            if dist.distribution.lower() == "pareto":
+                sleep_times = np.random.pareto(dist.alpha, size=total_clients)
         else:
             # By default, use Zipf distribution with a parameter of 1.5
-            sleep_times = np.random.zipf(1.5)
+            sleep_times = np.random.pareto(1.0, size=total_clients)
 
         Config.client_sleep_times = np.minimum(
             sleep_times, np.repeat(max_sleep_time, total_clients))
@@ -224,8 +224,8 @@ class Config:
             if len(gpus) > 0:
                 device = 'GPU'
                 tf.config.experimental.set_visible_devices(
-                    gpus[random.randint(0,
-                                        len(gpus) - 1)], 'GPU')
+                    gpus[np.random.randint(0,
+                                           len(gpus) - 1)], 'GPU')
         else:
             import torch
 
@@ -235,8 +235,8 @@ class Config:
                     device = 'cuda'
                 else:
                     device = 'cuda:' + str(
-                        random.randint(0,
-                                       torch.cuda.device_count() - 1))
+                        np.random.randint(0,
+                                          torch.cuda.device_count() - 1))
 
         return device
 

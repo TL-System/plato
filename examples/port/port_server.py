@@ -24,7 +24,7 @@ class Server(fedavg.Server):
         """ Compute the cosine similarity of the received updates and the difference
             between the current and a previous model according to client staleness. """
         # Loading the global model from a previous round according to staleness
-        filename = f"model_{self.current_round - staleness - 1}.pth"
+        filename = f"model_{self.current_round - 2}.pth"
         model_dir = Config().params['model_dir']
         model_path = f'{model_dir}/{filename}'
 
@@ -48,7 +48,7 @@ class Server(fedavg.Server):
 
             similarity = F.cosine_similarity(current - previous, deltas, dim=0)
 
-        return similarity
+        return similarity 
 
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using federated averaging."""
@@ -68,14 +68,14 @@ class Server(fedavg.Server):
             similarity = await self.cosine_similarity(update, staleness)
             staleness_factor = Server.staleness_function(staleness)
             print(
-                f'similarity = {(similarity + 1 ) / 2.0}, staleness = {staleness}, staleness factor = {staleness_factor}'
+                f'similarity = {similarity + 1}, staleness = {staleness}, staleness factor = {staleness_factor}'
             )
             print(
-                f'for client {i}, raw weight = {num_samples / self.total_samples * (similarity + 1 ) / 2.0 * staleness_factor}'
+                f'for client {i}, raw weight = {num_samples / self.total_samples * (similarity + 1) * staleness_factor}'
             )
 
             aggregation_weights.append(num_samples / self.total_samples *
-                                       (similarity + 1) / 2.0 *
+                                       (similarity + 1) *
                                        staleness_factor)
 
         # Normalize so that the sum of aggregation weights equals 1
@@ -117,9 +117,12 @@ class Server(fedavg.Server):
     @staticmethod
     def staleness_function(staleness):
         """ The staleness_function. """
-        staleness_hyperparameter = 0.5
+        staleness_bound = 10
 
-        staleness_factor = staleness_hyperparameter / (
-            staleness + staleness_hyperparameter)
+        if hasattr(Config().server, "staleness_bound"):
+            staleness_bound = Config().server.staleness_bound
+
+        staleness_factor = staleness_bound / (
+            staleness + staleness_bound)
 
         return staleness_factor
