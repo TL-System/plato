@@ -8,11 +8,11 @@ from collections import deque
 from statistics import mean, stdev
 
 import numpy as np
-
 from plato.config import Config
 from plato.utils import csv_processor
 from plato.utils.reinforcement_learning import simple_rl_agent
-from plato.utils.reinforcement_learning.policies import td3
+from plato.utils.reinforcement_learning.policies import \
+    registry as policies_registry
 
 
 class RLAgent(simple_rl_agent.RLAgent):
@@ -21,9 +21,8 @@ class RLAgent(simple_rl_agent.RLAgent):
         super().__init__()
         self.agent = 'FEI'
 
-        # Or use other policies such as ddpg, sac
-        self.policy = td3.Policy(Config().algorithm.n_features,
-                                 self.action_space)
+        self.policy = policies_registry.get(Config().algorithm.n_features,
+                                            self.action_space)
 
         if Config().algorithm.recurrent_actor:
             self.h, self.c = self.policy.get_initial_states()
@@ -79,7 +78,8 @@ class RLAgent(simple_rl_agent.RLAgent):
                      self.current_episode)
 
         # Reboot/reconfigure the FL server
-        await self.sio.emit('env_reset', {'current_episode': self.current_episode})
+        await self.sio.emit('env_reset',
+                            {'current_episode': self.current_episode})
 
     async def prep_action(self):
         """ Get action from RL policy. """
@@ -114,7 +114,8 @@ class RLAgent(simple_rl_agent.RLAgent):
         # reward for average accuracy in the last a few time steps
         if self.is_done:
             avg_accuracy = mean(self.pre_acc)
-            reward += math.log(avg_accuracy / (1 - avg_accuracy)) * Config().algorithm.beta
+            reward += math.log(avg_accuracy /
+                               (1 - avg_accuracy)) * Config().algorithm.beta
         return reward
 
     def get_done(self):

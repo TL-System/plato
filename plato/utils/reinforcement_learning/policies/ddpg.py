@@ -3,50 +3,14 @@ Reference:
 
 https://github.com/sweetice/Deep-reinforcement-learning-with-pytorch
 """
-import logging
-import os
+import copy
 
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torch.optim as optim
-
 from plato.config import Config
-
-
-class Replay_buffer():
-    """
-    Reference:
-    https://github.com/openai/baselines/blob/master/baselines/deepq/replay_buffer.py
-    (state, next_state, action, reward, done)
-    """
-    def __init__(self, max_size=Config().algorithm.replay_size):
-        self.storage = []
-        self.max_size = max_size
-        self.ptr = 0
-
-    def push(self, data):
-        if len(self.storage) == self.max_size:
-            self.storage[int(self.ptr)] = data
-            self.ptr = (self.ptr + 1) % self.max_size
-        else:
-            self.storage.append(data)
-
-    def sample(self, batch_size):
-        ind = np.random.randint(0, len(self.storage), size=batch_size)
-        x, u, r, y, d = [], [], [], [], []
-
-        for i in ind:
-            X, U, R, Y, D = self.storage[i]
-            x.append(np.array(X, copy=False))
-            u.append(np.array(U, copy=False))
-            r.append(np.array(R, copy=False))
-            y.append(np.array(Y, copy=False))
-            d.append(np.array(D, copy=False))
-
-        return np.array(x), np.array(u), np.array(r).reshape(
-            -1, 1), np.array(y), np.array(d).reshape(-1, 1)
+from plato.utils.reinforcement_learning.policies import base
 
 
 class Actor(nn.Module):
@@ -81,45 +45,50 @@ class Critic(nn.Module):
         return x
 
 
-class Policy(object):
-    def __init__(self, state_dim, action_dim, max_action):
-        self.device = Config().device()
-        self.actor = Actor(state_dim, action_dim, max_action).to(self.device)
-        self.actor_target = Actor(state_dim, action_dim,
-                                  max_action).to(self.device)
-        self.actor_target.load_state_dict(self.actor.state_dict())
-        self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=1e-4)
+class Policy(base.Policy):
+    def __init__(self, state_dim, action_space):
+        super().__init__(state_dim, action_space)
 
-        self.critic = Critic(state_dim, action_dim).to(self.device)
-        self.critic_target = Critic(state_dim, action_dim).to(self.device)
-        self.critic_target.load_state_dict(self.critic.state_dict())
-        self.critic_optimizer = optim.Adam(self.critic.parameters(), lr=1e-3)
-        self.replay_buffer = Replay_buffer()
+        # Initialize NNs
+        self.actor = Actor(state_dim, action_space.shape[0],
+                           self.max_action).to(self.device)
+        self.actor_target = copy.deepcopy(self.actor)
+        self.actor_optimizer = torch.optim.Adam(
+            self.actor.parameters(), lr=Config().algorithm.learning_rate)
 
-        self.num_critic_update_iteration = 0
-        self.num_actor_update_iteration = 0
-        self.num_training = 0
+        self.critic = Critic(state_dim, action_space.shape[0]).to(self.device)
+        self.critic_target = copy.deepcopy(self.critic)
+        self.critic_optimizer = torch.optim.Adam(
+            self.critic.parameters(), lr=Config().algorithm.learning_rate)
+        # Initialize replay memory
+        self.replay_buffer = base.ReplayMemory(state_dim,
+                                               action_space.shape[0],
+                                               Config().algorithm.replay_size,
+                                               Config().algorithm.replay_seed)
 
     def select_action(self, state):
+        """ Select action from policy. """
         state = torch.FloatTensor(state.reshape(1, -1)).to(self.device)
         return self.actor(state).cpu().data.numpy().flatten()
 
     def update(self):
+        """ Update policy. """
         for _ in range(Config().algorithm.update_iteration):
             # Sample replay buffer
-            x, u, r, y, d = self.replay_buffer.sample(
-                Config().algorithm.batch_size)
-            state = torch.FloatTensor(x).to(self.device)
-            action = torch.FloatTensor(u).to(self.device)
-            next_state = torch.FloatTensor(y).to(self.device)
-            reward = torch.FloatTensor(r).to(self.device)
-            done = torch.FloatTensor(1 - d).to(self.device)
+            state, action, reward, next_state, done = self.replay_buffer.sample(
+            )
+            state = torch.FloatTensor(state).to(self.device).unsqueeze(1)
+            action = torch.FloatTensor(action).to(self.device).unsqueeze(1)
+            reward = torch.FloatTensor(reward).to(self.device).unsqueeze(1)
+            next_state = torch.FloatTensor(next_state).to(
+                self.device).unsqueeze(1)
+            done = torch.FloatTensor(done).to(self.device).unsqueeze(1)
 
             # Compute the target Q value
             target_Q = self.critic_target(next_state,
                                           self.actor_target(next_state))
-            target_Q = reward + (done * Config().algorithm.gamma *
-                                 target_Q).detach()
+            target_Q = reward + (
+                (1 - done) * Config().algorithm.gamma * target_Q).detach()
 
             # Get current Q estimate
             current_Q = self.critic(state, action)
@@ -144,7 +113,8 @@ class Policy(object):
             for param, target_param in zip(self.critic.parameters(),
                                            self.critic_target.parameters()):
                 target_param.data.copy_(Config().algorithm.tau * param.data +
-                                        (1 - Config().tau) * target_param.data)
+                                        (1 - Config().algorithm.tau) *
+                                        target_param.data)
 
             for param, target_param in zip(self.actor.parameters(),
                                            self.actor_target.parameters()):
@@ -152,31 +122,4 @@ class Policy(object):
                                         (1 - Config().algorithm.tau) *
                                         target_param.data)
 
-            self.num_actor_update_iteration += 1
-            self.num_critic_update_iteration += 1
-
-    def save_model(self, ep=None):
-        """Saving the model to a file."""
-        model_name = Config().algorithm.model_name
-        model_path = f'./models/{model_name}/'
-        if not os.path.exists(model_path):
-            os.makedirs(model_path)
-        if ep is not None:
-            model_path += 'iter' + str(ep) + '_'
-
-        torch.save(self.actor.state_dict(), model_path + 'actor.pth')
-        torch.save(self.critic.state_dict(), model_path + 'critic.pth')
-
-        logging.info("[RL Agent] Model saved to %s.", model_path)
-
-    def load_model(self, ep=None):
-        """Loading pre-trained model weights from a file."""
-        model_name = Config().algorithm.model_name
-        model_path = f'./models/{model_name}/'
-        if ep is not None:
-            model_path += 'iter' + str(ep) + '_'
-
-        logging.info("[RL Agent] Loading a model from %s.", model_path)
-
-        self.actor.load_state_dict(torch.load(model_path + 'actor.pth'))
-        self.critic.load_state_dict(torch.load(model_path + 'critic.pth'))
+        return critic_loss.item(), actor_loss.item()

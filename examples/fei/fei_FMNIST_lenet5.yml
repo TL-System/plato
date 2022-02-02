@@ -93,7 +93,6 @@ algorithm:
     gamma: 0.99
     tau: 0.005
     learning_rate: 0.0003
-    seed: 1234
      # Noise added to target policy during critic update
     policy_noise: 0.25
     # Range to clip target policy noise
@@ -105,8 +104,9 @@ algorithm:
     hidden_size: 256
     # steps sampling random actions
     start_steps: 32
-    # replay buffer size
+    # replay memory
     replay_size: 10000
+    replay_seed: 1234
     # whether use LSTM or FC nets
     recurrent_actor: true
 

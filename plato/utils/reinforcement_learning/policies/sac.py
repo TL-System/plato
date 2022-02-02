@@ -3,19 +3,15 @@ Reference:
 
 https://github.com/pranz24/pytorch-soft-actor-critic
 """
-import logging
 import math
-import os
-import random
 
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.distributions import Normal
-from torch.optim import Adam
-
 from plato.config import Config
+from plato.utils.reinforcement_learning.policies import base
+from torch.distributions import Normal
 
 LOG_SIG_MAX = 2
 LOG_SIG_MIN = -20
@@ -50,28 +46,6 @@ def soft_update(target, source, tau):
 def hard_update(target, source):
     for target_param, param in zip(target.parameters(), source.parameters()):
         target_param.data.copy_(param.data)
-
-
-class ReplayMemory:
-    def __init__(self, capacity, seed):
-        random.seed(seed)
-        self.capacity = capacity
-        self.buffer = []
-        self.position = 0
-
-    def push(self, data):
-        if len(self.buffer) < self.capacity:
-            self.buffer.append(None)
-        self.buffer[self.position] = data
-        self.position = (self.position + 1) % self.capacity
-
-    def sample(self):
-        batch = random.sample(self.buffer, Config().algorithm.batch_size)
-        state, action, reward, next_state, done = map(np.stack, zip(*batch))
-        return state, action, reward, next_state, done
-
-    def __len__(self):
-        return len(self.buffer)
 
 
 # Initialize Policy weights
@@ -221,56 +195,57 @@ class DeterministicPolicy(nn.Module):
         return super(DeterministicPolicy, self).to(device)
 
 
-class Policy(object):
+class Policy(base.Policy):
     def __init__(self, state_dim, action_space):
-        self.device = Config().device()
-        self.alpha = Config().algorithm.alpha
-        self.automatic_entropy_tuning = Config(
-        ).algorithm.automatic_entropy_tuning
+        super().__init__(state_dim, action_space)
 
+        # Initialize NNs
         self.critic = QNetwork(state_dim, action_space.shape[0],
                                Config().algorithm.hidden_size).to(self.device)
-        self.critic_optim = Adam(self.critic.parameters(),
-                                 lr=Config().algorithm.learning_rate)
+        self.critic_optimizer = torch.optim.Adam(
+            self.critic.parameters(), lr=Config().algorithm.learning_rate)
 
         self.critic_target = QNetwork(state_dim, action_space.shape[0],
                                       Config().algorithm.hidden_size).to(
                                           self.device)
         hard_update(self.critic_target, self.critic)
 
-        if Config().algorithm.policy == "Gaussian":
+        if Config().algorithm.deterministic:
+            self.alpha = 0
+            self.automatic_entropy_tuning = False
+            self.actor = DeterministicPolicy(state_dim, action_space.shape[0],
+                                             Config().algorithm.hidden_size,
+                                             action_space).to(self.device)
+            self.actor_optimizer = torch.optim.Adam(
+                self.actor.parameters(), lr=Config().algorithm.learning_rate)
+        else:
             if self.automatic_entropy_tuning is True:
                 self.target_entropy = -torch.prod(
                     torch.Tensor(action_space.shape).to(self.device)).item()
                 self.log_alpha = torch.zeros(1,
                                              requires_grad=True,
                                              device=self.device)
-                self.alpha_optim = Adam([self.log_alpha],
-                                        lr=Config().learning_rate)
+                self.alpha_optimizer = torch.optim.Adam(
+                    [self.log_alpha], lr=Config().algorithm.learning_rate)
 
             self.actor = GaussianPolicy(state_dim, action_space.shape[0],
-                                        Config().hidden_size,
+                                        Config().algorithm.hidden_size,
                                         action_space).to(self.device)
-            self.actor_optim = Adam(self.actor.parameters(),
-                                    lr=Config().learning_rate)
+            self.actor_optimizer = torch.optim.Adam(
+                self.actor.parameters(), lr=Config().algorithm.learning_rate)
 
-        elif Config().algorithm.policy == "Deterministic":
-            self.alpha = 0
-            self.automatic_entropy_tuning = False
-            self.actor = DeterministicPolicy(state_dim, action_space.shape[0],
-                                             Config().algorithm.hidden_size,
-                                             action_space).to(self.device)
-            self.actor_optim = Adam(self.actor.parameters(),
-                                    lr=Config().algorithm.learning_rate)
+        # Initialize replay memory
+        self.replay_buffer = base.ReplayMemory(state_dim,
+                                               action_space.shape[0],
+                                               Config().algorithm.replay_size,
+                                               Config().algorithm.replay_seed)
+        self.alpha = Config().algorithm.alpha
+        self.automatic_entropy_tuning = Config(
+        ).algorithm.automatic_entropy_tuning
 
-        self.replay_buffer = ReplayMemory(Config().algorithm.replay_size,
-                                          Config().algorithm.seed)
-
-        self.num_update_iteration = 0
-
-    def select_action(self, state, evaluate=False):
+    def select_action(self, state, test=False):
         state = torch.FloatTensor(state).to(self.device).unsqueeze(0)
-        if evaluate is False:
+        if test is False:
             action, _, _ = self.actor.sample(state)
         else:
             _, _, action = self.actor.sample(state)
@@ -308,9 +283,9 @@ class Policy(object):
             qf2_loss = F.mse_loss(qf2, next_q_value)
             qf_loss = qf1_loss + qf2_loss
 
-            self.critic_optim.zero_grad()
+            self.critic_optimizer.zero_grad()
             qf_loss.backward()
-            self.critic_optim.step()
+            self.critic_optimizer.step()
 
             pi, log_pi, _ = self.actor.sample(state_batch)
 
@@ -319,17 +294,17 @@ class Policy(object):
 
             policy_loss = ((self.alpha * log_pi) - min_qf_pi).mean()
 
-            self.actor_optim.zero_grad()
+            self.actor_optimizer.zero_grad()
             policy_loss.backward()
-            self.actor_optim.step()
+            self.actor_optimizer.step()
 
             if self.automatic_entropy_tuning:
                 alpha_loss = -(self.log_alpha *
                                (log_pi + self.target_entropy).detach()).mean()
 
-                self.alpha_optim.zero_grad()
+                self.alpha_optimizer.zero_grad()
                 alpha_loss.backward()
-                self.alpha_optim.step()
+                self.alpha_optimizer.step()
 
                 self.alpha = self.log_alpha.exp()
                 alpha_tlogs = self.alpha.clone()  # For TensorboardX logs
@@ -340,33 +315,7 @@ class Policy(object):
             soft_update(self.critic_target, self.critic,
                         Config().algorithm.tau)
 
-            self.num_update_iteration += 1
+            self.total_it += 1
 
         return qf1_loss.item(), qf2_loss.item(), policy_loss.item(
         ), alpha_loss.item(), alpha_tlogs.item()
-
-    def save_model(self, ep=None):
-        """Saving the model to a file."""
-        model_name = Config().algorithm.model_name
-        model_path = f'./models/{model_name}/'
-        if not os.path.exists(model_path):
-            os.makedirs(model_path)
-        if ep is not None:
-            model_path += 'iter' + str(ep) + '_'
-
-        torch.save(self.actor.state_dict(), model_path + 'actor.pth')
-        torch.save(self.critic.state_dict(), model_path + 'critic.pth')
-
-        logging.info("[RL Agent] Model saved to %s.", model_path)
-
-    def load_model(self, ep=None):
-        """Loading pre-trained model weights from a file."""
-        model_name = Config().algorithm.model_name
-        model_path = f'./models/{model_name}/'
-        if ep is not None:
-            model_path += 'iter' + str(ep) + '_'
-
-        logging.info("[RL Agent] Loading a model from %s.", model_path)
-
-        self.actor.load_state_dict(torch.load(model_path + 'actor.pth'))
-        self.critic.load_state_dict(torch.load(model_path + 'critic.pth'))
