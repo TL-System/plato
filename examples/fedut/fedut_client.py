@@ -1,5 +1,6 @@
 import os
 from dataclasses import dataclass
+import re
 import statistics
 from tokenize import Double
 from plato.clients import simple
@@ -32,7 +33,11 @@ class Client(simple.Client):
         # compute statistical_utility
         filename = f"{self.client_id}__squred_batch_loss.pth"
         sum_loss = torch.load(filename).detach().numpy()
-
+        print("sum_loss is: ", sum_loss)
+        print("1.0 / report.num_samples * sum_loss",
+              1.0 / report.num_samples * sum_loss)
+        print("sqrt: ", np.sqrt(1.0 / report.num_samples * sum_loss))
+        print("number of samples: ", report.num_samples)
         self.statistical_utility = np.abs(report.num_samples) * np.sqrt(
             1.0 / report.num_samples * sum_loss)
 

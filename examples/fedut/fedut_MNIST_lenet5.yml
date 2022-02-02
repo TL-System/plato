@@ -1,9 +1,9 @@
 clients:
     # The total number of clients
-    total_clients: 1
+    total_clients: 5
 
     # The number of clients selected in each round
-    per_round: 1
+    per_round: 5
 
     # Should the clients compute test accuracy locally?
     do_test: true
@@ -13,7 +13,7 @@ server:
     port: 8000
     simulate_wall_time: true
     request_loss: true 
-    expected_duration: 50
+    expected_duration: 12
 data:
     # The training and testing dataset
     datasource: MNIST
@@ -57,3 +57,10 @@ trainer:
 algorithm:
     # Aggregation algorithm
     type: fedavg
+
+results:
+    # Write the following parameter(s) into a CSV
+    types: accuracy 
+
+    # Plot results (x_axis-y_axis)
+    plot: round-accuracy
