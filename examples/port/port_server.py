@@ -48,7 +48,7 @@ class Server(fedavg.Server):
 
             similarity = F.cosine_similarity(current - previous, deltas, dim=0)
 
-        return similarity 
+        return similarity
 
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using federated averaging."""
@@ -75,8 +75,7 @@ class Server(fedavg.Server):
             )
 
             aggregation_weights.append(num_samples / self.total_samples *
-                                       (similarity + 1) *
-                                       staleness_factor)
+                                       (similarity + 1) * staleness_factor)
 
         # Normalize so that the sum of aggregation weights equals 1
         aggregation_weights = [
@@ -122,7 +121,6 @@ class Server(fedavg.Server):
         if hasattr(Config().server, "staleness_bound"):
             staleness_bound = Config().server.staleness_bound
 
-        staleness_factor = staleness_bound / (
-            staleness + staleness_bound)
+        staleness_factor = staleness_bound / (staleness + staleness_bound)
 
         return staleness_factor
