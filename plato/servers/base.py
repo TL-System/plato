@@ -363,7 +363,6 @@ class Server:
             self.selected_clients = self.choose_clients(
                 self.clients_pool, self.clients_per_round)
 
-
         self.current_reported_clients = {}
         self.current_processed_clients = {}
 
@@ -804,6 +803,15 @@ class Server:
 
     async def wrap_up(self):
         """ Wrapping up when each round of training is done. """
+        # Save a checkpoint for resuming the training session
+        logging.info(
+            "[Server #%d] Saving the checkpoint to prepare for resuming the training session.",
+            os.getpid())
+        model_name = Config().trainer.model_name if hasattr(
+            Config().trainer, 'model_name') else 'custom'
+        filename = f"{model_name}.pth"
+        self.trainer.save_model(filename)
+
         # Break the loop when the target accuracy is achieved
         target_accuracy = Config().trainer.target_accuracy
 
