@@ -5,8 +5,6 @@ A simple federated learning server using federated averaging.
 import asyncio
 import logging
 import os
-import random
-import time
 
 from plato.algorithms import registry as algorithms_registry
 from plato.config import Config
@@ -19,6 +17,7 @@ from plato.utils import csv_processor
 
 class Server(base.Server):
     """Federated learning server using federated averaging."""
+
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__()
 
@@ -46,8 +45,6 @@ class Server(base.Server):
             self.recorded_items = [
                 x.strip() for x in recorded_items.split(',')
             ]
-
-        random.seed()
 
     def configure(self):
         """

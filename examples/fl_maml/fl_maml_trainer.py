@@ -16,6 +16,7 @@ from plato.utils import optimizers
 
 class Trainer(basic.Trainer):
     """A federated learning trainer for personalized FL using MAML algorithm."""
+
     def __init__(self, model=None):
         """Initializing the trainer with the provided model."""
         super().__init__(model=model)
@@ -218,7 +219,7 @@ class Trainer(basic.Trainer):
                                  self.client_id)
                     # Generate a training set for personalization
                     # by randomly choose one batch from test set
-                    random_batch_id = random.randint(0, len(test_loader) - 1)
+                    random_batch_id = np.random.randint(0, len(test_loader))
                     for batch_id, (examples, labels) in enumerate(test_loader):
                         if batch_id == random_batch_id:
                             personalize_train_set = [examples, labels]

@@ -3,11 +3,10 @@ Base class for trainers.
 """
 
 import os
-import random
+import numpy as np
 import sqlite3
 import time
 from abc import ABC, abstractmethod
-from typing import Tuple
 
 from plato.config import Config
 
@@ -35,7 +34,7 @@ class Trainer(ABC):
                         return return_value[0]
                 break
             except sqlite3.OperationalError:
-                time.sleep(random.random() * 2)
+                time.sleep(np.random.random() * 2)
 
     def set_client_id(self, client_id):
         """ Setting the client ID and initialize the shared database table for controlling
@@ -94,12 +93,12 @@ class Trainer(ABC):
         """Add to the list of running trainers if max_concurrency has not yet
         been reached."""
         if hasattr(Config().trainer, 'max_concurrency'):
-            time.sleep(random.random() * 2)
+            time.sleep(np.random.random() * 2)
             trainer_count = Trainer.run_sql_statement(
                 "SELECT COUNT(*) FROM trainers")
 
             while trainer_count >= Config().trainer.max_concurrency:
-                time.sleep(random.random() * 2)
+                time.sleep(np.random.random() * 2)
                 trainer_count = Trainer.run_sql_statement(
                     "SELECT COUNT(*) FROM trainers")
 

@@ -5,13 +5,11 @@ import asyncio
 import logging
 import multiprocessing as mp
 import os
-import random
 import re
 import time
 
 import numpy as np
 import torch
-import torch.nn as nn
 from opacus import GradSampleModule
 from opacus.privacy_engine import PrivacyEngine
 from opacus.validators import ModuleValidator
@@ -33,7 +31,6 @@ class Trainer(base.Trainer):
         super().__init__()
 
         self.training_start_time = time.time()
-        random.seed()  # Set seed to system clock to allow randomness
 
         if model is None:
             model = models_registry.get()
@@ -42,7 +39,7 @@ class Trainer(base.Trainer):
         if Config().is_parallel():
             logging.info("Using Data Parallelism.")
             # DataParallel will divide and allocate batch_size to all available GPUs
-            self.model = nn.DataParallel(model)
+            self.model = torch.nn.DataParallel(model)
         else:
             self.model = model
 
@@ -107,16 +104,10 @@ class Trainer(base.Trainer):
 
     def simulate_sleep_time(self):
         """Simulate client's speed by putting it to sleep."""
-        sleep_time = Config().client_sleep_times[self.client_id - 1]
-
-        # Introduce some randomness to the sleep time
-        deviation = 0.05
-        sleep_seconds = random.uniform(sleep_time * (1 - deviation),
-                                       sleep_time * (1 + deviation))
-        sleep_seconds = max(sleep_seconds, 0)
+        sleep_seconds = Config().client_sleep_times[self.client_id - 1]
 
         # Put this client to sleep
-        logging.info("[Client #%d] Going to sleep for %.1f seconds.",
+        logging.info("[Client #%d] Going to sleep for %.2f seconds.",
                      self.client_id, sleep_seconds)
         time.sleep(sleep_seconds)
         logging.info("[Client #%d] Woke up.", self.client_id)
@@ -178,7 +169,7 @@ class Trainer(base.Trainer):
                 if callable(_loss_criterion):
                     loss_criterion = self.loss_criterion(self.model)
                 else:
-                    loss_criterion = nn.CrossEntropyLoss()
+                    loss_criterion = torch.nn.CrossEntropyLoss()
 
                 # Initializing the optimizer
                 get_optimizer = getattr(self, "get_optimizer",
