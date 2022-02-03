@@ -23,6 +23,7 @@ class Trainer(base.Trainer):
     """A basic federated learning trainer for MindSpore, used by both
     the client and the server.
     """
+
     def __init__(self, model=None):
         """Initializing the trainer with the provided model.
 
@@ -72,9 +73,9 @@ class Trainer(base.Trainer):
             os.makedirs(model_dir)
 
         if filename is not None:
-            model_path = f'{model_dir}{filename}'
+            model_path = f'{model_dir}/{filename}'
         else:
-            model_path = f'{model_dir}{model_name}.ckpt'
+            model_path = f'{model_dir}/{model_name}.ckpt'
 
         mindspore.save_checkpoint(self.model, model_path)
 
@@ -91,9 +92,9 @@ class Trainer(base.Trainer):
         model_dir = Config().params['pretrained_model_dir']
 
         if filename is not None:
-            model_path = f'{model_dir}{filename}'
+            model_path = f'{model_dir}/{filename}'
         else:
-            model_path = f'{model_dir}{model_name}.ckpt'
+            model_path = f'{model_dir}/{model_name}.ckpt'
 
         if self.client_id == 0:
             logging.info("[Server #%d] Loading a model from %s.", os.getpid(),

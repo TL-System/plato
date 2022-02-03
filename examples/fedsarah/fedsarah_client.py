@@ -48,7 +48,7 @@ class Client(simple.Client):
         fn = f"new_client_control_variates_{self.client_id}.pth"
         os.remove(fn)
         return Report(report.num_samples, report.accuracy,
-                      report.training_time, report.data_loading_time,
+                      report.training_time, report.update_response,
                       2), [weights, self.client_control_variates]
 
     def load_payload(self, server_payload):
