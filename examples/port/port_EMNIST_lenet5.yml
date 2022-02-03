@@ -49,6 +49,8 @@ data:
     # The random seed for sampling data
     random_seed: 1
 
+    checkpoint_dir: /content/drive/MyDrive/EMNIST
+
 trainer:
     # The type of the trainer
     type: basic
