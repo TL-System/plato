@@ -11,7 +11,7 @@ https://proceedings.neurips.cc/paper/2020/hash/564127c03caab942e503ee6f810f54fd-
 """
 
 import logging
-import random
+import numpy as np
 from dataclasses import dataclass
 
 from plato.config import Config
@@ -49,8 +49,9 @@ class Client(simple.Client):
         if Config().algorithm.pattern == "constant":
             local_epochs = Config().algorithm.max_local_epochs
         else:
-            local_epochs = random.randint(2,
-                                          Config().algorithm.max_local_epochs)
+            local_epochs = np.random.randint(
+                2,
+                Config().algorithm.max_local_epochs + 1)
 
         logging.info("[Client #%d] Training with %d epoches.", self.client_id,
                      local_epochs)
