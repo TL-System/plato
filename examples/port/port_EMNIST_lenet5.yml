@@ -20,15 +20,15 @@ clients:
         distribution: pareto
         alpha: 1
 
-    server:
-        address: 127.0.0.1
-        port: 8000
-        synchronous: false
-        simulate_wall_time: true
-        minimum_clients_aggregated: 5
-        staleness_bound: 10
-        random_seed: 1
-        request_update: false
+server:
+    address: 127.0.0.1
+    port: 8000
+    synchronous: false
+    simulate_wall_time: true
+    minimum_clients_aggregated: 5
+    staleness_bound: 10
+    random_seed: 1
+    request_update: false
 
 data:
     # The training and testing dataset
