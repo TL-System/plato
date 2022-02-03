@@ -6,9 +6,6 @@ Reference:
 "How Asynchronous can Federated Learning Be?"
 
 """
-import os
-
-os.environ['config_file'] = './port_MNIST_lenet5.yml'
 
 import port_server
 
