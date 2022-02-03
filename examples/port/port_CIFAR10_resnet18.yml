@@ -21,6 +21,7 @@ clients:
         alpha: 1
 
     random_seed: 1
+
 server:
     address: 127.0.0.1
     port: 8000
@@ -30,7 +31,8 @@ server:
     minimum_clients_aggregated: 5
     staleness_bound: 10
     random_seed: 1
-#    request_update: true
+    request_update: false
+    checkpoint_dir: /content/drive/MyDrive/CIFAR10
 
 data:
     # The training and testing dataset
