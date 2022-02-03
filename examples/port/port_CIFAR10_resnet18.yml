@@ -46,7 +46,7 @@ data:
     sampler: noniid
 
     # The concentration parameter for the Dirichlet distribution
-    concentration: 0.9
+    concentration: 0.05
 
     # The random seed for sampling data
     random_seed: 1
@@ -88,7 +88,7 @@ algorithm:
     type: fedavg
 
 results:
-    results_dir: /content/drive/MyDrive
+    results_dir: /content/drive/MyDrive/CIFAR10
 
     # Write the following parameter(s) into a CSV
     types: round, elapsed_time, accuracy

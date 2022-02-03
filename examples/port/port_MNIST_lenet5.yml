@@ -92,7 +92,7 @@ algorithm:
     type: fedavg
 
 results:
-    results_dir: /content/drive/MyDrive
+    results_dir: /content/drive/MyDrive/MNIST
 
     # Write the following parameter(s) into a CSV
     types: round, elapsed_time, accuracy
