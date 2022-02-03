@@ -16,7 +16,7 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8080
+    port: 8000
 
 data:
     # The training and testing dataset
@@ -112,10 +112,9 @@ algorithm:
 
 results:
     # Write the following parameter(s) into a CSV
-    types: accuracy, training_time, round_time
+    types: accuracy, elapsed_time, round_time
 
-    # Plot results (x_axis&y_axis)
-    plot: round&accuracy, round&training_time, round_time&accuracy, round_time&training_time
+    # Plot results (x_axis-y_axis)
+    plot: round-accuracy, round-elapsed_time
 
-    
 

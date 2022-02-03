@@ -18,6 +18,8 @@ class Report(simple.Report):
 class Client(simple.Client):
     """ A federated learning client for FEI. """
     async def train(self):
+        """Information of training loss will be reported after training the model."""
+
         logging.info("Training on FEI client #%d", self.client_id)
 
         report, weights = await super().train()

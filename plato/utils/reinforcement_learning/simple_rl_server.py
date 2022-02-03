@@ -165,6 +165,18 @@ class RLServer(fedavg.Server):
         # Carry on with the current round of FL training using RL action
         await self.step()
 
+    async def process_clients(self, client_info):
+        """ Haven't considered asynchronous mode in RL control loop. """
+        client = client_info[1]
+        client_staleness = self.current_round - client['starting_round']
+
+        self.updates.append(
+            (client['report'], client['payload'], client_staleness))
+
+        self.wall_time = time.time()
+
+        await self.step()
+
     async def step(self):
         """ Carry on with the current round of FL training using RL action. """
         if self.action_applied and not self.clients_selected and len(
@@ -282,52 +294,6 @@ class RLServer(fedavg.Server):
 
         await self.step()
 
-    async def client_payload_done(self, sid, client_id, s3_key=None):
-        """ Upon receiving all the payload from a client, either via S3 or socket.io. """
-        if s3_key is None:
-            assert self.client_payload[sid] is not None
-
-            payload_size = 0
-            if isinstance(self.client_payload[sid], list):
-                for _data in self.client_payload[sid]:
-                    payload_size += sys.getsizeof(pickle.dumps(_data))
-            else:
-                payload_size = sys.getsizeof(
-                    pickle.dumps(self.client_payload[sid]))
-        else:
-            self.client_payload[sid] = self.s3_client.receive_from_s3(s3_key)
-            payload_size = sys.getsizeof(pickle.dumps(
-                self.client_payload[sid]))
-
-        logging.info(
-            "[Server #%d] Received %s MB of payload data from client #%d.",
-            os.getpid(), round(payload_size / 1024**2, 2), client_id)
-
-        # Pass through the inbound_processor(s), if any
-        self.client_payload[sid] = self.inbound_processor.process(
-            self.client_payload[sid])
-
-        start_time = self.training_clients[client_id]['start_time']
-        finish_time = self.reports[sid].training_time + start_time
-        starting_round = self.training_clients[client_id]['starting_round']
-
-        client_info = (
-            finish_time,  # sorted by the client's finish time
-            {
-                'client_id': client_id,
-                'sid': sid,
-                'starting_round': starting_round,
-                'start_time': start_time,
-                'report': self.reports[sid],
-                'payload': self.client_payload[sid],
-            })
-
-        heapq.heappush(self.reported_clients, client_info)
-        self.current_reported_clients[client_info[1]['client_id']] = True
-        del self.training_clients[client_id]
-
-        await self.step()
-
     async def client_disconnected(self, sid):
         """ When a client disconnected it should be removed from its internal states. """
         for client_id, client in dict(self.clients).items():
@@ -398,4 +364,3 @@ class RLServer(fedavg.Server):
         self.trainer.model = models_registry.get()
 
         self.algorithm = algorithms_registry.get(self.trainer)
-

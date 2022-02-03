@@ -182,6 +182,7 @@ class RLAgentBase(object):
     async def prep_agent_update(self):
         """ Update RL Agent. """
 
+
 class RLAgent(RLAgentBase):
     """ A basic RL environment for FL server using Gym for RL control. """
     def __init__(self):
@@ -216,7 +217,7 @@ class RLAgent(RLAgentBase):
         self.current_episode = 0
         self.is_done = False
 
-    def step(self, action):
+    def step(self):
         """ Update the followings using server update. """
         self.next_state = self.get_state()
         self.is_done = self.get_done()
@@ -240,7 +241,8 @@ class RLAgent(RLAgentBase):
                      self.current_episode)
 
         # Reboot/reconfigure the FL server
-        await self.sio.emit('env_reset', {'current_episode': self.current_episode})
+        await self.sio.emit('env_reset',
+                            {'current_episode': self.current_episode})
 
         return
 
@@ -295,14 +297,13 @@ class RLAgent(RLAgentBase):
         if self.current_step == 0:
             self.state = self.get_state()
         else:
-            self.step(self.action)
+            self.step()
             if Config().algorithm.mode == 'train':
                 self.process_experience()
             self.state = self.next_state
             self.episode_reward += self.reward
 
-            step_result_csv_file = Config(
-            ).algorithm.result_dir + 'step_result.csv'
+            step_result_csv_file = Config().result_dir + 'step_result.csv'
             csv_processor.write_csv(step_result_csv_file,
                                     [self.current_episode, self.current_step] +
                                     list(self.state) + list(self.action))

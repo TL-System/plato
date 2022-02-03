@@ -4,7 +4,6 @@ A federated learning server with RL Agent FEI
 import math
 
 import numpy as np
-
 from plato.utils.reinforcement_learning import simple_rl_server
 
 
@@ -29,11 +28,11 @@ class RLServer(simple_rl_server.RLServer):
         if len(self.updates) > 0 and len(self.updates) >= len(
                 self.selected_clients):
             state[0] = self.normalize_state(
-                [report.num_samples for (report, __) in self.updates])
+                [report.num_samples for (report, __, __) in self.updates])
             state[1] = self.normalize_state(
-                [report.training_time for (report, __) in self.updates])
+                [report.training_time for (report, __, __) in self.updates])
             state[2] = self.normalize_state(
-                [report.valuation for (report, __) in self.updates])
+                [report.valuation for (report, __, __) in self.updates])
             state[3] = self.normalize_state(self.corr)
         state = np.transpose(np.round(np.array(state), 4))
         return state
@@ -69,7 +68,7 @@ class RLServer(simple_rl_server.RLServer):
 
     def extract_client_updates(self, updates):
         """ Extract the model weights and update directions from clients updates. """
-        weights_received = [payload for (__, payload) in updates]
+        weights_received = [payload for (__, payload, __) in updates]
 
         # Get adaptive weighting based on both node contribution and date size
         self.corr = self.calc_corr(weights_received)

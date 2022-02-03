@@ -130,20 +130,9 @@ class RLAgent(simple_rl_agent.RLAgent):
 
     def process_env_update(self):
         """ Process state update to RL Agent. """
-        if self.current_step == 0:
-            self.state = self.get_state()
-        else:
-            self.step(self.action)
-            if Config().algorithm.mode == 'train':
-                self.process_experience()
-            self.state = self.next_state
-            self.episode_reward += self.reward
-            if Config().algorithm.recurrent_actor:
-                self.h, self.c = self.nh, self.nc
-            step_result_csv_file = Config().result_dir + 'step_result.csv'
-            csv_processor.write_csv(step_result_csv_file,
-                                    [self.current_episode, self.current_step] +
-                                    list(self.state) + list(self.action))
+        super().process_env_update()
+        if Config().algorithm.recurrent_actor:
+            self.h, self.c = self.nh, self.nc
 
     # Implement methods for communication between RL agent and env
     def process_env_response(self, response):
