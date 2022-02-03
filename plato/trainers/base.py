@@ -70,7 +70,7 @@ class Trainer(ABC):
         else:
             accuracy_path = f'{model_dir}/{model_name}.acc'
 
-        with open(accuracy_path, 'w') as file:
+        with open(accuracy_path, 'w', encoding='utf8') as file:
             file.write(str(accuracy))
 
     @staticmethod
@@ -84,7 +84,7 @@ class Trainer(ABC):
         else:
             accuracy_path = f'{model_dir}/{model_name}.acc'
 
-        with open(accuracy_path, 'r') as file:
+        with open(accuracy_path, 'r', encoding='utf8') as file:
             accuracy = float(file.read())
 
         return accuracy

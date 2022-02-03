@@ -13,6 +13,7 @@ import sys
 import time
 from abc import abstractmethod
 
+import numpy as np
 import socketio
 from aiohttp import web
 from plato.client import run
@@ -107,6 +108,7 @@ class Server:
         # set of reporting clients received since the previous round of aggregation
         self.current_reported_clients = {}
         self.current_processed_clients = {}
+        self.prng_state = None
 
         self.ping_interval = 3600
         self.ping_timeout = 360
@@ -183,6 +185,9 @@ class Server:
 
         self.client = client
         self.configure()
+
+        if Config().args.resume:
+            self.resume_from_checkpoint()
 
         if Config().is_central_server():
             # In cross-silo FL, the central server lets edge servers start first
@@ -801,16 +806,98 @@ class Server:
                         await self.wrap_up()
                         await self.select_clients()
 
-    async def wrap_up(self):
-        """ Wrapping up when each round of training is done. """
-        # Save a checkpoint for resuming the training session
+    def save_to_checkpoint(self):
+        """ Save a checkpoint for resuming the training session. """
         logging.info(
             "[Server #%d] Saving the checkpoint to prepare for resuming the training session.",
             os.getpid())
         model_name = Config().trainer.model_name if hasattr(
             Config().trainer, 'model_name') else 'custom'
-        filename = f"{model_name}.pth"
+        filename = f"checkpoint_{model_name}.pth"
         self.trainer.save_model(filename)
+
+        # Saving important data in the server for resuming its session later on
+        checkpoint_dir = Config.params['checkpoint_dir']
+
+        if not os.path.exists(checkpoint_dir):
+            os.makedirs(checkpoint_dir)
+
+        states_to_save = [
+            'reported_clients',
+            'training_clients',
+            'current_reported_clients',
+            'current_processed_clients',
+            'current_round',
+            'current_time',
+            'prng_state',
+        ]
+        variables_to_save = [
+            self.reported_clients,
+            self.training_clients,
+            self.current_reported_clients,
+            self.current_processed_clients,
+            self.current_round,
+            time.time(),
+            np.random.get_state(),
+        ]
+
+        for i, state in enumerate(states_to_save):
+            with open(f"{checkpoint_dir}/{state}.pkl",
+                      'wb') as checkpoint_file:
+                pickle.dump(variables_to_save[i], checkpoint_file)
+
+    def resume_from_checkpoint(self):
+        """ Resume a training session from a previously saved checkpoint. """
+        logging.info(
+            "[Server #%d] Resume a training session from a previously saved checkpoint.",
+            os.getpid())
+        model_name = Config().trainer.model_name if hasattr(
+            Config().trainer, 'model_name') else 'custom'
+        filename = f"checkpoint_{model_name}.pth"
+        self.trainer.load_model(filename)
+
+        states_to_load = [
+            'reported_clients',
+            'training_clients',
+            'current_reported_clients',
+            'current_processed_clients',
+            'current_round',
+            'current_time',
+            'prng_state',
+        ]
+        variables_to_load = {}
+
+        # Loading important data in the server for resuming its session
+        checkpoint_dir = Config.params['checkpoint_dir']
+
+        for i, state in enumerate(states_to_load):
+            with open(f"{checkpoint_dir}/{state}.pkl",
+                      'rb') as checkpoint_file:
+                variables_to_load[i] = pickle.load(checkpoint_file)
+
+        self.reported_clients = variables_to_load[0]
+        self.training_clients = variables_to_load[1]
+        self.current_reported_clients = variables_to_load[2]
+        self.current_processed_clients = variables_to_load[3]
+        self.current_round = variables_to_load[4]
+        wall_time = variables_to_load[5]
+        self.prng_state = variables_to_load[6]
+
+        time_elapsed = time.time() - wall_time
+        for client_info in self.reported_clients:
+            # Adjusting the finish time
+            client_info[0] += time_elapsed
+            client_info[1]['finish_time'] += time_elapsed
+
+        for client_id in self.training_clients:
+            # Adjusting the start time
+            self.training_clients[client_id]['start_time'] += time_elapsed
+
+        np.random.set_state(self.prng_state)
+
+    async def wrap_up(self):
+        """ Wrapping up when each round of training is done. """
+        self.save_to_checkpoint()
 
         # Break the loop when the target accuracy is achieved
         target_accuracy = Config().trainer.target_accuracy
