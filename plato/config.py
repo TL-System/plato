@@ -9,6 +9,7 @@ import random
 import sqlite3
 from collections import OrderedDict, namedtuple
 
+import numpy as np
 import yaml
 from yamlinclude import YamlIncludeConstructor
 
@@ -105,10 +106,14 @@ class Config:
                 Config.clients = Config.clients._replace(total_clients=1)
                 Config.clients = Config.clients._replace(per_round=1)
 
+            if hasattr(Config.clients,
+                       "speed_simulation") and Config.clients.speed_simulation:
+                Config.simulate_client_speed()
+
             if 'results' in config:
                 Config.results = Config.namedtuple_from_dict(config['results'])
-                if hasattr(Config().results, 'results_dir'):
-                    Config.result_dir = Config.results.results_dir
+                if hasattr(Config.results, 'results_dir'):
+                    Config.results_dir = Config.results.results_dir
                 else:
                     datasource = Config.data.datasource
                     model = Config.trainer.model_name
@@ -117,7 +122,7 @@ class Config:
                         server_type = Config.server.type
                     elif hasattr(Config().algorithm, "type"):
                         server_type = Config.algorithm.type
-                    Config.result_dir = f'./results/{datasource}/{model}/{server_type}/'
+                    Config.results_dir = f'./results/{datasource}/{model}/{server_type}'
 
             if 'model' in config:
                 Config.model = Config.namedtuple_from_dict(config['model'])
@@ -136,8 +141,8 @@ class Config:
             Config.params['run_id'] = os.getpid()
 
             # Pretrained models
-            Config.params['model_dir'] = "./models/pretrained/"
-            Config.params['pretrained_model_dir'] = "./models/pretrained/"
+            Config.params['model_dir'] = "./models/pretrained"
+            Config.params['pretrained_model_dir'] = "./models/pretrained"
 
         return cls._instance
 
@@ -163,6 +168,40 @@ class Config:
             return obj
 
     @staticmethod
+    def simulate_client_speed() -> float:
+        """Randomly generate a sleep time (in seconds per epoch) for each of the clients."""
+        # a random seed must be supplied to make sure that all the clients generate
+        # the same set of sleep times per epoch across the board
+        if hasattr(Config.clients, "random_seed"):
+            np.random.seed(Config.clients.random_seed)
+        else:
+            np.random.seed(1)
+
+        # Limit the simulated sleep time by the threshold 'max_sleep_time'
+        max_sleep_time = 60
+        if hasattr(Config.clients, "max_sleep_time"):
+            max_sleep_time = Config.clients.max_sleep_time
+
+        dist = Config.clients.simulation_distribution
+        total_clients = Config.clients.total_clients
+        sleep_times = []
+
+        if hasattr(Config.clients, "simulation_distribution"):
+
+            if dist.distribution.lower() == "normal":
+                sleep_times = np.random.normal(dist.mean,
+                                               dist.sd,
+                                               size=total_clients)
+            if dist.distribution.lower() == "pareto":
+                sleep_times = np.random.pareto(dist.alpha, size=total_clients)
+        else:
+            # By default, use Zipf distribution with a parameter of 1.5
+            sleep_times = np.random.pareto(1.0, size=total_clients)
+
+        Config.client_sleep_times = np.minimum(
+            sleep_times, np.repeat(max_sleep_time, total_clients))
+
+    @staticmethod
     def is_edge_server() -> bool:
         """Returns whether the current instance is an edge server in cross-silo FL."""
         return Config().args.port is not None
@@ -185,8 +224,7 @@ class Config:
             if len(gpus) > 0:
                 device = 'GPU'
                 tf.config.experimental.set_visible_devices(
-                    gpus[random.randint(0,
-                                        len(gpus) - 1)], 'GPU')
+                    gpus[np.random.randint(0, len(gpus))], 'GPU')
         else:
             import torch
 
@@ -196,8 +234,7 @@ class Config:
                     device = 'cuda'
                 else:
                     device = 'cuda:' + str(
-                        random.randint(0,
-                                       torch.cuda.device_count() - 1))
+                        np.random.randint(0, torch.cuda.device_count()))
 
         return device
 

@@ -117,7 +117,7 @@ def assign_sub_classes(dataset_labels,
             classes_assigned_count[assigned_cls] += 1
             j = 1
             while j < per_client_classes_size:
-                # ind = random.randint(0, max_class_id - 1)
+                # ind = np.random.randint(0, max_class_id)
                 ind = np.random.choice(left_classes_id_list, size=1)[0]
                 if ind not in current_assigned_cls:
                     j = j + 1

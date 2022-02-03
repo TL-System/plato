@@ -24,7 +24,7 @@ class RLConfig:
         self.device = Config().device()
 
         self.model_dir = os.path.join(dirname, 'models')
-        self.result_dir = Config().result_dir
+        self.results_dir = Config().results_dir
         self.log_interval = 4
 
         self.mode = 'train'  # or 'test'

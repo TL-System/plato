@@ -22,6 +22,7 @@ from plato.utils import s3
 
 class ServerEvents(socketio.AsyncNamespace):
     """ A custom namespace for socketio.AsyncServer. """
+
     def __init__(self, namespace, plato_server):
         super().__init__(namespace)
         self.plato_server = plato_server
@@ -65,6 +66,7 @@ class ServerEvents(socketio.AsyncNamespace):
 
 class Server:
     """ The base class for federated learning servers. """
+
     def __init__(self):
         self.sio = None
         self.client = None
@@ -202,6 +204,12 @@ class Server:
 
         asyncio.get_event_loop().create_task(
             self.periodic(self.periodic_interval))
+
+        if hasattr(Config().server, "random_seed"):
+            seed = Config().server.random_seed
+            logging.info("Setting the random seed for selecting clients: %s",
+                         seed)
+            random.seed(seed)
 
         self.start()
 
@@ -355,6 +363,19 @@ class Server:
             self.selected_clients = self.choose_clients(
                 self.clients_pool, self.clients_per_round)
 
+
+        self.current_reported_clients = {}
+        self.current_processed_clients = {}
+
+        # There is no need to clear the list of reporting clients if we are
+        # simulating the wall clock time on the server. This is because
+        # when wall clock time is simulated, the server needs to wait for
+        # all the clients to report before selecting a subset of clients for
+        # replacement, and all remaining reporting clients will be processed
+        # in the next round
+        if not self.simulate_wall_time:
+            self.reported_clients = []
+
         if len(self.selected_clients) > 0:
             self.selected_sids = []
 
@@ -413,26 +434,16 @@ class Server:
 
                 await self.send(sid, payload, selected_client_id)
 
-            self.current_reported_clients = {}
-            self.current_processed_clients = {}
-
-            # There is no need to clear the list of reporting clients if we are
-            # simulating the wall clock time on the server. This is because
-            # when wall clock time is simulated, the server needs to wait for
-            # all the clients to report before selecting a subset of clients for
-            # replacement, and all remaining reporting clients will be processed
-            # in the next round
-            if self.simulate_wall_time:
-                return
-
-            self.reported_clients = []
-
     def choose_clients(self, clients_pool, clients_count):
         """ Choose a subset of the clients to participate in each round. """
         assert clients_count <= len(clients_pool)
 
         # Select clients randomly
-        return random.sample(clients_pool, clients_count)
+        selected_clients = random.sample(clients_pool, clients_count)
+
+        logging.info("[Server %s] Selected clients: %s", os.getpid(),
+                     selected_clients)
+        return selected_clients
 
     async def periodic(self, periodic_interval):
         """ Runs periodic_task() periodically on the server. The time interval between
@@ -759,7 +770,7 @@ class Server:
         if len(self.updates) >= self.clients_per_round:
             logging.info(
                 "[Server #%d] All %d client report(s) received. Processing.",
-                os.getpid(), len(self.reported_clients))
+                os.getpid(), len(self.updates))
             await self.process_reports()
             await self.wrap_up()
             await self.select_clients()

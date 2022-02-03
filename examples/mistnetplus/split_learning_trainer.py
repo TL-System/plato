@@ -14,6 +14,7 @@ from plato.trainers import basic
 
 
 class Trainer(basic.Trainer):
+
     def __init__(self, model=None):
         super().__init__(model)
 
@@ -28,7 +29,7 @@ class Trainer(basic.Trainer):
 
         if callable(_train_loader):
             train_loader = self.train_loader(batch_size, trainset, sampler,
-                                         cut_layer)
+                                             cut_layer)
         else:
             train_loader = torch.utils.data.DataLoader(dataset=trainset,
                                                        shuffle=False,
@@ -97,7 +98,7 @@ class Trainer(basic.Trainer):
         if not os.path.exists(model_dir):
             os.makedirs(model_dir)
 
-        model_path = f'{model_dir}{model_name}_gradients.pth'
+        model_path = f'{model_dir}/{model_name}_gradients.pth'
         torch.save(self.cut_layer_grad, model_path)
 
         logging.info("[Server #%d] Gradients saved to %s.", os.getpid(),

@@ -26,6 +26,7 @@ class Report:
 
 
 class MistnetplusServer(fedavg.Server):
+
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
 
@@ -105,7 +106,7 @@ class MistnetplusServer(fedavg.Server):
         model_dir = Config().params['model_dir']
         model_name = Config().trainer.model_name
 
-        model_path = f'{model_dir}{model_name}_gradients.pth'
+        model_path = f'{model_dir}/{model_name}_gradients.pth'
         logging.info("[Server #%d] Loading gradients from %s.", os.getpid(),
                      model_path)
 

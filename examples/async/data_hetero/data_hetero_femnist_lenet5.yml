@@ -73,6 +73,6 @@ algorithm:
     type: fedavg
 
 results:
-    results_dir: ./
+    results_dir: .
     types: accuracy, elapsed_time, round_time
     plot: elapsed_time & accuracy
