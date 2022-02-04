@@ -140,7 +140,7 @@ class Client:
 
         logging.info("[Client #%d] Connecting to the server at %s.",
                      self.client_id, uri)
-        await self.sio.connect(uri)
+        await self.sio.connect(uri, wait_timeout=600)
         await self.sio.emit('client_alive', {'id': self.client_id})
 
         logging.info("[Client #%d] Waiting to be selected.", self.client_id)
@@ -158,7 +158,8 @@ class Client:
 
         logging.info("[Client #%d] Selected by the server.", self.client_id)
 
-        if not self.data_loaded:
+        if (hasattr(Config().data, 'reload_data')
+                and Config().data.reload_data) or not self.data_loaded:
             self.load_data()
 
     async def chunk_arrived(self, data) -> None:

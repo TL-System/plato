@@ -1,15 +1,8 @@
 ## Running Plato on Google Colaboratory
 
-### Option 1
-
 Go to [Google Colaboratory](https://colab.research.google.com/notebooks/intro.ipynb).
 
-Click `File` on the menu (upper left of the page), select `Upload Notebook`, and upload `plato_colab.ipynb`, which is under the `plato/examples/colab/` directory.
-
-### Option 2
-
-Under directory `plato/examples/colab/`, the notebook `colab_use_terminal.ipynb` provides step-by-step instructions on running *Plato* on Google Colaboratory but in a terminal of Visual Studio Code.
-
+Under directory `plato/examples/colab/`, the notebook `colab_use_terminal.ipynb` provides step-by-step instructions on running *Plato* on Google Colaboratory, while providing the facilities to use a secure shell to login and to open Visual Studio Code. To run Plato, just use the integrated terminal in the browser.
 
 ## Running Plato on Compute Canada
 
@@ -104,6 +97,7 @@ $ pip3 install torch==1.10.1+cu113 torchvision==0.11.2+cu113 torchaudio==0.10.1+
 To double-check the CUDA version used in the command above, start an interactive session and use the following command:
 
 ```shell
+salloc --time=2:00:00 --nodes=1 --ntasks-per-node=32 --gres=gpu:2 --mem=127000M --account=def-baochun
 nvidia-smi
 ```
 
@@ -132,8 +126,6 @@ $ source ~/.bashrc
 ```
 
 Next time, after you SSH into this cluster, just type `plato`:)
-
-
 
 ### Running Plato
 
@@ -167,7 +159,7 @@ source ~/.federated/bin/activate
 ./run --config=configs/CIFAR10/fedavg_wideresnet.yml --log=info
 ```
 
-**Note:** The above example requests a type of GPU on Compute Canada's `Graham` cluster that requires a very short waiting time (as for Jan 2022, but it may change.)
+**Note:** The example above requests a type of GPU on Compute Canada's `Graham` cluster that requires a very short waiting time (as for January 2022, but it may change.)
 
 You may use any type of [GPUs available on Compute Canada](https://docs.computecanada.ca/wiki/Using_GPUs_with_Slurm).
 

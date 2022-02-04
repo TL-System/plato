@@ -6,8 +6,6 @@ based on a configuration at run-time.
 import logging
 from collections import OrderedDict
 
-from aiohttp import FlowControlDataQueue
-
 from plato.config import Config
 
 if hasattr(Config().trainer, 'use_mindspore'):
@@ -29,13 +27,14 @@ elif hasattr(Config().trainer, 'use_tensorflow'):
                                           ('FashionMNIST',
                                            fashion_mnist_tensorflow)])
 else:
-    from plato.datasources import (mnist, fashion_mnist, cifar10, cinic10,
-                                   huggingface, pascal_voc, tiny_imagenet,
-                                   femnist, feature)
+    from plato.datasources import (mnist, fashion_mnist, emnist, cifar10,
+                                   cinic10, huggingface, pascal_voc,
+                                   tiny_imagenet, femnist, feature)
 
     registered_datasources = OrderedDict([
         ('MNIST', mnist),
         ('FashionMNIST', fashion_mnist),
+        ('EMNIST', emnist),
         ('CIFAR10', cifar10),
         ('CINIC10', cinic10),
         ('HuggingFace', huggingface),

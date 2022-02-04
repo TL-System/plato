@@ -23,6 +23,7 @@ class Report(base.Report):
 
 class Client(base.Client):
     """A basic federated learning client who sends simple weight updates."""
+
     def __init__(self,
                  model=None,
                  datasource=None,
@@ -64,7 +65,8 @@ class Client(base.Client):
         """Generating data and loading them onto this client."""
         logging.info("[Client #%d] Loading its data source...", self.client_id)
 
-        if self.datasource is None:
+        if self.datasource is None or (hasattr(Config().data, 'reload_data')
+                                       and Config().data.reload_data):
             self.datasource = datasources_registry.get(
                 client_id=self.client_id)
 
