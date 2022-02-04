@@ -90,7 +90,7 @@ The next step is to install the required Python packages. PyTorch should be inst
 pip3 install torch==1.10.1+cu113 torchvision==0.11.2+cu113 torchaudio==0.10.1+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
 ```
 
-To double-check the CUDA version used in the command above, start an interactive session and use the following command:
+To double-check the CUDA version used in the command above, start an interactive session and use the `nvidia-smi` command within the interactive session:
 
 ```shell
 salloc --time=2:00:00 --nodes=1 --ntasks-per-node=32 --gres=gpu:1 --mem=127000M --account=def-baochun
@@ -100,13 +100,13 @@ nvidia-smi
 Finally, install Plato as a pip package:
 
 ```shell
-$ pip install .
+pip install .
 ```
 
 **Tip:** Use alias to save trouble for future running *Plato*.
 
 ```
-$ vim ~/.bashrc
+vim ~/.bashrc
 ```
 
 Then add 
@@ -118,7 +118,7 @@ alias plato='cd ~/projects/def-baochun/<CCDB username>/plato/; module load pytho
 After saving this change and exiting `vim`, 
 
 ```
-$ source ~/.bashrc
+source ~/.bashrc
 ```
 
 Next time, after you SSH into this cluster, just type `plato`:)
@@ -128,14 +128,14 @@ Next time, after you SSH into this cluster, just type `plato`:)
 To start a federated learning training workload with *Plato*, create a job script:
 
 ```shell
-$ vi <job script file name>.sh
+vi <job script file name>.sh
 ```
 
 For exmaple:
 
 ```shell
-$ cd ~/projects/def-baochun/<CCDB username>/plato
-$ vi cifar_wideresnet.sh
+cd ~/projects/def-baochun/<CCDB username>/plato
+vi cifar_wideresnet.sh
 ```
 
 Then add your configuration parameters in the job script. The following is an example:
