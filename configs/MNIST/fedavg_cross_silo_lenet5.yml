@@ -3,13 +3,16 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 3
+    total_clients: 100
 
     # The number of clients selected in each round
-    per_round: 3
+    per_round: 20
 
     # Should the clients compute test accuracy locally?
     do_test: true
+
+    # Client simulation mode
+    simulation: true
 
 server:
     type: fedavg_cross_silo
@@ -24,30 +27,36 @@ data:
     data_path: ./data
 
     # Number of samples in each partition
-    partition_size: 20000
+    partition_size: 600
 
     # IID or non-IID?
     sampler: iid
+
+    # Whether to apply differential privacy
+    # differential_privacy: true
+    # dp_epsilon: 1
+    # dp_delta: 0.00001
+    # dp_max_grad_norm: 2
 
 trainer:
     # The type of the trainer
     type: basic
 
     # The maximum number of training rounds
-    rounds: 100
+    rounds: 50
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
 
     # The maximum number of clients running concurrently
-    max_concurrency: 3
+    max_concurrency: 1
 
     # The target accuracy
     target_accuracy: 0.95
 
     # Number of epoches for local training in each communication round
-    epochs: 1
-    batch_size: 32
+    epochs: 4
+    batch_size: 10
     optimizer: SGD
     learning_rate: 0.01
     momentum: 0.9
@@ -68,11 +77,11 @@ algorithm:
 
     # The number of local aggregation rounds on edge servers before sending
     # aggreagted weights to the central server
-    local_rounds: 2
+    local_rounds: 4
 
 results:
     # Write the following parameter(s) into a CSV
-    types: accuracy, elapsed_time, round_time, edge_agg_num
+    types: round, accuracy, elapsed_time, round_time
 
     # Plot results (x_axis-y_axis)
     plot: global_round-accuracy, global_round-elapsed_time
