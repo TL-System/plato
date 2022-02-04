@@ -20,6 +20,7 @@ from plato.utils import csv_processor
 
 class RandomPolicy(object):
     """ The world's simplest agent. """
+
     def __init__(self, action_space):
         self.action_space = action_space
 
@@ -29,6 +30,7 @@ class RandomPolicy(object):
 
 class RLAgent(base_rl_agent.RLAgent, gym.Env):
     """ A basic RL environment for FL server using Gym for RL control. """
+
     def __init__(self, config):
         super().__init__()
         self.agent = 'simple'
@@ -148,7 +150,7 @@ class RLAgent(base_rl_agent.RLAgent, gym.Env):
                 self.process_experience()
             self.state = self.next_state
             self.episode_reward += self.reward
-            step_result_csv_file = self.config.result_dir + 'step_result.csv'
+            step_result_csv_file = self.config.results_dir + 'step_result.csv'
             csv_processor.write_csv(step_result_csv_file,
                                     [self.current_episode, self.current_step] +
                                     list(self.state) + list(self.action))

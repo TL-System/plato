@@ -1,7 +1,6 @@
 """
 Samples data from a dataset, biased across labels according to the Dirichlet distribution.
 """
-import random
 import numpy as np
 import torch
 from torch.utils.data import WeightedRandomSampler
@@ -13,6 +12,7 @@ from plato.samplers import base
 class Sampler(base.Sampler):
     """Create a data sampler for each client to use a divided partition of the
     dataset, biased across labels according to the Dirichlet distribution."""
+
     def __init__(self, datasource, client_id, testing):
         super().__init__()
 
@@ -38,7 +38,7 @@ class Sampler(base.Sampler):
 
         if np.isnan(np.sum(target_proportions)):
             target_proportions = np.repeat(0, len(class_list))
-            target_proportions[random.randint(0, len(class_list) - 1)] = 1
+            target_proportions[np.random.randint(0, len(class_list))] = 1
 
         self.sample_weights = target_proportions[target_list]
 

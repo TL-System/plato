@@ -51,7 +51,7 @@ def plot(x_label: str, x_value: List[Any], y_label: str, y_value: List[Any],
     fig.savefig(figure_file_name)
 
 
-def plot_figures_from_dict(result_csv_file: str, result_dir: str):
+def plot_figures_from_dict(result_csv_file: str, results_dir: str):
     """Plot figures with dictionary of results."""
     result_dict = read_csv_to_dict(result_csv_file)
 
@@ -59,7 +59,7 @@ def plot_figures_from_dict(result_csv_file: str, result_dir: str):
     plot_pairs = [x.strip() for x in plot_pairs.split(',')]
 
     for pairs in plot_pairs:
-        figure_file_name = result_dir + pairs + '.pdf'
+        figure_file_name = results_dir + pairs + '.pdf'
         pair = [x.strip() for x in pairs.split('-')]
         x_y_labels: List = []
         x_y_values: Dict[str, List] = {}
@@ -88,9 +88,9 @@ def main():
     __ = Config()
 
     if hasattr(Config(), 'results'):
-        result_csv_file = Config().result_dir + 'result.csv'
+        result_csv_file = Config().results_dir + 'result.csv'
         print(f"Plotting results located at {result_csv_file}.")
-        plot_figures_from_dict(result_csv_file, Config().result_dir)
+        plot_figures_from_dict(result_csv_file, Config().results_dir)
     else:
         print("No results to be plotted according to the configuration file.")
 

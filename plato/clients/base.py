@@ -27,6 +27,7 @@ class Report:
 
 class ClientEvents(socketio.AsyncClientNamespace):
     """ A custom namespace for socketio.AsyncServer. """
+
     def __init__(self, namespace, plato_client):
         super().__init__(namespace)
         self.plato_client = plato_client
@@ -77,6 +78,7 @@ class ClientEvents(socketio.AsyncClientNamespace):
 
 class Client:
     """ A basic federated learning client. """
+
     def __init__(self) -> None:
         self.client_id = Config().args.id
         self.sio = None
@@ -138,7 +140,7 @@ class Client:
 
         logging.info("[Client #%d] Connecting to the server at %s.",
                      self.client_id, uri)
-        await self.sio.connect(uri)
+        await self.sio.connect(uri, wait_timeout=600)
         await self.sio.emit('client_alive', {'id': self.client_id})
 
         logging.info("[Client #%d] Waiting to be selected.", self.client_id)
@@ -156,7 +158,8 @@ class Client:
 
         logging.info("[Client #%d] Selected by the server.", self.client_id)
 
-        if not self.data_loaded:
+        if (hasattr(Config().data, 'reload_data')
+                and Config().data.reload_data) or not self.data_loaded:
             self.load_data()
 
     async def chunk_arrived(self, data) -> None:
@@ -281,7 +284,7 @@ class Client:
         """Additional client-specific processing on the server response."""
 
     def clear_checkpoint_files(self):
-        """Delete all the temporary checkpoint files created by the client"""
+        """ Delete all the temporary checkpoint files created by the client. """
         if hasattr(Config().server,
                    'request_update') and Config().server.request_update:
             import re
@@ -293,7 +296,7 @@ class Client:
                     filename)
                 if split is not None and self.client_id == int(
                         split.group('client_id')):
-                    file_path = f'{model_dir}{filename}'
+                    file_path = f'{model_dir}/{filename}'
                     os.remove(file_path)
 
     @abstractmethod

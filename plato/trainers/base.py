@@ -3,17 +3,17 @@ Base class for trainers.
 """
 
 import os
-import random
+import numpy as np
 import sqlite3
 import time
 from abc import ABC, abstractmethod
-from typing import Tuple
 
 from plato.config import Config
 
 
 class Trainer(ABC):
     """Base class for all the trainers."""
+
     def __init__(self):
         self.device = Config().device()
         self.client_id = 0
@@ -34,7 +34,7 @@ class Trainer(ABC):
                         return return_value[0]
                 break
             except sqlite3.OperationalError:
-                time.sleep(random.random() * 2)
+                time.sleep(np.random.random() * 2)
 
     def set_client_id(self, client_id):
         """ Setting the client ID and initialize the shared database table for controlling
@@ -47,14 +47,14 @@ class Trainer(ABC):
                 "CREATE TABLE IF NOT EXISTS trainers (run_id int)")
 
     @abstractmethod
-    def save_model(self, filename=None):
+    def save_model(self, filename=None, location=None):
         """Saving the model to a file. """
-        raise "save_model() not implemented."
+        raise TypeError("save_model() not implemented.")
 
     @abstractmethod
-    def load_model(self, filename=None):
+    def load_model(self, filename=None, location=None):
         """Loading pre-trained model weights from a file. """
-        raise "load_model() not implemented."
+        raise TypeError("load_model() not implemented.")
 
     @staticmethod
     def save_accuracy(accuracy, filename=None):
@@ -66,11 +66,11 @@ class Trainer(ABC):
             os.makedirs(model_dir)
 
         if filename is not None:
-            accuracy_path = f"{model_dir}{filename}"
+            accuracy_path = f"{model_dir}/{filename}"
         else:
-            accuracy_path = f'{model_dir}{model_name}.acc'
+            accuracy_path = f'{model_dir}/{model_name}.acc'
 
-        with open(accuracy_path, 'w') as file:
+        with open(accuracy_path, 'w', encoding='utf8') as file:
             file.write(str(accuracy))
 
     @staticmethod
@@ -80,11 +80,11 @@ class Trainer(ABC):
         model_name = Config().trainer.model_name
 
         if filename is not None:
-            accuracy_path = f"{model_dir}{filename}"
+            accuracy_path = f"{model_dir}/{filename}"
         else:
-            accuracy_path = f'{model_dir}{model_name}.acc'
+            accuracy_path = f'{model_dir}/{model_name}.acc'
 
-        with open(accuracy_path, 'r') as file:
+        with open(accuracy_path, 'r', encoding='utf8') as file:
             accuracy = float(file.read())
 
         return accuracy
@@ -93,12 +93,12 @@ class Trainer(ABC):
         """Add to the list of running trainers if max_concurrency has not yet
         been reached."""
         if hasattr(Config().trainer, 'max_concurrency'):
-            time.sleep(random.random() * 2)
+            time.sleep(np.random.random() * 2)
             trainer_count = Trainer.run_sql_statement(
                 "SELECT COUNT(*) FROM trainers")
 
             while trainer_count >= Config().trainer.max_concurrency:
-                time.sleep(random.random() * 2)
+                time.sleep(np.random.random() * 2)
                 trainer_count = Trainer.run_sql_statement(
                     "SELECT COUNT(*) FROM trainers")
 
@@ -113,8 +113,8 @@ class Trainer(ABC):
 
             model_name = Config().trainer.model_name
             model_dir = Config().params['model_dir']
-            model_file = f"{model_dir}{model_name}_{self.client_id}_{Config().params['run_id']}.pth"
-            accuracy_file = f"{model_dir}{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
+            model_file = f"{model_dir}/{model_name}_{self.client_id}_{Config().params['run_id']}.pth"
+            accuracy_file = f"{model_dir}/{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
 
             if os.path.exists(model_file):
                 os.remove(model_file)

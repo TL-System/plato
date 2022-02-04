@@ -5,8 +5,6 @@ A simple federated learning server using federated averaging.
 import asyncio
 import logging
 import os
-import random
-import time
 
 from plato.algorithms import registry as algorithms_registry
 from plato.config import Config
@@ -19,6 +17,7 @@ from plato.utils import csv_processor
 
 class Server(base.Server):
     """Federated learning server using federated averaging."""
+
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__()
 
@@ -46,8 +45,6 @@ class Server(base.Server):
             self.recorded_items = [
                 x.strip() for x in recorded_items.split(',')
             ]
-
-        random.seed()
 
     def configure(self):
         """
@@ -79,9 +76,9 @@ class Server(base.Server):
 
         # Initialize the csv file which will record results
         if hasattr(Config(), 'results'):
-            result_csv_file = Config().result_dir + 'result.csv'
+            result_csv_file = f'{Config().results_dir}/{os.getpid()}.csv'
             csv_processor.initialize_csv(result_csv_file, self.recorded_items,
-                                         Config().result_dir)
+                                         Config().results_dir)
 
     def load_trainer(self):
         """Setting up the global model to be trained via federated learning."""
@@ -179,8 +176,7 @@ class Server(base.Server):
                 }[item]
                 new_row.append(item_value)
 
-            result_csv_file = Config().result_dir + 'result.csv'
-
+            result_csv_file = f'{Config().results_dir}/{os.getpid()}.csv'
             csv_processor.write_csv(result_csv_file, new_row)
 
     @staticmethod

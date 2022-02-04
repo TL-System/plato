@@ -10,7 +10,6 @@ import time
 
 import numpy as np
 import torch
-import torch.nn as nn
 from opacus import GradSampleModule
 from opacus.privacy_engine import PrivacyEngine
 from opacus.validators import ModuleValidator
@@ -22,6 +21,7 @@ from plato.utils import optimizers
 
 class Trainer(base.Trainer):
     """A basic federated learning trainer, used by both the client and the server."""
+
     def __init__(self, model=None):
         """Initializing the trainer with the provided model.
 
@@ -32,6 +32,7 @@ class Trainer(base.Trainer):
         super().__init__()
 
         self.training_start_time = time.time()
+        self.models_per_epoch = {}
 
         if model is None:
             model = models_registry.get()
@@ -40,7 +41,7 @@ class Trainer(base.Trainer):
         if Config().is_parallel():
             logging.info("Using Data Parallelism.")
             # DataParallel will divide and allocate batch_size to all available GPUs
-            self.model = nn.DataParallel(model)
+            self.model = torch.nn.DataParallel(model)
         else:
             self.model = model
 
@@ -56,29 +57,25 @@ class Trainer(base.Trainer):
 
             self.model = GradSampleModule(self.model)
 
-        if hasattr(Config().clients,
-                   "speed_simulation") and Config().clients.speed_simulation:
-            # Simulated speed of client
-            self._sleep_time = None
-
     def zeros(self, shape):
         """Returns a PyTorch zero tensor with the given shape."""
         # This should only be called from a server
         assert self.client_id == 0
         return torch.zeros(shape)
 
-    def save_model(self, filename=None):
+    def save_model(self, filename=None, location=None):
         """Saving the model to a file."""
+        model_dir = Config(
+        ).params['model_dir'] if location is None else location
         model_name = Config().trainer.model_name
-        model_dir = Config().params['model_dir']
 
         if not os.path.exists(model_dir):
             os.makedirs(model_dir)
 
         if filename is not None:
-            model_path = f'{model_dir}{filename}'
+            model_path = f'{model_dir}/{filename}'
         else:
-            model_path = f'{model_dir}{model_name}.pth'
+            model_path = f'{model_dir}/{model_name}.pth'
 
         torch.save(self.model.state_dict(), model_path)
 
@@ -89,15 +86,16 @@ class Trainer(base.Trainer):
             logging.info("[Client #%d] Model saved to %s.", self.client_id,
                          model_path)
 
-    def load_model(self, filename=None):
+    def load_model(self, filename=None, location=None):
         """Loading pre-trained model weights from a file."""
-        model_dir = Config().params['pretrained_model_dir']
+        model_dir = Config(
+        ).params['model_dir'] if location is None else location
         model_name = Config().trainer.model_name
 
         if filename is not None:
-            model_path = f'{model_dir}{filename}'
+            model_path = f'{model_dir}/{filename}'
         else:
-            model_path = f'{model_dir}{model_name}.pth'
+            model_path = f'{model_dir}/{model_name}.pth'
 
         if self.client_id == 0:
             logging.info("[Server #%d] Loading a model from %s.", os.getpid(),
@@ -108,37 +106,12 @@ class Trainer(base.Trainer):
 
         self.model.load_state_dict(torch.load(model_path))
 
-    def _simulate_sleep_time(self) -> float:
-        """Simulate and return a sleep time (in seconds) for the client."""
-        np.random.seed(self.client_id)
-
-        sleep_time = 0
-        if hasattr(Config().clients, "simulation_distribution"):
-            dist = Config.clients.simulation_distribution
-            # Determine the distribution of client's simulate sleep time
-            if dist.distribution.lower() == "normal":
-                sleep_time = np.random.normal(dist.mean, dist.sd)
-            if dist.distribution.lower() == "zipf":
-                sleep_time = np.random.zipf(dist.s)
-        else:
-            # Default use Zipf distribution with a parameter of 1.5
-            sleep_time = np.random.zipf(1.5)
-        # Limit the simulated sleep time below a threshold
-        return min(sleep_time, 50)
-
-    def _simulate_client_speed(self):
+    def simulate_sleep_time(self):
         """Simulate client's speed by putting it to sleep."""
-        sleep_time = self._sleep_time
-
-        # Introduce some randomness to the sleep time
-        np.random.seed()  # Set seed to system clock to allow randomness
-        deviation = 0.05
-        sleep_seconds = np.random.uniform(sleep_time * (1 - deviation),
-                                          sleep_time * (1 + deviation))
-        sleep_seconds = max(sleep_seconds, 0)
+        sleep_seconds = Config().client_sleep_times[self.client_id - 1]
 
         # Put this client to sleep
-        logging.info("[Client #%d] Going to sleep for %f seconds.",
+        logging.info("[Client #%d] Going to sleep for %.2f seconds.",
                      self.client_id, sleep_seconds)
         time.sleep(sleep_seconds)
         logging.info("[Client #%d] Woke up.", self.client_id)
@@ -200,7 +173,7 @@ class Trainer(base.Trainer):
                 if callable(_loss_criterion):
                     loss_criterion = self.loss_criterion(self.model)
                 else:
-                    loss_criterion = nn.CrossEntropyLoss()
+                    loss_criterion = torch.nn.CrossEntropyLoss()
 
                 # Initializing the optimizer
                 get_optimizer = getattr(self, "get_optimizer",
@@ -281,7 +254,7 @@ class Trainer(base.Trainer):
                     if self.client_id != 0 and hasattr(
                             Config().clients, "speed_simulation") and Config(
                             ).clients.speed_simulation:
-                        self._simulate_client_speed()
+                        self.simulate_sleep_time()
 
                     # Saving the model at the end of this epoch to a file so that
                     # it can later be retrieved to respond to server requests
@@ -320,13 +293,6 @@ class Trainer(base.Trainer):
         """
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']
-
-        # Generate a simulated client's speed
-        if self.client_id != 0 and hasattr(
-                Config().clients,
-                "speed_simulation") and Config().clients.speed_simulation:
-            if self._sleep_time is None:
-                self._sleep_time = self._simulate_sleep_time()
 
         # Set the start time of training in absolute time
         self.training_start_time = time.time()
