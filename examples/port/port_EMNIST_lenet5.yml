@@ -45,7 +45,7 @@ data:
     sampler: noniid
 
     # The concentration parameter for the Dirichlet distribution
-    concentration: 0.05
+    concentration: 1.8
 
     # The random seed for sampling data
     random_seed: 1
