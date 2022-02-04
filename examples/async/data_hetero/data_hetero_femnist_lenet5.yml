@@ -24,14 +24,14 @@ data:
     # The training and testing dataset
     datasource: FEMNIST
 
+    # Whether data needs to be reloaded in client simulation mode
+    reload_data: true
+
     # Where the dataset is located
     data_path: ./data
 
     # Should concurrent client-side dataset download be allowed?
     concurrent_download: true
-
-    # Number of samples in each partition
-    partition_size: 500
 
     # IID or non-IID?
     sampler: all_inclusive
@@ -73,6 +73,6 @@ algorithm:
     type: fedavg
 
 results:
-    results_dir: ./
+    results_dir: .
     types: accuracy, elapsed_time, round_time
     plot: elapsed_time & accuracy

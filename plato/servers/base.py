@@ -13,6 +13,7 @@ import sys
 import time
 from abc import abstractmethod
 
+import numpy as np
 import socketio
 from aiohttp import web
 from plato.client import run
@@ -105,6 +106,7 @@ class Server:
         # set of reporting clients received since the previous round of aggregation
         self.current_reported_clients = {}
         self.current_processed_clients = {}
+        self.prng_state = None
 
         self.ping_interval = 3600
         self.ping_timeout = 360
@@ -182,6 +184,9 @@ class Server:
         self.client = client
         self.configure()
 
+        if Config().args.resume:
+            self.resume_from_checkpoint()
+
         if Config().is_central_server():
             # In cross-silo FL, the central server lets edge servers start first
             # Then starts their clients
@@ -202,6 +207,12 @@ class Server:
 
         asyncio.get_event_loop().create_task(
             self.periodic(self.periodic_interval))
+
+        if hasattr(Config().server, "random_seed"):
+            seed = Config().server.random_seed
+            logging.info("Setting the random seed for selecting clients: %s",
+                         seed)
+            random.seed(seed)
 
         self.start()
 
@@ -241,8 +252,7 @@ class Server:
             logging.info("[Server #%d] New contact from Client #%d received.",
                          os.getpid(), client_id)
 
-        if self.current_round == 0 and len(
-                self.clients) >= self.clients_per_round:
+        if len(self.clients) >= self.clients_per_round:
             logging.info("[Server #%d] Starting training.", os.getpid())
             await self.select_clients()
 
@@ -355,6 +365,18 @@ class Server:
             self.selected_clients = self.choose_clients(
                 self.clients_pool, self.clients_per_round)
 
+        self.current_reported_clients = {}
+        self.current_processed_clients = {}
+
+        # There is no need to clear the list of reporting clients if we are
+        # simulating the wall clock time on the server. This is because
+        # when wall clock time is simulated, the server needs to wait for
+        # all the clients to report before selecting a subset of clients for
+        # replacement, and all remaining reporting clients will be processed
+        # in the next round
+        if not self.simulate_wall_time:
+            self.reported_clients = []
+
         if len(self.selected_clients) > 0:
             self.selected_sids = []
 
@@ -363,6 +385,9 @@ class Server:
 
                 if self.client_simulation_mode:
                     client_id = i + 1
+                    if Config().is_central_server():
+                        client_id += Config().clients.per_round
+
                     sid = self.clients[client_id]['sid']
 
                     if self.asynchronous_mode and self.simulate_wall_time:
@@ -413,26 +438,16 @@ class Server:
 
                 await self.send(sid, payload, selected_client_id)
 
-            self.current_reported_clients = {}
-            self.current_processed_clients = {}
-
-            # There is no need to clear the list of reporting clients if we are
-            # simulating the wall clock time on the server. This is because
-            # when wall clock time is simulated, the server needs to wait for
-            # all the clients to report before selecting a subset of clients for
-            # replacement, and all remaining reporting clients will be processed
-            # in the next round
-            if self.simulate_wall_time:
-                return
-
-            self.reported_clients = []
-
     def choose_clients(self, clients_pool, clients_count):
         """ Choose a subset of the clients to participate in each round. """
         assert clients_count <= len(clients_pool)
 
         # Select clients randomly
-        return random.sample(clients_pool, clients_count)
+        selected_clients = random.sample(clients_pool, clients_count)
+
+        logging.info("[Server %s] Selected clients: %s", os.getpid(),
+                     selected_clients)
+        return selected_clients
 
     async def periodic(self, periodic_interval):
         """ Runs periodic_task() periodically on the server. The time interval between
@@ -759,7 +774,7 @@ class Server:
         if len(self.updates) >= self.clients_per_round:
             logging.info(
                 "[Server #%d] All %d client report(s) received. Processing.",
-                os.getpid(), len(self.reported_clients))
+                os.getpid(), len(self.updates))
             await self.process_reports()
             await self.wrap_up()
             await self.select_clients()
@@ -791,8 +806,67 @@ class Server:
                         await self.wrap_up()
                         await self.select_clients()
 
+    def save_to_checkpoint(self):
+        """ Save a checkpoint for resuming the training session. """
+        logging.info(
+            "[Server #%d] Saving the checkpoint to prepare for resuming the training session.",
+            os.getpid())
+        checkpoint_dir = Config.params['checkpoint_dir']
+
+        if not os.path.exists(checkpoint_dir):
+            os.makedirs(checkpoint_dir)
+
+        model_name = Config().trainer.model_name if hasattr(
+            Config().trainer, 'model_name') else 'custom'
+        filename = f"checkpoint_{model_name}.pth"
+        self.trainer.save_model(filename, checkpoint_dir)
+
+        # Saving important data in the server for resuming its session later on
+        states_to_save = ['current_round', 'numpy_prng_state', 'prng_state']
+        variables_to_save = [
+            self.current_round,
+            np.random.get_state(),
+            random.getstate(),
+        ]
+
+        for i, state in enumerate(states_to_save):
+            with open(f"{checkpoint_dir}/{state}.pkl",
+                      'wb') as checkpoint_file:
+                pickle.dump(variables_to_save[i], checkpoint_file)
+
+    def resume_from_checkpoint(self):
+        """ Resume a training session from a previously saved checkpoint. """
+        logging.info(
+            "[Server #%d] Resume a training session from a previously saved checkpoint.",
+            os.getpid())
+
+        # Loading important data in the server for resuming its session
+        checkpoint_dir = Config.params['checkpoint_dir']
+
+        model_name = Config().trainer.model_name if hasattr(
+            Config().trainer, 'model_name') else 'custom'
+        filename = f"checkpoint_{model_name}.pth"
+        self.trainer.load_model(filename, checkpoint_dir)
+
+        states_to_load = ['current_round', 'numpy_prng_state', 'prng_state']
+        variables_to_load = {}
+
+        for i, state in enumerate(states_to_load):
+            with open(f"{checkpoint_dir}/{state}.pkl",
+                      'rb') as checkpoint_file:
+                variables_to_load[i] = pickle.load(checkpoint_file)
+
+        self.current_round = variables_to_load[0]
+        numpy_prng_state = variables_to_load[1]
+        prng_state = variables_to_load[2]
+
+        np.random.set_state(numpy_prng_state)
+        random.setstate(prng_state)
+
     async def wrap_up(self):
         """ Wrapping up when each round of training is done. """
+        self.save_to_checkpoint()
+
         # Break the loop when the target accuracy is achieved
         target_accuracy = Config().trainer.target_accuracy
 

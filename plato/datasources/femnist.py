@@ -31,6 +31,7 @@ from plato.datasources import base
 
 class CustomDictDataset(Dataset):
     """ Custom dataset from a dictionary with support of transforms. """
+
     def __init__(self, loaded_data, transform=None):
         """ Initializing the custom dataset. """
         super().__init__()
@@ -40,6 +41,7 @@ class CustomDictDataset(Dataset):
     def __getitem__(self, index):
         sample = self.loaded_data['x'][index]
         target = self.loaded_data['y'][index]
+
         if self.transform:
             sample = self.transform(sample)
 
@@ -51,6 +53,7 @@ class CustomDictDataset(Dataset):
 
 class ReshapeListTransform:
     """ The transform that reshapes an image. """
+
     def __init__(self, new_shape):
         self.new_shape = new_shape
 
@@ -60,6 +63,7 @@ class ReshapeListTransform:
 
 class DataSource(base.DataSource):
     """The FEMNIST dataset."""
+
     def __init__(self, client_id=0):
         super().__init__()
         self.trainset = None
@@ -112,7 +116,7 @@ class DataSource(base.DataSource):
     @staticmethod
     def read_data(file_path):
         """ Reading the dataset specific to a client_id. """
-        with open(file_path, 'r') as fin:
+        with open(file_path, 'r', encoding='utf-8') as fin:
             loaded_data = json.load(fin)
         return loaded_data
 

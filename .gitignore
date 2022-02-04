@@ -145,6 +145,7 @@ result.csv
 # Models
 pretrained/
 logs/
+checkpoints/
 *.pth
 
 # macOS

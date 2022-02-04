@@ -20,30 +20,35 @@ clients:
         distribution: pareto
         alpha: 1
 
+    random_seed: 1
+
 server:
     address: 127.0.0.1
     port: 8000
-    synchronous: false
+    ping_timeout: 36000
+    synchronous: false #true: sychronous, false: port
     simulate_wall_time: true
     minimum_clients_aggregated: 5
     staleness_bound: 10
     random_seed: 1
+    request_update: false
+    checkpoint_dir: /content/drive/MyDrive/CIFAR10
 
 data:
     # The training and testing dataset
-    datasource: MNIST
+    datasource: CIFAR10
 
     # Where the dataset is located
     data_path: ./data
 
     # Number of samples in each partition
-    partition_size: 600
+    partition_size: 1000
 
     # IID or non-IID?
     sampler: noniid
 
     # The concentration parameter for the Dirichlet distribution
-    concentration: 0.3
+    concentration: 0.05
 
     # The random seed for sampling data
     random_seed: 1
@@ -53,39 +58,40 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 2
+    rounds: 60
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
 
-    # Whether to apply differential privacy
-    # differential_privacy: true
-    # dp_epsilon: 1
-    # dp_delta: 0.00001
-    # dp_max_grad_norm: 1
-
     # The maximum number of clients running concurrently
-    max_concurrency: 20
+    max_concurrency: 10
 
     # The target accuracy
-    target_accuracy: 0.98
+    target_accuracy: 0.60
 
     # Number of epoches for local training in each communication round
     epochs: 5
-    batch_size: 32
+    batch_size: 128
     optimizer: SGD
-    learning_rate: 0.01
+    learning_rate: 0.1
     momentum: 0.9
-    weight_decay: 0.0
+    weight_decay: 0.0001
+
+    # Learning rate schedule
+    lr_schedule: LambdaLR
+    lr_gamma: 0.1
+    lr_milestone_steps: 80ep,120ep
 
     # The machine learning model
-    model_name: lenet5
+    model_name: resnet_18
 
 algorithm:
     # Aggregation algorithm
     type: fedavg
 
 results:
+    results_dir: /content/drive/MyDrive/CIFAR10
+
     # Write the following parameter(s) into a CSV
     types: round, elapsed_time, accuracy
 

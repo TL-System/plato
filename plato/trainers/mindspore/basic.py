@@ -23,6 +23,7 @@ class Trainer(base.Trainer):
     """A basic federated learning trainer for MindSpore, used by both
     the client and the server.
     """
+
     def __init__(self, model=None):
         """Initializing the trainer with the provided model.
 
@@ -63,18 +64,19 @@ class Trainer(base.Trainer):
         assert self.client_id == 0
         return np.zeros(shape)
 
-    def save_model(self, filename=None):
+    def save_model(self, filename=None, location=None):
         """Saving the model to a file."""
+        model_dir = Config(
+        ).params['model_dir'] if location is None else location
         model_name = Config().trainer.model_name
-        model_dir = Config().params['model_dir']
 
         if not os.path.exists(model_dir):
             os.makedirs(model_dir)
 
         if filename is not None:
-            model_path = f'{model_dir}{filename}'
+            model_path = f'{model_dir}/{filename}'
         else:
-            model_path = f'{model_dir}{model_name}.ckpt'
+            model_path = f'{model_dir}/{model_name}.ckpt'
 
         mindspore.save_checkpoint(self.model, model_path)
 
@@ -85,15 +87,16 @@ class Trainer(base.Trainer):
             logging.info("[Client #%d] Model saved to %s.", self.client_id,
                          model_path)
 
-    def load_model(self, filename=None):
+    def load_model(self, filename=None, location=None):
         """Loading pre-trained model weights from a file."""
+        model_dir = Config(
+        ).params['model_dir'] if location is None else location
         model_name = Config().trainer.model_name
-        model_dir = Config().params['pretrained_model_dir']
 
         if filename is not None:
-            model_path = f'{model_dir}{filename}'
+            model_path = f'{model_dir}/{filename}'
         else:
-            model_path = f'{model_dir}{model_name}.ckpt'
+            model_path = f'{model_dir}/{model_name}.ckpt'
 
         if self.client_id == 0:
             logging.info("[Server #%d] Loading a model from %s.", os.getpid(),

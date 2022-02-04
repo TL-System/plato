@@ -9,54 +9,72 @@ clients:
     per_round: 20
 
     # Should the clients compute test accuracy locally?
-    do_test: true
+    do_test: false
 
-    # Client simulation mode
+    # Whether simulate clients or not
     simulation: true
+    speed_simulation: true
+
+    # The simulation distribution
+    simulation_distribution:
+        distribution: pareto
+        alpha: 1
 
 server:
-    type: fedavg_cross_silo
     address: 127.0.0.1
     port: 8000
+    synchronous: false
+    simulate_wall_time: true
+    minimum_clients_aggregated: 5
+    staleness_bound: 10
+    random_seed: 1
+    request_update: false
+    checkpoint_dir: /content/drive/MyDrive/EMNIST
 
 data:
     # The training and testing dataset
-    datasource: MNIST
+    datasource: EMNIST
 
     # Where the dataset is located
     data_path: ./data
 
     # Number of samples in each partition
-    partition_size: 600
+    partition_size: 3000
 
     # IID or non-IID?
-    sampler: iid
+    sampler: noniid
 
-    # Whether to apply differential privacy
-    # differential_privacy: true
-    # dp_epsilon: 1
-    # dp_delta: 0.00001
-    # dp_max_grad_norm: 2
+    # The concentration parameter for the Dirichlet distribution
+    concentration: 1.8
+
+    # The random seed for sampling data
+    random_seed: 1
 
 trainer:
     # The type of the trainer
     type: basic
 
     # The maximum number of training rounds
-    rounds: 50
+    rounds: 100
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
 
+    # Whether to apply differential privacy
+    # differential_privacy: true
+    # dp_epsilon: 1
+    # dp_delta: 0.00001
+    # dp_max_grad_norm: 1
+
     # The maximum number of clients running concurrently
-    max_concurrency: 1
+    max_concurrency: 10
 
     # The target accuracy
     target_accuracy: 0.95
 
     # Number of epoches for local training in each communication round
-    epochs: 4
-    batch_size: 10
+    epochs: 5
+    batch_size: 32
     optimizer: SGD
     learning_rate: 0.01
     momentum: 0.9
@@ -64,24 +82,17 @@ trainer:
 
     # The machine learning model
     model_name: lenet5
+    num_classes: 47
 
 algorithm:
     # Aggregation algorithm
     type: fedavg
 
-    # Cross-silo training
-    cross_silo: true
-
-    # The total number of silos (edge servers)
-    total_silos: 2
-
-    # The number of local aggregation rounds on edge servers before sending
-    # aggreagted weights to the central server
-    local_rounds: 4
-
 results:
+    results_dir: /content/drive/MyDrive/EMNIST
+
     # Write the following parameter(s) into a CSV
-    types: round, accuracy, elapsed_time, round_time
+    types: round, elapsed_time, accuracy
 
     # Plot results (x_axis-y_axis)
-    plot: global_round-accuracy, global_round-elapsed_time
+    plot: round-accuracy, elapsed_time-accuracy
