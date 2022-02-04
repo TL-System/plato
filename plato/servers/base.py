@@ -252,8 +252,7 @@ class Server:
             logging.info("[Server #%d] New contact from Client #%d received.",
                          os.getpid(), client_id)
 
-        if self.current_round == 0 and len(
-                self.clients) >= self.clients_per_round:
+        if len(self.clients) >= self.clients_per_round:
             logging.info("[Server #%d] Starting training.", os.getpid())
             await self.select_clients()
 
@@ -823,23 +822,11 @@ class Server:
         self.trainer.save_model(filename, checkpoint_dir)
 
         # Saving important data in the server for resuming its session later on
-        states_to_save = [
-            'reported_clients',
-            'training_clients',
-            'current_reported_clients',
-            'current_processed_clients',
-            'current_round',
-            'current_time',
-            'prng_state',
-        ]
+        states_to_save = ['current_round', 'numpy_prng_state', 'prng_state']
         variables_to_save = [
-            self.reported_clients,
-            self.training_clients,
-            self.current_reported_clients,
-            self.current_processed_clients,
             self.current_round,
-            time.time(),
             np.random.get_state(),
+            random.getstate(),
         ]
 
         for i, state in enumerate(states_to_save):
@@ -861,15 +848,7 @@ class Server:
         filename = f"checkpoint_{model_name}.pth"
         self.trainer.load_model(filename, checkpoint_dir)
 
-        states_to_load = [
-            'reported_clients',
-            'training_clients',
-            'current_reported_clients',
-            'current_processed_clients',
-            'current_round',
-            'current_time',
-            'prng_state',
-        ]
+        states_to_load = ['current_round', 'numpy_prng_state', 'prng_state']
         variables_to_load = {}
 
         for i, state in enumerate(states_to_load):
@@ -877,25 +856,12 @@ class Server:
                       'rb') as checkpoint_file:
                 variables_to_load[i] = pickle.load(checkpoint_file)
 
-        self.reported_clients = variables_to_load[0]
-        self.training_clients = variables_to_load[1]
-        self.current_reported_clients = variables_to_load[2]
-        self.current_processed_clients = variables_to_load[3]
-        self.current_round = variables_to_load[4]
-        wall_time = variables_to_load[5]
-        self.prng_state = variables_to_load[6]
+        self.current_round = variables_to_load[0]
+        numpy_prng_state = variables_to_load[1]
+        prng_state = variables_to_load[2]
 
-        time_elapsed = time.time() - wall_time
-        for client_info in self.reported_clients:
-            # Adjusting the finish time
-            client_info[0] += time_elapsed
-            client_info[1]['finish_time'] += time_elapsed
-
-        for client_id in self.training_clients:
-            # Adjusting the start time
-            self.training_clients[client_id]['start_time'] += time_elapsed
-
-        np.random.set_state(self.prng_state)
+        np.random.set_state(numpy_prng_state)
+        random.setstate(prng_state)
 
     async def wrap_up(self):
         """ Wrapping up when each round of training is done. """
