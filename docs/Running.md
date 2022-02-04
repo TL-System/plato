@@ -97,6 +97,7 @@ $ pip3 install torch==1.10.1+cu113 torchvision==0.11.2+cu113 torchaudio==0.10.1+
 To double-check the CUDA version used in the command above, start an interactive session and use the following command:
 
 ```shell
+salloc --time=2:00:00 --nodes=1 --ntasks-per-node=32 --gres=gpu:2 --mem=127000M --account=def-baochun
 nvidia-smi
 ```
 
