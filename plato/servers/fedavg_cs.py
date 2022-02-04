@@ -32,17 +32,21 @@ class Server(fedavg.Server):
             self.new_global_round_begins = asyncio.Event()
 
             # Compute the number of clients in each silo for edge servers
+            launched_clients = Config().clients.total_clients
+            if hasattr(Config().clients,
+                       'simulation') and Config().clients.simulation:
+                launched_clients = Config().clients.per_round
+
             self.total_clients = [
-                len(i) for i in np.array_split(
-                    np.arange(Config().clients.total_clients),
-                    Config().algorithm.total_silos)
-            ][Config().args.id - Config().clients.total_clients - 1]
+                len(i) for i in np.array_split(np.arange(launched_clients),
+                                               Config().algorithm.total_silos)
+            ][Config().args.id - launched_clients - 1]
 
             self.clients_per_round = [
                 len(i)
                 for i in np.array_split(np.arange(Config().clients.per_round),
                                         Config().algorithm.total_silos)
-            ][Config().args.id - Config().clients.total_clients - 1]
+            ][Config().args.id - launched_clients - 1]
 
             logging.info(
                 "[Edge server #%d (#%d)] Started training on %d clients with %d per round.",

@@ -25,12 +25,13 @@ clients:
 server:
     address: 127.0.0.1
     port: 8001
-    synchronous: false #true: sychronous, false: port
+    synchronous: false
     simulate_wall_time: true
     minimum_clients_aggregated: 5
     staleness_bound: 10
     random_seed: 1
-#    request_update: true
+    request_update: false
+    checkpoint_dir: /content/drive/MyDrive/MNIST
 
 data:
     datasource: MNIST
@@ -49,6 +50,8 @@ data:
 
     # The random seed for sampling data
     random_seed: 1
+
+    checkpoints_dir: /content/drive/MyDrive/MNIST
 
 trainer:
     # The type of the trainer
@@ -92,7 +95,7 @@ algorithm:
     type: fedavg
 
 results:
-    results_dir: /content/drive/MyDrive
+    results_dir: /content/drive/MyDrive/MNIST
 
     # Write the following parameter(s) into a CSV
     types: round, elapsed_time, accuracy
