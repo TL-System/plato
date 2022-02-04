@@ -78,14 +78,13 @@ algorithm:
     max_action: 1
     min_action: -1
     max_episode: 2000
-    steps_per_episode: 20
     beta: 10  # coefficient used in reward function
     theta: 0.005  # threshold for stdev(pre_acc)
     log_interval: 10
-    mode: train  # test
-    pretrained: false
-    pretrained_iter: 0
-    test_step: 100
+    mode: test  # test
+    pretrained: true
+    pretrained_iter: 150
+    test_step: 20
 
     # RL policy
     model_name: td3

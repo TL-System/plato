@@ -32,9 +32,6 @@ class RLAgent(simple_rl_agent.RLAgent):
         ).algorithm.pretrained or Config().algorithm.mode == 'test':
             self.policy.load_model(Config().algorithm.pretrained_iter)
             self.current_episode = Config().algorithm.pretrained_iter + 1
-            # BUG: variable episode length
-            self.total_steps = Config().algorithm.pretrained_iter * Config(
-            ).algorithm.steps_per_episode + 1
 
         self.recorded_rl_items = ['episode', 'actor_loss', 'critic_loss']
 
@@ -83,15 +80,24 @@ class RLAgent(simple_rl_agent.RLAgent):
 
     async def prep_action(self):
         """ Get action from RL policy. """
-        if Config().algorithm.start_steps > self.total_steps:
-            self.action = np.array(
-                self.action_space.sample())  # Sample random action
+        if Config().algorithm.mode == 'train':
+            if Config().algorithm.start_steps > self.total_steps:
+                self.action = np.array(
+                    self.action_space.sample())  # Sample random action
+                if Config().algorithm.recurrent_actor:
+                    self.action = np.reshape(self.action, (-1, 1))
+            else:  # Sample action from policy
+                if Config().algorithm.recurrent_actor:
+                    self.action, (self.nh,
+                                  self.nc) = self.policy.select_action(
+                                      self.state, (self.h, self.c))
+                    self.action = np.reshape(np.array(self.action), (-1, 1))
+                else:
+                    self.action = self.policy.select_action(self.state)
+        else:
             if Config().algorithm.recurrent_actor:
-                self.action = np.reshape(self.action, (-1, 1))
-        else:  # Sample action from policy
-            if Config().algorithm.recurrent_actor:
-                self.action, (self.nh, self.nc) = self.policy.select_action(
-                    self.state, (self.h, self.c))
+                # don't pass hidden states
+                self.action, __ = self.policy.select_action(self.state)
                 self.action = np.reshape(np.array(self.action), (-1, 1))
             else:
                 self.action = self.policy.select_action(self.state)
@@ -139,11 +145,6 @@ class RLAgent(simple_rl_agent.RLAgent):
         """ Additional RL-specific processing upon the server response. """
         super().process_env_response(response)
         self.test_accuracy = response['test_accuracy']
-
-    async def wrap_up(self):
-        """ Wrap up when RL control concluded. """
-        # Close FL environment
-        await self.sio.emit('agent_dead', {'agent': self.agent})
 
     def update_policy(self):
         """ Update agent if needed in training mode. """
