@@ -47,14 +47,14 @@ class Trainer(ABC):
                 "CREATE TABLE IF NOT EXISTS trainers (run_id int)")
 
     @abstractmethod
-    def save_model(self, filename=None):
+    def save_model(self, filename=None, location=None):
         """Saving the model to a file. """
-        raise "save_model() not implemented."
+        raise TypeError("save_model() not implemented.")
 
     @abstractmethod
-    def load_model(self, filename=None):
+    def load_model(self, filename=None, location=None):
         """Loading pre-trained model weights from a file. """
-        raise "load_model() not implemented."
+        raise TypeError("load_model() not implemented.")
 
     @staticmethod
     def save_accuracy(accuracy, filename=None):
@@ -70,7 +70,7 @@ class Trainer(ABC):
         else:
             accuracy_path = f'{model_dir}/{model_name}.acc'
 
-        with open(accuracy_path, 'w') as file:
+        with open(accuracy_path, 'w', encoding='utf8') as file:
             file.write(str(accuracy))
 
     @staticmethod
@@ -84,7 +84,7 @@ class Trainer(ABC):
         else:
             accuracy_path = f'{model_dir}/{model_name}.acc'
 
-        with open(accuracy_path, 'r') as file:
+        with open(accuracy_path, 'r', encoding='utf8') as file:
             accuracy = float(file.read())
 
         return accuracy

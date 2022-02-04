@@ -146,6 +146,7 @@ result.csv
 pretrained/
 wandb/
 logs/
+checkpoints/
 *.pth
 
 # macOS
