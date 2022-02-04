@@ -811,17 +811,17 @@ class Server:
         logging.info(
             "[Server #%d] Saving the checkpoint to prepare for resuming the training session.",
             os.getpid())
-        model_name = Config().trainer.model_name if hasattr(
-            Config().trainer, 'model_name') else 'custom'
-        filename = f"checkpoint_{model_name}.pth"
-        self.trainer.save_model(filename)
-
-        # Saving important data in the server for resuming its session later on
         checkpoint_dir = Config.params['checkpoint_dir']
 
         if not os.path.exists(checkpoint_dir):
             os.makedirs(checkpoint_dir)
 
+        model_name = Config().trainer.model_name if hasattr(
+            Config().trainer, 'model_name') else 'custom'
+        filename = f"checkpoint_{model_name}.pth"
+        self.trainer.save_model(filename, checkpoint_dir)
+
+        # Saving important data in the server for resuming its session later on
         states_to_save = [
             'reported_clients',
             'training_clients',
@@ -851,10 +851,14 @@ class Server:
         logging.info(
             "[Server #%d] Resume a training session from a previously saved checkpoint.",
             os.getpid())
+
+        # Loading important data in the server for resuming its session
+        checkpoint_dir = Config.params['checkpoint_dir']
+
         model_name = Config().trainer.model_name if hasattr(
             Config().trainer, 'model_name') else 'custom'
         filename = f"checkpoint_{model_name}.pth"
-        self.trainer.load_model(filename)
+        self.trainer.load_model(filename, checkpoint_dir)
 
         states_to_load = [
             'reported_clients',
@@ -866,9 +870,6 @@ class Server:
             'prng_state',
         ]
         variables_to_load = {}
-
-        # Loading important data in the server for resuming its session
-        checkpoint_dir = Config.params['checkpoint_dir']
 
         for i, state in enumerate(states_to_load):
             with open(f"{checkpoint_dir}/{state}.pkl",

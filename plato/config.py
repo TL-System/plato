@@ -147,7 +147,6 @@ class Config:
 
             # Pretrained models
             Config.params['model_dir'] = "./models/pretrained"
-            Config.params['pretrained_model_dir'] = "./models/pretrained"
 
             # Resume checkpoint
             if hasattr(Config().server, 'checkpoint_dir'):
