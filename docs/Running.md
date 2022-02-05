@@ -82,7 +82,7 @@ web.run_app(app,
             port=port)
 ```
 
-Finally, comment out the lines `import zstd` in `plato/processors/compress.py` and `plato/processors/uncompress.py`.
+Finally, comment out the lines `import zstd` in `plato/processors/compress.py` and `plato/processors/decompress.py`.
 
 The next step is to install the required Python packages. PyTorch should be installed following the advice of its [getting started website](https://pytorch.org/get-started/locally/). As for Jan 2022, Compute Canada provides GPU with CUDA version 11.2, so the command would be:
 
