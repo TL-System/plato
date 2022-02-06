@@ -65,7 +65,7 @@ class RLServer(base.Server):
             self.testset = dataset.get_test_set()
 
         # Initialize the csv file which will record results
-        if self.agent.current_episode == 1 and hasattr(Config(), 'results'):
+        if self.agent.current_episode == 0 and hasattr(Config(), 'results'):
             results_dir = Config().results_dir
             result_csv_file = f'{results_dir}/{os.getpid()}_episode_result.csv'
             csv_processor.initialize_csv(result_csv_file, self.recorded_items,

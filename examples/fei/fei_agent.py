@@ -127,8 +127,8 @@ class RLAgent(simple_rl_agent.RLAgent):
                     'critic_loss': critic_loss
                 }[item]
                 new_row.append(item_value)
-            episode_result_csv_file = Config(
-            ).results_dir + 'episode_result.csv'
+            results_dir = Config().results_dir
+            episode_result_csv_file = f'{results_dir}/{os.getpid()}_episode_result.csv'
             csv_processor.write_csv(episode_result_csv_file, new_row)
 
         episode_reward_csv_file = Config().results_dir + 'episode_reward.csv'
