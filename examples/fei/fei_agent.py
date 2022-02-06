@@ -37,21 +37,21 @@ class RLAgent(simple_rl_agent.RLAgent):
 
         if self.current_episode == 0:
             episode_result_csv_file = Config(
-            ).result_dir + 'episode_result.csv'
+            ).results_dir + 'episode_result.csv'
             csv_processor.initialize_csv(episode_result_csv_file,
                                          self.recorded_rl_items,
-                                         Config().result_dir)
+                                         Config().results_dir)
             episode_reward_csv_file = Config(
-            ).result_dir + 'episode_reward.csv'
+            ).results_dir + 'episode_reward.csv'
             csv_processor.initialize_csv(
                 episode_reward_csv_file,
                 ['Episode #', 'Steps', 'Final accuracy', 'Reward'],
-                Config().result_dir)
-            step_result_csv_file = Config().result_dir + 'step_result.csv'
+                Config().results_dir)
+            step_result_csv_file = Config().results_dir + 'step_result.csv'
             csv_processor.initialize_csv(
                 step_result_csv_file,
                 ['Episode #', 'Step #', 'state', 'action'],
-                Config().result_dir)
+                Config().results_dir)
 
         self.test_accuracy = None
         # Record test accuracy of the latest 5 rounds/steps
@@ -162,10 +162,10 @@ class RLAgent(simple_rl_agent.RLAgent):
                 }[item]
                 new_row.append(item_value)
             episode_result_csv_file = Config(
-            ).result_dir + 'episode_result.csv'
+            ).results_dir + 'episode_result.csv'
             csv_processor.write_csv(episode_result_csv_file, new_row)
 
-        episode_reward_csv_file = Config().result_dir + 'episode_reward.csv'
+        episode_reward_csv_file = Config().results_dir + 'episode_reward.csv'
         csv_processor.write_csv(episode_reward_csv_file, [
             self.current_episode, self.current_step,
             mean(self.pre_acc), self.episode_reward
