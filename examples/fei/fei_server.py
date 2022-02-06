@@ -10,8 +10,8 @@ from plato.utils.reinforcement_learning import simple_rl_server
 
 class RLServer(simple_rl_server.RLServer):
     """ A federated learning server with RL Agent. """
-    def __init__(self, agent, trainer=None):
-        super().__init__(agent, trainer)
+    def __init__(self, agent, model=None, algorithm=None, trainer=None):
+        super().__init__(agent, model, algorithm, trainer)
         self.local_correlations = {}
         self.last_global_grads = None
         self.corr = []
