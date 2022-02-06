@@ -6,15 +6,12 @@ import os
 
 import numpy as np
 import torch
-import torch.nn as nn
-import wandb
 import torch.nn.functional as F
-from scipy.stats import spearmanr
-
+from plato.config import Config
 from plato.datasources import qoenflx
 from plato.trainers import basic
-from plato.config import Config
 from plato.utils import optimizers
+from scipy.stats import spearmanr
 
 
 class Trainer(basic.Trainer):
@@ -106,9 +103,6 @@ class Trainer(basic.Trainer):
                             format(os.getpid(), epoch, epochs, batch_id,
                                    len(train_loader), loss.data.item()))
                     else:
-                        if hasattr(config, 'use_wandb'):
-                            wandb.log({"batch loss": loss.data.item()})
-
                         logging.info(
                             "[Client #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}".
                             format(self.client_id, epoch, epochs, batch_id,
