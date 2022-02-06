@@ -4,15 +4,14 @@ A federated learning server with RL Agent FEI
 import math
 
 import numpy as np
+from plato.config import Config
 from plato.utils.reinforcement_learning import simple_rl_server
 
 
 class RLServer(simple_rl_server.RLServer):
     """ A federated learning server with RL Agent. """
-    def __init__(self, trainer=None):
-        super().__init__(trainer)
-        # alpha controls the decreasing rate of the mapping function
-        self.alpha = 5
+    def __init__(self, agent, trainer=None):
+        super().__init__(agent, trainer)
         self.local_correlations = {}
         self.last_global_grads = None
         self.corr = []
@@ -21,9 +20,6 @@ class RLServer(simple_rl_server.RLServer):
     # Overwrite RL-related methods of simple RL server
     def prep_state(self):
         """ Wrap up the state update to RL Agent. """
-        # Initial state when env resets
-        if self.current_round == 0 and not self.action_applied:
-            return None
         state = [0] * 4
         if len(self.updates) > 0 and len(self.updates) >= len(
                 self.selected_clients):
@@ -35,36 +31,16 @@ class RLServer(simple_rl_server.RLServer):
                 [report.valuation for (report, __, __) in self.updates])
             state[3] = self.normalize_state(self.corr)
         state = np.transpose(np.round(np.array(state), 4))
-        return state
 
-    async def customize_env_response(self, response):
-        """ Wrap up generating the env response with any additional information. """
-        response['test_accuracy'] = self.accuracy
-        return response
+        self.agent.test_accuracy = self.accuracy
+
+        return state
 
     def apply_action(self):
         """ Apply action update from RL Agent to FL Env. """
-        self.smart_weighting = np.array(self.agent_update)
-
-    async def federated_averaging(self, updates):
-        """ Aggregate weight updates and deltas updates from the clients. """
-        # Extract weights udpates from the client updates
-        weights_received = self.extract_client_updates(updates)
-
-        # Perform weighted averaging
-        avg_update = {
-            name: self.trainer.zeros(weights.shape)
-            for name, weights in weights_received[0].items()
-        }
+        weights = np.array(self.agent.action)
         self.smart_weighting = self.normalize_weights(
-            self.smart_weighting[:self.clients_per_round])
-
-        # Use adaptive weighted average
-        for i, update in enumerate(weights_received):
-            for name, delta in update.items():
-                avg_update[name] += delta * self.smart_weighting[i]
-
-        return avg_update
+            weights[:self.clients_per_round])
 
     def extract_client_updates(self, updates):
         """ Extract the model weights and update directions from clients updates. """
@@ -105,9 +81,10 @@ class RLServer(simple_rl_server.RLServer):
                 self.current_round) * self.local_correlations[client_id] + (
                     1 / self.current_round) * correlation
             # Non-linear mapping to node contribution
-            contribs[i] = self.alpha * (
+
+            contribs[i] = Config().algorithm.alpha * (
                 1 -
-                math.exp(-math.exp(-self.alpha *
+                math.exp(-math.exp(-Config().algorithm.alpha *
                                    (self.local_correlations[client_id] - 1))))
 
         return contribs

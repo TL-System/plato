@@ -79,6 +79,7 @@ algorithm:
     max_action: 1
     min_action: -1
     max_episode: 2000
+    alpha: 5 # controls the decreasing rate of the mapping function
     beta: 10  # coefficient used in reward function
     theta: 0.005  # threshold for stdev(pre_acc)
     log_interval: 10
