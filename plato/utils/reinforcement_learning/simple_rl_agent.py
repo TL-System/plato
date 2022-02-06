@@ -3,6 +3,7 @@ A basic RL environment for FL server using Gym for RL control.
 """
 import asyncio
 import logging
+import os
 from abc import abstractmethod
 
 import numpy as np
@@ -108,7 +109,8 @@ class RLAgent(object):
             self.state = self.next_state
             self.episode_reward += self.reward
 
-            step_result_csv_file = Config().results_dir + 'step_result.csv'
+            results_dir = Config().results_dir = Config().results_dir
+            step_result_csv_file = f'{results_dir}/{os.getpid()}_step_result.csv'
             csv_processor.write_csv(step_result_csv_file,
                                     [self.current_episode, self.current_step] +
                                     list(self.state) + list(self.action))
