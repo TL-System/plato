@@ -146,7 +146,8 @@ class RLAgent(simple_rl_agent.RLAgent):
 
     def process_experience(self):
         """ Process step experience if needed in training mode. """
-        logging.info("[RL Agent] Saving the experience into replay buffer.")
+        logging.info(
+            "[RL Agent] Saving the experience into the replay buffer.")
         if Config().algorithm.recurrent_actor:
             self.policy.replay_buffer.push(
                 (self.state, self.action, self.reward, self.next_state,
