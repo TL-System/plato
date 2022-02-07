@@ -13,7 +13,7 @@ def get_long_description():
 
 
 def get_requirements():
-    with open("./docs/cc_requirements.txt") as f:
+    with open("requirements.txt") as f:
         return f.read().splitlines()
 
 

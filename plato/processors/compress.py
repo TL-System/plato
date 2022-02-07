@@ -3,7 +3,7 @@ Implements a Processor for compressing a numpy array.
 """
 from typing import Any
 
-# import zstd
+import zstd
 from plato.processors import base
 
 

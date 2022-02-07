@@ -4,7 +4,7 @@ Implements a Processor for decompressing a numpy array.
 from typing import Any
 
 import numpy as np
-#cimport zstd
+import zstd
 from plato.processors import base
 
 

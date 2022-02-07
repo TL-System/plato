@@ -8,7 +8,7 @@ https://huggingface.co/docs/datasets/quicktour.html
 
 import logging
 
-#from datasets import load_dataset
+from datasets import load_dataset
 
 from plato.config import Config
 from plato.datasources import base
@@ -28,8 +28,7 @@ class DataSource(base.DataSource):
         else:
             dataset_config = None
 
-
-#        self.dataset = load_dataset(dataset_name, dataset_config)
+        self.dataset = load_dataset(dataset_name, dataset_config)
         self.trainset = self.dataset['train']
         self.testset = self.dataset['validation']
 
