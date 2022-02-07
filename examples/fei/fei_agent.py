@@ -17,6 +17,7 @@ from plato.utils.reinforcement_learning.policies import \
 
 class RLAgent(simple_rl_agent.RLAgent):
     """ An RL agent for FL training using FEI. """
+
     def __init__(self):
         super().__init__()
         self.policy = policies_registry.get(Config().algorithm.n_features,
@@ -34,19 +35,18 @@ class RLAgent(simple_rl_agent.RLAgent):
         self.recorded_rl_items = ['episode', 'actor_loss', 'critic_loss']
 
         if self.current_episode == 0:
-            results_dir = Config().results_dir
-            episode_result_csv_file = f'{results_dir}/{os.getpid()}_episode_result.csv'
+            result_dir = Config().result_dir
+            episode_result_csv_file = f'{result_dir}/{os.getpid()}_episode_result.csv'
             csv_processor.initialize_csv(episode_result_csv_file,
-                                         self.recorded_rl_items, results_dir)
-            episode_reward_csv_file = f'{results_dir}/{os.getpid()}_episode_reward.csv'
+                                         self.recorded_rl_items, result_dir)
+            episode_reward_csv_file = f'{result_dir}/{os.getpid()}_episode_reward.csv'
             csv_processor.initialize_csv(
                 episode_reward_csv_file,
-                ['Episode #', 'Steps', 'Final accuracy', 'Reward'],
-                results_dir)
-            step_result_csv_file = f'{results_dir}/{os.getpid()}_step_result.csv'
+                ['Episode #', 'Steps', 'Final accuracy', 'Reward'], result_dir)
+            step_result_csv_file = f'{result_dir}/{os.getpid()}_step_result.csv'
             csv_processor.initialize_csv(
                 step_result_csv_file,
-                ['Episode #', 'Step #', 'state', 'action'], results_dir)
+                ['Episode #', 'Step #', 'state', 'action'], result_dir)
 
         # Record test accuracy of the latest 5 rounds/steps
         self.pre_acc = deque(5 * [0], maxlen=5)
@@ -127,11 +127,11 @@ class RLAgent(simple_rl_agent.RLAgent):
                     'critic_loss': critic_loss
                 }[item]
                 new_row.append(item_value)
-                
-            episode_result_csv_file = f'{Config().results_dir}/{os.getpid()}_episode_result.csv'
+
+            episode_result_csv_file = f'{Config().result_dir}/{os.getpid()}_episode_result.csv'
             csv_processor.write_csv(episode_result_csv_file, new_row)
-        
-        episode_reward_csv_file = f'{Config().results_dir}/{os.getpid()}_episode_reward.csv'
+
+        episode_reward_csv_file = f'{Config().result_dir}/{os.getpid()}_episode_reward.csv'
         csv_processor.write_csv(episode_reward_csv_file, [
             self.current_episode, self.current_step,
             mean(self.pre_acc), self.episode_reward
