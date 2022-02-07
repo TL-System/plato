@@ -145,4 +145,4 @@ None.
 |:---------:|:-------:|:-----------:|:----:|
 |types|Which parameter(s) will be written into a CSV file|`round`, `accuracy`, `elapsed_time`, `round_time`, `local_epoch_num`, `edge_agg_num`|Use comma `,` to seperate parameters|
 |plot|Plot results ||Format: x\_axis-y\_axis. Use hyphen `-` to seperate axis. Use comma `,` to seperate multiple plots|
-|results_dir|The directory of results||If not specify, results will be stored under `./results/<datasource>/<model>/<server_type>/`|
+|result_dir|The directory of results||If not specify, results will be stored under `./results/<datasource>/<model>/<server_type>/`|

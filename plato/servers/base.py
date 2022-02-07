@@ -23,6 +23,7 @@ from plato.utils import s3
 
 class ServerEvents(socketio.AsyncNamespace):
     """ A custom namespace for socketio.AsyncServer. """
+
     def __init__(self, namespace, plato_server):
         super().__init__(namespace)
         self.plato_server = plato_server
@@ -66,6 +67,7 @@ class ServerEvents(socketio.AsyncNamespace):
 
 class Server:
     """ The base class for federated learning servers. """
+
     def __init__(self):
         self.sio = None
         self.client = None
@@ -232,10 +234,8 @@ class Server:
 
         app = web.Application()
         self.sio.attach(app)
-        web.run_app(app,
-                    host=Config().server.address,
-                    port=port,
-                    loop=asyncio.get_event_loop())
+        web.run_app(app, host=Config().server.address, port=port)
+        # ,loop=asyncio.get_event_loop()
 
     async def register_client(self, sid, client_id):
         """ Adding a newly arrived client to the list of clients. """

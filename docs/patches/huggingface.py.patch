@@ -1,0 +1,19 @@
+--- huggingface.py	2022-02-05 11:41:48.000000000 -0500
++++ huggingface_cc.py	2022-02-05 11:42:14.000000000 -0500
+@@ -8,8 +8,6 @@
+ 
+ import logging
+ 
+-from datasets import load_dataset
+-
+ from plato.config import Config
+ from plato.datasources import base
+ 
+@@ -27,7 +25,6 @@
+         else:
+             dataset_config = None
+ 
+-        self.dataset = load_dataset(dataset_name, dataset_config)
+         self.trainset = self.dataset['train']
+         self.testset = self.dataset['validation']
+ 

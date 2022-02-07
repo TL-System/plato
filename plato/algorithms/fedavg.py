@@ -6,6 +6,7 @@ from plato.algorithms import base
 
 class Algorithm(base.Algorithm):
     """PyTorch-based federated averaging algorithm, used by both the client and the server."""
+
     def extract_weights(self, model=None):
         """Extract weights from the model."""
         if model is None:
