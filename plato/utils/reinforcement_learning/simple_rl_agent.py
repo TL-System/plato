@@ -117,7 +117,7 @@ class RLAgent(object):
 
     async def prep_agent_update(self):
         """ Update RL Agent. """
-        if self.is_done and Config().algorithm.mode == 'train':
+        if Config().algorithm.mode == 'train' and self.is_done:
             self.update_policy()
 
             # Break the loop when RL training is concluded
@@ -125,7 +125,7 @@ class RLAgent(object):
                 self.finished = True
             else:
                 await self.reset()
-        elif self.current_step >= Config().algorithm.test_step:
+        elif Config().algorithm.mode == 'test' and self.current_step >= Config().algorithm.test_step:
             # Break the loop when RL testing is concluded
             self.finished = True
         else:
