@@ -1,4 +1,7 @@
 clients:
+    # Type
+    type: simple
+
     # The total number of clients
     total_clients: 100
 
@@ -14,8 +17,8 @@ clients:
 
     # The simulation distribution
     simulation_distribution:
-        distribution: zipf
-        s: 1.5
+        distribution: pareto
+        alpha: 1.5
 
 server:
     address: 127.0.0.1
