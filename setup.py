@@ -13,7 +13,7 @@ def get_long_description():
 
 
 def get_requirements():
-    with open("requirements.txt") as f:
+    with open("./docs/cc_requirements.txt") as f:
         return f.read().splitlines()
 
 
@@ -59,5 +59,6 @@ setuptools.setup(
         "Topic :: Scientific/Engineering",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
     ],
-    keywords="machine-learning, deep-learning, edge-learning, federated-learning",
+    keywords=
+    "machine-learning, deep-learning, edge-learning, federated-learning",
 )
