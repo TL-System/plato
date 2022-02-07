@@ -8,11 +8,11 @@ from typing import List
 
 
 def initialize_csv(result_csv_file: str, recorded_items: List,
-                   results_dir: str) -> None:
+                   result_dir: str) -> None:
     """Create a CSV file and writer the first row."""
     # Create a new directory if it does not exist.
-    if not os.path.exists(results_dir):
-        os.makedirs(results_dir)
+    if not os.path.exists(result_dir):
+        os.makedirs(result_dir)
 
     with open(result_csv_file, 'w', encoding='utf-8',
               newline='') as result_file:

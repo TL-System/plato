@@ -144,6 +144,8 @@ result.csv
 
 # Models
 pretrained/
+models/
+wandb/
 logs/
 checkpoints/
 *.pth
