@@ -146,7 +146,10 @@ class Config:
             Config.params['run_id'] = os.getpid()
 
             # Pretrained models
-            Config.params['model_dir'] = "./models/pretrained"
+            if hasattr(Config().server, 'model_dir'):
+                Config.params['model_dir'] = Config().server.model_dir
+            else:
+                Config.params['model_dir'] = "./models/pretrained"
 
             # Resume checkpoint
             if hasattr(Config().server, 'checkpoint_dir'):
