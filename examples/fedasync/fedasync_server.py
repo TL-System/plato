@@ -70,7 +70,7 @@ class Server(fedavg.Server):
         updated_weights = OrderedDict()
         for name, weight in baseline_weights.items():
             updated_weights[name] = weight * (
-                    1 - self.mixing_hyperparam
+                1 - self.mixing_hyperparam
             ) + weights_received[0][name] * self.mixing_hyperparam
 
         self.algorithm.load_weights(updated_weights)
@@ -109,8 +109,7 @@ class Server(fedavg.Server):
             else:
                 logging.warning(
                     "FedAsync: Unknown staleness weighting function type. "
-                    "Type needs to be constant, polynomial, or hinge."
-                )
+                    "Type needs to be constant, polynomial, or hinge.")
         else:
             return Server.constant_function()
 
@@ -122,7 +121,7 @@ class Server(fedavg.Server):
     @staticmethod
     def polynomial_function(staleness, a) -> float:
         """ Polynomial staleness function as proposed in Sec. 5.2, Evaluation Setup. """
-        return (staleness + 1) ** -a
+        return (staleness + 1)**-a
 
     @staticmethod
     def hinge_function(staleness, a, b) -> float:

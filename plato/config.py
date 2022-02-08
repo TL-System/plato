@@ -211,7 +211,9 @@ class Config:
             if dist.distribution.lower() == "zipf":
                 sleep_times = np.random.zipf(dist.s, size=total_clients)
             if dist.distribution.lower() == "uniform":
-                sleep_times = np.random.uniform(dist.low, dist.high, size=total_clients)
+                sleep_times = np.random.uniform(dist.low,
+                                                dist.high,
+                                                size=total_clients)
         else:
             # By default, use Pareto distribution with a parameter of 1.0
             sleep_times = np.random.pareto(1.0, size=total_clients)
