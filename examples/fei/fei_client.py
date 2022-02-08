@@ -31,11 +31,11 @@ class Client(simple.Client):
         return Report(report.num_samples, report.accuracy,
                       report.training_time, report.update_response,
                       valuation), weights
-
+    
     def get_loss(self):
         """ Retrieve the loss value from the training process. """
         model_name = Config().trainer.model_name
-        filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.loss"
+        filename = f'{model_name}_{self.client_id}.loss'
         loss = self.trainer.load_loss(filename)
         return loss
 

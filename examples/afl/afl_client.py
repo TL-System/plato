@@ -40,7 +40,7 @@ class Client(simple.Client):
     def get_loss(self):
         """ Retrieve the loss value from the training process. """
         model_name = Config().trainer.model_name
-        filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.loss"
+        filename = f'{model_name}_{self.client_id}.loss'
         loss = self.trainer.load_loss(filename)
         return loss
 
