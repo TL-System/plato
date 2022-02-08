@@ -56,6 +56,7 @@ class RLAgent(simple_rl_agent.RLAgent):
         # Record test accuracy of the latest 5 rounds/steps
         self.pre_acc = deque(5 * [0], maxlen=5)
         self.test_accuracy = None
+        self.num_samples = None
 
     # Override RL-related methods of simple RL agent
     async def reset(self):
@@ -76,25 +77,28 @@ class RLAgent(simple_rl_agent.RLAgent):
         """ Get action from RL policy. """
         logging.info("[RL Agent] Selecting action...")
         if Config().algorithm.mode == 'train':
-            if Config().algorithm.start_steps > self.total_steps:
-                self.action = np.array(
-                    self.action_space.sample())  # Sample random action
-                # self.action = np.reshape(self.action, (-1, 1))
-            else:  # Sample action from policy
+            if self.current_step <= Config().algorithm.start_steps: 
+                # random action
+                # action = np.zeros(self.n_actions)
+                # noise = np.random.normal(0, .1, action.shape)
+                # self.action = action + noise
+                
+                # fedavg policy
+                self.action = np.array(self.num_samples)
+            else:  
+                # Sample action from policy
                 if Config().algorithm.recurrent_actor:
                     self.action, (self.nh,
                                   self.nc) = self.policy.select_action(
                                       self.state, (self.h, self.c))
                 else:
                     self.action = self.policy.select_action(self.state)
-                # self.action = np.reshape(np.array(self.action), (-1, 1))
         else:
             if Config().algorithm.recurrent_actor:
                 # don't pass hidden states
                 self.action, __ = self.policy.select_action(self.state)
             else:
                 self.action = self.policy.select_action(self.state)
-            self.action = np.reshape(np.array(self.action), (-1, 1))
 
     def get_reward(self):
         """ Get reward for agent. """

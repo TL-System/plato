@@ -53,12 +53,12 @@ class RLAgent(object):
 
     def step(self):
         """ Update the followings using server update. """
-        new_state = self.get_state()
-        is_done = self.get_done()
-        reward = self.get_reward()
+        self.new_state = self.get_state()
+        self.is_done = self.get_done()
+        self.reward = self.get_reward()
         info = self.get_info()
 
-        return new_state, reward, is_done, info
+        return self.new_state, self.reward, self.is_done, info
 
     async def reset(self):
         """ Reset RL environment. """

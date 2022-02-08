@@ -49,6 +49,7 @@ class RLServer(base.Server):
         
             Called every time when reseting a new RL episode.
         """
+        super().configure()
         logging.info("[Server #%d] Configuring the server for episode %d",
                      os.getpid(), self.agent.current_episode)
 
@@ -82,8 +83,7 @@ class RLServer(base.Server):
         # Reset model for new episode
         self.trainer.model = models_registry.get()
 
-        if self.algorithm is None:
-            self.algorithm = algorithms_registry.get(self.trainer)
+        self.algorithm = algorithms_registry.get(self.trainer)
 
     def extract_client_updates(self, updates):
         """Extract the model weight updates from client updates."""
@@ -102,8 +102,8 @@ class RLServer(base.Server):
         weights_received = self.extract_client_updates(updates)
 
         # Extract the total number of samples
-        self.total_samples = sum(
-            [report.num_samples for (report, __, __) in updates])
+        self.num_samples = [report.num_samples for (report, __, __) in updates]
+        self.total_samples = sum(self.num_samples)
 
         # Perform weighted averaging
         avg_update = {
@@ -113,6 +113,7 @@ class RLServer(base.Server):
 
         # e.g., wait for the new action from RL agent
         # if the action affects the global aggregation
+        self.agent.num_samples = self.num_samples
         await self.update_action()
 
         # Use adaptive weighted average
@@ -213,7 +214,6 @@ class RLServer(base.Server):
         if self.agent.reset_env:
             self.agent.reset_env = False
             self.configure()
-            await self.wrap_up()
         if self.agent.finished:
             await self.close()
 
