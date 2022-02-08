@@ -16,25 +16,27 @@ from torch.nn.utils.rnn import (pack_padded_sequence, pad_packed_sequence,
                                 pad_sequence)
 
 
-class ReplayMemory(base.ReplayMemory):
+class RNNReplayMemory:
     def __init__(self, state_dim, action_dim, hidden_size, capacity, seed):
-        super().__init__(state_dim, action_dim, capacity, seed)
         random.seed(seed)
         self.device = Config().device()
         self.capacity = int(capacity)
         self.ptr = 0
         self.size = 0
 
-        if Config().algorithm.recurrent_actor:
-            self.h = np.zeros((self.capacity, hidden_size))
-            self.nh = np.zeros((self.capacity, hidden_size))
-            self.c = np.zeros((self.capacity, hidden_size))
-            self.nc = np.zeros((self.capacity, hidden_size))
-            self.state = [0] * self.capacity
-            self.action = [0] * self.capacity
-            self.reward = [0] * self.capacity
-            self.next_state = [0] * self.capacity
-            self.done = [0] * self.capacity
+        self.h = np.zeros((self.capacity, hidden_size))
+        self.nh = np.zeros((self.capacity, hidden_size))
+        self.c = np.zeros((self.capacity, hidden_size))
+        self.nc = np.zeros((self.capacity, hidden_size))
+        if hasattr(Config().clients, 'varied') and Config().clients.varied:
+            self.state = np.zeros((self.capacity, action_dim, state_dim))
+            self.next_state = np.zeros((self.capacity, action_dim, state_dim))
+        else:
+            self.state = np.zeros((self.capacity, state_dim))
+            self.next_state = np.zeros((self.capacity, state_dim))
+        self.action = np.zeros((self.capacity, action_dim))
+        self.reward = np.zeros((self.capacity, 1))
+        self.done = np.zeros((self.capacity, 1))
 
     def push(self, data):
         self.state[self.ptr] = data[0]
@@ -43,11 +45,10 @@ class ReplayMemory(base.ReplayMemory):
         self.next_state[self.ptr] = data[3]
         self.done[self.ptr] = data[4]
 
-        if Config().algorithm.recurrent_actor:
-            self.h[self.ptr] = data[5].detach().cpu()
-            self.c[self.ptr] = data[6].detach().cpu()
-            self.nh[self.ptr] = data[7].detach().cpu()
-            self.nc[self.ptr] = data[8].detach().cpu()
+        self.h[self.ptr] = data[5].detach().cpu()
+        self.c[self.ptr] = data[6].detach().cpu()
+        self.nh[self.ptr] = data[7].detach().cpu()
+        self.nc[self.ptr] = data[8].detach().cpu()
 
         self.ptr = (self.ptr + 1) % self.capacity
         self.size = min(self.size + 1, self.capacity)
@@ -56,15 +57,6 @@ class ReplayMemory(base.ReplayMemory):
         ind = np.random.randint(0,
                                 self.size,
                                 size=int(Config().algorithm.batch_size))
-
-        if not Config().algorithm.recurrent_actor:
-            state = self.state[ind]
-            action = self.action[ind]
-            reward = self.reward[ind]
-            next_state = self.next_state[ind]
-            done = self.done[ind]
-
-            return state, action, reward, next_state, done
 
         h = torch.tensor(self.h[ind][None, ...],
                          requires_grad=True,
@@ -79,17 +71,27 @@ class ReplayMemory(base.ReplayMemory):
                           requires_grad=True,
                           dtype=torch.float).to(self.device)
 
-        state = [torch.FloatTensor(self.state[i]).to(self.device) for i in ind]
-        action = [
-            torch.FloatTensor(self.action[i]).to(self.device) for i in ind
-        ]
-        reward = [self.reward[i] for i in ind]
-        next_state = [
-            torch.FloatTensor(self.next_state[i]).to(self.device) for i in ind
-        ]
-        done = [self.done[i] for i in ind]
+        if hasattr(Config().clients, 'varied') and Config().clients.varied:
+            state = torch.FloatTensor(self.state[ind]).to(self.device)
+            next_state = torch.FloatTensor(self.next_state[ind]).to(
+                self.device)
+            action = torch.FloatTensor(self.action[ind]).to(
+                self.device)
+        else:
+            state = torch.FloatTensor(self.state[ind][:,
+                                                      None, :]).to(self.device)
+            next_state = torch.FloatTensor(
+                self.next_state[ind][:, None, :]).to(self.device)
+            action = torch.FloatTensor(self.action[ind][:, None, :]).to(
+                self.device)
+        reward = torch.FloatTensor(self.reward[ind][:,
+                                                    None, :]).to(self.device)
+        done = torch.FloatTensor(self.done[ind][:, None, :]).to(self.device)
 
         return state, action, reward, next_state, done, h, c, nh, nc
+
+    def __len__(self):
+        return self.size
 
 
 class TD3Actor(base.Actor):
@@ -143,7 +145,7 @@ class RNNActor(nn.Module):
 
         self.l1 = nn.LSTM(state_dim, hidden_size, batch_first=True)
         self.l2 = nn.Linear(hidden_size, hidden_size)
-        self.l3 = nn.Linear(hidden_size, 1)
+        self.l3 = nn.Linear(hidden_size, action_dim)
 
     def forward(self, state, hidden=None):
         if hasattr(Config().clients, 'varied') and Config().clients.varied:
@@ -163,16 +165,19 @@ class RNNActor(nn.Module):
             # Pad variable states
             # Get the length explicitly for later packing sequences
             lens = list(map(len, state))
-            if len(state) == 1:
-                state = [torch.squeeze(state)]
+            state = [state]
+
             # Pad and pack
             padded = pad_sequence(state, batch_first=True)
-            state = pack_padded_sequence(padded,
-                                         lengths=lens,
-                                         batch_first=True,
-                                         enforce_sorted=False)
+            packed_state = pack_padded_sequence(padded,
+                                                lengths=lens,
+                                                batch_first=True,
+                                                enforce_sorted=False)
         self.l1.flatten_parameters()
-        a, h = self.l1(state, hidden)
+        if hasattr(Config().clients, 'varied') and Config().clients.varied:
+            a, h = self.l1(packed_state[0], hidden)
+        else:
+            a, h = self.l1(state, hidden)
 
         # mini-batch update
         if hasattr(Config().clients,
@@ -181,6 +186,9 @@ class RNNActor(nn.Module):
 
         a = F.relu(self.l2(a))
         a = self.max_action * torch.tanh(self.l3(a))
+
+        if hasattr(Config().clients, 'varied') and Config().clients.varied:
+            a = a[0][0].unsqueeze(0).unsqueeze(0)
 
         return a, h
 
@@ -191,12 +199,22 @@ class RNNCritic(nn.Module):
         self.action_dim = action_dim
 
         # Q1 architecture
-        self.l1 = nn.LSTM(state_dim + 1, hidden_size, batch_first=True)
+        if hasattr(Config().clients, 'varied') and Config().clients.varied:
+            self.l1 = nn.LSTM(state_dim + 1, hidden_size, batch_first=True)
+        else:
+            self.l1 = nn.LSTM(state_dim + action_dim,
+                              hidden_size,
+                              batch_first=True)
         self.l2 = nn.Linear(hidden_size, hidden_size)
         self.l3 = nn.Linear(hidden_size, 1)
 
         # Q2 architecture
-        self.l4 = nn.LSTM(state_dim + 1, hidden_size, batch_first=True)
+        if hasattr(Config().clients, 'varied') and Config().clients.varied:
+            self.l4 = nn.LSTM(state_dim + 1, hidden_size, batch_first=True)
+        else:
+            self.l4 = nn.LSTM(state_dim + action_dim,
+                              hidden_size,
+                              batch_first=True)
         self.l5 = nn.Linear(hidden_size, hidden_size)
         self.l6 = nn.Linear(hidden_size, 1)
 
@@ -218,8 +236,8 @@ class RNNCritic(nn.Module):
             # Pad variable states
             # Get the length explicitly for later packing sequences
             lens = list(map(len, state))
-            if len(state) == 1:
-                state = [torch.squeeze(state)]
+            state = [state]
+            
             # Pad and pack
             padded = pad_sequence(state, batch_first=True)
             state = padded
@@ -304,10 +322,18 @@ class Policy(base.Policy):
             self.critic.parameters(), lr=Config().algorithm.learning_rate)
 
         # Initialize replay memory
-        self.replay_buffer = ReplayMemory(state_dim, action_dim,
-                                          Config().algorithm.hidden_size,
-                                          Config().algorithm.replay_size,
-                                          Config().algorithm.replay_seed)
+        if Config().algorithm.recurrent_actor:
+            self.replay_buffer = RNNReplayMemory(
+                state_dim, action_dim,
+                Config().algorithm.hidden_size,
+                Config().algorithm.replay_size,
+                Config().algorithm.replay_seed)
+
+        else:
+            self.replay_buffer = base.ReplayMemory(
+                state_dim, action_dim,
+                Config().algorithm.replay_size,
+                Config().algorithm.replay_seed)
 
         self.policy_noise = Config().algorithm.policy_noise * self.max_action
         self.noise_clip = Config().algorithm.noise_clip * self.max_action
@@ -330,7 +356,12 @@ class Policy(base.Policy):
     def select_action(self, state, hidden=None, test=False):
         """ Select action from policy. """
         if Config().algorithm.recurrent_actor:
-            state = torch.FloatTensor(state).to(self.device).unsqueeze(0)
+            if hasattr(Config().clients, 'varied') and Config().clients.varied:
+                state = torch.FloatTensor(state).to(self.device).unsqueeze(0)
+            else:
+                state = torch.FloatTensor(state.reshape(1, -1)).to(
+                    self.device)[:, None, :]
+            # state = torch.FloatTensor(state).to(self.device).unsqueeze(0)
             action, hidden = self.actor(state, hidden)
             return action.cpu().data.numpy().flatten(), hidden
         else:
@@ -346,10 +377,8 @@ class Policy(base.Policy):
         if Config().algorithm.recurrent_actor:
             state, action, reward, next_state, done, h, c, nh, nc = self.replay_buffer.sample(
             )
-            if hasattr(Config().clients, 'varied') and Config().clients.varied:
-                # Pad variable actions
-                padded = pad_sequence(action, batch_first=True)
-                action = padded
+            # if hasattr(Config().clients, 'varied') and Config().clients.varied:
+            #     state = state[0]
             reward = torch.FloatTensor(reward).to(self.device).unsqueeze(1)
             done = torch.FloatTensor(done).to(self.device).unsqueeze(1)
             hidden = (h, c)

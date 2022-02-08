@@ -14,6 +14,7 @@ from plato.utils.reinforcement_learning import simple_rl_agent
 from plato.utils.reinforcement_learning.policies import \
     registry as policies_registry
 
+os.environ['config_file'] = 'examples/fei/fei_FashionMNIST_lenet5.yml'
 
 class RLAgent(simple_rl_agent.RLAgent):
     """ An RL agent for FL training using FEI. """
@@ -21,7 +22,7 @@ class RLAgent(simple_rl_agent.RLAgent):
     def __init__(self):
         super().__init__()
         # TODO: check state_dim
-        if Config().algorithm.recurrent_actor:
+        if hasattr(Config().clients, 'varied') and Config().clients.varied:
             self.policy = policies_registry.get(Config().algorithm.n_features,
                                                 self.n_actions)
         else:
@@ -63,6 +64,13 @@ class RLAgent(simple_rl_agent.RLAgent):
 
         if Config().algorithm.recurrent_actor:
             self.h, self.c = self.policy.get_initial_states()
+    
+    def get_state(self):
+        """ Get state for agent. """
+        if hasattr(Config().clients, 'varied') and Config().clients.varied:
+            return self.new_state
+        else:
+            return np.squeeze(self.new_state.reshape(1, -1))
 
     def prep_action(self):
         """ Get action from RL policy. """
@@ -71,7 +79,7 @@ class RLAgent(simple_rl_agent.RLAgent):
             if Config().algorithm.start_steps > self.total_steps:
                 self.action = np.array(
                     self.action_space.sample())  # Sample random action
-                self.action = np.reshape(self.action, (-1, 1))
+                # self.action = np.reshape(self.action, (-1, 1))
             else:  # Sample action from policy
                 if Config().algorithm.recurrent_actor:
                     self.action, (self.nh,
@@ -79,7 +87,7 @@ class RLAgent(simple_rl_agent.RLAgent):
                                       self.state, (self.h, self.c))
                 else:
                     self.action = self.policy.select_action(self.state)
-                self.action = np.reshape(np.array(self.action), (-1, 1))
+                # self.action = np.reshape(np.array(self.action), (-1, 1))
         else:
             if Config().algorithm.recurrent_actor:
                 # don't pass hidden states
@@ -157,6 +165,5 @@ class RLAgent(simple_rl_agent.RLAgent):
                  np.float(self.is_done), self.h, self.c, self.nh, self.nc))
         else:
             self.policy.replay_buffer.push(
-                (self.state.reshape(1, -1), self.action.reshape(1, -1),
-                 self.reward, self.state.reshape(1,
-                                                 -1), np.float(self.is_done)))
+                (self.state, self.action,
+                 self.reward, self.next_state, np.float(self.is_done)))
