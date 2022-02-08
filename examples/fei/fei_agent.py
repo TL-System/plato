@@ -84,7 +84,7 @@ class RLAgent(simple_rl_agent.RLAgent):
                 # self.action = action + noise
                 
                 # fedavg policy
-                self.action = np.array(self.num_samples)
+                self.action = np.array(self.num_samples) / np.array(self.num_samples).sum()
             else:  
                 # Sample action from policy
                 if Config().algorithm.recurrent_actor:

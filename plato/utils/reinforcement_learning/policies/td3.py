@@ -102,6 +102,9 @@ class TD3Actor(base.Actor):
         x = F.relu(self.l1(x))
         x = F.relu(self.l2(x))
         x = self.max_action * torch.tanh(self.l3(x))
+        # Normalize/Scaling aggregation weights so that the sum is 1
+        x += 1  # [-1, 1] -> [0, 2]
+        x /= x.sum()
         return x
 
 
@@ -189,6 +192,10 @@ class RNNActor(nn.Module):
 
         if hasattr(Config().clients, 'varied') and Config().clients.varied:
             a = a[0][0].unsqueeze(0).unsqueeze(0)
+
+        # Normalize/Scaling aggregation weights so that the sum is 1
+        a += 1  # [-1, 1] -> [0, 2]
+        a /= a.sum()
 
         return a, h
 

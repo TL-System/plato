@@ -38,9 +38,7 @@ class RLServer(simple_rl_server.RLServer):
 
     def apply_action(self):
         """ Apply action update from RL Agent to FL Env. """
-        weights = np.array(self.agent.action)
-        self.smart_weighting = self.normalize_weights(
-            weights[:self.clients_per_round])
+        self.smart_weighting = np.array(self.agent.action)
 
     def extract_client_updates(self, updates):
         """ Extract the model weights and update directions from clients updates. """
@@ -100,17 +98,6 @@ class RLServer(simple_rl_server.RLServer):
             flattened = np.append(flattened, grads[i])
 
         return flattened
-
-    @staticmethod
-    def normalize_weights(weights):
-        """ Normalize/Scaling aggregation weights so that the sum is 1. """
-        # 1st method: scaling only
-        weights += 1  # [-1, 1] -> [0, 2]
-        normalized_weights = weights / weights.sum()
-        # 2nd method: offset + scaling
-        # normalized_weights =  (weights - np.min(weights)) / (np.max(weights) - np.min(weights))
-        # normalized_weights /= normalized_weights.sum()
-        return normalized_weights
 
     @staticmethod
     def normalize_state(feature):
