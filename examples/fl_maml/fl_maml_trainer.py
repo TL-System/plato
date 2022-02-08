@@ -4,7 +4,6 @@ The training and testing loops for PyTorch.
 import copy
 import logging
 import os
-import random
 
 import numpy as np
 import torch

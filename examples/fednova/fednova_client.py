@@ -40,7 +40,7 @@ class Client(simple.Client):
 
     def configure(self):
         super().configure()
-        random.seed(3000 + self.client_id)
+        np.random.seed(3000 + self.client_id)
 
     async def train(self):
         """ FedNova clients use different number of local epochs. """
