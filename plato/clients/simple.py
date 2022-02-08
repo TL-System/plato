@@ -3,7 +3,6 @@ A basic federated learning client who sends weight updates to the server.
 """
 
 import logging
-import time
 from dataclasses import dataclass
 
 from plato.algorithms import registry as algorithms_registry
@@ -23,7 +22,6 @@ class Report(base.Report):
 
 class Client(base.Client):
     """A basic federated learning client who sends simple weight updates."""
-
     def __init__(self,
                  model=None,
                  datasource=None,

@@ -5,7 +5,6 @@ A cross-silo federated learning server using federated averaging, as either edge
 import asyncio
 import logging
 import os
-import time
 import numpy as np
 
 from plato.config import Config

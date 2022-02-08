@@ -25,6 +25,7 @@ class Client(base.Client):
         self.server = server
         self.algorithm = algorithm
         self.trainer = trainer
+        self.report = None
 
     def configure(self):
         """ Prepare this edge client for training. """
@@ -47,7 +48,8 @@ class Client(base.Client):
         """ The edge client does not need to train models using local data. """
 
     def load_payload(self, server_payload):
-        """ The edge client does not need to train models using local data. """
+        """ The edge client loads the model from the central server. """
+        self.server.algorithm.load_weights(server_payload)
 
     def process_server_response(self, server_response):
         """ Additional client-specific processing on the server response. """
@@ -66,12 +68,23 @@ class Client(base.Client):
         self.server.model_aggregated.clear()
 
         # Extract model weights and biases
-        weights = self.algorithm.extract_weights()
+        weights = self.server.algorithm.extract_weights()
 
         # Generate a report of test accuracy for the server
         accuracy = self.server.accuracy
 
         training_time = time.perf_counter() - training_start_time
 
-        return Report(self.server.total_samples, accuracy, training_time,
-                      False, self.client_id), weights
+        self.report = Report(self.server.total_samples, accuracy,
+                             training_time, False, self.client_id)
+
+        return self.report, weights
+
+    async def obtain_model_update(self, wall_time):
+        """Retrieving a model update corresponding to a particular wall clock time.
+        Haven't tested yet, just to avoid pylint(abstract-method)."""
+        model = self.server.trainer.obtain_model_update(wall_time)
+        weights = self.server.algorithm.extract_weights(model)
+        self.report.update_response = True
+
+        return self.report, weights
