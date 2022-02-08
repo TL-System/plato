@@ -50,7 +50,6 @@ class Client(base.Client):
     def load_payload(self, server_payload) -> None:
         """ The edge client loads the model from the central server. """
         self.server.algorithm.load_weights(server_payload)
-        self.server.loaded_global_model.set()
 
     def process_server_response(self, server_response):
         """ Additional client-specific processing on the server response. """

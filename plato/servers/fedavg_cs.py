@@ -30,10 +30,6 @@ class Server(fedavg.Server):
             # before starting the first round of local aggregation
             self.new_global_round_begins = asyncio.Event()
 
-            # An edge client waits for loading the current global model
-            # before selecting clients
-            self.loaded_global_model = asyncio.Event()
-
             # Compute the number of clients in each silo for edge servers
             launched_clients = Config().clients.total_clients
             if hasattr(Config().clients,
@@ -98,9 +94,6 @@ class Server(fedavg.Server):
 
     async def select_clients(self):
         if Config().is_edge_server():
-            await self.loaded_global_model.wait()
-            self.loaded_global_model.clear()
-
             if self.current_round == 0:
                 # Wait until this edge server is selected by the central server
                 # to avoid the edge server selects clients and clients begin training
