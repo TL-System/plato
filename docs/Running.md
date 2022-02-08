@@ -40,49 +40,11 @@ You can now activate your environment:
 source ~/.federated/bin/activate
 ```
 
-Currently, there is no feasiable way to install the `datasets` package with `virtualenvs` (Compute Canada asks users to not use Conda.) So we cannot run *Plato* with HuggingFace datasets on Compute Canada right now. If you want to do experiments with HuggingFace datasets, you could do it on Google Colaboratory.
+Due to the lack of some packages on Compute Canada, some source files need to be patched. Use the following command to patch these files:
 
-To bypass installing the `datasets` package, please comment out the following 2 lines of code related to `huggingface` in `plato/datasources/huggingface.py`:
-
+```shell
+bash ./docs/patches/patch_cc.sh
 ```
-# from datasets import load_dataset
-# self.dataset = load_dataset(dataset_name, dataset_config)
-```
-
-Also, modify one line in `setup.py`. Change
-
-```
-def get_requirements():
-    with open("requirements.txt") as f:
-        return f.read().splitlines()
-```
-
-to
-
-```
-def get_requirements():
-    with open("./docs/cc_requirements.txt") as f:
-        return f.read().splitlines()
-```
-
-As Compute Canada only supports `aiohttp==3.7.4` but not `aiohttp>=3.8`, please modify `plato/servers/base.py`. Change
-
-```
-web.run_app(app,
-            host=Config().server.address,
-            port=port,
-            loop=asyncio.get_event_loop())
-```
-
-to
-
-```
-web.run_app(app,
-            host=Config().server.address,
-            port=port)
-```
-
-Finally, comment out the lines `import zstd` in `plato/processors/compress.py` and `plato/processors/decompress.py`.
 
 The next step is to install the required Python packages. PyTorch should be installed following the advice of its [getting started website](https://pytorch.org/get-started/locally/). As for Jan 2022, Compute Canada provides GPU with CUDA version 11.2, so the command would be:
 
@@ -93,7 +55,7 @@ pip3 install torch==1.10.1+cu113 torchvision==0.11.2+cu113 torchaudio==0.10.1+cu
 To double-check the CUDA version used in the command above, start an interactive session and use the `nvidia-smi` command within the interactive session:
 
 ```shell
-salloc --time=2:00:00 --nodes=1 --ntasks-per-node=32 --gres=gpu:1 --mem=127000M --account=def-baochun
+salloc --time=2:00:00 --nodes=1 --gres=gpu:1 --mem=64000M --account=def-baochun
 nvidia-smi
 ```
 
@@ -115,7 +77,7 @@ Then add
 alias plato='cd ~/projects/def-baochun/<CCDB username>/plato/; module load python/3.9; source ~/.federated/bin/activate'
 ```
 
-After saving this change and exiting `vim`, 
+After saving this change and exiting `vim`:
 
 ```
 source ~/.bashrc
@@ -142,10 +104,9 @@ Then add your configuration parameters in the job script. The following is an ex
 
 ```
 #!/bin/bash
-#SBATCH --time=20:00:00  # Request a job to be executed for 20 hours
+#SBATCH --time=3:00:00  # Request a job to be executed for 3 hours
 #SBATCH --nodes=1
-#SBATCH --gres=gpu:2
-#SBATCH --ntasks-per-node=32
+#SBATCH --gres=gpu:1
 #SBATCH --mem=127000M
 #SBATCH --account=def-baochun
 #SBATCH --output=cifar_wideresnet.out # The name of the output file
@@ -184,7 +145,7 @@ where `./cifar_wideresnet.out` is the output file that needs to be monitored, an
 If there is a need to start an interactive session (for debugging purposes, for example), it is also supported by Compute Canada using the `salloc` command:
 
 ```shell
-salloc --time=2:00:0 --nodes=1 --ntasks-per-node=32 --gres=gpu:1 --mem=127000M --account=def-baochun
+salloc --time=2:00:0 --nodes=1 --ntasks=4 --gres=gpu:1 --mem=64000M --account=def-baochun
 ```
 
 The job will then be queued and waiting for resources:
@@ -206,7 +167,7 @@ Then you can run *Plato*:
 ```shell
 module load python/3.9
 virtualenv --no-download ~/.federated
-./run --config=configs/CIFAR10/fedavg_wideresnet.yml
+./run -c configs/CIFAR10/fedavg_wideresnet.yml
 ```
 
 After the job is done, use `exit` at the command to relinquish the job allocation.
