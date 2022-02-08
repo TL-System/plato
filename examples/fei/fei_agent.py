@@ -19,8 +19,12 @@ class RLAgent(simple_rl_agent.RLAgent):
     """ An RL agent for FL training using FEI. """
     def __init__(self):
         super().__init__()
-        self.policy = policies_registry.get(Config().algorithm.n_features,
-                                            self.action_space)
+        # TODO: check state_dim
+        if Config().algorithm.recurrent_actor:
+            self.policy = policies_registry.get(Config().algorithm.n_features,
+                                                self.n_actions)
+        else:
+            self.policy = policies_registry.get(self.n_states, self.n_actions)
 
         if Config().algorithm.recurrent_actor:
             self.h, self.c = self.policy.get_initial_states()
@@ -67,23 +71,22 @@ class RLAgent(simple_rl_agent.RLAgent):
             if Config().algorithm.start_steps > self.total_steps:
                 self.action = np.array(
                     self.action_space.sample())  # Sample random action
-                if Config().algorithm.recurrent_actor:
-                    self.action = np.reshape(self.action, (-1, 1))
+                self.action = np.reshape(self.action, (-1, 1))
             else:  # Sample action from policy
                 if Config().algorithm.recurrent_actor:
                     self.action, (self.nh,
                                   self.nc) = self.policy.select_action(
                                       self.state, (self.h, self.c))
-                    self.action = np.reshape(np.array(self.action), (-1, 1))
                 else:
                     self.action = self.policy.select_action(self.state)
+                self.action = np.reshape(np.array(self.action), (-1, 1))
         else:
             if Config().algorithm.recurrent_actor:
                 # don't pass hidden states
                 self.action, __ = self.policy.select_action(self.state)
-                self.action = np.reshape(np.array(self.action), (-1, 1))
             else:
                 self.action = self.policy.select_action(self.state)
+            self.action = np.reshape(np.array(self.action), (-1, 1))
 
     def get_reward(self):
         """ Get reward for agent. """
@@ -127,10 +130,10 @@ class RLAgent(simple_rl_agent.RLAgent):
                     'critic_loss': critic_loss
                 }[item]
                 new_row.append(item_value)
-                
+
             episode_result_csv_file = f'{Config().results_dir}/{os.getpid()}_episode_result.csv'
             csv_processor.write_csv(episode_result_csv_file, new_row)
-        
+
         episode_reward_csv_file = f'{Config().results_dir}/{os.getpid()}_episode_reward.csv'
         csv_processor.write_csv(episode_reward_csv_file, [
             self.current_episode, self.current_step,
@@ -153,5 +156,6 @@ class RLAgent(simple_rl_agent.RLAgent):
                  np.float(self.is_done), self.h, self.c, self.nh, self.nc))
         else:
             self.policy.replay_buffer.push(
-                (self.state, self.action, self.reward, self.next_state,
-                 np.float(self.is_done)))
+                (self.state.reshape(1, -1), self.action.reshape(1, -1),
+                 self.reward, self.state.reshape(1,
+                                                 -1), np.float(self.is_done)))

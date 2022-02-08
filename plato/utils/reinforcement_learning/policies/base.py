@@ -1,3 +1,4 @@
+import copy
 import logging
 import os
 import random
@@ -53,52 +54,59 @@ class ReplayMemory:
 
 
 class Actor(nn.Module):
-    """ A simple example of actor NN. """
-    def __init__(self, state_dim, action_dim, hidden_size, max_action):
+    def __init__(self, state_dim, action_dim, max_action):
         super(Actor, self).__init__()
-        self.max_action = max_action
 
-        # actor NN layers, e.g.,
-        self.l1 = nn.Linear(state_dim, hidden_size)
-        self.l2 = nn.Linear(hidden_size, action_dim)
+        self.l1 = nn.Linear(state_dim, 400)
+        self.l2 = nn.Linear(400, 300)
+        self.l3 = nn.Linear(300, action_dim)
+
+        self.max_action = max_action
 
     def forward(self, x):
         x = F.relu(self.l1(x))
-        x = self.max_action * torch.tanh(self.l2(x))
+        x = F.relu(self.l2(x))
+        x = self.max_action * torch.tanh(self.l3(x))
         return x
 
 
 class Critic(nn.Module):
-    """ A simple example of critic NN. """
-    def __init__(self, state_dim, action_dim, hidden_size):
+    def __init__(self, state_dim, action_dim):
         super(Critic, self).__init__()
 
-        # critic NN layers, e.g.,
-        self.l1 = nn.Linear(state_dim + action_dim, hidden_size)
-        self.l2 = nn.Linear(hidden_size, 1)
+        self.l1 = nn.Linear(state_dim + action_dim, 400)
+        self.l2 = nn.Linear(400, 300)
+        self.l3 = nn.Linear(300, 1)
 
     def forward(self, x, u):
         x = F.relu(self.l1(torch.cat([x, u], 1)))
-        x = self.l2(x)
+        x = F.relu(self.l2(x))
+        x = self.l3(x)
         return x
 
 
 class Policy(ABC):
     """ A simple example of DRL policy. """
-    def __init__(self, state_dim, action_space):
+    def __init__(self, state_dim, action_dim):
         self.max_action = Config().algorithm.max_action
         self.device = Config().device()
         self.total_it = 0
 
         # Initialize NNs
-        self.actor = None
-        self.actor_optimizer = None
+        self.actor = Actor(state_dim, action_dim,
+                           self.max_action).to(self.device)
+        self.actor_target = copy.deepcopy(self.actor)
+        self.actor_optimizer = torch.optim.Adam(
+            self.actor.parameters(), lr=Config().algorithm.learning_rate)
 
-        self.critic = None
-        self.critic_optimizer = None
-
+        self.critic = Critic(state_dim, action_dim).to(self.device)
+        self.critic_target = copy.deepcopy(self.critic)
+        self.critic_optimizer = torch.optim.Adam(
+            self.critic.parameters(), lr=Config().algorithm.learning_rate)
         # Initialize replay memory
-        self.replay_buffer = None
+        self.replay_buffer = ReplayMemory(state_dim, action_dim,
+                                          Config().algorithm.replay_size,
+                                          Config().algorithm.replay_seed)
 
     def save_model(self, ep=None):
         """ Saving the model to a file. """
