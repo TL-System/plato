@@ -17,8 +17,10 @@ clients:
 
     # The simulation distribution
     simulation_distribution:
-        distribution: pareto
-        alpha: 1.5
+        # staleness is simulated from uniform distribution as mentioned in Section 5.2
+        distribution: uniform
+        low: 0
+        high: 20
 
 server:
     address: 127.0.0.1
@@ -27,8 +29,8 @@ server:
     simulate_wall_time: false
 
     # Parameter for FedAsync
-    minimum_clients_aggregated: 1
     staleness_bound: 4
+    minimum_clients_aggregated: 1
     mixing_hyperparameter: 0.9
     adaptive_mixing: true
     staleness_weighting_function:

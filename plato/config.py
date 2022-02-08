@@ -208,6 +208,8 @@ class Config:
                                                size=total_clients)
             if dist.distribution.lower() == "pareto":
                 sleep_times = np.random.pareto(dist.alpha, size=total_clients)
+            if dist.distribution.lower() == "uniform":
+                sleep_times = np.random.uniform(dist.low, dist.high, size=total_clients)
         else:
             # By default, use Zipf distribution with a parameter of 1.5
             sleep_times = np.random.pareto(1.0, size=total_clients)
