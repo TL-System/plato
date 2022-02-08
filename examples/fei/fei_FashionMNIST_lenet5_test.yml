@@ -1,9 +1,9 @@
 clients:
     # The total number of clients
-    total_clients: 10
+    total_clients: 3
 
     # The number of clients selected in each round
-    per_round: 10
+    per_round: 3
 
     # Whether select variable number of clients per round
     varied: false
@@ -29,7 +29,7 @@ data:
     partition_size: 200
 
     # Whether use varied partition per client or not?
-    varied: true
+    varied: false
 
     # IID or non-IID?
     sampler: noniid
@@ -57,7 +57,7 @@ trainer:
     epochs: 10
 
     # Whether use varied epochs per client or not?
-    varied: true
+    varied: false
 
     batch_size: 32
     optimizer: SGD
@@ -79,8 +79,8 @@ algorithm:
     min_action: -1
     max_episode: 2000
     alpha: 5 # controls the decreasing rate of the mapping function
-    beta: 20  # coefficient used in reward function
-    theta: 0.005  # threshold for stdev(pre_acc)
+    beta: 10  # coefficient used in reward function
+    theta: 1.0  # threshold for stdev(pre_acc)
     log_interval: 10
     mode: train  # test
     pretrained: false
@@ -100,10 +100,10 @@ algorithm:
     # Frequency of delayed policy updates
     policy_freq: 2
     # mini batch size
-    batch_size: 64
+    batch_size: 2
     hidden_size: 256
     # steps sampling random actions
-    start_steps: 320
+    start_steps: 1
     # replay memory
     replay_size: 10000
     replay_seed: 1234
