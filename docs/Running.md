@@ -55,7 +55,7 @@ pip3 install torch==1.10.1+cu113 torchvision==0.11.2+cu113 torchaudio==0.10.1+cu
 To double-check the CUDA version used in the command above, start an interactive session and use the `nvidia-smi` command within the interactive session:
 
 ```shell
-salloc --time=2:00:00 --nodes=1 --gres=gpu:1 --mem=64000M --account=def-baochun
+salloc --time=2:00:00 --gres=gpu:1 --mem=64G --account=def-baochun
 nvidia-smi
 ```
 
@@ -104,16 +104,16 @@ Then add your configuration parameters in the job script. The following is an ex
 
 ```
 #!/bin/bash
-#SBATCH --time=3:00:00  # Request a job to be executed for 3 hours
+#SBATCH --time=3:00:00
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:1
-#SBATCH --mem=127000M
+#SBATCH --mem=128G
 #SBATCH --account=def-baochun
 #SBATCH --output=cifar_wideresnet.out # The name of the output file
 
 module load python/3.9
 source ~/.federated/bin/activate
-./run --config=configs/CIFAR10/fedavg_wideresnet.yml --log=info
+./run -c configs/CIFAR10/fedavg_wideresnet.yml --log=info
 ```
 
 **Note:** The example above requests a type of GPU on Compute Canada's `Graham` cluster that requires a very short waiting time (as for January 2022, but it may change.)
@@ -145,7 +145,7 @@ where `./cifar_wideresnet.out` is the output file that needs to be monitored, an
 If there is a need to start an interactive session (for debugging purposes, for example), it is also supported by Compute Canada using the `salloc` command:
 
 ```shell
-salloc --time=2:00:0 --nodes=1 --ntasks=4 --gres=gpu:1 --mem=64000M --account=def-baochun
+salloc --time=2:00:00 --gres=gpu:1 --mem=64G --account=def-baochun
 ```
 
 The job will then be queued and waiting for resources:
@@ -165,8 +165,6 @@ salloc: Granted job allocation 53923456
 Then you can run *Plato*:
 
 ```shell
-module load python/3.9
-virtualenv --no-download ~/.federated
 ./run -c configs/CIFAR10/fedavg_wideresnet.yml
 ```
 
