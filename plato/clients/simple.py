@@ -125,8 +125,18 @@ class Client(base.Client):
         else:
             accuracy = 0
 
-        self.report = Report(self.sampler.trainset_size(), accuracy,
-                             training_time, False)
+        if hasattr(Config().clients,
+                   'sleep_simulation') and Config().clients.sleep_simulation:
+            sleep_seconds = Config().client_sleep_times[self.client_id - 1]
+            avg_training_time = Config().clients.avg_training_time
+
+            self.report = Report(self.sampler.trainset_size(), accuracy,
+                                 (avg_training_time + sleep_seconds) *
+                                 Config().trainer.epochs, False)
+        else:
+            self.report = Report(self.sampler.trainset_size(), accuracy,
+                                 training_time, False)
+
         return self.report, weights
 
     async def obtain_model_update(self, wall_time):

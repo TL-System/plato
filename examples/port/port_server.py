@@ -10,6 +10,7 @@ Reference:
 import asyncio
 import copy
 import os
+import logging
 
 import torch
 import torch.nn.functional as F
@@ -28,19 +29,19 @@ class Server(fedavg.Server):
         model_dir = Config().params['model_dir']
         model_path = f'{model_dir}/{filename}'
 
-        similarity = 0
+        similarity = 1.0
 
         if staleness > 0 and os.path.exists(model_path):
             previous_model = copy.deepcopy(self.trainer.model)
             previous_model.load_state_dict(torch.load(model_path))
 
             previous = torch.zeros(0)
-            for layer in previous_model.parameters():
-                previous = torch.cat((previous, layer.data.view(-1)))
+            for __, weight in previous_model.cpu().state_dict().items():
+                previous = torch.cat((previous, weight.view(-1)))
 
             current = torch.zeros(0)
-            for layer in self.trainer.model.parameters():
-                current = torch.cat((current, layer.data.view(-1)))
+            for __, weight in self.trainer.model.cpu().state_dict().items():
+                current = torch.cat((current, weight.view(-1)))
 
             deltas = torch.zeros(0)
             for __, delta in update.items():
@@ -67,22 +68,29 @@ class Server(fedavg.Server):
 
             similarity = await self.cosine_similarity(update, staleness)
             staleness_factor = Server.staleness_function(staleness)
-            print(
-                f'similarity = {similarity + 1}, staleness = {staleness}, staleness factor = {staleness_factor}'
-            )
-            print(
-                f'for client {i}, raw weight = {num_samples / self.total_samples * (similarity + 1) * staleness_factor}'
-            )
 
-            aggregation_weights.append(num_samples / self.total_samples *
-                                       (similarity + 1) * staleness_factor)
+            similarity_weight = Config().server.similarity_weight if hasattr(
+                Config().server, 'similarity_weight') else 1
+            staleness_weight = Config().server.staleness_weight if hasattr(
+                Config().server, 'staleness_weight') else 0
+
+            logging.info('[Client %s] similarity: %s', i, (similarity + 1) / 2)
+            logging.info('[Client %s] staleness: %s, staleness factor: %s', i,
+                         staleness, staleness_factor)
+            raw_weight = num_samples / self.total_samples * (
+                (similarity + 1) / 2 * similarity_weight +
+                staleness_factor * staleness_weight)
+            logging.info('[Client %s] raw weight = %s', i, raw_weight)
+
+            aggregation_weights.append(raw_weight)
 
         # Normalize so that the sum of aggregation weights equals 1
         aggregation_weights = [
             i / sum(aggregation_weights) for i in aggregation_weights
         ]
 
-        print('normalized weights = ', aggregation_weights)
+        logging.info('[Client %s] normalized weights: %s', i,
+                     aggregation_weights)
 
         # Perform weighted averaging
         avg_update = {

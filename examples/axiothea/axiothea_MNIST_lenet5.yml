@@ -93,4 +93,4 @@ results:
     # Write the following parameter(s) into a CSV
     types: accuracy, training_time, round_time, edge_agg_num
 
-    results_dir: ./results/test
+    result_dir: ./results/test
