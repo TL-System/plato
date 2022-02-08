@@ -18,6 +18,7 @@ from plato.utils import csv_processor
 
 class RLServer(base.Server):
     """ A federated learning server with RL Agent. """
+
     def __init__(self, agent, model=None, algorithm=None, trainer=None):
         super().__init__()
         self.agent = agent
@@ -66,10 +67,10 @@ class RLServer(base.Server):
 
         # Initialize the csv file which will record results
         if self.agent.current_episode == 0 and hasattr(Config(), 'results'):
-            results_dir = Config().results_dir
-            result_csv_file = f'{results_dir}/{os.getpid()}_episode_result.csv'
+            result_dir = Config().result_dir
+            result_csv_file = f'{result_dir}/{os.getpid()}_episode_result.csv'
             csv_processor.initialize_csv(result_csv_file, self.recorded_items,
-                                         results_dir)
+                                         result_dir)
 
     def load_trainer(self):
         """ Setting up the global model to be trained via federated learning. """
@@ -166,7 +167,7 @@ class RLServer(base.Server):
                 }[item]
                 new_row.append(item_value)
 
-            result_csv_file = f'{Config().results_dir}/{os.getpid()}.csv'
+            result_csv_file = f'{Config().result_dir}/{os.getpid()}.csv'
             csv_processor.write_csv(result_csv_file, new_row)
 
     @staticmethod

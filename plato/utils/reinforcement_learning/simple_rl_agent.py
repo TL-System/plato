@@ -14,6 +14,7 @@ from plato.utils import csv_processor
 
 class RLAgent(object):
     """ A basic RL environment for FL server using Gym for RL control. """
+
     def __init__(self):
         self.n_actions = Config().clients.per_round
         self.n_states = Config().clients.per_round * Config(
@@ -109,8 +110,8 @@ class RLAgent(object):
             self.state = self.next_state
             self.episode_reward += self.reward
 
-            results_dir = Config().results_dir = Config().results_dir
-            step_result_csv_file = f'{results_dir}/{os.getpid()}_step_result.csv'
+            result_dir = Config().result_dir = Config().result_dir
+            step_result_csv_file = f'{result_dir}/{os.getpid()}_step_result.csv'
             csv_processor.write_csv(step_result_csv_file,
                                     [self.current_episode, self.current_step] +
                                     list(self.state) + list(self.action))
@@ -125,7 +126,8 @@ class RLAgent(object):
                 self.finished = True
             else:
                 await self.reset()
-        elif Config().algorithm.mode == 'test' and self.current_step >= Config().algorithm.test_step:
+        elif Config().algorithm.mode == 'test' and self.current_step >= Config(
+        ).algorithm.test_step:
             # Break the loop when RL testing is concluded
             self.finished = True
         else:

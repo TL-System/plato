@@ -10,7 +10,7 @@ clients:
 
     # Should the clients compute test accuracy locally?
     do_test: false
-    
+
     # Whether simulate clients or not
     simulation: false
 
@@ -80,10 +80,10 @@ algorithm:
     min_action: -1
     max_episode: 2000
     alpha: 5 # controls the decreasing rate of the mapping function
-    beta: 10  # coefficient used in reward function
-    theta: 0.005  # threshold for stdev(pre_acc)
+    beta: 10 # coefficient used in reward function
+    theta: 0.005 # threshold for stdev(pre_acc)
     log_interval: 10
-    mode: test  # test
+    mode: test # test
     pretrained: true
     pretrained_iter: 300
     test_step: 50
@@ -94,8 +94,8 @@ algorithm:
     gamma: 0.99
     tau: 0.005
     learning_rate: 0.0003
+    # Noise added to target policy during critic updates
     seed: 1234
-     # Noise added to target policy during critic update
     policy_noise: 0.25
     # Range to clip target policy noise
     noise_clip: 0.5
@@ -106,7 +106,7 @@ algorithm:
     hidden_size: 256
     # steps sampling random actions
     start_steps: 32
-    # replay buffer size
+    # the size of the replay buffer
     replay_size: 10000
     # whether use LSTM or FC nets
     recurrent_actor: true

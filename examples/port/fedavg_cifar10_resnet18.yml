@@ -6,7 +6,7 @@ clients:
     total_clients: 100
 
     # The number of clients selected in each round
-    per_round: 20
+    per_round: 30
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -19,20 +19,25 @@ clients:
     simulation_distribution:
         distribution: pareto
         alpha: 1
+    max_sleep_time: 30
+    sleep_simulation: true
+    avg_training_time: 20
 
     random_seed: 1
 
 server:
     address: 127.0.0.1
-    port: 8000
+    port: 8001
     ping_timeout: 36000
-    synchronous: false #true: sychronous, false: port
+    synchronous: false
     simulate_wall_time: true
-    minimum_clients_aggregated: 5
+    minimum_clients_aggregated: 15
     staleness_bound: 10
     random_seed: 1
     request_update: false
-    checkpoint_dir: /content/drive/MyDrive/CIFAR10
+
+    checkpoint_dir: ./models/cifar10/fedavg
+    model_dir: ./models/cifar10/fedavg
 
 data:
     # The training and testing dataset
@@ -42,13 +47,13 @@ data:
     data_path: ./data
 
     # Number of samples in each partition
-    partition_size: 1000
+    partition_size: 5000
 
     # IID or non-IID?
-    sampler: noniid
+    sampler: iid
 
     # The concentration parameter for the Dirichlet distribution
-    concentration: 0.05
+    concentration: 5
 
     # The random seed for sampling data
     random_seed: 1
@@ -58,16 +63,16 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 60
+    rounds: 80
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
 
     # The maximum number of clients running concurrently
-    max_concurrency: 10
+    max_concurrency: 5
 
     # The target accuracy
-    target_accuracy: 0.60
+    target_accuracy: 0.75
 
     # Number of epoches for local training in each communication round
     epochs: 5
@@ -84,13 +89,14 @@ trainer:
 
     # The machine learning model
     model_name: resnet_18
+    pretrained: false
 
 algorithm:
     # Aggregation algorithm
     type: fedavg
 
 results:
-    results_dir: /content/drive/MyDrive/CIFAR10
+    result_dir: ./results/cifar10/fedavg
 
     # Write the following parameter(s) into a CSV
     types: round, elapsed_time, accuracy

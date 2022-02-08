@@ -117,8 +117,8 @@ class Config:
 
             if 'results' in config:
                 Config.results = Config.namedtuple_from_dict(config['results'])
-                if hasattr(Config.results, 'results_dir'):
-                    Config.results_dir = Config.results.results_dir
+                if hasattr(Config.results, 'result_dir'):
+                    Config.result_dir = Config.results.result_dir
                 else:
                     datasource = Config.data.datasource
                     model = Config.trainer.model_name
@@ -127,7 +127,7 @@ class Config:
                         server_type = Config.server.type
                     elif hasattr(Config().algorithm, "type"):
                         server_type = Config.algorithm.type
-                    Config.results_dir = f'./results/{datasource}/{model}/{server_type}'
+                    Config.result_dir = f'./results/{datasource}/{model}/{server_type}'
 
             if 'model' in config:
                 Config.model = Config.namedtuple_from_dict(config['model'])
@@ -146,7 +146,10 @@ class Config:
             Config.params['run_id'] = os.getpid()
 
             # Pretrained models
-            Config.params['model_dir'] = "./models/pretrained"
+            if hasattr(Config().server, 'model_dir'):
+                Config.params['model_dir'] = Config().server.model_dir
+            else:
+                Config.params['model_dir'] = "./models/pretrained"
 
             # Resume checkpoint
             if hasattr(Config().server, 'checkpoint_dir'):
@@ -205,8 +208,10 @@ class Config:
                                                size=total_clients)
             if dist.distribution.lower() == "pareto":
                 sleep_times = np.random.pareto(dist.alpha, size=total_clients)
+            if dist.distribution.lower() == "zipf":
+                sleep_times = np.random.zipf(dist.s, size=total_clients)
         else:
-            # By default, use Zipf distribution with a parameter of 1.5
+            # By default, use Pareto distribution with a parameter of 1.0
             sleep_times = np.random.pareto(1.0, size=total_clients)
 
         Config.client_sleep_times = np.minimum(

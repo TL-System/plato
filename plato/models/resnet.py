@@ -1,5 +1,8 @@
 """
 The ResNet model.
+
+Reference:
+https://github.com/kuangliu/pytorch-cifar/blob/master/models/resnet.py
 """
 import collections
 
@@ -83,6 +86,7 @@ class Bottleneck(nn.Module):
 
 
 class Model(nn.Module):
+
     def __init__(self, block, num_blocks, num_classes=10):
         super().__init__()
 
