@@ -3,7 +3,6 @@ The training and testing loops for PyTorch.
 """
 import asyncio
 import logging
-from msilib.schema import File
 import multiprocessing as mp
 import os
 import re
