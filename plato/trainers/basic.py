@@ -3,6 +3,7 @@ The training and testing loops for PyTorch.
 """
 import asyncio
 import logging
+from msilib.schema import File
 import multiprocessing as mp
 import os
 import re
@@ -69,8 +70,11 @@ class Trainer(base.Trainer):
         ).params['model_dir'] if location is None else location
         model_name = Config().trainer.model_name
 
-        if not os.path.exists(model_dir):
-            os.makedirs(model_dir)
+        try:
+            if not os.path.exists(model_dir):
+                os.makedirs(model_dir)
+        except FileExistsError:
+            pass
 
         if filename is not None:
             model_path = f'{model_dir}/{filename}'
