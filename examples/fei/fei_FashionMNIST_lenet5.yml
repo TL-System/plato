@@ -81,6 +81,7 @@ algorithm:
     alpha: 5 # controls the decreasing rate of the mapping function
     beta: 20  # coefficient used in reward function
     theta: 0.05  # threshold for stdev(pre_acc)
+    base: 1000  # for exponential function in state normalization
     log_interval: 10
     mode: train  # test
     pretrained: false

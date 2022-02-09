@@ -103,4 +103,5 @@ class RLServer(simple_rl_server.RLServer):
     def normalize_state(feature):
         """Normalize/Scaling state features."""
         norm = np.linalg.norm(feature)
-        return [x / norm for x in feature]
+        ret = [Config().algorithm.base**(x / norm) for x in feature]
+        return ret
