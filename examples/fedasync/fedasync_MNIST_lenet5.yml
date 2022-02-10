@@ -1,4 +1,7 @@
 clients:
+    # Type
+    type: simple
+
     # The total number of clients
     total_clients: 100
 
@@ -14,8 +17,8 @@ clients:
 
     # The simulation distribution
     simulation_distribution:
-        distribution: zipf
-        s: 1.5
+        distribution: pareto
+        alpha: 1.5
 
 server:
     address: 127.0.0.1
@@ -28,6 +31,9 @@ server:
     minimum_clients_aggregated: 1
     mixing_hyperparameter: 0.9
     adaptive_mixing: true
+    staleness_weighting_function:
+        type: Polynomial
+        a: 2
 
 data:
     # The training and testing dataset

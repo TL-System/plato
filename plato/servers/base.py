@@ -23,6 +23,7 @@ from plato.utils import s3
 
 class ServerEvents(socketio.AsyncNamespace):
     """ A custom namespace for socketio.AsyncServer. """
+
     def __init__(self, namespace, plato_server):
         super().__init__(namespace)
         self.plato_server = plato_server
@@ -66,6 +67,7 @@ class ServerEvents(socketio.AsyncNamespace):
 
 class Server:
     """ The base class for federated learning servers. """
+
     def __init__(self):
         self.sio = None
         self.client = None
@@ -78,6 +80,7 @@ class Server:
         self.selected_client_id = 0
         self.selected_sids = []
         self.current_round = 0
+        self.resumed_session = False
         self.algorithm = None
         self.trainer = None
         self.accuracy = 0
@@ -252,8 +255,10 @@ class Server:
             logging.info("[Server #%d] New contact from Client #%d received.",
                          os.getpid(), client_id)
 
-        if len(self.clients) >= self.clients_per_round:
+        if (self.current_round == 0 or self.resumed_session) and len(
+                self.clients) >= self.clients_per_round:
             logging.info("[Server #%d] Starting training.", os.getpid())
+            self.resumed_session = False
             await self.select_clients()
 
     @staticmethod
@@ -404,10 +409,6 @@ class Server:
                         self.selected_sids.append(sid)
                 else:
                     sid = self.clients[self.selected_client_id]['sid']
-
-                server_response = {'id': self.selected_client_id}
-                server_response = await self.customize_server_response(
-                    server_response)
 
                 self.training_clients[self.selected_client_id] = {
                     'id': self.selected_client_id,
@@ -857,6 +858,7 @@ class Server:
                 variables_to_load[i] = pickle.load(checkpoint_file)
 
         self.current_round = variables_to_load[0]
+        self.resumed_session = True
         numpy_prng_state = variables_to_load[1]
         prng_state = variables_to_load[2]
 

@@ -17,6 +17,7 @@ from plato.servers import fedavg_cs
 
 class Server(fedavg_cs.Server):
     """Federated server using RL."""
+
     def __init__(self):
         super().__init__()
 
@@ -77,10 +78,10 @@ class Server(fedavg_cs.Server):
 
             # Initialize the csv file which will record results of RL agent
             if hasattr(Config(), 'results'):
-                result_csv_file = Config().results_dir + 'result_rl.csv'
+                result_csv_file = Config().result_dir + 'result_rl.csv'
                 csv_processor.initialize_csv(result_csv_file,
                                              self.rl_recorded_items,
-                                             Config().results_dir)
+                                             Config().result_dir)
 
         else:
             super().configure()
@@ -197,7 +198,7 @@ class Server(fedavg_cs.Server):
                     time.perf_counter() - self.rl_episode_start_time
                 }[item]
                 new_row.append(item_value)
-            result_csv_file = Config().results_dir + 'result_rl.csv'
+            result_csv_file = Config().result_dir + 'result_rl.csv'
             csv_processor.write_csv(result_csv_file, new_row)
 
         self.wrapped_previous_episode.set()

@@ -68,8 +68,11 @@ class Trainer(base.Trainer):
         ).params['model_dir'] if location is None else location
         model_name = Config().trainer.model_name
 
-        if not os.path.exists(model_dir):
-            os.makedirs(model_dir)
+        try:
+            if not os.path.exists(model_dir):
+                os.makedirs(model_dir)
+        except FileExistsError:
+            pass
 
         if filename is not None:
             model_path = f'{model_dir}/{filename}'
@@ -107,13 +110,15 @@ class Trainer(base.Trainer):
 
     def simulate_sleep_time(self):
         """Simulate client's speed by putting it to sleep."""
-        sleep_seconds = Config().client_sleep_times[self.client_id - 1]
+        if not (hasattr(Config().clients, 'sleep_simulation')
+                and Config().clients.sleep_simulation):
+            sleep_seconds = Config().client_sleep_times[self.client_id - 1]
 
-        # Put this client to sleep
-        logging.info("[Client #%d] Going to sleep for %.2f seconds.",
-                     self.client_id, sleep_seconds)
-        time.sleep(sleep_seconds)
-        logging.info("[Client #%d] Woke up.", self.client_id)
+            # Put this client to sleep
+            logging.info("[Client #%d] Going to sleep for %.2f seconds.",
+                         self.client_id, sleep_seconds)
+            time.sleep(sleep_seconds)
+            logging.info("[Client #%d] Woke up.", self.client_id)
 
     def train_process(self, config, trainset, sampler, cut_layer=None):
         """The main training loop in a federated learning workload, run in
