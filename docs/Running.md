@@ -23,7 +23,7 @@ Your CCDB username can be located after signing into the [CCDB portal](https://c
 First, load version 3.9 of the Python programming language:
 
 ```shell
-module load python/3.9
+module load gcc/9.3.0 arrow cuda/11 python/3.9 scipy-stack
 ```
 
 Then create the directory that contains your own Python virtual environment using `virtualenv`:
@@ -40,13 +40,13 @@ You can now activate your environment:
 source ~/.federated/bin/activate
 ```
 
-Due to the lack of some packages on Compute Canada, some source files need to be patched. Use the following command to patch these files:
+Due to the versioning difference for some Python packages on Compute Canada, some source files may need to be patched. Use the following command to patch these files:
 
 ```shell
 bash ./docs/patches/patch_cc.sh
 ```
 
-The next step is to install the required Python packages. PyTorch should be installed following the advice of its [getting started website](https://pytorch.org/get-started/locally/). As for Jan 2022, Compute Canada provides GPU with CUDA version 11.2, so the command would be:
+The next step is to install the required Python packages. PyTorch should be installed following the advice of its [getting started website](https://pytorch.org/get-started/locally/). As for January 2022, Compute Canada provides GPU with CUDA version 11.2, so the command would be:
 
 ```shell
 pip3 install torch==1.10.1+cu113 torchvision==0.11.2+cu113 torchaudio==0.10.1+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
@@ -109,16 +109,14 @@ Then add your configuration parameters in the job script. The following is an ex
 #SBATCH --gres=gpu:1
 #SBATCH --mem=128G
 #SBATCH --account=def-baochun
-#SBATCH --output=cifar_wideresnet.out # The name of the output file
+#SBATCH --output=cifar_wideresnet.out
 
-module load python/3.9
+module load gcc/9.3.0 arrow cuda/11 python/3.9 scipy-stack
 source ~/.federated/bin/activate
 ./run -c configs/CIFAR10/fedavg_wideresnet.yml --log=info
 ```
 
-**Note:** The example above requests a type of GPU on Compute Canada's `Graham` cluster that requires a very short waiting time (as for January 2022, but it may change.)
-
-You may use any type of [GPUs available on Compute Canada](https://docs.computecanada.ca/wiki/Using_GPUs_with_Slurm).
+**Note:** On `cedar` and `graham`, one should remove the `--nodes=1` option.
 
 Submit the job:
 
