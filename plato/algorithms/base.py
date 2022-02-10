@@ -10,6 +10,7 @@ from plato.trainers.base import Trainer
 
 class Algorithm(ABC):
     """Base class for all the algorithms."""
+
     def __init__(self, trainer: Trainer):
         """Initializing the algorithm with the provided model and trainer.
 
@@ -56,7 +57,7 @@ class Algorithm(ABC):
         return updated_weights
 
     @abstractmethod
-    def extract_weights(self):
+    def extract_weights(self, model=None):
         """Extract weights from a model passed in as a parameter."""
 
     @abstractmethod

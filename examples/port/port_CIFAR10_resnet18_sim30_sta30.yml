@@ -1,0 +1,106 @@
+clients:
+    # Type
+    type: simple
+
+    # The total number of clients
+    total_clients: 100
+
+    # The number of clients selected in each round
+    per_round: 30
+
+    # Should the clients compute test accuracy locally?
+    do_test: false
+
+    # Whether simulate clients or not
+    simulation: true
+    speed_simulation: true
+
+    # The simulation distribution
+    simulation_distribution:
+        distribution: pareto
+        alpha: 1
+    max_sleep_time: 30
+    sleep_simulation: true
+    avg_training_time: 20
+
+    random_seed: 1
+
+server:
+    address: 127.0.0.1
+    port: 8004
+    ping_timeout: 36000
+    synchronous: false #true: sychronous, false: port
+    simulate_wall_time: true
+    minimum_clients_aggregated: 15
+    staleness_bound: 10
+    random_seed: 1
+    request_update: false
+    similarity_weight: 30
+    staleness_weight: 30
+
+    checkpoint_dir: ./models/cifar10/port_sim30_sta30
+    model_dir: ./models/cifar10/port_sim30_sta30
+
+data:
+    # The training and testing dataset
+    datasource: CIFAR10
+
+    # Where the dataset is located
+    data_path: ./data
+
+    # Number of samples in each partition
+    partition_size: 5000
+
+    # IID or non-IID?
+    sampler: iid
+
+    # The concentration parameter for the Dirichlet distribution
+    concentration: 5
+
+    # The random seed for sampling data
+    random_seed: 1
+
+trainer:
+    # The type of the trainer
+    type: basic
+
+    # The maximum number of training rounds
+    rounds: 80
+
+    # Whether the training should use multiple GPUs if available
+    parallelized: false
+
+    # The maximum number of clients running concurrently
+    max_concurrency: 5
+
+    # The target accuracy
+    target_accuracy: 0.75
+
+    # Number of epoches for local training in each communication round
+    epochs: 5
+    batch_size: 128
+    optimizer: SGD
+    learning_rate: 0.1
+    momentum: 0.9
+    weight_decay: 0.0001
+
+    # Learning rate schedule
+    lr_schedule: LambdaLR
+    lr_gamma: 0.1
+    lr_milestone_steps: 80ep,120ep
+
+    # The machine learning model
+    model_name: resnet_18
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg
+
+results:
+    result_dir: ./results/cifar10/port_sim30_sta30
+
+    # Write the following parameter(s) into a CSV
+    types: round, elapsed_time, accuracy
+
+    # Plot results (x_axis-y_axis)
+    plot: round-accuracy, elapsed_time-accuracy

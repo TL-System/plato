@@ -19,33 +19,41 @@ clients:
     simulation_distribution:
         distribution: pareto
         alpha: 1
+    max_sleep_time: 30
+    sleep_simulation: true
+    avg_training_time: 10
+
+    random_seed: 1
 
 server:
     address: 127.0.0.1
-    port: 8000
+    port: 8016
     synchronous: false
     simulate_wall_time: true
     minimum_clients_aggregated: 5
     staleness_bound: 10
     random_seed: 1
     request_update: false
-    checkpoint_dir: /content/drive/MyDrive/EMNIST
+    similarity_weight: 20
+    staleness_weight: 0
+
+    checkpoint_dir: ./models/mnist/port_sim20
+    model_dir: ./models/mnist/port_sim20
 
 data:
-    # The training and testing dataset
-    datasource: EMNIST
+    datasource: MNIST
 
     # Where the dataset is located
     data_path: ./data
 
     # Number of samples in each partition
-    partition_size: 3000
+    partition_size: 600
 
     # IID or non-IID?
     sampler: noniid
 
     # The concentration parameter for the Dirichlet distribution
-    concentration: 1.8
+    concentration: 0.8
 
     # The random seed for sampling data
     random_seed: 1
@@ -55,7 +63,7 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 100
+    rounds: 80
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -67,13 +75,17 @@ trainer:
     # dp_max_grad_norm: 1
 
     # The maximum number of clients running concurrently
+    # The limitation is CUDA memory
+    # When max_concurrency equals clients per_round,
+    # simulate_wall_time: false
+    # Otherwise, simulate_wall_time: true
     max_concurrency: 10
 
     # The target accuracy
-    target_accuracy: 0.95
+    target_accuracy: 0.98
 
     # Number of epoches for local training in each communication round
-    epochs: 5
+    epochs: 3
     batch_size: 32
     optimizer: SGD
     learning_rate: 0.01
@@ -82,14 +94,13 @@ trainer:
 
     # The machine learning model
     model_name: lenet5
-    num_classes: 47
 
 algorithm:
     # Aggregation algorithm
     type: fedavg
 
 results:
-    results_dir: /content/drive/MyDrive/EMNIST
+    result_dir: ./results/mnist/port_sim20
 
     # Write the following parameter(s) into a CSV
     types: round, elapsed_time, accuracy
