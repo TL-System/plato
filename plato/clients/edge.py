@@ -42,7 +42,7 @@ class Client(base.Client):
         # Pass inbound and outbound data payloads through processors for
         # additional data processing
         self.outbound_processor, self.inbound_processor = processor_registry.get(
-            "Client", client_id=self.client_id, trainer=self.trainer)
+            "Client", client_id=self.client_id, trainer=self.server.trainer)
 
     def load_data(self):
         """ The edge client does not need to train models using local data. """
