@@ -9,22 +9,16 @@ clients:
     per_round: 2
 
     # Should the clients compute test accuracy locally?
-    do_test: true
+    do_test: false
 
     # Whether simulate clients or not
     simulation: true
-
-    outbound_processors:
-        - model_quantize
 
 server:
     type: fedavg_cross_silo
     address: 127.0.0.1
     port: 8000
     do_test: true
-
-    inbound_processors:
-        - model_dequantize
 
 data:
     # The training and testing dataset
@@ -69,12 +63,6 @@ trainer:
     # The machine learning model
     model_name: lenet5
 
-    # Whether to apply differential privacy
-    differential_privacy: true
-    # dp_epsilon: 1
-    # dp_delta: 0.01
-    # dp_max_grad_norm: 1
-
 algorithm:
     # Aggregation algorithm
     type: fedavg
@@ -91,6 +79,6 @@ algorithm:
 
 results:
     # Write the following parameter(s) into a CSV
-    types: accuracy, training_time, round_time, edge_agg_num
+    types: round, accuracy, elapsed_time, round_time
 
     result_dir: ./results/test

@@ -10,9 +10,10 @@ from plato.clients import edge
 class Client(edge.Client):
     """A federated learning client at the edge server in a cross-silo training workload."""
     async def train(self):
-        logging.info("[Edge Server #%d] Training on an Axiothea edge server.",
+        # Perform model training
+        self.report, weights = await super().train()
+
+        logging.info("[Edge Server #%d] Pruned its aggregated updates.",
                      self.client_id)
 
-        # Perform model training
-        report, weights = await super().train()
-        return report, weights
+        return self.report, weights
