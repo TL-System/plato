@@ -9,6 +9,7 @@ import torch
 from torch.nn.utils import prune
 
 from plato.clients import edge
+from plato.config import Config
 from plato.models import registry as models_registry
 
 
@@ -45,7 +46,8 @@ class Client(edge.Client):
         prune.global_unstructured(
             parameters_to_prune,
             pruning_method=prune.L1Unstructured,
-            amount=0.2,
+            amount=Config().clients.pruning_amount if hasattr(
+                Config().clients, 'pruning_amount') else 0.2,
         )
 
         for module, name in parameters_to_prune:
