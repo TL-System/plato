@@ -28,7 +28,8 @@ class RNNReplayMemory:
         self.nh = np.zeros((self.capacity, hidden_size))
         self.c = np.zeros((self.capacity, hidden_size))
         self.nc = np.zeros((self.capacity, hidden_size))
-        if hasattr(Config().clients, 'varied') and Config().clients.varied:
+        if hasattr(Config().server,
+                   'synchronous') and not Config().server.synchronous:
             self.state = np.zeros((self.capacity, action_dim, state_dim))
             self.next_state = np.zeros((self.capacity, action_dim, state_dim))
         else:
@@ -71,12 +72,12 @@ class RNNReplayMemory:
                           requires_grad=True,
                           dtype=torch.float).to(self.device)
 
-        if hasattr(Config().clients, 'varied') and Config().clients.varied:
+        if hasattr(Config().server,
+                   'synchronous') and not Config().server.synchronous:
             state = torch.FloatTensor(self.state[ind]).to(self.device)
             next_state = torch.FloatTensor(self.next_state[ind]).to(
                 self.device)
-            action = torch.FloatTensor(self.action[ind]).to(
-                self.device)
+            action = torch.FloatTensor(self.action[ind]).to(self.device)
         else:
             state = torch.FloatTensor(self.state[ind][:,
                                                       None, :]).to(self.device)
@@ -151,7 +152,8 @@ class RNNActor(nn.Module):
         self.l3 = nn.Linear(hidden_size, action_dim)
 
     def forward(self, state, hidden=None):
-        if hasattr(Config().clients, 'varied') and Config().clients.varied:
+        if hasattr(Config().server,
+                   'synchronous') and not Config().server.synchronous:
             # Pad the first state to full dims
             if len(state) == 1:
                 pilot = state
@@ -177,20 +179,22 @@ class RNNActor(nn.Module):
                                                 batch_first=True,
                                                 enforce_sorted=False)
         self.l1.flatten_parameters()
-        if hasattr(Config().clients, 'varied') and Config().clients.varied:
+        if hasattr(Config().server,
+                   'synchronous') and not Config().server.synchronous:
             a, h = self.l1(packed_state[0], hidden)
         else:
             a, h = self.l1(state, hidden)
 
         # mini-batch update
-        if hasattr(Config().clients,
-                   'varied') and Config().clients.varied and len(state) != 1:
+        if hasattr(Config().server, 'synchronous'
+                   ) and not Config().server.synchronous and len(state) != 1:
             a, _ = pad_packed_sequence(a, batch_first=True)
 
         a = F.relu(self.l2(a))
         a = self.max_action * torch.tanh(self.l3(a))
 
-        if hasattr(Config().clients, 'varied') and Config().clients.varied:
+        if hasattr(Config().server,
+                   'synchronous') and not Config().server.synchronous:
             a = a[0][0].unsqueeze(0).unsqueeze(0)
 
         # Normalize/Scaling aggregation weights so that the sum is 1
@@ -206,7 +210,8 @@ class RNNCritic(nn.Module):
         self.action_dim = action_dim
 
         # Q1 architecture
-        if hasattr(Config().clients, 'varied') and Config().clients.varied:
+        if hasattr(Config().server,
+                   'synchronous') and not Config().server.synchronous:
             self.l1 = nn.LSTM(state_dim + 1, hidden_size, batch_first=True)
         else:
             self.l1 = nn.LSTM(state_dim + action_dim,
@@ -216,7 +221,8 @@ class RNNCritic(nn.Module):
         self.l3 = nn.Linear(hidden_size, 1)
 
         # Q2 architecture
-        if hasattr(Config().clients, 'varied') and Config().clients.varied:
+        if hasattr(Config().server,
+                   'synchronous') and not Config().server.synchronous:
             self.l4 = nn.LSTM(state_dim + 1, hidden_size, batch_first=True)
         else:
             self.l4 = nn.LSTM(state_dim + action_dim,
@@ -226,7 +232,8 @@ class RNNCritic(nn.Module):
         self.l6 = nn.Linear(hidden_size, 1)
 
     def forward(self, state, action, hidden1, hidden2):
-        if hasattr(Config().clients, 'varied') and Config().clients.varied:
+        if hasattr(Config().server,
+                   'synchronous') and not Config().server.synchronous:
             # Pad the first state to full dims
             if len(state) == 1:
                 pilot = state
@@ -244,13 +251,14 @@ class RNNCritic(nn.Module):
             # Get the length explicitly for later packing sequences
             lens = list(map(len, state))
             state = [state]
-            
+
             # Pad and pack
             padded = pad_sequence(state, batch_first=True)
             state = padded
         sa = torch.cat([state, action], -1)
 
-        if hasattr(Config().clients, 'varied') and Config().clients.varied:
+        if hasattr(Config().server,
+                   'synchronous') and not Config().server.synchronous:
             sa = pack_padded_sequence(sa,
                                       lengths=lens,
                                       batch_first=True,
@@ -260,7 +268,8 @@ class RNNCritic(nn.Module):
         q1, hidden1 = self.l1(sa, hidden1)
         q2, hidden2 = self.l4(sa, hidden2)
 
-        if hasattr(Config().clients, 'varied') and Config().clients.varied:
+        if hasattr(Config().server,
+                   'synchronous') and not Config().server.synchronous:
             q1, _ = pad_packed_sequence(q1, batch_first=True)
             q2, _ = pad_packed_sequence(q2, batch_first=True)
 
@@ -275,7 +284,8 @@ class RNNCritic(nn.Module):
         return q1, q2
 
     def Q1(self, state, action, hidden1):
-        if hasattr(Config().clients, 'varied') and Config().clients.varied:
+        if hasattr(Config().server,
+                   'synchronous') and not Config().server.synchronous:
             # Pad variable states
             # Get the length explicitly for later packing sequences
             lens = list(map(len, state))
@@ -285,7 +295,8 @@ class RNNCritic(nn.Module):
 
         sa = torch.cat([state, action], -1)
 
-        if hasattr(Config().clients, 'varied') and Config().clients.varied:
+        if hasattr(Config().server,
+                   'synchronous') and not Config().server.synchronous:
             sa = pack_padded_sequence(sa,
                                       lengths=lens,
                                       batch_first=True,
@@ -293,7 +304,8 @@ class RNNCritic(nn.Module):
         self.l1.flatten_parameters()
         q1, hidden1 = self.l1(sa, hidden1)
 
-        if hasattr(Config().clients, 'varied') and Config().clients.varied:
+        if hasattr(Config().server,
+                   'synchronous') and not Config().server.synchronous:
             q1, _ = pad_packed_sequence(q1, batch_first=True)
 
         q1 = F.relu(self.l2(q1))
@@ -363,7 +375,8 @@ class Policy(base.Policy):
     def select_action(self, state, hidden=None, test=False):
         """ Select action from policy. """
         if Config().algorithm.recurrent_actor:
-            if hasattr(Config().clients, 'varied') and Config().clients.varied:
+            if hasattr(Config().server,
+                       'synchronous') and not Config().server.synchronous:
                 state = torch.FloatTensor(state).to(self.device).unsqueeze(0)
             else:
                 state = torch.FloatTensor(state.reshape(1, -1)).to(
@@ -384,7 +397,7 @@ class Policy(base.Policy):
         if Config().algorithm.recurrent_actor:
             state, action, reward, next_state, done, h, c, nh, nc = self.replay_buffer.sample(
             )
-            # if hasattr(Config().clients, 'varied') and Config().clients.varied:
+            # if hasattr(Config().server, 'synchronous') and not Config().server.synchronous:
             #     state = state[0]
             reward = torch.FloatTensor(reward).to(self.device).unsqueeze(1)
             done = torch.FloatTensor(done).to(self.device).unsqueeze(1)

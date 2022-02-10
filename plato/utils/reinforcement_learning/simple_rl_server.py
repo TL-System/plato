@@ -190,6 +190,11 @@ class RLServer(base.Server):
     def customize_server_payload(self, payload):
         """ Customize the server payload before sending to the client. """
         return payload
+    
+    async def customize_server_response(self, server_response):
+        """ Wrap up generating the server response with any additional information. """
+        server_response['current_round'] =  self.current_round
+        return server_response
 
     async def update_action(self):
         if self.agent.current_step == 0:

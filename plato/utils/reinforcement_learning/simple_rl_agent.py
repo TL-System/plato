@@ -14,7 +14,6 @@ from plato.utils import csv_processor
 
 class RLAgent(object):
     """ A basic RL environment for FL server using Gym for RL control. """
-
     def __init__(self):
         self.n_actions = Config().clients.per_round
         self.n_states = Config().clients.per_round * Config(

@@ -4,7 +4,6 @@ A federated learning client for FEI.
 import logging
 import math
 from dataclasses import dataclass
-
 from plato.clients import simple
 from plato.config import Config
 
@@ -31,7 +30,15 @@ class Client(simple.Client):
         return Report(report.num_samples, report.accuracy,
                       report.training_time, report.update_response,
                       valuation), weights
-    
+
+    def process_server_response(self, server_response):
+        """Additional client-specific processing on the server response."""
+        # Reset workload capacity at the initial step (for the new episode)
+        if server_response['current_round'] == 1:
+            # Reset dataset
+            self.datasource = None
+            self.load_data()
+
     def get_loss(self):
         """ Retrieve the loss value from the training process. """
         model_name = Config().trainer.model_name
