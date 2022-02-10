@@ -118,6 +118,13 @@ class RLAgent(object):
 
     async def prep_agent_update(self):
         """ Update RL Agent. """
+        self.current_step += 1
+        self.total_steps += 1
+        logging.info("[RL Agent] Preparing action...")
+        self.prep_action()
+        self.action_updated.set()
+
+        # when episode ends
         if Config().algorithm.mode == 'train' and self.is_done:
             self.update_policy()
 
@@ -130,12 +137,6 @@ class RLAgent(object):
         ).algorithm.test_step:
             # Break the loop when RL testing is concluded
             self.finished = True
-        else:
-            self.current_step += 1
-            self.total_steps += 1
-            logging.info("[RL Agent] Preparing action...")
-            self.prep_action()
-            self.action_updated.set()
 
     @abstractmethod
     def update_policy(self):
