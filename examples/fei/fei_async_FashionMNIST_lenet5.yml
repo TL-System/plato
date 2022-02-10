@@ -1,19 +1,33 @@
 clients:
     # The total number of clients
-    total_clients: 3
+    total_clients: 100
 
     # The number of clients selected in each round
-    per_round: 3
+    per_round: 10
 
     # Should the clients compute test accuracy locally?
     do_test: false
     
     # Whether simulate clients or not
-    simulation: false
+    simulation: true
+    speed_simulation: true
+
+    # The simulation distribution
+    simulation_distribution:
+        distribution: pareto
+        alpha: 1
 
 server:
     address: 127.0.0.1
     port: 8000
+    synchronous: false
+    simulate_wall_time: false
+
+    # Parameter for FedAsync
+    staleness_bound: 1000 # FedAsync doesn't have any staleness bound
+    minimum_clients_aggregated: 10
+    mixing_hyperparameter: 0.9
+    adaptive_mixing: true
 
 data:
     # The training and testing dataset
@@ -73,8 +87,9 @@ algorithm:
     min_action: -1
     max_episode: 2000
     alpha: 5 # controls the decreasing rate of the mapping function
-    beta: 10  # coefficient used in reward function
-    theta: 1.0  # threshold for stdev(pre_acc)
+    beta: 20  # coefficient used in reward function
+    theta: 0.05  # threshold for stdev(pre_acc)
+    base: 1000  # for exponential function in state normalization
     log_interval: 10
     mode: train  # test
     pretrained: false
@@ -94,10 +109,10 @@ algorithm:
     # Frequency of delayed policy updates
     policy_freq: 2
     # mini batch size
-    batch_size: 2
+    batch_size: 64
     hidden_size: 256
     # steps sampling random actions
-    start_steps: 1
+    start_steps: 8
     # replay memory
     replay_size: 10000
     replay_seed: 1234

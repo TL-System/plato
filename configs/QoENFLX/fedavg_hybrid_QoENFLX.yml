@@ -56,9 +56,6 @@ trainer:
     # Number of epoches for local training in each communication round
     epochs: 50
 
-    # Whether use varied epochs per client or not?
-    varied: false
-
     batch_size: 64
     optimizer: Adadelta
     learning_rate: 1.0

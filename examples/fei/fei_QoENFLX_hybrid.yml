@@ -5,9 +5,6 @@ clients:
     # The number of clients selected in each round
     per_round: 10
 
-    # Whether select variable number of clients per round
-    varied: true
-
     # Should the clients compute test accuracy locally?
     do_test: false
 
@@ -29,7 +26,7 @@ data:
     partition_size: 30
 
     # Whether use varied partition per client or not?
-    varied: false
+    # varied: false
 
     # IID or non-IID?
     sampler: iid
@@ -55,9 +52,6 @@ trainer:
 
     # Number of epoches for local training in each communication round
     epochs: 50
-
-    # Whether use varied epochs per client or not?
-    varied: false
 
     batch_size: 64
     optimizer: Adadelta
@@ -116,4 +110,4 @@ results:
     types: accuracy, elapsed_time, round_time
 
     # Plot results (x_axis-y_axis)
-    plot: round-accuracy, round-elapsed_time
+    plot: round-accuracy, elapsed_time-accuracy
