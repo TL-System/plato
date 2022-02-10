@@ -18,6 +18,7 @@ from plato.servers import fedavg
 
 class Server(fedavg.Server):
     """A federated learning server using the FedAsync algorithm. """
+
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
 
@@ -92,6 +93,40 @@ class Server(fedavg.Server):
 
     @staticmethod
     def staleness_function(staleness) -> float:
+        """ Staleness function used to adjust the mixing hyperparameter """
+        if hasattr(Config().server, "staleness_weighting_function"):
+            staleness_func_param = Config().server.staleness_weighting_function
+            func_type = staleness_func_param.type.lower()
+            if func_type == "constant":
+                return Server.constant_function()
+            elif func_type == "polynomial":
+                a = staleness_func_param.a
+                return Server.polynomial_function(staleness, a)
+            elif func_type == "hinge":
+                a = staleness_func_param.a
+                b = staleness_func_param.b
+                return Server.hinge_function(staleness, a, b)
+            else:
+                logging.warning(
+                    "FedAsync: Unknown staleness weighting function type. "
+                    "Type needs to be constant, polynomial, or hinge.")
+        else:
+            return Server.constant_function()
+
+    @staticmethod
+    def constant_function() -> float:
+        """ Constant staleness function as proposed in Sec. 5.2, Evaluation Setup. """
+        return 1
+
+    @staticmethod
+    def polynomial_function(staleness, a) -> float:
         """ Polynomial staleness function as proposed in Sec. 5.2, Evaluation Setup. """
-        a = 2
         return (staleness + 1)**-a
+
+    @staticmethod
+    def hinge_function(staleness, a, b) -> float:
+        """ Hinge staleness function as proposed in Sec. 5.2, Evaluation Setup. """
+        if staleness <= b:
+            return 1
+        else:
+            return 1 / (a * (staleness - b) + 1)

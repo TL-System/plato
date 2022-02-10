@@ -69,8 +69,11 @@ class Trainer(base.Trainer):
         ).params['model_dir'] if location is None else location
         model_name = Config().trainer.model_name
 
-        if not os.path.exists(model_dir):
-            os.makedirs(model_dir)
+        try:
+            if not os.path.exists(model_dir):
+                os.makedirs(model_dir)
+        except FileExistsError:
+            pass
 
         if filename is not None:
             model_path = f'{model_dir}/{filename}'

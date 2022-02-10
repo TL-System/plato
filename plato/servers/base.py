@@ -80,6 +80,7 @@ class Server:
         self.selected_client_id = 0
         self.selected_sids = []
         self.current_round = 0
+        self.resumed_session = False
         self.algorithm = None
         self.trainer = None
         self.accuracy = 0
@@ -254,8 +255,10 @@ class Server:
             logging.info("[Server #%d] New contact from Client #%d received.",
                          os.getpid(), client_id)
 
-        if len(self.clients) >= self.clients_per_round:
+        if (self.current_round == 0 or self.resumed_session) and len(
+                self.clients) >= self.clients_per_round:
             logging.info("[Server #%d] Starting training.", os.getpid())
+            self.resumed_session = False
             await self.select_clients()
 
     @staticmethod
@@ -859,6 +862,7 @@ class Server:
                 variables_to_load[i] = pickle.load(checkpoint_file)
 
         self.current_round = variables_to_load[0]
+        self.resumed_session = True
         numpy_prng_state = variables_to_load[1]
         prng_state = variables_to_load[2]
 
