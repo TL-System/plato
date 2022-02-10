@@ -30,14 +30,17 @@ class RNNReplayMemory:
         self.nc = np.zeros((self.capacity, hidden_size))
         if hasattr(Config().server,
                    'synchronous') and not Config().server.synchronous:
-            self.state = np.zeros((self.capacity, action_dim, state_dim))
-            self.next_state = np.zeros((self.capacity, action_dim, state_dim))
+            self.state = [0] * self.capacity
+            self.action = [0] * self.capacity
+            self.reward = [0] * self.capacity
+            self.next_state = [0] * self.capacity
+            self.done = [0] * self.capacity
         else:
             self.state = np.zeros((self.capacity, state_dim))
+            self.action = np.zeros((self.capacity, action_dim))
+            self.reward = np.zeros((self.capacity, 1))
             self.next_state = np.zeros((self.capacity, state_dim))
-        self.action = np.zeros((self.capacity, action_dim))
-        self.reward = np.zeros((self.capacity, 1))
-        self.done = np.zeros((self.capacity, 1))
+            self.done = np.zeros((self.capacity, 1))
 
     def push(self, data):
         self.state[self.ptr] = data[0]
@@ -74,20 +77,30 @@ class RNNReplayMemory:
 
         if hasattr(Config().server,
                    'synchronous') and not Config().server.synchronous:
-            state = torch.FloatTensor(self.state[ind]).to(self.device)
-            next_state = torch.FloatTensor(self.next_state[ind]).to(
-                self.device)
-            action = torch.FloatTensor(self.action[ind]).to(self.device)
+            state = [
+                torch.FloatTensor(self.state[i]).to(self.device) for i in ind
+            ]
+            action = [
+                torch.FloatTensor(self.action[i]).to(self.device) for i in ind
+            ]
+            reward = [self.reward[i] for i in ind]
+            next_state = [
+                torch.FloatTensor(self.next_state[i]).to(self.device)
+                for i in ind
+            ]
+            done = [self.done[i] for i in ind]
         else:
             state = torch.FloatTensor(self.state[ind][:,
                                                       None, :]).to(self.device)
-            next_state = torch.FloatTensor(
-                self.next_state[ind][:, None, :]).to(self.device)
+
             action = torch.FloatTensor(self.action[ind][:, None, :]).to(
                 self.device)
-        reward = torch.FloatTensor(self.reward[ind][:,
+            reward = torch.FloatTensor(self.reward[ind][:, None, :]).to(
+                self.device)
+            next_state = torch.FloatTensor(
+                self.next_state[ind][:, None, :]).to(self.device)
+            done = torch.FloatTensor(self.done[ind][:,
                                                     None, :]).to(self.device)
-        done = torch.FloatTensor(self.done[ind][:, None, :]).to(self.device)
 
         return state, action, reward, next_state, done, h, c, nh, nc
 
@@ -149,7 +162,11 @@ class RNNActor(nn.Module):
 
         self.l1 = nn.LSTM(state_dim, hidden_size, batch_first=True)
         self.l2 = nn.Linear(hidden_size, hidden_size)
-        self.l3 = nn.Linear(hidden_size, action_dim)
+        if hasattr(Config().server,
+                   'synchronous') and not Config().server.synchronous:
+            self.l3 = nn.Linear(hidden_size, 1)
+        else:
+            self.l3 = nn.Linear(hidden_size, action_dim)
 
     def forward(self, state, hidden=None):
         if hasattr(Config().server,
@@ -170,20 +187,16 @@ class RNNActor(nn.Module):
             # Pad variable states
             # Get the length explicitly for later packing sequences
             lens = list(map(len, state))
-            state = [state]
-
+            if len(state) == 1:
+                state = [torch.squeeze(state)]
             # Pad and pack
             padded = pad_sequence(state, batch_first=True)
-            packed_state = pack_padded_sequence(padded,
-                                                lengths=lens,
-                                                batch_first=True,
-                                                enforce_sorted=False)
+            state = pack_padded_sequence(padded,
+                                         lengths=lens,
+                                         batch_first=True,
+                                         enforce_sorted=False)
         self.l1.flatten_parameters()
-        if hasattr(Config().server,
-                   'synchronous') and not Config().server.synchronous:
-            a, h = self.l1(packed_state[0], hidden)
-        else:
-            a, h = self.l1(state, hidden)
+        a, h = self.l1(state, hidden)
 
         # mini-batch update
         if hasattr(Config().server, 'synchronous'
@@ -192,10 +205,6 @@ class RNNActor(nn.Module):
 
         a = F.relu(self.l2(a))
         a = self.max_action * torch.tanh(self.l3(a))
-
-        if hasattr(Config().server,
-                   'synchronous') and not Config().server.synchronous:
-            a = a[0][0].unsqueeze(0).unsqueeze(0)
 
         # Normalize/Scaling aggregation weights so that the sum is 1
         a += 1  # [-1, 1] -> [0, 2]
@@ -250,8 +259,8 @@ class RNNCritic(nn.Module):
             # Pad variable states
             # Get the length explicitly for later packing sequences
             lens = list(map(len, state))
-            state = [state]
-
+            if len(state) == 1:
+                state = [torch.squeeze(state)]
             # Pad and pack
             padded = pad_sequence(state, batch_first=True)
             state = padded
@@ -371,7 +380,6 @@ class Policy(base.Policy):
             # c_0 = c_0.to(self.device)
         return (h_0, c_0)
 
-    # TODO: test=true
     def select_action(self, state, hidden=None, test=False):
         """ Select action from policy. """
         if Config().algorithm.recurrent_actor:
@@ -397,8 +405,11 @@ class Policy(base.Policy):
         if Config().algorithm.recurrent_actor:
             state, action, reward, next_state, done, h, c, nh, nc = self.replay_buffer.sample(
             )
-            # if hasattr(Config().server, 'synchronous') and not Config().server.synchronous:
-            #     state = state[0]
+            if hasattr(Config().server,
+                       'synchronous') and not Config().server.synchronous:
+                # Pad variable actions
+                padded = pad_sequence(action, batch_first=True)
+                action = padded
             reward = torch.FloatTensor(reward).to(self.device).unsqueeze(1)
             done = torch.FloatTensor(done).to(self.device).unsqueeze(1)
             hidden = (h, c)

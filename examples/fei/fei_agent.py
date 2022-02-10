@@ -14,14 +14,11 @@ from plato.utils.reinforcement_learning import simple_rl_agent
 from plato.utils.reinforcement_learning.policies import \
     registry as policies_registry
 
-os.environ['config_file'] = 'examples/fei/fei_async_FashionMNIST_lenet5.yml'
-
 
 class RLAgent(simple_rl_agent.RLAgent):
     """ An RL agent for FL training using FEI. """
     def __init__(self):
         super().__init__()
-        # TODO: check state_dim
         if hasattr(Config().server,
                    'synchronous') and not Config().server.synchronous:
             self.policy = policies_registry.get(Config().algorithm.n_features,
@@ -88,18 +85,30 @@ class RLAgent(simple_rl_agent.RLAgent):
                 # fedavg policy
                 self.action = np.array(self.num_samples) / np.array(
                     self.num_samples).sum()
+                if hasattr(Config().server,
+                           'synchronous') and not Config().server.synchronous:
+                    self.action = np.reshape(np.array(self.action), (-1, 1))
+
             else:
                 # Sample action from policy
                 if Config().algorithm.recurrent_actor:
                     self.action, (self.nh,
                                   self.nc) = self.policy.select_action(
                                       self.state, (self.h, self.c))
+                    if hasattr(
+                            Config().server,
+                            'synchronous') and not Config().server.synchronous:
+                        self.action = np.reshape(np.array(self.action),
+                                                 (-1, 1))
                 else:
                     self.action = self.policy.select_action(self.state)
         else:
             if Config().algorithm.recurrent_actor:
                 # don't pass hidden states
                 self.action, __ = self.policy.select_action(self.state)
+                if hasattr(Config().server,
+                           'synchronous') and not Config().server.synchronous:
+                    self.action = np.reshape(np.array(self.action), (-1, 1))
             else:
                 self.action = self.policy.select_action(self.state)
 
