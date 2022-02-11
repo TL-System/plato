@@ -95,6 +95,9 @@ class Client:
 
             assert hasattr(Config().algorithm, 'total_silos')
 
+    def __repr__(self):
+        return f'Client #{self.client_id}'
+
     async def start_client(self) -> None:
         """ Startup function for a client. """
 
@@ -124,9 +127,9 @@ class Client:
             self.s3_client = s3.S3()
 
         if hasattr(Config().server, 'use_https'):
-            uri = 'https://{}'.format(Config().server.address)
+            uri = f'https://{Config().server.address}'
         else:
-            uri = 'http://{}'.format(Config().server.address)
+            uri = f'http://{Config().server.address}'
 
         if hasattr(Config().server, 'port'):
             # If we are not using a production server deployed in the cloud
@@ -216,8 +219,8 @@ class Client:
         assert client_id == self.client_id
 
         logging.info(
-            "[Client #%d] Received %s MB of payload data from the server.",
-            client_id, round(payload_size / 1024**2, 2))
+            "[Client #%d] Received %.2f MB of payload data from the server.",
+            client_id, payload_size / 1024**2)
 
         self.server_payload = self.inbound_processor.process(
             self.server_payload)
@@ -228,10 +231,10 @@ class Client:
 
         if Config().is_edge_server():
             logging.info(
-                "[Server #%d] Model aggregated on edge server (client #%d).",
-                os.getpid(), client_id)
+                "[Server #%d] Model aggregated on edge server (%s).",
+                os.getpid(), self)
         else:
-            logging.info("[Client #%d] Model trained.", client_id)
+            logging.info("[%s] Model trained.", self)
 
         # Sending the client report as metadata to the server (payload to follow)
         await self.sio.emit('client_report', {'report': pickle.dumps(report)})
@@ -277,8 +280,8 @@ class Client:
 
         await self.sio.emit('client_payload_done', metadata)
 
-        logging.info("[Client #%d] Sent %s MB of payload data to the server.",
-                     self.client_id, round(data_size / 1024**2, 2))
+        logging.info("[%s] Sent %s MB of payload data to the server.",
+                     self, round(data_size / 1024**2, 2))
 
     def process_server_response(self, server_response) -> None:
         """Additional client-specific processing on the server response."""

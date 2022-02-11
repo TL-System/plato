@@ -2,9 +2,8 @@
 Training and testing loops for HuggingFace's transformer models for natural
 language processing.
 """
+import math
 from typing import Optional
-
-from torch.utils.data import Sampler, RandomSampler
 
 from transformers import AutoConfig, AutoTokenizer, HfArgumentParser
 from transformers import Trainer as HuggingFaceTrainer
@@ -12,6 +11,7 @@ from transformers import TrainingArguments, default_data_collator
 
 from plato.config import Config
 from plato.trainers import basic
+from torch.utils.data import RandomSampler, Sampler
 
 
 class SampledHuggingFaceTrainer(HuggingFaceTrainer):
@@ -104,4 +104,11 @@ class Trainer(basic.Trainer):
                                           tokenizer=self.tokenizer,
                                           data_collator=default_data_collator)
 
-        return self.trainer.evaluate()
+        metrics = self.trainer.evaluate()
+
+        try:
+            perplexity = math.exp(metrics["eval_loss"])
+        except OverflowError:
+            perplexity = float("inf")
+
+        return perplexity

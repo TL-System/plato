@@ -19,6 +19,7 @@ class Report(edge.Report):
 
 class Client(edge.Client):
     """A federated learning client at the edge server in a cross-silo training workload."""
+
     def __init__(self, server, algorithm=None, trainer=None):
         super().__init__(server, algorithm=algorithm, trainer=trainer)
         self.do_personalization_test = False
@@ -80,9 +81,8 @@ class Client(edge.Client):
             self.do_personalization_test = False
         else:
             report, payload = await self.train()
-            logging.info(
-                "[Server #%d] Model aggregated on edge server (client #%d).",
-                os.getpid(), client_id)
+            logging.info("[%s] Model aggregated on edge server (client #%d).",
+                         self, client_id)
 
         # Sending the client report as metadata to the server (payload to follow)
         await self.sio.emit('client_report', {'report': pickle.dumps(report)})
