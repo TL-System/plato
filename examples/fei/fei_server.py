@@ -12,7 +12,7 @@ class RLServer(simple_rl_server.RLServer):
     """ A federated learning server with RL Agent. """
     def __init__(self, agent, model=None, algorithm=None, trainer=None):
         super().__init__(agent, model, algorithm, trainer)
-        self.local_correlations = {}
+        self.local_correlations = [0] * Config().clients.per_round
         self.last_global_grads = None
         self.corr = []
         self.smart_weighting = []
@@ -21,15 +21,13 @@ class RLServer(simple_rl_server.RLServer):
     def prep_state(self):
         """ Wrap up the state update to RL Agent. """
         state = [0] * 4
-        if len(self.updates) > 0 and len(self.updates) >= len(
-                self.selected_clients):
-            state[0] = self.normalize_state(
-                [report.num_samples for (report, __, __) in self.updates])
-            state[1] = self.normalize_state(
-                [report.training_time for (report, __, __) in self.updates])
-            state[2] = self.normalize_state(
-                [report.valuation for (report, __, __) in self.updates])
-            state[3] = self.normalize_state(self.corr)
+        state[0] = self.normalize_state(
+            [report.num_samples for (report, __, __) in self.updates])
+        state[1] = self.normalize_state(
+            [report.training_time for (report, __, __) in self.updates])
+        state[2] = self.normalize_state(
+            [report.valuation for (report, __, __) in self.updates])
+        state[3] = self.normalize_state(self.corr)
         state = np.transpose(np.round(np.array(state), 4))
 
         self.agent.test_accuracy = self.accuracy
@@ -70,20 +68,18 @@ class RLServer(simple_rl_server.RLServer):
             correlations[i] = np.arccos(np.clip(inner / norms, -1.0, 1.0))
 
         for i, correlation in enumerate(correlations):
-            client_id = self.selected_clients[i]
-            # Update the smoothed angle for all clients
-            if client_id not in self.local_correlations.keys():
-                self.local_correlations[client_id] = correlation
-            self.local_correlations[client_id] = (
+            print("#updates: ", len(updates))
+            print("selected clients: ", self.selected_clients)
+            print("correlation length: ", len(correlations))
+            self.local_correlations[i] = correlation
+            self.local_correlations[i] = (
                 (self.current_round - 1) /
-                self.current_round) * self.local_correlations[client_id] + (
+                self.current_round) * self.local_correlations[i] + (
                     1 / self.current_round) * correlation
             # Non-linear mapping to node contribution
-
             contribs[i] = Config().algorithm.alpha * (
-                1 -
-                math.exp(-math.exp(-Config().algorithm.alpha *
-                                   (self.local_correlations[client_id] - 1))))
+                1 - math.exp(-math.exp(-Config().algorithm.alpha *
+                                       (self.local_correlations[i] - 1))))
 
         return contribs
 
