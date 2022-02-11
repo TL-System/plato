@@ -143,74 +143,76 @@ class Trainer(base.Trainer):
                              reinit=True)
 
         try:
-            custom_train = getattr(self, "train_model", None)
+            log_interval = 10
+            batch_size = config['batch_size']
 
-            if callable(custom_train):
-                self.train_model(config, trainset, sampler.get(), cut_layer)
+            logging.info("[Client #%d] Loading the dataset.", self.client_id)
+            _train_loader = getattr(self, "train_loader", None)
+
+            if callable(_train_loader):
+                train_loader = self.train_loader(batch_size, trainset,
+                                                 sampler.get(), cut_layer)
             else:
-                log_interval = 10
-                batch_size = config['batch_size']
+                train_loader = torch.utils.data.DataLoader(
+                    dataset=trainset,
+                    shuffle=False,
+                    batch_size=batch_size,
+                    sampler=sampler.get())
 
-                logging.info("[Client #%d] Loading the dataset.",
-                             self.client_id)
-                _train_loader = getattr(self, "train_loader", None)
+            iterations_per_epoch = np.ceil(len(trainset) /
+                                           batch_size).astype(int)
+            epochs = config['epochs']
 
-                if callable(_train_loader):
-                    train_loader = self.train_loader(batch_size, trainset,
-                                                     sampler.get(), cut_layer)
+            # Sending the model to the device used for training
+            self.model.to(self.device)
+            self.model.train()
+
+            # Initializing the loss criterion
+            _loss_criterion = getattr(self, "loss_criterion", None)
+            if callable(_loss_criterion):
+                loss_criterion = self.loss_criterion(self.model)
+            else:
+                loss_criterion = torch.nn.CrossEntropyLoss()
+
+            # Initializing the optimizer
+            get_optimizer = getattr(self, "get_optimizer",
+                                    optimizers.get_optimizer)
+            optimizer = get_optimizer(self.model)
+
+            # Initializing the learning rate schedule, if necessary
+            if hasattr(config, 'lr_schedule'):
+                lr_schedule = optimizers.get_lr_schedule(
+                    optimizer, iterations_per_epoch, train_loader)
+            else:
+                lr_schedule = None
+
+            if 'differential_privacy' in config and config[
+                    'differential_privacy']:
+                privacy_engine = PrivacyEngine(accountant='rdp',
+                                               secure_mode=False)
+
+                self.model, optimizer, train_loader = privacy_engine.make_private_with_epsilon(
+                    module=self.model,
+                    optimizer=optimizer,
+                    data_loader=train_loader,
+                    target_epsilon=config['dp_epsilon']
+                    if 'dp_epsilon' in config else 10.0,
+                    target_delta=config['dp_delta']
+                    if 'dp_delta' in config else 1e-5,
+                    epochs=epochs,
+                    max_grad_norm=config['dp_max_grad_norm']
+                    if 'max_grad_norm' in config else 1.0,
+                )
+
+            for epoch in range(1, epochs + 1):
+                custom_train = getattr(self, "train_model", None)
+
+                if callable(custom_train):
+                    # Use a custom training loop to train for one epoch
+                    self.train_model(config, trainset, sampler.get(),
+                                     cut_layer)
                 else:
-                    train_loader = torch.utils.data.DataLoader(
-                        dataset=trainset,
-                        shuffle=False,
-                        batch_size=batch_size,
-                        sampler=sampler.get())
-
-                iterations_per_epoch = np.ceil(len(trainset) /
-                                               batch_size).astype(int)
-                epochs = config['epochs']
-
-                # Sending the model to the device used for training
-                self.model.to(self.device)
-                self.model.train()
-
-                # Initializing the loss criterion
-                _loss_criterion = getattr(self, "loss_criterion", None)
-                if callable(_loss_criterion):
-                    loss_criterion = self.loss_criterion(self.model)
-                else:
-                    loss_criterion = torch.nn.CrossEntropyLoss()
-
-                # Initializing the optimizer
-                get_optimizer = getattr(self, "get_optimizer",
-                                        optimizers.get_optimizer)
-                optimizer = get_optimizer(self.model)
-
-                # Initializing the learning rate schedule, if necessary
-                if hasattr(config, 'lr_schedule'):
-                    lr_schedule = optimizers.get_lr_schedule(
-                        optimizer, iterations_per_epoch, train_loader)
-                else:
-                    lr_schedule = None
-
-                if 'differential_privacy' in config and config[
-                        'differential_privacy']:
-                    privacy_engine = PrivacyEngine(accountant='rdp',
-                                                   secure_mode=False)
-
-                    self.model, optimizer, train_loader = privacy_engine.make_private_with_epsilon(
-                        module=self.model,
-                        optimizer=optimizer,
-                        data_loader=train_loader,
-                        target_epsilon=config['dp_epsilon']
-                        if 'dp_epsilon' in config else 10.0,
-                        target_delta=config['dp_delta']
-                        if 'dp_delta' in config else 1e-5,
-                        epochs=epochs,
-                        max_grad_norm=config['dp_max_grad_norm']
-                        if 'max_grad_norm' in config else 1.0,
-                    )
-
-                for epoch in range(1, epochs + 1):
+                    # Use a default training loop
                     for batch_id, (examples,
                                    labels) in enumerate(train_loader):
                         examples, labels = examples.to(self.device), labels.to(
@@ -253,22 +255,23 @@ class Trainer(base.Trainer):
                     if hasattr(optimizer, "params_state_update"):
                         optimizer.params_state_update()
 
-                    # Simulate client's speed
-                    if self.client_id != 0 and hasattr(
-                            Config().clients, "speed_simulation") and Config(
-                            ).clients.speed_simulation:
-                        self.simulate_sleep_time()
+                # Simulate client's speed
+                if self.client_id != 0 and hasattr(
+                        Config().clients, "speed_simulation") and Config(
+                        ).clients.speed_simulation:
+                    self.simulate_sleep_time()
 
-                    # Saving the model at the end of this epoch to a file so that
-                    # it can later be retrieved to respond to server requests
-                    # in asynchronous mode when the wall clock time is simulated
-                    if hasattr(Config().server, 'request_update') and Config(
-                    ).server.request_update:
-                        self.model.cpu()
-                        training_time = time.perf_counter() - tic
-                        filename = f"{self.client_id}_{epoch}_{training_time}.pth"
-                        self.save_model(filename)
-                        self.model.to(self.device)
+                # Saving the model at the end of this epoch to a file so that
+                # it can later be retrieved to respond to server requests
+                # in asynchronous mode when the wall clock time is simulated
+                if hasattr(
+                        Config().server,
+                        'request_update') and Config().server.request_update:
+                    self.model.cpu()
+                    training_time = time.perf_counter() - tic
+                    filename = f"{self.client_id}_{epoch}_{training_time}.pth"
+                    self.save_model(filename)
+                    self.model.to(self.device)
 
         except Exception as training_exception:
             logging.info("Training on client #%d failed.", self.client_id)

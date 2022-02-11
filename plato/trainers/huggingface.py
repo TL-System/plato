@@ -5,13 +5,14 @@ language processing.
 import math
 from typing import Optional
 
+from torch.utils.data import RandomSampler, Sampler
+
 from transformers import AutoConfig, AutoTokenizer, HfArgumentParser
 from transformers import Trainer as HuggingFaceTrainer
 from transformers import TrainingArguments, default_data_collator
 
 from plato.config import Config
 from plato.trainers import basic
-from torch.utils.data import RandomSampler, Sampler
 
 
 class SampledHuggingFaceTrainer(HuggingFaceTrainer):
@@ -47,8 +48,9 @@ class Trainer(basic.Trainer):
         self.model.train()
 
         parser = HfArgumentParser(TrainingArguments)
-        self.training_args, = parser.parse_args_into_dataclasses(
-            args=['--output_dir=/tmp', '--report_to=none'])
+        self.training_args, = parser.parse_args_into_dataclasses(args=[
+            '--output_dir=/tmp', '--report_to=none', '--num_train_epochs=1'
+        ])
 
         model_checkpoint = Config().trainer.model_checkpoint
         config_kwargs = {
