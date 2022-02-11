@@ -17,7 +17,7 @@ clients:
 server:
     address: 127.0.0.1
     port: 8000
-    simulate_wall_time: false 
+    simulate_wall_time: false
 
 data:
     # The training and testing dataset
@@ -32,14 +32,14 @@ data:
     partition_size: 10
 
     # IID or non-IID?
-    sampler: iid 
+    sampler: iid
 
     # The random seed for sampling data
     random_seed: 1
 
 trainer:
     # The type of the trainer
-    type: HuggingFace 
+    type: HuggingFace
 
     # The maximum number of training rounds
     rounds: 5
@@ -56,8 +56,8 @@ trainer:
     # The maximum number of clients running concurrently
     max_concurrency: 1
 
-    # The target accuracy
-    target_accuracy: 0.98
+    # The target perplexity
+    target_perplexity: 20
 
     # Number of epoches for local training in each communication round
     epochs: 1
@@ -69,7 +69,7 @@ trainer:
 
     # The machine learning model
     model_name: HuggingFace_CausalLM
-    model_checkpoint: gpt2 
+    model_checkpoint: gpt2
 
 algorithm:
     # Aggregation algorithm
