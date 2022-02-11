@@ -63,7 +63,7 @@ def get():
 
     if model_name == 'HuggingFace_CausalLM':
         from transformers import AutoModelForCausalLM
-        model_checkpoint = Config.trainer.model_checkpoint
+        model_checkpoint = Config().trainer.model_checkpoint
         return AutoModelForCausalLM.from_pretrained(model_checkpoint)
 
     else:
