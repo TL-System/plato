@@ -2,9 +2,9 @@
 Implements a Processor for compressing model weights.
 """
 import logging
+import pickle
 from typing import Any
 import zstd
-import torch
 
 from plato.processors import model
 
@@ -21,19 +21,12 @@ class Processor(model.Processor):
     def process(self, data: Any) -> Any:
         """ Implements a Processor for compressing model parameters. """
 
-        output = super().process(data)
+        output = zstd.compress(pickle.dumps(data), self.compression_level)
 
         logging.info("[Client #%d] Compressed model parameters.",
                      self.client_id)
 
         return output
 
-    def _process_layer(self, layer: torch.Tensor) -> torch.Tensor:
-        """ Compress individual layer of the model. """
-
-        data = layer.detach().cpu().numpy()
-
-        compressed_layer = (data.shape, data.dtype,
-                            zstd.compress(data, self.compression_level))
-
-        return compressed_layer
+    def _process_layer(self, layer: Any) -> Any:
+        """ No need to process individual layer of the model """

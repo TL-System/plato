@@ -4,9 +4,8 @@ Implements a Processor for decompressing model weights.
 
 import logging
 from typing import Any
-import numpy as np
+import pickle
 import zstd
-import torch
 
 from plato.processors import model
 
@@ -21,18 +20,12 @@ class Processor(model.Processor):
     def process(self, data: Any) -> Any:
         """ Implements a Processor for decompressing model parameters. """
 
-        output = super().process(data)
+        output = pickle.loads(zstd.decompress(data))
 
         logging.info("[Server #%d] Decompressed received model parameters.",
                      self.server_id)
 
         return output
 
-    def _process_layer(self, layer: torch.Tensor) -> torch.Tensor:
-        """ Compress individual layer of the model. """
-
-        shape, dtype, modelcom = layer
-        modelcom = zstd.decompress(modelcom)
-        decompressed_layer = np.fromstring(modelcom, dtype).reshape(shape)
-
-        return torch.from_numpy(decompressed_layer)
+    def _process_layer(self, layer: Any) -> Any:
+        """ No need to process individual layer of the model """
