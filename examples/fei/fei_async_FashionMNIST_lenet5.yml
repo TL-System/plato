@@ -25,7 +25,7 @@ server:
 
     # Parameter for FedAsync
     staleness_bound: 1000 # FedAsync doesn't have any staleness bound
-    minimum_clients_aggregated: 10
+    minimum_clients_aggregated: 5
     mixing_hyperparameter: 0.9
     adaptive_mixing: true
 

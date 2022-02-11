@@ -87,8 +87,9 @@ class RLAgent(simple_rl_agent.RLAgent):
                     self.num_samples).sum()
                 if hasattr(Config().server,
                            'synchronous') and not Config().server.synchronous:
+                    pad = np.zeros(self.n_actions - len(self.action))
+                    self.action = np.concatenate((self.action, pad))
                     self.action = np.reshape(np.array(self.action), (-1, 1))
-
             else:
                 # Sample action from policy
                 if Config().algorithm.recurrent_actor:
