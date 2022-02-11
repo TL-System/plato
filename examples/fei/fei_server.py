@@ -68,9 +68,6 @@ class RLServer(simple_rl_server.RLServer):
             correlations[i] = np.arccos(np.clip(inner / norms, -1.0, 1.0))
 
         for i, correlation in enumerate(correlations):
-            print("#updates: ", len(updates))
-            print("selected clients: ", self.selected_clients)
-            print("correlation length: ", len(correlations))
             self.local_correlations[i] = correlation
             self.local_correlations[i] = (
                 (self.current_round - 1) /
