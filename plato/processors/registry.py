@@ -29,6 +29,8 @@ if not (hasattr(Config().trainer, 'use_tensorflow')
         model_deepcopy,
         model_quantize,
         model_dequantize,
+        model_compress,
+        model_decompress,
         model_randomized_response,
         model_pruning,
     )
@@ -48,6 +50,8 @@ if not (hasattr(Config().trainer, 'use_tensorflow')
         ('model_deepcopy', model_deepcopy.Processor),
         ('model_quantize', model_quantize.Processor),
         ('model_dequantize', model_dequantize.Processor),
+        ('model_compress', model_compress.Processor),
+        ('model_decompress', model_decompress.Processor),
         ('model_randomized_response', model_randomized_response.Processor),
         ('model_pruning', model_pruning.Processor),
     ])
