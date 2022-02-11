@@ -78,15 +78,20 @@ class RNNReplayMemory:
         if hasattr(Config().server,
                    'synchronous') and not Config().server.synchronous:
             state = [
-                torch.FloatTensor(self.state[i]).to(self.device) for i in ind
+                torch.tensor(self.state[i],
+                             requires_grad=True,
+                             dtype=torch.float).to(self.device) for i in ind
             ]
             action = [
-                torch.FloatTensor(self.action[i]).to(self.device) for i in ind
+                torch.tensor(self.action[i],
+                             requires_grad=True,
+                             dtype=torch.float).to(self.device) for i in ind
             ]
             reward = [self.reward[i] for i in ind]
             next_state = [
-                torch.FloatTensor(self.next_state[i]).to(self.device)
-                for i in ind
+                torch.tensor(self.next_state[i],
+                             requires_grad=True,
+                             dtype=torch.float).to(self.device) for i in ind
             ]
             done = [self.done[i] for i in ind]
         else:
