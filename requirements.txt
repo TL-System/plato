@@ -6,5 +6,6 @@ boto3
 pyyaml
 pyyaml-include
 datasets
+transformers
 opacus
 zstd
