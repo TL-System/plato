@@ -76,5 +76,16 @@ class Client(base.Client):
         training_time = time.perf_counter() - training_start_time
 
         comm_time = time.time()
-        return Report(self.server.total_samples, accuracy, training_time,
-                      comm_time, False, self.client_id), weights
+
+        self.report = Report(self.server.total_samples, accuracy,
+                             training_time, comm_time, False, self.client_id)
+
+        return self.report, weights
+
+    async def obtain_model_update(self, wall_time):
+        """Retrieving a model update corresponding to a particular wall clock time."""
+        model = self.server.trainer.obtain_model_update(wall_time)
+        weights = self.server.algorithm.extract_weights(model)
+        self.report.update_response = True
+
+        return self.report, weights
