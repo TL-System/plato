@@ -81,4 +81,4 @@ results:
     types: round, elapsed_time, accuracy
 
     # Plot results (x_axis-y_axis)
-    plot: round-accuracy, elapsed_time-accuracy
+    plot: round-accuracy, comm_time-elapsed_time-accuracy, round_time-elapsed_time-accuracy
