@@ -23,7 +23,6 @@ from plato.utils import s3
 
 class ServerEvents(socketio.AsyncNamespace):
     """ A custom namespace for socketio.AsyncServer. """
-
     def __init__(self, namespace, plato_server):
         super().__init__(namespace)
         self.plato_server = plato_server
@@ -67,7 +66,6 @@ class ServerEvents(socketio.AsyncNamespace):
 
 class Server:
     """ The base class for federated learning servers. """
-
     def __init__(self):
         self.sio = None
         self.client = None
@@ -588,7 +586,7 @@ class Server:
                 self.client_payload[sid]))
 
         logging.info("[%s] Received %s MB of payload data from client #%d.",
-                     self, round(payload_size / 1024**2, 2), client_id)
+                     self, payload_size / 1024**2, client_id)
 
         # Pass through the inbound_processor(s), if any
         self.client_payload[sid] = self.inbound_processor.process(

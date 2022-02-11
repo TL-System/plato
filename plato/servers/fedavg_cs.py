@@ -117,16 +117,18 @@ class Server(fedavg.Server):
         if Config().clients.do_test:
             # Compute the average accuracy from client reports
             self.accuracy = self.accuracy_averaging(self.updates)
-            logging.info(
-                '[Server #{:d}] Average client accuracy: {:.2f}%.'.format(
-                    os.getpid(), 100 * self.accuracy))
+            logging.info('[%s] Average client accuracy: %.2f%%.', self,
+                         100 * self.accuracy)
         else:
             if Config().is_central_server():
                 # Test the updated model directly at the central server
                 self.accuracy = await self.trainer.server_test(self.testset)
-                logging.info(
-                    '[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(
-                        os.getpid(), 100 * self.accuracy))
+                if hasattr(Config().trainer, 'target_perplexity'):
+                    logging.info('[%s] Global model perplexity: %.2f\n', self,
+                                 self.accuracy)
+                else:
+                    logging.info('[%s] Global model accuracy: %.2f%%\n', self,
+                                 100 * self.accuracy)
 
         await self.wrap_up_processing_reports()
 
@@ -148,6 +150,10 @@ class Server(fedavg.Server):
                     Config().trainer.epochs,
                     'elapsed_time':
                     self.wall_time - self.initial_wall_time,
+                    'comm_time':
+                    max([
+                        report.comm_time for (report, __, __) in self.updates
+                    ]),
                     'round_time':
                     max([
                         report.training_time
