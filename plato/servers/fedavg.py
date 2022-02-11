@@ -37,7 +37,7 @@ class Server(base.Server):
         self.clients_per_round = Config().clients.per_round
 
         logging.info(
-            "[Server #%d] Started training on %s clients with %s per round.",
+            "[Server #%d] Started training on %d clients with %d per round.",
             os.getpid(), self.total_clients, self.clients_per_round)
 
         if hasattr(Config(), 'results'):
@@ -64,10 +64,10 @@ class Server(base.Server):
             target_perplexity = Config().trainer.target_perplexity
 
         if target_accuracy:
-            logging.info("Training: %s rounds or accuracy above %s%%\n",
+            logging.info("Training: %s rounds or accuracy above %.1f%%\n",
                          total_rounds, 100 * target_accuracy)
         elif target_perplexity:
-            logging.info("Training: %s rounds or perplexity below %s\n",
+            logging.info("Training: %s rounds or perplexity below %.1f\n",
                          total_rounds, target_perplexity)
         else:
             logging.info("Training: %s rounds\n", total_rounds)
@@ -148,16 +148,18 @@ class Server(base.Server):
         if Config().clients.do_test:
             # Compute the average accuracy from client reports
             self.accuracy = self.accuracy_averaging(self.updates)
-            logging.info(
-                '[Server #{:d}] Average client accuracy: {:.2f}%.'.format(
-                    os.getpid(), 100 * self.accuracy))
+            logging.info('[%s] Average client accuracy: %.2f%%.', self,
+                         100 * self.accuracy)
         else:
             # Testing the updated model directly at the server
             self.accuracy = await self.trainer.server_test(self.testset)
 
-            logging.info(
-                f'[Server #{os.getpid()}] Global model accuracy: {self.accuracy}\n'
-            )
+        if hasattr(Config().trainer, 'target_perplexity'):
+            logging.info('[%s] Global model perplexity: %.2f\n', self,
+                         self.accuracy)
+        else:
+            logging.info('[%s] Global model accuracy: %.2f%%\n', self,
+                         100 * self.accuracy)
 
         if hasattr(Config().trainer, 'use_wandb'):
             wandb.log({"accuracy": self.accuracy})
@@ -177,9 +179,13 @@ class Server(base.Server):
                     self.accuracy * 100,
                     'elapsed_time':
                     self.wall_time - self.initial_wall_time,
+                    'comm_time':
+                    max([
+                        report.comm_time for (report, __, __) in self.updates
+                    ]),
                     'round_time':
                     max([
-                        report.training_time
+                        report.training_time + report.comm_time
                         for (report, __, __) in self.updates
                     ]),
                 }[item]

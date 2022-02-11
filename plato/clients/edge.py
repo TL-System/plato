@@ -20,6 +20,7 @@ class Report(simple.Report):
 
 class Client(base.Client):
     """ A federated learning client at the edge server in a cross-silo training workload. """
+
     def __init__(self, server, algorithm=None, trainer=None):
         super().__init__()
         self.server = server
@@ -73,5 +74,6 @@ class Client(base.Client):
 
         training_time = time.perf_counter() - training_start_time
 
+        comm_time = time.time()
         return Report(self.server.total_samples, accuracy, training_time,
-                      False, self.client_id), weights
+                      comm_time, False, self.client_id), weights

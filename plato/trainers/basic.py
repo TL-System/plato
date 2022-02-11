@@ -235,19 +235,17 @@ class Trainer(base.Trainer):
                         if batch_id % log_interval == 0:
                             if self.client_id == 0:
                                 logging.info(
-                                    "[Server #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}"
-                                    .format(os.getpid(), epoch, epochs,
-                                            batch_id, len(train_loader),
-                                            loss.data.item()))
+                                    "[Server #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
+                                    os.getpid(), epoch, epochs, batch_id,
+                                    len(train_loader), loss.data.item())
                             else:
                                 if hasattr(config, 'use_wandb'):
                                     wandb.log({"batch loss": loss.data.item()})
 
                                 logging.info(
-                                    "[Client #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}"
-                                    .format(self.client_id, epoch, epochs,
-                                            batch_id, len(train_loader),
-                                            loss.data.item()))
+                                    "[Client #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
+                                    self.client_id, epoch, epochs, batch_id,
+                                    len(train_loader), loss.data.item())
 
                     if lr_schedule is not None:
                         lr_schedule.step()
