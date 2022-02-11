@@ -60,9 +60,17 @@ def get():
         return yolo.Model.get_model()
 
     if model_name == 'HuggingFace_CausalLM':
-        from transformers import AutoModelForCausalLM
+        from transformers import AutoModelForCausalLM, AutoConfig
+
         model_checkpoint = Config().trainer.model_checkpoint
-        return AutoModelForCausalLM.from_pretrained(model_checkpoint)
+        config_kwargs = {
+            "cache_dir": None,
+            "revision": 'main',
+            "use_auth_token": None,
+        }
+        config = AutoConfig.from_pretrained(model_checkpoint, **config_kwargs)
+        return AutoModelForCausalLM.from_pretrained(model_checkpoint,
+                                                    config=config)
 
     else:
         for name, registered_model in registered_models.items():
