@@ -55,11 +55,20 @@ class Server(base.Server):
         super().configure()
 
         total_rounds = Config().trainer.rounds
-        target_accuracy = Config().trainer.target_accuracy
+        target_accuracy = None
+        target_perplexity = None
+
+        if hasattr(Config().trainer, 'target_accuracy'):
+            target_accuracy = Config().trainer.target_accuracy
+        elif hasattr(Config().trainer, 'target_perplexity'):
+            target_perplexity = Config().trainer.target_perplexity
 
         if target_accuracy:
-            logging.info("Training: %s rounds or %s%% accuracy\n",
+            logging.info("Training: %s rounds or accuracy above %s%%\n",
                          total_rounds, 100 * target_accuracy)
+        elif target_perplexity:
+            logging.info("Training: %s rounds or perplexity below %s\n",
+                         total_rounds, target_perplexity)
         else:
             logging.info("Training: %s rounds\n", total_rounds)
 
@@ -147,8 +156,8 @@ class Server(base.Server):
             self.accuracy = await self.trainer.server_test(self.testset)
 
             logging.info(
-                '[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(
-                    os.getpid(), 100 * self.accuracy))
+                f'[Server #{os.getpid()}] Global model accuracy: {self.accuracy}\n'
+            )
 
         if hasattr(Config().trainer, 'use_wandb'):
             wandb.log({"accuracy": self.accuracy})

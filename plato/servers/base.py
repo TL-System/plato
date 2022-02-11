@@ -870,10 +870,21 @@ class Server:
         self.save_to_checkpoint()
 
         # Break the loop when the target accuracy is achieved
-        target_accuracy = Config().trainer.target_accuracy
+        target_accuracy = None
+        target_perplexity = None
+
+        if hasattr(Config().trainer, 'target_accuracy'):
+            target_accuracy = Config().trainer.target_accuracy
+        elif hasattr(Config().trainer, 'target_perplexity'):
+            target_perplexity = Config().trainer.target_perplexity
 
         if target_accuracy and self.accuracy >= target_accuracy:
             logging.info("[Server #%d] Target accuracy reached.", os.getpid())
+            await self.close()
+
+        if target_perplexity and self.accuracy <= target_perplexity:
+            logging.info("[Server #%d] Target perplexity reached.",
+                         os.getpid())
             await self.close()
 
         if self.current_round >= Config().trainer.rounds:
