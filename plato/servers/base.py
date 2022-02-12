@@ -435,12 +435,12 @@ class Server:
                 if self.comm_simulation:
                     logging.info(
                         "[%s] Sending the current model to client #%d (simulated).",
-                        self, selected_client_id)
+                        self, self.selected_client_id)
 
                     model_name = Config().trainer.model_name if hasattr(
                         Config().trainer, 'model_name') else 'custom'
                     checkpoint_dir = Config().params['checkpoint_dir']
-                    payload_filename = f"{checkpoint_dir}/{model_name}_{self.current_round}.pth"
+                    payload_filename = f"{checkpoint_dir}/{model_name}_{self.selected_client_id}.pth"
                     with open(payload_filename, 'wb') as payload_file:
                         pickle.dump(payload, payload_file)
                     server_response['payload_filename'] = payload_filename
