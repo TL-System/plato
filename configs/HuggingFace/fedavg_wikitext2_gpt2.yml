@@ -13,11 +13,14 @@ clients:
 
     # Client simulation mode
     simulation: false
+    comm_simulation: true
 
 server:
     address: 127.0.0.1
     port: 8000
     simulate_wall_time: false
+    checkpoint_dir: ./models/huggingface/fedavg
+    model_dir: ./models/huggingface/fedavg
 
 data:
     # The training and testing dataset
