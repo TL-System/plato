@@ -168,7 +168,10 @@ class Client:
             self.load_data()
 
         if hasattr(Config().clients, 'comm_simulation'):
-            self.load_model(f"{response['model_checkpoint']}")
+            payload_filename = response['payload_filename']
+            with open(payload_filename, 'rb') as payload_file:
+                self.server_payload = pickle.load(payload_file)
+
             logging.info(
                 "[%s] Received the current model from the server (simulated).",
                 self)
@@ -236,13 +239,14 @@ class Client:
 
         self.server_payload = self.inbound_processor.process(
             self.server_payload)
-        self.load_payload(self.server_payload)
-        self.server_payload = None
 
         await self.start_training()
 
     async def start_training(self):
         """ Complete one round of training on this client. """
+        self.load_payload(self.server_payload)
+        self.server_payload = None
+
         report, payload = await self.train()
 
         if Config().is_edge_server():

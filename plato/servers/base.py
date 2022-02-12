@@ -429,18 +429,21 @@ class Server:
                              self.selected_client_id)
 
                 server_response = {'id': self.selected_client_id}
+                payload = self.algorithm.extract_weights()
+                payload = self.customize_server_payload(payload)
 
                 if self.comm_simulation:
                     logging.info(
                         "[%s] Sending the current model to client #%d (simulated).",
                         self, selected_client_id)
 
-                    self.save_to_checkpoint()
-
                     model_name = Config().trainer.model_name if hasattr(
                         Config().trainer, 'model_name') else 'custom'
-                    model_checkpoint = f"checkpoint_{model_name}_{self.current_round}.pth"
-                    server_response['model_checkpoint'] = model_checkpoint
+                    checkpoint_dir = Config().params['checkpoint_dir']
+                    payload_filename = f"{checkpoint_dir}/{model_name}_{self.current_round}.pth"
+                    with open(payload_filename, 'wb') as payload_file:
+                        pickle.dump(payload, payload_file)
+                    server_response['payload_filename'] = payload_filename
 
                 server_response = await self.customize_server_response(
                     server_response)
@@ -451,9 +454,6 @@ class Server:
                                     room=sid)
 
                 if not self.comm_simulation:
-                    payload = self.algorithm.extract_weights()
-                    payload = self.customize_server_payload(payload)
-
                     # Sending the server payload to the client
                     logging.info(
                         "[%s] Sending the current model to client #%d.", self,
