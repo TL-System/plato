@@ -6,13 +6,13 @@ import asyncio
 import logging
 import os
 import pickle
+import re
 import sys
 import uuid
 from abc import abstractmethod
 from dataclasses import dataclass
 
 import socketio
-
 from plato.config import Config
 from plato.utils import s3
 
@@ -89,6 +89,11 @@ class Client:
         self.outbound_processor = None
         self.inbound_processor = None
 
+        self.comm_simulation = False
+        if hasattr(Config().clients,
+                   'comm_simulation') and Config().clients.comm_simulation:
+            self.comm_simulation = True
+
         if hasattr(Config().algorithm,
                    'cross_silo') and not Config().is_edge_server():
             self.edge_server_id = None
@@ -135,14 +140,11 @@ class Client:
             # If we are not using a production server deployed in the cloud
             if hasattr(Config().algorithm,
                        'cross_silo') and not Config().is_edge_server():
-                uri = '{}:{}'.format(
-                    uri,
-                    int(Config().server.port) + int(self.edge_server_id))
+                uri = f'{uri}:{int(Config().server.port) + int(self.edge_server_id)}'
             else:
-                uri = '{}:{}'.format(uri, Config().server.port)
+                uri = f'{uri}:{Config().server.port}'
 
-        logging.info("[Client #%d] Connecting to the server at %s.",
-                     self.client_id, uri)
+        logging.info("[%s] Connecting to the server at %s.", self, uri)
         await self.sio.connect(uri, wait_timeout=600)
         await self.sio.emit('client_alive', {'id': self.client_id})
 
@@ -165,6 +167,16 @@ class Client:
                 and Config().data.reload_data) or not self.data_loaded:
             self.load_data()
 
+        if hasattr(Config().clients, 'comm_simulation'):
+            payload_filename = response['payload_filename']
+            with open(payload_filename, 'rb') as payload_file:
+                self.server_payload = pickle.load(payload_file)
+
+            logging.info(
+                "[%s] Received the current model from the server (simulated).",
+                self)
+            await self.start_training()
+
     async def chunk_arrived(self, data) -> None:
         """ Upon receiving a chunk of data from the server. """
         self.chunks.append(data)
@@ -178,7 +190,10 @@ class Client:
         report, payload = await self.obtain_model_update(data['time'])
 
         # Sending the client report as metadata to the server (payload to follow)
-        await self.sio.emit('client_report', {'report': pickle.dumps(report)})
+        await self.sio.emit('client_report', {
+            'id': self.client_id,
+            'report': pickle.dumps(report)
+        })
 
         # Sending the client training payload to the server
         await self.send(payload)
@@ -224,23 +239,44 @@ class Client:
 
         self.server_payload = self.inbound_processor.process(
             self.server_payload)
+
+        await self.start_training()
+
+    async def start_training(self):
+        """ Complete one round of training on this client. """
         self.load_payload(self.server_payload)
         self.server_payload = None
 
         report, payload = await self.train()
 
         if Config().is_edge_server():
-            logging.info(
-                "[Server #%d] Model aggregated on edge server (%s).",
-                os.getpid(), self)
+            logging.info("[Server #%d] Model aggregated on edge server (%s).",
+                         os.getpid(), self)
         else:
             logging.info("[%s] Model trained.", self)
 
         # Sending the client report as metadata to the server (payload to follow)
-        await self.sio.emit('client_report', {'report': pickle.dumps(report)})
+        await self.sio.emit('client_report', {
+            'id': self.client_id,
+            'report': pickle.dumps(report)
+        })
 
-        # Sending the client training payload to the server
-        await self.send(payload)
+        if self.comm_simulation:
+            model_name = Config().trainer.model_name if hasattr(
+                Config().trainer, 'model_name') else 'custom'
+            checkpoint_dir = Config().params['checkpoint_dir']
+            payload_filename = f"{checkpoint_dir}/{model_name}_client_{self.client_id}.pth"
+            with open(payload_filename, 'wb') as payload_file:
+                pickle.dump(payload, payload_file)
+
+            logging.info(
+                "[%s] Sent %.2f MB of payload data to the server (simulated).",
+                self,
+                sys.getsizeof(pickle.dumps(payload)) / 1024**2)
+
+        else:
+            # Sending the client training payload to the server
+            await self.send(payload)
 
     async def send_in_chunks(self, data) -> None:
         """ Sending a bytes object in fixed-sized chunks to the client. """
@@ -280,8 +316,8 @@ class Client:
 
         await self.sio.emit('client_payload_done', metadata)
 
-        logging.info("[%s] Sent %s MB of payload data to the server.",
-                     self, round(data_size / 1024**2, 2))
+        logging.info("[%s] Sent %.2f MB of payload data to the server.", self,
+                     data_size / 1024**2)
 
     def process_server_response(self, server_response) -> None:
         """Additional client-specific processing on the server response."""
@@ -290,8 +326,6 @@ class Client:
         """ Delete all the temporary checkpoint files created by the client. """
         if hasattr(Config().server,
                    'request_update') and Config().server.request_update:
-            import re
-
             model_dir = Config().params['model_dir']
             for filename in os.listdir(model_dir):
                 split = re.match(
@@ -308,16 +342,24 @@ class Client:
 
     @abstractmethod
     def load_data(self) -> None:
-        """Generating data and loading them onto this client."""
+        """ Generating data and loading them onto this client. """
+
+    @abstractmethod
+    def save_model(self, model_checkpoint) -> None:
+        """ Saving the model to a model checkpoint. """
+
+    @abstractmethod
+    def load_model(self, model_checkpoint) -> None:
+        """ Loading the model from a model checkpoint. """
 
     @abstractmethod
     def load_payload(self, server_payload) -> None:
-        """Loading the payload onto this client."""
+        """ Loading the payload onto this client. """
 
     @abstractmethod
     async def train(self):
-        """The machine learning training workload on a client."""
+        """ The machine learning training workload on a client. """
 
     @abstractmethod
     async def obtain_model_update(self, wall_time):
-        """Retrieving a model update corrsponding to a particular wall clock time."""
+        """ Retrieving a model update corrsponding to a particular wall clock time. """

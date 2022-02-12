@@ -147,3 +147,11 @@ class Client(base.Client):
         self.report.update_response = True
 
         return self.report, weights
+
+    def save_model(self, model_checkpoint):
+        """ Saving the model to a model checkpoint. """
+        self.trainer.save_model(model_checkpoint)
+
+    def load_model(self, model_checkpoint):
+        """ Loading the model from a model checkpoint. """
+        self.trainer.load_model(model_checkpoint)

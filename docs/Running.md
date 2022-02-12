@@ -74,7 +74,7 @@ vim ~/.bashrc
 Then add 
 
 ```
-alias plato='cd ~/projects/def-baochun/<CCDB username>/plato/; module load python/3.9; source ~/.federated/bin/activate'
+alias plato='cd ~/projects/def-baochun/<CCDB username>/plato/; module load gcc/9.3.0 arrow cuda/11 python/3.9 scipy-stack; source ~/.federated/bin/activate'
 ```
 
 After saving this change and exiting `vim`:

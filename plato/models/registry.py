@@ -69,8 +69,8 @@ def get():
             "use_auth_token": None,
         }
         config = AutoConfig.from_pretrained(model_checkpoint, **config_kwargs)
-        return AutoModelForCausalLM.from_pretrained(model_checkpoint,
-                                                    config=config)
+        return AutoModelForCausalLM.from_pretrained(
+            model_checkpoint, config=config, cache_dir='./models/huggingface')
 
     else:
         for name, registered_model in registered_models.items():

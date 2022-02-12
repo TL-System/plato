@@ -3,6 +3,7 @@ The base class for federated learning servers.
 """
 
 import asyncio
+import copy
 import heapq
 import logging
 import multiprocessing as mp
@@ -44,7 +45,8 @@ class ServerEvents(socketio.AsyncNamespace):
 
     async def on_client_report(self, sid, data):
         """ An existing client sends a new report from local training. """
-        await self.plato_server.client_report_arrived(sid, data['report'])
+        await self.plato_server.client_report_arrived(sid, data['id'],
+                                                      data['report'])
 
     async def on_chunk(self, sid, data):
         """ A chunk of data from the server arrived. """
@@ -89,6 +91,10 @@ class Server:
         self.s3_client = None
         self.outbound_processor = None
         self.inbound_processor = None
+        self.comm_simulation = False
+        if hasattr(Config().clients,
+                   'comm_simulation') and Config().clients.comm_simulation:
+            self.comm_simulation = True
 
         # States that need to be maintained for asynchronous FL
 
@@ -425,6 +431,22 @@ class Server:
                              self.selected_client_id)
 
                 server_response = {'id': self.selected_client_id}
+                payload = self.algorithm.extract_weights()
+                payload = self.customize_server_payload(payload)
+
+                if self.comm_simulation:
+                    logging.info(
+                        "[%s] Sending the current model to client #%d (simulated).",
+                        self, self.selected_client_id)
+
+                    model_name = Config().trainer.model_name if hasattr(
+                        Config().trainer, 'model_name') else 'custom'
+                    checkpoint_dir = Config().params['checkpoint_dir']
+                    payload_filename = f"{checkpoint_dir}/{model_name}_{self.selected_client_id}.pth"
+                    with open(payload_filename, 'wb') as payload_file:
+                        pickle.dump(payload, payload_file)
+                    server_response['payload_filename'] = payload_filename
+
                 server_response = await self.customize_server_response(
                     server_response)
 
@@ -433,15 +455,13 @@ class Server:
                                     {'response': server_response},
                                     room=sid)
 
-                payload = self.algorithm.extract_weights()
-                payload = self.customize_server_payload(payload)
+                if not self.comm_simulation:
+                    # Sending the server payload to the client
+                    logging.info(
+                        "[%s] Sending the current model to client #%d.", self,
+                        selected_client_id)
 
-                # Sending the server payload to the client
-                logging.info(
-                    "[Server #%d] Sending the current model to client #%d.",
-                    os.getpid(), selected_client_id)
-
-                await self.send(sid, payload, selected_client_id)
+                    await self.send(sid, payload, selected_client_id)
 
     def choose_clients(self, clients_pool, clients_count):
         """ Choose a subset of the clients to participate in each round. """
@@ -538,14 +558,30 @@ class Server:
 
         await self.sio.emit('payload_done', metadata, room=sid)
 
-        logging.info("[%s] Sent %.2f MB of payload data to client #%d.",
-                     os.getpid(), data_size / 1024**2, client_id)
+        logging.info("[%s] Sent %.2f MB of payload data to client #%d.", self,
+                     data_size / 1024**2, client_id)
 
-    async def client_report_arrived(self, sid, report):
+    async def client_report_arrived(self, sid, client_id, report):
         """ Upon receiving a report from a client. """
         self.reports[sid] = pickle.loads(report)
         self.client_payload[sid] = None
         self.client_chunks[sid] = []
+
+        if self.comm_simulation:
+            model_name = Config().trainer.model_name if hasattr(
+                Config().trainer, 'model_name') else 'custom'
+            checkpoint_dir = Config().params['checkpoint_dir']
+            payload_filename = f"{checkpoint_dir}/{model_name}_client_{client_id}.pth"
+            with open(payload_filename, 'rb') as payload_file:
+                self.client_payload[sid] = pickle.load(payload_file)
+
+            logging.info(
+                "[%s] Received %.2f MB of payload data from client #%d (simulated).",
+                self,
+                sys.getsizeof(pickle.dumps(self.client_payload[sid])) /
+                1024**2, client_id)
+
+            await self.process_client_info(client_id, sid)
 
     async def client_chunk_arrived(self, sid, data) -> None:
         """ Upon receiving a chunk of data from a client. """
@@ -585,13 +621,17 @@ class Server:
             payload_size = sys.getsizeof(pickle.dumps(
                 self.client_payload[sid]))
 
-        logging.info("[%s] Received %s MB of payload data from client #%d.",
+        logging.info("[%s] Received %.2f MB of payload data from client #%d.",
                      self, payload_size / 1024**2, client_id)
 
         # Pass through the inbound_processor(s), if any
         self.client_payload[sid] = self.inbound_processor.process(
             self.client_payload[sid])
 
+        await self.process_client_info(client_id, sid)
+
+    async def process_client_info(self, client_id, sid):
+        """ Process the received metadata information from a reporting client. """
         self.reports[sid].comm_time = time.time() - self.reports[sid].comm_time
         start_time = self.training_clients[client_id]['start_time']
         finish_time = self.reports[sid].training_time + self.reports[
@@ -812,9 +852,6 @@ class Server:
 
     def save_to_checkpoint(self):
         """ Save a checkpoint for resuming the training session. """
-        logging.info(
-            "[%s] Saving the checkpoint to prepare for resuming the training session.",
-            self)
         checkpoint_dir = Config.params['checkpoint_dir']
 
         if not os.path.exists(checkpoint_dir):
@@ -822,7 +859,9 @@ class Server:
 
         model_name = Config().trainer.model_name if hasattr(
             Config().trainer, 'model_name') else 'custom'
-        filename = f"checkpoint_{model_name}.pth"
+        filename = f"checkpoint_{model_name}_{self.current_round}.pth"
+        logging.info("[%s] Saving the checkpoint to %s/%s.", self,
+                     checkpoint_dir, filename)
         self.trainer.save_model(filename, checkpoint_dir)
 
         # Saving important data in the server for resuming its session later on
@@ -847,11 +886,6 @@ class Server:
         # Loading important data in the server for resuming its session
         checkpoint_dir = Config.params['checkpoint_dir']
 
-        model_name = Config().trainer.model_name if hasattr(
-            Config().trainer, 'model_name') else 'custom'
-        filename = f"checkpoint_{model_name}.pth"
-        self.trainer.load_model(filename, checkpoint_dir)
-
         states_to_load = ['current_round', 'numpy_prng_state', 'prng_state']
         variables_to_load = {}
 
@@ -867,6 +901,11 @@ class Server:
 
         np.random.set_state(numpy_prng_state)
         random.setstate(prng_state)
+
+        model_name = Config().trainer.model_name if hasattr(
+            Config().trainer, 'model_name') else 'custom'
+        filename = f"checkpoint_{model_name}_{self.current_round}.pth"
+        self.trainer.load_model(filename, checkpoint_dir)
 
     async def wrap_up(self):
         """ Wrapping up when each round of training is done. """
