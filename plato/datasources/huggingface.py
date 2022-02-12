@@ -30,7 +30,9 @@ class DataSource(base.DataSource):
         else:
             dataset_config = None
 
-        self.dataset = load_dataset(dataset_name, dataset_config)
+        self.dataset = load_dataset(dataset_name,
+                                    dataset_config,
+                                    cache_dir=Config().data.data_path)
 
         parser = HfArgumentParser(TrainingArguments)
         self.training_args, = parser.parse_args_into_dataclasses(
@@ -38,12 +40,12 @@ class DataSource(base.DataSource):
 
         model_checkpoint = Config().trainer.model_checkpoint
         config_kwargs = {
-            "cache_dir": None,
+            "cache_dir": Config().server.model_dir,
             "revision": 'main',
             "use_auth_token": None,
         }
         tokenizer_kwargs = {
-            "cache_dir": None,
+            "cache_dir": Config().data.data_path,
             "use_fast": True,
             "revision": 'main',
             "use_auth_token": None,

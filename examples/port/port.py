@@ -6,6 +6,10 @@ Reference:
 "How Asynchronous can Federated Learning Be?"
 
 """
+import os
+
+os.environ["WANDB_DISABLED"] = "true"
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 import port_server
 
