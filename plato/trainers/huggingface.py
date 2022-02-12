@@ -52,7 +52,7 @@ class Trainer(basic.Trainer):
             '--output_dir=/tmp', '--report_to=none', '--num_train_epochs=1'
         ])
 
-        model_checkpoint = Config().trainer.model_checkpoint
+        model_checkpoint = Config().params['checkpoint_dir']
         config_kwargs = {
             "cache_dir": model_checkpoint,
             "revision": 'main',
