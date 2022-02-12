@@ -54,7 +54,7 @@ class Trainer(basic.Trainer):
 
         model_checkpoint = Config().trainer.model_checkpoint
         config_kwargs = {
-            "cache_dir": None,
+            "cache_dir": model_checkpoint,
             "revision": 'main',
             "use_auth_token": None,
         }
@@ -62,7 +62,7 @@ class Trainer(basic.Trainer):
                                                  **config_kwargs)
 
         tokenizer_kwargs = {
-            "cache_dir": None,
+            "cache_dir": model_checkpoint,
             "use_fast": True,
             "revision": 'main',
             "use_auth_token": None,
