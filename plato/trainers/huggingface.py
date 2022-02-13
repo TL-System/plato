@@ -48,9 +48,8 @@ class Trainer(basic.Trainer):
         self.model.train()
 
         parser = HfArgumentParser(TrainingArguments)
-        self.training_args, = parser.parse_args_into_dataclasses(args=[
-            '--output_dir=/tmp', '--report_to=none', '--num_train_epochs=1'
-        ])
+        self.training_args, = parser.parse_args_into_dataclasses(
+            args=['--output_dir=/tmp', '--report_to=none'])
 
         model_checkpoint = Config().trainer.model_checkpoint
         config_kwargs = {
@@ -80,6 +79,8 @@ class Trainer(basic.Trainer):
         sampler: the sampler that extracts a partition for this client.
         cut_layer (optional): The layer which training should start from.
         """
+
+        self.training_args['num_train_epoches'] = config['epochs']
 
         self.trainer = SampledHuggingFaceTrainer(
             model=self.model,
