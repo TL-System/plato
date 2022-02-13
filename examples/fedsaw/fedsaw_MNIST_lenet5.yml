@@ -3,7 +3,7 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 10
+    total_clients: 2
 
     # The number of clients selected in each round
     per_round: 2
@@ -11,27 +11,33 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    # Client simulation mode
-    simulation: false
+    # Whether simulate clients or not
+    simulation: true
+
+    pruning_amount: 0.4
 
     # Processors for outbound data payloads
     outbound_processors:
-        - model_pruning
+        - model_compress
 
 server:
+    type: fedavg_cross_silo
     address: 127.0.0.1
     port: 8000
-    simulate_wall_time: true
+    do_test: true
+
+    inbound_processors:
+        - model_decompress
 
 data:
     # The training and testing dataset
     datasource: MNIST
 
     # Where the dataset is located
-    data_path: ./data
+    data_path: ../../data
 
     # Number of samples in each partition
-    partition_size: 20000
+    partition_size: 100
 
     # IID or non-IID?
     sampler: iid
@@ -44,26 +50,20 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 5
+    rounds: 2
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
 
-    # Whether to apply differential privacy
-    # differential_privacy: true
-    # dp_epsilon: 1
-    # dp_delta: 0.00001
-    # dp_max_grad_norm: 1
-
     # The maximum number of clients running concurrently
-    max_concurrency: 1
+    max_concurrency: 2
 
     # The target accuracy
-    target_accuracy: 0.97
+    target_accuracy: 0.99
 
     # Number of epoches for local training in each communication round
     epochs: 1
-    batch_size: 32
+    batch_size: 10
     optimizer: SGD
     learning_rate: 0.01
     momentum: 0.9
@@ -75,3 +75,19 @@ trainer:
 algorithm:
     # Aggregation algorithm
     type: fedavg
+
+    # Cross-silo training
+    cross_silo: true
+
+    # The total number of silos (edge servers)
+    total_silos: 2
+
+    # The number of local aggregation rounds on edge servers before sending
+    # aggregated weights to the central server
+    local_rounds: 2
+
+results:
+    # Write the following parameter(s) into a CSV
+    types: round, accuracy, elapsed_time, comm_time, round_time
+
+    result_dir: ./results/test

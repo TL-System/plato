@@ -9,13 +9,9 @@ from dataclasses import dataclass
 from plato.clients import simple
 
 
-@dataclass
-class Report(simple.Report):
-    """A client report."""
-
-
 class Client(simple.Client):
     """A federated learning client."""
+
     def __init__(self,
                  model=None,
                  datasource=None,
@@ -32,11 +28,11 @@ class Client(simple.Client):
         if 'personalization_test' in server_response:
             self.do_personalization_test = True
 
-    async def payload_done(self, client_id, object_key) -> None:
+    async def payload_done(self, client_id, s3_key=None) -> None:
         """ Upon receiving all the new payload from the server. """
         payload_size = 0
 
-        if object_key is None:
+        if s3_key is None:
             if isinstance(self.server_payload, list):
                 for _data in self.server_payload:
                     payload_size += sys.getsizeof(pickle.dumps(_data))
@@ -46,7 +42,7 @@ class Client(simple.Client):
             else:
                 payload_size = sys.getsizeof(pickle.dumps(self.server_payload))
         else:
-            self.server_payload = self.s3_client.receive_from_s3(object_key)
+            self.server_payload = self.s3_client.receive_from_s3(s3_key)
             payload_size = sys.getsizeof(pickle.dumps(self.server_payload))
 
         assert client_id == self.client_id
@@ -91,7 +87,7 @@ class Client(simple.Client):
             # The testing process failed, disconnect from the server
             await self.sio.disconnect()
 
-        logging.info("[Client #{:d}] Personlization accuracy: {:.2f}%".format(
-            self.client_id, 100 * personalization_accuracy))
+        logging.info("[%s] Personlization accuracy: %.2f%%", self,
+                     100 * personalization_accuracy)
 
         return personalization_accuracy
