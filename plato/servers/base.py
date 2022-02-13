@@ -115,7 +115,7 @@ class Server:
         # set of reporting clients received since the previous round of aggregation
         self.current_reported_clients = {}
         self.current_processed_clients = {}
-        self.prng_state = None
+        self.prng_state = random.getstate()
 
         self.ping_interval = 3600
         self.ping_timeout = 360
@@ -225,8 +225,8 @@ class Server:
             logging.info("Setting the random seed for selecting clients: %s",
                          seed)
             random.seed(seed)
+            self.prng_state = random.getstate()
 
-        self.prng_state = random.getstate()
         self.start()
 
     def start(self, port=Config().server.port):
