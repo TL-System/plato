@@ -224,6 +224,7 @@ class Server:
                          seed)
             random.seed(seed)
 
+        self.prng_state = random.getstate()
         self.start()
 
     def start(self, port=Config().server.port):
@@ -466,10 +467,12 @@ class Server:
     def choose_clients(self, clients_pool, clients_count):
         """ Choose a subset of the clients to participate in each round. """
         assert clients_count <= len(clients_pool)
+        random.setstate(self.prng_state)
 
         # Select clients randomly
         selected_clients = random.sample(clients_pool, clients_count)
 
+        self.prng_state = random.getstate()
         logging.info("[%s] Selected clients: %s", self, selected_clients)
         return selected_clients
 
