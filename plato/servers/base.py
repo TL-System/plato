@@ -223,8 +223,8 @@ class Server:
             logging.info("Setting the random seed for selecting clients: %s",
                          seed)
             random.seed(seed)
+            self.prng_state = random.getstate()
 
-        self.prng_state = random.getstate()
         self.start()
 
     def start(self, port=Config().server.port):
