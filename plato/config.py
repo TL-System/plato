@@ -115,30 +115,6 @@ class Config:
                        "speed_simulation") and Config.clients.speed_simulation:
                 Config.simulate_client_speed()
 
-            if 'results' in config:
-                Config.results = Config.namedtuple_from_dict(config['results'])
-                if hasattr(Config.results, 'result_dir'):
-                    Config.result_dir = Config.results.result_dir
-                else:
-                    datasource = Config.data.datasource
-                    model = Config.trainer.model_name
-                    server_type = "custom"
-                    if hasattr(Config().server, "type"):
-                        server_type = Config.server.type
-                    elif hasattr(Config().algorithm, "type"):
-                        server_type = Config.algorithm.type
-                    Config.result_dir = f'./results/{datasource}/{model}/{server_type}'
-
-            if 'model' in config:
-                Config.model = Config.namedtuple_from_dict(config['model'])
-
-            if hasattr(Config().trainer, 'max_concurrency'):
-                # Using a temporary SQLite database to limit the maximum number of concurrent
-                # trainers
-                Config.sql_connection = sqlite3.connect(
-                    "/tmp/running_trainers.sqlitedb")
-                Config().cursor = Config.sql_connection.cursor()
-
             # Customizable dictionary of global parameters
             Config.params: dict = {}
 
@@ -157,6 +133,35 @@ class Config:
                 ).server.checkpoint_dir
             else:
                 Config.params['checkpoint_dir'] = "./checkpoints"
+
+            datasource = Config.data.datasource
+            model = Config.trainer.model_name
+            server_type = "custom"
+            if hasattr(Config().server, "type"):
+                server_type = Config.server.type
+            elif hasattr(Config().algorithm, "type"):
+                server_type = Config.algorithm.type
+            Config.params[
+                'result_dir'] = f'./results/{datasource}_{model}_{server_type}'
+
+            if 'results' in config:
+                Config.results = Config.namedtuple_from_dict(config['results'])
+
+                if hasattr(Config.results, 'result_dir'):
+                    Config.params['result_dir'] = Config.results.result_dir
+
+            os.makedirs(Config.params['result_dir'], exist_ok=True)
+
+            if 'model' in config:
+                Config.model = Config.namedtuple_from_dict(config['model'])
+
+            if hasattr(Config().trainer, 'max_concurrency'):
+                # Using a temporary SQLite database to limit the maximum number of concurrent
+                # trainers
+                Config.sql_connection = sqlite3.connect(
+                    f"{Config().params['result_dir']}/running_trainers.sqlitedb"
+                )
+                Config().cursor = Config.sql_connection.cursor()
 
         return cls._instance
 
