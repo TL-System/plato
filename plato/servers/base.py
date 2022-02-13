@@ -24,7 +24,6 @@ from plato.utils import s3
 
 class ServerEvents(socketio.AsyncNamespace):
     """ A custom namespace for socketio.AsyncServer. """
-
     def __init__(self, namespace, plato_server):
         super().__init__(namespace)
         self.plato_server = plato_server
@@ -69,7 +68,6 @@ class ServerEvents(socketio.AsyncNamespace):
 
 class Server:
     """ The base class for federated learning servers. """
-
     def __init__(self):
         self.sio = None
         self.client = None
@@ -331,6 +329,10 @@ class Server:
             # In the client simulation mode, the client pool for client selection contains
             # all the virtual clients to be simulated
             self.clients_pool = list(range(1, 1 + self.total_clients))
+            if Config().is_central_server():
+                self.clients_pool = list(
+                    range(Config().clients.per_round + 1,
+                          Config().clients.per_round + 1 + self.total_clients))
 
         else:
             # If no clients are simulated, the client pool for client selection consists of
@@ -400,7 +402,7 @@ class Server:
                 if self.client_simulation_mode:
                     client_id = i + 1
                     if Config().is_central_server():
-                        client_id += Config().clients.per_round
+                        client_id = selected_client_id
 
                     sid = self.clients[client_id]['sid']
 

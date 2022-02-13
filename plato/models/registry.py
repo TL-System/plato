@@ -34,6 +34,8 @@ else:
         alexnet,
         squeezenet,
         shufflenet,
+        efficientnet,
+        regnet,
     )
     registered_models = OrderedDict([
         ('lenet5', lenet5.Model),
@@ -46,6 +48,8 @@ else:
         ('alexnet', alexnet.Model),
         ('squeezenet', squeezenet.Model),
         ('shufflenet', shufflenet.Model),
+        ('efficientnet', efficientnet.Model),
+        ('regnet', regnet.Model),
     ])
 
 
