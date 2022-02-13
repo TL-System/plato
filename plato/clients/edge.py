@@ -20,12 +20,12 @@ class Report(simple.Report):
 
 class Client(base.Client):
     """ A federated learning client at the edge server in a cross-silo training workload. """
-
     def __init__(self, server, algorithm=None, trainer=None):
         super().__init__()
         self.server = server
         self.algorithm = algorithm
         self.trainer = trainer
+        self.report = None
 
     def configure(self):
         """ Prepare this edge client for training. """
@@ -42,13 +42,14 @@ class Client(base.Client):
         # Pass inbound and outbound data payloads through processors for
         # additional data processing
         self.outbound_processor, self.inbound_processor = processor_registry.get(
-            "Client", client_id=self.client_id, trainer=self.trainer)
+            "Client", client_id=self.client_id, trainer=self.server.trainer)
 
     def load_data(self):
         """ The edge client does not need to train models using local data. """
 
-    def load_payload(self, server_payload):
-        """ The edge client does not need to train models using local data. """
+    def load_payload(self, server_payload) -> None:
+        """ The edge client loads the model from the central server. """
+        self.server.algorithm.load_weights(server_payload)
 
     def process_server_response(self, server_response):
         """ Additional client-specific processing on the server response. """
@@ -67,7 +68,7 @@ class Client(base.Client):
         self.server.model_aggregated.clear()
 
         # Extract model weights and biases
-        weights = self.algorithm.extract_weights()
+        weights = self.server.algorithm.extract_weights()
 
         # Generate a report of test accuracy for the server
         accuracy = self.server.accuracy
@@ -75,5 +76,16 @@ class Client(base.Client):
         training_time = time.perf_counter() - training_start_time
 
         comm_time = time.time()
-        return Report(self.server.total_samples, accuracy, training_time,
-                      comm_time, False, self.client_id), weights
+
+        self.report = Report(self.server.total_samples, accuracy,
+                             training_time, comm_time, False, self.client_id)
+
+        return self.report, weights
+
+    async def obtain_model_update(self, wall_time):
+        """Retrieving a model update corresponding to a particular wall clock time."""
+        model = self.server.trainer.obtain_model_update(wall_time)
+        weights = self.server.algorithm.extract_weights(model)
+        self.report.update_response = True
+
+        return self.report, weights
