@@ -80,7 +80,8 @@ class Trainer(basic.Trainer):
         cut_layer (optional): The layer which training should start from.
         """
 
-        self.training_args['num_train_epoches'] = config['epochs']
+        self.training_args.num_train_epoches = config['epochs']
+        self.training_args.per_device_train_batch_size = config['batch_size']
 
         self.trainer = SampledHuggingFaceTrainer(
             model=self.model,
