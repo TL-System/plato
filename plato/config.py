@@ -134,21 +134,23 @@ class Config:
             else:
                 Config.params['checkpoint_dir'] = "./checkpoints"
 
+            datasource = Config.data.datasource
+            model = Config.trainer.model_name
+            server_type = "custom"
+            if hasattr(Config().server, "type"):
+                server_type = Config.server.type
+            elif hasattr(Config().algorithm, "type"):
+                server_type = Config.algorithm.type
+            Config.params[
+                'result_dir'] = f'./results/{datasource}_{model}_{server_type}'
+
             if 'results' in config:
                 Config.results = Config.namedtuple_from_dict(config['results'])
+
                 if hasattr(Config.results, 'result_dir'):
                     Config.params['result_dir'] = Config.results.result_dir
-                else:
-                    datasource = Config.data.datasource
-                    model = Config.trainer.model_name
-                    server_type = "custom"
-                    if hasattr(Config().server, "type"):
-                        server_type = Config.server.type
-                    elif hasattr(Config().algorithm, "type"):
-                        server_type = Config.algorithm.type
 
-                    Config.params[
-                        'result_dir'] = f'./results/{datasource}/{model}/{server_type}'
+            os.makedirs(Config.params['result_dir'], exist_ok=True)
 
             if 'model' in config:
                 Config.model = Config.namedtuple_from_dict(config['model'])
