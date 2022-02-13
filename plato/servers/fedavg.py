@@ -85,9 +85,9 @@ class Server(base.Server):
 
         # Initialize the csv file which will record results
         if hasattr(Config(), 'results'):
-            result_csv_file = f'{Config().result_dir}/{os.getpid()}.csv'
+            result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}.csv"
             csv_processor.initialize_csv(result_csv_file, self.recorded_items,
-                                         Config().result_dir)
+                                         Config().params['result_dir'])
 
     def load_trainer(self):
         """Setting up the global model to be trained via federated learning."""
@@ -191,7 +191,7 @@ class Server(base.Server):
                 }[item]
                 new_row.append(item_value)
 
-            result_csv_file = f'{Config().result_dir}/{os.getpid()}.csv'
+            result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}.csv"
             csv_processor.write_csv(result_csv_file, new_row)
 
     @staticmethod
