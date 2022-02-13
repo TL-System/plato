@@ -7,8 +7,9 @@ https://huggingface.co/docs/datasets/quicktour.html
 """
 
 import logging
+import os
 
-from datasets import load_dataset
+import datasets
 from transformers import AutoConfig, AutoTokenizer, HfArgumentParser
 from transformers import (TrainingArguments, testing_utils, utils)
 
@@ -30,9 +31,15 @@ class DataSource(base.DataSource):
         else:
             dataset_config = None
 
-        self.dataset = load_dataset(dataset_name,
-                                    dataset_config,
-                                    cache_dir=Config().data.data_path)
+        saved_data_path = f"{Config().data.data_path}/{dataset_name}_{dataset_config}"
+
+        if os.path.exists(saved_data_path):
+            # If the dataset has already been downloaded and saved
+            self.dataset = datasets.load_from_disk(saved_data_path)
+        else:
+            # Download and save the dataset
+            self.dataset = datasets.load_dataset(dataset_name, dataset_config)
+            self.dataset.save_to_disk(saved_data_path)
 
         parser = HfArgumentParser(TrainingArguments)
         self.training_args, = parser.parse_args_into_dataclasses(
