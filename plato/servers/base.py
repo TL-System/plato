@@ -113,7 +113,7 @@ class Server:
         # set of reporting clients received since the previous round of aggregation
         self.current_reported_clients = {}
         self.current_processed_clients = {}
-        self.prng_state = None
+        self.prng_state = random.getstate()
 
         self.ping_interval = 3600
         self.ping_timeout = 360
