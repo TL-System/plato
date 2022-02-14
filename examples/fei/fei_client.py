@@ -28,8 +28,8 @@ class Client(simple.Client):
         valuation = self.calc_valuation(report.num_samples, loss)
 
         return Report(report.num_samples, report.accuracy,
-                      report.training_time, report.update_response,
-                      valuation), weights
+                      report.training_time, report.comm_time,
+                      report.update_response, valuation), weights
 
     def process_server_response(self, server_response):
         """Additional client-specific processing on the server response."""
