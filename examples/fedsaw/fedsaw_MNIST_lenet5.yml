@@ -13,6 +13,7 @@ clients:
 
     # Whether simulate clients or not
     simulation: true
+    comm_simulation: true
 
     pruning_amount: 0.4
 

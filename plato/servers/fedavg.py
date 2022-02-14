@@ -6,7 +6,6 @@ import asyncio
 import logging
 import os
 import random
-from torch.utils.data import SubsetRandomSampler
 
 from plato.algorithms import registry as algorithms_registry
 from plato.config import Config
