@@ -20,6 +20,7 @@ class Report(simple.Report):
 
 class Client(base.Client):
     """ A federated learning client at the edge server in a cross-silo training workload. """
+
     def __init__(self, server, algorithm=None, trainer=None):
         super().__init__()
         self.server = server
@@ -89,3 +90,11 @@ class Client(base.Client):
         self.report.update_response = True
 
         return self.report, weights
+
+    def save_model(self, model_checkpoint):
+        """ Saving the model to a model checkpoint. """
+        self.trainer.save_model(model_checkpoint)
+
+    def load_model(self, model_checkpoint):
+        """ Loading the model from a model checkpoint. """
+        self.trainer.load_model(model_checkpoint)
