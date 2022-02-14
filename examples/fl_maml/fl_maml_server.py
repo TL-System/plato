@@ -12,7 +12,6 @@ from plato.utils import csv_processor
 
 class Server(fedavg.Server):
     """A federated learning server for personalized FL."""
-
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
         self.do_personalization_test = False
@@ -81,7 +80,7 @@ class Server(fedavg.Server):
                     }[item]
                     new_row.append(item_value)
 
-                result_csv_file = Config().params['result_dir'] + 'result.csv'
+                result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}.csv"
 
                 csv_processor.write_csv(result_csv_file, new_row)
 

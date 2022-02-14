@@ -16,7 +16,6 @@ from plato.servers import fedavg_cs
 
 class Server(fedavg_cs.Server):
     """Cross-silo federated learning server using federated averaging."""
-
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
 
@@ -68,39 +67,26 @@ class Server(fedavg_cs.Server):
         self.personalization_accuracy = accuracy / len(
             self.personalization_test_updates)
 
+    def get_record_items_values(self):
+        """Get values will be recorded in result csv file."""
+        record_items_values = super().get_record_items_values()
+        record_items_values[
+            'personalization_accuracy'] = self.personalization_accuracy * 100
+        return record_items_values
+
     async def wrap_up_processing_reports(self):
         """Wrap up processing the reports with any additional work."""
         if self.do_personalization_test or Config().is_edge_server():
             if hasattr(Config(), 'results'):
                 new_row = []
                 for item in self.recorded_items:
-                    item_value = {
-                        'global_round':
-                        self.current_global_round,
-                        'round':
-                        self.current_round,
-                        'accuracy':
-                        self.accuracy * 100,
-                        'personalization_accuracy':
-                        self.personalization_accuracy * 100,
-                        'edge_agg_num':
-                        Config().algorithm.local_rounds,
-                        'local_epoch_num':
-                        Config().trainer.epochs,
-                        'elapsed_time':
-                        self.wall_time - self.initial_wall_time,
-                        'round_time':
-                        max([
-                            report.training_time
-                            for (report, __, __) in self.updates
-                        ]),
-                    }[item]
+                    item_value = self.get_record_items_values()[item]
                     new_row.append(item_value)
 
                 if Config().is_edge_server():
-                    result_csv_file = f"{Config().params['result_dir']}result_{Config().args.id}.csv"
+                    result_csv_file = f"{Config().params['result_dir']}/edge_{os.getpid()}.csv"
                 else:
-                    result_csv_file = f"{Config().params['result_dir']}result.csv"
+                    result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}.csv"
 
                 csv_processor.write_csv(result_csv_file, new_row)
 

@@ -6,6 +6,7 @@ import asyncio
 import logging
 import os
 import random
+from torch.utils.data import SubsetRandomSampler
 
 from plato.algorithms import registry as algorithms_registry
 from plato.config import Config
@@ -14,12 +15,10 @@ from plato.processors import registry as processor_registry
 from plato.servers import base
 from plato.trainers import registry as trainers_registry
 from plato.utils import csv_processor
-from torch.utils.data import SubsetRandomSampler
 
 
 class Server(base.Server):
     """Federated learning server using federated averaging."""
-
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__()
 

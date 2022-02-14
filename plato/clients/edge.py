@@ -2,42 +2,31 @@
 A federated learning client at the edge server in a cross-silo training workload.
 """
 
-import time
 from dataclasses import dataclass
+import time
 
-from plato.algorithms import registry as algorithms_registry
 from plato.clients import base
 from plato.clients import simple
 from plato.processors import registry as processor_registry
-from plato.trainers import registry as trainers_registry
 
 
 @dataclass
 class Report(simple.Report):
     """ Client report, to be sent to the federated learning server. """
+    average_accuracy: float
     client_id: str
 
 
 class Client(base.Client):
     """ A federated learning client at the edge server in a cross-silo training workload. """
-    def __init__(self, server, algorithm=None, trainer=None):
+    def __init__(self, server):
         super().__init__()
         self.server = server
-        self.algorithm = algorithm
-        self.trainer = trainer
         self.report = None
 
     def configure(self):
         """ Prepare this edge client for training. """
         super().configure()
-
-        if self.trainer is None:
-            self.trainer = trainers_registry.get()
-        self.trainer.set_client_id(self.client_id)
-
-        if self.algorithm is None:
-            self.algorithm = algorithms_registry.get(self.trainer)
-        self.algorithm.set_client_id(self.client_id)
 
         # Pass inbound and outbound data payloads through processors for
         # additional data processing
@@ -70,15 +59,17 @@ class Client(base.Client):
         # Extract model weights and biases
         weights = self.server.algorithm.extract_weights()
 
-        # Generate a report of test accuracy for the server
+        average_accuracy = self.server.average_accuracy
         accuracy = self.server.accuracy
 
         training_time = time.perf_counter() - training_start_time
 
         comm_time = time.time()
 
+        # Generate a report for the central server
         self.report = Report(self.server.total_samples, accuracy,
-                             training_time, comm_time, False, self.client_id)
+                             training_time, comm_time, False, average_accuracy,
+                             self.client_id)
 
         return self.report, weights
 
