@@ -18,6 +18,7 @@ from plato.utils import csv_processor
 
 class RLServer(base.Server):
     """ A federated learning server with RL Agent. """
+
     def __init__(self, agent, model=None, algorithm=None, trainer=None):
         super().__init__()
         self.agent = agent
