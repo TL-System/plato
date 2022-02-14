@@ -83,9 +83,17 @@ class Client(base.Client):
         return self.report, weights
 
     async def obtain_model_update(self, wall_time):
-        """Retrieving a model update corresponding to a particular wall clock time."""
+        """ Retrieving a model update corresponding to a particular wall clock time. """
         model = self.server.trainer.obtain_model_update(wall_time)
         weights = self.server.algorithm.extract_weights(model)
         self.report.update_response = True
 
         return self.report, weights
+
+    def save_model(self, model_checkpoint):
+        """ Saving the current aggregated model to a model checkpoint. """
+        self.server.trainer.save_model(model_checkpoint)
+
+    def load_model(self, model_checkpoint):
+        """ Loading the current aggregated model from a model checkpoint. """
+        self.server.trainer.load_model(model_checkpoint)

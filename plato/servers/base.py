@@ -3,7 +3,6 @@ The base class for federated learning servers.
 """
 
 import asyncio
-import copy
 import heapq
 import logging
 import multiprocessing as mp
