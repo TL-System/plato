@@ -465,7 +465,7 @@ class Trainer(base.Trainer):
                 testset,
                 batch_size=config['batch_size'],
                 shuffle=False,
-                sampler=sampler.get())
+                sampler=sampler)
 
         correct = 0
         total = 0

@@ -88,9 +88,9 @@ def main():
     __ = Config()
 
     if hasattr(Config(), 'results'):
-        result_csv_file = Config().result_dir + 'result.csv'
+        result_csv_file = Config().params['result_dir'] + 'result.csv'
         print(f"Plotting results located at {result_csv_file}.")
-        plot_figures_from_dict(result_csv_file, Config().result_dir)
+        plot_figures_from_dict(result_csv_file, Config().params['result_dir'])
     else:
         print("No results to be plotted according to the configuration file.")
 

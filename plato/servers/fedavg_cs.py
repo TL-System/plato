@@ -16,6 +16,7 @@ from plato.servers import fedavg
 
 class Server(fedavg.Server):
     """Cross-silo federated learning server using federated averaging."""
+
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
 
@@ -84,7 +85,7 @@ class Server(fedavg.Server):
                 "Server", server_id=os.getpid(), trainer=self.trainer)
 
             if hasattr(Config(), 'results'):
-                result_dir = Config().result_dir
+                result_dir = Config().params['result_dir']
                 result_csv_file = f'{result_dir}/edge_{os.getpid()}.csv'
                 csv_processor.initialize_csv(result_csv_file,
                                              self.recorded_items, result_dir)
@@ -163,9 +164,9 @@ class Server(fedavg.Server):
                 new_row.append(item_value)
 
             if Config().is_edge_server():
-                result_csv_file = f'{Config().result_dir}/edge_{os.getpid()}.csv'
+                result_csv_file = f"{Config().params['result_dir']}/edge_{os.getpid()}.csv"
             else:
-                result_csv_file = f'{Config().result_dir}/{os.getpid()}.csv'
+                result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}.csv"
 
             csv_processor.write_csv(result_csv_file, new_row)
 
