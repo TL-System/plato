@@ -46,8 +46,7 @@ class Client(edge.Client):
         prune.global_unstructured(
             parameters_to_prune,
             pruning_method=prune.L1Unstructured,
-            amount=Config().clients.pruning_amount if hasattr(
-                Config().clients, 'pruning_amount') else 0.2,
+            amount=Config().clients.pruning_amount,
         )
 
         for module, name in parameters_to_prune:
@@ -70,3 +69,20 @@ class Client(edge.Client):
             updates[name] = delta
 
         return updates
+
+    def process_server_response(self, server_response):
+        """ Additional client-specific processing on the server response. """
+        super().process_server_response(server_response)
+
+        if 'pruning_amount' in server_response:
+            pruning_amount_list = server_response['pruning_amount']
+            if hasattr(Config().clients,
+                       'simulation') and Config().clients.simulation:
+                index = self.client_id - Config().clients.per_round - 1
+            else:
+                index = self.client_id - Config().clients.total_clients - 1
+
+            pruning_amount = pruning_amount_list[index]
+            # Update the number of local epochs
+            Config().clients = Config().clients._replace(
+                pruning_amount=pruning_amount)

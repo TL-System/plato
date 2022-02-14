@@ -41,9 +41,15 @@ class Client(simple.Client):
                     module, torch.nn.Linear):
                 parameters_to_prune.append((module, 'weight'))
 
+        if hasattr(Config().clients, 'pruning_amount') and Config(
+        ).clients.pruning_method == 'random':
+            pruning_method = prune.RandomUnstructured
+        else:
+            pruning_method = prune.L1Unstructured
+
         prune.global_unstructured(
             parameters_to_prune,
-            pruning_method=prune.L1Unstructured,
+            pruning_method=pruning_method,
             amount=Config().clients.pruning_amount if hasattr(
                 Config().clients, 'pruning_amount') else 0.2,
         )
