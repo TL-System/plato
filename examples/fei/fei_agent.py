@@ -17,6 +17,7 @@ from plato.utils.reinforcement_learning.policies import \
 
 class RLAgent(simple_rl_agent.RLAgent):
     """ An RL agent for FL training using FEI. """
+
     def __init__(self):
         super().__init__()
         if hasattr(Config().server,
@@ -38,7 +39,7 @@ class RLAgent(simple_rl_agent.RLAgent):
         self.recorded_rl_items = ['episode', 'actor_loss', 'critic_loss']
 
         if self.current_episode == 0:
-            result_dir = Config().result_dir
+            result_dir = Config().params['result_dir']
             episode_result_csv_file = f'{result_dir}/{os.getpid()}_episode_result.csv'
             csv_processor.initialize_csv(episode_result_csv_file,
                                          self.recorded_rl_items, result_dir)
@@ -156,10 +157,10 @@ class RLAgent(simple_rl_agent.RLAgent):
                 }[item]
                 new_row.append(item_value)
 
-            episode_result_csv_file = f'{Config().result_dir}/{os.getpid()}_episode_result.csv'
+            episode_result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_episode_result.csv"
             csv_processor.write_csv(episode_result_csv_file, new_row)
 
-        episode_reward_csv_file = f'{Config().result_dir}/{os.getpid()}_episode_reward.csv'
+        episode_reward_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_episode_reward.csv"
         csv_processor.write_csv(episode_reward_csv_file, [
             self.current_episode, self.current_step,
             mean(self.pre_acc), self.episode_reward

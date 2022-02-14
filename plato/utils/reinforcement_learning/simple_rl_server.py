@@ -17,7 +17,7 @@ from plato.utils import csv_processor
 
 
 class RLServer(base.Server):
-    """ A federated learning server with RL Agent. """
+    """ A federated learning server with an RL Agent. """
 
     def __init__(self, agent, model=None, algorithm=None, trainer=None):
         super().__init__()
@@ -46,8 +46,7 @@ class RLServer(base.Server):
 
     def configure(self):
         """ Booting the federated learning server by setting up
-        the data, model, and creating the clients. 
-        
+        the data, model, and creating the clients.
             Called every time when reseting a new RL episode.
         """
         super().configure()
@@ -69,7 +68,7 @@ class RLServer(base.Server):
 
         # Initialize the csv file which will record results
         if self.agent.current_episode == 0 and hasattr(Config(), 'results'):
-            result_dir = Config().result_dir
+            result_dir = Config().params['result_dir']
             result_csv_file = f'{result_dir}/{os.getpid()}_episode_result.csv'
             csv_processor.initialize_csv(result_csv_file, self.recorded_items,
                                          result_dir)
@@ -137,16 +136,19 @@ class RLServer(base.Server):
         if Config().clients.do_test:
             # Compute the average accuracy from client reports
             self.accuracy = self.accuracy_averaging(self.updates)
-            logging.info(
-                '[Server #{:d}] Average client accuracy: {:.2f}%.'.format(
-                    os.getpid(), 100 * self.accuracy))
+            logging.info('[%s] Average client accuracy: %.2f%%.', self,
+                         100 * self.accuracy)
         else:
             # Testing the updated model directly at the server
-            self.accuracy = await self.trainer.server_test(self.testset)
+            self.accuracy = await self.trainer.server_test(
+                self.testset, self.testset_sampler)
 
-            logging.info(
-                '[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(
-                    os.getpid(), 100 * self.accuracy))
+        if hasattr(Config().trainer, 'target_perplexity'):
+            logging.info('[%s] Global model perplexity: %.2f\n', self,
+                         self.accuracy)
+        else:
+            logging.info('[%s] Global model accuracy: %.2f%%\n', self,
+                         100 * self.accuracy)
 
         await self.wrap_up_processing_reports()
 
@@ -163,15 +165,19 @@ class RLServer(base.Server):
                     self.accuracy * 100,
                     'elapsed_time':
                     self.wall_time - self.initial_wall_time,
+                    'comm_time':
+                    max([
+                        report.comm_time for (report, __, __) in self.updates
+                    ]),
                     'round_time':
                     max([
-                        report.training_time
+                        report.training_time + report.comm_time
                         for (report, __, __) in self.updates
                     ]),
                 }[item]
                 new_row.append(item_value)
 
-            result_csv_file = f'{Config().result_dir}/{os.getpid()}.csv'
+            result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}.csv"
             csv_processor.write_csv(result_csv_file, new_row)
 
     @staticmethod
