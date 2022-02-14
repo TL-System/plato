@@ -5,9 +5,7 @@ A simple federated learning server using federated averaging.
 import asyncio
 import logging
 import os
-import numpy as np
-
-from torch.utils.data import SubsetRandomSampler
+import random
 
 from plato.algorithms import registry as algorithms_registry
 from plato.config import Config
@@ -16,6 +14,7 @@ from plato.processors import registry as processor_registry
 from plato.servers import base
 from plato.trainers import registry as trainers_registry
 from plato.utils import csv_processor
+from torch.utils.data import SubsetRandomSampler
 
 
 class Server(base.Server):
@@ -91,8 +90,8 @@ class Server(base.Server):
             if hasattr(Config().data, 'testset_size'):
                 # Set the sampler for testset
                 all_inclusive = range(len(self.datasource.get_test_set()))
-                test_samples = np.random.sample(all_inclusive,
-                                                Config().data.testset_size)
+                test_samples = random.sample(all_inclusive,
+                                             Config().data.testset_size)
                 self.testset_sampler = SubsetRandomSampler(test_samples)
 
         # Initialize the csv file which will record results
