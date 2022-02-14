@@ -167,7 +167,8 @@ class Client:
                 and Config().data.reload_data) or not self.data_loaded:
             self.load_data()
 
-        if hasattr(Config().clients, 'comm_simulation'):
+        if hasattr(Config().clients,
+                   'comm_simulation') and Config().clients.comm_simulation:
             payload_filename = response['payload_filename']
             with open(payload_filename, 'rb') as payload_file:
                 self.server_payload = pickle.load(payload_file)
