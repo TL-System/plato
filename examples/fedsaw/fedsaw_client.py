@@ -41,7 +41,7 @@ class Client(simple.Client):
                     module, torch.nn.Linear):
                 parameters_to_prune.append((module, 'weight'))
 
-        if hasattr(Config().clients, 'pruning_amount') and Config(
+        if hasattr(Config().clients, 'pruning_method') and Config(
         ).clients.pruning_method == 'random':
             pruning_method = prune.RandomUnstructured
         else:
@@ -50,8 +50,7 @@ class Client(simple.Client):
         prune.global_unstructured(
             parameters_to_prune,
             pruning_method=pruning_method,
-            amount=Config().clients.pruning_amount if hasattr(
-                Config().clients, 'pruning_amount') else 0.2,
+            amount=Config().clients.pruning_amount,
         )
 
         for module, name in parameters_to_prune:
@@ -74,3 +73,10 @@ class Client(simple.Client):
             updates[name] = delta
 
         return updates
+
+    def process_server_response(self, server_response):
+        """Additional client-specific processing on the server response."""
+        if 'pruning_amount' in server_response:
+            # Update pruning amount
+            Config().clients = Config().clients._replace(
+                pruning_amount=server_response['pruning_amount'])

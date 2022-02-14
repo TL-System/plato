@@ -27,28 +27,23 @@ class Server(fedavg_cs.Server):
 
     async def customize_server_response(self, server_response):
         """ Wrap up generating the server response with any additional information. """
+        server_response = await super().customize_server_response(
+            server_response)
+
         if Config().is_central_server():
-            server_response = await super().customize_server_response(
-                server_response)
             server_response['pruning_amount'] = self.pruning_amount_list
         if Config().is_edge_server():
             # At this point, an edge server already updated Config().clients.pruning_amount
             # to the number received from the central server.
             # Now it could pass the new pruning amount to its clients.
             server_response['pruning_amount'] = Config().clients.pruning_amount
+
         return server_response
 
     def extract_client_updates(self, updates):
         """ Extract the model weight updates from client updates. """
         updates_received = [payload for (__, payload, __) in updates]
         return updates_received
-
-    async def wrap_up_processing_reports(self):
-        """ Wrap up processing the reports with any additional work. """
-        await super().wrap_up_processing_reports()
-
-        if Config().is_central_server():
-            self.update_pruning_amount_list()
 
     def update_pruning_amount_list(self):
         """ Update the list of each institution's clients' pruning_amount. """
@@ -102,3 +97,16 @@ class Server(fedavg_cs.Server):
         weights_diff = weights_diff * (num_samples / self.total_samples)
 
         return weights_diff
+
+    def get_record_items_values(self):
+        """Get values will be recorded in result csv file."""
+        record_items_values = super().get_record_items_values()
+        record_items_values['pruning_amount'] = Config().clients.pruning_amount
+        return record_items_values
+
+    async def wrap_up_processing_reports(self):
+        """Wrap up processing the reports with any additional work."""
+        await super().wrap_up_processing_reports()
+
+        if Config().is_central_server():
+            self.update_pruning_amount_list()
