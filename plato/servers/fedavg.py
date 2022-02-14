@@ -88,6 +88,8 @@ class Server(base.Server):
 
             if hasattr(Config().data, 'testset_size'):
                 # Set the sampler for testset
+                from torch.utils.data import SubsetRandomSampler
+
                 all_inclusive = range(len(self.datasource.get_test_set()))
                 test_samples = random.sample(all_inclusive,
                                              Config().data.testset_size)
