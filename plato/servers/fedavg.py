@@ -14,7 +14,6 @@ from plato.processors import registry as processor_registry
 from plato.servers import base
 from plato.trainers import registry as trainers_registry
 from plato.utils import csv_processor
-from torch.utils.data import SubsetRandomSampler
 
 
 class Server(base.Server):
@@ -89,6 +88,8 @@ class Server(base.Server):
 
             if hasattr(Config().data, 'testset_size'):
                 # Set the sampler for testset
+                from torch.utils.data import SubsetRandomSampler
+
                 all_inclusive = range(len(self.datasource.get_test_set()))
                 test_samples = random.sample(all_inclusive,
                                              Config().data.testset_size)
