@@ -442,6 +442,9 @@ class Server:
                         "[%s] Sending the current model to client #%d (simulated).",
                         self, self.selected_client_id)
 
+                    # First apply outbound processors, if any
+                    payload = self.outbound_processor.process(payload)
+
                     model_name = Config().trainer.model_name if hasattr(
                         Config().trainer, 'model_name') else 'custom'
                     checkpoint_dir = Config().params['checkpoint_dir']
