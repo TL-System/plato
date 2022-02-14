@@ -632,15 +632,20 @@ class Server:
         logging.info("[%s] Received %.2f MB of payload data from client #%d.",
                      self, payload_size / 1024**2, client_id)
 
-        # Pass through the inbound_processor(s), if any
-        self.client_payload[sid] = self.inbound_processor.process(
-            self.client_payload[sid])
-
         await self.process_client_info(client_id, sid)
 
     async def process_client_info(self, client_id, sid):
         """ Process the received metadata information from a reporting client. """
-        self.reports[sid].comm_time = time.time() - self.reports[sid].comm_time
+        # First pass through the inbound_processor(s), if any
+        self.client_payload[sid] = self.inbound_processor.process(
+            self.client_payload[sid])
+
+        if self.comm_simulation:
+            self.reports[sid].comm_time = 0
+        else:
+            self.reports[sid].comm_time = time.time(
+            ) - self.reports[sid].comm_time
+
         start_time = self.training_clients[client_id]['start_time']
         finish_time = self.reports[sid].training_time + self.reports[
             sid].comm_time + start_time
