@@ -1,6 +1,4 @@
-
 # include basic settings for the models and the learning process
-
 
 # clients settings
 clients:
@@ -14,7 +12,6 @@ clients:
 server:
   address: 127.0.0.1
   port: 8000
-
 
 # dataset settings for the original dataset and the corresponding multimodal data processor
 data:
@@ -33,14 +30,13 @@ data:
     num_workers: 4
 
   sampler: sample_quantity_noniid
-  test_set_sampler: sample_quantity_noniid
+  testset_sampler: sample_quantity_noniid
   modality_sampler: modality_iid
 
   per_client_classes_size: 6
-  
 
   min_partition_size: 200
-  
+
   # The random seed for sampling data
   random_seed: 1
 
@@ -48,8 +44,7 @@ data:
     rgb: !include Pipeline/kinetics_csn_rgb.yml
     flow: !include Pipeline/kinetics_tsn_flow.yml
     audio: !include Pipeline/kinetics_audio_feature.yml
-    
-  
+
 # Train settings
 
 # optimizer
@@ -76,8 +71,7 @@ lr_configs: &lr_config
   warmup_by_epoch: True
   warmup_iters: 16
 
-total_epochs: &total_epochs
-  1000
+total_epochs: &total_epochs 1000
 
 log_config: &log_config
   interval: 20
@@ -102,7 +96,6 @@ trainer:
   log_config: *log_config
   checkpoint_config: *checkpoint_config
 
-
 model:
   model_name: rgb_flow_audio_model
   model_config: !include Models/kinetics_full_models.yml
@@ -112,14 +105,13 @@ evaluation:
   metrics:
     - top_k_accuracy
     - mean_class_accuracy
-  
+
 algorithm:
   type: fedavg
 
 # Aggregation algorithm
 # The number of local aggregation rounds on edge servers before sending
-# aggreagted weights to the central server 
-
+# aggreagted weights to the central server
 
 # runtime setting
 runner_setting:
@@ -130,6 +122,6 @@ runner_setting:
     load_from: null
     resume_from: null
     workflow:
-        - train
-        - 1
+      - train
+      - 1
     find_unused_parameters: True

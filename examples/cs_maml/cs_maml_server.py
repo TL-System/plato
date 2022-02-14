@@ -36,16 +36,15 @@ class Server(fedavg_cs.Server):
     async def select_testing_clients(self):
         """Select a subset of the clients to test personalization."""
         self.do_personalization_test = True
-        logging.info("\n[Server #%d] Starting testing personalization.",
-                     os.getpid())
+        logging.info("\n[%s] Starting testing personalization.", self)
 
         self.current_round -= 1
         await super().select_clients()
 
         if len(self.selected_clients) > 0:
             logging.info(
-                "[Server #%d] Sent the current meta model to %d clients for personalization test.",
-                os.getpid(), len(self.selected_clients))
+                "[%s] Sent the current meta model to %d clients for personalization test.",
+                self, len(self.selected_clients))
 
     async def customize_server_response(self, server_response):
         """Wrap up generating the server response with any additional information."""
@@ -99,9 +98,9 @@ class Server(fedavg_cs.Server):
                     new_row.append(item_value)
 
                 if Config().is_edge_server():
-                    result_csv_file = f'{Config().result_dir}result_{Config().args.id}.csv'
+                    result_csv_file = f"{Config().params['result_dir']}result_{Config().args.id}.csv"
                 else:
-                    result_csv_file = f'{Config().result_dir}result.csv'
+                    result_csv_file = f"{Config().params['result_dir']}result.csv"
 
                 csv_processor.write_csv(result_csv_file, new_row)
 
@@ -114,8 +113,8 @@ class Server(fedavg_cs.Server):
                     # needs to be signaled to send a report to the central server
                     if self.current_round == Config().algorithm.local_rounds:
                         logging.info(
-                            '[Server #%d] Completed %s rounds of local aggregation.',
-                            os.getpid(),
+                            '[%s] Completed %s rounds of local aggregation.',
+                            self,
                             Config().algorithm.local_rounds)
                         self.model_aggregated.set()
 
@@ -142,9 +141,8 @@ class Server(fedavg_cs.Server):
             payload_size = sys.getsizeof(pickle.dumps(
                 self.client_payload[sid]))
 
-        logging.info(
-            "[Server #%d] Received %s MB of payload data from client #%d.",
-            os.getpid(), round(payload_size / 1024**2, 2), client_id)
+        logging.info("[%s] Received %s MB of payload data from client #%d.",
+                     self, round(payload_size / 1024**2, 2), client_id)
 
         if self.client_payload[sid] == 'personalization_accuracy':
             self.personalization_test_updates.append(self.reports[sid])
@@ -161,7 +159,7 @@ class Server(fedavg_cs.Server):
                     self.selected_clients):
                 logging.info(
                     "[Edge Server #%d] All %d client reports received. Processing.",
-                    os.getpid(), len(self.updates))
+                    self, len(self.updates))
                 await super().process_reports()
                 await self.wrap_up()
                 await self.select_clients()
@@ -171,8 +169,8 @@ class Server(fedavg_cs.Server):
                 if len(self.updates) > 0 and len(self.updates) >= len(
                         self.selected_clients):
                     logging.info(
-                        "[Server #%d] All %d client reports received. Processing.",
-                        os.getpid(), len(self.updates))
+                        "[%s] All %d client reports received. Processing.",
+                        self, len(self.updates))
                     await self.process_reports()
 
                     if Config().is_central_server():
@@ -183,8 +181,8 @@ class Server(fedavg_cs.Server):
                 if len(self.personalization_test_updates) >= len(
                         self.selected_clients):
                     logging.info(
-                        "[Server #%d] All %d personalization test results received.",
-                        os.getpid(), len(self.personalization_test_updates))
+                        "[%s] All %d personalization test results received.",
+                        self, len(self.personalization_test_updates))
 
                     await self.process_reports()
 

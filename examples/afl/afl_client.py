@@ -11,6 +11,7 @@ https://arxiv.org/pdf/1909.12641.pdf
 """
 import logging
 import math
+import time
 from dataclasses import dataclass
 
 from plato.clients import simple
@@ -25,6 +26,7 @@ class Report(simple.Report):
 
 class Client(simple.Client):
     """A federated learning client for AFL."""
+
     async def train(self):
         logging.info("Training on AFL client #%d", self.client_id)
 
@@ -33,9 +35,11 @@ class Client(simple.Client):
         # Get the valuation indicating the likely utility of training on this client
         loss = self.get_loss()
         valuation = self.calc_valuation(report.num_samples, loss)
+        comm_time = time.time()
 
-        return Report(report.num_samples, report.accuracy, report.training_time,
-                      report.update_response, valuation), weights
+        return Report(report.num_samples, report.accuracy,
+                      report.training_time, comm_time, report.update_response,
+                      valuation), weights
 
     def get_loss(self):
         """ Retrieve the loss value from the training process. """

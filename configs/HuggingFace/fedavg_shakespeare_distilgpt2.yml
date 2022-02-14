@@ -3,7 +3,7 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 10
+    total_clients: 2
 
     # The number of clients selected in each round
     per_round: 2
@@ -13,25 +13,25 @@ clients:
 
     # Client simulation mode
     simulation: false
-
-    # Processors for outbound data payloads
-    outbound_processors:
-        - model_pruning
+    comm_simulation: true
 
 server:
     address: 127.0.0.1
     port: 8000
-    simulate_wall_time: true
+    simulate_wall_time: false
+    checkpoint_dir: ./models/huggingface/fedavg
+    model_dir: ./models/huggingface/fedavg
 
 data:
     # The training and testing dataset
-    datasource: MNIST
+    datasource: HuggingFace
+    dataset_name: tiny_shakespeare
 
     # Where the dataset is located
     data_path: ./data
 
     # Number of samples in each partition
-    partition_size: 20000
+    partition_size: 2
 
     # IID or non-IID?
     sampler: iid
@@ -41,7 +41,7 @@ data:
 
 trainer:
     # The type of the trainer
-    type: basic
+    type: HuggingFace
 
     # The maximum number of training rounds
     rounds: 5
@@ -58,8 +58,8 @@ trainer:
     # The maximum number of clients running concurrently
     max_concurrency: 1
 
-    # The target accuracy
-    target_accuracy: 0.97
+    # The target perplexity
+    target_perplexity: 20
 
     # Number of epoches for local training in each communication round
     epochs: 1
@@ -70,8 +70,16 @@ trainer:
     weight_decay: 0.0
 
     # The machine learning model
-    model_name: lenet5
+    model_name: HuggingFace_CausalLM
+    model_checkpoint: distilgpt2
 
 algorithm:
     # Aggregation algorithm
     type: fedavg
+
+results:
+    # Write the following parameter(s) into a CSV
+    types: round, elapsed_time, accuracy
+
+    # Plot results (x_axis-y_axis)
+    plot: round-accuracy, elapsed_time-accuracy

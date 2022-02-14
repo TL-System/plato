@@ -2,11 +2,14 @@
 Training and testing loops for HuggingFace's transformer models for natural
 language processing.
 """
-import torch
+import math
+from typing import Optional
 
-from transformers import AutoTokenizer
+from torch.utils.data import RandomSampler, Sampler
+
+from transformers import AutoConfig, AutoTokenizer, HfArgumentParser
 from transformers import Trainer as HuggingFaceTrainer
-from transformers import TrainingArguments
+from transformers import TrainingArguments, default_data_collator
 
 from plato.config import Config
 from plato.trainers import basic
@@ -17,77 +20,55 @@ class SampledHuggingFaceTrainer(HuggingFaceTrainer):
     Training and testing loops for HuggingFace's transformer models for natural
     language processing.
     """
-    def __init__(self, model, args, train_dataset, eval_dataset, sampler):
+
+    def __init__(self, model, args, train_dataset, eval_dataset, tokenizer,
+                 data_collator, sampler):
         super().__init__(model=model,
                          args=args,
                          train_dataset=train_dataset,
-                         eval_dataset=eval_dataset)
+                         eval_dataset=eval_dataset,
+                         tokenizer=tokenizer,
+                         data_collator=data_collator)
         self.sampler = sampler
-        self.trainset = train_dataset
-        self.batch_size = Config().trainer.batch_size
 
-    def get_train_dataloader(self):
-        if self.sampler is not None:
-            return torch.utils.data.DataLoader(dataset=self.trainset,
-                                               shuffle=False,
-                                               batch_size=self.batch_size,
-                                               sampler=self.sampler.get())
+    def _get_train_sampler(self) -> Optional[Sampler]:
+        if self.sampler is None:
+            return RandomSampler(self.train_dataset)
+
+        return self.sampler
 
 
 class Trainer(basic.Trainer):
     """The trainer for HuggingFace transformer models for natural language processing. """
+
     def __init__(self, model=None):
         super().__init__(model)
 
         self.trainer = None
-
-        model_checkpoint = Config().trainer.model_checkpoint
-        self.tokenizer = AutoTokenizer.from_pretrained(model_checkpoint,
-                                                       use_fast=True)
-
         self.model.train()
 
-    def tokenize_function(self, examples):
-        return self.tokenizer(examples["text"])
+        parser = HfArgumentParser(TrainingArguments)
+        self.training_args, = parser.parse_args_into_dataclasses(
+            args=['--output_dir=/tmp', '--report_to=none'])
 
-    @staticmethod
-    def group_texts(examples):
-        """Concatenate all texts. """
-        block_size = 128
-
-        concatenated_examples = {
-            k: sum(examples[k], [])
-            for k in examples.keys()
+        model_checkpoint = Config().trainer.model_checkpoint
+        config_kwargs = {
+            "cache_dir": None,
+            "revision": 'main',
+            "use_auth_token": None,
         }
+        self.config = AutoConfig.from_pretrained(model_checkpoint,
+                                                 **config_kwargs)
 
-        total_length = len(concatenated_examples[list(examples.keys())[0]])
-
-        # We drop the small remainder, we could add padding if the model supported it
-        # instead of this drop, you can customize this part to your needs.
-        total_length = (total_length // block_size) * block_size
-
-        # Split by chunks of max_len.
-        result = {
-            k:
-            [t[i:i + block_size] for i in range(0, total_length, block_size)]
-            for k, t in concatenated_examples.items()
+        tokenizer_kwargs = {
+            "cache_dir": None,
+            "use_fast": True,
+            "revision": 'main',
+            "use_auth_token": None,
         }
-
-        result["labels"] = result["input_ids"].copy()
-        return result
-
-    def preprocess_data(self, datasets):
-        tokenized_datasets = datasets.map(self.tokenize_function,
-                                          batched=True,
-                                          num_proc=4,
-                                          remove_columns=["text"])
-
-        return tokenized_datasets.map(
-            Trainer.group_texts,
-            batched=True,
-            batch_size=1000,
-            num_proc=4,
-        )
+        self.tokenizer = AutoTokenizer.from_pretrained(model_checkpoint,
+                                                       config=self.config,
+                                                       **tokenizer_kwargs)
 
     def train_model(self, config, trainset, sampler, cut_layer=None):  # pylint: disable=unused-argument
         """The training loop for HuggingFace models.
@@ -98,20 +79,17 @@ class Trainer(basic.Trainer):
         sampler: the sampler that extracts a partition for this client.
         cut_layer (optional): The layer which training should start from.
         """
-        training_args = TrainingArguments(
-            "test-clm",
-            evaluation_strategy="epoch",
-            learning_rate=2e-5,
-            weight_decay=0.01,
-        )
 
-        print("Training dataset preprocessed.")
+        self.training_args.num_train_epoches = config['epochs']
+        self.training_args.per_device_train_batch_size = config['batch_size']
 
         self.trainer = SampledHuggingFaceTrainer(
             model=self.model,
-            args=training_args,
-            train_dataset=self.preprocess_data(trainset),
+            args=self.training_args,
+            train_dataset=trainset,
             eval_dataset=None,
+            tokenizer=self.tokenizer,
+            data_collator=default_data_collator,
             sampler=sampler)
 
         self.trainer.train()
@@ -123,11 +101,18 @@ class Trainer(basic.Trainer):
             config: Configuration parameters as a dictionary.
             testset: The test dataset.
         """
-        self.trainer = SampledHuggingFaceTrainer(
-            model=self.model,
-            args=None,
-            train_dataset=None,
-            eval_dataset=self.preprocess_data(testset),
-            sampler=None)
+        self.trainer = HuggingFaceTrainer(model=self.model,
+                                          args=self.training_args,
+                                          train_dataset=None,
+                                          eval_dataset=testset,
+                                          tokenizer=self.tokenizer,
+                                          data_collator=default_data_collator)
 
-        return self.trainer.evaluate()
+        metrics = self.trainer.evaluate()
+
+        try:
+            perplexity = math.exp(metrics["eval_loss"])
+        except OverflowError:
+            perplexity = float("inf")
+
+        return perplexity

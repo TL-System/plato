@@ -40,13 +40,15 @@ Attributes in **bold** must be included in a configuration file, while attribute
 
 - `outbound_feature_ndarrays`: Convert PyTorch tensor features into NumPy arrays before sending to the server, for the benefit of saving a substantial amount of communication overhead if the feature dataset is large. Must be placed after `feature_unbatch`.
 
-- `model_deepcopy`: Returns a deepcopy of the state_dict to prevent changing internal parameters of the model within clients.
+- `model_deepcopy`: Return a deepcopy of the state_dict to prevent changing internal parameters of the model within clients.
 
 - `model_randomized_response`: Activate randomized response on model parameters for PyTorch, must also set `algorithm.epsilon` to activate.
 
 - `model_quantize`: Quantize features for model parameters for PyTorch.
 
-- `model_pruning`: Pruning model weights for PyTorch. Must be placed as the first processor.
+- `model_pruning`: Prune model weights for PyTorch. Must be placed as the first processor.
+
+- `model_compress`: Compress model parameters. Must be placed as the last processor if applied.
 
 
 #### Valid processors for `clients.inbound_processors`
@@ -86,11 +88,13 @@ None.
 
 - `model_dequantize`: Dequantize features for PyTorch model parameters.
 
+- `model_decompress`: Decompress model parameters. Must be placed as the first processor if applied.
+
 ### data
 
 | Attribute | Meaning | Valid Value | Note |
 |:---------:|:-------:|:-----------:|:----:|
-|**dataset**| The training and testing dataset|`MNIST`, `FashionMNIST`, `CIFAR10`, `CINIC10`, `YOLO`, `HuggingFace`, `PASCAL_VOC`, or `TinyImageNet`||
+|**dataset**| The training and testing dataset|`MNIST`, `FashionMNIST`, `EMNIST`, `CIFAR10`, `CINIC10`, `YOLO`, `HuggingFace`, `PASCAL_VOC`, or `TinyImageNet`||
 |**data_path**|Where the dataset is located|e.g.,`./data`|For the `CINIC10` dataset, the default `data_path` is `./data/CINIC-10`, For the `TinyImageNet` dataset, the default `data_path` is `./data/tiny-imagenet-200`|
 |**sampler**|How to divide the entire dataset to the clients|`iid`||
 |||`iid_mindspore`||
@@ -115,6 +119,7 @@ None.
 |**parallelized**|Whether the training should use multiple GPUs if available|`true` or `false`||
 |max_concurrency|The maximum number of clients running concurrently. if this is not defined, no new processes are spawned for training|Any positive integer||
 |target_accuracy|The target accuracy of the global model|||
+|target_perplexity|The target perplexity of the global NLP model|
 |**epochs**|Number of epoches for local training in each communication round|Any positive integer||
 |**optimizer**||`SGD`, `Adam` or `FedProx`||
 |**batch_size**||Any positive integer||
@@ -143,6 +148,6 @@ None.
 
 | Attribute | Meaning | Valid Value | Note |
 |:---------:|:-------:|:-----------:|:----:|
-|types|Which parameter(s) will be written into a CSV file|`round`, `accuracy`, `elapsed_time`, `round_time`, `local_epoch_num`, `edge_agg_num`|Use comma `,` to seperate parameters|
+|types|Which parameter(s) will be written into a CSV file|`round`, `accuracy`, `elapsed_time`, `comm_time`, `round_time`, `local_epoch_num`, `edge_agg_num`|Use comma `,` to seperate parameters|
 |plot|Plot results ||Format: x\_axis-y\_axis. Use hyphen `-` to seperate axis. Use comma `,` to seperate multiple plots|
 |result_dir|The directory of results||If not specify, results will be stored under `./results/<datasource>/<model>/<server_type>/`|

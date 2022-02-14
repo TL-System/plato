@@ -173,7 +173,7 @@ class Trainer(base.Trainer):
 
         return accuracy
 
-    async def server_test(self, testset):
+    async def server_test(self, testset, sampler=None):
         """Testing the model on the server using the provided test dataset.
 
         Arguments:
@@ -186,4 +186,4 @@ class Trainer(base.Trainer):
                 loss=tf.keras.losses.SparseCategoricalCrossentropy(),
                 metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
 
-        return self.test(testset)
+        return self.test(testset, sampler)

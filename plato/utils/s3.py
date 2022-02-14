@@ -15,6 +15,7 @@ class S3:
     """ Manages the utilities to transmit Python objects to and from an S3-compatibile
         object storage service.
     """
+
     def __init__(self,
                  endpoint=None,
                  access_key=None,
@@ -97,17 +98,15 @@ class S3:
 
                 if response.status_code != 200:
                     raise ValueError(
-                        'Error occurred sending data: status code = {}'.format(
-                            response.status_code)) from None
+                        f'Error occurred sending data: status code = {response.status_code}'
+                    ) from None
 
             except botocore.exceptions.ClientError as error:
                 raise ValueError(
-                    'Error occurred sending data to S3: {}'.format(
-                        error)) from error
+                    f'Error occurred sending data to S3: {error}') from error
 
             except botocore.exceptions.ParamValidationError as error:
-                raise ValueError(
-                    'Incorrect parameters: {}'.format(error)) from error
+                raise ValueError(f'Incorrect parameters: {error}') from error
 
     def receive_from_s3(self, object_key) -> Any:
         """ Retrieves an object from an S3-compatible object storage service.
@@ -132,8 +131,8 @@ class S3:
             return pickle.loads(response.content)
 
         raise ValueError(
-            'Error occurred sending data: request status code = {}'.format(
-                response.status_code))
+            f'Error occurred sending data: request status code = {response.status_code}'
+        )
 
     def delete_from_s3(self, object_key):
         """ Deletes an object using its key from S3. """

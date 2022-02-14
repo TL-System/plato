@@ -205,7 +205,7 @@ In contrast, if server asynchronous mode is activated (`server:synchronous` set 
 
 ### Plotting runtime results
 
-If the configuration file contains a `results` section, the selected performance metrics, such as accuracy, will be saved in a `.csv` file in the `results/` directory. By default, the `results/` directory is under the path to the used configuration file, but it can be easily changed by modifying `Config.result_dir` in [`config.py`](config.py).
+If the configuration file contains a `results` section, the selected performance metrics, such as accuracy, will be saved in a `.csv` file in the `results/` directory.
 
 As `.csv` files, these results can be used however one wishes; an example Python program, called `plot.py`, plots the necessary figures and saves them as PDF files. To run this program:
 
