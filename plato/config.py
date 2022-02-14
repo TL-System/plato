@@ -126,6 +126,7 @@ class Config:
                 Config.params['model_dir'] = Config().server.model_dir
             else:
                 Config.params['model_dir'] = "./models/pretrained"
+            os.makedirs(Config.params['model_dir'], exist_ok=True)
 
             # Resume checkpoint
             if hasattr(Config().server, 'checkpoint_dir'):
@@ -133,6 +134,7 @@ class Config:
                 ).server.checkpoint_dir
             else:
                 Config.params['checkpoint_dir'] = "./checkpoints"
+            os.makedirs(Config.params['checkpoint_dir'], exist_ok=True)
 
             datasource = Config.data.datasource
             model = Config.trainer.model_name
