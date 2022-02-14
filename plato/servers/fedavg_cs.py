@@ -7,7 +7,6 @@ import logging
 import os
 import random
 import numpy as np
-from torch.utils.data import SubsetRandomSampler
 
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
@@ -100,6 +99,8 @@ class Server(fedavg.Server):
                         self.datasource, Config().args.id, testing='edge')
                 elif hasattr(Config().data, 'testset_size'):
                     # Set the Random Sampler for test set
+                    from torch.utils.data import SubsetRandomSampler
+
                     all_inclusive = range(len(self.datasource.get_test_set()))
                     test_samples = random.sample(all_inclusive,
                                                  Config().data.testset_size)
