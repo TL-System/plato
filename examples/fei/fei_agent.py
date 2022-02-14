@@ -17,7 +17,6 @@ from plato.utils.reinforcement_learning.policies import \
 
 class RLAgent(simple_rl_agent.RLAgent):
     """ An RL agent for FL training using FEI. """
-
     def __init__(self):
         super().__init__()
         if hasattr(Config().server,
@@ -46,11 +45,11 @@ class RLAgent(simple_rl_agent.RLAgent):
             episode_reward_csv_file = f'{result_dir}/{os.getpid()}_episode_reward.csv'
             csv_processor.initialize_csv(
                 episode_reward_csv_file,
-                ['Episode #', 'Steps', 'Final accuracy', 'Reward'], result_dir)
+                ['episode', '#steps', 'final accuracy', 'reward'], result_dir)
             step_result_csv_file = f'{result_dir}/{os.getpid()}_step_result.csv'
             csv_processor.initialize_csv(
-                step_result_csv_file,
-                ['Episode #', 'Step #', 'state', 'action'], result_dir)
+                step_result_csv_file, ['episode', 'step', 'state', 'action'],
+                result_dir)
 
         # Record test accuracy of the latest 5 rounds/steps
         self.pre_acc = deque(5 * [0], maxlen=5)

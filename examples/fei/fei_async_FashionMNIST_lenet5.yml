@@ -25,7 +25,7 @@ server:
 
     # Parameter for FedAsync
     staleness_bound: 1000 # FedAsync doesn't have any staleness bound
-    minimum_clients_aggregated: 5
+    minimum_clients_aggregated: 6
     mixing_hyperparameter: 0.9
     adaptive_mixing: true
 
@@ -39,8 +39,8 @@ data:
     # Number of samples in each partition
     partition_size: 200
 
-    # Whether use varied partition per client or not?
-    # varied: false
+    # Whether clients have different partition size or not?
+    variable_partition: true
 
     # IID or non-IID?
     sampler: noniid
@@ -88,7 +88,7 @@ algorithm:
     max_episode: 2000
     alpha: 5 # controls the decreasing rate of the mapping function
     beta: 20  # coefficient used in reward function
-    theta: 0.5  # threshold for stdev(pre_acc)
+    theta: 0.005  # threshold for stdev(pre_acc)
     base: 1000  # for exponential function in state normalization
     log_interval: 10
     mode: train  # test
@@ -109,10 +109,10 @@ algorithm:
     # Frequency of delayed policy updates
     policy_freq: 2
     # mini batch size
-    batch_size: 2
+    batch_size: 64
     hidden_size: 256
     # steps sampling random actions
-    start_steps: 1
+    start_steps: 8
     # replay memory
     replay_size: 10000
     replay_seed: 1234
