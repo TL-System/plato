@@ -257,7 +257,10 @@ class Server(fedavg.Server):
             'comm_time':
             max([report.comm_time for (report, __, __) in self.updates]),
             'round_time':
-            max([report.training_time for (report, __, __) in self.updates]),
+            max([
+                report.training_time + report.comm_time
+                for (report, __, __) in self.updates
+            ]),
         }
 
     async def wrap_up(self):
