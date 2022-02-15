@@ -145,10 +145,10 @@ class Trainer(base.Trainer):
         self.pause_training()
         return accuracy['Accuracy']
 
-    async def server_test(self, testset):
+    async def server_test(self, testset, sampler=None):
         """Testing the model on the server using the provided test dataset.
 
         Arguments:
         testset: The test dataset.
         """
-        return self.test(testset)
+        return self.test(testset, sampler)

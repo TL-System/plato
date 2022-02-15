@@ -167,14 +167,21 @@ class Client:
                 and Config().data.reload_data) or not self.data_loaded:
             self.load_data()
 
-        if hasattr(Config().clients, 'comm_simulation'):
+        if hasattr(Config().clients,
+                   'comm_simulation') and Config().clients.comm_simulation:
             payload_filename = response['payload_filename']
             with open(payload_filename, 'rb') as payload_file:
                 self.server_payload = pickle.load(payload_file)
 
+            payload_size = sys.getsizeof(pickle.dumps(self.server_payload))
+
             logging.info(
-                "[%s] Received the current model from the server (simulated).",
-                self)
+                "[%s] Received %.2f MB of payload data from the server (simulated).",
+                self, payload_size / 1024**2)
+
+            self.server_payload = self.inbound_processor.process(
+                self.server_payload)
+
             await self.start_training()
 
     async def chunk_arrived(self, data) -> None:
@@ -261,22 +268,8 @@ class Client:
             'report': pickle.dumps(report)
         })
 
-        if self.comm_simulation:
-            model_name = Config().trainer.model_name if hasattr(
-                Config().trainer, 'model_name') else 'custom'
-            checkpoint_dir = Config().params['checkpoint_dir']
-            payload_filename = f"{checkpoint_dir}/{model_name}_client_{self.client_id}.pth"
-            with open(payload_filename, 'wb') as payload_file:
-                pickle.dump(payload, payload_file)
-
-            logging.info(
-                "[%s] Sent %.2f MB of payload data to the server (simulated).",
-                self,
-                sys.getsizeof(pickle.dumps(payload)) / 1024**2)
-
-        else:
-            # Sending the client training payload to the server
-            await self.send(payload)
+        # Sending the client training payload to the server
+        await self.send(payload)
 
     async def send_in_chunks(self, data) -> None:
         """ Sending a bytes object in fixed-sized chunks to the client. """
@@ -289,35 +282,49 @@ class Client:
         await self.sio.emit('client_payload', {'id': self.client_id})
 
     async def send(self, payload) -> None:
-        """Sending the client payload to the server using either S3 or socket.io."""
+        """Sending the client payload to the server using simulation, S3 or socket.io."""
         # First apply outbound processors, if any
         payload = self.outbound_processor.process(payload)
 
-        metadata = {'id': self.client_id}
+        if self.comm_simulation:
+            # If we are using the filesystem to simulate communication over a network
+            model_name = Config().trainer.model_name if hasattr(
+                Config().trainer, 'model_name') else 'custom'
+            checkpoint_dir = Config().params['checkpoint_dir']
+            payload_filename = f"{checkpoint_dir}/{model_name}_client_{self.client_id}.pth"
+            with open(payload_filename, 'wb') as payload_file:
+                pickle.dump(payload, payload_file)
 
-        if self.s3_client is not None:
-            unique_key = uuid.uuid4().hex[:6].upper()
-            s3_key = f'client_payload_{self.client_id}_{unique_key}'
-            self.s3_client.send_to_s3(s3_key, payload)
-            data_size = sys.getsizeof(pickle.dumps(payload))
-            metadata['s3_key'] = s3_key
+            logging.info(
+                "[%s] Sent %.2f MB of payload data to the server (simulated).",
+                self,
+                sys.getsizeof(pickle.dumps(payload)) / 1024**2)
         else:
-            if isinstance(payload, list):
-                data_size: int = 0
+            metadata = {'id': self.client_id}
 
-                for data in payload:
-                    _data = pickle.dumps(data)
-                    await self.send_in_chunks(_data)
-                    data_size += sys.getsizeof(_data)
+            if self.s3_client is not None:
+                unique_key = uuid.uuid4().hex[:6].upper()
+                s3_key = f'client_payload_{self.client_id}_{unique_key}'
+                self.s3_client.send_to_s3(s3_key, payload)
+                data_size = sys.getsizeof(pickle.dumps(payload))
+                metadata['s3_key'] = s3_key
             else:
-                _data = pickle.dumps(payload)
-                await self.send_in_chunks(_data)
-                data_size = sys.getsizeof(_data)
+                if isinstance(payload, list):
+                    data_size: int = 0
 
-        await self.sio.emit('client_payload_done', metadata)
+                    for data in payload:
+                        _data = pickle.dumps(data)
+                        await self.send_in_chunks(_data)
+                        data_size += sys.getsizeof(_data)
+                else:
+                    _data = pickle.dumps(payload)
+                    await self.send_in_chunks(_data)
+                    data_size = sys.getsizeof(_data)
 
-        logging.info("[%s] Sent %.2f MB of payload data to the server.", self,
-                     data_size / 1024**2)
+            await self.sio.emit('client_payload_done', metadata)
+
+            logging.info("[%s] Sent %.2f MB of payload data to the server.",
+                         self, data_size / 1024**2)
 
     def process_server_response(self, server_response) -> None:
         """Additional client-specific processing on the server response."""
