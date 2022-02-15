@@ -6,7 +6,7 @@ clients:
     total_clients: 100
 
     # The number of clients selected in each round
-    per_round: 5
+    per_round: 20
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -14,17 +14,23 @@ clients:
     # Whether simulate clients or not
     simulation: true
     speed_simulation: true
+    comm_simulation: true
 
     # The simulation distribution
     simulation_distribution:
         distribution: pareto
-        alpha: 1.5
+        alpha: 1
+    max_sleep_time: 30
+    sleep_simulation: true
+    avg_training_time: 10
+
+    random_seed: 1
 
 server:
     address: 127.0.0.1
     port: 8000
     synchronous: false
-    simulate_wall_time: false
+    simulate_wall_time: true
 
     # Parameter for FedAsync
     staleness_bound: 1000 # FedAsync doesn't have any staleness bound
@@ -44,12 +50,13 @@ data:
 
     # Number of samples in each partition
     partition_size: 600
-    
+
     # IID or non-IID?
     sampler: noniid
 
     # The concentration parameter for the Dirichlet distribution
-    concentration: 0.3
+    concentration: 5
+    random_seed: 1
 
 trainer:
     # The type of the trainer
@@ -61,7 +68,7 @@ trainer:
     # Whether the training should use multiple GPUs if available
     parallelized: false
 
-    # The maximum number of clients running concurrently 
+    # The maximum number of clients running concurrently
     max_concurrency: 5
 
     # The target accuracy
@@ -88,4 +95,3 @@ results:
 
     # Plot results (x_axis-y_axis)
     plot: round-accuracy, elapsed_time-accuracy
-
