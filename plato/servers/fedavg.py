@@ -5,6 +5,7 @@ A simple federated learning server using federated averaging.
 import asyncio
 import logging
 import os
+import random
 
 from plato.algorithms import registry as algorithms_registry
 from plato.config import Config
@@ -30,7 +31,9 @@ class Server(base.Server):
         self.algorithm = algorithm
         self.trainer = trainer
 
+        self.datasource = None
         self.testset = None
+        self.testset_sampler = None
         self.total_samples = 0
 
         self.total_clients = Config().clients.total_clients
@@ -80,8 +83,17 @@ class Server(base.Server):
             "Server", server_id=os.getpid(), trainer=self.trainer)
 
         if not Config().clients.do_test:
-            dataset = datasources_registry.get(client_id=0)
-            self.testset = dataset.get_test_set()
+            self.datasource = datasources_registry.get(client_id=0)
+            self.testset = self.datasource.get_test_set()
+
+            if hasattr(Config().data, 'testset_size'):
+                # Set the sampler for testset
+                from torch.utils.data import SubsetRandomSampler
+
+                all_inclusive = range(len(self.datasource.get_test_set()))
+                test_samples = random.sample(all_inclusive,
+                                             Config().data.testset_size)
+                self.testset_sampler = SubsetRandomSampler(test_samples)
 
         # Initialize the csv file which will record results
         if hasattr(Config(), 'results'):
@@ -152,7 +164,8 @@ class Server(base.Server):
                          100 * self.accuracy)
         else:
             # Testing the updated model directly at the server
-            self.accuracy = await self.trainer.server_test(self.testset)
+            self.accuracy = await self.trainer.server_test(
+                self.testset, self.testset_sampler)
 
         if hasattr(Config().trainer, 'target_perplexity'):
             logging.info('[%s] Global model perplexity: %.2f\n', self,

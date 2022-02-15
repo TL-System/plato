@@ -24,6 +24,7 @@ from plato.utils import s3
 
 class ServerEvents(socketio.AsyncNamespace):
     """ A custom namespace for socketio.AsyncServer. """
+
     def __init__(self, namespace, plato_server):
         super().__init__(namespace)
         self.plato_server = plato_server
@@ -68,6 +69,7 @@ class ServerEvents(socketio.AsyncNamespace):
 
 class Server:
     """ The base class for federated learning servers. """
+
     def __init__(self):
         self.sio = None
         self.client = None
@@ -440,6 +442,9 @@ class Server:
                         "[%s] Sending the current model to client #%d (simulated).",
                         self, self.selected_client_id)
 
+                    # First apply outbound processors, if any
+                    payload = self.outbound_processor.process(payload)
+
                     model_name = Config().trainer.model_name if hasattr(
                         Config().trainer, 'model_name') else 'custom'
                     checkpoint_dir = Config().params['checkpoint_dir']
@@ -627,15 +632,20 @@ class Server:
         logging.info("[%s] Received %.2f MB of payload data from client #%d.",
                      self, payload_size / 1024**2, client_id)
 
-        # Pass through the inbound_processor(s), if any
-        self.client_payload[sid] = self.inbound_processor.process(
-            self.client_payload[sid])
-
         await self.process_client_info(client_id, sid)
 
     async def process_client_info(self, client_id, sid):
         """ Process the received metadata information from a reporting client. """
-        self.reports[sid].comm_time = time.time() - self.reports[sid].comm_time
+        # First pass through the inbound_processor(s), if any
+        self.client_payload[sid] = self.inbound_processor.process(
+            self.client_payload[sid])
+
+        if self.comm_simulation:
+            self.reports[sid].comm_time = 0
+        else:
+            self.reports[sid].comm_time = time.time(
+            ) - self.reports[sid].comm_time
+
         start_time = self.training_clients[client_id]['start_time']
         finish_time = self.reports[sid].training_time + self.reports[
             sid].comm_time + start_time

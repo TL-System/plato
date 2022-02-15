@@ -24,6 +24,7 @@ class Report(base.Report):
 
 class Client(base.Client):
     """A basic federated learning client who sends simple weight updates."""
+
     def __init__(self,
                  model=None,
                  datasource=None,
@@ -37,7 +38,7 @@ class Client(base.Client):
         self.trainset = None  # Training dataset
         self.testset = None  # Testing dataset
         self.sampler = None
-        self.test_set_sampler = None  # Sampler for the test set
+        self.testset_sampler = None  # Sampler for the test set
 
         self.report = None
 
@@ -86,11 +87,11 @@ class Client(base.Client):
         if Config().clients.do_test:
             # Set the testset if local testing is needed
             self.testset = self.datasource.get_test_set()
-            if hasattr(Config().data, 'test_set_sampler'):
+            if hasattr(Config().data, 'testset_sampler'):
                 # Set the sampler for test set
-                self.test_set_sampler = samplers_registry.get(self.datasource,
-                                                              self.client_id,
-                                                              testing=True)
+                self.testset_sampler = samplers_registry.get(self.datasource,
+                                                             self.client_id,
+                                                             testing=True)
 
     def load_payload(self, server_payload) -> None:
         """Loading the server model onto this client."""
@@ -111,7 +112,7 @@ class Client(base.Client):
 
         # Generate a report for the server, performing model testing if applicable
         if Config().clients.do_test:
-            accuracy = self.trainer.test(self.testset, self.test_set_sampler)
+            accuracy = self.trainer.test(self.testset, self.testset_sampler)
 
             if accuracy == -1:
                 # The testing process failed, disconnect from the server
@@ -144,6 +145,7 @@ class Client(base.Client):
         """Retrieving a model update corresponding to a particular wall clock time."""
         model = self.trainer.obtain_model_update(wall_time)
         weights = self.algorithm.extract_weights(model)
+        self.report.comm_time = time.time()
         self.report.update_response = True
 
         return self.report, weights

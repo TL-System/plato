@@ -601,13 +601,12 @@ class Trainer(base.Trainer):
         if sampler is None:
             test_loader = torch.utils.data.DataLoader(
                 testset, batch_size=config['batch_size'], shuffle=False)
-        # Use a testing set following the same distribution as the training set
         else:
             test_loader = torch.utils.data.DataLoader(
                 testset,
                 batch_size=config['batch_size'],
                 shuffle=False,
-                sampler=sampler.get())
+                sampler=sampler)
 
         correct = 0
         total = 0
