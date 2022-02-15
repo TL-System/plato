@@ -102,6 +102,7 @@ algorithm:
     start_steps: 32
     # the size of the replay buffer
     replay_size: 10000
+    replay_seed: 1234
     # whether use LSTM or FC nets
     recurrent_actor: true
 

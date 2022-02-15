@@ -13,11 +13,11 @@ from plato.models import registry as models_registry
 from plato.processors import registry as processor_registry
 from plato.servers import fedavg
 from plato.trainers import registry as trainers_registry
-from plato.utils import csv_processor
 
 
 class RLServer(fedavg.Server):
     """ A federated learning server with an RL Agent. """
+
     def __init__(self, agent, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
         self.agent = agent
@@ -63,8 +63,8 @@ class RLServer(fedavg.Server):
         self.update_state()
 
         # Extract the total number of samples
-        self.num_samples = [report.num_samples for (report, __, __) in updates]
-        self.total_samples = sum(self.num_samples)
+        num_samples = [report.num_samples for (report, __, __) in updates]
+        self.total_samples = sum(num_samples)
 
         # Perform weighted averaging
         avg_update = {
@@ -74,7 +74,7 @@ class RLServer(fedavg.Server):
 
         # e.g., wait for the new action from RL agent
         # if the action affects the global aggregation
-        self.agent.num_samples = self.num_samples
+        self.agent.num_samples = num_samples
         await self.agent.prep_agent_update()
         await self.update_action()
 
@@ -94,6 +94,7 @@ class RLServer(fedavg.Server):
         return server_response
 
     async def update_action(self):
+        """ Updating the RL agent's actions. """
         if self.agent.current_step == 0:
             logging.info("[RL Agent] Preparing initial action...")
             self.agent.prep_action()
