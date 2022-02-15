@@ -5,11 +5,12 @@ import math
 
 import numpy as np
 from plato.config import Config
-from plato.utils.reinforcement_learning import simple_rl_server
+from plato.utils.reinforcement_learning import rl_server
 
 
-class RLServer(simple_rl_server.RLServer):
+class RLServer(rl_server.RLServer):
     """ A federated learning server with RL Agent. """
+
     def __init__(self, agent, model=None, algorithm=None, trainer=None):
         super().__init__(agent, model, algorithm, trainer)
         self.local_correlations = [0] * Config().clients.per_round

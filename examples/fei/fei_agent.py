@@ -10,13 +10,14 @@ from statistics import mean, stdev
 import numpy as np
 from plato.config import Config
 from plato.utils import csv_processor
-from plato.utils.reinforcement_learning import simple_rl_agent
+from plato.utils.reinforcement_learning import rl_agent
 from plato.utils.reinforcement_learning.policies import \
     registry as policies_registry
 
 
-class RLAgent(simple_rl_agent.RLAgent):
+class RLAgent(rl_agent.RLAgent):
     """ An RL agent for FL training using FEI. """
+
     def __init__(self):
         super().__init__()
         if hasattr(Config().server,
