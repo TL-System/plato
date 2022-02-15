@@ -25,14 +25,18 @@ data:
     partition_size: 20000
 
     # IID or non-IID?
-    sampler: iid
+    sampler: noniid
+
+    # The concentration parameter for the Dirichlet distribution
+    concentration: 0.1
+
 
 trainer:
     # The type of the trainer
     type: basic
 
     # The maximum number of training rounds
-    rounds: 5
+    rounds: 30
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -44,7 +48,7 @@ trainer:
     target_accuracy: 0.98
 
     # Number of epoches for local training in each communication round
-    epochs: 1
+    epochs: 5
     batch_size: 32
     optimizer: SGD
     learning_rate: 0.01
