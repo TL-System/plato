@@ -77,9 +77,9 @@ algorithm:
     beta: 10 # coefficient used in reward function
     theta: 0.005 # threshold for stdev(pre_acc)
     log_interval: 10
-    mode: test # test
-    pretrained: true
-    pretrained_iter: 300
+    mode: train # test
+    pretrained: false
+    pretrained_iter: 0
     test_step: 50
 
     # RL policy
