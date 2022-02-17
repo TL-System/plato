@@ -66,11 +66,15 @@ class Server(fedavg_cs.Server):
 
         median = statistics.median(weights_diff_list)
 
-        self.pruning_amount_list = [
-            Config().clients.pruning_amount * (1 + math.tanh(
-                (median - weight_diff) / sum(weights_diff_list)))
-            for weight_diff in weights_diff_list
-        ]
+        for i, weight_diff in enumerate(weights_diff_list):
+            if weight_diff >= median:
+                self.pruning_amount_list[i] = Config(
+                ).clients.pruning_amount * (
+                    1 + math.tanh(weight_diff / sum(weights_diff_list)))
+            else:
+                self.pruning_amount_list[i] = Config(
+                ).clients.pruning_amount * (
+                    1 - math.tanh(weight_diff / sum(weights_diff_list)))
 
     def get_weights_differences(self):
         """
@@ -110,7 +114,7 @@ class Server(fedavg_cs.Server):
 
         weights_diff = weights_diff * (num_samples / self.total_samples)
 
-        return math.log(weights_diff)
+        return weights_diff
 
     def get_record_items_values(self):
         """Get values will be recorded in result csv file."""
