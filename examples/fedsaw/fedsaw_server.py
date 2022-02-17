@@ -7,6 +7,7 @@ import logging
 import math
 import os
 import pickle
+import statistics
 import sys
 
 import torch
@@ -62,11 +63,12 @@ class Server(fedavg_cs.Server):
 
     def compute_pruning_amount(self, weights_diff_list):
         """ A method to compute pruning amount. """
-        total_pruning_amount = Config().clients.pruning_amount * Config(
-        ).algorithm.total_silos
+
+        median = statistics.median(weights_diff_list)
 
         self.pruning_amount_list = [
-            total_pruning_amount * weight_diff / sum(weights_diff_list)
+            Config().clients.pruning_amount * (1 + math.tanh(
+                (median - weight_diff) / sum(weights_diff_list)))
             for weight_diff in weights_diff_list
         ]
 
