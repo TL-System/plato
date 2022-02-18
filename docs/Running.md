@@ -52,13 +52,6 @@ The next step is to install the required Python packages. PyTorch should be inst
 pip3 install torch==1.10.1+cu113 torchvision==0.11.2+cu113 torchaudio==0.10.1+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
 ```
 
-To double-check the CUDA version used in the command above, start an interactive session and use the `nvidia-smi` command within the interactive session:
-
-```shell
-salloc --time=2:00:00 --gres=gpu:1 --mem=64G --account=def-baochun
-nvidia-smi
-```
-
 Finally, install Plato as a pip package:
 
 ```shell
