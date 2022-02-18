@@ -83,12 +83,21 @@ class Server(base.Server):
 
             if hasattr(Config().data, 'testset_size'):
                 # Set the sampler for testset
-                from torch.utils.data import SubsetRandomSampler
+                import torch
+
+                if hasattr(Config().server, "random_seed"):
+                    random_seed = Config().server.random_seed
+                else:
+                    random_seed = 1
+
+                gen = torch.Generator()
+                gen.manual_seed(random_seed)
 
                 all_inclusive = range(len(self.datasource.get_test_set()))
                 test_samples = random.sample(all_inclusive,
                                              Config().data.testset_size)
-                self.testset_sampler = SubsetRandomSampler(test_samples)
+                self.testset_sampler = torch.utils.data.SubsetRandomSampler(
+                    test_samples, generator=gen)
 
         # Initialize the csv file which will record results
         if hasattr(Config(), 'results'):
@@ -181,7 +190,7 @@ class Server(base.Server):
                     'round':
                     self.current_round,
                     'accuracy':
-                    self.accuracy * 100,
+                    self.accuracy,
                     'elapsed_time':
                     self.wall_time - self.initial_wall_time,
                     'comm_time':

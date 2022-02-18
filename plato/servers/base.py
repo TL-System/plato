@@ -121,7 +121,7 @@ class Server:
         self.ping_timeout = 360
         self.asynchronous_mode = False
         self.periodic_interval = 5
-        self.staleness_bound = 0
+        self.staleness_bound = 1000
         self.minimum_clients = 1
         self.simulate_wall_time = False
         self.request_update = False
@@ -245,10 +245,8 @@ class Server:
 
         app = web.Application()
         self.sio.attach(app)
-        web.run_app(app,
-                    host=Config().server.address,
-                    port=port,
-                    loop=asyncio.get_event_loop())
+        web.run_app(app, host=Config().server.address, port=port)
+        # ,loop=asyncio.get_event_loop()
 
     async def register_client(self, sid, client_id):
         """ Adding a newly arrived client to the list of clients. """
@@ -442,9 +440,13 @@ class Server:
                         "[%s] Sending the current model to client #%d (simulated).",
                         self, self.selected_client_id)
 
+                    # First apply outbound processors, if any
+                    payload = self.outbound_processor.process(payload)
+
                     model_name = Config().trainer.model_name if hasattr(
                         Config().trainer, 'model_name') else 'custom'
                     checkpoint_dir = Config().params['checkpoint_dir']
+
                     payload_filename = f"{checkpoint_dir}/{model_name}_{self.selected_client_id}.pth"
                     with open(payload_filename, 'wb') as payload_file:
                         pickle.dump(payload, payload_file)
@@ -629,15 +631,20 @@ class Server:
         logging.info("[%s] Received %.2f MB of payload data from client #%d.",
                      self, payload_size / 1024**2, client_id)
 
-        # Pass through the inbound_processor(s), if any
-        self.client_payload[sid] = self.inbound_processor.process(
-            self.client_payload[sid])
-
         await self.process_client_info(client_id, sid)
 
     async def process_client_info(self, client_id, sid):
         """ Process the received metadata information from a reporting client. """
-        self.reports[sid].comm_time = time.time() - self.reports[sid].comm_time
+        # First pass through the inbound_processor(s), if any
+        self.client_payload[sid] = self.inbound_processor.process(
+            self.client_payload[sid])
+
+        if self.comm_simulation:
+            self.reports[sid].comm_time = 0
+        else:
+            self.reports[sid].comm_time = time.time(
+            ) - self.reports[sid].comm_time
+
         start_time = self.training_clients[client_id]['start_time']
         finish_time = self.reports[sid].training_time + self.reports[
             sid].comm_time + start_time
@@ -858,9 +865,6 @@ class Server:
     def save_to_checkpoint(self):
         """ Save a checkpoint for resuming the training session. """
         checkpoint_dir = Config.params['checkpoint_dir']
-
-        if not os.path.exists(checkpoint_dir):
-            os.makedirs(checkpoint_dir)
 
         model_name = Config().trainer.model_name if hasattr(
             Config().trainer, 'model_name') else 'custom'

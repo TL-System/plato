@@ -145,6 +145,7 @@ class Client(base.Client):
         """Retrieving a model update corresponding to a particular wall clock time."""
         model = self.trainer.obtain_model_update(wall_time)
         weights = self.algorithm.extract_weights(model)
+        self.report.comm_time = time.time()
         self.report.update_response = True
 
         return self.report, weights
