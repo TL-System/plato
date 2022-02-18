@@ -11,6 +11,7 @@ NUM_OF_STATE_FEATURES = 5
 
 class RLConfig:
     """Configuration for RL control"""
+
     def __init__(self):
         self.discrete_action_space = False
         self.n_actions = Config().clients.per_round
@@ -24,7 +25,6 @@ class RLConfig:
         self.device = Config().device()
 
         self.model_dir = os.path.join(dirname, 'models')
-        self.results_dir = Config().results_dir
         self.log_interval = 4
 
         self.mode = 'train'  # or 'test'

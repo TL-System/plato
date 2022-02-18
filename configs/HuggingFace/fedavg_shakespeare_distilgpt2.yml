@@ -3,62 +3,48 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 100
+    total_clients: 2
 
     # The number of clients selected in each round
-    per_round: 20
+    per_round: 2
 
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    # Whether simulate clients or not
-    simulation: true
-    speed_simulation: true
-
-    # The simulation distribution
-    simulation_distribution:
-        distribution: pareto
-        alpha: 1
-
-    random_seed: 1
+    # Client simulation mode
+    simulation: false
+    comm_simulation: true
 
 server:
     address: 127.0.0.1
-    port: 8001
-    synchronous: false
-    simulate_wall_time: true
-    minimum_clients_aggregated: 5
-    staleness_bound: 10
-    random_seed: 1
-    request_update: false
-    checkpoint_dir: /content/drive/MyDrive/MNIST
+    port: 8000
+    simulate_wall_time: false
+    checkpoint_dir: ./models/huggingface/fedavg
+    model_dir: ./models/huggingface/fedavg
 
 data:
-    datasource: MNIST
+    # The training and testing dataset
+    datasource: HuggingFace
+    dataset_name: tiny_shakespeare
 
     # Where the dataset is located
     data_path: ./data
 
     # Number of samples in each partition
-    partition_size: 600
+    partition_size: 2
 
     # IID or non-IID?
-    sampler: noniid
-
-    # The concentration parameter for the Dirichlet distribution
-    concentration: 0.8
+    sampler: iid
 
     # The random seed for sampling data
     random_seed: 1
 
-    checkpoints_dir: /content/drive/MyDrive/MNIST
-
 trainer:
     # The type of the trainer
-    type: basic
+    type: HuggingFace
 
     # The maximum number of training rounds
-    rounds: 60
+    rounds: 5
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -70,17 +56,13 @@ trainer:
     # dp_max_grad_norm: 1
 
     # The maximum number of clients running concurrently
-    # The limitation is CUDA memory
-    # When max_concurrency equals clients per_round,
-    # simulate_wall_time: false
-    # Otherwise, simulate_wall_time: true
-    max_concurrency: 20
+    max_concurrency: 1
 
-    # The target accuracy
-    target_accuracy: 0.95
+    # The target perplexity
+    target_perplexity: 20
 
     # Number of epoches for local training in each communication round
-    epochs: 3
+    epochs: 1
     batch_size: 32
     optimizer: SGD
     learning_rate: 0.01
@@ -88,15 +70,14 @@ trainer:
     weight_decay: 0.0
 
     # The machine learning model
-    model_name: lenet5
+    model_name: HuggingFace_CausalLM
+    model_checkpoint: distilgpt2
 
 algorithm:
     # Aggregation algorithm
     type: fedavg
 
 results:
-    results_dir: /content/drive/MyDrive/MNIST
-
     # Write the following parameter(s) into a CSV
     types: round, elapsed_time, accuracy
 

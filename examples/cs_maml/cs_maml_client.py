@@ -4,18 +4,13 @@ A personalized federated learning client using MAML algorithm for local training
 import logging
 import pickle
 import sys
-from dataclasses import dataclass
 
 from plato.clients import simple
 
 
-@dataclass
-class Report(simple.Report):
-    """A client report."""
-
-
 class Client(simple.Client):
     """A federated learning client."""
+
     def __init__(self,
                  model=None,
                  datasource=None,
@@ -32,11 +27,11 @@ class Client(simple.Client):
         if 'personalization_test' in server_response:
             self.do_personalization_test = True
 
-    async def payload_done(self, client_id, object_key) -> None:
+    async def payload_done(self, client_id, s3_key=None) -> None:
         """ Upon receiving all the new payload from the server. """
         payload_size = 0
 
-        if object_key is None:
+        if s3_key is None:
             if isinstance(self.server_payload, list):
                 for _data in self.server_payload:
                     payload_size += sys.getsizeof(pickle.dumps(_data))
@@ -46,14 +41,14 @@ class Client(simple.Client):
             else:
                 payload_size = sys.getsizeof(pickle.dumps(self.server_payload))
         else:
-            self.server_payload = self.s3_client.receive_from_s3(object_key)
+            self.server_payload = self.s3_client.receive_from_s3(s3_key)
             payload_size = sys.getsizeof(pickle.dumps(self.server_payload))
 
         assert client_id == self.client_id
 
         logging.info(
-            "[Client #%d] Received %s MB of payload data from the server.",
-            client_id, round(payload_size / 1024**2, 2))
+            "[Client #%d] Received %.2f MB of payload data from the server.",
+            client_id, payload_size / 1024**2)
 
         self.load_payload(self.server_payload)
         self.server_payload = None

@@ -2,9 +2,9 @@
 A basic federated learning client who sends weight updates to the server.
 """
 
+from dataclasses import dataclass
 import logging
 import time
-from dataclasses import dataclass
 
 from plato.algorithms import registry as algorithms_registry
 from plato.clients import base
@@ -18,6 +18,7 @@ from plato.trainers import registry as trainers_registry
 @dataclass
 class Report(base.Report):
     """Report from a simple client, to be sent to the federated learning server."""
+    comm_time: float
     update_response: bool
 
 
@@ -37,12 +38,9 @@ class Client(base.Client):
         self.trainset = None  # Training dataset
         self.testset = None  # Testing dataset
         self.sampler = None
-        self.test_set_sampler = None  # Sampler for the test set
+        self.testset_sampler = None  # Sampler for the test set
 
         self.report = None
-
-    def __repr__(self):
-        return 'Client #{}.'.format(self.client_id)
 
     def configure(self) -> None:
         """Prepare this client for training."""
@@ -63,7 +61,7 @@ class Client(base.Client):
 
     def load_data(self) -> None:
         """Generating data and loading them onto this client."""
-        logging.info("[Client #%d] Loading its data source...", self.client_id)
+        logging.info("[%s] Loading its data source...", self)
 
         if self.datasource is None or (hasattr(Config().data, 'reload_data')
                                        and Config().data.reload_data):
@@ -72,7 +70,7 @@ class Client(base.Client):
 
         self.data_loaded = True
 
-        logging.info("[Client #%d] Dataset size: %s", self.client_id,
+        logging.info("[%s] Dataset size: %s", self,
                      self.datasource.num_train_examples())
 
         # Setting up the data sampler
@@ -89,11 +87,11 @@ class Client(base.Client):
         if Config().clients.do_test:
             # Set the testset if local testing is needed
             self.testset = self.datasource.get_test_set()
-            if hasattr(Config().data, 'test_set_sampler'):
+            if hasattr(Config().data, 'testset_sampler'):
                 # Set the sampler for test set
-                self.test_set_sampler = samplers_registry.get(self.datasource,
-                                                              self.client_id,
-                                                              testing=True)
+                self.testset_sampler = samplers_registry.get(self.datasource,
+                                                             self.client_id,
+                                                             testing=True)
 
     def load_payload(self, server_payload) -> None:
         """Loading the server model onto this client."""
@@ -101,7 +99,7 @@ class Client(base.Client):
 
     async def train(self):
         """The machine learning training workload on a client."""
-        logging.info("[Client #%d] Started training.", self.client_id)
+        logging.info("[%s] Started training.", self)
 
         # Perform model training
         try:
@@ -114,25 +112,48 @@ class Client(base.Client):
 
         # Generate a report for the server, performing model testing if applicable
         if Config().clients.do_test:
-            accuracy = self.trainer.test(self.testset, self.test_set_sampler)
+            accuracy = self.trainer.test(self.testset, self.testset_sampler)
 
             if accuracy == -1:
                 # The testing process failed, disconnect from the server
                 await self.sio.disconnect()
 
-            logging.info("[Client #{:d}] Test accuracy: {:.2f}%".format(
-                self.client_id, 100 * accuracy))
+            if hasattr(Config().trainer, 'target_perplexity'):
+                logging.info("[%s] Test perplexity: %.2f", self, accuracy)
+            else:
+                logging.info("[%s] Test accuracy: %.2f%%", self,
+                             100 * accuracy)
         else:
             accuracy = 0
 
-        self.report = Report(self.sampler.trainset_size(), accuracy,
-                             training_time, False)
+        comm_time = time.time()
+
+        if hasattr(Config().clients,
+                   'sleep_simulation') and Config().clients.sleep_simulation:
+            sleep_seconds = Config().client_sleep_times[self.client_id - 1]
+            avg_training_time = Config().clients.avg_training_time
+            self.report = Report(self.sampler.trainset_size(), accuracy,
+                                 (avg_training_time + sleep_seconds) *
+                                 Config().trainer.epochs, comm_time, False)
+        else:
+            self.report = Report(self.sampler.trainset_size(), accuracy,
+                                 training_time, comm_time, False)
+
         return self.report, weights
 
     async def obtain_model_update(self, wall_time):
         """Retrieving a model update corresponding to a particular wall clock time."""
         model = self.trainer.obtain_model_update(wall_time)
         weights = self.algorithm.extract_weights(model)
+        self.report.comm_time = time.time()
         self.report.update_response = True
 
         return self.report, weights
+
+    def save_model(self, model_checkpoint):
+        """ Saving the model to a model checkpoint. """
+        self.trainer.save_model(model_checkpoint)
+
+    def load_model(self, model_checkpoint):
+        """ Loading the model from a model checkpoint. """
+        self.trainer.load_model(model_checkpoint)

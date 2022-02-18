@@ -5,7 +5,6 @@ A cross-silo federated learning server using federated averaging, as either edge
 import asyncio
 import logging
 import os
-import time
 import numpy as np
 
 from plato.config import Config
@@ -17,6 +16,7 @@ from plato.servers import fedavg
 
 class Server(fedavg.Server):
     """Cross-silo federated learning server using federated averaging."""
+
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
 
@@ -85,10 +85,10 @@ class Server(fedavg.Server):
                 "Server", server_id=os.getpid(), trainer=self.trainer)
 
             if hasattr(Config(), 'results'):
-                results_dir = Config().results_dir
-                result_csv_file = f'{results_dir}/edge_{os.getpid()}.csv'
+                result_dir = Config().params['result_dir']
+                result_csv_file = f'{result_dir}/edge_{os.getpid()}.csv'
                 csv_processor.initialize_csv(result_csv_file,
-                                             self.recorded_items, results_dir)
+                                             self.recorded_items, result_dir)
 
         else:
             super().configure()
@@ -118,16 +118,18 @@ class Server(fedavg.Server):
         if Config().clients.do_test:
             # Compute the average accuracy from client reports
             self.accuracy = self.accuracy_averaging(self.updates)
-            logging.info(
-                '[Server #{:d}] Average client accuracy: {:.2f}%.'.format(
-                    os.getpid(), 100 * self.accuracy))
+            logging.info('[%s] Average client accuracy: %.2f%%.', self,
+                         100 * self.accuracy)
         else:
             if Config().is_central_server():
                 # Test the updated model directly at the central server
                 self.accuracy = await self.trainer.server_test(self.testset)
-                logging.info(
-                    '[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(
-                        os.getpid(), 100 * self.accuracy))
+                if hasattr(Config().trainer, 'target_perplexity'):
+                    logging.info('[%s] Global model perplexity: %.2f\n', self,
+                                 self.accuracy)
+                else:
+                    logging.info('[%s] Global model accuracy: %.2f%%\n', self,
+                                 100 * self.accuracy)
 
         await self.wrap_up_processing_reports()
 
@@ -149,6 +151,10 @@ class Server(fedavg.Server):
                     Config().trainer.epochs,
                     'elapsed_time':
                     self.wall_time - self.initial_wall_time,
+                    'comm_time':
+                    max([
+                        report.comm_time for (report, __, __) in self.updates
+                    ]),
                     'round_time':
                     max([
                         report.training_time
@@ -158,9 +164,9 @@ class Server(fedavg.Server):
                 new_row.append(item_value)
 
             if Config().is_edge_server():
-                result_csv_file = f'{Config().results_dir}/edge_{os.getpid()}.csv'
+                result_csv_file = f"{Config().params['result_dir']}/edge_{os.getpid()}.csv"
             else:
-                result_csv_file = f'{Config().results_dir}/{os.getpid()}.csv'
+                result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}.csv"
 
             csv_processor.write_csv(result_csv_file, new_row)
 
