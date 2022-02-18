@@ -32,7 +32,7 @@ server:
     synchronous: false
     simulate_wall_time: true
 
-    # Parameter for FedAsync
+    # Parameters for FedAsync
     staleness_bound: 1000 # FedAsync doesn't have any staleness bound
     minimum_clients_aggregated: 1
     mixing_hyperparameter: 0.9
@@ -40,6 +40,9 @@ server:
     staleness_weighting_function:
         type: Polynomial
         a: 2
+
+    checkpoint_dir: ./models/fedasync/mnist
+    model_dir: ./models/fedasync/mnist
 
 data:
     # The training and testing dataset
@@ -56,6 +59,8 @@ data:
 
     # The concentration parameter for the Dirichlet distribution
     concentration: 5
+
+    # The random seed for sampling data
     random_seed: 1
 
 trainer:
@@ -63,16 +68,16 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 100
+    rounds: 80
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
 
-    # The maximum number of clients running concurrently
-    max_concurrency: 5
+    # The maximum number of clients running concurrently 
+    max_concurrency: 10
 
     # The target accuracy
-    target_accuracy: 0.97
+    target_accuracy: 0.98
 
     # Number of epoches for local training in each communication round
     epochs: 5
@@ -84,12 +89,14 @@ trainer:
 
     # The machine learning model
     model_name: lenet5
+    num_classes: 47
 
 algorithm:
     # Aggregation algorithm
     type: fedavg
 
 results:
+    result_dir: ./results/fedasync/mnist
     # Write the following parameter(s) into a CSV
     types: round, elapsed_time, accuracy
 

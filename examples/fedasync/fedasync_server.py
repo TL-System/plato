@@ -79,15 +79,19 @@ class Server(fedavg.Server):
         if Config().clients.do_test:
             # Compute the average accuracy from client reports
             self.accuracy = self.accuracy_averaging(self.updates)
-            logging.info(
-                '[Server #{:d}] Average client accuracy: {:.2f}%.'.format(
-                    os.getpid(), 100 * self.accuracy))
+            logging.info('[%s] Average client accuracy: %.2f%%.', self,
+                         100 * self.accuracy)
         else:
             # Testing the updated model directly at the server
-            self.accuracy = await self.trainer.server_test(self.testset)
-            logging.info(
-                '[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(
-                    os.getpid(), 100 * self.accuracy))
+            self.accuracy = await self.trainer.server_test(
+                self.testset, self.testset_sampler)
+
+        if hasattr(Config().trainer, 'target_perplexity'):
+            logging.info('[%s] Global model perplexity: %.2f\n', self,
+                         self.accuracy)
+        else:
+            logging.info('[%s] Global model accuracy: %.2f%%\n', self,
+                         100 * self.accuracy)
 
         await self.wrap_up_processing_reports()
 
