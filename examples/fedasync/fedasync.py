@@ -8,6 +8,8 @@ in Proc. 12th Annual Workshop on Optimization for Machine Learning (OPT 2020).
 
 https://opt-ml.org/papers/2020/paper_28.pdf
 """
+import os
+os.environ["WANDB_DISABLED"] = "true"
 
 import fedasync_server
 

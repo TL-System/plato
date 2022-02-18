@@ -52,13 +52,13 @@ else:
 def get(datasource, client_id, testing=False):
     """Get an instance of the sampler."""
     if testing:
-        if hasattr(Config().data, 'test_set_sampler'):
-            sampler_type = Config().data.test_set_sampler
+        if hasattr(Config().data, 'testset_sampler'):
+            sampler_type = Config().data.testset_sampler
             logging.info("[Client #%d] Test set sampler: %s", client_id,
                          sampler_type)
     elif testing == 'edge':
-        if hasattr(Config().data, 'edge_test_set_sampler'):
-            sampler_type = Config().data.edge_test_set_sampler
+        if hasattr(Config().data, 'edge_testset_sampler'):
+            sampler_type = Config().data.edge_testset_sampler
             logging.info("[Edge Server #%d] Test set sampler: %s", client_id,
                          sampler_type)
     else:

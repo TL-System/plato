@@ -9,32 +9,30 @@ clients:
     per_round: 2
 
     # Should the clients compute test accuracy locally?
-    do_test: true
+    do_test: false
 
-    # Whether simulate clients or not
-    simulation: true
-
-    outbound_processors:
-        - model_quantize
+    # Client simulation mode
+    simulation: false
+    comm_simulation: true
 
 server:
-    type: fedavg_cross_silo
     address: 127.0.0.1
     port: 8000
-    do_test: true
-
-    inbound_processors:
-        - model_dequantize
+    simulate_wall_time: false
+    checkpoint_dir: ./models/huggingface/fedavg
+    model_dir: ./models/huggingface/fedavg
 
 data:
     # The training and testing dataset
-    datasource: MNIST
+    datasource: HuggingFace
+    dataset_name: wikitext
+    dataset_config: wikitext-2-raw-v1
 
     # Where the dataset is located
-    data_path: ../../data
+    data_path: ./data
 
     # Number of samples in each partition
-    partition_size: 100
+    partition_size: 10
 
     # IID or non-IID?
     sampler: iid
@@ -44,53 +42,45 @@ data:
 
 trainer:
     # The type of the trainer
-    type: basic
+    type: HuggingFace
 
     # The maximum number of training rounds
-    rounds: 2
+    rounds: 5
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
 
-    # The maximum number of clients running concurrently
-    max_concurrency: 2
+    # Whether to apply differential privacy
+    # differential_privacy: true
+    # dp_epsilon: 1
+    # dp_delta: 0.00001
+    # dp_max_grad_norm: 1
 
-    # The target accuracy
-    target_accuracy: 0.99
+    # The maximum number of clients running concurrently
+    max_concurrency: 1
+
+    # The target perplexity
+    target_perplexity: 20
 
     # Number of epoches for local training in each communication round
     epochs: 1
-    batch_size: 10
+    batch_size: 32
     optimizer: SGD
     learning_rate: 0.01
     momentum: 0.9
     weight_decay: 0.0
 
     # The machine learning model
-    model_name: lenet5
-
-    # Whether to apply differential privacy
-    differential_privacy: true
-    # dp_epsilon: 1
-    # dp_delta: 0.01
-    # dp_max_grad_norm: 1
+    model_name: HuggingFace_CausalLM
+    model_checkpoint: gpt2
 
 algorithm:
     # Aggregation algorithm
     type: fedavg
 
-    # Cross-silo training
-    cross_silo: true
-
-    # The total number of silos (edge servers)
-    total_silos: 2
-
-    # The number of local aggregation rounds on edge servers before sending
-    # aggregated weights to the central server
-    local_rounds: 2
-
 results:
     # Write the following parameter(s) into a CSV
-    types: accuracy, training_time, round_time, edge_agg_num
+    types: round, elapsed_time, accuracy
 
-    results_dir: ./results/test
+    # Plot results (x_axis-y_axis)
+    plot: round-accuracy, elapsed_time-accuracy

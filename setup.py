@@ -59,5 +59,6 @@ setuptools.setup(
         "Topic :: Scientific/Engineering",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
     ],
-    keywords="machine-learning, deep-learning, edge-learning, federated-learning",
+    keywords=
+    "machine-learning, deep-learning, edge-learning, federated-learning",
 )

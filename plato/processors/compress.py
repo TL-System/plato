@@ -9,6 +9,7 @@ from plato.processors import base
 
 class Processor(base.Processor):
     """ Implements a Processor for compressing numpy array. """
+
     def __init__(self, cr=1, **kwargs) -> None:
         super().__init__(**kwargs)
         self.compression_ratio = cr

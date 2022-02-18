@@ -29,7 +29,6 @@ from plato.samplers import registry as samplers_registry
 class Report(base.Report):
     """Report from a simple client, to be sent to the federated learning server."""
     training_time: float
-    data_loading_time: float
     delta_o: float
     delta_g: float
 
@@ -37,6 +36,7 @@ class Report(base.Report):
 class Client(simple.Client):
     """A federated learning client with support for Adaptive gradient blending.
     """
+
     def __init__(self,
                  model=None,
                  datasource=None,
@@ -52,9 +52,6 @@ class Client(simple.Client):
         self.testset = None  # Testing dataset
         self.sampler = None
         self.modality_sampler = None
-
-        self.data_loading_time = None
-        self.data_loading_time_sent = False
 
         model_name = Config().trainer.model_name
         filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.pth"
@@ -80,10 +77,7 @@ class Client(simple.Client):
 
     def load_data(self) -> None:
         """Generating data and loading them onto this client."""
-        data_loading_start_time = time.time()
         logging.info("[Client #%d] Loading its data source...", self.client_id)
-
-        self.data_loaded = True
 
         logging.info("[Client #%d] Dataset size: %s", self.client_id,
                      self.datasource.num_train_examples())
@@ -104,8 +98,6 @@ class Client(simple.Client):
         if Config().clients.do_test:
             # Set the testset if local testing is needed
             self.testset = self.datasource.get_test_set()
-
-        self.data_loading_time = time.time() - data_loading_start_time
 
     def local_global_gradient_blending(self, local_model,
                                        global_eval_avg_loses,
@@ -246,11 +238,6 @@ class Client(simple.Client):
             accuracy = 0
 
         training_time = time.time() - training_start_time
-        data_loading_time = 0
-
-        if not self.data_loading_time_sent:
-            data_loading_time = self.data_loading_time
-            self.data_loading_time_sent = True
 
         return Report(self.sampler.trainset_size(), accuracy, training_time,
-                      data_loading_time, delta_o, delta_g), weights
+                      delta_o, delta_g), weights

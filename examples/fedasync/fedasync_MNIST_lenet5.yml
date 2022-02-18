@@ -1,9 +1,12 @@
 clients:
+    # Type
+    type: simple
+
     # The total number of clients
     total_clients: 100
 
     # The number of clients selected in each round
-    per_round: 5
+    per_round: 20
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -11,23 +14,35 @@ clients:
     # Whether simulate clients or not
     simulation: true
     speed_simulation: true
+    comm_simulation: true
 
     # The simulation distribution
     simulation_distribution:
-        distribution: zipf
-        s: 1.5
+        distribution: pareto
+        alpha: 1
+    max_sleep_time: 30
+    sleep_simulation: true
+    avg_training_time: 10
+
+    random_seed: 1
 
 server:
     address: 127.0.0.1
     port: 8000
     synchronous: false
-    simulate_wall_time: false
+    simulate_wall_time: true
 
-    # Parameter for FedAsync
+    # Parameters for FedAsync
     staleness_bound: 1000 # FedAsync doesn't have any staleness bound
     minimum_clients_aggregated: 1
     mixing_hyperparameter: 0.9
     adaptive_mixing: true
+    staleness_weighting_function:
+        type: Polynomial
+        a: 2
+
+    checkpoint_dir: ./models/fedasync/mnist
+    model_dir: ./models/fedasync/mnist
 
 data:
     # The training and testing dataset
@@ -38,28 +53,31 @@ data:
 
     # Number of samples in each partition
     partition_size: 600
-    
+
     # IID or non-IID?
     sampler: noniid
 
     # The concentration parameter for the Dirichlet distribution
-    concentration: 0.3
+    concentration: 5
+
+    # The random seed for sampling data
+    random_seed: 1
 
 trainer:
     # The type of the trainer
     type: basic
 
     # The maximum number of training rounds
-    rounds: 100
+    rounds: 80
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
 
     # The maximum number of clients running concurrently 
-    max_concurrency: 5
+    max_concurrency: 10
 
     # The target accuracy
-    target_accuracy: 0.97
+    target_accuracy: 0.98
 
     # Number of epoches for local training in each communication round
     epochs: 5
@@ -71,15 +89,16 @@ trainer:
 
     # The machine learning model
     model_name: lenet5
+    num_classes: 47
 
 algorithm:
     # Aggregation algorithm
     type: fedavg
 
 results:
+    result_dir: ./results/fedasync/mnist
     # Write the following parameter(s) into a CSV
     types: round, elapsed_time, accuracy
 
     # Plot results (x_axis-y_axis)
     plot: round-accuracy, elapsed_time-accuracy
-
