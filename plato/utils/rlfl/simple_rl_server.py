@@ -60,6 +60,7 @@ class RLServerEvents(base.ServerEvents):
 
 class RLServer(fedavg.Server):
     """ A federated learning server with RL Agent. """
+
     def __init__(self, trainer=None):
         super().__init__(trainer=trainer)
         self.rl_agent = None
@@ -358,9 +359,9 @@ class RLServer(fedavg.Server):
 
         # Initialize the csv file which will record results
         if self.current_rl_episode == 1 and hasattr(Config(), 'results'):
-            result_csv_file = Config().results_dir + 'result.csv'
+            result_csv_file = Config().params['result_dir'] + 'result.csv'
             csv_processor.initialize_csv(result_csv_file, self.recorded_items,
-                                         Config().results_dir)
+                                         Config().params['result_dir'])
 
     def load_trainer(self):
         """ Setting up the global model to be trained via federated learning. """

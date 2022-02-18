@@ -23,6 +23,7 @@ class Report(simple.Report):
 
 class Client(simple.Client):
     """A federated learning client for MistNet."""
+
     async def train(self):
         """A MistNet client only uses the first several layers in a forward pass."""
         logging.info("Training on MistNet client #%d", self.client_id)
@@ -41,5 +42,6 @@ class Client(simple.Client):
         training_time = time.perf_counter() - tic
 
         # Generate a report for the server, performing model testing if applicable
-        return Report(self.sampler.trainset_size(), 0, training_time, False,
-                      len(features)), features
+        comm_time = time.time()
+        return Report(self.sampler.trainset_size(), 0, training_time,
+                      comm_time, False, len(features)), features

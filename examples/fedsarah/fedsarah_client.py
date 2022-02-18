@@ -6,6 +6,7 @@ Using Stochastic Recursive Gradient." (https://arxiv.org/pdf/1703.00102.pdf)
 
 """
 import os
+import time
 from dataclasses import dataclass
 
 from plato.clients import simple
@@ -20,6 +21,7 @@ class Report(simple.Report):
 class Client(simple.Client):
     """ A FedSarah federated learning client who sends weight updates
     and client control variates. """
+
     def __init__(self,
                  model=None,
                  datasource=None,
@@ -47,8 +49,10 @@ class Client(simple.Client):
 
         fn = f"new_client_control_variates_{self.client_id}.pth"
         os.remove(fn)
+
+        comm_time = time.time()
         return Report(report.num_samples, report.accuracy,
-                      report.training_time, report.update_response,
+                      report.training_time, comm_time, report.update_response,
                       2), [weights, self.client_control_variates]
 
     def load_payload(self, server_payload):

@@ -34,6 +34,8 @@ else:
         alexnet,
         squeezenet,
         shufflenet,
+        efficientnet,
+        regnet,
     )
     registered_models = OrderedDict([
         ('lenet5', lenet5.Model),
@@ -46,6 +48,8 @@ else:
         ('alexnet', alexnet.Model),
         ('squeezenet', squeezenet.Model),
         ('shufflenet', shufflenet.Model),
+        ('efficientnet', efficientnet.Model),
+        ('regnet', regnet.Model),
     ])
 
 
@@ -60,9 +64,17 @@ def get():
         return yolo.Model.get_model()
 
     if model_name == 'HuggingFace_CausalLM':
-        from transformers import AutoModelForCausalLM
-        model_checkpoint = Config.trainer.model_checkpoint
-        return AutoModelForCausalLM.from_pretrained(model_checkpoint)
+        from transformers import AutoModelForCausalLM, AutoConfig
+
+        model_checkpoint = Config().trainer.model_checkpoint
+        config_kwargs = {
+            "cache_dir": None,
+            "revision": 'main',
+            "use_auth_token": None,
+        }
+        config = AutoConfig.from_pretrained(model_checkpoint, **config_kwargs)
+        return AutoModelForCausalLM.from_pretrained(
+            model_checkpoint, config=config, cache_dir='./models/huggingface')
 
     else:
         for name, registered_model in registered_models.items():

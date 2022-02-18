@@ -150,7 +150,8 @@ class RLAgent(base_rl_agent.RLAgent, gym.Env):
                 self.process_experience()
             self.state = self.next_state
             self.episode_reward += self.reward
-            step_result_csv_file = self.config.results_dir + 'step_result.csv'
+            step_result_csv_file = self.config.params[
+                'result_dir'] + 'step_result.csv'
             csv_processor.write_csv(step_result_csv_file,
                                     [self.current_episode, self.current_step] +
                                     list(self.state) + list(self.action))
