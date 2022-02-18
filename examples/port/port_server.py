@@ -31,7 +31,7 @@ class Server(fedavg.Server):
 
         similarity = 1.0
 
-        if staleness > 0 and os.path.exists(model_path):
+        if staleness > 1 and os.path.exists(model_path):
             previous_model = copy.deepcopy(self.trainer.model)
             previous_model.load_state_dict(torch.load(model_path))
 
@@ -72,7 +72,7 @@ class Server(fedavg.Server):
             similarity_weight = Config().server.similarity_weight if hasattr(
                 Config().server, 'similarity_weight') else 1
             staleness_weight = Config().server.staleness_weight if hasattr(
-                Config().server, 'staleness_weight') else 0
+                Config().server, 'staleness_weight') else 1
 
             logging.info('[Client %s] similarity: %s', i, (similarity + 1) / 2)
             logging.info('[Client %s] staleness: %s, staleness factor: %s', i,

@@ -161,8 +161,7 @@ class Config:
                 # Using a temporary SQLite database to limit the maximum number of concurrent
                 # trainers
                 Config.sql_connection = sqlite3.connect(
-                    f"{Config().params['result_dir']}/running_trainers.sqlitedb"
-                )
+                    f"{Config.params['result_dir']}/running_trainers.sqlitedb")
                 Config().cursor = Config.sql_connection.cursor()
 
         return cls._instance
