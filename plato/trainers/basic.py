@@ -133,12 +133,7 @@ class Trainer(base.Trainer):
         sampler: the sampler that extracts a partition for this client.
         cut_layer (optional): The layer which training should start from.
         """
-        if 'use_wandb' in config:
-            import wandb
-
-            run = wandb.init(project="plato",
-                             group=str(config['run_id']),
-                             reinit=True)
+        tic = time.perf_counter()
 
         try:
             custom_train = getattr(self, "train_model", None)
@@ -157,9 +152,6 @@ class Trainer(base.Trainer):
             model_type = config['model_name']
             filename = f"{model_type}_{self.client_id}_{config['run_id']}.pth"
             self.save_model(filename)
-
-        if 'use_wandb' in config:
-            run.finish()
 
     def train_loop(self, config, trainset, sampler, cut_layer):
         """ The default training loop when a custom training loop is not supplied. """
@@ -250,9 +242,6 @@ class Trainer(base.Trainer):
                             os.getpid(), epoch, epochs, batch_id,
                             len(train_loader), loss.data.item())
                     else:
-                        if hasattr(config, 'use_wandb'):
-                            wandb.log({"batch loss": loss.data.item()})
-
                         logging.info(
                             "[Client #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
                             self.client_id, epoch, epochs, batch_id,
