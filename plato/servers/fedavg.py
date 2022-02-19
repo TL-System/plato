@@ -22,11 +22,6 @@ class Server(base.Server):
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__()
 
-        if hasattr(Config().trainer, 'use_wandb'):
-            import wandb
-
-            wandb.init(project="plato", reinit=True)
-
         self.model = model
         self.algorithm = algorithm
         self.trainer = trainer
@@ -182,9 +177,6 @@ class Server(base.Server):
         else:
             logging.info('[%s] Global model accuracy: %.2f%%\n', self,
                          100 * self.accuracy)
-
-        if hasattr(Config().trainer, 'use_wandb'):
-            wandb.log({"accuracy": self.accuracy})
 
         await self.wrap_up_processing_reports()
 

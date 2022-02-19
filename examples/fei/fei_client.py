@@ -1,45 +1,43 @@
 """
-A federated learning server using Active Federated Learning, where in each round
-clients are selected not uniformly at random, but with a probability conditioned
-on the current model, as well as the data on the client, to maximize efficiency.
-
-Reference:
-
-Goetz et al., "Active Federated Learning", 2019.
-
-https://arxiv.org/pdf/1909.12641.pdf
+A federated learning client for FEI.
 """
 import logging
 import math
-import time
 from dataclasses import dataclass
-
 from plato.clients import simple
 from plato.config import Config
 
 
 @dataclass
 class Report(simple.Report):
-    """A client report containing the valuation, to be sent to the AFL federated learning server."""
+    """A client report containing the valuation, to be sent to the FEI federated learning server."""
     valuation: float
 
 
 class Client(simple.Client):
-    """A federated learning client for AFL."""
-
+    """ A federated learning client for FEI. """
     async def train(self):
-        logging.info("Training on AFL client #%d", self.client_id)
+        """Information of training loss will be reported after training the model."""
+
+        logging.info("Training on FEI client #%d", self.client_id)
 
         report, weights = await super().train()
 
         # Get the valuation indicating the likely utility of training on this client
         loss = self.get_loss()
         valuation = self.calc_valuation(report.num_samples, loss)
-        comm_time = time.time()
 
         return Report(report.num_samples, report.accuracy,
-                      report.training_time, comm_time, report.update_response,
-                      valuation), weights
+                      report.training_time, report.comm_time,
+                      report.update_response, valuation), weights
+
+    def process_server_response(self, server_response):
+        """Additional client-specific processing on the server response."""
+        # Reset workload capacity at the initial step (for the new episode)
+        if server_response['current_round'] == 1:
+            # Reset dataset
+            self.datasource = None
+            self.load_data()
 
     def get_loss(self):
         """ Retrieve the loss value from the training process. """
