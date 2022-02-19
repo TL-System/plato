@@ -25,12 +25,10 @@ else:
     from plato.trainers import (
         basic,
         pascal_voc,
-        qoenflx
     )
     registered_trainers = OrderedDict([
         ('basic', basic.Trainer),
         ('pascal_voc', pascal_voc.Trainer),
-        ('qoenflx', qoenflx.Trainer)
     ])
 
 
@@ -48,6 +46,6 @@ def get(model=None):
     elif trainer_name in registered_trainers:
         registered_trainer = registered_trainers[trainer_name](model)
     else:
-        raise ValueError('No such trainer: {}'.format(trainer_name))
+        raise ValueError(f'No such trainer: {trainer_name}')
 
     return registered_trainer

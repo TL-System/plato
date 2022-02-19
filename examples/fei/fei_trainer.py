@@ -7,6 +7,7 @@ import os
 import numpy as np
 import torch
 import torch.nn as nn
+
 from plato.config import Config
 from plato.trainers import basic
 from plato.utils import optimizers
@@ -14,6 +15,7 @@ from plato.utils import optimizers
 
 class Trainer(basic.Trainer):
     """ A federated learning trainer for FEI. """
+
     def train_model(self, config, trainset, sampler, cut_layer=None):
         """ A custom trainer reporting training loss. """
         log_interval = 10
@@ -119,7 +121,7 @@ class Trainer(basic.Trainer):
         else:
             loss_path = f'{model_dir}/{model_name}.loss'
 
-        with open(loss_path, 'w') as file:
+        with open(loss_path, 'w', encoding='utf-8') as file:
             file.write(str(loss))
 
     @staticmethod
@@ -133,7 +135,7 @@ class Trainer(basic.Trainer):
         else:
             loss_path = f'{model_dir}/{model_name}.loss'
 
-        with open(loss_path, 'r') as file:
+        with open(loss_path, 'r', encoding='utf-8') as file:
             loss = float(file.read())
 
         return loss

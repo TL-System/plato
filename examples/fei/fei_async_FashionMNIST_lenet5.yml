@@ -7,9 +7,14 @@ clients:
 
     # Should the clients compute test accuracy locally?
     do_test: false
-    
-    # Whether simulate clients or not
+
+    # Whether clients should be simulated with only a sufficient number of processes
     simulation: true
+
+    # Whether client-server communication should be simulated with files
+    comm_simulation: true
+
+    # Whether client heterogeneity should be simulated
     speed_simulation: true
 
     # The simulation distribution
@@ -20,14 +25,18 @@ clients:
 server:
     address: 127.0.0.1
     port: 8000
-    synchronous: false
-    simulate_wall_time: false
 
-    # Parameter for FedAsync
-    staleness_bound: 1000 # FedAsync doesn't have any staleness bound
+    # Should we operate in sychronous mode?
+    synchronous: false
+
+    # Should we simulate the wall-clock time on the server? Useful if max_concurrency is specified
+    simulate_wall_time: true
+
+    # What is the minimum number of clients that need to report before aggregation begins?
     minimum_clients_aggregated: 6
-    mixing_hyperparameter: 0.9
-    adaptive_mixing: true
+
+    # What is the staleness bound, beyond which the server should wait for stale clients?
+    staleness_bound: 1000
 
 data:
     # The training and testing dataset
@@ -87,11 +96,11 @@ algorithm:
     min_action: -1
     max_episode: 2000
     alpha: 5 # controls the decreasing rate of the mapping function
-    beta: 20  # coefficient used in reward function
-    theta: 0.005  # threshold for stdev(pre_acc)
-    base: 1000  # for exponential function in state normalization
+    beta: 20 # coefficient used in reward function
+    theta: 0.005 # threshold for stdev(pre_acc)
+    base: 1000 # for exponential function in state normalization
     log_interval: 10
-    mode: train  # test
+    mode: train # test
     pretrained: false
     pretrained_iter: 0
     test_step: 20
@@ -101,8 +110,9 @@ algorithm:
     # reward discounted factor
     gamma: 0.99
     tau: 0.005
-    learning_rate: 0.0003
-     # Noise added to target policy during critic update
+    learning_rate:
+        0.0003
+        # Noise added to target policy during critic update
     policy_noise: 0.25
     # Range to clip target policy noise
     noise_clip: 0.5
@@ -125,5 +135,3 @@ results:
 
     # Plot results (x_axis-y_axis)
     plot: round-accuracy, elapsed_time-accuracy
-
-
