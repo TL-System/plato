@@ -19,24 +19,7 @@ server:
     address: 127.0.0.1
     port: 8000
 
-data:
-    # The training and testing dataset
-    datasource: MNIST
-
-    # Where the dataset is located
-    data_path: ./data
-
-    # Number of samples in each partition
-    partition_size: 600
-
-    # IID or non-IID?
-    sampler: iid
-
-    # Whether to apply differential privacy
-    # differential_privacy: true
-    # dp_epsilon: 1
-    # dp_delta: 0.00001
-    # dp_max_grad_norm: 2
+data: !include mnist.yml
 
 trainer:
     # The type of the trainer

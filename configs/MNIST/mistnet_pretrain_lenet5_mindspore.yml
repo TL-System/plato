@@ -15,18 +15,7 @@ server:
     address: 127.0.0.1
     port: 8000
 
-data:
-    # The training and testing dataset
-    datasource: MNIST
-
-    # Where the dataset is located
-    data_path: ./data
-
-    # Number of samples in each partition
-    partition_size: 60000
-
-    # IID or non-IID?
-    sampler: iid
+data: !include mnist.yml
 
 trainer:
     # Should MindSpore be used instead of PyTorch?
