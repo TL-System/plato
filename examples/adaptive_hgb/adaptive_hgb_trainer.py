@@ -10,7 +10,6 @@ import multiprocessing as mp
 import numpy as np
 import torch
 
-import wandb
 from plato.config import Config
 from plato.utils import optimizers
 from plato.trainers import basic
@@ -302,10 +301,6 @@ class Trainer(basic.Trainer):
                                    len(train_loader),
                                    weighted_losses.data.item()))
                     else:
-                        if hasattr(config, 'use_wandb'):
-                            wandb.log(
-                                {"batch loss": weighted_losses.data.item()})
-
                         logging.info(
                             "[Client #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}".
                             format(self.client_id, epoch, epochs, batch_id,
@@ -353,14 +348,6 @@ class Trainer(basic.Trainer):
         model_type = config['model_name']
         filename = f"{model_type}_{self.client_id}_{config['run_id']}.pth"
         self.save_model(filename)
-
-        if 'use_wandb' in config:
-
-            run = wandb.init(project="plato",
-                             group=str(config['run_id']),
-                             reinit=True)
-        if 'use_wandb' in config:
-            run.finish()
 
     def train(self, trainset, evalset, sampler, blending_weights) -> bool:
         """The main training loop in a federated learning workload.

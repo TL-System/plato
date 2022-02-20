@@ -31,6 +31,12 @@ def get_optimizer(model) -> optim.Optimizer:
                                 lr=Config().trainer.learning_rate,
                                 momentum=Config().trainer.momentum,
                                 weight_decay=Config().trainer.weight_decay)
+    elif Config().trainer.optimizer == 'Adadelta':
+        return optim.Adadelta(model.parameters(),
+                                lr=Config().trainer.learning_rate,
+                                rho=Config().trainer.rho,
+                                eps=Config().trainer.eps,
+                                weight_decay=Config().trainer.weight_decay)
 
     raise ValueError('No such optimizer: {}'.format(
         Config().trainer.optimizer))

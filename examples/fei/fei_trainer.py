@@ -1,13 +1,5 @@
 """
-A federated learning server using Active Federated Learning, where in each round
-clients are selected not uniformly at random, but with a probability conditioned
-on the current model, as well as the data on the client, to maximize efficiency.
-
-Reference:
-
-Goetz et al., "Active Federated Learning", 2019.
-
-https://arxiv.org/pdf/1909.12641.pdf
+A customized trainer for FEI.
 """
 import logging
 import os
@@ -22,9 +14,10 @@ from plato.utils import optimizers
 
 
 class Trainer(basic.Trainer):
+    """ A federated learning trainer for FEI. """
 
     def train_model(self, config, trainset, sampler, cut_layer=None):
-        """A custom trainer reporting training loss. """
+        """ A custom trainer reporting training loss. """
         log_interval = 10
         batch_size = config['batch_size']
 
@@ -128,7 +121,7 @@ class Trainer(basic.Trainer):
         else:
             loss_path = f'{model_dir}/{model_name}.loss'
 
-        with open(loss_path, 'w') as file:
+        with open(loss_path, 'w', encoding='utf-8') as file:
             file.write(str(loss))
 
     @staticmethod
@@ -142,7 +135,7 @@ class Trainer(basic.Trainer):
         else:
             loss_path = f'{model_dir}/{model_name}.loss'
 
-        with open(loss_path, 'r') as file:
+        with open(loss_path, 'r', encoding='utf-8') as file:
             loss = float(file.read())
 
         return loss

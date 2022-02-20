@@ -35,6 +35,7 @@ else:
         alexnet,
         squeezenet,
         shufflenet,
+        hybrid,
         efficientnet,
         regnet,
     )
@@ -50,6 +51,7 @@ else:
         ('alexnet', alexnet.Model),
         ('squeezenet', squeezenet.Model),
         ('shufflenet', shufflenet.Model),
+        ('hybrid', hybrid.Model),
         ('efficientnet', efficientnet.Model),
         ('regnet', regnet.Model),
     ])
