@@ -242,8 +242,10 @@ class Server:
 
         app = web.Application()
         self.sio.attach(app)
-        web.run_app(app, host=Config().server.address, port=port)
-        # ,loop=asyncio.get_event_loop()
+        web.run_app(app,
+                    host=Config().server.address,
+                    port=port,
+                    loop=asyncio.get_event_loop())
 
     async def register_client(self, sid, client_id):
         """ Adding a newly arrived client to the list of clients. """
