@@ -9,17 +9,17 @@ Welcome to *Plato*, a new software framework to facilitate scalable federated le
 It is recommended that [Miniconda](https://docs.conda.io/en/latest/miniconda.html) is used to manage Python packages. Before using *Plato*, first install [Miniconda](https://docs.conda.io/en/latest/miniconda.html), update your `conda` environment, and then create a new `conda` environment with Python 3.9 using the command:
 
 ```shell
-$ conda update conda -y
-$ conda create -n federated python=3.9
-$ conda activate federated
+conda update conda -y
+conda create -n federated python=3.9
+conda activate plato
 ```
 
-where `federated` is the preferred name of your new environment.
+where `plato` is the preferred name of your new environment.
 
 The next step is to install the required Python packages. PyTorch should be installed following the advice of its [getting started website](https://pytorch.org/get-started/locally/). The typical command in Linux with CUDA GPU support, for example, would be:
 
 ```shell
-$ conda install pytorch torchvision cudatoolkit=11.1 -c pytorch -c nvidia
+conda install pytorch torchvision cudatoolkit=11.3 -c pytorch
 ```
 
 The CUDA version, used in the command above, can be obtained on Ubuntu Linux systems by using the command:
@@ -31,7 +31,7 @@ nvidia-smi
 In macOS (without GPU support), the typical command would be:
 
 ```shell
-$ conda install pytorch torchvision -c pytorch
+conda install pytorch torchvision -c pytorch
 ```
 
 ### Installing Plato as a pip package
@@ -39,7 +39,7 @@ $ conda install pytorch torchvision -c pytorch
 To use *Plato* as a Python framework, you only need to install it as a pip package:
 
 ```shell
-$ pip install plato-learn
+pip install plato-learn
 ```
 
 After *Plato* is installed, you can try to run any of the examples in `examples/`.
@@ -51,14 +51,20 @@ If you wish to modify the source code in *Plato* (rather than just using it as a
 We will need to install several packages using `pip` as well:
 
 ```shell
-$ pip install -r requirements.txt --upgrade
+pip install -r requirements.txt --upgrade
 ```
 
 Finally, we will install the current GitHub version of *Plato* as a local pip package:
 
 ```shell
-$ pip install .
-$ pip install yapf mypy pylint
+pip install .
+pip install yapf mypy pylint
+```
+
+**Tip:** After the initial installation of the required Python packages, use the following command to upgrade all the installed packages at any time:
+
+```shell
+python upgrade_packages.py
 ```
 
 If you use Visual Studio Code, it is possible to use `yapf` to reformat the code every time it is saved by adding the following settings to .`.vscode/settings.json`:
@@ -71,20 +77,22 @@ If you use Visual Studio Code, it is possible to use `yapf` to reformat the code
 In general, the following is the recommended starting point for `.vscode/settings.json`:
 
 ```
-"python.linting.enabled": true,
-"python.linting.pylintEnabled": true,
-"python.formatting.provider": "yapf", 
-"editor.formatOnSave": true,
-"python.linting.pylintArgs": [
-    "--init-hook",
-    "import sys; sys.path.append('/absolute/path/to/project/home/directory')"
-],
-"workbench.editor.enablePreview": false
+{
+	"python.linting.enabled": true,
+	"python.linting.pylintEnabled": true,
+	"python.formatting.provider": "yapf", 
+	"editor.formatOnSave": true,
+	"python.linting.pylintArgs": [
+	    "--init-hook",
+	    "import sys; sys.path.append('/absolute/path/to/project/home/directory')"
+	],
+	"workbench.editor.enablePreview": false
+}
 ```
 
 It goes without saying that `/absolute/path/to/project/home/directory` should be replaced with the actual path in the specific development environment.
 
-**Tip:** When working in Visual Studio Code as the development environment, one of the project developer's colour theme favourites is called `Bluloco`, both of its light and dark variants are excellent and very thoughtfully designed. The `Pylance` extension is also strongly recommended, which represents Microsoft's modern language server for Python.
+**Tip:** When working in Visual Studio Code as your development environment, two of our colour theme favourites are called `Bluloco` (both of its light and dark variants) and `City Lights` (dark). They are both excellent and very thoughtfully designed. The `Python` extension is also required, which represents Microsoft's modern language server for Python.
 
 ### Installing YOLOv5 as a Python package
 
@@ -102,11 +110,10 @@ pip install .
 To start a federated learning training workload, run [`run`](run) from the repository's root directory. For example:
 
 ```shell
-./run --config=configs/MNIST/fedavg_lenet5.yml
+./run -c configs/MNIST/fedavg_lenet5.yml
 ```
 
-* `--config` (`-c`): the path to the configuration file to be used. The default is `config.yml` in the project's home directory.
-* `--log` (`-l`): the level of logging information to be written to the console. Possible values are `critical`, `error`, `warn`, `info`, and `debug`, and the default is `info`.
+* `-c`: the path to the configuration file to be used. The default is `config.yml` in the project's home directory.
 
 *Plato* uses the YAML format for its configuration files to manage the runtime configuration parameters. Example configuration files have been provided in the `configs` directory.
 
@@ -118,13 +125,13 @@ Plato is designed to support multiple deep learning frameworks, including PyTorc
 
 ```shell
 pip install tensorflow tensorflow-datasets
-./run --config=configs/MNIST/fedavg_lenet5_tensorflow.yml
+./run -c configs/MNIST/fedavg_lenet5_tensorflow.yml
 ```
 
 **MindSpore.** Plato currently supports the latest MindSpore release, 1.5.0. We have provided a `Dockerfile_MindSpore` file for building a Docker container that supports MindSpore 1.5.0. To use trainers and servers based on MindSpore, assign `true` to `use_mindspore` in the `trainer` section of the configuration file. If GPU is not available when MindSpore is used, assign `true` to `cpuonly` in the `trainer` section as well. These variables are unassigned by default, and *Plato* would use PyTorch as its default framework. As examples of using MindSpore as its underlying deep learning framework, two configuration files have been provided: `configs/MNIST/fedavg_lenet5_mindspore.yml` and `configs/MNIST/mistnet_lenet5_mindspore.yml`. For example:
 
 ```shell
-./run --config=configs/MNIST/fedavg_lenet5_mindspore.yml
+./run -c configs/MNIST/fedavg_lenet5_mindspore.yml
 ```
 
 ### Running Plato in a Docker container
@@ -210,10 +217,10 @@ If the configuration file contains a `results` section, the selected performance
 As `.csv` files, these results can be used however one wishes; an example Python program, called `plot.py`, plots the necessary figures and saves them as PDF files. To run this program:
 
 ```shell
-python plot.py --config=config.yml
+python plot.py -c config.yml
 ```
 
-* `--config` (`-c`): the path to the configuration file to be used. The default is `config.yml` in the project's home directory.
+* -c`: the path to the configuration file to be used. The default is `config.yml` in the project's home directory.
 
 ### Running unit tests
 
@@ -234,13 +241,13 @@ The Plato federated learning server is designed to use Socket.IO over HTTP and H
 Remove the `conda` environment used to run *Plato* first, and then remove the directory containing *Plato*'s git repository.
 
 ```shell
-conda-env remove -n federated
+conda-env remove -n plato
 rm -rf plato/
 ```
 
-where `federated` (or `mindspore`) is the name of the `conda` environment that *Plato* runs in.
+where `plato` (or `tensorflow` or `mindspore`) is the name of the `conda` environment that *Plato* runs in.
 
-For more specific documentation on how Plato can be run on GPU cluster environments such as Google Colaboratory or Compute Canada, refer to `docs/Running.md`.
+For more specific documentation on how Plato can be run on GPU runtime environments such as Google Colaboratory or Compute Canada, refer to `docs/Running.md`.
 
 ## Technical Support
 
