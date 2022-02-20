@@ -110,8 +110,6 @@ To start a federated learning training workload, run [`run`](run) from the repos
 
 *Plato* uses the YAML format for its configuration files to manage the runtime configuration parameters. Example configuration files have been provided in the `configs` directory.
 
-*Plato* can opt to use `wandb` to produce and collect logs in the cloud. If this is needed, add `use_wandb: true` to the `trainer` section in your configuration file, and install the `wandb` pip package in your `conda` environment.
-
 ### Running Plato with MindSpore or TensorFlow
 
 Plato is designed to support multiple deep learning frameworks, including PyTorch, TensorFlow, and MindSpore. 

@@ -23,14 +23,6 @@ class Trainer(basic.Trainer):
 
     def train_process(self, config, trainset, sampler, cut_layer=None):
         """The main training loop in a federated learning workload."""
-
-        if 'use_wandb' in config:
-            import wandb
-
-            run = wandb.init(project="plato",
-                             group=str(config['run_id']),
-                             reinit=True)
-
         try:
             custom_train = getattr(self, "train_model", None)
 
@@ -135,9 +127,6 @@ class Trainer(basic.Trainer):
             filename = f"{model_type}_{self.client_id}_{config['run_id']}.pth"
             self.save_model(filename)
 
-        if 'use_wandb' in config:
-            run.finish()
-
     def training_per_stage(self, stage_id, optimizer, lr_schedule,
                            train_loader, cut_layer, training_model,
                            loss_criterion, log_interval, config, epoch,
@@ -179,9 +168,6 @@ class Trainer(basic.Trainer):
                                     len(train_loader), stage_id,
                                     loss.data.item()))
                     else:
-                        if hasattr(config, 'use_wandb'):
-                            wandb.log({"batch loss": loss.data.item()})
-
                         logging.info(
                             "[Client #{}] Epoch: [{}/{}][{}/{}]\tLoss of stage {}: {:.6f}"
                             .format(self.client_id, epoch, epochs, batch_id,
