@@ -31,7 +31,7 @@ server:
         - inbound_feature_tensors
         # - feature_dequantize
 
-data: !include mnist.yml
+data: !include mnist_iid.yml
 
 trainer:
     # The type of the trainer

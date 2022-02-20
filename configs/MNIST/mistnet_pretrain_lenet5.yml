@@ -15,7 +15,7 @@ server:
     address: 127.0.0.1
     port: 8000
 
-data: !include mnist.yml
+data: !include mnist_iid.yml
 
 trainer:
     # The type of the trainer
