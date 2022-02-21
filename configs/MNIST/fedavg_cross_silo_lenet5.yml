@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 100
+    total_clients: 3
 
     # The number of clients selected in each round
-    per_round: 20
+    per_round: 3
 
     # Should the clients compute test accuracy locally?
     do_test: true
@@ -19,14 +19,25 @@ server:
     address: 127.0.0.1
     port: 8000
 
-data: !include mnist_iid.yml
+data:
+    # The training and testing dataset
+    datasource: MNIST
+
+    # Where the dataset is located
+    data_path: ./data
+
+    # Number of samples in each partition
+    partition_size: 600
+
+    # IID or non-IID?
+    sampler: iid
 
 trainer:
     # The type of the trainer
     type: basic
 
     # The maximum number of training rounds
-    rounds: 50
+    rounds: 3
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -38,7 +49,7 @@ trainer:
     target_accuracy: 0.95
 
     # Number of epoches for local training in each communication round
-    epochs: 4
+    epochs: 2
     batch_size: 10
     optimizer: SGD
     learning_rate: 0.01
