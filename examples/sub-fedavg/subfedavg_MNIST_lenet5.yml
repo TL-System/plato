@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 1
+    total_clients: 2
 
     # The number of clients selected in each round
-    per_round: 1
+    per_round: 2
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -22,11 +22,9 @@ clients:
         - model_compress
 
 server:
-    type: fedavg_cross_silo
     address: 127.0.0.1
     port: 8000
     do_test: true
-    edge_do_test: true
 
     inbound_processors:
         - model_decompress
@@ -37,7 +35,6 @@ server:
 data:
     # The training and testing dataset
     datasource: MNIST
-    #datasource: CIFAR10
 
     # Where the dataset is located
     data_path: ../../data
@@ -48,7 +45,6 @@ data:
     # IID or non-IID?
     sampler: iid
 
-    edge_testset_sampler: iid
     testset_size: 1000
 
     # The random seed for sampling data
@@ -80,24 +76,13 @@ trainer:
 
     # The machine learning model
     model_name: lenet5
-    #model_name: resnet_18
 
 algorithm:
     # Aggregation algorithm
     type: fedavg
 
-    # Cross-silo training
-    cross_silo: true
-
-    # The total number of silos (edge servers)
-    total_silos: 1
-
-    # The number of local aggregation rounds on edge servers before sending
-    # aggregated weights to the central server
-    local_rounds: 2
-
 results:
     # Write the following parameter(s) into a CSV
-    types: round, accuracy, average_accuracy, elapsed_time, comm_time, round_time, comm_overhead
+    types: round, accuracy, elapsed_time, comm_time, round_time
 
     result_dir: ./results/test

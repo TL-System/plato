@@ -1,4 +1,5 @@
 """
+Reuse code from the authors' sourcecode
 https://github.com/MMorafah/Sub-FedAvg/blob/main/src/pruning/unstructured.py
 """
 
@@ -88,11 +89,11 @@ def real_prune(model, mask):
     return model.state_dict()
 
 
-def print_pruning(model):
+def compute_pruned_amount(model):
     '''
-    This function prints the pruning percentage and status of a given model
+    This function computes the pruned percentage and status of a given model
     :param model: a pytorch model
-    :return pruning percentage, number of remaining weights:
+    :return pruned percentage, number of remaining weights:
     '''
     nonzero = 0
     total = 0
@@ -116,7 +117,6 @@ def dist_masks(first_mask, last_mask):
     '''
     temp_dist = []
     for step, _ in enumerate(first_mask):
-        #1 - float(m1[step].reshape([-1]) == m2[step].reshape([-1])) / len(m2[step].reshape([-1]))
         temp_dist.append(
             distance.hamming(first_mask[step].reshape([-1]),
                              last_mask[step].reshape([-1])))
