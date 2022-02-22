@@ -18,3 +18,4 @@ The git repository includes a number of examples that showcased how third-party 
 |[FedSarah](https://arxiv.org/pdf/1703.00102.pdf)                             | Change directory to `examples/fedsarah` and run `python fedsarah.py -c <configuration file>`. | Yes |
 |[FedProx](https://arxiv.org/pdf/1812.06127.pdf)                              | Set `optimizer` of `trainer` to `FedProx` in your configuration file. | Yes |
 |[SCAFFOLD](https://arxiv.org/pdf/1910.06378.pdf)                             | Change directory to `examples/scaffold` and run `python scaffold.py -c <configuration file>`. | Not yet |
+|[FedMatch](https://openreview.net/forum?id=ce6CFXBh30h)| Change directory to `examples/fedmatch` and run 'python fedmatch.py'|
