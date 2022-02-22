@@ -38,8 +38,8 @@ class Trainer(basic.Trainer):
         ).clients.accuracy_threshold if hasattr(Config().clients,
                                                 "accuracy_threshold") else 0.5
 
-    def train_loop(self, config, trainset, sampler, cut_layer):
-        """ The default training loop when a custom training loop is not supplied. """
+    def train_model(self, config, trainset, sampler, cut_layer):
+        """ The custom training loop for Sub-FedAvg(Un). """
         batch_size = config['batch_size']
         log_interval = 10
 
