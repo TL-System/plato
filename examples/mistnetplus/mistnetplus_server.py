@@ -26,7 +26,6 @@ class Report:
 
 
 class MistnetplusServer(fedavg.Server):
-
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
 
@@ -71,7 +70,7 @@ class MistnetplusServer(fedavg.Server):
                          os.getpid(), client_id)
 
             sid = self.clients[client_id]['sid']
-
+            # payload = await self.customize_server_payload(pickle.dumps(payload))
             # Sending the server payload to the clients
             payload = self.load_gradients()
             await self.send(sid, payload, client_id)
