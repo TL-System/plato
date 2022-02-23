@@ -18,7 +18,6 @@ from plato.utils import csv_processor
 
 class Server(base.Server):
     """Federated learning server using federated averaging."""
-
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__()
 
