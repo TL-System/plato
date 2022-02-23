@@ -3,15 +3,29 @@ Reading runtime parameters from a standard configuration file (which is easier
 to work on than JSON).
 """
 import argparse
+import json
 import logging
 import os
-import random
 import sqlite3
 from collections import OrderedDict, namedtuple
+from typing import Any, IO
 
 import numpy as np
 import yaml
-from yamlinclude import YamlIncludeConstructor
+
+
+class Loader(yaml.SafeLoader):
+    """ YAML Loader with `!include` constructor. """
+
+    def __init__(self, stream: IO) -> None:
+        """Initialise Loader."""
+
+        try:
+            self.root_path = os.path.split(stream.name)[0]
+        except AttributeError:
+            self.root_path = os.path.curdir
+
+        super().__init__(stream)
 
 
 class Config:
@@ -21,6 +35,22 @@ class Config:
     """
 
     _instance = None
+
+    @staticmethod
+    def construct_include(loader: Loader, node: yaml.Node) -> Any:
+        """Include file referenced at node."""
+
+        filename = os.path.abspath(
+            os.path.join(loader.root_path, loader.construct_scalar(node)))
+        extension = os.path.splitext(filename)[1].lstrip('.')
+
+        with open(filename, 'r', encoding='utf-8') as config_file:
+            if extension in ('yaml', 'yml'):
+                return yaml.load(config_file, Loader)
+            elif extension in ('json', ):
+                return json.load(config_file)
+            else:
+                return ''.join(config_file.readlines())
 
     def __new__(cls):
         if cls._instance is None:
@@ -85,12 +115,11 @@ class Config:
             else:
                 filename = args.config
 
-            YamlIncludeConstructor.add_to_loader_class(
-                loader_class=yaml.SafeLoader, base_dir='./configs')
+            yaml.add_constructor('!include', Config.construct_include, Loader)
 
             if os.path.isfile(filename):
-                with open(filename, 'r', encoding="utf8") as config_file:
-                    config = yaml.load(config_file, Loader=yaml.SafeLoader)
+                with open(filename, 'r', encoding="utf-8") as config_file:
+                    config = yaml.load(config_file, Loader)
             else:
                 # if the configuration file does not exist, raise an error
                 raise ValueError("A configuration file must be supplied.")
@@ -246,6 +275,7 @@ class Config:
             pass
         elif hasattr(Config().trainer, 'use_tensorflow'):
             import tensorflow as tf
+
             gpus = tf.config.experimental.list_physical_devices('GPU')
             if len(gpus) > 0:
                 device = 'GPU'
@@ -273,15 +303,3 @@ class Config:
         ).trainer.parallelized and torch.cuda.is_available(
         ) and torch.distributed.is_available(
         ) and torch.cuda.device_count() > 1
-
-    @staticmethod
-    def store() -> None:
-        """ Saving the current run-time configuration to a file. """
-        data = {}
-        data['clients'] = Config.clients._asdict()
-        data['server'] = Config.server._asdict()
-        data['data'] = Config.data._asdict()
-        data['trainer'] = Config.trainer._asdict()
-        data['algorithm'] = Config.algorithm._asdict()
-        with open(Config.args.config, "w", encoding="utf8") as out:
-            yaml.dump(data, out, default_flow_style=False)
