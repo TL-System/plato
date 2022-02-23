@@ -43,6 +43,7 @@ class Trainer(base.Trainer):
             self.model = torch.nn.DataParallel(model)
         else:
             self.model = model
+
         if hasattr(Config().trainer, 'differential_privacy') and Config(
         ).trainer.differential_privacy:
             logging.info("Using differential privacy during training.")
