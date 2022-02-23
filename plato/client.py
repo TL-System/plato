@@ -35,10 +35,9 @@ def run(client_id,
             # A customized edge server
             if trainer is not None:
                 server = edge_server(trainer=trainer())
-                client = edge_client(server, trainer=trainer())
             else:
                 server = edge_server()
-                client = edge_client(server)
+            client = edge_client(server)
 
         server.configure()
         client.configure()
