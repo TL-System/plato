@@ -17,6 +17,9 @@ server:
     port: 8000
     do_test: true
 
+    checkpoint_dir: ./results/test/checkpoint
+    model_dir: ./results/test/model
+
 data:
     # The training and testing dataset
     datasource: MNIST
@@ -75,4 +78,5 @@ algorithm:
 
 results:
     # Write the following parameter(s) into a CSV
-    types: accuracy, personalization_accuracy, training_time, round_time
+    types: round, accuracy, personalization_accuracy, elapsed_time, comm_time, round_time
+    result_dir: ./results/test
