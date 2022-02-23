@@ -14,6 +14,8 @@ clients:
 server:
     address: 127.0.0.1
     port: 8000
+    checkpoint_dir: ./results/test/checkpoint
+    model_dir: ./results/test/model
 
 data:
     # The training and testing dataset
@@ -23,17 +25,18 @@ data:
     data_path: ../../data
 
     # Number of samples in each partition
-    partition_size: 1000
+    partition_size: 200
 
     # IID or non-IID?
     sampler: iid
+    #testset_sampler: iid
 
     # The random seed for sampling data
     random_seed: 1
 
 trainer:
     # The maximum number of training rounds
-    rounds: 1000
+    rounds: 2
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -45,7 +48,7 @@ trainer:
     target_accuracy: 0.98
 
     # Number of epoches for local training in each communication round
-    epochs: 4
+    epochs: 1
     batch_size: 10
     optimizer: SGD
     learning_rate: 0.01
@@ -63,4 +66,5 @@ algorithm:
 
 results:
     # Write the following parameter(s) into a CSV
-    types: accuracy, personalization_accuracy, training_time, round_time
+    types: round, accuracy, personalization_accuracy, elapsed_time, comm_time, round_time
+    result_dir: ./results/test
