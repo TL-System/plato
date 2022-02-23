@@ -2,18 +2,17 @@
 Base class for trainers.
 """
 
+from abc import ABC, abstractmethod
 import os
-import numpy as np
 import sqlite3
 import time
-from abc import ABC, abstractmethod
+import numpy as np
 
 from plato.config import Config
 
 
 class Trainer(ABC):
     """Base class for all the trainers."""
-
     def __init__(self):
         self.device = Config().device()
         self.client_id = 0

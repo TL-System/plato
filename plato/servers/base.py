@@ -3,7 +3,6 @@ The base class for federated learning servers.
 """
 
 import asyncio
-import copy
 import heapq
 import logging
 import multiprocessing as mp
@@ -24,7 +23,6 @@ from plato.utils import s3
 
 class ServerEvents(socketio.AsyncNamespace):
     """ A custom namespace for socketio.AsyncServer. """
-
     def __init__(self, namespace, plato_server):
         super().__init__(namespace)
         self.plato_server = plato_server
@@ -69,7 +67,6 @@ class ServerEvents(socketio.AsyncNamespace):
 
 class Server:
     """ The base class for federated learning servers. """
-
     def __init__(self):
         self.sio = None
         self.client = None

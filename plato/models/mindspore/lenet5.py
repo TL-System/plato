@@ -19,6 +19,7 @@ class Model(nn.Cell):
     Arguments:
         num_classes (int): The number of classes.
     """
+
     def __init__(self, num_classes=10, cut_layer=None):
         super().__init__()
         self.cut_layer = cut_layer
