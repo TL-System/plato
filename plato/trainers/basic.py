@@ -21,7 +21,6 @@ from plato.utils import optimizers
 
 class Trainer(base.Trainer):
     """A basic federated learning trainer, used by both the client and the server."""
-
     def __init__(self, model=None):
         """Initializing the trainer with the provided model.
 
@@ -133,7 +132,6 @@ class Trainer(base.Trainer):
         sampler: the sampler that extracts a partition for this client.
         cut_layer (optional): The layer which training should start from.
         """
-        tic = time.perf_counter()
 
         try:
             custom_train = getattr(self, "train_model", None)
