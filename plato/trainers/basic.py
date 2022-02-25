@@ -21,6 +21,7 @@ from plato.utils import optimizers
 
 class Trainer(base.Trainer):
     """A basic federated learning trainer, used by both the client and the server."""
+
     def __init__(self, model=None):
         """Initializing the trainer with the provided model.
 
@@ -110,8 +111,8 @@ class Trainer(base.Trainer):
 
     def simulate_sleep_time(self):
         """Simulate client's speed by putting it to sleep."""
-        if not (hasattr(Config().clients, 'sleep_simulation')
-                and Config().clients.sleep_simulation):
+        if hasattr(Config().clients,
+                   'sleep_simulation') and Config().clients.sleep_simulation:
             sleep_seconds = Config().client_sleep_times[self.client_id - 1]
 
             # Put this client to sleep
