@@ -19,6 +19,7 @@ clients:
     # FedProx hyperparameters
     proximal_term_penalty_constant: 1
     # FedProx parameters for experiment
+    straggler_simulation: true
     straggler_percentage: 90
 
 server:
