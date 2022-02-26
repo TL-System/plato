@@ -15,22 +15,24 @@ from plato.config import Config
 from plato.trainers import basic
 
 
-class FedProxLocalObjective():
+def flatten_weights_from_model(model):
+    """ Return the weights of the given model as a 1-D tensor """
+    weights = torch.tensor([], requires_grad=False)
+    for param in model.parameters():
+        weights = torch.cat((weights, torch.flatten(param)))
+    return weights
+
+
+class FedProxLocalObjective:
     """ Representing the local objective of FedProx clients. """
 
     def __init__(self, model):
         self.model = model
-        self.init_global_weights = torch.tensor([], requires_grad=False)
-        for param in model.parameters():
-            self.init_global_weights = torch.cat(
-                (self.init_global_weights, torch.flatten(param)))
+        self.init_global_weights = flatten_weights_from_model(model)
 
     def compute_objective(self, outputs, labels):
         """ Compute the objective the FedProx client wishes to minimize. """
-        cur_weights = torch.tensor([], requires_grad=False)
-        for param in self.model.parameters():
-            cur_weights = torch.cat((cur_weights, torch.flatten(param)))
-
+        cur_weights = flatten_weights_from_model(self.model)
         mu = Config().clients.proximal_term_penalty_constant
         prox_term = mu / 2 * torch.linalg.norm(
             cur_weights - self.init_global_weights, ord=2)
