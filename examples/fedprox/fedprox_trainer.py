@@ -9,6 +9,7 @@ Learning and Systems, 2, 429-450.
 https://proceedings.mlsys.org/paper/2020/file/38af86134b65d0f10fe33d30dd76442e-Paper.pdf
 """
 import torch
+import numpy as np
 
 from plato.config import Config
 from plato.trainers import basic
@@ -41,6 +42,21 @@ class FedProxLocalObjective():
 
 class Trainer(basic.Trainer):
     """ The federated learning trainer for the FedProx client. """
+
+    def train_process(self, config, trainset, sampler, cut_layer=None):
+        """The main training loop in FedProx framework. """
+        np.random.seed(self.client_id)
+        # Determine whether this selected client is a straggler
+        strag_prop = Config().clients.straggler_percentage / 100
+        is_straggler = np.random.choice([True, False],
+                                        p=[strag_prop, 1 - strag_prop])
+        if is_straggler:
+            # Choose the epoch uniformly as mentioned in Section 5.2 of the paper
+            global_epochs = Config().trainer.epochs
+            config['epochs'] = np.random.choice(np.arange(1, global_epochs))
+
+        super(Trainer, self).train_process(config, trainset, sampler,
+                                           cut_layer)
 
     def loss_criterion(self, model):
         """ Return the loss criterion for FedProx clients. """

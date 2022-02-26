@@ -3,7 +3,7 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 10
+    total_clients: 1000
 
     # The number of clients selected in each round
     per_round: 10
@@ -13,27 +13,18 @@ clients:
 
     # Whether simulate clients or not
     simulation: true
-    speed_simulation: true
-
-    # The simulation distribution
-    simulation_distribution:
-        distribution: pareto
-        alpha: 1
-    max_sleep_time: 30
-    sleep_simulation: true
-    avg_training_time: 10
 
     random_seed: 1
 
     # FedProx hyperparameters
     proximal_term_penalty_constant: 1
+    # FedProx parameters for experiment
+    straggler_percentage: 90
 
 server:
     address: 127.0.0.1
     port: 8000
     synchronous: true
-
-    staleness_bound: 1000
 
     checkpoint_dir: ./models/fedprox/mnist
     model_dir: ./models/fedprox/mnist
@@ -62,23 +53,23 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 20
+    rounds: 100
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
 
-    # The maximum number of clients running concurrently 
+    # The maximum number of clients running concurrently
     max_concurrency: 10
 
     # The target accuracy
     target_accuracy: 0.98
 
     # Number of epochs for local training in each communication round
-    epochs: 5
+    epochs: 20
     batch_size: 10
     optimizer: SGD
     learning_rate: 0.03
-    momentum: 0.9
+    momentum: 0.0 # learning rate is fixed as in Appendix C.2
     weight_decay: 0.0
 
     # The machine learning model
