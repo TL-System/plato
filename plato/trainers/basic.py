@@ -111,8 +111,8 @@ class Trainer(base.Trainer):
 
     def simulate_sleep_time(self):
         """Simulate client's speed by putting it to sleep."""
-        if hasattr(Config().clients,
-                   'sleep_simulation') and Config().clients.sleep_simulation:
+        if not (hasattr(Config().clients, 'sleep_simulation')
+                and Config().clients.sleep_simulation):
             sleep_seconds = Config().client_sleep_times[self.client_id - 1]
 
             # Put this client to sleep
