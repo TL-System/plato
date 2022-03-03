@@ -6,8 +6,6 @@ as either edge or central servers.
 import asyncio
 import logging
 import os
-import pickle
-import sys
 
 from plato.config import Config
 from plato.utils import csv_processor
@@ -16,7 +14,6 @@ from plato.servers import fedavg_cs
 
 class Server(fedavg_cs.Server):
     """Cross-silo federated learning server using federated averaging."""
-
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
 
@@ -26,7 +23,8 @@ class Server(fedavg_cs.Server):
         self.personalization_test_updates = []
         self.personalization_accuracy = 0
 
-        self.training_time = 0
+        self.round_time = 0
+        self.comm_time = 0
 
         if Config().is_edge_server():
             # An edge client waits for the event that a certain number of clients
@@ -68,39 +66,34 @@ class Server(fedavg_cs.Server):
         self.personalization_accuracy = accuracy / len(
             self.personalization_test_updates)
 
+    def get_record_items_values(self):
+        """Get values will be recorded in result csv file."""
+        return {
+            'global_round': self.current_global_round,
+            'round': self.current_round,
+            'accuracy': self.accuracy * 100,
+            'average_accuracy': self.average_accuracy * 100,
+            'edge_agg_num': Config().algorithm.local_rounds,
+            'local_epoch_num': Config().trainer.epochs,
+            'elapsed_time': self.wall_time - self.initial_wall_time,
+            'comm_time': self.comm_time,
+            'round_time': self.round_time,
+            'personalization_accuracy': self.personalization_accuracy * 100,
+        }
+
     async def wrap_up_processing_reports(self):
         """Wrap up processing the reports with any additional work."""
         if self.do_personalization_test or Config().is_edge_server():
             if hasattr(Config(), 'results'):
                 new_row = []
                 for item in self.recorded_items:
-                    item_value = {
-                        'global_round':
-                        self.current_global_round,
-                        'round':
-                        self.current_round,
-                        'accuracy':
-                        self.accuracy * 100,
-                        'personalization_accuracy':
-                        self.personalization_accuracy * 100,
-                        'edge_agg_num':
-                        Config().algorithm.local_rounds,
-                        'local_epoch_num':
-                        Config().trainer.epochs,
-                        'elapsed_time':
-                        self.wall_time - self.initial_wall_time,
-                        'round_time':
-                        max([
-                            report.training_time
-                            for (report, __, __) in self.updates
-                        ]),
-                    }[item]
+                    item_value = self.get_record_items_values()[item]
                     new_row.append(item_value)
 
                 if Config().is_edge_server():
-                    result_csv_file = f"{Config().params['result_dir']}result_{Config().args.id}.csv"
+                    result_csv_file = f"{Config().params['result_dir']}/edge_{os.getpid()}.csv"
                 else:
-                    result_csv_file = f"{Config().params['result_dir']}result.csv"
+                    result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}.csv"
 
                 csv_processor.write_csv(result_csv_file, new_row)
 
@@ -121,33 +114,40 @@ class Server(fedavg_cs.Server):
                         self.current_round = 0
 
         if not self.do_personalization_test:
-            self.training_time = max(
-                [report.training_time for (report, __, __) in self.updates])
+            self.round_time = max([
+                report.training_time + report.comm_time
+                for (report, __, __) in self.updates
+            ])
+            self.comm_time = max(
+                [report.comm_time for (report, __, __) in self.updates])
 
-    async def client_payload_done(self, sid, client_id, s3_key=None):
-        """ Upon receiving all the payload from a client, eithe via S3 or socket.io. """
-        if s3_key is None:
-            assert self.client_payload[sid] is not None
-
-            payload_size = 0
-            if isinstance(self.client_payload[sid], list):
-                for _data in self.client_payload[sid]:
-                    payload_size += sys.getsizeof(pickle.dumps(_data))
-            else:
-                payload_size = sys.getsizeof(
-                    pickle.dumps(self.client_payload[sid]))
+    async def process_client_info(self, client_id, sid):
+        """ Process the received metadata information from a reporting client. """
+        if self.do_personalization_test:
+            client_info = {
+                'client_id': client_id,
+                'sid': sid,
+                'report': self.reports[sid],
+                'payload': self.client_payload[sid],
+            }
+            await self.process_clients(client_info)
         else:
-            self.client_payload[sid] = self.s3_client.receive_from_s3(s3_key)
-            payload_size = sys.getsizeof(pickle.dumps(
-                self.client_payload[sid]))
+            await super().process_client_info(client_id, sid)
 
-        logging.info("[%s] Received %s MB of payload data from client #%d.",
-                     self, round(payload_size / 1024**2, 2), client_id)
+    async def process_clients(self, client_info):
+        """ Process client reports. """
 
-        if self.client_payload[sid] == 'personalization_accuracy':
-            self.personalization_test_updates.append(self.reports[sid])
+        if self.do_personalization_test:
+            client = client_info
         else:
-            self.updates.append((self.reports[sid], self.client_payload[sid]))
+            client = client_info[1]
+            client_staleness = self.current_round - client['starting_round']
+
+            self.updates.append(
+                (client['report'], client['payload'], client_staleness))
+
+        if client['payload'] == 'personalization_accuracy':
+            self.personalization_test_updates.append(client['report'])
 
         if Config().is_edge_server() and self.current_round <= Config(
         ).algorithm.local_rounds and self.current_round != 0:
@@ -158,8 +158,8 @@ class Server(fedavg_cs.Server):
             if len(self.updates) > 0 and len(self.updates) >= len(
                     self.selected_clients):
                 logging.info(
-                    "[Edge Server #%d] All %d client reports received. Processing.",
-                    self, len(self.updates))
+                    "[%s] All %d client reports received. Processing.", self,
+                    len(self.updates))
                 await super().process_reports()
                 await self.wrap_up()
                 await self.select_clients()

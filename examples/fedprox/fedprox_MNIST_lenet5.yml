@@ -1,70 +1,82 @@
 clients:
+    # Type
+    type: simple
+
     # The total number of clients
-    total_clients: 2
+    total_clients: 1000
 
     # The number of clients selected in each round
-    per_round: 2
+    per_round: 10
 
     # Should the clients compute test accuracy locally?
-    do_test: true
+    do_test: false
 
     # Whether simulate clients or not
     simulation: true
 
+    random_seed: 1
+
+    # FedProx hyperparameters
+    proximal_term_penalty_constant: 1
+    # FedProx parameters for experiment
+    straggler_simulation: true
+    straggler_percentage: 50
+
 server:
     address: 127.0.0.1
     port: 8000
-    checkpoint_dir: ./results/test/checkpoint
-    model_dir: ./results/test/model
+    synchronous: true
+
+    checkpoint_dir: ./models/fedprox/mnist
+    model_dir: ./models/fedprox/mnist
 
 data:
     # The training and testing dataset
     datasource: MNIST
 
     # Where the dataset is located
-    data_path: ../../data
+    data_path: ./data
 
     # Number of samples in each partition
-    partition_size: 200
+    partition_size: 600
 
     # IID or non-IID?
-    sampler: iid
-    #testset_sampler: iid
+    sampler: noniid
+
+    # The concentration parameter for the Dirichlet distribution
+    concentration: 5
 
     # The random seed for sampling data
     random_seed: 1
 
 trainer:
+    # The type of the trainer
+    type: basic
+
     # The maximum number of training rounds
-    rounds: 2
+    rounds: 100
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
 
     # The maximum number of clients running concurrently
-    max_concurrency: 1
+    max_concurrency: 10
 
     # The target accuracy
     target_accuracy: 0.98
 
-    # Number of epoches for local training in each communication round
-    epochs: 1
+    # Number of epochs for local training in each communication round
+    epochs: 20
     batch_size: 10
     optimizer: SGD
-    learning_rate: 0.01
-    momentum: 0.9
+    learning_rate: 0.03
+    momentum: 0.0 # learning rate is fixed as in Appendix C.2
     weight_decay: 0.0
-
-    meta_learning_rate: 0.01
 
     # The machine learning model
     model_name: lenet5
+    num_classes: 47
 
 algorithm:
     # Aggregation algorithm
     type: fedavg
-
-results:
-    # Write the following parameter(s) into a CSV
-    types: round, accuracy, personalization_accuracy, elapsed_time, comm_time, round_time
-    result_dir: ./results/test
