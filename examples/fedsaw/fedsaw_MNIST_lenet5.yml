@@ -3,16 +3,17 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 2
+    total_clients: 1
 
     # The number of clients selected in each round
-    per_round: 2
+    per_round: 1
 
     # Should the clients compute test accuracy locally?
-    do_test: false
+    do_test: true
 
     # Whether simulate clients or not
     simulation: true
+    comm_simulation: true
 
     pruning_amount: 0.4
 
@@ -25,9 +26,13 @@ server:
     address: 127.0.0.1
     port: 8000
     do_test: true
+    edge_do_test: true
 
     inbound_processors:
         - model_decompress
+
+    checkpoint_dir: ./results/test/checkpoint
+    model_dir: ./results/test/model
 
 data:
     # The training and testing dataset
@@ -41,6 +46,9 @@ data:
 
     # IID or non-IID?
     sampler: iid
+
+    edge_testset_sampler: iid
+    testset_size: 1000
 
     # The random seed for sampling data
     random_seed: 1
@@ -80,7 +88,7 @@ algorithm:
     cross_silo: true
 
     # The total number of silos (edge servers)
-    total_silos: 2
+    total_silos: 1
 
     # The number of local aggregation rounds on edge servers before sending
     # aggregated weights to the central server
@@ -88,6 +96,6 @@ algorithm:
 
 results:
     # Write the following parameter(s) into a CSV
-    types: round, accuracy, elapsed_time, comm_time, round_time
+    types: round, accuracy, average_accuracy, elapsed_time, comm_time, round_time
 
     result_dir: ./results/test

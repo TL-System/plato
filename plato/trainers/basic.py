@@ -132,7 +132,6 @@ class Trainer(base.Trainer):
         sampler: the sampler that extracts a partition for this client.
         cut_layer (optional): The layer which training should start from.
         """
-        tic = time.perf_counter()
 
         try:
             custom_train = getattr(self, "train_model", None)

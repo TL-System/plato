@@ -4,13 +4,21 @@ A federated learning client at the edge server in a cross-silo training workload
 
 import copy
 from collections import OrderedDict
+from dataclasses import dataclass
 import logging
+import time
 import torch
 from torch.nn.utils import prune
 
 from plato.clients import edge
 from plato.config import Config
 from plato.models import registry as models_registry
+
+
+@dataclass
+class Report(edge.Report):
+    """ Client report, to be sent to the federated learning server. """
+    comm_overhead: float
 
 
 class Client(edge.Client):
@@ -20,9 +28,27 @@ class Client(edge.Client):
         previous_weights = copy.deepcopy(
             self.server.algorithm.extract_weights())
 
-        # Perform model training
-        self.report, _ = await super().train()
+        training_start_time = time.perf_counter()
+        # Signal edge server to select clients to start a new round of local aggregation
+        self.server.new_global_round_begins.set()
 
+        # Wait for the edge server to finish model aggregation
+        await self.server.model_aggregated.wait()
+        self.server.model_aggregated.clear()
+
+        average_accuracy = self.server.average_accuracy
+        accuracy = self.server.accuracy
+
+        training_time = time.perf_counter() - training_start_time
+
+        comm_time = time.time()
+
+        # Generate a report for the central server
+        self.report = Report(self.server.total_samples, accuracy,
+                             training_time, comm_time, False, average_accuracy,
+                             self.client_id, self.server.comm_overhead)
+
+        self.server.comm_overhead = 0
         weight_updates = self.prune_updates(previous_weights)
 
         logging.info("[Edge Server #%d] Pruned its aggregated updates.",
@@ -43,11 +69,16 @@ class Client(edge.Client):
                     module, torch.nn.Linear):
                 parameters_to_prune.append((module, 'weight'))
 
+        if hasattr(Config().clients, 'pruning_method') and Config(
+        ).clients.pruning_method == 'random':
+            pruning_method = prune.RandomUnstructured
+        else:
+            pruning_method = prune.L1Unstructured
+
         prune.global_unstructured(
             parameters_to_prune,
-            pruning_method=prune.L1Unstructured,
-            amount=Config().clients.pruning_amount if hasattr(
-                Config().clients, 'pruning_amount') else 0.2,
+            pruning_method=pruning_method,
+            amount=Config().clients.pruning_amount,
         )
 
         for module, name in parameters_to_prune:
@@ -70,3 +101,20 @@ class Client(edge.Client):
             updates[name] = delta
 
         return updates
+
+    def process_server_response(self, server_response):
+        """ Additional client-specific processing on the server response. """
+        super().process_server_response(server_response)
+
+        if 'pruning_amount' in server_response:
+            pruning_amount_list = server_response['pruning_amount']
+            if hasattr(Config().clients,
+                       'simulation') and Config().clients.simulation:
+                index = self.client_id - Config().clients.per_round - 1
+            else:
+                index = self.client_id - Config().clients.total_clients - 1
+
+            pruning_amount = pruning_amount_list[index]
+            # Update pruning amount
+            Config().clients = Config().clients._replace(
+                pruning_amount=pruning_amount)
