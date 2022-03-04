@@ -81,7 +81,7 @@ class RLServer(fedavg.Server):
         # Use adaptive weighted average
         for i, update in enumerate(weights_received):
             for name, delta in update.items():
-                avg_update[name] += delta * self.smart_weighting[i]
+                avg_update[name] += delta * self.smart_weighting[i][0]
 
             # Yield to other tasks in the server
             await asyncio.sleep(0)
