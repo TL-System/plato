@@ -53,8 +53,6 @@ class Server(fedavg_cs.Server):
                     module, torch.nn.Linear):
                 parameters_to_prune.append((module, 'weight'))
 
-            self.pruning_amount = 0
-
         prune.global_unstructured(
             parameters_to_prune,
             pruning_method=prune.L1Unstructured,
