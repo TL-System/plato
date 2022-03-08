@@ -4,11 +4,14 @@ as either central or edge servers.
 """
 
 import logging
+import math
 import os
 import pickle
+import statistics
 import sys
 
 import torch
+from torch.nn.utils import prune
 
 from plato.config import Config
 from plato.servers import fedavg_cs
@@ -19,13 +22,14 @@ class Server(fedavg_cs.Server):
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
 
-        # The central server uses a list to store each institution's clients' pruning amount
-        self.edge_pruning_amount_list = None
-
-        self.pruning_amount = 0
         self.comm_overhead = 0
 
+        # The pruning amount of the global model
+        self.pruning_amount = Config().server.pruning_amount if hasattr(
+            Config().server, 'pruning_amount') else 0.4
+
         if Config().is_central_server():
+            # The central server uses a list to store each institution's clients' pruning amount
             self.edge_pruning_amount_list = [
                 Config().clients.pruning_amount
                 for i in range(Config().algorithm.total_silos)
@@ -35,16 +39,44 @@ class Server(fedavg_cs.Server):
             if 'pruning_amount' not in self.recorded_items:
                 self.recorded_items = self.recorded_items + ['pruning_amount']
 
+    def customize_server_payload(self, payload):
+        """ Prune global model weights. """
+        if Config().is_edge_server() and self.current_round == 1:
+            # Edge servers don't need to prune the global model
+            return payload
+
+        global_model = self.algorithm.model
+
+        parameters_to_prune = []
+        for _, module in global_model.named_modules():
+            if isinstance(module, torch.nn.Conv2d) or isinstance(
+                    module, torch.nn.Linear):
+                parameters_to_prune.append((module, 'weight'))
+
+            self.pruning_amount = 0
+
+        prune.global_unstructured(
+            parameters_to_prune,
+            pruning_method=prune.L1Unstructured,
+            amount=self.pruning_amount,
+        )
+
+        for module, name in parameters_to_prune:
+            prune.remove(module, name)
+
+        return global_model.cpu().state_dict()
+
     async def customize_server_response(self, server_response):
         """ Wrap up generating the server response with any additional information. """
         server_response = await super().customize_server_response(
             server_response)
 
         if Config().is_central_server():
-            server_response['edge_pruning_amount'] = self.pruning_amount_list
+            server_response[
+                'edge_pruning_amount'] = self.edge_pruning_amount_list
         if Config().is_edge_server():
             # At this point, an edge server already updated Config().clients.pruning_amount
-            # to the number received from the central server.
+            # to the value received from the central server.
             # Now it could pass the new pruning amount to its clients.
             server_response['edge_pruning_amount'] = Config(
             ).clients.pruning_amount
@@ -64,7 +96,17 @@ class Server(fedavg_cs.Server):
 
     def compute_edge_pruning_amount(self, weights_diff_list):
         """ A method to compute pruning amount of each institution's clients. """
-        self.edge_pruning_amount_list = self.edge_pruning_amount_list
+        median = statistics.median(weights_diff_list)
+
+        for i, weight_diff in enumerate(weights_diff_list):
+            if weight_diff >= median:
+                self.edge_pruning_amount_list[i] = Config(
+                ).clients.pruning_amount * (
+                    1 + math.tanh(weight_diff / sum(weights_diff_list)))
+            else:
+                self.edge_pruning_amount_list[i] = Config(
+                ).clients.pruning_amount * (
+                    1 - math.tanh(weight_diff / sum(weights_diff_list)))
 
     def get_weights_differences(self):
         """
@@ -109,15 +151,17 @@ class Server(fedavg_cs.Server):
     def get_record_items_values(self):
         """Get values will be recorded in result csv file."""
         record_items_values = super().get_record_items_values()
-        record_items_values['pruning_amount'] = Config().clients.pruning_amount
 
         if Config().is_central_server():
             edge_comm_overhead = sum(
                 [report.comm_overhead for (report, __, __) in self.updates])
             record_items_values[
                 'comm_overhead'] = edge_comm_overhead + self.comm_overhead
+            record_items_values['pruning_amount'] = self.pruning_amount
         else:
             record_items_values['comm_overhead'] = self.comm_overhead
+            record_items_values['pruning_amount'] = Config(
+            ).clients.pruning_amount
 
         return record_items_values
 
@@ -126,7 +170,7 @@ class Server(fedavg_cs.Server):
         await super().wrap_up_processing_reports()
 
         if Config().is_central_server():
-            self.update_pruning_amount_list()
+            #self.update_edge_pruning_amount_list()
             self.comm_overhead = 0
 
     async def send(self, sid, payload, client_id) -> None:
