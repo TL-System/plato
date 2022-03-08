@@ -27,6 +27,8 @@ server:
     port: 8000
     do_test: true
 
+    pruning_amount: 0.4
+
     inbound_processors:
         - model_decompress
     outbound_processors:
@@ -91,6 +93,6 @@ algorithm:
 
 results:
     # Write the following parameter(s) into a CSV
-    types: round, accuracy, elapsed_time, comm_time, round_time, received_payload
+    types: round, accuracy, comm_overhead, elapsed_time, comm_time, round_time
 
     result_dir: ./results/test
