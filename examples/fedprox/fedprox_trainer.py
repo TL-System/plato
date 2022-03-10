@@ -15,9 +15,9 @@ from plato.config import Config
 from plato.trainers import basic
 
 
-def flatten_weights_from_model(model):
+def flatten_weights_from_model(model, device):
     """ Return the weights of the given model as a 1-D tensor """
-    weights = torch.tensor([], requires_grad=False)
+    weights = torch.tensor([], requires_grad=False, device=device)
     for param in model.parameters():
         weights = torch.cat((weights, torch.flatten(param)))
     return weights
@@ -25,14 +25,16 @@ def flatten_weights_from_model(model):
 
 class FedProxLocalObjective:
     """ Representing the local objective of FedProx clients. """
-
-    def __init__(self, model):
+    def __init__(self, model, device):
         self.model = model
-        self.init_global_weights = flatten_weights_from_model(model)
+        self.device = device
+
+        self.init_global_weights = flatten_weights_from_model(
+            self.model, self.device)
 
     def compute_objective(self, outputs, labels):
         """ Compute the objective the FedProx client wishes to minimize. """
-        cur_weights = flatten_weights_from_model(self.model)
+        cur_weights = flatten_weights_from_model(self.model, self.device)
         mu = Config().clients.proximal_term_penalty_constant
         prox_term = mu / 2 * torch.linalg.norm(
             cur_weights - self.init_global_weights, ord=2)
@@ -44,7 +46,6 @@ class FedProxLocalObjective:
 
 class Trainer(basic.Trainer):
     """ The federated learning trainer for the FedProx client. """
-
     def train_process(self, config, trainset, sampler, cut_layer=None):
         """The main training loop in FedProx framework. """
 
@@ -71,5 +72,5 @@ class Trainer(basic.Trainer):
 
     def loss_criterion(self, model):
         """ Return the loss criterion for FedProx clients. """
-        local_obj = FedProxLocalObjective(model)
+        local_obj = FedProxLocalObjective(model, self.device)
         return local_obj.compute_objective
