@@ -11,16 +11,23 @@ clients:
     # Whether clients should be simulated with only a sufficient number of processes
     simulation: true
 
-    # Whether client-server communication should be simulated with files
-    comm_simulation: true
-
     # Whether client heterogeneity should be simulated
     speed_simulation: true
 
     # The simulation distribution
     simulation_distribution:
-        distribution: pareto
-        alpha: 1
+        # staleness is simulated from uniform distribution as mentioned in Section 5.2
+        distribution: uniform
+        low: 0
+        high: 20
+    
+    # Should clients really go to sleep, or should we just simulate the sleep times?
+    sleep_simulation: true
+
+    # If we are simulating client training times, what is the average training time?
+    avg_training_time: 20
+
+    random_seed: 1
 
 server:
     address: 127.0.0.1
@@ -36,17 +43,19 @@ server:
     minimum_clients_aggregated: 6
 
     # What is the staleness bound, beyond which the server should wait for stale clients?
-    staleness_bound: 1000
+    staleness_bound: 10
+
+    random_seed: 1
 
 data:
     # The training and testing dataset
-    datasource: FashionMNIST
+    datasource: CIFAR10
 
     # Where the dataset is located
     data_path: ./data
 
     # Number of samples in each partition
-    partition_size: 200
+    partition_size: 5000
 
     # Whether clients have different partition size or not?
     variable_partition: true
@@ -55,17 +64,17 @@ data:
     sampler: noniid
 
     # The concentration parameter for the Dirichlet distribution
-    concentration: 0.5
+    concentration: 5
 
     # The random seed for sampling data
     random_seed: 1
 
 trainer:
     # The maximum number of training rounds
-    rounds: 50
+    rounds: 200
 
     # Whether the training should use multiple GPUs if available
-    parallelized: false
+    parallelized: true
 
     # The maximum number of clients running concurrently
     max_concurrency: 4
@@ -74,16 +83,20 @@ trainer:
     target_accuracy: 1.0
 
     # Number of epoches for local training in each communication round
-    epochs: 10
-
-    batch_size: 32
+    epochs: 1
+    batch_size: 128
     optimizer: SGD
-    learning_rate: 0.01
+    learning_rate: 0.1
     momentum: 0.9
-    weight_decay: 0.0
+    weight_decay: 0.0001
+
+    # Learning rate schedule
+    lr_schedule: LambdaLR
+    lr_gamma: 0.1
+    lr_milestone_steps: 80ep,120ep
 
     # The machine learning model
-    model_name: lenet5
+    model_name: resnet_18
 
 algorithm:
     # Aggregation algorithm
@@ -100,19 +113,18 @@ algorithm:
     theta: 0.005 # threshold for stdev(pre_acc)
     base: 1000 # for exponential function in state normalization
     log_interval: 10
-    mode: train # test
+    mode: train # train/test
     pretrained: false
     pretrained_iter: 0
-    test_step: 20
+    test_step: 200
 
     # RL policy
     model_name: td3
     # reward discounted factor
     gamma: 0.99
     tau: 0.005
-    learning_rate:
-        0.0003
-        # Noise added to target policy during critic update
+    learning_rate: 0.0003
+    # Noise added to target policy during critic update
     policy_noise: 0.25
     # Range to clip target policy noise
     noise_clip: 0.5
@@ -131,7 +143,7 @@ algorithm:
 
 results:
     # Write the following parameter(s) into a CSV
-    types: accuracy, elapsed_time, round_time
+    types: round, accuracy, elapsed_time, comm_time, round_time
 
     # Plot results (x_axis-y_axis)
     plot: round-accuracy, elapsed_time-accuracy
