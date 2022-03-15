@@ -17,7 +17,6 @@ from plato.trainers import registry as trainers_registry
 
 class RLServer(fedavg.Server):
     """ A federated learning server with an RL Agent. """
-
     def __init__(self, agent, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
         self.agent = agent

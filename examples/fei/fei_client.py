@@ -10,7 +10,8 @@ from plato.config import Config
 
 @dataclass
 class Report(simple.Report):
-    """A client report containing the valuation, to be sent to the FEI federated learning server."""
+    """A client report to be sent to the FEI federated learning server."""
+    client_id: int
     valuation: float
 
 
@@ -29,7 +30,7 @@ class Client(simple.Client):
 
         return Report(report.num_samples, report.accuracy,
                       report.training_time, report.comm_time,
-                      report.update_response, valuation), weights
+                      report.update_response, self.client_id, valuation), weights
 
     def process_server_response(self, server_response):
         """Additional client-specific processing on the server response."""
