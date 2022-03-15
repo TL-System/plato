@@ -17,7 +17,6 @@ from plato.utils.reinforcement_learning.policies import \
 
 class RLAgent(rl_agent.RLAgent):
     """ An RL agent for FL training using FEI. """
-
     def __init__(self):
         super().__init__()
         if hasattr(Config().server,
@@ -37,9 +36,9 @@ class RLAgent(rl_agent.RLAgent):
             self.current_episode = Config().algorithm.pretrained_iter + 1
 
         self.recorded_rl_items = ['episode', 'actor_loss', 'critic_loss']
+        result_dir = Config().params['result_dir']
 
         if self.current_episode == 0:
-            result_dir = Config().params['result_dir']
             episode_result_csv_file = f'{result_dir}/{os.getpid()}_episode_result.csv'
             csv_processor.initialize_csv(episode_result_csv_file,
                                          self.recorded_rl_items, result_dir)
@@ -47,15 +46,18 @@ class RLAgent(rl_agent.RLAgent):
             csv_processor.initialize_csv(
                 episode_reward_csv_file,
                 ['episode', '#steps', 'final accuracy', 'reward'], result_dir)
+
+        if self.current_episode == 0 or Config().algorithm.mode == 'test':
             step_result_csv_file = f'{result_dir}/{os.getpid()}_step_result.csv'
             csv_processor.initialize_csv(
-                step_result_csv_file, ['episode', 'step', 'state', 'action'],
-                result_dir)
+                step_result_csv_file,
+                ['episode', 'step', 'id', 'action', 'state'], result_dir)
 
         # Record test accuracy of the latest 5 rounds/steps
         self.pre_acc = deque(5 * [0], maxlen=5)
         self.test_accuracy = None
         self.num_samples = None
+        self.client_ids = []
 
     # Override RL-related methods of simple RL agent
     async def reset(self):
@@ -138,6 +140,16 @@ class RLAgent(rl_agent.RLAgent):
     def process_env_update(self):
         """ Process state update to RL Agent. """
         super().process_env_update()
+
+        if self.current_step != 0:
+            result_dir = Config().params['result_dir'] = Config(
+            ).params['result_dir']
+            step_result_csv_file = f'{result_dir}/{os.getpid()}_step_result.csv'
+            csv_processor.write_csv(
+                step_result_csv_file,
+                [self.current_episode, self.current_step] + [self.client_ids] +
+                [list(np.squeeze(self.action))] + list(self.state))
+
         if Config().algorithm.recurrent_actor:
             self.h, self.c = self.nh, self.nc
 
