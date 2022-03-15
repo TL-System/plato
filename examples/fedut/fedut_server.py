@@ -10,18 +10,23 @@ import asyncio
 
 
 class Server(fedavg.Server):
+
     """A federated learning server using the Fedut algorithm."""
+    """
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model, algorithm, trainer)
+        
         self.statistical_utility = None
         self.global_utility = None
         self.system_utility = None
         self.local_training_time = None
         #print(Config.server)
         self.expected_duration = Config().server.expected_duration
+        """
 
+    """
     def extract_client_updates(self, updates):
-        """ Extract the model weights and statistical utility from clients updates. """
+        # Extract the model weights and statistical utility from clients updates. 
         weights_received = [payload[0] for (__, payload, __) in updates]
 
         self.statistical_utility = [
@@ -33,9 +38,10 @@ class Server(fedavg.Server):
         ]
 
         return self.algorithm.compute_weight_updates(weights_received)
-
+    """
+    """
     async def federated_averaging(self, updates):
-        """ Aggregate weight and delta updates from client updates. """
+        # Aggregate weight and delta updates from client updates. 
         weights_received = self.extract_client_updates(updates)
 
         # Adjust expected duration
@@ -95,3 +101,4 @@ class Server(fedavg.Server):
             await asyncio.sleep(0)
 
         return avg_update
+    """
