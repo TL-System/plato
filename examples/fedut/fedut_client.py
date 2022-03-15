@@ -24,10 +24,10 @@ class Client(simple.Client):
                  algorithm=None,
                  trainer=None):
         super().__init__(model, datasource, algorithm, trainer)
-        self.statistical_utility = None
-
+        #self.statistical_utility = None
+"""
     async def train(self):
-        """ Initialize the server control variates and client control variates for the trainer. """
+        # Initialize the server control variates and client control variates for the trainer.
 
         report, weights = await super().train()
         # compute statistical_utility
@@ -44,3 +44,4 @@ class Client(simple.Client):
         return Report(report.num_samples, report.accuracy,
                       report.training_time, report.update_response,
                       2), [weights, self.statistical_utility]
+"""
