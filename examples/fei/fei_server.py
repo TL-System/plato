@@ -10,7 +10,6 @@ from plato.utils.reinforcement_learning import rl_server
 
 class RLServer(rl_server.RLServer):
     """ A federated learning server with RL Agent. """
-
     def __init__(self, agent, model=None, algorithm=None, trainer=None):
         super().__init__(agent, model, algorithm, trainer)
         self.local_correlations = [0] * Config().clients.per_round
@@ -21,6 +20,9 @@ class RLServer(rl_server.RLServer):
     # Overwrite RL-related methods of simple RL server
     def prep_state(self):
         """ Wrap up the state update to RL Agent. """
+        # Store client ids
+        client_ids = [report.client_id for (report, __, __) in self.updates]
+
         state = [0] * 4
         state[0] = self.normalize_state(
             [report.num_samples for (report, __, __) in self.updates])
@@ -33,11 +35,17 @@ class RLServer(rl_server.RLServer):
 
         self.agent.test_accuracy = self.accuracy
 
-        return state
+        return state, client_ids
 
     def apply_action(self):
         """ Apply action update from RL Agent to FL Env. """
         self.smart_weighting = np.array(self.agent.action)
+
+    def update_state(self):
+        """ Wrap up the state update to RL Agent. """
+        # Pass new state to RL Agent
+        self.agent.new_state, self.agent.client_ids = self.prep_state()
+        self.agent.process_env_update()
 
     def extract_client_updates(self, updates):
         """ Extract the model weights and update directions from clients updates. """

@@ -14,7 +14,6 @@ from plato.utils import csv_processor
 
 class RLAgent(object):
     """ A basic RL environment for FL server using Gym for RL control. """
-
     def __init__(self):
         self.n_actions = Config().clients.per_round
         self.n_states = Config().clients.per_round * Config(
@@ -109,13 +108,6 @@ class RLAgent(object):
                 self.process_experience()
             self.state = self.next_state
             self.episode_reward += self.reward
-
-            result_dir = Config().params['result_dir'] = Config(
-            ).params['result_dir']
-            step_result_csv_file = f'{result_dir}/{os.getpid()}_step_result.csv'
-            csv_processor.write_csv(step_result_csv_file,
-                                    [self.current_episode, self.current_step] +
-                                    list(self.state) + list(self.action))
 
     async def prep_agent_update(self):
         """ Update RL Agent. """
