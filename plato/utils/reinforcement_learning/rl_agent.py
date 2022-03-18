@@ -38,7 +38,7 @@ class RLAgent(object):
         self.new_state = None
         self.action = None
         self.next_action = None
-        self.reward = None
+        self.reward = 0
         self.episode_reward = 0
         self.current_step = 0
         self.total_steps = 0
