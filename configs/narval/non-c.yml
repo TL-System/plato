@@ -72,7 +72,7 @@ data:
     sampler: noniid
     
     # The concentration parameter for the Dirichlet distribution
-    concentration: 5
+    concentration: 1
 
     # The size of the testset on the server
     testset_size: 10000
