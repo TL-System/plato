@@ -38,7 +38,7 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8020
+    port: 8030
     do_test: true
 
     ping_timeout: 36000
@@ -113,8 +113,6 @@ trainer:
 algorithm:
     # Aggregation algorithm
     type: fedavg
-
-    pattern: constant
 
 results:
     # Write the following parameter(s) into a CSV
