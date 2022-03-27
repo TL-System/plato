@@ -44,7 +44,7 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8010
+    port: 8012
     do_test: true
 
     ping_timeout: 36000
@@ -57,8 +57,8 @@ server:
     simulate_wall_time: true
 
     # The paths for storing temporary checkpoints and models
-    checkpoint_dir: ./models/cifar/iid/checkpoint
-    model_dir: ./models/cifar/iid/model
+    checkpoint_dir: ./models/cifar/ext/checkpoint
+    model_dir: ./models/cifar/ext/model
 
     random_seed: 1
 
@@ -73,10 +73,10 @@ data:
     partition_size: 1000
 
     # IID or non-IID?
-    sampler: iid
+    sampler: noniid
 
     # The concentration parameter for the Dirichlet distribution
-    concentration: 5
+    concentration: 1
 
     # The size of the testset on the server
     testset_size: 10000
@@ -124,4 +124,4 @@ results:
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time
 
-    result_dir: ./results/cifar/iid/
+    result_dir: ./results/cifar/ext/
