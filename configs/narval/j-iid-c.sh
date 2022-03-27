@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --time=4:00:00
 #SBATCH --gres=gpu:1
-#SBATCH --mem=255G
+#SBATCH --mem=127G
 #SBATCH --account=def-iamniudi
 #SBATCH --output=o-iid-c.out
 

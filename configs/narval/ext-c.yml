@@ -36,19 +36,27 @@ clients:
 
     random_seed: 1
 
+    # FedProx hyperparameters
+    proximal_term_penalty_constant: 1
+    # FedProx parameters for experiment
+    straggler_simulation: true
+    straggler_percentage: 50
+
+
 server:
     address: 127.0.0.1
-    port: 8000
+    port: 8001
     do_test: true
-
+    
     ping_timeout: 36000
     ping_interval: 36000
 
     # Should we simulate the wall-clock time on the server? Useful if max_concurrency is specified
     simulate_wall_time: true
+    
+    checkpoint_dir: ./models/cifar/ext/checkpoint
+    model_dir: ./models/cifar/ext/model
 
-    checkpoint_dir: ./models/cifar/iid/checkpoint
-    model_dir: ./models/cifar/iid/model
 
 data:
     # The training and testing dataset
@@ -61,10 +69,10 @@ data:
     partition_size: 1000
 
     # IID or non-IID?
-    sampler: iid
-
+    sampler: noniid
+    
     # The concentration parameter for the Dirichlet distribution
-    concentration: 5
+    concentration: 1
 
     # The size of the testset on the server
     testset_size: 10000
@@ -111,4 +119,4 @@ algorithm:
 results:
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time
-    result_dir: ./results/cifar/iid/
+    result_dir: ./results/cifar/ext/
