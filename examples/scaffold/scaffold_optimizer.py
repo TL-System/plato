@@ -11,7 +11,7 @@ https://arxiv.org/pdf/1910.06378.pdf
 import torch
 from torch import optim
 
-import scaffold_optimizer
+from plato.config import Config
 
 
 class ScaffoldOptimizer(optim.SGD):
@@ -92,8 +92,9 @@ class ScaffoldOptimizer(optim.SGD):
                     self.new_client_update_direction.append(d_p)
 
         if self.update_flag is True:
-            fn = f"new_client_update_direction_{self.client_id}.pth"
-            torch.save(self.new_client_update_direction, fn)
+            model_dir = Config().params['model_dir']
+            file_name = f"{model_dir}/new_client_update_direction_{self.client_id}.pth"
+            torch.save(self.new_client_update_direction, file_name)
             self.update_flag = False
 
         return loss

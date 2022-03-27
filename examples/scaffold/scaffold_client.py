@@ -10,11 +10,11 @@ https://arxiv.org/pdf/1910.06378.pdf
 """
 
 import os
-from dataclasses import dataclass
 
 import torch
 
 from plato.clients import simple
+from plato.config import Config
 
 
 class Client(simple.Client):
@@ -57,8 +57,9 @@ class Client(simple.Client):
 
         # Update client update direction
         self.client_update_direction = self.new_client_update_direction
-        fn = f"new_client_update_direction_{self.client_id}.pth"
-        os.remove(fn)
+        model_dir = Config().params['model_dir']
+        file_name = f"{model_dir}/new_client_update_direction_{self.client_id}.pth"
+        os.remove(file_name)
         return report, [weights, deltas]
 
     def load_payload(self, server_payload):

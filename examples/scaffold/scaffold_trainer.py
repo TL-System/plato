@@ -10,10 +10,10 @@ https://arxiv.org/pdf/1910.06378.pdf
 """
 import torch
 
+import scaffold_optimizer
+
 from plato.config import Config
 from plato.trainers import basic
-
-import scaffold_optimizer
 
 
 class Trainer(basic.Trainer):
@@ -32,7 +32,8 @@ class Trainer(basic.Trainer):
         self.new_client_update_direction = None
 
     def pause_training(self):
-        c_file = f"new_client_update_direction_{self.client_id}.pth"
+        model_dir = Config().params['model_dir']
+        c_file = f"{model_dir}/new_client_update_direction_{self.client_id}.pth"
         self.new_client_update_direction = torch.load(c_file)
         super().pause_training()
 
