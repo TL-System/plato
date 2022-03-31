@@ -26,7 +26,7 @@ class Server(fedavg_cs.Server):
 
         # The pruning amount of the global model
         self.pruning_amount = Config().server.pruning_amount if hasattr(
-            Config().server, 'pruning_amount') else 0.4
+            Config().server, 'pruning_amount') else 0.2
 
         if Config().is_central_server():
             # The central server uses a list to store each institution's clients' pruning amount
@@ -53,9 +53,15 @@ class Server(fedavg_cs.Server):
                     module, torch.nn.Linear):
                 parameters_to_prune.append((module, 'weight'))
 
+        if hasattr(Config().server, 'pruning_method') and Config(
+        ).server.pruning_method == 'random':
+            pruning_method = prune.RandomUnstructured
+        else:
+            pruning_method = prune.L1Unstructured
+
         prune.global_unstructured(
             parameters_to_prune,
-            pruning_method=prune.L1Unstructured,
+            pruning_method=pruning_method,
             amount=self.pruning_amount,
         )
 
