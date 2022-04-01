@@ -27,7 +27,8 @@ server:
     do_test: true
     ping_timeout: 12000
 
-    pruning_amount: 0.4
+    pruning_amount: 0.2
+    #pruning_method: random
 
     inbound_processors:
         - model_decompress
