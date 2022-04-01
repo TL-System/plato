@@ -28,6 +28,9 @@ class Server(fedavg_cs.Server):
         self.pruning_amount = Config().server.pruning_amount if hasattr(
             Config().server, 'pruning_amount') else 0.2
 
+        # A global/locally aggregated model only needs to be pruned once in a round
+        self.is_pruned = False
+
         if Config().is_central_server():
             # The central server uses a list to store each institution's clients' pruning amount
             self.edge_pruning_amount_list = [
@@ -41,7 +44,8 @@ class Server(fedavg_cs.Server):
 
     def customize_server_payload(self, payload):
         """ Prune global model weights. """
-        if Config().is_edge_server() and self.current_round == 1:
+        if self.is_pruned or (Config().is_edge_server()
+                              and self.current_round == 1):
             # Edge servers don't need to prune the global model
             return payload
 
@@ -67,6 +71,8 @@ class Server(fedavg_cs.Server):
 
         for module, name in parameters_to_prune:
             prune.remove(module, name)
+
+        self.is_pruned = True
 
         return global_model.cpu().state_dict()
 
@@ -172,6 +178,8 @@ class Server(fedavg_cs.Server):
     async def wrap_up_processing_reports(self):
         """Wrap up processing the reports with any additional work."""
         await super().wrap_up_processing_reports()
+
+        self.is_pruned = False
 
         if Config().is_central_server():
             #self.update_edge_pruning_amount_list()
