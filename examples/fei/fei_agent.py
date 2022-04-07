@@ -79,7 +79,7 @@ class RLAgent(rl_agent.RLAgent):
         """ Get action from RL policy. """
         logging.info("[RL Agent] Selecting action...")
         if Config().algorithm.mode == 'train':
-            if self.current_step <= Config().algorithm.start_steps:
+            if self.total_steps <= Config().algorithm.start_steps:
                 # random action
                 # action = np.zeros(self.n_actions)
                 # noise = np.random.normal(0, .1, action.shape)
