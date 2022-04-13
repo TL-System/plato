@@ -23,6 +23,7 @@ from plato.utils import s3
 
 class ServerEvents(socketio.AsyncNamespace):
     """ A custom namespace for socketio.AsyncServer. """
+
     def __init__(self, namespace, plato_server):
         super().__init__(namespace)
         self.plato_server = plato_server
@@ -67,6 +68,7 @@ class ServerEvents(socketio.AsyncNamespace):
 
 class Server:
     """ The base class for federated learning servers. """
+
     def __init__(self):
         self.sio = None
         self.client = None
@@ -431,6 +433,8 @@ class Server:
                              self.selected_client_id)
 
                 server_response = {'id': self.selected_client_id}
+                server_response['current_round'] = self.current_round
+
                 payload = self.algorithm.extract_weights()
                 payload = self.customize_server_payload(payload)
 
