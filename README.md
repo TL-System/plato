@@ -10,7 +10,7 @@ It is recommended that [Miniconda](https://docs.conda.io/en/latest/miniconda.htm
 
 ```shell
 conda update conda -y
-conda create -n federated python=3.9
+conda create -n plato python=3.9
 conda activate plato
 ```
 

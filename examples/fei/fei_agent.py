@@ -36,9 +36,9 @@ class RLAgent(rl_agent.RLAgent):
             self.current_episode = Config().algorithm.pretrained_iter + 1
 
         self.recorded_rl_items = ['episode', 'actor_loss', 'critic_loss']
+        result_dir = Config().params['result_dir']
 
         if self.current_episode == 0:
-            result_dir = Config().params['result_dir']
             episode_result_csv_file = f'{result_dir}/{os.getpid()}_episode_result.csv'
             csv_processor.initialize_csv(episode_result_csv_file,
                                          self.recorded_rl_items, result_dir)
@@ -46,6 +46,8 @@ class RLAgent(rl_agent.RLAgent):
             csv_processor.initialize_csv(
                 episode_reward_csv_file,
                 ['episode', '#steps', 'final accuracy', 'reward'], result_dir)
+
+        if self.current_episode == 0 or Config().algorithm.mode == 'test':
             step_result_csv_file = f'{result_dir}/{os.getpid()}_step_result.csv'
             csv_processor.initialize_csv(
                 step_result_csv_file,
@@ -77,7 +79,7 @@ class RLAgent(rl_agent.RLAgent):
         """ Get action from RL policy. """
         logging.info("[RL Agent] Selecting action...")
         if Config().algorithm.mode == 'train':
-            if self.current_step <= Config().algorithm.start_steps:
+            if self.total_steps <= Config().algorithm.start_steps:
                 # random action
                 # action = np.zeros(self.n_actions)
                 # noise = np.random.normal(0, .1, action.shape)
