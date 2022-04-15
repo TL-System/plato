@@ -6,7 +6,7 @@ clients:
     total_clients: 100
 
     # The number of clients selected in each round
-    per_round: 20
+    per_round: 50
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -15,37 +15,17 @@ clients:
     simulation: true
 
     # Whether client-server communication should be simulated with files
-    comm_simulation: true
-
-    # Whether client heterogeneity should be simulated
-    speed_simulation: true
-
-    # The distribution of client speeds
-    simulation_distribution:
-        distribution: pareto
-        alpha: 1
-
-    # The maximum amount of time for clients to sleep after each epoch
-    max_sleep_time: 30
-
-    # Should clients really go to sleep, or should we just simulate the sleep times?
-    sleep_simulation: true
-
-    # If we are simulating client training times, what is the average training time?
-    avg_training_time: 20
+    comm_simulation: false
 
     random_seed: 1
 
 server:
     address: 127.0.0.1
-    port: 8031
+    port: 8020
     do_test: true
 
     ping_timeout: 36000
     ping_interval: 36000
-
-    # Should we operate in sychronous mode?
-    synchronous: true
 
     # Should we simulate the wall-clock time on the server? Useful if max_concurrency is specified
     simulate_wall_time: true
