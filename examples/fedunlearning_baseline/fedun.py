@@ -8,7 +8,7 @@ Reference: Liu et al., "The Right to be Forgotten in Federated Learning: An Effi
 import os
 
 os.environ[
-    'config_file'] = 'examples/federated_unlearning/fedun_MNIST_lenet5.yml'
+    'config_file'] = 'examples/fedunlearning_baseline/fedun_MNIST_lenet5.yml'
 
 import fedun_client
 from plato.servers import fedavg

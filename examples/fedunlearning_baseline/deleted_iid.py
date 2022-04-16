@@ -44,11 +44,11 @@ class Sampler(iid.Sampler):
                                        1):total_size:total_clients]
 
         if (need_delete):
-            num_subset_length = len(self.subset_indices)
-            delelte_subset_length = num_subset_length * delete_data_ratio
+            num_subset_length = int(len(self.subset_indices))
+            delelte_subset_length = int(num_subset_length * delete_data_ratio)
             delete_index = np.random.choice(range(num_subset_length),
                                             delelte_subset_length,
                                             replace=False)
 
-            self.subset_indices = set(
-                np.delete(list(self.subset_indices), delete_index))
+            self.subset_indices = list(
+                np.delete(self.subset_indices, delete_index))
