@@ -31,5 +31,6 @@ def check_gpu_usage(process_exceptions=['Xorg'], user_exceptions=['bla123'], min
         if free:
             free_gpus.append(str(i))
 
-    print(f"[[GPU INFO]] [{','.join(free_gpus)}] Free")
+    print(f"[[GPU INFO]] [{', '.join(free_gpus)}] are free and made visible to this session.")
     pynvml.nvmlShutdown()
+    return ','.join(free_gpus)
