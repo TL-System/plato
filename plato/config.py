@@ -281,11 +281,11 @@ class Config:
             gpus = tf.config.experimental.list_physical_devices('GPU')
             if len(gpus) > 0:
                 device = 'GPU'
-                gpu_id = os.getenv('GPU_ID')
+                gpu_id = int(os.getenv('GPU_ID'))
 
                 if gpu_id is None:
                     gpu_id = available_gpu()
-                    os.environ['GPU_ID'] = gpu_id
+                    os.environ['GPU_ID'] = str(gpu_id)
 
                 tf.config.experimental.set_visible_devices(gpus[gpu_id], 'GPU')
 
@@ -301,7 +301,7 @@ class Config:
 
                     if gpu_id is None:
                         gpu_id = available_gpu()
-                        os.environ['GPU_ID'] = gpu_id
+                        os.environ['GPU_ID'] = str(gpu_id)
 
                     device = f'cuda:{gpu_id}'
 
