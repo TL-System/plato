@@ -281,8 +281,14 @@ class Config:
             gpus = tf.config.experimental.list_physical_devices('GPU')
             if len(gpus) > 0:
                 device = 'GPU'
-                tf.config.experimental.set_visible_devices(
-                    gpus[np.random.randint(0, len(gpus))], 'GPU')
+                gpu_id = os.getenv('GPU_ID')
+
+                if gpu_id is None:
+                    gpu_id = available_gpu()
+                    os.environ['GPU_ID'] = gpu_id
+
+                tf.config.experimental.set_visible_devices(gpus[gpu_id], 'GPU')
+
         else:
             import torch
 
@@ -291,7 +297,13 @@ class Config:
                            'parallelized') and Config().trainer.parallelized:
                     device = 'cuda'
                 else:
-                    device = 'cuda:' + available_gpu() 
+                    gpu_id = os.getenv('GPU_ID')
+
+                    if gpu_id is None:
+                        gpu_id = available_gpu()
+                        os.environ['GPU_ID'] = gpu_id
+
+                    device = f'cuda:{gpu_id}'
 
         return device
 
