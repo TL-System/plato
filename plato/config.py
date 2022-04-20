@@ -13,6 +13,8 @@ from typing import Any, IO
 import numpy as np
 import yaml
 
+from plato.utils.available_gpu import available_gpu
+
 
 class Loader(yaml.SafeLoader):
     """ YAML Loader with `!include` constructor. """
@@ -289,8 +291,7 @@ class Config:
                            'parallelized') and Config().trainer.parallelized:
                     device = 'cuda'
                 else:
-                    device = 'cuda:' + str(
-                        np.random.randint(0, torch.cuda.device_count()))
+                    device = 'cuda:' + available_gpu() 
 
         return device
 
