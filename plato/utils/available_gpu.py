@@ -1,17 +1,21 @@
-import pynvml as pynvml
-import psutil
+'''
+    A handy utility that looks for the best GPU with the most free available
+    CUDA memory.
+'''
 
-def available_gpu():
-    # Process exceptions -> we don't care about such procs
-    # User exceptions -> we care ONLY about procs of this user
+import logging
+import pynvml
+
+
+def available_gpu() -> int:
+    ''' Returns the best GPU with the most free available CUDA memory. '''
     pynvml.nvmlInit()
-    # print ("Driver Version:", pynvml.nvmlSystemGetDriverVersion())
-    deviceCount = pynvml.nvmlDeviceGetCount()
-    free_gpus = []
-    min_memory_used = 0
-    device_id = -1 
 
-    for i in range(deviceCount):
+    device_count = pynvml.nvmlDeviceGetCount()
+    min_memory_used = 0
+    device_id = -1
+
+    for i in range(device_count):
         handle = pynvml.nvmlDeviceGetHandleByIndex(i)
         mem = pynvml.nvmlDeviceGetMemoryInfo(handle)
         free_memory = mem.free / (1024**3)
@@ -22,6 +26,8 @@ def available_gpu():
             min_memory_used = free_memory
             device_id = i
 
-    print(f"[GPU INFO] [{device_id}] has the most available memory and made visible to this session.")
+    logging.info("GPU #%d is used as it has the most available memory.",
+                 device_id)
     pynvml.nvmlShutdown()
-    return str(device_id)
+
+    return device_id
