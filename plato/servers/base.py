@@ -433,7 +433,6 @@ class Server:
                              self.selected_client_id)
 
                 server_response = {'id': self.selected_client_id}
-                server_response['current_round'] = self.current_round
 
                 payload = self.algorithm.extract_weights()
                 payload = self.customize_server_payload(payload)
