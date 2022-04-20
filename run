@@ -3,8 +3,6 @@
 Starting point for a Plato federated learning training session.
 """
 import os
-from plato.utils.check_gpu_usage import check_gpu_usage
-os.environ['CUDA_VISIBLE_DEVICES'] = check_gpu_usage()
 
 from plato.servers import registry as server_registry
 
