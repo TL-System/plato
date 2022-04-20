@@ -173,7 +173,8 @@ class Server(fedavg.Server):
 
     async def aggregate_weights(self, updates):
         """Aggregate the reported weight updates from the selected clients."""
-        if 
+        if self.current_round == Config().clients.delete_round:
+            
         update = await self.federated_averaging(updates)
         updated_weights = self.algorithm.update_weights(update)
         self.algorithm.load_weights(updated_weights)
