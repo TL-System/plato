@@ -11,7 +11,7 @@ https://ieeexplore.ieee.org/abstract/document/9442814
 import os
 
 
-os.environ['config_file'] = './fedadp_MNIST_lenet5.yml'
+os.environ['config_file'] = 'examples/fedadp/fedadp_FashionMNIST_lenet5.yml'
 
 import fedadp_server
 
