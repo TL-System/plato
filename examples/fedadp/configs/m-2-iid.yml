@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 1000
+    total_clients: 200
 
     # The number of clients selected in each round
-    per_round: 100
+    per_round: 20
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -15,13 +15,13 @@ clients:
     simulation: true
 
     # Whether client-server communication should be simulated with files
-    comm_simulation: false
+    comm_simulation: true
 
     random_seed: 1
 
 server:
     address: 127.0.0.1
-    port: 8007
+    port: 8001
     do_test: true
     
     ping_timeout: 36000
@@ -30,13 +30,13 @@ server:
     # Should we simulate the wall-clock time on the server? Useful if max_concurrency is specified
     simulate_wall_time: true
     
-    checkpoint_dir: ./models/emnist/ext/checkpoint
-    model_dir: ./models/emnist/ext/model
+    checkpoint_dir: ./models/mnist/2/iid/checkpoint
+    model_dir: ./models/mnist/2/iid/model
 
 
 data:
     # The training and testing dataset
-    datasource: EMNIST
+    datasource: MNIST
 
     # Where the dataset is located
     data_path: ../../data
@@ -45,10 +45,7 @@ data:
     partition_size: 1000
 
     # IID or non-IID?
-    sampler: noniid
-    
-    # The concentration parameter for the Dirichlet distribution
-    concentration: 0.5
+    sampler: iid
 
     # The size of the testset on the server
     #testset_size: 10000
@@ -61,13 +58,13 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 60
+    rounds: 40
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
 
     # The maximum number of clients running concurrently
-    max_concurrency: 4
+    max_concurrency: 1
 
     # The target accuracy
     target_accuracy: 0.99
@@ -91,4 +88,4 @@ algorithm:
 results:
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time
-    result_dir: ./results/emnist/ext/
+    result_dir: ./results/mnist/2/iid/

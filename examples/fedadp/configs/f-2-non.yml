@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 1000
+    total_clients: 200
 
     # The number of clients selected in each round
-    per_round: 50
+    per_round: 20
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -21,7 +21,7 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8013
+    port: 8012
     do_test: true
     
     ping_timeout: 36000
@@ -30,13 +30,13 @@ server:
     # Should we simulate the wall-clock time on the server? Useful if max_concurrency is specified
     simulate_wall_time: true
     
-    checkpoint_dir: ./models/cifar/ext/checkpoint
-    model_dir: ./models/cifar/ext/model
+    checkpoint_dir: ./models/fashion/2/non/checkpoint
+    model_dir: ./models/fashion/2/non/model
 
 
 data:
     # The training and testing dataset
-    datasource: CIFAR10
+    datasource: FashionMNIST
 
     # Where the dataset is located
     data_path: ../../data
@@ -48,7 +48,7 @@ data:
     sampler: noniid
     
     # The concentration parameter for the Dirichlet distribution
-    concentration: 0.5
+    concentration: 1.0
 
     # The size of the testset on the server
     #testset_size: 10000
@@ -61,13 +61,13 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 100
+    rounds: 40
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
 
     # The maximum number of clients running concurrently
-    max_concurrency: 3
+    max_concurrency: 1
 
     # The target accuracy
     target_accuracy: 0.99
@@ -76,17 +76,13 @@ trainer:
     epochs: 5
     batch_size: 10
     optimizer: SGD
-    learning_rate: 0.1
+    learning_rate: 0.01
     momentum: 0.9
-    weight_decay: 0.0001
-
-    # Learning rate schedule
-    lr_schedule: LambdaLR
-    lr_gamma: 0.1
-    lr_milestone_steps: 80ep,120ep
+    weight_decay: 0.0
 
     # The machine learning model
-    model_name: resnet_18
+    model_name: lenet5
+    num_classes: 47
 
 algorithm:
     # Aggregation algorithm
@@ -95,4 +91,4 @@ algorithm:
 results:
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time
-    result_dir: ./results/cifar/ext/
+    result_dir: ./results/fashion/2/non/
