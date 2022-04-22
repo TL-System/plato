@@ -304,6 +304,9 @@ class Config:
                 if hasattr(Config().trainer,
                            'parallelized') and Config().trainer.parallelized:
                     device = 'cuda'
+                elif hasattr(Config().trainer, "gpu_id"):
+                    gpu_id = str(Config().trainer.gpu_id)
+                    device = f'cuda:{gpu_id}'
                 elif hasattr(Config().trainer,
                              "batch_job") and Config().trainer.batch_job:
                     if os.path.exists(os.environ['gpu_id_file']):
