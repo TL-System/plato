@@ -105,13 +105,8 @@ algorithm:
     # Aggregation algorithm
     type: fedavg
 
-results:
-    # Write the following parameter(s) into a CSV
-    types: accuracy, elapsed_time, round_time
-
-    # Plot results (x_axis&y_axis)
-    plot: round & accuracy, round & elapsed_time
-
+    # Decreasing rate of the mapping function used in FedAdp
+    alpha: 5
 
 results:
     result_dir: ./results/FashionMNIST_lenet5/FedAdp

@@ -12,7 +12,7 @@ https://ieeexplore.ieee.org/abstract/document/9442814
 import math
 
 import numpy as np
-
+from plato.config import Config
 from plato.servers import fedavg
 
 
@@ -21,8 +21,6 @@ class Server(fedavg.Server):
     def __init__(self):
         super().__init__()
 
-        # alpha controls the decreasing rate of the mapping function
-        self.alpha = 5
         self.local_angles = {}
         self.last_global_grads = None
         self.adaptive_weighting = None
@@ -35,7 +33,7 @@ class Server(fedavg.Server):
 
         num_samples = [report.num_samples for (report, __, __) in updates]
         total_samples = sum(num_samples)
-        
+
         self.global_grads = {
             name: self.trainer.zeros(weights.shape)
             for name, weights in weights_received[0].items()
@@ -43,7 +41,8 @@ class Server(fedavg.Server):
 
         for i, update in enumerate(weights_received):
             for name, delta in update.items():
-                self.global_grads[name] += delta * (num_samples[i] / total_samples)
+                self.global_grads[name] += delta * (num_samples[i] /
+                                                    total_samples)
 
         # Get adaptive weighting based on both node contribution and date size
         self.adaptive_weighting = self.calc_adaptive_weighting(
@@ -85,18 +84,14 @@ class Server(fedavg.Server):
         angles, contribs = [None] * len(updates), [None] * len(updates)
 
         # Compute the global gradient which is surrogated by using local gradients
-        # curr_global_grads = self.process_grad(self.algorithm.extract_weights())
-        # if self.last_global_grads is None:
-        #     self.last_global_grads = np.zeros(len(curr_global_grads))
-        # global_grads = np.subtract(curr_global_grads, self.last_global_grads)
-        # self.last_global_grads = curr_global_grads
         self.global_grads = self.process_grad(self.global_grads)
 
         # Compute angles in radian between local and global gradients
         for i, update in enumerate(updates):
             local_grads = self.process_grad(update)
             inner = np.inner(self.global_grads, local_grads)
-            norms = np.linalg.norm(self.global_grads) * np.linalg.norm(local_grads)
+            norms = np.linalg.norm(
+                self.global_grads) * np.linalg.norm(local_grads)
             angles[i] = np.arccos(np.clip(inner / norms, -1.0, 1.0))
 
         for i, angle in enumerate(angles):
@@ -106,15 +101,13 @@ class Server(fedavg.Server):
             if client_id not in self.local_angles.keys():
                 self.local_angles[client_id] = angle
             self.local_angles[client_id] = (
-                (self.current_round - 1) /
-                self.current_round) * self.local_angles[client_id]
-            +(1 / self.current_round) * angle
+                (self.current_round - 1) / self.current_round
+            ) * self.local_angles[client_id] + (1 / self.current_round) * angle
 
             # Non-linear mapping to node contribution
-            contribs[i] = self.alpha * (
-                1 -
-                math.exp(-math.exp(-self.alpha *
-                                   (self.local_angles[client_id] - 1))))
+            contribs[i] = Config().algorithm.alpha * (
+                1 - math.exp(-math.exp(-Config().algorithm.alpha *
+                                       (self.local_angles[client_id] - 1))))
 
         return contribs
 
@@ -126,6 +119,7 @@ class Server(fedavg.Server):
 
         flattened = grads[0]
         for i in range(1, len(grads)):
-            flattened = np.append(flattened, grads[i])
+            flattened = np.append(flattened,
+                                  -grads[i] / Config().trainer.learning_rate)
 
         return flattened
