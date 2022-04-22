@@ -9,6 +9,7 @@ import os
 import sqlite3
 from collections import OrderedDict, namedtuple
 from typing import Any, IO
+import hashlib
 
 import numpy as np
 import yaml
@@ -194,16 +195,23 @@ class Config:
                     f"{Config.params['result_dir']}/running_trainers.sqlitedb")
                 Config().cursor = Config.sql_connection.cursor()
 
-            filename_hash = 0
-            for character in filename:
-                filename_hash = (filename_hash * 281
-                                 ^ ord(character) * 997) & 0xFFFFFFFF
             os.environ['gpu_id_file'] = os.path.join(
                 Config.params['checkpoint_dir'],
-                str(filename_hash) + '.yml')
-            print("!!!", str(filename_hash))
+                str(Config().sha256sum(filename)) + '.yml')
+            print("!!!", str(Config().sha256sum(filename)))
 
         return cls._instance
+
+    @staticmethod
+    def sha256sum(filename):
+        """Returns to hash value of a file name."""
+        h = hashlib.sha256()
+        b = bytearray(128 * 1024)
+        mv = memoryview(b)
+        with open(filename, 'rb', buffering=0) as f:
+            while n := f.readinto(mv):
+                h.update(mv[:n])
+        return h.hexdigest()
 
     @staticmethod
     def namedtuple_from_dict(obj):
