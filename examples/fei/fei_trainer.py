@@ -77,6 +77,7 @@ class Trainer(basic.Trainer):
                 if 'max_grad_norm' in config else 1.0,
             )
 
+        total_loss = 0
         for epoch in range(1, epochs + 1):
             # Use a default training loop
             for batch_id, (examples, labels) in enumerate(train_loader):
@@ -110,6 +111,8 @@ class Trainer(basic.Trainer):
                             self.client_id, epoch, epochs, batch_id,
                             len(train_loader), loss.data.item())
 
+                total_loss += loss.data.item()
+
             if lr_schedule is not None:
                 lr_schedule.step()
 
@@ -133,10 +136,11 @@ class Trainer(basic.Trainer):
                 self.save_model(filename)
                 self.model.to(self.device)
 
-        # Save the training loss of the last epoch in this round
+        # Save the training loss averaged over epochs in this round
         model_name = config['model_name']
         filename = f'{model_name}_{self.client_id}.loss'
-        Trainer.save_loss(loss.data.item(), filename)
+        avg_loss = total_loss / epochs
+        Trainer.save_loss(avg_loss, filename)
 
     @staticmethod
     def save_loss(loss, filename=None):
