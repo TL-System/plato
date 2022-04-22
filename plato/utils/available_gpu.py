@@ -12,7 +12,7 @@ def available_gpu() -> int:
     pynvml.nvmlInit()
 
     device_count = pynvml.nvmlDeviceGetCount()
-    min_memory_used = 0
+    max_memory_unused = 0
     device_id = -1
 
     for i in range(device_count):
@@ -20,11 +20,11 @@ def available_gpu() -> int:
         mem = pynvml.nvmlDeviceGetMemoryInfo(handle)
         free_memory = mem.free / (1024**3)
 
-        if free_memory < min_memory_used:
-            continue
-        else:
-            min_memory_used = free_memory
+        if free_memory > max_memory_unused:
+            max_memory_unused = free_memory
             device_id = i
+        else:
+            continue
 
     logging.info("GPU #%d is used as it has the most available memory.",
                  device_id)
