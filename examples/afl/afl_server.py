@@ -9,11 +9,12 @@ Goetz et al., "Active Federated Learning", 2019.
 
 https://arxiv.org/pdf/1909.12641.pdf
 """
+import logging
 import math
 import random
 
 import numpy as np
-
+from plato.config import Config
 from plato.servers import fedavg
 
 
@@ -21,15 +22,6 @@ class Server(fedavg.Server):
     """A federated learning server using the AFL algorithm."""
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model, algorithm, trainer)
-        # The proportion of clients with the smallest valuations to be set to
-        # negative infinities
-        self.alpha1 = 0.75
-
-        # The softmax temperature used in distribution
-        self.alpha2 = 0.01
-
-        # The proportion of clients which are selected uniformly at random
-        self.alpha3 = 0.1
 
         self.local_values = {}
 
@@ -48,10 +40,10 @@ class Server(fedavg.Server):
 
         return update
 
-    def calc_sample_distribution(self):
+    def calc_sample_distribution(self, clients_pool):
         """ Calculate the sampling probability of each client for the next round. """
         # First, initialize valuations and probabilities when new clients are connected
-        for client_id in self.clients_pool:
+        for client_id in clients_pool:
             if client_id not in self.local_values:
                 self.local_values[client_id] = {}
                 self.local_values[client_id]["valuation"] = -float("inf")
@@ -59,44 +51,47 @@ class Server(fedavg.Server):
 
         # For a proportion of clients with the smallest valuations, reset these valuations
         # to negative infinities
-        num_smallest = int(self.alpha1 * len(self.clients_pool))
+        num_smallest = int(Config().algorithm.alpha1 * len(clients_pool))
         smallest_valuations = dict(
             sorted(self.local_values.items(),
                    key=lambda item: item[1]["valuation"])[:num_smallest])
-        for client_id in smallest_valuations:
+        for client_id in smallest_valuations.keys():
             self.local_values[client_id]["valuation"] = -float("inf")
-        for client_id in self.clients:
+        for client_id in clients_pool:
             self.local_values[client_id]["prob"] = math.exp(
-                self.alpha2 * self.local_values[client_id]["valuation"])
+                Config().algorithm.alpha2 *
+                self.local_values[client_id]["valuation"])
 
     def choose_clients(self, clients_pool, clients_count):
         """Choose a subset of the clients to participate in each round."""
+        assert clients_count <= len(clients_pool)
+        random.setstate(self.prng_state)
         # Update the clients sampling distribution
-        self.calc_sample_distribution()
+        self.calc_sample_distribution(clients_pool)
 
         # 1. Sample a subset of the clients according to the sampling distribution
-        num1 = int(math.floor((1 - self.alpha3) * clients_count))
+        num1 = int(math.floor((1 - Config().algorithm.alpha3) * clients_count))
         probs = np.array([
-            self.local_values[client_id]["prob"]
-            for client_id in clients_pool
+            self.local_values[client_id]["prob"] for client_id in clients_pool
         ])
 
-        if probs.sum() != 0.0:
-            probs /= probs.sum()
-        else:
-            probs = None
+        # Still give a small probability to those with zeros
+        probs = probs + 0.01
+        probs /= probs.sum()
 
-        subset1 = np.random.choice(clients_pool,
-                                   num1,
-                                   p=probs,
+        subset1 = np.random.choice(clients_pool, num1, p=probs,
                                    replace=False).tolist()
 
         # 2. Sample a subset of the remaining clients uniformly at random
-        num2 = self.clients_per_round - num1
-        remaining = self.clients_pool
+        num2 = clients_count - num1
+        remaining = clients_pool.copy()
         for client_id in subset1:
             remaining.remove(client_id)
         subset2 = random.sample(remaining, num2)
 
         # 3. Selected clients are the union of these two subsets
-        return subset1 + subset2
+        selected_clients = subset1 + subset2
+
+        self.prng_state = random.getstate()
+        logging.info("[%s] Selected clients: %s", self, selected_clients)
+        return selected_clients

@@ -26,7 +26,6 @@ class Report(simple.Report):
 
 class Client(simple.Client):
     """A federated learning client for AFL."""
-
     async def train(self):
         logging.info("Training on AFL client #%d", self.client_id)
 
