@@ -9,12 +9,8 @@ Goetz et al., "Active Federated Learning", 2019.
 
 https://arxiv.org/pdf/1909.12641.pdf
 """
-import os
-
-os.environ['config_file'] = './afl_MNIST_lenet5.yml'
-
-import afl_server
 import afl_client
+import afl_server
 import afl_trainer
 
 
