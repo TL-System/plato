@@ -60,7 +60,7 @@ class RLServer(rl_server.RLServer):
         """ Calculate the node contribution based on the angle
             between local gradient and global gradient.
         """
-        correlations, contribs = [None] * len(updates), [None] * len(updates)
+        correlations = [None] * len(updates)
 
         # Update the baseline model weights
         curr_global_grads = self.process_grad(self.algorithm.extract_weights())
@@ -74,20 +74,9 @@ class RLServer(rl_server.RLServer):
             local_grads = self.process_grad(update)
             inner = np.inner(global_grads, local_grads)
             norms = np.linalg.norm(global_grads) * np.linalg.norm(local_grads)
-            correlations[i] = np.arccos(np.clip(inner / norms, -1.0, 1.0))
+            correlations[i] = np.clip(inner / norms, -1.0, 1.0)
 
-        for i, correlation in enumerate(correlations):
-            self.local_correlations[i] = correlation
-            self.local_correlations[i] = (
-                (self.current_round - 1) /
-                self.current_round) * self.local_correlations[i] + (
-                    1 / self.current_round) * correlation
-            # Non-linear mapping to node contribution
-            contribs[i] = Config().algorithm.alpha * (
-                1 - math.exp(-math.exp(-Config().algorithm.alpha *
-                                       (self.local_correlations[i] - 1))))
-
-        return contribs
+        return correlations
 
     @staticmethod
     def process_grad(grads):
