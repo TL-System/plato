@@ -15,13 +15,13 @@ clients:
     simulation: true
 
     # Whether client-server communication should be simulated with files
-    comm_simulation: true
+    comm_simulation: false
 
     random_seed: 1
 
 server:
     address: 127.0.0.1
-    port: 8001
+    port: 8002
     do_test: true
     
     ping_timeout: 36000
@@ -30,13 +30,13 @@ server:
     # Should we simulate the wall-clock time on the server? Useful if max_concurrency is specified
     simulate_wall_time: true
     
-    checkpoint_dir: ./models/emnist/2/iid/checkpoint
-    model_dir: ./models/emnist/2/iid/model
+    checkpoint_dir: ./models/mnist/2/non/checkpoint
+    model_dir: ./models/mnist/2/non/model
 
 
 data:
     # The training and testing dataset
-    datasource: EMNIST
+    datasource: MNIST
 
     # Where the dataset is located
     data_path: ./data
@@ -45,7 +45,10 @@ data:
     partition_size: 1000
 
     # IID or non-IID?
-    sampler: iid
+    sampler: noniid
+    
+    # The concentration parameter for the Dirichlet distribution
+    concentration: 1.0
 
     # The size of the testset on the server
     #testset_size: 10000
@@ -58,7 +61,7 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 50
+    rounds: 40
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -88,4 +91,4 @@ algorithm:
 results:
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time
-    result_dir: ./results/emnist/2/iid/
+    result_dir: ./results/mnist/2/non/
