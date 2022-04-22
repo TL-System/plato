@@ -8,10 +8,6 @@ in the Proceedings of the 2019 International Joint Conference on Neural Networks
 
 https://arxiv.org/abs/1812.07108
 """
-import os
-
-os.environ['config_file'] = './fedatt_MNIST_lenet5.yml'
-
 import fedatt_server
 
 

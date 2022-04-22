@@ -12,7 +12,7 @@ from collections import OrderedDict
 
 import torch
 import torch.nn.functional as F
-
+from plato.config import Config
 from plato.servers import fedavg
 
 
@@ -20,12 +20,6 @@ class Server(fedavg.Server):
     """ A federated learning server using the FedAtt algorithm. """
     def __init__(self):
         super().__init__()
-
-        # epsilon: step size for aggregation
-        self.epsilon = 1.0
-
-        # dp: the magnitude of normal noise in the randomization mechanism
-        self.dp = 0.001
 
     async def federated_averaging(self, updates):
         """ Aggregate weight updates from the clients using FedAtt. """
@@ -48,11 +42,11 @@ class Server(fedavg.Server):
         }
 
         atts = OrderedDict()
-        for name, weight in baseline_weights.items():
+        for name in baseline_weights.keys():
             atts[name] = self.trainer.zeros(len(weights_received))
             for i, update in enumerate(weights_received):
                 delta = update[name]
-                atts[name][i] = torch.linalg.norm(delta)
+                atts[name][i] = torch.linalg.norm(-delta)
 
         for name in baseline_weights.keys():
             atts[name] = F.softmax(atts[name], dim=0)
@@ -61,9 +55,12 @@ class Server(fedavg.Server):
             att_weight = self.trainer.zeros(weight.shape)
             for i, update in enumerate(weights_received):
                 delta = update[name]
-                att_weight += torch.mul(delta, atts[name][i])
+                att_weight += torch.mul(-delta, atts[name][i])
 
-            att_update[name] = torch.mul(att_weight, self.epsilon) + torch.mul(
-                torch.randn(weight.shape), self.dp)
+            att_update[name] = -torch.mul(
+                att_weight,
+                Config().algorithm.epsilon) + torch.mul(
+                    torch.randn(weight.shape),
+                    Config().algorithm.dp)
 
         return att_update
