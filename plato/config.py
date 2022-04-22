@@ -18,7 +18,6 @@ from plato.utils.available_gpu import available_gpu
 
 class Loader(yaml.SafeLoader):
     """ YAML Loader with `!include` constructor. """
-
     def __init__(self, stream: IO) -> None:
         """Initialise Loader."""
 
@@ -195,6 +194,15 @@ class Config:
                     f"{Config.params['result_dir']}/running_trainers.sqlitedb")
                 Config().cursor = Config.sql_connection.cursor()
 
+            filename_hash = 0
+            for character in filename:
+                filename_hash = (filename_hash * 281
+                                 ^ ord(character) * 997) & 0xFFFFFFFF
+            os.environ['gpu_id_file'] = os.path.join(
+                Config.params['checkpoint_dir'],
+                str(filename_hash) + '.yml')
+            print("!!!", str(filename_hash))
+
         return cls._instance
 
     @staticmethod
@@ -296,6 +304,22 @@ class Config:
                 if hasattr(Config().trainer,
                            'parallelized') and Config().trainer.parallelized:
                     device = 'cuda'
+                elif hasattr(Config().trainer,
+                             "batch_job") and Config().trainer.batch_job:
+                    if os.path.exists(os.environ['gpu_id_file']):
+                        with open(os.environ['gpu_id_file'],
+                                  'r',
+                                  encoding='utf-8') as gpu_id_file:
+                            gpu_id = yaml.load(gpu_id_file, Loader)
+                            print("!!!READ", gpu_id)
+                    else:
+                        with open(os.environ['gpu_id_file'],
+                                  'w',
+                                  encoding='utf-8') as gpu_id_file:
+                            gpu_id = available_gpu()
+                            yaml.dump(str(gpu_id), gpu_id_file)
+                            print("!!!WRITE", gpu_id)
+                    device = f'cuda:{gpu_id}'
                 else:
                     gpu_id = os.getenv('GPU_ID')
 
