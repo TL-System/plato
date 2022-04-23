@@ -75,7 +75,7 @@ trainer:
     # Number of epoches for local training in each communication round
     epochs: 5
     batch_size: 10
-        optimizer: SGD
+    optimizer: SGD
     learning_rate: 0.1
     momentum: 0.9
     weight_decay: 0.0001
