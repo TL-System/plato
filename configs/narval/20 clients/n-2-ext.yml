@@ -21,7 +21,7 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8021
+    port: 8006
     do_test: true
     
     ping_timeout: 36000
@@ -30,22 +30,25 @@ server:
     # Should we simulate the wall-clock time on the server? Useful if max_concurrency is specified
     simulate_wall_time: true
     
-    checkpoint_dir: ./models/mnist/2/iid/checkpoint
-    model_dir: ./models/mnist/2/iid/model
+    checkpoint_dir: ./models/cinic/2/ext/checkpoint
+    model_dir: ./models/cinic/2/ext/model
 
 
 data:
     # The training and testing dataset
-    datasource: MNIST
+    datasource: CINIC10
 
     # Where the dataset is located
-    data_path: ../../data
+    data_path: ./data/CINIC-10
 
     # Number of samples in each partition
     partition_size: 1000
 
     # IID or non-IID?
-    sampler: iid
+    sampler: noniid
+    
+    # The concentration parameter for the Dirichlet distribution
+    concentration: 1.0
 
     # The size of the testset on the server
     #testset_size: 10000
@@ -58,7 +61,7 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 40
+    rounds: 50
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -74,12 +77,12 @@ trainer:
     batch_size: 10
     optimizer: SGD
     learning_rate: 0.01
-    momentum: 0.9
+    momentum: 0.5
     weight_decay: 0.0
 
     # The machine learning model
-    model_name: lenet5
-    num_classes: 47
+    model_name: vgg_16
+    num_classes: 10
 
 algorithm:
     # Aggregation algorithm
@@ -88,4 +91,4 @@ algorithm:
 results:
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time
-    result_dir: ./results/mnist/2/iid/
+    result_dir: ./results/cinic/2/ext/

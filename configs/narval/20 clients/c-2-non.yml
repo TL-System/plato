@@ -15,13 +15,13 @@ clients:
     simulation: true
 
     # Whether client-server communication should be simulated with files
-    comm_simulation: true
+    comm_simulation: false
 
     random_seed: 1
 
 server:
     address: 127.0.0.1
-    port: 8021
+    port: 8005
     do_test: true
     
     ping_timeout: 36000
@@ -30,22 +30,25 @@ server:
     # Should we simulate the wall-clock time on the server? Useful if max_concurrency is specified
     simulate_wall_time: true
     
-    checkpoint_dir: ./models/mnist/2/iid/checkpoint
-    model_dir: ./models/mnist/2/iid/model
+    checkpoint_dir: ./models/cifar/2/non/checkpoint
+    model_dir: ./models/cifar/2/non/model
 
 
 data:
     # The training and testing dataset
-    datasource: MNIST
+    datasource: CIFAR10
 
     # Where the dataset is located
-    data_path: ../../data
+    data_path: ./data
 
     # Number of samples in each partition
     partition_size: 1000
 
     # IID or non-IID?
-    sampler: iid
+    sampler: noniid
+    
+    # The concentration parameter for the Dirichlet distribution
+    concentration: 5.0
 
     # The size of the testset on the server
     #testset_size: 10000
@@ -58,7 +61,7 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 40
+    rounds: 50
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -73,13 +76,17 @@ trainer:
     epochs: 5
     batch_size: 10
     optimizer: SGD
-    learning_rate: 0.01
+    learning_rate: 0.1
     momentum: 0.9
-    weight_decay: 0.0
+    weight_decay: 0.0001
+
+    # Learning rate schedule
+    lr_schedule: LambdaLR
+    lr_gamma: 0.1
+    lr_milestone_steps: 80ep,120ep
 
     # The machine learning model
-    model_name: lenet5
-    num_classes: 47
+    model_name: resnet_18
 
 algorithm:
     # Aggregation algorithm
@@ -88,4 +95,4 @@ algorithm:
 results:
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time
-    result_dir: ./results/mnist/2/iid/
+    result_dir: ./results/cifar/2/non/

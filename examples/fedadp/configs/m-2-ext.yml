@@ -21,7 +21,7 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8000
+    port: 8020
     do_test: true
     
     ping_timeout: 36000
