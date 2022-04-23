@@ -105,10 +105,8 @@ class Server(fedavg.Server):
             ) * self.local_angles[client_id] + (1 / self.current_round) * angle
 
             # Non-linear mapping to node contribution
-            if hasattr(Config().algorithm, 'alpha'):
-                alpha = Config().algorithm.alpha
-            else:
-                alpha = 5
+            alpha = Config().algorithm.alpha if hasattr(
+                Config().algorithm, 'alpha') else 5
 
             contribs[i] = alpha * (
                 1 - math.exp(-math.exp(-alpha *

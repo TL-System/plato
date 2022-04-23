@@ -58,16 +58,12 @@ class Server(fedavg.Server):
                 att_weight += torch.mul(-delta, atts[name][i])
 
             # Step size for aggregation used in FedAtt
-            if hasattr(Config().algorithm, 'epsilon'):
-                epsilon = Config().algorithm.epsilon
-            else:
-                epsilon = 1.2
+            epsilon = Config().algorithm.epsilon if hasattr(
+                Config().algorithm, 'epsilon') else 1.2
 
             # The magnitude of normal noise in the randomization mechanism
-            if hasattr(Config().algorithm, 'magnitude'):
-                magnitude = Config().algorithm.magnitude
-            else:
-                magnitude = 0.001
+            magnitude = Config().algorithm.magnitude if hasattr(
+                Config().algorithm, 'magnitude') else 0.001
 
             att_update[name] = -torch.mul(att_weight, epsilon) + torch.mul(
                 torch.randn(weight.shape), magnitude)

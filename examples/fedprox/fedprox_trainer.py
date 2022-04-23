@@ -35,7 +35,8 @@ class FedProxLocalObjective:
     def compute_objective(self, outputs, labels):
         """ Compute the objective the FedProx client wishes to minimize. """
         cur_weights = flatten_weights_from_model(self.model, self.device)
-        mu = Config().clients.proximal_term_penalty_constant
+        mu = Config().clients.proximal_term_penalty_constant if hasattr(
+            Config().clients, "proximal_term_penalty_constant") else 1
         prox_term = mu / 2 * torch.linalg.norm(
             cur_weights - self.init_global_weights, ord=2)
 
