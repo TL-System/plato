@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 100
+    total_clients: 200
 
     # The number of clients selected in each round
-    per_round: 10
+    per_round: 20
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -14,62 +14,44 @@ clients:
     # Whether clients should be simulated with only a sufficient number of processes
     simulation: true
 
-    # Whether client heterogeneity should be simulated
-    speed_simulation: true
-
-    # The simulation distribution
-    simulation_distribution:
-        distribution: normal
-        mean: 10
-        sd: 3
-
-    # Should clients really go to sleep, or should we just simulate the sleep times?
-    sleep_simulation: true
-
-    # If we are simulating client training times, what is the average training time?
-    avg_training_time: 20
+    # Whether client-server communication should be simulated with files
+    comm_simulation: true
 
     random_seed: 1
 
 server:
     address: 127.0.0.1
-    port: 8000
-
-    # Should we operate in sychronous mode?
-    synchronous: false
+    port: 8013
+    do_test: true
+    
+    ping_timeout: 36000
+    ping_interval: 36000
 
     # Should we simulate the wall-clock time on the server? Useful if max_concurrency is specified
     simulate_wall_time: true
+    
+    checkpoint_dir: ./models/fashion/2/ext/checkpoint
+    model_dir: ./models/fashion/2/ext/model
 
-    # What is the minimum number of clients that need to report before aggregation begins?
-    minimum_clients_aggregated: 6
-
-    # What is the staleness bound, beyond which the server should wait for stale clients?
-    staleness_bound: 10
-
-    random_seed: 1
 
 data:
     # The training and testing dataset
     datasource: FashionMNIST
 
     # Where the dataset is located
-    data_path: ./data
+    data_path: ../../data
 
     # Number of samples in each partition
-    partition_size: 200
-
-    # Client's partition size distribution
-    partition_distribution:
-        distribution: uniform
-        low: 0.4
-        high: 1.0
+    partition_size: 1000
 
     # IID or non-IID?
     sampler: noniid
-
+    
     # The concentration parameter for the Dirichlet distribution
     concentration: 0.5
+
+    # The size of the testset on the server
+    #testset_size: 10000
 
     # The random seed for sampling data
     random_seed: 1
@@ -79,20 +61,20 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 100
+    rounds: 40
 
     # Whether the training should use multiple GPUs if available
-    parallelized: true
+    parallelized: false
 
     # The maximum number of clients running concurrently
-    max_concurrency: 4
+    max_concurrency: 1
 
     # The target accuracy
-    target_accuracy: 1.0
+    target_accuracy: 0.99
 
     # Number of epoches for local training in each communication round
-    epochs: 10
-    batch_size: 32
+    epochs: 5
+    batch_size: 10
     optimizer: SGD
     learning_rate: 0.01
     momentum: 0.9
@@ -100,22 +82,13 @@ trainer:
 
     # The machine learning model
     model_name: lenet5
+    num_classes: 47
 
 algorithm:
     # Aggregation algorithm
     type: fedavg
 
-    # Step size for aggregation used in FedAtt
-    epsilon: 1.2
-
-    # The magnitude of normal noise in the randomization mechanism used in FedAtt
-    magnitude: 0.001
-
 results:
-    result_dir: ./results/FashionMNIST_lenet5/FedAtt
-
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time
-
-    # Plot results (x_axis-y_axis)
-    plot: round-accuracy, elapsed_time-accuracy
+    result_dir: ./results/fashion/2/ext/
