@@ -46,6 +46,7 @@ class Server(fedavg.Server):
             atts[name] = self.trainer.zeros(len(weights_received))
             for i, update in enumerate(weights_received):
                 delta = update[name]
+                delta = delta.float()
                 atts[name][i] = torch.linalg.norm(-delta)
 
         for name in baseline_weights.keys():
@@ -55,6 +56,7 @@ class Server(fedavg.Server):
             att_weight = self.trainer.zeros(weight.shape)
             for i, update in enumerate(weights_received):
                 delta = update[name]
+                delta = delta.float()
                 att_weight += torch.mul(-delta, atts[name][i])
 
             # Step size for aggregation used in FedAtt
