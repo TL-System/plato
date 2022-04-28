@@ -1,20 +1,21 @@
 """
-Samples data from a dataset in an independent and identically distributed fashion.
+A customized iid sampler for federated unlearning.
+
+Reference: Liu et al., "The Right to be Forgotten in Federated Learning: An Efficient Realization with Rapid Retraining." in Proc. INFOCOM, 2022 https://arxiv.org/abs/2203.07320
+
 """
 import numpy as np
-import torch
-from torch.utils.data import SubsetRandomSampler
 
 from plato.config import Config
-from plato.samplers import base
+from plato.samplers import iid
 
 
-class Sampler(base.Sampler):
+class Sampler(iid.Sampler):
     """Create a data sampler for each client to use a randomly divided partition of the
-    dataset."""
+    dataset with delete_data_ratio."""
 
-    def __init__(self, datasource, client_id, testing):
-        super().__init__()
+    def __init__(self, datasource, client_id, testing, need_delete=False):
+        super().__init__(datasource, client_id, testing)
         if testing:
             dataset = datasource.get_test_set()
         else:
@@ -28,6 +29,7 @@ class Sampler(base.Sampler):
         partition_size = Config().data.partition_size
         total_clients = Config().clients.total_clients
         total_size = partition_size * total_clients
+        delete_data_ratio = Config().clients.delete_data_ratio
 
         # add extra samples to make it evenly divisible, if needed
         if len(indices) < total_size:
@@ -41,15 +43,12 @@ class Sampler(base.Sampler):
         self.subset_indices = indices[(int(client_id) -
                                        1):total_size:total_clients]
 
-    def get(self):
-        """Obtains an instance of the sampler. """
-        gen = torch.Generator()
-        gen.manual_seed(self.random_seed)
-        version = torch.__version__
-        if int(version[0]) <= 1 and int(version[2]) <= 5:
-            return SubsetRandomSampler(self.subset_indices)
-        return SubsetRandomSampler(self.subset_indices, generator=gen)
+        if (need_delete):
+            num_subset_length = int(len(self.subset_indices))
+            delelte_subset_length = int(num_subset_length * delete_data_ratio)
+            delete_index = np.random.choice(range(num_subset_length),
+                                            delelte_subset_length,
+                                            replace=False)
 
-    def trainset_size(self):
-        """Returns the length of the dataset after sampling. """
-        return len(self.subset_indices)
+            self.subset_indices = list(
+                np.delete(self.subset_indices, delete_index))

@@ -13,6 +13,7 @@ from plato.config import Config
 
 class Trainer(ABC):
     """Base class for all the trainers."""
+
     def __init__(self):
         self.device = Config().device()
         self.client_id = 0
