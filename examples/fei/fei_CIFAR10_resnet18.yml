@@ -20,13 +20,13 @@ clients:
         distribution: uniform
         low: 0
         high: 20
-
+    
     # Should clients really go to sleep, or should we just simulate the sleep times?
     sleep_simulation: true
 
     # If we are simulating client training times, what is the average training time?
     avg_training_time: 20
-    
+
     random_seed: 1
 
 server:
@@ -49,32 +49,29 @@ server:
 
 data:
     # The training and testing dataset
-    datasource: FashionMNIST
+    datasource: CIFAR10
 
     # Where the dataset is located
     data_path: ./data
 
     # Number of samples in each partition
-    partition_size: 200
+    partition_size: 5000
 
-    # Client's partition size distribution
-    partition_distribution:
-        distribution: uniform
-        low: 0.4
-        high: 1.0
+    # Whether clients have different partition size or not?
+    variable_partition: true
 
     # IID or non-IID?
     sampler: noniid
 
     # The concentration parameter for the Dirichlet distribution
-    concentration: 0.5
+    concentration: 5
 
     # The random seed for sampling data
     random_seed: 1
 
 trainer:
     # The maximum number of training rounds
-    rounds: 100
+    rounds: 200
 
     # Whether the training should use multiple GPUs if available
     parallelized: true
@@ -86,15 +83,20 @@ trainer:
     target_accuracy: 1.0
 
     # Number of epoches for local training in each communication round
-    epochs: 10
-    batch_size: 32
+    epochs: 1
+    batch_size: 128
     optimizer: SGD
-    learning_rate: 0.01
+    learning_rate: 0.1
     momentum: 0.9
-    weight_decay: 0.0
+    weight_decay: 0.0001
+
+    # Learning rate schedule
+    lr_schedule: LambdaLR
+    lr_gamma: 0.1
+    lr_milestone_steps: 80ep,120ep
 
     # The machine learning model
-    model_name: lenet5
+    model_name: resnet_18
 
 algorithm:
     # Aggregation algorithm
@@ -114,7 +116,7 @@ algorithm:
     mode: train # train/test
     pretrained: false
     pretrained_iter: 0
-    test_step: 100
+    test_step: 200
 
     # RL policy
     model_name: td3

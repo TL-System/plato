@@ -17,7 +17,6 @@ from plato.trainers import registry as trainers_registry
 
 class RLServer(fedavg.Server):
     """ A federated learning server with an RL Agent. """
-
     def __init__(self, agent, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
         self.agent = agent
@@ -81,7 +80,7 @@ class RLServer(fedavg.Server):
         # Use adaptive weighted average
         for i, update in enumerate(weights_received):
             for name, delta in update.items():
-                avg_update[name] += delta * self.smart_weighting[i]
+                avg_update[name] += delta * self.smart_weighting[i][0]
 
             # Yield to other tasks in the server
             await asyncio.sleep(0)

@@ -9,3 +9,5 @@ transformers
 opacus
 gym
 zstd
+pynvml
+psutil

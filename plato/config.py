@@ -13,6 +13,8 @@ from typing import Any, IO
 import numpy as np
 import yaml
 
+from plato.utils.available_gpu import available_gpu
+
 
 class Loader(yaml.SafeLoader):
     """ YAML Loader with `!include` constructor. """
@@ -279,8 +281,14 @@ class Config:
             gpus = tf.config.experimental.list_physical_devices('GPU')
             if len(gpus) > 0:
                 device = 'GPU'
-                tf.config.experimental.set_visible_devices(
-                    gpus[np.random.randint(0, len(gpus))], 'GPU')
+                gpu_id = int(os.getenv('GPU_ID'))
+
+                if gpu_id is None:
+                    gpu_id = available_gpu()
+                    os.environ['GPU_ID'] = str(gpu_id)
+
+                tf.config.experimental.set_visible_devices(gpus[gpu_id], 'GPU')
+
         else:
             import torch
 
@@ -289,8 +297,13 @@ class Config:
                            'parallelized') and Config().trainer.parallelized:
                     device = 'cuda'
                 else:
-                    device = 'cuda:' + str(
-                        np.random.randint(0, torch.cuda.device_count()))
+                    gpu_id = os.getenv('GPU_ID')
+
+                    if gpu_id is None:
+                        gpu_id = available_gpu()
+                        os.environ['GPU_ID'] = str(gpu_id)
+
+                    device = f'cuda:{gpu_id}'
 
         return device
 
