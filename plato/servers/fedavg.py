@@ -24,10 +24,8 @@ class Server(base.Server):
         self.model = model
         self.algorithm = algorithm
         
-        if trainer is not None:
-            self.trainer = trainer()
-        else:
-            self.trainer = None
+        self.custom_trainer = trainer
+        self.trainer = None
 
         self.datasource = None
         self.testset = None
@@ -110,8 +108,11 @@ class Server(base.Server):
 
     def load_trainer(self):
         """Setting up the global model to be trained via federated learning."""
-        if self.trainer is None:
+        if self.trainer is None and self.custom_trainer is None:
             self.trainer = trainers_registry.get(model=self.model)
+        elif self.custom_trainer is not None:
+            self.trainer = self.custom_trainer()
+            self.custom_trainer = None
 
         self.trainer.set_client_id(0)
 
