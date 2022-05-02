@@ -33,7 +33,12 @@ class Client(base.Client):
         self.model = model
         self.datasource = datasource
         self.algorithm = algorithm
-        self.custom_trainer = trainer
+        
+        if trainer is not None:
+            self.trainer = trainer()
+        else:
+            self.trainer = None
+
         self.trainset = None  # Training dataset
         self.testset = None  # Testing dataset
         self.sampler = None
@@ -45,10 +50,8 @@ class Client(base.Client):
         """Prepare this client for training."""
         super().configure()
 
-        if self.custom_trainer is None:
+        if self.trainer is None:
             self.trainer = trainers_registry.get(self.model)
-        else:
-            self.trainer = self.custom_trainer()
 
         self.trainer.set_client_id(self.client_id)
 
