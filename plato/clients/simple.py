@@ -13,7 +13,6 @@ from plato.datasources import registry as datasources_registry
 from plato.processors import registry as processor_registry
 from plato.samplers import registry as samplers_registry
 from plato.trainers import registry as trainers_registry
-from plato.trainers import basic
 
 @dataclass
 class Report(base.Report):
