@@ -14,7 +14,6 @@ from plato.processors import registry as processor_registry
 from plato.samplers import registry as samplers_registry
 from plato.trainers import registry as trainers_registry
 
-
 @dataclass
 class Report(base.Report):
     """Report from a simple client, to be sent to the federated learning server."""
@@ -34,7 +33,7 @@ class Client(base.Client):
         self.model = model
         self.datasource = datasource
         self.algorithm = algorithm
-        self.trainer = trainer
+        self.custom_trainer = trainer
         self.trainset = None  # Training dataset
         self.testset = None  # Testing dataset
         self.sampler = None
@@ -46,8 +45,11 @@ class Client(base.Client):
         """Prepare this client for training."""
         super().configure()
 
-        if self.trainer is None:
+        if self.custom_trainer is None:
             self.trainer = trainers_registry.get(self.model)
+        else:
+            self.trainer = self.custom_trainer()
+
         self.trainer.set_client_id(self.client_id)
 
         if self.algorithm is None:
