@@ -45,8 +45,8 @@ class Server(fedavg.Server):
         for name in baseline_weights.keys():
             atts[name] = self.trainer.zeros(len(weights_received))
             for i, update in enumerate(weights_received):
-                delta = update[name]
-                delta = delta.float()
+                # convert potential LongTensor to FloatTensor for linalg.norm
+                delta = update[name].type(torch.FloatTensor)
                 atts[name][i] = torch.linalg.norm(-delta)
 
         for name in baseline_weights.keys():
