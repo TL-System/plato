@@ -17,9 +17,9 @@ from plato.servers import fedavg
 
 def main():
     """ A Plato federated learning training session using the Sub-FedAvg algorithm. """
-    trainer = subfedavg_trainer.Trainer()
+    trainer = subfedavg_trainer.Trainer
     client = subfedavg_client.Client(trainer=trainer)
-    server = fedavg.Server()
+    server = fedavg.Server(trainer=trainer)
     server.run(client)
 
 
