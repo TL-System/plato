@@ -20,7 +20,7 @@ import split_learning_trainer
 
 def main():
     """ A Plato federated learning training session using the split learning algorithm. """
-    trainer = split_learning_trainer.Trainer()
+    trainer = split_learning_trainer.Trainer
     algorithm = split_learning_algorithm.Algorithm(trainer=trainer)
     client = split_learning_client.Client(algorithm=algorithm, trainer=trainer)
     server = split_learning_server.Server(algorithm=algorithm, trainer=trainer)
