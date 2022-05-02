@@ -13,8 +13,9 @@ import fedprox_trainer
 from plato.servers import fedavg
 from plato.clients import simple
 
+
 def main():
-    """ A Plato federated learning training session using FedAsync. """
+    """ A Plato federated learning training session using FedProx. """
     trainer = fedprox_trainer.Trainer
     client = simple.Client(trainer=trainer)
     server = fedavg.Server(trainer=trainer)
