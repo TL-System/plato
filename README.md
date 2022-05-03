@@ -19,7 +19,7 @@ where `plato` is the preferred name of your new environment.
 The next step is to install the required Python packages. PyTorch should be installed following the advice of its [getting started website](https://pytorch.org/get-started/locally/). The typical command in Linux with CUDA GPU support, for example, would be:
 
 ```shell
-conda install pytorch torchvision cudatoolkit=11.3 -c pytorch
+pip3 install torch torchvision --extra-index-url https://download.pytorch.org/whl/cu113
 ```
 
 The CUDA version, used in the command above, can be obtained on Ubuntu Linux systems by using the command:
