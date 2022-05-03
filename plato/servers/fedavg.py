@@ -21,9 +21,11 @@ class Server(base.Server):
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__()
 
-        self.model = model
+        self.custom_model = model
+        self.model = None
+
         self.algorithm = algorithm
-        
+
         self.custom_trainer = trainer
         self.trainer = None
 
@@ -108,10 +110,14 @@ class Server(base.Server):
 
     def load_trainer(self):
         """Setting up the global model to be trained via federated learning."""
+        if self.custom_model is not None:
+            self.model = self.custom_model()
+            self.custom_model = None
+
         if self.trainer is None and self.custom_trainer is None:
             self.trainer = trainers_registry.get(model=self.model)
         elif self.custom_trainer is not None:
-            self.trainer = self.custom_trainer()
+            self.trainer = self.custom_trainer(model=self.model)
             self.custom_trainer = None
 
         self.trainer.set_client_id(0)

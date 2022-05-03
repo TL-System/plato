@@ -18,7 +18,6 @@ from plato.utils.available_gpu import available_gpu
 
 class Loader(yaml.SafeLoader):
     """ YAML Loader with `!include` constructor. """
-
     def __init__(self, stream: IO) -> None:
         """Initialise Loader."""
 
