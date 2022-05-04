@@ -15,9 +15,9 @@ from plato.config import Config
 from plato.trainers import basic
 
 
-def flatten_weights_from_model(model, device):
+def flatten_weights_from_model(model):
     """ Return the weights of the given model as a 1-D tensor """
-    weights = torch.tensor([], requires_grad=False, device=device)
+    weights = torch.tensor([], requires_grad=False).to(Config().device())
     for param in model.parameters():
         weights = torch.cat((weights, torch.flatten(param)))
     return weights
@@ -25,16 +25,13 @@ def flatten_weights_from_model(model, device):
 
 class FedProxLocalObjective:
     """ Representing the local objective of FedProx clients. """
-    def __init__(self, model, device):
+    def __init__(self, model):
         self.model = model
-        self.device = device
-
-        self.init_global_weights = flatten_weights_from_model(
-            self.model, self.device)
+        self.init_global_weights = flatten_weights_from_model(model)
 
     def compute_objective(self, outputs, labels):
         """ Compute the objective the FedProx client wishes to minimize. """
-        cur_weights = flatten_weights_from_model(self.model, self.device)
+        cur_weights = flatten_weights_from_model(self.model)
         mu = Config().clients.proximal_term_penalty_constant if hasattr(
             Config().clients, "proximal_term_penalty_constant") else 1
         prox_term = mu / 2 * torch.linalg.norm(
@@ -73,5 +70,5 @@ class Trainer(basic.Trainer):
 
     def loss_criterion(self, model):
         """ Return the loss criterion for FedProx clients. """
-        local_obj = FedProxLocalObjective(model, self.device)
+        local_obj = FedProxLocalObjective(model)
         return local_obj.compute_objective
