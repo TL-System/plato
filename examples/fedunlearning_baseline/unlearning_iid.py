@@ -14,7 +14,7 @@ class Sampler(iid.Sampler):
     """Create a data sampler for each client to use a randomly divided partition of the
     dataset with delete_data_ratio."""
 
-    def __init__(self, datasource, client_id, testing, need_delete=False):
+    def __init__(self, datasource, client_id, testing, needs_to_delete=False):
         super().__init__(datasource, client_id, testing)
         if testing:
             dataset = datasource.get_test_set()
@@ -29,7 +29,7 @@ class Sampler(iid.Sampler):
         partition_size = Config().data.partition_size
         total_clients = Config().clients.total_clients
         total_size = partition_size * total_clients
-        delete_data_ratio = Config().clients.delete_data_ratio
+        deleted_data_ratio = Config().clients.delete_data_ratio
 
         # add extra samples to make it evenly divisible, if needed
         if len(indices) < total_size:
@@ -43,12 +43,12 @@ class Sampler(iid.Sampler):
         self.subset_indices = indices[(int(client_id) -
                                        1):total_size:total_clients]
 
-        if (need_delete):
-            num_subset_length = int(len(self.subset_indices))
-            delelte_subset_length = int(num_subset_length * delete_data_ratio)
-            delete_index = np.random.choice(range(num_subset_length),
-                                            delelte_subset_length,
+        if needs_to_delete:
+            subset_length = int(len(self.subset_indices))
+            deleted_subset_length = int(subset_length * deleted_data_ratio)
+            deleted_index = np.random.choice(range(subset_length),
+                                            deleted_subset_length,
                                             replace=False)
 
             self.subset_indices = list(
-                np.delete(self.subset_indices, delete_index))
+                np.delete(self.subset_indices, deleted_index))
