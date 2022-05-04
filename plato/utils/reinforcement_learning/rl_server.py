@@ -21,42 +21,17 @@ class RLServer(fedavg.Server):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
         self.agent = agent
 
-    def configure(self):
-        """ Booting the federated learning server by setting up
-        the data, model, and creating the clients.
-            Called every time when reseting a new RL episode.
-        """
-        super().configure()
-        logging.info("[Server #%d] Configuring the server for episode %d",
-                     os.getpid(), self.agent.current_episode)
+    def reset(self):
+        """ Resetting the model, trainer, and algorithm on the server. """
+        logging.info("Reconfiguring the server for episode %d",
+                     self.agent.current_episode)
 
-        self.current_round = 0
-
+        self.model = None
+        self.trainer = None
+        self.algorithm = None
         self.load_trainer()
 
-        # Prepares this server for processors that processes outbound and inbound
-        # data payloads
-        self.outbound_processor, self.inbound_processor = processor_registry.get(
-            "Server", server_id=os.getpid(), trainer=self.trainer)
-
-        if not Config().clients.do_test:
-            dataset = datasources_registry.get(client_id=0)
-            self.testset = dataset.get_test_set()
-
-    def load_trainer(self):
-        """ Setting up the global model to be trained via federated learning. """
-        if self.trainer is None and self.custom_trainer is None:
-            self.trainer = trainers_registry.get(model=self.model)
-        elif self.custom_trainer is not None:
-            self.trainer = self.custom_trainer()
-            self.custom_trainer = None
-
-        self.trainer.set_client_id(0)
-
-        # Reset model for new episode
-        self.trainer.model = models_registry.get()
-
-        self.algorithm = algorithms_registry.get(self.trainer)
+        self.current_round = 0
 
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using smart weighting."""
@@ -83,7 +58,10 @@ class RLServer(fedavg.Server):
         # Use adaptive weighted average
         for i, update in enumerate(weights_received):
             for name, delta in update.items():
-                avg_update[name] += delta * self.smart_weighting[i][0]
+                if delta.type() == 'torch.LongTensor':
+                    avg_update[name] += delta * self.smart_weighting[i][0]
+                else:
+                    avg_update[name] += delta * self.smart_weighting[i]
 
             # Yield to other tasks in the server
             await asyncio.sleep(0)
@@ -118,7 +96,7 @@ class RLServer(fedavg.Server):
 
         if self.agent.reset_env:
             self.agent.reset_env = False
-            self.configure()
+            self.reset()
         if self.agent.finished:
             await self.close()
 
