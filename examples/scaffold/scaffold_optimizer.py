@@ -42,17 +42,17 @@ class ScaffoldOptimizer(optim.SGD):
             learning_rate = -group['lr']
             counter = 0
             for name in self.server_control_variate:
-                param = group['params'][counter]
-                if self.server_control_variate[name].to(
-                        self.device).shape == param.shape:
+                if 'weight' in name or 'bias' in name:
+                    server_control_variate = self.server_control_variate[
+                        name].to(self.device)
+                    param = group['params'][counter]
                     if self.client_control_variate:
                         param.data.add_(torch.sub(
-                            self.server_control_variate[name].to(self.device),
+                            server_control_variate,
                             self.client_control_variate[name].to(self.device)),
                                         alpha=learning_rate)
                     else:
-                        param.data.add_(self.server_control_variate[name].to(
-                            self.device),
+                        param.data.add_(server_control_variate,
                                         alpha=learning_rate)
                     counter += 1
 
