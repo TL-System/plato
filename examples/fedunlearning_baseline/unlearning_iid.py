@@ -12,7 +12,7 @@ from plato.samplers import iid
 
 class Sampler(iid.Sampler):
     """Create a data sampler for each client to use a randomly divided partition of the
-    dataset with delete_data_ratio."""
+    dataset with a particular ratio of data to be deleted."""
 
     def __init__(self, datasource, client_id, testing, needs_to_delete=False):
         super().__init__(datasource, client_id, testing)
