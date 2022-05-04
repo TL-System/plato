@@ -9,8 +9,6 @@ Optimization", in the Proceedings of NeurIPS 2020.
 https://proceedings.neurips.cc/paper/2020/hash/564127c03caab942e503ee6f810f54fd-Abstract.html
 """
 
-from collections import OrderedDict
-
 from plato.servers import fedavg
 
 

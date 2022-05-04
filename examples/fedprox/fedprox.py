@@ -13,6 +13,7 @@ import fedprox_trainer
 from plato.servers import fedavg
 from plato.clients import simple
 
+
 def main():
     """ A Plato federated learning training session using FedProx. """
     trainer = fedprox_trainer.Trainer
