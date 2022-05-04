@@ -22,9 +22,14 @@ class Processor(model.Processor):
 
         output = pickle.loads(zstd.decompress(data))
 
-        logging.info("[Server #%d] Decompressed received model parameters.",
-                     self.server_id)
-
+        if self.client_id is None:
+            logging.info(
+                "[Server #%d] Decompressed received model parameters.",
+                self.server_id)
+        else:
+            logging.info(
+                "[Client #%d] Decompressed received model parameters.",
+                self.client_id)
         return output
 
     def _process_layer(self, layer: Any) -> Any:
