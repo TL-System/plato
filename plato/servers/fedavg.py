@@ -169,6 +169,7 @@ class Server(base.Server):
         # Testing the global model accuracy
         if Config().clients.do_test:
             # Compute the average accuracy from client reports
+            base = 4
             self.accuracy = self.accuracy_averaging(self.updates)
             logging.info('[%s] Average client accuracy: %.2f%%.', self,
                          100 * self.accuracy)
