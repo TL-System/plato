@@ -8,7 +8,7 @@ import logging
 import pickle
 import torch
 import torch.nn.functional as F
-import time 
+import time
 
 from plato.config import Config
 from plato.servers import fedavg
@@ -17,6 +17,7 @@ import logging
 
 class Server(fedavg.Server):
     """ A federated unlearning server that implements the federated unlearning baseline algorithm. """
+
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__()
         self.restarted_session = False
@@ -36,8 +37,9 @@ class Server(fedavg.Server):
             logging.info("[%s] New contact from Client #%d received.", self,
                          client_id)
 
-        if (self.current_round == 0 or self.resumed_session or not self.restarted_session) and len(
-                self.clients) >= self.clients_per_round:
+        if (self.current_round == 0 or self.resumed_session
+                or not self.restarted_session) and len(
+                    self.clients) >= self.clients_per_round:
             logging.info("[%s] Starting training.", self)
             self.resumed_session = False
             self.restarted_session = False
@@ -51,12 +53,14 @@ class Server(fedavg.Server):
     async def wrap_up_processing_reports(self):
         """ Wrap up processing the reports with any additional work. """
         await super().wrap_up_processing_reports()
-        
+
         logging.info("**********the current round is %d", self.current_round)
-        logging.info("**********the data deleted round is %d", Config().clients.data_deleted_round)
+        logging.info("**********the round for deleting data is %d",
+                     Config().clients.data_deleted_round)
 
         if self.current_round == Config().clients.data_deleted_round:
-            logging.info("[%s] Data deleted. Retraining from the first round.", self)
+            logging.info("[%s] Data deleted. Retraining from the first round.",
+                         self)
             self.current_round = 0
             self.restarted_session = True
 
@@ -66,10 +70,9 @@ class Server(fedavg.Server):
             model_name = Config().trainer.model_name if hasattr(
                 Config().trainer, 'model_name') else 'custom'
             filename = f"checkpoint_{model_name}_{self.current_round}.pth"
-            self.trainer.load_model(filename, checkpoint_dir)  
-        
+            self.trainer.load_model(filename, checkpoint_dir)
+
     async def customize_server_response(self, server_response):
         """ Wrap up generating the server response with any additional information. """
-        additional_info = {'current_round': self.current_round}
-        server_response.update(additional_info)
+        server_response['current_round'] = self.current_round
         return server_response
