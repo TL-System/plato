@@ -103,16 +103,23 @@ class Server(base.Server):
                 self.testset_sampler = torch.utils.data.SubsetRandomSampler(
                     test_samples, generator=gen)
 
-        # Initialize the csv file which will record results
+        # Initialize the csv files which will record results
         if hasattr(Config(), 'results'):
             result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}.csv"
-            headers = []
-            for item in self.recorded_items:
-                headers.append(item)
-            for i in range(self.clients_per_round):
-                headers.append("Client " + str(i + 1) + ' Accuracy')
-            csv_processor.initialize_csv(result_csv_file, headers,
+            test_accuracy_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_Client_Test_Accuracy.csv"
+            csv_processor.initialize_csv(result_csv_file, self.recorded_items,
                                          Config().params['result_dir'])
+            
+            round_num = []
+            round_num.append("")
+            for i in range(Config().trainer.rounds):
+                round_num.append("Round " + str(i + 1))
+            client_rows = []
+            client_rows.append("")
+            for i in range(Config().clients.per_round):
+                client_rows.append("Client " + str(i + 1))
+            csv_processor.initialize_accuracy_csv(test_accuracy_csv_file, round_num, client_rows, Config().params['result_dir'])
+
 
     def load_trainer(self):
         """Setting up the global model to be trained via federated learning."""
@@ -196,6 +203,8 @@ class Server(base.Server):
         """ Wrap up processing the reports with any additional work. """
         if hasattr(Config(), 'results'):
             new_row = []
+            new_test_accuracy_column = []
+            
             for item in self.recorded_items:
                 item_value = {
                     'round':
@@ -216,10 +225,12 @@ class Server(base.Server):
                 }[item]
                 new_row.append(item_value)
             for (report, __, __) in self.updates:
-                new_row.append(report.accuracy)
+                new_test_accuracy_column.append(report.accuracy)
                  
             result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}.csv"
+            test_accuracy_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_Client_Test_Accuracy.csv"
             csv_processor.write_csv(result_csv_file, new_row)
+            csv_processor.write_csv_column(test_accuracy_csv_file, new_test_accuracy_column)
     @staticmethod
     def accuracy_averaging(updates):
         """Compute the average accuracy across clients."""
