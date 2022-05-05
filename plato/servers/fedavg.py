@@ -110,7 +110,7 @@ class Server(base.Server):
             for item in self.recorded_items:
                 headers.append(item)
             for i in range(self.clients_per_round):
-                headers.append("Client " + str(i + 1))
+                headers.append("Client " + str(i + 1) + ' Accuracy')
             csv_processor.initialize_csv(result_csv_file, headers,
                                          Config().params['result_dir'])
 
@@ -216,7 +216,7 @@ class Server(base.Server):
                 }[item]
                 new_row.append(item_value)
             for (report, __, __) in self.updates:
-                new_row.append(report)
+                new_row.append(report.accuracy)
                  
             result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}.csv"
             csv_processor.write_csv(result_csv_file, new_row)
