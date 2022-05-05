@@ -5,21 +5,19 @@ Reference: Liu et al., "The Right to be Forgotten in Federated Learning: An Effi
 
 """
 import logging
-import pickle
-import torch
-import torch.nn.functional as F
 import time
 
 from plato.config import Config
 from plato.servers import fedavg
-import logging
 
 
 class Server(fedavg.Server):
-    """ A federated unlearning server that implements the federated unlearning baseline algorithm. """
+    """ A federated unlearning server that implements the federated unlearning baseline 
+        algorithm.
+    """
 
     def __init__(self, model=None, algorithm=None, trainer=None):
-        super().__init__()
+        super().__init__(model=model, algorithm=algorithm, trainer=trainer)
         self.restarted_session = False
 
     async def register_client(self, sid, client_id):
