@@ -190,7 +190,8 @@ class Server(base.Server):
         """ Wrap up processing the reports with any additional work. """
         if hasattr(Config(), 'results'):
             new_row = []
-
+            for (report, __, __) in self.updates:
+                new_row.append(report.accuracy)
             for item in self.recorded_items:
                 item_value = {
                     'round':
