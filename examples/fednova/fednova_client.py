@@ -10,9 +10,9 @@ Optimization", in the Proceedings of NeurIPS 2020.
 https://proceedings.neurips.cc/paper/2020/hash/564127c03caab942e503ee6f810f54fd-Abstract.html
 """
 
+from dataclasses import dataclass
 import logging
 import numpy as np
-from dataclasses import dataclass
 
 from plato.config import Config
 from plato.clients import simple
@@ -28,16 +28,6 @@ class Report(base.Report):
 class Client(simple.Client):
     """A fednova federated learning client who sends weight updates
     and the number of local epochs."""
-
-    def __init__(self,
-                 model=None,
-                 datasource=None,
-                 algorithm=None,
-                 trainer=None):
-        super().__init__(model, datasource, algorithm, trainer)
-        self.pattern = None
-        self.max_local_iter = None
-
     def configure(self):
         super().configure()
         np.random.seed(3000 + self.client_id)
@@ -46,20 +36,20 @@ class Client(simple.Client):
         """ FedNova clients use different number of local epochs. """
 
         # generate the number of local epochs randomly
-        if Config().algorithm.pattern == "constant":
-            local_epochs = Config().algorithm.max_local_epochs
-        else:
+        if hasattr(
+                Config().algorithm,
+                'pattern') and Config().algorithm.pattern == "uniform_random":
             local_epochs = np.random.randint(
                 2,
                 Config().algorithm.max_local_epochs + 1)
+            # Perform model training for a specific number of epoches
+            Config().trainer = Config().trainer._replace(epochs=local_epochs)
 
-        logging.info("[Client #%d] Training with %d epoches.", self.client_id,
-                     local_epochs)
-
-        # Perform model training for a specific number of epoches
-        Config().trainer = Config().trainer._replace(epochs=local_epochs)
+            logging.info("[Client #%d] Training with %d epoches.",
+                         self.client_id, local_epochs)
 
         report, weights = await super().train()
 
         return Report(report.num_samples, report.accuracy,
-                      report.training_time, local_epochs), weights
+                      report.training_time,
+                      Config().trainer.epochs), weights

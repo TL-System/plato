@@ -114,7 +114,9 @@ To start a federated learning training workload, run [`run`](run) from the repos
 ```
 
 * `-c`: the path to the configuration file to be used. The default is `config.yml` in the project's home directory.
-
+* `-r`: add this parser to resume a previously interrupted training session.
+* `-d`: add this parser to download the dataset to prepare for a training session.
+ 
 *Plato* uses the YAML format for its configuration files to manage the runtime configuration parameters. Example configuration files have been provided in the `configs` directory.
 
 ### Running Plato with MindSpore or TensorFlow
