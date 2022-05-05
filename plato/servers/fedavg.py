@@ -47,6 +47,7 @@ class Server(base.Server):
                 x.strip() for x in recorded_items.split(',')
             ]
 
+
     def configure(self):
         """
         Booting the federated learning server by setting up the data, model, and
@@ -105,7 +106,12 @@ class Server(base.Server):
         # Initialize the csv file which will record results
         if hasattr(Config(), 'results'):
             result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}.csv"
-            csv_processor.initialize_csv(result_csv_file, self.recorded_items,
+            headers = []
+            for item in self.recorded_items:
+                headers.append(item)
+            for i in range(self.clients_per_round):
+                headers.append("Client " + str(i + 1))
+            csv_processor.initialize_csv(result_csv_file, headers,
                                          Config().params['result_dir'])
 
     def load_trainer(self):
@@ -190,8 +196,6 @@ class Server(base.Server):
         """ Wrap up processing the reports with any additional work. """
         if hasattr(Config(), 'results'):
             new_row = []
-            for (report, __, __) in self.updates:
-                new_row.append(report.accuracy)
             for item in self.recorded_items:
                 item_value = {
                     'round':
@@ -211,10 +215,11 @@ class Server(base.Server):
                     ]),
                 }[item]
                 new_row.append(item_value)
-
+            for (report, __, __) in self.updates:
+                new_row.append(report)
+                 
             result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}.csv"
             csv_processor.write_csv(result_csv_file, new_row)
-
     @staticmethod
     def accuracy_averaging(updates):
         """Compute the average accuracy across clients."""

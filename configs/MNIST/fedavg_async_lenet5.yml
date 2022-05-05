@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 1
+    total_clients: 3
 
     # The number of clients selected in each round
-    per_round: 1
+    per_round: 3
 
     # Should the clients compute test accuracy locally?
     do_test: true
