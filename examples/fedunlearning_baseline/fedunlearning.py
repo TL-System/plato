@@ -11,13 +11,13 @@ os.environ[
     'config_file'] = 'examples/fedunlearning_baseline/fedun_MNIST_lenet5.yml'
 
 import fedunlearning_client
-from plato.servers import fedavg
+import fedunlearning_server
 
 
 def main():
     """ A Plato federated learning training session using the FedSarah algorithm. """
     client = fedunlearning_client.Client()
-    server = fedavg.Server()
+    server = fedunlearning_server.Server()
     server.run(client)
 
 

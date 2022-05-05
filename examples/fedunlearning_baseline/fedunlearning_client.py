@@ -8,7 +8,7 @@ import logging
 import pickle
 import sys
 
-import deleted_iid
+import unlearning_iid
 from plato.clients import simple
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
@@ -41,9 +41,9 @@ class Client(simple.Client):
         logging.info("[%s] Dataset size: %s", self,
                      self.datasource.num_train_examples())
 
-        need_delete = self.current_round >= Config().clients.delete_round
+        need_delete = self.current_round >= Config().clients.data_deleted_round
         # Setting up the data sampler
-        self.sampler = deleted_iid.Sampler(self.datasource, self.client_id,
+        self.sampler = unlearning_iid.Sampler(self.datasource, self.client_id,
                                            False, need_delete)
 
         if hasattr(Config().trainer, 'use_mindspore'):
@@ -77,7 +77,7 @@ class Client(simple.Client):
 
         logging.info("[Client #%d] Selected by the server.", self.client_id)
 
-        if self.current_round == Config().clients.delete_round:
+        if self.current_round == Config().clients.data_deleted_round:
             self.data_loaded = False
 
         if (hasattr(Config().data, 'reload_data')
