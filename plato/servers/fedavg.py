@@ -109,7 +109,9 @@ class Server(base.Server):
             test_accuracy_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_Client_Test_Accuracy.csv"
             csv_processor.initialize_csv(result_csv_file, self.recorded_items,
                                          Config().params['result_dir'])
-            
+
+        #Initializes a test accuracy csv file if test accuracies are computed locally
+        if (Config().clients.do_test):    
             round_num = []
             round_num.append("")
             for i in range(Config().trainer.rounds):
@@ -202,9 +204,7 @@ class Server(base.Server):
     async def wrap_up_processing_reports(self):
         """ Wrap up processing the reports with any additional work. """
         if hasattr(Config(), 'results'):
-            new_row = []
-            new_test_accuracy_column = []
-            
+            new_row = []           
             for item in self.recorded_items:
                 item_value = {
                     'round':
@@ -224,13 +224,17 @@ class Server(base.Server):
                     ]),
                 }[item]
                 new_row.append(item_value)
-            for (report, __, __) in self.updates:
-                new_test_accuracy_column.append(report.accuracy)
-                 
+
+            """If the test accuracies are computed locally, it is written into the new csv file"""    
+            if (Config().clients.do_test): 
+                new_test_accuracy_column = []
+                for (report, __, __) in self.updates:
+                    new_test_accuracy_column.append(report.accuracy)
+                test_accuracy_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_Client_Test_Accuracy.csv"    
+                csv_processor.write_csv_column(test_accuracy_csv_file, new_test_accuracy_column)   
+
             result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}.csv"
-            test_accuracy_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_Client_Test_Accuracy.csv"
             csv_processor.write_csv(result_csv_file, new_row)
-            csv_processor.write_csv_column(test_accuracy_csv_file, new_test_accuracy_column)
     @staticmethod
     def accuracy_averaging(updates):
         """Compute the average accuracy across clients."""
