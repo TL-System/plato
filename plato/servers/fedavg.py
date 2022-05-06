@@ -112,15 +112,11 @@ class Server(base.Server):
 
         #Initializes a test accuracy csv file if test accuracies are computed locally
         if (Config().clients.do_test):    
-            round_num = []
-            round_num.append("")
-            for i in range(Config().trainer.rounds):
-                round_num.append("Round " + str(i + 1))
-            client_rows = []
-            client_rows.append("")
+            client_headers = []
+            client_headers.append("")
             for i in range(Config().clients.per_round):
-                client_rows.append("Client " + str(i + 1))
-            csv_processor.initialize_accuracy_csv(test_accuracy_csv_file, round_num, client_rows, Config().params['result_dir'])
+                client_headers.append("Client " + str(i + 1))
+            csv_processor.initialize_csv(test_accuracy_csv_file, client_headers, Config().params['result_dir'])
 
 
     def load_trainer(self):
@@ -227,11 +223,16 @@ class Server(base.Server):
 
             """If the test accuracies are computed locally, it is written into the new csv file"""    
             if (Config().clients.do_test): 
-                new_test_accuracy_column = []
+                new_test_accuracy_row = []
+                new_test_accuracy_row.append(f"Round {self.current_round}")
                 for (report, __, __) in self.updates:
-                    new_test_accuracy_column.append(report.accuracy)
+                    new_test_accuracy_row.append(report.accuracy)
                 test_accuracy_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_Client_Test_Accuracy.csv"    
-                csv_processor.write_csv_column(test_accuracy_csv_file, new_test_accuracy_column)   
+                csv_processor.write_csv(test_accuracy_csv_file, new_test_accuracy_row)   
+
+                """If training has reached the last round, the csv file is transposed for readability"""
+                if (self.current_round == Config().trainer.rounds):
+                    csv_processor.transpose_csv(test_accuracy_csv_file)
 
             result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}.csv"
             csv_processor.write_csv(result_csv_file, new_row)
