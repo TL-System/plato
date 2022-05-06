@@ -35,12 +35,10 @@ class Server(fedavg.Server):
             logging.info("[%s] New contact from Client #%d received.", self,
                          client_id)
 
-        if (self.current_round == 0 or self.resumed_session
-                or not self.restarted_session) and len(
-                    self.clients) >= self.clients_per_round:
+        if (self.current_round == 0 or self.resumed_session) and len(
+                self.clients) >= self.clients_per_round:
             logging.info("[%s] Starting training.", self)
             self.resumed_session = False
-            self.restarted_session = False
 
             # Saving a checkpoint for round #0 before any training starts,
             # useful if we need to roll back to the very beginning, such as
@@ -52,7 +50,8 @@ class Server(fedavg.Server):
         """ Wrap up processing the reports with any additional work. """
         await super().wrap_up_processing_reports()
 
-        logging.info("**********the current round is %d", self.current_round)
+        logging.info("**********the round that has just completed was %d",
+                     self.current_round)
         logging.info("**********the round for deleting data is %d",
                      Config().clients.data_deleted_round)
 
