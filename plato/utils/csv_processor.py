@@ -48,12 +48,11 @@ def write_csv_column(result_csv_file: str, new_column: List) -> None:
     with open(result_csv_file, 'r', encoding='utf-8') as result_file:
         csv_reader = csv.reader(result_file)
         data = list(csv_reader)
-        data = [x for x in data if x != []]
         for i in range(1, len(data)):
             data[i].append(new_column[i - 1])
 
 
-    with open(result_csv_file, 'w', encoding='utf-8') as result_file:
+    with open(result_csv_file, 'w', encoding='utf-8', newline = '') as result_file:
         result_writer = csv.writer(result_file)
         for i in range(len(data)):
             result_writer.writerow(data[i])
