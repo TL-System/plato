@@ -18,6 +18,7 @@ from plato.utils import csv_processor
 
 class Server(base.Server):
     """Federated learning server using federated averaging."""
+
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__()
 
@@ -46,7 +47,6 @@ class Server(base.Server):
             self.recorded_items = [
                 x.strip() for x in recorded_items.split(',')
             ]
-
 
     def configure(self):
         """
@@ -110,11 +110,12 @@ class Server(base.Server):
                                          Config().params['result_dir'])
 
         # Initializes a test accuracy csv file if test accuracies are computed locally
-        if (Config().clients.do_test and hasattr(Config(), 'results')):    
+        if Config().clients.do_test and hasattr(Config(), 'results'):
             test_accuracy_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_test_accuracy.csv"
             test_accuracy_headers = ["round", "client_id", "test_accuracy"]
-            csv_processor.initialize_csv(test_accuracy_csv_file, test_accuracy_headers, Config().params['result_dir'])
-
+            csv_processor.initialize_csv(test_accuracy_csv_file,
+                                         test_accuracy_headers,
+                                         Config().params['result_dir'])
 
     def load_trainer(self):
         """Setting up the global model to be trained via federated learning."""
@@ -197,7 +198,7 @@ class Server(base.Server):
     async def wrap_up_processing_reports(self):
         """ Wrap up processing the reports with any additional work. """
         if hasattr(Config(), 'results'):
-            new_row = []           
+            new_row = []
             for item in self.recorded_items:
                 item_value = {
                     'round':
@@ -217,18 +218,22 @@ class Server(base.Server):
                     ]),
                 }[item]
                 new_row.append(item_value)
- 
+
             # Updates test accuracy csv file
-            if (Config().clients.do_test):  
-                test_accuracy_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_test_accuracy.csv" 
+            if Config().clients.do_test:
+                test_accuracy_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_test_accuracy.csv"
                 client_id = 1
                 for (report, __, __) in self.updates:
-                    test_accuracy_row = [self.current_round, client_id, report.accuracy]
-                    csv_processor.write_csv(test_accuracy_csv_file, test_accuracy_row) 
-                    client_id = client_id + 1     
+                    test_accuracy_row = [
+                        self.current_round, client_id, report.accuracy
+                    ]
+                    csv_processor.write_csv(test_accuracy_csv_file,
+                                            test_accuracy_row)
+                    client_id = client_id + 1
 
             result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}.csv"
             csv_processor.write_csv(result_csv_file, new_row)
+
     @staticmethod
     def accuracy_averaging(updates):
         """Compute the average accuracy across clients."""
