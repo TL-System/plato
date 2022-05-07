@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 10
+    total_clients: 5
 
     # The number of clients selected in each round
-    per_round: 5
+    per_round: 3
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -57,11 +57,13 @@ trainer:
     epochs: 1
     batch_size: 128
     #128,256,512,1024,2048
-    optimizer: SGD
+    optimizer: AdaHessian
     learning_rate: 0.001
-    momentum: 0.9
+    momentum_b1: 0.9
+    momentum_b2: 0.999
     ###by ningxin: β1=0.9, β2=0.999
-    weight_decay: 0.0001
+    eps: 1e-8
+    weight_decay: 0.0
 
     # Learning rate schedule
     lr_schedule: LambdaLR

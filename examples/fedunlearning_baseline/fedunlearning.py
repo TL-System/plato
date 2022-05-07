@@ -15,7 +15,9 @@ import fedunlearning_server
 
 
 def main():
-    """ A Plato federated learning training session using the FedSarah algorithm. """
+    """
+    A naive retrain example used as fed unlearning baseline
+    """
     client = fedunlearning_client.Client()
     server = fedunlearning_server.Server()
     server.run(client)

@@ -12,6 +12,7 @@ from torch import nn
 from plato.config import Config
 
 from plato.utils.fedprox_optimizer import FedProxOptimizer
+from plato.utils.ada_hessain import AdaHessian
 from plato.utils.step import Step
 
 
@@ -36,6 +37,12 @@ def get_optimizer(model) -> optim.Optimizer:
                                 lr=Config().trainer.learning_rate,
                                 rho=Config().trainer.rho,
                                 eps=Config().trainer.eps,
+                                weight_decay=Config().trainer.weight_decay)
+    elif Config().trainer.optimizer == 'AdaHessian':
+        return AdaHessian(model.parameters(),
+                                lr=Config().trainer.learning_rate,
+                                betas=(Config().trainer.momentum_b1,Config().trainer.momentum_b2),
+                                eps=float(Config().trainer.eps),
                                 weight_decay=Config().trainer.weight_decay)
 
     raise ValueError('No such optimizer: {}'.format(
