@@ -18,7 +18,7 @@ class Server(fedavg.Server):
 
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
-        self.restarted_session = False
+        self.restarted_session = True
 
     async def register_client(self, sid, client_id):
         """ Adding a newly arrived client to the list of clients. """
@@ -36,10 +36,16 @@ class Server(fedavg.Server):
                          client_id)
 
         if (self.current_round == 0 or self.resumed_session) and len(
+<<<<<<< Updated upstream
                 self.clients) >= self.clients_per_round:
             logging.info("[%s] Starting training.", self)
             self.resumed_session = False
 
+=======
+                    self.clients) >= self.clients_per_round:
+            logging.info("[%s] Starting training.", self)
+            self.resumed_session = False
+>>>>>>> Stashed changes
             # Saving a checkpoint for round #0 before any training starts,
             # useful if we need to roll back to the very beginning, such as
             # in the federated unlearning process
@@ -50,16 +56,20 @@ class Server(fedavg.Server):
         """ Wrap up processing the reports with any additional work. """
         await super().wrap_up_processing_reports()
 
+<<<<<<< Updated upstream
         logging.info("**********the round that has just completed was %d",
                      self.current_round)
         logging.info("**********the round for deleting data is %d",
                      Config().clients.data_deleted_round)
 
         if self.current_round == Config().clients.data_deleted_round:
+=======
+        if (self.current_round == Config().clients.data_deleted_round) and self.restarted_session:
+>>>>>>> Stashed changes
             logging.info("[%s] Data deleted. Retraining from the first round.",
                          self)
             self.current_round = 0
-            self.restarted_session = True
+            self.restarted_session = False
 
             # Loading the saved model the server for resuming the training session from round 1
             checkpoint_dir = Config.params['checkpoint_dir']
