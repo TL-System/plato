@@ -219,7 +219,7 @@ class Server(base.Server):
                 new_row.append(item_value)
  
             # Updates test accuracy csv file
-            if (Config().clients.do_test and hasattr(Config(), 'results')):  
+            if (Config().clients.do_test):  
                 test_accuracy_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_test_accuracy.csv" 
                 client_id = 1
                 for (report, __, __) in self.updates:
