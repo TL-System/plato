@@ -103,17 +103,17 @@ class Server(base.Server):
                 self.testset_sampler = torch.utils.data.SubsetRandomSampler(
                     test_samples, generator=gen)
 
-        # Initialize the csv files which will record results
+        # Initialize the csv file which will record results
         if hasattr(Config(), 'results'):
             result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}.csv"
-            test_accuracy_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_Client_Test_Accuracy.csv"
             csv_processor.initialize_csv(result_csv_file, self.recorded_items,
                                          Config().params['result_dir'])
 
         #Initializes a test accuracy csv file if test accuracies are computed locally
         if (Config().clients.do_test):    
-            client_headers = ["Round", "Client ID", "Test Accuracy"]
-            csv_processor.initialize_csv(test_accuracy_csv_file, client_headers, Config().params['result_dir'])
+            test_accuracy_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_Client_Test_Accuracy.csv"
+            test_accuracy_headers = ["Round", "Client ID", "Test Accuracy"]
+            csv_processor.initialize_csv(test_accuracy_csv_file, test_accuracy_headers, Config().params['result_dir'])
 
 
     def load_trainer(self):
@@ -226,7 +226,7 @@ class Server(base.Server):
                     test_accuracy_row = [self.current_round, client_id, report.accuracy]
                     csv_processor.write_csv(test_accuracy_csv_file, test_accuracy_row) 
                     client_id = client_id + 1     
-                    
+
             result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}.csv"
             csv_processor.write_csv(result_csv_file, new_row)
     @staticmethod
