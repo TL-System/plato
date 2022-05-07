@@ -109,10 +109,10 @@ class Server(base.Server):
             csv_processor.initialize_csv(result_csv_file, self.recorded_items,
                                          Config().params['result_dir'])
 
-        #Initializes a test accuracy csv file if test accuracies are computed locally
-        if (Config().clients.do_test):    
-            test_accuracy_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_Client_Test_Accuracy.csv"
-            test_accuracy_headers = ["Round", "Client ID", "Test Accuracy"]
+        # Initializes a test accuracy csv file if test accuracies are computed locally
+        if (Config().clients.do_test and hasattr(Config(), 'results')):    
+            test_accuracy_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_test_accuracy.csv"
+            test_accuracy_headers = ["round", "client_id", "test_accuracy"]
             csv_processor.initialize_csv(test_accuracy_csv_file, test_accuracy_headers, Config().params['result_dir'])
 
 
@@ -217,10 +217,10 @@ class Server(base.Server):
                     ]),
                 }[item]
                 new_row.append(item_value)
-
-            """If the test accuracies are computed locally, it is written into the new csv file"""    
-            if (Config().clients.do_test): 
-                test_accuracy_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_Client_Test_Accuracy.csv" 
+ 
+            # Updates test accuracy csv file
+            if (Config().clients.do_test and hasattr(Config(), 'results')):  
+                test_accuracy_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_test_accuracy.csv" 
                 client_id = 1
                 for (report, __, __) in self.updates:
                     test_accuracy_row = [self.current_round, client_id, report.accuracy]
