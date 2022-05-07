@@ -25,8 +25,3 @@ def write_csv(result_csv_file: str, new_row: List) -> None:
     with open(result_csv_file, 'a', encoding='utf-8', newline = '') as result_file:
         result_writer = csv.writer(result_file)
         result_writer.writerow(new_row)
-
-def transpose_csv(result_csv_file: str) -> None:
-    """ Transposes the csv """
-    transpose = zip(*csv.reader(open(result_csv_file, "r")))
-    csv.writer(open(result_csv_file, "w", newline = '')).writerows(transpose)

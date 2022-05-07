@@ -3,13 +3,13 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 3
+    total_clients: 100
 
     # The number of clients selected in each round
-    per_round: 3
+    per_round: 20
 
     # Should the clients compute test accuracy locally?
-    do_test: true
+    do_test: false
 
     # Whether simulate clients or not
     simulation: true
@@ -53,7 +53,7 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 4
+    rounds: 2
 
     # Whether the training should use multiple GPUs if available
     parallelized: false

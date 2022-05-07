@@ -112,10 +112,7 @@ class Server(base.Server):
 
         #Initializes a test accuracy csv file if test accuracies are computed locally
         if (Config().clients.do_test):    
-            client_headers = []
-            client_headers.append("")
-            for i in range(Config().clients.per_round):
-                client_headers.append("Client " + str(i + 1))
+            client_headers = ["Round", "Client ID", "Test Accuracy"]
             csv_processor.initialize_csv(test_accuracy_csv_file, client_headers, Config().params['result_dir'])
 
 
@@ -223,17 +220,13 @@ class Server(base.Server):
 
             """If the test accuracies are computed locally, it is written into the new csv file"""    
             if (Config().clients.do_test): 
-                new_test_accuracy_row = []
-                new_test_accuracy_row.append(f"Round {self.current_round}")
+                test_accuracy_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_Client_Test_Accuracy.csv" 
+                client_id = 1
                 for (report, __, __) in self.updates:
-                    new_test_accuracy_row.append(report.accuracy)
-                test_accuracy_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_Client_Test_Accuracy.csv"    
-                csv_processor.write_csv(test_accuracy_csv_file, new_test_accuracy_row)   
-
-                """If training has reached the last round, the csv file is transposed for readability"""
-                if (self.current_round == Config().trainer.rounds):
-                    csv_processor.transpose_csv(test_accuracy_csv_file)
-
+                    test_accuracy_row = [self.current_round, client_id, report.accuracy]
+                    csv_processor.write_csv(test_accuracy_csv_file, test_accuracy_row) 
+                    client_id = client_id + 1     
+                    
             result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}.csv"
             csv_processor.write_csv(result_csv_file, new_row)
     @staticmethod
