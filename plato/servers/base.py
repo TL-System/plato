@@ -126,8 +126,9 @@ class Server:
 
         Server.client_simulation_mode = False
 
-        # With specifying max_concurrency, clients train batch by batach
-        # This parameter is the number of selected clients that has trained
+        # With specifying max_concurrency, selected clients run batch by batach
+        # The number of clients in a batch is the same as the max_concurrency
+        # This parameter is the number of selected clients that has run in the current round
         if hasattr(Config().trainer, 'max_concurrency'):
             self.trained_clients_num = 0
 
@@ -418,8 +419,9 @@ class Server:
         if len(self.selected_clients) > 0:
             self.selected_sids = []
 
-            # With specifying max_concurrency, selected clients run batch by batach
-            # The number of clients in each batch is equal to max_concurrency
+            # With specifying max_concurrency, run selected clients batch by batach
+            # The number of clients in each batch is equal to
+            # (or maybe smaller than for the last batch) max_concurrency
             if hasattr(Config().trainer, 'max_concurrency'):
                 selected_clients = self.selected_clients[
                     self.trained_clients_num:min(
