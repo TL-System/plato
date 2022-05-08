@@ -2,19 +2,25 @@
 The CelebA dataset from the torchvision package.
 """
 
+from typing import Callable, List, Optional, Union
 from torchvision import datasets, transforms
-
-import zipfile
-import os
-import logging
 from plato.config import Config
 from plato.datasources import base
 
 
 class CelebA(datasets.CelebA):
 
-    def _check_integrity(self):
-        return True
+    def __init__(self,
+                 root: str,
+                 split: str = "train",
+                 target_type: Union[List[str], str] = "attr",
+                 transform: Optional[Callable] = None,
+                 target_transform: Optional[Callable] = None,
+                 download: bool = False) -> None:
+        super().__init__(root, split, target_type, transform, target_transform,
+                         download)
+        self.targets = self.identity.flatten().tolist()
+        self.classes = [f'Celebrity #{i}' for i in range(10177 + 1)]
 
 
 class DataSource(base.DataSource):
@@ -24,33 +30,23 @@ class DataSource(base.DataSource):
         super().__init__()
         _path = Config().data.data_path
 
-        DataSource.download_celeba(_path)
+        _transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+        ])
 
-        _transform = transforms.Compose([transforms.ToTensor()])
-        self.trainset = CelebA(root=_path,
-                               split='train',
-                               target_type=['attr', 'identity'],
-                               download=False,
-                               transform=_transform)
-        self.testset = CelebA(root=_path,
-                              split='test',
-                              target_type=['attr', 'identity'],
-                              download=False,
-                              transform=_transform)
-
-    @staticmethod
-    def download_celeba(root_path):
-        """ Download and unzip all CelebA data points. """
-        datapath = os.path.join(root_path, "celeba")
-        filename = os.path.join(datapath, "img_align_celeba.zip")
-        extracted_path, _ = os.path.splitext(filename)
-        if not os.path.exists(extracted_path):
-            logging.info("Extracting all images in %s to %s.",
-                         "img_align_celeba.zip", extracted_path)
-            with zipfile.ZipFile(filename, 'r') as zip_ref:
-                zip_ref.extractall(datapath)
-        else:
-            logging.info("Path %s already exists.", extracted_path)
+        self.trainset = CelebA(
+            root=_path,
+            split='train',
+            target_type=['attr', 'identity', 'bbox', 'landmarks'],
+            download=True,
+            transform=_transform)
+        self.testset = CelebA(
+            root=_path,
+            split='test',
+            target_type=['attr', 'identity', 'bbox', 'landmarks'],
+            download=True,
+            transform=_transform)
 
     def num_train_examples(self):
         return 162770
