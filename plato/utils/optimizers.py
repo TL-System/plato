@@ -36,8 +36,9 @@ def get_optimizer(model) -> optim.Optimizer:
             model.parameters(),
             lr=Config().trainer.learning_rate,
             betas=(Config().trainer.momentum_b1, Config().trainer.momentum_b2),
-            eps=float(Config().trainer.eps),
+            eps=Config().trainer.eps,
             weight_decay=Config().trainer.weight_decay,
+            hessian_power=Config().trainer.hessian_power,
         )
 
     raise ValueError(f'No such optimizer: {Config().trainer.optimizer}')

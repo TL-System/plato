@@ -63,6 +63,7 @@ trainer:
     create_graph: true
     eps: 1e-8
     weight_decay: 0.0
+    hessian_power: 1.0
 
     # Learning rate schedule
     lr_schedule: LambdaLR
