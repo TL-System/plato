@@ -9,6 +9,11 @@ from plato.datasources import base
 
 
 class CelebA(datasets.CelebA):
+    """
+    A wrapper class of torchvision's CelebA dataset class
+    to add <targets> and <classes> attributes as celebrity
+    identity, which is used for non-IID samplers.
+    """
 
     def __init__(self,
                  root: str,
@@ -30,23 +35,24 @@ class DataSource(base.DataSource):
         super().__init__()
         _path = Config().data.data_path
 
+        image_size = 64
         _transform = transforms.Compose([
+            transforms.Resize(image_size),
+            transforms.CenterCrop(image_size),
             transforms.ToTensor(),
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
         ])
 
-        self.trainset = CelebA(
-            root=_path,
-            split='train',
-            target_type=['attr', 'identity', 'bbox', 'landmarks'],
-            download=True,
-            transform=_transform)
-        self.testset = CelebA(
-            root=_path,
-            split='test',
-            target_type=['attr', 'identity', 'bbox', 'landmarks'],
-            download=True,
-            transform=_transform)
+        self.trainset = CelebA(root=_path,
+                               split='train',
+                               target_type=['attr', 'identity'],
+                               download=True,
+                               transform=_transform)
+        self.testset = CelebA(root=_path,
+                              split='test',
+                              target_type=['attr', 'identity'],
+                              download=True,
+                              transform=_transform)
 
     def num_train_examples(self):
         return 162770
