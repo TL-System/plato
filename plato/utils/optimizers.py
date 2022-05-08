@@ -29,14 +29,14 @@ def get_optimizer(model) -> optim.Optimizer:
         return optim.Adadelta(model.parameters(),
                               lr=Config().trainer.learning_rate,
                               rho=Config().trainer.rho,
-                              eps=Config().trainer.eps,
+                              eps=float(Config().trainer.eps),
                               weight_decay=Config().trainer.weight_decay)
     elif Config().trainer.optimizer == 'AdaHessian':
         return torch_optim.Adahessian(
             model.parameters(),
             lr=Config().trainer.learning_rate,
             betas=(Config().trainer.momentum_b1, Config().trainer.momentum_b2),
-            eps=Config().trainer.eps,
+            eps=float(Config().trainer.eps),
             weight_decay=Config().trainer.weight_decay,
             hessian_power=Config().trainer.hessian_power,
         )
