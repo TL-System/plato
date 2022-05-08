@@ -126,6 +126,11 @@ class Server:
 
         Server.client_simulation_mode = False
 
+        # With specifying max_concurrency, clients train batch by batach
+        # This parameter is the number of selected clients that has trained
+        if hasattr(Config().trainer, 'max_concurrency'):
+            self.trained_clients_num = 0
+
     def __repr__(self):
         return f'Server #{os.getpid()}'
 
@@ -263,7 +268,9 @@ class Server:
                          client_id)
 
         if (self.current_round == 0 or self.resumed_session) and len(
-                self.clients) >= self.clients_per_round:
+                self.clients) >= Config().trainer.max_concurrency if hasattr(
+                    Config().trainer,
+                    'max_concurrency') else self.clients_per_round:
             logging.info("[%s] Starting training.", self)
             self.resumed_session = False
             await self.select_clients()
@@ -279,8 +286,13 @@ class Server:
 
         if Server.client_simulation_mode:
             # In the client simulation mode, we only need to launch a limited
-            # number of client objects (same as the number of clients per round)
-            client_processes = Config().clients.per_round
+            # number of client objects
+            # If max_concurency is specified, the limite number is the same as max_concurrency
+            if hasattr(Config().trainer, 'max_concurrency'):
+                client_processes = Config().trainer.max_concurrency
+            # Otherwise, the limited number is the same as the number of clients per round
+            else:
+                client_processes = Config().clients.per_round
         else:
             client_processes = Config().clients.total_clients
 
@@ -316,86 +328,112 @@ class Server:
             logging.info("Closing the connection to client #%d.", client_id)
             await self.sio.emit('disconnect', room=client['sid'])
 
-    async def select_clients(self):
+    async def select_clients(self, for_next_batch=False):
         """ Select a subset of the clients and send messages to them to start training. """
-        self.updates = []
-        self.current_round += 1
+        if not for_next_batch:
+            self.updates = []
+            self.current_round += 1
 
-        logging.info("\n[%s] Starting round %s/%s.", self, self.current_round,
-                     Config().trainer.rounds)
+            logging.info("\n[%s] Starting round %s/%s.", self,
+                         self.current_round,
+                         Config().trainer.rounds)
 
-        if Server.client_simulation_mode:
-            # In the client simulation mode, the client pool for client selection contains
-            # all the virtual clients to be simulated
-            self.clients_pool = list(range(1, 1 + self.total_clients))
-            if Config().is_central_server():
-                self.clients_pool = list(
-                    range(Config().clients.per_round + 1,
-                          Config().clients.per_round + 1 + self.total_clients))
+            if Server.client_simulation_mode:
+                # In the client simulation mode, the client pool for client selection contains
+                # all the virtual clients to be simulated
+                self.clients_pool = list(range(1, 1 + self.total_clients))
 
-        else:
-            # If no clients are simulated, the client pool for client selection consists of
-            # the current set of clients that have contacted the server
-            self.clients_pool = list(self.clients)
+                if Config().is_central_server():
+                    launched_client_num = Config(
+                    ).trainer.max_concurrency if hasattr(
+                        Config().trainer,
+                        'max_concurrency') else Config().clients.per_round
+                    # In cross-silo FL, the central server selects from the pool of edge servers
+                    self.clients_pool = list(
+                        range(launched_client_num + 1,
+                              launched_client_num + 1 + self.total_clients))
+            else:
+                # If no clients are simulated, the client pool for client selection consists of
+                # the current set of clients that have contacted the server
+                self.clients_pool = list(self.clients)
 
-        # In asychronous FL, avoid selecting new clients to replace those that are still
-        # training at this time
+            # In asychronous FL, avoid selecting new clients to replace those that are still
+            # training at this time
 
-        # When simulating the wall clock time, if len(self.reported_clients) is 0, the
-        # server has aggregated all reporting clients already
-        if self.asynchronous_mode and self.selected_clients is not None and len(
-                self.reported_clients) > 0 and len(
-                    self.reported_clients) < self.clients_per_round:
-            # If self.selected_clients is None, it implies that it is the first iteration;
-            # If len(self.reported_clients) == self.clients_per_round, it implies that
-            # all selected clients have already reported.
+            # When simulating the wall clock time, if len(self.reported_clients) is 0, the
+            # server has aggregated all reporting clients already
+            if self.asynchronous_mode and self.selected_clients is not None and len(
+                    self.reported_clients) > 0 and len(
+                        self.reported_clients) < self.clients_per_round:
+                # If self.selected_clients is None, it implies that it is the first iteration;
+                # If len(self.reported_clients) == self.clients_per_round, it implies that
+                # all selected clients have already reported.
 
-            # Except for these two cases, we need to exclude the clients who are still
-            # training.
-            training_client_ids = [
-                self.training_clients[client_id]['id']
-                for client_id in list(self.training_clients.keys())
-            ]
+                # Except for these two cases, we need to exclude the clients who are still
+                # training.
+                training_client_ids = [
+                    self.training_clients[client_id]['id']
+                    for client_id in list(self.training_clients.keys())
+                ]
 
-            # If the server is simulating the wall clock time, some of the clients who
-            # reported may not have been aggregated; they should be excluded from the next
-            # round of client selection
-            reporting_client_ids = [
-                client[1]['client_id'] for client in self.reported_clients
-            ]
+                # If the server is simulating the wall clock time, some of the clients who
+                # reported may not have been aggregated; they should be excluded from the next
+                # round of client selection
+                reporting_client_ids = [
+                    client[1]['client_id'] for client in self.reported_clients
+                ]
 
-            selectable_clients = [
-                client for client in self.clients_pool
-                if client not in training_client_ids
-                and client not in reporting_client_ids
-            ]
+                selectable_clients = [
+                    client for client in self.clients_pool
+                    if client not in training_client_ids
+                    and client not in reporting_client_ids
+                ]
 
-            if self.simulate_wall_time:
-                self.selected_clients = self.choose_clients(
-                    selectable_clients, len(self.current_processed_clients))
+                if self.simulate_wall_time:
+                    self.selected_clients = self.choose_clients(
+                        selectable_clients,
+                        len(self.current_processed_clients))
+                else:
+                    self.selected_clients = self.choose_clients(
+                        selectable_clients, len(self.reported_clients))
             else:
                 self.selected_clients = self.choose_clients(
-                    selectable_clients, len(self.reported_clients))
-        else:
-            self.selected_clients = self.choose_clients(
-                self.clients_pool, self.clients_per_round)
+                    self.clients_pool, self.clients_per_round)
 
-        self.current_reported_clients = {}
-        self.current_processed_clients = {}
+            self.current_reported_clients = {}
+            self.current_processed_clients = {}
 
-        # There is no need to clear the list of reporting clients if we are
-        # simulating the wall clock time on the server. This is because
-        # when wall clock time is simulated, the server needs to wait for
-        # all the clients to report before selecting a subset of clients for
-        # replacement, and all remaining reporting clients will be processed
-        # in the next round
-        if not self.simulate_wall_time:
-            self.reported_clients = []
+            # There is no need to clear the list of reporting clients if we are
+            # simulating the wall clock time on the server. This is because
+            # when wall clock time is simulated, the server needs to wait for
+            # all the clients to report before selecting a subset of clients for
+            # replacement, and all remaining reporting clients will be processed
+            # in the next round
+            if not self.simulate_wall_time:
+                self.reported_clients = []
 
         if len(self.selected_clients) > 0:
             self.selected_sids = []
 
-            for i, selected_client_id in enumerate(self.selected_clients):
+            # With specifying max_concurrency, selected clients run batch by batach
+            # The number of clients in each batch is equal to max_concurrency
+            if hasattr(Config().trainer, 'max_concurrency'):
+                selected_clients = self.selected_clients[
+                    self.trained_clients_num:min(
+                        self.trained_clients_num + Config().trainer.
+                        max_concurrency, len(self.selected_clients))]
+                self.trained_clients_num = min(
+                    self.trained_clients_num +
+                    Config().trainer.max_concurrency,
+                    len(self.selected_clients))
+
+                # Prepare for the next round after selecting the last batch of this round
+                if self.trained_clients_num == len(self.selected_clients):
+                    self.trained_clients_num = 0
+            else:
+                selected_clients = self.selected_clients
+
+            for i, selected_client_id in enumerate(selected_clients):
                 self.selected_client_id = selected_client_id
 
                 if self.client_simulation_mode:
@@ -822,6 +860,13 @@ class Server:
 
             logging.info("[%s] Advancing the wall clock time to %.2f.", self,
                          self.wall_time)
+
+        if hasattr(Config().trainer, 'max_concurrency'):
+            # Clients in the current batch finish training
+            # The server will select the next batch of clients to train
+            if len(self.updates) >= self.trained_clients_num and len(
+                    self.updates) < self.clients_per_round:
+                await self.select_clients(for_next_batch=True)
 
         # If all updates have been received from selected clients, the aggregation process
         # proceeds regardless of synchronous or asynchronous modes. This guarantees that
