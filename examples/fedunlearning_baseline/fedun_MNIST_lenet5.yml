@@ -36,7 +36,6 @@ data:
     # IID or non-IID?
     sampler: iid
 
-
 trainer:
     # The type of the trainer
     type: basic
@@ -61,7 +60,7 @@ trainer:
     learning_rate: 0.001
     momentum_b1: 0.9
     momentum_b2: 0.999
-    ###by ningxin: β1=0.9, β2=0.999
+    create_graph: true
     eps: 1e-8
     weight_decay: 0.0
 
