@@ -23,6 +23,7 @@ from plato.utils import s3
 
 class ServerEvents(socketio.AsyncNamespace):
     """ A custom namespace for socketio.AsyncServer. """
+
     def __init__(self, namespace, plato_server):
         super().__init__(namespace)
         self.plato_server = plato_server
@@ -67,6 +68,7 @@ class ServerEvents(socketio.AsyncNamespace):
 
 class Server:
     """ The base class for federated learning servers. """
+
     def __init__(self):
         self.sio = None
         self.client = None
@@ -130,7 +132,7 @@ class Server:
         # The number of clients in a batch is the same as the max_concurrency
         # This parameter is the number of selected clients that has run in the current round
         if hasattr(Config().trainer, 'max_concurrency'):
-            self.trained_clients_num = 0
+            self.trained_clients = 0
 
     def __repr__(self):
         return f'Server #{os.getpid()}'
@@ -336,7 +338,7 @@ class Server:
             self.current_round += 1
 
             if hasattr(Config().trainer, 'max_concurrency'):
-                self.trained_clients_num = 0
+                self.trained_clients = 0
 
             logging.info("\n[%s] Starting round %s/%s.", self,
                          self.current_round,
@@ -419,17 +421,16 @@ class Server:
         if len(self.selected_clients) > 0:
             self.selected_sids = []
 
-            # With specifying max_concurrency, run selected clients batch by batach
-            # The number of clients in each batch is equal to
-            # (or maybe smaller than for the last batch) max_concurrency
+            # If max_concurrency is specified, run selected clients batch by batch,
+            # and the number of clients in each batch is equal to # (or maybe smaller
+            # than for the last batch) max_concurrency
             if hasattr(Config().trainer, 'max_concurrency'):
                 selected_clients = self.selected_clients[
-                    self.trained_clients_num:min(
-                        self.trained_clients_num + Config().trainer.
+                    self.trained_clients:min(
+                        self.trained_clients + Config().trainer.
                         max_concurrency, len(self.selected_clients))]
-                self.trained_clients_num = min(
-                    self.trained_clients_num +
-                    Config().trainer.max_concurrency,
+                self.trained_clients = min(
+                    self.trained_clients + Config().trainer.max_concurrency,
                     len(self.selected_clients))
 
             else:
@@ -877,7 +878,7 @@ class Server:
         elif hasattr(Config().trainer, 'max_concurrency'):
             # Clients in the current batch finish training
             # The server will select the next batch of clients to train
-            if len(self.updates) >= self.trained_clients_num:
+            if len(self.updates) >= self.trained_clients:
                 await self.select_clients(for_next_batch=True)
 
     async def client_disconnected(self, sid):
