@@ -2,6 +2,7 @@
 The CelebA dataset from the torchvision package.
 """
 
+import torch
 from typing import Callable, List, Optional, Union
 from torchvision import datasets, transforms
 from plato.config import Config
@@ -47,12 +48,33 @@ class DataSource(base.DataSource):
                                split='train',
                                target_type=['attr', 'identity'],
                                download=True,
-                               transform=_transform)
+                               transform=_transform,
+                               target_transform=DataSource._target_transform)
         self.testset = CelebA(root=_path,
                               split='test',
                               target_type=['attr', 'identity'],
                               download=True,
-                              transform=_transform)
+                              transform=_transform,
+                              target_transform=DataSource._target_transform)
+
+    @staticmethod
+    def _target_transform(label):
+        """
+        Output labels are in a tuple of tensors if specified more
+        than one target types, so we need to convert the tuple to
+        tensors. Here, we just merge two tensors by adding identity
+        as the 41st attribute
+        """
+        attr, identity = label
+        return torch.cat((attr.reshape([
+            -1,
+        ]), identity.reshape([
+            -1,
+        ])))
+
+    @staticmethod
+    def input_shape():
+        return [162770, 2, 64, 64]
 
     def num_train_examples(self):
         return 162770
