@@ -334,6 +334,9 @@ class Server:
             self.updates = []
             self.current_round += 1
 
+            if hasattr(Config().trainer, 'max_concurrency'):
+                self.trained_clients_num = 0
+
             logging.info("\n[%s] Starting round %s/%s.", self,
                          self.current_round,
                          Config().trainer.rounds)
@@ -427,9 +430,6 @@ class Server:
                     Config().trainer.max_concurrency,
                     len(self.selected_clients))
 
-                # Prepare for the next round after selecting the last batch of this round
-                if self.trained_clients_num == len(self.selected_clients):
-                    self.trained_clients_num = 0
             else:
                 selected_clients = self.selected_clients
 
@@ -861,13 +861,6 @@ class Server:
             logging.info("[%s] Advancing the wall clock time to %.2f.", self,
                          self.wall_time)
 
-        if hasattr(Config().trainer, 'max_concurrency'):
-            # Clients in the current batch finish training
-            # The server will select the next batch of clients to train
-            if len(self.updates) >= self.trained_clients_num and len(
-                    self.updates) < self.clients_per_round:
-                await self.select_clients(for_next_batch=True)
-
         # If all updates have been received from selected clients, the aggregation process
         # proceeds regardless of synchronous or asynchronous modes. This guarantees that
         # if asynchronous mode uses an excessively long aggregation interval, it will not
@@ -878,6 +871,12 @@ class Server:
             await self.process_reports()
             await self.wrap_up()
             await self.select_clients()
+
+        elif hasattr(Config().trainer, 'max_concurrency'):
+            # Clients in the current batch finish training
+            # The server will select the next batch of clients to train
+            if len(self.updates) >= self.trained_clients_num:
+                await self.select_clients(for_next_batch=True)
 
     async def client_disconnected(self, sid):
         """ When a client disconnected it should be removed from its internal states. """
