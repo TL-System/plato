@@ -9,7 +9,7 @@ clients:
     per_round: 20
 
     # Should the clients compute test accuracy locally?
-    do_test: false
+    do_test: true
 
     # Whether simulate clients or not
     simulation: true

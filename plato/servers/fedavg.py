@@ -225,8 +225,6 @@ class Server(base.Server):
             if Config().clients.do_test:
                 # Updates the log for client test accuracies
                 accuracy_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_accuracy.csv"
-
-                self.selected_clients.sort()
                 index = 0
                 for (report, __, __) in self.updates:
                     accuracy_row = [
