@@ -238,13 +238,14 @@ class Server(base.Server):
                 # Updates the log for client test accuracies
                 accuracy_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_accuracy.csv"
 
-                client_id = 1
+                self.selected_clients.sort()
+                index = 0
                 for (report, __, __) in self.updates:
                     accuracy_row = [
-                        self.current_round, client_id, report.accuracy
+                        self.current_round, self.selected_clients[index], report.accuracy
                     ]
+                    index = index + 1
                     csv_processor.write_csv(accuracy_csv_file, accuracy_row)
-                    client_id = client_id + 1
 
     @staticmethod
     def accuracy_averaging(updates):
