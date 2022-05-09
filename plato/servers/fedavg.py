@@ -176,7 +176,7 @@ class Server(base.Server):
         await self.aggregate_weights(self.updates)
 
         # Testing the global model accuracy
-        if Config().clients.do_test:
+        if hasattr(Config().server, 'do_test') and not Config().server.do_test:
             # Compute the average accuracy from client reports
             self.accuracy = self.accuracy_averaging(self.updates)
             logging.info('[%s] Average client accuracy: %.2f%%.', self,
