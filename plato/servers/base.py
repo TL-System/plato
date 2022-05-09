@@ -426,11 +426,12 @@ class Server:
                             self.trained_clients))
                     gpus_num = Config().is_multiple_gpus()
                     for cuda_id in range(gpus_num):
-                        while len(selected_clients) < (cuda_id + 1) * Config(
-                        ).trainer.max_concurrency:
-                            for client_id in untrained_clients:
-                                if client_id % gpus_num == cuda_id:
-                                    selected_clients.append(client_id)
+                        for client_id in untrained_clients:
+                            if client_id % gpus_num == cuda_id:
+                                selected_clients.append(client_id)
+                            if len(selected_clients) >= (cuda_id + 1) * Config(
+                            ).trainer.max_concurrency:
+                                break
                 else:
                     selected_clients = self.selected_clients[
                         len(self.trained_clients):min(
