@@ -262,14 +262,14 @@ class Config:
                        'cross_silo') and Config().args.port is None
 
     @staticmethod
-    def is_multiple_gpus() -> int:
-        """Check whether the training should use multiple GPUs if available."""
+    def gpu_count() -> int:
+        """Returns the number of GPUs available for training."""
         import torch
 
-        if hasattr(Config().trainer, 'parallelized') and Config(
-        ).trainer.parallelized and torch.cuda.is_available(
-        ) and torch.cuda.device_count() > 1:
-            return torch.cuda.device_count()
+        if torch.cuda.is_available():
+            return torch.cuda.device_count() if hasattr(
+                Config().trainer,
+                'parallelized') and Config().trainer.parallelized else 1
         else:
             return 0
 
@@ -297,11 +297,12 @@ class Config:
             import torch
 
             if torch.cuda.is_available() and torch.cuda.device_count() > 0:
-                if Config.is_multiple_gpus():
+                if Config.gpu_count() > 1:
                     # A client will always run on the same GPU
                     if isinstance(Config.args.id, int):
                         gpu_id = Config.args.id % torch.cuda.device_count()
                         device = f'cuda:{gpu_id}'
+                        print("!!!CLIENT", Config.args.id, device)
                     else:
                         device = 'cuda:0'
                 else:

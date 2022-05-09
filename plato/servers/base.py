@@ -129,7 +129,7 @@ class Server:
         Server.client_simulation_mode = False
 
         # With specifying max_concurrency, selected clients run batch by batach
-        # The number of clients in a batch is the same as the max_concurrency
+        # The number of clients in a batch on an available device is the same as the max_concurrency
         # This list contains ids of selected clients that has run in the current round
         if hasattr(Config().trainer, 'max_concurrency'):
             self.trained_clients = []
@@ -265,11 +265,17 @@ class Server:
             logging.info("[%s] New contact from Client #%d received.", self,
                          client_id)
 
-        if (self.current_round == 0 or self.resumed_session) and (
-                len(self.clients) >= min(Config().trainer.max_concurrency,
-                                         self.clients_per_round) if
-            (hasattr(Config().trainer, 'max_concurrency') and
-             not Config().is_central_server()) else self.clients_per_round):
+        if hasattr(Config().trainer,
+                   'max_concurrency') and not Config().is_central_server():
+            required_launched_clients = min(
+                Config().trainer.max_concurrency * max(1,
+                                                       Config().gpu_count()),
+                self.clients_per_round)
+        else:
+            required_launched_clients = self.clients_per_round
+
+        if (self.current_round == 0 or self.resumed_session) and len(
+                self.clients) >= required_launched_clients:
             logging.info("[%s] Starting training.", self)
             self.resumed_session = False
             await self.select_clients()
@@ -285,16 +291,22 @@ class Server:
 
         if Server.client_simulation_mode:
             # In the client simulation mode, we only need to launch the number of clients
-            # necessary for concurrent training, which is `max_concurrency` in `trainer`
+            # necessary for concurrent training, which is number of available devices
+            # multiply `max_concurrency` in `trainer`
             if hasattr(Config().trainer, 'max_concurrency'):
                 if Config().is_central_server():
                     client_processes = min(
                         Config().trainer.max_concurrency *
+                        max(1,
+                            Config().gpu_count()) *
                         Config().algorithm.total_silos,
                         Config().clients.per_round)
                 else:
-                    client_processes = min(Config().trainer.max_concurrency,
-                                           Config().clients.per_round)
+                    client_processes = min(
+                        Config().trainer.max_concurrency *
+                        max(1,
+                            Config().gpu_count()),
+                        Config().clients.per_round)
             # Otherwise, the limited number is the same as the number of clients per round
             else:
                 client_processes = Config().clients.per_round
@@ -354,6 +366,8 @@ class Server:
                 if Config().is_central_server():
                     launched_clients = min(
                         Config().trainer.max_concurrency *
+                        max(1,
+                            Config().gpu_count()) *
                         Config().algorithm.total_silos,
                         Config().clients.per_round) if hasattr(
                             Config().trainer,
@@ -431,14 +445,14 @@ class Server:
             if hasattr(Config().trainer,
                        'max_concurrency') and not Config().is_central_server():
                 selected_clients = []
-                if Config().is_multiple_gpus():
+                if Config().gpu_count() > 1:
                     untrained_clients = list(
                         set(self.selected_clients).difference(
                             self.trained_clients))
-                    gpus_num = Config().is_multiple_gpus()
-                    for cuda_id in range(gpus_num):
+                    available_gpus = Config().gpu_count()
+                    for cuda_id in range(available_gpus):
                         for client_id in untrained_clients:
-                            if client_id % gpus_num == cuda_id:
+                            if client_id % available_gpus == cuda_id:
                                 selected_clients.append(client_id)
                             if len(selected_clients) >= (cuda_id + 1) * Config(
                             ).trainer.max_concurrency:
