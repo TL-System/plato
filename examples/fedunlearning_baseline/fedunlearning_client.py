@@ -65,6 +65,6 @@ class Client(simple.Client):
                                                              self.client_id,
                                                              testing=True)
 
-    def process_server_response(self, response):
+    def process_server_response(self, server_response):
         if self.current_round == Config().clients.data_deleted_round:
             self.data_loaded = False
