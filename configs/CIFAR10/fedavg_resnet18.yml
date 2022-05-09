@@ -3,27 +3,30 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 3
+    total_clients: 100 
 
     # The number of clients selected in each round
-    per_round: 2
+    per_round: 12 
 
     # Should the clients compute test accuracy locally?
     do_test: false
 
+    # Client simulation mode
+    simulation: true
+
 server:
     address: 127.0.0.1
-    port: 8000
+    port: 8020
 
 data:
     # The training and testing dataset
     datasource: CIFAR10
 
     # Where the dataset is located
-    data_path: ./data
+    data_path: /data/bli/data
 
     # Number of samples in each partition
-    partition_size: 20000
+    partition_size: 30000
 
     # IID or non-IID?
     sampler: iid
@@ -33,13 +36,13 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 10000
+    rounds: 10 
 
     # Whether the training should use multiple GPUs if available
     parallelized: true
 
     # The maximum number of clients running concurrently
-    max_concurrency: 2
+    max_concurrency: 6
 
     # The target accuracy
     target_accuracy: 0.80
