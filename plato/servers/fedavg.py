@@ -135,7 +135,7 @@ class Server(base.Server):
 
     def extract_client_updates(self, updates):
         """Extract the model weight updates from client updates."""
-        weights_received = [payload for (__, payload, __) in updates]
+        weights_received = [payload for (__, __, payload, __) in updates]
         return self.algorithm.compute_weight_updates(weights_received)
 
     async def aggregate_weights(self, updates):
@@ -150,7 +150,7 @@ class Server(base.Server):
 
         # Extract the total number of samples
         self.total_samples = sum(
-            [report.num_samples for (report, __, __) in updates])
+            [report.num_samples for (__, report, __, __) in updates])
 
         # Perform weighted averaging
         avg_update = {
@@ -159,7 +159,7 @@ class Server(base.Server):
         }
 
         for i, update in enumerate(weights_received):
-            report, __, __ = updates[i]
+            __, report, __, __ = updates[i]
             num_samples = report.num_samples
 
             for name, delta in update.items():
@@ -209,12 +209,13 @@ class Server(base.Server):
                     self.wall_time - self.initial_wall_time,
                     'comm_time':
                     max([
-                        report.comm_time for (report, __, __) in self.updates
+                        report.comm_time
+                        for (__, report, __, __) in self.updates
                     ]),
                     'round_time':
                     max([
                         report.training_time + report.comm_time
-                        for (report, __, __) in self.updates
+                        for (__, report, __, __) in self.updates
                     ]),
                 }[item]
                 new_row.append(item_value)
@@ -225,13 +226,11 @@ class Server(base.Server):
             if Config().clients.do_test:
                 # Updates the log for client test accuracies
                 accuracy_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_accuracy.csv"
-                index = 0
-                for (report, __, __) in self.updates:
+
+                for (client_id, report, __, __) in self.updates:
                     accuracy_row = [
-                        self.current_round, self.selected_clients[index],
-                        report.accuracy
+                        self.current_round, client_id, report.accuracy
                     ]
-                    index = index + 1
                     csv_processor.write_csv(accuracy_csv_file, accuracy_row)
 
     @staticmethod
@@ -239,11 +238,11 @@ class Server(base.Server):
         """Compute the average accuracy across clients."""
         # Get total number of samples
         total_samples = sum(
-            [report.num_samples for (report, __, __) in updates])
+            [report.num_samples for (__, report, __, __) in updates])
 
         # Perform weighted averaging
         accuracy = 0
-        for (report, __, __) in updates:
+        for (__, report, __, __) in updates:
             accuracy += report.accuracy * (report.num_samples / total_samples)
 
         return accuracy

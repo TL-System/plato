@@ -755,8 +755,8 @@ class Server:
                     os.getpid(), client['client_id'])
 
                 client_staleness = self.current_round - client['starting_round']
-                self.updates.append(
-                    (client['report'], client['payload'], client_staleness))
+                self.updates.append((client['client_id'], client['report'],
+                                     client['payload'], client_staleness))
 
             # Step 3: Processing stale clients that exceed a staleness threshold
 
@@ -791,8 +791,8 @@ class Server:
                         client_staleness = self.current_round - client[
                             'starting_round']
                         self.updates.append(
-                            (client['report'], client['payload'],
-                             client_staleness))
+                            (client['client_id'], client['report'],
+                             client['payload'], client_staleness))
 
             self.reported_clients = possibly_stale_clients
             logging.info("[Server #%s] Aggregating %s clients in total.",
@@ -810,8 +810,8 @@ class Server:
             client = client_info[1]
             client_staleness = self.current_round - client['starting_round']
 
-            self.updates.append(
-                (client['report'], client['payload'], client_staleness))
+            self.updates.append((client['client_id'], client['report'],
+                                 client['payload'], client_staleness))
 
         if not self.simulate_wall_time:
             # In both synchronous and asynchronous modes, if we are not simulating the wall clock
