@@ -65,40 +65,6 @@ class Client(simple.Client):
                                                              self.client_id,
                                                              testing=True)
 
-    async def payload_to_arrive(self, response) -> None:
-        """ Upon receiving a response from the server. """
-        self.process_server_response(response)
-
-        self.current_round = response["current_round"]
-
-        # Update (virtual) client id for client, trainer and algorithm
-        if hasattr(Config().clients,
-                   'simulation') and Config().clients.simulation:
-            self.client_id = response['id']
-            self.configure()
-
-        logging.info("[Client #%d] Selected by the server.", self.client_id)
-
+    def process_server_response(self, response):
         if self.current_round == Config().clients.data_deleted_round:
             self.data_loaded = False
-
-        if (hasattr(Config().data, 'reload_data')
-                and Config().data.reload_data) or not self.data_loaded:
-            self.load_data()
-
-        if hasattr(Config().clients,
-                   'comm_simulation') and Config().clients.comm_simulation:
-            payload_filename = response['payload_filename']
-            with open(payload_filename, 'rb') as payload_file:
-                self.server_payload = pickle.load(payload_file)
-
-            payload_size = sys.getsizeof(pickle.dumps(self.server_payload))
-
-            logging.info(
-                "[%s] Received %.2f MB of payload data from the server (simulated).",
-                self, payload_size / 1024**2)
-
-            self.server_payload = self.inbound_processor.process(
-                self.server_payload)
-
-            await self.start_training()
