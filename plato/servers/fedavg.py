@@ -219,18 +219,6 @@ class Server(base.Server):
                 }[item]
                 new_row.append(item_value)
 
-            # Updates test accuracy csv file
-            if Config().clients.do_test:
-                test_accuracy_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_test_accuracy.csv"
-                client_id = 1
-                for (report, __, __) in self.updates:
-                    test_accuracy_row = [
-                        self.current_round, client_id, report
-                    ]
-                    csv_processor.write_csv(test_accuracy_csv_file,
-                                            test_accuracy_row)
-                    client_id = client_id + 1
-
             result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}.csv"
             csv_processor.write_csv(result_csv_file, new_row)
 
@@ -242,7 +230,8 @@ class Server(base.Server):
                 index = 0
                 for (report, __, __) in self.updates:
                     accuracy_row = [
-                        self.current_round, self.selected_clients[index], report.accuracy
+                        self.current_round, self.selected_clients[index],
+                        report.accuracy
                     ]
                     index = index + 1
                     csv_processor.write_csv(accuracy_csv_file, accuracy_row)
