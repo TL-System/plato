@@ -127,8 +127,8 @@ class Server(fedavg.Server):
                                                  Config().data.testset_size)
                     self.testset_sampler = SubsetRandomSampler(test_samples)
 
-    async def select_clients(self):
-        if Config().is_edge_server():
+    async def select_clients(self, for_next_batch=False):
+        if Config().is_edge_server() and not for_next_batch:
             if self.current_round == 0:
                 # Wait until this edge server is selected by the central server
                 # to avoid the edge server selects clients and clients begin training
@@ -136,7 +136,7 @@ class Server(fedavg.Server):
                 await self.new_global_round_begins.wait()
                 self.new_global_round_begins.clear()
 
-        await super().select_clients()
+        await super().select_clients(for_next_batch=for_next_batch)
 
     async def customize_server_response(self, server_response):
         """Wrap up generating the server response with any additional information."""

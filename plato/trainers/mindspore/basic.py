@@ -114,7 +114,6 @@ class Trainer(base.Trainer):
         Arguments:
         trainset: The training dataset.
         """
-        self.start_training()
         tic = time.perf_counter()
 
         self.mindspore_model.train(
@@ -135,7 +134,6 @@ class Trainer(base.Trainer):
         Arguments:
         testset: The test dataset.
         """
-        self.start_training()
 
         # Deactivate the cut layer so that testing uses all the layers
         self.mindspore_model._network.cut_layer = None
