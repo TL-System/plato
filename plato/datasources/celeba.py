@@ -36,7 +36,17 @@ class DataSource(base.DataSource):
         super().__init__()
         _path = Config().data.data_path
 
-        image_size = 64
+        target_types = []
+        if hasattr(Config().data, "celeba_targets"):
+            targets = Config().data.celeba_targets
+            if hasattr(targets, "attr") and targets.attr:
+                target_types.append("attr")
+            if hasattr(targets, "identity") and targets.identity:
+                target_types.append("identity")
+        else:
+            target_types = ['attr', 'identity']
+
+        image_size = 32
         _transform = transforms.Compose([
             transforms.Resize(image_size),
             transforms.CenterCrop(image_size),
@@ -46,13 +56,13 @@ class DataSource(base.DataSource):
 
         self.trainset = CelebA(root=_path,
                                split='train',
-                               target_type=['attr', 'identity'],
+                               target_type=target_types,
                                download=True,
                                transform=_transform,
                                target_transform=DataSource._target_transform)
         self.testset = CelebA(root=_path,
                               split='test',
-                              target_type=['attr', 'identity'],
+                              target_type=target_types,
                               download=True,
                               transform=_transform,
                               target_transform=DataSource._target_transform)
@@ -65,16 +75,22 @@ class DataSource(base.DataSource):
         tensors. Here, we just merge two tensors by adding identity
         as the 41st attribute
         """
-        attr, identity = label
-        return torch.cat((attr.reshape([
-            -1,
-        ]), identity.reshape([
-            -1,
-        ])))
+        if isinstance(label, tuple):
+            if len(label) == 1:
+                return label[0]
+            elif len(label) == 2:
+                attr, identity = label
+                return torch.cat((attr.reshape([
+                    -1,
+                ]), identity.reshape([
+                    -1,
+                ])))
+        else:
+            return label
 
     @staticmethod
     def input_shape():
-        return [162770, 2, 64, 64]
+        return [162770, 3, 32, 32]
 
     def num_train_examples(self):
         return 162770
