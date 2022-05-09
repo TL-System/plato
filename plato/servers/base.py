@@ -130,9 +130,9 @@ class Server:
 
         # With specifying max_concurrency, selected clients run batch by batach
         # The number of clients in a batch is the same as the max_concurrency
-        # This parameter is the number of selected clients that has run in the current round
+        # This list contains ids of selected clients that has run in the current round
         if hasattr(Config().trainer, 'max_concurrency'):
-            self.trained_clients = 0
+            self.trained_clients = []
 
     def __repr__(self):
         return f'Server #{os.getpid()}'
@@ -332,7 +332,7 @@ class Server:
             self.current_round += 1
 
             if hasattr(Config().trainer, 'max_concurrency'):
-                self.trained_clients = 0
+                self.trained_clients = []
 
             logging.info("\n[%s] Starting round %s/%s.", self,
                          self.current_round,
@@ -419,13 +419,25 @@ class Server:
             # and the number of clients in each batch is equal to # (or maybe smaller
             # than for the last batch) max_concurrency
             if hasattr(Config().trainer, 'max_concurrency'):
-                selected_clients = self.selected_clients[
-                    self.trained_clients:min(
-                        self.trained_clients + Config().trainer.
-                        max_concurrency, len(self.selected_clients))]
-                self.trained_clients = min(
-                    self.trained_clients + Config().trainer.max_concurrency,
-                    len(self.selected_clients))
+                selected_clients = []
+                if Config().is_multiple_gpus():
+                    untrained_clients = list(
+                        set(self.selected_clients).difference(
+                            self.trained_clients))
+                    gpus_num = Config().is_multiple_gpus()
+                    for cuda_id in range(gpus_num):
+                        while len(selected_clients) < (cuda_id + 1) * Config(
+                        ).trainer.max_concurrency:
+                            for client_id in untrained_clients:
+                                if client_id % gpus_num == cuda_id:
+                                    selected_clients.append(client_id)
+                else:
+                    selected_clients = self.selected_clients[
+                        len(self.trained_clients):min(
+                            len(self.trained_clients) + Config().trainer.
+                            max_concurrency, len(self.selected_clients))]
+
+                self.trained_clients += selected_clients
 
             else:
                 selected_clients = self.selected_clients
@@ -872,7 +884,7 @@ class Server:
         elif hasattr(Config().trainer, 'max_concurrency'):
             # Clients in the current batch finish training
             # The server will select the next batch of clients to train
-            if len(self.updates) >= self.trained_clients:
+            if len(self.updates) >= len(self.trained_clients):
                 await self.select_clients(for_next_batch=True)
 
     async def client_disconnected(self, sid):
