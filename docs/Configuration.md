@@ -17,7 +17,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |**total_clients**|The total number of clients|A positive number||
 |**per_round**|The number of clients selected in each round| Any positive integer that is not larger than **total_clients**||
 |**do_test**|Should the clients compute test accuracy locally?| `true` or `false`|| 
-|simulation|Should we turn on the client simulation mode? When this is turned on, the number of client processes started is equal to the number of clients per round, rather than the total number of clients.|
+|simulation|Should we turn on the client simulation mode? When this is turned on, the number of client processes started is equal to `max_concurrency`, rather than the total number of clients.|
 |speed_simulation|Should we simulate client heterogeneity in training speed?|
 |simulation_distribution|Parameters for simulating client heterogeneity in training speed|`distribution`|`normal` for normal or `zipf` for Zipf|
 |||`s`|the parameter `s` in Zipf distribution|

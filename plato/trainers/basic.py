@@ -291,7 +291,6 @@ class Trainer(base.Trainer):
         self.training_start_time = time.time()
 
         if 'max_concurrency' in config:
-            self.start_training()
             tic = time.perf_counter()
 
             if mp.get_start_method(allow_none=True) != 'spawn':
@@ -309,10 +308,6 @@ class Trainer(base.Trainer):
             try:
                 self.load_model(filename)
             except OSError as error:  # the model file is not found, training failed
-                if 'max_concurrency' in config:
-                    self.run_sql_statement(
-                        "DELETE FROM trainers WHERE run_id = (?)",
-                        (self.client_id, ))
                 raise ValueError(
                     f"Training on client {self.client_id} failed.") from error
 
@@ -401,8 +396,6 @@ class Trainer(base.Trainer):
         config['run_id'] = Config().params['run_id']
 
         if hasattr(Config().trainer, 'max_concurrency'):
-            self.start_training()
-
             if mp.get_start_method(allow_none=True) != 'spawn':
                 mp.set_start_method('spawn', force=True)
 

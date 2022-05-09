@@ -17,7 +17,6 @@ class Trainer(base.Trainer):
     """A basic federated learning trainer for TensorFlow, used by both
     the client and the server.
     """
-
     def __init__(self, model=None):
         """Initializing the trainer with the provided model.
 
@@ -143,7 +142,6 @@ class Trainer(base.Trainer):
         config['run_id'] = Config().params['run_id']
         if hasattr(Config().trainer, 'max_concurrency'):
             # reserved for mp.Process
-            self.start_training()
             tic = time.perf_counter()
             self.train_process(config, trainset, sampler, cut_layer)
             toc = time.perf_counter()
