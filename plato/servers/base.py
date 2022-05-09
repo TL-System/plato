@@ -283,9 +283,8 @@ class Server:
         starting_id = 1
 
         if Server.client_simulation_mode:
-            # In the client simulation mode, we only need to launch a limited
-            # number of client objects
-            # If max_concurency is specified, the limite number is the same as max_concurrency
+            # In the client simulation mode, we only need to launch the number of clients
+            # necessary for concurrent training, which is `max_concurrency` in `trainer`
             if hasattr(Config().trainer, 'max_concurrency'):
                 client_processes = Config().trainer.max_concurrency
             # Otherwise, the limited number is the same as the number of clients per round

@@ -175,7 +175,7 @@ If runtime exceptions occur that prevent a federated learning session from runni
 
 * Out of CUDA memory.
 
-  *Potential solutions:* Decrease the number of clients selected in each round (with the *client simulation mode* turned on); decrease the `max_concurrency` value in the `trainer` section in your configuration file; decrease the  `batch_size` used in the `trainer` section.
+  *Potential solutions:* Decrease the `max_concurrency` value in the `trainer` section in your configuration file.
  
 * The time that a client waits for the server to respond before disconnecting is too short. This could happen when training with large neural network models. If you get an `AssertionError` saying that there are not enough launched clients for the server to select, this could be the reason. But make sure you first check if it is due to the *out of CUDA memory* error.
 
