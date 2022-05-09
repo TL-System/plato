@@ -1,8 +1,10 @@
 """
-A customized trainer for federated unlearning.
+A customized client for federated unlearning.
 
-Reference: Liu et al., "The Right to be Forgotten in Federated Learning: An Efficient Realization with Rapid Retraining." in Proc. INFOCOM, 2022 https://arxiv.org/abs/2203.07320
+Liu et al., "The Right to be Forgotten in Federated Learning: An Efficient Realization with Rapid
+Retraining," in Proc. INFOCOM, 2022.
 
+Reference: https://arxiv.org/abs/2203.07320
 """
 import logging
 import pickle
@@ -44,7 +46,7 @@ class Client(simple.Client):
         need_delete = self.current_round >= Config().clients.data_deleted_round
         # Setting up the data sampler
         self.sampler = unlearning_iid.Sampler(self.datasource, self.client_id,
-                                           False, need_delete)
+                                              False, need_delete)
 
         if hasattr(Config().trainer, 'use_mindspore'):
             # MindSpore requires samplers to be used while constructing

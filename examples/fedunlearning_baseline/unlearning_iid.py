@@ -1,8 +1,10 @@
 """
 A customized iid sampler for federated unlearning.
 
-Reference: Liu et al., "The Right to be Forgotten in Federated Learning: An Efficient Realization with Rapid Retraining." in Proc. INFOCOM, 2022 https://arxiv.org/abs/2203.07320
+Liu et al., "The Right to be Forgotten in Federated Learning: An Efficient Realization with Rapid
+Retraining," in Proc. INFOCOM, 2022.
 
+Reference: https://arxiv.org/abs/2203.07320
 """
 import numpy as np
 
@@ -11,8 +13,8 @@ from plato.samplers import iid
 
 
 class Sampler(iid.Sampler):
-    """Create a data sampler for each client to use a randomly divided partition of the
-    dataset with a particular ratio of data to be deleted."""
+    """ Create a data sampler for each client to use a randomly divided partition of the
+    dataset with a particular ratio of data to be deleted. """
 
     def __init__(self, datasource, client_id, testing, needs_to_delete=False):
         super().__init__(datasource, client_id, testing)
@@ -47,8 +49,8 @@ class Sampler(iid.Sampler):
             subset_length = int(len(self.subset_indices))
             deleted_subset_length = int(subset_length * deleted_data_ratio)
             deleted_index = np.random.choice(range(subset_length),
-                                            deleted_subset_length,
-                                            replace=False)
+                                             deleted_subset_length,
+                                             replace=False)
 
             self.subset_indices = list(
                 np.delete(self.subset_indices, deleted_index))

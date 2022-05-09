@@ -55,8 +55,7 @@ trainer:
     # Number of epoches for local training in each communication round
     epochs: 1
     batch_size: 128
-    #128,256,512,1024,2048
-    optimizer: AdaHessian 
+    optimizer: AdaHessian
     learning_rate: 0.001
     momentum_b1: 0.9
     momentum_b2: 0.999
