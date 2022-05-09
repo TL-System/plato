@@ -121,8 +121,8 @@ class Server(base.Server):
         if self.algorithm is None:
             self.algorithm = algorithms_registry.get(self.trainer)
 
-    async def select_clients(self):
-        await super().select_clients()
+    async def select_clients(self, for_next_batch=False):
+        await super().select_clients(for_next_batch=for_next_batch)
 
     def extract_client_updates(self, updates):
         """Extract the model weight updates from client updates."""

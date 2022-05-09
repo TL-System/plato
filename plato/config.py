@@ -6,7 +6,6 @@ import argparse
 import json
 import logging
 import os
-import sqlite3
 from collections import OrderedDict, namedtuple
 from typing import Any, IO
 
@@ -18,6 +17,7 @@ from plato.utils.available_gpu import available_gpu
 
 class Loader(yaml.SafeLoader):
     """ YAML Loader with `!include` constructor. """
+
     def __init__(self, stream: IO) -> None:
         """Initialise Loader."""
 
@@ -186,13 +186,6 @@ class Config:
 
             if 'model' in config:
                 Config.model = Config.namedtuple_from_dict(config['model'])
-
-            if hasattr(Config().trainer, 'max_concurrency'):
-                # Using a temporary SQLite database to limit the maximum number of concurrent
-                # trainers
-                Config.sql_connection = sqlite3.connect(
-                    f"{Config.params['result_dir']}/running_trainers.sqlitedb")
-                Config().cursor = Config.sql_connection.cursor()
 
         return cls._instance
 

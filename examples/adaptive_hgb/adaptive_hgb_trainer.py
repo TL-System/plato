@@ -359,7 +359,6 @@ class Trainer(basic.Trainer):
         Returns:
             Whether training was successfully completed.
         """
-        self.start_training()
 
         if mp.get_start_method(allow_none=True) != 'spawn':
             mp.set_start_method('spawn', force=True)
