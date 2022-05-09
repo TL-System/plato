@@ -225,7 +225,7 @@ class Server(base.Server):
                 client_id = 1
                 for (report, __, __) in self.updates:
                     test_accuracy_row = [
-                        self.current_round, client_id, report.accuracy
+                        self.current_round, client_id, report
                     ]
                     csv_processor.write_csv(test_accuracy_csv_file,
                                             test_accuracy_row)
