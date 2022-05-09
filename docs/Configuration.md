@@ -17,7 +17,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |**total_clients**|The total number of clients|A positive number||
 |**per_round**|The number of clients selected in each round| Any positive integer that is not larger than **total_clients**||
 |**do_test**|Should the clients compute test accuracy locally?| `true` or `false`|| 
-|simulation|Should we turn on the client simulation mode? When this is turned on, the number of client processes started is equal to `max_concurrency`, rather than the total number of clients.|
+|simulation|Should we turn on the client simulation mode? When this is turned on, the number of client processes started is equal to `max_concurrency` (or `max_concurrency` * `total_silos` in cross-silo training), rather than the total number of clients.|
 |speed_simulation|Should we simulate client heterogeneity in training speed?|
 |simulation_distribution|Parameters for simulating client heterogeneity in training speed|`distribution`|`normal` for normal or `zipf` for Zipf|
 |||`s`|the parameter `s` in Zipf distribution|
@@ -117,7 +117,7 @@ None.
 |**type**|The type of the trainer|`basic`|
 |**rounds**|The maximum number of training rounds|Any positive integer||
 |**parallelized**|Whether the training should use multiple GPUs if available|`true` or `false`||
-|max_concurrency|The maximum number of clients running concurrently. if this is not defined, no new processes are spawned for training|Any positive integer||
+|max_concurrency|The maximum number of clients (of each edge server in cross-silo training) running concurrently. If this is not defined, no new processes are spawned for training|Any positive integer||
 |target_accuracy|The target accuracy of the global model|||
 |target_perplexity|The target perplexity of the global NLP model|
 |**epochs**|Number of epoches for local training in each communication round|Any positive integer||

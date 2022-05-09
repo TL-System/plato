@@ -265,10 +265,11 @@ class Server:
             logging.info("[%s] New contact from Client #%d received.", self,
                          client_id)
 
-        if (self.current_round == 0 or self.resumed_session) and len(
-                self.clients) >= Config().trainer.max_concurrency if hasattr(
-                    Config().trainer,
-                    'max_concurrency') else self.clients_per_round:
+        if (self.current_round == 0 or self.resumed_session) and (
+                len(self.clients) >= min(Config().trainer.max_concurrency,
+                                         self.clients_per_round) if
+            (hasattr(Config().trainer, 'max_concurrency') and
+             not Config().is_central_server()) else self.clients_per_round):
             logging.info("[%s] Starting training.", self)
             self.resumed_session = False
             await self.select_clients()
@@ -286,7 +287,14 @@ class Server:
             # In the client simulation mode, we only need to launch the number of clients
             # necessary for concurrent training, which is `max_concurrency` in `trainer`
             if hasattr(Config().trainer, 'max_concurrency'):
-                client_processes = Config().trainer.max_concurrency
+                if Config().is_central_server():
+                    client_processes = min(
+                        Config().trainer.max_concurrency *
+                        Config().algorithm.total_silos,
+                        Config().clients.per_round)
+                else:
+                    client_processes = min(Config().trainer.max_concurrency,
+                                           Config().clients.per_round)
             # Otherwise, the limited number is the same as the number of clients per round
             else:
                 client_processes = Config().clients.per_round
@@ -344,14 +352,16 @@ class Server:
                 self.clients_pool = list(range(1, 1 + self.total_clients))
 
                 if Config().is_central_server():
-                    launched_client_num = Config(
-                    ).trainer.max_concurrency if hasattr(
-                        Config().trainer,
-                        'max_concurrency') else Config().clients.per_round
+                    launched_clients = min(
+                        Config().trainer.max_concurrency *
+                        Config().algorithm.total_silos,
+                        Config().clients.per_round) if hasattr(
+                            Config().trainer,
+                            'max_concurrency') else Config().clients.per_round
                     # In cross-silo FL, the central server selects from the pool of edge servers
                     self.clients_pool = list(
-                        range(launched_client_num + 1,
-                              launched_client_num + 1 + self.total_clients))
+                        range(launched_clients + 1,
+                              launched_clients + 1 + self.total_clients))
             else:
                 # If no clients are simulated, the client pool for client selection consists of
                 # the current set of clients that have contacted the server
@@ -416,9 +426,10 @@ class Server:
             self.selected_sids = []
 
             # If max_concurrency is specified, run selected clients batch by batch,
-            # and the number of clients in each batch is equal to # (or maybe smaller
-            # than for the last batch) max_concurrency
-            if hasattr(Config().trainer, 'max_concurrency'):
+            # and the number of clients in each batch (on each GPU, if multiple GPUs are available)
+            # is equal to # (or maybe smaller than for the last batch) max_concurrency
+            if hasattr(Config().trainer,
+                       'max_concurrency') and not Config().is_central_server():
                 selected_clients = []
                 if Config().is_multiple_gpus():
                     untrained_clients = list(
@@ -882,7 +893,8 @@ class Server:
             await self.wrap_up()
             await self.select_clients()
 
-        elif hasattr(Config().trainer, 'max_concurrency'):
+        elif hasattr(Config().trainer,
+                     'max_concurrency') and not Config().is_central_server():
             # Clients in the current batch finish training
             # The server will select the next batch of clients to train
             if len(self.updates) >= len(self.trained_clients):
