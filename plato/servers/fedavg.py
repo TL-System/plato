@@ -111,10 +111,10 @@ class Server(base.Server):
 
             # Initialize the test accuracy csv file if clients compute locally
             if Config().clients.do_test:
-                test_accuracy_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_test_accuracy.csv"
-                test_accuracy_headers = ["round", "client_id", "test_accuracy"]
-                csv_processor.initialize_csv(test_accuracy_csv_file,
-                                             test_accuracy_headers,
+                accuracy_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_accuracy.csv"
+                accuracy_headers = ["round", "client_id", "accuracy"]
+                csv_processor.initialize_csv(accuracy_csv_file,
+                                             accuracy_headers,
                                              Config().params['result_dir'])
 
     def load_trainer(self):
@@ -219,20 +219,20 @@ class Server(base.Server):
                 }[item]
                 new_row.append(item_value)
 
-            # Updates test accuracy csv file
-            if Config().clients.do_test:
-                test_accuracy_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_test_accuracy.csv"
-                client_id = 1
-                for (report, __, __) in self.updates:
-                    test_accuracy_row = [
-                        self.current_round, client_id, report.accuracy
-                    ]
-                    csv_processor.write_csv(test_accuracy_csv_file,
-                                            test_accuracy_row)
-                    client_id = client_id + 1
-
             result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}.csv"
             csv_processor.write_csv(result_csv_file, new_row)
+
+            if Config().clients.do_test:
+                # Updates the log for client test accuracies
+                accuracy_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_accuracy.csv"
+
+                client_id = 1
+                for (report, __, __) in self.updates:
+                    accuracy_row = [
+                        self.current_round, client_id, report.accuracy
+                    ]
+                    csv_processor.write_csv(accuracy_csv_file, accuracy_row)
+                    client_id = client_id + 1
 
     @staticmethod
     def accuracy_averaging(updates):
