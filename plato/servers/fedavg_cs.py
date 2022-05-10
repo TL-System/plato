@@ -77,8 +77,10 @@ class Server(fedavg.Server):
             logging.info("Configuring edge server #%d as a %s server.",
                          Config().args.id,
                          Config().algorithm.type)
-            logging.info("Training with %s local aggregation rounds.",
-                         Config().algorithm.local_rounds)
+            logging.info(
+                "[Edge server #%d (#%d)] Training with %s local aggregation rounds.",
+                Config().args.id, os.getpid(),
+                Config().algorithm.local_rounds)
 
             self.load_trainer()
             self.trainer.set_client_id(Config().args.id)
