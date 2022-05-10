@@ -265,8 +265,11 @@ class Server:
             logging.info("[%s] New contact from Client #%d received.", self,
                          client_id)
 
-        if hasattr(Config().trainer,
-                   'max_concurrency') and not Config().is_central_server():
+        if hasattr(
+                Config().trainer,
+                'max_concurrency') and (hasattr(Config().clients, 'simulation')
+                                        and Config().clients.simulation
+                                        ) and not Config().is_central_server():
             required_launched_clients = min(
                 Config().trainer.max_concurrency * max(1,
                                                        Config().gpu_count()),
