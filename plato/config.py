@@ -262,6 +262,21 @@ class Config:
                        'cross_silo') and Config().args.port is None
 
     @staticmethod
+    def gpu_count() -> int:
+        """Returns the number of GPUs available for training."""
+        if hasattr(Config().trainer, 'use_mindspore'):
+            return 0
+
+        import torch
+
+        if torch.cuda.is_available():
+            return torch.cuda.device_count() if hasattr(
+                Config().trainer,
+                'parallelized') and Config().trainer.parallelized else 1
+        else:
+            return 0
+
+    @staticmethod
     def device() -> str:
         """Returns the device to be used for training."""
         device = 'cpu'
@@ -285,9 +300,13 @@ class Config:
             import torch
 
             if torch.cuda.is_available() and torch.cuda.device_count() > 0:
-                if hasattr(Config().trainer,
-                           'parallelized') and Config().trainer.parallelized:
-                    device = 'cuda'
+                if Config.gpu_count() > 1:
+                    # A client will always run on the same GPU
+                    if isinstance(Config.args.id, int):
+                        gpu_id = Config.args.id % torch.cuda.device_count()
+                        device = f'cuda:{gpu_id}'
+                    else:
+                        device = 'cuda:0'
                 else:
                     gpu_id = os.getenv('GPU_ID')
 
@@ -298,13 +317,3 @@ class Config:
                     device = f'cuda:{gpu_id}'
 
         return device
-
-    @staticmethod
-    def is_parallel() -> bool:
-        """Check if the hardware and OS support data parallelism."""
-        import torch
-
-        return hasattr(Config().trainer, 'parallelized') and Config(
-        ).trainer.parallelized and torch.cuda.is_available(
-        ) and torch.distributed.is_available(
-        ) and torch.cuda.device_count() > 1

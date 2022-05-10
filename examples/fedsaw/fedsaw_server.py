@@ -90,7 +90,7 @@ class Server(fedavg_cs.Server):
             else:
                 client_id = i + 1 + Config().clients.total_clients
             (report, received_updates) = [
-                (report, payload) for (report, payload, __) in self.updates
+                (report, payload) for (__, report, payload, __) in self.updates
                 if int(report.client_id) == client_id
             ][0]
             num_samples = report.num_samples
