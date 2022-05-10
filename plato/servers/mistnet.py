@@ -27,8 +27,16 @@ class Server(fedavg.Server):
         """Setting up a pre-trained model to be loaded on the server."""
         super().load_trainer()
 
-        logging.info("[Server #%d] Loading a pre-trained model.", os.getpid())
-        self.trainer.load_model()
+        model_dir = Config().params['model_dir']
+        model_file_name = Config().trainer.pretrained_model if hasattr(
+            Config().trainer,
+            'pretrained_model') else f'{Config().trainer.model_name}.pth'
+        pretrained_model_path = f'{model_dir}/{model_file_name}'
+
+        if os.path.exists(pretrained_model_path):
+            logging.info("[Server #%d] Loading a pre-trained model.",
+                         os.getpid())
+            self.trainer.load_model(filename=model_file_name)
 
     async def process_reports(self):
         """Process the features extracted by the client and perform server-side training."""
@@ -43,8 +51,7 @@ class Server(fedavg.Server):
         # Test the updated model
         if not Config().clients.do_test:
             self.accuracy = self.trainer.test(self.testset)
-            logging.info(
-                '[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(
-                    os.getpid(), 100 * self.accuracy))
+            logging.info('[%s] Global model accuracy: %.2f%%\n', self,
+                         100 * self.accuracy)
 
         await self.wrap_up_processing_reports()
