@@ -57,13 +57,13 @@ class Server(fedavg.Server):
 
         # Extract the total number of samples
         self.total_samples = sum(
-            [report.num_samples for (report, __, __) in updates])
+            [report.num_samples for (__, report, __, __) in updates])
 
         # Constructing the aggregation weights to be used
         aggregation_weights = []
 
         for i, update in enumerate(weights_received):
-            report, __, staleness = updates[i]
+            __, report, __, staleness = updates[i]
             num_samples = report.num_samples
 
             similarity = await self.cosine_similarity(update, staleness)
@@ -99,7 +99,7 @@ class Server(fedavg.Server):
         }
 
         for i, update in enumerate(weights_received):
-            report, __, staleness = updates[i]
+            __, report, __, staleness = updates[i]
             num_samples = report.num_samples
 
             for name, delta in update.items():

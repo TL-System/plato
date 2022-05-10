@@ -81,6 +81,7 @@ class Client:
 
     def __init__(self) -> None:
         self.client_id = Config().args.id
+        self.current_round = 0
         self.sio = None
         self.chunks = []
         self.server_payload = None
@@ -153,6 +154,7 @@ class Client:
 
     async def payload_to_arrive(self, response) -> None:
         """ Upon receiving a response from the server. """
+        self.current_round = response['current_round']
         self.process_server_response(response)
 
         # Update (virtual) client id for client, trainer and algorithm
