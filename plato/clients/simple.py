@@ -24,6 +24,7 @@ class Report(base.Report):
 
 class Client(base.Client):
     """A basic federated learning client who sends simple weight updates."""
+
     def __init__(self,
                  model=None,
                  datasource=None,
@@ -122,7 +123,9 @@ class Client(base.Client):
         weights = self.algorithm.extract_weights()
 
         # Generate a report for the server, performing model testing if applicable
-        if Config().clients.do_test:
+        if Config().clients.do_test and (
+                not hasattr(Config().clients, 'test_interval')
+                or self.current_round % Config().clients.test_interval == 0):
             accuracy = self.trainer.test(self.testset, self.testset_sampler)
 
             if accuracy == -1:

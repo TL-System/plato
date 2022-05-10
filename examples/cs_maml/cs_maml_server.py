@@ -14,6 +14,7 @@ from plato.servers import fedavg_cs
 
 class Server(fedavg_cs.Server):
     """Cross-silo federated learning server using federated averaging."""
+
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
 
@@ -116,10 +117,10 @@ class Server(fedavg_cs.Server):
         if not self.do_personalization_test:
             self.round_time = max([
                 report.training_time + report.comm_time
-                for (report, __, __) in self.updates
+                for (__, report, __, __) in self.updates
             ])
             self.comm_time = max(
-                [report.comm_time for (report, __, __) in self.updates])
+                [report.comm_time for (__, report, __, __) in self.updates])
 
     async def process_client_info(self, client_id, sid):
         """ Process the received metadata information from a reporting client. """
