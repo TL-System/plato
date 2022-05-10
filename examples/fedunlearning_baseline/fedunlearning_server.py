@@ -51,7 +51,7 @@ class Server(fedavg.Server):
         """ Wrap up processing the reports with any additional work. """
         await super().wrap_up_processing_reports()
 
-        if (self.current_round == Config().clients.data_deleted_round
+        if (self.current_round == Config().clients.data_deletion_round
             ) and self.restarted_session:
             logging.info("[%s] Data deleted. Retraining from the first round.",
                          self)

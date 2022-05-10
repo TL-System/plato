@@ -31,7 +31,7 @@ class Sampler(iid.Sampler):
         partition_size = Config().data.partition_size
         total_clients = Config().clients.total_clients
         total_size = partition_size * total_clients
-        deleted_data_ratio = Config().clients.delete_data_ratio
+        deleted_data_ratio = Config().clients.deleted_data_ratio
 
         # add extra samples to make it evenly divisible, if needed
         if len(indices) < total_size:

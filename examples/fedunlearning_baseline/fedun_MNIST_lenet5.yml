@@ -12,7 +12,7 @@ clients:
     do_test: false
 
     # The round to remove the local data by clients
-    data_deleted_round: 2
+    data_deletion_round: 2
 
     # The percentage to remove the local data by clients
     deleted_data_ratio: 0.3

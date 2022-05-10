@@ -111,7 +111,8 @@ class Client(base.Client):
 
     async def train(self):
         """The machine learning training workload on a client."""
-        logging.info("[%s] Started training.", self)
+        logging.info("[%s] Started training in communication round #%s.", self,
+                     self.current_round)
 
         # Perform model training
         try:

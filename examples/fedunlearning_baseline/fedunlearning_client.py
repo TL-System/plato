@@ -22,15 +22,22 @@ class Client(simple.Client):
                  algorithm=None,
                  trainer=None):
         super().__init__(model, datasource, algorithm, trainer)
-        self.current_round = 0
+        self.previous_round = {}
         self.testset_sampler = None
 
     def process_server_response(self, server_response):
-        if self.current_round == Config().clients.data_deleted_round:
+        if self.client_id in self.previous_round:
+            previous_round = self.previous_round[self.client_id]
+        else:
+            previous_round = 0
+
+        if self.current_round == 1 and self.current_round <= previous_round:
             logging.info(
-                "[%s] Unlearning sampler deployed: %s of the samples were deleted.",
+                "[%s] Unlearning sampler deployed: %s%% of the samples were deleted.",
                 self,
-                Config().clients.deleted_data_ratio)
+                Config().clients.deleted_data_ratio * 100)
 
             self.sampler = unlearning_iid.Sampler(self.datasource,
                                                   self.client_id, False)
+
+        self.previous_round[self.client_id] = self.current_round
