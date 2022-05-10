@@ -1,8 +1,10 @@
 """
 A customized server for federated unlearning.
 
-Reference: Liu et al., "The Right to be Forgotten in Federated Learning: An Efficient Realization with Rapid Retraining." in Proc. INFOCOM, 2022 https://arxiv.org/abs/2203.07320
+Liu et al., "The Right to be Forgotten in Federated Learning: An Efficient Realization with Rapid
+Retraining," in Proc. INFOCOM, 2022.
 
+Reference: https://arxiv.org/abs/2203.07320
 """
 import logging
 import time
@@ -36,7 +38,7 @@ class Server(fedavg.Server):
                          client_id)
 
         if (self.current_round == 0 or self.resumed_session) and len(
-                    self.clients) >= self.clients_per_round:
+                self.clients) >= self.clients_per_round:
             logging.info("[%s] Starting training.", self)
             self.resumed_session = False
             # Saving a checkpoint for round #0 before any training starts,
@@ -49,7 +51,8 @@ class Server(fedavg.Server):
         """ Wrap up processing the reports with any additional work. """
         await super().wrap_up_processing_reports()
 
-        if (self.current_round == Config().clients.data_deleted_round) and self.restarted_session:
+        if (self.current_round == Config().clients.data_deletion_round
+            ) and self.restarted_session:
             logging.info("[%s] Data deleted. Retraining from the first round.",
                          self)
             self.current_round = 0

@@ -12,10 +12,10 @@ clients:
     do_test: false
 
     # The round to remove the local data by clients
-    data_deleted_round: 2
+    data_deletion_round: 2
 
     # The percentage to remove the local data by clients
-    delete_data_ratio: 0.3
+    deleted_data_ratio: 0.3
 
 server:
     address: 127.0.0.1
@@ -55,8 +55,7 @@ trainer:
     # Number of epoches for local training in each communication round
     epochs: 1
     batch_size: 128
-    #128,256,512,1024,2048
-    optimizer: AdaHessian 
+    optimizer: AdaHessian
     learning_rate: 0.001
     momentum_b1: 0.9
     momentum_b2: 0.999

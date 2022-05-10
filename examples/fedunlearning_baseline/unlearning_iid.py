@@ -1,8 +1,10 @@
 """
 A customized iid sampler for federated unlearning.
 
-Reference: Liu et al., "The Right to be Forgotten in Federated Learning: An Efficient Realization with Rapid Retraining." in Proc. INFOCOM, 2022 https://arxiv.org/abs/2203.07320
+Liu et al., "The Right to be Forgotten in Federated Learning: An Efficient Realization with Rapid
+Retraining," in Proc. INFOCOM, 2022.
 
+Reference: https://arxiv.org/abs/2203.07320
 """
 import numpy as np
 
@@ -11,10 +13,10 @@ from plato.samplers import iid
 
 
 class Sampler(iid.Sampler):
-    """Create a data sampler for each client to use a randomly divided partition of the
-    dataset with a particular ratio of data to be deleted."""
+    """ Create a data sampler for each client to use a randomly divided partition of the
+    dataset with a particular ratio of data to be deleted. """
 
-    def __init__(self, datasource, client_id, testing, needs_to_delete=False):
+    def __init__(self, datasource, client_id, testing):
         super().__init__(datasource, client_id, testing)
         if testing:
             dataset = datasource.get_test_set()
@@ -29,7 +31,7 @@ class Sampler(iid.Sampler):
         partition_size = Config().data.partition_size
         total_clients = Config().clients.total_clients
         total_size = partition_size * total_clients
-        deleted_data_ratio = Config().clients.delete_data_ratio
+        deleted_data_ratio = Config().clients.deleted_data_ratio
 
         # add extra samples to make it evenly divisible, if needed
         if len(indices) < total_size:
@@ -43,12 +45,11 @@ class Sampler(iid.Sampler):
         self.subset_indices = indices[(int(client_id) -
                                        1):total_size:total_clients]
 
-        if needs_to_delete:
-            subset_length = int(len(self.subset_indices))
-            deleted_subset_length = int(subset_length * deleted_data_ratio)
-            deleted_index = np.random.choice(range(subset_length),
-                                            deleted_subset_length,
-                                            replace=False)
+        subset_length = int(len(self.subset_indices))
+        deleted_subset_length = int(subset_length * deleted_data_ratio)
+        deleted_index = np.random.choice(range(subset_length),
+                                         deleted_subset_length,
+                                         replace=False)
 
-            self.subset_indices = list(
-                np.delete(self.subset_indices, deleted_index))
+        self.subset_indices = list(
+            np.delete(self.subset_indices, deleted_index))

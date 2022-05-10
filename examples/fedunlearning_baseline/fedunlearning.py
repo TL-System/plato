@@ -1,8 +1,10 @@
 """
-A federated unlearning model to enables data holders to proactively erase their data from a trained model.
+A federated unlearning algorithm to enables data holders to proactively erase their data from a trained model.
 
-Reference: Liu et al., "The Right to be Forgotten in Federated Learning: An Efficient Realization with Rapid Retraining." in Proc. INFOCOM, 2022 https://arxiv.org/abs/2203.07320
+Liu et al., "The Right to be Forgotten in Federated Learning: An Efficient Realization with Rapid
+Retraining," in Proc. INFOCOM, 2022.
 
+Reference: https://arxiv.org/abs/2203.07320
 """
 
 import os
