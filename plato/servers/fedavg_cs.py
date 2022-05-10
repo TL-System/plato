@@ -202,11 +202,11 @@ class Server(fedavg.Server):
         """Compute the average accuracy across clients."""
         # Get total number of samples
         total_samples = sum(
-            [report.num_samples for (report, __, __) in self.updates])
+            [report.num_samples for (__, report, __, __) in self.updates])
 
         # Perform weighted averaging
         accuracy = 0
-        for (report, __, __) in self.updates:
+        for (__, report, __, __) in self.updates:
             accuracy += report.average_accuracy * (report.num_samples /
                                                    total_samples)
 
@@ -258,11 +258,11 @@ class Server(fedavg.Server):
             'elapsed_time':
             self.wall_time - self.initial_wall_time,
             'comm_time':
-            max([report.comm_time for (report, __, __) in self.updates]),
+            max([report.comm_time for (__, report, __, __) in self.updates]),
             'round_time':
             max([
                 report.training_time + report.comm_time
-                for (report, __, __) in self.updates
+                for (__, report, __, __) in self.updates
             ]),
         }
 
