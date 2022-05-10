@@ -20,6 +20,7 @@ from plato.servers import fedavg
 
 class Server(fedavg.Server):
     """A federated learning server using the AFL algorithm."""
+
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model, algorithm, trainer)
 
@@ -34,7 +35,7 @@ class Server(fedavg.Server):
 
         # Update the local valuations from the updates
         for i, update in enumerate(weights_received):
-            report, __, __ = updates[i]
+            __, report, __, __ = updates[i]
             client_id = self.selected_clients[i]
             self.local_values[client_id]["valuation"] = report.valuation
 
