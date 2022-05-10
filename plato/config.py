@@ -302,7 +302,6 @@ class Config:
                     if isinstance(Config.args.id, int):
                         gpu_id = Config.args.id % torch.cuda.device_count()
                         device = f'cuda:{gpu_id}'
-                        print("!!!CLIENT", Config.args.id, device)
                     else:
                         device = 'cuda:0'
                 else:
@@ -315,13 +314,3 @@ class Config:
                     device = f'cuda:{gpu_id}'
 
         return device
-
-    @staticmethod
-    def is_parallel() -> bool:
-        """Check if the hardware and OS support data parallelism."""
-        import torch
-
-        return hasattr(Config().trainer, 'parallelized') and Config(
-        ).trainer.parallelized and torch.cuda.is_available(
-        ) and torch.distributed.is_available(
-        ) and torch.cuda.device_count() > 1
