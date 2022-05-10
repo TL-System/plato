@@ -231,7 +231,11 @@ class Trainer(base.Trainer):
 
                 loss = loss_criterion(outputs, labels)
 
-                loss.backward()
+                if 'create_graph' in config:
+                    loss.backward(create_graph=config['create_graph'])
+                else:
+                    loss.backward()
+
                 optimizer.step()
 
                 if batch_id % log_interval == 0:
