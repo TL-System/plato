@@ -81,8 +81,8 @@ class Server(base.Server):
         self.outbound_processor, self.inbound_processor = processor_registry.get(
             "Server", server_id=os.getpid(), trainer=self.trainer)
 
-        if not Config().clients.do_test or (hasattr(Config().server, 'do_test')
-                                            and Config().server.do_test):
+        if not (hasattr(Config().server, 'do_test')
+                and not Config().server.do_test):
             self.datasource = datasources_registry.get(client_id=0)
             self.testset = self.datasource.get_test_set()
 
@@ -177,16 +177,15 @@ class Server(base.Server):
         await self.aggregate_weights(self.updates)
 
         # Testing the global model accuracy
-        if not Config().clients.do_test or (hasattr(Config().server, 'do_test')
-                                            and Config().server.do_test):
-            # Testing the updated model directly at the server
-            self.accuracy = await self.trainer.server_test(
-                self.testset, self.testset_sampler)
-        else:
+        if hasattr(Config().server, 'do_test') and not Config().server.do_test:
             # Compute the average accuracy from client reports
             self.accuracy = self.accuracy_averaging(self.updates)
             logging.info('[%s] Average client accuracy: %.2f%%.', self,
                          100 * self.accuracy)
+        else:
+            # Testing the updated model directly at the server
+            self.accuracy = await self.trainer.server_test(
+                self.testset, self.testset_sampler)
 
         if hasattr(Config().trainer, 'target_perplexity'):
             logging.info('[%s] Global model perplexity: %.2f\n', self,
