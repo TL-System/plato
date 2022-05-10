@@ -16,6 +16,7 @@ class Server(fedavg_cs.Server):
     A cross-silo federated learning server that tunes
     clients' local epoch numbers of each institution.
     """
+
     def __init__(self):
         super().__init__()
 
@@ -95,7 +96,7 @@ class Server(fedavg_cs.Server):
             else:
                 client_id = i + 1 + Config().clients.total_clients
             (report, weights) = [(report, payload)
-                                 for (report, payload, __) in self.updates
+                                 for (__, report, payload, __) in self.updates
                                  if int(report.client_id) == client_id][0]
             num_samples = report.num_samples
 
