@@ -264,6 +264,9 @@ class Config:
     @staticmethod
     def gpu_count() -> int:
         """Returns the number of GPUs available for training."""
+        if hasattr(Config().trainer, 'use_mindspore'):
+            return 0
+
         import torch
 
         if torch.cuda.is_available():
