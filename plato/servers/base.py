@@ -294,8 +294,10 @@ class Server:
 
         if Server.client_simulation_mode:
             # In the client simulation mode, we only need to launch the number of clients
-            # necessary for concurrent training, which is number of available devices
-            # multiply `max_concurrency` in `trainer`
+            # necessary for concurrent training
+            # If `max_concurrency` in `trainer` is specified, the limit number is
+            # `max_concurrency` multiply the number of available devices
+            # (multiply number of edge servers in cross-silo training)
             if hasattr(Config().trainer, 'max_concurrency'):
                 if Config().is_central_server():
                     client_processes = min(
@@ -318,7 +320,7 @@ class Server:
 
         if as_server:
             total_processes = Config().algorithm.total_silos
-            starting_id += client_processes
+            starting_id += Config().clients.total_clients
         else:
             total_processes = client_processes
 
@@ -361,24 +363,18 @@ class Server:
                          self.current_round,
                          Config().trainer.rounds)
 
-            if Server.client_simulation_mode:
+            if hasattr(Config().clients,
+                       'simulation') and Config().clients.simulation:
                 # In the client simulation mode, the client pool for client selection contains
                 # all the virtual clients to be simulated
-                self.clients_pool = list(range(1, 1 + self.total_clients))
 
                 if Config().is_central_server():
-                    launched_clients = min(
-                        Config().trainer.max_concurrency *
-                        max(1,
-                            Config().gpu_count()) *
-                        Config().algorithm.total_silos,
-                        Config().clients.per_round) if hasattr(
-                            Config().trainer,
-                            'max_concurrency') else Config().clients.per_round
                     # In cross-silo FL, the central server selects from the pool of edge servers
-                    self.clients_pool = list(
-                        range(launched_clients + 1,
-                              launched_clients + 1 + self.total_clients))
+                    self.clients_pool = list(self.clients)
+
+                elif not Config().is_edge_server():
+                    self.clients_pool = list(range(1, 1 + self.total_clients))
+
             else:
                 # If no clients are simulated, the client pool for client selection consists of
                 # the current set of clients that have contacted the server
@@ -469,7 +465,6 @@ class Server:
                             max_concurrency, len(self.selected_clients))]
 
                 self.trained_clients += selected_clients
-
             else:
                 selected_clients = self.selected_clients
 
@@ -477,9 +472,12 @@ class Server:
                 self.selected_client_id = selected_client_id
 
                 if self.client_simulation_mode:
-                    client_id = i + 1
                     if Config().is_central_server():
                         client_id = selected_client_id
+                    elif Config().is_edge_server():
+                        client_id = self.launched_clients[i]
+                    else:
+                        client_id = i + 1
 
                     sid = self.clients[client_id]['sid']
 
