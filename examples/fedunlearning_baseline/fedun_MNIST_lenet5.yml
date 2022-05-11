@@ -14,6 +14,9 @@ clients:
     # The round to remove the local data by clients
     data_deletion_round: 2
 
+    # The clients which need to remove their local data by client_id
+    deleted_clients_ids: 1, 3
+
     # The percentage to remove the local data by clients
     deleted_data_ratio: 0.3
 
