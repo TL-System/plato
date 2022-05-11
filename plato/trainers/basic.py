@@ -37,13 +37,7 @@ class Trainer(base.Trainer):
         if model is None:
             model = models_registry.get()
 
-        # Use data parallelism if multiple GPUs are available and the configuration specifies it
-        if Config().is_parallel():
-            logging.info("Using Data Parallelism.")
-            # DataParallel will divide and allocate batch_size to all available GPUs
-            self.model = torch.nn.DataParallel(model)
-        else:
-            self.model = model
+        self.model = model
 
         if hasattr(Config().trainer, 'differential_privacy') and Config(
         ).trainer.differential_privacy:
@@ -231,7 +225,11 @@ class Trainer(base.Trainer):
 
                 loss = loss_criterion(outputs, labels)
 
-                loss.backward()
+                if 'create_graph' in config:
+                    loss.backward(create_graph=config['create_graph'])
+                else:
+                    loss.backward()
+
                 optimizer.step()
 
                 if batch_id % log_interval == 0:

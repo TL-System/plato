@@ -14,6 +14,7 @@ from plato.servers import fedavg
 
 class Server(fedavg.Server):
     """A federated learning server using the FedNova algorithm. """
+
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using FedNova."""
         # Extracting weights from the updates
@@ -21,10 +22,10 @@ class Server(fedavg.Server):
 
         # Extracting the total number of samples
         self.total_samples = sum(
-            [report.num_samples for (report, __, __) in updates])
+            [report.num_samples for (__, report, __, __) in updates])
 
         # Extracting the number of local epoches, tau_i, from the updates
-        local_epochs = [report.epochs for (report, __, __) in updates]
+        local_epochs = [report.epochs for (__, report, __, __) in updates]
 
         # Performing weighted averaging
         avg_update = {
@@ -34,13 +35,13 @@ class Server(fedavg.Server):
 
         tau_eff = 0
         for i, update in enumerate(weights_received):
-            report, __, __ = updates[i]
+            __, report, __, __ = updates[i]
             num_samples = report.num_samples
             tau_eff_ = local_epochs[i] * num_samples / self.total_samples
             tau_eff += tau_eff_
 
         for i, update in enumerate(weights_received):
-            report, __, __ = updates[i]
+            __, report, __, __ = updates[i]
             num_samples = report.num_samples
 
             for name, delta in update.items():

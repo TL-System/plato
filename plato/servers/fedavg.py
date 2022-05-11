@@ -18,6 +18,7 @@ from plato.utils import csv_processor
 
 class Server(base.Server):
     """Federated learning server using federated averaging."""
+
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__()
 
@@ -80,7 +81,8 @@ class Server(base.Server):
         self.outbound_processor, self.inbound_processor = processor_registry.get(
             "Server", server_id=os.getpid(), trainer=self.trainer)
 
-        if not Config().clients.do_test:
+        if not (hasattr(Config().server, 'do_test')
+                and not Config().server.do_test):
             self.datasource = datasources_registry.get(client_id=0)
             self.testset = self.datasource.get_test_set()
 
@@ -108,6 +110,14 @@ class Server(base.Server):
             csv_processor.initialize_csv(result_csv_file, self.recorded_items,
                                          Config().params['result_dir'])
 
+            # Initialize the test accuracy csv file if clients compute locally
+            if Config().clients.do_test:
+                accuracy_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_accuracy.csv"
+                accuracy_headers = ["round", "client_id", "accuracy"]
+                csv_processor.initialize_csv(accuracy_csv_file,
+                                             accuracy_headers,
+                                             Config().params['result_dir'])
+
     def load_trainer(self):
         """Setting up the global model to be trained via federated learning."""
         if self.model is None and self.custom_model is not None:
@@ -126,7 +136,7 @@ class Server(base.Server):
 
     def extract_client_updates(self, updates):
         """Extract the model weight updates from client updates."""
-        weights_received = [payload for (__, payload, __) in updates]
+        weights_received = [payload for (__, __, payload, __) in updates]
         return self.algorithm.compute_weight_updates(weights_received)
 
     async def aggregate_weights(self, updates):
@@ -141,7 +151,7 @@ class Server(base.Server):
 
         # Extract the total number of samples
         self.total_samples = sum(
-            [report.num_samples for (report, __, __) in updates])
+            [report.num_samples for (__, report, __, __) in updates])
 
         # Perform weighted averaging
         avg_update = {
@@ -150,7 +160,7 @@ class Server(base.Server):
         }
 
         for i, update in enumerate(weights_received):
-            report, __, __ = updates[i]
+            __, report, __, __ = updates[i]
             num_samples = report.num_samples
 
             for name, delta in update.items():
@@ -167,7 +177,7 @@ class Server(base.Server):
         await self.aggregate_weights(self.updates)
 
         # Testing the global model accuracy
-        if Config().clients.do_test:
+        if hasattr(Config().server, 'do_test') and not Config().server.do_test:
             # Compute the average accuracy from client reports
             self.accuracy = self.accuracy_averaging(self.updates)
             logging.info('[%s] Average client accuracy: %.2f%%.', self,
@@ -190,7 +200,6 @@ class Server(base.Server):
         """ Wrap up processing the reports with any additional work. """
         if hasattr(Config(), 'results'):
             new_row = []
-
             for item in self.recorded_items:
                 item_value = {
                     'round':
@@ -201,12 +210,13 @@ class Server(base.Server):
                     self.wall_time - self.initial_wall_time,
                     'comm_time':
                     max([
-                        report.comm_time for (report, __, __) in self.updates
+                        report.comm_time
+                        for (__, report, __, __) in self.updates
                     ]),
                     'round_time':
                     max([
                         report.training_time + report.comm_time
-                        for (report, __, __) in self.updates
+                        for (__, report, __, __) in self.updates
                     ]),
                 }[item]
                 new_row.append(item_value)
@@ -214,16 +224,26 @@ class Server(base.Server):
             result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}.csv"
             csv_processor.write_csv(result_csv_file, new_row)
 
+            if Config().clients.do_test:
+                # Updates the log for client test accuracies
+                accuracy_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_accuracy.csv"
+
+                for (client_id, report, __, __) in self.updates:
+                    accuracy_row = [
+                        self.current_round, client_id, report.accuracy
+                    ]
+                    csv_processor.write_csv(accuracy_csv_file, accuracy_row)
+
     @staticmethod
     def accuracy_averaging(updates):
         """Compute the average accuracy across clients."""
         # Get total number of samples
         total_samples = sum(
-            [report.num_samples for (report, __, __) in updates])
+            [report.num_samples for (__, report, __, __) in updates])
 
         # Perform weighted averaging
         accuracy = 0
-        for (report, __, __) in updates:
+        for (__, report, __, __) in updates:
             accuracy += report.accuracy * (report.num_samples / total_samples)
 
         return accuracy

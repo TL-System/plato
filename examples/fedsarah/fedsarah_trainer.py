@@ -15,6 +15,7 @@ import fedsarah_optimizer
 
 class Trainer(basic.Trainer):
     """ The federated learning trainer for the FedSarah client. """
+
     def __init__(self, model=None):
         """ Initializing the trainer with the provided model.
 

@@ -8,10 +8,9 @@ import sys
 import numpy as np
 from torch import optim
 from torch import nn
+import torch_optimizer as torch_optim
 
 from plato.config import Config
-
-from plato.utils.fedprox_optimizer import FedProxOptimizer
 from plato.utils.step import Step
 
 
@@ -26,20 +25,23 @@ def get_optimizer(model) -> optim.Optimizer:
         return optim.Adam(model.parameters(),
                           lr=Config().trainer.learning_rate,
                           weight_decay=Config().trainer.weight_decay)
-    elif Config().trainer.optimizer == 'FedProx':
-        return FedProxOptimizer(model.parameters(),
-                                lr=Config().trainer.learning_rate,
-                                momentum=Config().trainer.momentum,
-                                weight_decay=Config().trainer.weight_decay)
     elif Config().trainer.optimizer == 'Adadelta':
         return optim.Adadelta(model.parameters(),
-                                lr=Config().trainer.learning_rate,
-                                rho=Config().trainer.rho,
-                                eps=Config().trainer.eps,
-                                weight_decay=Config().trainer.weight_decay)
+                              lr=Config().trainer.learning_rate,
+                              rho=Config().trainer.rho,
+                              eps=float(Config().trainer.eps),
+                              weight_decay=Config().trainer.weight_decay)
+    elif Config().trainer.optimizer == 'AdaHessian':
+        return torch_optim.Adahessian(
+            model.parameters(),
+            lr=Config().trainer.learning_rate,
+            betas=(Config().trainer.momentum_b1, Config().trainer.momentum_b2),
+            eps=float(Config().trainer.eps),
+            weight_decay=Config().trainer.weight_decay,
+            hessian_power=Config().trainer.hessian_power,
+        )
 
-    raise ValueError('No such optimizer: {}'.format(
-        Config().trainer.optimizer))
+    raise ValueError(f'No such optimizer: {Config().trainer.optimizer}')
 
 
 def get_lr_schedule(optimizer: optim.Optimizer,
