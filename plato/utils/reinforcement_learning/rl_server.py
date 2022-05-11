@@ -17,6 +17,7 @@ from plato.trainers import registry as trainers_registry
 
 class RLServer(fedavg.Server):
     """ A federated learning server with an RL Agent. """
+
     def __init__(self, agent, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
         self.agent = agent
@@ -40,7 +41,7 @@ class RLServer(fedavg.Server):
         self.update_state()
 
         # Extract the total number of samples
-        num_samples = [report.num_samples for (report, __, __) in updates]
+        num_samples = [report.num_samples for (__, report, __, __) in updates]
         self.total_samples = sum(num_samples)
 
         # Perform weighted averaging

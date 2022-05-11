@@ -129,10 +129,10 @@ class Server:
         Server.client_simulation_mode = False
 
         # With specifying max_concurrency, selected clients run batch by batach
-        # The number of clients in a batch is the same as the max_concurrency
-        # This parameter is the number of selected clients that has run in the current round
+        # The number of clients in a batch on an available device is the same as the max_concurrency
+        # This list contains ids of selected clients that has run in the current round
         if hasattr(Config().trainer, 'max_concurrency'):
-            self.trained_clients = 0
+            self.trained_clients = []
 
     def __repr__(self):
         return f'Server #{os.getpid()}'
@@ -265,10 +265,20 @@ class Server:
             logging.info("[%s] New contact from Client #%d received.", self,
                          client_id)
 
+        if hasattr(
+                Config().trainer,
+                'max_concurrency') and (hasattr(Config().clients, 'simulation')
+                                        and Config().clients.simulation
+                                        ) and not Config().is_central_server():
+            required_launched_clients = min(
+                Config().trainer.max_concurrency * max(1,
+                                                       Config().gpu_count()),
+                self.clients_per_round)
+        else:
+            required_launched_clients = self.clients_per_round
+
         if (self.current_round == 0 or self.resumed_session) and len(
-                self.clients) >= Config().trainer.max_concurrency if hasattr(
-                    Config().trainer,
-                    'max_concurrency') else self.clients_per_round:
+                self.clients) >= required_launched_clients:
             logging.info("[%s] Starting training.", self)
             self.resumed_session = False
             await self.select_clients()
@@ -284,9 +294,22 @@ class Server:
 
         if Server.client_simulation_mode:
             # In the client simulation mode, we only need to launch the number of clients
-            # necessary for concurrent training, which is `max_concurrency` in `trainer`
+            # necessary for concurrent training, which is number of available devices
+            # multiply `max_concurrency` in `trainer`
             if hasattr(Config().trainer, 'max_concurrency'):
-                client_processes = Config().trainer.max_concurrency
+                if Config().is_central_server():
+                    client_processes = min(
+                        Config().trainer.max_concurrency *
+                        max(1,
+                            Config().gpu_count()) *
+                        Config().algorithm.total_silos,
+                        Config().clients.per_round)
+                else:
+                    client_processes = min(
+                        Config().trainer.max_concurrency *
+                        max(1,
+                            Config().gpu_count()),
+                        Config().clients.per_round)
             # Otherwise, the limited number is the same as the number of clients per round
             else:
                 client_processes = Config().clients.per_round
@@ -332,7 +355,7 @@ class Server:
             self.current_round += 1
 
             if hasattr(Config().trainer, 'max_concurrency'):
-                self.trained_clients = 0
+                self.trained_clients = []
 
             logging.info("\n[%s] Starting round %s/%s.", self,
                          self.current_round,
@@ -344,14 +367,18 @@ class Server:
                 self.clients_pool = list(range(1, 1 + self.total_clients))
 
                 if Config().is_central_server():
-                    launched_client_num = Config(
-                    ).trainer.max_concurrency if hasattr(
-                        Config().trainer,
-                        'max_concurrency') else Config().clients.per_round
+                    launched_clients = min(
+                        Config().trainer.max_concurrency *
+                        max(1,
+                            Config().gpu_count()) *
+                        Config().algorithm.total_silos,
+                        Config().clients.per_round) if hasattr(
+                            Config().trainer,
+                            'max_concurrency') else Config().clients.per_round
                     # In cross-silo FL, the central server selects from the pool of edge servers
                     self.clients_pool = list(
-                        range(launched_client_num + 1,
-                              launched_client_num + 1 + self.total_clients))
+                        range(launched_clients + 1,
+                              launched_clients + 1 + self.total_clients))
             else:
                 # If no clients are simulated, the client pool for client selection consists of
                 # the current set of clients that have contacted the server
@@ -416,16 +443,32 @@ class Server:
             self.selected_sids = []
 
             # If max_concurrency is specified, run selected clients batch by batch,
-            # and the number of clients in each batch is equal to # (or maybe smaller
-            # than for the last batch) max_concurrency
-            if hasattr(Config().trainer, 'max_concurrency'):
-                selected_clients = self.selected_clients[
-                    self.trained_clients:min(
-                        self.trained_clients + Config().trainer.
-                        max_concurrency, len(self.selected_clients))]
-                self.trained_clients = min(
-                    self.trained_clients + Config().trainer.max_concurrency,
-                    len(self.selected_clients))
+            # and the number of clients in each batch (on each GPU, if multiple GPUs are available)
+            # is equal to # (or maybe smaller than for the last batch) max_concurrency
+            if hasattr(Config().trainer,
+                       'max_concurrency') and not Config().is_central_server():
+                selected_clients = []
+                if Config().gpu_count() > 1:
+                    untrained_clients = list(
+                        set(self.selected_clients).difference(
+                            self.trained_clients))
+                    available_gpus = Config().gpu_count()
+                    for cuda_id in range(available_gpus):
+                        for client_id in untrained_clients:
+                            if client_id % available_gpus == cuda_id:
+                                selected_clients.append(client_id)
+                            if len(selected_clients) >= min(
+                                (cuda_id + 1) *
+                                    Config().trainer.max_concurrency,
+                                    self.clients_per_round):
+                                break
+                else:
+                    selected_clients = self.selected_clients[
+                        len(self.trained_clients):min(
+                            len(self.trained_clients) + Config().trainer.
+                            max_concurrency, len(self.selected_clients))]
+
+                self.trained_clients += selected_clients
 
             else:
                 selected_clients = self.selected_clients
@@ -465,7 +508,10 @@ class Server:
                 logging.info("[%s] Selecting client #%d for training.", self,
                              self.selected_client_id)
 
-                server_response = {'id': self.selected_client_id}
+                server_response = {
+                    'id': self.selected_client_id,
+                    'current_round': self.current_round
+                }
                 payload = self.algorithm.extract_weights()
                 payload = self.customize_server_payload(payload)
 
@@ -785,8 +831,8 @@ class Server:
                     os.getpid(), client['client_id'])
 
                 client_staleness = self.current_round - client['starting_round']
-                self.updates.append(
-                    (client['report'], client['payload'], client_staleness))
+                self.updates.append((client['client_id'], client['report'],
+                                     client['payload'], client_staleness))
 
             # Step 3: Processing stale clients that exceed a staleness threshold
 
@@ -821,8 +867,8 @@ class Server:
                         client_staleness = self.current_round - client[
                             'starting_round']
                         self.updates.append(
-                            (client['report'], client['payload'],
-                             client_staleness))
+                            (client['client_id'], client['report'],
+                             client['payload'], client_staleness))
 
             self.reported_clients = possibly_stale_clients
             logging.info("[Server #%s] Aggregating %s clients in total.",
@@ -840,8 +886,8 @@ class Server:
             client = client_info[1]
             client_staleness = self.current_round - client['starting_round']
 
-            self.updates.append(
-                (client['report'], client['payload'], client_staleness))
+            self.updates.append((client['client_id'], client['report'],
+                                 client['payload'], client_staleness))
 
         if not self.simulate_wall_time:
             # In both synchronous and asynchronous modes, if we are not simulating the wall clock
@@ -869,10 +915,11 @@ class Server:
             await self.wrap_up()
             await self.select_clients()
 
-        elif hasattr(Config().trainer, 'max_concurrency'):
+        elif hasattr(Config().trainer,
+                     'max_concurrency') and not Config().is_central_server():
             # Clients in the current batch finish training
             # The server will select the next batch of clients to train
-            if len(self.updates) >= self.trained_clients:
+            if len(self.updates) >= len(self.trained_clients):
                 await self.select_clients(for_next_batch=True)
 
     async def client_disconnected(self, sid):
