@@ -34,6 +34,22 @@ class Server(fedavg.Server):
             # before starting the first round of local aggregation
             self.new_global_round_begins = asyncio.Event()
 
+            edge_server_id = Config().args.id - Config().clients.total_clients
+
+            # Compute the number of clients in each silo for edge servers
+            edges_total_clients = [
+                len(i) for i in np.array_split(
+                    np.arange(Config().clients.total_clients),
+                    Config().algorithm.total_silos)
+            ]
+            self.total_clients = edges_total_clients[edge_server_id - 1]
+
+            self.clients_per_round = [
+                len(i)
+                for i in np.array_split(np.arange(Config().clients.per_round),
+                                        Config().algorithm.total_silos)
+            ][edge_server_id - 1]
+
             if hasattr(Config().clients,
                        'simulation') and Config().clients.simulation:
                 if hasattr(Config().trainer, 'max_concurrency'):
@@ -45,52 +61,24 @@ class Server(fedavg.Server):
                         Config().clients.per_round)
                 else:
                     launched_total_clients = Config().clients.per_round
-            else:
-                launched_total_clients = Config().clients.total_clients
 
-            # Compute the number of clients in each silo for edge servers
-            edges_total_clients = [
-                len(i) for i in np.array_split(
-                    np.arange(Config().clients.total_clients),
-                    Config().algorithm.total_silos)
-            ]
-            self.total_clients = edges_total_clients[Config().args.id -
-                                                     launched_total_clients -
-                                                     1]
-
-            self.clients_per_round = [
-                len(i)
-                for i in np.array_split(np.arange(Config().clients.per_round),
-                                        Config().algorithm.total_silos)
-            ][Config().args.id - launched_total_clients - 1]
-
-            if hasattr(Config().clients,
-                       'simulation') and Config().clients.simulation:
                 edges_launched_clients = [
                     len(i)
                     for i in np.array_split(np.arange(launched_total_clients),
                                             Config().algorithm.total_silos)
                 ]
                 starting_client_id = sum(
-                    edges_launched_clients[:Config().args.id -
-                                           launched_total_clients - 1])
-                launched_clients = edges_launched_clients[
-                    Config().args.id - launched_total_clients - 1]
+                    edges_launched_clients[:edge_server_id - 1])
+                launched_clients = edges_launched_clients[edge_server_id - 1]
                 self.launched_clients = list(
                     range(starting_client_id + 1,
                           starting_client_id + 1 + launched_clients))
 
-                starting_client_id = sum(
-                    edges_total_clients[:Config().args.id -
-                                        launched_total_clients - 1])
+                starting_client_id = sum(edges_total_clients[:edge_server_id -
+                                                             1])
                 self.clients_pool = list(
                     range(starting_client_id + 1,
                           starting_client_id + 1 + self.total_clients))
-
-                logging.info(
-                    "!!![Edge server #%d (#%d)] LAUNCHED CLIENTS %s POOL %s.",
-                    Config().args.id, os.getpid(), self.launched_clients,
-                    self.clients_pool)
 
             logging.info(
                 "[Edge server #%d (#%d)] Started training on %d clients with %d per round.",

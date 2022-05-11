@@ -320,7 +320,7 @@ class Server:
 
         if as_server:
             total_processes = Config().algorithm.total_silos
-            starting_id += client_processes
+            starting_id += Config().clients.total_clients
         else:
             total_processes = client_processes
 
@@ -370,18 +370,8 @@ class Server:
 
                 if Config().is_central_server():
                     # In cross-silo FL, the central server selects from the pool of edge servers
-                    launched_clients = min(
-                        Config().trainer.max_concurrency *
-                        max(1,
-                            Config().gpu_count()) *
-                        Config().algorithm.total_silos,
-                        Config().clients.per_round) if hasattr(
-                            Config().trainer,
-                            'max_concurrency') else Config().clients.per_round
+                    self.clients_pool = list(self.clients)
 
-                    self.clients_pool = list(
-                        range(launched_clients + 1,
-                              launched_clients + 1 + self.total_clients))
                 elif not Config().is_edge_server():
                     self.clients_pool = list(range(1, 1 + self.total_clients))
 
@@ -389,8 +379,6 @@ class Server:
                 # If no clients are simulated, the client pool for client selection consists of
                 # the current set of clients that have contacted the server
                 self.clients_pool = list(self.clients)
-
-            logging.info("!!![%s] CLIENT POOL %s.", self, self.clients_pool)
 
             # In asychronous FL, avoid selecting new clients to replace those that are still
             # training at this time
@@ -491,8 +479,6 @@ class Server:
                     else:
                         client_id = i + 1
 
-                    logging.info("!!![%s] ID %s CLIENTS %s.", self, client_id,
-                                 self.clients)
                     sid = self.clients[client_id]['sid']
 
                     if self.asynchronous_mode and self.simulate_wall_time:
@@ -562,8 +548,6 @@ class Server:
 
     def choose_clients(self, clients_pool, clients_count):
         """ Choose a subset of the clients to participate in each round. """
-        logging.info("!!![%s] TOTAL %d, SELECT %d", self, len(clients_pool),
-                     clients_count)
         assert clients_count <= len(clients_pool)
         random.setstate(self.prng_state)
 
