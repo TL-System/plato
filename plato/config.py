@@ -12,8 +12,6 @@ from typing import Any, IO
 import numpy as np
 import yaml
 
-from plato.utils.available_gpu import available_gpu
-
 
 class Loader(yaml.SafeLoader):
     """ YAML Loader with `!include` constructor. """
@@ -286,32 +284,17 @@ class Config:
             gpus = tf.config.experimental.list_physical_devices('GPU')
             if len(gpus) > 0:
                 device = 'GPU'
-                gpu_id = int(os.getenv('GPU_ID'))
-
-                if gpu_id is None:
-                    gpu_id = available_gpu()
-                    os.environ['GPU_ID'] = str(gpu_id)
-
-                tf.config.experimental.set_visible_devices(gpus[gpu_id], 'GPU')
+                tf.config.experimental.set_visible_devices(gpus[0], 'GPU')
 
         else:
             import torch
 
             if torch.cuda.is_available() and torch.cuda.device_count() > 0:
-                if Config.gpu_count() > 1:
+                if Config.gpu_count() > 1 and isinstance(Config.args.id, int):
                     # A client will always run on the same GPU
-                    if isinstance(Config.args.id, int):
-                        gpu_id = Config.args.id % torch.cuda.device_count()
-                        device = f'cuda:{gpu_id}'
-                    else:
-                        device = 'cuda:0'
-                else:
-                    gpu_id = os.getenv('GPU_ID')
-
-                    if gpu_id is None:
-                        gpu_id = available_gpu()
-                        os.environ['GPU_ID'] = str(gpu_id)
-
+                    gpu_id = Config.args.id % torch.cuda.device_count()
                     device = f'cuda:{gpu_id}'
+                else:
+                    device = 'cuda:0'
 
         return device
