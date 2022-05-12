@@ -8,9 +8,6 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: true
 
-    # Whether simulate clients or not
-    simulation: true
-
 server:
     address: 127.0.0.1
     port: 8000
@@ -37,9 +34,6 @@ data:
 trainer:
     # The maximum number of training rounds
     rounds: 2
-
-    # Whether the training should use multiple GPUs if available
-    parallelized: false
 
     # The maximum number of clients running concurrently
     max_concurrency: 1
