@@ -27,6 +27,7 @@ class Server(fedavg.Server):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
         self.restarted_session = True
         self.clients_dic = {}
+        self.retrain_phase = False
 
     async def select_clients(self, for_next_batch=False):
         await super().select_clients(for_next_batch)
@@ -68,28 +69,20 @@ class Server(fedavg.Server):
         client_requesting_deletion = decode_config_with_comma(Config().clients.client_requesting_deletion)
 
         are_clients_selected_before_retrain = any([client_id in self.clients_dic.keys() for client_id in client_requesting_deletion])
-        print(self.clients_dic)
-        print("-------")
-        print(client_requesting_deletion)
-        print("-------")
-        print([client_id in self.clients_dic.keys() for client_id in client_requesting_deletion])
         
         if not are_clients_selected_before_retrain: 
              logging.info("[%s] Clients are not selected before data_deletion_round.", client_requesting_deletion)
 
         elif (self.current_round == Config().clients.data_deletion_round
             ) and self.restarted_session:
+            self.retrain_phase = True 
             logging.info("[%s] Data deleted. Retraining from the first round.",
-                         self)
-            print("self.current_round: ", self.current_round)     
+                         self)    
             client_requesting_deletion = decode_config_with_comma(Config().clients.client_requesting_deletion)
             start_retrain_round = [self.clients_dic[client_id] for client_id in client_requesting_deletion if client_id in self.clients_dic.keys()]
             initial_checkpoint_round = min(start_retrain_round)
             self.restarted_session = False
-            print("*************************")
-            print(client_requesting_deletion)
-            print(start_retrain_round)
-            print("initial_checkpoint_round: ", initial_checkpoint_round)
+
             # Loading the saved model the server for resuming the training session from round 1
             checkpoint_dir = Config.params['checkpoint_dir']
 
@@ -99,11 +92,11 @@ class Server(fedavg.Server):
             self.trainer.load_model(filename, checkpoint_dir)
             # The function select_clients() in server/base.py will add 1 to current_round
             self.current_round = initial_checkpoint_round - 1
-            print("self.current_round: ", self.current_round)
         else:
             pass
 
     async def customize_server_response(self, server_response):
         """ Wrap up generating the server response with any additional information. """
         server_response['current_round'] = self.current_round
+        server_response['retrain_phase'] = self.retrain_phase
         return server_response
