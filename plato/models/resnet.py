@@ -9,6 +9,8 @@ import collections
 import torch.nn as nn
 import torch.nn.functional as F
 
+from plato.config import Config
+
 
 class BasicBlock(nn.Module):
     expansion = 1
@@ -176,13 +178,17 @@ class Model(nn.Module):
 
         resnet_type = int(model_type.split('_')[1])
 
+        num_classes = 10
+        if hasattr(Config().data, 'num_classes'):
+            num_classes = Config().data.num_classes
+
         if resnet_type == 18:
-            return Model(BasicBlock, [2, 2, 2, 2])
+            return Model(BasicBlock, [2, 2, 2, 2], num_classes)
         elif resnet_type == 34:
-            return Model(BasicBlock, [3, 4, 6, 3])
+            return Model(BasicBlock, [3, 4, 6, 3], num_classes)
         elif resnet_type == 50:
-            return Model(Bottleneck, [3, 4, 6, 3])
+            return Model(Bottleneck, [3, 4, 6, 3], num_classes)
         elif resnet_type == 101:
-            return Model(Bottleneck, [3, 4, 23, 3])
+            return Model(Bottleneck, [3, 4, 23, 3], num_classes)
         elif resnet_type == 152:
-            return Model(Bottleneck, [3, 8, 36, 3])
+            return Model(Bottleneck, [3, 8, 36, 3], num_classes)

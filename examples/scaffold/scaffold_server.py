@@ -17,6 +17,7 @@ from plato.servers import fedavg
 
 class Server(fedavg.Server):
     """A federated learning server using the SCAFFOLD algorithm."""
+
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
         self.server_control_variate = None
@@ -24,10 +25,10 @@ class Server(fedavg.Server):
 
     def extract_client_updates(self, updates):
         """ Extract the model weights and control variates from clients' updates. """
-        weights_received = [payload[0] for (__, payload, __) in updates]
+        weights_received = [payload[0] for (__, __, payload, __) in updates]
 
         self.received_client_control_variates = [
-            payload[1] for (__, payload, __) in updates
+            payload[1] for (__, __, payload, __) in updates
         ]
 
         return self.algorithm.compute_weight_updates(weights_received)
