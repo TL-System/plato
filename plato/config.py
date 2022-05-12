@@ -270,9 +270,7 @@ class Config:
         import torch
 
         if torch.cuda.is_available():
-            return torch.cuda.device_count() if hasattr(
-                Config().trainer,
-                'parallelized') and Config().trainer.parallelized else 1
+            return torch.cuda.device_count()
         else:
             return 0
 
