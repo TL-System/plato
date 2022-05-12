@@ -1,10 +1,13 @@
 """
 The CelebA dataset from the torchvision package.
 """
+import logging
+import os
+from typing import Callable, List, Optional, Union
 
 import torch
-from typing import Callable, List, Optional, Union
 from torchvision import datasets, transforms
+
 from plato.config import Config
 from plato.datasources import base
 
@@ -36,6 +39,13 @@ class DataSource(base.DataSource):
         super().__init__()
         _path = Config().data.data_path
 
+        if not os.path.exists(os.path.join(_path, 'celeba')):
+            celeba_url = ''
+            DataSource.download(celeba_url, _path)
+        else:
+            logging.info("CelebA data already decompressed under %s",
+                         os.path.join(_path, 'celeba'))
+
         target_types = []
         if hasattr(Config().data, "celeba_targets"):
             targets = Config().data.celeba_targets
@@ -57,13 +67,13 @@ class DataSource(base.DataSource):
         self.trainset = CelebA(root=_path,
                                split='train',
                                target_type=target_types,
-                               download=True,
+                               download=False,
                                transform=_transform,
                                target_transform=DataSource._target_transform)
         self.testset = CelebA(root=_path,
                               split='test',
                               target_type=target_types,
-                              download=True,
+                              download=False,
                               transform=_transform,
                               target_transform=DataSource._target_transform)
 
