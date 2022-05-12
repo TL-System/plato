@@ -21,6 +21,7 @@ data:
 
     # Only add face identity as labels for training
     celeba_targets:
+        # For ResNet, do not set <attr> to True since it does not match the expected output of ResNet
         attr: false
         identity: true
     
@@ -34,7 +35,7 @@ data:
     partition_size: 20000
 
     # IID or non-IID?
-    sampler: iid
+    sampler: noniid
 
     # The concentration parameter for the Dirichlet distribution
     concentration: 0.5
@@ -50,7 +51,7 @@ trainer:
     rounds: 5
 
     # Whether the training should use multiple GPUs if available
-    parallelized: false
+    parallelized: true
 
     # The maximum number of clients running concurrently
     max_concurrency: 3

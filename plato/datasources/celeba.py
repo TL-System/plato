@@ -40,7 +40,7 @@ class DataSource(base.DataSource):
         _path = Config().data.data_path
 
         if not os.path.exists(os.path.join(_path, 'celeba')):
-            celeba_url = ''
+            celeba_url = 'http://iqua.ece.toronto.edu/baochun/celeba.tar.gz'
             DataSource.download(celeba_url, _path)
         else:
             logging.info("CelebA data already decompressed under %s",
