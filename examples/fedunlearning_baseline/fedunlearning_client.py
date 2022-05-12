@@ -12,11 +12,13 @@ import unlearning_iid
 from plato.clients import simple
 from plato.config import Config
 
+
 def decode_config_with_comma(target_string):
     if isinstance(target_string, int):
-        return [target_string]       
-    else: 
+        return [target_string]
+    else:
         return list(map(lambda x: int(x), target_string.split(", ")))
+
 
 class Client(simple.Client):
     """A federated learning client of federated unlearning."""
@@ -26,30 +28,40 @@ class Client(simple.Client):
                  datasource=None,
                  algorithm=None,
                  trainer=None):
-        super().__init__(model, datasource, algorithm, trainer)
-        #recording which clients reach the delete conditions. key: ids, value: if it needs deletion
+        super().__init__(model=model,
+                         datasource=datasource,
+                         algorithm=algorithm,
+                         trainer=trainer)
+
+        # Recording which clients reach the delete conditions. key: ids, value: if it needs deletion
         self.clients_delete_dic = {}
 
-    def process_server_response(self, server_response):        
+    def process_server_response(self, server_response):
+        if server_response['retrain_phase'] or self.current_round > Config(
+        ).clients.data_deletion_round:
+            client_requesting_deletion_ids = decode_config_with_comma(
+                Config().clients.client_requesting_deletion)
 
-        if server_response['retrain_phase'] or self.current_round > Config().clients.data_deletion_round:
-            client_requesting_deletion_ids = decode_config_with_comma(Config().clients.client_requesting_deletion)
-            
             for client_requesting_deletion_id in client_requesting_deletion_ids:
                 self.clients_delete_dic[client_requesting_deletion_id] = True
-            
+
             if self.client_id in client_requesting_deletion_ids:
 
-                if self.clients_delete_dic[self.client_id] == True :
-                    
-                    logging.info("[%s] Unlearning sampler deployed: %s%% of the samples were deleted.", self,Config().clients.deleted_data_ratio * 100)
+                if self.clients_delete_dic[self.client_id] is True:
+                    logging.info(
+                        "[%s] Unlearning sampler deployed: %s%% of the samples were deleted.",
+                        self,
+                        Config().clients.deleted_data_ratio * 100)
 
-                    if (hasattr(Config().data, 'reload_data') and Config().data.reload_data) or not self.data_loaded:
+                    if (hasattr(Config().data, 'reload_data') and
+                            Config().data.reload_data) or not self.data_loaded:
                         self.load_data()
 
-                    self.sampler = unlearning_iid.Sampler(self.datasource, self.client_id, False)
-                else: pass     
-            else: pass  
-        else: pass                                        
-
-
+                    self.sampler = unlearning_iid.Sampler(
+                        self.datasource, self.client_id, False)
+                else:
+                    pass
+            else:
+                pass
+        else:
+            pass

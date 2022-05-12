@@ -12,7 +12,7 @@ clients:
     do_test: false
 
     # Client simulation mode
-    simulation: false
+    simulation: true 
 
     # Processors for outbound data payloads
     outbound_processors:
@@ -21,6 +21,7 @@ clients:
 server:
     address: 127.0.0.1
     port: 8000
+    random_seed: 1
     simulate_wall_time: true
 
 data: !include mnist_iid.yml
