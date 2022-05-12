@@ -12,6 +12,11 @@ import unlearning_iid
 from plato.clients import simple
 from plato.config import Config
 
+def decode_config_with_comma(target_string):
+    if isinstance(target_string, int):
+        return [target_string]       
+    else: 
+        return list(map(lambda x: int(x), target_string.split(", ")))
 
 class Client(simple.Client):
     """A federated learning client of federated unlearning."""
@@ -22,22 +27,21 @@ class Client(simple.Client):
                  algorithm=None,
                  trainer=None):
         super().__init__(model, datasource, algorithm, trainer)
-        self.previous_round = {}
-        self.testset_sampler = None
+        #recording which clients reach the delete conditions. key: ids, value: if it needs deletion
+        self.clients_delete_dic = {}
 
-    def process_server_response(self, server_response):
-        if self.client_id in self.previous_round:
-            previous_round = self.previous_round[self.client_id]
-        else:
-            previous_round = 0
+    def process_server_response(self, server_response):           
+        if self.current_round == Config().clients.data_deletion_round:
+            client_requesting_deletion_ids = decode_config_with_comma(Config().clients.client_requesting_deletion)
+            for client_requesting_deletion_id in client_requesting_deletion_ids:
+                self.clients_delete_dic[client_requesting_deletion_id] = True
+            if self.client_id in client_requesting_deletion_ids:
 
-        if self.current_round == 1 and self.current_round <= previous_round:
-            logging.info(
-                "[%s] Unlearning sampler deployed: %s%% of the samples were deleted.",
-                self,
-                Config().clients.deleted_data_ratio * 100)
+                if self.clients_delete_dic[self.client_id] == True:
+                    logging.info("[%s] Unlearning sampler deployed: %s%% of the samples were deleted.", self,Config().clients.deleted_data_ratio * 100)
 
-            self.sampler = unlearning_iid.Sampler(self.datasource,
-                                                  self.client_id, False)
+                    self.sampler = unlearning_iid.Sampler(self.datasource, self.client_id, False)
+                else: pass     
+            else: pass  
+        else: pass                                        
 
-        self.previous_round[self.client_id] = self.current_round
