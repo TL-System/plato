@@ -11,9 +11,6 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    # Client simulation mode
-    simulation: false
-
 server:
     address: 127.0.0.1
     port: 8000
@@ -41,9 +38,6 @@ trainer:
 
     # The maximum number of training rounds
     rounds: 50
-
-    # Whether the training should use multiple GPUs if available
-    parallelized: false
 
     # Whether to apply differential privacy
     # differential_privacy: true

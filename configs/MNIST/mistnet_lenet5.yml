@@ -40,9 +40,6 @@ trainer:
     # The maximum number of training rounds
     rounds: 1
 
-    # Whether the training should use multiple GPUs if available
-    parallelized: false
-
     # The target accuracy
     target_accuracy: 0.95
 
