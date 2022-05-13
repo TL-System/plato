@@ -16,6 +16,7 @@ class Processor(model.Processor):
 
     def __init__(self,
                  parameter_to_prune='weight',
+                 pruning_method=prune.ln_structured,
                  conv_dim=0,
                  linear_dim=-1,
                  norm=1,
@@ -25,6 +26,7 @@ class Processor(model.Processor):
         super().__init__(**kwargs)
 
         self.parameter_to_prune = parameter_to_prune
+        self.pruning_method = pruning_method
         self.conv_dim = conv_dim
         self.linear_dim = linear_dim
         self.norm = norm
@@ -44,14 +46,25 @@ class Processor(model.Processor):
             original_state_dict = copy.deepcopy(self.model.cpu().state_dict())
 
         for _, module in self.model.named_modules():
-            if isinstance(module, torch.nn.Conv2d):
-                prune.ln_structured(module, self.parameter_to_prune,
-                                    self.amount, self.norm, self.conv_dim)
-                prune.remove(module, self.parameter_to_prune)
-            elif isinstance(module, torch.nn.Linear):
-                prune.ln_structured(module, self.parameter_to_prune,
-                                    self.amount, self.norm, self.linear_dim)
-                prune.remove(module, self.parameter_to_prune)
+            if self.pruning_method == prune.ln_structured:
+                if isinstance(module, torch.nn.Conv2d):
+                    prune.ln_structured(module, self.parameter_to_prune,
+                                        self.amount, self.norm, self.conv_dim)
+                    prune.remove(module, self.parameter_to_prune)
+                elif isinstance(module, torch.nn.Linear):
+                    prune.ln_structured(module, self.parameter_to_prune,
+                                        self.amount, self.norm,
+                                        self.linear_dim)
+                    prune.remove(module, self.parameter_to_prune)
+            elif self.pruning_method == prune.random_structured:
+                if isinstance(module, torch.nn.Conv2d):
+                    prune.random_structured(module, self.parameter_to_prune,
+                                            self.amount, self.conv_dim)
+                    prune.remove(module, self.parameter_to_prune)
+                elif isinstance(module, torch.nn.Linear):
+                    prune.random_structured(module, self.parameter_to_prune,
+                                            self.amount, self.linear_dim)
+                    prune.remove(module, self.parameter_to_prune)
 
         output = self.model.cpu().state_dict()
 
@@ -74,6 +87,19 @@ class Processor(model.Processor):
         layer_shape = layer.shape()
         if len(layer_shape) <= 1:
             return layer
-        else:
-            return prune.ln_structured(layer, self.parameter_to_prune,
-                                       self.amount, self.norm)
+        elif isinstance(layer, torch.nn.Linear):
+            if self.pruning_method == prune.ln_structured:
+                return prune.ln_structured(layer, self.parameter_to_prune,
+                                           self.amount, self.norm,
+                                           self.linear_dim)
+            elif self.pruning_method == prune.random_structured:
+                return prune.random_structured(layer, self.parameter_to_prune,
+                                               self.amount, self.linear_dim)
+        elif isinstance(layer, torch.nn.Conv2d):
+            if self.pruning_method == prune.ln_structured:
+                return prune.ln_structured(layer, self.parameter_to_prune,
+                                           self.amount, self.norm,
+                                           self.conv_dim)
+            elif self.pruning_method == prune.random_structured:
+                return prune.random_structured(layer, self.parameter_to_prune,
+                                               self.amount, self.conv_dim)
