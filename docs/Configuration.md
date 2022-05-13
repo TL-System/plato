@@ -17,7 +17,6 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |**total_clients**|The total number of clients|A positive number||
 |**per_round**|The number of clients selected in each round| Any positive integer that is not larger than **total_clients**||
 |**do_test**|Should the clients compute test accuracy locally?| `true` or `false`|if `true` and the configuration file has `results` section, a CSV file will log test accuracy of every selected client in each round| 
-|simulation|Should we turn on the client simulation mode? When this is turned on, the number of client processes started on one available device is equal to `max_concurrency` (or `max_concurrency` * `total_silos` in cross-silo training), rather than the total number of clients.|
 |speed_simulation|Should we simulate client heterogeneity in training speed?|
 |simulation_distribution|Parameters for simulating client heterogeneity in training speed|`distribution`|`normal` for normal or `zipf` for Zipf|
 |||`s`|the parameter `s` in Zipf distribution|

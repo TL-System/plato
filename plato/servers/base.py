@@ -126,8 +126,6 @@ class Server:
         self.request_update = False
         self.disable_clients = False
 
-        Server.client_simulation_mode = False
-
         # With specifying max_concurrency, selected clients run batch by batach
         # The number of clients in a batch on an available device is the same as the max_concurrency
         # This list contains ids of selected clients that has run in the current round
@@ -180,11 +178,6 @@ class Server:
         self.disable_clients = hasattr(
             Config().server,
             'disable_clients') and Config().server.disable_clients
-
-        # Are we simulating the clients rather than running all selected clients as separate
-        # processes?
-        Server.client_simulation_mode = hasattr(
-            Config().clients, 'simulation') and Config().clients.simulation
 
     def run(self,
             client=None,
@@ -265,11 +258,8 @@ class Server:
             logging.info("[%s] New contact from Client #%d received.", self,
                          client_id)
 
-        if hasattr(
-                Config().trainer,
-                'max_concurrency') and (hasattr(Config().clients, 'simulation')
-                                        and Config().clients.simulation
-                                        ) and not Config().is_central_server():
+        if hasattr(Config().trainer,
+                   'max_concurrency') and not Config().is_central_server():
             required_launched_clients = min(
                 Config().trainer.max_concurrency * max(1,
                                                        Config().gpu_count()),
@@ -292,31 +282,26 @@ class Server:
         """ Starting all the clients as separate processes. """
         starting_id = 1
 
-        if Server.client_simulation_mode:
-            # In the client simulation mode, we only need to launch the number of clients
-            # necessary for concurrent training
-            # If `max_concurrency` in `trainer` is specified, the limit number is
-            # `max_concurrency` multiply the number of available devices
-            # (multiply number of edge servers in cross-silo training)
-            if hasattr(Config().trainer, 'max_concurrency'):
-                if Config().is_central_server():
-                    client_processes = min(
-                        Config().trainer.max_concurrency *
-                        max(1,
-                            Config().gpu_count()) *
-                        Config().algorithm.total_silos,
-                        Config().clients.per_round)
-                else:
-                    client_processes = min(
-                        Config().trainer.max_concurrency *
-                        max(1,
-                            Config().gpu_count()),
-                        Config().clients.per_round)
-            # Otherwise, the limited number is the same as the number of clients per round
+        # We only need to launch the number of clients necessary for concurrent training
+        # If `max_concurrency` in `trainer` is specified, the limit number is
+        # `max_concurrency` multiply the number of available devices
+        # (multiply number of edge servers in cross-silo training)
+        if hasattr(Config().trainer, 'max_concurrency'):
+            if Config().is_central_server():
+                client_processes = min(
+                    Config().trainer.max_concurrency *
+                    max(1,
+                        Config().gpu_count()) * Config().algorithm.total_silos,
+                    Config().clients.per_round)
             else:
-                client_processes = Config().clients.per_round
+                client_processes = min(
+                    Config().trainer.max_concurrency *
+                    max(1,
+                        Config().gpu_count()),
+                    Config().clients.per_round)
+        # Otherwise, the limited number is the same as the number of clients per round
         else:
-            client_processes = Config().clients.total_clients
+            client_processes = Config().clients.per_round
 
         if as_server:
             total_processes = Config().algorithm.total_silos
@@ -363,22 +348,12 @@ class Server:
                          self.current_round,
                          Config().trainer.rounds)
 
-            if hasattr(Config().clients,
-                       'simulation') and Config().clients.simulation:
-                # In the client simulation mode, the client pool for client selection contains
-                # all the virtual clients to be simulated
-
-                if Config().is_central_server():
-                    # In cross-silo FL, the central server selects from the pool of edge servers
-                    self.clients_pool = list(self.clients)
-
-                elif not Config().is_edge_server():
-                    self.clients_pool = list(range(1, 1 + self.total_clients))
-
-            else:
-                # If no clients are simulated, the client pool for client selection consists of
-                # the current set of clients that have contacted the server
+            if Config().is_central_server():
+                # In cross-silo FL, the central server selects from the pool of edge servers
                 self.clients_pool = list(self.clients)
+
+            elif not Config().is_edge_server():
+                self.clients_pool = list(range(1, 1 + self.total_clients))
 
             # In asychronous FL, avoid selecting new clients to replace those that are still
             # training at this time
@@ -471,30 +446,27 @@ class Server:
             for i, selected_client_id in enumerate(selected_clients):
                 self.selected_client_id = selected_client_id
 
-                if self.client_simulation_mode:
-                    if Config().is_central_server():
-                        client_id = selected_client_id
-                    elif Config().is_edge_server():
-                        client_id = self.launched_clients[i]
-                    else:
-                        client_id = i + 1
-
-                    sid = self.clients[client_id]['sid']
-
-                    if self.asynchronous_mode and self.simulate_wall_time:
-                        training_sids = []
-                        for client_info in self.reported_clients:
-                            training_sids.append(client_info[1]['sid'])
-
-                        # skip if this sid is currently `training' with reporting clients
-                        # or it has already been selected in this round
-                        while sid in training_sids or sid in self.selected_sids:
-                            client_id = client_id % self.clients_per_round + 1
-                            sid = self.clients[client_id]['sid']
-
-                        self.selected_sids.append(sid)
+                if Config().is_central_server():
+                    client_id = selected_client_id
+                elif Config().is_edge_server():
+                    client_id = self.launched_clients[i]
                 else:
-                    sid = self.clients[self.selected_client_id]['sid']
+                    client_id = i + 1
+
+                sid = self.clients[client_id]['sid']
+
+                if self.asynchronous_mode and self.simulate_wall_time:
+                    training_sids = []
+                    for client_info in self.reported_clients:
+                        training_sids.append(client_info[1]['sid'])
+
+                    # skip if this sid is currently `training' with reporting clients
+                    # or it has already been selected in this round
+                    while sid in training_sids or sid in self.selected_sids:
+                        client_id = client_id % self.clients_per_round + 1
+                        sid = self.clients[client_id]['sid']
+
+                    self.selected_sids.append(sid)
 
                 self.training_clients[self.selected_client_id] = {
                     'id': self.selected_client_id,

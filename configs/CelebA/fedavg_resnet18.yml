@@ -24,7 +24,7 @@ data:
         # For ResNet, do not set <attr> to True since it does not match the expected output of ResNet
         attr: false
         identity: true
-    
+
     # Number of identity in CelebA
     num_classes: 10178
 
@@ -49,9 +49,6 @@ trainer:
 
     # The maximum number of training rounds
     rounds: 5
-
-    # Whether the training should use multiple GPUs if available
-    parallelized: true
 
     # The maximum number of clients running concurrently
     max_concurrency: 3
