@@ -9,7 +9,7 @@ import torch.nn.utils.prune as prune
 from plato.processors import model
 
 
-class structured_processing(model.Processor):
+class Processor(model.Processor):
     """
     A processor for the structured pruning of model weights.
     """

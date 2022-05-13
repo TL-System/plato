@@ -16,7 +16,7 @@ clients:
 
     # Processors for outbound data payloads
     outbound_processors:
-        - model_pruning
+        - unstructured_pruning
 
 server:
     address: 127.0.0.1
