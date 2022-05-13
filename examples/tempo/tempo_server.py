@@ -90,11 +90,7 @@ class Server(fedavg_cs.Server):
         """
         weights_diff_list = []
         for i in range(Config().algorithm.total_silos):
-            if hasattr(Config().clients,
-                       'simulation') and Config().clients.simulation:
-                client_id = i + 1 + Config().clients.per_round
-            else:
-                client_id = i + 1 + Config().clients.total_clients
+            client_id = i + 1 + Config().clients.total_clients
             (report, weights) = [(report, payload)
                                  for (__, report, payload, __) in self.updates
                                  if int(report.client_id) == client_id][0]
