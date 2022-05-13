@@ -11,9 +11,6 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    # Client simulation mode
-    simulation: false
-
     # Processors for outbound data payloads
     outbound_processors:
         - unstructured_pruning
@@ -31,9 +28,6 @@ trainer:
 
     # The maximum number of training rounds
     rounds: 5
-
-    # Whether the training should use multiple GPUs if available
-    parallelized: false
 
     # Whether to apply differential privacy
     # differential_privacy: true

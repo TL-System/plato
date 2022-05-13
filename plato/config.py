@@ -12,8 +12,6 @@ from typing import Any, IO
 import numpy as np
 import yaml
 
-from plato.utils.available_gpu import available_gpu
-
 
 class Loader(yaml.SafeLoader):
     """ YAML Loader with `!include` constructor. """
@@ -173,16 +171,17 @@ class Config:
                 server_type = Config.server.type
             elif hasattr(Config().algorithm, "type"):
                 server_type = Config.algorithm.type
-            Config.params[
-                'result_dir'] = f'./results/{datasource}_{model}_{server_type}'
 
             if 'results' in config:
                 Config.results = Config.namedtuple_from_dict(config['results'])
 
                 if hasattr(Config.results, 'result_dir'):
                     Config.params['result_dir'] = Config.results.result_dir
+                else:
+                    Config.params[
+                        'result_dir'] = f'./results/{datasource}_{model}_{server_type}'
 
-            os.makedirs(Config.params['result_dir'], exist_ok=True)
+                os.makedirs(Config.params['result_dir'], exist_ok=True)
 
             if 'model' in config:
                 Config.model = Config.namedtuple_from_dict(config['model'])
@@ -262,6 +261,19 @@ class Config:
                        'cross_silo') and Config().args.port is None
 
     @staticmethod
+    def gpu_count() -> int:
+        """Returns the number of GPUs available for training."""
+        if hasattr(Config().trainer, 'use_mindspore'):
+            return 0
+
+        import torch
+
+        if torch.cuda.is_available():
+            return torch.cuda.device_count()
+        else:
+            return 0
+
+    @staticmethod
     def device() -> str:
         """Returns the device to be used for training."""
         device = 'cpu'
@@ -273,38 +285,17 @@ class Config:
             gpus = tf.config.experimental.list_physical_devices('GPU')
             if len(gpus) > 0:
                 device = 'GPU'
-                gpu_id = int(os.getenv('GPU_ID'))
-
-                if gpu_id is None:
-                    gpu_id = available_gpu()
-                    os.environ['GPU_ID'] = str(gpu_id)
-
-                tf.config.experimental.set_visible_devices(gpus[gpu_id], 'GPU')
+                tf.config.experimental.set_visible_devices(gpus[0], 'GPU')
 
         else:
             import torch
 
             if torch.cuda.is_available() and torch.cuda.device_count() > 0:
-                if hasattr(Config().trainer,
-                           'parallelized') and Config().trainer.parallelized:
-                    device = 'cuda'
-                else:
-                    gpu_id = os.getenv('GPU_ID')
-
-                    if gpu_id is None:
-                        gpu_id = available_gpu()
-                        os.environ['GPU_ID'] = str(gpu_id)
-
+                if Config.gpu_count() > 1 and isinstance(Config.args.id, int):
+                    # A client will always run on the same GPU
+                    gpu_id = Config.args.id % torch.cuda.device_count()
                     device = f'cuda:{gpu_id}'
+                else:
+                    device = 'cuda:0'
 
         return device
-
-    @staticmethod
-    def is_parallel() -> bool:
-        """Check if the hardware and OS support data parallelism."""
-        import torch
-
-        return hasattr(Config().trainer, 'parallelized') and Config(
-        ).trainer.parallelized and torch.cuda.is_available(
-        ) and torch.distributed.is_available(
-        ) and torch.cuda.device_count() > 1
