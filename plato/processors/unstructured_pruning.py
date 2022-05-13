@@ -1,5 +1,5 @@
 """
-Implements a Processor for global pruning of model weights.
+Implements a Processor for global unstructured pruning of model weights.
 """
 import logging
 from typing import Any
@@ -13,10 +13,11 @@ from plato.processors import model
 
 class Processor(model.Processor):
     """
-    Implements a Processor for global pruning of model weights.
+    Implements a Processor for global unstructured pruning of model weights.
     """
+
     def __init__(self,
-                 parameters_to_prune=[],
+                 parameters_to_prune=None,
                  pruning_method=prune.L1Unstructured,
                  amount=0.2,
                  keep_model=True,
@@ -30,7 +31,8 @@ class Processor(model.Processor):
 
         self.model = self.trainer.model
 
-        if len(self.parameters_to_prune) == 0:
+        if self.parameters_to_prune is None:
+            self.parameters_to_prune = []
             for _, module in self.model.named_modules():
                 if isinstance(module, torch.nn.Conv2d) or isinstance(
                         module, torch.nn.Linear):
@@ -38,7 +40,7 @@ class Processor(model.Processor):
 
     def process(self, data: Any) -> Any:
         """
-        Implements a Processor for global pruning of model weights.
+        Proceesses global unstructured pruning on model weights.
         """
 
         if self.model is None:
@@ -61,7 +63,12 @@ class Processor(model.Processor):
         if self.keep_model:
             self.model.load_state_dict(original_state_dict)
 
-        logging.info("[Client #%d] Global unstructured pruning applied.", self.client_id)
+        if self.client_id is None:
+            logging.info("[Server #%d] Global unstructured pruning applied.",
+                         self.server_id)
+        else:
+            logging.info("[Client #%d] Global unstructured pruning applied.",
+                         self.client_id)
 
         return output
 

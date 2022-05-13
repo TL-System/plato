@@ -47,7 +47,9 @@ Attributes in **bold** must be included in a configuration file, while attribute
 
 - `model_quantize`: Quantize features for model parameters for PyTorch.
 
-- `model_pruning`: Prune model weights for PyTorch. Must be placed as the first processor if applied.
+- `unstructured_pruning`: Process unstructured pruning on model weights for PyTorch. The `model_compress` processor needs to be applied after it in the configuration file or the communication overhead will not be reduced.
+
+- `structured_pruning`: Process structured pruning on model weights for PyTorch. The `model_compress` processor needs to be applied after it in the configuration file or the communication overhead will not be reduced.
 
 - `model_compress`: Compress model parameters with `Zstandard` compression algorithm. Must be placed as the last processor if applied.
 
@@ -81,7 +83,9 @@ Attributes in **bold** must be included in a configuration file, while attribute
 
 #### Valid processors for `server.outbound_processors`
 
-- `model_pruning`: Prune model weights for PyTorch. Must be placed as the first processor if applied.
+- `unstructured_pruning`: Process unstructured pruning on model weights for PyTorch. The `model_compress` processor needs to be applied after it in the configuration file or the communication overhead will not be reduced.
+
+- `structured_pruning`: Process structured pruning on model weights for PyTorch. The `model_compress` processor needs to be applied after it in the configuration file or the communication overhead will not be reduced.
 
 - `model_compress`: Compress model parameters with `Zstandard` compression algorithm. Must be placed as the last processor if applied.
 

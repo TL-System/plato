@@ -19,7 +19,7 @@ class Processor(model.Processor):
                  conv_dim=0,
                  linear_dim=-1,
                  norm=1,
-                 amount=0.1,
+                 amount=0.2,
                  keep_model=True,
                  **kwargs) -> None:
         super().__init__(**kwargs)
@@ -35,7 +35,7 @@ class Processor(model.Processor):
 
     def process(self, data):
         """
-        A processor for the structured pruning of model weights going layer by layer.
+        Processes structured pruning of model weights layer by layer.
         """
         if self.model is None:
             return data
@@ -58,8 +58,12 @@ class Processor(model.Processor):
         if self.keep_model:
             self.model.load_state_dict(original_state_dict)
 
-        logging.info("[Client #%d] Structured pruning applied.",
-                     self.client_id)
+        if self.client_id is None:
+            logging.info("[Server #%d] Structured pruning applied.",
+                         self.server_id)
+        else:
+            logging.info("[Client #%d] Structured pruning applied.",
+                         self.client_id)
 
         return output
 
