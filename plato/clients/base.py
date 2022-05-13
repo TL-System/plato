@@ -151,10 +151,8 @@ class Client:
         self.process_server_response(response)
 
         # Update (virtual) client id for client, trainer and algorithm
-        if hasattr(Config().clients,
-                   'simulation') and Config().clients.simulation:
-            self.client_id = response['id']
-            self.configure()
+        self.client_id = response['id']
+        self.configure()
 
         logging.info("[Client #%d] Selected by the server.", self.client_id)
 

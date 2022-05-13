@@ -11,9 +11,6 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    # Whether clients should be simulated with only a sufficient number of processes
-    simulation: true
-
     # Whether client heterogeneity should be simulated
     speed_simulation: true
 
@@ -80,9 +77,6 @@ trainer:
 
     # The maximum number of training rounds
     rounds: 100
-
-    # Whether the training should use multiple GPUs if available
-    parallelized: true
 
     # The maximum number of clients running concurrently
     max_concurrency: 4

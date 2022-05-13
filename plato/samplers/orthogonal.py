@@ -13,6 +13,7 @@ from plato.samplers import base
 class Sampler(base.Sampler):
     """Create a data sampler for each client to use a divided partition of the dataset.
     A client only has data of certain classes."""
+
     def __init__(self, datasource, client_id, testing):
         super().__init__()
 
@@ -28,11 +29,7 @@ class Sampler(base.Sampler):
             target_list = datasource.targets()
         class_list = datasource.classes()
 
-        if hasattr(Config().clients,
-                   'simulation') and Config().clients.simulation:
-            max_client_id = int(Config().clients.per_round)
-        else:
-            max_client_id = int(Config().clients.total_clients)
+        max_client_id = int(Config().clients.total_clients)
 
         if client_id > max_client_id:
             # This client is an edge server
