@@ -61,7 +61,7 @@ class Processor(model.Processor):
         if self.keep_model:
             self.model.load_state_dict(original_state_dict)
 
-        logging.info("[Client #%d] Global pruning applied.", self.client_id)
+        logging.info("[Client #%d] Global unstructured pruning applied.", self.client_id)
 
         return output
 
