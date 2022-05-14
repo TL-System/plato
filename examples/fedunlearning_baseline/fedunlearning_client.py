@@ -39,10 +39,6 @@ class Client(simple.Client):
             previous_round = 0
 
         client_pool = Config().clients.clients_requesting_deletion
-        print(self.client_id)
-        print(self.current_round)
-        print(previous_round)
-        print(client_pool)
 
         if self.client_id in client_pool and self.current_round <= previous_round:
             logging.info(
