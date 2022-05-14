@@ -13,14 +13,6 @@ from plato.clients import simple
 from plato.config import Config
 
 
-def decode_config_with_comma(target_string):
-    """ Split the input target_string as int by comma. """
-    if isinstance(target_string, int):
-        return [target_string]
-    else:
-        return list(map(int, target_string.split(", ")))
-
-
 class Client(simple.Client):
     """A federated learning client of federated unlearning."""
 
@@ -40,11 +32,12 @@ class Client(simple.Client):
     def process_server_response(self, server_response):
         if server_response['retrain_phase'] or self.current_round > Config(
         ).clients.data_deletion_round:
-            client_requesting_deletion_ids = decode_config_with_comma(
-                Config().clients.client_requesting_deletion)
+            client_requesting_deletion_ids = Config(
+            ).clients.client_requesting_deletion
 
             for client_requesting_deletion_id in client_requesting_deletion_ids:
-                self.clients_need_to_be_deleted[client_requesting_deletion_id] = True
+                self.clients_need_to_be_deleted[
+                    client_requesting_deletion_id] = True
 
             if self.client_id in client_requesting_deletion_ids:
 

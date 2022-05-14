@@ -17,14 +17,6 @@ from plato.config import Config
 from plato.servers import fedavg
 
 
-def decode_config_with_comma(target_string):
-    """ Split the input target_string as int by comma. """
-    if isinstance(target_string, int):
-        return [target_string]
-    else:
-        return list(map(int, target_string.split(", ")))
-
-
 class Server(fedavg.Server):
     """ A federated unlearning server that implements the federated unlearning baseline algorithm.
     
@@ -57,7 +49,8 @@ class Server(fedavg.Server):
                 'sid': sid,
                 'last_contacted': time.perf_counter()
             }
-            logging.info("[%s] New client with id #%d arrived.", self, client_id)
+            logging.info("[%s] New client with id #%d arrived.", self,
+                         client_id)
         else:
             self.clients[client_id]['last_contacted'] = time.perf_counter()
             logging.info("[%s] New contact from Client #%d received.", self,
@@ -77,29 +70,27 @@ class Server(fedavg.Server):
         """ Wrap up processing the reports with any additional work. """
         await super().wrap_up_processing_reports()
 
-        client_requesting_deletion = decode_config_with_comma(
-            Config().clients.client_requesting_deletion)
-
         are_clients_selected_before_retrain = any([
             client_id in self.clients_arrive_round
-            for client_id in client_requesting_deletion
+            for client_id in Config().clients.client_requesting_deletion
         ])
 
         if not are_clients_selected_before_retrain:
             logging.info(
                 "[%s] Clients are not selected before data_deletion_round.",
-                client_requesting_deletion)
+                Config().clients.client_requesting_deletion)
 
         elif (self.current_round == Config().clients.data_deletion_round
               ) and self.restarted_session:
             # If data_deletion_round equals to the current round at server at the first time
             # retrain phase start
             self.retrain_phase = True
-            client_requesting_deletion = decode_config_with_comma(
-                Config().clients.client_requesting_deletion)
-            for client_to_delete in client_requesting_deletion:
+
+            for client_to_delete in Config(
+            ).clients.client_requesting_deletion:
                 if client_to_delete in self.clients_arrive_round:
-                    self.start_retrain_round.append(self.clients_arrive_round[client_to_delete])
+                    self.start_retrain_round.append(
+                        self.clients_arrive_round[client_to_delete])
 
             self.current_round = min(self.start_retrain_round) - 1
             self.restarted_session = False
