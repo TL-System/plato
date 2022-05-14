@@ -16,46 +16,19 @@ from plato.config import Config
 class Client(simple.Client):
     """A federated learning client of federated unlearning."""
 
-    def __init__(self,
-                 model=None,
-                 datasource=None,
-                 algorithm=None,
-                 trainer=None):
-        super().__init__(model=model,
-                         datasource=datasource,
-                         algorithm=algorithm,
-                         trainer=trainer)
-
-        # Recording which clients reach the delete conditions. key: ids, value: if it needs deletion
-        self.clients_need_to_be_deleted = {}
-
     def process_server_response(self, server_response):
         if server_response['retrain_phase'] or self.current_round > Config(
         ).clients.data_deletion_round:
-            client_requesting_deletion_ids = Config(
-            ).clients.client_requesting_deletion
+            if self.client_id in Config().clients.client_requesting_deletion:
+                logging.info(
+                    "[%s] Unlearning sampler deployed: %s%% of the samples were deleted.",
+                    self,
+                    Config().clients.deleted_data_ratio * 100)
 
-            for client_requesting_deletion_id in client_requesting_deletion_ids:
-                self.clients_need_to_be_deleted[
-                    client_requesting_deletion_id] = True
+                if (hasattr(Config().data, 'reload_data')
+                        and Config().data.reload_data) or not self.data_loaded:
+                    logging.info("[%s] Loading the dataset.", self)
+                    self.load_data()
 
-            if self.client_id in client_requesting_deletion_ids:
-
-                if self.clients_need_to_be_deleted[self.client_id] is True:
-                    logging.info(
-                        "[%s] Unlearning sampler deployed: %s%% of the samples were deleted.",
-                        self,
-                        Config().clients.deleted_data_ratio * 100)
-
-                    if (hasattr(Config().data, 'reload_data') and
-                            Config().data.reload_data) or not self.data_loaded:
-                        self.load_data()
-
-                    self.sampler = unlearning_iid.Sampler(
-                        self.datasource, self.client_id, False)
-                else:
-                    pass
-            else:
-                pass
-        else:
-            pass
+                self.sampler = unlearning_iid.Sampler(self.datasource,
+                                                      self.client_id, False)
