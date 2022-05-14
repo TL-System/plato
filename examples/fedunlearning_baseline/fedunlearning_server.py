@@ -18,29 +18,36 @@ from plato.servers import fedavg
 
 
 def decode_config_with_comma(target_string):
+    """ Split the input target_string as int by comma. """
     if isinstance(target_string, int):
         return [target_string]
     else:
-        return list(map(lambda x: int(x), target_string.split(", ")))
+        return list(map(int, target_string.split(", ")))
 
 
 class Server(fedavg.Server):
-    """ A federated unlearning server that implements the federated unlearning baseline 
-        algorithm.
+    """ A federated unlearning server that implements the federated unlearning baseline algorithm.
+    
+    When we reach the 'data_deletion_round,' the server will roll back to the round, which is the minimum of the client_requesting_deletion first selected for the training.
+    
+    For example, if client[1] wants to delete its data after round 2, the server first finishes the aggregation at round 2, then finds out if or not the client[1] was selected in the previous round. If it was, roll back to the round that is the first time that client[1] is selected and start retraining. Otherwise, keep training with the client[1] and delete its data by all data * 'deleted_data_ratio.'
     """
 
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
         self.restarted_session = True
-        self.clients_dic = {}
+        # Store client_id as keys, the round that corresponding client first be selected as values
+        self.clients_arrive_round = {}
         self.retrain_phase = False
+        # If current round is in retrain phase, retrain_phase becomes True
+        self.start_retrain_round = []
 
     async def select_clients(self, for_next_batch=False):
         await super().select_clients(for_next_batch)
 
         for client_id in self.selected_clients:
-            if not client_id in self.clients_dic.keys():
-                self.clients_dic[client_id] = self.current_round
+            if not client_id in self.clients_arrive_round:
+                self.clients_arrive_round[client_id] = self.current_round
 
     async def register_client(self, sid, client_id):
         """ Adding a newly arrived client to the list of clients. """
@@ -75,7 +82,7 @@ class Server(fedavg.Server):
             Config().clients.client_requesting_deletion)
 
         are_clients_selected_before_retrain = any([
-            client_id in self.clients_dic.keys()
+            client_id in self.clients_arrive_round
             for client_id in client_requesting_deletion
         ])
 
@@ -86,16 +93,17 @@ class Server(fedavg.Server):
 
         elif (self.current_round == Config().clients.data_deletion_round
               ) and self.restarted_session:
+            # If data_deletion_round equals to the current round at server at the first time
+            # retrain phase start
             self.retrain_phase = True
             client_requesting_deletion = decode_config_with_comma(
                 Config().clients.client_requesting_deletion)
-            start_retrain_round = [
-                self.clients_dic[client_id]
-                for client_id in client_requesting_deletion
-                if client_id in self.clients_dic.keys()
-            ]
+            for client_to_delete in client_requesting_deletion:
+                if client_to_delete in self.clients_arrive_round:
+                    self.start_retrain_round.append(
+                        self.clients_arrive_round[client_to_delete])
 
-            self.current_round = min(start_retrain_round) - 1
+            self.current_round = min(self.start_retrain_round) - 1
             self.restarted_session = False
 
             logging.info(

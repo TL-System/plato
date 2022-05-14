@@ -14,10 +14,11 @@ from plato.config import Config
 
 
 def decode_config_with_comma(target_string):
+    """ Split the input target_string as int by comma. """
     if isinstance(target_string, int):
         return [target_string]
     else:
-        return list(map(lambda x: int(x), target_string.split(", ")))
+        return list(map(int, target_string.split(", ")))
 
 
 class Client(simple.Client):
@@ -34,7 +35,7 @@ class Client(simple.Client):
                          trainer=trainer)
 
         # Recording which clients reach the delete conditions. key: ids, value: if it needs deletion
-        self.clients_delete_dic = {}
+        self.clients_need_to_be_deleted = {}
 
     def process_server_response(self, server_response):
         if server_response['retrain_phase'] or self.current_round > Config(
@@ -43,11 +44,11 @@ class Client(simple.Client):
                 Config().clients.client_requesting_deletion)
 
             for client_requesting_deletion_id in client_requesting_deletion_ids:
-                self.clients_delete_dic[client_requesting_deletion_id] = True
+                self.clients_need_to_be_deleted[client_requesting_deletion_id] = True
 
             if self.client_id in client_requesting_deletion_ids:
 
-                if self.clients_delete_dic[self.client_id] is True:
+                if self.clients_need_to_be_deleted[self.client_id] is True:
                     logging.info(
                         "[%s] Unlearning sampler deployed: %s%% of the samples were deleted.",
                         self,
