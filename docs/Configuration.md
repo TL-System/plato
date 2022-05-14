@@ -16,13 +16,14 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |||`mistnet`|A client for MistNet|
 |**total_clients**|The total number of clients|A positive number||
 |**per_round**|The number of clients selected in each round| Any positive integer that is not larger than **total_clients**||
-|**do_test**|Should the clients compute test accuracy locally?| `true` or `false`|| 
-|simulation|Should we turn on the client simulation mode? When this is turned on, the number of client processes started on one available device is equal to `max_concurrency` (or `max_concurrency` * `total_silos` in cross-silo training), rather than the total number of clients.|
+|**do_test**|Should the clients compute test accuracy locally?| `true` or `false`|if `true` and the configuration file has `results` section, a CSV file will log test accuracy of every selected client in each round| 
 |speed_simulation|Should we simulate client heterogeneity in training speed?|
 |simulation_distribution|Parameters for simulating client heterogeneity in training speed|`distribution`|`normal` for normal or `zipf` for Zipf|
 |||`s`|the parameter `s` in Zipf distribution|
 |||`mean`|The mean in normal distribution|
 |||`sd`|The standard deviation in normal distribution|
+|random_seed|The random seed for generating a sleep time (in seconds per epoch) for each of the clients||default: 1|
+|max_sleep_time|The maximum simulated sleep time (in seconds)||default: 60|
 |outbound_processors|A list of processors to apply on the payload before sending| A list of processor names || 
 |inbound_processors|A list of processors to apply on the payload right after receiving| A list of processor names || 
 
@@ -46,14 +47,14 @@ Attributes in **bold** must be included in a configuration file, while attribute
 
 - `model_quantize`: Quantize features for model parameters for PyTorch.
 
-- `model_pruning`: Prune model weights for PyTorch. Must be placed as the first processor.
+- `model_pruning`: Prune model weights for PyTorch. Must be placed as the first processor if applied.
 
-- `model_compress`: Compress model parameters. Must be placed as the last processor if applied.
+- `model_compress`: Compress model parameters with `Zstandard` compression algorithm. Must be placed as the last processor if applied.
 
 
 #### Valid processors for `clients.inbound_processors`
 
-None.
+- `model_decompress`: Decompress model parameters. Must be placed as the first processor if `model_compress` is applied on the server side.
 
 ### server
 
@@ -73,14 +74,20 @@ None.
 |staleness_bound|In asynchronous mode, should we wait for stale clients who are behind the current round by more than this bound?|Any positive integer|default: 0|
 |minimum_clients_aggregated|The minimum number of clients that need to arrive before aggregation and processing by the server when operating in asynchronous mode|Any positive integer|default: 1|
 |do_test|Should the central server compute test accuracy locally?| `true` or `false`|| 
+|checkpoint_dir|The directory of checkpoints||default: ./checkpoints|
+|model_dir|The directory of pretrained and trained models||default: ./models/pretrained|
 |outbound_processors|A list of processors to apply on the payload before sending| A list of processor names || 
 |inbound_processors|A list of processors to apply on the payload right after receiving| A list of processor names || 
 
 #### Valid processors for `server.outbound_processors`
 
-None.
+- `model_pruning`: Prune model weights for PyTorch. Must be placed as the first processor if applied.
+
+- `model_compress`: Compress model parameters with `Zstandard` compression algorithm. Must be placed as the last processor if applied.
 
 #### Valid processors for `server.inbound_processors`
+
+- `model_decompress`: Decompress model parameters. Must be placed as the first processor if `model_compress` is applied on the client side.
 
 - `inbound_feature_tensors`: Convert PyTorch tensor features into NumPy arrays before sending to client, for the benefit of saving a substantial amount of communication overhead if the feature dataset is large. Must be used if `clients.outbound_processors` includes `outbound_feature_ndarrays`.
 
@@ -88,13 +95,11 @@ None.
 
 - `model_dequantize`: Dequantize features for PyTorch model parameters.
 
-- `model_decompress`: Decompress model parameters. Must be placed as the first processor if applied.
-
 ### data
 
 | Attribute | Meaning | Valid Value | Note |
 |:---------:|:-------:|:-----------:|:----:|
-|**dataset**| The training and testing dataset|`MNIST`, `FashionMNIST`, `EMNIST`, `CIFAR10`, `CINIC10`, `YOLO`, `HuggingFace`, `PASCAL_VOC`, or `TinyImageNet`||
+|**dataset**| The training and testing dataset|`MNIST`, `FashionMNIST`, `EMNIST`, `CIFAR10`, `CINIC10`, `YOLO`, `HuggingFace`, `PASCAL_VOC`, `TinyImageNet`, or `CelebA`||
 |**data_path**|Where the dataset is located|e.g.,`./data`|For the `CINIC10` dataset, the default `data_path` is `./data/CINIC-10`, For the `TinyImageNet` dataset, the default `data_path` is `./data/tiny-imagenet-200`|
 |**sampler**|How to divide the entire dataset to the clients|`iid`||
 |||`iid_mindspore`||
@@ -116,8 +121,7 @@ None.
 |:---------:|:-------:|:-----------:|:----:|
 |**type**|The type of the trainer|`basic`|
 |**rounds**|The maximum number of training rounds|Any positive integer||
-|**parallelized**|Whether the training should use multiple GPUs if available|`true` or `false`||
-|max_concurrency|The maximum number of clients (of each edge server in cross-silo training) running concurrently on one available device. If this is not defined, no new processes are spawned for training|Any positive integer||
+|max_concurrency|The maximum number of clients (of each edge server in cross-silo training) running concurrently on one available device. If this is not defined, no new processes are spawned for training|Any positive integer|Plato will automatically use all available GPUs to maximize the speed of training, launching the same number of clients on every GPU.|
 |target_accuracy|The target accuracy of the global model|||
 |target_perplexity|The target perplexity of the global NLP model|
 |**epochs**|Number of epoches for local training in each communication round|Any positive integer||
@@ -150,4 +154,4 @@ None.
 |:---------:|:-------:|:-----------:|:----:|
 |types|Which parameter(s) will be written into a CSV file|`round`, `accuracy`, `elapsed_time`, `comm_time`, `round_time`, `local_epoch_num`, `edge_agg_num`|Use comma `,` to seperate parameters|
 |plot|Plot results ||Format: x\_axis-y\_axis. Use hyphen `-` to seperate axis. Use comma `,` to seperate multiple plots|
-|result_dir|The directory of results||If not specify, results will be stored under `./results/<datasource>/<model>/<server_type>/`|
+|result_dir|The directory of results||If not specified, results will be stored under `./results/<datasource>/<model>/<server_type>/`|
