@@ -1,5 +1,8 @@
 """
 The training and testing loops for GAN models.
+
+Reference:
+https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html
 """
 import logging
 import os
