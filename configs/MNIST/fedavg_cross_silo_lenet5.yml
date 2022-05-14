@@ -11,9 +11,6 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: true
 
-    # Client simulation mode
-    simulation: true
-
 server:
     type: fedavg_cross_silo
     address: 127.0.0.1
@@ -38,9 +35,6 @@ trainer:
 
     # The maximum number of training rounds
     rounds: 3
-
-    # Whether the training should use multiple GPUs if available
-    parallelized: false
 
     # The maximum number of clients running concurrently
     max_concurrency: 1
