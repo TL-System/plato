@@ -37,6 +37,7 @@ class Server(fedavg.Server):
         self.round_first_selected = {}
 
     async def select_clients(self, for_next_batch=False):
+        """ Remembers the first round that a particular client ID was selected. """
         await super().select_clients(for_next_batch)
 
         for client_id in self.selected_clients:
@@ -69,7 +70,7 @@ class Server(fedavg.Server):
             await self.select_clients()
 
     async def wrap_up_processing_reports(self):
-        """ Wrap up processing the reports with any additional work. """
+        """ Enters the retraining phase if a specific set of conditions are satisfied. """
         await super().wrap_up_processing_reports()
 
         clients_to_delete = Config().clients.clients_requesting_deletion
