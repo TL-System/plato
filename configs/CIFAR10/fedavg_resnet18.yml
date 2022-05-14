@@ -6,10 +6,13 @@ clients:
     total_clients: 1000
 
     # The number of clients selected in each round
-    per_round: 100
+    per_round: 200
 
     # Should the clients compute test accuracy locally?
     do_test: false
+
+    # Whether client-server communication should be simulated with files
+    comm_simulation: true
 
 server:
     address: 127.0.0.1
