@@ -21,6 +21,9 @@ clients:
     # The percentage to remove the local data by clients
     deleted_data_ratio: 0.3
 
+    # Whether the same set of clients would be selected during retraining
+    exact_retrain: true
+
 server:
     address: 127.0.0.1
     port: 8000

@@ -7,8 +7,12 @@ Retraining," in Proc. INFOCOM, 2022.
 Reference: https://arxiv.org/abs/2203.07320
 """
 import logging
+import os
+import pickle
+import random
 import time
 
+import numpy as np
 from plato.config import Config
 from plato.servers import fedavg
 
@@ -83,8 +87,6 @@ class Server(fedavg.Server):
         elif (self.current_round == Config().clients.data_deletion_round
               ) and self.restarted_session:
             self.retrain_phase = True
-            logging.info("[%s] Data deleted. Retraining from the first round.",
-                         self)
             client_requesting_deletion = decode_config_with_comma(
                 Config().clients.client_requesting_deletion)
             start_retrain_round = [
@@ -95,15 +97,28 @@ class Server(fedavg.Server):
 
             initial_checkpoint_round = min(start_retrain_round)
             self.restarted_session = False
+            logging.info("[%s] Data deleted. Retraining from round #%s.", self,
+                         initial_checkpoint_round)
 
-            # Loading the saved model the server for resuming the training session from round 1
+            # Loading the saved model on the server for resuming the training session from round 1
             checkpoint_dir = Config.params['checkpoint_dir']
 
             model_name = Config().trainer.model_name if hasattr(
                 Config().trainer, 'model_name') else 'custom'
             filename = f"checkpoint_{model_name}_{initial_checkpoint_round}.pth"
             self.trainer.load_model(filename, checkpoint_dir)
-            # TODO: Needs to load the PRNG state here too for random.sample() on the server
+            logging.info(
+                "[Server #%d] Model used for the retraining phase loaded from %s.",
+                os.getpid(), checkpoint_dir)
+
+            if hasattr(Config().clients,
+                       'exact_retrain') and Config().clients.exact_retrain:
+                # Loading the PRNG states on the server in preparation for the retraining phase
+                logging.info(
+                    "[Server #%d] Random states in round #%s restored for exact retraining.",
+                    os.getpid(), initial_checkpoint_round)
+                self.restore_random_states(initial_checkpoint_round,
+                                           checkpoint_dir)
 
             # The function select_clients() in server/base.py will add 1 to current_round
             self.current_round = initial_checkpoint_round - 1
