@@ -8,11 +8,8 @@ Reference: https://arxiv.org/abs/2203.07320
 """
 import logging
 import os
-import pickle
-import random
 import time
 
-import numpy as np
 from plato.config import Config
 from plato.servers import fedavg
 
