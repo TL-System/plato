@@ -95,19 +95,19 @@ class Server(fedavg.Server):
                 if client_id in self.clients_dic.keys()
             ]
 
-            initial_checkpoint_round = min(start_retrain_round) - 1
+            self.current_round = min(start_retrain_round) - 1
             self.restarted_session = False
 
             logging.info(
                 "[%s] Data deleted. Retraining from the states after round #%s.",
-                self, initial_checkpoint_round)
+                self, self.current_round)
 
             # Loading the saved model on the server for resuming the training session from round 1
             checkpoint_dir = Config.params['checkpoint_dir']
 
             model_name = Config().trainer.model_name if hasattr(
                 Config().trainer, 'model_name') else 'custom'
-            filename = f"checkpoint_{model_name}_{initial_checkpoint_round}.pth"
+            filename = f"checkpoint_{model_name}_{self.current_round}.pth"
             self.trainer.load_model(filename, checkpoint_dir)
             logging.info(
                 "[Server #%d] Model used for the retraining phase loaded from %s.",
@@ -118,13 +118,8 @@ class Server(fedavg.Server):
                 # Loading the PRNG states on the server in preparation for the retraining phase
                 logging.info(
                     "[Server #%d] Random states after round #%s restored for exact retraining.",
-                    os.getpid(), initial_checkpoint_round)
-                self.restore_random_states(initial_checkpoint_round,
-                                           checkpoint_dir)
-
-            self.current_round = initial_checkpoint_round
-        else:
-            pass
+                    os.getpid(), self.current_round)
+                self.restore_random_states(self.current_round, checkpoint_dir)
 
     async def customize_server_response(self, server_response):
         """ Wrap up generating the server response with any additional information. """
