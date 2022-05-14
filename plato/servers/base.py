@@ -958,8 +958,8 @@ class Server:
                       'rb') as checkpoint_file:
                 variables_to_load[i] = pickle.load(checkpoint_file)
 
-        numpy_prng_state = variables_to_load[1]
-        prng_state = variables_to_load[2]
+        numpy_prng_state = variables_to_load[0]
+        prng_state = variables_to_load[1]
 
         np.random.set_state(numpy_prng_state)
         random.setstate(prng_state)

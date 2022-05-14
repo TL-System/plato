@@ -29,7 +29,7 @@ server:
     port: 8000
     random_seed: 1
 
-    checkpoint_dir: ./models/fedun/mnist
+    checkpoint_dir: ./checkpoints
 
 data:
     # The training and testing dataset

@@ -95,10 +95,12 @@ class Server(fedavg.Server):
                 if client_id in self.clients_dic.keys()
             ]
 
-            initial_checkpoint_round = min(start_retrain_round)
+            initial_checkpoint_round = min(start_retrain_round) - 1
             self.restarted_session = False
-            logging.info("[%s] Data deleted. Retraining from round #%s.", self,
-                         initial_checkpoint_round)
+
+            logging.info(
+                "[%s] Data deleted. Retraining from the states after round #%s.",
+                self, initial_checkpoint_round)
 
             # Loading the saved model on the server for resuming the training session from round 1
             checkpoint_dir = Config.params['checkpoint_dir']
@@ -115,13 +117,12 @@ class Server(fedavg.Server):
                        'exact_retrain') and Config().clients.exact_retrain:
                 # Loading the PRNG states on the server in preparation for the retraining phase
                 logging.info(
-                    "[Server #%d] Random states in round #%s restored for exact retraining.",
+                    "[Server #%d] Random states after round #%s restored for exact retraining.",
                     os.getpid(), initial_checkpoint_round)
                 self.restore_random_states(initial_checkpoint_round,
                                            checkpoint_dir)
 
-            # The function select_clients() in server/base.py will add 1 to current_round
-            self.current_round = initial_checkpoint_round - 1
+            self.current_round = initial_checkpoint_round
         else:
             pass
 
