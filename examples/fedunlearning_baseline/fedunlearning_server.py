@@ -19,10 +19,17 @@ from plato.servers import fedavg
 
 class Server(fedavg.Server):
     """ A federated unlearning server that implements the federated unlearning baseline algorithm.
-    
-    When we reach the 'data_deletion_round,' the server will roll back to the round, which is the minimum of the client_requesting_deletion first selected for the training.
-    
-    For example, if client[1] wants to delete its data after round 2, the server first finishes the aggregation at round 2, then finds out if or not the client[1] was selected in the previous round. If it was, roll back to the round that is the first time that client[1] is selected and start retraining. Otherwise, keep training with the client[1] and delete its data by all data * 'deleted_data_ratio.'
+
+    When 'data_deletion_round' specified in the configuration, the server will enter a retraining
+    phase after this round is reached, during which it will roll back to the minimum round number
+    necessary for all the clients requesting data deletion.
+
+    For example, if client #1 wishes to delete its data after round #2, the server first finishes
+    its aggregation at round #2, then finds out whether or not client #1 was selected in one of the
+    previous rounds. If it was, the server will roll back to the round when client #1 was selected
+    for the first time, and starts retraining phases from there. Otherwise, it will keep training
+    but with client #1 deleting a percentage of its data samples, according to `delete_data_ratio`
+    in the configuration.
     """
 
     def __init__(self, model=None, algorithm=None, trainer=None):
