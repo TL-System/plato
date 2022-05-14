@@ -975,7 +975,7 @@ class Server:
 
     def restore_random_states(self, round_to_restore, checkpoint_dir):
         """ Restoring the numpy.random and random states from previously saved checkpoints
-            for a particular round. 
+            for a particular round.
         """
         states_to_load = ['numpy_prng_state', 'prng_state']
         variables_to_load = {}
@@ -986,10 +986,10 @@ class Server:
                 variables_to_load[i] = pickle.load(checkpoint_file)
 
         numpy_prng_state = variables_to_load[0]
-        prng_state = variables_to_load[1]
+        self.prng_state = variables_to_load[1]
 
         np.random.set_state(numpy_prng_state)
-        random.setstate(prng_state)
+        random.setstate(self.prng_state)
 
     async def wrap_up(self):
         """ Wrapping up when each round of training is done. """
