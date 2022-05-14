@@ -56,7 +56,10 @@ class DataSource(base.DataSource):
         else:
             target_types = ['attr', 'identity']
 
-        image_size = 32
+        image_size = 64
+        if hasattr(Config().data, 'celeba_img_size'):
+            image_size = Config().data.celeba_img_size
+
         _transform = transforms.Compose([
             transforms.Resize(image_size),
             transforms.CenterCrop(image_size),
