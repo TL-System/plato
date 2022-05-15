@@ -53,7 +53,7 @@ class Server(fedavg_cs.Server):
 
     def extract_client_updates(self, updates):
         """ Extract the model weight updates from client updates. """
-        updates_received = [payload for (__, payload, __) in updates]
+        updates_received = [payload for (__, __, payload, __) in updates]
         return updates_received
 
     def update_pruning_amount_list(self):
