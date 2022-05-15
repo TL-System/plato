@@ -40,4 +40,6 @@ class Client(simple.Client):
             if name in self.model_representation_weights_key:
                 representation_weights[name] = para
 
+        print("representation_weights: ", representation_weights.keys())
+
         return report, representation_weights
