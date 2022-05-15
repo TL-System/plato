@@ -14,11 +14,16 @@ clients:
     # Processors for outbound data payloads
     outbound_processors:
         - unstructured_pruning
+        - model_compress
 
 server:
     address: 127.0.0.1
     port: 8000
     simulate_wall_time: true
+
+    # Processors for inbound data payloads
+    inbound_processors:
+        - model_decompress
 
 data: !include mnist_iid.yml
 
