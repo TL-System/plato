@@ -15,18 +15,21 @@ clients:
     # The round to remove the local data by clients
     data_deletion_round: 2
 
-    # The clients which need to remove their local data by client_id, each client id split by comma
-    client_requesting_deletion: 3
+    # The clients which need to delete their local data samples
+    clients_requesting_deletion: [2, 3]
 
-    # The percentage to remove the local data by clients
+    # The percentage to delete the local data by clients
     deleted_data_ratio: 0.3
+
+    # Whether the same set of clients would be selected during retraining
+    exact_retrain: true
 
 server:
     address: 127.0.0.1
     port: 8000
     random_seed: 1
 
-    checkpoint_dir: ./models/fedun/mnist
+    checkpoint_dir: ./checkpoints
 
 data:
     # The training and testing dataset
