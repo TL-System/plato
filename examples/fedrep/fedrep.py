@@ -12,7 +12,7 @@ Official source code: https://github.com/lgcollins/FedRep
 """
 import os
 
-os.environ['config_file'] = 'fednova_MNIST_lenet5.yml'
+os.environ['config_file'] = 'fedrep_MNIST_lenet5.yml'
 
 import fedrep_trainer
 import fedrep_client
