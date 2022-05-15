@@ -16,12 +16,12 @@ server:
     address: 127.0.0.1
     port: 8000
 
+    # The prefix for directories of models, checkpoints, and results
+    base_path: ./cross_silo
+
 data:
     # The training and testing dataset
     datasource: MNIST
-
-    # Where the dataset is located
-    data_path: ./data
 
     # Number of samples in each partition
     partition_size: 600
