@@ -92,10 +92,8 @@ class Server:
         self.s3_client = None
         self.outbound_processor = None
         self.inbound_processor = None
-        self.comm_simulation = False
-        if hasattr(Config().clients,
-                   'comm_simulation') and Config().clients.comm_simulation:
-            self.comm_simulation = True
+        self.comm_simulation = Config().clients.comm_simulation if hasattr(
+            Config().clients, 'comm_simulation') else True
 
         # States that need to be maintained for asynchronous FL
 

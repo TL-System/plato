@@ -90,10 +90,8 @@ class Client:
         self.outbound_processor = None
         self.inbound_processor = None
 
-        self.comm_simulation = False
-        if hasattr(Config().clients,
-                   'comm_simulation') and Config().clients.comm_simulation:
-            self.comm_simulation = True
+        self.comm_simulation = Config().clients.comm_simulation if hasattr(
+            Config().clients, 'comm_simulation') else True
 
         if hasattr(Config().algorithm,
                    'cross_silo') and not Config().is_edge_server():
@@ -162,8 +160,7 @@ class Client:
                 and Config().data.reload_data) or not self.data_loaded:
             self.load_data()
 
-        if hasattr(Config().clients,
-                   'comm_simulation') and Config().clients.comm_simulation:
+        if self.comm_simulation:
             payload_filename = response['payload_filename']
             with open(payload_filename, 'rb') as payload_file:
                 self.server_payload = pickle.load(payload_file)

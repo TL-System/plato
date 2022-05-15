@@ -11,9 +11,6 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    # Whether client-server communication should be simulated with files
-    comm_simulation: true
-
     # Whether client heterogeneity should be simulated
     speed_simulation: true
 

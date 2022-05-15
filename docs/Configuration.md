@@ -16,8 +16,8 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |||`mistnet`|A client for MistNet|
 |**total_clients**|The total number of clients|A positive number||
 |**per_round**|The number of clients selected in each round| Any positive integer that is not larger than **total_clients**||
-|**do_test**|Should the clients compute test accuracy locally?| `true` or `false`|if `true` and the configuration file has `results` section, a CSV file will log test accuracy of every selected client in each round| 
-|speed_simulation|Should we simulate client heterogeneity in training speed?|
+|**do_test**|Whether the clients compute test accuracy locally| `true` or `false`|if `true` and the configuration file has `results` section, a CSV file will log test accuracy of every selected client in each round| 
+|speed_simulation|Whether we simulate client heterogeneity in training speed|
 |simulation_distribution|Parameters for simulating client heterogeneity in training speed|`distribution`|`normal` for normal or `zipf` for Zipf|
 |||`s`|the parameter `s` in Zipf distribution|
 |||`mean`|The mean in normal distribution|
@@ -26,6 +26,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |max_sleep_time|The maximum simulated sleep time (in seconds)||default: 60|
 |outbound_processors|A list of processors to apply on the payload before sending| A list of processor names || 
 |inbound_processors|A list of processors to apply on the payload right after receiving| A list of processor names || 
+|comm_simulation|Whether client-server communication should be simulated with files|`true` or `false`|default: true|
 
 #### Valid processors for `clients.outbound_processors`
 
@@ -70,10 +71,10 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |ping_timeout| The time in seconds that the client waits for the server to respond before disconnecting. The default is 360 (seconds).||Increase this number when your session stops running when training larger models (but make sure it is not due to the *out of CUDA memory* error)|
 |synchronous|Synchronous or asynchronous mode|`true` or `false`||
 |periodic_interval|The time interval for a server operating in asynchronous mode to aggregate received updates|Any positive integer|default: 5 seconds|
-|simulate_wall_time|Should we simulate the wall clock time on the server?|`true` or `false`||
+|simulate_wall_time|Whether the wall clock time on the server is simulated|`true` or `false`||
 |staleness_bound|In asynchronous mode, should we wait for stale clients who are behind the current round by more than this bound?|Any positive integer|default: 0|
 |minimum_clients_aggregated|The minimum number of clients that need to arrive before aggregation and processing by the server when operating in asynchronous mode|Any positive integer|default: 1|
-|do_test|Should the central server compute test accuracy locally?| `true` or `false`|| 
+|do_test|Whether the central server computes test accuracy locally| `true` or `false`|| 
 |checkpoint_dir|The directory of checkpoints||default: ./checkpoints|
 |model_dir|The directory of pretrained and trained models||default: ./models/pretrained|
 |outbound_processors|A list of processors to apply on the payload before sending| A list of processor names || 
