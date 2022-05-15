@@ -31,6 +31,7 @@ class Server(fedavg.Server):
 
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
+
         self.retraining = False
 
         # A dictionary that maps client IDs to the first round when the server selected it
@@ -103,6 +104,7 @@ class Server(fedavg.Server):
                     Config().trainer, 'model_name') else 'custom'
                 filename = f"checkpoint_{model_name}_{self.current_round}.pth"
                 self.trainer.load_model(filename, checkpoint_dir)
+
                 logging.info(
                     "[Server #%d] Model used for the retraining phase loaded from %s.",
                     os.getpid(), checkpoint_dir)
