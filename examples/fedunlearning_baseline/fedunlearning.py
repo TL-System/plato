@@ -8,6 +8,8 @@ Reference: https://arxiv.org/abs/2203.07320
 """
 
 import os
+import warnings
+warnings.filterwarnings("ignore")
 
 os.environ[
     'config_file'] = 'examples/fedunlearning_baseline/fedun_MNIST_lenet5.yml'

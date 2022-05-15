@@ -929,19 +929,12 @@ class Server:
         logging.info("[%s] Saving the checkpoint to %s/%s.", self,
                      checkpoint_dir, filename)
         self.trainer.save_model(filename, checkpoint_dir)
+        self.save_random_states(self.current_round, checkpoint_dir)
 
-        # Saving important data in the server for resuming its session later on
-        states_to_save = ['current_round', 'numpy_prng_state', 'prng_state']
-        variables_to_save = [
-            self.current_round,
-            np.random.get_state(),
-            random.getstate(),
-        ]
-
-        for i, state in enumerate(states_to_save):
-            with open(f"{checkpoint_dir}/{state}.pkl",
-                      'wb') as checkpoint_file:
-                pickle.dump(variables_to_save[i], checkpoint_file)
+        # Saving the current round in the server for resuming its session later on
+        with open(f"{checkpoint_dir}/current_round.pkl",
+                  'wb') as checkpoint_file:
+            pickle.dump(self.current_round, checkpoint_file)
 
     def resume_from_checkpoint(self):
         """ Resume a training session from a previously saved checkpoint. """
@@ -952,26 +945,51 @@ class Server:
         # Loading important data in the server for resuming its session
         checkpoint_dir = Config.params['checkpoint_dir']
 
-        states_to_load = ['current_round', 'numpy_prng_state', 'prng_state']
-        variables_to_load = {}
+        with open(f"{checkpoint_dir}/current_round.pkl",
+                  'rb') as checkpoint_file:
+            self.current_round = pickle.load(checkpoint_file)
 
-        for i, state in enumerate(states_to_load):
-            with open(f"{checkpoint_dir}/{state}.pkl",
-                      'rb') as checkpoint_file:
-                variables_to_load[i] = pickle.load(checkpoint_file)
-
-        self.current_round = variables_to_load[0]
+        self.restore_random_states(self.current_round, checkpoint_dir)
         self.resumed_session = True
-        numpy_prng_state = variables_to_load[1]
-        prng_state = variables_to_load[2]
-
-        np.random.set_state(numpy_prng_state)
-        random.setstate(prng_state)
 
         model_name = Config().trainer.model_name if hasattr(
             Config().trainer, 'model_name') else 'custom'
         filename = f"checkpoint_{model_name}_{self.current_round}.pth"
         self.trainer.load_model(filename, checkpoint_dir)
+
+    def save_random_states(self, round_to_save, checkpoint_dir):
+        """ Saving the random states in the server for resuming its session later on. """
+        states_to_save = [
+            f'numpy_prng_state_{round_to_save}', f'prng_state_{round_to_save}'
+        ]
+
+        variables_to_save = [
+            np.random.get_state(),
+            random.getstate(),
+        ]
+
+        for i, state in enumerate(states_to_save):
+            with open(f"{checkpoint_dir}/{state}.pkl",
+                      'wb') as checkpoint_file:
+                pickle.dump(variables_to_save[i], checkpoint_file)
+
+    def restore_random_states(self, round_to_restore, checkpoint_dir):
+        """ Restoring the numpy.random and random states from previously saved checkpoints
+            for a particular round.
+        """
+        states_to_load = ['numpy_prng_state', 'prng_state']
+        variables_to_load = {}
+
+        for i, state in enumerate(states_to_load):
+            with open(f"{checkpoint_dir}/{state}_{round_to_restore}.pkl",
+                      'rb') as checkpoint_file:
+                variables_to_load[i] = pickle.load(checkpoint_file)
+
+        numpy_prng_state = variables_to_load[0]
+        self.prng_state = variables_to_load[1]
+
+        np.random.set_state(numpy_prng_state)
+        random.setstate(self.prng_state)
 
     async def wrap_up(self):
         """ Wrapping up when each round of training is done. """

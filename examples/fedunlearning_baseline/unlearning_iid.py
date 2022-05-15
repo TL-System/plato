@@ -44,12 +44,11 @@ class Sampler(iid.Sampler):
         # Compute the indices of data in the subset for this client
         self.subset_indices = indices[(int(client_id) -
                                        1):total_size:total_clients]
-
         subset_length = int(len(self.subset_indices))
         deleted_subset_length = int(subset_length * deleted_data_ratio)
         deleted_index = np.random.choice(range(subset_length),
                                          deleted_subset_length,
                                          replace=False)
-
         self.subset_indices = list(
             np.delete(self.subset_indices, deleted_index))
+
