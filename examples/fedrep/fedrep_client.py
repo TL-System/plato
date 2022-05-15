@@ -3,6 +3,8 @@ Implement the client for Fedrep method.
 
 """
 
+import collections
+
 from plato.config import Config
 from plato.clients import simple
 from plato.clients import base
@@ -27,3 +29,15 @@ class Client(simple.Client):
         #   global and local model in the FedRep's way
         self.trainer.set_global_local_weights_key(
             global_keys=self.model_representation_weights_key)
+
+    async def train(self):
+        """ Implement the train for FedRep method. """
+        report, weights = await super().train()
+
+        # extract the representation weights as the global model
+        representation_weights = collections.OrderedDict()
+        for name, para in weights.items():
+            if name in self.model_representation_weights_key:
+                representation_weights[name] = para
+
+        return report, representation_weights
