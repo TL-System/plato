@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 1000
+    total_clients: 10
 
     # The number of clients selected in each round
-    per_round: 10
+    per_round: 3
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -16,19 +16,14 @@ clients:
 
     random_seed: 1
 
-    # FedProx hyperparameters
-    proximal_term_penalty_constant: 1
-    # FedProx parameters for experiment
-    straggler_simulation: true
-    straggler_percentage: 50
 
 server:
     address: 127.0.0.1
     port: 8000
     synchronous: true
 
-    checkpoint_dir: ./models/fedprox/mnist
-    model_dir: ./models/fedprox/mnist
+    checkpoint_dir: ./models/fedrep/mnist
+    model_dir: ./models/fedrep/mnist
 
 data:
     # The training and testing dataset
@@ -76,8 +71,6 @@ trainer:
     # Number of epoches for head optimization
     head_epochs: 9
 
-
-    learning_rate: 0.03
 
     # The machine learning model
     model_name: lenet5

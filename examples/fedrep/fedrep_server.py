@@ -3,19 +3,20 @@ Implement the server for Fedrep method.
 
 """
 
+import logging
 from plato.servers import fedavg
 
 
 class Server(fedavg.Server):
-    def __init__(self, model=None, trainer=None):
-        super().__init__(model, trainer)
+    def __init__(self, model=None, algorithm=None, trainer=None):
+        super().__init__(model, algorithm, trainer)
 
         self.model_representation_weights_key = []
 
     def extract_representation_weights_key(self):
         """ Obtain the weights responsible for representation. """
 
-        model_full_weights_key = list(self.model.state_dict().keys())
+        model_full_weights_key = list(self.trainer.model.state_dict().keys())
         # in general, the weights before the final layer are regarded as
         #   the representation.
         # then the final layer is the last two key in the obtained key list.
@@ -25,6 +26,9 @@ class Server(fedavg.Server):
         #  representaion:
         #   ['conv1.weight', 'conv1.bias', 'conv2.weight', 'conv2.bias', 'conv3.weight', 'conv3.bias', 'fc4.weight', 'fc4.bias']
         self.model_representation_weights_key = model_full_weights_key[:-2]
+
+        logging.info(("representation_weights: {}").format(
+            self.model_representation_weights_key))
 
     def load_trainer(self):
         """ rewrite the load_trainer func to further extract the representaion keys """

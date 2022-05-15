@@ -32,9 +32,12 @@ class Trainer(basic.Trainer):
         self.model_representation_weights_key = global_keys
         # the left weights are regarded as the head in default
         full_model_weights_key = self.model.state_dict().keys()
-        self.model_head_weights_key = filter(
-            lambda i: i not in self.model_representation_weights_key,
-            full_model_weights_key)
+        self.model_head_weights_key = [
+            name for name in full_model_weights_key if name not in global_keys
+        ]
+        logging.info(("representation_weights: {}").format(
+            self.model_representation_weights_key))
+        logging.info(("head_weights: {}").format(self.model_head_weights_key))
 
     def train_model(self, config, trainset, sampler, cut_layer=None):
         """The main training loop of FedRep in a federated learning workload. 
