@@ -67,7 +67,7 @@ class Trainer(base.Trainer):
     def save_model(self, filename=None, location=None):
         """Saving the model to a file."""
         model_dir = Config(
-        ).params['model_dir'] if location is None else location
+        ).params['model_path'] if location is None else location
         model_name = Config().trainer.model_name
 
         if not os.path.exists(model_dir):
@@ -90,7 +90,7 @@ class Trainer(base.Trainer):
     def load_model(self, filename=None, location=None):
         """Loading pre-trained model weights from a file."""
         model_dir = Config(
-        ).params['model_dir'] if location is None else location
+        ).params['model_path'] if location is None else location
         model_name = Config().trainer.model_name
 
         if filename is not None:

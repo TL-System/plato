@@ -40,7 +40,7 @@ server:
         a: 2
 
     checkpoint_path: models/fedasync/mnist
-    model_dir: models/fedasync/mnist
+    model_path: models/fedasync/mnist
 
 data:
     # The training and testing dataset

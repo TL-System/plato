@@ -22,6 +22,7 @@ from plato.config import Config
 class Client(simple.Client):
     """A SCAFFOLD federated learning client who sends weight updates
     and client control variate."""
+
     def __init__(self,
                  model=None,
                  datasource=None,
@@ -40,7 +41,7 @@ class Client(simple.Client):
     async def train(self):
         """ Initialize the server control variate and client control variate for trainer. """
         # Load the client's control variate if it has participated before
-        model_dir = Config().params['model_dir']
+        model_dir = Config().params['model_path']
         model_name = Config().trainer.model_name
         filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}_control_variate.pth"
         self.control_variate_path = f"{model_dir}/{filename}"

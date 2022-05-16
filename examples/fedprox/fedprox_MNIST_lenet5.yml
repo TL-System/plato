@@ -25,7 +25,7 @@ server:
     synchronous: true
 
     checkpoint_path: models/fedprox/mnist
-    model_dir: models/fedprox/mnist
+    model_path: models/fedprox/mnist
 
 data:
     # The training and testing dataset

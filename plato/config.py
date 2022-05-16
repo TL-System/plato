@@ -170,17 +170,15 @@ class Config:
                 Config.params['data_path'] = os.path.join(
                     Config.params['base_path'], "data")
 
-            os.makedirs(Config.params['data_path'], exist_ok=True)
-
             # Pretrained models
-            if hasattr(Config().server, 'model_dir'):
-                Config.params['model_dir'] = os.path.join(
+            if hasattr(Config().server, 'model_path'):
+                Config.params['model_path'] = os.path.join(
                     Config.params['base_path'],
-                    Config().server.model_dir)
+                    Config().server.model_path)
             else:
-                Config.params['model_dir'] = os.path.join(
+                Config.params['model_path'] = os.path.join(
                     Config.params['base_path'], "models/pretrained")
-            os.makedirs(Config.params['model_dir'], exist_ok=True)
+            os.makedirs(Config.params['model_path'], exist_ok=True)
 
             # Resume checkpoint
             if hasattr(Config().server, 'checkpoint_path'):

@@ -26,7 +26,7 @@ server:
         - model_decompress
 
     checkpoint_path: results/test/checkpoint
-    model_dir: results/test/model
+    model_path: results/test/model
 
 data:
     # The training and testing dataset

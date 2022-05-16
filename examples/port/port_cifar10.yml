@@ -57,7 +57,7 @@ server:
 
     # The paths for storing temporary checkpoints and models
     checkpoint_path: models/cifar10
-    model_dir: models/cifar10
+    model_path: models/cifar10
 
     random_seed: 1
 

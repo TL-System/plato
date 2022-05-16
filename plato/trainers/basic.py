@@ -60,7 +60,7 @@ class Trainer(base.Trainer):
     def save_model(self, filename=None, location=None):
         """Saving the model to a file."""
         model_dir = Config(
-        ).params['model_dir'] if location is None else location
+        ).params['model_path'] if location is None else location
         model_name = Config().trainer.model_name
 
         try:
@@ -86,7 +86,7 @@ class Trainer(base.Trainer):
     def load_model(self, filename=None, location=None):
         """Loading pre-trained model weights from a file."""
         model_dir = Config(
-        ).params['model_dir'] if location is None else location
+        ).params['model_path'] if location is None else location
         model_name = Config().trainer.model_name
 
         if filename is not None:
@@ -472,7 +472,7 @@ class Trainer(base.Trainer):
         # Constructing a list of epochs and training times
         self.models_per_epoch = {}
 
-        for filename in os.listdir(Config().params['model_dir']):
+        for filename in os.listdir(Config().params['model_path']):
             split = re.match(
                 r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+).pth",
                 filename)

@@ -19,6 +19,7 @@ from plato.trainers import basic
 
 class Trainer(basic.Trainer):
     """The federated learning trainer for the SCAFFOLD client. """
+
     def __init__(self, model=None):
         """Initializing the trainer with the provided model.
 
@@ -52,7 +53,7 @@ class Trainer(basic.Trainer):
         if self.client_id == 0:
             # Also save the control variate
             model_dir = Config(
-            ).params['model_dir'] if location is None else location
+            ).params['model_path'] if location is None else location
 
             if filename is not None:
                 control_variate_path = f'{model_dir}/{filename}'.replace(
@@ -74,7 +75,7 @@ class Trainer(basic.Trainer):
         # The server loads its control variate
         if self.client_id == 0:
             model_dir = Config(
-            ).params['model_dir'] if location is None else location
+            ).params['model_path'] if location is None else location
 
             if filename is not None:
                 control_variate_path = f'{model_dir}/{filename}'.replace(

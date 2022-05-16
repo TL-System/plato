@@ -8,6 +8,13 @@ This document introduces all the possible parameters in the configuration file.
 
 Attributes in **bold** must be included in a configuration file, while attributes in *italic* only need to be included under certain conditions.
 
+### general (optional)
+
+| Attribute | Meaning | Valid Value | Note |
+|:---------:|:-------:|:-----------:|:----:|
+|base_path|The prefix of directory of dataset, models, checkpoints, and results||default: `./`|
+
+
 ### clients
 
 | Attribute | Meaning | Valid Value | Note |
@@ -75,9 +82,8 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |staleness_bound|In asynchronous mode, should we wait for stale clients who are behind the current round by more than this bound?|Any positive integer|default: 0|
 |minimum_clients_aggregated|The minimum number of clients that need to arrive before aggregation and processing by the server when operating in asynchronous mode|Any positive integer|default: 1|
 |do_test|Whether the central server computes test accuracy locally| `true` or `false`|| 
-|base_path|The prefix of directory of models, checkpoints, and results||default: `./<datasource>_<model>_<server_type>`|
-|model_dir|The directory of pretrained and trained models||default: `<base_path>/models/pretrained`|
-|checkpoint_path|The directory of checkpoints||default: `<base_path>/models/checkpoints`|
+|model_path|The directory of pretrained and trained models||default: `<base_path>/models/pretrained`|
+|checkpoint_path|The directory of checkpoints||default: `<base_path>/checkpoints`|
 |outbound_processors|A list of processors to apply on the payload before sending| A list of processor names || 
 |inbound_processors|A list of processors to apply on the payload right after receiving| A list of processor names || 
 
@@ -102,7 +108,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 | Attribute | Meaning | Valid Value | Note |
 |:---------:|:-------:|:-----------:|:----:|
 |**dataset**| The training and testing dataset|`MNIST`, `FashionMNIST`, `EMNIST`, `CIFAR10`, `CINIC10`, `YOLO`, `HuggingFace`, `PASCAL_VOC`, `TinyImageNet`, or `CelebA`||
-|data_path|Where the dataset is located|e.g.,`./data`, which is the default|For the `CINIC10` dataset, the default `data_path` is `./data/CINIC-10`, For the `TinyImageNet` dataset, the default `data_path` is `./data/tiny-imagenet-200`|
+|data_path|Where the dataset is located||default: `./data`, except for the `CINIC10` dataset, the default is `./data/CINIC-10`; for the `TinyImageNet` dataset, the default is `./data/tiny-imagenet-200`|
 |**sampler**|How to divide the entire dataset to the clients|`iid`||
 |||`iid_mindspore`||
 |||`noniid`|Could have *concentration* attribute to specify the concentration parameter in the Dirichlet distribution|

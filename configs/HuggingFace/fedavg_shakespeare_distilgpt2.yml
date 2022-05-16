@@ -16,7 +16,7 @@ server:
     port: 8000
     simulate_wall_time: false
     checkpoint_path: checkpoints/huggingface/fedavg
-    model_dir: models/huggingface/fedavg
+    model_path: models/huggingface/fedavg
 
 data:
     # The training and testing dataset

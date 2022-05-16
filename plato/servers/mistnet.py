@@ -27,7 +27,7 @@ class Server(fedavg.Server):
         """Setting up a pre-trained model to be loaded on the server."""
         super().load_trainer()
 
-        model_dir = Config().params['model_dir']
+        model_dir = Config().params['model_path']
         model_file_name = Config().trainer.pretrained_model if hasattr(
             Config().trainer,
             'pretrained_model') else f'{Config().trainer.model_name}.pth'

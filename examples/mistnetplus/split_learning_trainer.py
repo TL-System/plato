@@ -93,7 +93,7 @@ class Trainer(basic.Trainer):
     def save_gradients(self):
         """ Saving gradients to a file. """
         model_name = Config().trainer.model_name
-        model_dir = Config().params['model_dir']
+        model_dir = Config().params['model_path']
 
         if not os.path.exists(model_dir):
             os.makedirs(model_dir)

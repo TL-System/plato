@@ -12,7 +12,7 @@ server:
     address: 127.0.0.1
     port: 8000
     checkpoint_path: results/test/checkpoint
-    model_dir: results/test/model
+    model_path: results/test/model
 
 data:
     # The training and testing dataset

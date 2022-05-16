@@ -16,6 +16,7 @@ from plato.utils import optimizers
 
 class Trainer(basic.Trainer):
     """ A federated learning trainer for FEI. """
+
     def train_model(self, config, trainset, sampler, cut_layer=None):
         """ A custom trainer reporting training loss. """
         batch_size = config['batch_size']
@@ -145,7 +146,7 @@ class Trainer(basic.Trainer):
     @staticmethod
     def save_loss(loss, filename=None):
         """ Saving the training loss to a file. """
-        model_dir = Config().params['model_dir']
+        model_dir = Config().params['model_path']
         model_name = Config().trainer.model_name
 
         if not os.path.exists(model_dir):
@@ -162,7 +163,7 @@ class Trainer(basic.Trainer):
     @staticmethod
     def load_loss(filename=None):
         """ Loading the training loss from a file. """
-        model_dir = Config().params['model_dir']
+        model_dir = Config().params['model_path']
         model_name = Config().trainer.model_name
 
         if filename is not None:

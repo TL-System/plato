@@ -17,6 +17,7 @@ class Trainer(base.Trainer):
     """A basic federated learning trainer for TensorFlow, used by both
     the client and the server.
     """
+
     def __init__(self, model=None):
         """Initializing the trainer with the provided model.
 
@@ -40,7 +41,7 @@ class Trainer(base.Trainer):
     def save_model(self, filename=None, location=None):
         """Saving the model to a file."""
         model_dir = Config(
-        ).params['model_dir'] if location is None else location
+        ).params['model_path'] if location is None else location
         model_name = Config().trainer.model_name
 
         if not os.path.exists(model_dir):
@@ -62,7 +63,7 @@ class Trainer(base.Trainer):
 
     def load_model(self, filename=None, dir=None):
         """Loading pre-trained model weights from a file."""
-        model_dir = Config().params['model_dir'] if dir is None else dir
+        model_dir = Config().params['model_path'] if dir is None else dir
         model_name = Config().trainer.model_name
 
         if filename is not None:
