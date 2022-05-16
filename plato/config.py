@@ -195,14 +195,14 @@ class Config:
             if 'results' in config:
                 Config.results = Config.namedtuple_from_dict(config['results'])
 
-                if hasattr(Config.results, 'result_dir'):
-                    Config.params['result_dir'] = os.path.join(
-                        Config.params['base_path'], Config.results.result_dir)
+                if hasattr(Config.results, 'result_path'):
+                    Config.params['result_path'] = os.path.join(
+                        Config.params['base_path'], Config.results.result_path)
                 else:
-                    Config.params['result_dir'] = os.path.join(
+                    Config.params['result_path'] = os.path.join(
                         Config.params['base_path'], "results")
 
-                os.makedirs(Config.params['result_dir'], exist_ok=True)
+                os.makedirs(Config.params['result_path'], exist_ok=True)
 
             if 'model' in config:
                 Config.model = Config.namedtuple_from_dict(config['model'])

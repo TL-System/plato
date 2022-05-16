@@ -92,9 +92,9 @@ class Server(fedavg_cs.Server):
                     new_row.append(item_value)
 
                 if Config().is_edge_server():
-                    result_csv_file = f"{Config().params['result_dir']}/edge_{os.getpid()}.csv"
+                    result_csv_file = f"{Config().params['result_path']}/edge_{os.getpid()}.csv"
                 else:
-                    result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}.csv"
+                    result_csv_file = f"{Config().params['result_path']}/{os.getpid()}.csv"
 
                 csv_processor.write_csv(result_csv_file, new_row)
 

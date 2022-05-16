@@ -117,7 +117,7 @@ algorithm:
     type: fedavg
 
 results:
-    result_dir: ./results/cifar10
+    result_path: results/cifar10
 
     # Write the following parameter(s) into a CSV
     types: round, elapsed_time, accuracy

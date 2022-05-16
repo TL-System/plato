@@ -156,4 +156,4 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |:---------:|:-------:|:-----------:|:----:|
 |types|Which parameter(s) will be written into a CSV file|`round`, `accuracy`, `elapsed_time`, `comm_time`, `round_time`, `local_epoch_num`, `edge_agg_num`|Use comma `,` to seperate parameters|
 |plot|Plot results ||Format: x\_axis-y\_axis. Use hyphen `-` to seperate axis. Use comma `,` to seperate multiple plots|
-|result_dir|The directory of results||If not specified, results will be stored under `<base_path>/results/`|
+|result_path|The directory of results||If not specified, results will be stored under `<base_path>/results/`|

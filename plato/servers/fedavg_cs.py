@@ -135,10 +135,10 @@ class Server(fedavg.Server):
                     self.testset_sampler = SubsetRandomSampler(test_samples)
 
             if hasattr(Config(), 'results'):
-                result_dir = Config().params['result_dir']
-                result_csv_file = f'{result_dir}/edge_{os.getpid()}.csv'
+                result_path = Config().params['result_path']
+                result_csv_file = f'{result_path}/edge_{os.getpid()}.csv'
                 csv_processor.initialize_csv(result_csv_file,
-                                             self.recorded_items, result_dir)
+                                             self.recorded_items, result_path)
         else:
             super().configure()
             if hasattr(Config().server, 'do_test') and Config().server.do_test:
@@ -245,9 +245,9 @@ class Server(fedavg.Server):
                 new_row.append(item_value)
 
             if Config().is_edge_server():
-                result_csv_file = f"{Config().params['result_dir']}/edge_{os.getpid()}.csv"
+                result_csv_file = f"{Config().params['result_path']}/edge_{os.getpid()}.csv"
             else:
-                result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}.csv"
+                result_csv_file = f"{Config().params['result_path']}/{os.getpid()}.csv"
 
             csv_processor.write_csv(result_csv_file, new_row)
 

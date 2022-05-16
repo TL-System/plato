@@ -106,17 +106,17 @@ class Server(base.Server):
 
         # Initialize the csv file which will record results
         if hasattr(Config(), 'results'):
-            result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}.csv"
+            result_csv_file = f"{Config().params['result_path']}/{os.getpid()}.csv"
             csv_processor.initialize_csv(result_csv_file, self.recorded_items,
-                                         Config().params['result_dir'])
+                                         Config().params['result_path'])
 
             # Initialize the test accuracy csv file if clients compute locally
             if Config().clients.do_test:
-                accuracy_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_accuracy.csv"
+                accuracy_csv_file = f"{Config().params['result_path']}/{os.getpid()}_accuracy.csv"
                 accuracy_headers = ["round", "client_id", "accuracy"]
                 csv_processor.initialize_csv(accuracy_csv_file,
                                              accuracy_headers,
-                                             Config().params['result_dir'])
+                                             Config().params['result_path'])
 
     def load_trainer(self):
         """Setting up the global model to be trained via federated learning."""
@@ -221,12 +221,12 @@ class Server(base.Server):
                 }[item]
                 new_row.append(item_value)
 
-            result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}.csv"
+            result_csv_file = f"{Config().params['result_path']}/{os.getpid()}.csv"
             csv_processor.write_csv(result_csv_file, new_row)
 
             if Config().clients.do_test:
                 # Updates the log for client test accuracies
-                accuracy_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_accuracy.csv"
+                accuracy_csv_file = f"{Config().params['result_path']}/{os.getpid()}_accuracy.csv"
 
                 for (client_id, report, __, __) in self.updates:
                     accuracy_row = [

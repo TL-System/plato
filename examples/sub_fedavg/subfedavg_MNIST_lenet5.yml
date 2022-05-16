@@ -78,4 +78,4 @@ results:
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time
 
-    result_dir: ./results/test
+    result_path: results/test
