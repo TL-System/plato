@@ -26,8 +26,8 @@ class Server(fedavg.Server):
             between the current and a previous model according to client staleness. """
         # Loading the global model from a previous round according to staleness
         filename = f"model_{self.current_round - 2}.pth"
-        model_dir = Config().params['model_path']
-        model_path = f'{model_dir}/{filename}'
+        model_path = Config().params['model_path']
+        model_path = f'{model_path}/{filename}'
 
         similarity = 1.0
 

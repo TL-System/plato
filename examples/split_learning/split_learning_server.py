@@ -50,10 +50,10 @@ class Server(fedavg.Server):
 
     def load_gradients(self):
         """ Loading gradients from a file. """
-        model_dir = Config().params['model_path']
+        model_path = Config().params['model_path']
         model_name = Config().trainer.model_name
 
-        model_path = f'{model_dir}/{model_name}_gradients.pth'
+        model_path = f'{model_path}/{model_name}_gradients.pth'
         logging.info("[Server #%d] Loading gradients from %s.", os.getpid(),
                      model_path)
 

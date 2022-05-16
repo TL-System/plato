@@ -32,16 +32,16 @@ class Trainer(ABC):
     @staticmethod
     def save_accuracy(accuracy, filename=None):
         """Saving the test accuracy to a file."""
-        model_dir = Config().params['model_path']
+        model_path = Config().params['model_path']
         model_name = Config().trainer.model_name
 
-        if not os.path.exists(model_dir):
-            os.makedirs(model_dir)
+        if not os.path.exists(model_path):
+            os.makedirs(model_path)
 
         if filename is not None:
-            accuracy_path = f"{model_dir}/{filename}"
+            accuracy_path = f"{model_path}/{filename}"
         else:
-            accuracy_path = f'{model_dir}/{model_name}.acc'
+            accuracy_path = f'{model_path}/{model_name}.acc'
 
         with open(accuracy_path, 'w', encoding='utf8') as file:
             file.write(str(accuracy))
@@ -49,13 +49,13 @@ class Trainer(ABC):
     @staticmethod
     def load_accuracy(filename=None):
         """Loading the test accuracy from a file."""
-        model_dir = Config().params['model_path']
+        model_path = Config().params['model_path']
         model_name = Config().trainer.model_name
 
         if filename is not None:
-            accuracy_path = f"{model_dir}/{filename}"
+            accuracy_path = f"{model_path}/{filename}"
         else:
-            accuracy_path = f'{model_dir}/{model_name}.acc'
+            accuracy_path = f'{model_path}/{model_name}.acc'
 
         with open(accuracy_path, 'r', encoding='utf8') as file:
             accuracy = float(file.read())
@@ -66,9 +66,9 @@ class Trainer(ABC):
         """Remove files of running trainers."""
         if hasattr(Config().trainer, 'max_concurrency'):
             model_name = Config().trainer.model_name
-            model_dir = Config().params['model_path']
-            model_file = f"{model_dir}/{model_name}_{self.client_id}_{Config().params['run_id']}.pth"
-            accuracy_file = f"{model_dir}/{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
+            model_path = Config().params['model_path']
+            model_file = f"{model_path}/{model_name}_{self.client_id}_{Config().params['run_id']}.pth"
+            accuracy_file = f"{model_path}/{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
 
             if os.path.exists(model_file):
                 os.remove(model_file)

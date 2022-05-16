@@ -325,14 +325,14 @@ class Client:
         """ Delete all the temporary checkpoint files created by the client. """
         if hasattr(Config().server,
                    'request_update') and Config().server.request_update:
-            model_dir = Config().params['model_path']
-            for filename in os.listdir(model_dir):
+            model_path = Config().params['model_path']
+            for filename in os.listdir(model_path):
                 split = re.match(
                     r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+).pth",
                     filename)
                 if split is not None and self.client_id == int(
                         split.group('client_id')):
-                    file_path = f'{model_dir}/{filename}'
+                    file_path = f'{model_path}/{filename}'
                     os.remove(file_path)
 
     @abstractmethod

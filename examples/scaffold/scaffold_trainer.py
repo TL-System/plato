@@ -52,15 +52,15 @@ class Trainer(basic.Trainer):
 
         if self.client_id == 0:
             # Also save the control variate
-            model_dir = Config(
+            model_path = Config(
             ).params['model_path'] if location is None else location
 
             if filename is not None:
-                control_variate_path = f'{model_dir}/{filename}'.replace(
+                control_variate_path = f'{model_path}/{filename}'.replace(
                     ".pth", "_control_variate.pth")
             else:
                 model_name = Config().trainer.model_name
-                control_variate_path = f'{model_dir}/{model_name}_control_variate.pth'
+                control_variate_path = f'{model_path}/{model_name}_control_variate.pth'
 
             logging.info("[Server #%d] Saving the control variate to %s.",
                          os.getpid(), control_variate_path)
@@ -74,15 +74,15 @@ class Trainer(basic.Trainer):
 
         # The server loads its control variate
         if self.client_id == 0:
-            model_dir = Config(
+            model_path = Config(
             ).params['model_path'] if location is None else location
 
             if filename is not None:
-                control_variate_path = f'{model_dir}/{filename}'.replace(
+                control_variate_path = f'{model_path}/{filename}'.replace(
                     ".pth", "_control_variate.pth")
             else:
                 model_name = Config().trainer.model_name
-                control_variate_path = f'{model_dir}/{model_name}_control_variate.pth'
+                control_variate_path = f'{model_path}/{model_name}_control_variate.pth'
 
             if os.path.exists(control_variate_path):
                 logging.info("[Server #%d] Loading a control variate from %s.",

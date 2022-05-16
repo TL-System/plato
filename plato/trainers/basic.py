@@ -59,20 +59,20 @@ class Trainer(base.Trainer):
 
     def save_model(self, filename=None, location=None):
         """Saving the model to a file."""
-        model_dir = Config(
+        model_path = Config(
         ).params['model_path'] if location is None else location
         model_name = Config().trainer.model_name
 
         try:
-            if not os.path.exists(model_dir):
-                os.makedirs(model_dir)
+            if not os.path.exists(model_path):
+                os.makedirs(model_path)
         except FileExistsError:
             pass
 
         if filename is not None:
-            model_path = f'{model_dir}/{filename}'
+            model_path = f'{model_path}/{filename}'
         else:
-            model_path = f'{model_dir}/{model_name}.pth'
+            model_path = f'{model_path}/{model_name}.pth'
 
         torch.save(self.model.state_dict(), model_path)
 
@@ -85,14 +85,14 @@ class Trainer(base.Trainer):
 
     def load_model(self, filename=None, location=None):
         """Loading pre-trained model weights from a file."""
-        model_dir = Config(
+        model_path = Config(
         ).params['model_path'] if location is None else location
         model_name = Config().trainer.model_name
 
         if filename is not None:
-            model_path = f'{model_dir}/{filename}'
+            model_path = f'{model_path}/{filename}'
         else:
-            model_path = f'{model_dir}/{model_name}.pth'
+            model_path = f'{model_path}/{model_name}.pth'
 
         if self.client_id == 0:
             logging.info("[Server #%d] Loading a model from %s.", os.getpid(),

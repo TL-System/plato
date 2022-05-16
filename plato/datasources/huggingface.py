@@ -47,7 +47,7 @@ class DataSource(base.DataSource):
 
         model_checkpoint = Config().trainer.model_checkpoint
         config_kwargs = {
-            "cache_dir": Config().server.model_dir,
+            "cache_dir": Config().server.model_path,
             "revision": 'main',
             "use_auth_token": None,
         }
