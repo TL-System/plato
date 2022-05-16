@@ -35,7 +35,9 @@ class Client(base.Client):
         self.model = None
 
         self.datasource = datasource
-        self.algorithm = algorithm
+
+        self.custom_algorithm = algorithm
+        self.algorithm = None
 
         self.custom_trainer = trainer
         self.trainer = None
@@ -62,8 +64,11 @@ class Client(base.Client):
 
         self.trainer.set_client_id(self.client_id)
 
-        if self.algorithm is None:
+        if self.custom_algorithm is None:
             self.algorithm = algorithms_registry.get(self.trainer)
+        else:
+            self.algorithm = self.custom_algorithm(self.trainer)
+
         self.algorithm.set_client_id(self.client_id)
 
         # Pass inbound and outbound data payloads through processors for

@@ -25,7 +25,8 @@ class Server(base.Server):
         self.custom_model = model
         self.model = None
 
-        self.algorithm = algorithm
+        self.custom_algorithm = algorithm
+        self.algorithm = None
 
         self.custom_trainer = trainer
         self.trainer = None
@@ -128,8 +129,10 @@ class Server(base.Server):
         elif self.trainer is None and self.custom_trainer is not None:
             self.trainer = self.custom_trainer(model=self.model)
 
-        if self.algorithm is None:
+        if self.custom_algorithm is None:
             self.algorithm = algorithms_registry.get(self.trainer)
+        else:
+            self.algorithm = self.custom_algorithm(self.trainer)
 
     async def select_clients(self, for_next_batch=False):
         await super().select_clients(for_next_batch=for_next_batch)
