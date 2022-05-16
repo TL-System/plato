@@ -24,7 +24,6 @@ class Report(base.Report):
 
 class Client(base.Client):
     """A basic federated learning client who sends simple weight updates."""
-
     def __init__(self,
                  model=None,
                  datasource=None,
@@ -64,10 +63,11 @@ class Client(base.Client):
 
         self.trainer.set_client_id(self.client_id)
 
-        if self.custom_algorithm is None:
+        if self.algorithm is None and self.custom_algorithm is None:
             self.algorithm = algorithms_registry.get(self.trainer)
-        else:
+        elif self.custom_algorithm is not None:
             self.algorithm = self.custom_algorithm(self.trainer)
+            self.custom_algorithm = None
 
         self.algorithm.set_client_id(self.client_id)
 

@@ -18,7 +18,6 @@ from plato.utils import csv_processor
 
 class Server(base.Server):
     """Federated learning server using federated averaging."""
-
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__()
 
@@ -129,9 +128,9 @@ class Server(base.Server):
         elif self.trainer is None and self.custom_trainer is not None:
             self.trainer = self.custom_trainer(model=self.model)
 
-        if self.custom_algorithm is None:
+        if self.algorithm is None and self.custom_algorithm is None:
             self.algorithm = algorithms_registry.get(self.trainer)
-        else:
+        elif self.algorithm is None and self.custom_algorithm is not None:
             self.algorithm = self.custom_algorithm(self.trainer)
 
     async def select_clients(self, for_next_batch=False):
