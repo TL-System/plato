@@ -20,7 +20,7 @@ import fedrep_algorithm
 def main():
     """ A Plato federated learning training session using the FedRep algorithm. """
     trainer = fedrep_trainer.Trainer
-    algorithm = fedrep_algorithm.Algorithm(trainer=trainer)
+    algorithm = fedrep_algorithm.Algorithm
     client = fedrep_client.Client(algorithm=algorithm, trainer=trainer)
     server = fedrep_server.Server(algorithm=algorithm, trainer=trainer)
 
