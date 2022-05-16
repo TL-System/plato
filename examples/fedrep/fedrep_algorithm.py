@@ -25,6 +25,8 @@ class Algorithm(fedavg.Algorithm):
             return extracted_weights
 
         if model is None:
-            return extract_required_weights(self.model.cpu())
+            return extract_required_weights(self.model.cpu(),
+                                            self.representation_weights_key)
         else:
-            return extract_required_weights(model.cpu())
+            return extract_required_weights(model.cpu(),
+                                            self.representation_weights_key)

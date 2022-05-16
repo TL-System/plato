@@ -8,9 +8,6 @@ raw patient data," in Proc. AI for Social Good Workshop, affiliated with ICLR 20
 
 https://arxiv.org/pdf/1812.00564.pdf
 """
-import os
-
-os.environ['config_file'] = 'split_learning_MNIST_lenet5.yml'
 
 import split_learning_server
 import split_learning_algorithm
