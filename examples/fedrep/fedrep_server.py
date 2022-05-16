@@ -5,6 +5,8 @@ Implement the server for Fedrep method.
 
 import logging
 from plato.servers import fedavg
+from plato.trainers import registry as trainers_registry
+from plato.algorithms import registry as algorithms_registry
 
 
 class Server(fedavg.Server):
@@ -33,7 +35,14 @@ class Server(fedavg.Server):
     def load_trainer(self):
         """ rewrite the load_trainer func to further extract the representaion keys """
         super().load_trainer()
+
         self.extract_representation_weights_key()
+
+        # the representation keys are regarded as the global model
+        #   this needs to be set in the trainer for training the
+        #   global and local model in the FedRep's way
+        self.trainer.set_global_local_weights_key(
+            global_keys=self.model_representation_weights_key)
 
     async def customize_server_response(self, server_response):
         """ Wrap up generating the server response with any additional information. """
