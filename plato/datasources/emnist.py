@@ -12,7 +12,7 @@ class DataSource(base.DataSource):
 
     def __init__(self):
         super().__init__()
-        _path = Config().data.data_path
+        _path = Config().params['data_path']
 
         train_transform = transforms.Compose([
             transforms.RandomHorizontalFlip(),

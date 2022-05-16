@@ -14,9 +14,6 @@ clients:
     # Whether client heterogeneity should be simulated
     speed_simulation: true
 
-    # Whether client-server communication should be simulated with files
-    comm_simulation: true
-
     # The simulation distribution
     simulation_distribution:
         distribution: pareto
@@ -42,15 +39,12 @@ server:
         type: Polynomial
         a: 2
 
-    checkpoint_dir: ./models/fedasync/mnist
-    model_dir: ./models/fedasync/mnist
+    checkpoint_path: models/fedasync/mnist
+    model_path: models/fedasync/mnist
 
 data:
     # The training and testing dataset
     datasource: MNIST
-
-    # Where the dataset is located
-    data_path: ./data
 
     # Number of samples in each partition
     partition_size: 600
@@ -94,7 +88,7 @@ algorithm:
     type: fedavg
 
 results:
-    result_dir: ./results/fedasync/mnist
+    result_path: results/fedasync/mnist
     # Write the following parameter(s) into a CSV
     types: round, elapsed_time, accuracy
 

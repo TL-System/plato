@@ -182,8 +182,8 @@ class Server(fedavg_cs.Server):
         if self.comm_simulation:
             model_name = Config().trainer.model_name if hasattr(
                 Config().trainer, 'model_name') else 'custom'
-            checkpoint_dir = Config().params['checkpoint_dir']
-            payload_filename = f"{checkpoint_dir}/{model_name}_client_{client_id}.pth"
+            checkpoint_path = Config().params['checkpoint_path']
+            payload_filename = f"{checkpoint_path}/{model_name}_client_{client_id}.pth"
             with open(payload_filename, 'rb') as payload_file:
                 self.client_payload[sid] = pickle.load(payload_file)
 

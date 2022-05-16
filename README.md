@@ -218,7 +218,7 @@ In contrast, if server asynchronous mode is activated (`server:synchronous` set 
 
 ### Plotting runtime results
 
-If the configuration file contains a `results` section, the selected performance metrics, such as accuracy, will be saved in a `.csv` file in the `results/` directory.
+The selected performance metrics, such as accuracy, will be saved in a `.csv` file in the `results/` directory. If the configuration file contains `types` in a `results` section, the performance metrics are in `results.types`. Otherwise, the `.csv` file will record global model accuracy and elpased training time of each communication round.
 
 As `.csv` files, these results can be used however one wishes; an example Python program, called `plot.py`, plots the necessary figures and saves them as PDF files. To run this program:
 

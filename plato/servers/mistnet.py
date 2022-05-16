@@ -27,11 +27,11 @@ class Server(fedavg.Server):
         """Setting up a pre-trained model to be loaded on the server."""
         super().load_trainer()
 
-        model_dir = Config().params['model_dir']
+        model_path = Config().params['model_path']
         model_file_name = Config().trainer.pretrained_model if hasattr(
             Config().trainer,
             'pretrained_model') else f'{Config().trainer.model_name}.pth'
-        pretrained_model_path = f'{model_dir}/{model_file_name}'
+        pretrained_model_path = f'{model_path}/{model_file_name}'
 
         if os.path.exists(pretrained_model_path):
             logging.info("[Server #%d] Loading a pre-trained model.",

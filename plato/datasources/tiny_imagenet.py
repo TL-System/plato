@@ -17,9 +17,10 @@ from plato.datasources import base
 
 class DataSource(base.DataSource):
     """The Tiny ImageNet 200 dataset."""
+
     def __init__(self):
         super().__init__()
-        _path = Config().data.data_path
+        _path = Config().params['data_path']
 
         if not os.path.exists(_path):
             logging.info(
