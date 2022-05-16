@@ -149,58 +149,58 @@ class Config:
             # A run ID is unique to each client in an experiment
             Config.params['run_id'] = os.getpid()
 
-            # Directory of dataset
-            if hasattr(Config().data, 'data_path'):
-                Config.params['data_path'] = Config().data.data_path
-            else:
-                Config.params['data_path'] = "./data"
-            os.makedirs(Config.params['data_path'], exist_ok=True)
+            if 'general' in config:
+                Config.general = Config.namedtuple_from_dict(config['general'])
 
-            # If directories of pretrained models, checkpoints and results
+            # If directories of dataset, pretrained models, checkpoints and results
             # are not specified in the configuration file,
             # a base directory will be used to generate those directories
-            if hasattr(Config().server, 'base_path'):
-                Config.params['base_path'] = Config().server.base_path
+            if (hasattr(Config(), 'general')
+                    and hasattr(Config().general, 'base_path')):
+                Config.params['base_path'] = Config().general.base_path
             else:
-                datasource = Config.data.datasource
-                model = Config.trainer.model_name
-                if hasattr(Config().server, "type"):
-                    server_type = Config.server.type
-                elif hasattr(Config().algorithm, "type"):
-                    server_type = Config.algorithm.type
-                else:
-                    server_type = "custom"
-                Config.params[
-                    'base_path'] = f'./{datasource}_{model}_{server_type}'
-            os.makedirs(Config.params['base_path'], exist_ok=True)
+                Config.params['base_path'] = './'
+
+            # Directory of dataset
+            if hasattr(Config().data, 'data_path'):
+                Config.params['data_path'] = os.path.join(
+                    Config.params['base_path'],
+                    Config().data.data_path)
+            else:
+                Config.params['data_path'] = os.path.join(
+                    Config.params['base_path'], "data")
+
+            os.makedirs(Config.params['data_path'], exist_ok=True)
 
             # Pretrained models
             if hasattr(Config().server, 'model_dir'):
-                Config.params['model_dir'] = Config.params[
-                    'base_path'] + Config().server.model_dir
+                Config.params['model_dir'] = os.path.join(
+                    Config.params['base_path'],
+                    Config().server.model_dir)
             else:
-                Config.params['model_dir'] = Config.params[
-                    'base_path'] + "/models/pretrained"
+                Config.params['model_dir'] = os.path.join(
+                    Config.params['base_path'], "models/pretrained")
             os.makedirs(Config.params['model_dir'], exist_ok=True)
 
             # Resume checkpoint
             if hasattr(Config().server, 'checkpoint_dir'):
-                Config.params['checkpoint_dir'] = Config.params[
-                    'base_path'] + Config().server.checkpoint_dir
+                Config.params['checkpoint_dir'] = os.path.join(
+                    Config.params['base_path'],
+                    Config().server.checkpoint_dir)
             else:
-                Config.params['checkpoint_dir'] = Config.params[
-                    'base_path'] + "/models/checkpoints"
+                Config.params['checkpoint_dir'] = os.path.join(
+                    Config.params['base_path'], "checkpoints")
             os.makedirs(Config.params['checkpoint_dir'], exist_ok=True)
 
             if 'results' in config:
                 Config.results = Config.namedtuple_from_dict(config['results'])
 
                 if hasattr(Config.results, 'result_dir'):
-                    Config.params['result_dir'] = Config.params[
-                        'base_path'] + Config.results.result_dir
+                    Config.params['result_dir'] = os.path.join(
+                        Config.params['base_path'], Config.results.result_dir)
                 else:
-                    Config.params[
-                        'result_dir'] = Config.params['base_path'] + "/results"
+                    Config.params['result_dir'] = os.path.join(
+                        Config.params['base_path'], "results")
 
                 os.makedirs(Config.params['result_dir'], exist_ok=True)
 

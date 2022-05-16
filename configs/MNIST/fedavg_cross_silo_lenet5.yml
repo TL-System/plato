@@ -1,3 +1,7 @@
+general:
+    # The prefix of directories of dataset, models, checkpoints, and results
+    base_path: ./cross_silo
+
 clients:
     # Type
     type: simple
@@ -15,9 +19,6 @@ server:
     type: fedavg_cross_silo
     address: 127.0.0.1
     port: 8000
-
-    # The prefix for directories of models, checkpoints, and results
-    base_path: ./cross_silo
 
 data:
     # The training and testing dataset
