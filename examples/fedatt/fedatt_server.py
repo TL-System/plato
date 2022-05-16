@@ -56,12 +56,18 @@ class Server(fedavg.Server):
             att_weight = self.trainer.zeros(weight.shape)
             for i, update in enumerate(weights_received):
                 delta = update[name]
+                delta = delta.float()
                 att_weight += torch.mul(-delta, atts[name][i])
 
-            att_update[name] = -torch.mul(
-                att_weight,
-                Config().algorithm.epsilon) + torch.mul(
-                    torch.randn(weight.shape),
-                    Config().algorithm.dp)
+            # Step size for aggregation used in FedAtt
+            epsilon = Config().algorithm.epsilon if hasattr(
+                Config().algorithm, 'epsilon') else 1.2
+
+            # The magnitude of normal noise in the randomization mechanism
+            magnitude = Config().algorithm.magnitude if hasattr(
+                Config().algorithm, 'magnitude') else 0.001
+
+            att_update[name] = -torch.mul(att_weight, epsilon) + torch.mul(
+                torch.randn(weight.shape), magnitude)
 
         return att_update

@@ -24,6 +24,7 @@ class Report(base.Report):
 
 class Client(base.Client):
     """A basic federated learning client who sends simple weight updates."""
+
     def __init__(self,
                  model=None,
                  datasource=None,
@@ -34,7 +35,9 @@ class Client(base.Client):
         self.model = None
 
         self.datasource = datasource
-        self.algorithm = algorithm
+
+        self.custom_algorithm = algorithm
+        self.algorithm = None
 
         self.custom_trainer = trainer
         self.trainer = None
@@ -61,8 +64,11 @@ class Client(base.Client):
 
         self.trainer.set_client_id(self.client_id)
 
-        if self.algorithm is None:
+        if self.custom_algorithm is None:
             self.algorithm = algorithms_registry.get(self.trainer)
+        else:
+            self.algorithm = self.custom_algorithm(self.trainer)
+
         self.algorithm.set_client_id(self.client_id)
 
         # Pass inbound and outbound data payloads through processors for
@@ -110,7 +116,8 @@ class Client(base.Client):
 
     async def train(self):
         """The machine learning training workload on a client."""
-        logging.info("[%s] Started training.", self)
+        logging.info("[%s] Started training in communication round #%s.", self,
+                     self.current_round)
 
         # Perform model training
         try:
@@ -122,7 +129,9 @@ class Client(base.Client):
         weights = self.algorithm.extract_weights()
 
         # Generate a report for the server, performing model testing if applicable
-        if Config().clients.do_test:
+        if Config().clients.do_test and (
+                not hasattr(Config().clients, 'test_interval')
+                or self.current_round % Config().clients.test_interval == 0):
             accuracy = self.trainer.test(self.testset, self.testset_sampler)
 
             if accuracy == -1:

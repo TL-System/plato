@@ -38,9 +38,6 @@ trainer:
     # The maximum number of training rounds
     rounds: 5
 
-    # Whether the training should use multiple GPUs if available
-    parallelized: false
-
     # The maximum number of clients running concurrently
     max_concurrency: 4
 

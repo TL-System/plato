@@ -23,8 +23,12 @@ class Processor(model.Processor):
 
         output = zstd.compress(pickle.dumps(data), self.compression_level)
 
-        logging.info("[Client #%d] Compressed model parameters.",
-                     self.client_id)
+        if self.client_id is None:
+            logging.info("[Server #%d] Compressed model parameters.",
+                         self.server_id)
+        else:
+            logging.info("[Client #%d] Compressed model parameters.",
+                         self.client_id)
 
         return output
 

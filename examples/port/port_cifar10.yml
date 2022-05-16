@@ -11,9 +11,6 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    # Whether clients should be simulated with only a sufficient number of processes 
-    simulation: true
-
     # Whether client-server communication should be simulated with files
     comm_simulation: true
 
@@ -83,7 +80,7 @@ data:
     # The concentration parameter for the Dirichlet distribution
     concentration: 5
 
-    # The size of the testset on the server 
+    # The size of the testset on the server
     testset_size: 10000
 
     # The random seed for sampling data
@@ -95,9 +92,6 @@ trainer:
 
     # The maximum number of training rounds
     rounds: 80
-
-    # Whether the training should use multiple GPUs if available
-    parallelized: false
 
     # The maximum number of clients running concurrently
     max_concurrency: 5

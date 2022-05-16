@@ -11,8 +11,7 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    # Client simulation mode
-    simulation: false
+    # Whether client-server communication should be simulated with files
     comm_simulation: true
 
 server:
@@ -46,9 +45,6 @@ trainer:
 
     # The maximum number of training rounds
     rounds: 5
-
-    # Whether the training should use multiple GPUs if available
-    parallelized: false
 
     # Whether to apply differential privacy
     # differential_privacy: true

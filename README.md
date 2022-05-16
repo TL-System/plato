@@ -114,7 +114,9 @@ To start a federated learning training workload, run [`run`](run) from the repos
 ```
 
 * `-c`: the path to the configuration file to be used. The default is `config.yml` in the project's home directory.
-
+* `-r`: add this parser to resume a previously interrupted training session.
+* `-d`: add this parser to download the dataset to prepare for a training session.
+ 
 *Plato* uses the YAML format for its configuration files to manage the runtime configuration parameters. Example configuration files have been provided in the `configs` directory.
 
 ### Running Plato with MindSpore or TensorFlow
@@ -192,7 +194,7 @@ If runtime exceptions occur that prevent a federated learning session from runni
 
 * Out of CUDA memory.
 
-  *Potential solutions:* Decrease the number of clients selected in each round (with the *client simulation mode* turned on); decrease the `max_concurrency` value in the `trainer` section in your configuration file; decrease the  `batch_size` used in the `trainer` section.
+  *Potential solutions:* Decrease the `max_concurrency` value in the `trainer` section in your configuration file.
  
 * The time that a client waits for the server to respond before disconnecting is too short. This could happen when training with large neural network models. If you get an `AssertionError` saying that there are not enough launched clients for the server to select, this could be the reason. But make sure you first check if it is due to the *out of CUDA memory* error.
 
@@ -206,9 +208,7 @@ If runtime exceptions occur that prevent a federated learning session from runni
 
 ### Client simulation mode
 
-Plato supports a *client simulation mode*, in which the actual number of client processes launched equals the number of clients to be selected by the server per round, rather than the total number of clients. This supports a simulated federated learning environment, where the set of selected clients by the server will be simulated by the set of client processes actually running. For example, with a total of 10000 clients, if the server only needs to select 100 of them to train their models in each round, only 100 client processes will be launched in client simulation mode, and a client process may assume a different client ID in each round.
-
-To turn on the client simulation mode, add `simulation: true` to the `clients` section in the configuration file.
+Plato runs in a *client simulation mode*, where the actual number of client processes launched on one available device (of each edge server in cross-silo training) equals the number of clients needed for concurrently active training (defined in `max_concurrency` in the `trainer` section of the configuration file), rather than the total number of clients. This supports a simulated federated learning environment, where the set of selected clients by the server will be simulated by the set of client processes actually running. For example, with a total of 10000 clients and 1000 clients selected, if only 7 clients can train concurrently on one GPU in the federated learning session due to limits of CUDA memory, then the same number of clients will be launched on one GPU as separate processes. Each client process may assume different client IDs in client simulation mode.
 
 ### Server asynchronous mode
 

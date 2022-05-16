@@ -89,7 +89,6 @@ trainer:
   optimizer_config: *optimizer_config
   learning_rate_config: *lr_config
   rounds: *total_epochs
-  parallelized: False
   max_accuracy: 3
   target_accuracy: 0.67
 

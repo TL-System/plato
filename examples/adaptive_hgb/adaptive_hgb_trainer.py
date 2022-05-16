@@ -31,6 +31,7 @@ from plato.trainers import basic
 
 class Trainer(basic.Trainer):
     """The federated learning trainer for the adaptive gradient blending client. """
+
     def __init__(self, model=None):
         """Initializing the trainer with the provided model.
 
@@ -40,8 +41,6 @@ class Trainer(basic.Trainer):
         """
 
         super().__init__(model)
-
-        self.is_distributed = Config().is_parallel()
 
         self.init_trajectory_items()
 
@@ -359,7 +358,6 @@ class Trainer(basic.Trainer):
         Returns:
             Whether training was successfully completed.
         """
-        self.start_training()
 
         if mp.get_start_method(allow_none=True) != 'spawn':
             mp.set_start_method('spawn', force=True)

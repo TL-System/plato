@@ -18,6 +18,7 @@ from plato.servers import fedavg
 
 class Server(fedavg.Server):
     """A federated learning server using the FedAdp algorithm."""
+
     def __init__(self):
         super().__init__()
 
@@ -31,7 +32,7 @@ class Server(fedavg.Server):
         # Extract weights udpates from the client updates
         weights_received = self.extract_client_updates(updates)
 
-        num_samples = [report.num_samples for (report, __, __) in updates]
+        num_samples = [report.num_samples for (__, report, __, __) in updates]
         total_samples = sum(num_samples)
 
         self.global_grads = {
@@ -105,8 +106,11 @@ class Server(fedavg.Server):
             ) * self.local_angles[client_id] + (1 / self.current_round) * angle
 
             # Non-linear mapping to node contribution
-            contribs[i] = Config().algorithm.alpha * (
-                1 - math.exp(-math.exp(-Config().algorithm.alpha *
+            alpha = Config().algorithm.alpha if hasattr(
+                Config().algorithm, 'alpha') else 5
+
+            contribs[i] = alpha * (
+                1 - math.exp(-math.exp(-alpha *
                                        (self.local_angles[client_id] - 1))))
 
         return contribs
