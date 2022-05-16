@@ -122,7 +122,7 @@ class Server(base.Server):
         if self.trainer is None and self.custom_trainer is None:
             self.trainer = trainers_registry.get(model=self.model)
         elif self.trainer is None and self.custom_trainer is not None:
-            self.trainer = self.custom_trainer(model=self.model)            self.custom_trainer = None
+            self.trainer = self.custom_trainer(model=self.model)
             self.custom_trainer = None
 
         if self.algorithm is None and self.custom_algorithm is None:
