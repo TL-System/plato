@@ -68,7 +68,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |s3_endpoint_url|The endpoint URL for an S3-compatible storage service, used for transferring payloads between clients and servers.||
 |s3_bucket|The bucket name for an S3-compatible storage service, used for transferring payloads between clients and servers.||
 |ping_interval|The time interval in seconds at which the server pings the client. ||default: 3600|
-|ping_timeout| The time in seconds that the client waits for the server to respond before disconnecting. The default is 360 (seconds).||Increase this number when your session stops running when training larger models (but make sure it is not due to the *out of CUDA memory* error)|
+|ping_timeout| The time in seconds that the client waits for the server to respond before disconnecting.|| default: 3600|
 |synchronous|Synchronous or asynchronous mode|`true` or `false`||
 |periodic_interval|The time interval for a server operating in asynchronous mode to aggregate received updates|Any positive integer|default: 5 seconds|
 |simulate_wall_time|Whether the wall clock time on the server is simulated|`true` or `false`||

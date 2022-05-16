@@ -115,7 +115,7 @@ class Server:
         self.prng_state = random.getstate()
 
         self.ping_interval = 3600
-        self.ping_timeout = 360
+        self.ping_timeout = 3600
         self.asynchronous_mode = False
         self.periodic_interval = 5
         self.staleness_bound = 1000
@@ -139,7 +139,7 @@ class Server:
         self.ping_interval = Config().server.ping_interval if hasattr(
             Config().server, 'ping_interval') else 3600
         self.ping_timeout = Config().server.ping_timeout if hasattr(
-            Config().server, 'ping_timeout') else 360
+            Config().server, 'ping_timeout') else 3600
 
         # Are we operating in asynchronous mode?
         self.asynchronous_mode = hasattr(
