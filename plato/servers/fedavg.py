@@ -117,7 +117,7 @@ class Server(base.Server):
     def load_trainer(self):
         """Setting up the global model to be trained via federated learning."""
         if self.model is None and self.custom_model is not None:
-            self.model = self.custom_model()
+            self.model = self.custom_model
 
         if self.trainer is None and self.custom_trainer is None:
             self.trainer = trainers_registry.get(model=self.model)

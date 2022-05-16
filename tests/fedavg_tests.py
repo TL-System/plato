@@ -12,6 +12,11 @@ from plato.trainers import basic
 
 class InnerProductModel(torch.nn.Module):
 
+    def __init__(self, n):
+        super().__init__()
+        self.layer = torch.nn.Linear(n, 1, bias=False)
+        self.layer.weight.data = torch.arange(n, dtype=torch.float32)
+
     @staticmethod
     def is_valid_model_type(model_type):
         raise NotImplementedError
@@ -24,11 +29,6 @@ class InnerProductModel(torch.nn.Module):
     def loss_criterion(self):
         return torch.nn.MSELoss()
 
-    def __init__(self, n):
-        super().__init__()
-        self.layer = torch.nn.Linear(n, 1, bias=False)
-        self.layer.weight.data = torch.arange(n, dtype=torch.float32)
-
     def forward(self, x):
         return self.layer(x)
 
@@ -37,15 +37,17 @@ async def test_fedavg_aggregation(self):
     print("\nTesting federated averaging.")
     updates = []
     model = copy.deepcopy(self.model)
-    server = fedavg_server.Server(model=model)
-    trainer = basic.Trainer(model=model)
-    algorithm = fedavg_alg.Algorithm(trainer=trainer)
-    server.trainer = trainer
-    server.algorithm = algorithm
+
+    trainer = basic.Trainer
+    algorithm = fedavg_alg.Algorithm
+    server = fedavg_server.Server(model=model,
+                                  algorithm=algorithm,
+                                  trainer=trainer)
+    server.load_trainer()
 
     weights = copy.deepcopy(self.algorithm.extract_weights())
     print(f"Report 1 weights: {weights}")
-    updates.append((simple.Report(1, 100, 0, 0, 0), weights, 0))
+    updates.append((0, simple.Report(1, 100, 0, 0, 0), weights, 0))
 
     self.model.train()
 
@@ -55,7 +57,7 @@ async def test_fedavg_aggregation(self):
     self.assertEqual(44.0, self.model(self.example).item())
     weights = copy.deepcopy(self.algorithm.extract_weights())
     print(f"Report 2 weights: {weights}")
-    updates.append((simple.Report(1, 100, 0, 0, 0), weights, 0))
+    updates.append((0, simple.Report(1, 100, 0, 0, 0), weights, 0))
 
     self.optimizer.zero_grad()
     self.model.loss_criterion(self.model(self.example), self.label).backward()
@@ -63,7 +65,7 @@ async def test_fedavg_aggregation(self):
     self.assertEqual(43.2, np.round(self.model(self.example).item(), 4))
     weights = copy.deepcopy(self.algorithm.extract_weights())
     print(f"Report 3 Weights: {weights}")
-    updates.append((simple.Report(1, 100, 0, 0, 0), weights, 0))
+    updates.append((0, simple.Report(1, 100, 0, 0, 0), weights, 0))
 
     self.optimizer.zero_grad()
     self.model.loss_criterion(self.model(self.example), self.label).backward()
@@ -71,7 +73,7 @@ async def test_fedavg_aggregation(self):
     self.assertEqual(42.56, np.round(self.model(self.example).item(), 4))
     weights = copy.deepcopy(self.algorithm.extract_weights())
     print(f"Report 4 Weights: {weights}")
-    updates.append((simple.Report(1, 100, 0, 0, 0), weights, 0))
+    updates.append((0, simple.Report(1, 100, 0, 0, 0), weights, 0))
 
     print(
         f"Weights before federated averaging: {server.model.layer.weight.data}"
