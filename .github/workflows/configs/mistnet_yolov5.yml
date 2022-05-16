@@ -155,11 +155,8 @@ trainer:
     # The maximum number of training rounds
     rounds: 1
 
-    # Whether the training should use multiple GPUs if available
-    parallelized: false
-
     # The maximum number of clients running concurrently
-    max_concurrency: 3
+    max_concurrency: 1
 
     # The target accuracy
     target_accuracy: 0.99

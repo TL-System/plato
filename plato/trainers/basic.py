@@ -36,13 +36,7 @@ class Trainer(base.Trainer):
         if model is None:
             model = models_registry.get()
 
-        # Use data parallelism if multiple GPUs are available and the configuration specifies it
-        if Config().is_parallel():
-            logging.info("Using Data Parallelism.")
-            # DataParallel will divide and allocate batch_size to all available GPUs
-            self.model = torch.nn.DataParallel(model)
-        else:
-            self.model = model
+        self.model = model
 
         if hasattr(Config().trainer, 'differential_privacy') and Config(
         ).trainer.differential_privacy:
@@ -230,7 +224,11 @@ class Trainer(base.Trainer):
 
                 loss = loss_criterion(outputs, labels)
 
-                loss.backward()
+                if 'create_graph' in config:
+                    loss.backward(create_graph=config['create_graph'])
+                else:
+                    loss.backward()
+
                 optimizer.step()
 
                 if batch_id % log_interval == 0:
@@ -286,7 +284,6 @@ class Trainer(base.Trainer):
         self.training_start_time = time.time()
 
         if 'max_concurrency' in config:
-            self.start_training()
             tic = time.perf_counter()
 
             if mp.get_start_method(allow_none=True) != 'spawn':
@@ -304,10 +301,6 @@ class Trainer(base.Trainer):
             try:
                 self.load_model(filename)
             except OSError as error:  # the model file is not found, training failed
-                if 'max_concurrency' in config:
-                    self.run_sql_statement(
-                        "DELETE FROM trainers WHERE run_id = (?)",
-                        (self.client_id, ))
                 raise ValueError(
                     f"Training on client {self.client_id} failed.") from error
 
@@ -396,8 +389,6 @@ class Trainer(base.Trainer):
         config['run_id'] = Config().params['run_id']
 
         if hasattr(Config().trainer, 'max_concurrency'):
-            self.start_training()
-
             if mp.get_start_method(allow_none=True) != 'spawn':
                 mp.set_start_method('spawn', force=True)
 

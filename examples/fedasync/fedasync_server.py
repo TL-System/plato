@@ -60,7 +60,7 @@ class Server(fedavg.Server):
             self.mixing_hyperparam *= self.staleness_function(client_staleness)
 
         # Calculate updated weights from clients
-        payload_received = [payload for (__, payload, __) in self.updates]
+        payload_received = [payload for (__, __, payload, __) in self.updates]
         weights_received = self.algorithm.compute_weight_updates(
             payload_received)
 

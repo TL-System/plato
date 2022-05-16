@@ -18,6 +18,7 @@ from plato.utils import csv_processor
 
 class Server(fedavg.Server):
     """Cross-silo federated learning server using federated averaging."""
+
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
 
@@ -33,22 +34,47 @@ class Server(fedavg.Server):
             # before starting the first round of local aggregation
             self.new_global_round_begins = asyncio.Event()
 
-            # Compute the number of clients in each silo for edge servers
-            launched_clients = Config().clients.total_clients
-            if hasattr(Config().clients,
-                       'simulation') and Config().clients.simulation:
-                launched_clients = Config().clients.per_round
+            edge_server_id = Config().args.id - Config().clients.total_clients
 
-            self.total_clients = [
-                len(i) for i in np.array_split(np.arange(launched_clients),
-                                               Config().algorithm.total_silos)
-            ][Config().args.id - launched_clients - 1]
+            # Compute the number of clients in each silo for edge servers
+            edges_total_clients = [
+                len(i) for i in np.array_split(
+                    np.arange(Config().clients.total_clients),
+                    Config().algorithm.total_silos)
+            ]
+            self.total_clients = edges_total_clients[edge_server_id - 1]
 
             self.clients_per_round = [
                 len(i)
                 for i in np.array_split(np.arange(Config().clients.per_round),
                                         Config().algorithm.total_silos)
-            ][Config().args.id - launched_clients - 1]
+            ][edge_server_id - 1]
+
+            if hasattr(Config().trainer, 'max_concurrency'):
+                launched_total_clients = min(
+                    Config().trainer.max_concurrency *
+                    max(1,
+                        Config().gpu_count()) * Config().algorithm.total_silos,
+                    Config().clients.per_round)
+            else:
+                launched_total_clients = Config().clients.per_round
+
+            edges_launched_clients = [
+                len(i)
+                for i in np.array_split(np.arange(launched_total_clients),
+                                        Config().algorithm.total_silos)
+            ]
+            starting_client_id = sum(edges_launched_clients[:edge_server_id -
+                                                            1])
+            launched_clients = edges_launched_clients[edge_server_id - 1]
+            self.launched_clients = list(
+                range(starting_client_id + 1,
+                      starting_client_id + 1 + launched_clients))
+
+            starting_client_id = sum(edges_total_clients[:edge_server_id - 1])
+            self.clients_pool = list(
+                range(starting_client_id + 1,
+                      starting_client_id + 1 + self.total_clients))
 
             logging.info(
                 "[Edge server #%d (#%d)] Started training on %d clients with %d per round.",
@@ -76,8 +102,10 @@ class Server(fedavg.Server):
             logging.info("Configuring edge server #%d as a %s server.",
                          Config().args.id,
                          Config().algorithm.type)
-            logging.info("Training with %s local aggregation rounds.",
-                         Config().algorithm.local_rounds)
+            logging.info(
+                "[Edge server #%d (#%d)] Training with %s local aggregation rounds.",
+                Config().args.id, os.getpid(),
+                Config().algorithm.local_rounds)
 
             self.load_trainer()
             self.trainer.set_client_id(Config().args.id)
@@ -111,7 +139,6 @@ class Server(fedavg.Server):
                 result_csv_file = f'{result_dir}/edge_{os.getpid()}.csv'
                 csv_processor.initialize_csv(result_csv_file,
                                              self.recorded_items, result_dir)
-
         else:
             super().configure()
             if hasattr(Config().server, 'do_test') and Config().server.do_test:
@@ -127,8 +154,8 @@ class Server(fedavg.Server):
                                                  Config().data.testset_size)
                     self.testset_sampler = SubsetRandomSampler(test_samples)
 
-    async def select_clients(self):
-        if Config().is_edge_server():
+    async def select_clients(self, for_next_batch=False):
+        if Config().is_edge_server() and not for_next_batch:
             if self.current_round == 0:
                 # Wait until this edge server is selected by the central server
                 # to avoid the edge server selects clients and clients begin training
@@ -136,7 +163,7 @@ class Server(fedavg.Server):
                 await self.new_global_round_begins.wait()
                 self.new_global_round_begins.clear()
 
-        await super().select_clients()
+        await super().select_clients(for_next_batch=for_next_batch)
 
     async def customize_server_response(self, server_response):
         """Wrap up generating the server response with any additional information."""
@@ -199,11 +226,11 @@ class Server(fedavg.Server):
         """Compute the average accuracy across clients."""
         # Get total number of samples
         total_samples = sum(
-            [report.num_samples for (report, __, __) in self.updates])
+            [report.num_samples for (__, report, __, __) in self.updates])
 
         # Perform weighted averaging
         accuracy = 0
-        for (report, __, __) in self.updates:
+        for (__, report, __, __) in self.updates:
             accuracy += report.average_accuracy * (report.num_samples /
                                                    total_samples)
 
@@ -255,11 +282,11 @@ class Server(fedavg.Server):
             'elapsed_time':
             self.wall_time - self.initial_wall_time,
             'comm_time':
-            max([report.comm_time for (report, __, __) in self.updates]),
+            max([report.comm_time for (__, report, __, __) in self.updates]),
             'round_time':
             max([
                 report.training_time + report.comm_time
-                for (report, __, __) in self.updates
+                for (__, report, __, __) in self.updates
             ]),
         }
 

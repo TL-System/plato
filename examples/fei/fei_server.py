@@ -10,6 +10,7 @@ from plato.utils.reinforcement_learning import rl_server
 
 class RLServer(rl_server.RLServer):
     """ A federated learning server with RL Agent. """
+
     def __init__(self, agent, model=None, algorithm=None, trainer=None):
         super().__init__(agent, model, algorithm, trainer)
         self.local_correlations = [0] * Config().clients.per_round
@@ -21,15 +22,17 @@ class RLServer(rl_server.RLServer):
     def prep_state(self):
         """ Wrap up the state update to RL Agent. """
         # Store client ids
-        client_ids = [report.client_id for (report, __, __) in self.updates]
+        client_ids = [
+            report.client_id for (__, report, __, __) in self.updates
+        ]
 
         state = [0] * 4
         state[0] = self.normalize_state(
-            [report.num_samples for (report, __, __) in self.updates])
+            [report.num_samples for (__, report, __, __) in self.updates])
         state[1] = self.normalize_state(
-            [report.training_time for (report, __, __) in self.updates])
+            [report.training_time for (__, report, __, __) in self.updates])
         state[2] = self.normalize_state(
-            [report.valuation for (report, __, __) in self.updates])
+            [report.valuation for (__, report, __, __) in self.updates])
         state[3] = self.normalize_state(self.corr)
         state = np.transpose(np.round(np.array(state), 4))
 

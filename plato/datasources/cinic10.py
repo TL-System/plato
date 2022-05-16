@@ -26,7 +26,7 @@ class DataSource(base.DataSource):
                 "Downloading the CINIC-10 dataset. This may take a while.")
             url = Config().data.download_url if hasattr(
                 Config().data, 'download_url'
-            ) else 'https://iqua.ece.toronto.edu/~bli/CINIC-10.tar.gz'
+            ) else 'http://iqua.ece.toronto.edu/baochun/CINIC-10.tar.gz'
             DataSource.download(url, _path)
 
         _transform = transforms.Compose([

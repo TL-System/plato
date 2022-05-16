@@ -12,6 +12,7 @@ from plato.samplers import base
 class Sampler(base.Sampler):
     """Create a data sampler for each client to use a randomly divided partition of the
     dataset."""
+
     def __init__(self, datasource, client_id, testing):
         super().__init__()
         if testing:

@@ -14,6 +14,7 @@ from plato.servers import fedavg_cs
 
 class Server(fedavg_cs.Server):
     """Cross-silo federated learning server using Sub-FedAvg(Un)."""
+
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
 
@@ -29,8 +30,9 @@ class Server(fedavg_cs.Server):
         record_items_values['pruning_amount'] = Config().clients.pruning_amount
 
         if Config().is_central_server():
-            edge_comm_overhead = sum(
-                [report.comm_overhead for (report, __, __) in self.updates])
+            edge_comm_overhead = sum([
+                report.comm_overhead for (__, report, __, __) in self.updates
+            ])
             record_items_values[
                 'comm_overhead'] = edge_comm_overhead + self.comm_overhead
         else:
