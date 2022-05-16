@@ -211,7 +211,7 @@ class Config:
                 ).params['result_types'] = "round, accuracy, elapsed_time"
 
             # The set of pairs to be plotted
-            if hasattr(Config, 'results') and hasattr(Config.results, 'types'):
+            if hasattr(Config, 'results') and hasattr(Config.results, 'plot'):
                 Config().params['plot_pairs'] = Config().results.plot
             else:
                 Config().params[
