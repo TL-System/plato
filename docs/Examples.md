@@ -18,3 +18,4 @@ The git repository includes a number of examples that showcased how third-party 
 |[FedSarah](https://arxiv.org/pdf/1703.00102.pdf)                             | Change directory to `examples/fedsarah` and run `python fedsarah.py -c <configuration file>`. | Yes |
 |[FedProx](https://arxiv.org/pdf/1812.06127.pdf)                              | Set `optimizer` of `trainer` to `FedProx` in your configuration file. | Yes |
 |[SCAFFOLD](https://arxiv.org/pdf/1910.06378.pdf)                             | Change directory to `examples/scaffold` and run `python scaffold.py -c <configuration file>`. | Not yet |
+|[FedRep](https://arxiv.org/pdf/2102.07078.pdf)                             | Directly run `python examples/fedrep/fedrep.py -c /fedrep/fedrep_MNIST_lenet5.yml`. | Only on MNIST |
