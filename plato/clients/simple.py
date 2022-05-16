@@ -58,16 +58,17 @@ class Client(base.Client):
 
         if self.trainer is None and self.custom_trainer is None:
             self.trainer = trainers_registry.get(model=self.model)
-        elif self.custom_trainer is not None:
+        elif self.trainer is None and self.custom_trainer is not None:
             self.trainer = self.custom_trainer(model=self.model)
             self.custom_trainer = None
 
         self.trainer.set_client_id(self.client_id)
 
-        if self.custom_algorithm is None:
-            self.algorithm = algorithms_registry.get(self.trainer)
-        else:
-            self.algorithm = self.custom_algorithm(self.trainer)
+        if self.algorithm is None and self.custom_algorithm is None:
+            self.algorithm = algorithms_registry.get(trainer=self.trainer)
+        elif self.algorithm is None and self.custom_algorithm is not None:
+            self.algorithm = self.custom_algorithm(trainer=self.trainer)
+            self.custom_algorithm = None
 
         self.algorithm.set_client_id(self.client_id)
 
