@@ -193,14 +193,29 @@ class Config:
             if 'results' in config:
                 Config.results = Config.namedtuple_from_dict(config['results'])
 
-                if hasattr(Config.results, 'result_path'):
-                    Config.params['result_path'] = os.path.join(
-                        Config.params['base_path'], Config.results.result_path)
-                else:
-                    Config.params['result_path'] = os.path.join(
-                        Config.params['base_path'], "results")
+            # Directory of the .csv file containing results
+            if hasattr(Config, 'results') and hasattr(Config.results,
+                                                      'result_path'):
+                Config.params['result_path'] = os.path.join(
+                    Config.params['base_path'], Config.results.result_path)
+            else:
+                Config.params['result_path'] = os.path.join(
+                    Config.params['base_path'], "results")
+            os.makedirs(Config.params['result_path'], exist_ok=True)
 
-                os.makedirs(Config.params['result_path'], exist_ok=True)
+            # The set of columns in the .csv file
+            if hasattr(Config, 'results') and hasattr(Config.results, 'types'):
+                Config().params['result_types'] = Config.results.types
+            else:
+                Config(
+                ).params['result_types'] = "round, accuracy, elapsed_time"
+
+            # The set of pairs to be plotted
+            if hasattr(Config, 'results') and hasattr(Config.results, 'types'):
+                Config().params['plot_pairs'] = Config().results.plot
+            else:
+                Config().params[
+                    'plot_pairs'] = "round-accuracy, elapsed_time-accuracy"
 
             if 'model' in config:
                 Config.model = Config.namedtuple_from_dict(config['model'])

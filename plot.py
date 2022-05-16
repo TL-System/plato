@@ -3,6 +3,7 @@ A simple utility that plot figures of results as PDF files, stored in results/.
 """
 
 import csv
+import os
 from typing import Dict, List, Any
 
 import matplotlib.pyplot as plt
@@ -16,7 +17,7 @@ def read_csv_to_dict(result_csv_file: str) -> Dict[str, List]:
     into a dictionary."""
     result_dict: Dict[str, List] = {}
 
-    plot_pairs = Config().results.plot
+    plot_pairs = Config().params['plot_pairs']
     plot_pairs = [x.strip() for x in plot_pairs.split(',')]
 
     for pairs in plot_pairs:
@@ -25,7 +26,7 @@ def read_csv_to_dict(result_csv_file: str) -> Dict[str, List]:
             if item not in result_dict:
                 result_dict[item] = []
 
-    with open(result_csv_file, 'r') as f:
+    with open(result_csv_file, 'r', encoding='utf-8') as f:
         reader = csv.DictReader(f)
         for row in reader:
             for item in result_dict:
@@ -55,11 +56,11 @@ def plot_figures_from_dict(result_csv_file: str, result_path: str):
     """Plot figures with dictionary of results."""
     result_dict = read_csv_to_dict(result_csv_file)
 
-    plot_pairs = Config().results.plot
+    plot_pairs = Config().params['plot_pairs']
     plot_pairs = [x.strip() for x in plot_pairs.split(',')]
 
     for pairs in plot_pairs:
-        figure_file_name = result_path + pairs + '.pdf'
+        figure_file_name = os.path.join(result_path, pairs + '.pdf')
         pair = [x.strip() for x in pairs.split('-')]
         x_y_labels: List = []
         x_y_values: Dict[str, List] = {}
@@ -87,12 +88,13 @@ def main():
     """Plotting figures from the run-time results."""
     __ = Config()
 
-    if hasattr(Config(), 'results'):
-        result_csv_file = Config().params['result_path'] + 'result.csv'
-        print(f"Plotting results located at {result_csv_file}.")
-        plot_figures_from_dict(result_csv_file, Config().params['result_path'])
-    else:
-        print("No results to be plotted according to the configuration file.")
+    result_csv_path = Config().params['result_path']
+    result_csv_file = os.path.join(result_csv_path, [
+        file for file in os.listdir(result_csv_path)
+        if (file.endswith(".csv") and not file.endswith("accuracy.csv"))
+    ][0])
+    print(f"Plotting results located at {result_csv_file}.")
+    plot_figures_from_dict(result_csv_file, Config().params['result_path'])
 
 
 if __name__ == "__main__":

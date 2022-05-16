@@ -85,18 +85,18 @@ class Server(fedavg_cs.Server):
     async def wrap_up_processing_reports(self):
         """Wrap up processing the reports with any additional work."""
         if self.do_personalization_test or Config().is_edge_server():
-            if hasattr(Config(), 'results'):
-                new_row = []
-                for item in self.recorded_items:
-                    item_value = self.get_record_items_values()[item]
-                    new_row.append(item_value)
+            # Record results
+            new_row = []
+            for item in self.recorded_items:
+                item_value = self.get_record_items_values()[item]
+                new_row.append(item_value)
 
-                if Config().is_edge_server():
-                    result_csv_file = f"{Config().params['result_path']}/edge_{os.getpid()}.csv"
-                else:
-                    result_csv_file = f"{Config().params['result_path']}/{os.getpid()}.csv"
+            if Config().is_edge_server():
+                result_csv_file = f"{Config().params['result_path']}/edge_{os.getpid()}.csv"
+            else:
+                result_csv_file = f"{Config().params['result_path']}/{os.getpid()}.csv"
 
-                csv_processor.write_csv(result_csv_file, new_row)
+            csv_processor.write_csv(result_csv_file, new_row)
 
             if Config().is_edge_server():
                 if self.do_personalization_test:

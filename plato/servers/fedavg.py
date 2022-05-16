@@ -42,11 +42,8 @@ class Server(base.Server):
             "[Server #%d] Started training on %d clients with %d per round.",
             os.getpid(), self.total_clients, self.clients_per_round)
 
-        if hasattr(Config(), 'results'):
-            recorded_items = Config().results.types
-            self.recorded_items = [
-                x.strip() for x in recorded_items.split(',')
-            ]
+        recorded_items = Config().params['result_types']
+        self.recorded_items = [x.strip() for x in recorded_items.split(',')]
 
     def configure(self):
         """
@@ -105,18 +102,16 @@ class Server(base.Server):
                     test_samples, generator=gen)
 
         # Initialize the csv file which will record results
-        if hasattr(Config(), 'results'):
-            result_csv_file = f"{Config().params['result_path']}/{os.getpid()}.csv"
-            csv_processor.initialize_csv(result_csv_file, self.recorded_items,
-                                         Config().params['result_path'])
+        result_csv_file = f"{Config().params['result_path']}/{os.getpid()}.csv"
+        csv_processor.initialize_csv(result_csv_file, self.recorded_items,
+                                     Config().params['result_path'])
 
-            # Initialize the test accuracy csv file if clients compute locally
-            if Config().clients.do_test:
-                accuracy_csv_file = f"{Config().params['result_path']}/{os.getpid()}_accuracy.csv"
-                accuracy_headers = ["round", "client_id", "accuracy"]
-                csv_processor.initialize_csv(accuracy_csv_file,
-                                             accuracy_headers,
-                                             Config().params['result_path'])
+        # Initialize the test accuracy csv file if clients compute locally
+        if Config().clients.do_test:
+            accuracy_csv_file = f"{Config().params['result_path']}/{os.getpid()}_accuracy.csv"
+            accuracy_headers = ["round", "client_id", "accuracy"]
+            csv_processor.initialize_csv(accuracy_csv_file, accuracy_headers,
+                                         Config().params['result_path'])
 
     def load_trainer(self):
         """Setting up the global model to be trained via federated learning."""
@@ -198,41 +193,38 @@ class Server(base.Server):
 
     async def wrap_up_processing_reports(self):
         """ Wrap up processing the reports with any additional work. """
-        if hasattr(Config(), 'results'):
-            new_row = []
-            for item in self.recorded_items:
-                item_value = {
-                    'round':
-                    self.current_round,
-                    'accuracy':
-                    self.accuracy,
-                    'elapsed_time':
-                    self.wall_time - self.initial_wall_time,
-                    'comm_time':
-                    max([
-                        report.comm_time
-                        for (__, report, __, __) in self.updates
-                    ]),
-                    'round_time':
-                    max([
-                        report.training_time + report.comm_time
-                        for (__, report, __, __) in self.updates
-                    ]),
-                }[item]
-                new_row.append(item_value)
+        # Record results into a .csv file
+        new_row = []
+        for item in self.recorded_items:
+            item_value = {
+                'round':
+                self.current_round,
+                'accuracy':
+                self.accuracy,
+                'elapsed_time':
+                self.wall_time - self.initial_wall_time,
+                'comm_time':
+                max([
+                    report.comm_time for (__, report, __, __) in self.updates
+                ]),
+                'round_time':
+                max([
+                    report.training_time + report.comm_time
+                    for (__, report, __, __) in self.updates
+                ]),
+            }[item]
+            new_row.append(item_value)
 
-            result_csv_file = f"{Config().params['result_path']}/{os.getpid()}.csv"
-            csv_processor.write_csv(result_csv_file, new_row)
+        result_csv_file = f"{Config().params['result_path']}/{os.getpid()}.csv"
+        csv_processor.write_csv(result_csv_file, new_row)
 
-            if Config().clients.do_test:
-                # Updates the log for client test accuracies
-                accuracy_csv_file = f"{Config().params['result_path']}/{os.getpid()}_accuracy.csv"
+        if Config().clients.do_test:
+            # Updates the log for client test accuracies
+            accuracy_csv_file = f"{Config().params['result_path']}/{os.getpid()}_accuracy.csv"
 
-                for (client_id, report, __, __) in self.updates:
-                    accuracy_row = [
-                        self.current_round, client_id, report.accuracy
-                    ]
-                    csv_processor.write_csv(accuracy_csv_file, accuracy_row)
+            for (client_id, report, __, __) in self.updates:
+                accuracy_row = [self.current_round, client_id, report.accuracy]
+                csv_processor.write_csv(accuracy_csv_file, accuracy_row)
 
     @staticmethod
     def accuracy_averaging(updates):
