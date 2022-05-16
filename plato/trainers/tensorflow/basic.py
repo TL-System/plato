@@ -61,9 +61,10 @@ class Trainer(base.Trainer):
             logging.info("[Client #%d] Model saved to %s.", self.client_id,
                          model_path)
 
-    def load_model(self, filename=None, dir=None):
+    def load_model(self, filename=None, location=None):
         """Loading pre-trained model weights from a file."""
-        model_path = Config().params['model_path'] if dir is None else dir
+        model_path = Config(
+        ).params['model_path'] if location is None else location
         model_name = Config().trainer.model_name
 
         if filename is not None:

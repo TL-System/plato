@@ -98,8 +98,8 @@ class Trainer(basic.Trainer):
         if not os.path.exists(model_path):
             os.makedirs(model_path)
 
-        model_path = f'{model_path}/{model_name}_gradients.pth'
-        torch.save(self.cut_layer_grad, model_path)
+        model_gradients_path = f'{model_path}/{model_name}_gradients.pth'
+        torch.save(self.cut_layer_grad, model_gradients_path)
 
         logging.info("[Server #%d] Gradients saved to %s.", os.getpid(),
-                     model_path)
+                     model_gradients_path)
