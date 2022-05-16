@@ -25,8 +25,8 @@ server:
     inbound_processors:
         - model_decompress
 
-    checkpoint_dir: ./results/test/checkpoint
-    model_dir: ./results/test/model
+    checkpoint_path: results/test/checkpoint
+    model_dir: results/test/model
 
 data:
     # The training and testing dataset

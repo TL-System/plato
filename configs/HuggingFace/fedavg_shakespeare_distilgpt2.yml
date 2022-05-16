@@ -15,16 +15,13 @@ server:
     address: 127.0.0.1
     port: 8000
     simulate_wall_time: false
-    checkpoint_dir: ./models/huggingface/fedavg
-    model_dir: ./models/huggingface/fedavg
+    checkpoint_path: checkpoints/huggingface/fedavg
+    model_dir: models/huggingface/fedavg
 
 data:
     # The training and testing dataset
     datasource: HuggingFace
     dataset_name: tiny_shakespeare
-
-    # Where the dataset is located
-    data_path: ./data
 
     # Number of samples in each partition
     partition_size: 2

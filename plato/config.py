@@ -183,14 +183,14 @@ class Config:
             os.makedirs(Config.params['model_dir'], exist_ok=True)
 
             # Resume checkpoint
-            if hasattr(Config().server, 'checkpoint_dir'):
-                Config.params['checkpoint_dir'] = os.path.join(
+            if hasattr(Config().server, 'checkpoint_path'):
+                Config.params['checkpoint_path'] = os.path.join(
                     Config.params['base_path'],
-                    Config().server.checkpoint_dir)
+                    Config().server.checkpoint_path)
             else:
-                Config.params['checkpoint_dir'] = os.path.join(
+                Config.params['checkpoint_path'] = os.path.join(
                     Config.params['base_path'], "checkpoints")
-            os.makedirs(Config.params['checkpoint_dir'], exist_ok=True)
+            os.makedirs(Config.params['checkpoint_path'], exist_ok=True)
 
             if 'results' in config:
                 Config.results = Config.namedtuple_from_dict(config['results'])

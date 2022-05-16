@@ -29,14 +29,9 @@ server:
     port: 8000
     random_seed: 1
 
-    checkpoint_dir: ./checkpoints
-
 data:
     # The training and testing dataset
     datasource: MNIST
-
-    # Where the dataset is located
-    data_path: ./data
 
     # Number of samples in each partition
     partition_size: 20000

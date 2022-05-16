@@ -77,7 +77,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |do_test|Whether the central server computes test accuracy locally| `true` or `false`|| 
 |base_path|The prefix of directory of models, checkpoints, and results||default: `./<datasource>_<model>_<server_type>`|
 |model_dir|The directory of pretrained and trained models||default: `<base_path>/models/pretrained`|
-|checkpoint_dir|The directory of checkpoints||default: `<base_path>/models/checkpoints`|
+|checkpoint_path|The directory of checkpoints||default: `<base_path>/models/checkpoints`|
 |outbound_processors|A list of processors to apply on the payload before sending| A list of processor names || 
 |inbound_processors|A list of processors to apply on the payload right after receiving| A list of processor names || 
 
