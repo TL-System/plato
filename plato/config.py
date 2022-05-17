@@ -149,39 +149,73 @@ class Config:
             # A run ID is unique to each client in an experiment
             Config.params['run_id'] = os.getpid()
 
-            # Pretrained models
-            if hasattr(Config().server, 'model_dir'):
-                Config.params['model_dir'] = Config().server.model_dir
+            if 'general' in config:
+                Config.general = Config.namedtuple_from_dict(config['general'])
+
+            # If directories of dataset, pretrained models, checkpoints and results
+            # are not specified in the configuration file,
+            # a base directory will be used to generate those directories
+            if (hasattr(Config(), 'general')
+                    and hasattr(Config().general, 'base_path')):
+                Config.params['base_path'] = Config().general.base_path
             else:
-                Config.params['model_dir'] = "./models/pretrained"
-            os.makedirs(Config.params['model_dir'], exist_ok=True)
+                Config.params['base_path'] = './'
+
+            # Directory of dataset
+            if hasattr(Config().data, 'data_path'):
+                Config.params['data_path'] = os.path.join(
+                    Config.params['base_path'],
+                    Config().data.data_path)
+            else:
+                Config.params['data_path'] = os.path.join(
+                    Config.params['base_path'], "data")
+
+            # Pretrained models
+            if hasattr(Config().server, 'model_path'):
+                Config.params['model_path'] = os.path.join(
+                    Config.params['base_path'],
+                    Config().server.model_path)
+            else:
+                Config.params['model_path'] = os.path.join(
+                    Config.params['base_path'], "models/pretrained")
+            os.makedirs(Config.params['model_path'], exist_ok=True)
 
             # Resume checkpoint
-            if hasattr(Config().server, 'checkpoint_dir'):
-                Config.params['checkpoint_dir'] = Config(
-                ).server.checkpoint_dir
+            if hasattr(Config().server, 'checkpoint_path'):
+                Config.params['checkpoint_path'] = os.path.join(
+                    Config.params['base_path'],
+                    Config().server.checkpoint_path)
             else:
-                Config.params['checkpoint_dir'] = "./checkpoints"
-            os.makedirs(Config.params['checkpoint_dir'], exist_ok=True)
-
-            datasource = Config.data.datasource
-            model = Config.trainer.model_name
-            server_type = "custom"
-            if hasattr(Config().server, "type"):
-                server_type = Config.server.type
-            elif hasattr(Config().algorithm, "type"):
-                server_type = Config.algorithm.type
+                Config.params['checkpoint_path'] = os.path.join(
+                    Config.params['base_path'], "checkpoints")
+            os.makedirs(Config.params['checkpoint_path'], exist_ok=True)
 
             if 'results' in config:
                 Config.results = Config.namedtuple_from_dict(config['results'])
 
-                if hasattr(Config.results, 'result_dir'):
-                    Config.params['result_dir'] = Config.results.result_dir
-                else:
-                    Config.params[
-                        'result_dir'] = f'./results/{datasource}_{model}_{server_type}'
+            # Directory of the .csv file containing results
+            if hasattr(Config, 'results') and hasattr(Config.results,
+                                                      'result_path'):
+                Config.params['result_path'] = os.path.join(
+                    Config.params['base_path'], Config.results.result_path)
+            else:
+                Config.params['result_path'] = os.path.join(
+                    Config.params['base_path'], "results")
+            os.makedirs(Config.params['result_path'], exist_ok=True)
 
-                os.makedirs(Config.params['result_dir'], exist_ok=True)
+            # The set of columns in the .csv file
+            if hasattr(Config, 'results') and hasattr(Config.results, 'types'):
+                Config().params['result_types'] = Config.results.types
+            else:
+                Config(
+                ).params['result_types'] = "round, accuracy, elapsed_time"
+
+            # The set of pairs to be plotted
+            if hasattr(Config, 'results') and hasattr(Config.results, 'plot'):
+                Config().params['plot_pairs'] = Config().results.plot
+            else:
+                Config().params[
+                    'plot_pairs'] = "round-accuracy, elapsed_time-accuracy"
 
             if 'model' in config:
                 Config.model = Config.namedtuple_from_dict(config['model'])

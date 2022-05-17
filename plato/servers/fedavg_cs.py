@@ -81,8 +81,7 @@ class Server(fedavg.Server):
                 Config().args.id, os.getpid(), self.total_clients,
                 self.clients_per_round)
 
-            if hasattr(Config(), 'results'):
-                self.recorded_items = ['global_round'] + self.recorded_items
+            self.recorded_items = ['global_round'] + self.recorded_items
 
         # Compute the number of clients for the central server
         if Config().is_central_server():
@@ -134,11 +133,11 @@ class Server(fedavg.Server):
                                                  Config().data.testset_size)
                     self.testset_sampler = SubsetRandomSampler(test_samples)
 
-            if hasattr(Config(), 'results'):
-                result_dir = Config().params['result_dir']
-                result_csv_file = f'{result_dir}/edge_{os.getpid()}.csv'
-                csv_processor.initialize_csv(result_csv_file,
-                                             self.recorded_items, result_dir)
+            # Initialize path of the result .csv file
+            result_path = Config().params['result_path']
+            result_csv_file = f'{result_path}/edge_{os.getpid()}.csv'
+            csv_processor.initialize_csv(result_csv_file, self.recorded_items,
+                                         result_path)
         else:
             super().configure()
             if hasattr(Config().server, 'do_test') and Config().server.do_test:
@@ -238,18 +237,18 @@ class Server(fedavg.Server):
 
     async def wrap_up_processing_reports(self):
         """Wrap up processing the reports with any additional work."""
-        if hasattr(Config(), 'results'):
-            new_row = []
-            for item in self.recorded_items:
-                item_value = self.get_record_items_values()[item]
-                new_row.append(item_value)
+        # Record results into a .csv file
+        new_row = []
+        for item in self.recorded_items:
+            item_value = self.get_record_items_values()[item]
+            new_row.append(item_value)
 
-            if Config().is_edge_server():
-                result_csv_file = f"{Config().params['result_dir']}/edge_{os.getpid()}.csv"
-            else:
-                result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}.csv"
+        if Config().is_edge_server():
+            result_csv_file = f"{Config().params['result_path']}/edge_{os.getpid()}.csv"
+        else:
+            result_csv_file = f"{Config().params['result_path']}/{os.getpid()}.csv"
 
-            csv_processor.write_csv(result_csv_file, new_row)
+        csv_processor.write_csv(result_csv_file, new_row)
 
         if Config().is_edge_server():
             # When a certain number of aggregations are completed, an edge client

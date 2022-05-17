@@ -90,6 +90,7 @@ def collate_fn(batch):
 
 class Flickr30KEDataset(multimodal_base.MultiModalDataset):
     """ Prepare the Flickr30K Entities dataset."""
+
     def __init__(self,
                  dataset_info,
                  phase,
@@ -207,6 +208,7 @@ class Flickr30KEDataset(multimodal_base.MultiModalDataset):
 
 class DataSource(multimodal_base.MultiModalDataSource):
     """The Flickr30K Entities dataset."""
+
     def __init__(self):
         super().__init__()
 
@@ -214,7 +216,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         self.modality_names = ["image", "text"]
 
-        _path = Config().data.data_path
+        _path = Config().params['data_path']
         self._data_path_process(data_path=_path, base_data_name=self.data_name)
 
         raw_data_name = self.data_name + "Raw"
