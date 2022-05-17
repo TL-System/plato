@@ -106,7 +106,7 @@ algorithm:
     magnitude: 0.001
 
 results:
-    result_dir: ./results/FashionMNIST_lenet5/FedAtt
+    result_path: results/FashionMNIST_lenet5/FedAtt
 
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time

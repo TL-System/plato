@@ -28,12 +28,9 @@ class Server(fedavg_cs.Server):
                 for i in range(Config().algorithm.total_silos)
             ]
 
-        if hasattr(Config(), 'results'):
-            if Config().is_edge_server():
-                if 'local_epoch_num' not in self.recorded_items:
-                    self.recorded_items = self.recorded_items + [
-                        'local_epoch_num'
-                    ]
+        if Config().is_edge_server():
+            if 'local_epoch_num' not in self.recorded_items:
+                self.recorded_items = self.recorded_items + ['local_epoch_num']
 
     async def customize_server_response(self, server_response):
         """Wrap up generating the server response with any additional information."""

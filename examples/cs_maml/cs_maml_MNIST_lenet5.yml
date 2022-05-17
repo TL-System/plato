@@ -14,8 +14,8 @@ server:
     port: 8000
     do_test: true
 
-    checkpoint_dir: ./results/test/checkpoint
-    model_dir: ./results/test/model
+    checkpoint_path: results/test/checkpoint
+    model_path: results/test/model
 
 data:
     # The training and testing dataset
@@ -73,4 +73,4 @@ algorithm:
 results:
     # Write the following parameter(s) into a CSV
     types: round, accuracy, personalization_accuracy, elapsed_time, comm_time, round_time
-    result_dir: ./results/test
+    result_path: results/test

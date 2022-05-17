@@ -37,7 +37,7 @@ class DataSource(base.DataSource):
 
     def __init__(self):
         super().__init__()
-        _path = Config().data.data_path
+        _path = Config().params['data_path']
 
         if not os.path.exists(os.path.join(_path, 'celeba')):
             celeba_url = 'http://iqua.ece.toronto.edu/baochun/celeba.tar.gz'

@@ -11,9 +11,6 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    # Whether client-server communication should be simulated with files
-    comm_simulation: true
-
     # Whether client heterogeneity should be simulated
     speed_simulation: true
 
@@ -59,17 +56,14 @@ server:
     staleness_weight: 3
 
     # The paths for storing temporary checkpoints and models
-    checkpoint_dir: ./models/cifar10
-    model_dir: ./models/cifar10
+    checkpoint_path: models/cifar10
+    model_path: models/cifar10
 
     random_seed: 1
 
 data:
     # The training and testing dataset
     datasource: CIFAR10
-
-    # Where the dataset is located
-    data_path: ./data
 
     # Number of samples in each partition
     partition_size: 5000
@@ -120,7 +114,7 @@ algorithm:
     type: fedavg
 
 results:
-    result_dir: ./results/cifar10
+    result_path: results/cifar10
 
     # Write the following parameter(s) into a CSV
     types: round, elapsed_time, accuracy

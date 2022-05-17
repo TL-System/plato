@@ -17,6 +17,7 @@ from plato.utils.reinforcement_learning.policies import \
 
 class RLAgent(rl_agent.RLAgent):
     """ An RL agent for FL training using FEI. """
+
     def __init__(self):
         super().__init__()
         if hasattr(Config().server,
@@ -36,22 +37,22 @@ class RLAgent(rl_agent.RLAgent):
             self.current_episode = Config().algorithm.pretrained_iter + 1
 
         self.recorded_rl_items = ['episode', 'actor_loss', 'critic_loss']
-        result_dir = Config().params['result_dir']
+        result_path = Config().params['result_path']
 
         if self.current_episode == 0:
-            episode_result_csv_file = f'{result_dir}/{os.getpid()}_episode_result.csv'
+            episode_result_csv_file = f'{result_path}/{os.getpid()}_episode_result.csv'
             csv_processor.initialize_csv(episode_result_csv_file,
-                                         self.recorded_rl_items, result_dir)
-            episode_reward_csv_file = f'{result_dir}/{os.getpid()}_episode_reward.csv'
+                                         self.recorded_rl_items, result_path)
+            episode_reward_csv_file = f'{result_path}/{os.getpid()}_episode_reward.csv'
             csv_processor.initialize_csv(
                 episode_reward_csv_file,
-                ['episode', '#steps', 'final accuracy', 'reward'], result_dir)
+                ['episode', '#steps', 'final accuracy', 'reward'], result_path)
 
         if self.current_episode == 0 or Config().algorithm.mode == 'test':
-            step_result_csv_file = f'{result_dir}/{os.getpid()}_step_result.csv'
+            step_result_csv_file = f'{result_path}/{os.getpid()}_step_result.csv'
             csv_processor.initialize_csv(
                 step_result_csv_file,
-                ['episode', 'step', 'id', 'action', 'state'], result_dir)
+                ['episode', 'step', 'id', 'action', 'state'], result_path)
 
         # Record test accuracy of the latest 5 rounds/steps
         self.pre_acc = deque(5 * [0], maxlen=5)
@@ -142,9 +143,9 @@ class RLAgent(rl_agent.RLAgent):
         super().process_env_update()
 
         if self.current_step != 0:
-            result_dir = Config().params['result_dir'] = Config(
-            ).params['result_dir']
-            step_result_csv_file = f'{result_dir}/{os.getpid()}_step_result.csv'
+            result_path = Config().params['result_path'] = Config(
+            ).params['result_path']
+            step_result_csv_file = f'{result_path}/{os.getpid()}_step_result.csv'
             csv_processor.write_csv(
                 step_result_csv_file,
                 [self.current_episode, self.current_step] + [self.client_ids] +
@@ -169,10 +170,10 @@ class RLAgent(rl_agent.RLAgent):
                 }[item]
                 new_row.append(item_value)
 
-            episode_result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_episode_result.csv"
+            episode_result_csv_file = f"{Config().params['result_path']}/{os.getpid()}_episode_result.csv"
             csv_processor.write_csv(episode_result_csv_file, new_row)
 
-        episode_reward_csv_file = f"{Config().params['result_dir']}/{os.getpid()}_episode_reward.csv"
+        episode_reward_csv_file = f"{Config().params['result_path']}/{os.getpid()}_episode_reward.csv"
         csv_processor.write_csv(episode_reward_csv_file, [
             self.current_episode, self.current_step,
             mean(self.pre_acc), self.episode_reward

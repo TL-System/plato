@@ -10,9 +10,10 @@ from plato.datasources import base
 
 class DataSource(base.DataSource):
     """The PASCAL dataset."""
+
     def __init__(self):
         super().__init__()
-        _path = Config().data.data_path
+        _path = Config().params['data_path']
         self.mean = [0.45734706, 0.43338275, 0.40058118]
         self.std = [0.23965294, 0.23532275, 0.2398498]
         _transform = transforms.Compose([
