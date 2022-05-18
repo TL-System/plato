@@ -33,20 +33,6 @@ class Client(simple.Client):
         self.algorithm.set_global_weights_key(
             global_keys=self.model_representation_weights_key)
 
-    # async def train(self):
-    #     """ Implement the train for FedRep method. """
-    #     report, weights = await super().train()
-
-    #     # extract the representation weights as the global model
-    #     representation_weights = collections.OrderedDict()
-    #     for name, para in weights.items():
-    #         if name in self.model_representation_weights_key:
-    #             representation_weights[name] = para
-
-    #     print("representation_weights: ", representation_weights.keys())
-
-    #     return report, representation_weights
-
     def load_payload(self, server_payload) -> None:
         """Loading the server model onto this client."""
         print("Loading server payload: ", server_payload.keys())

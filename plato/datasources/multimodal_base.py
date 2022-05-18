@@ -5,25 +5,22 @@ Base class for multimodal datasets.
 from abc import abstractmethod
 import logging
 import os
-import subprocess
-from collections import namedtuple
+
+import torch
 
 import torch
 from torchvision.datasets.utils import download_url, extract_archive
-from torchvision.datasets.utils import download_file_from_google_drive
+
+import gdown
 
 from plato.datasources import base
-
-TextData = namedtuple('TextData', ['caption', 'caption_phrases'])
-BoxData = namedtuple('BoxData', ['caption_phrase_bboxs'])
-TargetData = namedtuple('TargetData',
-                        ['caption_phrases_cate', 'caption_phrases_cate_id'])
 
 
 class MultiModalDataSource(base.DataSource):
     """
     The training or testing dataset that accommodates custom augmentation and transforms.
     """
+
     def __init__(self):
         super().__init__()
 
@@ -104,11 +101,7 @@ class MultiModalDataSource(base.DataSource):
         data_path,  # the base directory for the data
         base_data_name=None):  # the directory name of the working data
         """ Generate the data structure based on the defined data path """
-
-        # Create the full path by introducing the project path
-        proj_root_path = os.path.abspath(os.curdir)
-        base_data_path = os.path.join(proj_root_path, data_path,
-                                      base_data_name)
+        base_data_path = os.path.join(data_path, base_data_name)
 
         if not os.path.exists(base_data_path):
             os.makedirs(base_data_path)
@@ -130,6 +123,7 @@ class MultiModalDataSource(base.DataSource):
         self,
         download_url_address,
         put_data_dir,
+        download_file_name=None,
         extract_to_dir=None,
         obtained_file_name=None,
     ):
@@ -138,7 +132,9 @@ class MultiModalDataSource(base.DataSource):
         if extract_to_dir is None:
             extract_to_dir = put_data_dir
 
-        download_file_name = os.path.basename(download_url_address)
+        if download_file_name is None:
+            download_file_name = os.path.basename(download_url_address)
+
         download_file_path = os.path.join(put_data_dir, download_file_name)
 
         download_extracted_file_name = download_file_name.split(".")[0]
@@ -174,13 +170,14 @@ class MultiModalDataSource(base.DataSource):
                                          extract_download_file_name)
         if not self._exist_judgement(download_data_path):
             logging.info("Downloading the data to %s", download_data_path)
-            download_file_from_google_drive(file_id=download_file_id,
-                                            root=put_data_dir,
-                                            filename=download_data_file_name)
+
+            gdown.download(id=download_file_id, output=download_data_path)
+
         if not self._exist_judgement(extract_data_path):
+            logging.info("Extracting from %s", download_data_path)
             extract_archive(from_path=download_data_path,
                             to_path=put_data_dir,
-                            remove_finished=True)
+                            remove_finished=False)
 
     def _exist_file_in_dir(self,
                            tg_file_name,
@@ -203,11 +200,11 @@ class MultiModalDataSource(base.DataSource):
             logging.info("The path %s does not exist", target_path)
             return False
 
-        # remove all .DS_Store files
-        command = ['find', '.', '-name', '".DS_Store"', '-delete']
-        command = ' '.join(command)
-        #cmd = f"find . -name ".DS_Store" -delete"
-        subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT)
+        # # remove all .DS_Store files
+        # command = ['find', '.', '-name', '".DS_Store"', '-delete']
+        # command = ' '.join(command)
+        # #cmd = f"find . -name ".DS_Store" -delete"
+        # subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT)
 
         def get_size(folder):
             # get size
@@ -215,6 +212,8 @@ class MultiModalDataSource(base.DataSource):
             for ele in os.scandir(folder):
                 if not ele.name.startswith('.'):
                     size += os.path.getsize(ele)
+                if size > 0:
+                    return size
             return size
 
         def is_contain_useful_file(target_dir):
@@ -262,9 +261,18 @@ class MultiModalDataSource(base.DataSource):
 
 class MultiModalDataset(torch.utils.data.Dataset):
     """ The base interface for the multimodal data """
+
     def __init__(self):
         self.phase = None  # the 'train' , 'test', 'val'
 
+        # whether utilize the debug mode,
+        #  True:
+        #  the collected sample contains sample id, raw sample data
+        #   and the processed sample data
+        #  False:
+        #   it only contains the processed sample data
+
+        self.DEBUG_mode = False
         # the recorded samples for current dataset
         #   In flickr20K entities dataset, this presents as:
         #    this is a dict in which key is the 'sample name/id' ...
@@ -282,7 +290,7 @@ class MultiModalDataset(torch.utils.data.Dataset):
         #  e.g. in flickr30k entities, ["Images", "Annotations", "Sentences"]
         self.data_types = None
 
-        # the name of the modalities in the dataset
+        # the name of the modalities in dataset
         self.modalities_name = None
 
         # the sampler for modalities,
@@ -295,7 +303,7 @@ class MultiModalDataset(torch.utils.data.Dataset):
         # the basic modalities
         self.basic_modalities = ["rgb", "flow", "text", "audio"]
         # the additional data/annotations
-        self.basic_items = ["box", "target"]
+        self.basic_items = ["bbox"]
 
     @abstractmethod
     def get_targets(self):
@@ -308,14 +316,13 @@ class MultiModalDataset(torch.utils.data.Dataset):
             Different multi-modal datasets should have their
              personal 'get_one_multimodal_sample' method.
 
-
             Args:
                 sample_idx (int): the index of the sample
 
             Output:
-                a dict containing different modalities, the
-                 key of the dict is the modality name that should
-                 be included in the basic_modalities and basic_items.
+                a dict containing sample containers, it can be
+                    - sample: container for raw loaded sample
+                    - transformed_sample: container for transformed sample
          """
         raise NotImplementedError(
             "Please Implement the 'get_one_multimodal_sample(self, sample_idx)' function"
@@ -323,18 +330,20 @@ class MultiModalDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, sample_idx):
         """Get the sample for either training or testing given index."""
-        sampled_multimodal_data = self.get_one_multimodal_sample(sample_idx)
-
-        # utilize the modality to mask specific modalities
+        multimodal_sample, sample_label = self.get_one_multimodal_sample(
+            sample_idx)
+        if self.modality_sampler is None:
+            self.modality_sampler = self.basic_modalities
+        # maintain the modality data required by the modality_sampler
         sampled_modality_data = dict()
-        for item_name, item_data in sampled_multimodal_data.items():
+        for modal_name, modal_data in multimodal_sample.items():
             # maintain the modality data based on the sampler
             # maintain the external data
-            if item_name in self.modality_sampler or \
-                item_name in self.basic_items:
-                sampled_modality_data[item_name] = item_data
+            if modal_name in self.modality_sampler or \
+                modal_name in self.basic_items:
+                sampled_modality_data[modal_name] = modal_data
 
-        return sampled_modality_data
+        return sampled_modality_data, sample_label
 
     @abstractmethod
     def __len__(self):
