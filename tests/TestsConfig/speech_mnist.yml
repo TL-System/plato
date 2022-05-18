@@ -1,0 +1,67 @@
+# include basic settings for the models and the learning process
+
+# clients settings
+clients:
+  type: simple # type
+  total_clients: 5 # total number of clients
+  per_round: 3 # number of clients selected in each round
+
+  do_test: False # Should clients compute test accuracy locally?
+
+# server settings
+server:
+  address: 127.0.0.1
+  port: 8000
+
+# dataset settings for the original dataset and the corresponding multimodal data processor
+data:
+
+  datasource: SPEECH_MNIST
+  data_path: ./data
+
+  sampler: sample_quantity_noniid
+  testset_sampler: sample_quantity_noniid
+  modality_sampler: modality_iid
+
+  per_client_classes_size: 6
+
+  min_partition_size: 200
+
+  # The random seed for sampling data
+  random_seed: 1
+
+trainer:
+    # The type of the trainer
+    type: basic
+
+    # The maximum number of training rounds
+    rounds: 100
+
+    # Whether the training should use multiple GPUs if available
+    parallelized: false
+
+    # The maximum number of clients running concurrently
+    max_concurrency: 10
+
+    # The target accuracy
+    target_accuracy: 0.98
+
+    # Number of epochs for local training in each communication round
+    epochs: 10
+    batch_size: 10
+    optimizer: SGD
+    learning_rate: 0.03
+    momentum: 0.0 # learning rate is fixed as in Appendix C.2
+    weight_decay: 0.0
+
+    # Number of epoches for head optimization
+    head_epochs: 9
+
+
+    # The machine learning model
+    model_name: lenet5
+    num_classes: 47
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg

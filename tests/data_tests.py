@@ -5,7 +5,11 @@ Testing multi-modal datasources of Plato framework.
 import os
 import unittest
 
-os.environ['config_file'] = 'tests/TestsConfig/flickr30k_entities.yml'
+os.environ['config_file'] = 'tests/TestsConfig/speech_mnist.yml'
+
+# os.environ['config_file'] = 'tests/TestsConfig/fsdd_mnist.yml'
+
+#os.environ['config_file'] = 'tests/TestsConfig/flickr30k_entities.yml'
 
 # os.environ['config_file'] = 'tests/TestsConfig/coco.yml'
 
@@ -23,7 +27,11 @@ import torch
 
 from plato.config import Config
 
-from plato.datasources.flickr30k_entities import DataSource as f30ke_DataSource
+from plato.datasources.speech_mnist import DataSource as sp_mnist_DataSource
+
+# from plato.datasources.fsdd_mnist import DataSource as fsdd_mnist_DataSource
+
+#from plato.datasources.flickr30k_entities import DataSource as f30ke_DataSource
 # from plato.datasources.referitgame import DataSource as refer_Datasource
 # from plato.datasources.coco import DataSource as coco_Datasource
 # from plato.datasources.kinetics import DataSource as kinetics_Datasource
@@ -37,6 +45,7 @@ from sampler_test_utils import define_sampler
 
 class DatasetsTest(unittest.TestCase):
     """ Aiming to test the correcness of implemented samplers and datasets """
+
     def setUp(self):
         super().setUp()
 
@@ -91,10 +100,20 @@ class DatasetsTest(unittest.TestCase):
 
         return True
 
-    def test_f30ke_datasource(self):
-        """ Test the flickr30k entities dataset. """
-        self.utest_datasource = f30ke_DataSource()
+    def test_sp_mnist_datasource(self):
+        """ Test the multimodal fsdd mnist dataset. """
+        self.utest_datasource = sp_mnist_DataSource()
         assert self.assertDataSourceDefinition(self.utest_datasource)
+
+    # def test_fsdd_datasource(self):
+    #     """ Test the multimodal fsdd mnist dataset. """
+    #     self.utest_datasource = fsdd_mnist_DataSource()
+    #     assert self.assertDataSourceDefinition(self.utest_datasource)
+
+    # def test_f30ke_datasource(self):
+    #     """ Test the flickr30k entities dataset. """
+    #     self.utest_datasource = f30ke_DataSource()
+    #     assert self.assertDataSourceDefinition(self.utest_datasource)
 
     # def test_coco_datasource(self):
     #     """ Test the MSCOCO dataset. """
