@@ -46,12 +46,12 @@ class SPMNISTDataset(multimodal_base.MultiModalDataset):
         basic_audio_file_name = "data_sp_{}.npy"
         basic_rgb_file_name = "data_wr_{}.npy"
         basic_label_file_name = "labels_{}.npy"
-        audio_samples_path = os.apth.join(
-            data_dir, self.phase, basic_audio_file_name.format(self.phase))
-        rgb_samples_path = os.apth.join(data_dir, self.phase,
+        audio_samples_path = os.path.join(
+            data_dir, basic_audio_file_name.format(self.phase))
+        rgb_samples_path = os.path.join(data_dir,
                                         basic_rgb_file_name.format(self.phase))
-        samples_label_path = os.apth.join(
-            data_dir, self.phase, basic_label_file_name.format(self.phase))
+        samples_label_path = os.path.join(
+            data_dir, basic_label_file_name.format(self.phase))
 
         self.phase_info = {
             "audio": audio_samples_path,
@@ -106,7 +106,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
                 self._download_arrange_data(
                     download_url_address=file_url,
                     put_data_dir=split_dir,
-                    download_file_name=file_name,
+                    obtained_file_name=file_name + ".npy",
                 )
 
     def get_train_set(self, modality_sampler=None):
