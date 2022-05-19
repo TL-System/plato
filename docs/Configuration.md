@@ -76,6 +76,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |disable_clients|If this optional setting is enabled as `true`, the server will not launched client processes on the same machine.||
 |s3_endpoint_url|The endpoint URL for an S3-compatible storage service, used for transferring payloads between clients and servers.||
 |s3_bucket|The bucket name for an S3-compatible storage service, used for transferring payloads between clients and servers.||
+|random_seed|Use a fixed random seed for selecting clients (and sampling testset if needed) so that experiments are reproducible||
 |ping_interval|The time interval in seconds at which the server pings the client. ||default: 3600|
 |ping_timeout| The time in seconds that the client waits for the server to respond before disconnecting.|| default: 3600|
 |synchronous|Synchronous or asynchronous mode|`true` or `false`||
@@ -120,7 +121,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |||`mixed`|Some data are iid, while others are non-iid. Must have *non_iid_clients* attributes|
 |test_set_sampler|How to sample the test set when clients test locally|Could be any **sampler**|Without this parameter, every client's test set is the test set of the datasource|
 |edge_test_set_sampler|How to sample the test set when edge servers test locally|Could be any **sampler**|Without this parameter, edge servers' test sets are the test set of the datasource if they locally test their aggregated models in cross-silo FL|
-|random_seed|Use a fixed random seed so that experiments are reproducible (clients always have the same datasets)||
+|random_seed|Use a fixed random seed to sample each client's dataset so that experiments are reproducible||
 |**partition_size**|Number of samples in each client's dataset|Any positive integer||
 |concentration| The concentration parameter of symmetric Dirichlet distribution, used by `noniid` **sampler** || default: 1|
 |*non_iid_clients*|Indexs of clients whose datasets are non-iid. Other clients' datasets are iid|e.g., 4|Must have this attribute if the **sampler** is `mixed`|
