@@ -155,8 +155,8 @@ class Client:
 
         logging.info("[Client #%d] Selected by the server.", self.client_id)
 
-        if not (hasattr(Config().data, 'reload_data')
-                and not Config().data.reload_data):
+        if not hasattr(Config().data,
+                       'reload_data') or Config().data.reload_data:
             self.load_data()
 
         if self.comm_simulation:
