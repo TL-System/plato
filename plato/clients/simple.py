@@ -86,8 +86,6 @@ class Client(base.Client):
             self.datasource = datasources_registry.get(
                 client_id=self.client_id)
 
-        self.data_loaded = True
-
         logging.info("[%s] Dataset size: %s", self,
                      self.datasource.num_train_examples())
 
