@@ -3,6 +3,9 @@ The implementation of the simsiam's [1] augmentation function.
 
 [1].  Chen & He, Exploring Simple Siamese Representation Learning, 2021.
 
+This augmentaion is directly extracted from the 'augmentaions/' of 
+ https://github.com/PatrickHua/SimSiam.
+
 """
 
 import numpy as np
