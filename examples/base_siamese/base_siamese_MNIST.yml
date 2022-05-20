@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 10
+    total_clients: 5
 
     # The number of clients selected in each round
-    per_round: 3
+    per_round: 1
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -44,6 +44,11 @@ data:
     # The random seed for sampling data
     random_seed: 1
 
+    # set the data wrapper to further process the data 
+    #   for the specific usage, such as constrastive learning
+    # data_wrapper: Null
+    data_wrapper: ContrastiveWrapper
+
 trainer:
     # The type of the trainer
     type: basic
@@ -62,12 +67,14 @@ trainer:
 
     # Number of epochs for local training in each communication round
     epochs: 10
-    batch_size: 10
+    batch_size: 2
     optimizer: SGD
     learning_rate: 0.03
     momentum: 0.0 # learning rate is fixed as in Appendix C.2
     weight_decay: 0.0
 
+    # margin
+    margin: 2.0
     # Number of epoches for head optimization
     head_epochs: 9
 
