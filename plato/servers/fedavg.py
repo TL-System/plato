@@ -201,23 +201,7 @@ class Server(base.Server):
         # Record results into a .csv file
         new_row = []
         for item in self.recorded_items:
-            item_value = {
-                'round':
-                self.current_round,
-                'accuracy':
-                self.accuracy,
-                'elapsed_time':
-                self.wall_time - self.initial_wall_time,
-                'comm_time':
-                max([
-                    report.comm_time for (__, report, __, __) in self.updates
-                ]),
-                'round_time':
-                max([
-                    report.training_time + report.comm_time
-                    for (__, report, __, __) in self.updates
-                ]),
-            }[item]
+            item_value = self.get_record_items_values()[item]
             new_row.append(item_value)
 
         result_csv_file = f"{Config().params['result_path']}/{os.getpid()}.csv"
@@ -230,6 +214,24 @@ class Server(base.Server):
             for (client_id, report, __, __) in self.updates:
                 accuracy_row = [self.current_round, client_id, report.accuracy]
                 csv_processor.write_csv(accuracy_csv_file, accuracy_row)
+
+    def get_record_items_values(self):
+        """Get values will be recorded in result csv file."""
+        return {
+            'round':
+            self.current_round,
+            'accuracy':
+            self.accuracy,
+            'elapsed_time':
+            self.wall_time - self.initial_wall_time,
+            'comm_time':
+            max([report.comm_time for (__, report, __, __) in self.updates]),
+            'round_time':
+            max([
+                report.training_time + report.comm_time
+                for (__, report, __, __) in self.updates
+            ]),
+        }
 
     @staticmethod
     def accuracy_averaging(updates):
