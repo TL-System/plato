@@ -6,9 +6,13 @@ Please access the git repo "https://github.com/Jakobovski/free-spoken-digit-data
 
 In summary, 6 speakers generate 3,000 recordings (50 of each digit per speaker).
 
-"""
+Another one audio data source is the AudioMNIST:
+ https://github.com/jayrodge/AudioMNIST-using-PyTorch.
+ https://github.com/soerenab/AudioMNIST.
 
-import os
+However, limited by time, we do not implement it (AudioMNIST-based MNIST) currently.
+
+"""
 
 import numpy as np
 from torchfsdd import TorchFSDDGenerator, TrimSilence
