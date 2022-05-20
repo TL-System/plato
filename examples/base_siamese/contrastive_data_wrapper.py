@@ -24,7 +24,7 @@ class ContrastiveDataWrapper(torch.utils.data.Dataset):
         self.dataset = dataset
 
         # all labels for samples of the dataset
-        self.dataset_labels = self.dataset.targets
+        self.dataset_labels = self.dataset.targets.tolist()
         # the category of labels
         self.unique_label = list(set(self.dataset_labels))
         self.label_classes_size = len(self.unique_label)
@@ -59,7 +59,7 @@ class ContrastiveDataWrapper(torch.utils.data.Dataset):
         """ Increase the selected_label_count by one, but with the upper bound. """
         self.selected_label_count += 1
 
-        if self.selected_label_count == len(self.label_classes_size):
+        if self.selected_label_count == self.label_classes_size - 1:
             self.selected_label_count = 0
 
     def increase_selected_index_count(self, target_label):
@@ -73,7 +73,8 @@ class ContrastiveDataWrapper(torch.utils.data.Dataset):
     def sample_label_pool(self, except_label):
         """ Sample one class of label from the label's class pool """
         # copy the label classes while removing the except_label
-        temp_unique_label = self.unique_label
+
+        temp_unique_label = self.unique_label.copy()
         temp_unique_label.remove(except_label)
 
         select_label_class_pos = self.selected_label_count % len(
@@ -93,7 +94,8 @@ class ContrastiveDataWrapper(torch.utils.data.Dataset):
         """ Sample one sample from the given label class. """
 
         # obtain all sample indexs for the target label
-        label_index_pool = self.label_indexs_pool[target_label]
+        label_index_pool = self.label_indexs_pool[target_label].copy()
+
         if except_sample_index is not None:
             # remove the except sample index
             label_index_pool.remove(except_sample_index)
@@ -108,7 +110,7 @@ class ContrastiveDataWrapper(torch.utils.data.Dataset):
         sample_index = label_index_pool[positive_sample_pos]
 
         # increase the selected samples count for this label
-        self.increase_selected_index_count()
+        self.increase_selected_index_count(target_label)
 
         return sample_index
 
@@ -125,7 +127,7 @@ class ContrastiveDataWrapper(torch.utils.data.Dataset):
         obtained_sample, sample_label = self.dataset[item_index]
 
         # decide to prepare positive or negative sample
-        self.is_positive = np.random.randint(1, size=10) > 0.5
+        self.is_positive = np.random.randint(1, size=1) > 0.5
 
         if self.is_positive:
             # obtain positive sample by sampling from the same
@@ -133,7 +135,7 @@ class ContrastiveDataWrapper(torch.utils.data.Dataset):
             positive_sample_index = self.sample_label_index_pool(
                 sample_label, except_sample_index=item_index)
 
-            paired_sample_label = 1
+            paired_sample_label = torch.tensor(1)
             prepared_sample, _ = self.dataset[positive_sample_index]
 
         else:
@@ -143,10 +145,10 @@ class ContrastiveDataWrapper(torch.utils.data.Dataset):
             negative_sample_index = self.sample_label_index_pool(
                 selected_label)
 
-            paired_sample_label = 0
+            paired_sample_label = torch.tensor(0)
             prepared_sample, _ = self.dataset[negative_sample_index]
 
-        return tuple(obtained_sample, prepared_sample), paired_sample_label
+        return obtained_sample, prepared_sample, paired_sample_label
 
 
 class ContrastiveAugmentDataWrapper(torch.utils.data.Dataset):
