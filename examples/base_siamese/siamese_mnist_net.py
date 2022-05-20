@@ -36,14 +36,15 @@ class SiameseBase(nn.Module):
 
         return out
 
-    def forward(self, x, y):
+    def forward(self, inputs):
 
+        x, y = inputs
         # doing the forwarding twice so as to obtain the same functions as that of twin networks
 
         out1 = self.forward_once(x)
         out2 = self.forward_once(y)
 
-        return out1, out2
+        return (out1, out2)
 
     def evaluate(self, x, y):
 

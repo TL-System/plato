@@ -1,13 +1,16 @@
 """
-Implement the client for base siamese method.
+Implement the client for the basic siamese method.
 
 """
 
-import collections
+import logging
 
 from plato.config import Config
 from plato.clients import simple
-from plato.clients import base
+from plato.datasources import registry as datasources_registry
+from plato.samplers import registry as samplers_registry
+
+import datawrapper_registry
 
 
 class Client(simple.Client):
@@ -19,3 +22,18 @@ class Client(simple.Client):
                  trainer=None):
         super().__init__(model, datasource, algorithm, trainer)
         self.model_representation_weights_key = []
+
+    def load_data(self) -> None:
+        """Generating data and loading them onto this client."""
+        super().load_data()
+
+        if hasattr(Config().data,
+                   "data_wrapper") and Config().data.data_wrapper != None:
+
+            self.trainset = datawrapper_registry.get(self.trainset)
+
+        if Config().clients.do_test:
+            if hasattr(Config().data,
+                       "data_wrapper") and Config().data.data_wrapper != None:
+
+                self.testset = datawrapper_registry.get(self.testset)
