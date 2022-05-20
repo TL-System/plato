@@ -3,14 +3,11 @@ Implement the client for Fedrep method.
 
 """
 
-import collections
-
-from plato.config import Config
 from plato.clients import simple
-from plato.clients import base
 
 
 class Client(simple.Client):
+
     def __init__(self,
                  model=None,
                  datasource=None,
