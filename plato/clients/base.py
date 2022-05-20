@@ -85,7 +85,6 @@ class Client:
         self.sio = None
         self.chunks = []
         self.server_payload = None
-        self.data_loaded = False  # is training data already loaded from the disk?
         self.s3_client = None
         self.outbound_processor = None
         self.inbound_processor = None
@@ -156,8 +155,8 @@ class Client:
 
         logging.info("[Client #%d] Selected by the server.", self.client_id)
 
-        if (hasattr(Config().data, 'reload_data')
-                and Config().data.reload_data) or not self.data_loaded:
+        if not hasattr(Config().data,
+                       'reload_data') or Config().data.reload_data:
             self.load_data()
 
         if self.comm_simulation:
