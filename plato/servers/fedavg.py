@@ -108,7 +108,7 @@ class Server(base.Server):
                                      Config().params['result_path'])
 
         # Initialize the test accuracy csv file if clients compute locally
-        if Config().clients.do_test:
+        if hasattr(Config().clients, 'do_test') and Config().clients.do_test:
             accuracy_csv_file = f"{Config().params['result_path']}/{os.getpid()}_accuracy.csv"
             accuracy_headers = ["round", "client_id", "accuracy"]
             csv_processor.initialize_csv(accuracy_csv_file, accuracy_headers,
@@ -223,7 +223,7 @@ class Server(base.Server):
         result_csv_file = f"{Config().params['result_path']}/{os.getpid()}.csv"
         csv_processor.write_csv(result_csv_file, new_row)
 
-        if Config().clients.do_test:
+        if hasattr(Config().clients, 'do_test') and Config().clients.do_test:
             # Updates the log for client test accuracies
             accuracy_csv_file = f"{Config().params['result_path']}/{os.getpid()}_accuracy.csv"
 

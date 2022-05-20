@@ -12,6 +12,7 @@ from plato.samplers import base
 class Sampler(base.Sampler):
     """Create a data sampler for each client to use a divided partition of the
     dataset, biased across labels according to the Dirichlet distribution."""
+
     def __init__(self, datasource, client_id, testing):
         super().__init__()
 
@@ -26,12 +27,11 @@ class Sampler(base.Sampler):
 
             if dist.distribution.lower() == "uniform":
                 self.partition_size *= np.random.uniform(dist.low, dist.high)
-                
+
             if dist.distribution.lower() == "normal":
                 self.partition_size *= np.random.normal(dist.mean, dist.high)
 
-            self.partition_size = int(self.partition_size)    
-
+            self.partition_size = int(self.partition_size)
 
         # Concentration parameter to be used in the Dirichlet distribution
         concentration = Config().data.concentration if hasattr(

@@ -49,7 +49,7 @@ class Server(fedavg.Server):
                              Config().algorithm.cut_layer)
 
         # Test the updated model
-        if not Config().clients.do_test:
+        if not hasattr(Config().server, 'do_test') or Config().server.do_test:
             self.accuracy = self.trainer.test(self.testset)
             logging.info('[%s] Global model accuracy: %.2f%%\n', self,
                          100 * self.accuracy)
