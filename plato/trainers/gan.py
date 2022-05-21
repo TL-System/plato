@@ -121,6 +121,9 @@ class Trainer(base.Trainer):
         self.discriminator.to(self.device)
         self.discriminator.train()
 
+        # self.generator.apply(self.model.weights_init)
+        # self.discriminator.apply(self.model.weights_init)
+
         optimizer_gen = optimizers.get_optimizer(self.generator)
         optimizer_disc = optimizers.get_optimizer(self.discriminator)
 
@@ -129,10 +132,12 @@ class Trainer(base.Trainer):
 
         epochs = config['epochs']
         for epoch in range(1, epochs + 1):
+            # Here we assume the data samples still have labels attached to them,
+            # but GAN training does not need labels, so we'll just discard them
             for batch_id, (examples, _) in enumerate(train_loader):
                 cur_batch_size = len(examples)
                 examples = examples.to(self.device)
-                label = torch.full((cur_batch_size, ),
+                label = torch.full((cur_batch_size,),
                                    real_label,
                                    dtype=torch.float)
                 label = label.to(self.device)

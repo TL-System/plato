@@ -21,9 +21,9 @@ data:
 
     # Only add face identity as labels for training
     celeba_targets:
-        # No label is needed to train GAN
-        attr: true
-        identity: false
+        attr: false
+        # No label is needed to train GAN; label here is for non-iid sampler
+        identity: true
     
     # Resize all images to 32x32; default is 64x64
     celeba_img_size: 64
@@ -58,10 +58,9 @@ trainer:
 
     # Number of epoches for local training in each communication round
     epochs: 5
-    batch_size: 32
-    optimizer: SGD
-    learning_rate: 0.01
-    momentum: 0.9
+    batch_size: 128
+    optimizer: Adam
+    learning_rate: 0.0002
     weight_decay: 0.0
 
     # The machine learning model
