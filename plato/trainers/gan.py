@@ -13,12 +13,12 @@ import numpy as np
 import torch
 
 from plato.config import Config
-from plato.trainers import base
+from plato.trainers import basic
 from plato.models import registry as models_registry
 from plato.utils import optimizers
 
 
-class Trainer(base.Trainer):
+class Trainer(basic.Trainer):
     """A federated learning trainer for GAN models."""
 
     def __init__(self, model=None):
@@ -204,7 +204,7 @@ class Trainer(base.Trainer):
                             epochs, batch_id, len(train_loader),
                             err_gen.data.item(), err_disc_total.data.item())
 
-    def train_process(self, trainset, sampler, cut_layer=None):
+    def train_process(self, trainset, sampler, config, cut_layer=None):
         """The main training loop in a federated learning workload, run in
           a separate process with a new CUDA context, so that CUDA memory
           can be released after the training completes.
@@ -225,7 +225,6 @@ class Trainer(base.Trainer):
         if 'max_concurrency' in config:
             self.generator.cpu()
             self.discriminator.cpu()
-            config = Config().trainer._asdict()
             model_type = config['model_name']
             filename = f"{model_type}_{self.client_id}_{config['run_id']}.pth"
             self.save_model(filename)
@@ -254,7 +253,7 @@ class Trainer(base.Trainer):
                 mp.set_start_method('spawn', force=True)
 
             train_proc = mp.Process(target=self.train_process,
-                                    args=(trainset, sampler, cut_layer))
+                                    args=(trainset, sampler, config, cut_layer))
             train_proc.start()
             train_proc.join()
 
@@ -271,7 +270,7 @@ class Trainer(base.Trainer):
             self.pause_training()
         else:
             tic = time.perf_counter()
-            self.train_process(trainset, sampler, cut_layer)
+            self.train_process(trainset, sampler, config, cut_layer)
             toc = time.perf_counter()
 
         training_time = toc - tic
@@ -285,6 +284,7 @@ class Trainer(base.Trainer):
         testset: The test dataset.
         sampler: The sampler that extracts a partition of the test dataset.
         """
+        return 0
 
     async def server_test(self, testset, sampler=None):
         """Testing the model on the server using the provided test dataset.
@@ -293,3 +293,4 @@ class Trainer(base.Trainer):
         testset: The test dataset.
         sampler: The sampler that extracts a partition of the test dataset.
         """
+        return 0

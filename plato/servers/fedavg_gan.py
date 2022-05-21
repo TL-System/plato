@@ -16,7 +16,7 @@ class Server(fedavg.Server):
 
         # Total sample is the same for both Generator and Discriminator
         self.total_samples = sum(
-            [report.num_samples for ((__, report, __, __), __) in updates])
+            [report.num_samples for (__, report, __, __) in updates])
 
         # Perform weighted averaging for both Generator and Discriminator
         gen_avg_update = {
