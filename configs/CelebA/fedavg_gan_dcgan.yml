@@ -21,8 +21,8 @@ data:
 
     # Only add face identity as labels for training
     celeba_targets:
-        # For ResNet, do not set <attr> to True since it does not match the expected output of ResNet
-        attr: false
+        # No label is needed to train GAN
+        attr: true
         identity: false
     
     # Resize all images to 32x32; default is 64x64

@@ -80,8 +80,8 @@ class Model:
     """A wrapper class to hold the Generator and Discriminator models of DCGAN"""
 
     def __init__(self) -> None:
-        self.generator = Generator
-        self.discriminator = Discriminator
+        self.generator = Generator()
+        self.discriminator = Discriminator()
         self.loss_criterion = nn.BCELoss()
 
         self.nz = nz
@@ -96,3 +96,8 @@ class Model:
         elif classname.find('BatchNorm') != -1:
             nn.init.normal_(model.weight.data, 1.0, 0.02)
             nn.init.constant_(model.bias.data, 0)
+
+    @staticmethod
+    def get_model(*args):
+        """Obtaining an instance of this model."""
+        return Model()

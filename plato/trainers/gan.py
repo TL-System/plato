@@ -26,7 +26,7 @@ class Trainer(base.Trainer):
 
         if model is None:
             model = models_registry.get()
-        gan_model = model()
+        gan_model = model
         self.generator = gan_model.generator
         self.discriminator = gan_model.discriminator
         self.loss_criterion = gan_model.loss_criterion
