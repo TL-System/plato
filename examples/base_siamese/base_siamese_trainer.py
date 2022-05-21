@@ -2,20 +2,12 @@
 Implement the trainer for base siamese method.
 
 """
-import os
-import time
-import logging
 
 import torch
 import torch.nn as nn
 
-from opacus import GradSampleModule
-from opacus.privacy_engine import PrivacyEngine
-from opacus.validators import ModuleValidator
-
 from plato.config import Config
 from plato.trainers import basic
-from plato.utils import optimizers
 
 
 class ContrastiveLoss(nn.Module):
