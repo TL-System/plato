@@ -8,9 +8,8 @@ import logging
 from plato.config import Config
 from plato.clients import simple
 from plato.datasources import registry as datasources_registry
+from plato.datasources import datawrapper_registry
 from plato.samplers import registry as samplers_registry
-
-import datawrapper_registry
 
 
 class Client(simple.Client):
