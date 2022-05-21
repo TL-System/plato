@@ -30,7 +30,7 @@ class Trainer(base.Trainer):
         self.netG = gan_model.netG
         self.netD = gan_model.netD
         self.loss_criterion = gan_model.loss_criterion
-        self.gan_model = gan_model
+        self.model = gan_model
 
     def save_model(self, filename=None, location=None):
         """Saving the model to a file. """
@@ -118,9 +118,6 @@ class Trainer(base.Trainer):
         self.netG.train()
         self.netD.to(self.device)
         self.netD.train()
-
-        self.netG.apply(self.gan_model.weights_init)
-        self.netD.apply(self.gan_model.weights_init)
 
         optimizerG = optimizers.get_optimizer(self.netG)
         optimizerD = optimizers.get_optimizer(self.netD)
