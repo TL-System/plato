@@ -7,8 +7,6 @@ https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html
 
 import torch.nn as nn
 
-from plato.config import Config
-
 nz = 100
 nc = 3
 ngf = 64
@@ -44,8 +42,8 @@ class Generator(nn.Module):
             # state size. (nc) x 64 x 64
         )
 
-    def forward(self, input):
-        return self.main(input)
+    def forward(self, input_data):
+        return self.main(input_data)
 
 
 class Discriminator(nn.Module):
@@ -74,16 +72,16 @@ class Discriminator(nn.Module):
             nn.Conv2d(ndf * 8, 1, 4, 1, 0, bias=False),
             nn.Sigmoid())
 
-    def forward(self, input):
-        return self.main(input)
+    def forward(self, input_data):
+        return self.main(input_data)
 
 
 class Model:
     """A wrapper class to hold the Generator and Discriminator models of DCGAN"""
 
     def __init__(self) -> None:
-        self.netG = Generator
-        self.netD = Discriminator
+        self.generator = Generator
+        self.discriminator = Discriminator
         self.loss_criterion = nn.BCELoss()
 
         self.nz = nz

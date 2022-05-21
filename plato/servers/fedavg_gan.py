@@ -20,11 +20,11 @@ class Server(fedavg.Server):
             [report.num_samples for ((__, report, __, __), __) in updates])
 
         # Perform weighted averaging for both Generator and Discriminator
-        avg_update_G = {
+        gen_avg_update = {
             name: self.trainer.zeros(weights.shape)
             for name, weights in weights_received[0][0].items()
         }
-        avg_update_D = {
+        disc_avg_update = {
             name: self.trainer.zeros(weights.shape)
             for name, weights in weights_received[0][1].items()
         }
@@ -33,17 +33,17 @@ class Server(fedavg.Server):
             __, report, __, __ = updates[i]
             num_samples = report.num_samples
 
-            update_from_G, update_from_D = update
+            update_from_gen, update_from_disc = update
 
-            for name, delta in update_from_G.items():
-                avg_update_G[name] += delta * (num_samples /
-                                               self.total_samples)
+            for name, delta in update_from_gen.items():
+                gen_avg_update[name] += delta * (num_samples /
+                                                 self.total_samples)
 
-            for name, delta in update_from_D.items():
-                avg_update_D[name] += delta * (num_samples /
-                                               self.total_samples)
+            for name, delta in update_from_disc.items():
+                disc_avg_update[name] += delta * (num_samples /
+                                                  self.total_samples)
 
             # Yield to other tasks in the server
             await asyncio.sleep(0)
 
-        return avg_update_G, avg_update_D
+        return gen_avg_update, disc_avg_update
