@@ -151,7 +151,7 @@ class Trainer(base.Trainer):
                 ## Train with all-fake batch
                 # Generate batch of latent vectors
                 noise = torch.randn(cur_batch_size,
-                                    self.nz,
+                                    self.model.nz,
                                     1,
                                     1,
                                     device=self.device)

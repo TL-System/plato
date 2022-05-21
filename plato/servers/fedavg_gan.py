@@ -14,8 +14,7 @@ class Server(fedavg.Server):
         """Aggregate weight updates from the clients using federated averaging."""
         weights_received = self.extract_client_updates(updates)
 
-        # Extract the total number of samples; total sample is the same for
-        # both Generator and Discriminator
+        # Total sample is the same for both Generator and Discriminator
         self.total_samples = sum(
             [report.num_samples for ((__, report, __, __), __) in updates])
 
