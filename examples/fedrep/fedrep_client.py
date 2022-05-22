@@ -3,7 +3,6 @@ Implement the client for Fedrep method.
 
 """
 
-from re import S
 from plato.clients import simple
 
 
@@ -24,9 +23,9 @@ class Client(simple.Client):
         self.model_representation_weights_key = server_response[
             "representation_keys"]
 
-        # the representation keys are regarded as the global model
-        #   this needs to be set in the trainer for training the
-        #   global and local model in the FedRep's way
+        # The representation keys are regarded as the global model.
+        # This needs to be set in the trainer for training the
+        # global and local model according to the FedRep algorithm.
         self.trainer.set_global_local_weights_key(
             global_keys=self.model_representation_weights_key)
 
