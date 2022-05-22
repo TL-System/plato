@@ -30,33 +30,33 @@ class Server(fedavg.Server):
     async def federated_averaging(self, updates):
         """ Aggregate weight updates and deltas updates from the clients. """
         # Extract weights udpates from the client updates
-        weights_received = self.extract_client_updates(updates)
+        updates_received = self.extract_client_updates(updates)
 
         num_samples = [report.num_samples for (__, report, __, __) in updates]
         total_samples = sum(num_samples)
 
         self.global_grads = {
             name: self.trainer.zeros(weights.shape)
-            for name, weights in weights_received[0].items()
+            for name, weights in updates_received[0].items()
         }
 
-        for i, update in enumerate(weights_received):
+        for i, update in enumerate(updates_received):
             for name, delta in update.items():
                 self.global_grads[name] += delta * (num_samples[i] /
                                                     total_samples)
 
         # Get adaptive weighting based on both node contribution and date size
         self.adaptive_weighting = self.calc_adaptive_weighting(
-            weights_received, num_samples)
+            updates_received, num_samples)
 
         # Perform weighted averaging
         avg_update = {
             name: self.trainer.zeros(weights.shape)
-            for name, weights in weights_received[0].items()
+            for name, weights in updates_received[0].items()
         }
 
         # Use adaptive weighted average
-        for i, update in enumerate(weights_received):
+        for i, update in enumerate(updates_received):
             for name, delta in update.items():
                 avg_update[name] += delta * self.adaptive_weighting[i]
 
