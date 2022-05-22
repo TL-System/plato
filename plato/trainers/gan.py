@@ -112,10 +112,8 @@ class Trainer(basic.Trainer):
                                                    batch_size=batch_size,
                                                    sampler=sampler)
 
-        self.generator.to(self.device)
-        self.generator.train()
-        self.discriminator.to(self.device)
-        self.discriminator.train()
+        self.model.to(self.device)
+        self.model.train()
 
         # self.generator.apply(self.model.weights_init)
         # self.discriminator.apply(self.model.weights_init)
@@ -199,31 +197,6 @@ class Trainer(basic.Trainer):
                             "Discriminator Loss: %.6f", self.client_id, epoch,
                             epochs, batch_id, len(train_loader),
                             err_gen.data.item(), err_disc_total.data.item())
-
-    def train_process(self, config, trainset, sampler, cut_layer=None):
-        """The main training loop in a federated learning workload, run in
-          a separate process with a new CUDA context, so that CUDA memory
-          can be released after the training completes.
-
-        Arguments:
-        self: the trainer itself.
-        trainset: The training dataset.
-        sampler: the sampler that extracts a partition for this client.
-        cut_layer (optional): The layer which training should start from.
-        """
-
-        try:
-            self.train_loop(config, trainset, sampler.get(), cut_layer)
-        except Exception as training_exception:
-            logging.info("Training on client #%d failed.", self.client_id)
-            raise training_exception
-
-        if 'max_concurrency' in config:
-            self.generator.cpu()
-            self.discriminator.cpu()
-            model_type = config['model_name']
-            filename = f"{model_type}_{self.client_id}_{config['run_id']}.pth"
-            self.save_model(filename)
 
     def test(self, testset, sampler=None) -> float:
         """Testing the model using the provided test dataset.
