@@ -79,8 +79,8 @@ async def test_fedavg_aggregation(self):
         f"Weights before federated averaging: {server.model.layer.weight.data}"
     )
 
-    update = await server.federated_averaging(updates)
-    updated_weights = server.algorithm.update_weights(update)
+    deltas = await server.federated_averaging(updates)
+    updated_weights = server.algorithm.update_weights(deltas)
     server.algorithm.load_weights(updated_weights)
 
     print(

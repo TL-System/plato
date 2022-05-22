@@ -1,6 +1,5 @@
 import os
 import logging
-from collections import OrderedDict
 from torch import nn
 
 os.environ['config_file'] = 'examples/configs/server.yml'
@@ -13,18 +12,18 @@ class fedReIdServer(fedavg.Server):
         super().__init__(model, trainer)
         self.clients_belive = None
 
-    def extract_client_updates(self, updates):
+    def compute_weight_deltas(self, updates):
         """ Extract the model weights and update directions from clients updates. """
         weights_received = [payload[0] for (__, payload, __) in updates]
 
         self.clients_belive = [payload[1] for (__, payload, __) in updates]
 
-        return self.algorithm.compute_weight_updates(weights_received)
+        return self.algorithm.compute_weight_deltas(weights_received)
 
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using federated averaging."""
         # Extract weights from the updates
-        updates_received = self.extract_client_updates(updates)
+        deltas_received = self.compute_weight_deltas(updates)
 
         self.total_belive = sum(self.clients_belive)
         if self.total_belive == 0.0:
@@ -33,11 +32,11 @@ class fedReIdServer(fedavg.Server):
         # Perform weighted averaging
         avg_update = {
             name: self.trainer.zeros(weights.shape)
-            for name, weights in updates_received[0].items()
+            for name, weights in deltas_received[0].items()
         }
 
-        for i, update in enumerate(updates_received):
-            report, __ = updates_received[i]
+        for i, update in enumerate(deltas_received):
+            report, __ = deltas_received[i]
             belive = self.clients_belive[i]
             logging.info("%d -> %f", i, belive)
             for name, delta in update.items():

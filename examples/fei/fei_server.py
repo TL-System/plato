@@ -50,14 +50,14 @@ class RLServer(rl_server.RLServer):
         self.agent.new_state, self.agent.client_ids = self.prep_state()
         self.agent.process_env_update()
 
-    def extract_client_updates(self, updates):
+    def compute_weight_deltas(self, updates):
         """ Extract the model weights and update directions from clients updates. """
         weights_received = [payload for (__, payload, __) in updates]
 
         # Get adaptive weighting based on both node contribution and date size
         self.corr = self.calc_corr(weights_received)
 
-        return self.algorithm.compute_weight_updates(weights_received)
+        return self.algorithm.compute_weight_deltas(weights_received)
 
     def calc_corr(self, updates):
         """ Calculate the node contribution based on the angle
