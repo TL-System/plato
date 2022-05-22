@@ -2,7 +2,9 @@
 A federated learning server using federated averaging to train GAN models.
 """
 import asyncio
+
 from plato.servers import fedavg
+from plato.config import Config
 
 
 class Server(fedavg.Server):
@@ -46,3 +48,16 @@ class Server(fedavg.Server):
             await asyncio.sleep(0)
 
         return gen_avg_update, disc_avg_update
+
+    def customize_server_payload(self, payload):
+        """ Customize the server payload before sending to the client. """
+        weights_gen = None
+        weights_disc = None
+        if hasattr(Config().server, 'network_to_sync'):
+            if hasattr(Config().server.network_to_sync,
+                       'generator') and Config().server.network_to_sync.generator:
+                weights_gen = payload[0]
+            if hasattr(Config().server.network_to_sync,
+                       'discriminator') and Config().server.network_to_sync.discriminator:
+                weights_disc = payload[1]
+        return weights_gen, weights_disc
