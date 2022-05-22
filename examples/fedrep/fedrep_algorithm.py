@@ -7,7 +7,7 @@ from plato.algorithms import fedavg
 
 
 class Algorithm(fedavg.Algorithm):
-    """The federated learning trainer for Adaptive Synchronization Frequency,
+    """The federated learning algorithm for federated representation learning,
        used by the server.
     """
 
