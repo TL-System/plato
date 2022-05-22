@@ -23,12 +23,12 @@ class Server(fedavg.Server):
 
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using attack-adaptive aggregation."""
-        updates_received = self.extract_client_updates(updates)
+        deltas_received = self.compute_weight_deltas(updates)
 
         # Performing attack-adaptive aggregation
         att_update = {
             name: self.trainer.zeros(weights.shape)
-            for name, weights in updates_received[0].items()
+            for name, weights in deltas_received[0].items()
         }
 
         # Extracting baseline model weights
@@ -37,8 +37,8 @@ class Server(fedavg.Server):
         # Calculating attention
         atts = OrderedDict()
         for name, weight in baseline_weights.items():
-            atts[name] = self.trainer.zeros(len(updates_received))
-            for i, update in enumerate(updates_received):
+            atts[name] = self.trainer.zeros(len(deltas_received))
+            for i, update in enumerate(deltas_received):
                 delta = update[name]
 
                 # Calculating the cosine similarity
@@ -52,7 +52,7 @@ class Server(fedavg.Server):
 
         for name, weight in baseline_weights.items():
             att_weight = self.trainer.zeros(weight.shape)
-            for i, update in enumerate(updates_received):
+            for i, update in enumerate(deltas_received):
                 delta = update[name]
                 att_weight += delta.mul(atts[name][i])
             att_update[name] = att_weight

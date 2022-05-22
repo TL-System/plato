@@ -61,7 +61,7 @@ class Server(fedavg.Server):
 
         # Calculate updated weights from clients
         payload_received = [payload for (__, __, payload, __) in self.updates]
-        updates_received = self.algorithm.compute_weight_updates(
+        deltas_received = self.algorithm.compute_weight_deltas(
             payload_received)
 
         # Actually update the global model's weights (PyTorch only)
@@ -71,7 +71,7 @@ class Server(fedavg.Server):
         for name, weight in baseline_weights.items():
             updated_weights[name] = weight * (
                 1 - self.mixing_hyperparam
-            ) + updates_received[0][name] * self.mixing_hyperparam
+            ) + deltas_received[0][name] * self.mixing_hyperparam
 
         self.algorithm.load_weights(updated_weights)
 
