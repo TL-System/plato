@@ -31,8 +31,3 @@ class Client(simple.Client):
 
         self.algorithm.set_global_weights_key(
             global_keys=self.model_representation_weights_key)
-
-    def load_payload(self, server_payload) -> None:
-        """Loading the server model onto this client."""
-        print("Loading server payload: ", server_payload.keys())
-        self.algorithm.load_weights(server_payload)
