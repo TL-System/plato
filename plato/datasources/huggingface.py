@@ -31,7 +31,7 @@ class DataSource(base.DataSource):
         else:
             dataset_config = None
 
-        saved_data_path = f"{Config().data.data_path}/{dataset_name}_{dataset_config}"
+        saved_data_path = f"{Config().params['data_path']}/{dataset_name}_{dataset_config}"
 
         if os.path.exists(saved_data_path):
             # If the dataset has already been downloaded and saved
@@ -47,12 +47,12 @@ class DataSource(base.DataSource):
 
         model_checkpoint = Config().trainer.model_checkpoint
         config_kwargs = {
-            "cache_dir": Config().server.model_dir,
+            "cache_dir": Config().params['model_path'],
             "revision": 'main',
             "use_auth_token": None,
         }
         tokenizer_kwargs = {
-            "cache_dir": Config().data.data_path,
+            "cache_dir": Config().params['data_path'],
             "use_fast": True,
             "revision": 'main',
             "use_auth_token": None,

@@ -101,7 +101,7 @@ algorithm:
     alpha3: 0.1
 
 results:
-    result_dir: ./results/FashionMNIST_lenet5/AFL
+    result_path: results/FashionMNIST_lenet5/AFL
 
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time

@@ -177,15 +177,13 @@ If runtime exceptions occur that prevent a federated learning session from runni
 
   *Potential solutions:* Decrease the `max_concurrency` value in the `trainer` section in your configuration file.
  
-* The time that a client waits for the server to respond before disconnecting is too short. This could happen when training with large neural network models. If you get an `AssertionError` saying that there are not enough launched clients for the server to select, this could be the reason. But make sure you first check if it is due to the *out of CUDA memory* error.
-
-  *Potential solutions:* Add `ping_timeout` in the `server` section in your configuration file. The default value for `ping_timeout` is 360 (seconds). 
-
-  For example, to run a training session with the CIFAR-10 dataset and the ResNet-18 model, and if 10 clients are selected per round, `ping_timeout` needs to be 360 when clients' local datasets are non-iid by symmetric Dirichlet distribution with the concentration of 0.01. Consider an even larger number if you run with larger models and more clients.
-
 * Running processes have not been terminated from previous runs. 
 
   *Potential solutions:* Use the command `pkill python` to terminate them so that there will not be CUDA errors in the upcoming run.
+ 
+* The time that a client waits for the server to respond before disconnecting is too short. This could happen when training with large neural network models. If you get an `AssertionError` saying that there are not enough launched clients for the server to select, this could be the reason. But make sure you first check if it is due to the *out of CUDA memory* error.
+
+  *Potential solutions:* Add `ping_timeout` in the `server` section in your configuration file. The default value for `ping_timeout` is 360 (seconds). 
 
 ### Removing the Python virtual environment
 

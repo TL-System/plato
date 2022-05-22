@@ -76,7 +76,7 @@ class Server(fedavg.Server):
         self.algorithm.load_weights(updated_weights)
 
         # Testing the global model accuracy
-        if Config().clients.do_test:
+        if hasattr(Config().server, 'do_test') and not Config().server.do_test:
             # Compute the average accuracy from client reports
             self.accuracy = self.accuracy_averaging(self.updates)
             logging.info('[%s] Average client accuracy: %.2f%%.', self,

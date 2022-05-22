@@ -85,15 +85,12 @@ class Client:
         self.sio = None
         self.chunks = []
         self.server_payload = None
-        self.data_loaded = False  # is training data already loaded from the disk?
         self.s3_client = None
         self.outbound_processor = None
         self.inbound_processor = None
 
-        self.comm_simulation = False
-        if hasattr(Config().clients,
-                   'comm_simulation') and Config().clients.comm_simulation:
-            self.comm_simulation = True
+        self.comm_simulation = Config().clients.comm_simulation if hasattr(
+            Config().clients, 'comm_simulation') else True
 
         if hasattr(Config().algorithm,
                    'cross_silo') and not Config().is_edge_server():
@@ -148,20 +145,21 @@ class Client:
     async def payload_to_arrive(self, response) -> None:
         """ Upon receiving a response from the server. """
         self.current_round = response['current_round']
-        self.process_server_response(response)
 
         # Update (virtual) client id for client, trainer and algorithm
         self.client_id = response['id']
+
+        self.process_server_response(response)
+
         self.configure()
 
         logging.info("[Client #%d] Selected by the server.", self.client_id)
 
-        if (hasattr(Config().data, 'reload_data')
-                and Config().data.reload_data) or not self.data_loaded:
+        if not hasattr(Config().data,
+                       'reload_data') or Config().data.reload_data:
             self.load_data()
 
-        if hasattr(Config().clients,
-                   'comm_simulation') and Config().clients.comm_simulation:
+        if self.comm_simulation:
             payload_filename = response['payload_filename']
             with open(payload_filename, 'rb') as payload_file:
                 self.server_payload = pickle.load(payload_file)
@@ -283,8 +281,8 @@ class Client:
             # If we are using the filesystem to simulate communication over a network
             model_name = Config().trainer.model_name if hasattr(
                 Config().trainer, 'model_name') else 'custom'
-            checkpoint_dir = Config().params['checkpoint_dir']
-            payload_filename = f"{checkpoint_dir}/{model_name}_client_{self.client_id}.pth"
+            checkpoint_path = Config().params['checkpoint_path']
+            payload_filename = f"{checkpoint_path}/{model_name}_client_{self.client_id}.pth"
             with open(payload_filename, 'wb') as payload_file:
                 pickle.dump(payload, payload_file)
 
@@ -326,14 +324,14 @@ class Client:
         """ Delete all the temporary checkpoint files created by the client. """
         if hasattr(Config().server,
                    'request_update') and Config().server.request_update:
-            model_dir = Config().params['model_dir']
-            for filename in os.listdir(model_dir):
+            model_path = Config().params['model_path']
+            for filename in os.listdir(model_path):
                 split = re.match(
                     r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+).pth",
                     filename)
                 if split is not None and self.client_id == int(
                         split.group('client_id')):
-                    file_path = f'{model_dir}/{filename}'
+                    file_path = f'{model_path}/{filename}'
                     os.remove(file_path)
 
     @abstractmethod

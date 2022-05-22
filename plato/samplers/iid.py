@@ -15,6 +15,7 @@ class Sampler(base.Sampler):
 
     def __init__(self, datasource, client_id, testing):
         super().__init__()
+
         if testing:
             dataset = datasource.get_test_set()
         else:
@@ -45,8 +46,8 @@ class Sampler(base.Sampler):
         """Obtains an instance of the sampler. """
         gen = torch.Generator()
         gen.manual_seed(self.random_seed)
-        version = torch.__version__
-        if int(version[0]) <= 1 and int(version[2]) <= 5:
+        version = torch.__version__.split(".")
+        if int(version[0]) <= 1 and int(version[1]) <= 5:
             return SubsetRandomSampler(self.subset_indices)
         return SubsetRandomSampler(self.subset_indices, generator=gen)
 

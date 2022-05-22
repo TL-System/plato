@@ -81,6 +81,7 @@ def obtain_required_anno_files(splits_info):
 
 class KineticsDataset(multimodal_base.MultiModalDataset):
     """ Prepare the Kinetics dataset."""
+
     def __init__(self,
                  multimodal_data_holder,
                  phase,
@@ -137,6 +138,7 @@ class KineticsDataset(multimodal_base.MultiModalDataset):
 
 class DataSource(multimodal_base.MultiModalDataSource):
     """The Kinetics datasource."""
+
     def __init__(self):
         super().__init__()
 
@@ -149,7 +151,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
             "video", "audio", "rgb", "flow", "audio_feature"
         ]
 
-        _path = Config().data.data_path
+        _path = Config().params['data_path']
         # Generate the basic path for the dataset, it performs:
         #   1.- Assign path to self.mm_data_info
         #   2.- Assign splits path to self.splits_info

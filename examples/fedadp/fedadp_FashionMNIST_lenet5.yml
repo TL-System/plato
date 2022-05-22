@@ -103,7 +103,7 @@ algorithm:
     alpha: 5
 
 results:
-    result_dir: ./results/FashionMNIST_lenet5/FedAdp
+    result_path: results/FashionMNIST_lenet5/FedAdp
 
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time

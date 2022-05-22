@@ -55,6 +55,7 @@ from plato.datasources import multimodal_base
 
 class DataSource(multimodal_base.MultiModalDataSource):
     """ The COCO dataset."""
+
     def __init__(self):
         super().__init__()
 
@@ -63,7 +64,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         self.modality_names = ["image", "text"]
 
-        _path = Config().data.data_path
+        _path = Config().params['data_path']
         self._data_path_process(data_path=_path, base_data_name=self.data_name)
 
         base_data_path = self.mm_data_info["base_data_dir_path"]
