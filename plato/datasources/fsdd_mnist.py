@@ -15,13 +15,12 @@ However, limited by time, we do not implement it (AudioMNIST-based MNIST) curren
 """
 
 import numpy as np
-from torchfsdd import TorchFSDDGenerator, TrimSilence
-from torchaudio.transforms import MFCC
-from torchvision import transforms as vision_transforms
-from torchvision import datasets
-
 from plato.config import Config
 from plato.datasources import multimodal_base
+from torchaudio.transforms import MFCC
+from torchfsdd import TorchFSDDGenerator, TrimSilence
+from torchvision import datasets
+from torchvision import transforms as vision_transforms
 
 
 class FSDDMNISTDataset(multimodal_base.MultiModalDataset):
@@ -66,7 +65,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
     def __init__(self):
         super().__init__()
-        _path = Config().data.data_path
+        _path = Config().params['data_path']
 
         self.data_name = Config().data.datasource
         self.modality_names = ["audio", "text"]

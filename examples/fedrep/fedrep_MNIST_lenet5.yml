@@ -16,21 +16,17 @@ clients:
 
     random_seed: 1
 
-
 server:
     address: 127.0.0.1
     port: 8000
     synchronous: true
 
-    checkpoint_dir: ./models/fedrep/mnist
-    model_dir: ./models/fedrep/mnist
+    checkpoint_path: models/fedrep/mnist
+    model_path: models/fedrep/mnist
 
 data:
     # The training and testing dataset
     datasource: MNIST
-
-    # Where the dataset is located
-    data_path: ./data
 
     # Number of samples in each partition
     partition_size: 600
@@ -70,7 +66,6 @@ trainer:
 
     # Number of epoches for head optimization
     head_epochs: 9
-
 
     # The machine learning model
     model_name: lenet5

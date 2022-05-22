@@ -16,21 +16,17 @@ clients:
 
     random_seed: 1
 
-
 server:
     address: 127.0.0.1
     port: 8000
     synchronous: true
 
-    checkpoint_dir: ./models/base_siamese/mnist
-    model_dir: ./models/base_siamese/mnist
+    checkpoint_path: models/base_siamese/mnist
+    model_path: models/base_siamese/mnist
 
 data:
     # The training and testing dataset
     datasource: MNIST
-
-    # Where the dataset is located
-    data_path: ./data
 
     # Number of samples in each partition
     partition_size: 600
@@ -44,7 +40,7 @@ data:
     # The random seed for sampling data
     random_seed: 1
 
-    # set the data wrapper to further process the data 
+    # set the data wrapper to further process the data
     #   for the specific usage, such as constrastive learning
     # data_wrapper: Null
     data_wrapper: ContrastiveWrapper
@@ -77,7 +73,6 @@ trainer:
     margin: 2.0
     # Number of epoches for head optimization
     head_epochs: 9
-
 
     # The machine learning model
     model_name: lenet5

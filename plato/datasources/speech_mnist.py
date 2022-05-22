@@ -83,7 +83,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
     def __init__(self):
         super().__init__()
-        _path = Config().data.data_path
+        _path = Config().params['data_path']
 
         self.data_name = Config().data.datasource
         self.modality_names = ["audio", "text"]
