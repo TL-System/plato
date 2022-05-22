@@ -9,7 +9,6 @@ Learning and Systems, 2, 429-450.
 https://proceedings.mlsys.org/paper/2020/file/38af86134b65d0f10fe33d30dd76442e-Paper.pdf
 """
 import torch
-import numpy as np
 
 from plato.config import Config
 from plato.trainers import basic
@@ -32,15 +31,16 @@ class FedProxLocalObjective:
 
     def compute_objective(self, outputs, labels):
         """ Compute the objective the FedProx client wishes to minimize. """
-        cur_weights = flatten_weights_from_model(self.model)
-        mu = Config().clients.proximal_term_penalty_constant if hasattr(
+        current_weights = flatten_weights_from_model(self.model)
+        parameter_mu = Config(
+        ).clients.proximal_term_penalty_constant if hasattr(
             Config().clients, "proximal_term_penalty_constant") else 1
-        prox_term = mu / 2 * torch.linalg.norm(
-            cur_weights - self.init_global_weights, ord=2)
+        proximal_term = parameter_mu / 2 * torch.linalg.norm(
+            current_weights - self.init_global_weights, ord=2)
 
         local_function = torch.nn.CrossEntropyLoss()
-        h = local_function(outputs, labels) + prox_term
-        return h
+        function_h = local_function(outputs, labels) + proximal_term
+        return function_h
 
 
 class Trainer(basic.Trainer):
