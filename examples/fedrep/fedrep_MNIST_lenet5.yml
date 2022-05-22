@@ -19,7 +19,7 @@ clients:
 server:
     address: 127.0.0.1
     port: 8000
-    synchronous: true
+    do_test: false
 
     checkpoint_path: models/fedrep/mnist
     model_path: models/fedrep/mnist

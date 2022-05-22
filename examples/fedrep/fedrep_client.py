@@ -3,6 +3,7 @@ Implement the client for Fedrep method.
 
 """
 
+from re import S
 from plato.clients import simple
 
 
@@ -18,6 +19,8 @@ class Client(simple.Client):
 
     def process_server_response(self, server_response) -> None:
         """Additional client-specific processing on the server response."""
+        super().process_server_response(server_response)
+
         self.model_representation_weights_key = server_response[
             "representation_keys"]
 

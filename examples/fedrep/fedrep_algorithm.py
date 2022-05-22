@@ -10,16 +10,19 @@ class Algorithm(fedavg.Algorithm):
     """The federated learning trainer for Adaptive Synchronization Frequency,
        used by the server.
     """
+
     def __init__(self, trainer=None):
         super().__init__(trainer)
 
         self.representation_weights_key = []
 
     def set_global_weights_key(self, global_keys):
+        """ Setting the global representation weights. """
         self.representation_weights_key = global_keys
 
     def extract_weights(self, model=None):
-        """Extract weights from the model."""
+        """ Extract weights from the model. """
+
         def extract_required_weights(model, weights_key):
             full_weights = model.state_dict()
 
