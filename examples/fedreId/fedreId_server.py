@@ -8,6 +8,7 @@ from plato.servers import fedavg
 
 
 class fedReIdServer(fedavg.Server):
+
     def __init__(self, model=None, trainer=None):
         super().__init__(model, trainer)
         self.clients_belive = None
@@ -23,7 +24,7 @@ class fedReIdServer(fedavg.Server):
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using federated averaging."""
         # Extract weights from the updates
-        weights_received = self.extract_client_updates(updates)
+        updates_received = self.extract_client_updates(updates)
 
         self.total_belive = sum(self.clients_belive)
         if self.total_belive == 0.0:
@@ -32,11 +33,11 @@ class fedReIdServer(fedavg.Server):
         # Perform weighted averaging
         avg_update = {
             name: self.trainer.zeros(weights.shape)
-            for name, weights in weights_received[0].items()
+            for name, weights in updates_received[0].items()
         }
 
-        for i, update in enumerate(weights_received):
-            report, __ = weights_received[i]
+        for i, update in enumerate(updates_received):
+            report, __ = updates_received[i]
             belive = self.clients_belive[i]
             logging.info("%d -> %f", i, belive)
             for name, delta in update.items():

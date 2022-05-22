@@ -147,7 +147,7 @@ class Server(base.Server):
 
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using federated averaging."""
-        weights_received = self.extract_client_updates(updates)
+        updates_received = self.extract_client_updates(updates)
 
         # Extract the total number of samples
         self.total_samples = sum(
@@ -156,10 +156,10 @@ class Server(base.Server):
         # Perform weighted averaging
         avg_update = {
             name: self.trainer.zeros(weights.shape)
-            for name, weights in weights_received[0].items()
+            for name, weights in updates_received[0].items()
         }
 
-        for i, update in enumerate(weights_received):
+        for i, update in enumerate(updates_received):
             __, report, __, __ = updates[i]
             num_samples = report.num_samples
 
