@@ -1,5 +1,7 @@
 """
-A federated learning training session using the honest-but-curious server with gradient leakage attack.
+A federated learning training session with the honest-but-curious server.
+The server can analyze periodic gradients from certain clients to
+perform the gradient leakage attacks and reconstruct the training data of the victim clients.
 
 Reference:
 
@@ -12,7 +14,7 @@ import dlg_server
 
 
 def main():
-    """ A Plato federated learning training session using the honest-but-curious server with gradient leakage attack. """
+    """ A Plato federated learning training session with the honest-but-curious server. """
     server = dlg_server.Server()
     server.run()
 
