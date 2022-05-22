@@ -52,6 +52,7 @@ from plato.datasources.datalib import data_utils
 
 class GymDataset(multimodal_base.MultiModalDataset):
     """ Prepare the Gym dataset."""
+
     def __init__(self,
                  multimodal_data_holder,
                  phase,
@@ -102,6 +103,7 @@ class GymDataset(multimodal_base.MultiModalDataset):
 
 class DataSource(multimodal_base.MultiModalDataSource):
     """The Gym dataset."""
+
     def __init__(self):
         super().__init__()
 
@@ -114,7 +116,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
             "video", "audio", "rgb", "flow", "audio_feature"
         ]
 
-        _path = Config().data.data_path
+        _path = Config().params['data_path']
         self._data_path_process(data_path=_path, base_data_name=self.data_name)
         self._create_modalities_path(modality_names=self.modality_names)
 

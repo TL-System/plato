@@ -24,6 +24,7 @@ from plato.utils import optimizers
 
 class Trainer(basic.Trainer):
     """ A federated learning trainer for FEI. """
+
     def train_model(self, config, trainset, sampler, cut_layer=None):
         """ A custom trainer reporting training loss. """
         batch_size = config['batch_size']
@@ -149,16 +150,16 @@ class Trainer(basic.Trainer):
     @staticmethod
     def save_loss(loss, filename=None):
         """ Saving the training loss to a file. """
-        model_dir = Config().params['model_dir']
+        model_path = Config().params['model_path']
         model_name = Config().trainer.model_name
 
-        if not os.path.exists(model_dir):
-            os.makedirs(model_dir)
+        if not os.path.exists(model_path):
+            os.makedirs(model_path)
 
         if filename is not None:
-            loss_path = f'{model_dir}/{filename}'
+            loss_path = f'{model_path}/{filename}'
         else:
-            loss_path = f'{model_dir}/{model_name}.loss'
+            loss_path = f'{model_path}/{model_name}.loss'
 
         with open(loss_path, 'w', encoding='utf-8') as file:
             file.write(str(loss))
@@ -166,13 +167,13 @@ class Trainer(basic.Trainer):
     @staticmethod
     def load_loss(filename=None):
         """ Loading the training loss from a file. """
-        model_dir = Config().params['model_dir']
+        model_path = Config().params['model_path']
         model_name = Config().trainer.model_name
 
         if filename is not None:
-            loss_path = f'{model_dir}/{filename}'
+            loss_path = f'{model_path}/{filename}'
         else:
-            loss_path = f'{model_dir}/{model_name}.loss'
+            loss_path = f'{model_path}/{model_name}.loss'
 
         with open(loss_path, 'r', encoding='utf-8') as file:
             loss = float(file.read())

@@ -81,8 +81,7 @@ class Server(fedavg.Server):
                 Config().args.id, os.getpid(), self.total_clients,
                 self.clients_per_round)
 
-            if hasattr(Config(), 'results'):
-                self.recorded_items = ['global_round'] + self.recorded_items
+            self.recorded_items = ['global_round'] + self.recorded_items
 
         # Compute the number of clients for the central server
         if Config().is_central_server():
@@ -134,11 +133,11 @@ class Server(fedavg.Server):
                                                  Config().data.testset_size)
                     self.testset_sampler = SubsetRandomSampler(test_samples)
 
-            if hasattr(Config(), 'results'):
-                result_dir = Config().params['result_dir']
-                result_csv_file = f'{result_dir}/edge_{os.getpid()}.csv'
-                csv_processor.initialize_csv(result_csv_file,
-                                             self.recorded_items, result_dir)
+            # Initialize path of the result .csv file
+            result_path = Config().params['result_path']
+            result_csv_file = f'{result_path}/edge_{os.getpid()}.csv'
+            csv_processor.initialize_csv(result_csv_file, self.recorded_items,
+                                         result_path)
         else:
             super().configure()
             if hasattr(Config().server, 'do_test') and Config().server.do_test:
@@ -238,20 +237,30 @@ class Server(fedavg.Server):
 
     async def wrap_up_processing_reports(self):
         """Wrap up processing the reports with any additional work."""
-        if hasattr(Config(), 'results'):
+        # Record results into a .csv file
+        if Config().is_central_server():
+            await super().wrap_up_processing_reports()
+
+        if Config().is_edge_server():
             new_row = []
             for item in self.recorded_items:
                 item_value = self.get_record_items_values()[item]
                 new_row.append(item_value)
 
-            if Config().is_edge_server():
-                result_csv_file = f"{Config().params['result_dir']}/edge_{os.getpid()}.csv"
-            else:
-                result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}.csv"
-
+            result_csv_file = f"{Config().params['result_path']}/edge_{os.getpid()}.csv"
             csv_processor.write_csv(result_csv_file, new_row)
 
-        if Config().is_edge_server():
+            if hasattr(Config().clients,
+                       'do_test') and Config().clients.do_test:
+                # Updates the log for client test accuracies
+                accuracy_csv_file = f"{Config().params['result_path']}/edge_{os.getpid()}_accuracy.csv"
+
+                for (client_id, report, __, __) in self.updates:
+                    accuracy_row = [
+                        self.current_round, client_id, report.accuracy
+                    ]
+                    csv_processor.write_csv(accuracy_csv_file, accuracy_row)
+
             # When a certain number of aggregations are completed, an edge client
             # needs to be signaled to send a report to the central server
             if self.current_round == Config().algorithm.local_rounds:
@@ -266,29 +275,14 @@ class Server(fedavg.Server):
 
     def get_record_items_values(self):
         """Get values will be recorded in result csv file."""
-        return {
-            'global_round':
-            self.current_global_round,
-            'round':
-            self.current_round,
-            'accuracy':
-            self.accuracy * 100,
-            'average_accuracy':
-            self.average_accuracy * 100,
-            'edge_agg_num':
-            Config().algorithm.local_rounds,
-            'local_epoch_num':
-            Config().trainer.epochs,
-            'elapsed_time':
-            self.wall_time - self.initial_wall_time,
-            'comm_time':
-            max([report.comm_time for (__, report, __, __) in self.updates]),
-            'round_time':
-            max([
-                report.training_time + report.comm_time
-                for (__, report, __, __) in self.updates
-            ]),
-        }
+        record_items_values = super().get_record_items_values()
+
+        record_items_values['global_round'] = self.current_global_round
+        record_items_values['average_accuracy'] = self.average_accuracy * 100
+        record_items_values['edge_agg_num'] = Config().algorithm.local_rounds
+        record_items_values['local_epoch_num'] = Config().trainer.epochs
+
+        return record_items_values
 
     async def wrap_up(self):
         """Wrapping up when each round of training is done."""

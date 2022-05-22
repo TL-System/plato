@@ -98,16 +98,16 @@ class Server(fedavg.Server):
                     self, self.current_round)
 
                 # Loading the saved model on the server for starting the retraining phase
-                checkpoint_dir = Config.params['checkpoint_dir']
+                checkpoint_path = Config.params['checkpoint_path']
 
                 model_name = Config().trainer.model_name if hasattr(
                     Config().trainer, 'model_name') else 'custom'
                 filename = f"checkpoint_{model_name}_{self.current_round}.pth"
-                self.trainer.load_model(filename, checkpoint_dir)
+                self.trainer.load_model(filename, checkpoint_path)
 
                 logging.info(
                     "[Server #%d] Model used for the retraining phase loaded from %s.",
-                    os.getpid(), checkpoint_dir)
+                    os.getpid(), checkpoint_path)
 
                 if hasattr(Config().clients,
                            'exact_retrain') and Config().clients.exact_retrain:
@@ -116,4 +116,4 @@ class Server(fedavg.Server):
                         "[Server #%d] Random states after round #%s restored for exact retraining.",
                         os.getpid(), self.current_round)
                     self.restore_random_states(self.current_round,
-                                               checkpoint_dir)
+                                               checkpoint_path)

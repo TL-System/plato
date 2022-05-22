@@ -95,15 +95,15 @@ class Trainer(basic.Trainer):
     def save_gradients(self):
         """ Saving gradients to a file. """
         model_name = Config().trainer.model_name
-        model_dir = Config().params['model_dir']
+        model_path = Config().params['model_path']
 
-        if not os.path.exists(model_dir):
-            os.makedirs(model_dir)
+        if not os.path.exists(model_path):
+            os.makedirs(model_path)
 
-        model_path = f'{model_dir}/{model_name}_gradients.pth'
-        if os.path.exists(model_path):
-            os.remove(model_path)
-        torch.save(self.cut_layer_grad, model_path)
+        model_gradients_path = f'{model_path}/{model_name}_gradients.pth'
+        if os.path.exists(model_gradients_path):
+            os.remove(model_gradients_path)
+        torch.save(self.cut_layer_grad, model_gradients_path)
 
         logging.info("[Server #%d] Gradients saved to %s.", os.getpid(),
-                     model_path)
+                     model_gradients_path)

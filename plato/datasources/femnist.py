@@ -69,7 +69,7 @@ class DataSource(base.DataSource):
         self.trainset = None
         self.testset = None
 
-        root_path = os.path.join(Config().data.data_path, 'FEMNIST',
+        root_path = os.path.join(Config().params['data_path'], 'FEMNIST',
                                  'packaged_data')
         if client_id == 0:
             # If we are on the federated learning server

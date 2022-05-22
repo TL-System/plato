@@ -60,28 +60,23 @@ class Server(fedavg.Server):
     async def wrap_up_processing_reports(self):
         """Wrap up processing the reports with any additional work."""
         if self.do_personalization_test:
-            if hasattr(Config(), 'results'):
-                new_row = []
-                for item in self.recorded_items:
-                    item_value = {
-                        'round':
-                        self.current_round,
-                        'accuracy':
-                        self.accuracy * 100,
-                        'personalization_accuracy':
-                        self.personalization_accuracy * 100,
-                        'elapsed_time':
-                        self.wall_time - self.initial_wall_time,
-                        'comm_time':
-                        self.comm_time,
-                        'round_time':
-                        self.round_time,
-                    }[item]
-                    new_row.append(item_value)
+            # Record results into a .csv file
+            new_row = []
+            for item in self.recorded_items:
+                item_value = {
+                    'round': self.current_round,
+                    'accuracy': self.accuracy * 100,
+                    'personalization_accuracy':
+                    self.personalization_accuracy * 100,
+                    'elapsed_time': self.wall_time - self.initial_wall_time,
+                    'comm_time': self.comm_time,
+                    'round_time': self.round_time,
+                }[item]
+                new_row.append(item_value)
 
-                result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}.csv"
+            result_csv_file = f"{Config().params['result_path']}/{os.getpid()}.csv"
 
-                csv_processor.write_csv(result_csv_file, new_row)
+            csv_processor.write_csv(result_csv_file, new_row)
 
             self.do_personalization_test = False
 

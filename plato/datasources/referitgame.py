@@ -55,6 +55,7 @@ def collate_fn(batch):
 
 class ReferItGameDataset(multimodal_base.MultiModalDataset):
     """Prepares the Flickr30K Entities dataset."""
+
     def __init__(self,
                  dataset_info,
                  phase,
@@ -148,6 +149,7 @@ class ReferItGameDataset(multimodal_base.MultiModalDataset):
 
 class DataSource(multimodal_base.MultiModalDataSource):
     """The ReferItGame dataset."""
+
     def __init__(self):
         super().__init__()
 
@@ -170,7 +172,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
                     self.split_config, self.split_configs)
             logging.info(info_msg)
 
-        _path = Config().data.data_path
+        _path = Config().params['data_path']
         self._data_path_process(data_path=_path, base_data_name=self.data_name)
         base_data_path = self.mm_data_info["base_data_dir_path"]
 
