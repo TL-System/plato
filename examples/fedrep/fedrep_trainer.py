@@ -19,6 +19,7 @@ from plato.utils import optimizers
 
 
 class Trainer(basic.Trainer):
+
     def __init__(self, model=None):
         super().__init__(model)
 
@@ -35,19 +36,19 @@ class Trainer(basic.Trainer):
         self.model_head_weights_key = [
             name for name in full_model_weights_key if name not in global_keys
         ]
-        logging.info(("representation_weights: {}").format(
-            self.model_representation_weights_key))
-        logging.info(("head_weights: {}").format(self.model_head_weights_key))
+        logging.info("Representation_weights: %s",
+                     self.model_representation_weights_key)
+        logging.info("Head_weights: %s", self.model_head_weights_key)
 
     def train_model(self, config, trainset, sampler, cut_layer=None):
-        """The main training loop of FedRep in a federated learning workload. 
-        
+        """The main training loop of FedRep in a federated learning workload.
+
             The local training stage contains two parts:
-                - head optimization:
-                Makes τ local gradient-based updates to solve for its optimal head given 
+                - Head optimization:
+                Makes τ local gradient-based updates to solve for its optimal head given
                 the current global representation communicated by the server.
-                - representation optimization:
-                Takes one local gradient-based update with respect to the current representation,
+                - Representation optimization:
+                Takes one local gradient-based update with respect to the current representation
         """
         batch_size = config['batch_size']
         log_interval = 10
@@ -71,7 +72,6 @@ class Trainer(basic.Trainer):
         # load the local update epochs for head optimization
         head_epochs = config['head_epochs']
 
-        representation_epochs = epochs - head_epochs
         # Sending the model to the device used for training
         self.model.to(self.device)
         self.model.train()

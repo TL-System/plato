@@ -8,6 +8,7 @@ from plato.servers import fedavg
 
 
 class Server(fedavg.Server):
+
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model, algorithm, trainer)
 
@@ -27,8 +28,8 @@ class Server(fedavg.Server):
         #   ['conv1.weight', 'conv1.bias', 'conv2.weight', 'conv2.bias', 'conv3.weight', 'conv3.bias', 'fc4.weight', 'fc4.bias']
         self.model_representation_weights_key = model_full_weights_key[:-2]
 
-        logging.info(("representation_weights: {}").format(
-            self.model_representation_weights_key))
+        logging.info("Representation_weights: %s",
+                     self.model_representation_weights_key)
 
     def load_trainer(self):
         """ rewrite the load_trainer func to further extract the representaion keys """
