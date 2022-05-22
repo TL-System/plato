@@ -35,19 +35,19 @@ class Trainer(basic.Trainer):
         self.representation_param_names = []
         self.head_param_names = []
 
-    def set_representation_and_head(self, global_representation_param_names):
+    def set_representation_and_head(self, representation_param_names):
         """ Setting the global local weights key. """
         # the representation keys are obtained from
         #   the server response
-        self.representation_param_names = global_representation_param_names
+        self.representation_param_names = representation_param_names
 
         # FedRep calls the weights and biases of the final fully-connected layer
         # in each of the models as the "head"
-        full_model_parameter_names = self.model.state_dict().keys()
+        model_parameter_names = self.model.state_dict().keys()
 
         self.head_param_names = [
-            name for name in full_model_parameter_names
-            if name not in global_representation_param_names
+            name for name in model_parameter_names
+            if name not in representation_param_names
         ]
 
         logging.info("[Client #%s] Representation layers: %s", self,

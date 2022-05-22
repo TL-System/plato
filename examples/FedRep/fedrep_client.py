@@ -29,13 +29,13 @@ class Client(simple.Client):
         super().process_server_response(server_response)
 
         self.representation_param_names = server_response[
-            "representation_keys"]
+            "representation_param_names"]
 
         # The representation keys are regarded as the global model.
         # This needs to be set in the trainer for training the
         # global and local model according to the FedRep algorithm.
         self.trainer.set_representation_and_head(
-            global_parameter_names=self.representation_param_names)
+            representation_param_names=self.representation_param_names)
 
-        self.algorithm.set_global_parameter_names(
-            global_parameter_names=self.representation_param_names)
+        self.algorithm.set_representation_param_names(
+            representation_param_names=self.representation_param_names)

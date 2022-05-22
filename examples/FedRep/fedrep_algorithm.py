@@ -23,9 +23,9 @@ class Algorithm(fedavg.Algorithm):
 
         self.representation_param_names = []
 
-    def set_global_parameter_names(self, global_parameter_names):
+    def set_representation_param_names(self, representation_param_names):
         """ Setting the global representation weights. """
-        self.representation_param_names = global_parameter_names
+        self.representation_param_names = representation_param_names
 
     def extract_weights(self, model=None):
         """ Extract weights from the model. """

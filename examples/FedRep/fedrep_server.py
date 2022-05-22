@@ -51,14 +51,17 @@ class Server(fedavg.Server):
         #   this needs to be set in the trainer for training the
         #   global and local model in the FedRep's way
         self.trainer.set_representation_and_head(
-            global_parameter_names=self.representation_param_names)
+            representation_param_names=self.representation_param_names)
 
-        self.algorithm.set_global_parameter_names(
-            global_parameter_names=self.representation_param_names)
+        self.algorithm.set_representation_param_names(
+            representation_param_names=self.representation_param_names)
 
     async def customize_server_response(self, server_response):
-        """ Wrap up generating the server response with any additional information. """
+        """ 
+            The FedRep server sends parameter names belonging to the representation
+            layers back to the clients.
+        """
         # server sends the required the representaion to the client
         server_response[
-            "representation_keys"] = self.representation_param_names
+            "representation_param_names"] = self.representation_param_names
         return server_response
