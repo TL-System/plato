@@ -15,6 +15,10 @@ server:
     address: 127.0.0.1
     port: 8000
 
+    # At the end of each round, the server can choose to only send the global Generator
+    # or Discriminator (or both or neither) model to the clients next round. Reference 
+    # this for detail: https://deepai.org/publication/federated-generative-adversarial-learning
+    # By default, both model will be sent to the clients.
     network_to_sync:
         generator: true
         discriminator: false
@@ -60,7 +64,7 @@ trainer:
     target_accuracy: 0.94
 
     # Number of epoches for local training in each communication round
-    epochs: 1
+    epochs: 5
     batch_size: 128
     optimizer: Adam
     learning_rate: 0.0002

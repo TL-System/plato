@@ -51,13 +51,12 @@ class Server(fedavg.Server):
 
     def customize_server_payload(self, payload):
         """ Customize the server payload before sending to the client. """
-        weights_gen = None
-        weights_disc = None
+        weights_gen, weights_disc = payload
         if hasattr(Config().server, 'network_to_sync'):
-            if hasattr(Config().server.network_to_sync,
-                       'generator') and Config().server.network_to_sync.generator:
-                weights_gen = payload[0]
-            if hasattr(Config().server.network_to_sync,
-                       'discriminator') and Config().server.network_to_sync.discriminator:
-                weights_disc = payload[1]
+            if hasattr(Config().server.network_to_sync, 'generator'
+                       ) and not Config().server.network_to_sync.generator:
+                weights_gen = None
+            if hasattr(Config().server.network_to_sync, 'discriminator'
+                       ) and not Config().server.network_to_sync.discriminator:
+                weights_disc = None
         return weights_gen, weights_disc
