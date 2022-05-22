@@ -24,6 +24,7 @@ class Report(base.Report):
 
 class Client(base.Client):
     """A basic federated learning client who sends simple weight updates."""
+
     def __init__(self,
                  model=None,
                  datasource=None,
@@ -57,16 +58,16 @@ class Client(base.Client):
 
         if self.trainer is None and self.custom_trainer is None:
             self.trainer = trainers_registry.get(model=self.model)
-        elif self.custom_trainer is not None:
+        elif self.trainer is None and self.custom_trainer is not None:
             self.trainer = self.custom_trainer(model=self.model)
             self.custom_trainer = None
 
         self.trainer.set_client_id(self.client_id)
 
         if self.algorithm is None and self.custom_algorithm is None:
-            self.algorithm = algorithms_registry.get(self.trainer)
-        elif self.custom_algorithm is not None:
-            self.algorithm = self.custom_algorithm(self.trainer)
+            self.algorithm = algorithms_registry.get(trainer=self.trainer)
+        elif self.algorithm is None and self.custom_algorithm is not None:
+            self.algorithm = self.custom_algorithm(trainer=self.trainer)
             self.custom_algorithm = None
 
         self.algorithm.set_client_id(self.client_id)
@@ -85,8 +86,6 @@ class Client(base.Client):
             self.datasource = datasources_registry.get(
                 client_id=self.client_id)
 
-        self.data_loaded = True
-
         logging.info("[%s] Dataset size: %s", self,
                      self.datasource.num_train_examples())
 
@@ -101,7 +100,7 @@ class Client(base.Client):
             # PyTorch uses samplers when loading data with a data loader
             self.trainset = self.datasource.get_train_set()
 
-        if Config().clients.do_test:
+        if hasattr(Config().clients, 'do_test') and Config().clients.do_test:
             # Set the testset if local testing is needed
             self.testset = self.datasource.get_test_set()
             if hasattr(Config().data, 'testset_sampler'):
@@ -129,9 +128,9 @@ class Client(base.Client):
         weights = self.algorithm.extract_weights()
 
         # Generate a report for the server, performing model testing if applicable
-        if Config().clients.do_test and (
-                not hasattr(Config().clients, 'test_interval')
-                or self.current_round % Config().clients.test_interval == 0):
+        if (hasattr(Config().clients, 'do_test') and Config().clients.do_test
+            ) and (not hasattr(Config().clients, 'test_interval') or
+                   self.current_round % Config().clients.test_interval == 0):
             accuracy = self.trainer.test(self.testset, self.testset_sampler)
 
             if accuracy == -1:

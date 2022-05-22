@@ -20,7 +20,7 @@ class DataSource(base.DataSource):
 
     def __init__(self):
         super().__init__()
-        _path = Config().data.data_path
+        _path = Config().params['data_path']
 
         # Downloading the MNIST dataset from https://ossci-datasets.s3.amazonaws.com/mnist/
         self.train_path = _path + "/MNIST/raw/train"

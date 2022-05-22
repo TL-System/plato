@@ -8,6 +8,13 @@ This document introduces all the possible parameters in the configuration file.
 
 Attributes in **bold** must be included in a configuration file, while attributes in *italic* only need to be included under certain conditions.
 
+### general (optional)
+
+| Attribute | Meaning | Valid Value | Note |
+|:---------:|:-------:|:-----------:|:----:|
+|base_path|The prefix of directory of dataset, models, checkpoints, and results||default: `./`|
+
+
 ### clients
 
 | Attribute | Meaning | Valid Value | Note |
@@ -16,8 +23,8 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |||`mistnet`|A client for MistNet|
 |**total_clients**|The total number of clients|A positive number||
 |**per_round**|The number of clients selected in each round| Any positive integer that is not larger than **total_clients**||
-|**do_test**|Should the clients compute test accuracy locally?| `true` or `false`|if `true` and the configuration file has `results` section, a CSV file will log test accuracy of every selected client in each round| 
-|speed_simulation|Should we simulate client heterogeneity in training speed?|
+|do_test|Whether the clients compute test accuracy locally| `true` or `false`|if `true` and the configuration file has `results` section, a CSV file will log test accuracy of every selected client in each round| 
+|speed_simulation|Whether we simulate client heterogeneity in training speed|
 |simulation_distribution|Parameters for simulating client heterogeneity in training speed|`distribution`|`normal` for normal or `zipf` for Zipf|
 |||`s`|the parameter `s` in Zipf distribution|
 |||`mean`|The mean in normal distribution|
@@ -26,6 +33,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |max_sleep_time|The maximum simulated sleep time (in seconds)||default: 60|
 |outbound_processors|A list of processors to apply on the payload before sending| A list of processor names || 
 |inbound_processors|A list of processors to apply on the payload right after receiving| A list of processor names || 
+|comm_simulation|Whether client-server communication should be simulated with files|`true` or `false`|default: true|
 
 #### Valid processors for `clients.outbound_processors`
 
@@ -68,16 +76,17 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |disable_clients|If this optional setting is enabled as `true`, the server will not launched client processes on the same machine.||
 |s3_endpoint_url|The endpoint URL for an S3-compatible storage service, used for transferring payloads between clients and servers.||
 |s3_bucket|The bucket name for an S3-compatible storage service, used for transferring payloads between clients and servers.||
+|random_seed|Use a fixed random seed for selecting clients (and sampling testset if needed) so that experiments are reproducible||
 |ping_interval|The time interval in seconds at which the server pings the client. ||default: 3600|
-|ping_timeout| The time in seconds that the client waits for the server to respond before disconnecting. The default is 360 (seconds).||Increase this number when your session stops running when training larger models (but make sure it is not due to the *out of CUDA memory* error)|
+|ping_timeout| The time in seconds that the client waits for the server to respond before disconnecting.|| default: 3600|
 |synchronous|Synchronous or asynchronous mode|`true` or `false`||
 |periodic_interval|The time interval for a server operating in asynchronous mode to aggregate received updates|Any positive integer|default: 5 seconds|
-|simulate_wall_time|Should we simulate the wall clock time on the server?|`true` or `false`||
+|simulate_wall_time|Whether the wall clock time on the server is simulated|`true` or `false`||
 |staleness_bound|In asynchronous mode, should we wait for stale clients who are behind the current round by more than this bound?|Any positive integer|default: 0|
 |minimum_clients_aggregated|The minimum number of clients that need to arrive before aggregation and processing by the server when operating in asynchronous mode|Any positive integer|default: 1|
-|do_test|Should the central server compute test accuracy locally?| `true` or `false`|| 
-|checkpoint_dir|The directory of checkpoints||default: ./checkpoints|
-|model_dir|The directory of pretrained and trained models||default: ./models/pretrained|
+|do_test|Whether the central server computes test accuracy locally| `true` or `false`|| 
+|model_path|The directory of pretrained and trained models||default: `<base_path>/models/pretrained`|
+|checkpoint_path|The directory of checkpoints||default: `<base_path>/checkpoints`|
 |outbound_processors|A list of processors to apply on the payload before sending| A list of processor names || 
 |inbound_processors|A list of processors to apply on the payload right after receiving| A list of processor names || 
 
@@ -104,7 +113,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 | Attribute | Meaning | Valid Value | Note |
 |:---------:|:-------:|:-----------:|:----:|
 |**dataset**| The training and testing dataset|`MNIST`, `FashionMNIST`, `EMNIST`, `CIFAR10`, `CINIC10`, `YOLO`, `HuggingFace`, `PASCAL_VOC`, `TinyImageNet`, or `CelebA`||
-|**data_path**|Where the dataset is located|e.g.,`./data`|For the `CINIC10` dataset, the default `data_path` is `./data/CINIC-10`, For the `TinyImageNet` dataset, the default `data_path` is `./data/tiny-imagenet-200`|
+|data_path|Where the dataset is located||default: `./data`, except for the `CINIC10` dataset, the default is `./data/CINIC-10`; for the `TinyImageNet` dataset, the default is `./data/tiny-imagenet-200`|
 |**sampler**|How to divide the entire dataset to the clients|`iid`||
 |||`iid_mindspore`||
 |||`noniid`|Could have *concentration* attribute to specify the concentration parameter in the Dirichlet distribution|
@@ -112,7 +121,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |||`mixed`|Some data are iid, while others are non-iid. Must have *non_iid_clients* attributes|
 |test_set_sampler|How to sample the test set when clients test locally|Could be any **sampler**|Without this parameter, every client's test set is the test set of the datasource|
 |edge_test_set_sampler|How to sample the test set when edge servers test locally|Could be any **sampler**|Without this parameter, edge servers' test sets are the test set of the datasource if they locally test their aggregated models in cross-silo FL|
-|random_seed|Use a fixed random seed so that experiments are reproducible (clients always have the same datasets)||
+|random_seed|Use a fixed random seed to sample each client's dataset so that experiments are reproducible||
 |**partition_size**|Number of samples in each client's dataset|Any positive integer||
 |concentration| The concentration parameter of symmetric Dirichlet distribution, used by `noniid` **sampler** || default: 1|
 |*non_iid_clients*|Indexs of clients whose datasets are non-iid. Other clients' datasets are iid|e.g., 4|Must have this attribute if the **sampler** is `mixed`|
@@ -156,6 +165,6 @@ Attributes in **bold** must be included in a configuration file, while attribute
 
 | Attribute | Meaning | Valid Value | Note |
 |:---------:|:-------:|:-----------:|:----:|
-|types|Which parameter(s) will be written into a CSV file|`round`, `accuracy`, `elapsed_time`, `comm_time`, `round_time`, `local_epoch_num`, `edge_agg_num`|Use comma `,` to seperate parameters|
-|plot|Plot results ||Format: x\_axis-y\_axis. Use hyphen `-` to seperate axis. Use comma `,` to seperate multiple plots|
-|result_dir|The directory of results||If not specified, results will be stored under `./results/<datasource>/<model>/<server_type>/`|
+|types|The set of columns that will be written into a .csv file|`round`, `accuracy`, `elapsed_time`, `comm_time`, `round_time`, `local_epoch_num`, `edge_agg_num` (Use comma `,` to seperate them)|default: `round, accuracy, elapsed_time`|
+|plot|Plot results |(Format: x\_axis-y\_axis. Use hyphen `-` to seperate axis. Use comma `,` to seperate multiple plots)|default: `round-accuracy, elapsed_time-accuracy`|
+|result_path|The directory of results||default: `<base_path>/results/`|

@@ -28,6 +28,7 @@ def collate_fn(batch):
 
 class YOLODataset(torch.utils.data.Dataset):
     """Prepares the YOLO dataset for use in YOLOv5."""
+
     def __init__(self, dataset):
         self.dataset = dataset
 
@@ -41,9 +42,10 @@ class YOLODataset(torch.utils.data.Dataset):
 
 class DataSource(base.DataSource):
     """The YOLO dataset."""
+
     def __init__(self):
         super().__init__()
-        _path = Config().data.data_path
+        _path = Config().params['data_path']
 
         if not os.path.exists(_path):
             os.makedirs(_path)

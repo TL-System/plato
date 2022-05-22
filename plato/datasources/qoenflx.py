@@ -21,6 +21,7 @@ FEATURE_NAMES = ["VQA", "R$_1$", "R$_2$", "M", "I"]
 
 
 class QoENFLXDataset(torch.utils.data.Dataset):
+
     def __init__(self, dataset):
         self.dataset = dataset
 
@@ -48,11 +49,12 @@ class QoENFLXDataset(torch.utils.data.Dataset):
 
 class DataSource(base.DataSource):
     """A data source for QoENFLX datasets."""
+
     def __init__(self):
         super().__init__()
 
         logging.info("Dataset: QoENFLX")
-        dataset_path = Config().data.data_path + '/QoENFLX/VideoATLAS/'
+        dataset_path = Config().params['data_path'] + '/QoENFLX/VideoATLAS/'
         db_files = os.listdir(dataset_path)
         db_files.sort(key=lambda var: [
             int(x) if x.isdigit() else x
@@ -61,7 +63,7 @@ class DataSource(base.DataSource):
         Nvideos = len(db_files)
 
         pre_load_train_test_data_LIVE_Netflix = sio.loadmat(
-            Config().data.data_path +
+            Config().params['data_path'] +
             '/QoENFLX/TrainingMatrix_LIVENetflix_1000_trials.mat'
         )['TrainingMatrix_LIVENetflix_1000_trials']
 

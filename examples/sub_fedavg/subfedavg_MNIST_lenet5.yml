@@ -11,9 +11,6 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    # Whether client-server communication should be simulated with files
-    comm_simulation: true
-
     pruning_amount: 0.4
 
     # Processors for outbound data payloads
@@ -28,8 +25,8 @@ server:
     inbound_processors:
         - model_decompress
 
-    checkpoint_dir: ./results/test/checkpoint
-    model_dir: ./results/test/model
+    checkpoint_path: results/test/checkpoint
+    model_path: results/test/model
 
 data:
     # The training and testing dataset
@@ -81,4 +78,4 @@ results:
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time
 
-    result_dir: ./results/test
+    result_path: results/test

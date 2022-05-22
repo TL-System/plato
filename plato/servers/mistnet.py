@@ -27,11 +27,11 @@ class Server(fedavg.Server):
         """Setting up a pre-trained model to be loaded on the server."""
         super().load_trainer()
 
-        model_dir = Config().params['model_dir']
+        model_path = Config().params['model_path']
         model_file_name = Config().trainer.pretrained_model if hasattr(
             Config().trainer,
             'pretrained_model') else f'{Config().trainer.model_name}.pth'
-        pretrained_model_path = f'{model_dir}/{model_file_name}'
+        pretrained_model_path = f'{model_path}/{model_file_name}'
 
         if os.path.exists(pretrained_model_path):
             logging.info("[Server #%d] Loading a pre-trained model.",
@@ -49,7 +49,7 @@ class Server(fedavg.Server):
                              Config().algorithm.cut_layer)
 
         # Test the updated model
-        if not Config().clients.do_test:
+        if not hasattr(Config().server, 'do_test') or Config().server.do_test:
             self.accuracy = self.trainer.test(self.testset)
             logging.info('[%s] Global model accuracy: %.2f%%\n', self,
                          100 * self.accuracy)
