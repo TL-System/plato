@@ -18,12 +18,12 @@ server:
 data:
     # The training and testing dataset
     datasource: YOLO
-    data_params: packages/yolov5/yolov5/data/coco128.yaml
+    data_params: ./packages/yolov5/yolov5/data/coco128.yaml
 
     # Where the dataset is located
-    data_path: ./data/COCO
-    train_path: ./data/COCO/coco128/images/train2017/
-    test_path: ./data/COCO/coco128/images/train2017/
+    data_path: data/COCO
+    train_path: data/COCO/coco128/images/train2017/
+    test_path: data/COCO/coco128/images/train2017/
 
     # download command/URL (optional)
     download_urls:

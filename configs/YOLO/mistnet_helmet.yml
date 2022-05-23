@@ -32,9 +32,9 @@ data:
     data_params: ./configs/YOLO/helmet_data.yaml
 
     # Where the dataset is located
-    data_path: ./data/helmet/
-    train_path: ./data/helmet/helmet/images/train/
-    test_path: ./data/helmet/helmet/images/val/
+    data_path: data/helmet/
+    train_path: data/helmet/helmet/images/train/
+    test_path: data/helmet/helmet/images/val/
 
     # download command/URL
     download_urls: ["https://iqua.ece.toronto.edu/~bli/helmet.zip"]
