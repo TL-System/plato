@@ -3,16 +3,9 @@ A federated learning server with RL Agent.
 """
 import asyncio
 import logging
-import os
 from abc import abstractmethod
 
-from plato.algorithms import registry as algorithms_registry
-from plato.config import Config
-from plato.datasources import registry as datasources_registry
-from plato.models import registry as models_registry
-from plato.processors import registry as processor_registry
 from plato.servers import fedavg
-from plato.trainers import registry as trainers_registry
 
 
 class RLServer(fedavg.Server):
@@ -37,7 +30,7 @@ class RLServer(fedavg.Server):
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using smart weighting."""
         # Extract weights udpates from the client updates
-        weights_received = self.extract_client_updates(updates)
+        deltas_received = self.compute_weight_deltas(updates)
         self.update_state()
 
         # Extract the total number of samples
@@ -47,7 +40,7 @@ class RLServer(fedavg.Server):
         # Perform weighted averaging
         avg_update = {
             name: self.trainer.zeros(weights.shape)
-            for name, weights in weights_received[0].items()
+            for name, weights in deltas_received[0].items()
         }
 
         # e.g., wait for the new action from RL agent
@@ -57,7 +50,7 @@ class RLServer(fedavg.Server):
         await self.update_action()
 
         # Use adaptive weighted average
-        for i, update in enumerate(weights_received):
+        for i, update in enumerate(deltas_received):
             for name, delta in update.items():
                 if delta.type() == 'torch.LongTensor':
                     avg_update[name] += delta * self.smart_weighting[i][0]

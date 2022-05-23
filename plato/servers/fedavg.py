@@ -134,20 +134,20 @@ class Server(base.Server):
     async def select_clients(self, for_next_batch=False):
         await super().select_clients(for_next_batch=for_next_batch)
 
-    def extract_client_updates(self, updates):
+    def compute_weight_deltas(self, updates):
         """Extract the model weight updates from client updates."""
         weights_received = [payload for (__, __, payload, __) in updates]
-        return self.algorithm.compute_weight_updates(weights_received)
+        return self.algorithm.compute_weight_deltas(weights_received)
 
     async def aggregate_weights(self, updates):
         """Aggregate the reported weight updates from the selected clients."""
-        update = await self.federated_averaging(updates)
-        updated_weights = self.algorithm.update_weights(update)
+        deltas = await self.federated_averaging(updates)
+        updated_weights = self.algorithm.update_weights(deltas)
         self.algorithm.load_weights(updated_weights)
 
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using federated averaging."""
-        weights_received = self.extract_client_updates(updates)
+        deltas_received = self.compute_weight_deltas(updates)
 
         # Extract the total number of samples
         self.total_samples = sum(
@@ -156,10 +156,10 @@ class Server(base.Server):
         # Perform weighted averaging
         avg_update = {
             name: self.trainer.zeros(weights.shape)
-            for name, weights in weights_received[0].items()
+            for name, weights in deltas_received[0].items()
         }
 
-        for i, update in enumerate(weights_received):
+        for i, update in enumerate(deltas_received):
             __, report, __, __ = updates[i]
             num_samples = report.num_samples
 

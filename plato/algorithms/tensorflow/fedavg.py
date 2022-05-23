@@ -11,6 +11,7 @@ from plato.trainers.base import Trainer
 class Algorithm(base.Algorithm):
     """ Framework-specific algorithms for federated Averaging with TensorFlow, used
     by both the client and the server. """
+
     def __init__(self, trainer: Trainer):
         """Initializing the algorithm with the provided model and trainer.
 
@@ -28,35 +29,35 @@ class Algorithm(base.Algorithm):
         """ Extract weights from the model. """
         if model is None:
             return self.model.get_weights()
-        else:
-            return model.get_weights()
 
-    def compute_weight_updates(self, weights_received):
-        """ Extract the weights received from a client and compute the updates. """
+        return model.get_weights()
+
+    def compute_weight_deltas(self, weights_received):
+        """ Extract the weights received from a client and compute the deltas. """
         # Extract baseline model weights
         baseline_weights = self.extract_weights()
 
-        # Calculate updates from the received weights
-        updates = []
+        # Calculate deltas from the received weights
+        deltas = []
         for weight in weights_received:
-            update = OrderedDict()
+            delta = OrderedDict()
             for index, current_weight in enumerate(weight):
                 baseline = baseline_weights[index]
 
-                # Calculate update
-                delta = current_weight - baseline
-                update[index] = delta
-            updates.append(update)
+                # Calculating the delta
+                _delta = current_weight - baseline
+                delta[index] = _delta
+            deltas.append(delta)
 
-        return updates
+        return deltas
 
-    def update_weights(self, update):
+    def update_weights(self, deltas):
         """ Update the existing model weights. """
         baseline_weights = self.extract_weights()
 
         updated_weights = OrderedDict()
         for index, weight in enumerate(baseline_weights):
-            updated_weights[index] = weight + update[index]
+            updated_weights[index] = weight + deltas[index]
 
         return updated_weights
 
