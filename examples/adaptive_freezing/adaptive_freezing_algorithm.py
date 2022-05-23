@@ -24,6 +24,7 @@ class Algorithm(fedavg.Algorithm):
     """The federated learning trainer for Adaptive Parameter Freezing,
        used by both the client and the server.
     """
+
     def __init__(self, trainer: Trainer = None):
         super().__init__(trainer)
         self.sync_mask = {}
@@ -64,15 +65,15 @@ class Algorithm(fedavg.Algorithm):
             weights[name] = weights_to_sync
         return weights
 
-    def compute_weight_updates(self, weights_received):
-        """Extract the weights received from a client and compute the updates."""
+    def compute_weight_deltas(self, weights_received):
+        """Extract the weights received from a client and compute the deltas."""
         # Extract baseline model weights
         baseline_weights = self.extract_weights()
 
         # Calculate updates from the received weights
-        updates = []
+        deltas = []
         for weight in weights_received:
-            update = OrderedDict()
+            delta = OrderedDict()
             for name, current_weight in weight.items():
                 baseline = baseline_weights[name]
 
@@ -81,11 +82,11 @@ class Algorithm(fedavg.Algorithm):
                 updated_weight[self.sync_mask[name]] = current_weight
 
                 # Calculate update
-                delta = updated_weight - baseline
-                update[name] = delta
-            updates.append(update)
+                _delta = updated_weight - baseline
+                delta[name] = _delta
+            deltas.append(delta)
 
-        return updates
+        return deltas
 
     def preserve_weights(self):
         """Making a copy of the model weights for later use."""

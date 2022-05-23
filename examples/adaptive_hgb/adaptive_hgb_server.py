@@ -13,7 +13,7 @@ class Server(fedavg.Server):
 
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using federated averaging."""
-        weights_received = self.extract_client_updates(updates)
+        deltas_received = self.compute_weight_deltas(updates)
 
         # Extract the total number of samples
         self.total_samples = sum(
@@ -28,10 +28,10 @@ class Server(fedavg.Server):
         # Perform weighted averaging
         avg_update = {
             name: self.trainer.zeros(weights.shape)
-            for name, weights in weights_received[0].items()
+            for name, weights in deltas_received[0].items()
         }
 
-        for i, update in enumerate(weights_received):
+        for i, update in enumerate(deltas_received):
             __, report, __, __ = updates[i]
 
             for name, delta in update.items():
