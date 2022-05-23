@@ -11,12 +11,13 @@ from plato.servers import fedavg
 
 class Server(fedavg.Server):
     """A federated learning server using the FedSarah algorithm."""
+
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model, algorithm, trainer)
         self.server_control_variates = None
         self.control_variates_received = None
 
-    def extract_client_updates(self, updates):
+    def compute_weight_deltas(self, updates):
         """ Extract the model weights and control variates from clients updates. """
         weights_received = [payload[0] for (__, payload, __) in updates]
 
@@ -24,7 +25,7 @@ class Server(fedavg.Server):
             payload[1] for (__, payload, __) in updates
         ]
 
-        return self.algorithm.compute_weight_updates(weights_received)
+        return self.algorithm.compute_weight_deltas(weights_received)
 
     async def federated_averaging(self, updates):
         """ Aggregate weight and delta updates from client updates. """

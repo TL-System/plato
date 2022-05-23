@@ -20,14 +20,15 @@ from plato.servers import fedavg
 
 class Server(fedavg.Server):
     """A federated learning server using the fed_attack_adapt algorithm."""
+
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using attack-adaptive aggregation."""
-        weights_received = self.extract_client_updates(updates)
+        deltas_received = self.compute_weight_deltas(updates)
 
         # Performing attack-adaptive aggregation
         att_update = {
             name: self.trainer.zeros(weights.shape)
-            for name, weights in weights_received[0].items()
+            for name, weights in deltas_received[0].items()
         }
 
         # Extracting baseline model weights
@@ -36,8 +37,8 @@ class Server(fedavg.Server):
         # Calculating attention
         atts = OrderedDict()
         for name, weight in baseline_weights.items():
-            atts[name] = self.trainer.zeros(len(weights_received))
-            for i, update in enumerate(weights_received):
+            atts[name] = self.trainer.zeros(len(deltas_received))
+            for i, update in enumerate(deltas_received):
                 delta = update[name]
 
                 # Calculating the cosine similarity
@@ -51,7 +52,7 @@ class Server(fedavg.Server):
 
         for name, weight in baseline_weights.items():
             att_weight = self.trainer.zeros(weight.shape)
-            for i, update in enumerate(weights_received):
+            for i, update in enumerate(deltas_received):
                 delta = update[name]
                 att_weight += delta.mul(atts[name][i])
             att_update[name] = att_weight
