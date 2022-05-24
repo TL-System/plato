@@ -18,7 +18,7 @@ import socketio
 from aiohttp import web
 from plato.client import run
 from plato.config import Config
-from plato.utils import s3
+from plato.utils import s3, fonts
 
 
 class ServerEvents(socketio.AsyncNamespace):
@@ -342,9 +342,10 @@ class Server:
             if hasattr(Config().trainer, 'max_concurrency'):
                 self.trained_clients = []
 
-            logging.info("\n[%s] Starting round %s/%s.", self,
-                         self.current_round,
-                         Config().trainer.rounds)
+            logging.info(
+                fonts.colourize(
+                    f"\n[{{self}}] Starting round {self.current_round}/{Config().trainer.rounds}."
+                ))
 
             if Config().is_central_server():
                 # In cross-silo FL, the central server selects from the pool of edge servers
