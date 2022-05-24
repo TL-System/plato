@@ -80,9 +80,12 @@ class DataSource(base.DataSource):
     def get_train_set(self):
         single_class = (Config().data.num_classes == 1)
 
+        train_path = os.path.join(Config.params['base_path'],
+                                  Config().data.train_path)
+
         if self.train_set is None:
             self.train_set = LoadImagesAndLabels(
-                Config().data.train_path,
+                train_path,
                 self.image_size,
                 Config().trainer.batch_size,
                 augment=False,  # augment images
@@ -100,9 +103,12 @@ class DataSource(base.DataSource):
     def get_test_set(self):
         single_class = (Config().data.num_classes == 1)
 
+        test_path = os.path.join(Config.params['base_path'],
+                                 Config().data.test_path)
+
         if self.test_set is None:
             self.test_set = LoadImagesAndLabels(
-                Config().data.test_path,
+                test_path,
                 self.image_size,
                 Config().trainer.batch_size,
                 augment=False,  # augment images

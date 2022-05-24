@@ -41,9 +41,6 @@ data:
     # The training and testing dataset
     datasource: CIFAR10
 
-    # Where the dataset is located
-    data_path: ./data
-
     # Number of samples in each partition
     partition_size: 600
 

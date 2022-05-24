@@ -2,9 +2,9 @@
 A basic federated learning client who sends weight updates to the server.
 """
 
-from dataclasses import dataclass
 import logging
 import time
+from dataclasses import dataclass
 
 from plato.algorithms import registry as algorithms_registry
 from plato.clients import base
@@ -13,6 +13,7 @@ from plato.datasources import registry as datasources_registry
 from plato.processors import registry as processor_registry
 from plato.samplers import registry as samplers_registry
 from plato.trainers import registry as trainers_registry
+from plato.utils import fonts
 
 
 @dataclass
@@ -115,8 +116,10 @@ class Client(base.Client):
 
     async def train(self):
         """The machine learning training workload on a client."""
-        logging.info("[%s] Started training in communication round #%s.", self,
-                     self.current_round)
+        logging.info(
+            fonts.colourize(
+                f"[{self}] Started training in communication round #{self.current_round}."
+            ))
 
         # Perform model training
         try:

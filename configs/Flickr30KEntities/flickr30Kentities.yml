@@ -19,12 +19,8 @@ data:
     # The training and testing dataset
     dataname: Flickr30KEntities
     datasource: Flickr30K
-
-    # Where the dataset is located
-    data_path: ./data
     download_file_id: 14qrLYzC0eazGzdkDkTxr534QQrZjLMaf
     num_workers: 4
-
 
 trainer:
     # The type of the trainer
