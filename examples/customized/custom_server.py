@@ -1,11 +1,12 @@
 """
 This example uses a very simple model to show how the model and the server
-be customized in Plato.
+be customized in Plato and executed in a standalone fashion.
 
 To run this example:
 
-python examples/basic/custom_server.py -c examples/basic/server.yml
+python examples/customized/custom_server.py -c examples/customized/server.yml
 """
+
 import logging
 
 from torch import nn

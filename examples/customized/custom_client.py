@@ -1,4 +1,12 @@
-""" An example for running Plato with custom clients. """
+""" 
+An example for running Plato with custom clients. 
+
+To run this example:
+
+python examples/customized/custom_client.py -c examples/customized/client.yml
+
+"""
+
 import asyncio
 import logging
 
