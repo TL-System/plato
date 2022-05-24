@@ -54,7 +54,7 @@ class Client(base.Client):
         """Prepare this client for training."""
         super().configure()
         if self.custom_model is not None:
-            self.model = self.custom_model()
+            self.model = self.custom_model
             self.custom_model = None
 
         if self.trainer is None and self.custom_trainer is None:
