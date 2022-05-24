@@ -108,6 +108,9 @@ class Server:
         self.initial_wall_time = time.time()
         self.wall_time = time.time()
 
+        # The wall clock time when a communication round starts
+        self.round_start_wall_time = self.wall_time
+
         # When simulating the wall clock time, the server needs to remember the
         # set of reporting clients received since the previous round of aggregation
         self.current_reported_clients = {}
@@ -338,6 +341,7 @@ class Server:
         if not for_next_batch:
             self.updates = []
             self.current_round += 1
+            self.round_start_wall_time = self.wall_time
 
             if hasattr(Config().trainer, 'max_concurrency'):
                 self.trained_clients = []
@@ -469,7 +473,7 @@ class Server:
                 self.training_clients[self.selected_client_id] = {
                     'id': self.selected_client_id,
                     'starting_round': self.current_round,
-                    'start_time': self.wall_time,
+                    'start_time': self.round_start_wall_time,
                     'update_requested': False
                 }
 
