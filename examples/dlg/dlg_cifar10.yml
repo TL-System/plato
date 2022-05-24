@@ -13,23 +13,17 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8000
+    port: 8001
 
 data:
     # The training and testing dataset
-    datasource: EMNIST
+    datasource: CIFAR10
 
     # Number of samples in each partition
     partition_size: 1
 
     # IID or non-IID?
-    sampler: noniid
-
-    # The concentration parameter for the Dirichlet distribution
-    concentration: 1
-
-    # The random seed for sampling data
-    random_seed: 1
+    sampler: iid
 
 trainer:
     # The type of the trainer
@@ -50,18 +44,22 @@ trainer:
     optimizer: SGD
     learning_rate: 0.01
     momentum: 0.9
-    weight_decay: 0.0
+    weight_decay: 0.0001
+
+    # Learning rate schedule
+    lr_schedule: LambdaLR
+    lr_gamma: 0.1
+    lr_milestone_steps: 80ep,120ep
 
     # The machine learning model
-    model_name: lenet5
-    num_classes: 47
+    model_name: resnet_18
 
 algorithm:
     # Aggregation algorithm
     type: fedavg
 
 results:
-    result_path: results/EMNIST_lenet5/DLG
+    result_path: results/CIAFR10_resnet18/DLG
 
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time
