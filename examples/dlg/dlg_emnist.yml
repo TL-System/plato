@@ -36,7 +36,7 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 100
+    rounds: 1
 
     # The maximum number of clients running concurrently
     max_concurrency: 4
@@ -59,6 +59,15 @@ trainer:
 algorithm:
     # Aggregation algorithm
     type: fedavg
+
+    # DLG related
+    # Resconstruct data from the model and gradients 
+    # in a particular communication round (starting from 1)
+    attack_round: 1
+    # One particular client, e.g., the first selected client
+    victim_client: 0
+    num_iters: 300
+    log_interval: 10
 
 results:
     result_path: results/EMNIST_lenet5/DLG
