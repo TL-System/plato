@@ -15,6 +15,7 @@ from plato.clients import simple
 
 
 class Client(simple.Client):
+    """A personalized federated learning client using the FedRep algorithm."""
 
     def __init__(self,
                  model=None,

@@ -18,9 +18,7 @@ import logging
 import torch
 import numpy as np
 
-from opacus import GradSampleModule
 from opacus.privacy_engine import PrivacyEngine
-from opacus.validators import ModuleValidator
 
 from plato.config import Config
 from plato.trainers import basic
@@ -28,6 +26,7 @@ from plato.utils import optimizers
 
 
 class Trainer(basic.Trainer):
+    """A personalized federated learning trainer using the FedRep algorithm."""
 
     def __init__(self, model=None):
         super().__init__(model)

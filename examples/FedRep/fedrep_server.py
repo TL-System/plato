@@ -17,6 +17,7 @@ from plato.servers import fedavg
 
 
 class Server(fedavg.Server):
+    """A personalized federated learning server using the FedRep algorithm."""
 
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model, algorithm, trainer)
@@ -33,16 +34,19 @@ class Server(fedavg.Server):
         # then the final layer is the last two key in the obtained key list.
         # For example,
         #  lenet:
-        #  ['conv1.weight', 'conv1.bias', 'conv2.weight', 'conv2.bias', 'conv3.weight', 'conv3.bias', 'fc4.weight', 'fc4.bias', 'fc5.weight', 'fc5.bias']
+        #  ['conv1.weight', 'conv1.bias', 'conv2.weight', 'conv2.bias',
+        #  'conv3.weight', 'conv3.bias', 'fc4.weight', 'fc4.bias',
+        #  'fc5.weight', 'fc5.bias']
         #  representaion:
-        #   ['conv1.weight', 'conv1.bias', 'conv2.weight', 'conv2.bias', 'conv3.weight', 'conv3.bias', 'fc4.weight', 'fc4.bias']
+        #  ['conv1.weight', 'conv1.bias', 'conv2.weight', 'conv2.bias',
+        #  'conv3.weight', 'conv3.bias', 'fc4.weight', 'fc4.bias']
         self.representation_param_names = model_full_parameter_names[:-2]
 
         logging.info("Representation_weights: %s",
                      self.representation_param_names)
 
     def load_trainer(self):
-        """ rewrite the load_trainer func to further extract the representaion keys """
+        """ Rewrite the load_trainer func to further extract the representaion keys """
         super().load_trainer()
 
         self.extract_representation_param_names()
@@ -57,7 +61,7 @@ class Server(fedavg.Server):
             representation_param_names=self.representation_param_names)
 
     async def customize_server_response(self, server_response):
-        """ 
+        """
             The FedRep server sends parameter names belonging to the representation
             layers back to the clients.
         """
