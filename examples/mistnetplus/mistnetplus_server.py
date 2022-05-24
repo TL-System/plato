@@ -90,14 +90,14 @@ class MistnetplusServer(fedavg.Server):
 
     async def aggregate_weights(self, updates):
         model = self.algorithm.extract_weights()
-        update = await self.federated_averaging(updates)
-        feature_update = self.algorithm.update_weights(update)
+        deltas = await self.federated_averaging(updates)
+        updated_features = self.algorithm.update_weights(deltas)
 
-        for name, weight in model.items():
+        for name, __ in model.items():
             if name == Config().algorithm.cut_layer:
                 logging.info("[Server #%d] %s cut", os.getpid(), name)
                 break
-            model[name] = model[name] + feature_update[name]
+            model[name] = model[name] + updated_features[name]
 
         self.algorithm.load_weights(model)
 
