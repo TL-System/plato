@@ -1,15 +1,21 @@
+"""
+This example uses a very simple model to show how the model and the server
+be customized in Plato.
+
+To run this example:
+
+python examples/basic/custom_server.py -c examples/basic/server.yml
+"""
 import logging
-import os
 
 from torch import nn
-
-os.environ['config_file'] = './server.yml'
 
 from plato.servers import fedavg
 
 
 class CustomServer(fedavg.Server):
     """ A custom federated learning server. """
+
     def __init__(self, model=None, trainer=None):
         super().__init__(model, trainer)
         logging.info("A custom server has been initialized.")
