@@ -54,7 +54,8 @@ class Server(fedavg.Server):
         """Process the client reports: before aggregating their weights,
            perform the gradient leakage attacks and reconstruct the training data.
         """
-        self.deep_leakage_from_gradients(self.updates)
+        if self.current_round == Config().algorithm.attack_round:
+            self.deep_leakage_from_gradients(self.updates)
         await self.aggregate_weights(self.updates)
 
     def deep_leakage_from_gradients(self, updates):
@@ -80,23 +81,17 @@ class Server(fedavg.Server):
         logging.info("[Gradient Leakage Attacking...] Dummy label is %d.",
                      torch.argmax(dummy_label, dim=-1).item())
 
-        # TODO: move to config files
-        # One particular client, i.e., the first selected client
-        victim_client = 0
-        num_iters = 300
-        log_interval = 10
-
         # TODO: the server actually has no idea about the local learning rate
         # Convert local updates to gradients
         target_grad = []
-        for delta in deltas_received[victim_client].values():
+        for delta in deltas_received[Config().algorithm.victim_client].values():
             target_grad.append(- delta / Config().trainer.learning_rate)
         # target_grad = - deltas_received[self.victim_client] / Config().trainer.learning_rate
 
         # TODO: periodic analysis, which round?
         # Gradient matching
         history = []
-        for iters in range(num_iters):
+        for iters in range(Config().algorithm.num_iters):
             def closure():
                 optimizer.zero_grad()
                 dummy_pred = self.trainer.model(dummy_data)
@@ -119,7 +114,7 @@ class Server(fedavg.Server):
                 history.append(tt(dummy_data[0].cpu()))
 
         plt.figure(figsize=(12, 8))
-        for i in range(num_iters // log_interval):
+        for i in range(Config().algorithm.num_iters // Config().algorithm.log_interval):
             plt.subplot(3, 10, i + 1)
             plt.imshow(history[i])
             plt.title("iter=%d" % (i * 10))
