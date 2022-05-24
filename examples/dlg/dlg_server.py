@@ -13,35 +13,20 @@ in Advances in Neural Information Processing Systems 2019.
 https://papers.nips.cc/paper/2019/file/60a6c4002cc7b29142def8871531281a-Paper.pdf
 """
 
-import asyncio
 import logging
-import math
 
 import matplotlib.pyplot as plt
-import numpy as np
 import torch
 import torch.nn.functional as F
 from plato.config import Config
 from plato.servers import fedavg
 from torchvision import transforms
 
-""" Helper methods """
-
-
-def label_to_onehot(target, num_classes):
-    target = torch.unsqueeze(target, 1)
-    onehot_target = torch.zeros(target.size(
-        0), num_classes, device=target.device)
-    onehot_target.scatter_(1, target, 1)
-    return onehot_target
-
-
-def cross_entropy_for_onehot(pred, target):
-    return torch.mean(torch.sum(- target * F.log_softmax(pred, dim=-1), 1))
-
+from utils import cross_entropy_for_onehot
 
 criterion = cross_entropy_for_onehot
 tt = transforms.ToPILImage()
+torch.manual_seed(100)
 
 
 class Server(fedavg.Server):
@@ -58,13 +43,17 @@ class Server(fedavg.Server):
             self.deep_leakage_from_gradients(self.updates)
         await self.aggregate_weights(self.updates)
 
+    def compute_weight_deltas(self, updates):
+        """Extract the model weight updates from client updates."""
+        weights_received = [payload[0] for (__, __, payload, __) in updates]
+        return self.algorithm.compute_weight_deltas(weights_received)
+
     def deep_leakage_from_gradients(self, updates):
         """ Analyze periodic gradients from certain clients. """
         # Obtain the local updates from clients
-        deltas_received = self.compute_weight_deltas(updates)
+        # deltas_received = self.compute_weight_deltas(updates)
 
         # Generate dummy items
-        torch.manual_seed(50)
         data_size = self.testset.data[0].shape
         if len(data_size) == 2:
             data_size = (1, 1, data_size[0], data_size[1])
@@ -83,10 +72,11 @@ class Server(fedavg.Server):
 
         # TODO: the server actually has no idea about the local learning rate
         # Convert local updates to gradients
-        target_grad = []
-        for delta in deltas_received[Config().algorithm.victim_client].values():
-            target_grad.append(- delta / Config().trainer.learning_rate)
-        # target_grad = - deltas_received[self.victim_client] / Config().trainer.learning_rate
+        # target_grad = []
+        # for delta in deltas_received[Config().algorithm.victim_client].values():
+        #     target_grad.append(- delta / Config().trainer.learning_rate)
+        __, __, payload, __ = updates[Config().algorithm.victim_client]
+        target_grad = payload[1]
 
         # TODO: periodic analysis, which round?
         # Gradient matching
@@ -100,9 +90,9 @@ class Server(fedavg.Server):
                 dummy_grad = torch.autograd.grad(
                     dummy_loss, self.trainer.model.parameters(), create_graph=True)
 
-                grad_diff = sum(((dummy_g - traget_g) ** 2).sum()
-                                for dummy_g, traget_g in zip(dummy_grad, target_grad))
-
+                grad_diff = 0
+                for gx, gy in zip(dummy_grad, target_grad):
+                    grad_diff += ((gx - gy) ** 2).sum()
                 grad_diff.backward()
                 return grad_diff
 
@@ -117,7 +107,7 @@ class Server(fedavg.Server):
         for i in range(Config().algorithm.num_iters // Config().algorithm.log_interval):
             plt.subplot(3, 10, i + 1)
             plt.imshow(history[i])
-            plt.title("iter=%d" % (i * 10))
+            plt.title("iter=%d" % (i * Config().algorithm.log_interval))
             plt.axis('off')
         logging.info("[Gradient Leakage Attacking...] Reconstructed label is %d.",
                      torch.argmax(dummy_label, dim=-1).item())
