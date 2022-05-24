@@ -60,19 +60,19 @@ class Server(fedavg.Server):
         deltas_received = self.compute_weight_deltas(updates)
 
         # Generate dummy items
-        # TODO: Obtain the sizes of data and labels from the dataset
-        data_size = (1, 1, 28, 28)
-        label_size = 1
-        # One particular client, i.e., the first selected client
-        victim_client = 0
         torch.manual_seed(50)
-        dummy_data = torch.randn(data_size).to(
+        data_size = self.testset.train_data[0].size()
+        # label_size = self.testset.train_labels[0].size()
+        dummy_data = torch.randn((1, 1, data_size[0], data_size[1])).to(
             Config().device()).requires_grad_(True)
-        dummy_label = torch.randn(label_size).to(
+        dummy_label = torch.randn(1).to(
             Config().device()).requires_grad_(True)
         optimizer = torch.optim.LBFGS([dummy_data, dummy_label])
 
-        num_iter = 300
+        # TODO: move to config files
+        # One particular client, i.e., the first selected client
+        victim_client = 0
+        num_iter = 0
 
         # TODO: the server actually has no idea about the local learning rate
         # Convert local updates to gradients
