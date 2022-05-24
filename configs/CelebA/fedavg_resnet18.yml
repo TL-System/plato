@@ -28,9 +28,6 @@ data:
     # Number of identity in CelebA
     num_classes: 10178
 
-    # Where the dataset is located
-    data_path: ./data
-
     # Number of samples in each partition
     partition_size: 20000
 
