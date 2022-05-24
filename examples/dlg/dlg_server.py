@@ -17,11 +17,13 @@ import asyncio
 import logging
 import math
 
+import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torch.nn.functional as F
 from plato.config import Config
 from plato.servers import fedavg
+from torchvision import transforms
 
 """ Helper methods """
 
@@ -39,6 +41,7 @@ def cross_entropy_for_onehot(pred, target):
 
 
 criterion = cross_entropy_for_onehot
+tt = transforms.ToPILImage()
 
 
 class Server(fedavg.Server):
@@ -61,18 +64,27 @@ class Server(fedavg.Server):
 
         # Generate dummy items
         torch.manual_seed(50)
-        data_size = self.testset.train_data[0].size()
-        # label_size = self.testset.train_labels[0].size()
-        dummy_data = torch.randn((1, 1, data_size[0], data_size[1])).to(
+        data_size = self.testset.data[0].shape
+        if len(data_size) == 2:
+            data_size = (1, 1, data_size[0], data_size[1])
+        else:
+            data_size = (1, data_size[2], data_size[0], data_size[1])
+        dummy_data = torch.randn(data_size).to(
             Config().device()).requires_grad_(True)
         dummy_label = torch.randn(1).to(
             Config().device()).requires_grad_(True)
         optimizer = torch.optim.LBFGS([dummy_data, dummy_label])
 
+        plt.imshow(tt(dummy_data[0].cpu()))
+        plt.title("Dummy data")
+        logging.info("[Gradient Leakage Attacking...] Dummy label is %d.",
+                     torch.argmax(dummy_label, dim=-1).item())
+
         # TODO: move to config files
         # One particular client, i.e., the first selected client
         victim_client = 0
-        num_iter = 0
+        num_iters = 300
+        log_interval = 10
 
         # TODO: the server actually has no idea about the local learning rate
         # Convert local updates to gradients
@@ -83,7 +95,8 @@ class Server(fedavg.Server):
 
         # TODO: periodic analysis, which round?
         # Gradient matching
-        for iters in range(num_iter):
+        history = []
+        for iters in range(num_iters):
             def closure():
                 optimizer.zero_grad()
                 dummy_pred = self.trainer.model(dummy_data)
@@ -101,7 +114,16 @@ class Server(fedavg.Server):
             optimizer.step(closure)
             if iters % 10 == 0:
                 current_loss = closure()
-                logging.info("[Gradient Difference] Iter #{}: {:.4f}".format(
-                    iters, current_loss.item()))
+                logging.info("[Gradient Leakage Attacking...] Iter %d: Gradient Difference %.4f",
+                             iters, current_loss.item())
+                history.append(tt(dummy_data[0].cpu()))
 
-        # TODO: Plot image history
+        plt.figure(figsize=(12, 8))
+        for i in range(num_iters // log_interval):
+            plt.subplot(3, 10, i + 1)
+            plt.imshow(history[i])
+            plt.title("iter=%d" % (i * 10))
+            plt.axis('off')
+        logging.info("[Gradient Leakage Attacking...] Reconstructed label is %d.",
+                     torch.argmax(dummy_label, dim=-1).item())
+        plt.show()
