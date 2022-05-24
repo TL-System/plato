@@ -36,10 +36,10 @@ data:
     partition_size: 600
 
     # IID or non-IID?
-    sampler: iid
+    sampler: noniid
 
     # The concentration parameter for the Dirichlet distribution
-    concentration: 5
+    concentration: 1
 
     # The random seed for sampling data
     random_seed: 1
