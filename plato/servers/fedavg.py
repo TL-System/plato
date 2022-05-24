@@ -118,6 +118,7 @@ class Server(base.Server):
         """Setting up the global model to be trained via federated learning."""
         if self.model is None and self.custom_model is not None:
             self.model = self.custom_model
+            self.custom_model = None
 
         if self.trainer is None and self.custom_trainer is None:
             self.trainer = trainers_registry.get(model=self.model)
