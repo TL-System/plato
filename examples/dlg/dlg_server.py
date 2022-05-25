@@ -54,7 +54,6 @@ class Server(fedavg.Server):
         # deltas_received = self.compute_weight_deltas(updates)
 
         # Generate dummy items
-        # TODO: replace hard-coded sizes
         data_size = self.testset.data[0].shape
         if len(data_size) == 2:
             data_size = (1, 1, data_size[0], data_size[1])
@@ -62,7 +61,7 @@ class Server(fedavg.Server):
             data_size = (1, data_size[2], data_size[0], data_size[1])
         dummy_data = torch.randn(data_size).to(
             Config().device()).requires_grad_(True)
-        dummy_label = torch.randn((1, 47)).to(
+        dummy_label = torch.randn((1, Config().trainer.num_classes)).to(
             Config().device()).requires_grad_(True)
         optimizer = torch.optim.LBFGS([dummy_data, dummy_label])
 
