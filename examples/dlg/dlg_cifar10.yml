@@ -53,6 +53,7 @@ trainer:
 
     # The machine learning model
     model_name: resnet_18
+    num_classes: 10
 
 algorithm:
     # Aggregation algorithm
@@ -67,7 +68,7 @@ algorithm:
     num_iters: 300
     log_interval: 10
     # The random seed for dummy data and label
-    random_seed: 3
+    random_seed: 5
 
 results:
     result_path: results/CIAFR10_resnet18/DLG
