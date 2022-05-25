@@ -131,7 +131,7 @@ class Trainer(basic.Trainer):
                 # else:
                 #     loss.backward()
 
-                optimizer.step()
+                # optimizer.step()
 
                 if batch_id % log_interval == 0:
                     if self.client_id == 0:
