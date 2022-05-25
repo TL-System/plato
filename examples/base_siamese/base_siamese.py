@@ -18,7 +18,7 @@ import base_siamese_server
 def main():
     """ A Plato federated learning training session using the FedRep algorithm. """
     trainer = base_siamese_trainer.Trainer
-    base_siamese_model = siamese_mnist_net.SiameseBase
+    base_siamese_model = siamese_mnist_net.SiameseBase()
     client = base_siamese_client.Client(model=base_siamese_model,
                                         trainer=trainer)
     server = base_siamese_server.Server(model=base_siamese_model,

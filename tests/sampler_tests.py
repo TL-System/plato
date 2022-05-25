@@ -26,6 +26,7 @@ from plato.samplers import registry as samplers_registry
 
 class SamplersTest(unittest.TestCase):
     """ Testing the correctness of implemented samplers. """
+
     def setUp(self):
         super().setUp()
 
