@@ -108,7 +108,7 @@ class Server(base.Server):
                                      Config().params['result_path'])
 
         # Initialize the test accuracy csv file if clients compute locally
-        if Config().clients.do_test:
+        if hasattr(Config().clients, 'do_test') and Config().clients.do_test:
             accuracy_csv_file = f"{Config().params['result_path']}/{os.getpid()}_accuracy.csv"
             accuracy_headers = ["round", "client_id", "accuracy"]
             csv_processor.initialize_csv(accuracy_csv_file, accuracy_headers,
@@ -118,6 +118,7 @@ class Server(base.Server):
         """Setting up the global model to be trained via federated learning."""
         if self.model is None and self.custom_model is not None:
             self.model = self.custom_model
+            self.custom_model = None
 
         if self.trainer is None and self.custom_trainer is None:
             self.trainer = trainers_registry.get(model=self.model)
@@ -134,20 +135,20 @@ class Server(base.Server):
     async def select_clients(self, for_next_batch=False):
         await super().select_clients(for_next_batch=for_next_batch)
 
-    def extract_client_updates(self, updates):
+    def compute_weight_deltas(self, updates):
         """Extract the model weight updates from client updates."""
         weights_received = [payload for (__, __, payload, __) in updates]
-        return self.algorithm.compute_weight_updates(weights_received)
+        return self.algorithm.compute_weight_deltas(weights_received)
 
     async def aggregate_weights(self, updates):
         """Aggregate the reported weight updates from the selected clients."""
-        update = await self.federated_averaging(updates)
-        updated_weights = self.algorithm.update_weights(update)
+        deltas = await self.federated_averaging(updates)
+        updated_weights = self.algorithm.update_weights(deltas)
         self.algorithm.load_weights(updated_weights)
 
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using federated averaging."""
-        weights_received = self.extract_client_updates(updates)
+        deltas_received = self.compute_weight_deltas(updates)
 
         # Extract the total number of samples
         self.total_samples = sum(
@@ -156,10 +157,10 @@ class Server(base.Server):
         # Perform weighted averaging
         avg_update = {
             name: self.trainer.zeros(weights.shape)
-            for name, weights in weights_received[0].items()
+            for name, weights in deltas_received[0].items()
         }
 
-        for i, update in enumerate(weights_received):
+        for i, update in enumerate(deltas_received):
             __, report, __, __ = updates[i]
             num_samples = report.num_samples
 
@@ -201,35 +202,37 @@ class Server(base.Server):
         # Record results into a .csv file
         new_row = []
         for item in self.recorded_items:
-            item_value = {
-                'round':
-                self.current_round,
-                'accuracy':
-                self.accuracy,
-                'elapsed_time':
-                self.wall_time - self.initial_wall_time,
-                'comm_time':
-                max([
-                    report.comm_time for (__, report, __, __) in self.updates
-                ]),
-                'round_time':
-                max([
-                    report.training_time + report.comm_time
-                    for (__, report, __, __) in self.updates
-                ]),
-            }[item]
+            item_value = self.get_record_items_values()[item]
             new_row.append(item_value)
 
         result_csv_file = f"{Config().params['result_path']}/{os.getpid()}.csv"
         csv_processor.write_csv(result_csv_file, new_row)
 
-        if Config().clients.do_test:
+        if hasattr(Config().clients, 'do_test') and Config().clients.do_test:
             # Updates the log for client test accuracies
             accuracy_csv_file = f"{Config().params['result_path']}/{os.getpid()}_accuracy.csv"
 
             for (client_id, report, __, __) in self.updates:
                 accuracy_row = [self.current_round, client_id, report.accuracy]
                 csv_processor.write_csv(accuracy_csv_file, accuracy_row)
+
+    def get_record_items_values(self):
+        """Get values will be recorded in result csv file."""
+        return {
+            'round':
+            self.current_round,
+            'accuracy':
+            self.accuracy,
+            'elapsed_time':
+            self.wall_time - self.initial_wall_time,
+            'comm_time':
+            max([report.comm_time for (__, report, __, __) in self.updates]),
+            'round_time':
+            max([
+                report.training_time + report.comm_time
+                for (__, report, __, __) in self.updates
+            ]),
+        }
 
     @staticmethod
     def accuracy_averaging(updates):

@@ -18,7 +18,7 @@ import socketio
 from aiohttp import web
 from plato.client import run
 from plato.config import Config
-from plato.utils import s3
+from plato.utils import s3, fonts
 
 
 class ServerEvents(socketio.AsyncNamespace):
@@ -107,6 +107,9 @@ class Server:
         # clients can only run a batch at a time, controlled by `max_concurrency`
         self.initial_wall_time = time.time()
         self.wall_time = time.time()
+
+        # The wall clock time when a communication round starts
+        self.round_start_wall_time = self.wall_time
 
         # When simulating the wall clock time, the server needs to remember the
         # set of reporting clients received since the previous round of aggregation
@@ -338,13 +341,15 @@ class Server:
         if not for_next_batch:
             self.updates = []
             self.current_round += 1
+            self.round_start_wall_time = self.wall_time
 
             if hasattr(Config().trainer, 'max_concurrency'):
                 self.trained_clients = []
 
-            logging.info("\n[%s] Starting round %s/%s.", self,
-                         self.current_round,
-                         Config().trainer.rounds)
+            logging.info(
+                fonts.colourize(
+                    f"\n[{{self}}] Starting round {self.current_round}/{Config().trainer.rounds}."
+                ))
 
             if Config().is_central_server():
                 # In cross-silo FL, the central server selects from the pool of edge servers
@@ -469,7 +474,7 @@ class Server:
                 self.training_clients[self.selected_client_id] = {
                     'id': self.selected_client_id,
                     'starting_round': self.current_round,
-                    'start_time': self.wall_time,
+                    'start_time': self.round_start_wall_time,
                     'update_requested': False
                 }
 
