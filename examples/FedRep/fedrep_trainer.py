@@ -53,9 +53,9 @@ class Trainer(basic.Trainer):
             if name not in representation_param_names
         ]
 
-        logging.info("[Client #%s] Representation layers: %s", self,
+        logging.info("[Client #%s] Representation layers: %s", self.client_id,
                      self.representation_param_names)
-        logging.info("[Client #%s] Head layers: %s", self,
+        logging.info("[Client #%s] Head layers: %s", self.client_id,
                      self.head_param_names)
 
     def train_model(self, config, trainset, sampler, cut_layer=None):
