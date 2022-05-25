@@ -99,8 +99,9 @@ class Trainer(basic.Trainer):
                 # Plot ground truth data
                 plt.imshow(tt(examples[0].cpu()))
                 plt.title("Ground truth image")
-                # TODO: num_classes depends on the datasets
-                onehot_labels = label_to_onehot(labels, num_classes=47)
+
+                onehot_labels = label_to_onehot(
+                    labels, num_classes=Config().trainer.num_classes)
                 logging.info("GT label is %d. \nOnehot label is %d.", labels.item(
                 ), torch.argmax(onehot_labels, dim=-1).item())
 
@@ -123,6 +124,11 @@ class Trainer(basic.Trainer):
                 file_path = f"{Config().params['model_path']}/{self.client_id}.pickle"
                 with open(file_path, 'wb') as handle:
                     pickle.dump(target_grad, handle)
+
+                # for name, param in self.model.named_parameters():
+                #     if param.requires_grad:
+                #         print(name, param.data[0])
+                #         break
 
                 # loss = loss_criterion(outputs, labels)
 
