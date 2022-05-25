@@ -26,7 +26,7 @@ from utils import cross_entropy_for_onehot
 
 criterion = cross_entropy_for_onehot
 tt = transforms.ToPILImage()
-torch.manual_seed(100)
+torch.manual_seed(Config().algorithm.random_seed)
 
 
 class Server(fedavg.Server):
@@ -54,6 +54,7 @@ class Server(fedavg.Server):
         # deltas_received = self.compute_weight_deltas(updates)
 
         # Generate dummy items
+        # TODO: replace hard-coded sizes
         data_size = self.testset.data[0].shape
         if len(data_size) == 2:
             data_size = (1, 1, data_size[0], data_size[1])
@@ -61,20 +62,14 @@ class Server(fedavg.Server):
             data_size = (1, data_size[2], data_size[0], data_size[1])
         dummy_data = torch.randn(data_size).to(
             Config().device()).requires_grad_(True)
-        dummy_label = torch.randn(1).to(
+        dummy_label = torch.randn((1, 47)).to(
             Config().device()).requires_grad_(True)
         optimizer = torch.optim.LBFGS([dummy_data, dummy_label])
 
-        plt.imshow(tt(dummy_data[0].cpu()))
-        plt.title("Dummy data")
         logging.info("[Gradient Leakage Attacking...] Dummy label is %d.",
                      torch.argmax(dummy_label, dim=-1).item())
 
         # TODO: the server actually has no idea about the local learning rate
-        # Convert local updates to gradients
-        # target_grad = []
-        # for delta in deltas_received[Config().algorithm.victim_client].values():
-        #     target_grad.append(- delta / Config().trainer.learning_rate)
         __, __, payload, __ = updates[Config().algorithm.victim_client]
         target_grad = payload[1]
 
@@ -97,7 +92,7 @@ class Server(fedavg.Server):
                 return grad_diff
 
             optimizer.step(closure)
-            if iters % 10 == 0:
+            if iters % Config().algorithm.log_interval == 0:
                 current_loss = closure()
                 logging.info("[Gradient Leakage Attacking...] Iter %d: Gradient Difference %.4f",
                              iters, current_loss.item())
@@ -105,7 +100,8 @@ class Server(fedavg.Server):
 
         plt.figure(figsize=(12, 8))
         for i in range(Config().algorithm.num_iters // Config().algorithm.log_interval):
-            plt.subplot(3, 10, i + 1)
+            plt.subplot(5, Config().algorithm.num_iters //
+                        Config().algorithm.log_interval / 5, i + 1)
             plt.imshow(history[i])
             plt.title("iter=%d" % (i * Config().algorithm.log_interval))
             plt.axis('off')
