@@ -35,7 +35,8 @@ class Trainer(basic.Trainer):
         self.head_param_names = []
 
     def set_representation_and_head(self, representation_param_names):
-        """ Setting the parameter names for global and local models. """
+        """ Setting the parameter names for global (representation)
+         and local (the head) models. """
 
         # set the parameter names for the representation
         #   As mentioned by Eq. 1 and Fig. 2 of the paper, the representation
