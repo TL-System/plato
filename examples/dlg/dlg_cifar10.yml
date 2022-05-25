@@ -66,6 +66,8 @@ algorithm:
     victim_client: 0
     num_iters: 300
     log_interval: 10
+    # The random seed for dummy data and label
+    random_seed: 3
 
 results:
     result_path: results/CIAFR10_resnet18/DLG
