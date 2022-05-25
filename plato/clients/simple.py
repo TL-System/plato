@@ -2,9 +2,9 @@
 A basic federated learning client who sends weight updates to the server.
 """
 
-from dataclasses import dataclass
 import logging
 import time
+from dataclasses import dataclass
 
 from plato.algorithms import registry as algorithms_registry
 from plato.clients import base
@@ -13,6 +13,7 @@ from plato.datasources import registry as datasources_registry
 from plato.processors import registry as processor_registry
 from plato.samplers import registry as samplers_registry
 from plato.trainers import registry as trainers_registry
+from plato.utils import fonts
 
 
 @dataclass
@@ -53,7 +54,7 @@ class Client(base.Client):
         """Prepare this client for training."""
         super().configure()
         if self.custom_model is not None:
-            self.model = self.custom_model()
+            self.model = self.custom_model
             self.custom_model = None
 
         if self.trainer is None and self.custom_trainer is None:
@@ -86,8 +87,6 @@ class Client(base.Client):
             self.datasource = datasources_registry.get(
                 client_id=self.client_id)
 
-        self.data_loaded = True
-
         logging.info("[%s] Dataset size: %s", self,
                      self.datasource.num_train_examples())
 
@@ -102,7 +101,7 @@ class Client(base.Client):
             # PyTorch uses samplers when loading data with a data loader
             self.trainset = self.datasource.get_train_set()
 
-        if Config().clients.do_test:
+        if hasattr(Config().clients, 'do_test') and Config().clients.do_test:
             # Set the testset if local testing is needed
             self.testset = self.datasource.get_test_set()
             if hasattr(Config().data, 'testset_sampler'):
@@ -117,8 +116,10 @@ class Client(base.Client):
 
     async def train(self):
         """The machine learning training workload on a client."""
-        logging.info("[%s] Started training in communication round #%s.", self,
-                     self.current_round)
+        logging.info(
+            fonts.colourize(
+                f"[{self}] Started training in communication round #{self.current_round}."
+            ))
 
         # Perform model training
         try:
@@ -130,9 +131,9 @@ class Client(base.Client):
         weights = self.algorithm.extract_weights()
 
         # Generate a report for the server, performing model testing if applicable
-        if Config().clients.do_test and (
-                not hasattr(Config().clients, 'test_interval')
-                or self.current_round % Config().clients.test_interval == 0):
+        if (hasattr(Config().clients, 'do_test') and Config().clients.do_test
+            ) and (not hasattr(Config().clients, 'test_interval') or
+                   self.current_round % Config().clients.test_interval == 0):
             accuracy = self.trainer.test(self.testset, self.testset_sampler)
 
             if accuracy == -1:

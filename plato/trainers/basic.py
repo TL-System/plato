@@ -39,10 +39,10 @@ class Trainer(base.Trainer):
 
         self.model = model
 
+    def make_model_private(self):
+        """ Make the model private for use with the differential privacy engine. """
         if hasattr(Config().trainer, 'differential_privacy') and Config(
         ).trainer.differential_privacy:
-            logging.info("Using differential privacy during training.")
-
             errors = ModuleValidator.validate(self.model, strict=False)
             if len(errors) > 0:
                 self.model = ModuleValidator.fix(self.model)
@@ -101,7 +101,7 @@ class Trainer(base.Trainer):
             logging.info("[Client #%d] Loading a model from %s.",
                          self.client_id, model_path)
 
-        self.model.load_state_dict(torch.load(model_path))
+        self.model.load_state_dict(torch.load(model_path), strict=False)
 
     def simulate_sleep_time(self):
         """Simulate client's speed by putting it to sleep."""
@@ -192,7 +192,12 @@ class Trainer(base.Trainer):
             lr_schedule = None
 
         if 'differential_privacy' in config and config['differential_privacy']:
+            logging.info(
+                "[Client #%s] Using differential privacy during training.",
+                self.client_id)
+
             privacy_engine = PrivacyEngine(accountant='rdp', secure_mode=False)
+            self.make_model_private()
 
             self.model, optimizer, train_loader = privacy_engine.make_private_with_epsilon(
                 module=self.model,

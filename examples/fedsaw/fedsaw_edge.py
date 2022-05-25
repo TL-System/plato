@@ -23,6 +23,7 @@ class Report(edge.Report):
 
 class Client(edge.Client):
     """A federated learning client at the edge server in a cross-silo training workload."""
+
     async def train(self):
         """ The training process on a FedSaw edge client. """
         previous_weights = copy.deepcopy(
@@ -59,9 +60,9 @@ class Client(edge.Client):
     def prune_updates(self, previous_weights):
         """ Prune aggregated updates. """
 
-        updates = self.compute_weight_updates(previous_weights)
+        deltas = self.compute_weight_deltas(previous_weights)
         updates_model = models_registry.get()
-        updates_model.load_state_dict(updates, strict=True)
+        updates_model.load_state_dict(deltas, strict=True)
 
         parameters_to_prune = []
         for _, module in updates_model.named_modules():
@@ -86,21 +87,21 @@ class Client(edge.Client):
 
         return updates_model.cpu().state_dict()
 
-    def compute_weight_updates(self, previous_weights):
-        """ Compute the weight updates. """
+    def compute_weight_deltas(self, previous_weights):
+        """ Compute the weight deltas. """
         # Extract trained model weights
         new_weights = self.server.algorithm.extract_weights()
 
-        # Calculate updates from the received weights
-        updates = OrderedDict()
+        # Calculate deltas from the received weights
+        deltas = OrderedDict()
         for name, new_weight in new_weights.items():
             previous_weight = previous_weights[name]
 
-            # Calculate update
+            # Calculate deltas
             delta = new_weight - previous_weight
-            updates[name] = delta
+            deltas[name] = delta
 
-        return updates
+        return deltas
 
     def process_server_response(self, server_response):
         """ Additional client-specific processing on the server response. """

@@ -31,10 +31,10 @@ class Server(fedavg.Server):
         update = await super().federated_averaging(updates)
 
         # Extracting weights from the updates
-        weights_received = self.extract_client_updates(updates)
+        deltas_received = self.compute_weight_deltas(updates)
 
         # Update the local valuations from the updates
-        for i, update in enumerate(weights_received):
+        for i, update in enumerate(deltas_received):
             __, report, __, __ = updates[i]
             client_id = self.selected_clients[i]
             self.local_values[client_id]["valuation"] = report.valuation

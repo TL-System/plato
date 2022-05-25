@@ -95,7 +95,7 @@ class Client(simple.Client):
 
         self.valset = self.datasource.get_val_set()
 
-        if Config().clients.do_test:
+        if hasattr(Config().clients, 'do_test') and Config().clients.do_test:
             # Set the testset if local testing is needed
             self.testset = self.datasource.get_test_set()
 
@@ -225,15 +225,15 @@ class Client(simple.Client):
         delta_o, delta_g = self.obtain_delta_og()
 
         # Generate a report for the server, performing model testing if applicable
-        if Config().clients.do_test:
+        if hasattr(Config().clients, 'do_test') and Config().clients.do_test:
             accuracy = self.trainer.test(self.testset)
 
             if accuracy == 0:
                 # The testing process failed, disconnect from the server
                 await self.sio.disconnect()
 
-            logging.info("[Client #{:d}] Test accuracy: {:.2f}%".format(
-                self.client_id, 100 * accuracy))
+            logging.info('[Client #%d] Test accuracy: %.2f%%.', self.client_id,
+                         100 * accuracy)
         else:
             accuracy = 0
 
