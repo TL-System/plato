@@ -1,6 +1,3 @@
-
-
-
 clients:
     # Type
     type: simple
@@ -13,9 +10,6 @@ clients:
 
     # Should the clients compute test accuracy locally?
     do_test: true
-
-    # Whether simulate clients or not
-    simulation: true
 
     random_seed: 1
 
@@ -38,6 +32,8 @@ data:
     # IID or non-IID?
     sampler: noniid
 
+    testset_sampler: noniid
+
     # The concentration parameter for the Dirichlet distribution
     concentration: 1
 
@@ -50,9 +46,6 @@ trainer:
 
     # The maximum number of training rounds
     rounds: 100
-
-    # Whether the training should use multiple GPUs if available
-    parallelized: false
 
     # The maximum number of clients running concurrently
     max_concurrency: 7
