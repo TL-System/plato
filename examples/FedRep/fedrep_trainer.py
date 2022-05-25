@@ -88,7 +88,8 @@ class Trainer(basic.Trainer):
         # load the total local update epochs
         epochs = config['epochs']
         # load the local update epochs for head optimization
-        head_epochs = config['head_epochs']
+        head_epochs = config[
+            'head_epochs'] if 'head_epochs' in config else epochs - 1
 
         # Sending the model to the device used for training
         self.model.to(self.device)
