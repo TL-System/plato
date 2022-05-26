@@ -80,6 +80,8 @@ class Server(fedavg.Server):
         # TODO: periodic analysis, which round?
         # Gradient matching
         history = []
+        losses = []
+        mses = []
 
         for iters in range(Config().algorithm.num_iters):
             def closure():
@@ -98,11 +100,13 @@ class Server(fedavg.Server):
                 return grad_diff
 
             optimizer.step(closure)
+            current_loss = closure().item()
+            losses.append(current_loss)
+            mses.append(torch.mean((dummy_data - gt_data)**2).item())
 
             if iters % Config().algorithm.log_interval == 0:
-                current_loss = closure()
-                logging.info("[Gradient Leakage Attacking...] Iter %d: Gradient Difference %.4f",
-                             iters, current_loss.item())
+                logging.info("[Gradient Leakage Attacking...] Iter %d: Gradient difference = %.8f, MSE = %.8f",
+                             iters, losses[-1], mses[-1])
                 history.append(tt(dummy_data[0].cpu()))
 
         plt.figure(figsize=(12, 8))
