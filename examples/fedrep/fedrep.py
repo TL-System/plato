@@ -1,14 +1,14 @@
 """
-Exploiting Shared Representations for Personalized Federated Learning.
+A personalized federated learning training session using FedRep.
 
 Reference:
 
-Collins, Liam, et al., "Exploiting Shared Representations for Personalized Federated Learning", in the Proceedings of ICML 2021.
+Collins et al., "Exploiting Shared Representations for Personalized Federated
+Learning", in the Proceedings of ICML 2021.
 
-Paper address: https://arxiv.org/abs/2102.07078
+https://arxiv.org/abs/2102.07078
 
-Official source code: https://github.com/lgcollins/FedRep
-
+Source code: https://github.com/lgcollins/FedRep
 """
 
 import fedrep_trainer

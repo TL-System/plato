@@ -1,54 +1,81 @@
 """
-Implement the server for Fedrep method.
+A personalized federated learning server using FedRep.
 
+Reference:
+
+Collins et al., "Exploiting Shared Representations for Personalized Federated
+Learning", in the Proceedings of ICML 2021.
+
+https://arxiv.org/abs/2102.07078
+
+Source code: https://github.com/lgcollins/FedRep
 """
 
 import logging
+
 from plato.servers import fedavg
 
 
 class Server(fedavg.Server):
+    """A personalized federated learning server using the FedRep algorithm."""
 
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model, algorithm, trainer)
 
-        self.model_representation_weights_key = []
+        # parameter names of the representation
+        #   As mentioned by Eq. 1 and Fig. 2 of the paper, the representation
+        #   behaves as the global model.
+        self.representation_param_names = []
 
-    def extract_representation_weights_key(self):
+    def extract_representation_param_names(self):
         """ Obtain the weights responsible for representation. """
 
-        model_full_weights_key = list(self.trainer.model.state_dict().keys())
+        model_full_parameter_names = list(
+            self.trainer.model.state_dict().keys())
+
         # in general, the weights before the final layer are regarded as
         #   the representation.
-        # then the final layer is the last two key in the obtained key list.
+        # then the final layer is regarded as the head.
         # For example,
         #  lenet:
-        #  ['conv1.weight', 'conv1.bias', 'conv2.weight', 'conv2.bias', 'conv3.weight', 'conv3.bias', 'fc4.weight', 'fc4.bias', 'fc5.weight', 'fc5.bias']
+        #  ['conv1.weight', 'conv1.bias', 'conv2.weight', 'conv2.bias',
+        #  'conv3.weight', 'conv3.bias', 'fc4.weight', 'fc4.bias',
+        #  'fc5.weight', 'fc5.bias']
         #  representaion:
-        #   ['conv1.weight', 'conv1.bias', 'conv2.weight', 'conv2.bias', 'conv3.weight', 'conv3.bias', 'fc4.weight', 'fc4.bias']
-        self.model_representation_weights_key = model_full_weights_key[:-2]
+        #  ['conv1.weight', 'conv1.bias', 'conv2.weight', 'conv2.bias',
+        #  'conv3.weight', 'conv3.bias', 'fc4.weight', 'fc4.bias']
+        self.representation_param_names = model_full_parameter_names[:-2]
 
         logging.info("Representation_weights: %s",
-                     self.model_representation_weights_key)
+                     self.representation_param_names)
 
     def load_trainer(self):
-        """ rewrite the load_trainer func to further extract the representaion keys """
+        """ Rewrite the load_trainer func to further extract the representaion keys """
         super().load_trainer()
 
-        self.extract_representation_weights_key()
+        self.extract_representation_param_names()
 
-        # the representation keys are regarded as the global model
-        #   this needs to be set in the trainer for training the
-        #   global and local model in the FedRep's way
-        self.trainer.set_global_local_weights_key(
-            global_keys=self.model_representation_weights_key)
+        # The trainer responsible for optimizing the model should know
+        # which part parameters behave as the representation and which
+        # part of the parameters behave as the head. The main reason is
+        # that the head is optimized in the 'Client Update' while the
+        # representation is optimized in the 'Server Update', as mentioned
+        # in Section 3 of the FedRep paper.
+        self.trainer.set_representation_and_head(
+            representation_param_names=self.representation_param_names)
 
-        self.algorithm.set_global_weights_key(
-            global_keys=self.model_representation_weights_key)
+        # The algorithm only operates on the representation without
+        # considering the head as the head is solely known by each client
+        # because of personalization.
+        self.algorithm.set_representation_param_names(
+            representation_param_names=self.representation_param_names)
 
     async def customize_server_response(self, server_response):
-        """ Wrap up generating the server response with any additional information. """
-        # server sends the required the representaion to the client
+        """
+            The FedRep server sends parameter names belonging to the representation
+            layers back to the clients.
+        """
+        # server sends the required representaion to the client
         server_response[
-            "representation_keys"] = self.model_representation_weights_key
+            "representation_param_names"] = self.representation_param_names
         return server_response

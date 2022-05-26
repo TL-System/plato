@@ -1,7 +1,16 @@
 """
-Implement the trainer for Fedrep method.
+A personalized federated learning trainer using FedRep.
 
+Reference:
+
+Collins et al., "Exploiting Shared Representations for Personalized Federated
+Learning", in the Proceedings of ICML 2021.
+
+https://arxiv.org/abs/2102.07078
+
+Source code: https://github.com/lgcollins/FedRep
 """
+
 import os
 import time
 import logging
@@ -9,9 +18,7 @@ import logging
 import torch
 import numpy as np
 
-from opacus import GradSampleModule
 from opacus.privacy_engine import PrivacyEngine
-from opacus.validators import ModuleValidator
 
 from plato.config import Config
 from plato.trainers import basic
@@ -19,26 +26,37 @@ from plato.utils import optimizers
 
 
 class Trainer(basic.Trainer):
+    """A personalized federated learning trainer using the FedRep algorithm."""
 
     def __init__(self, model=None):
         super().__init__(model)
 
-        self.model_representation_weights_key = []
-        self.model_head_weights_key = []
+        self.representation_param_names = []
+        self.head_param_names = []
 
-    def set_global_local_weights_key(self, global_keys):
-        """ Setting the global local weights key. """
-        # the representation keys are obtained from
-        #   the server response
-        self.model_representation_weights_key = global_keys
-        # the left weights are regarded as the head in default
-        full_model_weights_key = self.model.state_dict().keys()
-        self.model_head_weights_key = [
-            name for name in full_model_weights_key if name not in global_keys
+    def set_representation_and_head(self, representation_param_names):
+        """ Setting the parameter names for global (representation)
+         and local (the head) models. """
+
+        # set the parameter names for the representation
+        #   As mentioned by Eq. 1 and Fig. 2 of the paper, the representation
+        #   behaves as the global model.
+        self.representation_param_names = representation_param_names
+
+        # FedRep calls the weights and biases of the final fully-connected layer
+        # in each of the models as the "head"
+        # This insight is obtained from the source code of FedRep.
+        model_parameter_names = self.model.state_dict().keys()
+
+        self.head_param_names = [
+            name for name in model_parameter_names
+            if name not in representation_param_names
         ]
-        logging.info("Representation_weights: %s",
-                     self.model_representation_weights_key)
-        logging.info("Head_weights: %s", self.model_head_weights_key)
+
+        logging.info("[Client #%s] Representation layers: %s", self.client_id,
+                     self.representation_param_names)
+        logging.info("[Client #%s] Head layers: %s", self.client_id,
+                     self.head_param_names)
 
     def train_model(self, config, trainset, sampler, cut_layer=None):
         """The main training loop of FedRep in a federated learning workload.
@@ -70,7 +88,8 @@ class Trainer(basic.Trainer):
         # load the total local update epochs
         epochs = config['epochs']
         # load the local update epochs for head optimization
-        head_epochs = config['head_epochs']
+        head_epochs = config[
+            'head_epochs'] if 'head_epochs' in config else epochs - 1
 
         # Sending the model to the device used for training
         self.model.to(self.device)
@@ -114,16 +133,20 @@ class Trainer(basic.Trainer):
 
         for epoch in range(1, epochs + 1):
 
+            # As presented in the Section 3 of the FedRep paper,
+            #   the head is optimized for (epochs - 1) while frozing
+            #   the representation
             if epoch <= head_epochs:
                 for name, param in self.model.named_parameters():
-                    if name in self.model_representation_weights_key:
+                    if name in self.representation_param_names:
                         param.requires_grad = False
                     else:
                         param.requires_grad = True
-
+            # Then, the representation will be optimized for only one
+            #   epoch.
             if epoch > head_epochs:
                 for name, param in self.model.named_parameters():
-                    if name in self.model_representation_weights_key:
+                    if name in self.representation_param_names:
                         param.requires_grad = True
                     else:
                         param.requires_grad = False
