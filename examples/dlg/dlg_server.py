@@ -52,6 +52,15 @@ class Server(fedavg.Server):
         """ Analyze periodic gradients from certain clients. """
         # Obtain the local updates from clients
         # deltas_received = self.compute_weight_deltas(updates)
+        # TODO: the server actually has no idea about the local learning rate
+        __, __, payload, __ = updates[Config().algorithm.victim_client]
+        # Receive the ground truth for evaluation
+        # It will not be used for data reconstruction
+        gt_data, gt_label, target_grad = payload[1]
+
+        # Plot ground truth data        plt.imshow(tt(gt_data.cpu()))
+        plt.title("Ground truth image")
+        logging.info("GT label is %d.", torch.argmax(gt_label, dim=-1).item())
 
         # Generate dummy items
         data_size = self.testset.data[0].shape
@@ -68,16 +77,14 @@ class Server(fedavg.Server):
         logging.info("[Gradient Leakage Attacking...] Dummy label is %d.",
                      torch.argmax(dummy_label, dim=-1).item())
 
-        # TODO: the server actually has no idea about the local learning rate
-        __, __, payload, __ = updates[Config().algorithm.victim_client]
-        target_grad = payload[1]
-
         # TODO: periodic analysis, which round?
         # Gradient matching
         history = []
+
         for iters in range(Config().algorithm.num_iters):
             def closure():
                 optimizer.zero_grad()
+
                 dummy_pred = self.trainer.model(dummy_data)
                 dummy_onehot_label = F.softmax(dummy_label, dim=-1)
                 dummy_loss = criterion(dummy_pred, dummy_onehot_label)
@@ -91,6 +98,7 @@ class Server(fedavg.Server):
                 return grad_diff
 
             optimizer.step(closure)
+
             if iters % Config().algorithm.log_interval == 0:
                 current_loss = closure()
                 logging.info("[Gradient Leakage Attacking...] Iter %d: Gradient Difference %.4f",
