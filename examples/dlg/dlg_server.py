@@ -14,6 +14,7 @@ https://papers.nips.cc/paper/2019/file/60a6c4002cc7b29142def8871531281a-Paper.pd
 """
 
 import logging
+import lpips
 
 import matplotlib.pyplot as plt
 import torch
@@ -26,7 +27,9 @@ from utils import cross_entropy_for_onehot
 
 criterion = cross_entropy_for_onehot
 tt = transforms.ToPILImage()
+loss_fn = lpips.LPIPS(net='vgg')
 torch.manual_seed(Config().algorithm.random_seed)
+
 
 
 class Server(fedavg.Server):
@@ -82,6 +85,7 @@ class Server(fedavg.Server):
         history = []
         losses = []
         mses = []
+        lpipss = []
 
         for iters in range(Config().algorithm.num_iters):
             def closure():
@@ -103,10 +107,11 @@ class Server(fedavg.Server):
             current_loss = closure().item()
             losses.append(current_loss)
             mses.append(torch.mean((dummy_data - gt_data)**2).item())
+            lpipss.append(loss_fn.forward(dummy_data, gt_data))
 
             if iters % Config().algorithm.log_interval == 0:
-                logging.info("[Gradient Leakage Attacking...] Iter %d: Gradient difference = %.8f, MSE = %.8f",
-                             iters, losses[-1], mses[-1])
+                logging.info("[Gradient Leakage Attacking...] Iter %d: Gradient difference = %.8f, MSE = %.8f, LPIPS = %.8f",
+                             iters, losses[-1], mses[-1], lpipss[-1])
                 history.append(tt(dummy_data[0].cpu()))
 
         plt.figure(figsize=(12, 8))
