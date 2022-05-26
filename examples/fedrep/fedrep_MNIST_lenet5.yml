@@ -9,10 +9,7 @@ clients:
     per_round: 3
 
     # Should the clients compute test accuracy locally?
-    do_test: True
-
-    # Whether simulate clients or not
-    simulation: true
+    do_test: true
 
     random_seed: 1
 
@@ -20,6 +17,7 @@ server:
     address: 127.0.0.1
     port: 8000
     do_test: false
+    random_seed: 1
 
     checkpoint_path: models/fedrep/mnist
     model_path: models/fedrep/mnist
@@ -37,6 +35,8 @@ data:
     # The concentration parameter for the Dirichlet distribution
     concentration: 5
 
+    testset_sampler: noniid
+
     # The random seed for sampling data
     random_seed: 1
 
@@ -46,9 +46,6 @@ trainer:
 
     # The maximum number of training rounds
     rounds: 100
-
-    # Whether the training should use multiple GPUs if available
-    parallelized: false
 
     # The maximum number of clients running concurrently
     max_concurrency: 10
@@ -69,7 +66,7 @@ trainer:
 
     # The machine learning model
     model_name: lenet5
-    num_classes: 47
+    num_classes: 10
 
 algorithm:
     # Aggregation algorithm
