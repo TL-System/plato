@@ -348,7 +348,7 @@ class Server:
 
             logging.info(
                 fonts.colourize(
-                    f"\n[{{self}}] Starting round {self.current_round}/{Config().trainer.rounds}."
+                    f"\n[{self}] Starting round {self.current_round}/{Config().trainer.rounds}."
                 ))
 
             if Config().is_central_server():
