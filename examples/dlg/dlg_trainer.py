@@ -96,15 +96,6 @@ class Trainer(basic.Trainer):
                 examples, labels = examples.to(self.device), labels.to(
                     self.device)
 
-                # Plot ground truth data
-                plt.imshow(tt(examples[0].cpu()))
-                plt.title("Ground truth image")
-
-                onehot_labels = label_to_onehot(
-                    labels, num_classes=Config().trainer.num_classes)
-                logging.info("GT label is %d. \nOnehot label is %d.", labels.item(
-                ), torch.argmax(onehot_labels, dim=-1).item())
-
                 if 'differential_privacy' in config and config[
                         'differential_privacy']:
                     optimizer.zero_grad(set_to_none=True)
@@ -116,19 +107,17 @@ class Trainer(basic.Trainer):
                 else:
                     outputs = self.model.forward_from(examples, cut_layer)
 
-                # TODO: DLG gradients
+                # Save the ground truth and gradients
+                onehot_labels = label_to_onehot(
+                    labels, num_classes=Config().trainer.num_classes)
                 loss = criterion(outputs, onehot_labels)
                 dy_dx = torch.autograd.grad(loss, self.model.parameters())
                 target_grad = list((_.detach().clone() for _ in dy_dx))
 
                 file_path = f"{Config().params['model_path']}/{self.client_id}.pickle"
                 with open(file_path, 'wb') as handle:
-                    pickle.dump(target_grad, handle)
-
-                # for name, param in self.model.named_parameters():
-                #     if param.requires_grad:
-                #         print(name, param.data[0])
-                #         break
+                    pickle.dump(
+                        [examples[0], onehot_labels, target_grad], handle)
 
                 # loss = loss_criterion(outputs, labels)
 
