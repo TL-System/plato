@@ -11,6 +11,8 @@ import torch
 import torch.nn as nn
 from opacus.privacy_engine import PrivacyEngine
 
+from sklearn.neural_network import MLPClassifier
+
 from plato.config import Config
 from plato.trainers import basic
 from plato.utils import optimizers
@@ -219,22 +221,27 @@ class Trainer(basic.Trainer):
                         shuffle=False,
                         sampler=sampler.get())
 
-                correct = 0
-                total = 0
-
+                samples_feature = []
+                samples_label = []
                 with torch.no_grad():
-                    for examples1, examples2, labels in test_loader:
-                        examples1, examples2, labels = examples1.to(
-                            self.device), examples2.to(self.device), labels.to(
-                                self.device)
-                        examples = (examples1, examples2)
-                        outputs = self.model(examples)
+                    for examples, labels in test_loader:
+                        examples, labels = examples.to(self.device), labels.to(
+                            self.device)
 
-                        _, predicted = torch.max(outputs.data, 1)
-                        total += labels.size(0)
-                        correct += (predicted == labels).sum().item()
+                        outputs = self.model.forward_once(examples)
+                        samples_feature.extend(
+                            outputs.data.cpu().numpy().tolist())
+                        samples_label.extend(
+                            labels.data.cpu().numpy().tolist())
 
-                accuracy = correct / total
+                    # define a simple MLP classifier
+                    clf = MLPClassifier(solver='adam',
+                                        alpha=1e-5,
+                                        hidden_layer_sizes=(10, 10),
+                                        random_state=1)
+                    clf.fit(samples_feature, samples_label)
+                    accuracy = clf.score(samples_feature, samples_label)
+
         except Exception as testing_exception:
             logging.info("Testing on client #%d failed.", self.client_id)
             raise testing_exception
