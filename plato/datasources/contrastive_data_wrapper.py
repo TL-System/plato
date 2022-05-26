@@ -31,7 +31,8 @@ class ContrastiveDataWrapper(torch.utils.data.Dataset):
 
         # the samples index containing in each label
         self.label_indexs_pool = {
-            label_id: np.where(np.array(self.dataset_labels) == label_id)[0]
+            label_id:
+            np.where(np.array(self.dataset_labels) == label_id)[0].tolist()
             for label_id in self.unique_label
         }
         self.label_indexs_pool_size = {
@@ -48,9 +49,6 @@ class ContrastiveDataWrapper(torch.utils.data.Dataset):
         #  present the samples within which class will be sampled
         #  to behave as the negative sample
         self.selected_label_count = 0
-
-        # whether to prepare a positive sample
-        self.is_positive = 0
 
     def __len__(self):
         return len(self.dataset)
@@ -127,9 +125,9 @@ class ContrastiveDataWrapper(torch.utils.data.Dataset):
         obtained_sample, sample_label = self.dataset[item_index]
 
         # decide to prepare positive or negative sample
-        self.is_positive = np.random.randint(1, size=1) > 0.5
+        is_positive = np.random.uniform(low=0.0, high=1.0, size=1)[0] > 0.5
 
-        if self.is_positive:
+        if is_positive:
             # obtain positive sample by sampling from the same
             #   label class.
             positive_sample_index = self.sample_label_index_pool(

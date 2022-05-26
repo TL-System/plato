@@ -20,6 +20,7 @@ server:
     address: 127.0.0.1
     port: 8000
     synchronous: true
+    do_test: false
 
     checkpoint_path: models/base_siamese/mnist
     model_path: models/base_siamese/mnist
@@ -63,7 +64,7 @@ trainer:
 
     # Number of epochs for local training in each communication round
     epochs: 10
-    batch_size: 2
+    batch_size: 10
     optimizer: SGD
     learning_rate: 0.03
     momentum: 0.0 # learning rate is fixed as in Appendix C.2
@@ -71,8 +72,7 @@ trainer:
 
     # margin
     margin: 2.0
-    # Number of epoches for head optimization
-    head_epochs: 9
+
 
     # The machine learning model
     model_name: lenet5

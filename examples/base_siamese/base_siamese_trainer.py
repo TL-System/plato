@@ -46,7 +46,6 @@ class ContrastiveLoss(nn.Module):
 #       1- linear evaluation,
 #       first learn representations from the framework.
 #       Then, train a new linear classifier on the frozen representations.
-#   2-
 
 
 class Trainer(basic.Trainer):
