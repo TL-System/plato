@@ -21,7 +21,7 @@ import simclr_server
 def main():
     """ A Plato federated learning training session using the FedRep algorithm. """
     trainer = simclr_trainer.Trainer
-    simclr_model = simclr_net.SimCLR
+    simclr_model = simclr_net.SimCLR()
     client = simclr_client.Client(model=simclr_model, trainer=trainer)
     server = simclr_server.Server(model=simclr_model, trainer=trainer)
 
