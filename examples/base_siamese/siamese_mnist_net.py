@@ -46,8 +46,8 @@ class SiameseBase(nn.Module):
 
         return (out1, out2)
 
-    def evaluate(self, x, y):
-
+    def evaluate(self, inputs):
+        x, y = inputs
         # this can be used later for evalutation
 
         m = torch.tensor(1.0, dtype=torch.float32)
@@ -63,6 +63,6 @@ class SiameseBase(nn.Module):
 
         with torch.no_grad():
 
-            out1, out2 = self.forward(x, y)
+            out1, out2 = self.forward((x, y))
 
             return nn.functional.pairwise_distance(out1, out2)

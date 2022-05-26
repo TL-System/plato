@@ -26,9 +26,3 @@ class Client(simple.Client):
                    "data_wrapper") and Config().data.data_wrapper != None:
 
             self.trainset = datawrapper_registry.get(self.trainset)
-
-        if Config().clients.do_test:
-            if hasattr(Config().data,
-                       "data_wrapper") and Config().data.data_wrapper != None:
-
-                self.testset = datawrapper_registry.get(self.testset)
