@@ -14,7 +14,7 @@ class Server(fedavg.Server):
 
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using federated averaging."""
-        weights_received = self.extract_client_updates(updates)
+        weights_received = self.compute_weight_deltas(updates)
 
         # Total sample is the same for both Generator and Discriminator
         self.total_samples = sum(

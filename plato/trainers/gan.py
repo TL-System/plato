@@ -9,6 +9,7 @@ import os
 
 import torch
 import numpy as np
+import scipy
 
 from plato.config import Config
 from plato.models import registry as models_registry
@@ -132,7 +133,7 @@ class Trainer(basic.Trainer):
             for batch_id, (examples, _) in enumerate(train_loader):
                 cur_batch_size = len(examples)
                 examples = examples.to(self.device)
-                label = torch.full((cur_batch_size, ),
+                label = torch.full((cur_batch_size,),
                                    real_label,
                                    dtype=torch.float)
                 label = label.to(self.device)
@@ -213,7 +214,7 @@ class Trainer(basic.Trainer):
                                                   shuffle=True)
 
         with torch.no_grad():
-            real_examples, _ = next(test_loader)
+            real_examples, _ = next(iter(test_loader))
             real_examples = real_examples.to(self.device)
 
             noise = torch.randn(sample_size,
@@ -231,7 +232,7 @@ class Trainer(basic.Trainer):
     def calculate_fid(real_examples, fake_examples):
 
         def temp_model(img):
-            return torch.ones(len(img), 2048)
+            return torch.randn(len(img), 2048)
 
         inception_model = temp_model
 
@@ -243,10 +244,12 @@ class Trainer(basic.Trainer):
                                                          rowvar=False)
         mu2, sigma2 = fake_features.mean(axis=0), np.cov(fake_features,
                                                          rowvar=False)
+
+        mu1, mu2, sigma1, sigma2 = np.array(mu1), np.array(mu2), np.array(sigma1), np.array(sigma2)
         # calculate sum squared difference between means
-        ssdiff = np.sum((mu1 - mu2)**2.0)
+        ssdiff = np.sum((mu1 - mu2) ** 2.0)
         # calculate sqrt of product between cov
-        covmean = np.linalg.sqrtm(sigma1.dot(sigma2))
+        covmean = scipy.linalg.sqrtm(sigma1.dot(sigma2))
         # check and correct imaginary numbers from sqrt
         if np.iscomplexobj(covmean):
             covmean = covmean.real

@@ -38,7 +38,7 @@ data:
 
     # Number of samples in each partition
     # partition_size: 162770
-    partition_size: 20000
+    partition_size: 2000
 
     # IID or non-IID?
     sampler: iid
