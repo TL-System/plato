@@ -8,6 +8,7 @@ import logging
 import os
 
 import torch
+import numpy as np
 
 from plato.config import Config
 from plato.models import registry as models_registry
@@ -198,20 +199,58 @@ class Trainer(basic.Trainer):
                             epochs, batch_id, len(train_loader),
                             err_gen.data.item(), err_disc_total.data.item())
 
-    def test(self, testset, sampler=None) -> float:
-        """Testing the model using the provided test dataset.
+    def test_model(self, config, testset):
 
-        Arguments:
-        testset: The test dataset.
-        sampler: The sampler that extracts a partition of the test dataset.
-        """
-        return 0
+        self.model.to(self.device)
+        self.model.eval()
 
-    async def server_test(self, testset, sampler=None):
-        """Testing the model on the server using the provided test dataset.
+        fidelity = -1
 
-        Arguments:
-        testset: The test dataset.
-        sampler: The sampler that extracts a partition of the test dataset.
-        """
-        return 0
+        sample_size = min(len(testset), 50000)
+
+        test_loader = torch.utils.data.DataLoader(testset,
+                                                  batch_size=sample_size,
+                                                  shuffle=True)
+
+        with torch.no_grad():
+            real_examples, _ = next(test_loader)
+            real_examples = real_examples.to(self.device)
+
+            noise = torch.randn(sample_size,
+                                self.model.nz,
+                                1,
+                                1,
+                                device=self.device)
+            fake_examples = self.generator(noise)
+            fidelity = Trainer.calculate_fid(real_examples, fake_examples)
+
+        print(fidelity)
+        return fidelity
+
+    @staticmethod
+    def calculate_fid(real_examples, fake_examples):
+
+        def temp_model(img):
+            return torch.ones(len(img), 2048)
+
+        inception_model = temp_model
+
+        real_features = inception_model(real_examples)
+        fake_features = inception_model(fake_examples)
+
+        # calculate mean and covariance statistics
+        mu1, sigma1 = real_features.mean(axis=0), np.cov(real_features,
+                                                         rowvar=False)
+        mu2, sigma2 = fake_features.mean(axis=0), np.cov(fake_features,
+                                                         rowvar=False)
+        # calculate sum squared difference between means
+        ssdiff = np.sum((mu1 - mu2)**2.0)
+        # calculate sqrt of product between cov
+        covmean = np.linalg.sqrtm(sigma1.dot(sigma2))
+        # check and correct imaginary numbers from sqrt
+        if np.iscomplexobj(covmean):
+            covmean = covmean.real
+        # calculate score
+        fid = ssdiff + np.trace(sigma1 + sigma2 - 2.0 * covmean)
+
+        return fid

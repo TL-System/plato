@@ -50,7 +50,16 @@ class Server(fedavg.Server):
         return gen_avg_update, disc_avg_update
 
     def customize_server_payload(self, payload):
-        """ Customize the server payload before sending to the client. """
+        """
+        Customize the server payload before sending to the client.
+        
+        At the end of each round, the server can choose to only send the global Generator
+        or Discriminator (or both or neither) model to the clients next round. 
+        Reference this paper for more detail:
+        https://deepai.org/publication/federated-generative-adversarial-learning
+
+        By default, both model will be sent to the clients.
+        """
         weights_gen, weights_disc = payload
         if hasattr(Config().server, 'network_to_sync'):
             if hasattr(Config().server.network_to_sync, 'generator'

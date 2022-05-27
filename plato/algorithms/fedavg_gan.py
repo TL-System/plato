@@ -70,6 +70,8 @@ class Algorithm(fedavg.Algorithm):
     def load_weights(self, weights):
         """Load the model weights passed in as a parameter."""
         weights_gen, weights_disc = weights
+        # The client might only receive one or none of the Generator
+        # and Discriminator model weight.
         if weights_gen is not None:
             self.generator.load_state_dict(weights_gen, strict=True)
         if weights_disc is not None:
