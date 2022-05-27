@@ -4,7 +4,7 @@ The MNIST dataset.
 
 import os
 
-from mindspore.dataset.engine.datasets import MnistDataset
+from mindspore.dataset import MnistDataset
 import mindspore.dataset as ds
 import mindspore.dataset.vision.c_transforms as CV
 import mindspore.dataset.transforms.c_transforms as C
@@ -17,9 +17,10 @@ from plato.datasources import base
 
 class DataSource(base.DataSource):
     """The MNIST dataset."""
+
     def __init__(self):
         super().__init__()
-        _path = Config().data.data_path
+        _path = Config().params['data_path']
 
         # Downloading the MNIST dataset from https://ossci-datasets.s3.amazonaws.com/mnist/
         self.train_path = _path + "/MNIST/raw/train"

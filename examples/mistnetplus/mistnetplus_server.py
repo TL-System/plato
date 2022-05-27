@@ -90,27 +90,27 @@ class MistnetplusServer(fedavg.Server):
 
     async def aggregate_weights(self, updates):
         model = self.algorithm.extract_weights()
-        update = await self.federated_averaging(updates)
-        feature_update = self.algorithm.update_weights(update)
+        deltas = await self.federated_averaging(updates)
+        updated_features = self.algorithm.update_weights(deltas)
 
-        for name, weight in model.items():
+        for name, __ in model.items():
             if name == Config().algorithm.cut_layer:
                 logging.info("[Server #%d] %s cut", os.getpid(), name)
                 break
-            model[name] = model[name] + feature_update[name]
+            model[name] = model[name] + updated_features[name]
 
         self.algorithm.load_weights(model)
 
     def load_gradients(self):
         """ Loading gradients from a file. """
-        model_dir = Config().params['model_dir']
+        model_path = Config().params['model_path']
         model_name = Config().trainer.model_name
 
-        model_path = f'{model_dir}/{model_name}_gradients.pth'
+        model_gradients_path = f'{model_path}/{model_name}_gradients.pth'
         logging.info("[Server #%d] Loading gradients from %s.", os.getpid(),
-                     model_path)
+                     model_gradients_path)
 
-        return torch.load(model_path)
+        return torch.load(model_gradients_path)
 
 
 def main():

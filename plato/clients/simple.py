@@ -2,9 +2,9 @@
 A basic federated learning client who sends weight updates to the server.
 """
 
-from dataclasses import dataclass
 import logging
 import time
+from dataclasses import dataclass
 
 from plato.algorithms import registry as algorithms_registry
 from plato.clients import base
@@ -13,6 +13,7 @@ from plato.datasources import registry as datasources_registry
 from plato.processors import registry as processor_registry
 from plato.samplers import registry as samplers_registry
 from plato.trainers import registry as trainers_registry
+from plato.utils import fonts
 
 
 @dataclass
@@ -31,10 +32,17 @@ class Client(base.Client):
                  algorithm=None,
                  trainer=None):
         super().__init__()
-        self.model = model
+        self.custom_model = model
+        self.model = None
+
         self.datasource = datasource
-        self.algorithm = algorithm
-        self.trainer = trainer
+
+        self.custom_algorithm = algorithm
+        self.algorithm = None
+
+        self.custom_trainer = trainer
+        self.trainer = None
+
         self.trainset = None  # Training dataset
         self.testset = None  # Testing dataset
         self.sampler = None
@@ -45,13 +53,24 @@ class Client(base.Client):
     def configure(self) -> None:
         """Prepare this client for training."""
         super().configure()
+        if self.custom_model is not None:
+            self.model = self.custom_model
+            self.custom_model = None
 
-        if self.trainer is None:
-            self.trainer = trainers_registry.get(self.model)
+        if self.trainer is None and self.custom_trainer is None:
+            self.trainer = trainers_registry.get(model=self.model)
+        elif self.trainer is None and self.custom_trainer is not None:
+            self.trainer = self.custom_trainer(model=self.model)
+            self.custom_trainer = None
+
         self.trainer.set_client_id(self.client_id)
 
-        if self.algorithm is None:
-            self.algorithm = algorithms_registry.get(self.trainer)
+        if self.algorithm is None and self.custom_algorithm is None:
+            self.algorithm = algorithms_registry.get(trainer=self.trainer)
+        elif self.algorithm is None and self.custom_algorithm is not None:
+            self.algorithm = self.custom_algorithm(trainer=self.trainer)
+            self.custom_algorithm = None
+
         self.algorithm.set_client_id(self.client_id)
 
         # Pass inbound and outbound data payloads through processors for
@@ -68,8 +87,6 @@ class Client(base.Client):
             self.datasource = datasources_registry.get(
                 client_id=self.client_id)
 
-        self.data_loaded = True
-
         logging.info("[%s] Dataset size: %s", self,
                      self.datasource.num_train_examples())
 
@@ -84,7 +101,7 @@ class Client(base.Client):
             # PyTorch uses samplers when loading data with a data loader
             self.trainset = self.datasource.get_train_set()
 
-        if Config().clients.do_test:
+        if hasattr(Config().clients, 'do_test') and Config().clients.do_test:
             # Set the testset if local testing is needed
             self.testset = self.datasource.get_test_set()
             if hasattr(Config().data, 'testset_sampler'):
@@ -99,7 +116,10 @@ class Client(base.Client):
 
     async def train(self):
         """The machine learning training workload on a client."""
-        logging.info("[%s] Started training.", self)
+        logging.info(
+            fonts.colourize(
+                f"[{self}] Started training in communication round #{self.current_round}."
+            ))
 
         # Perform model training
         try:
@@ -111,7 +131,9 @@ class Client(base.Client):
         weights = self.algorithm.extract_weights()
 
         # Generate a report for the server, performing model testing if applicable
-        if Config().clients.do_test:
+        if (hasattr(Config().clients, 'do_test') and Config().clients.do_test
+            ) and (not hasattr(Config().clients, 'test_interval') or
+                   self.current_round % Config().clients.test_interval == 0):
             accuracy = self.trainer.test(self.testset, self.testset_sampler)
 
             if accuracy == -1:

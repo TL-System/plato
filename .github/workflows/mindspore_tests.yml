@@ -30,8 +30,8 @@ jobs:
           sudo apt-get update
           sudo apt install -y python3-pip
           conda activate plato
-          conda install mindspore-cpu=1.5.0 -c mindspore -c conda-forge -y
-          pip3 install numpy python-socketio aiohttp requests boto3 pyyaml pyyaml-include datasets
+          conda install mindspore-cpu=1.6.1 -c mindspore -c conda-forge -y
+          pip3 install numpy python-socketio aiohttp requests boto3 pyyaml pynvml psutil datasets
 
       - name: Training workloads
         shell: bash -l {0}

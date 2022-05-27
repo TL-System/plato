@@ -1,18 +1,19 @@
+general:
+    # The prefix of directories of dataset, models, checkpoints, and results
+    base_path: ./cross_silo
+
 clients:
     # Type
     type: simple
 
     # The total number of clients
-    total_clients: 100
+    total_clients: 3
 
     # The number of clients selected in each round
-    per_round: 20
+    per_round: 3
 
     # Should the clients compute test accuracy locally?
     do_test: true
-
-    # Client simulation mode
-    simulation: true
 
 server:
     type: fedavg_cross_silo
@@ -23,30 +24,18 @@ data:
     # The training and testing dataset
     datasource: MNIST
 
-    # Where the dataset is located
-    data_path: ./data
-
     # Number of samples in each partition
     partition_size: 600
 
     # IID or non-IID?
     sampler: iid
 
-    # Whether to apply differential privacy
-    # differential_privacy: true
-    # dp_epsilon: 1
-    # dp_delta: 0.00001
-    # dp_max_grad_norm: 2
-
 trainer:
     # The type of the trainer
     type: basic
 
     # The maximum number of training rounds
-    rounds: 50
-
-    # Whether the training should use multiple GPUs if available
-    parallelized: false
+    rounds: 3
 
     # The maximum number of clients running concurrently
     max_concurrency: 1
@@ -55,7 +44,7 @@ trainer:
     target_accuracy: 0.95
 
     # Number of epoches for local training in each communication round
-    epochs: 4
+    epochs: 2
     batch_size: 10
     optimizer: SGD
     learning_rate: 0.01

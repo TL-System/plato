@@ -3,7 +3,6 @@ The base class for federated learning servers.
 """
 
 import asyncio
-import copy
 import heapq
 import logging
 import multiprocessing as mp
@@ -19,7 +18,7 @@ import socketio
 from aiohttp import web
 from plato.client import run
 from plato.config import Config
-from plato.utils import s3
+from plato.utils import s3, fonts
 
 
 class ServerEvents(socketio.AsyncNamespace):
@@ -93,10 +92,8 @@ class Server:
         self.s3_client = None
         self.outbound_processor = None
         self.inbound_processor = None
-        self.comm_simulation = False
-        if hasattr(Config().clients,
-                   'comm_simulation') and Config().clients.comm_simulation:
-            self.comm_simulation = True
+        self.comm_simulation = Config().clients.comm_simulation if hasattr(
+            Config().clients, 'comm_simulation') else True
 
         # States that need to be maintained for asynchronous FL
 
@@ -111,6 +108,9 @@ class Server:
         self.initial_wall_time = time.time()
         self.wall_time = time.time()
 
+        # The wall clock time when a communication round starts
+        self.round_start_wall_time = self.wall_time
+
         # When simulating the wall clock time, the server needs to remember the
         # set of reporting clients received since the previous round of aggregation
         self.current_reported_clients = {}
@@ -118,7 +118,7 @@ class Server:
         self.prng_state = random.getstate()
 
         self.ping_interval = 3600
-        self.ping_timeout = 360
+        self.ping_timeout = 3600
         self.asynchronous_mode = False
         self.periodic_interval = 5
         self.staleness_bound = 1000
@@ -127,7 +127,11 @@ class Server:
         self.request_update = False
         self.disable_clients = False
 
-        Server.client_simulation_mode = False
+        # With specifying max_concurrency, selected clients run batch by batach
+        # The number of clients in a batch on an available device is the same as the max_concurrency
+        # This list contains ids of selected clients that has run in the current round
+        if hasattr(Config().trainer, 'max_concurrency'):
+            self.trained_clients = []
 
     def __repr__(self):
         return f'Server #{os.getpid()}'
@@ -138,7 +142,7 @@ class Server:
         self.ping_interval = Config().server.ping_interval if hasattr(
             Config().server, 'ping_interval') else 3600
         self.ping_timeout = Config().server.ping_timeout if hasattr(
-            Config().server, 'ping_timeout') else 360
+            Config().server, 'ping_timeout') else 3600
 
         # Are we operating in asynchronous mode?
         self.asynchronous_mode = hasattr(
@@ -176,22 +180,12 @@ class Server:
             Config().server,
             'disable_clients') and Config().server.disable_clients
 
-        # Are we simulating the clients rather than running all selected clients as separate
-        # processes?
-        Server.client_simulation_mode = hasattr(
-            Config().clients, 'simulation') and Config().clients.simulation
-
     def run(self,
             client=None,
             edge_server=None,
             edge_client=None,
             trainer=None):
         """ Start a run loop for the server. """
-        # Remove the running trainers table from previous runs.
-        if not Config().is_edge_server() and hasattr(Config().trainer,
-                                                     'max_concurrency'):
-            with Config().sql_connection:
-                Config().cursor.execute("DROP TABLE IF EXISTS trainers")
 
         self.client = client
         self.configure()
@@ -265,8 +259,17 @@ class Server:
             logging.info("[%s] New contact from Client #%d received.", self,
                          client_id)
 
+        if hasattr(Config().trainer,
+                   'max_concurrency') and not Config().is_central_server():
+            required_launched_clients = min(
+                Config().trainer.max_concurrency * max(1,
+                                                       Config().gpu_count()),
+                self.clients_per_round)
+        else:
+            required_launched_clients = self.clients_per_round
+
         if (self.current_round == 0 or self.resumed_session) and len(
-                self.clients) >= self.clients_per_round:
+                self.clients) >= required_launched_clients:
             logging.info("[%s] Starting training.", self)
             self.resumed_session = False
             await self.select_clients()
@@ -280,16 +283,30 @@ class Server:
         """ Starting all the clients as separate processes. """
         starting_id = 1
 
-        if Server.client_simulation_mode:
-            # In the client simulation mode, we only need to launch a limited
-            # number of client objects (same as the number of clients per round)
-            client_processes = Config().clients.per_round
+        # We only need to launch the number of clients necessary for concurrent training
+        # If `max_concurrency` in `trainer` is specified, the limit number is
+        # `max_concurrency` multiply the number of available devices
+        # (multiply number of edge servers in cross-silo training)
+        if hasattr(Config().trainer, 'max_concurrency'):
+            if Config().is_central_server():
+                client_processes = min(
+                    Config().trainer.max_concurrency *
+                    max(1,
+                        Config().gpu_count()) * Config().algorithm.total_silos,
+                    Config().clients.per_round)
+            else:
+                client_processes = min(
+                    Config().trainer.max_concurrency *
+                    max(1,
+                        Config().gpu_count()),
+                    Config().clients.per_round)
+        # Otherwise, the limited number is the same as the number of clients per round
         else:
-            client_processes = Config().clients.total_clients
+            client_processes = Config().clients.per_round
 
         if as_server:
             total_processes = Config().algorithm.total_silos
-            starting_id += client_processes
+            starting_id += Config().clients.total_clients
         else:
             total_processes = client_processes
 
@@ -319,121 +336,155 @@ class Server:
             logging.info("Closing the connection to client #%d.", client_id)
             await self.sio.emit('disconnect', room=client['sid'])
 
-    async def select_clients(self):
+    async def select_clients(self, for_next_batch=False):
         """ Select a subset of the clients and send messages to them to start training. """
-        self.updates = []
-        self.current_round += 1
+        if not for_next_batch:
+            self.updates = []
+            self.current_round += 1
+            self.round_start_wall_time = self.wall_time
 
-        logging.info("\n[%s] Starting round %s/%s.", self, self.current_round,
-                     Config().trainer.rounds)
+            if hasattr(Config().trainer, 'max_concurrency'):
+                self.trained_clients = []
 
-        if Server.client_simulation_mode:
-            # In the client simulation mode, the client pool for client selection contains
-            # all the virtual clients to be simulated
-            self.clients_pool = list(range(1, 1 + self.total_clients))
+            logging.info(
+                fonts.colourize(
+                    f"\n[{self}] Starting round {self.current_round}/{Config().trainer.rounds}."
+                ))
+
             if Config().is_central_server():
-                self.clients_pool = list(
-                    range(Config().clients.per_round + 1,
-                          Config().clients.per_round + 1 + self.total_clients))
+                # In cross-silo FL, the central server selects from the pool of edge servers
+                self.clients_pool = list(self.clients)
 
-        else:
-            # If no clients are simulated, the client pool for client selection consists of
-            # the current set of clients that have contacted the server
-            self.clients_pool = list(self.clients)
+            elif not Config().is_edge_server():
+                self.clients_pool = list(range(1, 1 + self.total_clients))
 
-        # In asychronous FL, avoid selecting new clients to replace those that are still
-        # training at this time
+            # In asychronous FL, avoid selecting new clients to replace those that are still
+            # training at this time
 
-        # When simulating the wall clock time, if len(self.reported_clients) is 0, the
-        # server has aggregated all reporting clients already
-        if self.asynchronous_mode and self.selected_clients is not None and len(
-                self.reported_clients) > 0 and len(
-                    self.reported_clients) < self.clients_per_round:
-            # If self.selected_clients is None, it implies that it is the first iteration;
-            # If len(self.reported_clients) == self.clients_per_round, it implies that
-            # all selected clients have already reported.
+            # When simulating the wall clock time, if len(self.reported_clients) is 0, the
+            # server has aggregated all reporting clients already
+            if self.asynchronous_mode and self.selected_clients is not None and len(
+                    self.reported_clients) > 0 and len(
+                        self.reported_clients) < self.clients_per_round:
+                # If self.selected_clients is None, it implies that it is the first iteration;
+                # If len(self.reported_clients) == self.clients_per_round, it implies that
+                # all selected clients have already reported.
 
-            # Except for these two cases, we need to exclude the clients who are still
-            # training.
-            training_client_ids = [
-                self.training_clients[client_id]['id']
-                for client_id in list(self.training_clients.keys())
-            ]
+                # Except for these two cases, we need to exclude the clients who are still
+                # training.
+                training_client_ids = [
+                    self.training_clients[client_id]['id']
+                    for client_id in list(self.training_clients.keys())
+                ]
 
-            # If the server is simulating the wall clock time, some of the clients who
-            # reported may not have been aggregated; they should be excluded from the next
-            # round of client selection
-            reporting_client_ids = [
-                client[1]['client_id'] for client in self.reported_clients
-            ]
+                # If the server is simulating the wall clock time, some of the clients who
+                # reported may not have been aggregated; they should be excluded from the next
+                # round of client selection
+                reporting_client_ids = [
+                    client[1]['client_id'] for client in self.reported_clients
+                ]
 
-            selectable_clients = [
-                client for client in self.clients_pool
-                if client not in training_client_ids
-                and client not in reporting_client_ids
-            ]
+                selectable_clients = [
+                    client for client in self.clients_pool
+                    if client not in training_client_ids
+                    and client not in reporting_client_ids
+                ]
 
-            if self.simulate_wall_time:
-                self.selected_clients = self.choose_clients(
-                    selectable_clients, len(self.current_processed_clients))
+                if self.simulate_wall_time:
+                    self.selected_clients = self.choose_clients(
+                        selectable_clients,
+                        len(self.current_processed_clients))
+                else:
+                    self.selected_clients = self.choose_clients(
+                        selectable_clients, len(self.reported_clients))
             else:
                 self.selected_clients = self.choose_clients(
-                    selectable_clients, len(self.reported_clients))
-        else:
-            self.selected_clients = self.choose_clients(
-                self.clients_pool, self.clients_per_round)
+                    self.clients_pool, self.clients_per_round)
 
-        self.current_reported_clients = {}
-        self.current_processed_clients = {}
+            self.current_reported_clients = {}
+            self.current_processed_clients = {}
 
-        # There is no need to clear the list of reporting clients if we are
-        # simulating the wall clock time on the server. This is because
-        # when wall clock time is simulated, the server needs to wait for
-        # all the clients to report before selecting a subset of clients for
-        # replacement, and all remaining reporting clients will be processed
-        # in the next round
-        if not self.simulate_wall_time:
-            self.reported_clients = []
+            # There is no need to clear the list of reporting clients if we are
+            # simulating the wall clock time on the server. This is because
+            # when wall clock time is simulated, the server needs to wait for
+            # all the clients to report before selecting a subset of clients for
+            # replacement, and all remaining reporting clients will be processed
+            # in the next round
+            if not self.simulate_wall_time:
+                self.reported_clients = []
 
         if len(self.selected_clients) > 0:
             self.selected_sids = []
 
-            for i, selected_client_id in enumerate(self.selected_clients):
+            # If max_concurrency is specified, run selected clients batch by batch,
+            # and the number of clients in each batch (on each GPU, if multiple GPUs are available)
+            # is equal to # (or maybe smaller than for the last batch) max_concurrency
+            if hasattr(Config().trainer,
+                       'max_concurrency') and not Config().is_central_server():
+                selected_clients = []
+                if Config().gpu_count() > 1:
+                    untrained_clients = list(
+                        set(self.selected_clients).difference(
+                            self.trained_clients))
+                    available_gpus = Config().gpu_count()
+                    for cuda_id in range(available_gpus):
+                        for client_id in untrained_clients:
+                            if client_id % available_gpus == cuda_id:
+                                selected_clients.append(client_id)
+                            if len(selected_clients) >= min(
+                                (cuda_id + 1) *
+                                    Config().trainer.max_concurrency,
+                                    self.clients_per_round):
+                                break
+                else:
+                    selected_clients = self.selected_clients[
+                        len(self.trained_clients):min(
+                            len(self.trained_clients) + Config().trainer.
+                            max_concurrency, len(self.selected_clients))]
+
+                self.trained_clients += selected_clients
+            else:
+                selected_clients = self.selected_clients
+
+            for i, selected_client_id in enumerate(selected_clients):
                 self.selected_client_id = selected_client_id
 
-                if self.client_simulation_mode:
-                    client_id = i + 1
-                    if Config().is_central_server():
-                        client_id = selected_client_id
-
-                    sid = self.clients[client_id]['sid']
-
-                    if self.asynchronous_mode and self.simulate_wall_time:
-                        training_sids = []
-                        for client_info in self.reported_clients:
-                            training_sids.append(client_info[1]['sid'])
-
-                        # skip if this sid is currently `training' with reporting clients
-                        # or it has already been selected in this round
-                        while sid in training_sids or sid in self.selected_sids:
-                            client_id = client_id % self.clients_per_round + 1
-                            sid = self.clients[client_id]['sid']
-
-                        self.selected_sids.append(sid)
+                if Config().is_central_server():
+                    client_id = selected_client_id
+                elif Config().is_edge_server():
+                    client_id = self.launched_clients[i]
                 else:
-                    sid = self.clients[self.selected_client_id]['sid']
+                    client_id = i + 1
+
+                sid = self.clients[client_id]['sid']
+
+                if self.asynchronous_mode and self.simulate_wall_time:
+                    training_sids = []
+                    for client_info in self.reported_clients:
+                        training_sids.append(client_info[1]['sid'])
+
+                    # skip if this sid is currently `training' with reporting clients
+                    # or it has already been selected in this round
+                    while sid in training_sids or sid in self.selected_sids:
+                        client_id = client_id % self.clients_per_round + 1
+                        sid = self.clients[client_id]['sid']
+
+                    self.selected_sids.append(sid)
 
                 self.training_clients[self.selected_client_id] = {
                     'id': self.selected_client_id,
                     'starting_round': self.current_round,
-                    'start_time': self.wall_time,
+                    'start_time': self.round_start_wall_time,
                     'update_requested': False
                 }
 
                 logging.info("[%s] Selecting client #%d for training.", self,
                              self.selected_client_id)
 
-                server_response = {'id': self.selected_client_id}
+                server_response = {
+                    'id': self.selected_client_id,
+                    'current_round': self.current_round
+                }
                 payload = self.algorithm.extract_weights()
                 payload = self.customize_server_payload(payload)
 
@@ -447,9 +498,9 @@ class Server:
 
                     model_name = Config().trainer.model_name if hasattr(
                         Config().trainer, 'model_name') else 'custom'
-                    checkpoint_dir = Config().params['checkpoint_dir']
+                    checkpoint_path = Config().params['checkpoint_path']
 
-                    payload_filename = f"{checkpoint_dir}/{model_name}_{self.selected_client_id}.pth"
+                    payload_filename = f"{checkpoint_path}/{model_name}_{self.selected_client_id}.pth"
                     with open(payload_filename, 'wb') as payload_file:
                         pickle.dump(payload, payload_file)
                     server_response['payload_filename'] = payload_filename
@@ -579,8 +630,8 @@ class Server:
         if self.comm_simulation:
             model_name = Config().trainer.model_name if hasattr(
                 Config().trainer, 'model_name') else 'custom'
-            checkpoint_dir = Config().params['checkpoint_dir']
-            payload_filename = f"{checkpoint_dir}/{model_name}_client_{client_id}.pth"
+            checkpoint_path = Config().params['checkpoint_path']
+            payload_filename = f"{checkpoint_path}/{model_name}_client_{client_id}.pth"
             with open(payload_filename, 'rb') as payload_file:
                 self.client_payload[sid] = pickle.load(payload_file)
 
@@ -753,8 +804,8 @@ class Server:
                     os.getpid(), client['client_id'])
 
                 client_staleness = self.current_round - client['starting_round']
-                self.updates.append(
-                    (client['report'], client['payload'], client_staleness))
+                self.updates.append((client['client_id'], client['report'],
+                                     client['payload'], client_staleness))
 
             # Step 3: Processing stale clients that exceed a staleness threshold
 
@@ -789,8 +840,8 @@ class Server:
                         client_staleness = self.current_round - client[
                             'starting_round']
                         self.updates.append(
-                            (client['report'], client['payload'],
-                             client_staleness))
+                            (client['client_id'], client['report'],
+                             client['payload'], client_staleness))
 
             self.reported_clients = possibly_stale_clients
             logging.info("[Server #%s] Aggregating %s clients in total.",
@@ -808,8 +859,8 @@ class Server:
             client = client_info[1]
             client_staleness = self.current_round - client['starting_round']
 
-            self.updates.append(
-                (client['report'], client['payload'], client_staleness))
+            self.updates.append((client['client_id'], client['report'],
+                                 client['payload'], client_staleness))
 
         if not self.simulate_wall_time:
             # In both synchronous and asynchronous modes, if we are not simulating the wall clock
@@ -836,6 +887,13 @@ class Server:
             await self.process_reports()
             await self.wrap_up()
             await self.select_clients()
+
+        elif hasattr(Config().trainer,
+                     'max_concurrency') and not Config().is_central_server():
+            # Clients in the current batch finish training
+            # The server will select the next batch of clients to train
+            if len(self.updates) >= len(self.trained_clients):
+                await self.select_clients(for_next_batch=True)
 
     async def client_disconnected(self, sid):
         """ When a client disconnected it should be removed from its internal states. """
@@ -866,27 +924,20 @@ class Server:
 
     def save_to_checkpoint(self):
         """ Save a checkpoint for resuming the training session. """
-        checkpoint_dir = Config.params['checkpoint_dir']
+        checkpoint_path = Config.params['checkpoint_path']
 
         model_name = Config().trainer.model_name if hasattr(
             Config().trainer, 'model_name') else 'custom'
         filename = f"checkpoint_{model_name}_{self.current_round}.pth"
         logging.info("[%s] Saving the checkpoint to %s/%s.", self,
-                     checkpoint_dir, filename)
-        self.trainer.save_model(filename, checkpoint_dir)
+                     checkpoint_path, filename)
+        self.trainer.save_model(filename, checkpoint_path)
+        self.save_random_states(self.current_round, checkpoint_path)
 
-        # Saving important data in the server for resuming its session later on
-        states_to_save = ['current_round', 'numpy_prng_state', 'prng_state']
-        variables_to_save = [
-            self.current_round,
-            np.random.get_state(),
-            random.getstate(),
-        ]
-
-        for i, state in enumerate(states_to_save):
-            with open(f"{checkpoint_dir}/{state}.pkl",
-                      'wb') as checkpoint_file:
-                pickle.dump(variables_to_save[i], checkpoint_file)
+        # Saving the current round in the server for resuming its session later on
+        with open(f"{checkpoint_path}/current_round.pkl",
+                  'wb') as checkpoint_file:
+            pickle.dump(self.current_round, checkpoint_file)
 
     def resume_from_checkpoint(self):
         """ Resume a training session from a previously saved checkpoint. """
@@ -895,28 +946,53 @@ class Server:
             self)
 
         # Loading important data in the server for resuming its session
-        checkpoint_dir = Config.params['checkpoint_dir']
+        checkpoint_path = Config.params['checkpoint_path']
 
-        states_to_load = ['current_round', 'numpy_prng_state', 'prng_state']
-        variables_to_load = {}
+        with open(f"{checkpoint_path}/current_round.pkl",
+                  'rb') as checkpoint_file:
+            self.current_round = pickle.load(checkpoint_file)
 
-        for i, state in enumerate(states_to_load):
-            with open(f"{checkpoint_dir}/{state}.pkl",
-                      'rb') as checkpoint_file:
-                variables_to_load[i] = pickle.load(checkpoint_file)
-
-        self.current_round = variables_to_load[0]
+        self.restore_random_states(self.current_round, checkpoint_path)
         self.resumed_session = True
-        numpy_prng_state = variables_to_load[1]
-        prng_state = variables_to_load[2]
-
-        np.random.set_state(numpy_prng_state)
-        random.setstate(prng_state)
 
         model_name = Config().trainer.model_name if hasattr(
             Config().trainer, 'model_name') else 'custom'
         filename = f"checkpoint_{model_name}_{self.current_round}.pth"
-        self.trainer.load_model(filename, checkpoint_dir)
+        self.trainer.load_model(filename, checkpoint_path)
+
+    def save_random_states(self, round_to_save, checkpoint_path):
+        """ Saving the random states in the server for resuming its session later on. """
+        states_to_save = [
+            f'numpy_prng_state_{round_to_save}', f'prng_state_{round_to_save}'
+        ]
+
+        variables_to_save = [
+            np.random.get_state(),
+            random.getstate(),
+        ]
+
+        for i, state in enumerate(states_to_save):
+            with open(f"{checkpoint_path}/{state}.pkl",
+                      'wb') as checkpoint_file:
+                pickle.dump(variables_to_save[i], checkpoint_file)
+
+    def restore_random_states(self, round_to_restore, checkpoint_path):
+        """ Restoring the numpy.random and random states from previously saved checkpoints
+            for a particular round.
+        """
+        states_to_load = ['numpy_prng_state', 'prng_state']
+        variables_to_load = {}
+
+        for i, state in enumerate(states_to_load):
+            with open(f"{checkpoint_path}/{state}_{round_to_restore}.pkl",
+                      'rb') as checkpoint_file:
+                variables_to_load[i] = pickle.load(checkpoint_file)
+
+        numpy_prng_state = variables_to_load[0]
+        self.prng_state = variables_to_load[1]
+
+        np.random.set_state(numpy_prng_state)
+        random.setstate(self.prng_state)
 
     async def wrap_up(self):
         """ Wrapping up when each round of training is done. """

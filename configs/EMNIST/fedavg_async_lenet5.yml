@@ -11,8 +11,7 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    # Whether simulate clients or not
-    simulation: true
+    # Whether client heterogeneity should be simulated
     speed_simulation: true
 
     # The simulation distribution
@@ -29,9 +28,6 @@ server:
 data:
     # The training and testing dataset
     datasource: EMNIST
-
-    # Where the dataset is located
-    data_path: ./data
 
     # Number of samples in each partition
     partition_size: 1128
@@ -51,9 +47,6 @@ trainer:
 
     # The maximum number of training rounds
     rounds: 50
-
-    # Whether the training should use multiple GPUs if available
-    parallelized: false
 
     # Whether to apply differential privacy
     # differential_privacy: true

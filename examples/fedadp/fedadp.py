@@ -8,11 +8,6 @@ in IEEE Transactions on Cognitive Communications and Networking (TCCN'21).
 
 https://ieeexplore.ieee.org/abstract/document/9442814
 """
-import os
-
-
-os.environ['config_file'] = './fedadp_MNIST_lenet5.yml'
-
 import fedadp_server
 
 

@@ -9,9 +9,10 @@ from plato.datasources import base
 
 class DataSource(base.DataSource):
     """ The MNIST dataset. """
+
     def __init__(self):
         super().__init__()
-        _path = Config().data.data_path
+        _path = Config().params['data_path']
 
         _transform = transforms.Compose([
             transforms.ToTensor(),

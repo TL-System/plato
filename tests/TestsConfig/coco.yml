@@ -17,7 +17,6 @@ server:
 data:
   dataname: COCO2017
   datasource: COCO
-  data_path: ./data
 
   download_train_url: http://images.cocodataset.org/zips/train2017.zip
   download_test_url: http://images.cocodataset.org/zips/test2017.zip
@@ -87,7 +86,6 @@ trainer:
   optimizer_config: *optimizer_config
   learning_rate_config: *lr_config
   rounds: *total_epochs
-  parallelized: False
   max_accuracy: 3
   target_accuracy: 0.67
 

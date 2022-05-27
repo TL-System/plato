@@ -11,8 +11,7 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    # Whether simulate clients or not
-    simulation: true
+    # Whether client heterogeneity should be simulated
     speed_simulation: true
 
     # The simulation distribution
@@ -42,12 +41,9 @@ data:
     # The training and testing dataset
     datasource: CIFAR10
 
-    # Where the dataset is located
-    data_path: ./data
-
     # Number of samples in each partition
     partition_size: 600
-    
+
     # IID or non-IID?
     sampler: noniid
 
@@ -61,10 +57,7 @@ trainer:
     # The maximum number of training rounds
     rounds: 100
 
-    # Whether the training should use multiple GPUs if available
-    parallelized: false
-
-    # The maximum number of clients running concurrently 
+    # The maximum number of clients running concurrently
     max_concurrency: 5
 
     # The target accuracy
@@ -91,4 +84,3 @@ results:
 
     # Plot results (x_axis-y_axis)
     plot: round-accuracy, elapsed_time-accuracy
-

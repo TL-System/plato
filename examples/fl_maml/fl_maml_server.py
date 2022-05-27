@@ -3,8 +3,6 @@ A federated learning server for personalized FL.
 """
 import logging
 import os
-import pickle
-import sys
 from plato.config import Config
 from plato.servers import fedavg
 from plato.utils import csv_processor
@@ -21,7 +19,8 @@ class Server(fedavg.Server):
         self.personalization_test_updates = []
         self.personalization_accuracy = 0
 
-        self.training_time = 0
+        self.round_time = 0
+        self.comm_time = 0
 
     async def select_testing_clients(self):
         """Select a subset of the clients to test personalization."""
@@ -61,60 +60,61 @@ class Server(fedavg.Server):
     async def wrap_up_processing_reports(self):
         """Wrap up processing the reports with any additional work."""
         if self.do_personalization_test:
-            if hasattr(Config(), 'results'):
-                new_row = []
-                for item in self.recorded_items:
-                    item_value = {
-                        'round':
-                        self.current_round,
-                        'accuracy':
-                        self.accuracy * 100,
-                        'personalization_accuracy':
-                        self.personalization_accuracy * 100,
-                        'elapsed_time':
-                        self.wall_time - self.initial_wall_time,
-                        'round_time':
-                        max([
-                            report.training_time
-                            for (report, __, __) in self.updates
-                        ]),
-                    }[item]
-                    new_row.append(item_value)
+            # Record results into a .csv file
+            new_row = []
+            for item in self.recorded_items:
+                item_value = {
+                    'round': self.current_round,
+                    'accuracy': self.accuracy * 100,
+                    'personalization_accuracy':
+                    self.personalization_accuracy * 100,
+                    'elapsed_time': self.wall_time - self.initial_wall_time,
+                    'comm_time': self.comm_time,
+                    'round_time': self.round_time,
+                }[item]
+                new_row.append(item_value)
 
-                result_csv_file = Config().params['result_dir'] + 'result.csv'
+            result_csv_file = f"{Config().params['result_path']}/{os.getpid()}.csv"
 
-                csv_processor.write_csv(result_csv_file, new_row)
+            csv_processor.write_csv(result_csv_file, new_row)
 
             self.do_personalization_test = False
 
         else:
-            self.training_time = max(
-                [report.training_time for (report, __, __) in self.updates])
+            self.round_time = max([
+                report.training_time + report.comm_time
+                for (__, report, __, __) in self.updates
+            ])
+            self.comm_time = max(
+                [report.comm_time for (__, report, __, __) in self.updates])
 
-    async def client_payload_done(self, sid, client_id, s3_key=None):
-        """ Upon receiving all the payload from a client, either via S3 or socket.io. """
-        if s3_key is None:
-            assert self.client_payload[sid] is not None
-
-            payload_size = 0
-            if isinstance(self.client_payload[sid], list):
-                for _data in self.client_payload[sid]:
-                    payload_size += sys.getsizeof(pickle.dumps(_data))
-            else:
-                payload_size = sys.getsizeof(
-                    pickle.dumps(self.client_payload[sid]))
+    async def process_client_info(self, client_id, sid):
+        """ Process the received metadata information from a reporting client. """
+        if self.do_personalization_test:
+            client_info = {
+                'client_id': client_id,
+                'sid': sid,
+                'report': self.reports[sid],
+                'payload': self.client_payload[sid],
+            }
+            await self.process_clients(client_info)
         else:
-            self.client_payload[sid] = self.s3_client.receive_from_s3(s3_key)
-            payload_size = sys.getsizeof(pickle.dumps(
-                self.client_payload[sid]))
+            await super().process_client_info(client_id, sid)
 
-        logging.info("[%s] Received %s MB of payload data from client #%d.",
-                     self, round(payload_size / 1024**2, 2), client_id)
+    async def process_clients(self, client_info):
+        """ Process client reports. """
 
-        if self.client_payload[sid] == 'personalization_accuracy':
-            self.personalization_test_updates.append(self.reports[sid])
+        if self.do_personalization_test:
+            client = client_info
         else:
-            self.updates.append((self.reports[sid], self.client_payload[sid]))
+            client = client_info[1]
+            client_staleness = self.current_round - client['starting_round']
+
+            self.updates.append(
+                (client['report'], client['payload'], client_staleness))
+
+        if client['payload'] == 'personalization_accuracy':
+            self.personalization_test_updates.append(client['report'])
 
         if len(self.personalization_test_updates) == 0:
             if len(self.updates) > 0 and len(self.updates) >= len(

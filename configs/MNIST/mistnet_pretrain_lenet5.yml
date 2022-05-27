@@ -15,18 +15,7 @@ server:
     address: 127.0.0.1
     port: 8000
 
-data:
-    # The training and testing dataset
-    datasource: MNIST
-
-    # Where the dataset is located
-    data_path: ./data
-
-    # Number of samples in each partition
-    partition_size: 20000
-
-    # IID or non-IID?
-    sampler: iid
+data: !include mnist_iid.yml
 
 trainer:
     # The type of the trainer
@@ -34,9 +23,6 @@ trainer:
 
     # The maximum number of training rounds
     rounds: 100
-
-    # Whether the training should use multiple GPUs if available
-    parallelized: false
 
     # The target accuracy
     target_accuracy: 0.90

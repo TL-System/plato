@@ -1,51 +1,60 @@
 clients:
+    # Type
     type: simple
 
     # The total number of clients
     total_clients: 3
 
     # The number of clients selected in each round
-    per_round: 3
+    per_round: 1
 
     # Should the clients compute test accuracy locally?
     do_test: false
 
 server:
-    type: fedavg_cross_silo
     address: 127.0.0.1
     port: 8000
 
 data:
     # The training and testing dataset
-    datasource: MNIST
+    datasource: CelebA
 
-    # Where the dataset is located
-    data_path: ./data
+    # Only add face identity as labels for training
+    celeba_targets:
+        # For ResNet, do not set <attr> to True since it does not match the expected output of ResNet
+        attr: false
+        identity: true
+
+    # Number of identity in CelebA
+    num_classes: 10178
 
     # Number of samples in each partition
     partition_size: 20000
 
     # IID or non-IID?
-    sampler: iid
+    sampler: noniid
+
+    # The concentration parameter for the Dirichlet distribution
+    concentration: 0.5
+
+    # The random seed for sampling data
+    random_seed: 1
 
 trainer:
     # The type of the trainer
     type: basic
 
     # The maximum number of training rounds
-    rounds: 100
-
-    # Whether the training should use multiple GPUs if available
-    parallelized: false
+    rounds: 5
 
     # The maximum number of clients running concurrently
     max_concurrency: 3
 
     # The target accuracy
-    target_accuracy: 0.95
+    target_accuracy: 0.94
 
     # Number of epoches for local training in each communication round
-    epochs: 1
+    epochs: 5
     batch_size: 32
     optimizer: SGD
     learning_rate: 0.01
@@ -53,23 +62,8 @@ trainer:
     weight_decay: 0.0
 
     # The machine learning model
-    model_name: lenet5
+    model_name: resnet_18
 
 algorithm:
     # Aggregation algorithm
     type: fedavg
-
-    # Cross-silo training
-    cross_silo: true
-
-    # The total number of silos (edge servers)
-    total_silos: 2
-
-    # The number of local aggregation rounds on edge servers before sending
-    # aggregated weights to the central server
-    local_rounds: 2
-
-    # The number of episodes of RL training
-    rl_episodes: 1
-
-    rl_target_reward: null

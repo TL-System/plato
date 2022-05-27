@@ -1,6 +1,9 @@
 clients:
+    # Type
+    type: simple
+
     # The total number of clients
-    total_clients: 10
+    total_clients: 2
 
     # The number of clients selected in each round
     per_round: 2
@@ -8,45 +11,57 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    # Whether simulate clients or not
-    simulation: true
+    pruning_amount: 0.4
+
+    # Processors for outbound data payloads
+    outbound_processors:
+        - model_compress
 
 server:
     address: 127.0.0.1
     port: 8000
+    do_test: true
+
+    inbound_processors:
+        - model_decompress
+
+    checkpoint_path: results/test/checkpoint
+    model_path: results/test/model
 
 data:
     # The training and testing dataset
     datasource: MNIST
 
     # Where the dataset is located
-    data_path: ./data
+    data_path: ../../data
 
     # Number of samples in each partition
-    partition_size: 20000
+    partition_size: 100
 
     # IID or non-IID?
     sampler: iid
+
+    testset_size: 1000
 
     # The random seed for sampling data
     random_seed: 1
 
 trainer:
-    # The maximum number of training rounds
-    rounds: 5
+    # The type of the trainer
+    type: basic
 
-    # Whether the training should use multiple GPUs if available
-    parallelized: false
+    # The maximum number of training rounds
+    rounds: 2
 
     # The maximum number of clients running concurrently
-    max_concurrency: 1
+    max_concurrency: 2
 
     # The target accuracy
-    target_accuracy: 0.98
+    target_accuracy: 0.99
 
     # Number of epoches for local training in each communication round
-    epochs: 1
-    batch_size: 32
+    epochs: 2
+    batch_size: 10
     optimizer: SGD
     learning_rate: 0.01
     momentum: 0.9
@@ -61,7 +76,6 @@ algorithm:
 
 results:
     # Write the following parameter(s) into a CSV
-    types: accuracy, elapsed_time, round_time
+    types: round, accuracy, elapsed_time, comm_time, round_time
 
-    # Plot results (x_axis-y_axis)
-    plot: round-accuracy, round-elapsed_time
+    result_path: results/test

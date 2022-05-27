@@ -11,8 +11,7 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    # Whether simulate clients or not
-    simulation: true
+    # Whether client heterogeneity should be simulated
     speed_simulation: true
 
     # The simulation distribution
@@ -33,9 +32,6 @@ data:
     # The training and testing dataset
     datasource: MNIST
 
-    # Where the dataset is located
-    data_path: ./data
-
     # Number of samples in each partition
     partition_size: 600
 
@@ -54,9 +50,6 @@ trainer:
 
     # The maximum number of training rounds
     rounds: 2
-
-    # Whether the training should use multiple GPUs if available
-    parallelized: false
 
     # Whether to apply differential privacy
     # differential_privacy: true

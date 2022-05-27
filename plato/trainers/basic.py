@@ -37,18 +37,12 @@ class Trainer(base.Trainer):
         if model is None:
             model = models_registry.get()
 
-        # Use data parallelism if multiple GPUs are available and the configuration specifies it
-        if Config().is_parallel():
-            logging.info("Using Data Parallelism.")
-            # DataParallel will divide and allocate batch_size to all available GPUs
-            self.model = torch.nn.DataParallel(model)
-        else:
-            self.model = model
+        self.model = model
 
+    def make_model_private(self):
+        """ Make the model private for use with the differential privacy engine. """
         if hasattr(Config().trainer, 'differential_privacy') and Config(
         ).trainer.differential_privacy:
-            logging.info("Using differential privacy during training.")
-
             errors = ModuleValidator.validate(self.model, strict=False)
             if len(errors) > 0:
                 self.model = ModuleValidator.fix(self.model)
@@ -65,20 +59,20 @@ class Trainer(base.Trainer):
 
     def save_model(self, filename=None, location=None):
         """Saving the model to a file."""
-        model_dir = Config(
-        ).params['model_dir'] if location is None else location
+        model_path = Config(
+        ).params['model_path'] if location is None else location
         model_name = Config().trainer.model_name
 
         try:
-            if not os.path.exists(model_dir):
-                os.makedirs(model_dir)
+            if not os.path.exists(model_path):
+                os.makedirs(model_path)
         except FileExistsError:
             pass
 
         if filename is not None:
-            model_path = f'{model_dir}/{filename}'
+            model_path = f'{model_path}/{filename}'
         else:
-            model_path = f'{model_dir}/{model_name}.pth'
+            model_path = f'{model_path}/{model_name}.pth'
 
         torch.save(self.model.state_dict(), model_path)
 
@@ -91,14 +85,14 @@ class Trainer(base.Trainer):
 
     def load_model(self, filename=None, location=None):
         """Loading pre-trained model weights from a file."""
-        model_dir = Config(
-        ).params['model_dir'] if location is None else location
+        model_path = Config(
+        ).params['model_path'] if location is None else location
         model_name = Config().trainer.model_name
 
         if filename is not None:
-            model_path = f'{model_dir}/{filename}'
+            model_path = f'{model_path}/{filename}'
         else:
-            model_path = f'{model_dir}/{model_name}.pth'
+            model_path = f'{model_path}/{model_name}.pth'
 
         if self.client_id == 0:
             logging.info("[Server #%d] Loading a model from %s.", os.getpid(),
@@ -107,7 +101,7 @@ class Trainer(base.Trainer):
             logging.info("[Client #%d] Loading a model from %s.",
                          self.client_id, model_path)
 
-        self.model.load_state_dict(torch.load(model_path))
+        self.model.load_state_dict(torch.load(model_path), strict=False)
 
     def simulate_sleep_time(self):
         """Simulate client's speed by putting it to sleep."""
@@ -133,7 +127,6 @@ class Trainer(base.Trainer):
         sampler: the sampler that extracts a partition for this client.
         cut_layer (optional): The layer which training should start from.
         """
-        tic = time.perf_counter()
 
         try:
             custom_train = getattr(self, "train_model", None)
@@ -199,7 +192,12 @@ class Trainer(base.Trainer):
             lr_schedule = None
 
         if 'differential_privacy' in config and config['differential_privacy']:
+            logging.info(
+                "[Client #%s] Using differential privacy during training.",
+                self.client_id)
+
             privacy_engine = PrivacyEngine(accountant='rdp', secure_mode=False)
+            self.make_model_private()
 
             self.model, optimizer, train_loader = privacy_engine.make_private_with_epsilon(
                 module=self.model,
@@ -232,7 +230,11 @@ class Trainer(base.Trainer):
 
                 loss = loss_criterion(outputs, labels)
 
-                loss.backward()
+                if 'create_graph' in config:
+                    loss.backward(create_graph=config['create_graph'])
+                else:
+                    loss.backward()
+
                 optimizer.step()
 
                 if batch_id % log_interval == 0:
@@ -288,7 +290,6 @@ class Trainer(base.Trainer):
         self.training_start_time = time.time()
 
         if 'max_concurrency' in config:
-            self.start_training()
             tic = time.perf_counter()
 
             if mp.get_start_method(allow_none=True) != 'spawn':
@@ -306,10 +307,6 @@ class Trainer(base.Trainer):
             try:
                 self.load_model(filename)
             except OSError as error:  # the model file is not found, training failed
-                if 'max_concurrency' in config:
-                    self.run_sql_statement(
-                        "DELETE FROM trainers WHERE run_id = (?)",
-                        (self.client_id, ))
                 raise ValueError(
                     f"Training on client {self.client_id} failed.") from error
 
@@ -398,8 +395,6 @@ class Trainer(base.Trainer):
         config['run_id'] = Config().params['run_id']
 
         if hasattr(Config().trainer, 'max_concurrency'):
-            self.start_training()
-
             if mp.get_start_method(allow_none=True) != 'spawn':
                 mp.set_start_method('spawn', force=True)
 
@@ -482,7 +477,7 @@ class Trainer(base.Trainer):
         # Constructing a list of epochs and training times
         self.models_per_epoch = {}
 
-        for filename in os.listdir(Config().params['model_dir']):
+        for filename in os.listdir(Config().params['model_path']):
             split = re.match(
                 r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+).pth",
                 filename)

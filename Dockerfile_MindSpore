@@ -18,11 +18,11 @@ RUN apt-get update \
     && ~/miniconda3/bin/conda update -n base -c defaults conda \
     && ~/miniconda3/bin/conda init bash \
     && ~/miniconda3/bin/conda create -n plato_gpu -c conda-forge python=3.9.0 \
-    && ~/miniconda3/bin/conda install mindspore-gpu=1.5.0 cudatoolkit=11.1 -c mindspore -c conda-forge -n plato_gpu -y \
+    && ~/miniconda3/bin/conda install mindspore-gpu=1.6.0 cudatoolkit=11.1 -c mindspore -c conda-forge -n plato_gpu -y \
     && ~/miniconda3/envs/plato_gpu/bin/pip install -r ~/requirements.txt \
     && ~/miniconda3/envs/plato_gpu/bin/pip install plato-learn \
     && ~/miniconda3/bin/conda create -n plato_cpu -c conda-forge python=3.9.0 \
-    && ~/miniconda3/bin/conda install mindspore-cpu=1.5.0 -c mindspore -c conda-forge -n plato_cpu -y \
+    && ~/miniconda3/bin/conda install mindspore-cpu=1.6.0 -c mindspore -c conda-forge -n plato_cpu -y \
     && ~/miniconda3/envs/plato_cpu/bin/pip install -r ~/requirements.txt \
     && ~/miniconda3/envs/plato_cpu/bin/pip install plato-learn
 

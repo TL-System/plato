@@ -40,17 +40,17 @@ class Trainer(base.Trainer):
 
     def save_model(self, filename=None, location=None):
         """Saving the model to a file."""
-        model_dir = Config(
-        ).params['model_dir'] if location is None else location
+        model_path = Config(
+        ).params['model_path'] if location is None else location
         model_name = Config().trainer.model_name
 
-        if not os.path.exists(model_dir):
-            os.makedirs(model_dir)
+        if not os.path.exists(model_path):
+            os.makedirs(model_path)
 
         if filename is not None:
-            model_path = f'{model_dir}/{filename}'
+            model_path = f'{model_path}/{filename}'
         else:
-            model_path = f'{model_dir}/{model_name}.ckpt'
+            model_path = f'{model_path}/{model_name}.ckpt'
 
         self.model.save_weights(model_path)
 
@@ -61,15 +61,16 @@ class Trainer(base.Trainer):
             logging.info("[Client #%d] Model saved to %s.", self.client_id,
                          model_path)
 
-    def load_model(self, filename=None, dir=None):
+    def load_model(self, filename=None, location=None):
         """Loading pre-trained model weights from a file."""
-        model_dir = Config().params['model_dir'] if dir is None else dir
+        model_path = Config(
+        ).params['model_path'] if location is None else location
         model_name = Config().trainer.model_name
 
         if filename is not None:
-            model_path = f'{model_dir}/{filename}'
+            model_path = f'{model_path}/{filename}'
         else:
-            model_path = f'{model_dir}/{model_name}.ckpt'
+            model_path = f'{model_path}/{model_name}.ckpt'
 
         if self.client_id == 0:
             logging.info("[Server #%d] Loading a model from %s.", os.getpid(),
@@ -143,7 +144,6 @@ class Trainer(base.Trainer):
         config['run_id'] = Config().params['run_id']
         if hasattr(Config().trainer, 'max_concurrency'):
             # reserved for mp.Process
-            self.start_training()
             tic = time.perf_counter()
             self.train_process(config, trainset, sampler, cut_layer)
             toc = time.perf_counter()

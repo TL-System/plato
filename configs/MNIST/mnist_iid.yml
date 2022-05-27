@@ -1,0 +1,11 @@
+# The training and testing dataset
+datasource: MNIST
+
+# Number of samples in each partition
+partition_size: 20000
+
+# IID or non-IID?
+sampler: iid
+
+# The random seed for sampling data
+random_seed: 1

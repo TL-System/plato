@@ -3,11 +3,8 @@ A federated learning client at the edge server in a cross-silo training workload
 """
 
 from dataclasses import dataclass
-
 import logging
-import os
 import pickle
-import sys
 
 from plato.clients import edge
 
@@ -19,9 +16,8 @@ class Report(edge.Report):
 
 class Client(edge.Client):
     """A federated learning client at the edge server in a cross-silo training workload."""
-
-    def __init__(self, server, algorithm=None, trainer=None):
-        super().__init__(server, algorithm=algorithm, trainer=trainer)
+    def __init__(self, server):
+        super().__init__(server)
         self.do_personalization_test = False
 
     def process_server_response(self, server_response):
@@ -50,29 +46,8 @@ class Client(edge.Client):
 
         return report, payload
 
-    async def payload_done(self, client_id, object_key) -> None:
-        """Upon receiving all the new payload from the server."""
-        payload_size = 0
-
-        if object_key is None:
-            if isinstance(self.server_payload, list):
-                for _data in self.server_payload:
-                    payload_size += sys.getsizeof(pickle.dumps(_data))
-            elif isinstance(self.server_payload, dict):
-                for key, value in self.server_payload.items():
-                    payload_size += sys.getsizeof(pickle.dumps({key: value}))
-            else:
-                payload_size = sys.getsizeof(pickle.dumps(self.server_payload))
-        else:
-            self.server_payload = self.s3_client.receive_from_s3(object_key)
-            payload_size = sys.getsizeof(pickle.dumps(self.server_payload))
-
-        assert client_id == self.client_id
-
-        logging.info(
-            "[Client #%d] Received %s MB of payload data from the server.",
-            client_id, round(payload_size / 1024**2, 2))
-
+    async def start_training(self):
+        """ Complete one round of training on this client. """
         self.load_payload(self.server_payload)
         self.server_payload = None
 
@@ -81,11 +56,13 @@ class Client(edge.Client):
             self.do_personalization_test = False
         else:
             report, payload = await self.train()
-            logging.info("[%s] Model aggregated on edge server (client #%d).",
-                         self, client_id)
+            logging.info("[%s] Model aggregated on edge server.", self)
 
         # Sending the client report as metadata to the server (payload to follow)
-        await self.sio.emit('client_report', {'report': pickle.dumps(report)})
+        await self.sio.emit('client_report', {
+            'id': self.client_id,
+            'report': pickle.dumps(report)
+        })
 
         # Sending the client training payload to the server
         await self.send(payload)

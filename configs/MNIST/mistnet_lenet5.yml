@@ -31,21 +31,7 @@ server:
         - inbound_feature_tensors
         # - feature_dequantize
 
-data:
-    # The training and testing dataset
-    datasource: MNIST
-
-    # Where the dataset is located
-    data_path: ./data
-
-    # Number of samples in each partition
-    partition_size: 20000
-
-    # Fixed random seed
-    random_seed: 1
-
-    # IID, biased, or sharded?
-    sampler: iid
+data: !include mnist_iid.yml
 
 trainer:
     # The type of the trainer
@@ -53,9 +39,6 @@ trainer:
 
     # The maximum number of training rounds
     rounds: 1
-
-    # Whether the training should use multiple GPUs if available
-    parallelized: false
 
     # The target accuracy
     target_accuracy: 0.95

@@ -35,17 +35,14 @@ def run(client_id,
             # A customized edge server
             if trainer is not None:
                 server = edge_server(trainer=trainer())
-                client = edge_client(server, trainer=trainer())
             else:
                 server = edge_server()
-                client = edge_client(server)
+            client = edge_client(server)
 
         server.configure()
         client.configure()
 
-        logging.info("Starting an edge server as client #%d on port %d",
-                     Config().args.id,
-                     Config().args.port)
+        logging.info("Starting an edge server as client #%d", Config().args.id)
         asyncio.ensure_future(client.start_client())
 
         logging.info("Starting an edge server as server #%d on port %d",

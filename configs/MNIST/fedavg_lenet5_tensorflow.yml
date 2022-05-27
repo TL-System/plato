@@ -9,27 +9,13 @@ clients:
     per_round: 3
 
     # Should the clients compute test accuracy locally?
-    do_test: false 
+    do_test: false
 
 server:
     address: 127.0.0.1
     port: 8000
 
-data:
-    # The training and testing dataset
-    datasource: MNIST
-
-    # Where the dataset is located
-    data_path: ./data
-
-    # Number of samples in each partition
-    partition_size: 20000
-
-    # IID or non-IID?
-    sampler: iid
-
-    # The random seed for sampling data
-    random_seed: 1
+data: !include mnist_iid.yml
 
 trainer:
     # Should TensorFlow be used instead of PyTorch?
@@ -40,9 +26,6 @@ trainer:
 
     # The maximum number of training rounds
     rounds: 5
-
-    # Whether the training should use multiple GPUs if available
-    parallelized: false
 
     # The maximum number of clients running concurrently
     max_concurrency: 3

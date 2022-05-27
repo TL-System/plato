@@ -3,15 +3,28 @@ Reading runtime parameters from a standard configuration file (which is easier
 to work on than JSON).
 """
 import argparse
+import json
 import logging
 import os
-import random
-import sqlite3
 from collections import OrderedDict, namedtuple
+from typing import Any, IO
 
 import numpy as np
 import yaml
-from yamlinclude import YamlIncludeConstructor
+
+
+class Loader(yaml.SafeLoader):
+    """ YAML Loader with `!include` constructor. """
+
+    def __init__(self, stream: IO) -> None:
+        """Initialise Loader."""
+
+        try:
+            self.root_path = os.path.split(stream.name)[0]
+        except AttributeError:
+            self.root_path = os.path.curdir
+
+        super().__init__(stream)
 
 
 class Config:
@@ -21,6 +34,22 @@ class Config:
     """
 
     _instance = None
+
+    @staticmethod
+    def construct_include(loader: Loader, node: yaml.Node) -> Any:
+        """Include file referenced at node."""
+
+        filename = os.path.abspath(
+            os.path.join(loader.root_path, loader.construct_scalar(node)))
+        extension = os.path.splitext(filename)[1].lstrip('.')
+
+        with open(filename, 'r', encoding='utf-8') as config_file:
+            if extension in ('yaml', 'yml'):
+                return yaml.load(config_file, Loader)
+            elif extension in ('json', ):
+                return json.load(config_file)
+            else:
+                return ''.join(config_file.readlines())
 
     def __new__(cls):
         if cls._instance is None:
@@ -38,6 +67,11 @@ class Config:
                                 type=str,
                                 default='./config.yml',
                                 help='Federated learning configuration file.')
+            parser.add_argument('-b',
+                                '--base',
+                                type=str,
+                                default='./',
+                                help='The base path for datasets and models.')
             parser.add_argument('-s',
                                 '--server',
                                 type=str,
@@ -85,12 +119,11 @@ class Config:
             else:
                 filename = args.config
 
-            YamlIncludeConstructor.add_to_loader_class(
-                loader_class=yaml.SafeLoader, base_dir='./configs')
+            yaml.add_constructor('!include', Config.construct_include, Loader)
 
             if os.path.isfile(filename):
-                with open(filename, 'r', encoding="utf8") as config_file:
-                    config = yaml.load(config_file, Loader=yaml.SafeLoader)
+                with open(filename, 'r', encoding="utf-8") as config_file:
+                    config = yaml.load(config_file, Loader)
             else:
                 # if the configuration file does not exist, raise an error
                 raise ValueError("A configuration file must be supplied.")
@@ -121,48 +154,73 @@ class Config:
             # A run ID is unique to each client in an experiment
             Config.params['run_id'] = os.getpid()
 
-            # Pretrained models
-            if hasattr(Config().server, 'model_dir'):
-                Config.params['model_dir'] = Config().server.model_dir
+            # The base path used for all datasets, models, checkpoints, and results
+            Config.params['base_path'] = Config.args.base
+
+            if 'general' in config:
+                Config.general = Config.namedtuple_from_dict(config['general'])
+
+                if hasattr(Config.general, 'base_path'):
+                    Config.params['base_path'] = Config().general.base_path
+
+            # Directory of dataset
+            if hasattr(Config().data, 'data_path'):
+                Config.params['data_path'] = os.path.join(
+                    Config.params['base_path'],
+                    Config().data.data_path)
             else:
-                Config.params['model_dir'] = "./models/pretrained"
-            os.makedirs(Config.params['model_dir'], exist_ok=True)
+                Config.params['data_path'] = os.path.join(
+                    Config.params['base_path'], "data")
+
+            # Pretrained models
+            if hasattr(Config().server, 'model_path'):
+                Config.params['model_path'] = os.path.join(
+                    Config.params['base_path'],
+                    Config().server.model_path)
+            else:
+                Config.params['model_path'] = os.path.join(
+                    Config.params['base_path'], "models/pretrained")
+            os.makedirs(Config.params['model_path'], exist_ok=True)
 
             # Resume checkpoint
-            if hasattr(Config().server, 'checkpoint_dir'):
-                Config.params['checkpoint_dir'] = Config(
-                ).server.checkpoint_dir
+            if hasattr(Config().server, 'checkpoint_path'):
+                Config.params['checkpoint_path'] = os.path.join(
+                    Config.params['base_path'],
+                    Config().server.checkpoint_path)
             else:
-                Config.params['checkpoint_dir'] = "./checkpoints"
-            os.makedirs(Config.params['checkpoint_dir'], exist_ok=True)
-
-            datasource = Config.data.datasource
-            model = Config.trainer.model_name
-            server_type = "custom"
-            if hasattr(Config().server, "type"):
-                server_type = Config.server.type
-            elif hasattr(Config().algorithm, "type"):
-                server_type = Config.algorithm.type
-            Config.params[
-                'result_dir'] = f'./results/{datasource}_{model}_{server_type}'
+                Config.params['checkpoint_path'] = os.path.join(
+                    Config.params['base_path'], "checkpoints")
+            os.makedirs(Config.params['checkpoint_path'], exist_ok=True)
 
             if 'results' in config:
                 Config.results = Config.namedtuple_from_dict(config['results'])
 
-                if hasattr(Config.results, 'result_dir'):
-                    Config.params['result_dir'] = Config.results.result_dir
+            # Directory of the .csv file containing results
+            if hasattr(Config, 'results') and hasattr(Config.results,
+                                                      'result_path'):
+                Config.params['result_path'] = os.path.join(
+                    Config.params['base_path'], Config.results.result_path)
+            else:
+                Config.params['result_path'] = os.path.join(
+                    Config.params['base_path'], "results")
+            os.makedirs(Config.params['result_path'], exist_ok=True)
 
-            os.makedirs(Config.params['result_dir'], exist_ok=True)
+            # The set of columns in the .csv file
+            if hasattr(Config, 'results') and hasattr(Config.results, 'types'):
+                Config().params['result_types'] = Config.results.types
+            else:
+                Config(
+                ).params['result_types'] = "round, accuracy, elapsed_time"
+
+            # The set of pairs to be plotted
+            if hasattr(Config, 'results') and hasattr(Config.results, 'plot'):
+                Config().params['plot_pairs'] = Config().results.plot
+            else:
+                Config().params[
+                    'plot_pairs'] = "round-accuracy, elapsed_time-accuracy"
 
             if 'model' in config:
                 Config.model = Config.namedtuple_from_dict(config['model'])
-
-            if hasattr(Config().trainer, 'max_concurrency'):
-                # Using a temporary SQLite database to limit the maximum number of concurrent
-                # trainers
-                Config.sql_connection = sqlite3.connect(
-                    f"{Config.params['result_dir']}/running_trainers.sqlitedb")
-                Config().cursor = Config.sql_connection.cursor()
 
         return cls._instance
 
@@ -239,6 +297,19 @@ class Config:
                        'cross_silo') and Config().args.port is None
 
     @staticmethod
+    def gpu_count() -> int:
+        """Returns the number of GPUs available for training."""
+        if hasattr(Config().trainer, 'use_mindspore'):
+            return 0
+
+        import torch
+
+        if torch.cuda.is_available():
+            return torch.cuda.device_count()
+        else:
+            return 0
+
+    @staticmethod
     def device() -> str:
         """Returns the device to be used for training."""
         device = 'cpu'
@@ -246,42 +317,21 @@ class Config:
             pass
         elif hasattr(Config().trainer, 'use_tensorflow'):
             import tensorflow as tf
+
             gpus = tf.config.experimental.list_physical_devices('GPU')
             if len(gpus) > 0:
                 device = 'GPU'
-                tf.config.experimental.set_visible_devices(
-                    gpus[np.random.randint(0, len(gpus))], 'GPU')
+                tf.config.experimental.set_visible_devices(gpus[0], 'GPU')
+
         else:
             import torch
 
             if torch.cuda.is_available() and torch.cuda.device_count() > 0:
-                if hasattr(Config().trainer,
-                           'parallelized') and Config().trainer.parallelized:
-                    device = 'cuda'
+                if Config.gpu_count() > 1 and isinstance(Config.args.id, int):
+                    # A client will always run on the same GPU
+                    gpu_id = Config.args.id % torch.cuda.device_count()
+                    device = f'cuda:{gpu_id}'
                 else:
-                    device = 'cuda:' + str(
-                        np.random.randint(0, torch.cuda.device_count()))
+                    device = 'cuda:0'
 
         return device
-
-    @staticmethod
-    def is_parallel() -> bool:
-        """Check if the hardware and OS support data parallelism."""
-        import torch
-
-        return hasattr(Config().trainer, 'parallelized') and Config(
-        ).trainer.parallelized and torch.cuda.is_available(
-        ) and torch.distributed.is_available(
-        ) and torch.cuda.device_count() > 1
-
-    @staticmethod
-    def store() -> None:
-        """ Saving the current run-time configuration to a file. """
-        data = {}
-        data['clients'] = Config.clients._asdict()
-        data['server'] = Config.server._asdict()
-        data['data'] = Config.data._asdict()
-        data['trainer'] = Config.trainer._asdict()
-        data['algorithm'] = Config.algorithm._asdict()
-        with open(Config.args.config, "w", encoding="utf8") as out:
-            yaml.dump(data, out, default_flow_style=False)

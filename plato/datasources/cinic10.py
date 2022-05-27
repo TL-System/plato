@@ -17,16 +17,17 @@ from plato.datasources import base
 
 class DataSource(base.DataSource):
     """The CINIC-10 dataset."""
+
     def __init__(self):
         super().__init__()
-        _path = Config().data.data_path
+        _path = Config().params['data_path']
 
         if not os.path.exists(_path):
             logging.info(
                 "Downloading the CINIC-10 dataset. This may take a while.")
             url = Config().data.download_url if hasattr(
                 Config().data, 'download_url'
-            ) else 'https://iqua.ece.toronto.edu/~bli/CINIC-10.tar.gz'
+            ) else 'http://iqua.ece.toronto.edu/baochun/CINIC-10.tar.gz'
             DataSource.download(url, _path)
 
         _transform = transforms.Compose([
