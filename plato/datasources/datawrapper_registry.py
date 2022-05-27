@@ -8,10 +8,13 @@ from collections import OrderedDict
 
 from plato.config import Config
 
-from plato.datasources.contrastive_data_wrapper import (ContrastiveDataWrapper)
+from plato.datasources.contrastive_data_wrapper import (
+    ContrastiveDataWrapper, ContrastiveAugmentDataWrapper)
 
-registered_datasources_wrapper = OrderedDict([('ContrastiveWrapper',
-                                               ContrastiveDataWrapper)])
+registered_datasources_wrapper = OrderedDict([
+    ('ContrastiveWrapper', ContrastiveDataWrapper),
+    ("ContrastiveAugmentWrapper", ContrastiveAugmentDataWrapper)
+])
 
 
 def get(datasource, augment_transformer=None):

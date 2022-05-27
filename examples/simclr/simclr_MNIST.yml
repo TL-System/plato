@@ -43,12 +43,13 @@ data:
     # set the data wrapper to further process the data
     #   for the specific usage, such as constrastive learning
     # data_wrapper: Null
-    data_wrapper: ContrastiveWrapper
+    data_wrapper: ContrastiveAugmentWrapper
 
 trainer:
     # The type of the trainer
     type: basic
 
+    
     # The maximum number of training rounds
     rounds: 100
 
@@ -71,12 +72,12 @@ trainer:
 
     # margin
     margin: 2.0
-    # Number of epoches for head optimization
-    head_epochs: 9
-
+    
+    # image_size
+    image_size: 32
     # The machine learning model
     model_name: lenet5
-    num_classes: 47
+    num_classes: 10
 
 algorithm:
     # Aggregation algorithm
