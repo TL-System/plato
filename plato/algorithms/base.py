@@ -27,32 +27,32 @@ class Algorithm(ABC):
         """ Setting the client ID. """
         self.client_id = client_id
 
-    def compute_weight_updates(self, weights_received):
-        """Extract the weights received from a client and compute the updates."""
+    def compute_weight_deltas(self, weights_received):
+        """Extract the weights received from a client and compute the deltas."""
         # Extract baseline model weights
         baseline_weights = self.extract_weights()
 
         # Calculate updates from the received weights
-        updates = []
+        deltas = []
         for weight in weights_received:
-            update = OrderedDict()
+            delta = OrderedDict()
             for name, current_weight in weight.items():
                 baseline = baseline_weights[name]
 
                 # Calculate update
-                delta = current_weight - baseline
-                update[name] = delta
-            updates.append(update)
+                _delta = current_weight - baseline
+                delta[name] = _delta
+            deltas.append(delta)
 
-        return updates
+        return deltas
 
-    def update_weights(self, update):
+    def update_weights(self, deltas):
         """ Update the existing model weights. """
         baseline_weights = self.extract_weights()
 
         updated_weights = OrderedDict()
         for name, weight in baseline_weights.items():
-            updated_weights[name] = weight + update[name]
+            updated_weights[name] = weight + deltas[name]
 
         return updated_weights
 

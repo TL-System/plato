@@ -21,6 +21,7 @@ class Algorithm(fedavg.Algorithm):
     """The federated learning trainer for Adaptive Synchronization Frequency,
        used by the server.
     """
+
     def __init__(self, trainer: Trainer = None):
         super().__init__(trainer)
 
@@ -43,26 +44,26 @@ class Algorithm(fedavg.Algorithm):
         self.frequency_increase_ratio = 2
         self.frequency_decrease_step = 2
 
-    def compute_weight_updates(self, weights_received):
-        """Extract the weights received from a client and compute the updates."""
+    def compute_weight_deltas(self, weights_received):
+        """Extract the weights received from a client and compute the deltas."""
         # Extract baseline model weights
         baseline_weights = self.extract_weights()
 
         self.update_sync_frequency(baseline_weights, weights_received)
 
         # Calculate updates from the received weights
-        updates = []
+        deltas = []
         for weight in weights_received:
-            update = OrderedDict()
+            delta = OrderedDict()
             for name, current_weight in weight.items():
                 baseline = baseline_weights[name]
 
                 # Calculate update
-                delta = current_weight - baseline
-                update[name] = delta
-            updates.append(update)
+                _delta = current_weight - baseline
+                delta[name] = _delta
+            deltas.append(delta)
 
-        return updates
+        return deltas
 
     def moving_average(self, previous_value, new_value):
         """Compute the exponential moving average."""

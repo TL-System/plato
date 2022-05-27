@@ -16,7 +16,6 @@ server:
 # dataset settings for the original dataset and the corresponding multimodal data processor
 data:
   datasource: CIFAR10
-  data_path: ./data
 
   downloader:
     num_workers: 4
