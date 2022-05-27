@@ -36,10 +36,11 @@ class Trainer(basic.Trainer):
 
         # Use the pre-trained InceptionV3 model as a feature extractor
         # for testing
-        self.inception_model = torchvision.models.inception_v3(pretrained=True,
-                                                          aux_logits=False)
+        self.inception_model = torchvision.models.inception_v3(
+            pretrained=True, aux_logits=False)
         # Remove the last output layer of inception
         self.inception_model.fc = nn.Identity()
+        self.inception_model.eval()
 
         self.training_start_time = 0
 
@@ -143,7 +144,7 @@ class Trainer(basic.Trainer):
             for batch_id, (examples, _) in enumerate(train_loader):
                 cur_batch_size = len(examples)
                 examples = examples.to(self.device)
-                label = torch.full((cur_batch_size,),
+                label = torch.full((cur_batch_size, ),
                                    real_label,
                                    dtype=torch.float)
                 label = label.to(self.device)
@@ -215,48 +216,53 @@ class Trainer(basic.Trainer):
         self.model.to(self.device)
         self.model.eval()
 
-        fidelity = -1
+        perplexity = -1
 
-        sample_size = min(len(testset), 50000)
+        test_loader = torch.utils.data.DataLoader(
+            testset, batch_size=config['batch_size'], shuffle=True)
 
-        test_loader = torch.utils.data.DataLoader(testset,
-                                                  batch_size=sample_size,
-                                                  shuffle=True)
-
+        real_features, fake_features = [], []
         with torch.no_grad():
-            real_examples, _ = next(iter(test_loader))
-            real_examples = real_examples.to(self.device)
+            for real_examples, _ in test_loader:
+                real_examples = real_examples.to(self.device)
 
-            noise = torch.randn(sample_size,
-                                self.model.nz,
-                                1,
-                                1,
-                                device=self.device)
-            fake_examples = self.generator(noise)
-            fidelity = self.calculate_fid(real_examples, fake_examples)
+                noise = torch.randn(config['batch_size'],
+                                    self.model.nz,
+                                    1,
+                                    1,
+                                    device=self.device)
+                fake_examples = self.generator(noise)
 
-        return fidelity
+                self.inception_model.to(self.device)
+                feature_real = self.feature_extractor(real_examples)
+                feature_fake = self.feature_extractor(fake_examples)
+
+                real_features.extend(list(feature_real))
+                fake_features.extend(list(feature_fake))
+
+            real_features, fake_features = np.stack(real_features), np.stack(
+                fake_features)
+            perplexity = self.calculate_fid(real_features, fake_features)
+
+        return perplexity
 
     def feature_extractor(self, inputs):
 
         # Since the input to InceptionV3 needs to be at least 75x75,
         # we will pad the input image if needed.
-        hpad = math.ceil((75 - inputs.size(dim=1)) / 2)
-        vpad = math.ceil((75 - inputs.size(dim=2)) / 2)
+        hpad = math.ceil((75 - inputs.size(dim=-2)) / 2)
+        vpad = math.ceil((75 - inputs.size(dim=-1)) / 2)
         hpad, vpad = max(0, hpad), max(0, vpad)
         pad = nn.ZeroPad2d((hpad, hpad, vpad, vpad))
         inputs = pad(inputs)
 
-        features = self.inception_model(inputs)
+        features = None
+        with torch.no_grad():
+            features = self.inception_model(inputs)
         features = np.array(features)
         return features
 
-    def calculate_fid(self, real_examples, fake_examples):
-
-        feature_extractor = self.feature_extractor
-
-        real_features = feature_extractor(real_examples)
-        fake_features = feature_extractor(fake_examples)
+    def calculate_fid(self, real_features, fake_features):
 
         # calculate mean and covariance statistics
         mu1, sigma1 = real_features.mean(axis=0), np.cov(real_features,
@@ -264,7 +270,7 @@ class Trainer(basic.Trainer):
         mu2, sigma2 = fake_features.mean(axis=0), np.cov(fake_features,
                                                          rowvar=False)
         # calculate sum squared difference between means
-        ssdiff = np.sum((mu1 - mu2) ** 2.0)
+        ssdiff = np.sum((mu1 - mu2)**2.0)
         # calculate sqrt of product between cov
         covmean = scipy.linalg.sqrtm(sigma1.dot(sigma2))
         # check and correct imaginary numbers from sqrt
