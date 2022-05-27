@@ -24,8 +24,10 @@ class Trainer(basic.Trainer):
     def __init__(self, model=None):
         """Initializing the trainer with the provided model.
         """
-        super().__init__()
-        self.max_physical_batch_size = 128
+        super().__init__(model=model)
+        self.max_physical_batch_size = Config(
+        ).trainer.max_physical_batch_size if hasattr(
+            Config().trainer, "max_physical_batch_size") else 32
 
     def make_model_private(self):
         """ Make the model private for use with the differential privacy engine. """
