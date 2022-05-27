@@ -10,36 +10,13 @@ import time
 import numpy as np
 import torch
 import torch.nn.functional as F
+from opacus.privacy_engine import PrivacyEngine
 
 from plato.config import Config
 from plato.trainers import basic
 from plato.utils import optimizers
 
-
-def NT_XentLoss(z1, z2, temperature=0.5):
-    z1 = F.normalize(z1, dim=1)
-    z2 = F.normalize(z2, dim=1)
-    N, Z = z1.shape
-    device = z1.device
-    representations = torch.cat([z1, z2], dim=0)
-    similarity_matrix = F.cosine_similarity(representations.unsqueeze(1),
-                                            representations.unsqueeze(0),
-                                            dim=-1)
-    l_pos = torch.diag(similarity_matrix, N)
-    r_pos = torch.diag(similarity_matrix, -N)
-    positives = torch.cat([l_pos, r_pos]).view(2 * N, 1)
-    diag = torch.eye(2 * N, dtype=torch.bool, device=device)
-    diag[N:, :N] = diag[:N, N:] = diag[:N, :N]
-
-    negatives = similarity_matrix[~diag].view(2 * N, -1)
-
-    logits = torch.cat([positives, negatives], dim=1)
-    logits /= temperature
-
-    labels = torch.zeros(2 * N, device=device, dtype=torch.int64)
-
-    loss = F.cross_entropy(logits, labels, reduction='sum')
-    return loss / (2 * N)
+from nt_xent import NT_Xent
 
 
 class Trainer(basic.Trainer):
@@ -51,10 +28,12 @@ class Trainer(basic.Trainer):
         """ The loss computation. """
         # define the loss computation instance
         defined_temperature = Config().trainer.temperature
+        batch_size = Config().trainer.batch_size
 
         def loss_compute(outputs, labels):
             z1, z2 = outputs
-            loss = NT_XentLoss(z1, z2, temperature=defined_temperature)
+            criterion = NT_Xent(batch_size, defined_temperature, world_size=1)
+            loss = criterion(z1, z2)
             return loss
 
         return loss_compute
@@ -127,7 +106,7 @@ class Trainer(basic.Trainer):
                 examples1, examples2, labels = examples1.to(
                     self.device), examples2.to(self.device), labels.to(
                         self.device)
-                examples = (examples1, examples2)
+
                 if 'differential_privacy' in config and config[
                         'differential_privacy']:
                     optimizer.zero_grad(set_to_none=True)
@@ -135,9 +114,10 @@ class Trainer(basic.Trainer):
                     optimizer.zero_grad()
 
                 if cut_layer is None:
-                    outputs = self.model(examples)
+                    outputs = self.model(examples1, examples2)
                 else:
-                    outputs = self.model.forward_from(examples, cut_layer)
+                    outputs = self.model.forward_from(examples1, examples2,
+                                                      cut_layer)
 
                 loss = loss_criterion(outputs, labels)
 
