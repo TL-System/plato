@@ -1,10 +1,7 @@
 """
 The Lenet used by DLG paper
 """
-import collections
-
 import torch.nn as nn
-import torch.nn.functional as F
 
 from plato.config import Config
 
@@ -24,14 +21,13 @@ class Model(nn.Module):
         self.fc = nn.Sequential(
             nn.Linear(588, num_classes)
         )
-        
+
     def forward(self, x):
         out = self.body(x)
         out = out.view(out.size(0), -1)
         # print(out.size())
         out = self.fc(out)
         return out
-
 
     @staticmethod
     def get_model(*args):
