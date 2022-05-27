@@ -41,7 +41,7 @@ def build_mlp_from_config(mlp_configs, layer_name_prefix="layer"):
 
         Args:
             mlp_configs (dict):    
-     """
+    """
     input_dim = mlp_configs['input_dim']
     output_dim = mlp_configs['output_dim']
 
