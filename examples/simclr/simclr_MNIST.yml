@@ -45,6 +45,10 @@ data:
     # data_wrapper: Null
     data_wrapper: ContrastiveAugmentWrapper
 
+    # set the data augmentation 
+    #   options: simsiam, byol, simclr
+    augment_transformer_name: simclr
+
 trainer:
     # The type of the trainer
     type: basic
@@ -70,13 +74,19 @@ trainer:
     momentum: 0.0 # learning rate is fixed as in Appendix C.2
     weight_decay: 0.0
 
-    # margin
-    margin: 2.0
+    # temperature
+    temperature: 0.5
     
     # image_size
-    image_size: 32
-    # The machine learning model
+    #  - CIFAR10 (Image size=32)
+    #  - MNIST (Image size=28)
+    image_size: 28
+    #
+    
     model_name: lenet5
+    projection_dim: 64
+    # The machine learning model
+
     num_classes: 10
 
 algorithm:

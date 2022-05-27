@@ -28,13 +28,14 @@ class Client(simple.Client):
 
         if hasattr(Config().data,
                    "data_wrapper") and Config().data.data_wrapper != None:
-            augment_transformer = None
+            augment_transformer_name = None
 
-            if hasattr(Config().data, "augment_transformer"
-                       ) and Config().data.augment_transformer != None:
+            if hasattr(Config().data, "augment_transformer_name"
+                       ) and Config().data.augment_transformer_name != None:
                 image_size = Config().trainer.image_size
-
-                augment_transformer = get_aug(name='simclr',
+                augment_transformer_name = Config(
+                ).data.augment_transformer_name
+                augment_transformer = get_aug(name=augment_transformer_name,
                                               image_size=image_size,
                                               train=True,
                                               train_classifier=None)

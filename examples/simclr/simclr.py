@@ -5,6 +5,9 @@ The official code: https://github.com/google-research/simclr .
 
 The third-party code: https://github.com/PatrickHua/SimSiam
 
+Our implementation relys on:
+ https://github.com/spijkervet/SimCLR.git
+
 Reference:
 
 [1]. https://arxiv.org/abs/2002.05709
