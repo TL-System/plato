@@ -41,15 +41,13 @@ class Trainer(base.Trainer):
 
     def make_model_private(self):
         """ Make the model private for use with the differential privacy engine. """
-        if hasattr(Config().trainer, 'differential_privacy') and Config(
-        ).trainer.differential_privacy:
+        errors = ModuleValidator.validate(self.model, strict=False)
+        if len(errors) > 0:
+            self.model = ModuleValidator.fix(self.model)
             errors = ModuleValidator.validate(self.model, strict=False)
-            if len(errors) > 0:
-                self.model = ModuleValidator.fix(self.model)
-                errors = ModuleValidator.validate(self.model, strict=False)
-                assert len(errors) == 0
+            assert len(errors) == 0
 
-            self.model = GradSampleModule(self.model)
+        self.model = GradSampleModule(self.model)
 
     def zeros(self, shape):
         """Returns a PyTorch zero tensor with the given shape."""
@@ -152,6 +150,9 @@ class Trainer(base.Trainer):
         log_interval = 10
         tic = time.perf_counter()
 
+        if 'differential_privacy' in config and config['differential_privacy']:
+            self.make_model_private()
+
         logging.info("[Client #%d] Loading the dataset.", self.client_id)
         _train_loader = getattr(self, "train_loader", None)
 
@@ -166,10 +167,6 @@ class Trainer(base.Trainer):
 
         iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
         epochs = config['epochs']
-
-        # Sending the model to the device used for training
-        self.model.to(self.device)
-        self.model.train()
 
         # Initializing the loss criterion
         _loss_criterion = getattr(self, "loss_criterion", None)
@@ -197,7 +194,6 @@ class Trainer(base.Trainer):
                 self.client_id)
 
             privacy_engine = PrivacyEngine(accountant='rdp', secure_mode=False)
-            self.make_model_private()
 
             self.model, optimizer, train_loader = privacy_engine.make_private_with_epsilon(
                 module=self.model,
@@ -211,6 +207,9 @@ class Trainer(base.Trainer):
                 max_grad_norm=config['dp_max_grad_norm']
                 if 'max_grad_norm' in config else 1.0,
             )
+
+        self.model.to(self.device)
+        self.model.train()
 
         for epoch in range(1, epochs + 1):
             # Use a default training loop
