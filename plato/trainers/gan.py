@@ -5,9 +5,12 @@ Reference:
 https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html
 """
 import logging
+import math
 import os
 
 import torch
+import torch.nn as nn
+import torchvision
 import numpy as np
 import scipy
 
@@ -30,6 +33,13 @@ class Trainer(basic.Trainer):
         self.discriminator = gan_model.discriminator
         self.loss_criterion = gan_model.loss_criterion
         self.model = gan_model
+
+        # Use the pre-trained InceptionV3 model as a feature extractor
+        # for testing
+        self.inception_model = torchvision.models.inception_v3(pretrained=True,
+                                                          aux_logits=False)
+        # Remove the last output layer of inception
+        self.inception_model.fc = nn.Identity()
 
         self.training_start_time = 0
 
@@ -223,29 +233,36 @@ class Trainer(basic.Trainer):
                                 1,
                                 device=self.device)
             fake_examples = self.generator(noise)
-            fidelity = Trainer.calculate_fid(real_examples, fake_examples)
+            fidelity = self.calculate_fid(real_examples, fake_examples)
 
-        print(fidelity)
         return fidelity
 
-    @staticmethod
-    def calculate_fid(real_examples, fake_examples):
+    def feature_extractor(self, inputs):
 
-        def temp_model(img):
-            return torch.randn(len(img), 2048)
+        # Since the input to InceptionV3 needs to be at least 75x75,
+        # we will pad the input image if needed.
+        hpad = math.ceil((75 - inputs.size(dim=1)) / 2)
+        vpad = math.ceil((75 - inputs.size(dim=2)) / 2)
+        hpad, vpad = max(0, hpad), max(0, vpad)
+        pad = nn.ZeroPad2d((hpad, hpad, vpad, vpad))
+        inputs = pad(inputs)
 
-        inception_model = temp_model
+        features = self.inception_model(inputs)
+        features = np.array(features)
+        return features
 
-        real_features = inception_model(real_examples)
-        fake_features = inception_model(fake_examples)
+    def calculate_fid(self, real_examples, fake_examples):
+
+        feature_extractor = self.feature_extractor
+
+        real_features = feature_extractor(real_examples)
+        fake_features = feature_extractor(fake_examples)
 
         # calculate mean and covariance statistics
         mu1, sigma1 = real_features.mean(axis=0), np.cov(real_features,
                                                          rowvar=False)
         mu2, sigma2 = fake_features.mean(axis=0), np.cov(fake_features,
                                                          rowvar=False)
-
-        mu1, mu2, sigma1, sigma2 = np.array(mu1), np.array(mu2), np.array(sigma1), np.array(sigma2)
         # calculate sum squared difference between means
         ssdiff = np.sum((mu1 - mu2) ** 2.0)
         # calculate sqrt of product between cov
