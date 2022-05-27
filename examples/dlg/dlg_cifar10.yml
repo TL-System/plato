@@ -11,6 +11,8 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
+    random_seed: 10
+
 server:
     address: 127.0.0.1
     port: 8001
@@ -24,6 +26,8 @@ data:
 
     # IID or non-IID?
     sampler: iid
+
+    random_seed: 50
 
 trainer:
     # The type of the trainer
@@ -52,7 +56,7 @@ trainer:
     lr_milestone_steps: 80ep,120ep
 
     # The machine learning model
-    model_name: resnet_18
+    model_name: dlg
     num_classes: 10
 
 algorithm:
@@ -65,10 +69,12 @@ algorithm:
     attack_round: 1
     # One particular client, e.g., the first selected client
     victim_client: 0
-    num_iters: 300
+    num_iters: 600
     log_interval: 10
+    # Whether or not use customized initialization for model weights
+    init_params: false
     # The random seed for dummy data and label
-    random_seed: 5
+    random_seed: 800
 
 results:
     result_path: results/CIAFR10_resnet18/DLG

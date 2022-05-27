@@ -19,6 +19,13 @@ from plato.trainers import base
 from plato.utils import optimizers
 
 
+def weights_init(m):
+    if hasattr(m, "weight"):
+        m.weight.data.uniform_(-0.5, 0.5)
+    if hasattr(m, "bias"):
+        m.bias.data.uniform_(-0.5, 0.5)
+
+
 class Trainer(base.Trainer):
     """A basic federated learning trainer, used by both the client and the server."""
 
@@ -38,6 +45,10 @@ class Trainer(base.Trainer):
             model = models_registry.get()
 
         self.model = model
+
+        if hasattr(Config().algorithm, 'init_params') and Config(
+        ).algorithm.init_params:
+            self.model.apply(weights_init)
 
     def make_model_private(self):
         """ Make the model private for use with the differential privacy engine. """
