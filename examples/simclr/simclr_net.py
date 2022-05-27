@@ -8,6 +8,7 @@ import torch.nn as nn
 from torchvision.models import resnet50
 
 from plato.config import Config
+from general_MLP import build_mlp_from_config
 
 backbone_mapper = {"resnet50": resnet50}
 
@@ -16,14 +17,22 @@ class projection_MLP(nn.Module):
 
     def __init__(self, in_dim, out_dim=256):
         super().__init__()
-        hidden_dim = in_dim
-        self.layer1 = nn.Sequential(nn.Linear(in_dim, hidden_dim),
-                                    nn.ReLU(inplace=True))
-        self.layer2 = nn.Linear(hidden_dim, out_dim)
+
+        self.layers = build_mlp_from_config(
+            dict(
+                type='FullyConnectedHead',
+                output_dim=out_dim,
+                input_dim=in_dim,
+                hidden_layers_dim=[in_dim],
+                batch_norms=[None, None],
+                activations=["relu", None],
+                dropout_ratios=[0, 0],
+            ))
 
     def forward(self, x):
-        x = self.layer1(x)
-        x = self.layer2(x)
+        for layer in self.layers:
+            x = layer(x)
+
         return x
 
 
