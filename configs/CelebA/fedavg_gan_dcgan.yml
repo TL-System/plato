@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 1
+    total_clients: 2
 
     # The number of clients selected in each round
-    per_round: 1
+    per_round: 2
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -37,8 +37,7 @@ data:
     data_path: data
 
     # Number of samples in each partition
-    # partition_size: 162770
-    partition_size: 2000
+    partition_size: 81000
 
     # IID or non-IID?
     sampler: iid
@@ -54,7 +53,7 @@ trainer:
     type: gan
 
     # The maximum number of training rounds
-    rounds: 2
+    rounds: 5
 
     # The maximum number of clients running concurrently
     max_concurrency: 3
@@ -63,7 +62,7 @@ trainer:
     target_perplexity: 0
 
     # Number of epoches for local training in each communication round
-    epochs: 1
+    epochs: 5
     batch_size: 128
     optimizer: Adam
     learning_rate: 0.0002
