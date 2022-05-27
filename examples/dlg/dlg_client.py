@@ -18,7 +18,6 @@ class Report(base.Report):
 class Client(simple.Client):
     async def send(self, payload) -> None:
         """Sending the client payload to the server using simulation, S3 or socket.io."""
-        # TODO: Replace weights with gradients
         file_path = f"{Config().params['model_path']}/{self.client_id}.pickle"
         with open(file_path, 'rb') as handle:
             payload = (payload, pickle.load(handle))
