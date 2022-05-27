@@ -3,7 +3,6 @@ import os
 import pickle
 import time
 
-import matplotlib.pyplot as plt
 import numpy as np
 import torch
 from opacus.privacy_engine import PrivacyEngine
@@ -117,7 +116,7 @@ class Trainer(basic.Trainer):
                 file_path = f"{Config().params['model_path']}/{self.client_id}.pickle"
                 with open(file_path, 'wb') as handle:
                     pickle.dump(
-                        [examples[0], onehot_labels, target_grad], handle)
+                        [examples, onehot_labels, target_grad], handle)
 
                 # loss = loss_criterion(outputs, labels)
 
