@@ -5,6 +5,7 @@ The implementation of wrapper for the contrastive dataset
 
 import numpy as np
 import torch
+from PIL import Image
 
 
 class ContrastiveDataWrapper(torch.utils.data.Dataset):
@@ -188,11 +189,20 @@ class ContrastiveAugmentDataWrapper(torch.utils.data.Dataset):
          self-supervised learning relies on unannotated samples. 
          But we still inject the sample label into the output to make 
          it maintain consistency with other datasets object.
-         """
+        """
+        # obtain the raw data without applying the outside transormation
+        #   as we only need to perform the data augmentation proposed
+        #   in the contrastive learning.
         raw_sample = self.raw_data[item_index]
         sample_label = self.dataset_labels[item_index]
 
+        # doing this so that it is consistent with all other datasets
+        # to return a PIL Image
+        # we must convert the data to raw data to PTL type before
+        #   applying the transformation.
+        # see the source code of torchvision.datasets.
+        raw_sample = Image.fromarray(raw_sample.numpy(), mode="L")
         # the aug_transformer is expected to output paired samples
         prepared_sample1, prepared_sample2 = self.aug_transformer(raw_sample)
 
-        return tuple(prepared_sample1, prepared_sample2), sample_label
+        return prepared_sample1, prepared_sample2, sample_label
