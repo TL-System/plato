@@ -136,14 +136,12 @@ class Trainer(basic.Trainer):
                             logging.info(
                                 "[Server #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
                                 os.getpid(), epoch, epochs, batch_id,
-                                len(memory_safe_train_loader),
-                                loss.data.item())
+                                len(train_loader), loss.data.item())
                         else:
                             logging.info(
                                 "[Client #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
                                 self.client_id, epoch, epochs, batch_id,
-                                len(memory_safe_train_loader),
-                                loss.data.item())
+                                len(train_loader), loss.data.item())
 
             if lr_schedule is not None:
                 lr_schedule.step()
