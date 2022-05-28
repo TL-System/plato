@@ -83,22 +83,6 @@ class Trainer(basic.Trainer):
         else:
             lr_schedule = None
 
-        if 'differential_privacy' in config and config['differential_privacy']:
-            privacy_engine = PrivacyEngine(accountant='rdp', secure_mode=False)
-
-            self.model, optimizer, train_loader = privacy_engine.make_private_with_epsilon(
-                module=self.model,
-                optimizer=optimizer,
-                data_loader=train_loader,
-                target_epsilon=config['dp_epsilon']
-                if 'dp_epsilon' in config else 10.0,
-                target_delta=config['dp_delta']
-                if 'dp_delta' in config else 1e-5,
-                epochs=epochs,
-                max_grad_norm=config['dp_max_grad_norm']
-                if 'max_grad_norm' in config else 1.0,
-            )
-
         for epoch in range(1, epochs + 1):
             # Use a default training loop
             for batch_id, (examples, labels) in enumerate(train_loader):
@@ -107,11 +91,7 @@ class Trainer(basic.Trainer):
                     self.device), examples2.to(self.device), labels.to(
                         self.device)
 
-                if 'differential_privacy' in config and config[
-                        'differential_privacy']:
-                    optimizer.zero_grad(set_to_none=True)
-                else:
-                    optimizer.zero_grad()
+                optimizer.zero_grad()
 
                 if cut_layer is None:
                     outputs = self.model(examples1, examples2)
@@ -162,3 +142,72 @@ class Trainer(basic.Trainer):
                 filename = f"{self.client_id}_{epoch}_{training_time}.pth"
                 self.save_model(filename)
                 self.model.to(self.device)
+
+    def test_process(self, config, testset, sampler=None):
+        """The testing loop, run in a separate process with a new CUDA context,
+        so that CUDA memory can be released after the training completes.
+
+        Arguments:
+        config: a dictionary of configuration parameters.
+        testset: The test dataset.
+        sampler: The sampler that extracts a partition of the test dataset.
+        """
+        self.model.to(self.device)
+        self.model.eval()
+
+        # Initialize accuracy to be returned to -1, so that the client can disconnect
+        # from the server when testing fails
+        accuracy = -1
+
+        try:
+            custom_test = getattr(self, "test_model", None)
+
+            if callable(custom_test):
+                accuracy = self.test_model(config, testset)
+            else:
+                if sampler is None:
+                    test_loader = torch.utils.data.DataLoader(
+                        testset,
+                        batch_size=config['batch_size'],
+                        shuffle=False)
+                # Use a testing set following the same distribution as the training set
+                else:
+                    test_loader = torch.utils.data.DataLoader(
+                        testset,
+                        batch_size=config['batch_size'],
+                        shuffle=False,
+                        sampler=sampler.get())
+
+                samples_feature = []
+                samples_label = []
+                with torch.no_grad():
+                    for examples, labels in test_loader:
+                        examples, labels = examples.to(self.device), labels.to(
+                            self.device)
+
+                        outputs = self.model.forward_once(examples)
+                        samples_feature.extend(
+                            outputs.data.cpu().numpy().tolist())
+                        samples_label.extend(
+                            labels.data.cpu().numpy().tolist())
+
+                    # define a simple MLP classifier
+                    clf = MLPClassifier(solver='adam',
+                                        alpha=1e-5,
+                                        hidden_layer_sizes=(10, 10),
+                                        random_state=1)
+                    clf.fit(samples_feature, samples_label)
+                    accuracy = clf.score(samples_feature, samples_label)
+
+        except Exception as testing_exception:
+            logging.info("Testing on client #%d failed.", self.client_id)
+            raise testing_exception
+
+        self.model.cpu()
+
+        if 'max_concurrency' in config:
+            model_name = config['model_name']
+            filename = f"{model_name}_{self.client_id}_{config['run_id']}.acc"
+            self.save_accuracy(accuracy, filename)
+        else:
+            return accuracy
