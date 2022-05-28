@@ -202,7 +202,12 @@ class ContrastiveAugmentDataWrapper(torch.utils.data.Dataset):
         #   applying the transformation.
         # see the source code of torchvision.datasets.
         raw_sample = Image.fromarray(raw_sample.numpy(), mode="L")
-        # the aug_transformer is expected to output paired samples
-        prepared_sample1, prepared_sample2 = self.aug_transformer(raw_sample)
 
-        return prepared_sample1, prepared_sample2, sample_label
+        # we can obtain different number of prepared samples
+        #   based on what aug_transformer used.
+        #   - paired samples if using contrastive-oriented transform
+        #   - one sample if using general transform
+
+        prepared_samples = self.aug_transformer(raw_sample)
+
+        return prepared_samples, sample_label

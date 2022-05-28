@@ -101,8 +101,8 @@ class Trainer(basic.Trainer):
 
         for epoch in range(1, epochs + 1):
             # Use a default training loop
-            for batch_id, (examples1, examples2,
-                           labels) in enumerate(train_loader):
+            for batch_id, (examples, labels) in enumerate(train_loader):
+                examples1, examples2 = examples
                 examples1, examples2, labels = examples1.to(
                     self.device), examples2.to(self.device), labels.to(
                         self.device)
