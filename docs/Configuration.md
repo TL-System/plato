@@ -135,7 +135,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 | Attribute | Meaning | Valid Value | Note |
 |:---------:|:-------:|:-----------:|:----:|
 |**type**|The type of the trainer|`basic` or `diff_privacy`|
-|max_physical_batch_size|The limit on the physical batch size when using `diff_privacy` trainer|defualt: 32|Different values and corresponding (approximate) memory usages of one process: 128: 18005 MB; 64: 9651 MB; 32: 4901 MB; 16: 3277 MB |
+|max_physical_batch_size|The limit on the physical batch size when using `diff_privacy` trainer|defualt: 128|GPU memory usage of one process training the ResNet-18 model is 2817 MB|
 |**rounds**|The maximum number of training rounds|Any positive integer||
 |max_concurrency|The maximum number of clients (of each edge server in cross-silo training) running concurrently on one available device. If this is not defined, no new processes are spawned for training|Any positive integer|Plato will automatically use all available GPUs to maximize the speed of training, launching the same number of clients on every GPU.|
 |target_accuracy|The target accuracy of the global model|||

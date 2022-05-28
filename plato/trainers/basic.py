@@ -99,7 +99,12 @@ class Trainer(base.Trainer):
             time.sleep(sleep_seconds)
             logging.info("[Client #%d] Woke up.", self.client_id)
 
-    def train_process(self, config, trainset, sampler, cut_layer=None):
+    def train_process(self,
+                      config,
+                      trainset,
+                      sampler,
+                      cut_layer=None,
+                      **kwargs):
         """The main training loop in a federated learning workload, run in
           a separate process with a new CUDA context, so that CUDA memory
           can be released after the training completes.
@@ -108,8 +113,9 @@ class Trainer(base.Trainer):
         self: the trainer itself.
         config: a dictionary of configuration parameters.
         trainset: The training dataset.
-        sampler: the sampler that extracts a partition for this client.
+        sampler: The sampler that extracts a partition for this client.
         cut_layer (optional): The layer which training should start from.
+        kwargs (optional): Additional keyword arguments.
         """
 
         try:
@@ -117,9 +123,16 @@ class Trainer(base.Trainer):
 
             if callable(custom_train):
                 # Use a custom training loop to train
-                self.train_model(config, trainset, sampler.get(), cut_layer)
+                self.train_model(config, trainset, sampler.get(), cut_layer,
+                                 **kwargs)
             else:
-                self.train_loop(config, trainset, sampler.get(), cut_layer)
+                self.train_loop(
+                    config,
+                    trainset,
+                    sampler.get(),
+                    cut_layer,
+                    **kwargs,
+                )
         except Exception as training_exception:
             logging.info("Training on client #%d failed.", self.client_id)
             raise training_exception
@@ -130,7 +143,7 @@ class Trainer(base.Trainer):
             filename = f"{model_type}_{self.client_id}_{config['run_id']}.pth"
             self.save_model(filename)
 
-    def train_loop(self, config, trainset, sampler, cut_layer):
+    def train_loop(self, config, trainset, sampler, cut_layer, **kwargs):
         """ The default training loop when a custom training loop is not supplied. """
         batch_size = config['batch_size']
         log_interval = 10
@@ -230,13 +243,14 @@ class Trainer(base.Trainer):
                 self.save_model(filename)
                 self.model.to(self.device)
 
-    def train(self, trainset, sampler, cut_layer=None) -> float:
+    def train(self, trainset, sampler, cut_layer=None, **kwargs) -> float:
         """The main training loop in a federated learning workload.
 
         Arguments:
         trainset: The training dataset.
         sampler: the sampler that extracts a partition for this client.
         cut_layer (optional): The layer which training should start from.
+        kwargs (optional): Additional keyword arguments.
 
         Returns:
         float: Elapsed time during training.
@@ -254,8 +268,8 @@ class Trainer(base.Trainer):
                 mp.set_start_method('spawn', force=True)
 
             train_proc = mp.Process(target=self.train_process,
-                                    args=(config, trainset, sampler,
-                                          cut_layer))
+                                    args=(config, trainset, sampler, cut_layer),
+                                    kwargs=kwargs)
             train_proc.start()
             train_proc.join()
 
@@ -272,14 +286,14 @@ class Trainer(base.Trainer):
             self.pause_training()
         else:
             tic = time.perf_counter()
-            self.train_process(config, trainset, sampler, cut_layer)
+            self.train_process(config, trainset, sampler, cut_layer, **kwargs)
             toc = time.perf_counter()
 
         training_time = toc - tic
 
         return training_time
 
-    def test_process(self, config, testset, sampler=None):
+    def test_process(self, config, testset, sampler=None, **kwargs):
         """The testing loop, run in a separate process with a new CUDA context,
         so that CUDA memory can be released after the training completes.
 
@@ -287,6 +301,7 @@ class Trainer(base.Trainer):
         config: a dictionary of configuration parameters.
         testset: The test dataset.
         sampler: The sampler that extracts a partition of the test dataset.
+        kwargs (optional): Additional keyword arguments.
         """
         self.model.to(self.device)
         self.model.eval()
@@ -342,12 +357,13 @@ class Trainer(base.Trainer):
         else:
             return accuracy
 
-    def test(self, testset, sampler=None) -> float:
+    def test(self, testset, sampler=None, **kwargs) -> float:
         """Testing the model using the provided test dataset.
 
         Arguments:
         testset: The test dataset.
         sampler: The sampler that extracts a partition of the test dataset.
+        kwargs (optional): Additional keyword arguments.
         """
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']
@@ -357,11 +373,8 @@ class Trainer(base.Trainer):
                 mp.set_start_method('spawn', force=True)
 
             proc = mp.Process(target=self.test_process,
-                              args=(
-                                  config,
-                                  testset,
-                                  sampler,
-                              ))
+                              args=(config, testset, sampler),
+                              kwargs=kwargs)
             proc.start()
             proc.join()
 
@@ -376,16 +389,17 @@ class Trainer(base.Trainer):
 
             self.pause_training()
         else:
-            accuracy = self.test_process(config, testset)
+            accuracy = self.test_process(config, testset, **kwargs)
 
         return accuracy
 
-    async def server_test(self, testset, sampler=None):
+    async def server_test(self, testset, sampler=None, **kwargs):
         """Testing the model on the server using the provided test dataset.
 
         Arguments:
         testset: The test dataset.
         sampler: The sampler that extracts a partition of the test dataset.
+        **kwargs (optional): Additional keyword arguments.
         """
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']

@@ -1,9 +1,13 @@
 """
-Useful tools used for implementing samplers
-
+    Rewrite the Opacus's BatchMemoryManager
+    Reference: https://opacus.ai/api/_modules/opacus/utils/batch_memory_manager.html
 """
 
 import numpy as np
+
+from opacus.optimizers import DPOptimizer
+from opacus.utils.batch_memory_manager import BatchSplittingSampler
+from torch.utils.data import DataLoader, BatchSampler
 
 
 def extend_indices(indices, required_total_size):
@@ -188,3 +192,66 @@ def create_dirichlet_skew(
             np.repeat(concentration, number_partitions))
 
     return proportions
+
+
+def wrap_data_loader(*, data_loader: DataLoader,
+                     original_batch_sampler: BatchSampler, max_batch_size: int,
+                     optimizer: DPOptimizer):
+    """
+    Replaces batch_sampler in the input data loader with ``BatchSplittingSampler``
+
+    Args:
+        data_loader: Wrapper DataLoader
+        max_batch_size: max physical batch size we want to emit
+        optimizer: DPOptimizer instance used for training
+
+    Returns:
+        New DataLoader instance with batch_sampler wrapped in ``BatchSplittingSampler``
+    """
+    return DataLoader(
+        dataset=data_loader.dataset,
+        batch_sampler=BatchSplittingSampler(
+            sampler=original_batch_sampler,
+            max_batch_size=max_batch_size,
+            optimizer=optimizer,
+        ),
+        num_workers=data_loader.num_workers,
+        collate_fn=data_loader.collate_fn,
+        pin_memory=data_loader.pin_memory,
+        timeout=data_loader.timeout,
+        worker_init_fn=data_loader.worker_init_fn,
+        multiprocessing_context=data_loader.multiprocessing_context,
+        generator=data_loader.generator,
+        prefetch_factor=data_loader.prefetch_factor,
+        persistent_workers=data_loader.persistent_workers,
+    )
+
+
+class BatchMemoryManager(object):
+    """
+        Enable sampler on top of Opacus BatchMemoryManager
+    """
+
+    def __init__(
+        self,
+        *,
+        data_loader: DataLoader,
+        original_batch_sampler: BatchSampler,
+        max_physical_batch_size: int,
+        optimizer: DPOptimizer,
+    ):
+        self.data_loader = data_loader
+        self.optimizer = optimizer
+        self.original_batch_sampler = original_batch_sampler
+        self.max_physical_batch_size = max_physical_batch_size
+
+    def __enter__(self):
+        return wrap_data_loader(
+            data_loader=self.data_loader,
+            original_batch_sampler=self.original_batch_sampler,
+            max_batch_size=self.max_physical_batch_size,
+            optimizer=self.optimizer,
+        )
+
+    def __exit__(self, type, value, traceback):
+        pass

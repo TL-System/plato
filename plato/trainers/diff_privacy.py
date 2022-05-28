@@ -10,12 +10,12 @@ import torch
 
 from opacus import GradSampleModule
 from opacus.privacy_engine import PrivacyEngine
-from opacus.utils.batch_memory_manager import BatchMemoryManager
 from opacus.validators import ModuleValidator
 
 from plato.config import Config
 from plato.trainers import basic
 from plato.utils import optimizers
+from plato.samplers.sampler_utils import BatchMemoryManager
 
 
 class Trainer(basic.Trainer):
@@ -27,7 +27,7 @@ class Trainer(basic.Trainer):
         super().__init__(model=model)
         self.max_physical_batch_size = Config(
         ).trainer.max_physical_batch_size if hasattr(
-            Config().trainer, "max_physical_batch_size") else 32
+            Config().trainer, "max_physical_batch_size") else 128
 
     def make_model_private(self):
         """ Make the model private for use with the differential privacy engine. """
@@ -60,6 +60,7 @@ class Trainer(basic.Trainer):
                                                        sampler=sampler)
 
         iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
+        batch_sampler = train_loader.batch_sampler
         epochs = config['epochs']
 
         # Initializing the loss criterion
@@ -107,6 +108,7 @@ class Trainer(basic.Trainer):
         for epoch in range(1, epochs + 1):
             with BatchMemoryManager(
                     data_loader=train_loader,
+                    original_batch_sampler=batch_sampler,
                     max_physical_batch_size=self.max_physical_batch_size,
                     optimizer=optimizer) as memory_safe_train_loader:
                 for batch_id, (examples,

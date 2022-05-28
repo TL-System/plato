@@ -17,6 +17,7 @@ from plato.trainers import basic
 def flatten_weights_from_model(model, device):
     """ Return the weights of the given model as a 1-D tensor """
     weights = torch.tensor([], requires_grad=False).to(device)
+    model.to(device)
     for param in model.parameters():
         weights = torch.cat((weights, torch.flatten(param)))
     return weights
