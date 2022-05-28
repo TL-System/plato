@@ -16,10 +16,9 @@ server:
     port: 8000
 
     # Choose to send Generator or Discriminator to clients at
-    # the end of each round
-    network_to_sync:
-        generator: true
-        discriminator: false
+    # the end of each round. 
+    # Value here should be one of 'none', 'generator', 'discriminator', or 'both'
+    network_to_sync: none
 
 data:
     # The training and testing dataset
@@ -30,7 +29,7 @@ data:
         attr: false
         identity: true
     
-    # Resize all images to 32x32; default is 64x64
+    # Resize all images to 64x64
     celeba_img_size: 64
 
     # Where the dataset is located

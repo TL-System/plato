@@ -59,12 +59,22 @@ class Server(fedavg.Server):
 
         By default, both model will be sent to the clients.
         """
-        weights_gen, weights_disc = payload
         if hasattr(Config().server, 'network_to_sync'):
-            if hasattr(Config().server.network_to_sync, 'generator'
-                       ) and not Config().server.network_to_sync.generator:
-                weights_gen = None
-            if hasattr(Config().server.network_to_sync, 'discriminator'
-                       ) and not Config().server.network_to_sync.discriminator:
-                weights_disc = None
-        return weights_gen, weights_disc
+            network = Config().server.network_to_sync.lower()
+        else:
+            network = 'both'
+
+        weights_gen, weights_disc = payload
+        if network == 'none':
+            server_payload = None, None
+        elif network == 'generator':
+            server_payload = weights_gen, None
+        elif network == 'discriminator':
+            server_payload = None, weights_disc
+        elif network == 'both':
+            server_payload = payload
+        else:
+            raise ValueError(
+                f'Unknown value to attribute network_to_sync: {network}')
+
+        return server_payload
