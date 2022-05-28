@@ -8,15 +8,15 @@ from plato.trainers.base import Trainer
 
 
 class Algorithm(fedavg.Algorithm):
-    """Federated averaging algorithm for GAN models, used by both the client and the server."""
+    """ Federated averaging algorithm for GAN models, used by both the client and the server. """
 
     def __init__(self, trainer: Trainer):
-        super().__init__(trainer)
+        super().__init__(trainer=trainer)
         self.generator = self.model.generator
         self.discriminator = self.model.discriminator
 
     def compute_weight_deltas(self, weights_received):
-        """Extract the weights received from a client and compute the updates."""
+        """ Extract the weights received from a client and compute the updates. """
         baseline_weights_gen, baseline_weights_disc = self.extract_weights()
 
         deltas = []
@@ -55,7 +55,7 @@ class Algorithm(fedavg.Algorithm):
         return updated_weights_gen, updated_weights_disc
 
     def extract_weights(self, model=None):
-        """Extract weights from the model."""
+        """ Extract weights from the model. """
         generator = self.generator
         discriminator = self.discriminator
         if model is not None:
@@ -68,7 +68,7 @@ class Algorithm(fedavg.Algorithm):
         return gen_weight, disc_weight
 
     def load_weights(self, weights):
-        """Load the model weights passed in as a parameter."""
+        """ Load the model weights passed in as a parameter. """
         weights_gen, weights_disc = weights
         # The client might only receive one or none of the Generator
         # and Discriminator model weight.

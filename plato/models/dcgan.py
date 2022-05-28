@@ -5,7 +5,7 @@ Reference:
 https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html
 """
 
-import torch.nn as nn
+from torch import nn
 
 nz = 100
 nc = 3
@@ -17,7 +17,7 @@ class Generator(nn.Module):
     """ Generator network of DCGAN """
 
     def __init__(self):
-        super(Generator, self).__init__()
+        super().__init__()
 
         self.main = nn.Sequential(
             # input is Z, going into a convolution
@@ -43,14 +43,15 @@ class Generator(nn.Module):
         )
 
     def forward(self, input_data):
+        """ Forward pass. """
         return self.main(input_data)
 
 
 class Discriminator(nn.Module):
-    """ Discriminator network of DCGAN """
+    """ Discriminator network of DCGAN. """
 
     def __init__(self):
-        super(Discriminator, self).__init__()
+        super().__init__()
 
         self.main = nn.Sequential(
             # input is (nc) x 64 x 64
@@ -77,7 +78,7 @@ class Discriminator(nn.Module):
 
 
 class Model:
-    """A wrapper class to hold the Generator and Discriminator models of DCGAN"""
+    """ A wrapper class to hold the Generator and Discriminator models of DCGAN. """
 
     def __init__(self) -> None:
         self.generator = Generator()
@@ -115,5 +116,5 @@ class Model:
 
     @staticmethod
     def get_model(*args):
-        """Obtaining an instance of this model."""
+        """ Obtaining an instance of this model. """
         return Model()

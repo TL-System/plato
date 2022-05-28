@@ -8,9 +8,7 @@ from plato.config import Config
 
 
 class Server(fedavg.Server):
-
-    def __init__(self, model=None, algorithm=None, trainer=None):
-        super().__init__(model=model, algorithm=algorithm, trainer=trainer)
+    """ Federated learning server using federated averaging to train GAN models. """
 
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using federated averaging."""
@@ -52,9 +50,10 @@ class Server(fedavg.Server):
     def customize_server_payload(self, payload):
         """
         Customize the server payload before sending to the client.
-        
+
         At the end of each round, the server can choose to only send the global Generator
-        or Discriminator (or both or neither) model to the clients next round. 
+        or Discriminator (or both or neither) model to the clients next round.
+
         Reference this paper for more detail:
         https://deepai.org/publication/federated-generative-adversarial-learning
 
