@@ -22,9 +22,15 @@ elif hasattr(Config().trainer, 'use_tensorflow'):
         ('basic', basic_tensorflow.Trainer),
     ])
 else:
-    from plato.trainers import (basic, pascal_voc, gan)
+    from plato.trainers import (
+        basic,
+        diff_privacy,
+        pascal_voc,
+        gan
+    )
     registered_trainers = OrderedDict([
         ('basic', basic.Trainer),
+        ('diff_privacy', diff_privacy.Trainer),
         ('pascal_voc', pascal_voc.Trainer),
         ('gan', gan.Trainer),
     ])
