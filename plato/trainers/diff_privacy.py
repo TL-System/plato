@@ -10,13 +10,12 @@ import torch
 
 from opacus import GradSampleModule
 from opacus.privacy_engine import PrivacyEngine
-from opacus.utils.batch_memory_manager import BatchMemoryManager
 from opacus.validators import ModuleValidator
 
 from plato.config import Config
 from plato.trainers import basic
 from plato.utils import optimizers
-
+from plato.samplers.sampler_utils import BatchMemoryManager
 
 class Trainer(basic.Trainer):
     """A differentially private federated learning trainer, used by the client."""
@@ -60,6 +59,7 @@ class Trainer(basic.Trainer):
                                                        sampler=sampler)
 
         iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
+        batch_sampler = train_loader.batch_sampler
         epochs = config['epochs']
 
         # Initializing the loss criterion
@@ -107,6 +107,7 @@ class Trainer(basic.Trainer):
         for epoch in range(1, epochs + 1):
             with BatchMemoryManager(
                     data_loader=train_loader,
+                    original_batch_sampler=batch_sampler,
                     max_physical_batch_size=self.max_physical_batch_size,
                     optimizer=optimizer) as memory_safe_train_loader:
                 for batch_id, (examples,
@@ -134,12 +135,12 @@ class Trainer(basic.Trainer):
                             logging.info(
                                 "[Server #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
                                 os.getpid(), epoch, epochs, batch_id,
-                                len(train_loader), loss.data.item())
+                                len(memory_safe_train_loader), loss.data.item())
                         else:
                             logging.info(
                                 "[Client #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
                                 self.client_id, epoch, epochs, batch_id,
-                                len(train_loader), loss.data.item())
+                                len(memory_safe_train_loader), loss.data.item())
 
             if lr_schedule is not None:
                 lr_schedule.step()
