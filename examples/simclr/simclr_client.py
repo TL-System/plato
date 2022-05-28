@@ -34,7 +34,7 @@ class Client(simple.Client):
         #   - transform: set the 'train' to be False to
         #       use the general transform,
         #       i.e., eval_aug under 'datasource/augmentations/eval_aug.py'
-        self.memory_train_loader = None
+        self.memory_trainset = None
 
     def load_data(self) -> None:
         """Generating data and loading them onto this client."""
@@ -57,7 +57,7 @@ class Client(simple.Client):
             self.trainset = datawrapper_registry.get(self.trainset,
                                                      augment_transformer)
 
-            general_augment_transformer = get_aug(name="general transform",
+            general_augment_transformer = get_aug(name="general_transform",
                                                   image_size=image_size,
                                                   train=False,
                                                   train_classifier=False)
@@ -75,7 +75,7 @@ class Client(simple.Client):
                            ) and Config().data.augment_transformer != None:
                     image_size = Config().trainer.image_size
 
-                    augment_transformer = get_aug(name='simclr',
+                    augment_transformer = get_aug(name="general_transform",
                                                   image_size=image_size,
                                                   train=False,
                                                   train_classifier=None)
