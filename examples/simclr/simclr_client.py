@@ -22,6 +22,20 @@ class Client(simple.Client):
                  trainer=None):
         super().__init__(model, datasource, algorithm, trainer)
 
+        # using the name memory is general in this domain,
+        #   it aims to record the train loader without using
+        #   the data augmentation.
+        # thus, it utilizes the same transform as the test loader
+        #   for monitor (i.e., contrastive learning monitor)
+        #   but performs on the train dataset.
+        # for this trainset loader,
+        #   - train: True, as it utilize the trainset
+        #   - shuffle: False
+        #   - transform: set the 'train' to be False to
+        #       use the general transform,
+        #       i.e., eval_aug under 'datasource/augmentations/eval_aug.py'
+        self.memory_train_loader = None
+
     def load_data(self) -> None:
         """Generating data and loading them onto this client."""
         super().load_data()
@@ -42,6 +56,15 @@ class Client(simple.Client):
 
             self.trainset = datawrapper_registry.get(self.trainset,
                                                      augment_transformer)
+
+            general_augment_transformer = get_aug(name="general transform",
+                                                  image_size=image_size,
+                                                  train=False,
+                                                  train_classifier=False)
+            # get the same trainset again for memory trainset
+            self.memory_trainset = self.datasource.get_train_set()
+            self.memory_trainset = datawrapper_registry.get(
+                self.memory_trainset, general_augment_transformer)
 
         if Config().clients.do_test:
             if hasattr(Config().data,

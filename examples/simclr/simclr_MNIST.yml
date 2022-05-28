@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 5
+    total_clients: 10
 
     # The number of clients selected in each round
-    per_round: 1
+    per_round: 4
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -20,7 +20,7 @@ server:
     address: 127.0.0.1
     port: 8000
     synchronous: true
-
+    do_test: false
     checkpoint_path: models/simclr/mnist
     model_path: models/simclr/mnist
 
