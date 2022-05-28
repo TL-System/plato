@@ -3,59 +3,62 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 2
+    total_clients: 1000
 
     # The number of clients selected in each round
-    per_round: 2
+    per_round: 200
 
     # Should the clients compute test accuracy locally?
     do_test: false
 
+    # Whether client-server communication should be simulated with files
+    comm_simulation: true
+
 server:
     address: 127.0.0.1
-    port: 8000
-    simulate_wall_time: false
-    checkpoint_path: checkpoints/huggingface/fedavg
-    model_path: models/huggingface/fedavg
+    port: 8020
 
 data:
     # The training and testing dataset
-    datasource: HuggingFace
-    dataset_name: tiny_shakespeare
+    datasource: CIFAR10
 
     # Number of samples in each partition
-    partition_size: 1009
+    partition_size: 1000
 
     # IID or non-IID?
     sampler: iid
 
-    # The random seed for sampling data
-    random_seed: 1
-
 trainer:
-    # The type of the trainer
-    type: HuggingFace
+    # Using the differential privacy trainer
+    type: diff_privacy 
+    dp_epsilon: 1
+    dp_delta: 0.00001
+    dp_max_grad_norm: 1 
 
     # The maximum number of training rounds
-    rounds: 5
+    rounds: 20
 
     # The maximum number of clients running concurrently
-    max_concurrency: 2
+    max_concurrency: 1
 
-    # The target perplexity
-    target_perplexity: 20
+    # The target accuracy
+    target_accuracy: 0.80
 
     # Number of epoches for local training in each communication round
     epochs: 5
-    batch_size: 32
+    batch_size: 10
     optimizer: SGD
-    learning_rate: 0.01
+    learning_rate: 0.1
     momentum: 0.9
-    weight_decay: 0.0
+    weight_decay: 0.0001
+
+    # Learning rate schedule
+    lr_schedule: LambdaLR
+    lr_gamma: 0.1
+    lr_milestone_steps: 80ep,120ep
 
     # The machine learning model
-    model_name: HuggingFace_CausalLM
-    model_checkpoint: bert-base-uncased
+    model_name: resnet_18
 
 algorithm:
     # Aggregation algorithm

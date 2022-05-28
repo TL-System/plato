@@ -10,9 +10,6 @@ import time
 
 import numpy as np
 import torch
-from opacus import GradSampleModule
-from opacus.privacy_engine import PrivacyEngine
-from opacus.validators import ModuleValidator
 from plato.config import Config
 from plato.models import registry as models_registry
 from plato.trainers import base
@@ -37,18 +34,6 @@ class Trainer(base.Trainer):
             model = models_registry.get()
 
         self.model = model
-
-    def make_model_private(self):
-        """ Make the model private for use with the differential privacy engine. """
-        if hasattr(Config().trainer, 'differential_privacy') and Config(
-        ).trainer.differential_privacy:
-            errors = ModuleValidator.validate(self.model, strict=False)
-            if len(errors) > 0:
-                self.model = ModuleValidator.fix(self.model)
-                errors = ModuleValidator.validate(self.model, strict=False)
-                assert len(errors) == 0
-
-            self.model = GradSampleModule(self.model)
 
     def zeros(self, shape):
         """Returns a PyTorch zero tensor with the given shape."""
@@ -131,7 +116,7 @@ class Trainer(base.Trainer):
             custom_train = getattr(self, "train_model", None)
 
             if callable(custom_train):
-                # Use a custom training loop to train for one epoch
+                # Use a custom training loop to train
                 self.train_model(config, trainset, sampler.get(), cut_layer)
             else:
                 self.train_loop(config, trainset, sampler.get(), cut_layer)
@@ -166,10 +151,6 @@ class Trainer(base.Trainer):
         iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
         epochs = config['epochs']
 
-        # Sending the model to the device used for training
-        self.model.to(self.device)
-        self.model.train()
-
         # Initializing the loss criterion
         _loss_criterion = getattr(self, "loss_criterion", None)
         if callable(_loss_criterion):
@@ -190,37 +171,15 @@ class Trainer(base.Trainer):
         else:
             lr_schedule = None
 
-        if 'differential_privacy' in config and config['differential_privacy']:
-            logging.info(
-                "[Client #%s] Using differential privacy during training.",
-                self.client_id)
-
-            privacy_engine = PrivacyEngine(accountant='rdp', secure_mode=False)
-            self.make_model_private()
-
-            self.model, optimizer, train_loader = privacy_engine.make_private_with_epsilon(
-                module=self.model,
-                optimizer=optimizer,
-                data_loader=train_loader,
-                target_epsilon=config['dp_epsilon']
-                if 'dp_epsilon' in config else 10.0,
-                target_delta=config['dp_delta']
-                if 'dp_delta' in config else 1e-5,
-                epochs=epochs,
-                max_grad_norm=config['dp_max_grad_norm']
-                if 'max_grad_norm' in config else 1.0,
-            )
+        self.model.to(self.device)
+        self.model.train()
 
         for epoch in range(1, epochs + 1):
             # Use a default training loop
             for batch_id, (examples, labels) in enumerate(train_loader):
                 examples, labels = examples.to(self.device), labels.to(
                     self.device)
-                if 'differential_privacy' in config and config[
-                        'differential_privacy']:
-                    optimizer.zero_grad(set_to_none=True)
-                else:
-                    optimizer.zero_grad()
+                optimizer.zero_grad()
 
                 if cut_layer is None:
                     outputs = self.model(examples)

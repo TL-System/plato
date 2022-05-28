@@ -40,12 +40,6 @@ trainer:
     # The maximum number of training rounds
     rounds: 5
 
-    # Whether to apply differential privacy
-    # differential_privacy: true
-    # dp_epsilon: 1
-    # dp_delta: 0.00001
-    # dp_max_grad_norm: 1
-
     # The maximum number of clients running concurrently
     max_concurrency: 1
 

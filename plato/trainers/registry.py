@@ -24,10 +24,12 @@ elif hasattr(Config().trainer, 'use_tensorflow'):
 else:
     from plato.trainers import (
         basic,
+        diff_privacy,
         pascal_voc,
     )
     registered_trainers = OrderedDict([
         ('basic', basic.Trainer),
+        ('diff_privacy', diff_privacy.Trainer),
         ('pascal_voc', pascal_voc.Trainer),
     ])
 
