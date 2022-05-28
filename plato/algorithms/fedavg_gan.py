@@ -39,10 +39,10 @@ class Algorithm(fedavg.Algorithm):
 
         return deltas
 
-    def update_weights(self, update):
+    def update_weights(self, deltas):
         """ Update the existing model weights. """
         baseline_weights_gen, baseline_weights_disc = self.extract_weights()
-        update_gen, update_disc = update
+        update_gen, update_disc = deltas
 
         updated_weights_gen = OrderedDict()
         for name, weight in baseline_weights_gen.items():

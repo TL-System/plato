@@ -255,7 +255,7 @@ class Trainer(basic.Trainer):
 
     def feature_extractor(self, inputs):
         """Extract the feature of input data with InceptionV3.
-        
+
         The feature extracted from each input is a NumPy array
         of length 2048.
         """
@@ -271,6 +271,7 @@ class Trainer(basic.Trainer):
         features = None
         with torch.no_grad():
             features = self.inception_model(inputs)
+        features = features.cpu()
         features = np.array(features)
 
         return features
