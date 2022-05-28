@@ -18,7 +18,7 @@ server:
     # Choose to send Generator or Discriminator to clients at
     # the end of each round. 
     # Value here should be one of 'none', 'generator', 'discriminator', or 'both'
-    network_to_sync: none
+    network_to_sync: generator
 
 data:
     # The training and testing dataset
