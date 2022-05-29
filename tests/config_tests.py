@@ -54,7 +54,14 @@ class ConfigTest(unittest.TestCase):
         self.model_config = Config.namedtuple_from_dict(model_params_config)
 
     def test_dataconfig(self):
-        """ Test the structure and necessary parameters of the data configuration """
+        """ Test the structure and necessary parameters of the data configuration.
+
+            This function tests the core part of the configuration file. It tests:
+                downloader, num_workers, multi_modal_configs, and whether there are
+                three modalities, including rgb, flow, and audio and the corresponding
+                data types are correct.
+
+        """
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -77,7 +84,12 @@ class ConfigTest(unittest.TestCase):
                 self.data_config.multi_modal_configs.rgb.train.type)
 
     def test_modelconfig(self):
-        """ Test the structure and necessary parameters of the model configuration """
+        """ Test the structure and necessary parameters of the model configuration.
+
+            This function tests the core part of the configuration file. It tests whether
+            the model is defined and whether the configurations for the defined model is
+            correct.
+        """
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=UserWarning)
 
