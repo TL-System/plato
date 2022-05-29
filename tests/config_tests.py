@@ -1,5 +1,11 @@
 """
 Testing a federated learning configuration.
+
+How to run the tests:
+
+ 1 Run the following command in the root directory.
+    python tests/config_tests.py
+
 """
 
 import os

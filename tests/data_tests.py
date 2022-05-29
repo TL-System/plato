@@ -1,29 +1,35 @@
 """
 Testing multi-modal datasources of Plato framework.
+
+How to run the tests:
+
+For example, when you want to test the ReferItGame dataset.
+ 1 Uncomment the 'import' code for the dataset you want to test
+    # from plato.datasources.referitgame import DataSource as refer_Datasource
+    to   from plato.datasources.referitgame import DataSource as refer_Datasource
+
+ 2 Uncomment the configuration file for the dataset you want to test
+    # os.environ['config_file'] = 'tests/TestsConfig/referitgame.yml'
+    to   os.environ['config_file'] = 'tests/TestsConfig/referitgame.yml'
+
+ 3 Uncomment the corresponding function that conducts the dataset test.
+    i.e. test_ref_datasource() for the ReferItGame dataset
+
+ 4 Run the following command in the root directory.
+    python tests/data_tests.py
+
+
+Note, before testing the referitgame dataset, you need to first download the
+    COCO data.
+
 """
 
 import os
 import unittest
 
-os.environ['config_file'] = 'tests/TestsConfig/referitgame.yml'
+# os.environ['config_file'] = 'tests/TestsConfig/referitgame.yml'
 
-import numpy as np
-import torch
-
-from sampler_test_utils import define_sampler
-
-from plato.config import Config
-
-# from plato.datasources.flickr30k_entities import DataSource as f30ke_DataSource
-from plato.datasources.referitgame import DataSource as refer_Datasource
-# from plato.datasources.coco import DataSource as coco_Datasource
-# from plato.datasources.kinetics import DataSource as kinetics_Datasource
-# from plato.datasources.gym import DataSource as GymDataSource
-from plato.samplers import registry as samplers_registry
-
-from plato.samplers import modality_iid
-
-# os.environ['config_file'] = 'tests/TestsConfig/flickr30k_entities.yml'
+os.environ['config_file'] = 'tests/TestsConfig/flickr30k_entities.yml'
 
 # os.environ['config_file'] = 'tests/TestsConfig/coco.yml'
 
@@ -33,6 +39,22 @@ from plato.samplers import modality_iid
 
 # Note: the plato will search the dir './config' for Pipeline and other configuration files
 #   directly by default. This is achieved by the code in line 83 of 'config.py'
+
+import numpy as np
+import torch
+
+from sampler_test_utils import define_sampler
+
+from plato.config import Config
+
+from plato.datasources.flickr30k_entities import DataSource as f30ke_DataSource
+# from plato.datasources.referitgame import DataSource as refer_Datasource
+# from plato.datasources.coco import DataSource as coco_Datasource
+# from plato.datasources.kinetics import DataSource as kinetics_Datasource
+# from plato.datasources.gym import DataSource as GymDataSource
+from plato.samplers import registry as samplers_registry
+
+from plato.samplers import modality_iid
 
 
 class DatasetsTest(unittest.TestCase):
@@ -91,10 +113,10 @@ class DatasetsTest(unittest.TestCase):
 
         return True
 
-    # def test_f30ke_datasource(self):
-    #     """ Test the flickr30k entities dataset. """
-    #     self.utest_datasource = f30ke_DataSource()
-    #     assert self.assert_datasource_definition(self.utest_datasource)
+    def test_f30ke_datasource(self):
+        """ Test the flickr30k entities dataset. """
+        self.utest_datasource = f30ke_DataSource()
+        assert self.assert_datasource_definition(self.utest_datasource)
 
     # def test_coco_datasource(self):
     #     """ Test the MSCOCO dataset. """
@@ -103,12 +125,12 @@ class DatasetsTest(unittest.TestCase):
     #     self.utest_datasource = coco_Datasource()
     #     # assert self.assert_datasource_definition(self.utest_datasource)
 
-    def test_ref_datasource(self):
-        """ Test the ReferItGmae dataset. """
-        # set the specific
+    # def test_ref_datasource(self):
+    #     """ Test the ReferItGmae dataset. """
+    #     # set the specific
 
-        self.utest_datasource = refer_Datasource()
-        assert self.assert_datasource_definition(self.utest_datasource)
+    #     self.utest_datasource = refer_Datasource()
+    #     assert self.assert_datasource_definition(self.utest_datasource)
 
     # def test_kinetics_datasource(self):
     #     """ Test the kinetics700 dataset. """
