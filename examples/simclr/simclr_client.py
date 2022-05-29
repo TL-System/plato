@@ -108,6 +108,16 @@ class Client(simple.Client):
         weights = self.algorithm.extract_weights()
 
         # Generate a report for the server, performing model testing if applicable
+        # This is the monitor test performed to measure the representation's quality
+        # based on the cluster method, such as k-nearest neighbors (KNN). The detailed
+        # procedures of this test are:
+        # 1.- Extract representation from the memory trainset based on the trained
+        # encoder of the self-supervised methods. The memory trainset is a duplicate
+        # of the trainset but without applying the contrastive data augmentation.
+        # It only utilizes the normal transform, as shown in 'datasources/augmentations/test_aug.py' .
+        # 2.- Train the KNN method based on the extracted representation of the memory trainset.
+        # 3.- Using the trained KNN method to classify the testset to obtain accuracy.
+
         if (hasattr(Config().clients, 'do_test') and Config().clients.do_test
             ) and (not hasattr(Config().clients, 'test_interval') or
                    self.current_round % Config().clients.test_interval == 0):
@@ -116,6 +126,46 @@ class Client(simple.Client):
                                          sampler=self.testset_sampler,
                                          memory_trainset=self.memory_trainset,
                                          memory_trainset_sampler=self.sampler)
+
+            if accuracy == -1:
+                # The testing process failed, disconnect from the server
+                await self.sio.disconnect()
+
+            if hasattr(Config().trainer, 'target_perplexity'):
+                logging.info("[%s] Test perplexity: %.2f", self, accuracy)
+            else:
+                logging.info("[%s] Test accuracy: %.2f%%", self,
+                             100 * accuracy)
+        else:
+            accuracy = 0
+
+        # In general, the performance of self-supervised learning methods is
+        # measured by applying their encoder to extract representation for the
+        # downstream tasks; thus, the quantity metrics are reported based on the
+        # objective of these tasks. This is commonly called linear evaluation and
+        # is conducted after completing the training of self-supervised learning
+        # methods. However, in federated learning, it is expected to track its
+        # performance after several rounds of communication. Therefore, in every
+        # #eval_test_interval round, the linear evaluation will be conducted to
+        # obtain accuracy or other metrics. The procedures are:
+        # 1.- Design a very simple model for the downstream task, such as the
+        # image classification. The classifier can be a one layer fully-connected layer.
+        # 2.- Use the encoder of the trained self-supervised method as the
+        # backbone to extract representation from the train data.
+        # 3.- Combine the backbone and the designed model to perform the
+        # downstream task. Thus, the input samples are processed by the
+        # backbone to generate representation, which is used as input for
+        # the designed model to complete the task. This encoder/backbone is
+        # frozen without any changes. Only the designed model is optimized.
+        if (hasattr(Config().clients, 'do_test') and Config().clients.do_test
+            ) and (not hasattr(Config().clients, 'eval_test_interval') or
+                   self.current_round % Config().clients.test_interval == 0):
+
+            accuracy = self.trainer.eval_test(
+                testset=self.testset,
+                sampler=self.testset_sampler,
+                memory_trainset=self.memory_trainset,
+                memory_trainset_sampler=self.sampler)
 
             if accuracy == -1:
                 # The testing process failed, disconnect from the server
