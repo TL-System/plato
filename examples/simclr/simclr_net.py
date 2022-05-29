@@ -52,7 +52,7 @@ class SimCLR(nn.Module):
         self.encoder, encode_dim = register_encoder(
             base_model_name=defined_model_name)
 
-        # build the
+        # build the projector proposed in the simclr net
         self.projector = projection_MLP(in_dim=encode_dim,
                                         out_dim=projection_dim)
 
