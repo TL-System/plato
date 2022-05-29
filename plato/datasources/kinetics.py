@@ -284,10 +284,10 @@ class DataSource(multimodal_base.MultiModalDataSource):
         """ Rename classes by replacing whitespace to  'Underscore' """
         video_format_path_key = self.set_modality_path_key_format(
             modality_name="video")
-        videos_root_dir_path = self.splits_info[mode][video_format_path_key]
+        videos_root__path = self.splits_info[mode][video_format_path_key]
         videos_dirs_name = [
-            dir_name for dir_name in os.listdir(videos_root_dir_path)
-            if os.path.isdir(os.path.join(videos_root_dir_path, dir_name))
+            dir_name for dir_name in os.listdir(videos_root__path)
+            if os.path.isdir(os.path.join(videos_root__path, dir_name))
         ]
 
         new_videos_dirs_name = [
@@ -295,11 +295,11 @@ class DataSource(multimodal_base.MultiModalDataSource):
         ]
 
         videos_dirs_path = [
-            os.path.join(videos_root_dir_path, dir_name)
+            os.path.join(videos_root__path, dir_name)
             for dir_name in videos_dirs_name
         ]
         new_videos_dirs_path = [
-            os.path.join(videos_root_dir_path, dir_name)
+            os.path.join(videos_root__path, dir_name)
             for dir_name in new_videos_dirs_name
         ]
         for i, _ in enumerate(videos_dirs_path):
@@ -319,25 +319,25 @@ class DataSource(multimodal_base.MultiModalDataSource):
                                                       modality_name="video")
         src_mode_videos_dir = video_data_path
 
-        rgb_out_dir_path = self.get_modality_data_path(mode=mode,
-                                                       modality_name="rgb")
-        flow_our_dir_path = self.get_modality_data_path(mode=mode,
-                                                        modality_name="flow")
-        audio_out_dir_path = self.get_modality_data_path(mode=mode,
-                                                         modality_name="audio")
-        audio_feature_dir_path = self.get_modality_data_path(
+        rgb_out__path = self.get_modality_data_path(mode=mode,
+                                                    modality_name="rgb")
+        flow_our__path = self.get_modality_data_path(mode=mode,
+                                                     modality_name="flow")
+        audio_out__path = self.get_modality_data_path(mode=mode,
+                                                      modality_name="audio")
+        audio_feature__path = self.get_modality_data_path(
             mode=mode, modality_name="audio_feature")
 
         # define the modalities extractor
-        if not self._exists(rgb_out_dir_path):
+        if not self._exists(rgb_out__path):
             vdf_extractor = frames_extraction_tools.VideoFramesExtractor(
                 video_src_dir=src_mode_videos_dir,
                 dir_level=2,
                 num_worker=8,
                 video_ext="mp4",
                 mixed_ext=False)
-        if not self._exists(audio_out_dir_path) \
-            or not self._exists(audio_feature_dir_path):
+        if not self._exists(audio_out__path) \
+            or not self._exists(audio_feature__path):
             vda_extractor = audio_extraction_tools.VideoAudioExtractor(
                 video_src_dir=src_mode_videos_dir,
                 dir_level=2,
@@ -346,35 +346,35 @@ class DataSource(multimodal_base.MultiModalDataSource):
                 mixed_ext=False)
 
         if torch.cuda.is_available():
-            if not self._exists(rgb_out_dir_path):
+            if not self._exists(rgb_out__path):
                 logging.info(
                     "Extracting frames by GPU from videos in %s to %s.",
-                    src_mode_videos_dir, rgb_out_dir_path)
-                vdf_extractor.build_frames_gpu(rgb_out_dir_path,
-                                               flow_our_dir_path,
+                    src_mode_videos_dir, rgb_out__path)
+                vdf_extractor.build_frames_gpu(rgb_out__path,
+                                               flow_our__path,
                                                new_short=1,
                                                new_width=0,
                                                new_height=0)
         else:
-            if not self._exists(rgb_out_dir_path):
+            if not self._exists(rgb_out__path):
                 logging.info(
                     "Extracting frames by CPU from videos in %s to %s.",
-                    src_mode_videos_dir, rgb_out_dir_path)
-                vdf_extractor.build_frames_cpu(to_dir=rgb_out_dir_path)
+                    src_mode_videos_dir, rgb_out__path)
+                vdf_extractor.build_frames_cpu(to_dir=rgb_out__path)
 
-        if not self._exists(audio_out_dir_path):
+        if not self._exists(audio_out__path):
             logging.info("Extracting audios by CPU from videos in %s to %s.",
-                         src_mode_videos_dir, audio_out_dir_path)
-            vda_extractor.build_audios(to_dir=audio_out_dir_path)
+                         src_mode_videos_dir, audio_out__path)
+            vda_extractor.build_audios(to_dir=audio_out__path)
 
-        if not self._exists(audio_feature_dir_path):
+        if not self._exists(audio_feature__path):
             logging.info(
                 "Extracting audios feature by CPU from audios in %s to %s.",
-                audio_out_dir_path, audio_feature_dir_path)
+                audio_out__path, audio_feature__path)
             # # window_size:32ms hop_size:16ms
             vda_extractor.build_audios_features(
-                audio_src_path=audio_out_dir_path,
-                to_dir=audio_feature_dir_path,
+                audio_src_path=audio_out__path,
+                to_dir=audio_feature__path,
                 fft_size=512,  # fft_size / sample_rate is window size
                 hop_size=256)
 

@@ -132,17 +132,17 @@ class DataSource(multimodal_base.MultiModalDataSource):
                                                     "gym99_categories.txt")
 
         self.raw_videos_path = os.path.join(base_data_path, "videos")
-        self.event_dir_path = os.path.join(base_data_path, "event")
-        self.event_subsection_dir_path = os.path.join(base_data_path,
-                                                      "subactions")
+        self.event__path = os.path.join(base_data_path, "event")
+        self.event_subsection__path = os.path.join(base_data_path,
+                                                   "subactions")
         self.data_event_anno_file_path = os.path.join(
             self.data_annotation_path, "event_annotation.json")
-        self.event_subsection_frames_dir_path = os.path.join(
+        self.event_subsection_frames__path = os.path.join(
             base_data_path, "subaction_rawframes")
-        self.event_subsection_audios_dir_path = os.path.join(
+        self.event_subsection_audios__path = os.path.join(
             base_data_path, "subaction_audios")
 
-        self.event_subsection_audios_fea_dir_path = os.path.join(
+        self.event_subsection_audios_fea__path = os.path.join(
             base_data_path, "subaction_audios_features")
 
         self.rawframes_splits_list_files_into = {
@@ -212,28 +212,28 @@ class DataSource(multimodal_base.MultiModalDataSource):
             logging.info("Done.")
 
         # Trim Videos into Events
-        if not self._exists(self.event_dir_path):
+        if not self._exists(self.event__path):
             gym_trim.trim_event(video_root=self.raw_videos_path,
                                 anno_file=self.data_anno_file_path,
                                 event_anno_file=self.data_event_anno_file_path,
-                                event_root=self.event_dir_path)
-        if not self._exists(self.event_subsection_dir_path):
+                                event_root=self.event__path)
+        if not self._exists(self.event_subsection__path):
             gym_trim.trim_subsection(
                 event_anno_file=self.data_event_anno_file_path,
-                event_root=self.event_dir_path,
-                subaction_root=self.event_subsection_dir_path)
+                event_root=self.event__path,
+                subaction_root=self.event_subsection__path)
 
         logging.info("The Gym dataset has been prepared")
         self.extract_videos_rgb_flow_audio()
 
     def extract_videos_rgb_flow_audio(self):
         """ Extract the rgb optical flow audios from the video """
-        src_videos_dir = self.event_subsection_dir_path
-        frames_out_dir_path = self.event_subsection_frames_dir_path
-        rgb_out_dir_path = self.event_subsection_frames_dir_path
-        flow_our_dir_path = self.event_subsection_frames_dir_path
-        audio_out_dir_path = self.event_subsection_audios_dir_path
-        audio_feature_dir_path = self.event_subsection_audios_fea_dir_path
+        src_videos_dir = self.event_subsection__path
+        frames_out__path = self.event_subsection_frames__path
+        rgb_out__path = self.event_subsection_frames__path
+        flow_our__path = self.event_subsection_frames__path
+        audio_out__path = self.event_subsection_audios__path
+        audio_feature__path = self.event_subsection_audios_fea__path
 
         # define the modalities extractor
         vdf_extractor = frames_extraction_tools.VideoFramesExtractor(
@@ -250,44 +250,43 @@ class DataSource(multimodal_base.MultiModalDataSource):
             mixed_ext=False)
 
         if torch.cuda.is_available():
-            if not self._exists(rgb_out_dir_path) and not self._exists(
-                    flow_our_dir_path):
+            if not self._exists(rgb_out__path) and not self._exists(
+                    flow_our__path):
                 logging.info(
                     "Extracting frames by GPU from videos in %s to %s.",
-                    src_videos_dir, rgb_out_dir_path)
-                vdf_extractor.build_full_frames_gpu(
-                    to_dir_path=frames_out_dir_path,
-                    new_short=256,
-                    new_width=0,
-                    new_height=0)
+                    src_videos_dir, rgb_out__path)
+                vdf_extractor.build_full_frames_gpu(to__path=frames_out__path,
+                                                    new_short=256,
+                                                    new_width=0,
+                                                    new_height=0)
         else:
-            if not self._exists(rgb_out_dir_path):
+            if not self._exists(rgb_out__path):
                 logging.info(
                     "Extracting frames by CPU from videos in %s to %s.",
-                    src_videos_dir, rgb_out_dir_path)
-                vdf_extractor.build_frames_cpu(to_dir=frames_out_dir_path)
+                    src_videos_dir, rgb_out__path)
+                vdf_extractor.build_frames_cpu(to_dir=frames_out__path)
 
-        if not self._exists(audio_out_dir_path):
+        if not self._exists(audio_out__path):
             logging.info("Extracting audios by CPU from videos in %s to %s.",
-                         src_videos_dir, audio_out_dir_path)
-            vda_extractor.build_audios(to_dir=audio_out_dir_path)
+                         src_videos_dir, audio_out__path)
+            vda_extractor.build_audios(to_dir=audio_out__path)
 
-        if not self._exists(audio_feature_dir_path):
+        if not self._exists(audio_feature__path):
             logging.info(
                 "Extracting audios feature by CPU from audios in %s to %s.",
-                audio_out_dir_path, audio_feature_dir_path)
+                audio_out__path, audio_feature__path)
             # # window_size:32ms hop_size:16ms
 
             vda_extractor.build_audios_features(
-                audio_src_path=audio_out_dir_path,
-                to_dir=audio_feature_dir_path,
+                audio_src_path=audio_out__path,
+                to_dir=audio_feature__path,
                 fft_size=512,  # fft_size / sample_rate is window size
                 hop_size=256)
         # extract the splits data into list files based on the frames information
         gym_trim.generate_splits_list(
-            data_root=self.event_subsection_dir_path,
+            data_root=self.event_subsection__path,
             annotation_root=self.data_annotation_path,
-            frame_data_root=frames_out_dir_path)
+            frame_data_root=frames_out__path)
 
         # generate the audio and audio features splits file
         # just copy the frame files to the audio ones
@@ -316,12 +315,12 @@ class DataSource(multimodal_base.MultiModalDataSource):
         #   The main reason is that the obtained path here is the full path
         cur_rawframes_anno_file_path = self.rawframes_splits_list_files_into[
             mode]
-        cur_rawframes_data_path = self.event_subsection_frames_dir_path
+        cur_rawframes_data_path = self.event_subsection_frames__path
         cur_videos_anno_file_path = None
-        cur_video_data_path = self.event_subsection_dir_path
+        cur_video_data_path = self.event_subsection__path
         cur_audio_feas_anno_file_path = self.audios_splits_list_files_into[
             mode]
-        cur_audio_feas_data_path = self.event_subsection_audios_dir_path
+        cur_audio_feas_data_path = self.event_subsection_audios__path
 
         if modality_name == "rgb" or modality_name == "flow":
             loaded_config["ann_file"] = cur_rawframes_anno_file_path
