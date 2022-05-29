@@ -398,9 +398,9 @@ class DataSource(multimodal_base.MultiModalDataSource):
             output_format=output_format)
 
         target_list_regu = f'_{data_format}.{output_format}'
-        if not self._exist_file_in_dir(tg_file_name=target_list_regu,
-                                       search_dir=out_path,
-                                       is_partial_name=True):
+        if not self._file_exists(tg_file_name=target_list_regu,
+                                 search_path=out_path,
+                                 is_partial_name=True):
             logging.info("Extracting annotation list for %s. ", data_format)
 
             gen_annots_op.read_data_splits_csv_info()

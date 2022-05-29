@@ -21,21 +21,21 @@ import unittest
 
 # os.environ['config_file'] = 'tests/TestsConfig/distribution_noniid_sampler.yml'
 
-os.environ[
-    'config_file'] = 'tests/TestsConfig/label_quantity_noniid_sampler.yml'
+# os.environ['config_file'] = 'tests/TestsConfig/label_quantity_noniid_sampler.yml'
 
 # os.environ[
 #     'config_file'] = 'tests/TestsConfig/mixed_label_quantity_noniid_sampler.yml'
 
-# os.environ[
-#     'config_file'] = 'tests/TestsConfig/sample_quantity_noniid_sampler.yml'
+os.environ[
+    'config_file'] = 'tests/TestsConfig/sample_quantity_noniid_sampler.yml'
 
-import sampler_test_utils
 import numpy as np
 
 from plato.config import Config
 from plato.datasources.cifar10 import DataSource
 from plato.samplers import registry as samplers_registry
+
+import sampler_test_utils
 
 
 class SamplersTest(unittest.TestCase):
