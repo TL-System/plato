@@ -9,25 +9,36 @@ Then motivated by the insight that the encoder of contrastive learning methods
  produces high-quality, such as distinguishable, representation, we can monior
  the generated representations based on the cluster methods, such as KNN.
 
-
 """
 
 from tqdm import tqdm
+
 import torch.nn.functional as F
 import torch
 
 
-# code copied from https://colab.research.google.com/github/facebookresearch/moco/blob/colab-notebook/colab/moco_cifar10_demo.ipynb#scrollTo=RI1Y8bSImD7N
-# test using a knn monitor
-def knn_monitor(net,
+def knn_monitor(encoder,
                 memory_data_loader,
                 test_data_loader,
-                epoch,
+                device,
                 k=200,
                 t=0.1,
                 hide_progress=False):
-    net.eval()
-    classes = len(memory_data_loader.dataset.classes)
+    """ Using the KNN monitor to test the representation quality.
+    
+        This part of code is obtained from the official code for SimClr:
+        https://colab.research.google.com/github/facebookresearch/moco/blob/colab-notebook/colab/moco_cifar10_demo.ipynb#scrollTo=RI1Y8bSImD7N.
+
+        Args:
+            encoder (torch.nn.module): the defined encoder 
+            memory_data_loader: the data loader of the trainset using the test 
+                data augmentation
+            test_data_loader:  the data loader of the testset using the test 
+                data augmentation
+
+     """
+    encoder.eval()
+    classes = len(memory_data_loader.dataset.dataset.classes)
     total_top1, total_top5, total_num, feature_bank = 0.0, 0.0, 0, []
     with torch.no_grad():
         # generate feature bank
@@ -35,20 +46,21 @@ def knn_monitor(net,
                                  desc='Feature extracting',
                                  leave=False,
                                  disable=hide_progress):
-            feature = net(data.cuda(non_blocking=True))
+            data, target = data.to(device), target.to(device)
+            feature = encoder(data)
             feature = F.normalize(feature, dim=1)
             feature_bank.append(feature)
         # [D, N]
         feature_bank = torch.cat(feature_bank, dim=0).t().contiguous()
         # [N]
-        feature_labels = torch.tensor(memory_data_loader.dataset.targets,
-                                      device=feature_bank.device)
+        feature_labels = torch.tensor(
+            memory_data_loader.dataset.dataset.targets,
+            device=feature_bank.device)
         # loop test data to predict the label by weighted knn search
         test_bar = tqdm(test_data_loader, desc='kNN', disable=hide_progress)
         for data, target in test_bar:
-            data, target = data.cuda(non_blocking=True), target.cuda(
-                non_blocking=True)
-            feature = net(data)
+            data, target = data.to(device), target.to(device)
+            feature = encoder(data)
             feature = F.normalize(feature, dim=1)
 
             pred_labels = knn_predict(feature, feature_bank, feature_labels,
@@ -56,8 +68,8 @@ def knn_monitor(net,
 
             total_num += data.size(0)
             total_top1 += (pred_labels[:, 0] == target).float().sum().item()
-            test_bar.set_postfix({'Accuracy': total_top1 / total_num * 100})
-    return total_top1 / total_num * 100
+            test_bar.set_postfix({'Accuracy': total_top1 / total_num})
+    return total_top1 / total_num
 
 
 # knn monitor as in InstDisc https://arxiv.org/abs/1805.01978

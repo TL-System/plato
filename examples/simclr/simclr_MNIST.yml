@@ -1,16 +1,17 @@
+
 clients:
     # Type
     type: simple
 
     # The total number of clients
-    total_clients: 10
+    total_clients: 5
 
     # The number of clients selected in each round
-    per_round: 4
+    per_round: 2
 
     # Should the clients compute test accuracy locally?
-    do_test: false
-
+    do_test: True
+    test_interval: 1
     # Whether simulate clients or not
     simulation: true
 
@@ -33,7 +34,7 @@ data:
 
     # IID or non-IID?
     sampler: noniid
-
+    testset_sampler: noniid
     # The concentration parameter for the Dirichlet distribution
     concentration: 5
 
@@ -48,6 +49,7 @@ data:
     # set the data augmentation 
     #   options: simsiam, byol, simclr
     augment_transformer_name: simclr
+    is_norm: False 
 
 trainer:
     # The type of the trainer

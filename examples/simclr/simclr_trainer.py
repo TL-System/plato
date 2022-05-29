@@ -6,6 +6,7 @@ Implement the trainer for SimCLR method.
 import os
 import logging
 import time
+import multiprocessing as mp
 
 import numpy as np
 import torch
@@ -17,6 +18,8 @@ from plato.trainers import basic
 from plato.utils import optimizers
 
 from nt_xent import NT_Xent
+
+from contrastive_learning_monitor import knn_monitor
 
 
 class Trainer(basic.Trainer):
@@ -143,7 +146,7 @@ class Trainer(basic.Trainer):
                 self.save_model(filename)
                 self.model.to(self.device)
 
-    def test_process(self, config, testset, sampler=None):
+    def test_process(self, config, testset, sampler=None, **kwargs):
         """The testing loop, run in a separate process with a new CUDA context,
         so that CUDA memory can be released after the training completes.
 
@@ -151,6 +154,7 @@ class Trainer(basic.Trainer):
         config: a dictionary of configuration parameters.
         testset: The test dataset.
         sampler: The sampler that extracts a partition of the test dataset.
+        kwargs (optional): Additional keyword arguments.
         """
         self.model.to(self.device)
         self.model.eval()
@@ -170,6 +174,11 @@ class Trainer(basic.Trainer):
                         testset,
                         batch_size=config['batch_size'],
                         shuffle=False)
+                    if "memory_trainset" in list(kwargs.keys()):
+                        memory_train_loader = torch.utils.data.DataLoader(
+                            kwargs["memory_trainset"],
+                            batch_size=config['batch_size'],
+                            shuffle=False)
                 # Use a testing set following the same distribution as the training set
                 else:
                     test_loader = torch.utils.data.DataLoader(
@@ -177,27 +186,22 @@ class Trainer(basic.Trainer):
                         batch_size=config['batch_size'],
                         shuffle=False,
                         sampler=sampler.get())
-
-                samples_feature = []
-                samples_label = []
+                    if "memory_trainset" in list(kwargs.keys()):
+                        memory_train_loader = torch.utils.data.DataLoader(
+                            kwargs["memory_trainset"],
+                            batch_size=config['batch_size'],
+                            shuffle=False,
+                            sampler=kwargs["memory_trainset_sampler"].get())
+                accuracy = 0
                 with torch.no_grad():
-                    for examples, labels in test_loader:
-                        examples, labels = examples.to(self.device), labels.to(
-                            self.device)
-
-                        outputs = self.model.forward_once(examples)
-                        samples_feature.extend(
-                            outputs.data.cpu().numpy().tolist())
-                        samples_label.extend(
-                            labels.data.cpu().numpy().tolist())
-
-                    # define a simple MLP classifier
-                    clf = MLPClassifier(solver='adam',
-                                        alpha=1e-5,
-                                        hidden_layer_sizes=(10, 10),
-                                        random_state=1)
-                    clf.fit(samples_feature, samples_label)
-                    accuracy = clf.score(samples_feature, samples_label)
+                    accuracy = knn_monitor(
+                        encoder=self.model.encoder,
+                        memory_data_loader=memory_train_loader,
+                        test_data_loader=test_loader,
+                        device=self.device,
+                        k=200,
+                        t=0.1,
+                        hide_progress=False)
 
         except Exception as testing_exception:
             logging.info("Testing on client #%d failed.", self.client_id)
