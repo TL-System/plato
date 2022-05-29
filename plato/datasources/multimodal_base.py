@@ -24,6 +24,7 @@ class MultiModalDataSource(base.DataSource):
     """
     The training or testing dataset that accommodates custom augmentation and transforms.
     """
+
     def __init__(self):
         super().__init__()
 
@@ -107,8 +108,7 @@ class MultiModalDataSource(base.DataSource):
 
         # Create the full path by introducing the project path
         proj_root_path = os.path.abspath(os.curdir)
-        base_data_path = os.path.join(proj_root_path, data_path,
-                                      base_data_name)
+        base_data_path = os.path.join(data_path, base_data_name)
 
         if not os.path.exists(base_data_path):
             os.makedirs(base_data_path)
@@ -262,6 +262,7 @@ class MultiModalDataSource(base.DataSource):
 
 class MultiModalDataset(torch.utils.data.Dataset):
     """ The base interface for the multimodal data """
+
     def __init__(self):
         self.phase = None  # the 'train' , 'test', 'val'
 
