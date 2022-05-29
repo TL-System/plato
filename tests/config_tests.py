@@ -6,15 +6,16 @@ import os
 import unittest
 import warnings
 
-os.environ['config_file'] = 'configs/Kinetics/kinetics_mm.yml'
-
 from plato.config import Config
+
+os.environ['config_file'] = 'configs/Kinetics/kinetics_mm.yml'
 
 
 class ConfigTest(unittest.TestCase):
     """ Testing the correctness of loading a configuration file. """
-    def setup(self):
-        super().setup()
+
+    def setUp(self):
+        super().setUp()
 
         self.addTypeEqualityFunc(Config, 'assertConfigEqual')
 
@@ -25,26 +26,20 @@ class ConfigTest(unittest.TestCase):
             "downloader": {
                 "num_workers": 4
             },
-            "multi_modal_pipeliner": {
+            "multi_modal_configs": {
                 "rgb": {
-                    "rgb_data": {
-                        "train": {
-                            "type": "RawframeDataset"
-                        }
+                    "train": {
+                        "type": "RawframeDataset"
                     }
                 },
                 "flow": {
-                    "flow_data": {
-                        "train": {
-                            "type": "RawframeDataset"
-                        }
+                    "train": {
+                        "type": "RawframeDataset"
                     }
                 },
                 "audio": {
-                    "audio_data": {
-                        "train": {
-                            "type": "AudioFeatureDataset"
-                        }
+                    "train": {
+                        "type": "AudioFeatureDataset"
                     }
                 }
             }
@@ -85,25 +80,25 @@ class ConfigTest(unittest.TestCase):
                 dst_value=self.data_config.downloader.num_workers)
 
             self.assertAttrContained(src_config=defined_data_config,
-                                     dst_key="multi_modal_pipeliner")
+                                     dst_key="multi_modal_configs")
             self.assertAttrContained(
-                src_config=defined_data_config.multi_modal_pipeliner,
+                src_config=defined_data_config.multi_modal_configs,
                 dst_key="rgb")
             self.assertAttrContained(
-                src_config=defined_data_config.multi_modal_pipeliner,
+                src_config=defined_data_config.multi_modal_configs,
                 dst_key="flow")
             self.assertAttrContained(
-                src_config=defined_data_config.multi_modal_pipeliner,
+                src_config=defined_data_config.multi_modal_configs,
                 dst_key="audio")
 
             self.assertAttrContained(
-                src_config=defined_data_config.multi_modal_pipeliner.rgb,
-                dst_key="rgb_data")
+                src_config=defined_data_config.multi_modal_configs.rgb,
+                dst_key="train")
+
             self.assertAttrValueEqual(
-                src_value=defined_data_config.multi_modal_pipeliner.rgb.
-                rgb_data.train.type,
-                dst_value=self.data_config.multi_modal_pipeliner.rgb.rgb_data.
-                train.type)
+                src_value=defined_data_config.multi_modal_configs.rgb.train.
+                type,
+                dst_value=self.data_config.multi_modal_configs.rgb.train.type)
 
     def test_modelconfig(self):
         """ Test the structure and necessary parameters of the model configuration """
