@@ -293,10 +293,10 @@ class DataSource(multimodal_base.MultiModalDataSource):
                 split_dt_type_path = self.splits_info[split_type][dt_type][
                     "path"]
 
-                if not self._exist_judgement(split_dt_type_path):
+                if not self._exists(split_dt_type_path):
                     os.makedirs(split_dt_type_path, exist_ok=True)
                 else:
-                    logging.info("The path %s does exist", split_dt_type_path)
+                    logging.info("The path %s exists.", split_dt_type_path)
                     continue
 
                 raw_data_type_path = self.mm_data_info[dt_type]["path"]
@@ -309,7 +309,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
                 # 2. saving the splited data into the target file
                 data_utils.copy_files(split_samples_path, split_dt_type_path)
 
-        logging.info(" Done!")
+        logging.info("Done.")
 
     def get_phase_data_info(self, phase):
         """ Obtain the data information for the required phrase """

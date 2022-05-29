@@ -199,7 +199,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
                                         put_data_dir=self.data_anno_dir_path,
                                         obtained_file_name="gym99_val_org.txt")
 
-        if not self._exist_judgement(self.raw_videos_path):
+        if not self._exists(self.raw_videos_path):
 
             logging.info(
                 "Downloading the raw videos for the Gym dataset. This may take a long time."
@@ -211,12 +211,12 @@ class DataSource(multimodal_base.MultiModalDataSource):
             logging.info("Done.")
 
         # Trim Videos into Events
-        if not self._exist_judgement(self.event_dir_path):
+        if not self._exists(self.event_dir_path):
             gym_trim.trim_event(video_root=self.raw_videos_path,
                                 anno_file=self.data_anno_file_path,
                                 event_anno_file=self.data_event_anno_file_path,
                                 event_root=self.event_dir_path)
-        if not self._exist_judgement(self.event_subsection_dir_path):
+        if not self._exists(self.event_subsection_dir_path):
             gym_trim.trim_subsection(
                 event_anno_file=self.data_event_anno_file_path,
                 event_root=self.event_dir_path,
@@ -249,9 +249,8 @@ class DataSource(multimodal_base.MultiModalDataSource):
             mixed_ext=False)
 
         if torch.cuda.is_available():
-            if not self._exist_judgement(
-                    rgb_out_dir_path) and not self._exist_judgement(
-                        flow_our_dir_path):
+            if not self._exists(rgb_out_dir_path) and not self._exists(
+                    flow_our_dir_path):
                 logging.info(
                     "Extracting frames by GPU from videos in %s to %s.",
                     src_videos_dir, rgb_out_dir_path)
@@ -261,18 +260,18 @@ class DataSource(multimodal_base.MultiModalDataSource):
                     new_width=0,
                     new_height=0)
         else:
-            if not self._exist_judgement(rgb_out_dir_path):
+            if not self._exists(rgb_out_dir_path):
                 logging.info(
                     "Extracting frames by CPU from videos in %s to %s.",
                     src_videos_dir, rgb_out_dir_path)
                 vdf_extractor.build_frames_cpu(to_dir=frames_out_dir_path)
 
-        if not self._exist_judgement(audio_out_dir_path):
+        if not self._exists(audio_out_dir_path):
             logging.info("Extracting audios by CPU from videos in %s to %s.",
                          src_videos_dir, audio_out_dir_path)
             vda_extractor.build_audios(to_dir=audio_out_dir_path)
 
-        if not self._exist_judgement(audio_feature_dir_path):
+        if not self._exists(audio_feature_dir_path):
             logging.info(
                 "Extracting audios feature by CPU from audios in %s to %s.",
                 audio_out_dir_path, audio_feature_dir_path)

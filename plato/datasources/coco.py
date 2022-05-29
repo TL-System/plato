@@ -70,7 +70,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
         base_data_path = self.mm_data_info["base_data_dir_path"]
         raw_data_name = self.data_name + "Raw"
         raw_data_path = os.path.join(base_data_path, raw_data_name)
-        if not self._exist_judgement(raw_data_path):
+        if not self._exists(raw_data_path):
             os.makedirs(raw_data_path, exist_ok=True)
 
         download_train_url = Config().data.download_train_url

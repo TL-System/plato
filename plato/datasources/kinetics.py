@@ -238,7 +238,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
             video_path_format = self.set_modality_path_key_format(
                 modality_name="video")
             video_dir = self.splits_info[split][video_path_format]
-            if not self._exist_judgement(video_dir):
+            if not self._exists(video_dir):
                 num_workers = Config().data.downloader.num_workers
                 # Set the tmp_dir to save the raw video
                 # Then, the raw video will be clipped to save to
@@ -328,15 +328,15 @@ class DataSource(multimodal_base.MultiModalDataSource):
             mode=mode, modality_name="audio_feature")
 
         # define the modalities extractor
-        if not self._exist_judgement(rgb_out_dir_path):
+        if not self._exists(rgb_out_dir_path):
             vdf_extractor = frames_extraction_tools.VideoFramesExtractor(
                 video_src_dir=src_mode_videos_dir,
                 dir_level=2,
                 num_worker=8,
                 video_ext="mp4",
                 mixed_ext=False)
-        if not self._exist_judgement(audio_out_dir_path) \
-            or not self._exist_judgement(audio_feature_dir_path):
+        if not self._exists(audio_out_dir_path) \
+            or not self._exists(audio_feature_dir_path):
             vda_extractor = audio_extraction_tools.VideoAudioExtractor(
                 video_src_dir=src_mode_videos_dir,
                 dir_level=2,
@@ -345,7 +345,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
                 mixed_ext=False)
 
         if torch.cuda.is_available():
-            if not self._exist_judgement(rgb_out_dir_path):
+            if not self._exists(rgb_out_dir_path):
                 logging.info(
                     "Extracting frames by GPU from videos in %s to %s.",
                     src_mode_videos_dir, rgb_out_dir_path)
@@ -355,18 +355,18 @@ class DataSource(multimodal_base.MultiModalDataSource):
                                                new_width=0,
                                                new_height=0)
         else:
-            if not self._exist_judgement(rgb_out_dir_path):
+            if not self._exists(rgb_out_dir_path):
                 logging.info(
                     "Extracting frames by CPU from videos in %s to %s.",
                     src_mode_videos_dir, rgb_out_dir_path)
                 vdf_extractor.build_frames_cpu(to_dir=rgb_out_dir_path)
 
-        if not self._exist_judgement(audio_out_dir_path):
+        if not self._exists(audio_out_dir_path):
             logging.info("Extracting audios by CPU from videos in %s to %s.",
                          src_mode_videos_dir, audio_out_dir_path)
             vda_extractor.build_audios(to_dir=audio_out_dir_path)
 
-        if not self._exist_judgement(audio_feature_dir_path):
+        if not self._exists(audio_feature_dir_path):
             logging.info(
                 "Extracting audios feature by CPU from audios in %s to %s.",
                 audio_out_dir_path, audio_feature_dir_path)

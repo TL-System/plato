@@ -145,7 +145,7 @@ class MultiModalDataSource(base.DataSource):
         download_extracted_dir_path = os.path.join(
             extract_to_dir, download_extracted_file_name)
         # Download the raw data if necessary
-        if not self._exist_judgement(download_file_path):
+        if not self._exists(download_file_path):
             logging.info("Downloading the %s data.....", download_file_name)
             download_url(url=download_url_address,
                          root=put_data_dir,
@@ -153,7 +153,7 @@ class MultiModalDataSource(base.DataSource):
 
         # Extract the data to the specific dir
         if ".zip" in download_file_name or ".tar.gz" in download_file_name:
-            if not self._exist_judgement(download_extracted_dir_path):
+            if not self._exists(download_extracted_dir_path):
                 logging.info("Extracting data to %s dir.....", extract_to_dir)
                 extract_archive(from_path=download_file_path,
                                 to_path=extract_to_dir,
@@ -172,12 +172,12 @@ class MultiModalDataSource(base.DataSource):
                                           download_data_file_name)
         extract_data_path = os.path.join(put_data_dir,
                                          extract_download_file_name)
-        if not self._exist_judgement(download_data_path):
+        if not self._exists(download_data_path):
             logging.info("Downloading the data to %s", download_data_path)
             download_file_from_google_drive(file_id=download_file_id,
                                             root=put_data_dir,
                                             filename=download_data_file_name)
-        if not self._exist_judgement(extract_data_path):
+        if not self._exists(extract_data_path):
             extract_archive(from_path=download_data_path,
                             to_path=put_data_dir,
                             remove_finished=True)
@@ -197,10 +197,10 @@ class MultiModalDataSource(base.DataSource):
 
         return is_existed
 
-    def _exist_judgement(self, target_path):
-        """ Judeg whether the input file/dir existed and whether it contains useful data """
+    def _exists(self, target_path):
+        """ Does the input path/file exist and does the file contain useful data? """
         if not os.path.exists(target_path):
-            logging.info("The path %s does not exist", target_path)
+            logging.info("The path %s does not exist.", target_path)
             return False
 
         # remove all .DS_Store files
@@ -229,13 +229,13 @@ class MultiModalDataSource(base.DataSource):
         if os.path.isdir(target_path):
             if get_size(target_path
                         ) == 0 or not is_contain_useful_file(target_path):
-                logging.info("The path %s does exist but contains no data",
+                logging.info("The path %s exists but contains no data.",
                              target_path)
                 return False
             else:
                 return True
 
-        logging.info("The file %s does exist", target_path)
+        logging.info("The file %s exists.", target_path)
         return True
 
     def num_modalities(self) -> int:
@@ -252,16 +252,18 @@ class MultiModalDataSource(base.DataSource):
     @abstractmethod
     def get_train_set(self, modality_sampler):
         """ Obtain the train dataset with the modaltiy_sampler """
-        raise NotImplementedError("Please Implement 'get_train_set' method")
+        raise NotImplementedError(
+            "Please Implement the 'get_train_set' method.")
 
     @abstractmethod
     def get_test_set(self, modality_sampler):
         """ btain the test dataset with the modaltiy_sampler """
-        raise NotImplementedError("Please Implement 'get_test_set' method")
+        raise NotImplementedError(
+            "Please Implement the 'get_test_set' method.")
 
 
 class MultiModalDataset(torch.utils.data.Dataset):
-    """ The base interface for the multimodal data """
+    """ The base interface for multimodal data. """
 
     def __init__(self):
         self.phase = None  # the 'train' , 'test', 'val'

@@ -178,7 +178,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         # raw coco images path
         coco_raw_imgs_path = self.base_coco
-        if self._exist_judgement(coco_raw_imgs_path):
+        if self._exists(coco_raw_imgs_path):
             logging.info(
                 "Successfully connecting the source COCO2017 images data from the path %s",
                 coco_raw_imgs_path)
