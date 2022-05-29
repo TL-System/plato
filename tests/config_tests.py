@@ -17,10 +17,6 @@ class ConfigTest(unittest.TestCase):
     def setUp(self):
         super().setUp()
 
-        self.addTypeEqualityFunc(Config, 'assertConfigEqual')
-
-        self.defined_config = Config()
-
         # define several example parameters that will be used as
         #   a demo to test the loaded configuration file.
         data_params_config = {
