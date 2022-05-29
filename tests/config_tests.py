@@ -21,7 +21,8 @@ class ConfigTest(unittest.TestCase):
 
         self.defined_config = Config()
 
-        # define several example parameters
+        # define several example parameters that will be used as
+        #   a demo to test the loaded configuration file.
         data_params_config = {
             "downloader": {
                 "num_workers": 4
@@ -56,14 +57,6 @@ class ConfigTest(unittest.TestCase):
         self.data_config = Config.namedtuple_from_dict(data_params_config)
         self.model_config = Config.namedtuple_from_dict(model_params_config)
 
-    def assertAttrContained(self, src_config, dst_key):
-        """ The attrs of dst_key should be included in the src_config"""
-        assert hasattr(src_config, dst_key)
-
-    def assertAttrValueEqual(self, src_value, dst_value):
-        """ The two values should be equal with each other """
-        self.assertEqual(src_value, dst_value)
-
     def test_dataconfig(self):
         """ Test the structure and necessary parameters of the data configuration """
         with warnings.catch_warnings():
@@ -71,34 +64,21 @@ class ConfigTest(unittest.TestCase):
 
             defined_data_config = Config().data
 
-            self.assertAttrContained(src_config=defined_data_config,
-                                     dst_key="downloader")
-            self.assertAttrContained(src_config=defined_data_config.downloader,
-                                     dst_key="num_workers")
-            self.assertAttrValueEqual(
-                src_value=defined_data_config.downloader.num_workers,
-                dst_value=self.data_config.downloader.num_workers)
+            hasattr(defined_data_config, "downloader")
+            hasattr(defined_data_config.downloader, "num_workers")
 
-            self.assertAttrContained(src_config=defined_data_config,
-                                     dst_key="multi_modal_configs")
-            self.assertAttrContained(
-                src_config=defined_data_config.multi_modal_configs,
-                dst_key="rgb")
-            self.assertAttrContained(
-                src_config=defined_data_config.multi_modal_configs,
-                dst_key="flow")
-            self.assertAttrContained(
-                src_config=defined_data_config.multi_modal_configs,
-                dst_key="audio")
+            self.assertEqual(defined_data_config.downloader.num_workers,
+                             self.data_config.downloader.num_workers)
 
-            self.assertAttrContained(
-                src_config=defined_data_config.multi_modal_configs.rgb,
-                dst_key="train")
+            hasattr(defined_data_config, "multi_modal_configs")
+            hasattr(defined_data_config.multi_modal_configs, "rgb")
+            hasattr(defined_data_config.multi_modal_configs, "flow")
+            hasattr(defined_data_config.multi_modal_configs, "audio")
+            hasattr(defined_data_config.multi_modal_configs.rgb, "train")
 
-            self.assertAttrValueEqual(
-                src_value=defined_data_config.multi_modal_configs.rgb.train.
-                type,
-                dst_value=self.data_config.multi_modal_configs.rgb.train.type)
+            self.assertEqual(
+                defined_data_config.multi_modal_configs.rgb.train.type,
+                self.data_config.multi_modal_configs.rgb.train.type)
 
     def test_modelconfig(self):
         """ Test the structure and necessary parameters of the model configuration """
@@ -106,14 +86,13 @@ class ConfigTest(unittest.TestCase):
             warnings.filterwarnings("ignore", category=UserWarning)
 
             defined_model_config = Config().model
-            self.assertAttrContained(src_config=defined_model_config,
-                                     dst_key="model_name")
-            self.assertAttrValueEqual(
-                src_value=defined_model_config.model_name,
-                dst_value="rgb_flow_audio_model")
-            self.assertAttrValueEqual(
-                src_value=defined_model_config.model_config.rgb_model.type,
-                dst_value=self.model_config.model_config.rgb_model.type)
+
+            hasattr(defined_model_config, "model_name")
+
+            self.assertEqual(defined_model_config.model_name,
+                             "rgb_flow_audio_model")
+            self.assertEqual(defined_model_config.model_config.rgb_model.type,
+                             self.model_config.model_config.rgb_model.type)
 
 
 if __name__ == '__main__':
