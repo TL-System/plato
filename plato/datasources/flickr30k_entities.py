@@ -222,13 +222,11 @@ class DataSource(multimodal_base.MultiModalDataSource):
         raw_data_name = self.data_name + "Raw"
         base_data_path = self.mm_data_info["base_data_dir_path"]
 
-        download_file_id = Config().data.download_file_id
+        download_url = Config().data.download_url
 
-        self._download_google_driver_arrange_data(
-            download_file_id=download_file_id,
-            extract_download_file_name=raw_data_name,
-            put_data_dir=base_data_path,
-        )
+        self._download_arrange_data(download_url_address=download_url,
+                                    put_data_dir=base_data_path,
+                                    extract_to_dir=base_data_path)
 
         # define the path of different data source,
         #   the annotation is .xml, the sentence is in .txt

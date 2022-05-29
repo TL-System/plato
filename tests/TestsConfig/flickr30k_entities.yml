@@ -19,7 +19,7 @@ data:
   datasource: Flickr30K
   data_path: data
 
-  download_file_id: 1mJ-Y0gLFyCLbB6C-M49dUtEsbfVkK4F-
+  download_url: http://iqua.ece.toronto.edu/baochun/Flickr30KEntitiesRaw.zip
 
   downloader:
     num_workers: 4
