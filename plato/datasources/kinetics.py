@@ -155,7 +155,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
         # Generate the basic path for the dataset, it performs:
         #   1.- Assign path to self.mm_data_info
         #   2.- Assign splits path to self.splits_info
-        #       where the root path for splits is the base_data_dir_path
+        #       where the root path for splits is the data_path
         #       in self.mm_data_info
         self._data_path_process(data_path=_path, base_data_name=self.data_name)
         # Generate the modalities path for all splits, it performs:
@@ -166,18 +166,19 @@ class DataSource(multimodal_base.MultiModalDataSource):
         self._create_modalities_path(modality_names=self.modality_names)
 
         # Set the annotation file path
-        base_data_path = self.mm_data_info["base_data_dir_path"]
+        base_data_path = self.mm_data_info["data_path"]
 
         # Define all the dir here
         kinetics_anno_dir_name = "annotations"
-        self.data_anno_dir_path = os.path.join(base_data_path,
-                                               kinetics_anno_dir_name)
+        self.data_annotation_path = os.path.join(base_data_path,
+                                                 kinetics_anno_dir_name)
 
         for split in ["train", "test", "validate"]:
             split_anno_path = os.path.join(
-                self.data_anno_dir_path, base_data_name + "_" + split + ".csv")
+                self.data_annotation_path,
+                base_data_name + "_" + split + ".csv")
             split_tiny_anno_path = os.path.join(
-                self.data_anno_dir_path,
+                self.data_annotation_path,
                 base_data_name + "_" + split + "_tiny.csv")
             split_name = split if split != "validate" else "val"
             self.splits_info[split_name]["split_anno_file"] = split_anno_path
@@ -194,7 +195,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
         #       'video_path': xxx}
         #  the self.mm_data_info can contain
         #   - source_data_path
-        #   - base_data_dir_path
+        #   - data_path
 
         anno_download_url = (
             "https://storage.googleapis.com/deepmind-media/Datasets/{}.tar.gz"
@@ -202,16 +203,16 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         extracted_anno_file_name = self._download_arrange_data(
             download_url_address=anno_download_url,
-            put_data_dir=self.data_anno_dir_path,
+            data_path=self.data_annotation_path,
             obtained_file_name=None)
-        download_anno_path = os.path.join(self.data_anno_dir_path,
+        download_anno_path = os.path.join(self.data_annotation_path,
                                           extracted_anno_file_name)
 
         downloaded_files = os.listdir(download_anno_path)
         for file_name in downloaded_files:
             new_file_name = base_data_name + "_" + file_name
             shutil.move(os.path.join(download_anno_path, file_name),
-                        os.path.join(self.data_anno_dir_path, new_file_name))
+                        os.path.join(self.data_annotation_path, new_file_name))
 
         # Whether to create the tiny dataset
         for split in ["train", "test", "validate"]:
@@ -380,14 +381,14 @@ class DataSource(multimodal_base.MultiModalDataSource):
     def extract_splits_list_files(self, data_format, splits):
         """ Extract and generate the split information of current mode/phase """
         output_format = "json"
-        out_path = self.mm_data_info["base_data_dir_path"]
+        out_path = self.mm_data_info["data_path"]
 
         # obtained a dict that contains the required data splits' file path
         #   it can be full data or tiny data
         required_anno_files = obtain_required_anno_files(self.splits_info)
         data_splits_file_info = required_anno_files
         gen_annots_op = modality_data_anntation_tools.GenerateMDataAnnotation(
-            data_src_dir=self.mm_data_info["base_data_dir_path"],
+            data_src_dir=self.mm_data_info["data_path"],
             data_annos_files_info=data_splits_file_info,
             dataset_name=self.data_name,
             data_format=data_format,  # 'rawframes', 'videos', 'audio_features'

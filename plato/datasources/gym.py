@@ -120,23 +120,23 @@ class DataSource(multimodal_base.MultiModalDataSource):
         self._data_path_process(data_path=_path, base_data_name=self.data_name)
         self._create_modalities_path(modality_names=self.modality_names)
 
-        base_data_path = self.mm_data_info["base_data_dir_path"]
+        base_data_path = self.mm_data_info["data_path"]
         # define all the dir here
         gym_anno_dir_name = "annotations"
-        self.data_anno_dir_path = os.path.join(base_data_path,
-                                               gym_anno_dir_name)
+        self.data_annotation_path = os.path.join(base_data_path,
+                                                 gym_anno_dir_name)
 
-        self.data_anno_file_path = os.path.join(self.data_anno_dir_path,
+        self.data_anno_file_path = os.path.join(self.data_annotation_path,
                                                 "annotation.json")
-        self.categoty_anno_file_path = os.path.join(self.data_anno_dir_path,
+        self.categoty_anno_file_path = os.path.join(self.data_annotation_path,
                                                     "gym99_categories.txt")
 
         self.raw_videos_path = os.path.join(base_data_path, "videos")
         self.event_dir_path = os.path.join(base_data_path, "event")
         self.event_subsection_dir_path = os.path.join(base_data_path,
                                                       "subactions")
-        self.data_event_anno_file_path = os.path.join(self.data_anno_dir_path,
-                                                      "event_annotation.json")
+        self.data_event_anno_file_path = os.path.join(
+            self.data_annotation_path, "event_annotation.json")
         self.event_subsection_frames_dir_path = os.path.join(
             base_data_path, "subaction_rawframes")
         self.event_subsection_audios_dir_path = os.path.join(
@@ -147,23 +147,24 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         self.rawframes_splits_list_files_into = {
             "train":
-            os.path.join(self.data_anno_dir_path, "gym99_train_rawframes.txt"),
+            os.path.join(self.data_annotation_path,
+                         "gym99_train_rawframes.txt"),
             "val":
-            os.path.join(self.data_anno_dir_path, "gym99_val_rawframes.txt")
+            os.path.join(self.data_annotation_path, "gym99_val_rawframes.txt")
         }
 
         self.audios_splits_list_files_into = {
             "train":
-            os.path.join(self.data_anno_dir_path, "gym99_train_audios.txt"),
+            os.path.join(self.data_annotation_path, "gym99_train_audios.txt"),
             "val":
-            os.path.join(self.data_anno_dir_path, "gym99_val_audios.txt")
+            os.path.join(self.data_annotation_path, "gym99_val_audios.txt")
         }
         self.audio_features_splits_list_files_into = {
             "train":
-            os.path.join(self.data_anno_dir_path,
+            os.path.join(self.data_annotation_path,
                          "gym99_train_audio_features.txt"),
             "val":
-            os.path.join(self.data_anno_dir_path,
+            os.path.join(self.data_annotation_path,
                          "gym99_val_audio_features.txt")
         }
 
@@ -178,25 +179,25 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         _ = self._download_arrange_data(
             download_url_address=set_level_category_url,
-            put_data_dir=self.data_anno_dir_path,
+            data_path=self.data_annotation_path,
             obtained_file_name="set_categories.txt")
 
         _ = self._download_arrange_data(
             download_url_address=g99_categoty_url,
-            put_data_dir=self.data_anno_dir_path,
+            data_path=self.data_annotation_path,
             obtained_file_name="gym99_categories.txt")
 
         _ = self._download_arrange_data(download_url_address=anno_url,
-                                        put_data_dir=self.data_anno_dir_path,
+                                        data_path=self.data_annotation_path,
                                         obtained_file_name="annotation.json")
 
         _ = self._download_arrange_data(
             download_url_address=train_url,
-            put_data_dir=self.data_anno_dir_path,
+            data_path=self.data_annotation_path,
             obtained_file_name="gym99_train_org.txt")
 
         _ = self._download_arrange_data(download_url_address=eval_url,
-                                        put_data_dir=self.data_anno_dir_path,
+                                        data_path=self.data_annotation_path,
                                         obtained_file_name="gym99_val_org.txt")
 
         if not self._exists(self.raw_videos_path):
@@ -283,9 +284,10 @@ class DataSource(multimodal_base.MultiModalDataSource):
                 fft_size=512,  # fft_size / sample_rate is window size
                 hop_size=256)
         # extract the splits data into list files based on the frames information
-        gym_trim.generate_splits_list(data_root=self.event_subsection_dir_path,
-                                      annotation_root=self.data_anno_dir_path,
-                                      frame_data_root=frames_out_dir_path)
+        gym_trim.generate_splits_list(
+            data_root=self.event_subsection_dir_path,
+            annotation_root=self.data_annotation_path,
+            frame_data_root=frames_out_dir_path)
 
         # generate the audio and audio features splits file
         # just copy the frame files to the audio ones

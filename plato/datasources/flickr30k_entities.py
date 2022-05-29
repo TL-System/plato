@@ -220,12 +220,12 @@ class DataSource(multimodal_base.MultiModalDataSource):
         self._data_path_process(data_path=_path, base_data_name=self.data_name)
 
         raw_data_name = self.data_name + "Raw"
-        base_data_path = self.mm_data_info["base_data_dir_path"]
+        base_data_path = self.mm_data_info["data_path"]
 
         download_url = Config().data.download_url
 
         self._download_arrange_data(download_url_address=download_url,
-                                    put_data_dir=base_data_path,
+                                    data_path=base_data_path,
                                     extract_to_dir=base_data_path)
 
         # define the path of different data source,

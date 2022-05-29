@@ -36,11 +36,11 @@ class MultiModalDataSource(base.DataSource):
 
         # define the information container for the source data
         #  - source_data_path: the original downloaded data
-        #  - base_data_dir_path: the source data used for the model
-        # For some datasets, we directly utilize the base_data_dir_path as
+        #  - data_path: the source data used for the model
+        # For some datasets, we directly utilize the data_path as
         #  there is no need to process the original downloaded data to put them
-        #  in the base_data_dir_path dir.
-        self.mm_data_info = {"source_data_path": "", "base_data_dir_path": ""}
+        #  in the data_path dir.
+        self.mm_data_info = {"source_data_path": "", "data_path": ""}
 
         # define the paths for the splited root data - train, test, and val
         self.splits_info = {
@@ -113,7 +113,7 @@ class MultiModalDataSource(base.DataSource):
             os.makedirs(base_data_path)
 
         #
-        self.mm_data_info["base_data_dir_path"] = base_data_path
+        self.mm_data_info["data_path"] = base_data_path
 
         # create the split dirs for current dataset
         for split_type in list(self.splits_info.keys()):
@@ -128,31 +128,31 @@ class MultiModalDataSource(base.DataSource):
     def _download_arrange_data(
         self,
         download_url_address,
-        put_data_dir,
+        data_path,
         extract_to_dir=None,
         obtained_file_name=None,
     ):
         """ Download the raw data and arrange the data """
         # Extract to the same dir as the download dir
         if extract_to_dir is None:
-            extract_to_dir = put_data_dir
+            extract_to_dir = data_path
 
         download_file_name = os.path.basename(download_url_address)
-        download_file_path = os.path.join(put_data_dir, download_file_name)
+        download_file_path = os.path.join(data_path, download_file_name)
 
         download_extracted_file_name = download_file_name.split(".")[0]
-        download_extracted_dir_path = os.path.join(
-            extract_to_dir, download_extracted_file_name)
+        download_extracted_path = os.path.join(extract_to_dir,
+                                               download_extracted_file_name)
         # Download the raw data if necessary
         if not self._exists(download_file_path):
             logging.info("Downloading the %s data.....", download_file_name)
             download_url(url=download_url_address,
-                         root=put_data_dir,
+                         root=data_path,
                          filename=obtained_file_name)
 
         # Extract the data to the specific dir
         if ".zip" in download_file_name or ".tar.gz" in download_file_name:
-            if not self._exists(download_extracted_dir_path):
+            if not self._exists(download_extracted_path):
                 logging.info("Extracting data to %s dir.....", extract_to_dir)
                 extract_archive(from_path=download_file_path,
                                 to_path=extract_to_dir,
@@ -164,21 +164,19 @@ class MultiModalDataSource(base.DataSource):
         self,
         download_file_id,
         extract_download_file_name,
-        put_data_dir,
+        data_path,
     ):
         download_data_file_name = extract_download_file_name + ".zip"
-        download_data_path = os.path.join(put_data_dir,
-                                          download_data_file_name)
-        extract_data_path = os.path.join(put_data_dir,
-                                         extract_download_file_name)
+        download_data_path = os.path.join(data_path, download_data_file_name)
+        extract_data_path = os.path.join(data_path, extract_download_file_name)
         if not self._exists(download_data_path):
             logging.info("Downloading the data to %s", download_data_path)
             download_file_from_google_drive(file_id=download_file_id,
-                                            root=put_data_dir,
+                                            root=data_path,
                                             filename=download_data_file_name)
         if not self._exists(extract_data_path):
             extract_archive(from_path=download_data_path,
-                            to_path=put_data_dir,
+                            to_path=data_path,
                             remove_finished=True)
 
     def _file_exists(self, tg_file_name, search_path, is_partial_name=True):

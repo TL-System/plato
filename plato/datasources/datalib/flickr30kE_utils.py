@@ -305,7 +305,7 @@ def integrate_data_to_json(splits_info,
             logging.info("The integration process for %s is done.", split_type)
 
     if globally:
-        save_path = os.path.join(mm_data_info["base_data_dir_path"],
+        save_path = os.path.join(mm_data_info["data_path"],
                                  "total_integrated_data.json")
         if os.path.exists(save_path):
             logging.info("Gloablly integrated file already exists.")
