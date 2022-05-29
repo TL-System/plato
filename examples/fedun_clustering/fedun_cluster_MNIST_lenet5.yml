@@ -28,6 +28,8 @@ server:
     address: 127.0.0.1
     port: 8000
     random_seed: 1
+     # The total number of clusters
+    clusters: 10
 
 data:
     # The training and testing dataset
@@ -44,35 +46,21 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 5
+    rounds: 10
 
     # The maximum number of clients running concurrently
-    max_concurrency: 2
+    max_concurrency: 20
 
     # The target accuracy
-    target_accuracy: 0.97
-    # Number of epoches for local training in each communication round
-    epochs: 1
-    batch_size: 128
-    optimizer: AdaHessian
-    learning_rate: 0.001
-    momentum_b1: 0.9
-    momentum_b2: 0.999
-    create_graph: true
-    eps: 1e-8
-    weight_decay: 0.0
-    hessian_power: 1.0
+    target_accuracy: 0.98
 
-    # epochs: 1
-    # batch_size: 128
-    # optimizer: SGD
-    # learning_rate: 0.001
-    # momentum: 0.9
-    # weight_decay: 0.0
-    # # Learning rate schedule
-    # lr_schedule: LambdaLR
-    # lr_gamma: 0.1
-    # lr_milestone_steps: 80ep,120ep
+    # Number of epoches for local training in each communication round
+    epochs: 5
+    batch_size: 32
+    optimizer: SGD
+    learning_rate: 0.01
+    momentum: 0.9
+    weight_decay: 0.0
 
     # The machine learning model
     model_name: lenet5
