@@ -1,15 +1,14 @@
 """
-Useful tools used for implementing samplers
-
+    Rewrite the Opacus's BatchMemoryManager
+    Reference: https://opacus.ai/api/_modules/opacus/utils/batch_memory_manager.html
 """
 
 import numpy as np
 
-import math
-from typing import List
 from opacus.optimizers import DPOptimizer
 from opacus.utils.batch_memory_manager import BatchSplittingSampler
 from torch.utils.data import DataLoader, BatchSampler
+
 
 def extend_indices(indices, required_total_size):
     """ Extend the indices to obtain the required total size
@@ -195,16 +194,9 @@ def create_dirichlet_skew(
     return proportions
 
 
-
-'''
-    Rewrite the Opacus's BatchMemoryManager
-    Reference: https://opacus.ai/api/_modules/opacus/utils/batch_memory_manager.html
-'''
-
-def wrap_data_loader(
-    *, data_loader: DataLoader, original_batch_sampler: BatchSampler, 
-    max_batch_size: int, optimizer: DPOptimizer
-):
+def wrap_data_loader(*, data_loader: DataLoader,
+                     original_batch_sampler: BatchSampler, max_batch_size: int,
+                     optimizer: DPOptimizer):
     """
     Replaces batch_sampler in the input data loader with ``BatchSplittingSampler``
 

@@ -17,6 +17,7 @@ from plato.trainers import basic
 from plato.utils import optimizers
 from plato.samplers.sampler_utils import BatchMemoryManager
 
+
 class Trainer(basic.Trainer):
     """A differentially private federated learning trainer, used by the client."""
 
@@ -26,7 +27,7 @@ class Trainer(basic.Trainer):
         super().__init__(model=model)
         self.max_physical_batch_size = Config(
         ).trainer.max_physical_batch_size if hasattr(
-            Config().trainer, "max_physical_batch_size") else 32
+            Config().trainer, "max_physical_batch_size") else 128
 
     def make_model_private(self):
         """ Make the model private for use with the differential privacy engine. """

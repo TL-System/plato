@@ -77,7 +77,7 @@ class Trainer(ABC):
                 os.remove(accuracy_file)
 
     @abstractmethod
-    def train(self, trainset, sampler, cut_layer=None) -> float:
+    def train(self, trainset, sampler, cut_layer=None, **kwargs) -> float:
         """The main training loop in a federated learning workload.
 
         Arguments:
@@ -90,7 +90,7 @@ class Trainer(ABC):
         """
 
     @abstractmethod
-    def test(self, testset, sampler=None) -> float:
+    def test(self, testset, sampler=None, **kwargs) -> float:
         """Testing the model using the provided test dataset.
 
         Arguments:
@@ -99,7 +99,7 @@ class Trainer(ABC):
         """
 
     @abstractmethod
-    async def server_test(self, testset, sampler=None):
+    async def server_test(self, testset, sampler=None, **kwargs):
         """Testing the model on the server using the provided test dataset.
 
         Arguments:
