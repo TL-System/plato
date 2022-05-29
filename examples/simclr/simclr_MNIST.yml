@@ -12,6 +12,7 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: True
     test_interval: 1
+    eval_test_interval: 1
     # Whether simulate clients or not
     simulation: true
 

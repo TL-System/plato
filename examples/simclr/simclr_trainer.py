@@ -215,3 +215,109 @@ class Trainer(basic.Trainer):
             self.save_accuracy(accuracy, filename)
         else:
             return accuracy
+
+    def eval_test_process(self, config, testset, sampler=None, **kwargs):
+        """The testing loop, run in a separate process with a new CUDA context,
+        so that CUDA memory can be released after the training completes.
+
+        Arguments:
+        config: a dictionary of configuration parameters.
+        testset: The test dataset.
+        sampler: The sampler that extracts a partition of the test dataset.
+        kwargs (optional): Additional keyword arguments.
+        """
+        self.model.to(self.device)
+        self.model.eval()
+
+        # Initialize accuracy to be returned to -1, so that the client can disconnect
+        # from the server when testing fails
+        accuracy = -1
+
+        try:
+            custom_test = getattr(self, "test_model", None)
+
+            if callable(custom_test):
+                accuracy = self.test_model(config, testset)
+            else:
+                if sampler is None:
+                    test_loader = torch.utils.data.DataLoader(
+                        testset,
+                        batch_size=config['batch_size'],
+                        shuffle=False)
+                    if "memory_trainset" in list(kwargs.keys()):
+                        memory_train_loader = torch.utils.data.DataLoader(
+                            kwargs["memory_trainset"],
+                            batch_size=config['batch_size'],
+                            shuffle=False)
+                # Use a testing set following the same distribution as the training set
+                else:
+                    test_loader = torch.utils.data.DataLoader(
+                        testset,
+                        batch_size=config['batch_size'],
+                        shuffle=False,
+                        sampler=sampler.get())
+                    if "memory_trainset" in list(kwargs.keys()):
+                        memory_train_loader = torch.utils.data.DataLoader(
+                            kwargs["memory_trainset"],
+                            batch_size=config['batch_size'],
+                            shuffle=False,
+                            sampler=kwargs["memory_trainset_sampler"].get())
+                accuracy = 0
+                with torch.no_grad():
+                    accuracy = knn_monitor(
+                        encoder=self.model.encoder,
+                        memory_data_loader=memory_train_loader,
+                        test_data_loader=test_loader,
+                        device=self.device,
+                        k=200,
+                        t=0.1,
+                        hide_progress=False)
+
+        except Exception as testing_exception:
+            logging.info("Testing on client #%d failed.", self.client_id)
+            raise testing_exception
+
+        self.model.cpu()
+
+        if 'max_concurrency' in config:
+            model_name = config['model_name']
+            filename = f"{model_name}_{self.client_id}_{config['run_id']}.acc"
+            self.save_accuracy(accuracy, filename)
+        else:
+            return accuracy
+
+    def eval_test(self, testset, sampler=None, **kwargs) -> float:
+        """Testing the model using the provided test dataset.
+
+        Arguments:
+        testset: The test dataset.
+        sampler: The sampler that extracts a partition of the test dataset.
+        kwargs (optional): Additional keyword arguments.
+        """
+        config = Config().trainer._asdict()
+        config['run_id'] = Config().params['run_id']
+
+        if hasattr(Config().trainer, 'max_concurrency'):
+            if mp.get_start_method(allow_none=True) != 'spawn':
+                mp.set_start_method('spawn', force=True)
+
+            proc = mp.Process(target=self.eval_test_process,
+                              args=(config, testset, sampler),
+                              kwargs=kwargs)
+            proc.start()
+            proc.join()
+
+            accuracy = -1
+            try:
+                model_name = Config().trainer.model_name
+                filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
+                accuracy = self.load_accuracy(filename)
+            except OSError as error:  # the model file is not found, training failed
+                raise ValueError(
+                    f"Testing on client #{self.client_id} failed.") from error
+
+            self.pause_training()
+        else:
+            accuracy = self.test_process(config, testset, **kwargs)
+
+        return accuracy
