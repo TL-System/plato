@@ -29,6 +29,7 @@ class Trainer(base.Trainer):
 
         self.training_start_time = time.time()
         self.models_per_epoch = {}
+        self.model_state_dict = None
 
         if model is None:
             model = models_registry.get()
@@ -58,7 +59,10 @@ class Trainer(base.Trainer):
         else:
             model_path = f'{model_path}/{model_name}.pth'
 
-        torch.save(self.model.state_dict(), model_path)
+        if self.model_state_dict is None:
+            torch.save(self.model.state_dict(), model_path)
+        else:
+            torch.save(self.model_state_dict, model_path)
 
         if self.client_id == 0:
             logging.info("[Server #%d] Model saved to %s.", os.getpid(),
@@ -85,7 +89,7 @@ class Trainer(base.Trainer):
             logging.info("[Client #%d] Loading a model from %s.",
                          self.client_id, model_path)
 
-        self.model.load_state_dict(torch.load(model_path), strict=False)
+        self.model.load_state_dict(torch.load(model_path), strict=True)
 
     def simulate_sleep_time(self):
         """Simulate client's speed by putting it to sleep."""
@@ -268,7 +272,8 @@ class Trainer(base.Trainer):
                 mp.set_start_method('spawn', force=True)
 
             train_proc = mp.Process(target=self.train_process,
-                                    args=(config, trainset, sampler, cut_layer),
+                                    args=(config, trainset, sampler,
+                                          cut_layer),
                                     kwargs=kwargs)
             train_proc.start()
             train_proc.join()
