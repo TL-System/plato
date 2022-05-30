@@ -25,6 +25,7 @@ class Trainer(basic.Trainer):
         """Initializing the trainer with the provided model.
         """
         super().__init__(model=model)
+
         self.max_physical_batch_size = Config(
         ).trainer.max_physical_batch_size if hasattr(
             Config().trainer, "max_physical_batch_size") else 128
@@ -165,3 +166,10 @@ class Trainer(basic.Trainer):
                 filename = f"{self.client_id}_{epoch}_{training_time}.pth"
                 self.save_model(filename)
                 self.model.to(self.device)
+
+        # After GradSampleModule() conversion, the state_dict names have a `_module` prefix
+        # We will need to save the weights with the original layer names without the prefix
+        self.model_state_dict = {
+            k[8:]: v
+            for k, v in self.model.state_dict().items()
+        }
