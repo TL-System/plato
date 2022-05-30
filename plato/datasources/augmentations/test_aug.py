@@ -1,25 +1,65 @@
-""" The implementation of data augmentation for the test phase 
+""" The implementation of data augmentation for the eval phase 
     of contrastive learning.
     
-    The test phase of the contrastive learning is to measure 
-    the quality of representation. Thus, the clustering
-    methods can be used to first learn from the extracted 
-    representation of the trainset. Then, the learned clusters 
-    are used to obtain accuracy from the testset.
+    In general, the evaluation phase is implemented by the 
+        linear evaluation. This is a typical transform.
+
 """
 
-import torchvision.transforms as T
-from PIL import Image
+from torchvision import transforms as T
+from PIL import Image, ImageOps
 
 
 class TestTransform():
 
-    def __init__(self, image_size, normalize):
+    def __init__(self, image_size, train, normalize):
+        transform_functions = []
+        if train == True:
+            transform_functions = [
+                T.RandomResizedCrop(image_size),
+                T.RandomHorizontalFlip(),
+                T.ToTensor()
+            ]
+        else:
+            transform_functions = [
+                T.Resize(image_size),  # 224 -> 256 
+                T.CenterCrop(image_size),
+                T.ToTensor()
+            ]
 
-        transform_functions = [
-            T.Resize(image_size),  # 224 -> 256 
-            T.ToTensor(),
-        ]
+        if normalize is not None:
+            transform_functions = transform_functions.append(
+                T.Normalize(*normalize))
+
+        self.transform = T.Compose(transform_functions)
+
+    def __call__(self, x):
+        return self.transform(x)
+
+
+class ByolTestTransform():
+
+    def __init__(self, image_size, train, normalize):
+        #self.denormalize = Denormalize(*imagenet_norm)
+        transform_functions = []
+        if train == True:
+            transform_functions = [
+                T.RandomResizedCrop(image_size,
+                                    scale=(0.08, 1.0),
+                                    ratio=(3.0 / 4.0, 4.0 / 3.0),
+                                    interpolation=Image.BICUBIC),
+                T.RandomHorizontalFlip(),
+                T.ToTensor()
+            ]
+
+        else:
+            transform_functions = [
+                T.Resize(int(image_size * (8 / 7)),
+                         interpolation=Image.BICUBIC),  # 224 -> 256 
+                T.CenterCrop(image_size),
+                T.ToTensor()
+            ]
+
         if normalize is not None:
             transform_functions.append(T.Normalize(*normalize))
 

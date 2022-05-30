@@ -19,6 +19,7 @@ class Model(nn.Module):
     Arguments:
         num_classes (int): The number of classes. Default: 10.
     """
+
     def __init__(self, num_classes=10):
         super().__init__()
 
