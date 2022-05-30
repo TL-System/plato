@@ -12,7 +12,7 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: True
     test_interval: 1
-    eval_test_interval: 1
+    #eval_test_interval: 1
     # Whether simulate clients or not
     simulation: true
 
@@ -50,6 +50,8 @@ data:
     # set the data augmentation 
     #   options: simsiam, byol, simclr
     augment_transformer_name: simclr
+    # some methods apply the normalization to samples
+    #   while others do not
     is_norm: False 
 
 trainer:
@@ -70,12 +72,20 @@ trainer:
     target_accuracy: 0.98
 
     # Number of epochs for local training in each communication round
-    epochs: 10
+    epochs: 2
     batch_size: 2
     optimizer: SGD
     learning_rate: 0.03
     momentum: 0.0 # learning rate is fixed as in Appendix C.2
     weight_decay: 0.0
+
+    # Number of epochs for local training in each communication round
+    pers_epochs: 10
+    pers_batch_size: 2
+    pers_optimizer: SGD
+    pers_learning_rate: 0.03
+    pers_momentum: 0.0 # learning rate is fixed as in Appendix C.2
+    pers_weight_decay: 0.0
 
     # temperature
     temperature: 0.5
@@ -84,11 +94,19 @@ trainer:
     #  - CIFAR10 (Image size=32)
     #  - MNIST (Image size=28)
     image_size: 28
-    #
-    
+
+    # The machine learning model,
+    # it behaves as the encoder for the ssl method
+    # the final fc layer will be removed
     model_name: lenet5
     projection_dim: 64
-    # The machine learning model
+    
+    personalized_model_name: pure_one_layer_mlp  
+
+    monitor_name: knn
+    knn_k: 200
+    knn_t: 0.1
+    hide_monitor_progress: False
 
     num_classes: 10
 

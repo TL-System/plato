@@ -19,7 +19,7 @@ from plato.utils import optimizers
 
 from nt_xent import NT_Xent
 
-from contrastive_learning_monitor import knn_monitor
+from plato.models import ssl_monitor_register
 
 
 class Trainer(basic.Trainer):
@@ -27,12 +27,23 @@ class Trainer(basic.Trainer):
     def __init__(self, model=None):
         super().__init__(model)
 
+        # the client's personalized model
+        # to perform the evaluation stage of the ssl methods
+        # the client must assign its own personalized model
+        #  to its trainer
+        self.personalized_model = None
+
+    def set_client_personalized_model(self, personalized_model):
+        """ Setting the client's personalized model """
+        self.personalized_model = personalized_model
+
     def loss_criterion(self, model):
         """ The loss computation. """
         # define the loss computation instance
         defined_temperature = Config().trainer.temperature
         batch_size = Config().trainer.batch_size
 
+        # currently, the loss computation only supports the one-GPU learning.
         def loss_compute(outputs, labels):
             z1, z2 = outputs
             criterion = NT_Xent(batch_size, defined_temperature, world_size=1)
@@ -194,14 +205,11 @@ class Trainer(basic.Trainer):
                             sampler=kwargs["memory_trainset_sampler"].get())
                 accuracy = 0
                 with torch.no_grad():
-                    accuracy = knn_monitor(
+                    accuracy = ssl_monitor_register.get()(
                         encoder=self.model.encoder,
                         memory_data_loader=memory_train_loader,
                         test_data_loader=test_loader,
-                        device=self.device,
-                        k=200,
-                        t=0.1,
-                        hide_progress=False)
+                        device=self.device)
 
         except Exception as testing_exception:
             logging.info("Testing on client #%d failed.", self.client_id)
@@ -226,27 +234,26 @@ class Trainer(basic.Trainer):
         sampler: The sampler that extracts a partition of the test dataset.
         kwargs (optional): Additional keyword arguments.
         """
-        self.model.to(self.device)
-        self.model.eval()
+        self.personalized_model.to(self.device)
 
         # Initialize accuracy to be returned to -1, so that the client can disconnect
         # from the server when testing fails
         accuracy = -1
 
         try:
-            custom_test = getattr(self, "test_model", None)
+            custom_test = getattr(self, "eval_test_model", None)
 
             if callable(custom_test):
-                accuracy = self.test_model(config, testset)
+                accuracy = self.eval_test_model(config, testset)
             else:
                 if sampler is None:
                     test_loader = torch.utils.data.DataLoader(
                         testset,
                         batch_size=config['batch_size'],
                         shuffle=False)
-                    if "memory_trainset" in list(kwargs.keys()):
-                        memory_train_loader = torch.utils.data.DataLoader(
-                            kwargs["memory_trainset"],
+                    if "eval_trainset" in list(kwargs.keys()):
+                        eval_train_loader = torch.utils.data.DataLoader(
+                            kwargs["eval_trainset"],
                             batch_size=config['batch_size'],
                             shuffle=False)
                 # Use a testing set following the same distribution as the training set
@@ -256,28 +263,18 @@ class Trainer(basic.Trainer):
                         batch_size=config['batch_size'],
                         shuffle=False,
                         sampler=sampler.get())
-                    if "memory_trainset" in list(kwargs.keys()):
-                        memory_train_loader = torch.utils.data.DataLoader(
-                            kwargs["memory_trainset"],
+                    if "eval_trainset" in list(kwargs.keys()):
+                        eval_train_loader = torch.utils.data.DataLoader(
+                            kwargs["eval_trainset"],
                             batch_size=config['batch_size'],
                             shuffle=False,
-                            sampler=kwargs["memory_trainset_sampler"].get())
-                accuracy = 0
-                with torch.no_grad():
-                    accuracy = knn_monitor(
-                        encoder=self.model.encoder,
-                        memory_data_loader=memory_train_loader,
-                        test_data_loader=test_loader,
-                        device=self.device,
-                        k=200,
-                        t=0.1,
-                        hide_progress=False)
+                            sampler=kwargs["eval_trainset_sampler"].get())
 
         except Exception as testing_exception:
             logging.info("Testing on client #%d failed.", self.client_id)
             raise testing_exception
 
-        self.model.cpu()
+        self.personalized_model.cpu()
 
         if 'max_concurrency' in config:
             model_name = config['model_name']

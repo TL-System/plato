@@ -1,7 +1,7 @@
 """
 The implementation for the SimCLR [1] method.
 
-The official code: https://github.com/google-research/simclr . 
+The official code: https://github.com/google-research/simclr
 
 The third-party code: https://github.com/PatrickHua/SimSiam
 
