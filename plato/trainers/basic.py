@@ -14,7 +14,6 @@ from plato.config import Config
 from plato.models import registry as models_registry
 from plato.trainers import base
 from plato.utils import optimizers
-from plato.models import lenet5
 
 
 class Trainer(base.Trainer):
