@@ -7,34 +7,44 @@ import random
 
 from PIL import ImageFilter
 import numpy as np
-import torchvision.transforms as transforms
+
+import torchvision.transforms as T
+
 
 class SvAVTransform():
-    def __init__(self, size_crops, nmb_crops, min_scale_crops, max_scale_crops):
+
+    def __init__(self, size_crops, nmb_crops, min_scale_crops, max_scale_crops,
+                 normalize):
         assert len(size_crops) == len(nmb_crops)
         assert len(min_scale_crops) == len(nmb_crops)
         assert len(max_scale_crops) == len(nmb_crops)
-        
+
         color_transform = [get_color_distortion(), PILRandomGaussianBlur()]
-        mean = [0.485, 0.456, 0.406]
-        std = [0.228, 0.224, 0.225]
+
         trans = []
         for i in range(len(size_crops)):
-            randomresizedcrop = transforms.RandomResizedCrop(
+            randomresizedcrop = T.RandomResizedCrop(
                 size_crops[i],
                 scale=(min_scale_crops[i], max_scale_crops[i]),
             )
-            trans.extend([transforms.Compose([randomresizedcrop,
-                                              transforms.RandomHorizontalFlip(p=0.5),
-                                              transforms.Compose(color_transform),
-                                              transforms.ToTensor(),
-                                              transforms.Normalize(mean=mean, std=std)
-                                             ])] * nmb_crops[i])
+            i_transform_funcs = [
+                randomresizedcrop,
+                T.RandomHorizontalFlip(p=0.5),
+                T.Compose(color_transform),
+                T.ToTensor()
+            ]
+
+            if normalize is not None:
+                i_transform_funcs.append(T.Normalize(*normalize))
+
+            trans.extend([T.Compose(i_transform_funcs)] * nmb_crops[i])
+
         self.transform = trans
-    
+
     def __call__(self, x):
-        return tuple(map(lambda trans: trans(x), self.transform)) 
-    
+        return tuple(map(lambda trans: trans(x), self.transform))
+
+
 class PILRandomGaussianBlur(object):
     """
     Apply Gaussian Blur to the PIL image. Take the radius and probability of
@@ -54,15 +64,13 @@ class PILRandomGaussianBlur(object):
 
         return img.filter(
             ImageFilter.GaussianBlur(
-                radius=random.uniform(self.radius_min, self.radius_max)
-            )
-        )
+                radius=random.uniform(self.radius_min, self.radius_max)))
 
 
 def get_color_distortion(s=1.0):
     # s is the strength of color distortion.
-    color_jitter = transforms.ColorJitter(0.8*s, 0.8*s, 0.8*s, 0.2*s)
-    rnd_color_jitter = transforms.RandomApply([color_jitter], p=0.8)
-    rnd_gray = transforms.RandomGrayscale(p=0.2)
-    color_distort = transforms.Compose([rnd_color_jitter, rnd_gray])
+    color_jitter = T.ColorJitter(0.8 * s, 0.8 * s, 0.8 * s, 0.2 * s)
+    rnd_color_jitter = T.RandomApply([color_jitter], p=0.8)
+    rnd_gray = T.RandomGrayscale(p=0.2)
+    color_distort = T.Compose([rnd_color_jitter, rnd_gray])
     return color_distort
