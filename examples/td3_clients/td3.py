@@ -5,7 +5,7 @@ import logging
 
 import td3_learning_client
 import td3_learning_agent
-import td3_learning_server
+from plato.servers import fedavg
 import td3_trainer
 
 
@@ -15,7 +15,7 @@ def main():
     trainer = td3_trainer.Trainer
     client = td3_learning_client.RLClient(trainer=trainer)
     agent = td3_learning_agent.RLAgent()
-    server = td3_learning_server.Server(agent=agent, trainer=trainer)
+    server = fedavg.Server(trainer=trainer)
     server.run(client)
 
 
