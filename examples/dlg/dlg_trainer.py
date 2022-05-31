@@ -10,6 +10,9 @@ from plato.config import Config
 from plato.trainers import basic
 from plato.utils import optimizers
 from torchvision import transforms
+import matplotlib.pyplot as plt
+from plato.samplers import registry as samplers_registry
+from plato.datasources import registry as datasources_registry
 
 from utils import cross_entropy_for_onehot, label_to_onehot
 
@@ -90,10 +93,21 @@ class Trainer(basic.Trainer):
             )
 
         for epoch in range(1, epochs + 1):
+            datasource = datasources_registry.get(
+                client_id=self.client_id)
+            sampler = samplers_registry.get(datasource, self.client_id)
+            train_loader = torch.utils.data.DataLoader(dataset=trainset,
+                                                       shuffle=False,
+                                                       batch_size=batch_size,
+                                                       sampler=sampler.get())
+
             # Use a default training loop
             for batch_id, (examples, labels) in enumerate(train_loader):
                 examples, labels = examples.to(self.device), labels.to(
                     self.device)
+
+                plt.imshow(tt(examples[0].cpu()))
+                plt.title("Ground truth image")
 
                 if 'differential_privacy' in config and config[
                         'differential_privacy']:

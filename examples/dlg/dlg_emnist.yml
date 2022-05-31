@@ -27,7 +27,7 @@ data:
     partition_size: 1
 
     # IID or non-IID?
-    sampler: noniid
+    sampler: iid
 
     # The concentration parameter for the Dirichlet distribution
     concentration: 1
