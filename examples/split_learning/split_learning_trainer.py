@@ -23,7 +23,7 @@ class Trainer(basic.Trainer):
 
     def train_model(self, config, trainset, sampler, cut_layer=None):
         batch_size = config['batch_size']
-
+    
         logging.info("[Client #%d] Loading the dataset.", self.client_id)
         _train_loader = getattr(self, "train_loader", None)
 
