@@ -52,15 +52,20 @@ class Server(fedavg.Server):
 
     def deep_leakage_from_gradients(self, updates):
         """ Analyze periodic gradients from certain clients. """
-        # Obtain the local updates from clients
-        # deltas_received = self.compute_weight_deltas(updates)
-        # TODO: the server actually has no idea about the local learning rate
         __, __, payload, __ = updates[Config().algorithm.victim_client]
         # Receive the ground truth for evaluation
         # It will not be used for data reconstruction
         gt_data, gt_label, target_grad = payload[1]
 
-        # Plot ground truth data        plt.imshow(tt(gt_data.cpu()))
+        if not (hasattr(Config().algorithm, 'share_gradients') and Config().algorithm.share_gradients):
+            # Obtain the local updates from clients
+            deltas_received = self.compute_weight_deltas(updates)
+            target_grad = []
+            for delta in deltas_received[Config().algorithm.victim_client].values():
+                target_grad.append(- delta / Config().trainer.learning_rate)
+
+        # Plot ground truth data
+        plt.imshow(tt(gt_data[0].cpu()))
         plt.title("Ground truth image")
         logging.info("GT label is %d.", torch.argmax(gt_label, dim=-1).item())
 
