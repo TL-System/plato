@@ -12,7 +12,7 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: True
     test_interval: 1
-    #eval_test_interval: 1
+    eval_test_interval: 1
     # Whether simulate clients or not
     simulation: true
 
@@ -86,6 +86,8 @@ trainer:
     pers_learning_rate: 0.03
     pers_momentum: 0.0 # learning rate is fixed as in Appendix C.2
     pers_weight_decay: 0.0
+    # currently, we only support CosineAnnealingLR
+    pers_lr_schedule: CosineAnnealingLR
 
     # temperature
     temperature: 0.5

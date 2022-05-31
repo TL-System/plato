@@ -16,17 +16,17 @@ Reference:
 
 import simclr_net
 
-import simclr_trainer
-import simclr_client
-import simclr_server
+from plato.trainers import ssl as ssl_trainer
+from plato.clients import simple_ssl as ssl_client
+from plato.servers import fedavg
 
 
 def main():
     """ A Plato federated learning training session using the FedRep algorithm. """
-    trainer = simclr_trainer.Trainer
+    trainer = ssl_trainer.Trainer
     simclr_model = simclr_net.SimCLR()
-    client = simclr_client.Client(model=simclr_model, trainer=trainer)
-    server = simclr_server.Server(model=simclr_model, trainer=trainer)
+    client = ssl_client.Client(model=simclr_model, trainer=trainer)
+    server = fedavg.Server(model=simclr_model, trainer=trainer)
 
     server.run(client)
 
