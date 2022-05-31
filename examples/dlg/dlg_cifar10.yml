@@ -27,7 +27,7 @@ data:
     # IID or non-IID?
     sampler: iid
 
-    random_seed: 50
+    random_seed: 4324
 
 trainer:
     # The type of the trainer
@@ -69,12 +69,14 @@ algorithm:
     attack_round: 1
     # One particular client, e.g., the first selected client
     victim_client: 0
-    num_iters: 600
+    num_iters: 300
     log_interval: 10
     # Whether or not use customized initialization for model weights
-    init_params: false
+    init_params: true
+    # Whether sharing gradients or model weights
+    share_gradients: true
     # The random seed for dummy data and label
-    random_seed: 800
+    random_seed: 10
 
 results:
     result_path: results/CIAFR10_resnet18/DLG

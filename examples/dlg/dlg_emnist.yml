@@ -73,7 +73,9 @@ algorithm:
     num_iters: 100
     log_interval: 10
     # Whether or not use customized initialization for model weights
-    init_params: false
+    init_params: true
+    # Whether sharing gradients or model weights
+    share_gradients: false
     # The random seed for dummy data and label
     random_seed: 50
 
