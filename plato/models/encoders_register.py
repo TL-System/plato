@@ -5,7 +5,7 @@ Implementation of the encoder register
 
 import logging
 
-import torch.nn as nn
+from torch import nn
 
 from plato.models import registry as model_register
 from plato.config import Config
@@ -14,11 +14,9 @@ from plato.config import Config
 class Identity(nn.Module):
     """ The constant layer. """
 
-    def __init__(self):
-        super(Identity, self).__init__()
-
-    def forward(self, x):
-        return x
+    def forward(self, samples):
+        """ Forward the input without any operations. """
+        return samples
 
 
 class TruncatedLeNetModel(nn.Module):
@@ -35,24 +33,24 @@ class TruncatedLeNetModel(nn.Module):
         self.model.relu4 = Identity()
         self.model.fc5 = Identity()
 
-    def forward(self, x):
-        return self.model.forward_to(x, cut_layer="flatten")
+    def forward(self, samples):
+        """ Forward to specific layer (cut)_layer) of LeNet5. """
+        return self.model.forward_to(samples, cut_layer="flatten")
 
 
 def get():
-    """ Register the encoder from the required model by removing the 
+    """ Register the encoder from the required model by removing the
         final fully-connected blocks. """
 
     model_name = Config().trainer.model_name
 
-    logging.info((
-        "Define the encoder from the model: {} without final fully-connected layers"
-    ).format(model_name))
+    logging.info(
+        "Define the encoder from the model: %s without final fully-connected layers",
+        model_name)
 
     model = model_register.get()
 
     if model_name == "lenet5":
-        """ Using wrapper of lenet5_model. """
         # get encoding dimensions
         #   i.e., the output dim of the encoder
         encode_output_dim = model.fc4.in_features
