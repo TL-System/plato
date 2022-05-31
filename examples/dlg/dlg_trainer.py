@@ -109,23 +109,25 @@ class Trainer(basic.Trainer):
                 # Save the ground truth and gradients
                 onehot_labels = label_to_onehot(
                     labels, num_classes=Config().trainer.num_classes)
-                loss = criterion(outputs, onehot_labels)
-                dy_dx = torch.autograd.grad(loss, self.model.parameters())
-                target_grad = list((_.detach().clone() for _ in dy_dx))
+                target_grad = None
+                if hasattr(Config().algorithm, 'share_gradients') and Config().algorithm.share_gradients:
+                    loss = criterion(outputs, onehot_labels)
+                    dy_dx = torch.autograd.grad(loss, self.model.parameters())
+                    target_grad = list((_.detach().clone() for _ in dy_dx))
+                else:
+                    loss = loss_criterion(outputs, labels)
+
+                    if 'create_graph' in config:
+                        loss.backward(create_graph=config['create_graph'])
+                    else:
+                        loss.backward()
+
+                    optimizer.step()
 
                 file_path = f"{Config().params['model_path']}/{self.client_id}.pickle"
                 with open(file_path, 'wb') as handle:
                     pickle.dump(
                         [examples, onehot_labels, target_grad], handle)
-
-                # loss = loss_criterion(outputs, labels)
-
-                # if 'create_graph' in config:
-                #     loss.backward(create_graph=config['create_graph'])
-                # else:
-                #     loss.backward()
-
-                # optimizer.step()
 
                 if batch_id % log_interval == 0:
                     if self.client_id == 0:
