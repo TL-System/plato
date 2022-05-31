@@ -30,6 +30,6 @@ class RLClient(simple.Client):
                  trainer=None):
         super().__init__(model=model,
                          datasource=datasource,
-                         algorithm=algrithm,
+                         algorithm=algorithm,
                          trainer=trainer)
    
