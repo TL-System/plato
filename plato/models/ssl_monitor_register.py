@@ -19,7 +19,7 @@ import torch
 from plato.config import Config
 
 
-def knn_monitor(encoder, memory_data_loader, test_data_loader, device):
+def knn_monitor(encoder, monitor_data_loader, test_data_loader, device):
     """ Using the KNN monitor to test the representation quality.
     
         This part of code is obtained from the official code for SimClr:
@@ -27,7 +27,7 @@ def knn_monitor(encoder, memory_data_loader, test_data_loader, device):
 
         Args:
             encoder (torch.nn.module): the defined encoder 
-            memory_data_loader: the data loader of the trainset using the test 
+            monitor_data_loader: the data loader of the trainset using the test 
                 data augmentation
             test_data_loader:  the data loader of the testset using the test 
                 data augmentation
@@ -40,11 +40,11 @@ def knn_monitor(encoder, memory_data_loader, test_data_loader, device):
     hide_progress = Config().trainer.hide_monitor_progress
 
     encoder.eval()
-    classes = len(memory_data_loader.dataset.dataset.classes)
+    classes = len(monitor_data_loader.dataset.dataset.classes)
     total_top1, total_top5, total_num, feature_bank = 0.0, 0.0, 0, []
     with torch.no_grad():
         # generate feature bank
-        for data, target in tqdm(memory_data_loader,
+        for data, target in tqdm(monitor_data_loader,
                                  desc='Feature extracting',
                                  leave=False,
                                  disable=hide_progress):
@@ -55,11 +55,9 @@ def knn_monitor(encoder, memory_data_loader, test_data_loader, device):
         # [D, N]
         feature_bank = torch.cat(feature_bank, dim=0).t().contiguous()
         # [N]
-        feature_labels = memory_data_loader.dataset.dataset.targets.clone(
+        feature_labels = monitor_data_loader.dataset.dataset.targets.clone(
         ).detach().requires_grad_(False)
-        # torch.tensor(
-        #     memory_data_loader.dataset.dataset.targets,
-        #     device=feature_bank.device)
+
         # loop test data to predict the label by weighted knn search
         test_bar = tqdm(test_data_loader, desc='kNN', disable=hide_progress)
         for data, target in test_bar:
