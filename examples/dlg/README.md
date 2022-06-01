@@ -1,17 +1,17 @@
 # DLG related configuration parameters
 
-`attack_round: 1` ¨C reconstruct data from gradients/weights obtained in a particular communication round; 1st round by default.
+`attack_round: 1` â€” reconstruct data from gradients/weights obtained in a particular communication round; 1st round by default.
 
-`victim_client: 0` ¨C reconstruct data from one particular client, e.g., the first selected client.
+`victim_client: 0` â€” reconstruct data from one particular client, e.g., the first selected client.
 
-`num_iters: 100` ¨C the number of iterations for matching gradients/weights.
+`num_iters: 100` â€” the number of iterations for matching gradients/weights.
 
-`log_interval: 10` ¨C determines how often the matching loss, performance, etc., are logged.
+`log_interval: 10` â€” determines how often the matching loss, performance, etc., are logged.
 
-`init_params: true` ¨C whether or not use customized initialization for model weights.
+`init_params: true` â€” whether or not use customized initialization for model weights.
 
-`share_gradients: false` ¨C whether sharing gradients or model weights.
+`share_gradients: false` â€” whether sharing gradients or model weights.
 
-`match_weight: true` ¨C reconstruct data by directly matching weights when it's true; reconstruct data by matching gradients calculated from updates otherwise; setting `share_gradients: false` is a prerequisite.
+`match_weight: true` â€” reconstruct data by directly matching weights when it's true; reconstruct data by matching gradients calculated from updates otherwise; setting `share_gradients: false` is a prerequisite.
 
-`random_seed: 50` ¨C the random seed for generating dummy data and label.
+`random_seed: 50` â€” the random seed for generating dummy data and label.
