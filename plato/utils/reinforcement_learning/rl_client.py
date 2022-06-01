@@ -63,8 +63,6 @@ class RLClient(simple.Client):
 
     async def wrap_up(self):
         """ Wrapping up when each round of training is done. """
-        self.save_to_checkpoint()
-
         if self.agent.reset_env:
             self.agent.reset_env = False
             self.reset()
