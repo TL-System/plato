@@ -97,7 +97,7 @@ class Server:
 
         # States that need to be maintained for asynchronous FL
 
-        # sids is currently in use
+        # sids that are currently in use
         self.training_sids = []
 
         # Clients whose new reports were received but not yet processed
