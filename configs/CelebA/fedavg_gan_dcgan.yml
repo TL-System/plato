@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 3
+    total_clients: 2
 
     # The number of clients selected in each round
-    per_round: 1
+    per_round: 2
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -15,27 +15,31 @@ server:
     address: 127.0.0.1
     port: 8000
 
+    # Choose to send Generator or Discriminator to clients at
+    # the end of each round. 
+    # Value here should be one of 'none', 'generator', 'discriminator', or 'both'
+    network_to_sync: generator
+
 data:
     # The training and testing dataset
     datasource: CelebA
 
     # Only add face identity as labels for training
     celeba_targets:
-        # For ResNet, do not set <attr> to True since it does not match the expected output of ResNet
         attr: false
         identity: true
     
-    # Resize all images to 32x32; default is 64x64
-    celeba_img_size: 32
+    # Resize all images to 64x64
+    celeba_img_size: 64
 
-    # Number of identity in CelebA
-    num_classes: 10178
+    # Where the dataset is located
+    data_path: data
 
     # Number of samples in each partition
-    partition_size: 20000
+    partition_size: 81000
 
     # IID or non-IID?
-    sampler: noniid
+    sampler: iid
 
     # The concentration parameter for the Dirichlet distribution
     concentration: 0.5
@@ -45,7 +49,7 @@ data:
 
 trainer:
     # The type of the trainer
-    type: basic
+    type: gan
 
     # The maximum number of training rounds
     rounds: 5
@@ -53,20 +57,19 @@ trainer:
     # The maximum number of clients running concurrently
     max_concurrency: 3
 
-    # The target accuracy
-    target_accuracy: 0.94
+    # The target Frechet Distance
+    target_perplexity: 0
 
     # Number of epoches for local training in each communication round
     epochs: 5
-    batch_size: 32
-    optimizer: SGD
-    learning_rate: 0.01
-    momentum: 0.9
+    batch_size: 128
+    optimizer: Adam
+    learning_rate: 0.0002
     weight_decay: 0.0
 
     # The machine learning model
-    model_name: resnet_18
+    model_name: dcgan
 
 algorithm:
     # Aggregation algorithm
-    type: fedavg
+    type: fedavg_gan
