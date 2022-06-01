@@ -15,7 +15,7 @@ def main():
     trainer = td3_trainer.Trainer
     client = td3_learning_client.RLClient(trainer=trainer)
     agent = td3_learning_agent.RLAgent()
-    server = fedavg.Server(trainer=trainer)
+    server = fedavg.Server(trainer=trainer, model=agent)
     server.run(client)
 
 
