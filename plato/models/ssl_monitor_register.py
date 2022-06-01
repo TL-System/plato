@@ -55,8 +55,12 @@ def knn_monitor(encoder, monitor_data_loader, test_data_loader, device):
         # [D, N]
         feature_bank = torch.cat(feature_bank, dim=0).t().contiguous()
         # [N]
-        feature_labels = monitor_data_loader.dataset.dataset.targets.clone(
-        ).detach().requires_grad_(False)
+        # conver to tensor if the obtained targets are stored in the list
+        feature_labels = monitor_data_loader.dataset.dataset.targets
+        if not torch.is_tensor(feature_labels):
+            feature_labels = torch.as_tensor(feature_labels)
+
+        feature_labels = feature_labels.clone().detach().requires_grad_(False)
 
         # loop test data to predict the label by weighted knn search
         test_bar = tqdm(test_data_loader, desc='kNN', disable=hide_progress)
