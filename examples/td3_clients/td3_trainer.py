@@ -13,8 +13,9 @@ from plato.models import registry as models_registry
 from plato.trainers import basic
 from plato.utils import optimizers
 
-
-
+class Trainer(basic.Trainer):
+    def __init__(self):
+        print("hello")
 
 
 
