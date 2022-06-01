@@ -214,6 +214,9 @@ class ContrastiveAugmentDataWrapper(torch.utils.data.Dataset):
         if self.dataset.target_transform is not None:
             sample_label = self.dataset.target_transform(sample_label)
 
+        if not torch.is_tensor(sample_label):
+            sample_label = torch.as_tensor(sample_label)
+
         # we can obtain different number of prepared samples
         #   based on what aug_transformer used.
         #   - paired samples if using contrastive-oriented transform
