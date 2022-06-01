@@ -79,10 +79,11 @@ class Client(simple.Client):
         """Generating data and loading them onto this client."""
         super().load_data()
 
-        # obtain the general trainset for SSL with data augmentation
+        # obtain the contrastive trainset for SSL with data augmentation
         # transform. It is supported by the trainset
-        # - SSL's data augmentation transform for training
-        # - trainset
+        # the characteristics:
+        #   - SSL's data augmentation transform for contrastive training
+        #   - trainset
         augment_transformer_name = Config().data.augment_transformer_name
         augment_transformer = get_aug(name=augment_transformer_name,
                                       train=True,
@@ -91,12 +92,13 @@ class Client(simple.Client):
                                                  augment_transformer)
 
         # get the same trainset again for monitor trainset
-        # this dataset is prepared for the representation learning
-        #   monitor
-        # - general data transform used by also the transform in
-        #   downstream task' test phase,
-        #   i.e., test transform of the EvalTransform
-        # - trainset
+        # this dataset is prepared to monitor the representation learning
+        # the characteristics:
+        #   - utilize the general data transform, which the same as the transform in
+        #       downstream task' test phase,
+        #       i.e., test transform of the 'datasources/test_aug.py'
+        #   - trainset
+        #   - the transform for the monitor, such as knn
         general_augment_transformer = get_aug(name=augment_transformer_name,
                                               train=False,
                                               for_downstream_task=False)
@@ -105,17 +107,38 @@ class Client(simple.Client):
             self.monitor_trainset, general_augment_transformer)
 
         if Config().clients.do_test:
+
+            # obtain the testset with the corresponding transform for
+            #   - the test loader for monitor
+            #   - the test loader for downstream tasks, such as the
+            #   the personalized learning of each client.
+            # the characteristics:
+            #   - the general data transform for upper mentioned two
+            #   blocks
+            #   - testset
             augment_transformer = get_aug(name=augment_transformer_name,
                                           train=False,
                                           for_downstream_task=False)
-
             self.testset = datawrapper_registry.get(self.testset,
                                                     augment_transformer)
+
+            # obtain the trainset with the corresponding transform for
+            #   - the train loader for downstream tasks, such as the
+            #   the personalized learning of each client
+            # the characteristics:
+            #   - the general data transform for the downstream tasks,
+            #   such as the image classification
+            #   - trainset
+            # Note: we utilize the 'eval' as this stage's prefix just
+            #   to follow the commonly utilized name in self-supervised
+            #   learning (ssl). They utilize the 'linear evaluation' because
+            #   the performance on downstream tasks is regarded as the
+            #   evaluation fro the representation learning of ssl.
+            #   Therefore, to make it consistent, we call it eval_trainset
 
             augment_transformer = get_aug(name=augment_transformer_name,
                                           train=True,
                                           for_downstream_task=True)
-
             self.eval_trainset = self.datasource.get_train_set()
             self.eval_trainset = datawrapper_registry.get(
                 self.eval_trainset, augment_transformer)
@@ -151,7 +174,7 @@ class Client(simple.Client):
             # 1.- Extract representation from the monitor trainset based on the trained
             # encoder of the self-supervised methods. The monitor trainset is a duplicate
             # of the trainset but without applying the contrastive data augmentation.
-            # It only utilizes the normal transform, as shown in
+            # It only utilizes the normal test transform, as shown in
             # 'datasources/augmentations/test_aug.py' .
             # 2.- Train the KNN method based on the extracted representation
             # of the monitor trainset.
@@ -178,15 +201,17 @@ class Client(simple.Client):
             # performance after several rounds of communication. Therefore, in every
             # #eval_test_interval round, the linear evaluation will be conducted to
             # obtain accuracy or other metrics. The procedures are:
-            # 1.- Design a very simple model for the downstream task, such as the
-            # image classification. The classifier can be a one layer fully-connected layer.
+            # 1.- Design a simple personalized model (i.e., self.personalized_model)
+            # for the client's downstream task, such as the image classification.
+            # The classifier can be a one layer fully-connected layer.
             # 2.- Use the encoder of the trained self-supervised method as the
             # backbone to extract representation from the train data.
             # 3.- Combine the backbone and the designed model to perform the
             # downstream task. Thus, the input samples are processed by the
             # backbone to generate representation, which is used as input for
             # the designed model to complete the task. This encoder/backbone is
-            # frozen without any changes. Only the designed model is optimized.
+            # frozen without any changes. Only the designed model (self.personalized_model)
+            # is optimized.
             if hasattr(Config().clients,
                        'eval_test_interval') and self.current_round % Config(
                        ).clients.eval_test_interval == 0:
