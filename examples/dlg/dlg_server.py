@@ -5,12 +5,17 @@ perform the gradient leakage attacks and
 reconstruct the training data of the victim clients.
 
 
-Reference:
+References:
 
 Zhu et al., "Deep Leakage from Gradients,"
 in Advances in Neural Information Processing Systems 2019.
 
 https://papers.nips.cc/paper/2019/file/60a6c4002cc7b29142def8871531281a-Paper.pdf
+
+Wang et al., "Protect Privacy from Gradient Leakage Attack in Federated Learning,"
+in Proc. INFOCOM 2022.
+
+https://infocom.info/day/2/track/Track%20A#A-3
 """
 
 import logging
@@ -42,15 +47,15 @@ class Server(fedavg.Server):
         super().__init__()
 
     async def process_reports(self):
-        """Process the client reports: before aggregating their weights,
-           perform the gradient leakage attacks and reconstruct the training data.
+        """ Process the client reports: before aggregating their weights,
+            perform the gradient leakage attacks and reconstruct the training data.
         """
         if self.current_round == Config().algorithm.attack_round:
             self.deep_leakage_from_gradients(self.updates)
         await self.aggregate_weights(self.updates)
 
     def compute_weight_deltas(self, updates):
-        """Extract the model weight updates from client updates."""
+        """ Extract the model weight updates from client updates. """
         weights_received = [payload[0] for (__, __, payload, __) in updates]
         return self.algorithm.compute_weight_deltas(weights_received)
 
@@ -131,6 +136,7 @@ class Server(fedavg.Server):
         plt.show()
 
     def gradient_closure(self, optimizer, dummy_data, dummy_label, target_grad):
+        """ Take a step to match the gradients. """
         def closure():
             optimizer.zero_grad()
             # self.trainer.model.zero_grad()
@@ -148,6 +154,7 @@ class Server(fedavg.Server):
         return closure
 
     def weight_closure(self, optimizer, dummy_data, dummy_label, target_weight, model):
+        """ Take a step to match the model weights. """
         def closure():
             optimizer.zero_grad()
             # self.trainer.model.zero_grad()
@@ -161,7 +168,7 @@ class Server(fedavg.Server):
         return closure
 
     def loss_steps(self, dummy_data, dummy_label, model):
-        """Take a few gradient descent steps to fit the model to the given input."""
+        """ Take a few gradient descent steps to fit the model to the dummy data and labels. """
         epochs = Config().trainer.epochs
         batch_size = Config().trainer.batch_size
         # TODO: use_updates or not
