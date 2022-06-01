@@ -16,8 +16,8 @@ Reference:
 
 import simclr_net
 
-from plato.trainers import ssl as ssl_trainer
-from plato.clients import simple_ssl as ssl_client
+from plato.trainers import self_sl as ssl_trainer
+from plato.clients import ssl_simple as ssl_client
 from plato.servers import fedavg
 
 

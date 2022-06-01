@@ -14,30 +14,74 @@ from plato.config import Config
 from plato.utils.step import Step
 
 
-def get_optimizer(model) -> optim.Optimizer:
+class AverageMeter():
+    """Computes and stores the average and current value"""
+
+    def __init__(self, name, fmt=':f'):
+        self.name = name
+        self.fmt = fmt
+        self.log = []
+        self.val = 0
+        self.avg = 0
+        self.sum = 0
+        self.count = 0
+
+    def reset(self):
+        self.log.append(self.avg)
+        self.val = 0
+        self.avg = 0
+        self.sum = 0
+        self.count = 0
+
+    def update(self, val, n=1):
+        self.val = val
+        self.sum += val * n
+        self.count += n
+        self.avg = self.sum / self.count
+
+    def __str__(self):
+        fmtstr = '{name} {val' + self.fmt + '} ({avg' + self.fmt + '})'
+        return fmtstr.format(**self.__dict__)
+
+
+def get_optimizer(model,
+                  optimizer_name=None,
+                  learning_rate=None,
+                  momentum=None,
+                  weight_decay=None) -> optim.Optimizer:
     """Obtain the optimizer used for training the model."""
-    if Config().trainer.optimizer == 'SGD':
+    if optimizer_name is None:
+        optimizer_name = Config().trainer.optimizer
+    if learning_rate is None:
+        learning_rate = Config().trainer.learning_rate
+    if weight_decay is None:
+        weight_decay = Config().trainer.weight_decay
+
+    if optimizer_name == 'SGD':
+        if momentum is None:
+            momentum = Config().trainer.momentum
         return optim.SGD(model.parameters(),
-                         lr=Config().trainer.learning_rate,
-                         momentum=Config().trainer.momentum,
-                         weight_decay=Config().trainer.weight_decay)
-    elif Config().trainer.optimizer == 'Adam':
+                         lr=learning_rate,
+                         momentum=momentum,
+                         weight_decay=weight_decay)
+    elif optimizer_name == 'Adam':
         return optim.Adam(model.parameters(),
-                          lr=Config().trainer.learning_rate,
-                          weight_decay=Config().trainer.weight_decay)
-    elif Config().trainer.optimizer == 'Adadelta':
+                          lr=learning_rate,
+                          weight_decay=weight_decay)
+    elif optimizer_name == 'Adadelta':
+
         return optim.Adadelta(model.parameters(),
-                              lr=Config().trainer.learning_rate,
+                              lr=learning_rate,
                               rho=Config().trainer.rho,
                               eps=float(Config().trainer.eps),
-                              weight_decay=Config().trainer.weight_decay)
-    elif Config().trainer.optimizer == 'AdaHessian':
+                              weight_decay=weight_decay)
+    elif optimizer_name == 'AdaHessian':
         return torch_optim.Adahessian(
             model.parameters(),
-            lr=Config().trainer.learning_rate,
+            lr=learning_rate,
             betas=(Config().trainer.momentum_b1, Config().trainer.momentum_b2),
             eps=float(Config().trainer.eps),
-            weight_decay=Config().trainer.weight_decay,
+            weight_decay=weight_decay,
             hessian_power=Config().trainer.hessian_power,
         )
 
@@ -46,13 +90,18 @@ def get_optimizer(model) -> optim.Optimizer:
 
 def get_lr_schedule(optimizer: optim.Optimizer,
                     iterations_per_epoch: int,
+                    lr_schedule=None,
+                    epochs=None,
                     train_loader=None):
     """Returns a learning rate scheduler according to the configuration."""
-    if Config().trainer.lr_schedule == 'CosineAnnealingLR':
-        return optim.lr_scheduler.CosineAnnealingLR(
-            optimizer,
-            len(train_loader) * Config().trainer.epochs)
-    elif Config().trainer.lr_schedule == 'LambdaLR':
+    if lr_schedule is None:
+        lr_schedule = Config().trainer.lr_schedule
+    if lr_schedule == 'CosineAnnealingLR':
+        if epochs is None:
+            epochs = Config().trainer.epochs
+        return optim.lr_scheduler.CosineAnnealingLR(optimizer,
+                                                    len(train_loader) * epochs)
+    elif lr_schedule == 'LambdaLR':
         lambdas = [lambda it: 1.0]
 
         if hasattr(Config().trainer, 'lr_gamma') and hasattr(
@@ -73,7 +122,7 @@ def get_lr_schedule(optimizer: optim.Optimizer,
         # Combine the lambdas
         return optim.lr_scheduler.LambdaLR(
             optimizer, lambda it: np.product([l(it) for l in lambdas]))
-    elif Config().trainer.lr_schedule == 'StepLR':
+    elif lr_schedule == 'StepLR':
         step_size = Config().trainer.lr_step_size if hasattr(
             Config().trainer, 'lr_step_size') else 30
         gamma = Config().trainer.lr_gamma if hasattr(Config().trainer,
@@ -81,7 +130,7 @@ def get_lr_schedule(optimizer: optim.Optimizer,
         return optim.lr_scheduler.StepLR(optimizer,
                                          step_size=step_size,
                                          gamma=gamma)
-    elif Config().trainer.lr_schedule == 'ReduceLROnPlateau':
+    elif lr_schedule == 'ReduceLROnPlateau':
         factor = Config().trainer.lr_factor if hasattr(Config().trainer,
                                                        'lr_factor') else 0.1
         patience = Config().trainer.lr_patience if hasattr(
