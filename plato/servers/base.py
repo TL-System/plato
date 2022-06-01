@@ -720,7 +720,8 @@ class Server:
         self.current_reported_clients[client_info[1]['client_id']] = True
         del self.training_clients[client_id]
 
-        self.training_sids.remove(client_info[1]['sid'])
+        if self.asynchronous_mode and self.simulate_wall_time:
+            self.training_sids.remove(client_info[1]['sid'])
 
         await self.process_clients(client_info)
 
