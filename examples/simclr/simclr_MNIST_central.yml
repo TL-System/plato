@@ -18,7 +18,7 @@
 #     - step_size 20
 #     - gamma 0.9
 #   - batch_size: 64
-
+#   - weight_decay=1e-3
 clients:
     # Type
     type: simple
@@ -94,30 +94,19 @@ trainer:
     # Number of epochs for local training in each communication round
     epochs: 100
     batch_size: 64
-    optimizer: ADAM
+    optimizer: Adam
     learning_rate: 0.003
-    betas: 0.9
+    betas:
+      - 0.9
+      - 0.999
     eps: 0.00000008 # 1e-8
+    weight_decay: 0.001
+
 
     scheduler: CosineAnnealingLR
     step_size: 20
     gamma: 0.9
-# They utilize:
-#   - num_epochs:100
-#   - use_scheduler
-#   - head_type: mlp
-#   - see the transform for details
-#   - projection dim (its feature dim): 128
-#   - temperature: 0.07
-#   - optimizer: 
-#     - adam
-#     - lr 1e-3
-#     - betas (0.9, 0.999)
-#     - eps 1e-08
-#   - scheduler:
-#     - step_size 20
-#     - gamma 0.9
-#   - batch_size: 64
+
 
     # Number of epochs for local training in each communication round
     pers_epochs: 30
