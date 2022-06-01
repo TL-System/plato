@@ -106,8 +106,8 @@ class Trainer(basic.Trainer):
                 examples, labels = examples.to(self.device), labels.to(
                     self.device)
 
-                plt.imshow(tt(examples[0].cpu()))
-                plt.title("Ground truth image")
+                # plt.imshow(tt(examples[0].cpu()))
+                # plt.title("Ground truth image")
 
                 if 'differential_privacy' in config and config[
                         'differential_privacy']:
