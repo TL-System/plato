@@ -97,6 +97,9 @@ class Server:
 
         # States that need to be maintained for asynchronous FL
 
+        # sids is currently in use
+        self.training_sids = []
+
         # Clients whose new reports were received but not yet processed
         self.reported_clients = []
 
@@ -443,6 +446,7 @@ class Server:
                             max_concurrency, len(self.selected_clients))]
 
                 self.trained_clients += selected_clients
+
             else:
                 selected_clients = self.selected_clients
 
@@ -459,16 +463,14 @@ class Server:
                 sid = self.clients[client_id]['sid']
 
                 if self.asynchronous_mode and self.simulate_wall_time:
-                    training_sids = []
-                    for client_info in self.reported_clients:
-                        training_sids.append(client_info[1]['sid'])
 
                     # skip if this sid is currently `training' with reporting clients
                     # or it has already been selected in this round
-                    while sid in training_sids or sid in self.selected_sids:
+                    while sid in self.training_sids or sid in self.selected_sids:
                         client_id = client_id % self.clients_per_round + 1
                         sid = self.clients[client_id]['sid']
 
+                    self.training_sids.append(sid)
                     self.selected_sids.append(sid)
 
                 self.training_clients[self.selected_client_id] = {
@@ -718,6 +720,8 @@ class Server:
         self.current_reported_clients[client_info[1]['client_id']] = True
         del self.training_clients[client_id]
 
+        self.training_sids.remove(client_info[1]['sid'])
+
         await self.process_clients(client_info)
 
     async def process_clients(self, client_info):
@@ -892,7 +896,9 @@ class Server:
                      'max_concurrency') and not Config().is_central_server():
             # Clients in the current batch finish training
             # The server will select the next batch of clients to train
-            if len(self.updates) >= len(self.trained_clients):
+            if len(self.updates) >= len(self.trained_clients) or len(
+                    self.current_reported_clients) >= len(
+                        self.trained_clients):
                 await self.select_clients(for_next_batch=True)
 
     async def client_disconnected(self, sid):
