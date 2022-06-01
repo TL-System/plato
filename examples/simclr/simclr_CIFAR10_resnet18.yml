@@ -1,0 +1,117 @@
+
+clients:
+    # Type
+    type: simple
+
+    # The total number of clients
+    total_clients: 5
+
+    # The number of clients selected in each round
+    per_round: 2
+
+    # Should the clients compute test accuracy locally?
+    do_test: True
+    test_interval: 1
+    eval_test_interval: 1
+    # Whether simulate clients or not
+    simulation: true
+
+    random_seed: 1
+
+server:
+    address: 127.0.0.1
+    port: 8000
+    synchronous: true
+    do_test: false
+    checkpoint_path: models/simclr/mnist
+    model_path: models/simclr/mnist
+
+data:
+    # The training and testing dataset
+    datasource: CIFAR10
+
+    # Number of samples in each partition
+    partition_size: 600
+
+    # IID or non-IID?
+    sampler: noniid
+    testset_sampler: noniid
+    # The concentration parameter for the Dirichlet distribution
+    concentration: 5
+
+    # The random seed for sampling data
+    random_seed: 1
+
+    # set the data wrapper to further process the data
+    #   for the specific usage, such as constrastive learning
+    # data_wrapper: Null
+    data_wrapper: ContrastiveAugmentWrapper
+
+    # set the data augmentation 
+    #   options: simsiam, byol, simclr
+    augment_transformer_name: simclr
+    # some methods apply the normalization to samples
+    #   while others do not
+    is_norm: False 
+
+trainer:
+    # The type of the trainer
+    type: basic
+
+    
+    # The maximum number of training rounds
+    rounds: 100
+
+    # Whether the training should use multiple GPUs if available
+    parallelized: false
+
+    # The maximum number of clients running concurrently
+    max_concurrency: 10
+
+    # The target accuracy
+    target_accuracy: 0.80
+
+    # Number of epochs for local training in each communication round
+    epochs: 2
+    batch_size: 10
+    optimizer: SGD
+    learning_rate: 0.003
+    momentum: 0.9 # learning rate is fixed as in Appendix C.2
+    weight_decay: 0.0001
+
+    # Number of epochs for local training in each communication round
+    pers_epochs: 10
+    pers_batch_size: 32
+    pers_optimizer: SGD
+    pers_learning_rate: 0.03
+    pers_momentum: 0.0 # learning rate is fixed as in Appendix C.2
+    pers_weight_decay: 0.0
+    # currently, we only support CosineAnnealingLR
+    pers_lr_schedule: CosineAnnealingLR
+
+    # temperature
+    temperature: 0.5
+    
+    # image_size
+    #  - CIFAR10 (Image size=32)
+    #  - MNIST (Image size=28)
+    image_size: 32
+
+    # The machine learning model,
+    # it behaves as the encoder for the ssl method
+    # the final fc layer will be removed
+    model_name: resnet_18
+    projection_dim: 256
+    
+    personalized_model_name: pure_one_layer_mlp  
+
+    monitor_name: knn
+    knn_k: 200
+    knn_t: 0.1
+    hide_monitor_progress: False
+
+    num_classes: 10
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg

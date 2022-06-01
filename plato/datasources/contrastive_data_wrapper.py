@@ -170,6 +170,7 @@ class ContrastiveAugmentDataWrapper(torch.utils.data.Dataset):
     """
 
     def __init__(self, dataset, aug_transformer):
+        super().__init__()
         self.dataset = dataset
         self.raw_data = self.dataset.data
 
@@ -201,7 +202,17 @@ class ContrastiveAugmentDataWrapper(torch.utils.data.Dataset):
         # we must convert the data to raw data to PTL type before
         #   applying the transformation.
         # see the source code of torchvision.datasets.
-        raw_sample = Image.fromarray(raw_sample.numpy(), mode="L")
+        if torch.is_tensor(raw_sample):
+            # this is for the MNIST dataset.
+            # from the torchvision datases, the raw MNIST is np.narray
+            # and the mode should be L
+            raw_sample = raw_sample.numpy()
+            raw_sample = Image.fromarray(raw_sample, mode="L")
+        else:
+            raw_sample = Image.fromarray(raw_sample)
+
+        if self.dataset.target_transform is not None:
+            sample_label = self.dataset.target_transform(sample_label)
 
         # we can obtain different number of prepared samples
         #   based on what aug_transformer used.
