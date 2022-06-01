@@ -114,7 +114,7 @@ class Server(fedavg.Server):
             lpipss.append(loss_fn.forward(dummy_data, gt_data))
 
             if iters % Config().algorithm.log_interval == 0:
-                logging.info("[Gradient Leakage Attacking...] Iter %d: Gradient difference = %.10f, MSE = %.8f, LPIPS = %.8f",
+                logging.info("[Gradient Leakage Attacking...] Iter %d: Loss = %.10f, MSE = %.8f, LPIPS = %.8f",
                              iters, losses[-1], mses[-1], lpipss[-1])
                 history.append(tt(dummy_data[0].cpu()))
 
@@ -153,7 +153,7 @@ class Server(fedavg.Server):
             dummy_weight = self.loss_steps(dummy_data, dummy_label)
 
             weight_diff = 0
-            for wx, wy in zip(dummy_weight, [target_weight]):
+            for wx, wy in zip(dummy_weight.values(), target_weight.values()):
                 weight_diff += ((wx - wy) ** 2).sum()
             weight_diff.backward()
             return weight_diff
@@ -176,10 +176,14 @@ class Server(fedavg.Server):
                     dummy_data[idx * batch_size:(idx + 1) * batch_size])
                 labels_ = dummy_label[idx * batch_size:(idx + 1) * batch_size]
             loss = loss_criterion(dummy_pred, labels_)
-            grad = torch.autograd.grad(loss, model.parameters.values(),
+            grad = torch.autograd.grad(loss, model.parameters(),
                                        retain_graph=True, create_graph=True, only_inputs=True)
-
-            model.parameters = OrderedDict((name, param - Config().trainer.learning_rate * grad_part)
-                                           for ((name, param), grad_part)
-                                           in zip(model.parameters.items(), grad))
-        return list(model.parameters.values())
+            with torch.no_grad():
+                parameters = OrderedDict(model.named_parameters())
+                for (name, param), grad_part in zip(parameters.items(), grad):
+                    param -= Config().trainer.learning_rate * grad_part
+        # for name, param in model.named_parameters():
+        #     if param.requires_grad:
+        #         print(name, param.data[0])
+        #         break
+        return OrderedDict(model.named_parameters())
