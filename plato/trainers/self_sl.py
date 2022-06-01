@@ -203,15 +203,14 @@ class Trainer(basic.Trainer):
             loss_criterion = torch.nn.CrossEntropyLoss()
 
         # Initializing the optimizer
-        get_optimizer = getattr(self, "get_optimizer",
-                                optimizers.get_optimizer)
-        optimizer = get_optimizer(self.model)
+        get_dynamic_optimizer = getattr(self, "get_optimizer",
+                                        optimizers.get_dynamic_optimizer)
+        optimizer = get_dynamic_optimizer(self.model)
 
         # Initializing the learning rate schedule, if necessary
         if hasattr(config, 'lr_schedule'):
-            lr_schedule = optimizers.get_lr_schedule(optimizer,
-                                                     iterations_per_epoch,
-                                                     train_loader)
+            lr_schedule = optimizers.get_dynamic_lr_schedule(
+                optimizer, iterations_per_epoch, train_loader)
         else:
             lr_schedule = None
 
@@ -391,9 +390,9 @@ class Trainer(basic.Trainer):
                 num_eval_train_epochs = Config().trainer.pers_epochs
                 # perform the evaluation in the downstream task
                 #   i.e., the client's personal local dataset
-                eval_optimizer = optimizers.get_optimizer(
+                eval_optimizer = optimizers.get_dynamic_optimizer(
                     self.personalized_model,
-                    optimizer_name=Config().trainer.pers_optimizer,
+                    optimizer=Config().trainer.pers_optimizer,
                     learning_rate=Config().trainer.pers_learning_rate,
                     momentum=Config().trainer.pers_momentum,
                     weight_decay=Config().trainer.pers_weight_decay)
@@ -402,12 +401,12 @@ class Trainer(basic.Trainer):
                     Config().trainer.pers_batch_size).astype(int)
                 # Initializing the learning rate schedule, if necessary
                 if hasattr(config, 'lr_schedule'):
-                    lr_schedule = optimizers.get_lr_schedule(
+                    lr_schedule = optimizers.get_dynamic_lr_schedule(
                         optimizer=eval_optimizer,
                         iterations_per_epoch=iterations_per_epoch,
+                        train_loader=eval_train_loader,
                         lr_schedule=Config().trainer.pers_lr_schedule,
-                        epochs=Config().trainer.pers_epochs,
-                        train_loader=eval_train_loader)
+                        epochs=Config().trainer.pers_epochs)
                 else:
                     lr_schedule = None
 
