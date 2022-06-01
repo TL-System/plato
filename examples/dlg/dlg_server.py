@@ -100,8 +100,9 @@ class Server(fedavg.Server):
         # Sharing and matching updates
         if not (hasattr(Config().algorithm, 'share_gradients') and Config().algorithm.share_gradients) \
                 and hasattr(Config().algorithm, 'match_weight') and Config().algorithm.match_weight:
+            model = deepcopy(self.trainer.model)
             closure = self.weight_closure(
-                optimizer, dummy_data, dummy_label, target_weight)
+                optimizer, dummy_data, dummy_label, target_weight, model)
         else:
             closure = self.gradient_closure(
                 optimizer, dummy_data, dummy_label, target_grad)
@@ -146,11 +147,11 @@ class Server(fedavg.Server):
             return grad_diff
         return closure
 
-    def weight_closure(self, optimizer, dummy_data, dummy_label, target_weight):
+    def weight_closure(self, optimizer, dummy_data, dummy_label, target_weight, model):
         def closure():
             optimizer.zero_grad()
             # self.trainer.model.zero_grad()
-            dummy_weight = self.loss_steps(dummy_data, dummy_label)
+            dummy_weight = self.loss_steps(dummy_data, dummy_label, model)
 
             weight_diff = 0
             for wx, wy in zip(dummy_weight.values(), target_weight.values()):
@@ -159,15 +160,13 @@ class Server(fedavg.Server):
             return weight_diff
         return closure
 
-    def loss_steps(self, dummy_data, dummy_label):
+    def loss_steps(self, dummy_data, dummy_label, model):
         """Take a few gradient descent steps to fit the model to the given input."""
-        model = deepcopy(self.trainer.model)
         epochs = Config().trainer.epochs
         batch_size = Config().trainer.batch_size
         # TODO: use_updates or not
         for epoch in range(epochs):
             if batch_size == 0:
-                # TODO: model deep copy
                 dummy_pred = model(dummy_data)
                 labels_ = dummy_label
             else:
@@ -175,8 +174,9 @@ class Server(fedavg.Server):
                 dummy_pred = model(
                     dummy_data[idx * batch_size:(idx + 1) * batch_size])
                 labels_ = dummy_label[idx * batch_size:(idx + 1) * batch_size]
-            loss = loss_criterion(dummy_pred, labels_)
-            grad = torch.autograd.grad(loss, model.parameters(),
+            dummy_onehot_label = F.softmax(labels_, dim=-1)
+            dummy_loss = criterion(dummy_pred, dummy_onehot_label)
+            grad = torch.autograd.grad(dummy_loss, model.parameters(),
                                        retain_graph=True, create_graph=True, only_inputs=True)
             with torch.no_grad():
                 parameters = OrderedDict(model.named_parameters())
