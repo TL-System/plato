@@ -248,7 +248,7 @@ The Plato federated learning server is designed to use Socket.IO over HTTP and H
 Remove the `conda` environment used to run *Plato* first, and then remove the directory containing *Plato*'s git repository.
 
 ```shell
-conda-env remove -n plato
+conda env remove -n plato
 rm -rf plato/
 ```
 
