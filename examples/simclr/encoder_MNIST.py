@@ -1,7 +1,8 @@
 """ 
 To compare with other third-part implementations of 
     SimCLR. We introduce their implementations here.
-
+    
+    https://github.com/giakou4/MNIST_classification.
 """
 
 import torch
@@ -38,3 +39,6 @@ class Encoder(torch.nn.Module):
         x = self.layer3(x)
         x = x.view(x.size(0), -1)  # Flatten them for FC
         return x
+
+    def encoding_dim(self):
+        return self._to_linear
