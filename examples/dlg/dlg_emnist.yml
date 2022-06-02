@@ -33,7 +33,7 @@ data:
     concentration: 1
 
     # The random seed for sampling data
-    random_seed: 30
+    random_seed: 10
 
 trainer:
     # The type of the trainer
