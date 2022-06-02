@@ -232,6 +232,8 @@ class Server(base.Server):
                 report.training_time + report.comm_time
                 for (__, report, __, __) in self.updates
             ]),
+            'comm_overhead':
+            self.comm_overhead,
         }
 
     @staticmethod
