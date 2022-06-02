@@ -1,14 +1,19 @@
-""" An example for running Plato with custom clients. """
+""" 
+An example for running Plato with custom clients. 
+
+To run this example:
+
+python examples/customized/custom_client.py -c examples/customized/client.yml
+
+"""
+
 import asyncio
 import logging
-import os
 
 import torch
 from torch import nn
 from torchvision.datasets import MNIST
 from torchvision.transforms import ToTensor
-
-os.environ['config_file'] = './client.yml'
 
 from plato.clients import simple
 from plato.datasources import base
@@ -16,8 +21,9 @@ from plato.trainers import basic
 
 
 class DataSource(base.DataSource):
-    """A custom datasource with custom training and validation datasets.
+    """ A custom datasource with custom training and validation datasets.
     """
+
     def __init__(self):
         super().__init__()
 
@@ -33,6 +39,7 @@ class DataSource(base.DataSource):
 
 class Trainer(basic.Trainer):
     """A custom trainer with custom training and testing loops. """
+
     def train_model(self, config, trainset, sampler, cut_layer=None):  # pylint: disable=unused-argument
         """A custom training loop. """
         optimizer = torch.optim.Adam(self.model.parameters(), lr=1e-3)
@@ -82,13 +89,14 @@ class Trainer(basic.Trainer):
 
 class CustomClient(simple.Client):
     """ An example for customizing the client. """
+
     def __init__(self, model=None, datasource=None, trainer=None):
         super().__init__(model=model, datasource=datasource, trainer=trainer)
         logging.info("A customized client has been initialized.")
 
 
 def main():
-    """ 
+    """
     A Plato federated learning training session using a custom client.
 
     To run this example:
@@ -102,12 +110,13 @@ def main():
         nn.Linear(128, 10),
     )
     datasource = DataSource()
-    trainer = Trainer(model=model)
+    trainer = Trainer
 
     client = CustomClient(model=model, datasource=datasource, trainer=trainer)
     client.configure()
     loop = asyncio.get_event_loop()
     loop.run_until_complete(client.start_client())
+
 
 if __name__ == "__main__":
     main()

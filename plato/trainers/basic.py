@@ -10,9 +10,6 @@ import time
 
 import numpy as np
 import torch
-from opacus import GradSampleModule
-from opacus.privacy_engine import PrivacyEngine
-from opacus.validators import ModuleValidator
 from plato.config import Config
 from plato.models import registry as models_registry
 from plato.trainers import base
@@ -40,27 +37,16 @@ class Trainer(base.Trainer):
 
         self.training_start_time = time.time()
         self.models_per_epoch = {}
+        self.model_state_dict = None
 
         if model is None:
             model = models_registry.get()
 
         self.model = model
 
-        if hasattr(Config().algorithm, 'init_params') and Config(
-        ).algorithm.init_params:
+        if hasattr(Config().algorithm,
+                   'init_params') and Config().algorithm.init_params:
             self.model.apply(weights_init)
-
-    def make_model_private(self):
-        """ Make the model private for use with the differential privacy engine. """
-        if hasattr(Config().trainer, 'differential_privacy') and Config(
-        ).trainer.differential_privacy:
-            errors = ModuleValidator.validate(self.model, strict=False)
-            if len(errors) > 0:
-                self.model = ModuleValidator.fix(self.model)
-                errors = ModuleValidator.validate(self.model, strict=False)
-                assert len(errors) == 0
-
-            self.model = GradSampleModule(self.model)
 
     def zeros(self, shape):
         """Returns a PyTorch zero tensor with the given shape."""
@@ -85,7 +71,10 @@ class Trainer(base.Trainer):
         else:
             model_path = f'{model_path}/{model_name}.pth'
 
-        torch.save(self.model.state_dict(), model_path)
+        if self.model_state_dict is None:
+            torch.save(self.model.state_dict(), model_path)
+        else:
+            torch.save(self.model_state_dict, model_path)
 
         if self.client_id == 0:
             logging.info("[Server #%d] Model saved to %s.", os.getpid(),
@@ -112,7 +101,7 @@ class Trainer(base.Trainer):
             logging.info("[Client #%d] Loading a model from %s.",
                          self.client_id, model_path)
 
-        self.model.load_state_dict(torch.load(model_path), strict=False)
+        self.model.load_state_dict(torch.load(model_path), strict=True)
 
     def simulate_sleep_time(self):
         """Simulate client's speed by putting it to sleep."""
@@ -126,7 +115,12 @@ class Trainer(base.Trainer):
             time.sleep(sleep_seconds)
             logging.info("[Client #%d] Woke up.", self.client_id)
 
-    def train_process(self, config, trainset, sampler, cut_layer=None):
+    def train_process(self,
+                      config,
+                      trainset,
+                      sampler,
+                      cut_layer=None,
+                      **kwargs):
         """The main training loop in a federated learning workload, run in
           a separate process with a new CUDA context, so that CUDA memory
           can be released after the training completes.
@@ -135,18 +129,26 @@ class Trainer(base.Trainer):
         self: the trainer itself.
         config: a dictionary of configuration parameters.
         trainset: The training dataset.
-        sampler: the sampler that extracts a partition for this client.
+        sampler: The sampler that extracts a partition for this client.
         cut_layer (optional): The layer which training should start from.
+        kwargs (optional): Additional keyword arguments.
         """
 
         try:
             custom_train = getattr(self, "train_model", None)
 
             if callable(custom_train):
-                # Use a custom training loop to train for one epoch
-                self.train_model(config, trainset, sampler.get(), cut_layer)
+                # Use a custom training loop to train
+                self.train_model(config, trainset, sampler.get(), cut_layer,
+                                 **kwargs)
             else:
-                self.train_loop(config, trainset, sampler.get(), cut_layer)
+                self.train_loop(
+                    config,
+                    trainset,
+                    sampler.get(),
+                    cut_layer,
+                    **kwargs,
+                )
         except Exception as training_exception:
             logging.info("Training on client #%d failed.", self.client_id)
             raise training_exception
@@ -157,7 +159,7 @@ class Trainer(base.Trainer):
             filename = f"{model_type}_{self.client_id}_{config['run_id']}.pth"
             self.save_model(filename)
 
-    def train_loop(self, config, trainset, sampler, cut_layer):
+    def train_loop(self, config, trainset, sampler, cut_layer, **kwargs):
         """ The default training loop when a custom training loop is not supplied. """
         batch_size = config['batch_size']
         log_interval = 10
@@ -177,10 +179,6 @@ class Trainer(base.Trainer):
 
         iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
         epochs = config['epochs']
-
-        # Sending the model to the device used for training
-        self.model.to(self.device)
-        self.model.train()
 
         # Initializing the loss criterion
         _loss_criterion = getattr(self, "loss_criterion", None)
@@ -202,37 +200,15 @@ class Trainer(base.Trainer):
         else:
             lr_schedule = None
 
-        if 'differential_privacy' in config and config['differential_privacy']:
-            logging.info(
-                "[Client #%s] Using differential privacy during training.",
-                self.client_id)
-
-            privacy_engine = PrivacyEngine(accountant='rdp', secure_mode=False)
-            self.make_model_private()
-
-            self.model, optimizer, train_loader = privacy_engine.make_private_with_epsilon(
-                module=self.model,
-                optimizer=optimizer,
-                data_loader=train_loader,
-                target_epsilon=config['dp_epsilon']
-                if 'dp_epsilon' in config else 10.0,
-                target_delta=config['dp_delta']
-                if 'dp_delta' in config else 1e-5,
-                epochs=epochs,
-                max_grad_norm=config['dp_max_grad_norm']
-                if 'max_grad_norm' in config else 1.0,
-            )
+        self.model.to(self.device)
+        self.model.train()
 
         for epoch in range(1, epochs + 1):
             # Use a default training loop
             for batch_id, (examples, labels) in enumerate(train_loader):
                 examples, labels = examples.to(self.device), labels.to(
                     self.device)
-                if 'differential_privacy' in config and config[
-                        'differential_privacy']:
-                    optimizer.zero_grad(set_to_none=True)
-                else:
-                    optimizer.zero_grad()
+                optimizer.zero_grad()
 
                 if cut_layer is None:
                     outputs = self.model(examples)
@@ -283,13 +259,14 @@ class Trainer(base.Trainer):
                 self.save_model(filename)
                 self.model.to(self.device)
 
-    def train(self, trainset, sampler, cut_layer=None) -> float:
+    def train(self, trainset, sampler, cut_layer=None, **kwargs) -> float:
         """The main training loop in a federated learning workload.
 
         Arguments:
         trainset: The training dataset.
         sampler: the sampler that extracts a partition for this client.
         cut_layer (optional): The layer which training should start from.
+        kwargs (optional): Additional keyword arguments.
 
         Returns:
         float: Elapsed time during training.
@@ -308,7 +285,8 @@ class Trainer(base.Trainer):
 
             train_proc = mp.Process(target=self.train_process,
                                     args=(config, trainset, sampler,
-                                          cut_layer))
+                                          cut_layer),
+                                    kwargs=kwargs)
             train_proc.start()
             train_proc.join()
 
@@ -325,14 +303,14 @@ class Trainer(base.Trainer):
             self.pause_training()
         else:
             tic = time.perf_counter()
-            self.train_process(config, trainset, sampler, cut_layer)
+            self.train_process(config, trainset, sampler, cut_layer, **kwargs)
             toc = time.perf_counter()
 
         training_time = toc - tic
 
         return training_time
 
-    def test_process(self, config, testset, sampler=None):
+    def test_process(self, config, testset, sampler=None, **kwargs):
         """The testing loop, run in a separate process with a new CUDA context,
         so that CUDA memory can be released after the training completes.
 
@@ -340,6 +318,7 @@ class Trainer(base.Trainer):
         config: a dictionary of configuration parameters.
         testset: The test dataset.
         sampler: The sampler that extracts a partition of the test dataset.
+        kwargs (optional): Additional keyword arguments.
         """
         self.model.to(self.device)
         self.model.eval()
@@ -395,12 +374,13 @@ class Trainer(base.Trainer):
         else:
             return accuracy
 
-    def test(self, testset, sampler=None) -> float:
+    def test(self, testset, sampler=None, **kwargs) -> float:
         """Testing the model using the provided test dataset.
 
         Arguments:
         testset: The test dataset.
         sampler: The sampler that extracts a partition of the test dataset.
+        kwargs (optional): Additional keyword arguments.
         """
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']
@@ -410,11 +390,8 @@ class Trainer(base.Trainer):
                 mp.set_start_method('spawn', force=True)
 
             proc = mp.Process(target=self.test_process,
-                              args=(
-                                  config,
-                                  testset,
-                                  sampler,
-                              ))
+                              args=(config, testset, sampler),
+                              kwargs=kwargs)
             proc.start()
             proc.join()
 
@@ -429,16 +406,17 @@ class Trainer(base.Trainer):
 
             self.pause_training()
         else:
-            accuracy = self.test_process(config, testset)
+            accuracy = self.test_process(config, testset, **kwargs)
 
         return accuracy
 
-    async def server_test(self, testset, sampler=None):
+    async def server_test(self, testset, sampler=None, **kwargs):
         """Testing the model on the server using the provided test dataset.
 
         Arguments:
         testset: The test dataset.
         sampler: The sampler that extracts a partition of the test dataset.
+        **kwargs (optional): Additional keyword arguments.
         """
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']

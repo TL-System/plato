@@ -38,6 +38,7 @@ else:
         hybrid,
         efficientnet,
         regnet,
+        dcgan
     )
     registered_models = OrderedDict([
         ('dlg', dlg.Model),
@@ -54,6 +55,7 @@ else:
         ('hybrid', hybrid.Model),
         ('efficientnet', efficientnet.Model),
         ('regnet', regnet.Model),
+        ('dcgan', dcgan.Model),
     ])
 
 
