@@ -181,8 +181,7 @@ class Server(fedavg.Server):
                 dummy_pred = model(
                     dummy_data[idx * batch_size:(idx + 1) * batch_size])
                 labels_ = dummy_label[idx * batch_size:(idx + 1) * batch_size]
-            dummy_onehot_label = F.softmax(labels_, dim=-1)
-            dummy_loss = criterion(dummy_pred, dummy_onehot_label)
+            dummy_loss = loss_criterion(dummy_pred, torch.argmax(labels_, dim=-1))
             grad = torch.autograd.grad(dummy_loss, model.parameters(),
                                        retain_graph=True, create_graph=True, only_inputs=True)
             with torch.no_grad():
