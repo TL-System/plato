@@ -506,8 +506,10 @@ class Server:
                     checkpoint_path = Config().params['checkpoint_path']
 
                     payload_filename = f"{checkpoint_path}/{model_name}_{self.selected_client_id}.pth"
+
                     with open(payload_filename, 'wb') as payload_file:
                         pickle.dump(payload, payload_file)
+
                     server_response['payload_filename'] = payload_filename
 
                     payload_size = sys.getsizeof(

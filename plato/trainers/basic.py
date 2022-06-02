@@ -182,7 +182,7 @@ class Trainer(base.Trainer):
         optimizer = get_optimizer(self.model)
 
         # Initializing the learning rate schedule, if necessary
-        if hasattr(config, 'lr_schedule'):
+        if 'lr_schedule' in config:
             lr_schedule = optimizers.get_lr_schedule(optimizer,
                                                      iterations_per_epoch,
                                                      train_loader)
