@@ -402,23 +402,19 @@ class Trainer(basic.Trainer):
 
                 # perform the evaluation in the downstream task
                 #   i.e., the client's personal local dataset
+
                 eval_optimizer = optimizers.get_dynamic_optimizer(
-                    self.personalized_model,
-                    optimizer=Config().trainer.pers_optimizer,
-                    learning_rate=Config().trainer.pers_learning_rate,
-                    momentum=Config().trainer.pers_momentum,
-                    weight_decay=Config().trainer.pers_weight_decay)
+                    self.personalized_model, prefix="pers_")
                 iterations_per_epoch = np.ceil(
                     len(kwargs["eval_trainset"]) /
                     Config().trainer.pers_batch_size).astype(int)
                 # Initializing the learning rate schedule, if necessary
-                if hasattr(config, 'lr_schedule'):
+                if hasattr(config, 'pers_lr_schedule'):
                     lr_schedule = optimizers.get_dynamic_lr_schedule(
                         optimizer=eval_optimizer,
                         iterations_per_epoch=iterations_per_epoch,
                         train_loader=eval_train_loader,
-                        lr_schedule=Config().trainer.pers_lr_schedule,
-                        epochs=Config().trainer.pers_epochs)
+                        prefix="pers_")
                 else:
                     lr_schedule = None
 
