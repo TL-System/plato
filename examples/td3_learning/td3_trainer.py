@@ -97,10 +97,17 @@ class Trainer(base.Policy):
         action = self.actor(state)
         return action.cpu().data.numpy().flatten()
 
-    def update(self, iterations=1000):
+    #add to replay buffer
+    def add(self, transition):
+        if base.ReplayMemory.__len__ == Config().algorithm.replay_size:
+            print("store and update replay pointer")
+            #store and update pointer, add a method to base class base.ReplayBuffer
+
+
+    def update(self):
         """Training"""
 
-        for it in range(iterations):
+        for it in range(Config().algorithm.iterations):
 
             #sample from replay buffer
             batch_states, batch_actions, batch_rewards, batch_next_states, batch_dones = self.replay_buffer.sample()
@@ -179,8 +186,6 @@ class Trainer(base.Policy):
         print ("Average Reward over the Evaluation Step: %f" % (avg_reward))
         print ("---------------------------------------")
         return avg_reward
-
-
 
 
 

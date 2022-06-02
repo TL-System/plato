@@ -24,6 +24,10 @@ state_dim = env.observation_space.shape[0]
 action_dim = env.action_space.shape[0]
 max_action = float(env.action_space.high[0])
 
+trainer = td3_trainer.Trainer(state_dim, action_dim)
+
+evaluations = [td3_trainer.Trainer.evaluate_policy(trainer)]
+
 def main():
     """ A Plato federated learning training session using TD3. """
     logging.info("Starting RL Environment's process.")
@@ -37,7 +41,6 @@ def main():
         nn.Linear(128, 10),
     )
 
-    trainer = td3_trainer.Trainer(state_dim, action_dim)
     client = td3_learning_client.RLClient(trainer=trainer, model=model)
     server = td3_learning_server.TD3Server(model=model)
     server.run(client)
