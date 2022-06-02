@@ -7,15 +7,16 @@ import time
 
 import numpy as np
 import torch
+from torch.utils.data import Subset
 
 from opacus import GradSampleModule
 from opacus.privacy_engine import PrivacyEngine
 from opacus.validators import ModuleValidator
+from opacus.utils.batch_memory_manager import BatchMemoryManager
 
 from plato.config import Config
 from plato.trainers import basic
 from plato.utils import optimizers
-from plato.samplers.sampler_utils import BatchMemoryManager
 
 
 class Trainer(basic.Trainer):
@@ -30,6 +31,8 @@ class Trainer(basic.Trainer):
         ).trainer.max_physical_batch_size if hasattr(
             Config().trainer, "max_physical_batch_size") else 128
 
+        self.make_model_private()
+
     def make_model_private(self):
         """ Make the model private for use with the differential privacy engine. """
         errors = ModuleValidator.validate(self.model, strict=False)
@@ -38,30 +41,27 @@ class Trainer(basic.Trainer):
             errors = ModuleValidator.validate(self.model, strict=False)
             assert len(errors) == 0
 
-        self.model = GradSampleModule(self.model)
-
     def train_model(self, config, trainset, sampler, cut_layer):
         """ The training loop that supports differential privacy. """
         batch_size = config['batch_size']
         log_interval = 10
         tic = time.perf_counter()
 
-        self.make_model_private()
+        self.model = GradSampleModule(self.model)
 
-        logging.info("[Client #%d] Loading the dataset.", self.client_id)
+        logging.info("[Client #%d] Loading the dataset with size %d.",
+                     self.client_id, len(list(sampler)))
         _train_loader = getattr(self, "train_loader", None)
+        trainset = Subset(trainset, list(sampler))
 
         if callable(_train_loader):
-            train_loader = self.train_loader(batch_size, trainset, sampler,
-                                             cut_layer)
+            train_loader = self.train_loader(batch_size, trainset, cut_layer)
         else:
             train_loader = torch.utils.data.DataLoader(dataset=trainset,
                                                        shuffle=False,
-                                                       batch_size=batch_size,
-                                                       sampler=sampler)
+                                                       batch_size=batch_size)
 
         iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
-        batch_sampler = train_loader.batch_sampler
         epochs = config['epochs']
 
         # Initializing the loss criterion
@@ -109,7 +109,6 @@ class Trainer(basic.Trainer):
         for epoch in range(1, epochs + 1):
             with BatchMemoryManager(
                     data_loader=train_loader,
-                    original_batch_sampler=batch_sampler,
                     max_physical_batch_size=self.max_physical_batch_size,
                     optimizer=optimizer) as memory_safe_train_loader:
                 for batch_id, (examples,
@@ -170,6 +169,6 @@ class Trainer(basic.Trainer):
         # After GradSampleModule() conversion, the state_dict names have a `_module` prefix
         # We will need to save the weights with the original layer names without the prefix
         self.model_state_dict = {
-            k[8:]: v
+            k[8:] if '_module.' in k else k: v
             for k, v in self.model.state_dict().items()
         }
