@@ -116,6 +116,7 @@ class Client(simple.Client):
         monitor_augment_transformer = get_aug(name=augment_transformer_name,
                                               train=False,
                                               for_downstream_task=False)
+
         self.monitor_trainset = self.datasource.get_train_set()
         self.monitor_trainset = datawrapper_registry.get(
             self.monitor_trainset, monitor_augment_transformer)

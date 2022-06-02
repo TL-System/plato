@@ -43,7 +43,7 @@ class GatherLayer(torch.autograd.Function):
 
 class NT_Xent(nn.Module):
 
-    def __init__(self, batch_size, temperature, world_size):
+    def __init__(self, batch_size, temperature, world_size=1):
         super(NT_Xent, self).__init__()
         self.batch_size = batch_size
         self.temperature = temperature
@@ -173,8 +173,7 @@ class Trainer(basic.Trainer):
     def train_loop(self, config, trainset, sampler, cut_layer):
         """ The default training loop when a custom training loop is not supplied. """
         batch_size = config['batch_size']
-        epoch_log_interval = config['epoch_log_interval']
-        batch_log_interval = config['batch_log_interval']
+
         tic = time.perf_counter()
 
         logging.info("[Client #%d] Loading the dataset.", self.client_id)
@@ -190,7 +189,6 @@ class Trainer(basic.Trainer):
                                                        sampler=sampler)
 
         iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
-        epochs = config['epochs']
 
         # Sending the model to the device used for training
         self.model.to(self.device)
@@ -215,7 +213,14 @@ class Trainer(basic.Trainer):
         else:
             lr_schedule = None
 
+        epoch_log_interval = config['epoch_log_interval']
+        batch_log_interval = config['batch_log_interval']
+        epochs = config['epochs']
+        epoch_loss_meter = optimizers.AverageMeter(name='Loss')
+        batch_loss_meter = optimizers.AverageMeter(name='Loss')
+
         for epoch in range(1, epochs + 1):
+            epoch_loss_meter.reset()
             # Use a default training loop
             for batch_id, (examples, labels) in enumerate(train_loader):
                 examples1, examples2 = examples
@@ -223,6 +228,7 @@ class Trainer(basic.Trainer):
                     self.device), examples2.to(self.device), labels.to(
                         self.device)
 
+                batch_loss_meter.reset()
                 optimizer.zero_grad()
 
                 if cut_layer is None:
@@ -239,19 +245,25 @@ class Trainer(basic.Trainer):
                     loss.backward()
 
                 optimizer.step()
+                epoch_loss_meter.update(loss.data.item())
+                batch_loss_meter.update(loss.data.item())
 
                 if batch_id % batch_log_interval == 0:
                     if self.client_id == 0:
                         logging.info(
                             "[Server #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
                             os.getpid(), epoch, epochs, batch_id,
-                            len(train_loader), loss.data.item())
+                            len(train_loader), batch_loss_meter.avg)
                     else:
                         logging.info(
-                            "[Client #%d] Contrastive Pre-train Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
+                            "   [Client #%d] Contrastive Pre-train Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
                             self.client_id, epoch, epochs, batch_id,
-                            len(train_loader), loss.data.item())
+                            len(train_loader), batch_loss_meter.avg)
 
+            if epoch - 1 % epoch_log_interval == 0:
+                logging.info(
+                    "[Client #%d] Contrastive Pre-train Epoch: [%d/%d]\tLoss: %.6f",
+                    self.client_id, epoch, epochs, epoch_loss_meter.avg)
             if lr_schedule is not None:
                 lr_schedule.step()
 
@@ -321,13 +333,12 @@ class Trainer(basic.Trainer):
                             batch_size=config['batch_size'],
                             shuffle=False,
                             sampler=kwargs["monitor_trainset_sampler"].get())
-                accuracy = 0
-                with torch.no_grad():
-                    accuracy = ssl_monitor_register.get()(
-                        encoder=self.model.encoder,
-                        monitor_data_loader=monitor_train_loader,
-                        test_data_loader=test_loader,
-                        device=self.device)
+
+                accuracy = ssl_monitor_register.get()(
+                    encoder=self.model.encoder,
+                    monitor_data_loader=monitor_train_loader,
+                    test_data_loader=test_loader,
+                    device=self.device)
 
         except Exception as testing_exception:
             logging.info("Monitor Testing on client #%d failed.",
@@ -389,7 +400,6 @@ class Trainer(basic.Trainer):
                             shuffle=False,
                             sampler=kwargs["eval_trainset_sampler"].get())
 
-                num_eval_train_epochs = Config().trainer.pers_epochs
                 # perform the evaluation in the downstream task
                 #   i.e., the client's personal local dataset
                 eval_optimizer = optimizers.get_dynamic_optimizer(
@@ -423,13 +433,15 @@ class Trainer(basic.Trainer):
                 self.model.eval()
                 self.personalized_model.train()
 
-                loss_meter = optimizers.AverageMeter(name='Loss')
+                epoch_log_interval = config['epoch_log_interval']
+                num_eval_train_epochs = Config().trainer.pers_epochs
+                epoch_loss_meter = optimizers.AverageMeter(name='Loss')
 
                 # Start eval training
                 global_progress = tqdm(range(0, num_eval_train_epochs),
                                        desc=f'Evaluating')
                 for epoch in global_progress:
-                    loss_meter.reset()
+                    epoch_loss_meter.reset()
                     local_progress = tqdm(
                         eval_train_loader,
                         desc=f'Epoch {epoch}/{num_eval_train_epochs}',
@@ -439,6 +451,7 @@ class Trainer(basic.Trainer):
                         examples, labels = examples.to(self.device), labels.to(
                             self.device)
                         eval_optimizer.zero_grad()
+
                         with torch.no_grad():
                             feature = self.model.encoder(examples)
 
@@ -448,14 +461,23 @@ class Trainer(basic.Trainer):
 
                         loss.backward()
                         eval_optimizer.step()
+                        epoch_loss_meter.update(loss.data.item())
+
                         if lr_schedule is not None:
                             lr_schedule = lr_schedule.step()
                         local_progress.set_postfix({
-                            'lr': lr_schedule,
-                            "loss": loss_meter.val,
-                            'loss_avg': loss_meter.avg
+                            'lr':
+                            lr_schedule,
+                            "loss":
+                            epoch_loss_meter.val,
+                            'loss_avg':
+                            epoch_loss_meter.avg
                         })
 
+                    logging.info(
+                        "[Client #%d] Personalization Training Epoch: [%d/%d]\tLoss: %.6f",
+                        self.client_id, epoch, num_eval_train_epochs,
+                        epoch_loss_meter.avg)
                 # perform the test phase of the eval stage
                 acc_meter = optimizers.AverageMeter(name='Accuracy')
 
