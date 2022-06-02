@@ -113,7 +113,7 @@ class Client(simple.Client):
         #       i.e., test transform of the 'datasources/test_aug.py'
         #   - trainset
         #   - the transform for the monitor, such as knn
-        monitor_augment_transformer = get_aug(name=augment_transformer_name,
+        monitor_augment_transformer = get_aug(name="test",
                                               train=False,
                                               for_downstream_task=False)
 
@@ -131,7 +131,7 @@ class Client(simple.Client):
             #   - the general data transform for upper mentioned two
             #   blocks
             #   - testset
-            augment_transformer = get_aug(name=augment_transformer_name,
+            augment_transformer = get_aug(name="test",
                                           train=False,
                                           for_downstream_task=False)
             self.testset = datawrapper_registry.get(self.testset,
@@ -151,7 +151,7 @@ class Client(simple.Client):
             #   evaluation fro the representation learning of ssl.
             #   Therefore, to make it consistent, we call it eval_trainset
 
-            augment_transformer = get_aug(name=augment_transformer_name,
+            augment_transformer = get_aug(name="test",
                                           train=True,
                                           for_downstream_task=True)
             self.eval_trainset = self.datasource.get_train_set()
