@@ -141,6 +141,7 @@ def get_lr_schedule(optimizer: optim.Optimizer,
 
 
 def insert_parameter(defined_parameters,
+                     parameter_prefix,
                      parameter_name,
                      desired_parameter_name=None,
                      is_manority=True,
@@ -165,12 +166,16 @@ def insert_parameter(defined_parameters,
             In some cases, it is desired to change the <parameter_name> to
         the desired one <desired_parameter_name>.
     """
-
+    if parameter_prefix is None:
+        parameter_config_name = parameter_name
+    else:
+        parameter_config_name = parameter_prefix + parameter_name
     # insert the parameter if it does not exist in defined_parameters
     # only insert parameter when it is not defined
     if parameter_name not in defined_parameters:
-        if hasattr(Config().trainer, parameter_name):
-            parameter_value = getattr(Config().trainer, parameter_name)
+        if hasattr(Config().trainer, parameter_config_name):
+
+            parameter_value = getattr(Config().trainer, parameter_config_name)
             defined_parameters[parameter_name] = parameter_value
         else:
             if is_manority:
@@ -190,35 +195,57 @@ def insert_parameter(defined_parameters,
 def get_dynamic_optimizer(model, **kwargs) -> optim.Optimizer:
     """Obtain the optimizer used for training the model."""
 
+    # obtain the prefix if it is provided
+    # 'prefix' is a very important indicator to declare
+    # which part of parameters will be used
+    #   For example, in the self-supervised learning,
+    # we have two optimizers following different parameters in
+    # the config file. For the optimizer of evaluation part,
+    # its corresponding parameters' name start with "pers_".
+
+    prefix = None
+    if "prefix" in kwargs:
+        prefix = kwargs.pop("prefix")
+
     # it is expected to set these basic params in the
     # function's arguments
     # otherwise, the default in the config file will
     # be used.
-    kwargs = insert_parameter(kwargs, "learning_rate", "lr", is_manority=True)
-    kwargs = insert_parameter(kwargs, "weight_decay", is_manority=True)
-    kwargs = insert_parameter(kwargs, "optimizer", is_manority=True)
+    kwargs = insert_parameter(kwargs,
+                              prefix,
+                              "learning_rate",
+                              "lr",
+                              is_manority=True)
+    kwargs = insert_parameter(kwargs, prefix, "weight_decay", is_manority=True)
+    kwargs = insert_parameter(kwargs, prefix, "optimizer", is_manority=True)
     optimizer_name = kwargs.pop("optimizer")
 
     # add different parameters for different optimizers
     if optimizer_name == 'SGD':
-        kwargs = insert_parameter(kwargs, "momentum", is_manority=False)
+        kwargs = insert_parameter(kwargs,
+                                  prefix,
+                                  "momentum",
+                                  is_manority=False)
 
     if optimizer_name == 'Adam':
-        kwargs = insert_parameter(kwargs, "betas", is_manority=False)
-        kwargs = insert_parameter(kwargs, "eps", is_manority=False)
+        kwargs = insert_parameter(kwargs, prefix, "betas", is_manority=False)
+        kwargs = insert_parameter(kwargs, prefix, "eps", is_manority=False)
 
     if optimizer_name == 'Adadelta':
-        kwargs = insert_parameter(kwargs, "rho", is_manority=False)
-        kwargs = insert_parameter(kwargs, "eps", is_manority=False)
+        kwargs = insert_parameter(kwargs, prefix, "rho", is_manority=False)
+        kwargs = insert_parameter(kwargs, prefix, "eps", is_manority=False)
 
     if optimizer_name == 'AdaHessian':
-        kwargs = insert_parameter(kwargs, "betas", is_manority=False)
-        kwargs = insert_parameter(kwargs, "eps", is_manority=False)
-        kwargs = insert_parameter(kwargs, "hessian_power", is_manority=False)
+        kwargs = insert_parameter(kwargs, prefix, "betas", is_manority=False)
+        kwargs = insert_parameter(kwargs, prefix, "eps", is_manority=False)
+        kwargs = insert_parameter(kwargs,
+                                  prefix,
+                                  "hessian_power",
+                                  is_manority=False)
 
     supported_optimziers = list(optimizers_pool.keys())
     if optimizer_name not in supported_optimziers:
-        raise ValueError(f'No such optimizer: {Config().trainer.optimizer}')
+        raise ValueError(f'No such optimizer: {optimizer_name}')
 
     return optimizers_pool[optimizer_name](model.parameters(), **kwargs)
 
@@ -229,23 +256,42 @@ def get_dynamic_lr_schedule(optimizer: optim.Optimizer,
                             **kwargs):
     """Returns a learning rate scheduler according to the configuration."""
 
-    kwargs = insert_parameter(kwargs, "lr_schedule", is_manority=True)
+    # obtain the prefix if it is provided
+    # 'prefix' is a very important indicator to declare
+    # which part of parameters will be used
+    #   For example, in the self-supervised learning,
+    # we have two optimizers following different parameters in
+    # the config file. For the optimizer of evaluation part,
+    # its corresponding parameters' name start with "pers_".
+
+    prefix = None
+    if "prefix" in kwargs:
+        prefix = kwargs.pop("prefix")
+
+    kwargs = insert_parameter(kwargs, prefix, "lr_schedule", is_manority=True)
     lr_schedule = kwargs.pop("lr_schedule")
 
     if lr_schedule == 'CosineAnnealingLR':
-        kwargs = insert_parameter(kwargs, "T_max", is_manority=False)
-        kwargs = insert_parameter(kwargs, "epochs", is_manority=True)
+        kwargs = insert_parameter(kwargs, prefix, "T_max", is_manority=False)
+        kwargs = insert_parameter(kwargs, prefix, "epochs", is_manority=True)
 
         if "T_max" not in kwargs:
             epochs = kwargs.pop("epochs")
             kwargs["T_max"] = len(train_loader) * epochs
 
     if lr_schedule == "LambdaLR":
-        kwargs = insert_parameter(kwargs, "lr_gamma", is_manority=False)
         kwargs = insert_parameter(kwargs,
+                                  prefix,
+                                  "lr_gamma",
+                                  is_manority=False)
+        kwargs = insert_parameter(kwargs,
+                                  prefix,
                                   "lr_milestone_steps",
                                   is_manority=False)
-        kwargs = insert_parameter(kwargs, "lr_warmup_steps", is_manority=False)
+        kwargs = insert_parameter(kwargs,
+                                  prefix,
+                                  "lr_warmup_steps",
+                                  is_manority=False)
 
         lambdas = [lambda it: 1.0]
         if "lr_gamma" in kwargs and "lr_milestone_steps" in kwargs:
@@ -265,11 +311,13 @@ def get_dynamic_lr_schedule(optimizer: optim.Optimizer,
 
     if lr_schedule == "StepLR":
         kwargs = insert_parameter(kwargs,
+                                  prefix,
                                   "lr_step_size",
                                   is_manority=True,
                                   desired_parameter_name="step_size",
                                   default_value=30)
         kwargs = insert_parameter(kwargs,
+                                  prefix,
                                   "lr_gamma",
                                   is_manority=True,
                                   desired_parameter_name="gamma",
@@ -277,11 +325,13 @@ def get_dynamic_lr_schedule(optimizer: optim.Optimizer,
 
     if lr_schedule == "ReduceLROnPlateau":
         kwargs = insert_parameter(kwargs,
+                                  prefix,
                                   "lr_factor",
                                   is_manority=True,
                                   desired_parameter_name="factor",
                                   default_value=0.1)
         kwargs = insert_parameter(kwargs,
+                                  prefix,
                                   "lr_patience",
                                   is_manority=True,
                                   desired_parameter_name="patience",
