@@ -247,7 +247,7 @@ class Trainer(basic.Trainer):
                             len(train_loader), loss.data.item())
                     else:
                         logging.info(
-                            "[Client #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
+                            "[Client #%d] Contrastive Pre-train Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
                             self.client_id, epoch, epochs, batch_id,
                             len(train_loader), loss.data.item())
 
@@ -329,7 +329,8 @@ class Trainer(basic.Trainer):
                         device=self.device)
 
         except Exception as testing_exception:
-            logging.info("Testing on client #%d failed.", self.client_id)
+            logging.info("Monitor Testing on client #%d failed.",
+                         self.client_id)
             raise testing_exception
 
         self.model.cpu()
@@ -436,7 +437,7 @@ class Trainer(basic.Trainer):
                     for idx, (examples, labels) in enumerate(local_progress):
                         examples, labels = examples.to(self.device), labels.to(
                             self.device)
-                        self.personalized_model.zero_grad()
+                        eval_optimizer.zero_grad()
                         with torch.no_grad():
                             feature = self.model.encoder(examples)
 
