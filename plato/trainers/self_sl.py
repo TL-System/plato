@@ -42,7 +42,22 @@ class GatherLayer(torch.autograd.Function):
 
 
 class NT_Xent(nn.Module):
-    """ The NTXent loss utilized by most self-supervised methods. """
+    """ The NTXent loss utilized by most self-supervised methods. 
+    
+        Note: here can be important issue existed in this implementation
+        of NT_Xent as:
+        the NT_Xent loss utilized by the SimCLR method set the defined batch_size
+        as the parameter. However, at the end of one epoch, the left samples may smaller than
+        the batch_size. This makes the #loaded samples != batch_size.
+        Working on criterion that is defined with batch_size but receives loaded
+        samples whose size is smaller than the batch size may causes problems.
+        drop_last = True can alleviate this issue.
+        Currently drop_last is default to be False in Plato.
+        Under this case, to avoid this issue, we need to set:
+        partition_size / batch_size = integar
+        partition_size / pers_batch_size = integar
+    
+    """
 
     def __init__(self, batch_size, temperature, world_size=1):
         super(NT_Xent, self).__init__()
@@ -81,7 +96,21 @@ class NT_Xent(nn.Module):
         sim_j_i = torch.diag(sim, -self.batch_size * self.world_size)
 
         # We have 2N samples, but with Distributed training every GPU gets N examples too, resulting in: 2xNxN
-        positive_samples = torch.cat((sim_i_j, sim_j_i), dim=0).reshape(N, 1)
+        try:
+            positive_samples = torch.cat((sim_i_j, sim_j_i),
+                                         dim=0).reshape(N, 1)
+        except:
+            print("self.batch_size: ", self.batch_size)
+            print("self.world_size: ", self.world_size)
+            print("N: ", N)
+            print("z_i shape: ", z_i.shape)
+            print("z_j shape: ", z_j.shape)
+            print("sim shape: ", sim.shape)
+            print("sim_i_j shape: ", sim_i_j.shape)
+            print("sim_j_i shape: ", sim_j_i.shape)
+            positive_samples = torch.cat((sim_i_j, sim_j_i),
+                                         dim=0).reshape(N, 1)
+
         negative_samples = sim[self.mask].reshape(N, -1)
 
         labels = torch.zeros(N).to(positive_samples.device).long()
@@ -119,11 +148,11 @@ class Trainer(basic.Trainer):
         # define the loss computation instance
         defined_temperature = Config().trainer.temperature
         batch_size = Config().trainer.batch_size
+        criterion = NT_Xent(batch_size, defined_temperature, world_size=1)
 
         # currently, the loss computation only supports the one-GPU learning.
         def loss_compute(outputs, labels):
             z1, z2 = outputs
-            criterion = NT_Xent(batch_size, defined_temperature, world_size=1)
             loss = criterion(z1, z2)
             return loss
 

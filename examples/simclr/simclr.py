@@ -5,9 +5,9 @@ The official code: https://github.com/google-research/simclr
 
 The third-party code: https://github.com/PatrickHua/SimSiam
 
-Our implementation relys on:
- https://github.com/spijkervet/SimCLR.git
-
+The structure of our SimCLR and the classifier is the same as the ones used in
+the work https://github.com/spijkervet/SimCLR.git.
+ 
 Reference:
 
 [1]. https://arxiv.org/abs/2002.05709
@@ -30,7 +30,6 @@ def main():
     """
     trainer = ssl_trainer.Trainer
     simclr_model = simclr_net.SimCLR()
-
     client = ssl_client.Client(model=simclr_model, trainer=trainer)
     server = fedavg.Server(model=simclr_model, trainer=trainer)
 
