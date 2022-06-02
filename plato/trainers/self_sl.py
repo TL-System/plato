@@ -208,7 +208,7 @@ class Trainer(basic.Trainer):
         optimizer = get_dynamic_optimizer(self.model)
 
         # Initializing the learning rate schedule, if necessary
-        if hasattr(config, 'lr_schedule'):
+        if 'lr_schedule' in config:
             lr_schedule = optimizers.get_dynamic_lr_schedule(
                 optimizer, iterations_per_epoch, train_loader)
         else:
@@ -409,7 +409,8 @@ class Trainer(basic.Trainer):
                     len(kwargs["eval_trainset"]) /
                     Config().trainer.pers_batch_size).astype(int)
                 # Initializing the learning rate schedule, if necessary
-                if hasattr(config, 'pers_lr_schedule'):
+
+                if 'pers_lr_schedule' in config:
                     lr_schedule = optimizers.get_dynamic_lr_schedule(
                         optimizer=eval_optimizer,
                         iterations_per_epoch=iterations_per_epoch,
