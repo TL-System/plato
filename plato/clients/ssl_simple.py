@@ -34,8 +34,13 @@ class Client(simple.Client):
                  datasource=None,
                  algorithm=None,
                  trainer=None,
-                 personalized_model=None):
+                 personalized_model=None,
+                 contrastive_transform=None):
         super().__init__(model, datasource, algorithm, trainer)
+
+        # the specific transform used by the contrastive learning
+        self.custom_contrastive_transform = contrastive_transform
+        self.contrastive_transform = None
 
         # using the name monitor_trainset is general in this domain,
         #   it aims to record the train loader without using
@@ -84,12 +89,21 @@ class Client(simple.Client):
         # the characteristics:
         #   - SSL's data augmentation transform for contrastive training
         #   - trainset
-        augment_transformer_name = Config().data.augment_transformer_name
-        augment_transformer = get_aug(name=augment_transformer_name,
-                                      train=True,
-                                      for_downstream_task=False)
+
+        # use the custom contrastive transfrom is possible
+        if self.custom_contrastive_transform is not None:
+            self.contrastive_transform = self.custom_contrastive_transform
+            self.custom_contrastive_transform = None
+
+        # define the contrastive transform based on the requirement
+        if self.contrastive_transform is None:
+            augment_transformer_name = Config().data.augment_transformer_name
+            self.contrastive_transform = get_aug(name=augment_transformer_name,
+                                                 train=True,
+                                                 for_downstream_task=False)
+
         self.trainset = datawrapper_registry.get(self.trainset,
-                                                 augment_transformer)
+                                                 self.contrastive_transform)
 
         # get the same trainset again for monitor trainset
         # this dataset is prepared to monitor the representation learning
@@ -99,12 +113,12 @@ class Client(simple.Client):
         #       i.e., test transform of the 'datasources/test_aug.py'
         #   - trainset
         #   - the transform for the monitor, such as knn
-        general_augment_transformer = get_aug(name=augment_transformer_name,
+        monitor_augment_transformer = get_aug(name=augment_transformer_name,
                                               train=False,
                                               for_downstream_task=False)
         self.monitor_trainset = self.datasource.get_train_set()
         self.monitor_trainset = datawrapper_registry.get(
-            self.monitor_trainset, general_augment_transformer)
+            self.monitor_trainset, monitor_augment_transformer)
 
         if Config().clients.do_test:
 

@@ -28,11 +28,14 @@ class ProjectionMLP(nn.Module):
 class SimCLR(nn.Module):
     """ The implementation of SimCLR method. """
 
-    def __init__(self):
+    def __init__(self, encoder=None, encoder_dim=None):
         super().__init__()
 
-        #define the encoder
-        self.encoder, self.encode_dim = encoders_register.get()
+        if encoder is None:
+            #define the encoder based on the model_name in config
+            self.encoder, self.encode_dim = encoders_register.get()
+        else:
+            self.encoder, self.encode_dim = encoder, encoder_dim
 
         # build the projector proposed in the simclr net
         self.projector = ProjectionMLP(in_dim=self.encode_dim)

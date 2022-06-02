@@ -14,7 +14,7 @@
 #     - lr 1e-3
 #     - betas (0.9, 0.999)
 #     - eps 1e-08
-#   - scheduler:
+#   - scheduler: StepLR
 #     - step_size 20
 #     - gamma 0.9
 #   - batch_size: 64
@@ -102,8 +102,7 @@ trainer:
     eps: 0.00000008 # 1e-8
     weight_decay: 0.001
 
-
-    scheduler: CosineAnnealingLR
+    scheduler: StepLR
     step_size: 20
     gamma: 0.9
 
