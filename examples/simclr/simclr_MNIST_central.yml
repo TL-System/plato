@@ -77,8 +77,6 @@ data:
 trainer:
     # The type of the trainer
     type: basic
-
-    
     # The maximum number of training rounds
     rounds: 1
 
@@ -116,7 +114,8 @@ trainer:
     pers_weight_decay: 0.0
     # currently, we only support CosineAnnealingLR
     pers_lr_schedule: CosineAnnealingLR
-
+    pers_epoch_log_interval: 1
+    pers_batch_log_interval: 50
     # temperature
     temperature: 0.5
     
@@ -139,6 +138,10 @@ trainer:
     hide_monitor_progress: False
 
     num_classes: 10
+
+    # Define the logging information
+    epoch_log_interval: 1
+    batch_log_interval: 50
 
 algorithm:
     # Aggregation algorithm
