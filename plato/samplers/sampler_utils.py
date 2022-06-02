@@ -1,6 +1,5 @@
 """
-Useful tools used for implementing samplers
-
+Utility functions that samples local datasets
 """
 
 import numpy as np
