@@ -15,6 +15,7 @@ from plato.samplers import registry as samplers_registry
 from plato.trainers import registry as trainers_registry
 from plato.utils.reinforcement_learning.policies import td3
 from plato.clients import simple
+from plato.utils.reinforcement_learning import rl_agent
 
 
 class Report(simple.Report):
@@ -60,14 +61,6 @@ class RLClient(simple.Client):
         # Pass new state to RL Agent
         self.agent.new_state = self.prep_state()
         self.agent.process_env_update()
-
-    async def wrap_up(self):
-        """ Wrapping up when each round of training is done. """
-        if self.agent.reset_env:
-            self.agent.reset_env = False
-            self.reset()
-        if self.agent.finished:
-            await self.close()
 
     @abstractmethod
     def train(self):
