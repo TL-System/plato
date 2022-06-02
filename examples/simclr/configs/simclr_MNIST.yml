@@ -4,10 +4,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 5
+    total_clients: 50
 
     # The number of clients selected in each round
-    per_round: 2
+    per_round: 30
 
     # Should the clients compute test accuracy locally?
     do_test: True
@@ -31,7 +31,7 @@ data:
     datasource: MNIST
 
     # Number of samples in each partition
-    partition_size: 600
+    partition_size: 20000
 
     # IID or non-IID?
     sampler: noniid
@@ -72,23 +72,45 @@ trainer:
     target_accuracy: 0.98
 
     # Number of epochs for local training in each communication round
-    epochs: 2
-    batch_size: 2
-    optimizer: SGD
-    learning_rate: 0.03
-    momentum: 0.0 # learning rate is fixed as in Appendix C.2
-    weight_decay: 0.0
+    #   The user is expected to carefully choose the batch_size to avoid
+    # the memory allocation issue as the contrastive samples occupy more
+    # space as more samples will be contained within one loading.
+    epochs: 5
+    batch_size: 30
+    optimizer: Adam
+    learning_rate: 0.003
+    betas:
+      - 0.9
+      - 0.999
+    eps: 0.00000008 # 1e-8
+    weight_decay: 0.001
 
+    scheduler: StepLR
+    step_size: 20
+    gamma: 0.9
+
+    epoch_log_interval: 1
+    batch_log_interval: 100
+    
     # Number of epochs for local training in each communication round
-    pers_epochs: 10
-    pers_batch_size: 2
-    pers_optimizer: SGD
-    pers_learning_rate: 0.03
-    pers_momentum: 0.0 # learning rate is fixed as in Appendix C.2
-    pers_weight_decay: 0.0
-    # currently, we only support CosineAnnealingLR
-    pers_lr_schedule: CosineAnnealingLR
+    #   The batch size for the downstream task can be larger as it 
+    # does not utilize the 
+    pers_epochs: 50
+    pers_batch_size: 64
+    pers_optimizer: Adam
+    pers_learning_rate: 0.005
+    pers_betas: 
+        - 0.9
+        - 0.99   
+    pers_eps: 0.00000009 # 1e-8
+    pers_weight_decay: 0.002
 
+    # currently, we only support CosineAnnealingLR
+    pers_lr_schedule: StepLR
+    pers_step_size: 20
+    pers_gamma: 0.9
+
+    pers_epoch_log_interval: 1
     # temperature
     temperature: 0.5
     
@@ -101,7 +123,7 @@ trainer:
     # it behaves as the encoder for the ssl method
     # the final fc layer will be removed
     model_name: lenet5
-    projection_dim: 64
+    projection_dim: 128
     
     personalized_model_name: pure_one_layer_mlp  
 
