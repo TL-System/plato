@@ -15,6 +15,7 @@ Reference:
 """
 
 import simclr_net
+from encoder_MNIST import Encoder
 
 from plato.trainers import self_sl as ssl_trainer
 from plato.clients import ssl_simple as ssl_client
@@ -22,15 +23,15 @@ from plato.servers import fedavg
 
 
 def main():
-    """ A Plato federated learning training session using the FedRep algorithm. 
-        This implementation of simclr utilizes the general setting, i.e.,
-        removing the final fully-connected layers of model defined following 
-        the 'model_name' in config file
-
+    """ A Plato federated learning training session using the FedRep algorithm.
+    
+        This implementation of simclr utilizes the specifc encoder for the MNIST dataset.
+        https://github.com/giakou4/MNIST_classification
     """
+    MNIST_encoder = Encoder()
     trainer = ssl_trainer.Trainer
-    simclr_model = simclr_net.SimCLR()
-
+    simclr_model = simclr_net.SimCLR(encoder=MNIST_encoder,
+                                     encoder_dim=MNIST_encoder.encoding_dim())
     client = ssl_client.Client(model=simclr_model, trainer=trainer)
     server = fedavg.Server(model=simclr_model, trainer=trainer)
 
