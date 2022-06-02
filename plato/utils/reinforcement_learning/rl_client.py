@@ -25,13 +25,14 @@ class Report(simple.Report):
 class RLClient(simple.Client):
     """A federated learning client that uses RL methods to learn"""
     
+    #maybe only two functions?? *look into
     def __init__(self, agent, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
         self.agent = agent
 
     def reset(self):
-        """ Resetting the model, trainer, and algorithm on the server. """
-        logging.info("Reconfiguring the server for episode %d",
+        """ Resetting the model, trainer, and algorithm on the client. """
+        logging.info("Reconfiguring the client for episode %d",
                      self.agent.current_episode)
 
         self.model = None
@@ -73,7 +74,6 @@ class RLClient(simple.Client):
     @abstractmethod
     def prep_state(self):
         """ Wrap up the state update to RL Agent. """
-        return
 
     @abstractmethod
     def apply_action(self):
