@@ -7,7 +7,7 @@
 """
 
 from torchvision import transforms as T
-from PIL import Image, ImageOps
+from PIL import Image
 
 
 class TestTransform():
@@ -28,12 +28,12 @@ class TestTransform():
             ]
 
         if normalize is not None:
-            transform_functions = transform_functions.append(
-                T.Normalize(*normalize))
+            transform_functions.append(T.Normalize(*normalize))
 
         self.transform = T.Compose(transform_functions)
 
     def __call__(self, x):
+
         return self.transform(x)
 
 
