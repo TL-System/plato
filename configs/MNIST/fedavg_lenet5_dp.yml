@@ -18,7 +18,7 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8000
+    port: 8005
     random_seed: 1
     simulate_wall_time: true
 
@@ -29,8 +29,11 @@ server:
 data: !include mnist_iid.yml
 
 trainer:
-    # The type of the trainer
-    type: basic
+    # Using the differential privacy trainer
+    type: diff_privacy 
+    dp_epsilon: 1
+    dp_delta: 0.00001
+    dp_max_grad_norm: 1 
 
     # The maximum number of training rounds
     rounds: 5

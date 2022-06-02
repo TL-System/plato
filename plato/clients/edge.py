@@ -15,10 +15,12 @@ class Report(simple.Report):
     """ Client report, to be sent to the federated learning server. """
     average_accuracy: float
     client_id: str
+    edge_server_comm_overhead: float
 
 
 class Client(base.Client):
     """ A federated learning client at the edge server in a cross-silo training workload. """
+
     def __init__(self, server):
         super().__init__()
         self.server = server
@@ -69,7 +71,9 @@ class Client(base.Client):
         # Generate a report for the central server
         self.report = Report(self.server.total_samples, accuracy,
                              training_time, comm_time, False, average_accuracy,
-                             self.client_id)
+                             self.client_id, self.server.comm_overhead)
+
+        self.server.comm_overhead = 0
 
         return self.report, weights
 

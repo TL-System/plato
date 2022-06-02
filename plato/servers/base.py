@@ -95,7 +95,13 @@ class Server:
         self.comm_simulation = Config().clients.comm_simulation if hasattr(
             Config().clients, 'comm_simulation') else True
 
+        # Accumulated communication overhead (MB) throughout the FL training session
+        self.comm_overhead = 0
+
         # States that need to be maintained for asynchronous FL
+
+        # sids that are currently in use
+        self.training_sids = []
 
         # Clients whose new reports were received but not yet processed
         self.reported_clients = []
@@ -348,7 +354,7 @@ class Server:
 
             logging.info(
                 fonts.colourize(
-                    f"\n[{{self}}] Starting round {self.current_round}/{Config().trainer.rounds}."
+                    f"\n[{self}] Starting round {self.current_round}/{Config().trainer.rounds}."
                 ))
 
             if Config().is_central_server():
@@ -443,6 +449,7 @@ class Server:
                             max_concurrency, len(self.selected_clients))]
 
                 self.trained_clients += selected_clients
+
             else:
                 selected_clients = self.selected_clients
 
@@ -459,16 +466,14 @@ class Server:
                 sid = self.clients[client_id]['sid']
 
                 if self.asynchronous_mode and self.simulate_wall_time:
-                    training_sids = []
-                    for client_info in self.reported_clients:
-                        training_sids.append(client_info[1]['sid'])
 
                     # skip if this sid is currently `training' with reporting clients
                     # or it has already been selected in this round
-                    while sid in training_sids or sid in self.selected_sids:
+                    while sid in self.training_sids or sid in self.selected_sids:
                         client_id = client_id % self.clients_per_round + 1
                         sid = self.clients[client_id]['sid']
 
+                    self.training_sids.append(sid)
                     self.selected_sids.append(sid)
 
                 self.training_clients[self.selected_client_id] = {
@@ -504,6 +509,15 @@ class Server:
                     with open(payload_filename, 'wb') as payload_file:
                         pickle.dump(payload, payload_file)
                     server_response['payload_filename'] = payload_filename
+
+                    payload_size = sys.getsizeof(
+                        pickle.dumps(payload)) / 1024**2
+
+                    logging.info(
+                        "[%s] Sending %.2f MB of payload data to client #%d (simulated).",
+                        self, payload_size, self.selected_client_id)
+
+                    self.comm_overhead += payload_size
 
                 server_response = await self.customize_server_response(
                     server_response)
@@ -621,6 +635,8 @@ class Server:
         logging.info("[%s] Sent %.2f MB of payload data to client #%d.", self,
                      data_size / 1024**2, client_id)
 
+        self.comm_overhead += data_size / 1024**2
+
     async def client_report_arrived(self, sid, client_id, report):
         """ Upon receiving a report from a client. """
         self.reports[sid] = pickle.loads(report)
@@ -635,11 +651,14 @@ class Server:
             with open(payload_filename, 'rb') as payload_file:
                 self.client_payload[sid] = pickle.load(payload_file)
 
+            payload_size = sys.getsizeof(pickle.dumps(
+                self.client_payload[sid])) / 1024**2
+
             logging.info(
                 "[%s] Received %.2f MB of payload data from client #%d (simulated).",
-                self,
-                sys.getsizeof(pickle.dumps(self.client_payload[sid])) /
-                1024**2, client_id)
+                self, payload_size, client_id)
+
+            self.comm_overhead += payload_size
 
             await self.process_client_info(client_id, sid)
 
@@ -684,6 +703,8 @@ class Server:
         logging.info("[%s] Received %.2f MB of payload data from client #%d.",
                      self, payload_size / 1024**2, client_id)
 
+        self.comm_overhead += payload_size / 1024**2
+
         await self.process_client_info(client_id, sid)
 
     async def process_client_info(self, client_id, sid):
@@ -703,6 +724,9 @@ class Server:
             sid].comm_time + start_time
         starting_round = self.training_clients[client_id]['starting_round']
 
+        if Config().is_central_server():
+            self.comm_overhead += self.reports[sid].edge_server_comm_overhead
+
         client_info = (
             finish_time,  # sorted by the client's finish time
             {
@@ -717,6 +741,9 @@ class Server:
         heapq.heappush(self.reported_clients, client_info)
         self.current_reported_clients[client_info[1]['client_id']] = True
         del self.training_clients[client_id]
+
+        if self.asynchronous_mode and self.simulate_wall_time:
+            self.training_sids.remove(client_info[1]['sid'])
 
         await self.process_clients(client_info)
 
@@ -892,7 +919,9 @@ class Server:
                      'max_concurrency') and not Config().is_central_server():
             # Clients in the current batch finish training
             # The server will select the next batch of clients to train
-            if len(self.updates) >= len(self.trained_clients):
+            if len(self.updates) >= len(self.trained_clients) or len(
+                    self.current_reported_clients) >= len(
+                        self.trained_clients):
                 await self.select_clients(for_next_batch=True)
 
     async def client_disconnected(self, sid):

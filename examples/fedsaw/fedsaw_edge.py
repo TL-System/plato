@@ -18,7 +18,6 @@ from plato.models import registry as models_registry
 @dataclass
 class Report(edge.Report):
     """ Client report, to be sent to the federated learning server. """
-    comm_overhead: float
 
 
 class Client(edge.Client):

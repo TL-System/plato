@@ -1,32 +1,73 @@
 """
-A federated learning server using Active Federated Learning, where in each round
-clients are selected not uniformly at random, but with a probability conditioned
-on the current model, as well as the data on the client, to maximize efficiency.
+A personalized federated learning trainer using FedRep.
 
 Reference:
 
-Goetz et al., "Active Federated Learning", 2019.
+Collins et al., "Exploiting Shared Representations for Personalized Federated
+Learning", in the Proceedings of ICML 2021.
 
-https://arxiv.org/pdf/1909.12641.pdf
+https://arxiv.org/abs/2102.07078
+
+Source code: https://github.com/lgcollins/FedRep
 """
-import logging
+
 import os
 import time
+import logging
 
-import numpy as np
 import torch
+import numpy as np
+
 from opacus.privacy_engine import PrivacyEngine
+
 from plato.config import Config
-from plato.models import registry as models_registry
 from plato.trainers import basic
 from plato.utils import optimizers
 
 
 class Trainer(basic.Trainer):
-    """ A federated learning trainer for FEI. """
+    """A personalized federated learning trainer using the FedRep algorithm."""
+
+    def __init__(self, model=None):
+        super().__init__(model)
+
+        self.representation_param_names = []
+        self.head_param_names = []
+
+    def set_representation_and_head(self, representation_param_names):
+        """ Setting the parameter names for global (representation)
+         and local (the head) models. """
+
+        # set the parameter names for the representation
+        #   As mentioned by Eq. 1 and Fig. 2 of the paper, the representation
+        #   behaves as the global model.
+        self.representation_param_names = representation_param_names
+
+        # FedRep calls the weights and biases of the final fully-connected layer
+        # in each of the models as the "head"
+        # This insight is obtained from the source code of FedRep.
+        model_parameter_names = self.model.state_dict().keys()
+
+        self.head_param_names = [
+            name for name in model_parameter_names
+            if name not in representation_param_names
+        ]
+
+        logging.info("[Client #%s] Representation layers: %s", self.client_id,
+                     self.representation_param_names)
+        logging.info("[Client #%s] Head layers: %s", self.client_id,
+                     self.head_param_names)
 
     def train_model(self, config, trainset, sampler, cut_layer=None):
-        """ A custom trainer reporting training loss. """
+        """The main training loop of FedRep in a federated learning workload.
+
+            The local training stage contains two parts:
+                - Head optimization:
+                Makes τ local gradient-based updates to solve for its optimal head given
+                the current global representation communicated by the server.
+                - Representation optimization:
+                Takes one local gradient-based update with respect to the current representation
+        """
         batch_size = config['batch_size']
         log_interval = 10
         tic = time.perf_counter()
@@ -44,7 +85,11 @@ class Trainer(basic.Trainer):
                                                        sampler=sampler)
 
         iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
+        # load the total local update epochs
         epochs = config['epochs']
+        # load the local update epochs for head optimization
+        head_epochs = config[
+            'head_epochs'] if 'head_epochs' in config else epochs - 1
 
         # Sending the model to the device used for training
         self.model.to(self.device)
@@ -71,6 +116,25 @@ class Trainer(basic.Trainer):
             lr_schedule = None
 
         for epoch in range(1, epochs + 1):
+
+            # As presented in the Section 3 of the FedRep paper,
+            #   the head is optimized for (epochs - 1) while frozing
+            #   the representation
+            if epoch <= head_epochs:
+                for name, param in self.model.named_parameters():
+                    if name in self.representation_param_names:
+                        param.requires_grad = False
+                    else:
+                        param.requires_grad = True
+            # Then, the representation will be optimized for only one
+            #   epoch.
+            if epoch > head_epochs:
+                for name, param in self.model.named_parameters():
+                    if name in self.representation_param_names:
+                        param.requires_grad = True
+                    else:
+                        param.requires_grad = False
+
             # Use a default training loop
             for batch_id, (examples, labels) in enumerate(train_loader):
                 examples, labels = examples.to(self.device), labels.to(
@@ -121,41 +185,3 @@ class Trainer(basic.Trainer):
                 filename = f"{self.client_id}_{epoch}_{training_time}.pth"
                 self.save_model(filename)
                 self.model.to(self.device)
-
-        # Save the training loss of the last epoch in this round
-        model_name = config['model_name']
-        filename = f'{model_name}_{self.client_id}.loss'
-        Trainer.save_loss(loss.data.item(), filename)
-
-    @staticmethod
-    def save_loss(loss, filename=None):
-        """ Saving the training loss to a file. """
-        model_path = Config().params['model_path']
-        model_name = Config().trainer.model_name
-
-        if not os.path.exists(model_path):
-            os.makedirs(model_path)
-
-        if filename is not None:
-            loss_path = f'{model_path}/{filename}'
-        else:
-            loss_path = f'{model_path}/{model_name}.loss'
-
-        with open(loss_path, 'w', encoding='utf-8') as file:
-            file.write(str(loss))
-
-    @staticmethod
-    def load_loss(filename=None):
-        """ Loading the training loss from a file. """
-        model_path = Config().params['model_path']
-        model_name = Config().trainer.model_name
-
-        if filename is not None:
-            loss_path = f'{model_path}/{filename}'
-        else:
-            loss_path = f'{model_path}/{model_name}.loss'
-
-        with open(loss_path, 'r', encoding='utf-8') as file:
-            loss = float(file.read())
-
-        return loss
