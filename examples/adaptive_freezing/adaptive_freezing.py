@@ -9,7 +9,7 @@ Proceedings of the 41st IEEE International Conference on Distributed Computing
 Systems (ICDCS 2021), Online, July 7-10, 2021.
 
 The camera-ready manuscript of this paper is located at:
-https://iqua.ece.toronto.edu/papers/cchen-icdcs21.pdf
+https://ieeexplore.ieee.org/document/9546506
 
 """
 

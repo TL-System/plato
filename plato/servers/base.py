@@ -95,6 +95,9 @@ class Server:
         self.comm_simulation = Config().clients.comm_simulation if hasattr(
             Config().clients, 'comm_simulation') else True
 
+        # Accumulated communication overhead (MB) throughout the FL training session
+        self.comm_overhead = 0
+
         # States that need to be maintained for asynchronous FL
 
         # sids that are currently in use
@@ -503,9 +506,20 @@ class Server:
                     checkpoint_path = Config().params['checkpoint_path']
 
                     payload_filename = f"{checkpoint_path}/{model_name}_{self.selected_client_id}.pth"
+
                     with open(payload_filename, 'wb') as payload_file:
                         pickle.dump(payload, payload_file)
+
                     server_response['payload_filename'] = payload_filename
+
+                    payload_size = sys.getsizeof(
+                        pickle.dumps(payload)) / 1024**2
+
+                    logging.info(
+                        "[%s] Sending %.2f MB of payload data to client #%d (simulated).",
+                        self, payload_size, self.selected_client_id)
+
+                    self.comm_overhead += payload_size
 
                 server_response = await self.customize_server_response(
                     server_response)
@@ -623,6 +637,8 @@ class Server:
         logging.info("[%s] Sent %.2f MB of payload data to client #%d.", self,
                      data_size / 1024**2, client_id)
 
+        self.comm_overhead += data_size / 1024**2
+
     async def client_report_arrived(self, sid, client_id, report):
         """ Upon receiving a report from a client. """
         self.reports[sid] = pickle.loads(report)
@@ -637,11 +653,14 @@ class Server:
             with open(payload_filename, 'rb') as payload_file:
                 self.client_payload[sid] = pickle.load(payload_file)
 
+            payload_size = sys.getsizeof(pickle.dumps(
+                self.client_payload[sid])) / 1024**2
+
             logging.info(
                 "[%s] Received %.2f MB of payload data from client #%d (simulated).",
-                self,
-                sys.getsizeof(pickle.dumps(self.client_payload[sid])) /
-                1024**2, client_id)
+                self, payload_size, client_id)
+
+            self.comm_overhead += payload_size
 
             await self.process_client_info(client_id, sid)
 
@@ -686,6 +705,8 @@ class Server:
         logging.info("[%s] Received %.2f MB of payload data from client #%d.",
                      self, payload_size / 1024**2, client_id)
 
+        self.comm_overhead += payload_size / 1024**2
+
         await self.process_client_info(client_id, sid)
 
     async def process_client_info(self, client_id, sid):
@@ -704,6 +725,9 @@ class Server:
         finish_time = self.reports[sid].training_time + self.reports[
             sid].comm_time + start_time
         starting_round = self.training_clients[client_id]['starting_round']
+
+        if Config().is_central_server():
+            self.comm_overhead += self.reports[sid].edge_server_comm_overhead
 
         client_info = (
             finish_time,  # sorted by the client's finish time
