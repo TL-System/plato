@@ -37,7 +37,7 @@ data:
     test_path: data/helmet/helmet/images/val/
 
     # download command/URL
-    download_urls: ["https://iqua.ece.toronto.edu/~bli/helmet.zip"]
+    download_urls: ["http://iqua.ece.toronto.edu/~bli/helmet.zip"]
 
     # number of training examples
     num_train_examples: 5457
