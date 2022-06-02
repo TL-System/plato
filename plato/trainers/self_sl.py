@@ -42,6 +42,7 @@ class GatherLayer(torch.autograd.Function):
 
 
 class NT_Xent(nn.Module):
+    """ The NTXent loss utilized by most self-supervised methods. """
 
     def __init__(self, batch_size, temperature, world_size=1):
         super(NT_Xent, self).__init__()
@@ -402,7 +403,6 @@ class Trainer(basic.Trainer):
 
                 # perform the evaluation in the downstream task
                 #   i.e., the client's personal local dataset
-
                 eval_optimizer = optimizers.get_dynamic_optimizer(
                     self.personalized_model, prefix="pers_")
                 iterations_per_epoch = np.ceil(
