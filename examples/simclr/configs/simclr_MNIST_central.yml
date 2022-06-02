@@ -103,9 +103,9 @@ trainer:
     eps: 0.00000008 # 1e-8
     weight_decay: 0.001
 
-    scheduler: StepLR
-    step_size: 20
-    gamma: 0.9
+    lr_scheduler: StepLR
+    lr_step_size: 20
+    lr_gamma: 0.9
 
     epoch_log_interval: 2
     batch_log_interval: 200
@@ -125,8 +125,8 @@ trainer:
 
     # currently, we only support CosineAnnealingLR
     pers_lr_schedule: StepLR
-    pers_step_size: 20
-    pers_gamma: 0.9
+    pers_lr_step_size: 20
+    pers_lr_gamma: 0.9
 
     pers_epoch_log_interval: 2
     # temperature
