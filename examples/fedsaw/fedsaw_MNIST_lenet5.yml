@@ -9,7 +9,7 @@ clients:
     per_round: 1
 
     # Should the clients compute test accuracy locally?
-    do_test: true
+    do_test: false
 
     # Whether simulate clients or not
     simulation: true
@@ -96,6 +96,6 @@ algorithm:
 
 results:
     # Write the following parameter(s) into a CSV
-    types: round, accuracy, average_accuracy, elapsed_time, comm_time, round_time
+    types: round, accuracy, elapsed_time, comm_time, round_time, comm_overhead
 
     result_path: ./results/test

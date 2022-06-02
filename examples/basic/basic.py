@@ -3,14 +3,10 @@ This example uses a very simple model and the MNIST dataset to show how the mode
 the training and validation datasets, as well as the training and testing loops can
 be customized in Plato.
 """
-import os
-
 import torch
 from torch import nn
 from torchvision.datasets import MNIST
 from torchvision.transforms import ToTensor
-
-os.environ['config_file'] = './fedavg_lenet5.yml'
 
 from plato.clients import simple
 from plato.datasources import base
@@ -19,8 +15,10 @@ from plato.trainers import basic
 
 
 class DataSource(base.DataSource):
-    """A custom datasource with custom training and validation datasets.
     """
+    A custom datasource with custom training and validation datasets.
+    """
+
     def __init__(self):
         super().__init__()
 
@@ -35,7 +33,8 @@ class DataSource(base.DataSource):
 
 
 class Trainer(basic.Trainer):
-    """A custom trainer with custom training and testing loops. """
+    """ A custom trainer with custom training and testing loops. """
+
     def train_model(self, config, trainset, sampler, cut_layer=None):  # pylint: disable=unused-argument
         """A custom training loop. """
         optimizer = torch.optim.Adam(self.model.parameters(), lr=1e-3)
@@ -61,7 +60,7 @@ class Trainer(basic.Trainer):
                 optimizer.zero_grad()
 
     def test_model(self, config, testset):  # pylint: disable=unused-argument
-        """A custom testing loop. """
+        """ A custom testing loop. """
         test_loader = torch.utils.data.DataLoader(
             testset, batch_size=config['batch_size'], shuffle=False)
 
@@ -84,7 +83,8 @@ class Trainer(basic.Trainer):
 
 
 def main():
-    """A Plato federated learning training session using a custom model,
+    """
+       A Plato federated learning training session using a custom model,
        datasource, and trainer.
     """
     model = nn.Sequential(
@@ -96,7 +96,7 @@ def main():
     )
 
     datasource = DataSource()
-    trainer = Trainer(model=model)
+    trainer = Trainer
 
     client = simple.Client(model=model, datasource=datasource, trainer=trainer)
     server = fedavg.Server(model=model, trainer=trainer)
