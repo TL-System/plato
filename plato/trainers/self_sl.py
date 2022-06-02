@@ -173,7 +173,8 @@ class Trainer(basic.Trainer):
     def train_loop(self, config, trainset, sampler, cut_layer):
         """ The default training loop when a custom training loop is not supplied. """
         batch_size = config['batch_size']
-        log_interval = 10
+        epoch_log_interval = config['epoch_log_interval']
+        batch_log_interval = config['batch_log_interval']
         tic = time.perf_counter()
 
         logging.info("[Client #%d] Loading the dataset.", self.client_id)
@@ -239,7 +240,7 @@ class Trainer(basic.Trainer):
 
                 optimizer.step()
 
-                if batch_id % log_interval == 0:
+                if batch_id % batch_log_interval == 0:
                     if self.client_id == 0:
                         logging.info(
                             "[Server #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
