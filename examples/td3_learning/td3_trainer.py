@@ -6,12 +6,12 @@ import os
 import time
 
 import copy
-import random
 
-import gym
 import numpy as np
 import torch
 import torch.nn.functional as F
+import globals
+
 from torch import nn
 from plato.utils.reinforcement_learning.policies import base
 from opacus.privacy_engine import PrivacyEngine
@@ -19,6 +19,9 @@ from plato.config import Config
 from plato.models import registry as models_registry
 from plato.trainers import basic
 from plato.utils import optimizers
+
+
+
 
 
 class TD3Actor(base.Actor):
@@ -71,6 +74,7 @@ class Trainer(base.Policy):
     def __init__(self, state_dim, action_dim):
         super().__init__(state_dim, action_dim)
         #Create actor and critic
+        #Could have used the base class given's but for convenient sake we declare our own
         self.actor = TD3Actor(state_dim, action_dim, self.max_action).to(self.device)
         self.critic = TD3Critic(state_dim, action_dim).to(self.device)
 
@@ -86,7 +90,7 @@ class Trainer(base.Policy):
         self.replay_buffer = base.ReplayMemory(
             state_dim, action_dim, 
             Config().algorithm.replay_size, 
-            Config().replay_seed)
+            Config().algorithm.replay_seed)
         
         self.policy_noise = Config().algorithm.policy_noise * self.max_action
         self.noise_clip = Config().algorithm.noise_clip * self.max_action
@@ -172,13 +176,12 @@ class Trainer(base.Policy):
                 
     def evaluate_policy(policy, eval_episodes = 10):
         avg_reward = 0
-        env = gym.make("Cartpole-v0")
         for _ in range(eval_episodes):
-            obs = env.reset()
+            obs = globals.env.reset()
             done = False
             while not done:
                 action = policy.select_action(np.array(obs))
-                obs, reward, done, _ = env.step(action)
+                obs, reward, done, _ = globals.env.step(action)
                 avg_reward += reward
         avg_reward /= eval_episodes
         print ("---------------------------------------")

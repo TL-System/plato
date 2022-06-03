@@ -10,6 +10,7 @@ import td3_trainer
 import td3
 import os
 import numpy as np
+import globals
 
 
 file_name = "TD3_RL"
@@ -18,8 +19,9 @@ results_dir = "./results"
 
 class RLClient(simple.Client):
     def __init__(self, trainer=None, model=None):
-        super().__init__(model=model,trainer=trainer)
-        self.trainer = trainer
+        super().__init__(model=model)
+        self.RL_Online_trainer = trainer
+        
         if not os.path.exists(results_dir):
             os.makedirs(results_dir)
         if Config().algorithm.save_models and not os.path.exists(models_dir):
@@ -45,11 +47,11 @@ class RLClient(simple.Client):
                 #evaluate episode and save policy
                 if timesteps_since_eval >= Config().algorithm.policy_freq:
                     timesteps_since_eval %= Config().algorithm.policy_freq
-                    td3.evaluations.append(td3_trainer.Trainer.evaluate_policy(self.trainer))
+                    globals.evaluations.append(td3_trainer.Trainer.evaluate_policy(self.RL_Online_trainer))
                     np.save("./results/%s" % (file_name), td3.evaluations)
                 
                 #When the training step is done, we reset the state of the env
-                obs = td3.env.reset()
+                obs = globals.env.reset()
 
                 #Set done to false
                 done = False
@@ -60,23 +62,23 @@ class RLClient(simple.Client):
                 episode_num += 1
                 
             #Before the number of specified timesteps from config file we sample random actions
-            if total_timesteps < Config().algorithm.start_timesteps:
-                action = td3.env.action_space.sample()
+            if total_timesteps < Config().algorithm.start_steps:
+                action = globals.env.action_space.sample()
             else: #after we pass the threshold we switch model
-                action = self.trainer.select_action(np.array(obs))
+                action = self.RL_Online_trainer.select_action(np.array(obs))
 
                 #if not 0 we add noise
                 if Config().algorithm.expl_noise != 0:
                     expl_noise = Config().algorithm.expl_noise
-                    action = (action+np.random.normal(0, expl_noise, size = td3.env.action_space.shape[0])).clip(
-                        td3.env.action_space.low, td3.env.action_space.high
+                    action = (action+np.random.normal(0, expl_noise, size = globals.env.action_space.shape[0])).clip(
+                        globals.env.action_space.low, globals.env.action_space.high
                     )
 
             #performs action in environment, then reaches next state and receives the reward
-            new_obs, reward, done, _ = td3.env.step(action)
+            new_obs, reward, done, _ = globals.env.step(action)
 
             #is episode done?
-            done_bool = 0 if episode_timesteps + 1 == td3.env.max_episode_steps else float(done)
+            done_bool = 0 if episode_timesteps + 1 == globals.env._max_episode_steps else float(done)
             
             #update total reward
             episode_reward += reward
@@ -91,7 +93,7 @@ class RLClient(simple.Client):
             timesteps_since_eval += 1
         
         #Add the last policy evaluation to our list of evaluations and save evaluations
-        td3.evaluations.append(td3_trainer.Trainer.evaluate_policy(self.trainer))
+        globals.evaluations.append(td3_trainer.Trainer.evaluate_policy(self.RL_Online_trainer))
         np.save("./results/%s" % (file_name), td3.evaluations)
             
 

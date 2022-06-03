@@ -5,26 +5,14 @@ import logging
 
 import td3_learning_client
 import td3_trainer
+import td3_learning_server
 
-import gym
-import torch
-import numpy as np
+import globals
 
-from td3_learning import td3_learning_server
 from torch import nn
 
-env = gym.make("Cartpole-v0")
 
-seed = 0
-
-env.seed(seed)
-torch.manual_seed(seed)
-np.random.seed(seed)
-state_dim = env.observation_space.shape[0]
-action_dim = env.action_space.shape[0]
-max_action = float(env.action_space.high[0])
-
-trainer = td3_trainer.Trainer(state_dim, action_dim)
+trainer = td3_trainer.Trainer(globals.state_dim, globals.action_dim)
 
 evaluations = [td3_trainer.Trainer.evaluate_policy(trainer)]
 
