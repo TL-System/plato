@@ -99,9 +99,8 @@ class Trainer(base.Policy):
 
     #add to replay buffer
     def add(self, transition):
-        if base.ReplayMemory.__len__ == Config().algorithm.replay_size:
-            print("store and update replay pointer")
-            #store and update pointer, add a method to base class base.ReplayBuffer
+            #adds to ReplayMemory, it always updates the pointer in the push method
+            base.ReplayMemory.push(transition)
 
 
     def update(self):

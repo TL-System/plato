@@ -58,26 +58,42 @@ class RLClient(simple.Client):
                 episode_reward = 0
                 episode_timesteps = 0
                 episode_num += 1
+                
+            #Before the number of specified timesteps from config file we sample random actions
+            if total_timesteps < Config().algorithm.start_timesteps:
+                action = td3.env.action_space.sample()
+            else: #after we pass the threshold we switch model
+                action = self.trainer.select_action(np.array(obs))
 
-                if total_timesteps < Config().algorithm.start_timesteps:
-                    action = td3.env.action_space.sample()
-                else:
-                    action = self.trainer.select_action(np.array(obs))
+                #if not 0 we add noise
+                if Config().algorithm.expl_noise != 0:
+                    expl_noise = Config().algorithm.expl_noise
+                    action = (action+np.random.normal(0, expl_noise, size = td3.env.action_space.shape[0])).clip(
+                        td3.env.action_space.low, td3.env.action_space.high
+                    )
 
-                    if Config().algorithm.expl_noise != 0:
-                        expl_noise = Config().algorithm.expl_noise
-                        action = (action+np.random.normal(0, expl_noise, size = td3.env.action_space.shape[0])).clip(
-                            td3.env.action_space.low, td3.env.action_space.high
-                        )
+            #performs action in environment, then reaches next state and receives the reward
+            new_obs, reward, done, _ = td3.env.step(action)
 
-                new_obs, reward, done, _ = td3.env.step(action)
+            #is episode done?
+            done_bool = 0 if episode_timesteps + 1 == td3.env.max_episode_steps else float(done)
+            
+            #update total reward
+            episode_reward += reward
+            
+            #add to replay buffer in this order due to push method in replay buffer
+            td3_trainer.Trainer.add((obs, action, reward, new_obs, done_bool))
 
-                done_bool = 0 if episode_timesteps + 1 == td3.env.max_episode_steps else float(done)
-
-                episode_reward += reward
-
-               #td3_trainer.Trainer.
-               #add to replay buffer
+            #Update state, episode time_step, total timesteps, and timesteps since last eval
+            obs = new_obs
+            episode_timesteps += 1
+            total_timesteps += 1
+            timesteps_since_eval += 1
+        
+        #Add the last policy evaluation to our list of evaluations and save evaluations
+        td3.evaluations.append(td3_trainer.Trainer.evaluate_policy(self.trainer))
+        np.save("./results/%s" % (file_name), td3.evaluations)
+            
 
 
 
