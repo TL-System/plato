@@ -3,7 +3,7 @@ The implementation of the simsiam's [1] augmentation function.
 
 [1]. Chen & He, Exploring Simple Siamese Representation Learning, 2021.
 
-This augmentaion is directly extracted from the 'augmentaions/' of 
+This augmentaion is directly extracted from the 'augmentaions/' of
  https://github.com/PatrickHua/SimSiam.
 
 """
@@ -12,9 +12,11 @@ import torchvision.transforms as T
 
 
 class SimSiamTransform():
+    """ This the contrastive data augmentation used by the Simsiam method. """
 
     def __init__(self, image_size, normalize):
-        image_size = 224 if image_size is None else image_size  # by default simsiam use image size 224
+        # by default simsiam use image size 224
+        image_size = 224 if image_size is None else image_size
         p_blur = 0.5 if image_size > 32 else 0  # exclude cifar
         # the paper didn't specify this, feel free to change this value
         # I use the setting from simclr which is 50% chance applying the gaussian blur

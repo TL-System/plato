@@ -1,7 +1,21 @@
+"""
+The implementation of the SimCLR's [1] augmentation function.
+
+The official code: https://github.com/google-research/simclr
+
+The third-party code: https://github.com/PatrickHua/SimSiam
+
+
+Reference:
+
+[1]. https://arxiv.org/abs/2002.05709
+"""
+
 import torchvision.transforms as T
 
 
 class SimCLRTransform():
+    """ This the contrastive data augmentation used by the SimCLR method. """
 
     def __init__(self, image_size, normalize):
         image_size = 224 if image_size is None else image_size
@@ -22,7 +36,7 @@ class SimCLRTransform():
         self.transform = T.Compose(transform_functions)
 
     def __call__(self, x):
-
+        """ Perform the contrastive data augmentation. """
         x1 = self.transform(x)
         x2 = self.transform(x)
 

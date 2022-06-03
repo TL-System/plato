@@ -1,9 +1,6 @@
 """
 The augmentations used for constrative learning.
 
-These augmentation functions follow the setting
- of the corresponding method.
-
 
 """
 
@@ -12,7 +9,7 @@ import logging
 from plato.config import Config
 
 from .simsiam_aug import SimSiamTransform
-from .byol_aug import BYOL_transform
+from .byol_aug import BYOLTransform
 from .simclr_aug import SimCLRTransform
 from .test_aug import TestTransform
 
@@ -20,18 +17,18 @@ from .normalizations import datasets_norm
 
 
 def get(name='simsiam', train=True, for_downstream_task=False):
-    """ Get the data agumentation for different methods, and the final 
+    """ Get the data agumentation for different methods, and the final
         linear evaluation part. """
     transform_mapper = {
         "simsiam": SimSiamTransform,
-        "byol": BYOL_transform,
+        "byol": BYOLTransform,
         "simclr": SimCLRTransform,
         "test": TestTransform,
     }
     supported_transform_name = list(transform_mapper.keys())
     if name not in supported_transform_name:
-        logging.exception(("{} is not included in the support set {}").format(
-            name, supported_transform_name))
+        logging.exception(("%s is not included in the support set %s"), name,
+                          supported_transform_name)
         raise NotImplementedError
 
     dataset_name = Config().data.datasource
