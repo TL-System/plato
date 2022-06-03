@@ -1,7 +1,9 @@
-####################################################################################
-### Code from original implementation: #############################################
-### https://github.com/facebookresearch/swav/blob/master/src/multicropdataset.py ###
-####################################################################################
+"""
+The implementation of the SWAV's [1] augmentation function.
+
+[1]. https://github.com/facebookresearch/swav/blob/master/src/multicropdataset.py
+
+"""
 
 import random
 
@@ -12,6 +14,7 @@ import torchvision.transforms as T
 
 
 class SvAVTransform():
+    """ This the contrastive data augmentation used by the SWAV method. """
 
     def __init__(self, size_crops, nmb_crops, min_scale_crops, max_scale_crops,
                  normalize):
@@ -22,9 +25,9 @@ class SvAVTransform():
         color_transform = [get_color_distortion(), PILRandomGaussianBlur()]
 
         trans = []
-        for i in range(len(size_crops)):
+        for i, size_crop in enumerate(size_crops):
             randomresizedcrop = T.RandomResizedCrop(
-                size_crops[i],
+                size_crop,
                 scale=(min_scale_crops[i], max_scale_crops[i]),
             )
             i_transform_funcs = [
@@ -45,7 +48,7 @@ class SvAVTransform():
         return tuple(map(lambda trans: trans(x), self.transform))
 
 
-class PILRandomGaussianBlur(object):
+class PILRandomGaussianBlur():
     """
     Apply Gaussian Blur to the PIL image. Take the radius and probability of
     application as the parameter.
@@ -58,6 +61,7 @@ class PILRandomGaussianBlur(object):
         self.radius_max = radius_max
 
     def __call__(self, img):
+        """ Perform the Gaussian Blur """
         do_it = np.random.rand() <= self.prob
         if not do_it:
             return img
@@ -68,6 +72,7 @@ class PILRandomGaussianBlur(object):
 
 
 def get_color_distortion(s=1.0):
+    """ Get the color_distort """
     # s is the strength of color distortion.
     color_jitter = T.ColorJitter(0.8 * s, 0.8 * s, 0.8 * s, 0.2 * s)
     rnd_color_jitter = T.RandomApply([color_jitter], p=0.8)

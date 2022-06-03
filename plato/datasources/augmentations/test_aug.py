@@ -1,8 +1,9 @@
-""" The implementation of data augmentation for the eval phase 
-    of contrastive learning.
-    
-    In general, the evaluation phase is implemented by the 
-        linear evaluation. This is a typical transform.
+"""
+The implementation of data augmentation for the eval/test phase
+of contrastive learning.
+
+In general, the evaluation phase is implemented by the
+linear evaluation utilizing the general transform.
 
 """
 
@@ -11,10 +12,11 @@ from PIL import Image
 
 
 class TestTransform():
+    """ The transform for test and evaluation. """
 
     def __init__(self, image_size, train, normalize):
         transform_functions = []
-        if train == True:
+        if train:
             transform_functions = [
                 T.RandomResizedCrop(image_size),
                 T.RandomHorizontalFlip(),
@@ -22,7 +24,7 @@ class TestTransform():
             ]
         else:
             transform_functions = [
-                T.Resize(image_size),  # 224 -> 256 
+                T.Resize(image_size),  # 224 -> 256
                 T.CenterCrop(image_size),
                 T.ToTensor()
             ]
@@ -38,11 +40,12 @@ class TestTransform():
 
 
 class ByolTestTransform():
+    """ The test transform utilized in the BYLO method."""
 
     def __init__(self, image_size, train, normalize):
         #self.denormalize = Denormalize(*imagenet_norm)
         transform_functions = []
-        if train == True:
+        if train:
             transform_functions = [
                 T.RandomResizedCrop(image_size,
                                     scale=(0.08, 1.0),
@@ -55,7 +58,7 @@ class ByolTestTransform():
         else:
             transform_functions = [
                 T.Resize(int(image_size * (8 / 7)),
-                         interpolation=Image.BICUBIC),  # 224 -> 256 
+                         interpolation=Image.BICUBIC),  # 224 -> 256
                 T.CenterCrop(image_size),
                 T.ToTensor()
             ]
