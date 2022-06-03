@@ -220,15 +220,13 @@ class DataSource(multimodal_base.MultiModalDataSource):
         self._data_path_process(data_path=_path, base_data_name=self.data_name)
 
         raw_data_name = self.data_name + "Raw"
-        base_data_path = self.mm_data_info["base_data_dir_path"]
+        base_data_path = self.mm_data_info["data_path"]
 
-        download_file_id = Config().data.download_file_id
+        download_url = Config().data.download_url
 
-        self._download_google_driver_arrange_data(
-            download_file_id=download_file_id,
-            extract_download_file_name=raw_data_name,
-            put_data_dir=base_data_path,
-        )
+        self._download_arrange_data(download_url_address=download_url,
+                                    data_path=base_data_path,
+                                    extract_to_dir=base_data_path)
 
         # define the path of different data source,
         #   the annotation is .xml, the sentence is in .txt
@@ -295,10 +293,10 @@ class DataSource(multimodal_base.MultiModalDataSource):
                 split_dt_type_path = self.splits_info[split_type][dt_type][
                     "path"]
 
-                if not self._exist_judgement(split_dt_type_path):
+                if not self._exists(split_dt_type_path):
                     os.makedirs(split_dt_type_path, exist_ok=True)
                 else:
-                    logging.info("The path %s does exist", split_dt_type_path)
+                    logging.info("The path %s exists.", split_dt_type_path)
                     continue
 
                 raw_data_type_path = self.mm_data_info[dt_type]["path"]
@@ -311,7 +309,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
                 # 2. saving the splited data into the target file
                 data_utils.copy_files(split_samples_path, split_dt_type_path)
 
-        logging.info(" Done!")
+        logging.info("Done.")
 
     def get_phase_data_info(self, phase):
         """ Obtain the data information for the required phrase """
