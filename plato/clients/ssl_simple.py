@@ -198,6 +198,7 @@ class Client(simple.Client):
                 logging.info("[%s] {%s}: %.2f%%", self, logging_str,
                              100 * accuracy)
 
+        accuracy = -1
         # Generate a report for the server, performing model testing if applicable
         if hasattr(Config().clients, 'do_test') and Config().clients.do_test:
             # This is the monitor test performed to measure the representation's quality
@@ -247,12 +248,16 @@ class Client(simple.Client):
             if hasattr(Config().clients,
                        'eval_test_interval') and self.current_round % Config(
                        ).clients.eval_test_interval == 0:
-
+                # it is important to also point out
+                # which current is the personalized model
+                # trained.
                 accuracy = self.trainer.eval_test(
                     testset=self.testset,
                     sampler=self.testset_sampler,
                     eval_trainset=self.eval_trainset,
-                    eval_trainset_sampler=self.sampler)
+                    eval_trainset_sampler=self.sampler,
+                    current_round=self.current_round)
+
                 logging_str = "Evaluation test"
                 test_logging(logging_str, accuracy)
             if accuracy == -1:

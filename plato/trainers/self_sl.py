@@ -128,6 +128,7 @@ class Trainer(basic.Trainer):
         # the client must assign its own personalized model
         #  to its trainer
         self.personalized_model = None
+        self.personalized_model_state_dict = None
 
     def set_client_personalized_model(self, personalized_model):
         """ Setting the client's personalized model """
@@ -161,12 +162,17 @@ class Trainer(basic.Trainer):
 
         return loss_compute
 
-    def save_personalized_model(self, filename=None, location=None):
-        """ Saving the model to a file. """
+    @staticmethod
+    def process_save_path(filename, location, work_model_name,
+                          desired_extenstion):
+        """ Process the input arguments to obtain the final saving path. """
         model_path = Config(
         ).params['model_path'] if location is None else location
-        personalized_model_name = Config().trainer.personalized_model_name
-
+        # set the model_type to
+        #  - "model_name" to obtain the global model's name
+        #  - "personalized_model_name" to obtain the personalized model's name
+        #  - or any other model you defined and want to process
+        model_name = getattr(Config().trainer, work_model_name)
         try:
             if not os.path.exists(model_path):
                 os.makedirs(model_path)
@@ -174,34 +180,75 @@ class Trainer(basic.Trainer):
             pass
 
         if filename is not None:
-            model_path = f'{model_path}/{filename}'
+            to_save_path = f'{model_path}/{filename}'
         else:
-            model_path = f'{model_path}/{personalized_model_name}.pth'
+            to_save_path = f'{model_path}/{model_name}'
 
-        if self.model_state_dict is None:
-            torch.save(self.personalized_model.state_dict(), model_path)
+        # check the filr extension
+        save_prefix, save_extension = os.path.splitext(to_save_path)[-1]
+        # the save file must contain a 'pth' as its extension
+        if save_extension != desired_extenstion:
+            to_save_path = save_prefix + desired_extenstion
+
+        return to_save_path
+
+    def save_personalized_model(self, filename=None, location=None):
+        """ Saving the model to a file. """
+        # process the arguments to obtain the to save path
+        to_save_path = self.process_save_path(
+            filename,
+            location,
+            work_model_name="personalized_model_name",
+            desired_extenstion=".pth")
+
+        if self.personalized_model_state_dict is None:
+            torch.save(self.personalized_model.state_dict(), to_save_path)
         else:
-            torch.save(self.model_state_dict, model_path)
+            torch.save(self.personalized_model_state_dict, to_save_path)
 
         logging.info("[Client #%d] Personalized Model saved to %s.",
-                     self.client_id, model_path)
+                     self.client_id, to_save_path)
 
     def load_personalized_model(self, filename=None, location=None):
         """Loading pre-trained model weights from a file."""
-        model_path = Config(
-        ).params['model_path'] if location is None else location
-        personalized_model_name = Config().trainer.personalized_model_name
-
-        if filename is not None:
-            model_path = f'{model_path}/{filename}'
-        else:
-            model_path = f'{model_path}/{personalized_model_name}.pth'
+        # process the arguments to obtain the to save path
+        load_from_path = self.process_save_path(
+            filename,
+            location,
+            work_model_name="personalized_model_name",
+            desired_extenstion=".pth")
 
         logging.info("[Client #%d] Loading a Personalized model from %s.",
-                     self.client_id, model_path)
+                     self.client_id, load_from_path)
 
-        self.personalized_model.load_state_dict(torch.load(model_path),
+        self.personalized_model.load_state_dict(torch.load(load_from_path),
                                                 strict=True)
+
+    @staticmethod
+    def save_personalized_accuracy(accuracy, filename=None, location=None):
+        """Saving the test accuracy to a file."""
+        to_save_accuracy_path = Trainer.process_save_path(
+            filename,
+            location,
+            work_model_name="personalized_model_name",
+            desired_extenstion=".acc")
+
+        with open(to_save_accuracy_path, 'w', encoding='utf8') as file:
+            file.write(str(accuracy))
+
+    @staticmethod
+    def load_personalized_accuracy(filename=None, location=None):
+        """Loading the test accuracy from a file."""
+        to_load_accuracy_path = Trainer.process_save_path(
+            filename,
+            location,
+            work_model_name="personalized_model_name",
+            desired_extenstion=".acc")
+
+        with open(to_load_accuracy_path, 'r', encoding='utf8') as file:
+            accuracy = float(file.read())
+
+        return accuracy
 
     def train_loop(
         self,
@@ -576,14 +623,27 @@ class Trainer(basic.Trainer):
                          self.client_id)
             raise testing_exception
 
+        # saving the personalized model for current round
+        # to the dir of this client
         if 'max_concurrency' in config:
             self.personalized_model.cpu()
             model_type = config['personalized_model_name']
-            filename = f"{model_type}_{self.client_id}_{config['run_id']}.pth"
-            self.save_personalized_model(filename)
+            current_round = kwargs['current_round']
+            filename = f"{model_type}_Round({current_round})_{config['run_id']}.pth"
+            model_path = Config().params['model_path']
+            save_location = os.path.join(model_path, self.client_id)
+            os.makedirs(save_location, exist_ok=True)
+            self.save_personalized_model(filename, location=save_location)
 
         if 'max_concurrency' in config:
             model_name = config['personalized_model_name']
+
+            current_round = kwargs['current_round']
+            filename = f"{model_name}_Round({current_round})_{config['run_id']}.acc"
+            model_path = Config().params['model_path']
+            save_location = os.path.join(model_path, self.client_id)
+            os.makedirs(save_location, exist_ok=True)
+
             filename = f"{model_name}_{self.client_id}_{config['run_id']}.acc"
             self.save_accuracy(accuracy, filename)
         else:
