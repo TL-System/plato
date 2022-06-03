@@ -34,7 +34,7 @@ class RLClient(simple.Client):
         episode_num = 0
         episode_reward = 0
         timesteps_since_eval = 0
-        while total_timesteps < Config().algorithm.max_timesteps:
+        while total_timesteps < Config().algorithm.max_steps:
 
             #If episode is done
             if done:
