@@ -22,8 +22,6 @@ from plato.utils import optimizers
 
 
 
-
-
 class TD3Actor(base.Actor):
     def __init__(self, state_dim, action_dim, max_action):
         super().__init__(state_dim, action_dim, max_action)
@@ -104,7 +102,7 @@ class Trainer(base.Policy):
     #add to replay buffer
     def add(self, transition):
             #adds to ReplayMemory, it always updates the pointer in the push method
-            base.ReplayMemory.push(transition)
+            self.replay_buffer.push(transition)
 
 
     def update(self):

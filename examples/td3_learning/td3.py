@@ -4,7 +4,7 @@ A federated learning training session using td3
 import logging
 
 import td3_learning_client
-import td3_trainer
+import td3_learning_trainer
 import td3_learning_server
 
 import globals
@@ -14,9 +14,9 @@ from torch import nn
 #to run
 #python examples/td3_learning/td3.py -c examples/td3_learning/td3_FashionMNIST_lenet5.yml
 
-trainer = td3_trainer.Trainer(globals.state_dim, globals.action_dim)
+trainer = td3_learning_trainer.Trainer(globals.state_dim, globals.action_dim)
 
-evaluations = [td3_trainer.Trainer.evaluate_policy(trainer)]
+evaluations = [td3_learning_trainer.Trainer.evaluate_policy(trainer)]
 
 def main():
     """ A Plato federated learning training session using TD3. """

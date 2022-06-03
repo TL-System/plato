@@ -6,7 +6,7 @@ import math
 from dataclasses import dataclass
 from plato.clients import simple
 from plato.config import Config
-import td3_trainer
+import td3_learning_trainer
 import td3
 import os
 import numpy as np
@@ -40,14 +40,14 @@ class RLClient(simple.Client):
             if done:
                 #if not at beginning
                 if total_timesteps != 0:
-                    print("Total Timesteps: {} Episode Num: {} Reward: {}".format(total_timesteps, episode_num, episode_reward))
+                    logging.info("Total Timesteps: {} Episode Num: {} Reward: {}".format(total_timesteps, episode_num, episode_reward))
                     #train here call td3_trainer
-                    td3_trainer.Trainer.update()
+                    td3_learning_trainer.Trainer.update()
 
                 #evaluate episode and save policy
                 if timesteps_since_eval >= Config().algorithm.policy_freq:
                     timesteps_since_eval %= Config().algorithm.policy_freq
-                    globals.evaluations.append(td3_trainer.Trainer.evaluate_policy(self.RL_Online_trainer))
+                    globals.evaluations.append(td3_learning_trainer.Trainer.evaluate_policy(self.RL_Online_trainer))
                     np.save("./results/%s" % (file_name), td3.evaluations)
                 
                 #When the training step is done, we reset the state of the env
@@ -84,7 +84,7 @@ class RLClient(simple.Client):
             episode_reward += reward
             
             #add to replay buffer in this order due to push method in replay buffer
-            td3_trainer.Trainer.add((obs, action, reward, new_obs, done_bool))
+            td3_learning_trainer.Trainer.add((obs, action, reward, new_obs, done_bool))
 
             #Update state, episode time_step, total timesteps, and timesteps since last eval
             obs = new_obs
@@ -93,7 +93,7 @@ class RLClient(simple.Client):
             timesteps_since_eval += 1
         
         #Add the last policy evaluation to our list of evaluations and save evaluations
-        globals.evaluations.append(td3_trainer.Trainer.evaluate_policy(self.RL_Online_trainer))
+        globals.evaluations.append(td3_learning_trainer.Trainer.evaluate_policy(self.RL_Online_trainer))
         np.save("./results/%s" % (file_name), td3.evaluations)
             
 

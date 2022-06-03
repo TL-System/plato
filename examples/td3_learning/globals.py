@@ -15,7 +15,7 @@ env = gym.make("BipedalWalker-v3")
 
 seed = 0
 
-env.seed(seed)
+env.reset(seed=seed)
 torch.manual_seed(seed)
 np.random.seed(seed)
 state_dim = env.observation_space.shape[0]
