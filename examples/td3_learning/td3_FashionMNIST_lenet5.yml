@@ -1,5 +1,4 @@
 clients:
-    type: simple
     # The total number of clients
     total_clients: 100
 
