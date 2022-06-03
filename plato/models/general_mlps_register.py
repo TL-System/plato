@@ -1,7 +1,15 @@
 """
 The implementation of the general Multi-layer perceptron (MLP).
 
-I.e., build the fully-connected net based on the configs
+I.e., build the fully-connected net based on the configs.
+
+This a very flexible MLP network generator implemented by us.
+The main reason is that, in the self-supervised learning, a plenty
+of MLP with different structures will be used by various methods.
+Thus, we provide a flexible function to define any types of MLP networks.
+
+We provide four types of MLP networks used by different self-supervised
+learning methods.
 
 """
 
@@ -17,6 +25,7 @@ activations_func = {
 }
 
 
+# pylint: disable=too-many-locals
 def build_mlp_from_config(mlp_configs, layer_name_prefix="layer"):
     """ Build one fully-connected network based the input setting.
 
@@ -26,19 +35,19 @@ def build_mlp_from_config(mlp_configs, layer_name_prefix="layer"):
 
           Schema B: From the researcher "https://math.stackexchange.com/users/167500/pseudomarvin".
             fc -> activation -> dropout -> bn -> ....
-          
+
           See more discussion in:
            https://stackoverflow.com/questions/39691902/ordering-of-batch-normalization-and-dropout
-        
+
         Our work use the schema A.
 
         Tricks:
           - Usually, Just drop the Dropout(when you have BN)
-           as BN eliminates the need for Dropout in some cases cause BN provides similar 
+           as BN eliminates the need for Dropout in some cases cause BN provides similar
            regularization benefits as Dropout intuitively.
 
         Args:
-            mlp_configs (dict):    
+            mlp_configs (dict):
     """
     input_dim = mlp_configs['input_dim']
     output_dim = mlp_configs['output_dim']
@@ -55,15 +64,25 @@ def build_mlp_from_config(mlp_configs, layer_name_prefix="layer"):
     assert len(batch_norms) == len(activations) == len(dropout_porbs)
     assert hidden_n == len(batch_norms) - 1
 
-    def build_one_layer(layer_ipt_dim, layer_opt_dim, bn, activation,
-                        dropout_prob):
-        """ Build one layer of MLP. Default no hidden layer"""
+    def build_one_layer(layer_ipt_dim, layer_opt_dim, batch_norm_type,
+                        activation, dropout_prob):
+        """ Build one layer of MLP. Default no hidden layer.
+
+            For the structure of one MLP layer. Please access the description
+            below the function 'build_mlp_from_config' for details.
+
+        """
         layer_structure = OrderedDict()
         layer_structure["fc"] = nn.Linear(layer_ipt_dim, layer_opt_dim)
-        if bn is not None:
+        # the batch_norm_type here can be:
+        #   - default if the user wants to use
+        #       the batch norm following the defualt parameters 'default_params'.
+        #   - dict if the use wants to set custom parameters
+        # however, once the batch_norm_type
+        if batch_norm_type is not None:
             default_params = dict(momentum=0.1, eps=1e-5)
-            bn_params = default_params if bn == "default" else default_params.update(
-                bn)
+            bn_params = default_params if batch_norm_type == "default" else default_params.update(
+                batch_norm_type)
             layer_structure["bn"] = nn.BatchNorm1d(layer_opt_dim, **bn_params)
         if activation is not None:
             layer_structure[activation] = activations_func[activation](
@@ -79,10 +98,11 @@ def build_mlp_from_config(mlp_configs, layer_name_prefix="layer"):
     for hid_id, hid_dim in enumerate(hidden_layers_dim):
         layer_input_dim = input_dim if hid_id == 0 else hidden_layers_dim[
             hid_id - 1]
-        bn = batch_norms[hid_id]
+        desired_batch_norm = batch_norms[hid_id]
         activation = activations[hid_id]
         dropout_prob = dropout_porbs[hid_id]
-        built_layer = build_one_layer(layer_input_dim, hid_dim, bn, activation,
+        built_layer = build_one_layer(layer_input_dim, hid_dim,
+                                      desired_batch_norm, activation,
                                       dropout_prob)
         mlp_layers[layer_name_prefix + str(hid_id + 1)] = built_layer
 
@@ -93,9 +113,10 @@ def build_mlp_from_config(mlp_configs, layer_name_prefix="layer"):
 
 class Model():
     """The Multi-layer perceptron (MLP) model."""
-
+    # pylint: disable=too-few-public-methods
     @staticmethod
     def get_model(model_type, input_dim):
+        """ Get the desired MLP model with required input dimension (input_dim). """
         if model_type == 'pure_one_layer_mlp':
             return build_mlp_from_config(mlp_configs=dict(
                 type='FullyConnectedHead',
@@ -142,3 +163,5 @@ class Model():
                     activations=["relu", None],
                     dropout_ratios=[0, 0],
                 ))
+
+        raise ValueError(f'No such MLP model: {model_type}')

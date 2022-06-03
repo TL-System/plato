@@ -7,7 +7,7 @@ The third-party code: https://github.com/PatrickHua/SimSiam
 
 The structure of our SimCLR and the classifier is the same as the ones used in
 the work https://github.com/spijkervet/SimCLR.git.
- 
+
 Reference:
 
 [1]. https://arxiv.org/abs/2002.05709
@@ -22,10 +22,10 @@ from plato.servers import fedavg
 
 
 def main():
-    """ A Plato federated learning training session using the FedRep algorithm. 
+    """ A Plato federated learning training session using the FedRep algorithm.
         This implementation of simclr utilizes the general setting, i.e.,
-        removing the final fully-connected layers of model defined following 
-        the 'model_name' in config file
+        removing the final fully-connected layers of model defined by
+        the 'model_name' in config file.
 
     """
     trainer = ssl_trainer.Trainer

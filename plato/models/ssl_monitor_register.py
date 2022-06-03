@@ -5,7 +5,7 @@ As the training phase of contrastive learning does not output general metrics
  , such as accuracy, but only the losses, it is highly required to monitor the
  training process by other external methods.
 
-Then motivated by the insight that the encoder of contrastive learning methods 
+Then motivated by the insight that the encoder of contrastive learning methods
  produces high-quality, such as distinguishable, representation, we can monior
  the generated representations based on the cluster methods, such as KNN.
 
@@ -19,17 +19,18 @@ import torch
 from plato.config import Config
 
 
+# pylint: disable=too-many-locals
 def knn_monitor(encoder, monitor_data_loader, test_data_loader, device):
     """ Using the KNN monitor to test the representation quality.
-    
+
         This part of code is obtained from the official code for SimClr:
         https://colab.research.google.com/github/facebookresearch/moco/blob/colab-notebook/colab/moco_cifar10_demo.ipynb#scrollTo=RI1Y8bSImD7N.
 
         Args:
-            encoder (torch.nn.module): the defined encoder 
-            monitor_data_loader: the data loader of the trainset using the test 
+            encoder (torch.nn.module): the defined encoder
+            monitor_data_loader: the data loader of the trainset using the test
                 data augmentation
-            test_data_loader:  the data loader of the testset using the test 
+            test_data_loader:  the data loader of the testset using the test
                 data augmentation
     """
     # the number of nearest neighbors searched to determine the label via maximum vote
@@ -41,7 +42,9 @@ def knn_monitor(encoder, monitor_data_loader, test_data_loader, device):
 
     encoder.eval()
     classes = len(monitor_data_loader.dataset.dataset.classes)
-    total_top1, total_top5, total_num, feature_bank = 0.0, 0.0, 0, []
+    # for '_' here, we can set it to be other accuracy such as total_top5
+
+    total_top1, _, total_num, feature_bank = 0.0, 0.0, 0, []
     with torch.no_grad():
         # generate feature bank
         for data, target in tqdm(monitor_data_loader,
@@ -79,11 +82,12 @@ def knn_monitor(encoder, monitor_data_loader, test_data_loader, device):
     return total_top1 / total_num
 
 
+# pylint: disable=too-many-arguments
 def knn_predict(feature, feature_bank, feature_labels, classes, knn_k, knn_t):
-    """ Perform the prediction based on the knn. 
-    
+    """ Perform the prediction based on the knn.
+
         knn monitor as in InstDisc https://arxiv.org/abs/1805.01978
-        This Implementation follows http://github.com/zhirongw/lemniscate.pytorch 
+        This Implementation follows http://github.com/zhirongw/lemniscate.pytorch
          and https://github.com/leftthomas/SimCLR
     """
     # compute cos similarity between each feature vector and feature bank ---> [B, N]
@@ -116,10 +120,12 @@ def knn_predict(feature, feature_bank, feature_labels, classes, knn_k, knn_t):
 def get():
     """ Obtain the required monitor. """
 
+    # currently, only knn is supported
     supported_monitors = {"knn": knn_monitor}
 
     monitor_name = Config().trainer.monitor_name
-    if monitor_name in list(supported_monitors.keys()):
+
+    if monitor_name in supported_monitors:
         return supported_monitors[monitor_name]
-    else:
-        raise ValueError('No such monitor: {}'.format(monitor_name))
+
+    raise ValueError(f'No such monitor: {monitor_name}')

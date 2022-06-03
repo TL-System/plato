@@ -1,5 +1,5 @@
-""" 
-The implementation of wrapper for the contrastive dataset
+"""
+The implementation of wrappers for the contrastive dataset.
 
 """
 
@@ -10,19 +10,25 @@ from PIL import Image
 
 class ContrastiveDataWrapper(torch.utils.data.Dataset):
     """Prepares the contrastive dataset for use in the self-supervised learning.
-    
+
         This is the most common method used to prepare the contrastive sample.
 
         The positive sample is obtained by sampling one sample, except the given sample,
             from the label class of the given sample.
-        
+
         The negative sample is obtained by sampling from a label class that is different
             from the label class of the given sample.
-    
+
     """
 
+    # pylint: disable=too-many-instance-attributes
     def __init__(self, dataset, aug_transformer=None):
+        # the defined dataset
         self.dataset = dataset
+        # the desired transformer
+        # this transformer will not be used, but it
+        # is maintained here for the potential usage.
+        self.aug_transformer = aug_transformer
 
         # all labels for samples of the dataset
         self.dataset_labels = self.dataset.targets.tolist()
@@ -158,7 +164,7 @@ class ContrastiveAugmentDataWrapper(torch.utils.data.Dataset):
 
         [1].  Chen & He, Exploring Simple Siamese Representation Learning, 2021.
 
-        For the input sample x, it only prepares paired positive samples by 
+        For the input sample x, it only prepares paired positive samples by
             applying data augmentation method, i.e, aug, to x.
             x1, x2 = aug(x), aug(x) # random augmentation
 
@@ -185,10 +191,10 @@ class ContrastiveAugmentDataWrapper(torch.utils.data.Dataset):
 
     def __getitem__(self, item_index):
         """ generate the contrastive dataset.
-        
-        Note, in general, there is no need to output the sample label as 
-         self-supervised learning relies on unannotated samples. 
-         But we still inject the sample label into the output to make 
+
+        Note, in general, there is no need to output the sample label as
+         self-supervised learning relies on unannotated samples.
+         But we still inject the sample label into the output to make
          it maintain consistency with other datasets object.
         """
         # obtain the raw data without applying the outside transormation

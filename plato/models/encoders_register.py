@@ -1,13 +1,16 @@
 """
 Implementation of the encoder register
 
-    For the encoder with ResNet as backbone, we do not utilize 
-the ones implemented under the plato/models. The main reason is 
+    For the encoder with ResNet as backbone, we do not utilize
+the ones implemented under the plato/models. The main reason is
 that the plato's version ignore the AdaptiveAvgPool2d. Then, all current
 methods of self-supervised utilize the resnet from torchvision to perform
-the learning process. For the fair comparsion, we decide to utilize the 
+the learning process. For the fair comparsion, we decide to utilize the
 one from torchvision directly.
 
+Generally, for the self-supervised learning, the encoder is defined as the
+general network, such as VGG and ResNet, but ignoring the final fully-connected
+blocks.
 
 """
 
@@ -23,6 +26,7 @@ from plato.config import Config
 class Identity(nn.Module):
     """ The constant layer. """
 
+    # pylint: disable=no-self-use
     def forward(self, samples):
         """ Forward the input without any operations. """
         return samples
@@ -31,8 +35,6 @@ class Identity(nn.Module):
 class TruncatedLeNetModel(nn.Module):
     """The truncated LeNet-5 model.
 
-    Arguments:
-        num_classes (int): The number of classes. Default: 10.
     """
 
     def __init__(self, defined_lenet5_model):

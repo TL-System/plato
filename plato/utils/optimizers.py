@@ -292,7 +292,6 @@ def get_dynamic_lr_schedule(optimizer: optim.Optimizer,
                                   prefix,
                                   "lr_warmup_steps",
                                   is_manority=False)
-
         lambdas = [lambda it: 1.0]
         if "lr_gamma" in kwargs and "lr_milestone_steps" in kwargs:
             lr_gamma = kwargs.pop("lr_gamma")
