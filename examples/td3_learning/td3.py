@@ -11,6 +11,8 @@ import globals
 
 from torch import nn
 
+#to run
+#python examples/td3_learning/td3.py -c examples/td3_learning/td3_FashionMNIST_lenet5.yml
 
 trainer = td3_trainer.Trainer(globals.state_dim, globals.action_dim)
 
