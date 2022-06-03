@@ -47,10 +47,6 @@ class Trainer(basic.Trainer):
         iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
         epochs = config['epochs']
 
-        # Sending the model to the device used for training
-        self.model.to(self.device)
-        self.model.train()
-
         # Initializing the loss criterion
         _loss_criterion = getattr(self, "loss_criterion", None)
         if callable(_loss_criterion):
@@ -71,26 +67,8 @@ class Trainer(basic.Trainer):
         else:
             lr_schedule = None
 
-        if 'differential_privacy' in config and config['differential_privacy']:
-            logging.info(
-                "[Client #%s] Using differential privacy during training.",
-                self.client_id)
-
-            privacy_engine = PrivacyEngine(accountant='rdp', secure_mode=False)
-            self.make_model_private()
-
-            self.model, optimizer, train_loader = privacy_engine.make_private_with_epsilon(
-                module=self.model,
-                optimizer=optimizer,
-                data_loader=train_loader,
-                target_epsilon=config['dp_epsilon']
-                if 'dp_epsilon' in config else 10.0,
-                target_delta=config['dp_delta']
-                if 'dp_delta' in config else 1e-5,
-                epochs=epochs,
-                max_grad_norm=config['dp_max_grad_norm']
-                if 'max_grad_norm' in config else 1.0,
-            )
+        self.model.to(self.device)
+        self.model.train()
 
         for epoch in range(1, epochs + 1):
             # Use a default training loop
@@ -105,11 +83,7 @@ class Trainer(basic.Trainer):
             plt.imshow(tt(examples[0].cpu()))
             plt.title("Ground truth image")
 
-            if 'differential_privacy' in config and config[
-                    'differential_privacy']:
-                optimizer.zero_grad(set_to_none=True)
-            else:
-                optimizer.zero_grad()
+            optimizer.zero_grad()
 
             if cut_layer is None:
                 outputs = self.model(examples)
