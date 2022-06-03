@@ -47,7 +47,7 @@ class RLClient(simple.Client):
                 #evaluate episode and save policy
                 if timesteps_since_eval >= Config().algorithm.policy_freq:
                     timesteps_since_eval %= Config().algorithm.policy_freq
-                    globals.evaluations.append(td3_learning_trainer.Trainer.evaluate_policy(self.RL_Online_trainer))
+                    td3.evaluations.append(td3_learning_trainer.Trainer.evaluate_policy(self.RL_Online_trainer))
                     np.save("./results/%s" % (file_name), td3.evaluations)
                 
                 #When the training step is done, we reset the state of the env
@@ -93,9 +93,8 @@ class RLClient(simple.Client):
             timesteps_since_eval += 1
         
         #Add the last policy evaluation to our list of evaluations and save evaluations
-        globals.evaluations.append(td3_learning_trainer.Trainer.evaluate_policy(self.RL_Online_trainer))
+        td3.evaluations.append(td3_learning_trainer.Trainer.evaluate_policy(self.RL_Online_trainer))
         np.save("./results/%s" % (file_name), td3.evaluations)
-            
 
 
 
