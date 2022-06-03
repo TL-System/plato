@@ -19,6 +19,7 @@ class ProjectionMLP(nn.Module):
             model_type="simclr_projection_mlp", input_dim=in_dim)
 
     def forward(self, x):
+        """ Forward the projection layer. """
         for layer in self.layers:
             x = layer(x)
 
@@ -31,9 +32,10 @@ class SimCLR(nn.Module):
     def __init__(self, encoder=None, encoder_dim=None):
         super().__init__()
 
+        # define the encoder based on the model_name in config
         if encoder is None:
-            #define the encoder based on the model_name in config
             self.encoder, self.encode_dim = encoders_register.get()
+        # utilize the custom model
         else:
             self.encoder, self.encode_dim = encoder, encoder_dim
 

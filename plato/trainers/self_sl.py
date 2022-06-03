@@ -10,7 +10,8 @@ import multiprocessing as mp
 
 import numpy as np
 import torch
-import torch.nn as nn
+from torch import nn
+
 import torch.distributed as dist
 from tqdm import tqdm
 
@@ -24,26 +25,28 @@ from plato.models import ssl_monitor_register
 class GatherLayer(torch.autograd.Function):
     """Gather tensors from all process, supporting backward propagation."""
 
+    # pylint: disable=abstract-method
+    # pylint: disable=arguments-differ
     @staticmethod
-    def forward(ctx, input):
-        ctx.save_for_backward(input)
+    def forward(ctx, input_tn):
+        ctx.save_for_backward(input_tn)
         output = [
-            torch.zeros_like(input) for _ in range(dist.get_world_size())
+            torch.zeros_like(input_tn) for _ in range(dist.get_world_size())
         ]
-        dist.all_gather(output, input)
+        dist.all_gather(output, input_tn)
         return tuple(output)
 
     @staticmethod
     def backward(ctx, *grads):
-        (input, ) = ctx.saved_tensors
-        grad_out = torch.zeros_like(input)
+        (input_tn, ) = ctx.saved_tensors
+        grad_out = torch.zeros_like(input_tn)
         grad_out[:] = grads[dist.get_rank()]
         return grad_out
 
 
-class NT_Xent(nn.Module):
-    """ The NTXent loss utilized by most self-supervised methods. 
-    
+class NTXent(nn.Module):
+    """ The NTXent loss utilized by most self-supervised methods.
+
         Note: here can be important issue existed in this implementation
         of NT_Xent as:
         the NT_Xent loss utilized by the SimCLR method set the defined batch_size
@@ -56,22 +59,24 @@ class NT_Xent(nn.Module):
         Under this case, to avoid this issue, we need to set:
         partition_size / batch_size = integar
         partition_size / pers_batch_size = integar
-    
+
     """
 
     def __init__(self, batch_size, temperature, world_size=1):
-        super(NT_Xent, self).__init__()
+        super().__init__()
         self.batch_size = batch_size
         self.temperature = temperature
         self.world_size = world_size
 
-        self.mask = self.mask_correlated_samples(batch_size, world_size)
+        self.mask = self.mask_correlated_samples()
         self.criterion = nn.CrossEntropyLoss(reduction="sum")
         self.similarity_f = nn.CosineSimilarity(dim=2)
 
-    def mask_correlated_samples(self, batch_size, world_size):
-        N = 2 * batch_size * world_size
-        mask = torch.ones((N, N), dtype=bool)
+    def mask_correlated_samples(self):
+        """ Mask out the correlated samples. """
+        batch_size, world_size = self.batch_size, self.world_size
+        collected_samples = 2 * batch_size * world_size
+        mask = torch.ones((collected_samples, collected_samples), dtype=bool)
         mask = mask.fill_diagonal_(0)
         for i in range(batch_size * world_size):
             mask[i, batch_size * world_size + i] = 0
@@ -81,46 +86,39 @@ class NT_Xent(nn.Module):
     def forward(self, z_i, z_j):
         """
         We do not sample negative examples explicitly.
-        Instead, given a positive pair, similar to (Chen et al., 2017), we treat the other 2(N − 1) augmented examples within a minibatch as negative examples.
+        Instead, given a positive pair, similar to (Chen et al., 2017),
+        we treat the other 2(N - 1) augmented examples within
+        a minibatch as negative examples.
         """
-        N = 2 * self.batch_size * self.world_size
+        collected_samples = 2 * self.batch_size * self.world_size
 
-        z = torch.cat((z_i, z_j), dim=0)
+        collected_z = torch.cat((z_i, z_j), dim=0)
         if self.world_size > 1:
-            z = torch.cat(GatherLayer.apply(z), dim=0)
+            collected_z = torch.cat(GatherLayer.apply(collected_z), dim=0)
 
-        sim = self.similarity_f(z.unsqueeze(1),
-                                z.unsqueeze(0)) / self.temperature
+        sim = self.similarity_f(collected_z.unsqueeze(1),
+                                collected_z.unsqueeze(0)) / self.temperature
 
         sim_i_j = torch.diag(sim, self.batch_size * self.world_size)
         sim_j_i = torch.diag(sim, -self.batch_size * self.world_size)
 
-        # We have 2N samples, but with Distributed training every GPU gets N examples too, resulting in: 2xNxN
-        try:
-            positive_samples = torch.cat((sim_i_j, sim_j_i),
-                                         dim=0).reshape(N, 1)
-        except:
-            print("self.batch_size: ", self.batch_size)
-            print("self.world_size: ", self.world_size)
-            print("N: ", N)
-            print("z_i shape: ", z_i.shape)
-            print("z_j shape: ", z_j.shape)
-            print("sim shape: ", sim.shape)
-            print("sim_i_j shape: ", sim_i_j.shape)
-            print("sim_j_i shape: ", sim_j_i.shape)
-            positive_samples = torch.cat((sim_i_j, sim_j_i),
-                                         dim=0).reshape(N, 1)
+        # We have 2N samples, but with Distributed training every GPU
+        # gets N examples too, resulting in: 2xNxN
+        positive_samples = torch.cat((sim_i_j, sim_j_i),
+                                     dim=0).reshape(collected_samples, 1)
 
-        negative_samples = sim[self.mask].reshape(N, -1)
+        negative_samples = sim[self.mask].reshape(collected_samples, -1)
 
-        labels = torch.zeros(N).to(positive_samples.device).long()
+        labels = torch.zeros(collected_samples).to(
+            positive_samples.device).long()
         logits = torch.cat((positive_samples, negative_samples), dim=1)
         loss = self.criterion(logits, labels)
-        loss /= N
+        loss /= collected_samples
         return loss
 
 
 class Trainer(basic.Trainer):
+    """ A federated learning trainer for self-supervised models. """
 
     def __init__(self, model=None):
         super().__init__(model)
@@ -135,25 +133,30 @@ class Trainer(basic.Trainer):
         """ Setting the client's personalized model """
         self.personalized_model = personalized_model
 
-    def loss_criterion(self, model):
-        """ The loss computation. 
+    @staticmethod
+    def loss_criterion(model):
+        """ The loss computation.
             Currently, we only support the NT_Xent.
 
-            The pytorch_metric_learning provides a strong 
+            The pytorch_metric_learning provides a strong
             support for loss criterion. However, how to use
-            its NTXent is still nor clear. 
-            The loss criterion will be replaced by the one 
+            its NTXent is still nor clear.
+            The loss criterion will be replaced by the one
             in pytorch_metric_learning afterward.
         """
         # define the loss computation instance
         defined_temperature = Config().trainer.temperature
         batch_size = Config().trainer.batch_size
-        criterion = NT_Xent(batch_size, defined_temperature, world_size=1)
+        criterion = NTXent(batch_size, defined_temperature, world_size=1)
 
         # currently, the loss computation only supports the one-GPU learning.
         def loss_compute(outputs, labels):
-            z1, z2 = outputs
-            loss = criterion(z1, z2)
+            """ A wrapper for loss computation.
+
+                Maintain labels here for potential usage.
+            """
+            encoded_z1, encoded_z2 = outputs
+            loss = criterion(encoded_z1, encoded_z2)
             return loss
 
         return loss_compute
@@ -200,8 +203,26 @@ class Trainer(basic.Trainer):
         self.personalized_model.load_state_dict(torch.load(model_path),
                                                 strict=True)
 
-    def train_loop(self, config, trainset, sampler, cut_layer):
-        """ The default training loop when a custom training loop is not supplied. """
+    def train_loop(
+        self,
+        config,
+        trainset,
+        sampler,
+        cut_layer,
+        **kwargs,
+    ):
+        """ The default training loop when a custom training loop is not supplied.
+
+        Note:
+            This is the training stage of self-supervised learning (ssl). It is responsible
+        for performing the contrastive learning process based on the trainset to train
+        a encoder in the unsupervised manner. Then, this trained encoder is desired to
+        use the strong backbone by downstream tasks to solve the objectives effectively.
+            Therefore, the train loop here utilize the
+            - trainset with one specific transform (contrastive data augmentation)
+            - self.model, the ssl method to be trained.
+
+        """
         batch_size = config['batch_size']
 
         tic = time.perf_counter()
@@ -286,7 +307,8 @@ class Trainer(basic.Trainer):
                             len(train_loader), batch_loss_meter.avg)
                     else:
                         logging.info(
-                            "   [Client #%d] Contrastive Pre-train Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
+                            "   [Client #%d] Contrastive Pre-train Epoch: \
+                            [%d/%d][%d/%d]\tLoss: %.6f",
                             self.client_id, epoch, epochs, batch_id,
                             len(train_loader), batch_loss_meter.avg)
 
@@ -326,6 +348,18 @@ class Trainer(basic.Trainer):
         testset: The test dataset.
         sampler: The sampler that extracts a partition of the test dataset.
         kwargs (optional): Additional keyword arguments.
+
+        Note:
+            This function performs the test process of the self-supervised learning.
+        Thus, it aims to measure the quanlity of the learned representation. Generally,
+        the monitors, cluster algorithms, will be used to make a classification within
+        the test dataset. The general pipeline is:
+            trainset -> pre-trained ssl encoder -> extracted samples' features.
+            extracted samples' features -> knn -> clusters.
+            testset -> trained knn -> classification.
+            Therefore, the monitor process here utilize the
+            - trainset with general transform
+            - testset with general transform
         """
         self.model.to(self.device)
         self.model.eval()
@@ -345,7 +379,7 @@ class Trainer(basic.Trainer):
                         testset,
                         batch_size=config['batch_size'],
                         shuffle=False)
-                    if "monitor_trainset" in list(kwargs.keys()):
+                    if "monitor_trainset" in kwargs:
                         monitor_train_loader = torch.utils.data.DataLoader(
                             kwargs["monitor_trainset"],
                             batch_size=config['batch_size'],
@@ -357,7 +391,7 @@ class Trainer(basic.Trainer):
                         batch_size=config['batch_size'],
                         shuffle=False,
                         sampler=sampler.get())
-                    if "monitor_trainset" in list(kwargs.keys()):
+                    if "monitor_trainset" in kwargs:
                         monitor_train_loader = torch.utils.data.DataLoader(
                             kwargs["monitor_trainset"],
                             batch_size=config['batch_size'],
@@ -381,11 +415,14 @@ class Trainer(basic.Trainer):
             model_name = config['model_name']
             filename = f"{model_name}_{self.client_id}_{config['run_id']}.acc"
             self.save_accuracy(accuracy, filename)
+            model_name = config['model_name']
+            filename = f"{model_name}_{self.client_id}_{config['run_id']}_monitor.acc"
+            self.save_accuracy(accuracy, filename)
         else:
             return accuracy
 
     def eval_test_process(self, config, testset, sampler=None, **kwargs):
-        """The testing loop, run in a separate process with a new CUDA context,
+        """ The testing loop, run in a separate process with a new CUDA context,
         so that CUDA memory can be released after the training completes.
 
         Arguments:
@@ -393,6 +430,20 @@ class Trainer(basic.Trainer):
         testset: The test dataset.
         sampler: The sampler that extracts a partition of the test dataset.
         kwargs (optional): Additional keyword arguments.
+
+        Note:
+            This is second stage of evaluation in general self-supervised learning
+        methods. In this stage, the learned representation will be used for downstream
+        tasks, such as image classification. The pipeline is:
+            task_input -> pretrained ssl_encoder -> representation -> task_solver -> task_loss.
+
+            But in the federated learning domain, each client perform this stage on its
+        local data. The main target is to train the personalized model to complete its
+        own task. Thus, the task_solver mentioned above is the personalized_model.
+
+            By the way, the upper mentioned 'pretrained ssl_encoder' is the self.model
+        in the federated learning implementation. As this is the only model shared among
+        clients.
         """
         self.personalized_model.to(self.device)
 
@@ -411,7 +462,7 @@ class Trainer(basic.Trainer):
                         testset,
                         batch_size=config['pers_batch_size'],
                         shuffle=False)
-                    if "eval_trainset" in list(kwargs.keys()):
+                    if "eval_trainset" in kwargs:
                         eval_train_loader = torch.utils.data.DataLoader(
                             kwargs["eval_trainset"],
                             batch_size=config['pers_batch_size'],
@@ -423,7 +474,7 @@ class Trainer(basic.Trainer):
                         batch_size=config['pers_batch_size'],
                         shuffle=False,
                         sampler=sampler.get())
-                    if "eval_trainset" in list(kwargs.keys()):
+                    if "eval_trainset" in kwargs:
                         eval_train_loader = torch.utils.data.DataLoader(
                             kwargs["eval_trainset"],
                             batch_size=config['pers_batch_size'],
@@ -459,13 +510,13 @@ class Trainer(basic.Trainer):
                 self.model.eval()
                 self.personalized_model.train()
 
-                epoch_log_interval = config['epoch_log_interval']
+                epoch_log_interval = config['pers_epoch_log_interval']
                 num_eval_train_epochs = Config().trainer.pers_epochs
                 epoch_loss_meter = optimizers.AverageMeter(name='Loss')
 
                 # Start eval training
                 global_progress = tqdm(range(0, num_eval_train_epochs),
-                                       desc=f'Evaluating')
+                                       desc='Evaluating')
                 for epoch in global_progress:
                     epoch_loss_meter.reset()
                     local_progress = tqdm(
@@ -473,7 +524,7 @@ class Trainer(basic.Trainer):
                         desc=f'Epoch {epoch}/{num_eval_train_epochs}',
                         disable=True)
 
-                    for idx, (examples, labels) in enumerate(local_progress):
+                    for _, (examples, labels) in enumerate(local_progress):
                         examples, labels = examples.to(self.device), labels.to(
                             self.device)
                         eval_optimizer.zero_grad()
@@ -500,17 +551,18 @@ class Trainer(basic.Trainer):
                             epoch_loss_meter.avg
                         })
 
-                    logging.info(
-                        "[Client #%d] Personalization Training Epoch: [%d/%d]\tLoss: %.6f",
-                        self.client_id, epoch, num_eval_train_epochs,
-                        epoch_loss_meter.avg)
+                    if epoch % epoch_log_interval == 0:
+                        logging.info(
+                            "[Client #%d] Personalization Training Epoch: [%d/%d]\tLoss: %.6f",
+                            self.client_id, epoch, num_eval_train_epochs,
+                            epoch_loss_meter.avg)
                 # perform the test phase of the eval stage
                 acc_meter = optimizers.AverageMeter(name='Accuracy')
 
                 self.personalized_model.eval()
-                correct, total = 0, 0
+                correct = 0
                 acc_meter.reset()
-                for idx, (examples, labels) in enumerate(test_loader):
+                for _, (examples, labels) in enumerate(test_loader):
                     examples, labels = examples.to(self.device), labels.to(
                         self.device)
                     with torch.no_grad():
@@ -544,6 +596,16 @@ class Trainer(basic.Trainer):
         testset: The test dataset.
         sampler: The sampler that extracts a partition of the test dataset.
         kwargs (optional): Additional keyword arguments.
+
+
+        Note:
+            It performs 'eval_test_process' that is responsible for evaluating
+        the learned representation of ssl.
+            Under the terminologies of federated learning, this part is to train
+        the personalized model.
+            However, we still call it 'eval_test' just to align the learning stage
+        with that in self-supervised learning (ssl), i.e., evaluation stage.
+
         """
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']

@@ -1,6 +1,6 @@
 """
-Implement the client for the SimCLR method.
-
+A basic federated self-supervised learning client
+who performs the pre-train and evaluation stages locally.
 
 """
 
@@ -9,6 +9,7 @@ import time
 from dataclasses import dataclass
 
 import torch
+from thop import profile, clever_format
 
 from plato.config import Config
 from plato.clients import simple
@@ -20,8 +21,6 @@ from plato.datasources.augmentations.augmentation_register import get as get_aug
 
 from plato.utils import fonts
 
-from thop import profile, clever_format
-
 
 @dataclass
 class Report(base.Report):
@@ -31,8 +30,12 @@ class Report(base.Report):
 
 
 class Client(simple.Client):
-    """A basic self-supervised federated learning client who completes the learning process."""
+    """A basic self-supervised federated learning client who completes
+     learning process containing two stages."""
 
+    # pylint: disable=too-many-instance-attributes
+    # pylint: disable=too-many-arguments
+    # Six is reasonable in this case.
     def __init__(self,
                  model=None,
                  datasource=None,
@@ -85,10 +88,11 @@ class Client(simple.Client):
             flops, params = profile(self.personalized_model,
                                     inputs=(torch.randn(1, input_dim)),
                                     verbose=False)
-            flops, params = clever_format([flops, params], "%.3f")
+            format_outputs = clever_format([flops, params], "%.3f")
+
             logging.info(
                 "   [Client #%d]'s personalized model: Params[%s], FLOPs[%s]",
-                self.client_id, params, flops)
+                self.client_id, format_outputs[1], format_outputs[0])
 
         # assign the client's personalized model to its trainer
         self.trainer.set_client_personalized_model(self.personalized_model)
