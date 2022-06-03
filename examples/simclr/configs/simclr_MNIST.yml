@@ -1,20 +1,27 @@
+general:
+    # The prefix of directories of dataset, models, checkpoints, and results
+    # on sim server
+    # base_path: /data/sijia/INFOCOM23/experiments
+
+    # locally
+    base_path: ./INFOCOM23/experiments
 
 clients:
     # Type
     type: simple
 
     # The total number of clients
-    total_clients: 50
+    total_clients: 5
 
     # The number of clients selected in each round
-    per_round: 30
+    per_round: 3
 
     # Should the clients compute test accuracy locally?
     do_test: True
     # Minotor the self-supervised learning by knn for
     # every 5 round
     test_interval: 5
-    # Train the personalized model based on the 
+    # Train the personalized model based on the
     # learned representation every 10 rounds
     eval_test_interval: 10
     # Whether simulate clients or not
@@ -27,8 +34,7 @@ server:
     port: 8000
     synchronous: true
     do_test: false
-    checkpoint_path: models/simclr/mnist
-    model_path: models/simclr/mnist
+
 
 data:
     # The training and testing dataset
@@ -36,7 +42,7 @@ data:
 
     # Number of samples in each partition
     #
-    # This is one important parameter that 
+    # This is one important parameter that
     # may lead the failure of the loss criterion part
     # if your loss criterion relies on the batch_size
     # as its argument. For example, the NT_Xent loss utilized
@@ -50,7 +56,7 @@ data:
     # Under this case, to avoid this issue, we need to set:
     #   partition_size / batch_size = integar
     #   partition_size / pers_batch_size = integar
-    partition_size: 30000
+    partition_size: 300
 
     # IID or non-IID?
     sampler: noniid
@@ -66,18 +72,18 @@ data:
     # data_wrapper: Null
     data_wrapper: ContrastiveAugmentWrapper
 
-    # set the data augmentation 
+    # set the data augmentation
     #   options: simsiam, byol, simclr
     augment_transformer_name: simclr
     # some methods apply the normalization to samples
     #   while others do not
-    is_norm: False 
+    is_norm: False
 
 trainer:
     # The type of the trainer
     type: basic
 
-    
+
     # The maximum number of training rounds
     rounds: 100
 
@@ -94,7 +100,7 @@ trainer:
     #   The user is expected to carefully choose the batch_size to avoid
     # the memory allocation issue as the contrastive samples occupy more
     # space as more samples will be contained within one loading.
-    epochs: 5
+    epochs: 2
     batch_size: 30
     optimizer: Adam
     learning_rate: 0.003
@@ -110,17 +116,17 @@ trainer:
 
     epoch_log_interval: 1
     batch_log_interval: 100
-    
+
     # Number of epochs for local training in each communication round
-    #   The batch size for the downstream task can be larger as it 
-    # does not utilize the 
-    pers_epochs: 50
+    #   The batch size for the downstream task can be larger as it
+    # does not utilize the
+    pers_epochs: 5
     pers_batch_size: 64
     pers_optimizer: Adam
     pers_learning_rate: 0.005
-    pers_betas: 
+    pers_betas:
         - 0.9
-        - 0.99   
+        - 0.99
     pers_eps: 0.00000009 # 1e-8
     pers_weight_decay: 0.002
 
@@ -131,7 +137,7 @@ trainer:
     pers_epoch_log_interval: 1
     # temperature
     temperature: 0.5
-    
+
     # image_size
     #  - CIFAR10 (Image size=32)
     #  - MNIST (Image size=28)
@@ -142,8 +148,8 @@ trainer:
     # the final fc layer will be removed
     model_name: lenet5
     projection_dim: 128
-    
-    personalized_model_name: pure_one_layer_mlp  
+
+    personalized_model_name: pure_one_layer_mlp
 
     monitor_name: knn
     knn_k: 200
@@ -155,3 +161,6 @@ trainer:
 algorithm:
     # Aggregation algorithm
     type: fedavg
+
+results:
+    results_path: simclr_mnist
