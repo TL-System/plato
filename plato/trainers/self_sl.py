@@ -14,6 +14,7 @@ from torch import nn
 
 import torch.distributed as dist
 from tqdm import tqdm
+import pandas as pd
 
 from plato.config import Config
 from plato.trainers import basic
@@ -166,6 +167,7 @@ class Trainer(basic.Trainer):
     def process_save_path(filename, location, work_model_name,
                           desired_extenstion):
         """ Process the input arguments to obtain the final saving path. """
+        # default saving everything to the model path
         model_path = Config(
         ).params['model_path'] if location is None else location
         # set the model_type to
@@ -185,7 +187,7 @@ class Trainer(basic.Trainer):
             to_save_path = f'{model_path}/{model_name}'
 
         # check the filr extension
-        save_prefix, save_extension = os.path.splitext(to_save_path)[-1]
+        save_prefix, save_extension = os.path.splitext(to_save_path)
         # the save file must contain a 'pth' as its extension
         if save_extension != desired_extenstion:
             to_save_path = save_prefix + desired_extenstion
@@ -225,19 +227,37 @@ class Trainer(basic.Trainer):
                                                 strict=True)
 
     @staticmethod
-    def save_personalized_accuracy(accuracy, filename=None, location=None):
+    def save_personalized_accuracy(accuracy,
+                                   round=None,
+                                   accuracy_type="monitor_accuracy",
+                                   filename=None,
+                                   location=None):
         """Saving the test accuracy to a file."""
         to_save_accuracy_path = Trainer.process_save_path(
             filename,
             location,
             work_model_name="personalized_model_name",
-            desired_extenstion=".acc")
+            desired_extenstion=".csv")
 
-        with open(to_save_accuracy_path, 'w', encoding='utf8') as file:
-            file.write(str(accuracy))
+        current_round = round if round is not None else 0
+        acc_dataframe = pd.DataFrame(
+            {
+                "round": current_round,
+                accuracy_type: accuracy
+            }, index=[0])
+
+        is_use_header = True if not os.path.exists(
+            to_save_accuracy_path) else False
+        acc_dataframe.to_csv(to_save_accuracy_path,
+                             index=False,
+                             mode='a',
+                             header=is_use_header)
 
     @staticmethod
-    def load_personalized_accuracy(filename=None, location=None):
+    def load_personalized_accuracy(round=None,
+                                   accuracy_type="monitor_accuracy",
+                                   filename=None,
+                                   location=None):
         """Loading the test accuracy from a file."""
         to_load_accuracy_path = Trainer.process_save_path(
             filename,
@@ -245,8 +265,16 @@ class Trainer(basic.Trainer):
             work_model_name="personalized_model_name",
             desired_extenstion=".acc")
 
-        with open(to_load_accuracy_path, 'r', encoding='utf8') as file:
-            accuracy = float(file.read())
+        loaded_rounds_accuracy = pd.read_csv(to_load_accuracy_path)
+        if round is None:
+            # default use the last row
+            desired_row = loaded_rounds_accuracy.iloc[-1]
+        else:
+            desired_row = loaded_rounds_accuracy.loc[
+                loaded_rounds_accuracy['round'] == round]
+            desired_row = loaded_rounds_accuracy.iloc[-1]
+
+        accuracy = desired_row[accuracy_type]
 
         return accuracy
 
@@ -459,11 +487,26 @@ class Trainer(basic.Trainer):
         self.model.cpu()
 
         if 'max_concurrency' in config:
+            # first save the monitor to the results path
+            results_path = Config().params['result_path']
+            # the unique name set in the config file
+            # to save the results
+            unique_name = config['unique_name']
+
+            save_location = os.path.join(results_path, unique_name)
+            current_round = kwargs['current_round']
+            filename = f"client_{self.client_id}_monitor.csv"
+
+            os.makedirs(save_location, exist_ok=True)
+            self.save_personalized_accuracy(accuracy,
+                                            round=current_round,
+                                            accuracy_type="monitor_accuracy",
+                                            filename=filename,
+                                            location=save_location)
+            # save current accuracy directly for the latter usage
+            # in the test(...)
             model_name = config['model_name']
             filename = f"{model_name}_{self.client_id}_{config['run_id']}.acc"
-            self.save_accuracy(accuracy, filename)
-            model_name = config['model_name']
-            filename = f"{model_name}_{self.client_id}_{config['run_id']}_monitor.acc"
             self.save_accuracy(accuracy, filename)
         else:
             return accuracy
@@ -627,25 +670,46 @@ class Trainer(basic.Trainer):
         # to the dir of this client
         if 'max_concurrency' in config:
             self.personalized_model.cpu()
-            model_type = config['personalized_model_name']
+            model_path = Config().params['checkpoint_path']
+            # the unique name set in the config file
+            # to save the results
+            unique_name = config['unique_name']
+
+            save_location = os.path.join(model_path, unique_name,
+                                         "client_" + str(self.client_id))
+
             current_round = kwargs['current_round']
-            filename = f"{model_type}_Round({current_round})_{config['run_id']}.pth"
-            model_path = Config().params['model_path']
-            save_location = os.path.join(model_path, self.client_id)
+            filename = f"Round_{current_round}_personalization.pth"
+
             os.makedirs(save_location, exist_ok=True)
-            self.save_personalized_model(filename, location=save_location)
+            self.save_personalized_model(filename=filename,
+                                         location=save_location)
 
         if 'max_concurrency' in config:
-            model_name = config['personalized_model_name']
+            # save the personaliation accuracy to the results dir
+            results_path = Config().params['result_path']
+            # the unique name set in the config file
+            # to save the results
+            unique_name = config['unique_name']
+
+            save_location = os.path.join(model_path, unique_name)
 
             current_round = kwargs['current_round']
-            filename = f"{model_name}_Round({current_round})_{config['run_id']}.acc"
-            model_path = Config().params['model_path']
-            save_location = os.path.join(model_path, self.client_id)
+            filename = f"client_{self.client_id}_personalization.csv"
             os.makedirs(save_location, exist_ok=True)
+            self.save_personalized_accuracy(
+                accuracy,
+                round=current_round,
+                accuracy_type="personalization_accuracy",
+                filename=filename,
+                location=save_location)
 
+            # save the accuracy directly for latter usage
+            # in the eval_test(...)
+            model_name = config['personalized_model_name']
             filename = f"{model_name}_{self.client_id}_{config['run_id']}.acc"
             self.save_accuracy(accuracy, filename)
+
         else:
             return accuracy
 

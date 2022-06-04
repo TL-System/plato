@@ -221,7 +221,8 @@ class Client(simple.Client):
                     testset=self.testset,
                     sampler=self.testset_sampler,
                     monitor_trainset=self.monitor_trainset,
-                    monitor_trainset_sampler=self.sampler)
+                    monitor_trainset_sampler=self.sampler,
+                    current_round=self.current_round)
                 logging_str = "Monitor test"
                 test_logging(logging_str, accuracy)
 
