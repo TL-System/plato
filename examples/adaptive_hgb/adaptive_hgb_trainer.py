@@ -235,23 +235,23 @@ class Trainer(basic.Trainer):
                                                   num_workers=config.data.get(
                                                       'workers_per_gpu', 1))
 
-        iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
         epochs = config['epochs']
 
-        # Sending the model to the device used for training
-        self.model.to(self.device)
-        self.model.train()
         # Initializing the optimizer
         get_optimizer = getattr(self, "get_optimizer",
                                 optimizers.get_optimizer)
         optimizer = get_optimizer(self.model)
+
         # Initializing the learning rate schedule, if necessary
-        if hasattr(config, 'lr_schedule'):
+        if 'lr_schedule' in config:
             lr_schedule = optimizers.get_lr_schedule(optimizer,
-                                                     iterations_per_epoch,
+                                                     len(train_loader),
                                                      train_loader)
         else:
             lr_schedule = None
+
+        self.model.to(self.device)
+        self.model.train()
 
         # operate the local training
         supported_modalities = trainset.supported_modalities
