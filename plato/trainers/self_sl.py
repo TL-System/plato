@@ -489,11 +489,7 @@ class Trainer(basic.Trainer):
         if 'max_concurrency' in config:
             # first save the monitor to the results path
             results_path = Config().params['result_path']
-            # the unique name set in the config file
-            # to save the results
-            unique_name = config['unique_name']
-
-            save_location = os.path.join(results_path, unique_name)
+            save_location = results_path
             current_round = kwargs['current_round']
             filename = f"client_{self.client_id}_monitor.csv"
 
@@ -670,12 +666,9 @@ class Trainer(basic.Trainer):
         # to the dir of this client
         if 'max_concurrency' in config:
             self.personalized_model.cpu()
-            model_path = Config().params['checkpoint_path']
-            # the unique name set in the config file
-            # to save the results
-            unique_name = config['unique_name']
+            check_point_path = Config().params['checkpoint_path']
 
-            save_location = os.path.join(model_path, unique_name,
+            save_location = os.path.join(check_point_path,
                                          "client_" + str(self.client_id))
 
             current_round = kwargs['current_round']
@@ -687,12 +680,9 @@ class Trainer(basic.Trainer):
 
         if 'max_concurrency' in config:
             # save the personaliation accuracy to the results dir
-            results_path = Config().params['result_path']
-            # the unique name set in the config file
-            # to save the results
-            unique_name = config['unique_name']
+            result_path = Config().params['result_path']
 
-            save_location = os.path.join(model_path, unique_name)
+            save_location = result_path
 
             current_round = kwargs['current_round']
             filename = f"client_{self.client_id}_personalization.csv"

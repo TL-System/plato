@@ -20,10 +20,10 @@ clients:
     do_test: True
     # Minotor the self-supervised learning by knn for
     # every 5 round
-    test_interval: 5
+    test_interval: 1
     # Train the personalized model based on the
     # learned representation every 10 rounds
-    eval_test_interval: 10
+    eval_test_interval: 1
     # Whether simulate clients or not
     simulation: true
 
@@ -35,6 +35,8 @@ server:
     synchronous: true
     do_test: false
 
+    model_path: models/SimCLR_MNIST_l5_pureMLP
+    checkpoint_path: checkpoints/SimCLR_MNIST_l5_pureMLP
 
 data:
     # The training and testing dataset
@@ -56,7 +58,7 @@ data:
     # Under this case, to avoid this issue, we need to set:
     #   partition_size / batch_size = integar
     #   partition_size / pers_batch_size = integar
-    partition_size: 300
+    partition_size: 900
 
     # IID or non-IID?
     sampler: noniid
@@ -158,9 +160,11 @@ trainer:
 
     num_classes: 10
 
+
+
 algorithm:
     # Aggregation algorithm
     type: fedavg
 
 results:
-    results_path: simclr_mnist
+    result_path: results/SimCLR_MNIST_l5_pureMLP
