@@ -48,9 +48,9 @@ class GatherLayer(torch.autograd.Function):
 class NTXent(nn.Module):
     """ The NTXent loss utilized by most self-supervised methods.
 
-        Note: here can be important issue existed in this implementation
+        Note: An important issue existed in this implementation
         of NT_Xent as:
-        the NT_Xent loss utilized by the SimCLR method set the defined batch_size
+        the NT_Xent loss utilized by the SimCLR method sets the defined batch_size
         as the parameter. However, at the end of one epoch, the left samples may smaller than
         the batch_size. This makes the #loaded samples != batch_size.
         Working on criterion that is defined with batch_size but receives loaded
@@ -321,16 +321,10 @@ class Trainer(basic.Trainer):
         self.model.train()
 
         # Initializing the loss criterion
-        _loss_criterion = getattr(self, "loss_criterion", None)
-        if callable(_loss_criterion):
-            loss_criterion = self.loss_criterion(self.model)
-        else:
-            loss_criterion = torch.nn.CrossEntropyLoss()
+        loss_criterion = self.loss_criterion(self.model)
 
         # Initializing the optimizer
-        get_dynamic_optimizer = getattr(self, "get_optimizer",
-                                        optimizers.get_dynamic_optimizer)
-        optimizer = get_dynamic_optimizer(self.model)
+        optimizer = optimizers.get_dynamic_optimizer(self.model)
 
         # Initializing the learning rate schedule, if necessary
         if 'lr_schedule' in config:
@@ -339,12 +333,16 @@ class Trainer(basic.Trainer):
         else:
             lr_schedule = None
 
+        # Obtain the logging interval
+        epochs = config['epochs']
         epoch_log_interval = config['epoch_log_interval']
         batch_log_interval = config['batch_log_interval']
-        epochs = config['epochs']
+
+        # Define the container to hold the logging information
         epoch_loss_meter = optimizers.AverageMeter(name='Loss')
         batch_loss_meter = optimizers.AverageMeter(name='Loss')
 
+        # Start training
         for epoch in range(1, epochs + 1):
             epoch_loss_meter.reset()
             # Use a default training loop
@@ -354,26 +352,23 @@ class Trainer(basic.Trainer):
                     self.device), examples2.to(self.device), labels.to(
                         self.device)
 
+                # Reset and clear previous data
                 batch_loss_meter.reset()
                 optimizer.zero_grad()
 
-                if cut_layer is None:
-                    outputs = self.model(examples1, examples2)
-                else:
-                    outputs = self.model.forward_from(examples1, examples2,
-                                                      cut_layer)
-
+                # Forward the model and compute the loss
+                outputs = self.model(examples1, examples2)
                 loss = loss_criterion(outputs, labels)
 
-                if 'create_graph' in config:
-                    loss.backward(create_graph=config['create_graph'])
-                else:
-                    loss.backward()
-
+                # Perform the backpropagation
+                loss.backward()
                 optimizer.step()
+
+                # Update the loss data in the logging container
                 epoch_loss_meter.update(loss.data.item())
                 batch_loss_meter.update(loss.data.item())
 
+                # Performe logging of batches
                 if batch_id % batch_log_interval == 0:
                     if self.client_id == 0:
                         logging.info(
@@ -387,10 +382,13 @@ class Trainer(basic.Trainer):
                             self.client_id, epoch, epochs, batch_id,
                             len(train_loader), batch_loss_meter.avg)
 
+            # Performe logging of epochs
             if epoch - 1 % epoch_log_interval == 0:
                 logging.info(
                     "[Client #%d] Contrastive Pre-train Epoch: [%d/%d]\tLoss: %.6f",
                     self.client_id, epoch, epochs, epoch_loss_meter.avg)
+
+            # Update the learning rate
             if lr_schedule is not None:
                 lr_schedule.step()
 
@@ -472,7 +470,7 @@ class Trainer(basic.Trainer):
                             batch_size=config['batch_size'],
                             shuffle=False,
                             sampler=kwargs["monitor_trainset_sampler"].get())
-
+                # Perform the monitor process to evaluate the representation
                 accuracy = ssl_monitor_register.get()(
                     encoder=self.model.encoder,
                     monitor_data_loader=monitor_train_loader,
@@ -523,7 +521,7 @@ class Trainer(basic.Trainer):
         tasks, such as image classification. The pipeline is:
             task_input -> pretrained ssl_encoder -> representation -> task_solver -> task_loss.
 
-            But in the federated learning domain, each client perform this stage on its
+            But in the federated learning domain, each client performs this stage on its
         local data. The main target is to train the personalized model to complete its
         own task. Thus, the task_solver mentioned above is the personalized_model.
 
@@ -567,15 +565,15 @@ class Trainer(basic.Trainer):
                             shuffle=False,
                             sampler=kwargs["eval_trainset_sampler"].get())
 
-                # perform the evaluation in the downstream task
+                # Perform the evaluation in the downstream task
                 #   i.e., the client's personal local dataset
                 eval_optimizer = optimizers.get_dynamic_optimizer(
                     self.personalized_model, prefix="pers_")
                 iterations_per_epoch = np.ceil(
                     len(kwargs["eval_trainset"]) /
                     Config().trainer.pers_batch_size).astype(int)
-                # Initializing the learning rate schedule, if necessary
 
+                # Initializing the learning rate schedule, if necessary
                 if 'pers_lr_schedule' in config:
                     lr_schedule = optimizers.get_dynamic_lr_schedule(
                         optimizer=eval_optimizer,
@@ -596,11 +594,16 @@ class Trainer(basic.Trainer):
                 self.model.eval()
                 self.personalized_model.train()
 
+                # Define the training and logging information
                 epoch_log_interval = config['pers_epoch_log_interval']
                 num_eval_train_epochs = Config().trainer.pers_epochs
                 epoch_loss_meter = optimizers.AverageMeter(name='Loss')
 
                 # Start eval training
+                # Note:
+                #   To distanguish the eval training stage with the
+                # previous ssl's training stage. We utilize the progress bar
+                # to demonstrate the training progress details.
                 global_progress = tqdm(range(0, num_eval_train_epochs),
                                        desc='Evaluating')
                 for epoch in global_progress:
@@ -613,21 +616,29 @@ class Trainer(basic.Trainer):
                     for _, (examples, labels) in enumerate(local_progress):
                         examples, labels = examples.to(self.device), labels.to(
                             self.device)
+                        # Clear the previous gradient
                         eval_optimizer.zero_grad()
 
+                        # Extract representation from the trained
+                        # frozen encoder of ssl.
+                        # No optimization is reuqired by this encoder.
                         with torch.no_grad():
                             feature = self.model.encoder(examples)
 
+                        # Perfrom the training and compute the loss
                         preds = self.personalized_model(feature)
-
                         loss = eval_loss_criterion(preds, labels)
 
+                        # Perfrom the optimization
                         loss.backward()
                         eval_optimizer.step()
+
+                        # Update the epoch loss container
                         epoch_loss_meter.update(loss.data.item())
 
                         if lr_schedule is not None:
                             lr_schedule = lr_schedule.step()
+
                         local_progress.set_postfix({
                             'lr':
                             lr_schedule,
@@ -642,7 +653,8 @@ class Trainer(basic.Trainer):
                             "[Client #%d] Personalization Training Epoch: [%d/%d]\tLoss: %.6f",
                             self.client_id, epoch, num_eval_train_epochs,
                             epoch_loss_meter.avg)
-                # perform the test phase of the eval stage
+
+                # Define the test phase of the eval stage
                 acc_meter = optimizers.AverageMeter(name='Accuracy')
 
                 self.personalized_model.eval()
