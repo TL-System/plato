@@ -72,58 +72,54 @@ class Trainer(basic.Trainer):
 
         for epoch in range(1, epochs + 1):
             # Use a default training loop
-            batch_id = 0
-            img_index = 1
-            (examples, labels) = trainset[img_index]
-            examples, labels = examples.to(self.device), torch.Tensor([labels]).long().to(
-                self.device)
-            examples = examples.view(1, *examples.size())
-            labels = labels.view(1, )
+            for batch_id, (examples, labels) in enumerate(train_loader):
+                examples, labels = examples.to(self.device), labels.to(
+                    self.device)
 
-            plt.imshow(tt(examples[0].cpu()))
-            plt.title("Ground truth image")
+                plt.imshow(tt(examples[0].cpu()))
+                plt.title("Ground truth image")
 
-            optimizer.zero_grad()
+                optimizer.zero_grad()
 
-            if cut_layer is None:
-                outputs = self.model(examples)
-            else:
-                outputs = self.model.forward_from(examples, cut_layer)
-
-            # Save the ground truth and gradients
-            onehot_labels = label_to_onehot(
-                labels, num_classes=Config().trainer.num_classes)
-            target_grad = None
-            if hasattr(Config().algorithm, 'share_gradients') and Config().algorithm.share_gradients:
-                loss = criterion(outputs, onehot_labels)
-                dy_dx = torch.autograd.grad(loss, self.model.parameters())
-                target_grad = list((_.detach().clone() for _ in dy_dx))
-            else:
-                loss = loss_criterion(outputs, labels)
-
-                if 'create_graph' in config:
-                    loss.backward(create_graph=config['create_graph'])
+                if cut_layer is None:
+                    outputs = self.model(examples)
                 else:
-                    loss.backward()
+                    outputs = self.model.forward_from(examples, cut_layer)
 
-                optimizer.step()
-
-            file_path = f"{Config().params['model_path']}/{self.client_id}.pickle"
-            with open(file_path, 'wb') as handle:
-                pickle.dump(
-                    [examples, onehot_labels, target_grad], handle)
-
-            if batch_id % log_interval == 0:
-                if self.client_id == 0:
-                    logging.info(
-                        "[Server #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
-                        os.getpid(), epoch, epochs, batch_id,
-                        len(train_loader), loss.data.item())
+                # Save the ground truth and gradients
+                onehot_labels = label_to_onehot(
+                    labels, num_classes=Config().trainer.num_classes)
+                target_grad = None
+                if hasattr(Config().algorithm, 'share_gradients') and Config().algorithm.share_gradients:
+                    loss = criterion(outputs, onehot_labels)
+                    dy_dx = torch.autograd.grad(loss, self.model.parameters())
+                    target_grad = list((_.detach().clone() for _ in dy_dx))
                 else:
-                    logging.info(
-                        "[Client #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
-                        self.client_id, epoch, epochs, batch_id,
-                        len(train_loader), loss.data.item())
+                    loss = loss_criterion(outputs, labels)
+
+                    if 'create_graph' in config:
+                        loss.backward(create_graph=config['create_graph'])
+                    else:
+                        loss.backward()
+
+                    optimizer.step()
+
+                file_path = f"{Config().params['model_path']}/{self.client_id}.pickle"
+                with open(file_path, 'wb') as handle:
+                    pickle.dump(
+                        [examples, onehot_labels, target_grad], handle)
+
+                if batch_id % log_interval == 0:
+                    if self.client_id == 0:
+                        logging.info(
+                            "[Server #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
+                            os.getpid(), epoch, epochs, batch_id,
+                            len(train_loader), loss.data.item())
+                    else:
+                        logging.info(
+                            "[Client #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
+                            self.client_id, epoch, epochs, batch_id,
+                            len(train_loader), loss.data.item())
 
             if lr_schedule is not None:
                 lr_schedule.step()
