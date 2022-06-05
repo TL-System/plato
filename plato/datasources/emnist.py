@@ -15,10 +15,10 @@ class DataSource(base.DataSource):
         _path = Config().params['data_path']
 
         train_transform = transforms.Compose([
-            transforms.RandomHorizontalFlip(),
-            transforms.RandomAffine(degrees=10,
-                                    translate=(0.2, 0.2),
-                                    scale=(0.8, 1.2)),
+            # transforms.RandomHorizontalFlip(),
+            # transforms.RandomAffine(degrees=10,
+            #                         translate=(0.2, 0.2),
+            #                         scale=(0.8, 1.2)),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.5], std=[0.5])
         ])
