@@ -11,7 +11,7 @@ import multiprocessing as mp
 import numpy as np
 import torch
 from torch import nn
-
+import torch.nn.functional as F
 import torch.distributed as dist
 from tqdm import tqdm
 import pandas as pd
@@ -92,6 +92,8 @@ class NTXent(nn.Module):
         a minibatch as negative examples.
         """
         collected_samples = 2 * self.batch_size * self.world_size
+        z_i = F.normalize(z_i, dim=1)
+        z_j = F.normalize(z_j, dim=1)
 
         collected_z = torch.cat((z_i, z_j), dim=0)
         if self.world_size > 1:
@@ -347,17 +349,24 @@ class Trainer(basic.Trainer):
             epoch_loss_meter.reset()
             # Use a default training loop
             for batch_id, (examples, labels) in enumerate(train_loader):
-                examples1, examples2 = examples
-                examples1, examples2, labels = examples1.to(
-                    self.device), examples2.to(self.device), labels.to(
-                        self.device)
+                # Support a more general way to hold the loaded samples
+                # The defined model is responsible for processing the
+                # examples based on its requirements.
+                if torch.is_tensor(examples):
+                    examples = examples.to(self.device)
+                else:
+                    examples = [
+                        each_sample.to(self.device) for each_sample in examples
+                    ]
+
+                labels = labels.to(self.device)
 
                 # Reset and clear previous data
                 batch_loss_meter.reset()
                 optimizer.zero_grad()
 
                 # Forward the model and compute the loss
-                outputs = self.model(examples1, examples2)
+                outputs = self.model(examples)
                 loss = loss_criterion(outputs, labels)
 
                 # Perform the backpropagation

@@ -25,7 +25,7 @@ implemented by the work https://github.com/giakou4/MNIST_classification
 import simclr_net
 from mnist_encoder_net import Encoder
 
-from plato.trainers import self_sl as ssl_trainer
+from plato.trainers import contrastive_ssl as ssl_trainer
 from plato.clients import ssl_simple as ssl_client
 from plato.servers import fedavg
 
