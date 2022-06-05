@@ -42,8 +42,9 @@ class SimCLR(nn.Module):
         # build the projector proposed in the simclr net
         self.projector = ProjectionMLP(in_dim=self.encode_dim)
 
-    def forward(self, samples1, samples2):
+    def forward(self, augmented_samples):
         """ Forward two batch of contrastive samples. """
+        samples1, samples2 = augmented_samples
         encoded_h1 = self.encoder(samples1)
         encoded_h2 = self.encoder(samples2)
 
