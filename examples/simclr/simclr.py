@@ -16,17 +16,16 @@ Reference:
 
 import simclr_net
 
-from plato.trainers import self_sl as ssl_trainer
+from plato.trainers import contrastive_ssl as ssl_trainer
 from plato.clients import ssl_simple as ssl_client
 from plato.servers import fedavg
 
 
 def main():
-    """ A Plato federated learning training session using the FedRep algorithm.
+    """ A Plato federated learning training session using the SimCLR algorithm.
         This implementation of simclr utilizes the general setting, i.e.,
         removing the final fully-connected layers of model defined by
         the 'model_name' in config file.
-
     """
     trainer = ssl_trainer.Trainer
     simclr_model = simclr_net.SimCLR()

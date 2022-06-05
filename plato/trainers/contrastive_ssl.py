@@ -1,5 +1,5 @@
 """
-Implement the trainer for self-supervised learning method.
+Implement the trainer for contrastive self-supervised learning method.
 
 """
 
@@ -119,7 +119,7 @@ class NTXent(nn.Module):
 
 
 class Trainer(basic.Trainer):
-    """ A federated learning trainer for self-supervised models. """
+    """ A federated learning trainer for contrastive self-supervised methods. """
 
     def __init__(self, model=None):
         super().__init__(model)
