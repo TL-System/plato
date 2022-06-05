@@ -1,29 +1,30 @@
+
 general:
     # The prefix of directories of dataset, models, checkpoints, and results
     # on sim server
-    # base_path: /data/sijia/INFOCOM23/experiments
+    # base_path: /data/user/Projects/experiments
 
     # locally
-    base_path: ./INFOCOM23/experiments
+    base_path: ./Projects/experiments
 
 clients:
     # Type
     type: simple
 
     # The total number of clients
-    total_clients: 5
+    total_clients: 50
 
     # The number of clients selected in each round
-    per_round: 3
+    per_round: 30
 
     # Should the clients compute test accuracy locally?
     do_test: True
     # Minotor the self-supervised learning by knn for
     # every 5 round
-    test_interval: 1
+    test_interval: 5
     # Train the personalized model based on the
     # learned representation every 10 rounds
-    eval_test_interval: 1
+    eval_test_interval: 10
     # Whether simulate clients or not
     simulation: true
 
@@ -35,6 +36,20 @@ server:
     synchronous: true
     do_test: false
 
+    # for the models/checkpoints/results path, please keep their dir's
+    # name the same
+    # For example, the subdir name of model_path is
+    # 'SimCLR_MNIST_l5_pureMLP', it is desired to use the same name
+    # for checkpoint_path and result_path.
+
+    # Note, for the name of this subdir, it is desired to follow the same
+    # rule as:
+    # {ssl_method_name}_{dataset_name}_{encoder_backbone_name}_{personalized_model_name}
+    # For example, for the name here, it uses
+    #   SimCLR  : The SimCLR method
+    #   MNIST   : The MNIST dataset
+    #   l5      : The LeNet5 network
+    #   pureMLP : The pure MLP network (1 layer without any enhancements)
     model_path: models/SimCLR_MNIST_l5_pureMLP
     checkpoint_path: checkpoints/SimCLR_MNIST_l5_pureMLP
 
@@ -58,7 +73,7 @@ data:
     # Under this case, to avoid this issue, we need to set:
     #   partition_size / batch_size = integar
     #   partition_size / pers_batch_size = integar
-    partition_size: 900
+    partition_size: 20000
 
     # IID or non-IID?
     sampler: noniid
@@ -102,7 +117,7 @@ trainer:
     #   The user is expected to carefully choose the batch_size to avoid
     # the memory allocation issue as the contrastive samples occupy more
     # space as more samples will be contained within one loading.
-    epochs: 2
+    epochs: 5
     batch_size: 30
     optimizer: Adam
     learning_rate: 0.003
@@ -121,8 +136,8 @@ trainer:
 
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
-    # does not utilize the
-    pers_epochs: 5
+    # does not utilize the contrastive samples
+    pers_epochs: 30
     pers_batch_size: 64
     pers_optimizer: Adam
     pers_learning_rate: 0.005
@@ -159,8 +174,6 @@ trainer:
     hide_monitor_progress: False
 
     num_classes: 10
-
-
 
 algorithm:
     # Aggregation algorithm
