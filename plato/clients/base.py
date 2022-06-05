@@ -27,6 +27,7 @@ class Report:
 
 class ClientEvents(socketio.AsyncClientNamespace):
     """ A custom namespace for socketio.AsyncServer. """
+
     def __init__(self, namespace, plato_client):
         super().__init__(namespace)
         self.plato_client = plato_client
@@ -77,6 +78,7 @@ class ClientEvents(socketio.AsyncClientNamespace):
 
 class Client:
     """ A basic federated learning client. """
+
     def __init__(self) -> None:
         self.client_id = Config().args.id
         self.current_round = 0
