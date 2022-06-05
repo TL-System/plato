@@ -149,9 +149,6 @@ logs/
 checkpoints/
 *.pth
 
-# Visualization
-visualization/
-
 # macOS
 .DS_Store
 

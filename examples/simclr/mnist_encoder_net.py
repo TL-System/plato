@@ -43,7 +43,7 @@ class Encoder(torch.nn.Module):
         x = self.layer1(x)
         x = self.layer2(x)
         x = self.layer3(x)
-        x = x.view(x.size(0), -1)  # Flatten them for FC
+        x = x.view(x.size(0), -1)
         return x
 
     def get_encoding_dim(self):
