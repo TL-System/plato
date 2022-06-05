@@ -198,7 +198,11 @@ class Client(simple.Client):
                 logging.info("[%s] {%s}: %.2f%%", self, logging_str,
                              100 * accuracy)
 
-        accuracy = -1
+        # set the accuracy to be 0
+        # even thouth we set the do_test to be True, the test procedure will not
+        # be performed in every round. We just set it to be 0
+        # if the test procedure is performes, the accuracy will be changed.
+        accuracy = 0
         # Generate a report for the server, performing model testing if applicable
         if hasattr(Config().clients, 'do_test') and Config().clients.do_test:
             # This is the monitor test performed to measure the representation's quality
@@ -264,7 +268,6 @@ class Client(simple.Client):
             if accuracy == -1:
                 # The testing process failed, disconnect from the server
                 await self.sio.disconnect()
-
         else:
             accuracy = 0
 
