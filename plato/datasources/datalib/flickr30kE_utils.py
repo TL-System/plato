@@ -13,22 +13,22 @@ from plato.datasources.datalib import data_utils
 
 def phrase_boxes_alignment(flatten_boxes, ori_phrases_boxes):
     """ align the bounding boxes with corresponding phrases. """
-    phrases_boxes = list()
+    phrases_boxes = []
 
-    ori_pb_boxes_count = list()
+    ori_pb_boxes_count = []
     for ph_boxes in ori_phrases_boxes:
         ori_pb_boxes_count.append(len(ph_boxes))
 
     strat_point = 0
     for pb_boxes_num in ori_pb_boxes_count:
-        sub_boxes = list()
+        sub_boxes = []
         for i in range(strat_point, strat_point + pb_boxes_num):
             sub_boxes.append(flatten_boxes[i])
 
         strat_point += pb_boxes_num
         phrases_boxes.append(sub_boxes)
 
-    pb_boxes_count = list()
+    pb_boxes_count = []
     for ph_boxes in phrases_boxes:
         pb_boxes_count.append(len(ph_boxes))
 
@@ -39,7 +39,7 @@ def phrase_boxes_alignment(flatten_boxes, ori_phrases_boxes):
 
 def filter_bad_boxes(boxes_coor):
     """ Filter the boxes with wrong coordinates """
-    filted_boxes = list()
+    filted_boxes = []
     for box_coor in boxes_coor:
         [xmin, ymin, xmax, ymax] = box_coor
         if xmin < xmax and ymin < ymax:
@@ -117,7 +117,7 @@ def get_sentence_data(parse_file_path):
 
 
 def get_annotations(parse_file_path):
-    """ Parses the xml files in the Flickr30K Entities dataset
+    """ Parses the xml files in the Flickr30K Entities dataset.
     Args:
         parse_file_path - full file path to the annotations file to parse
     Return:
@@ -161,7 +161,7 @@ def get_annotations(parse_file_path):
 
 
 def align_anno_sent(image_sents, image_annos):
-    """Align the items in annotations and sentences
+    """Align the items in annotations and sentences.
 
     Args:
         image_sents ([list]): [each itme is a dict that contains 'sentence', 'phrases']
@@ -173,14 +173,14 @@ def align_anno_sent(image_sents, image_annos):
                 items because for one image, there are 5 sentences. Sometimes,
                 some sentences are useless, making the number of items less than 5]
     """
-    aligned_items = list()  # each item is a dict
+    aligned_items = []  # each item is a dict
     for sent_info in image_sents:
 
         img_sent = sent_info["sentence"]
-        img_sent_phrases = list()
-        img_sent_phrases_type = list()
-        img_sent_phrases_id = list()
-        img_sent_phrases_boxes = list()
+        img_sent_phrases = []
+        img_sent_phrases_type = []
+        img_sent_phrases_id = []
+        img_sent_phrases_boxes = []
         for phrase_info_idx in range(len(sent_info["phrases"])):
             phrase_info = sent_info["phrases"][phrase_info_idx]
 
@@ -226,9 +226,11 @@ def integrate_data_to_json(splits_info,
                            split_wise=True,
                            globally=True):
     """ Integrate the data into one json file that contains aligned
-         annotation-sentence for each image.
-        The integrated data info is presented as the dict type.
-         Each item in dict contains image and one of its annotation.
+        annotation-sentence for each image.
+        
+        The integrated data info is presented as a dict type.
+        
+        Each item in dict contains image and one of its annotation.
 
         For example, one randomly item:
             {
@@ -244,9 +246,10 @@ def integrate_data_to_json(splits_info,
             ....
             }
         """
+
     def operate_integration(images_name, images_annotations_path,
                             images_sentences_path):
-        """ Obtain the integrated for images """
+        """ Obtain the integrated for images. """
         integrated_data = dict()
         for image_name_idx, image_name in enumerate(images_name):
             image_sent_path = images_sentences_path[image_name_idx]
@@ -270,9 +273,8 @@ def integrate_data_to_json(splits_info,
             save_path = os.path.join(path,
                                      split_type + "_integrated_data.json")
             if os.path.exists(save_path):
-                warn_info = ("Integrated {}, but file already existed"
-                             ).format(split_type)
-                logging.info(warn_info)
+                logging.info("Integrating %s: the file already exists.",
+                             split_type)
                 continue
 
             split_data_types_samples_path = []
@@ -297,16 +299,16 @@ def integrate_data_to_json(splits_info,
                 images_name=split_data_types_samples_path[0],
                 images_annotations_path=split_data_types_samples_path[1],
                 images_sentences_path=split_data_types_samples_path[2])
-            with open(save_path, 'w') as outfile:
+            with open(save_path, 'w', encoding='utf-8') as outfile:
                 json.dump(split_integrated_data, outfile)
 
-            logging.info("Integration for %s Done!", split_type)
+            logging.info("The integration process for %s is done.", split_type)
 
     if globally:
-        save_path = os.path.join(mm_data_info["base_data_dir_path"],
+        save_path = os.path.join(mm_data_info["data_path"],
                                  "total_integrated_data.json")
         if os.path.exists(save_path):
-            logging.info("Gloablly Integrated file, Existed!")
+            logging.info("Gloablly integrated file already exists.")
             return
 
         raw_data_types_samples_path = []
@@ -327,7 +329,7 @@ def integrate_data_to_json(splits_info,
             images_name=raw_data_types_samples_path[0],
             images_annotations_path=raw_data_types_samples_path[1],
             images_sentences_path=raw_data_types_samples_path[2])
-        with open(save_path, 'w') as outfile:
+        with open(save_path, 'w', encoding='utf-8') as outfile:
             json.dump(global_integrated_data, outfile)
 
-        logging.info("Integration for the whole dataset, Done!")
+        logging.info("Integration for the whole dataset, Done.")
