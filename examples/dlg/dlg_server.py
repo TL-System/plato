@@ -72,13 +72,20 @@ class Server(fedavg.Server):
             # Obtain the local updates from clients
             deltas_received = self.compute_weight_deltas(updates)
             target_grad = []
-            for delta in deltas_received[Config().algorithm.victim_client].values():
-                target_grad.append(- delta / Config().trainer.learning_rate)
+            for delta in deltas_received[
+                    Config().algorithm.victim_client].values():
+                target_grad.append(-delta / Config().trainer.learning_rate)
 
         # Plot ground truth data
-        plt.imshow(tt(gt_data[0].cpu()))
-        plt.title("Ground truth image")
-        logging.info("GT label is %d.", torch.argmax(gt_label, dim=-1).item())
+        partition_size = Config().data.partition_size
+
+        gt_figure = plt.figure(figsize=(12, 4))
+
+        for i in range(partition_size):
+            gt_figure.add_subplot(1, partition_size, i + 1)
+            plt.imshow(tt(gt_data[i][0].cpu()))
+            plt.axis('off')
+            plt.title("GT image %d" % (i + 1))
 
         # Generate dummy items
         data_size = self.testset.data[0].shape
@@ -106,11 +113,11 @@ class Server(fedavg.Server):
         if not (hasattr(Config().algorithm, 'share_gradients') and Config().algorithm.share_gradients) \
                 and hasattr(Config().algorithm, 'match_weight') and Config().algorithm.match_weight:
             model = deepcopy(self.trainer.model)
-            closure = self.weight_closure(
-                optimizer, dummy_data, dummy_label, target_weight, model)
+            closure = self.weight_closure(optimizer, dummy_data, dummy_label,
+                                          target_weight, model)
         else:
-            closure = self.gradient_closure(
-                optimizer, dummy_data, dummy_label, target_grad)
+            closure = self.gradient_closure(optimizer, dummy_data, dummy_label,
+                                            target_grad)
 
         for iters in range(Config().algorithm.num_iters):
             optimizer.step(closure)
@@ -120,41 +127,52 @@ class Server(fedavg.Server):
             lpipss.append(loss_fn.forward(dummy_data, gt_data))
 
             if iters % Config().algorithm.log_interval == 0:
-                logging.info("[Gradient Leakage Attacking...] Iter %d: Loss = %.10f, MSE = %.8f, LPIPS = %.8f",
-                             iters, losses[-1], mses[-1], lpipss[-1])
+                logging.info(
+                    "[Gradient Leakage Attacking...] Iter %d: Loss = %.10f, MSE = %.8f, LPIPS = %.8f",
+                    iters, losses[-1], mses[-1], lpipss[-1])
                 history.append(tt(dummy_data[0].cpu()))
 
         plt.figure(figsize=(12, 8))
-        for i in range(Config().algorithm.num_iters // Config().algorithm.log_interval):
-            plt.subplot(5, Config().algorithm.num_iters //
-                        Config().algorithm.log_interval / 5, i + 1)
+        for i in range(Config().algorithm.num_iters //
+                       Config().algorithm.log_interval):
+            plt.subplot(
+                5,
+                int(Config().algorithm.num_iters //
+                    Config().algorithm.log_interval / 5), i + 1)
             plt.imshow(history[i])
             plt.title("iter=%d" % (i * Config().algorithm.log_interval))
             plt.axis('off')
-        logging.info("[Gradient Leakage Attacking...] Reconstructed label is %d.",
-                     torch.argmax(dummy_label, dim=-1).item())
+        logging.info(
+            "[Gradient Leakage Attacking...] Reconstructed label is %d.",
+            torch.argmax(dummy_label, dim=-1).item())
         plt.show()
 
-    def gradient_closure(self, optimizer, dummy_data, dummy_label, target_grad):
+    def gradient_closure(self, optimizer, dummy_data, dummy_label,
+                         target_grad):
         """ Take a step to match the gradients. """
+
         def closure():
             optimizer.zero_grad()
             # self.trainer.model.zero_grad()
             dummy_pred = self.trainer.model(dummy_data)
             dummy_onehot_label = F.softmax(dummy_label, dim=-1)
             dummy_loss = criterion(dummy_pred, dummy_onehot_label)
-            dummy_grad = torch.autograd.grad(
-                dummy_loss, self.trainer.model.parameters(), create_graph=True)
+            dummy_grad = torch.autograd.grad(dummy_loss,
+                                             self.trainer.model.parameters(),
+                                             create_graph=True)
 
             grad_diff = 0
             for gx, gy in zip(dummy_grad, target_grad):
-                grad_diff += ((gx - gy) ** 2).sum()
+                grad_diff += ((gx - gy)**2).sum()
             grad_diff.backward()
             return grad_diff
+
         return closure
 
-    def weight_closure(self, optimizer, dummy_data, dummy_label, target_weight, model):
+    def weight_closure(self, optimizer, dummy_data, dummy_label, target_weight,
+                       model):
         """ Take a step to match the model weights. """
+
         def closure():
             optimizer.zero_grad()
             # self.trainer.model.zero_grad()
@@ -162,9 +180,10 @@ class Server(fedavg.Server):
 
             weight_diff = 0
             for wx, wy in zip(dummy_weight.values(), target_weight.values()):
-                weight_diff += ((wx - wy) ** 2).sum()
+                weight_diff += ((wx - wy)**2).sum()
             weight_diff.backward()
             return weight_diff
+
         return closure
 
     def loss_steps(self, dummy_data, dummy_label, model):
@@ -178,12 +197,16 @@ class Server(fedavg.Server):
                 labels_ = dummy_label
             else:
                 idx = epoch % (dummy_data.shape[0] // batch_size)
-                dummy_pred = model(
-                    dummy_data[idx * batch_size:(idx + 1) * batch_size])
+                dummy_pred = model(dummy_data[idx * batch_size:(idx + 1) *
+                                              batch_size])
                 labels_ = dummy_label[idx * batch_size:(idx + 1) * batch_size]
-            dummy_loss = loss_criterion(dummy_pred, torch.argmax(labels_, dim=-1))
-            grad = torch.autograd.grad(dummy_loss, model.parameters(),
-                                       retain_graph=True, create_graph=True, only_inputs=True)
+            dummy_loss = loss_criterion(dummy_pred,
+                                        torch.argmax(labels_, dim=-1))
+            grad = torch.autograd.grad(dummy_loss,
+                                       model.parameters(),
+                                       retain_graph=True,
+                                       create_graph=True,
+                                       only_inputs=True)
             with torch.no_grad():
                 parameters = OrderedDict(model.named_parameters())
                 for (name, param), grad_part in zip(parameters.items(), grad):
