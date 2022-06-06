@@ -40,9 +40,9 @@ class Trainer(base.Trainer):
         self.model_state_dict = None
 
         if model is None:
-            self.model = models_registry.get()
-        else:
-            self.model = model.get_model()
+            model = models_registry.get()
+
+        self.model = model
 
         if hasattr(Config().algorithm,
                    'init_params') and Config().algorithm.init_params:
