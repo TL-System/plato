@@ -69,7 +69,7 @@ algorithm:
     # Whether or not use customized initialization for model weights
     init_params: true
     # Whether sharing gradients or model weights
-    share_gradients: true
+    share_gradients: false
     # Do reconstruction by directly matching updates when it's true,
     # otherwise by matching gradients calculated from updates
     match_weight: true
