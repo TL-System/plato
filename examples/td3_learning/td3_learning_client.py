@@ -12,10 +12,16 @@ import os
 import numpy as np
 import globals
 
+from torch import nn
 
 file_name = "TD3_RL"
 models_dir = "./pytorch_models"
 results_dir = "./results"
+
+class Report(simple.Report):
+    """A client report to be sent to the federated learning server."""
+    client_id: int
+
 
 class RLClient(simple.Client):
     def __init__(self, trainer=None, model=None):
@@ -102,6 +108,12 @@ class RLClient(simple.Client):
         #Add the last policy evaluation to our list of evaluations and save evaluations
         td3.evaluations.append(self.RL_Online_trainer.evaluate_policy(self.RL_Online_trainer))
         np.save("./results/%s" % (file_name), td3.evaluations)
+        
+        #returns report and weights
+        report, weights = await super().train()
+        return Report(report.num_samples, report.accuracy,
+                      report.training_time, report.comm_time,
+                      report.update_response, self.client_id), weights
 
 
 

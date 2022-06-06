@@ -17,6 +17,7 @@ from torch import nn
 trainer = td3_learning_trainer.Trainer(globals.state_dim, globals.action_dim)
 
 #evaluations = [td3_learning_trainer.Trainer.evaluate_policy(trainer)]
+evaluations = []
 
 def main():
     """ A Plato federated learning training session with clients running TD3. """

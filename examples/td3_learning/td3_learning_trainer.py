@@ -118,61 +118,61 @@ class Trainer(base.Policy):
             next_state = torch.FloatTensor(batch_next_states).to(self.device)
             done = torch.FloatTensor(batch_dones).to(self.device)
 
-            with torch.no_grad():
-                #from next state s' get next action a'
-                next_action = self.actor_target(next_state)
+            #with torch.no_grad():
+            #from next state s' get next action a'
+            next_action = self.actor_target(next_state)
 
-                #add gaussian noise to this next action a' and clamp it in range of values supported by env
-                noise = torch.FloatTensor(batch_actions).data.normal_(0, self.policy_noise).to(self.device)
-                noise = noise.clamp(-self.noise_clip, self.noise_clip)
-                next_action = (next_action + noise).clamp(-self.max_action, self.max_action)
+            #add gaussian noise to this next action a' and clamp it in range of values supported by env
+            noise = torch.FloatTensor(batch_actions).data.normal_(0, self.policy_noise).to(self.device)
+            noise = noise.clamp(-self.noise_clip, self.noise_clip)
+            next_action = (next_action + noise).clamp(-self.max_action, self.max_action)
 
-                #Two critics take the couple (s', a') as input and return two Q values Qt1(s',a') & Qt2 as outputs
-                target_Q1, target_Q2 = self.critic_target(next_state, next_action)
+            #Two critics take the couple (s', a') as input and return two Q values Qt1(s',a') & Qt2 as outputs
+            target_Q1, target_Q2 = self.critic_target(next_state, next_action)
 
-                #Keep minimum of the two Q values: min(Q1, Q2)
-                target_Q = torch.min(target_Q1, target_Q2)
+            #Keep minimum of the two Q values: min(Q1, Q2)
+            target_Q = torch.min(target_Q1, target_Q2)
 
-                #Get final target of the two critic models
-                target_Q = reward + (1-done) * Config().algorithm.gamma * target_Q
+            #Get final target of the two critic models
+            target_Q = reward + (1-done) * Config().algorithm.gamma * target_Q
 
-                #Two critics take each couple (s,a) as input and return two Q-values
-                current_Q1, current_Q2 = self.critic(state, action)
+            #Two critics take each couple (s,a) as input and return two Q-values
+            current_Q1, current_Q2 = self.critic(state, action)
 
-                #Compute critic loss
-                critic_loss = F.mse_loss(current_Q1, target_Q) + \
-                    F.mse_loss(current_Q2, target_Q)
+            #Compute critic loss
+            critic_loss = F.mse_loss(current_Q1, target_Q) + \
+                F.mse_loss(current_Q2, target_Q)
 
-                #optimize the critic
-                self.critic.optimizer.zero_grad()
-                critic_loss.backward()
-                self.critic.optimizer.step()
+            #optimize the critic
+            self.critic_optimizer.zero_grad()
+            critic_loss.backward()
+            self.critic_optimizer.step()
 
-                if it % Config().algorithm.policy_freq == 0:
+            if it % Config().algorithm.policy_freq == 0:
 
-                    #Compute actor loss
-                    actor_loss = -self.critic.Q1(state, self.actor(state)).mean()
+                #Compute actor loss
+                actor_loss = -self.critic.Q1(state, self.actor(state)).mean()
 
-                    #optimize actor
-                    self.actor.optimizer.zero_grad()
-                    actor_loss.backward()
-                    self.actor.optimizer.step()
+                #optimize actor
+                self.actor_optimizer.zero_grad()
+                actor_loss.backward()
+                self.actor_optimizer.step()
 
-                     # Update the frozen target models
-                    for param, target_param in zip(self.critic.parameters(),
-                                                self.critic_target.parameters()):
-                        target_param.data.copy_(Config().algorithm.tau * param.data +
-                                                (1 - Config().algorithm.tau) *
-                                                target_param.data)
+                    # Update the frozen target models
+                for param, target_param in zip(self.critic.parameters(),
+                                            self.critic_target.parameters()):
+                    target_param.data.copy_(Config().algorithm.tau * param.data +
+                                            (1 - Config().algorithm.tau) *
+                                            target_param.data)
 
-                    for param, target_param in zip(self.actor.parameters(),
-                                                self.actor_target.parameters()):
-                        target_param.data.copy_(Config().algorithm.tau * param.data +
-                                                (1 - Config().algorithm.tau) *
-                                                target_param.data)
+                for param, target_param in zip(self.actor.parameters(),
+                                            self.actor_target.parameters()):
+                    target_param.data.copy_(Config().algorithm.tau * param.data +
+                                            (1 - Config().algorithm.tau) *
+                                            target_param.data)
                 
                 
-    def evaluate_policy(policy, eval_episodes = 10):
+    def evaluate_policy(self, policy, eval_episodes = 10):
         avg_reward = 0
         for _ in range(eval_episodes):
             obs = globals.env.reset()

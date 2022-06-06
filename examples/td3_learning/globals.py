@@ -11,7 +11,7 @@ import numpy as np
 from torch import nn
 
 
-env = gym.make("BipedalWalker-v3")
+env = gym.make("MountainCarContinuous-v0")
 
 seed = 0
 
