@@ -76,6 +76,13 @@ class Trainer(basic.Trainer):
                 examples, labels = examples.to(self.device), labels.to(
                     self.device)
 
+                try:
+                    full_examples = torch.cat((examples, full_examples), dim=0)
+                    full_labels = torch.cat((labels, full_labels), dim=0)
+                except:
+                    full_examples = examples
+                    full_labels = labels
+
                 plt.imshow(tt(examples[0].cpu()))
                 plt.title("Ground truth image")
 
@@ -90,7 +97,8 @@ class Trainer(basic.Trainer):
                 onehot_labels = label_to_onehot(
                     labels, num_classes=Config().trainer.num_classes)
                 target_grad = None
-                if hasattr(Config().algorithm, 'share_gradients') and Config().algorithm.share_gradients:
+                if hasattr(Config().algorithm, 'share_gradients') and Config(
+                ).algorithm.share_gradients:
                     loss = criterion(outputs, onehot_labels)
                     dy_dx = torch.autograd.grad(loss, self.model.parameters())
                     target_grad = list((_.detach().clone() for _ in dy_dx))
@@ -104,11 +112,6 @@ class Trainer(basic.Trainer):
 
                     optimizer.step()
 
-                file_path = f"{Config().params['model_path']}/{self.client_id}.pickle"
-                with open(file_path, 'wb') as handle:
-                    pickle.dump(
-                        [examples, onehot_labels, target_grad], handle)
-
                 if batch_id % log_interval == 0:
                     if self.client_id == 0:
                         logging.info(
@@ -120,6 +123,14 @@ class Trainer(basic.Trainer):
                             "[Client #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
                             self.client_id, epoch, epochs, batch_id,
                             len(train_loader), loss.data.item())
+
+            full_onehot_labels = label_to_onehot(
+                full_labels, num_classes=Config().trainer.num_classes)
+
+            file_path = f"{Config().params['model_path']}/{self.client_id}.pickle"
+            with open(file_path, 'wb') as handle:
+                pickle.dump([full_examples, full_onehot_labels, target_grad],
+                            handle)
 
             if lr_schedule is not None:
                 lr_schedule.step()
