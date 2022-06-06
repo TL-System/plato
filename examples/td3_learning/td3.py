@@ -27,16 +27,16 @@ def main():
     # TODO: there should be an actor and critic model communicated with clients.
     # TODO: Not only one single model. 
     # TODO: This model should be two models. How? I still do not know.
-    model = nn.Sequential(
-        nn.Linear(28 * 28, 128),
-        nn.ReLU(),
-        nn.Linear(128, 128),
-        nn.ReLU(),
-        nn.Linear(128, 10),
-    )
+    #model = nn.Sequential(
+       # nn.Linear(28, 128),
+        #nn.ReLU(),
+        #nn.Linear(128, 128),
+        #nn.ReLU(),
+        #nn.Linear(128, 10),
+    #)
 
-    client = td3_learning_client.RLClient(trainer=trainer, model=model)
-    server = td3_learning_server.TD3Server(model=model)
+    client = td3_learning_client.RLClient(trainer=trainer, model=None)
+    server = td3_learning_server.TD3Server(model=None)
     server.run(client)
 
 if __name__ == "__main__":

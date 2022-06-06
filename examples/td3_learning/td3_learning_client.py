@@ -40,6 +40,8 @@ class RLClient(simple.Client):
 
     async def train(self):
         episode_reward = 0
+        episode_timesteps = 0 #fixing error about using before assignment
+        obs = 0 #fixing error about using before assignment
         round_episode_steps = 0
         if self.total_timesteps > Config().algorithm.max_steps:
             # TODO: when max number of steps is hit, we should stop training and terminate the process. How?
@@ -113,7 +115,7 @@ class RLClient(simple.Client):
         report, weights = await super().train()
         return Report(report.num_samples, report.accuracy,
                       report.training_time, report.comm_time,
-                      report.update_response, self.client_id), weights
+                      report.update_response), weights
 
 
 

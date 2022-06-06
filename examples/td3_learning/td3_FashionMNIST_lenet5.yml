@@ -28,7 +28,7 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8006
+    port: 8002
 
     # Should we operate in sychronous mode?
     synchronous: false
@@ -88,7 +88,7 @@ trainer:
     weight_decay: 0.0
 
     # The machine learning model
-    model_name: td3
+    model_name: lenet5
 
 algorithm:
     # Aggregation algorithm
@@ -126,7 +126,7 @@ algorithm:
     batch_size: 64
     hidden_size: 256
     # steps sampling random actions
-    start_steps: 8
+    start_steps: 10000
     # replay memory
     replay_size: 10000
     replay_seed: 1234

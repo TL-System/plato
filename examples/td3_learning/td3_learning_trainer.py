@@ -182,9 +182,9 @@ class Trainer(base.Policy):
                 obs, reward, done, _ = globals.env.step(action)
                 avg_reward += reward
         avg_reward /= eval_episodes
-        print ("---------------------------------------")
-        print ("Average Reward over the Evaluation Step: %f" % (avg_reward))
-        print ("---------------------------------------")
+        #print ("---------------------------------------")
+        #print ("Average Reward over the Evaluation Step: %f" % (avg_reward))
+        #print ("---------------------------------------")
         return avg_reward
 
 
