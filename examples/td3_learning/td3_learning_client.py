@@ -47,12 +47,12 @@ class RLClient(simple.Client):
                 if self.total_timesteps != 0:
                     logging.info("Total Timesteps: {} Episode Num: {} Reward: {}".format(self.total_timesteps, self.episode_num, episode_reward))
                     #train here call td3_trainer
-                    td3_learning_trainer.Trainer.update()
+                    self.RL_Online_trainer.update()
 
                 #evaluate episode and save policy
                 if self.timesteps_since_eval >= Config().algorithm.policy_freq:
                     self.timesteps_since_eval %= Config().algorithm.policy_freq
-                    td3.evaluations.append(td3_learning_trainer.Trainer.evaluate_policy(self.RL_Online_trainer))
+                    td3.evaluations.append(self.RL_Online_trainer.evaluate_policy(self.RL_Online_trainer))
                     np.save("./results/%s" % (file_name), td3.evaluations)
                 
                 #When the training step is done, we reset the state of the env
@@ -89,7 +89,8 @@ class RLClient(simple.Client):
             episode_reward += reward
             
             #add to replay buffer in this order due to push method in replay buffer
-            td3_learning_trainer.Trainer.add((obs, action, reward, new_obs, done_bool))
+            new = (obs, action, reward, new_obs, done_bool)
+            self.RL_Online_trainer.add(new)
 
             #Update state, episode time_step, total timesteps, and timesteps since last eval
             obs = new_obs
@@ -99,7 +100,7 @@ class RLClient(simple.Client):
             self.timesteps_since_eval += 1
         
         #Add the last policy evaluation to our list of evaluations and save evaluations
-        td3.evaluations.append(td3_learning_trainer.Trainer.evaluate_policy(self.RL_Online_trainer))
+        td3.evaluations.append(self.RL_Online_trainer.evaluate_policy(self.RL_Online_trainer))
         np.save("./results/%s" % (file_name), td3.evaluations)
 
 
