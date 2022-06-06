@@ -36,9 +36,3 @@ class Model(nn.Module):
         out = self.fc(out)
         return out
 
-    @staticmethod
-    def get_model(*args):
-        """Obtaining an instance of this model."""
-        if hasattr(Config().trainer, 'num_classes'):
-            return Model(num_classes=Config().trainer.num_classes)
-        return Model()
