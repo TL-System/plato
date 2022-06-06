@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 1000
+    total_clients: 1
 
     # The number of clients selected in each round
-    per_round: 200
+    per_round: 1
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -23,7 +23,7 @@ data:
     datasource: CIFAR10
 
     # Number of samples in each partition
-    partition_size: 1000
+    partition_size: 50000
 
     # IID or non-IID?
     sampler: iid
@@ -31,12 +31,12 @@ data:
 trainer:
     # Using the differential privacy trainer
     type: diff_privacy 
-    dp_epsilon: 1
+    dp_epsilon: 10
     dp_delta: 0.00001
     dp_max_grad_norm: 1 
 
     # The maximum number of training rounds
-    rounds: 20
+    rounds: 100
 
     # The maximum number of clients running concurrently
     max_concurrency: 1
@@ -45,12 +45,12 @@ trainer:
     target_accuracy: 0.80
 
     # Number of epoches for local training in each communication round
-    epochs: 5
-    batch_size: 10
+    epochs: 1
+    batch_size: 32
     optimizer: SGD
-    learning_rate: 0.1
+    learning_rate: 0.01
     momentum: 0.9
-    weight_decay: 0.0001
+    weight_decay: 0.0
 
     # Learning rate schedule
     lr_schedule: LambdaLR

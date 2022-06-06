@@ -95,7 +95,13 @@ class Server:
         self.comm_simulation = Config().clients.comm_simulation if hasattr(
             Config().clients, 'comm_simulation') else True
 
+        # Accumulated communication overhead (MB) throughout the FL training session
+        self.comm_overhead = 0
+
         # States that need to be maintained for asynchronous FL
+
+        # sids that are currently in use
+        self.training_sids = []
 
         # Clients whose new reports were received but not yet processed
         self.reported_clients = []
@@ -381,7 +387,7 @@ class Server:
                 # reported may not have been aggregated; they should be excluded from the next
                 # round of client selection
                 reporting_client_ids = [
-                    client[1]['client_id'] for client in self.reported_clients
+                    client[2]['client_id'] for client in self.reported_clients
                 ]
 
                 selectable_clients = [
@@ -443,6 +449,7 @@ class Server:
                             max_concurrency, len(self.selected_clients))]
 
                 self.trained_clients += selected_clients
+
             else:
                 selected_clients = self.selected_clients
 
@@ -459,16 +466,14 @@ class Server:
                 sid = self.clients[client_id]['sid']
 
                 if self.asynchronous_mode and self.simulate_wall_time:
-                    training_sids = []
-                    for client_info in self.reported_clients:
-                        training_sids.append(client_info[1]['sid'])
 
                     # skip if this sid is currently `training' with reporting clients
                     # or it has already been selected in this round
-                    while sid in training_sids or sid in self.selected_sids:
+                    while sid in self.training_sids or sid in self.selected_sids:
                         client_id = client_id % self.clients_per_round + 1
                         sid = self.clients[client_id]['sid']
 
+                    self.training_sids.append(sid)
                     self.selected_sids.append(sid)
 
                 self.training_clients[self.selected_client_id] = {
@@ -501,9 +506,20 @@ class Server:
                     checkpoint_path = Config().params['checkpoint_path']
 
                     payload_filename = f"{checkpoint_path}/{model_name}_{self.selected_client_id}.pth"
+
                     with open(payload_filename, 'wb') as payload_file:
                         pickle.dump(payload, payload_file)
+
                     server_response['payload_filename'] = payload_filename
+
+                    payload_size = sys.getsizeof(
+                        pickle.dumps(payload)) / 1024**2
+
+                    logging.info(
+                        "[%s] Sending %.2f MB of payload data to client #%d (simulated).",
+                        self, payload_size, self.selected_client_id)
+
+                    self.comm_overhead += payload_size
 
                 server_response = await self.customize_server_response(
                     server_response)
@@ -621,6 +637,8 @@ class Server:
         logging.info("[%s] Sent %.2f MB of payload data to client #%d.", self,
                      data_size / 1024**2, client_id)
 
+        self.comm_overhead += data_size / 1024**2
+
     async def client_report_arrived(self, sid, client_id, report):
         """ Upon receiving a report from a client. """
         self.reports[sid] = pickle.loads(report)
@@ -635,11 +653,14 @@ class Server:
             with open(payload_filename, 'rb') as payload_file:
                 self.client_payload[sid] = pickle.load(payload_file)
 
+            payload_size = sys.getsizeof(pickle.dumps(
+                self.client_payload[sid])) / 1024**2
+
             logging.info(
                 "[%s] Received %.2f MB of payload data from client #%d (simulated).",
-                self,
-                sys.getsizeof(pickle.dumps(self.client_payload[sid])) /
-                1024**2, client_id)
+                self, payload_size, client_id)
+
+            self.comm_overhead += payload_size
 
             await self.process_client_info(client_id, sid)
 
@@ -684,6 +705,8 @@ class Server:
         logging.info("[%s] Received %.2f MB of payload data from client #%d.",
                      self, payload_size / 1024**2, client_id)
 
+        self.comm_overhead += payload_size / 1024**2
+
         await self.process_client_info(client_id, sid)
 
     async def process_client_info(self, client_id, sid):
@@ -703,8 +726,13 @@ class Server:
             sid].comm_time + start_time
         starting_round = self.training_clients[client_id]['starting_round']
 
+        if Config().is_central_server():
+            self.comm_overhead += self.reports[sid].edge_server_comm_overhead
+
         client_info = (
             finish_time,  # sorted by the client's finish time
+            random.random(
+            ),  # in case two or more clients have the same finish time
             {
                 'client_id': client_id,
                 'sid': sid,
@@ -715,8 +743,11 @@ class Server:
             })
 
         heapq.heappush(self.reported_clients, client_info)
-        self.current_reported_clients[client_info[1]['client_id']] = True
+        self.current_reported_clients[client_info[2]['client_id']] = True
         del self.training_clients[client_id]
+
+        if self.asynchronous_mode and self.simulate_wall_time:
+            self.training_sids.remove(client_info[2]['sid'])
 
         await self.process_clients(client_info)
 
@@ -744,7 +775,7 @@ class Server:
 
                 request_sent = False
                 for i, client_info in enumerate(self.reported_clients):
-                    client = client_info[1]
+                    client = client_info[2]
                     client_staleness = self.current_round - client[
                         'starting_round']
 
@@ -790,7 +821,7 @@ class Server:
                         self.minimum_clients)):
                 # Extract a client with the earliest finish time in wall clock time
                 client_info = heapq.heappop(self.reported_clients)
-                client = client_info[1]
+                client = client_info[2]
 
                 # Removing from the list of current reporting clients as well, if needed
                 self.current_processed_clients[client['client_id']] = True
@@ -823,14 +854,14 @@ class Server:
                 client_info = heapq.heappop(self.reported_clients)
                 heapq.heappush(possibly_stale_clients, client_info)
 
-                if client_info[1][
+                if client_info[2][
                         'starting_round'] < self.current_round - self.staleness_bound:
                     for __ in range(0, len(possibly_stale_clients)):
                         stale_client_info = heapq.heappop(
                             possibly_stale_clients)
                         # Update the simulated wall clock time to be the finish time of this client
                         self.wall_time = stale_client_info[0]
-                        client = stale_client_info[1]
+                        client = stale_client_info[2]
 
                         # Add the report and payload of the extracted reporting client into updates
                         logging.info(
@@ -856,7 +887,7 @@ class Server:
             # In both synchronous and asynchronous modes, if we are not simulating the wall clock
             # time, we need to add the client report to the list of updates so far;
             # the same applies when we are running in synchronous mode.
-            client = client_info[1]
+            client = client_info[2]
             client_staleness = self.current_round - client['starting_round']
 
             self.updates.append((client['client_id'], client['report'],
@@ -892,7 +923,9 @@ class Server:
                      'max_concurrency') and not Config().is_central_server():
             # Clients in the current batch finish training
             # The server will select the next batch of clients to train
-            if len(self.updates) >= len(self.trained_clients):
+            if len(self.updates) >= len(self.trained_clients) or len(
+                    self.current_reported_clients) >= len(
+                        self.trained_clients):
                 await self.select_clients(for_next_batch=True)
 
     async def client_disconnected(self, sid):
