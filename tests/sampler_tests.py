@@ -1,5 +1,19 @@
 """
 Testing samplers in Plato framework.
+
+How to run the tests:
+
+For example, when you want to test the label_quantity_noniid_sampler.
+
+ 1 Uncomment the configuration file for the dataset you want to test
+    # os.environ[
+    'config_file'] = 'tests/TestsConfig/label_quantity_noniid_sampler.yml'
+    to   os.environ[
+    'config_file'] = 'tests/TestsConfig/label_quantity_noniid_sampler.yml'
+
+ 2 Run the following command in the root directory.
+    python tests/sampler_tests.py
+
 """
 
 import os
@@ -7,25 +21,26 @@ import unittest
 
 # os.environ['config_file'] = 'tests/TestsConfig/distribution_noniid_sampler.yml'
 
-os.environ[
-    'config_file'] = 'tests/TestsConfig/label_quantity_noniid_sampler.yml'
+# os.environ['config_file'] = 'tests/TestsConfig/label_quantity_noniid_sampler.yml'
 
 # os.environ[
 #     'config_file'] = 'tests/TestsConfig/mixed_label_quantity_noniid_sampler.yml'
 
-# os.environ[
-#     'config_file'] = 'tests/TestsConfig/sample_quantity_noniid_sampler.yml'
+os.environ[
+    'config_file'] = 'tests/TestsConfig/sample_quantity_noniid_sampler.yml'
 
-import sampler_test_utils
 import numpy as np
 
 from plato.config import Config
 from plato.datasources.cifar10 import DataSource
 from plato.samplers import registry as samplers_registry
 
+import sampler_test_utils
+
 
 class SamplersTest(unittest.TestCase):
     """ Testing the correctness of implemented samplers. """
+
     def setUp(self):
         super().setUp()
 

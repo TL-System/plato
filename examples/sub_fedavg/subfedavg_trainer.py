@@ -18,6 +18,7 @@ from plato.utils import optimizers
 
 class Trainer(basic.Trainer):
     """A federated learning trainer for Sub-Fedavg algorithm."""
+
     def __init__(self, model=None):
         """Initializing the trainer with the provided model."""
         super().__init__(model=model)
@@ -55,16 +56,7 @@ class Trainer(basic.Trainer):
                                                        batch_size=batch_size,
                                                        sampler=sampler)
 
-        iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
         epochs = config['epochs']
-
-        if not self.made_init_mask:
-            self.mask = pruning_processor.make_init_mask(self.model)
-            self.made_init_mask = True
-
-        # Sending the model to the device used for training
-        self.model.to(self.device)
-        self.model.train()
 
         # Initializing the loss criterion
         _loss_criterion = getattr(self, "loss_criterion", None)
@@ -77,6 +69,17 @@ class Trainer(basic.Trainer):
         get_optimizer = getattr(self, "get_optimizer",
                                 optimizers.get_optimizer)
         optimizer = get_optimizer(self.model)
+
+        # Initializing the learning rate schedule, if necessary
+        if 'lr_schedule' in config:
+            lr_schedule = optimizers.get_lr_schedule(optimizer,
+                                                     len(train_loader),
+                                                     train_loader)
+        else:
+            lr_schedule = None
+
+        self.model.to(self.device)
+        self.model.train()
 
         # Initializing the learning rate schedule, if necessary
         if hasattr(config, 'lr_schedule'):
