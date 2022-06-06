@@ -24,6 +24,7 @@ from copy import deepcopy
 
 import lpips
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 import torch
 import torch.nn.functional as F
 from plato.config import Config
@@ -87,24 +88,35 @@ class Server(fedavg.Server):
             plt.axis('off')
             plt.title("GT image %d" % (i + 1))
 
+        dummy_data = []
+        dummy_label = []
+        optimizer = []
+        closure = []
+
         # Generate dummy items
         data_size = self.testset.data[0].shape
         if len(data_size) == 2:
             data_size = (1, 1, data_size[0], data_size[1])
         else:
             data_size = (1, data_size[2], data_size[0], data_size[1])
-        dummy_data = torch.randn(data_size).to(
-            Config().device()).requires_grad_(True)
-        dummy_label = torch.randn((1, Config().trainer.num_classes)).to(
-            Config().device()).requires_grad_(True)
-        optimizer = torch.optim.LBFGS([dummy_data, dummy_label])
+        for i in range(partition_size):
+            dummy_data.append(
+                torch.randn(data_size).to(
+                    Config().device()).requires_grad_(True))
+            dummy_label.append(
+                torch.randn((1, Config().trainer.num_classes)).to(
+                    Config().device()).requires_grad_(True))
+            optimizer.append(torch.optim.LBFGS([dummy_data[i],
+                                                dummy_label[i]]))
 
-        logging.info("[Gradient Leakage Attacking...] Dummy label is %d.",
-                     torch.argmax(dummy_label, dim=-1).item())
+            logging.info("[Gradient Leakage Attacking...] Dummy label is %d.",
+                         torch.argmax(dummy_label[i], dim=-1).item())
 
         # TODO: periodic analysis, which round?
         # Gradient matching
         history = []
+        for i in range(partition_size):
+            history.append([])
         losses = []
         mses = []
         lpipss = []
@@ -112,39 +124,62 @@ class Server(fedavg.Server):
         # Sharing and matching updates
         if not (hasattr(Config().algorithm, 'share_gradients') and Config().algorithm.share_gradients) \
                 and hasattr(Config().algorithm, 'match_weight') and Config().algorithm.match_weight:
-            model = deepcopy(self.trainer.model)
-            closure = self.weight_closure(optimizer, dummy_data, dummy_label,
-                                          target_weight, model)
+            for i in range(partition_size):
+                model = deepcopy(self.trainer.model)
+                closure.append(
+                    self.weight_closure(optimizer[i], dummy_data[i],
+                                        dummy_label[i], target_weight, model))
         else:
-            closure = self.gradient_closure(optimizer, dummy_data, dummy_label,
-                                            target_grad)
+            for i in range(partition_size):
+                closure.append(
+                    self.gradient_closure(optimizer[i], dummy_data[i],
+                                          dummy_label[i], target_grad))
 
         for iters in range(Config().algorithm.num_iters):
-            optimizer.step(closure)
-            current_loss = closure().item()
+            current = iters % partition_size
+            optimizer[current].step(closure[current])
+            current_loss = closure[current]().item()
             losses.append(current_loss)
-            mses.append(torch.mean((dummy_data - gt_data)**2).item())
-            lpipss.append(loss_fn.forward(dummy_data, gt_data))
+            mses.append(
+                torch.mean((dummy_data[current] - gt_data[current])**2).item())
+            lpipss.append(
+                loss_fn.forward(dummy_data[current], gt_data[current]))
 
             if iters % Config().algorithm.log_interval == 0:
-                logging.info(
-                    "[Gradient Leakage Attacking...] Iter %d: Loss = %.10f, MSE = %.8f, LPIPS = %.8f",
-                    iters, losses[-1], mses[-1], lpipss[-1])
-                history.append(tt(dummy_data[0].cpu()))
+                # logging.info(
+                #     "[Gradient Leakage Attacking...] Iter %d: Loss = %.10f, MSE = %.8f, LPIPS = %.8f",
+                #     iters, losses[-1], mses[-1], lpipss[-1])
+                for i in range(partition_size):
+                    history[i].append(tt(dummy_data[i][0].cpu()))
+                logging.info("iter %d", iters)
 
-        plt.figure(figsize=(12, 8))
+        fig = plt.figure(figsize=(12, 8))
+        outer = gridspec.GridSpec(
+            (Config().algorithm.num_iters // Config().algorithm.log_interval)
+            // 2,
+            2,
+            wspace=0.2,
+            hspace=0.2)
+
         for i in range(Config().algorithm.num_iters //
                        Config().algorithm.log_interval):
-            plt.subplot(
-                5,
-                int(Config().algorithm.num_iters //
-                    Config().algorithm.log_interval / 5), i + 1)
-            plt.imshow(history[i])
-            plt.title("iter=%d" % (i * Config().algorithm.log_interval))
-            plt.axis('off')
-        logging.info(
-            "[Gradient Leakage Attacking...] Reconstructed label is %d.",
-            torch.argmax(dummy_label, dim=-1).item())
+            inner = gridspec.GridSpecFromSubplotSpec(1,
+                                                     partition_size,
+                                                     subplot_spec=outer[i])
+            outerplot = plt.Subplot(fig, outer[i])
+            outerplot.set_title("Iter=%d" %
+                                (i * Config().algorithm.log_interval))
+            outerplot.axis('off')
+            fig.add_subplot(outerplot)
+
+            for j in range(partition_size):
+                innerplot = plt.Subplot(fig, inner[j])
+                innerplot.imshow(history[j][i])
+                innerplot.axis('off')
+                fig.add_subplot(innerplot)
+        # logging.info(
+        #     "[Gradient Leakage Attacking...] Reconstructed label is %d.",
+        #     torch.argmax(dummy_label, dim=-1).item())
         plt.show()
 
     def gradient_closure(self, optimizer, dummy_data, dummy_label,
