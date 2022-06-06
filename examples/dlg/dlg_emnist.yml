@@ -24,7 +24,7 @@ data:
     datasource: EMNIST
 
     # Number of samples in each partition
-    partition_size: 1
+    partition_size: 4
 
     # IID or non-IID?
     sampler: iid
@@ -50,7 +50,7 @@ trainer:
 
     # Number of epoches for local training in each communication round
     epochs: 1
-    batch_size: 1
+    batch_size: 4
     optimizer: SGD
     learning_rate: 0.01
     momentum: 0.9
