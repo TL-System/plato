@@ -3,7 +3,7 @@ clients:
     total_clients: 100
 
     # The number of clients selected in each round
-    per_round: 10
+    per_round: 1
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -67,7 +67,6 @@ data:
     random_seed: 1
 
 trainer:
-
     #The type of trainer
     type: basic
     # The maximum number of training rounds
@@ -77,6 +76,7 @@ trainer:
     max_concurrency: 4
 
     # The target accuracy
+    # TODO: we should have a traain reward, or target number of steps
     target_accuracy: 1.0
 
     # Number of epoches for local training in each communication round
@@ -141,6 +141,9 @@ algorithm:
 
     #Total number of iterations/timestpes
     max_steps: 500000
+    
+    #Epsiode steps to run before stopping training
+    max_round_episode_steps: 1000
 
     #If we should save the model or not
     save_models: False
