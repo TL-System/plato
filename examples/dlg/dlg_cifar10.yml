@@ -1,7 +1,4 @@
 clients:
-    # Type
-    type: simple
-
     # The total number of clients
     total_clients: 1
 
@@ -30,9 +27,6 @@ data:
     random_seed: 4324
 
 trainer:
-    # The type of the trainer
-    type: basic
-
     # The maximum number of training rounds
     rounds: 1
 

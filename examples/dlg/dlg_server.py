@@ -42,8 +42,8 @@ torch.manual_seed(Config().algorithm.random_seed)
 class Server(fedavg.Server):
     """ An honest-but-curious federated learning server with gradient leakage attack. """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, model, trainer):
+        super().__init__(model=model, trainer=trainer)
 
     async def process_reports(self):
         """ Process the client reports: before aggregating their weights,
@@ -196,10 +196,11 @@ class Server(fedavg.Server):
         for epoch in range(epochs):
             optimizer.zero_grad()
 
-            if batch_size == 0:
+            if batch_size == 1:
                 dummy_pred = model(dummy_data)
                 labels_ = dummy_label
             else:
+                # TODO: local steps vs. epochs
                 idx = epoch % (dummy_data.shape[0] // batch_size)
                 dummy_pred = model(
                     dummy_data[idx * batch_size:(idx + 1) * batch_size])
@@ -210,7 +211,7 @@ class Server(fedavg.Server):
             loss.backward(create_graph=True)
 
             optimizer.step()
-            
+
         # for name, param in model.named_parameters():
         #     if param.requires_grad:
         #         print("after loss steps", param.data[0])
