@@ -43,12 +43,7 @@ class Trainer(basic.Trainer):
                                                        batch_size=batch_size,
                                                        sampler=sampler)
 
-        iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
         epochs = config['epochs']
-
-        # Sending the model to the device used for training
-        self.model.to(self.device)
-        self.model.train()
 
         # Initializing the loss criterion
         _loss_criterion = getattr(self, "loss_criterion", None)
@@ -63,12 +58,15 @@ class Trainer(basic.Trainer):
         optimizer = get_optimizer(self.model)
 
         # Initializing the learning rate schedule, if necessary
-        if hasattr(config, 'lr_schedule'):
+        if 'lr_schedule' in config:
             lr_schedule = optimizers.get_lr_schedule(optimizer,
-                                                     iterations_per_epoch,
+                                                     len(train_loader),
                                                      train_loader)
         else:
             lr_schedule = None
+
+        self.model.to(self.device)
+        self.model.train()
 
         for epoch in range(1, epochs + 1):
             # Use a default training loop
