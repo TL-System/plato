@@ -26,27 +26,32 @@ class RLClient(simple.Client):
             os.makedirs(results_dir)
         if Config().algorithm.save_models and not os.path.exists(models_dir):
             os.makedirs(models_dir)
+        self.timesteps_since_eval = 0
+        self.episode_num = 0
+        self.total_timesteps = 0
+        self.done = True
 
 
     async def train(self):
-        total_timesteps = 0
-        done = True
-        episode_num = 0
         episode_reward = 0
-        timesteps_since_eval = 0
-        while total_timesteps < Config().algorithm.max_steps:
+        round_episode_steps = 0
+        if self.total_timesteps > Config().algorithm.max_steps:
+            # TODO: when max number of steps is hit, we should stop training and terminate the process. How?
+            print("Done training")
+            return
+        while round_episode_steps < Config().algorithm.max_round_episode_steps:
 
             #If episode is done
-            if done:
+            if self.done:
                 #if not at beginning
-                if total_timesteps != 0:
-                    logging.info("Total Timesteps: {} Episode Num: {} Reward: {}".format(total_timesteps, episode_num, episode_reward))
+                if self.total_timesteps != 0:
+                    logging.info("Total Timesteps: {} Episode Num: {} Reward: {}".format(self.total_timesteps, self.episode_num, episode_reward))
                     #train here call td3_trainer
                     td3_learning_trainer.Trainer.update()
 
                 #evaluate episode and save policy
-                if timesteps_since_eval >= Config().algorithm.policy_freq:
-                    timesteps_since_eval %= Config().algorithm.policy_freq
+                if self.timesteps_since_eval >= Config().algorithm.policy_freq:
+                    self.timesteps_since_eval %= Config().algorithm.policy_freq
                     td3.evaluations.append(td3_learning_trainer.Trainer.evaluate_policy(self.RL_Online_trainer))
                     np.save("./results/%s" % (file_name), td3.evaluations)
                 
@@ -54,15 +59,15 @@ class RLClient(simple.Client):
                 obs = globals.env.reset()
 
                 #Set done to false
-                done = False
+                self.done = False
 
                 # Set rewards and episode timesteps to zero
                 episode_reward = 0
                 episode_timesteps = 0
-                episode_num += 1
+                self.episode_num += 1
                 
             #Before the number of specified timesteps from config file we sample random actions
-            if total_timesteps < Config().algorithm.start_steps:
+            if self.total_timesteps < Config().algorithm.start_steps:
                 action = globals.env.action_space.sample()
             else: #after we pass the threshold we switch model
                 action = self.RL_Online_trainer.select_action(np.array(obs))
@@ -75,10 +80,10 @@ class RLClient(simple.Client):
                     )
 
             #performs action in environment, then reaches next state and receives the reward
-            new_obs, reward, done, _ = globals.env.step(action)
+            new_obs, reward, self.done, _ = globals.env.step(action)
 
             #is episode done?
-            done_bool = 0 if episode_timesteps + 1 == globals.env._max_episode_steps else float(done)
+            done_bool = 0 if episode_timesteps + 1 == globals.env._max_episode_steps else float(self.done)
             
             #update total reward
             episode_reward += reward
@@ -89,8 +94,9 @@ class RLClient(simple.Client):
             #Update state, episode time_step, total timesteps, and timesteps since last eval
             obs = new_obs
             episode_timesteps += 1
-            total_timesteps += 1
-            timesteps_since_eval += 1
+            self.total_timesteps += 1
+            round_episode_steps += 1
+            self.timesteps_since_eval += 1
         
         #Add the last policy evaluation to our list of evaluations and save evaluations
         td3.evaluations.append(td3_learning_trainer.Trainer.evaluate_policy(self.RL_Online_trainer))
