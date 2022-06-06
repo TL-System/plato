@@ -16,6 +16,9 @@ class Report(base.Report):
 
 
 class Client(simple.Client):
+    def __init__(self, model, trainer):
+        super().__init__(model=model, trainer=trainer)
+
     async def send(self, payload) -> None:
         """Sending the client payload to the server using simulation, S3 or socket.io."""
         file_path = f"{Config().params['model_path']}/{self.client_id}.pickle"
