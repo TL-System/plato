@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 from plato.samplers import registry as samplers_registry
 from plato.datasources import registry as datasources_registry
 
-from utils import cross_entropy_for_onehot, label_to_onehot
+from utils.utils import cross_entropy_for_onehot, label_to_onehot
 
 criterion = cross_entropy_for_onehot
 tt = transforms.ToPILImage()

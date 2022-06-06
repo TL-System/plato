@@ -12,10 +12,10 @@ in Advances in Neural Information Processing Systems 2019.
 
 https://papers.nips.cc/paper/2019/file/60a6c4002cc7b29142def8871531281a-Paper.pdf
 
-Wang et al., "Protect Privacy from Gradient Leakage Attack in Federated Learning,"
-in Proc. INFOCOM 2022.
+Geiping et al., "Inverting Gradients - How easy is it to break privacy in federated learning?"
+in Advances in Neural Information Processing Systems 2020.
 
-https://infocom.info/day/2/track/Track%20A#A-3
+https://proceedings.neurips.cc/paper/2020/file/c4ede56bbd98819ae6112b20ac6bf145-Paper.pdf
 """
 
 import logging
@@ -32,7 +32,8 @@ from plato.servers import fedavg
 from plato.utils import optimizers
 from torchvision import transforms
 
-from utils import cross_entropy_for_onehot
+from utils.utils import cross_entropy_for_onehot
+from utils.modules import MetaMonkey
 
 tt = transforms.ToPILImage()
 loss_fn = lpips.LPIPS(net='vgg')
@@ -164,26 +165,22 @@ class Server(fedavg.Server):
             dummy_weight = self.loss_steps(dummy_data, dummy_label, model)
 
             weight_diff = 0
-            for wx, wy in zip(dummy_weight.values(), target_weight.values()):
+            for wx, wy in zip(dummy_weight, target_weight.values()):
                 weight_diff += ((wx - wy) ** 2).sum()
             weight_diff.backward()
             return weight_diff
         return closure
 
     def loss_steps(self, dummy_data, dummy_label, model):
-        """ Mimic the cleint's train loop to fit the model to the dummy data and labels. """
+        """Take a few gradient descent steps to fit the model to the given input."""
+        patched_model = MetaMonkey(model)
+        
         epochs = Config().trainer.epochs
         batch_size = Config().trainer.batch_size
-        # TODO: #images == partition size?
 
         # Initializing the loss criterion
         loss_criterion = torch.nn.CrossEntropyLoss()
-
-        # Initializing the optimizer
-        get_optimizer = getattr(self, "get_optimizer",
-                                optimizers.get_optimizer)
-        optimizer = get_optimizer(model)
-
+        
         # TODO: optional parameters: lr_schedule, create_graph...
         
         # TODO: use updates or weights
@@ -194,8 +191,6 @@ class Server(fedavg.Server):
         #         break
 
         for epoch in range(epochs):
-            optimizer.zero_grad()
-
             if batch_size == 1:
                 dummy_pred = model(dummy_data)
                 labels_ = dummy_label
@@ -206,15 +201,14 @@ class Server(fedavg.Server):
                     dummy_data[idx * batch_size:(idx + 1) * batch_size])
                 labels_ = dummy_label[idx * batch_size:(idx + 1) * batch_size]
 
-            loss = loss_criterion(dummy_pred, torch.argmax(labels_, dim=-1))
+            loss = loss_criterion(dummy_pred, torch.argmax(labels_, dim=-1)).sum()
             
-            loss.backward(create_graph=True)
+            grad = torch.autograd.grad(loss, patched_model.parameters.values(),
+                                   retain_graph=True, create_graph=True, only_inputs=True)
 
-            optimizer.step()
+            patched_model.parameters = OrderedDict((name, param - Config().trainer.learning_rate * grad_part)
+                                               for ((name, param), grad_part)
+                                               in zip(patched_model.parameters.items(), grad))
 
-        # for name, param in model.named_parameters():
-        #     if param.requires_grad:
-        #         print("after loss steps", param.data[0])
-        #         break
 
-        return OrderedDict(model.named_parameters())
+        return list(patched_model.parameters.values())
