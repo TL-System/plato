@@ -30,6 +30,8 @@ import torch.nn.functional as F
 from plato.config import Config
 from plato.servers import fedavg
 from torchvision import transforms
+import math
+from statistics import mean
 
 from utils import cross_entropy_for_onehot
 
@@ -83,32 +85,29 @@ class Server(fedavg.Server):
         gt_figure = plt.figure(figsize=(12, 4))
 
         for i in range(partition_size):
+            logging.info("Ground truth labels: %d" %
+                         torch.argmax(gt_label[i], dim=-1).item())
             gt_figure.add_subplot(1, partition_size, i + 1)
             plt.imshow(tt(gt_data[i][0].cpu()))
             plt.axis('off')
             plt.title("GT image %d" % (i + 1))
 
-        dummy_data = []
-        dummy_label = []
-        optimizer = []
-        closure = []
-
         # Generate dummy items
         data_size = self.testset.data[0].shape
         if len(data_size) == 2:
-            data_size = (1, 1, data_size[0], data_size[1])
+            data_size = (partition_size, 1, data_size[0], data_size[1])
         else:
-            data_size = (1, data_size[2], data_size[0], data_size[1])
-        for i in range(partition_size):
-            dummy_data.append(
-                torch.randn(data_size).to(
-                    Config().device()).requires_grad_(True))
-            dummy_label.append(
-                torch.randn((1, Config().trainer.num_classes)).to(
-                    Config().device()).requires_grad_(True))
-            optimizer.append(torch.optim.LBFGS([dummy_data[i],
-                                                dummy_label[i]]))
+            data_size = (partition_size, data_size[2], data_size[0],
+                         data_size[1])
 
+        dummy_data = torch.randn(data_size).to(
+            Config().device()).requires_grad_(True)
+        dummy_label = torch.randn(
+            (partition_size, Config().trainer.num_classes)).to(
+                Config().device()).requires_grad_(True)
+        optimizer = torch.optim.LBFGS([dummy_data, dummy_label])
+
+        for i in range(partition_size):
             logging.info("[Gradient Leakage Attacking...] Dummy label is %d.",
                          torch.argmax(dummy_label[i], dim=-1).item())
 
@@ -119,39 +118,52 @@ class Server(fedavg.Server):
             history.append([])
         losses = []
         mses = []
+        avg_mses = []
         lpipss = []
+        avg_lpips = []
 
         # Sharing and matching updates
         if not (hasattr(Config().algorithm, 'share_gradients') and Config().algorithm.share_gradients) \
                 and hasattr(Config().algorithm, 'match_weight') and Config().algorithm.match_weight:
-            for i in range(partition_size):
-                model = deepcopy(self.trainer.model)
-                closure.append(
-                    self.weight_closure(optimizer[i], dummy_data[i],
-                                        dummy_label[i], target_weight, model))
+            model = deepcopy(self.trainer.model)
+            closure = self.weight_closure(optimizer, dummy_data, dummy_label,
+                                          target_weight, model)
         else:
-            for i in range(partition_size):
-                closure.append(
-                    self.gradient_closure(optimizer[i], dummy_data[i],
-                                          dummy_label[i], target_grad))
+            closure = self.gradient_closure(optimizer, dummy_data, dummy_label,
+                                            target_grad)
 
         for iters in range(Config().algorithm.num_iters):
-            current = iters % partition_size
-            optimizer[current].step(closure[current])
-            current_loss = closure[current]().item()
+            optimizer.step(closure)
+            current_loss = closure().item()
             losses.append(current_loss)
-            mses.append(
-                torch.mean((dummy_data[current] - gt_data[current])**2).item())
-            lpipss.append(
-                loss_fn.forward(dummy_data[current], gt_data[current]))
+            mses.append([])
+            lpipss.append([])
+            for i in range(partition_size):
+                mses[iters].append(math.inf)
+                lpipss[iters].append(math.inf)
+                for j in range(partition_size):
+                    mses[iters][i] = min(
+                        mses[iters][i],
+                        torch.mean((dummy_data[i] - gt_data[j])**2).item())
+                    lpipss[iters][i] = min(
+                        lpipss[iters][i],
+                        loss_fn.forward(dummy_data[i], gt_data[j]).item())
+
+            avg_mses.append(mean(mses[iters]))
+            avg_lpips.append(mean(lpipss[iters]))
 
             if iters % Config().algorithm.log_interval == 0:
-                # logging.info(
-                #     "[Gradient Leakage Attacking...] Iter %d: Loss = %.10f, MSE = %.8f, LPIPS = %.8f",
-                #     iters, losses[-1], mses[-1], lpipss[-1])
+                logging.info(
+                    "[Gradient Leakage Attacking...] Iter %d: Loss = %.10f, avg MSE = %.8f, avg LPIPS = %.8f",
+                    iters, losses[-1], avg_mses[-1], avg_lpips[-1])
                 for i in range(partition_size):
                     history[i].append(tt(dummy_data[i][0].cpu()))
-                logging.info("iter %d", iters)
+
+        logging.info("Attack complete")
+
+        for i in range(partition_size):
+            logging.info("Reconstructed label is %d.",
+                         torch.argmax(dummy_label[i], dim=-1).item())
 
         fig = plt.figure(figsize=(12, 8))
         outer = gridspec.GridSpec(
@@ -177,9 +189,6 @@ class Server(fedavg.Server):
                 innerplot.imshow(history[j][i])
                 innerplot.axis('off')
                 fig.add_subplot(innerplot)
-        # logging.info(
-        #     "[Gradient Leakage Attacking...] Reconstructed label is %d.",
-        #     torch.argmax(dummy_label, dim=-1).item())
         plt.show()
 
     def gradient_closure(self, optimizer, dummy_data, dummy_label,
