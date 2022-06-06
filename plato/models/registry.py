@@ -18,7 +18,6 @@ elif hasattr(Config().trainer, "use_tensorflow"):
     registered_models = {"lenet5": lenet5_tensorflow.Model}
 else:
     from plato.models import (
-        dlg,
         lenet5,
         dcgan,
         multilayer,
