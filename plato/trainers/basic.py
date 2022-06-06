@@ -33,9 +33,9 @@ class Trainer(base.Trainer):
         self.model_state_dict = None
 
         if model is None:
-            model = models_registry.get()
-
-        self.model = model
+            self.model = models_registry.get()
+        else:
+            self.model = model.get_model()
 
     def zeros(self, shape):
         """Returns a PyTorch zero tensor with the given shape."""
