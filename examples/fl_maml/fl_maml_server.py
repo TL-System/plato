@@ -107,7 +107,7 @@ class Server(fedavg.Server):
         if self.do_personalization_test:
             client = client_info
         else:
-            client = client_info[1]
+            client = client_info[2]
             client_staleness = self.current_round - client['starting_round']
 
             self.updates.append(

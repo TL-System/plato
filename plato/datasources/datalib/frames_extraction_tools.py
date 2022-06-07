@@ -93,6 +93,7 @@ def extract_optical_flow(videos_items):
 
 class VideoFramesExtractor(modality_extraction_base.VideoExtractorBase):
     """ The class for extracting the frame the video """
+
     def __init__(self,
                  video_src_dir,
                  dir_level=2,
@@ -150,29 +151,29 @@ class VideoFramesExtractor(modality_extraction_base.VideoExtractorBase):
                 len(self.videos_path_list) * [self.is_classname_contained]))
 
     def build_frames_gpu(self,
-                         rgb_out_dir_path,
-                         flow_our_dir_path,
+                         rgb_out__path,
+                         flow_our__path,
                          new_short=1,
                          new_width=0,
                          new_height=0):
         """ Get the optical flow frame based on the GPU  """
-        self.build_rgb_frames(rgb_out_dir_path,
+        self.build_rgb_frames(rgb_out__path,
                               new_short=new_short,
                               new_width=new_width,
                               new_height=new_height)
-        self.build_optical_flow_frames(flow_our_dir_path,
+        self.build_optical_flow_frames(flow_our__path,
                                        new_short=new_short,
                                        new_width=new_width,
                                        new_height=new_height)
 
     def build_full_frames_gpu(self,
-                              to_dir_path,
+                              to__path,
                               new_short=1,
                               new_width=0,
                               new_height=0):
         """ The interface for extracting all frames based on the GPU  """
-        self.build_frames_gpu(rgb_out_dir_path=to_dir_path,
-                              flow_our_dir_path=to_dir_path,
+        self.build_frames_gpu(rgb_out__path=to__path,
+                              flow_our__path=to__path,
                               new_short=new_short,
                               new_width=new_width,
                               new_height=new_height)

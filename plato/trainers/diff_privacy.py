@@ -61,7 +61,6 @@ class Trainer(basic.Trainer):
                                                        shuffle=False,
                                                        batch_size=batch_size)
 
-        iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
         epochs = config['epochs']
 
         # Initializing the loss criterion
@@ -77,9 +76,9 @@ class Trainer(basic.Trainer):
         optimizer = get_optimizer(self.model)
 
         # Initializing the learning rate schedule, if necessary
-        if hasattr(config, 'lr_schedule'):
+        if 'lr_schedule' in config:
             lr_schedule = optimizers.get_lr_schedule(optimizer,
-                                                     iterations_per_epoch,
+                                                     len(train_loader),
                                                      train_loader)
         else:
             lr_schedule = None
