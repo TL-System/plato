@@ -39,11 +39,6 @@ data:
   # The random seed for sampling data
   random_seed: 1
 
-  multi_modal_configs:
-    rgb: !include Pipeline/kinetics_csn_rgb.yml
-    flow: !include Pipeline/kinetics_tsn_flow.yml
-    audio_feature: !include Pipeline/kinetics_audio_feature.yml
-
 # Train settings
 
 # optimizer
@@ -93,10 +88,6 @@ trainer:
 
   log_config: *log_config
   checkpoint_config: *checkpoint_config
-
-model:
-  model_name: rgb_flow_audio_model
-  model_config: !include Models/kinetics_full_models.yml
 
 evaluation:
   interval: 5

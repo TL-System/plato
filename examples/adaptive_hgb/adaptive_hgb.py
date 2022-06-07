@@ -13,16 +13,16 @@ import adaptive_hgb_client
 import adaptive_hgb_server
 import adaptive_hgb_trainer
 
+os.environ['config_file'] = 'configs/Kinetics/kinetics_mm.yml'
+
 from plato.config import Config
 from plato.models.multimodal import multimodal_module
-from plato.datasources.multimodal import kinetics
-
-os.environ['config_file'] = 'configs/Kinetics/kinetics_mm.yml'
+from plato.datasources import kinetics
 
 
 def main():
     """ A Plato federated learning training session using the HGB algorithm. """
-    _ = Config()
+    __ = Config()
     support_modalities = ['rgb', "flow", "audio"]
 
     kinetics_data_source = kinetics.DataSource()
@@ -42,7 +42,7 @@ def main():
         multimodal_nets_configs=Config.multimodal_nets_configs,
         is_fused_head=True)
 
-    trainer = adaptive_hgb_trainer.Trainer(model=multi_model)
+    trainer = adaptive_hgb_trainer.Trainer
 
     client = adaptive_hgb_client.Client(model=multi_model,
                                         datasource=kinetics_data_source,

@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 from plato.samplers import registry as samplers_registry
 from plato.datasources import registry as datasources_registry
 
-from utils import cross_entropy_for_onehot, label_to_onehot
+from utils.utils import cross_entropy_for_onehot, label_to_onehot
 
 criterion = cross_entropy_for_onehot
 tt = transforms.ToPILImage()
@@ -44,7 +44,6 @@ class Trainer(basic.Trainer):
                                                        batch_size=batch_size,
                                                        sampler=sampler)
 
-        iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
         epochs = config['epochs']
 
         # Initializing the loss criterion
@@ -60,9 +59,9 @@ class Trainer(basic.Trainer):
         optimizer = get_optimizer(self.model)
 
         # Initializing the learning rate schedule, if necessary
-        if hasattr(config, 'lr_schedule'):
+        if 'lr_schedule' in config:
             lr_schedule = optimizers.get_lr_schedule(optimizer,
-                                                     iterations_per_epoch,
+                                                     len(train_loader),
                                                      train_loader)
         else:
             lr_schedule = None

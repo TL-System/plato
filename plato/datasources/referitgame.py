@@ -167,18 +167,17 @@ class DataSource(multimodal_base.MultiModalDataSource):
         #  unc, google
         self.split_name = Config().data.split_name
         if self.split_config not in self.split_configs:
-            info_msg = (
-                "{} does not exsit in the official configs {}.....").format(
-                    self.split_config, self.split_configs)
-            logging.info(info_msg)
+            logging.info(
+                "%s does not exist in the official configurations %s.",
+                self.split_config, self.split_configs)
 
         _path = Config().params['data_path']
         self._data_path_process(data_path=_path, base_data_name=self.data_name)
-        base_data_path = self.mm_data_info["base_data_dir_path"]
+        base_data_path = self.mm_data_info["data_path"]
 
         # raw coco images path
         coco_raw_imgs_path = self.base_coco
-        if self._exist_judgement(coco_raw_imgs_path):
+        if self._exists(coco_raw_imgs_path):
             logging.info(
                 "Successfully connecting the source COCO2017 images data from the path %s",
                 coco_raw_imgs_path)
@@ -192,7 +191,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
         ).data.download_splits_base_url + self.split_config + ".zip"
         for dd_url in [download_split_url]:
             self._download_arrange_data(download_url_address=dd_url,
-                                        put_data_dir=base_data_path)
+                                        data_path=base_data_path)
 
         self._dataset_refer = referitgame_utils.REFER(
             data_root=base_data_path,
@@ -200,7 +199,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
             dataset=self.split_config,
             splitBy=self.split_name)  # default is unc or google
 
-        self._splited_referids_holder = dict()
+        self._splited_referids_holder = {}
         self._connect_to_splits()
 
     def _connect_to_splits(self):
@@ -215,8 +214,8 @@ class DataSource(multimodal_base.MultiModalDataSource):
         """ Get phrases from the raw data """
         mode_refer_ids = self._splited_referids_holder[phase]
 
-        mode_elements_holder = dict()
-        mode_flatten_emelemts = list()
+        mode_elements_holder = {}
+        mode_flatten_emelemts = []
 
         for refer_id in mode_refer_ids:
 
@@ -226,11 +225,11 @@ class DataSource(multimodal_base.MultiModalDataSource):
             caption_phrases_cate = self._dataset_refer.Cats[ref['category_id']]
             caption_phrases_cate_id = ref['category_id']
 
-            mode_elements_holder[refer_id] = dict()
+            mode_elements_holder[refer_id] = {}
             mode_elements_holder[refer_id]["image_id"] = image_id
             mode_elements_holder[refer_id]["image_file_path"] = image_file_path
 
-            mode_elements_holder[refer_id]["sentences"] = list()
+            mode_elements_holder[refer_id]["sentences"] = []
             for send in ref["sentences"]:
                 caption = send["tokens"]
                 caption_phrase = send["tokens"]
