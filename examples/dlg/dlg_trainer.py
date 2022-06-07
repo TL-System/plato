@@ -3,16 +3,12 @@ import os
 import pickle
 import time
 
-import numpy as np
+import matplotlib.pyplot as plt
 import torch
-from opacus.privacy_engine import PrivacyEngine
 from plato.config import Config
 from plato.trainers import basic
 from plato.utils import optimizers
 from torchvision import transforms
-import matplotlib.pyplot as plt
-from plato.samplers import registry as samplers_registry
-from plato.datasources import registry as datasources_registry
 
 from utils.utils import cross_entropy_for_onehot, label_to_onehot
 
