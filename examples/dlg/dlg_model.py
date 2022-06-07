@@ -2,7 +2,6 @@
 The Lenet used by DLG paper
 """
 import torch.nn as nn
-
 from plato.config import Config
 
 
@@ -35,4 +34,3 @@ class Model(nn.Module):
         # print(out.size())
         out = self.fc(out)
         return out
-
