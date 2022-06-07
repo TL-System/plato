@@ -19,6 +19,17 @@ trainer = td3_learning_trainer.Trainer(globals.state_dim, globals.action_dim)
 #evaluations = [td3_learning_trainer.Trainer.evaluate_policy(trainer)]
 evaluations = []
 
+class Model:
+    """A wrapper class that holds both actor and critic models"""
+    def __init__(self):
+        self.wrapped_actor = trainer.actor
+        self.wrapped_critic = trainer.critic
+
+    def cpu(self):
+        self.wrapped_actor.cpu()
+        self.wrapped_critic.cpu()
+
+
 def main():
     """ A Plato federated learning training session with clients running TD3. """
     logging.info("Starting RL Environment's process.")
@@ -34,9 +45,10 @@ def main():
         #nn.ReLU(),
         #nn.Linear(128, 10),
     #)
+    test_model = Model()
 
-    client = td3_learning_client.RLClient(trainer=trainer, model=None)
-    server = td3_learning_server.TD3Server(model=None)
+    client = td3_learning_client.RLClient(trainer=trainer, model=test_model)
+    server = td3_learning_server.TD3Server(model=test_model)
     server.run(client)
 
 if __name__ == "__main__":
