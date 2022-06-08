@@ -1,14 +1,14 @@
 clients:
     # The total number of clients
-    total_clients: 3
+    total_clients: 1
 
     # The number of clients selected in each round
-    per_round: 2
+    per_round: 1
 
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    random_seed: 10
+    random_seed: 20
 
 server:
     address: 127.0.0.1
@@ -21,7 +21,7 @@ data:
     datasource: EMNIST
 
     # Number of samples in each partition
-    partition_size: 2
+    partition_size: 1
 
     # IID or non-IID?
     sampler: iid
@@ -30,11 +30,11 @@ data:
     concentration: 1
 
     # The random seed for sampling data
-    random_seed: 11
+    random_seed: 20
 
 trainer:
     # The maximum number of training rounds
-    rounds: 10
+    rounds: 1
 
     # The maximum number of clients running concurrently
     max_concurrency: 4
@@ -44,7 +44,7 @@ trainer:
 
     # Number of epoches for local training in each communication round
     epochs: 1
-    batch_size: 2
+    batch_size: 1
     optimizer: SGD
     learning_rate: 0.01
     momentum: 0.9
@@ -64,8 +64,8 @@ algorithm:
     attack_round: 1
     # One particular client, e.g., the first selected client
     victim_client: 0
-    num_iters: 100
-    log_interval: 10
+    num_iters: 4000
+    log_interval: 400
     # Whether or not use customized initialization for model weights
     init_params: true
     # Whether sharing gradients or model weights
@@ -74,7 +74,7 @@ algorithm:
     # otherwise by matching gradients calculated from updates
     match_weight: true
     # The random seed for dummy data and label
-    random_seed: 50
+    random_seed: 20
 
 results:
     result_path: results/EMNIST_lenet5/DLG
