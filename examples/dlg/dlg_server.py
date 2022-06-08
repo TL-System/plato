@@ -81,8 +81,8 @@ class Server(fedavg.Server):
 
         num_images = Config().data.partition_size
 
-        dlg_result_path = f"{Config().params['result_path']}/DLG"
-        dlg_result_file = f"{dlg_result_path}/{os.getpid()}.csv"
+        dlg_result_path = f"{Config().params['result_path']}"
+        dlg_result_file = f"{dlg_result_path}/{os.getpid()}_evals.csv"
         dlg_result_headers = [
             "Iteration", "Loss", "Average MSE", "Average LPIPS"
         ]
@@ -250,7 +250,7 @@ class Server(fedavg.Server):
     @staticmethod
     def plot_gt(num_images, gt_data, gt_label):
         """ Plot ground truth data """
-        gt_result_path = f"{Config().params['result_path']}/DLG/gt.png"
+        gt_result_path = f"{Config().params['result_path']}/{os.getpid()}_gt.png"
         gt_figure = plt.figure(figsize=(12, 4))
 
         for i in range(num_images):
@@ -265,7 +265,7 @@ class Server(fedavg.Server):
     @staticmethod
     def plot_reconstructed(num_images, history):
         """ Plot the reconstructed data. """
-        reconstructed_result_path = f"{Config().params['result_path']}/DLG/reconstructed.png"
+        reconstructed_result_path = f"{Config().params['result_path']}/{os.getpid()}_reconstructed.png"
         for i in range(num_images):
             logging.info("Reconstructed label is %d.",
                          torch.argmax(history[-1][i][1], dim=-1).item())
