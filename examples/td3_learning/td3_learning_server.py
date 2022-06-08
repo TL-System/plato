@@ -17,7 +17,7 @@ from plato.servers import fedavg
 class TD3Server(fedavg.Server):
     """ A custom federated learning server. """
 
-    def __init__(self, model=None, trainer=None):
-        super().__init__(model, trainer)
+    def __init__(self, model=None, trainer=None, algorithm=None):
+        super().__init__(trainer=trainer, algorithm=algorithm,model=model)
         logging.info("A custom server has been initialized.")
 

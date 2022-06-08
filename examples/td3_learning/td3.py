@@ -6,6 +6,7 @@ import logging
 import td3_learning_client
 import td3_learning_trainer
 import td3_learning_server
+import td3_algorithm
 
 import globals
 
@@ -28,6 +29,7 @@ class Model:
     def cpu(self):
         self.wrapped_actor.cpu()
         self.wrapped_critic.cpu()
+    
 
 
 def main():
@@ -46,7 +48,7 @@ def main():
         #nn.Linear(128, 10),
     #)
     test_model = Model()
-
+    #algorithm = td3_algorithm.Algorithm(trainer=trainer)
     client = td3_learning_client.RLClient(trainer=trainer, model=test_model)
     server = td3_learning_server.TD3Server(model=test_model)
     server.run(client)
