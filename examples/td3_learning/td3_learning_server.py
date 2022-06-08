@@ -17,8 +17,8 @@ class TD3Server(fedavg.Server):
     """ Federated learning server using federated averaging to train Actor-Critic models. """
     """ A custom federated learning server. """
 
-    def __init__(self, model=None, trainer=None, algorithm = None):
-        super().__init__(model, algorithm, trainer)
+    def __init__(self, model = None, trainer = None, algorithm = None):
+        super().__init__(trainer = trainer, algorithm = algorithm, model = model)
         logging.info("A custom server has been initialized.")
         
     async def federated_averaging(self, updates):
