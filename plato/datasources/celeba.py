@@ -56,26 +56,32 @@ class DataSource(base.DataSource):
         else:
             target_types = ['attr', 'identity']
 
-        image_size = 32
+        image_size = 64
+        if hasattr(Config().data, 'celeba_img_size'):
+            image_size = Config().data.celeba_img_size
+
         _transform = transforms.Compose([
             transforms.Resize(image_size),
             transforms.CenterCrop(image_size),
             transforms.ToTensor(),
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
         ])
+        _target_transform = None
+        if target_types:
+            _target_transform = DataSource._target_transform
 
         self.trainset = CelebA(root=_path,
                                split='train',
                                target_type=target_types,
                                download=False,
                                transform=_transform,
-                               target_transform=DataSource._target_transform)
+                               target_transform=_target_transform)
         self.testset = CelebA(root=_path,
                               split='test',
                               target_type=target_types,
                               download=False,
                               transform=_transform,
-                              target_transform=DataSource._target_transform)
+                              target_transform=_target_transform)
 
     @staticmethod
     def _target_transform(label):
@@ -100,7 +106,10 @@ class DataSource(base.DataSource):
 
     @staticmethod
     def input_shape():
-        return [162770, 3, 32, 32]
+        image_size = 64
+        if hasattr(Config().data, 'celeba_img_size'):
+            image_size = Config().data.celeba_img_size
+        return [162770, 3, image_size, image_size]
 
     def num_train_examples(self):
         return 162770

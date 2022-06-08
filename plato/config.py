@@ -67,6 +67,11 @@ class Config:
                                 type=str,
                                 default='./config.yml',
                                 help='Federated learning configuration file.')
+            parser.add_argument('-b',
+                                '--base',
+                                type=str,
+                                default='./',
+                                help='The base path for datasets and models.')
             parser.add_argument('-s',
                                 '--server',
                                 type=str,
@@ -149,17 +154,14 @@ class Config:
             # A run ID is unique to each client in an experiment
             Config.params['run_id'] = os.getpid()
 
+            # The base path used for all datasets, models, checkpoints, and results
+            Config.params['base_path'] = Config.args.base
+
             if 'general' in config:
                 Config.general = Config.namedtuple_from_dict(config['general'])
 
-            # If directories of dataset, pretrained models, checkpoints and results
-            # are not specified in the configuration file,
-            # a base directory will be used to generate those directories
-            if (hasattr(Config(), 'general')
-                    and hasattr(Config().general, 'base_path')):
-                Config.params['base_path'] = Config().general.base_path
-            else:
-                Config.params['base_path'] = './'
+                if hasattr(Config.general, 'base_path'):
+                    Config.params['base_path'] = Config().general.base_path
 
             # Directory of dataset
             if hasattr(Config().data, 'data_path'):
