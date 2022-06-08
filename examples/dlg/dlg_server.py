@@ -148,8 +148,9 @@ class Server(fedavg.Server):
                 logging.info(
                     "[Gradient Leakage Attacking...] Iter %d: Loss = %.10f, avg MSE = %.8f, avg LPIPS = %.8f",
                     iters, losses[-1], avg_mses[-1], avg_lpips[-1])
-                history.append([[tt(dummy_data[i][0].cpu()), dummy_label[i]]
-                                for i in range(num_images)])
+                history.append([[
+                    tt(dummy_data[i][0].cpu()), dummy_label[i], dummy_data[i]
+                ] for i in range(num_images)])
                 new_row = [
                     iters,
                     round(losses[-1], 8),
@@ -159,6 +160,8 @@ class Server(fedavg.Server):
                 csv_processor.write_csv(dlg_result_file, new_row)
 
         self.plot_reconstructed(num_images, history)
+
+        self.write_history(num_images, history)
 
         logging.info("Attack complete")
 
@@ -295,3 +298,15 @@ class Server(fedavg.Server):
                 innerplot.axis('off')
                 fig.add_subplot(innerplot)
         fig.savefig(reconstructed_result_path)
+
+    @staticmethod
+    def write_history(num_images, history):
+        """ Write the history of the tensors into text file. """
+        log_interval = Config().algorithm.log_interval
+        file_path = f"{Config().params['result_path']}/{os.getpid()}_history.txt"
+        with open(file_path, 'w') as file:
+            for iter in range(len(history)):
+                file.write("Iteration: " + str(log_interval * iter) + "\n")
+                for img_num in range(num_images):
+                    file.write("Image number: " + str(img_num + 1) + "\n")
+                    file.write(str(history[iter][img_num][2]) + "\n")
