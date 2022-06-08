@@ -131,13 +131,7 @@ class Trainer(base.Trainer):
                 self.train_model(config, trainset, sampler.get(), cut_layer,
                                  **kwargs)
             else:
-                self.train_loop(
-                    config,
-                    trainset,
-                    sampler.get(),
-                    cut_layer,
-                    **kwargs,
-                )
+                self.train_loop(config, trainset, sampler.get(), cut_layer)
         except Exception as training_exception:
             logging.info("Training on client #%d failed.", self.client_id)
             raise training_exception
@@ -148,7 +142,7 @@ class Trainer(base.Trainer):
             filename = f"{model_type}_{self.client_id}_{config['run_id']}.pth"
             self.save_model(filename)
 
-    def train_loop(self, config, trainset, sampler, cut_layer, **kwargs):
+    def train_loop(self, config, trainset, sampler, cut_layer):
         """ The default training loop when a custom training loop is not supplied. """
         batch_size = config['batch_size']
         log_interval = 10
@@ -166,7 +160,6 @@ class Trainer(base.Trainer):
                                                        batch_size=batch_size,
                                                        sampler=sampler)
 
-        iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
         epochs = config['epochs']
 
         # Initializing the loss criterion
@@ -182,9 +175,9 @@ class Trainer(base.Trainer):
         optimizer = get_optimizer(self.model)
 
         # Initializing the learning rate schedule, if necessary
-        if hasattr(config, 'lr_schedule'):
+        if 'lr_schedule' in config:
             lr_schedule = optimizers.get_lr_schedule(optimizer,
-                                                     iterations_per_epoch,
+                                                     len(train_loader),
                                                      train_loader)
         else:
             lr_schedule = None
