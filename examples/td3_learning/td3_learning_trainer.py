@@ -21,10 +21,11 @@ from plato.models import registry as models_registry
 from plato.trainers import basic
 from plato.utils import optimizers
 
-class Trainer(base.Policy):
-    def __init__(self, state_dim, action_dim, max_action, model=None):
+class Trainer(basic.Trainer):
+    def __init__(self, state_dim, action_dim, max_action=None, model=None):
         #super().__init__(state_dim, action_dim, max_action, model)
-        super().__init__(state_dim, action_dim)
+        super().__init__(model=model)
+        self.env = globals.env
         #Create actor and critic
         #Could have used the base class given's but for convenient sake we declare our own
         self.max_action = max_action            
@@ -61,7 +62,7 @@ class Trainer(base.Policy):
             self.replay_buffer.push(transition)
 
 
-    def update(self):
+    def train_loop(self, config, trainset, sampler, cut_layer):
         """Training"""
 
         for it in range(Config().algorithm.iterations):
@@ -129,21 +130,35 @@ class Trainer(base.Policy):
 
         print("one client update done")    
                 
-                
-    def evaluate_policy(self, policy, eval_episodes = 10):
-        avg_reward = 0
-        for _ in range(eval_episodes):
-            obs = globals.env.reset()
-            done = False
-            while not done:
-                action = policy.select_action(np.array(obs))
-                obs, reward, done, _ = globals.env.step(action)
-                avg_reward += reward
-        avg_reward /= eval_episodes
-        #print ("---------------------------------------")
-        #print ("Average Reward over the Evaluation Step: %f" % (avg_reward))
-        #print ("---------------------------------------")
-        return avg_reward
+            
+    def load_model(self, filename=None, location=None):
+        """Loading pre-trained model weights from a file."""
+        model_path = Config(
+        ).params['model_path'] if location is None else location
+        model_name = Config().trainer.model_name
+
+        if filename is not None:
+            model_path = f'{model_path}/{filename}'
+        else:
+            model_path = f'{model_path}/{model_name}.pth'
+
+        if self.client_id == 0:
+            logging.info("[Server #%d] Loading a model from %s.", os.getpid(),
+                         model_path)
+        else:
+            logging.info("[Client #%d] Loading a model from %s.",
+                         self.client_id, model_path)
+
+
+        #self.model.load_state_dict(torch.load(model_path), strict=True)
+        self.actor.load_state_dict(torch.load(model_path), strict=True)
+
+        self.critic.load_state_dict(torch.load(model_path), strict=True)
+
+        self.actor_target.load_state_dict(torch.load(model_path), strict=True)
+
+        self.critic_target.load_state_dict(torch.load(model_path), strict=True)
+
 
 
 

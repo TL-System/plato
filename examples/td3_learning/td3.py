@@ -15,7 +15,6 @@ from torch import nn
 #to run
 #python examples/td3_learning/td3.py -c examples/td3_learning/td3_FashionMNIST_lenet5.yml
 
-evaluations = []
 
 def main():
     """ A Plato federated learning training session with clients running TD3. """

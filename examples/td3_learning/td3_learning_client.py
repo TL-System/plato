@@ -28,6 +28,8 @@ class RLClient(simple.Client):
     def __init__(self, trainer = None, model = None, algorithm = None):
         super().__init__(model=model, algorithm=algorithm)
         self.RL_Online_trainer = trainer
+        self.env = globals.env
+        self.evaluations = []
         
         if not os.path.exists(results_dir):
             os.makedirs(results_dir)
@@ -47,7 +49,7 @@ class RLClient(simple.Client):
             # TODO: when max number of steps is hit, we should stop training and terminate the process. How?
             print("Done training")
             return
-        while round_episode_steps < Config().algorithm.max_round_episode_steps:
+        while round_episode_steps < globals.max_episode_steps:
 
             #If episode is done
             if self.done:
@@ -55,16 +57,16 @@ class RLClient(simple.Client):
                 if self.total_timesteps != 0:
                     logging.info("Total Timesteps: {} Episode Num: {} Reward: {}".format(self.total_timesteps, self.episode_num, episode_reward))
                     #train here call td3_trainer
-                    self.RL_Online_trainer.update()
+                    self.RL_Online_trainer.train_loop(config=None, trainset=None,sampler=None, cut_layer=None)
 
                 #evaluate episode and save policy
                 if self.timesteps_since_eval >= Config().algorithm.policy_freq:
                     self.timesteps_since_eval %= Config().algorithm.policy_freq
-                    td3.evaluations.append(self.RL_Online_trainer.evaluate_policy(self.RL_Online_trainer))
-                    np.save("./results/%s" % (file_name), td3.evaluations)
+                    self.evaluations.append(evaluate_policy(self.RL_Online_trainer, self.env))
+                    np.save("./results/%s" % (file_name), self.evaluations)
                 
                 #When the training step is done, we reset the state of the env
-                obs = globals.env.reset()
+                obs = self.env.reset()
 
                 #Set done to false
                 self.done = False
@@ -76,22 +78,24 @@ class RLClient(simple.Client):
                 
             #Before the number of specified timesteps from config file we sample random actions
             if self.total_timesteps < Config().algorithm.start_steps:
-                action = globals.env.action_space.sample()
+                action = self.env.action_space.sample()
             else: #after we pass the threshold we switch model
                 action = self.RL_Online_trainer.select_action(np.array(obs))
 
                 #if not 0 we add noise
                 if Config().algorithm.expl_noise != 0:
                     expl_noise = Config().algorithm.expl_noise
-                    action = (action+np.random.normal(0, expl_noise, size = globals.env.action_space.shape[0])).clip(
-                        globals.env.action_space.low, globals.env.action_space.high
+                    action = (action+np.random.normal(0, expl_noise, size = self.env.action_space.shape[0])).clip(
+                        self.env.action_space.low, self.env.action_space.high
                     )
 
             #performs action in environment, then reaches next state and receives the reward
-            new_obs, reward, self.done, _ = globals.env.step(action)
+            new_obs, reward, self.done, _ = self.env.step(action)
+            print(new_obs)
+            print(reward)
 
             #is episode done?
-            done_bool = 0 if episode_timesteps + 1 == globals.env._max_episode_steps else float(self.done)
+            done_bool = 0 if episode_timesteps + 1 == self.env._max_episode_steps else float(self.done)
             
             #update total reward
             episode_reward += reward
@@ -108,15 +112,28 @@ class RLClient(simple.Client):
             self.timesteps_since_eval += 1
         
         #Add the last policy evaluation to our list of evaluations and save evaluations
-        td3.evaluations.append(self.RL_Online_trainer.evaluate_policy(self.RL_Online_trainer))
-        np.save("./results/%s" % (file_name), td3.evaluations)
+        self.evaluations.append(evaluate_policy(self.RL_Online_trainer, self.env))
+        np.save("./results/%s" % (file_name), self.evaluations)
         
         #returns report and weights
-        report, weights = await super().train()
+        report, weights = await self.train()
         return Report(report.num_samples, report.accuracy,
                       report.training_time, report.comm_time,
                       report.update_response), weights
 
 
 
-
+def evaluate_policy(trainer, env, eval_episodes = 10):
+        avg_reward = 0
+        for _ in range(eval_episodes):
+            obs = env.reset()
+            done = False
+            while not done:
+                action = trainer.select_action(np.array(obs))
+                obs, reward, done, _ = env.step(action)
+                avg_reward += reward
+        avg_reward /= eval_episodes
+        #print ("---------------------------------------")
+        #print ("Average Reward over the Evaluation Step: %f" % (avg_reward))
+        #print ("---------------------------------------")
+        return avg_reward
