@@ -13,7 +13,7 @@ import torch.nn.functional as F
 import globals
 
 from torch import nn
-#from plato.utils.reinforcement_learning.policies import base
+from plato.utils.reinforcement_learning.policies import base
 from plato.trainers import basic
 from opacus.privacy_engine import PrivacyEngine
 from plato.config import Config
@@ -21,13 +21,14 @@ from plato.models import registry as models_registry
 from plato.trainers import basic
 from plato.utils import optimizers
 
-class Trainer(basic.Trainer):
+class Trainer(base.Policy):
     def __init__(self, state_dim, action_dim, max_action, model=None):
-        super().__init__(model)
+        #super().__init__(state_dim, action_dim, max_action, model)
+        super().__init__(state_dim, action_dim)
         #Create actor and critic
         #Could have used the base class given's but for convenient sake we declare our own
         self.max_action = max_action            
-        #self.model = model
+        self.model = model
         self.actor = self.model.actor
         self.critic = self.model.critic
         self.actor_target = self.model.actor_target
