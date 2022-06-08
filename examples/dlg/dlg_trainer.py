@@ -2,6 +2,7 @@ import logging
 import os
 import pickle
 import time
+import math
 
 import matplotlib.pyplot as plt
 import torch
@@ -24,6 +25,7 @@ class Trainer(basic.Trainer):
 
     def train_loop(self, config, trainset, sampler, cut_layer):
         """ The default training loop when a custom training loop is not supplied. """
+        partition_size = Config().data.partition_size
         batch_size = config['batch_size']
         log_interval = 10
         tic = time.perf_counter()
@@ -65,6 +67,9 @@ class Trainer(basic.Trainer):
         self.model.to(self.device)
         self.model.train()
 
+        target_grad = None
+        total_local_updates = epochs * math.ceil(partition_size / batch_size)
+
         for epoch in range(1, epochs + 1):
             # Use a default training loop
             for batch_id, (examples, labels) in enumerate(train_loader):
@@ -91,12 +96,19 @@ class Trainer(basic.Trainer):
                 # Save the ground truth and gradients
                 onehot_labels = label_to_onehot(
                     labels, num_classes=Config().trainer.num_classes)
-                target_grad = None
                 if hasattr(Config().algorithm, 'share_gradients') and Config(
                 ).algorithm.share_gradients:
                     loss = criterion(outputs, onehot_labels)
                     dy_dx = torch.autograd.grad(loss, self.model.parameters())
-                    target_grad = list((_.detach().clone() for _ in dy_dx))
+                    current_grad = list((_.detach().clone() for _ in dy_dx))
+
+                    # Sum up the gradients for each local update
+                    try:
+                        target_grad = [
+                            sum(x) for x in zip(current_grad, target_grad)
+                        ]
+                    except:
+                        target_grad = list((_.detach().clone() for _ in dy_dx))
                 else:
                     loss = loss_criterion(outputs, labels)
 
@@ -122,11 +134,6 @@ class Trainer(basic.Trainer):
             full_onehot_labels = label_to_onehot(
                 full_labels, num_classes=Config().trainer.num_classes)
 
-            file_path = f"{Config().params['model_path']}/{self.client_id}.pickle"
-            with open(file_path, 'wb') as handle:
-                pickle.dump([full_examples, full_onehot_labels, target_grad],
-                            handle)
-
             if lr_schedule is not None:
                 lr_schedule.step()
 
@@ -149,3 +156,10 @@ class Trainer(basic.Trainer):
                 filename = f"{self.client_id}_{epoch}_{training_time}.pth"
                 self.save_model(filename)
                 self.model.to(self.device)
+
+        target_grad = [x / total_local_updates for x in target_grad]
+
+        file_path = f"{Config().params['model_path']}/{self.client_id}.pickle"
+        with open(file_path, 'wb') as handle:
+            pickle.dump([full_examples, full_onehot_labels, target_grad],
+                        handle)
