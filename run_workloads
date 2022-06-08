@@ -37,7 +37,7 @@ if __name__ == '__main__':
         except FileExistsError:
             pass
         with open(os.path.join(log_folder, log_name), 'a',
-                  encoding='utf8') as fp:
+                  encoding='utf-8') as fp:
             fp.write(f'{t}\n\n')
             fp.flush()
             subprocess.call(['./run', f'--config={t}.yml'],

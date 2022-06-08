@@ -6,8 +6,10 @@ from plato.config import Config
 
 class Model(nn.Module):
     """A VGG-style neural network model for image classification."""
+
     class ConvModule(nn.Module):
         """A single convolutional module in a VGG network."""
+
         def __init__(self, in_filters, out_filters):
             super().__init__()
             self.conv = nn.Conv2d(in_filters,
@@ -54,7 +56,8 @@ class Model(nn.Module):
         if not Model.is_valid_model_type(model_type):
             raise ValueError('Invalid VGG model type: {}'.format(model_type))
 
-        outputs = Config().trainer.num_classes or 10
+        outputs = Config().trainer.num_classes if hasattr(
+            Config().trainer, 'num_classes') else 1.0
 
         num = int(model_type.split('_')[1])
         if num == 11:
