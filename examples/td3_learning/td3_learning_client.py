@@ -24,8 +24,9 @@ class Report(simple.Report):
 
 
 class RLClient(simple.Client):
-    def __init__(self, trainer=None, model=None):
-        super().__init__(model=model)
+    
+    def __init__(self, trainer = None, model = None, algorithm = None):
+        super().__init__(model=model, algorithm=algorithm)
         self.RL_Online_trainer = trainer
         
         if not os.path.exists(results_dir):
@@ -36,7 +37,6 @@ class RLClient(simple.Client):
         self.episode_num = 0
         self.total_timesteps = 0
         self.done = True
-
 
     async def train(self):
         episode_reward = 0

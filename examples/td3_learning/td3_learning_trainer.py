@@ -13,74 +13,29 @@ import torch.nn.functional as F
 import globals
 
 from torch import nn
-from plato.utils.reinforcement_learning.policies import base
+#from plato.utils.reinforcement_learning.policies import base
+from plato.trainers import basic
 from opacus.privacy_engine import PrivacyEngine
 from plato.config import Config
 from plato.models import registry as models_registry
 from plato.trainers import basic
 from plato.utils import optimizers
 
-
-
-class TD3Actor(base.Actor):
-    def __init__(self, state_dim, action_dim, max_action):
-        super().__init__(state_dim, action_dim, max_action)
-
-    def forward(self, x, hidden=None):
-        x = F.relu(self.l1(x))
-        x = F.relu(self.l2(x))
-        x = self.max_action * torch.tanh(self.l3(x))
-        # Normalize/Scaling aggregation weights so that the sum is 1
-        x += 1  # [-1, 1] -> [0, 2]
-        x /= x.sum()
-        return x
-
-
-class TD3Critic(nn.Module):
-    def __init__(self, state_dim, action_dim):
-        super(TD3Critic, self).__init__()
-
-        # Q1 architecture
-        self.l1 = nn.Linear(state_dim + action_dim, 400)
-        self.l2 = nn.Linear(400, 300)
-        self.l3 = nn.Linear(300, 1)
-
-        # Q2 architecture
-        self.l4 = nn.Linear(state_dim + action_dim, 400)
-        self.l5 = nn.Linear(400, 300)
-        self.l6 = nn.Linear(300, 1)
-
-    def forward(self, state, action, hidden1=None, hidden2=None):
-        sa = torch.cat([state, action], 1)
-        q1 = F.relu(self.l1(sa))
-        q1 = F.relu(self.l2(q1))
-        q1 = self.l3(q1)
-        q2 = F.relu(self.l4(sa))
-        q2 = F.relu(self.l5(q2))
-        q2 = self.l6(q2)
-        return q1, q2
-
-    def Q1(self, state, action, hidden=None):
-        sa = torch.cat([state, action], 1)
-        q1 = F.relu(self.l1(sa))
-        q1 = F.relu(self.l2(q1))
-        q1 = self.l3(q1)
-        return q1
-
-
-class Trainer(base.Policy):
-    def __init__(self, state_dim, action_dim):
-        super().__init__(state_dim, action_dim)
+class Trainer(basic.Trainer):
+    def __init__(self, state_dim, action_dim, max_action, model=None):
+        super().__init__(model)
         #Create actor and critic
         #Could have used the base class given's but for convenient sake we declare our own
-        self.actor = TD3Actor(state_dim, action_dim, self.max_action).to(self.device)
-        self.critic = TD3Critic(state_dim, action_dim).to(self.device)
-
-        self.actor_target = copy.deepcopy(self.actor)
+        self.max_action = max_action            
+        #self.model = model
+        self.actor = self.model.actor
+        self.critic = self.model.critic
+        self.actor_target = self.model.actor_target
+        self.critic_target = self.model.critic_target
+        
         self.actor_optimizer = torch.optim.Adam(
             self.actor.parameters(), lr = Config().algorithm.learning_rate)
-
-        self.critic_target = copy.deepcopy(self.critic)
+        
         self.critic_optimizer = torch.optim.Adam(
             self.critic.parameters(), lr = Config().algorithm.learning_rate)
 
@@ -170,6 +125,8 @@ class Trainer(base.Policy):
                     target_param.data.copy_(Config().algorithm.tau * param.data +
                                             (1 - Config().algorithm.tau) *
                                             target_param.data)
+
+        print("one client update done")    
                 
                 
     def evaluate_policy(self, policy, eval_episodes = 10):
