@@ -2,8 +2,6 @@
 The implementation of the Bylo's core network
 
 """
-import copy
-from functools import wraps
 
 import torch
 from torch import nn
@@ -11,14 +9,6 @@ from plato.config import Config
 
 from plato.models import encoders_register
 from plato.models import general_mlps_register
-
-
-
-
-def set_requires_grad(model, status):
-    """ Set the desired status to parameters of the model """
-    for p in model.parameters():
-        p.requires_grad = status
 
 
 class ModelEMA:
@@ -49,7 +39,7 @@ class ModelEMA:
 
 
 class ProjectionMLP(nn.Module):
-    """ The implementation of SimCLR's projection layer. """
+    """ The implementation of Byol's projection layer. """
 
     def __init__(self, in_dim):
         super().__init__()
@@ -71,6 +61,7 @@ class ProjectionMLP(nn.Module):
 
 class EncoderwithProjection(nn.Module):
     """ The module combining the encoder and the projection. """
+
     def __init__(self, encoder=None, encoder_dim=None):
         super().__init__()
 
@@ -83,9 +74,9 @@ class EncoderwithProjection(nn.Module):
 
         # build the projector proposed in the bylo net
         self.projector = ProjectionMLP(in_dim=self.encode_dim)
-        
+
         self.projection_dim = self.projector.output_dim()
-    
+
     def forward(self, x):
         """ Forward the encoder and the projection """
         x = self.encoder(x)
@@ -94,7 +85,6 @@ class EncoderwithProjection(nn.Module):
 
     def get_projection_dim(self):
         return self.projection_dim
-        
 
 
 class BYOL(nn.Module):
@@ -105,17 +95,21 @@ class BYOL(nn.Module):
         encoder.
         But, I strictly follows that in the paper, the encoder is the f_θ,
         the projector is g_θ.
-        Thus, we denote the combination of f_θ and g_θ as the onliner embedder.
+        Thus, we denote the combination of f_θ and g_θ as the onliner network.
+
+        By the way, based on the implementation from the resource
+        https://github.com/PatrickHua/SimSiam, the projector and predictor of
+        BYOL share the same strucutre but only varies in the input dimension.
+
     """
 
     def __init__(self, encoder=None, encoder_dim=None):
         super().__init__()
 
-        
         # combine online encoder and online projector to be
         # the online network
-        self.online_network = EncoderwithProjection(encoder, encoder_dim) 
-        
+        self.online_network = EncoderwithProjection(encoder, encoder_dim)
+
         projection_dim = self.online_network.get_projection_dim()
         # set the required online predictor
         # default use the same structure with its predictor
@@ -134,7 +128,7 @@ class BYOL(nn.Module):
         # note that the target network will not be optimized, it update
         # only depends on the moving average of the previous target network
         # and the newly online network.
-        self.target_network = EncoderwithProjection(encoder, encoder_dim) 
+        self.target_network = EncoderwithProjection(encoder, encoder_dim)
 
         # set the moving average
         moving_average_decay = Config(
@@ -146,9 +140,10 @@ class BYOL(nn.Module):
     @torch.no_grad()
     def _initializes_target_network(self):
         """ Initialize the tareget network. """
-        for param_q, param_k in zip(self.online_network.parameters(), self.target_network.parameters()):
+        for param_q, param_k in zip(self.online_network.parameters(),
+                                    self.target_network.parameters()):
             param_k.data.copy_(param_q.data)  # initialize
-            param_k.requires_grad = False     # not update by gradient
+            param_k.requires_grad = False  # not update by gradient
 
     @torch.no_grad()
     def _update_target_network(self):
@@ -177,12 +172,12 @@ class BYOL(nn.Module):
 
     @property
     def encoder(self):
-        """ Obtain the target embedder's encoder. """
+        """ Obtain the target network's encoder. """
         target_network_encoder = self.target_network.encoder
         return target_network_encoder
 
     @property
     def encode_dim(self):
-        """ Obtain the target embedder's encoder. """
-        
+        """ Obtain the target network's encoder. """
+
         return self.online_network.encode_dim

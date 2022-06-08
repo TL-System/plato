@@ -16,9 +16,9 @@ Source code: https://github.com/lucidrains/byol-pytorch
 import byol_net
 import byol_trainer
 import byol_server
-import fedavg_byol
 
 from plato.clients import ssl_simple as ssl_client
+from plato.algorithms import fedavg_ssl
 
 
 def main():
@@ -28,7 +28,7 @@ def main():
         the 'model_name' in config file.
     """
     trainer = byol_trainer.Trainer
-    algorithm = fedavg_byol.Algorithm
+    algorithm = fedavg_ssl.Algorithm
     byol_model = byol_net.BYOL()
     client = ssl_client.Client(model=byol_model,
                                trainer=trainer,
