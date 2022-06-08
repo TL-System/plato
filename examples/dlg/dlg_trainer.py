@@ -157,7 +157,12 @@ class Trainer(basic.Trainer):
                 self.save_model(filename)
                 self.model.to(self.device)
 
-        target_grad = [x / total_local_updates for x in target_grad]
+        if hasattr(Config().algorithm,
+                   'share_gradients') and Config().algorithm.share_gradients:
+            try:
+                target_grad = [x / total_local_updates for x in target_grad]
+            except:
+                target_grad = None
 
         file_path = f"{Config().params['model_path']}/{self.client_id}.pickle"
         with open(file_path, 'wb') as handle:
