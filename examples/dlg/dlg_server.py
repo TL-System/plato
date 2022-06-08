@@ -20,6 +20,7 @@ https://proceedings.neurips.cc/paper/2020/file/c4ede56bbd98819ae6112b20ac6bf145-
 
 import logging
 import math
+import os
 from collections import OrderedDict
 from copy import deepcopy
 from statistics import mean
@@ -31,6 +32,7 @@ import torch
 import torch.nn.functional as F
 from plato.config import Config
 from plato.servers import fedavg
+from plato.utils import csv_processor
 from torchvision import transforms
 
 from utils.modules import MetaMonkey
@@ -79,6 +81,14 @@ class Server(fedavg.Server):
 
         num_images = Config().data.partition_size
 
+        dlg_result_path = f"{Config().params['result_path']}/DLG"
+        dlg_result_file = f"{dlg_result_path}/{os.getpid()}.csv"
+        dlg_result_headers = [
+            "Iteration", "Loss", "Average MSE", "Average LPIPS"
+        ]
+        csv_processor.initialize_csv(dlg_result_file, dlg_result_headers,
+                                     dlg_result_path)
+
         self.plot_gt(num_images, gt_data, gt_label)
 
         # Generate dummy items
@@ -86,8 +96,7 @@ class Server(fedavg.Server):
         if len(data_size) == 2:
             data_size = (num_images, 1, data_size[0], data_size[1])
         else:
-            data_size = (num_images, data_size[2], data_size[0],
-                         data_size[1])
+            data_size = (num_images, data_size[2], data_size[0], data_size[1])
 
         dummy_data = torch.randn(data_size).to(
             Config().device()).requires_grad_(True)
@@ -107,12 +116,12 @@ class Server(fedavg.Server):
         if not (hasattr(Config().algorithm, 'share_gradients') and Config().algorithm.share_gradients) \
                 and hasattr(Config().algorithm, 'match_weight') and Config().algorithm.match_weight:
             model = deepcopy(self.trainer.model)
-            closure = self.weight_closure(
-                match_optimizer, dummy_data, dummy_label, target_weight, model)
+            closure = self.weight_closure(match_optimizer, dummy_data,
+                                          dummy_label, target_weight, model)
         # Matching gradients
         else:
-            closure = self.gradient_closure(
-                match_optimizer, dummy_data, dummy_label, target_grad)
+            closure = self.gradient_closure(match_optimizer, dummy_data,
+                                            dummy_label, target_grad)
 
         for iters in range(Config().algorithm.num_iters):
             match_optimizer.step(closure)
@@ -140,33 +149,44 @@ class Server(fedavg.Server):
                     "[Gradient Leakage Attacking...] Iter %d: Loss = %.10f, avg MSE = %.8f, avg LPIPS = %.8f",
                     iters, losses[-1], avg_mses[-1], avg_lpips[-1])
                 history.append([[tt(dummy_data[i][0].cpu()), dummy_label[i]]
-                               for i in range(num_images)])
+                                for i in range(num_images)])
+                new_row = [
+                    iters,
+                    round(losses[-1], 8),
+                    round(avg_mses[-1], 8),
+                    round(avg_lpips[-1], 8)
+                ]
+                csv_processor.write_csv(dlg_result_file, new_row)
 
         self.plot_reconstructed(num_images, history)
 
         logging.info("Attack complete")
 
-    def gradient_closure(self, match_optimizer, dummy_data, dummy_label, target_grad):
+    def gradient_closure(self, match_optimizer, dummy_data, dummy_label,
+                         target_grad):
         """ Take a step to match the gradients. """
+
         def closure():
             match_optimizer.zero_grad()
             # self.trainer.model.zero_grad()
             dummy_pred = self.trainer.model(dummy_data)
             dummy_onehot_label = F.softmax(dummy_label, dim=-1)
-            dummy_loss = cross_entropy_for_onehot(
-                dummy_pred, dummy_onehot_label)
-            dummy_grad = torch.autograd.grad(
-                dummy_loss, self.trainer.model.parameters(), create_graph=True)
+            dummy_loss = cross_entropy_for_onehot(dummy_pred,
+                                                  dummy_onehot_label)
+            dummy_grad = torch.autograd.grad(dummy_loss,
+                                             self.trainer.model.parameters(),
+                                             create_graph=True)
 
             grad_diff = 0
             for gx, gy in zip(dummy_grad, target_grad):
-                grad_diff += ((gx - gy) ** 2).sum()
+                grad_diff += ((gx - gy)**2).sum()
             grad_diff.backward()
             return grad_diff
 
         return closure
 
-    def weight_closure(self, match_optimizer, dummy_data, dummy_label, target_weight, model):
+    def weight_closure(self, match_optimizer, dummy_data, dummy_label,
+                       target_weight, model):
         """ Take a step to match the model weights. """
 
         def closure():
@@ -175,7 +195,7 @@ class Server(fedavg.Server):
 
             weight_diff = 0
             for wx, wy in zip(dummy_weight, target_weight.values()):
-                weight_diff += ((wx - wy) ** 2).sum()
+                weight_diff += ((wx - wy)**2).sum()
             weight_diff.backward()
             return weight_diff
 
@@ -211,42 +231,49 @@ class Server(fedavg.Server):
                                               batch_size])
                 labels_ = dummy_label[idx * batch_size:(idx + 1) * batch_size]
 
-            loss = loss_criterion(
-                dummy_pred, torch.argmax(labels_, dim=-1)).sum()
+            loss = loss_criterion(dummy_pred, torch.argmax(labels_,
+                                                           dim=-1)).sum()
 
-            grad = torch.autograd.grad(loss, patched_model.parameters.values(),
-                                       retain_graph=True, create_graph=True, only_inputs=True)
+            grad = torch.autograd.grad(loss,
+                                       patched_model.parameters.values(),
+                                       retain_graph=True,
+                                       create_graph=True,
+                                       only_inputs=True)
 
-            patched_model.parameters = OrderedDict((name, param - Config().trainer.learning_rate * grad_part)
-                                                   for ((name, param), grad_part)
-                                                   in zip(patched_model.parameters.items(), grad))
+            patched_model.parameters = OrderedDict(
+                (name, param - Config().trainer.learning_rate * grad_part)
+                for ((name, param),
+                     grad_part) in zip(patched_model.parameters.items(), grad))
 
         return list(patched_model.parameters.values())
 
     @staticmethod
     def plot_gt(num_images, gt_data, gt_label):
         """ Plot ground truth data """
+        gt_result_path = f"{Config().params['result_path']}/DLG/gt.png"
         gt_figure = plt.figure(figsize=(12, 4))
 
         for i in range(num_images):
-            logging.info("Ground truth labels: %d",
-                         torch.argmax(gt_label[i], dim=-1).item())
+            current_label = torch.argmax(gt_label[i], dim=-1).item()
+            logging.info("Ground truth labels: %d", current_label)
             gt_figure.add_subplot(1, num_images, i + 1)
             plt.imshow(tt(gt_data[i][0].cpu()))
             plt.axis('off')
-            plt.title("GT image %d" % (i + 1))
+            plt.title("GT image %d\nLabel: %d" % ((i + 1), current_label))
+        plt.savefig(gt_result_path)
 
     @staticmethod
     def plot_reconstructed(num_images, history):
         """ Plot the reconstructed data. """
+        reconstructed_result_path = f"{Config().params['result_path']}/DLG/reconstructed.png"
         for i in range(num_images):
             logging.info("Reconstructed label is %d.",
                          torch.argmax(history[-1][i][1], dim=-1).item())
 
         fig = plt.figure(figsize=(12, 8))
         outer = gridspec.GridSpec(
-            (Config().algorithm.num_iters //
-                Config().algorithm.log_interval) // 2,
+            (Config().algorithm.num_iters // Config().algorithm.log_interval)
+            // 2,
             2,
             wspace=0.2,
             hspace=0.2)
@@ -267,4 +294,4 @@ class Server(fedavg.Server):
                 innerplot.imshow(history[i][j][0])
                 innerplot.axis('off')
                 fig.add_subplot(innerplot)
-        plt.show()
+        fig.savefig(reconstructed_result_path)
