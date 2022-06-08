@@ -280,6 +280,18 @@ class Trainer(basic.Trainer):
 
         return accuracy
 
+    def save_encoded_data(self, data, filename=None, location=None):
+        """ Save the encoded data (np.narray). """
+        # process the arguments to obtain the to save path
+        to_save_path = self.process_save_path(filename,
+                                              location,
+                                              work_model_name="model_name",
+                                              desired_extenstion=".npy")
+
+        np.save(to_save_path, data, allow_pickle=True)
+        logging.info("[Client #%d] Saving encoded data to %s.", self.client_id,
+                     to_save_path)
+
     def train_loop(
         self,
         config,
@@ -495,8 +507,11 @@ class Trainer(basic.Trainer):
 
         if 'max_concurrency' in config:
             # first save the monitor to the results path
-            results_path = Config().params['result_path']
-            save_location = results_path
+            result_path = Config().params['result_path']
+
+            save_location = os.path.join(result_path,
+                                         "client_" + str(self.client_id))
+
             current_round = kwargs['current_round']
             filename = f"client_{self.client_id}_monitor.csv"
 
@@ -615,6 +630,8 @@ class Trainer(basic.Trainer):
                 # to demonstrate the training progress details.
                 global_progress = tqdm(range(0, num_eval_train_epochs),
                                        desc='Evaluating')
+                train_data_encoded = list()
+                train_data_labels = list()
                 for epoch in global_progress:
                     epoch_loss_meter.reset()
                     local_progress = tqdm(
@@ -644,6 +661,8 @@ class Trainer(basic.Trainer):
 
                         # Update the epoch loss container
                         epoch_loss_meter.update(loss.data.item())
+                        train_data_encoded.append(feature.numpy())
+                        train_data_labels.append(labels.numpy())
 
                         if lr_schedule is not None:
                             lr_schedule = lr_schedule.step()
@@ -668,6 +687,8 @@ class Trainer(basic.Trainer):
 
                 self.personalized_model.eval()
                 correct = 0
+                test_data_encoded = list()
+                test_data_labels = list()
                 acc_meter.reset()
                 for _, (examples, labels) in enumerate(test_loader):
                     examples, labels = examples.to(self.device), labels.to(
@@ -677,13 +698,16 @@ class Trainer(basic.Trainer):
                         preds = self.personalized_model(feature).argmax(dim=1)
                         correct = (preds == labels).sum().item()
                         acc_meter.update(correct / preds.shape[0])
+                        test_data_encoded.append(feature.numpy())
+                        test_data_labels.append(labels.numpy())
+
                 accuracy = acc_meter.avg
         except Exception as testing_exception:
             logging.info("Evaluation Testing on client #%d failed.",
                          self.client_id)
             raise testing_exception
 
-        # saving the personalized model for current round
+        # save the personalized model for current round
         # to the dir of this client
         if 'max_concurrency' in config:
             self.personalized_model.cpu()
@@ -699,11 +723,13 @@ class Trainer(basic.Trainer):
             self.save_personalized_model(filename=filename,
                                          location=save_location)
 
+        # save the accuracy of the client
         if 'max_concurrency' in config:
             # save the personaliation accuracy to the results dir
             result_path = Config().params['result_path']
 
-            save_location = result_path
+            save_location = os.path.join(result_path,
+                                         "client_" + str(self.client_id))
 
             current_round = kwargs['current_round']
             filename = f"client_{self.client_id}_personalization.csv"
@@ -721,6 +747,30 @@ class Trainer(basic.Trainer):
             filename = f"{model_name}_{self.client_id}_{config['run_id']}.acc"
             self.save_accuracy(accuracy, filename)
 
+        # save the encoded data to the
+        if 'max_concurrency' in config:
+            # save the encoded data to the results dir
+            result_path = Config().params['result_path']
+            save_location = os.path.join(result_path,
+                                         "client_" + str(self.client_id))
+            current_round = kwargs['current_round']
+            train_encoded_filename = f"Round_{current_round}_train_encoded.npy"
+            train_label_filename = f"Round_{current_round}_train_label.npy"
+            test_encoded_filename = f"Round_{current_round}_test_encoded.npy"
+            test_label_filename = f"Round_{current_round}_test_label.npy"
+
+            self.save_encoded_data(data=train_data_encoded,
+                                   filename=train_encoded_filename,
+                                   location=save_location)
+            self.save_encoded_data(data=train_data_labels,
+                                   filename=train_label_filename,
+                                   location=save_location)
+            self.save_encoded_data(data=test_data_encoded,
+                                   filename=test_encoded_filename,
+                                   location=save_location)
+            self.save_encoded_data(data=test_data_labels,
+                                   filename=test_label_filename,
+                                   location=save_location)
         else:
             return accuracy
 
