@@ -1,0 +1,183 @@
+
+general:
+    # The prefix of directories of dataset, models, checkpoints, and results
+    # on sim server
+    # base_path: /data/user/Projects/experiments
+
+    # locally
+    base_path: ./Projects/experiments
+
+clients:
+    # Type
+    type: simple
+
+    # The total number of clients
+    total_clients: 50
+
+    # The number of clients selected in each round
+    per_round: 30
+
+    # Should the clients compute test accuracy locally?
+    do_test: True
+    # Minotor the self-supervised learning by knn for
+    # every 5 round
+    test_interval: 5
+    # Train the personalized model based on the
+    # learned representation every 10 rounds
+    eval_test_interval: 10
+    # Whether simulate clients or not
+    simulation: true
+
+    random_seed: 1
+
+server:
+    address: 127.0.0.1
+    port: 8000
+    synchronous: true
+    do_test: false
+
+    # for the models/checkpoints/results path, please keep their dir's
+    # name the same
+    # For example, the subdir name of model_path is
+    # 'SimCLR_MNIST_l5_pureMLP', it is desired to use the same name
+    # for checkpoint_path and result_path.
+
+    # Note, for the name of this subdir, it is desired to follow the same
+    # rule as:
+    # {ssl_method_name}_{dataset_name}_{encoder_backbone_name}_{personalized_model_name}
+    # For example, for the name here, it uses
+    #   SimCLR  : The SimCLR method
+    #   MNIST   : The MNIST dataset
+    #   l5      : The LeNet5 network
+    #   pureMLP : The pure MLP network (1 layer without any enhancements)
+    model_path: models/SimCLR_MNIST_l5_pureMLP
+    checkpoint_path: checkpoints/SimCLR_MNIST_l5_pureMLP
+
+data:
+    # The training and testing dataset
+    datasource: MNIST
+
+    # Number of samples in each partition
+    #
+    # This is one important parameter that
+    # may lead the failure of the loss criterion part
+    # if your loss criterion relies on the batch_size
+    # as its argument. For example, the NT_Xent loss utilized
+    # by the SimCLR method set the defined batch_size as the parameter.
+    # However, at the end of one epoch, the left samples may smaller than
+    # the batch_size. This makes the #loaded samples != batch_size.
+    # Working on criterion that is defined with batch_size but receives loaded
+    # samples whose size is smaller than the batch size may causes problems.
+    # drop_last = True can alleviate this issue.
+    # Currently drop_last is default to be False in Plato.
+    # Under this case, to avoid this issue, we need to set:
+    #   partition_size / batch_size = integar
+    #   partition_size / pers_batch_size = integar
+    partition_size: 20000
+
+    # IID or non-IID?
+    sampler: noniid
+    testset_sampler: noniid
+    # The concentration parameter for the Dirichlet distribution
+    concentration: 5
+
+    # The random seed for sampling data
+    random_seed: 1
+
+    # set the data wrapper to further process the data
+    #   for the specific usage, such as constrastive learning
+    # data_wrapper: Null
+    data_wrapper: ContrastiveAugmentWrapper
+
+    # set the data augmentation
+    #   options: simsiam, byol, simclr
+    augment_transformer_name: simclr
+    # some methods apply the normalization to samples
+    #   while others do not
+    is_norm: False
+
+trainer:
+    # The type of the trainer
+    type: basic
+
+
+    # The maximum number of training rounds
+    rounds: 100
+
+    # Whether the training should use multiple GPUs if available
+    parallelized: false
+
+    # The maximum number of clients running concurrently
+    max_concurrency: 10
+
+    # The target accuracy
+    target_accuracy: 0.98
+
+    # Number of epochs for local training in each communication round
+    #   The user is expected to carefully choose the batch_size to avoid
+    # the memory allocation issue as the contrastive samples occupy more
+    # space as more samples will be contained within one loading.
+    epochs: 5
+    batch_size: 30
+    optimizer: Adam
+    learning_rate: 0.003
+    betas:
+      - 0.9
+      - 0.999
+    eps: 0.00000008 # 1e-8
+    weight_decay: 0.001
+
+    lr_scheduler: StepLR
+    lr_step_size: 20
+    lr_gamma: 0.9
+
+    epoch_log_interval: 1
+    batch_log_interval: 100
+
+    # Number of epochs for local training in each communication round
+    #   The batch size for the downstream task can be larger as it
+    # does not utilize the contrastive samples
+    pers_epochs: 30
+    pers_batch_size: 64
+    pers_optimizer: Adam
+    pers_learning_rate: 0.005
+    pers_betas:
+        - 0.9
+        - 0.99
+    pers_eps: 0.00000009 # 1e-8
+    pers_weight_decay: 0.002
+
+    pers_lr_schedule: StepLR
+    pers_lr_step_size: 20
+    pers_lr_gamma: 0.9
+
+    pers_epoch_log_interval: 1
+    # temperature
+    temperature: 0.5
+
+    # image_size
+    #  - CIFAR10 (Image size=32)
+    #  - MNIST (Image size=28)
+    image_size: 28
+
+    # The machine learning model,
+    # it behaves as the encoder for the ssl method
+    # the final fc layer will be removed
+    model_name: lenet5
+    projection_dim: 128
+
+    personalized_model_name: pure_one_layer_mlp
+
+    monitor_name: knn
+    knn_k: 200
+    knn_t: 0.1
+    hide_monitor_progress: False
+
+    num_classes: 10
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg
+
+results:
+    result_path: results/SimCLR_MNIST_l5_pureMLP
