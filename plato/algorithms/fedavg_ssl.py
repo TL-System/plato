@@ -1,5 +1,12 @@
 """
-The federated averaging algorithm for Byol method.
+The federated averaging algorithm for self-supervised method.
+
+The main target of this algorithm is to achieve the property of
+randomly exchanging the whole defined or its sub-module between
+the server and clients.
+Thus, the 'extract_weights' functions extract the model' parameters
+based on the required 'global_model_name'.
+
 """
 from collections import OrderedDict
 
