@@ -30,6 +30,7 @@ class TestTransform():
             ]
 
         if normalize is not None:
+
             transform_functions.append(T.Normalize(*normalize))
 
         self.transform = T.Compose(transform_functions)

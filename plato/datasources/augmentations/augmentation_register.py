@@ -41,21 +41,24 @@ def get(name='simsiam', train=True, for_downstream_task=False):
     # train: True, for_downstream_task: False
     if train and not for_downstream_task:
         augmentation = transform_mapper[name](image_size, normalize)
+        logging.info(
+            f"Exploit {name} transform for {dataset_name} with image_size {image_size}"
+        )
     # obtain the transform for the train stage of the for_downstream_task
     # train: True, for_downstream_task: True
-    elif train and for_downstream_task:
+    if train and for_downstream_task:
         augmentation = transform_mapper["test"](image_size,
                                                 train=True,
                                                 normalize=normalize)
     # obtain the transform for the test stage of the downstream_task
     # train: False, for_downstream_task: True
-    elif not train and for_downstream_task:
+    if not train and for_downstream_task:
         augmentation = transform_mapper["test"](image_size,
                                                 train=False,
                                                 normalize=normalize)
     # obtain the transform for the monitor stage of the ssl
     # train: False, for_downstream_task: False
-    else:
+    if not train and not for_downstream_task:
         augmentation = transform_mapper["test"](image_size,
                                                 train=False,
                                                 normalize=normalize)

@@ -61,6 +61,7 @@ class BYOLTransform():
 
     def __call__(self, x):
         """ Perform data augmentation. """
+
         x1 = self.transform1(x)
         x2 = self.transform2(x)
         return x1, x2
