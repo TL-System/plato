@@ -3,6 +3,7 @@ A customized trainer for td3.
 """
 import logging
 import os
+from pyexpat import model
 import time
 
 import copy
@@ -69,6 +70,12 @@ class Trainer(basic.Trainer):
         self.total_timesteps = 0
         self.done = True
 
+        self.episode_reward = 0
+        
+        self.actor_state_dict = None
+        self.critic_state_dict = None
+        self.actor_target_state_dict = None
+        self.critic_target_state_dict = None
 
     def select_action(self, state):
         """Select action from policy"""
@@ -85,7 +92,6 @@ class Trainer(basic.Trainer):
     def train_model(self, config, trainset, sampler, cut_layer):
         """Main Training"""
         print("in line 87 of td3_learning_trainer!")
-        episode_reward = 0
         episode_timesteps = 0 #fixing error about using before assignment
         obs = 0 #fixing error about using before assignment
         round_episode_steps = 0
@@ -93,13 +99,13 @@ class Trainer(basic.Trainer):
             # TODO: when max number of steps is hit, we should stop training and terminate the process. How?
             print("Done training")
             return
-        while round_episode_steps < globals.max_episode_steps:
+        while round_episode_steps <= globals.max_episode_steps:
             print("in while loop line 97")
             #If episode is done
             if self.done:
                 #if not at beginning
                 if self.total_timesteps != 0:
-                    logging.info("Total Timesteps: {} Episode Num: {} Reward: {}".format(self.total_timesteps, self.episode_num, episode_reward))
+                    logging.info("Total Timesteps: {} Episode Num: {} Reward: {}".format(self.total_timesteps, self.episode_num, self.episode_reward))
                     #train here call td3_trainer
                     self.train_helper()
 
@@ -116,7 +122,7 @@ class Trainer(basic.Trainer):
                 self.done = False
 
                 # Set rewards and episode timesteps to zero
-                episode_reward = 0
+                self.episode_reward = 0
                 episode_timesteps = 0
                 self.episode_num += 1
             
@@ -141,7 +147,7 @@ class Trainer(basic.Trainer):
             done_bool = 0 if episode_timesteps + 1 == self.env._max_episode_steps else float(self.done)
             
             #update total reward
-            episode_reward += reward
+            self.episode_reward += reward
            
             #add to replay buffer in this order due to push method in replay buffer
             new = (obs, action, reward, new_obs, done_bool)
@@ -247,7 +253,7 @@ class Trainer(basic.Trainer):
             logging.info("[Client #%d] Loading a model from %s.",
                          self.client_id, model_path)
 
-
+        print("in line 251 of trainer")
         #self.model.load_state_dict(torch.load(model_path), strict=True)
         self.actor.load_state_dict(torch.load(model_path), strict=True)
 
@@ -258,7 +264,60 @@ class Trainer(basic.Trainer):
         self.critic_target.load_state_dict(torch.load(model_path), strict=True)
 
     def save_model(self, filename=None, location=None):
-        print("line 261 of trainer of save model")
+        """Saving the model to a file."""
+        model_path = Config(
+        ).params['model_path'] if location is None else location
+        actor_model_name = 'actor_model'
+        critic_model_name = 'critic_model'
+        actor_target_model_name = 'actor_target_model'
+        critic_target_model_name = 'critic_target_model'
+
+        try:
+            if not os.path.exists(model_path):
+                os.makedirs(model_path)
+        except FileExistsError:
+            pass
+
+        if filename is not None:
+           # model_path = f'{model_path}/{filename}'
+           # model_filename = filename + _'model'
+           # model path = Config().params stuff
+           actor_filename = filename + '_actor'
+           critic_filename = filename + '_critic'
+           actor_target_filename = filename + '_actor_target'
+           critic_target_filename = filename + '_critic_target'
+           actor_model_path = f'{model_path}/{actor_filename}'
+           critic_model_path = f'{model_path}/{critic_filename}'
+           actor_target_model_path = f'{model_path}/{actor_target_filename}'
+           critic_target_model_path = f'{model_path}/{critic_target_filename}'
+        else:
+            actor_model_path = f'{model_path}/{actor_model_name}'
+            critic_model_path = f'{model_path}/{critic_model_name}'
+            actor_target_model_path = f'{model_path}/{actor_target_model_name}'
+            critic_target_model_path = f'{model_path}/{critic_target_model_name}'
+
+        if self.model_state_dict is None:
+            #torch.save(self.model.state_dict(), model_path)
+            torch.save(self.actor.state_dict(), actor_model_path)
+            torch.save(self.critic.state_dict(),critic_model_path)
+            torch.save(self.actor_target.state_dict(), actor_target_model_path)
+            torch.save(self.critic_target.state_dict(), critic_target_model_path)
+
+        else:
+            #torch.save(self.model_state_dict, model_path)
+            torch.save(self.actor_state_dict, actor_model_path)
+            torch.save(self.critic_state_dict, critic_model_path)
+            torch.save(self.actor_target_state_dict, actor_target_model_path)
+            torch.save(self.critic_target_state_dict, critic_target_model_path)
+        
+        #TODO What is the difference between .state_dict() & _state_dict
+
+        if self.client_id == 0:
+            logging.info("[Server #%d] Model saved to %s.", os.getpid(),
+                         model_path)
+        else:
+            logging.info("[Client #%d] Model saved to %s.", self.client_id,
+                         model_path)
 
 
 
