@@ -60,8 +60,8 @@ class RLClient(simple.Client):
                     self.RL_Online_trainer.train_loop(config=None, trainset=None,sampler=None, cut_layer=None)
 
                 #evaluate episode and save policy
-                if self.timesteps_since_eval >= Config().algorithm.policy_freq:
-                    self.timesteps_since_eval %= Config().algorithm.policy_freq
+                if self.timesteps_since_eval >= Config().algorithm.eval_freq * globals.max_episode_steps:
+                    self.timesteps_since_eval %= (Config().algorithm.eval_freq * globals.max_episode_steps)
                     self.evaluations.append(evaluate_policy(self.RL_Online_trainer, self.env))
                     np.save("./results/%s" % (file_name), self.evaluations)
                 
@@ -114,7 +114,7 @@ class RLClient(simple.Client):
         np.save("./results/%s" % (file_name), self.evaluations)
         
         #returns report and weights
-        report, weights = await self.train()
+        report, weights = await super().train()
         return Report(report.num_samples, report.accuracy,
                       report.training_time, report.comm_time,
                       report.update_response), weights
@@ -123,15 +123,22 @@ class RLClient(simple.Client):
 
 def evaluate_policy(trainer, env, eval_episodes = 10):
         avg_reward = 0
-        for _ in range(eval_episodes):
+        for i in range(eval_episodes):
             obs = env.reset()
+            print("obs in 129 in client evaluate policy", obs)
             done = False
+            step_num = 0
             while not done:
                 action = trainer.select_action(np.array(obs))
+                print("episode num i", i)
+                print("step num", step_num)
+                print("action in 135 in eval policy in client", action)
+                print("obs in 136 in eval policy in client", np.array(obs))
                 obs, reward, done, _ = env.step(action)
+                step_num += 1
                 avg_reward += reward
         avg_reward /= eval_episodes
-        #print ("---------------------------------------")
-        #print ("Average Reward over the Evaluation Step: %f" % (avg_reward))
-        #print ("---------------------------------------")
+        print ("---------------------------------------")
+        print ("Average Reward over the Evaluation Step: %f" % (avg_reward))
+        print ("---------------------------------------")
         return avg_reward
