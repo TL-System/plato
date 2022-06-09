@@ -37,6 +37,7 @@ from torchvision import transforms
 
 from utils.modules import MetaMonkey
 from utils.utils import cross_entropy_for_onehot
+from utils.utils import total_variation as TV
 
 cross_entropy = torch.nn.CrossEntropyLoss()
 tt = transforms.ToPILImage()
@@ -119,7 +120,6 @@ class Server(fedavg.Server):
             match_optimizer = torch.optim.LBFGS(
                 [dummy_data, ], lr=Config().algorithm.lr)
             # Estimate the gt label
-            # TODO: why -2?
             est_label = torch.argmin(torch.sum(
                 target_grad[-2], dim=-1), dim=-1).detach().reshape((1,)).requires_grad_(False)
             for i in range(num_images):
@@ -206,11 +206,11 @@ class Server(fedavg.Server):
                                              self.trainer.model.parameters(),
                                              create_graph=True)
 
-            grad_diff = 0
-            for gx, gy in zip(dummy_grad, target_grad):
-                grad_diff += ((gx - gy)**2).sum()
-            grad_diff.backward()
-            return grad_diff
+            rec_loss = self.reconstruction_costs([dummy_grad], target_grad)
+            if hasattr(Config().algorithm, 'total_variation') and Config().algorithm.total_variation > 0:
+                rec_loss += Config().algorithm.total_variation * TV(dummy_data)
+            rec_loss.backward()
+            return rec_loss
 
         return closure
 
@@ -222,11 +222,12 @@ class Server(fedavg.Server):
             match_optimizer.zero_grad()
             dummy_weight = self.loss_steps(dummy_data, dummy_label, model)
 
-            weight_diff = 0
-            for wx, wy in zip(dummy_weight, target_weight.values()):
-                weight_diff += ((wx - wy)**2).sum()
-            weight_diff.backward()
-            return weight_diff
+            rec_loss = self.reconstruction_costs(
+                [dummy_weight], target_weight.values())
+            if hasattr(Config().algorithm, 'total_variation') and Config().algorithm.total_variation > 0:
+                rec_loss += Config().algorithm.total_variation * TV(dummy_data)
+            rec_loss.backward()
+            return rec_loss
 
         return closure
 
@@ -272,6 +273,40 @@ class Server(fedavg.Server):
                      grad_part) in zip(patched_model.parameters.items(), grad))
 
         return list(patched_model.parameters.values())
+
+    @staticmethod
+    def reconstruction_costs(dummy, target):
+        # TODO: various indices, weights?
+        indices = torch.arange(len(target))
+        cost_fn = Config().algorithm.cost_fn
+
+        total_costs = 0
+        for trial in dummy:
+            pnorm = [0, 0]
+            costs = 0
+            for i in indices:
+                if cost_fn == 'l2':
+                    costs += ((trial[i] - target[i]).pow(2)).sum()
+                elif cost_fn == 'l1':
+                    costs += ((trial[i] - target[i]).abs()).sum()
+                elif cost_fn == 'max':
+                    costs += ((trial[i] - target[i]).abs()).max()
+                elif cost_fn == 'sim':
+                    costs -= (trial[i] * target[i]).sum()
+                    pnorm[0] += trial[i].pow(2).sum()
+                    pnorm[1] += target[i].pow(2).sum()
+                elif cost_fn == 'simlocal':
+                    costs += 1 - torch.nn.functional.cosine_similarity(trial[i].flatten(),
+                                                                       target[i].flatten(
+                    ),
+                        0, 1e-10)
+            if cost_fn == 'sim':
+                costs = 1 + costs / pnorm[0].sqrt() / pnorm[1].sqrt()
+
+            # Accumulate final costs
+            total_costs += costs
+
+        return total_costs / len(dummy)
 
     @staticmethod
     def plot_gt(num_images, gt_data, gt_label):
