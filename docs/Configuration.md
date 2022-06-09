@@ -34,6 +34,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |outbound_processors|A list of processors to apply on the payload before sending| A list of processor names || 
 |inbound_processors|A list of processors to apply on the payload right after receiving| A list of processor names || 
 |comm_simulation|Whether client-server communication should be simulated with files|`true` or `false`|default: true|
+|compute_comm_time|Whether communication time should be computed with specified bandwidth when client-server communication is simulated with files|`true` or `false`||
 
 #### Valid processors for `clients.outbound_processors`
 
@@ -89,6 +90,9 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |checkpoint_path|The directory of checkpoints||default: `<base_path>/checkpoints`|
 |outbound_processors|A list of processors to apply on the payload before sending| A list of processor names || 
 |inbound_processors|A list of processors to apply on the payload right after receiving| A list of processor names || 
+|downlink_bandwidth|Bandwidth for downlink communication (server to clients) in MBps||default:1|
+|uplink_bandwidth|Bandwidth for uplink communication (clients to server) in MBps||default:1|
+
 
 #### Valid processors for `server.outbound_processors`
 
