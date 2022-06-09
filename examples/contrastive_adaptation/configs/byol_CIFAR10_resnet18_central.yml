@@ -55,8 +55,8 @@ server:
     #   CIFAR10         : The CIFAR10 dataset
     #   resnet18        : The encoder built upon resnet18
     #   pureMLP         : The pure MLP network (1 layer without any enhancements)
-    model_path: models/BYOL_CIFAR10_resnet18_pureMLP
-    checkpoint_path: checkpoints/BYOL_CIFAR10_resnet18_pureMLP
+    model_path: models/BYOL_CIFAR10_central_resnet18_pureMLP
+    checkpoint_path: checkpoints/BYOL_centralCIFAR10_resnet18_pureMLP
 
 data:
     # The training and testing dataset
@@ -195,4 +195,4 @@ algorithm:
     type: fedavg
 
 results:
-    result_path: results/BYOL_CIFAR10_resnet18_pureMLP
+    result_path: results/BYOL_CIFAR10_central_resnet18_pureMLP
