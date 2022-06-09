@@ -15,20 +15,26 @@ class DataSource(base.DataSource):
         super().__init__()
         _path = Config().params['data_path']
 
-        _transform = transforms.Compose([
+        train_transform = transforms.Compose([
             transforms.RandomHorizontalFlip(),
             transforms.RandomCrop(32, 4),
             transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ])
+
+        test_transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        ])
+
         self.trainset = datasets.CIFAR10(root=_path,
                                          train=True,
                                          download=True,
-                                         transform=_transform)
+                                         transform=train_transform)
         self.testset = datasets.CIFAR10(root=_path,
                                         train=False,
                                         download=True,
-                                        transform=_transform)
+                                        transform=test_transform)
 
     def num_train_examples(self):
         return 50000
