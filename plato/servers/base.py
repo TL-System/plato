@@ -98,6 +98,18 @@ class Server:
         # Accumulated communication overhead (MB) throughout the FL training session
         self.comm_overhead = 0
 
+        # Downlink and uplink bandwidth (MBps)
+        # for computing communication time in communication simulation mode
+        self.downlink_bandwidth = Config(
+        ).server.downlink_bandwidth if hasattr(Config().server,
+                                               'downlink_bandwidth') else 1
+        self.uplink_bandwidth = Config().server.uplink_bandwidth if hasattr(
+            Config().server, 'uplink_bandwidth') else 1
+
+        # Use dictionaries to record downlink/uplink communication time of each client
+        self.downlink_comm_time = {}
+        self.uplink_comm_time = {}
+
         # States that need to be maintained for asynchronous FL
 
         # sids that are currently in use
@@ -521,6 +533,12 @@ class Server:
 
                     self.comm_overhead += payload_size
 
+                    # Compute the communication time to transfer the current global model to client
+                    self.downlink_comm_time[
+                        self.selected_client_id] = payload_size / (
+                            self.downlink_bandwidth /
+                            len(self.selected_clients))
+
                 server_response = await self.customize_server_response(
                     server_response)
 
@@ -662,6 +680,9 @@ class Server:
 
             self.comm_overhead += payload_size
 
+            self.uplink_comm_time[
+                client_id] = payload_size / self.uplink_bandwidth
+
             await self.process_client_info(client_id, sid)
 
     async def client_chunk_arrived(self, sid, data) -> None:
@@ -716,7 +737,12 @@ class Server:
             self.client_payload[sid])
 
         if self.comm_simulation:
-            self.reports[sid].comm_time = 0
+            if hasattr(Config().clients, 'compute_comm_time') and Config(
+            ).clients.compute_comm_time:
+                self.reports[sid].comm_time = self.downlink_comm_time[
+                    client_id] + self.uplink_comm_time[client_id]
+            else:
+                self.reports[sid].comm_time = 0
         else:
             self.reports[sid].comm_time = time.time(
             ) - self.reports[sid].comm_time
