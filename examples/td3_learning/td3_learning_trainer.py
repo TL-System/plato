@@ -239,29 +239,42 @@ class Trainer(basic.Trainer):
         """Loading pre-trained model weights from a file."""
         model_path = Config(
         ).params['model_path'] if location is None else location
-        model_name = Config().trainer.model_name
+        actor_model_name = 'actor_model'
+        critic_model_name = 'critic_model'
+        actor_target_model_name = 'actor_target_model'
+        critic_target_model_name = 'critic_target_model'
 
         if filename is not None:
-            model_path = f'{model_path}/{filename}'
+            actor_filename = filename + '_actor'
+            actor_model_path = f'{model_path}/{actor_filename}'
+            critic_filename = filename + '_critic'
+            critic_model_path = f'{model_path}/{critic_filename}'
+            actor_target_filename = filename + '_actor_target'
+            actor_target_model_path = f'{model_path}/{actor_target_filename}'
+            critic_target_filename = filename + '_critic_target'
+            critic_target_model_path = f'{model_path}/{critic_target_filename}'
         else:
-            model_path = f'{model_path}/{model_name}.pth'
+            actor_model_path = f'{model_path}/{actor_model_name}.pth'
+            critic_model_path = f'{model_path}/{critic_model_name}.pth'
+            actor_target_model_path = f'{model_path}/{actor_target_model_name}.pth'
+            critic_target_model_path = f'{model_path}/{critic_target_model_name}.pth'
 
         if self.client_id == 0:
-            logging.info("[Server #%d] Loading a model from %s.", os.getpid(),
-                         model_path)
+            logging.info("[Server #%d] Loading models from %s, %s, %s and %s.", os.getpid(),
+                         actor_model_path, critic_model_path, actor_target_model_path, critic_target_model_path)
         else:
-            logging.info("[Client #%d] Loading a model from %s.",
-                         self.client_id, model_path)
+            logging.info("[Client #%d] Loading a model from %s, %s, %s and %s.",
+                         self.client_id, actor_model_path, critic_model_path, actor_target_model_path, critic_target_model_path)
 
         print("in line 251 of trainer")
         #self.model.load_state_dict(torch.load(model_path), strict=True)
-        self.actor.load_state_dict(torch.load(model_path), strict=True)
+        self.actor.load_state_dict(torch.load(actor_model_path), strict=True)
 
-        self.critic.load_state_dict(torch.load(model_path), strict=True)
+        self.critic.load_state_dict(torch.load(critic_model_path), strict=True)
 
-        self.actor_target.load_state_dict(torch.load(model_path), strict=True)
+        self.actor_target.load_state_dict(torch.load(actor_target_model_path), strict=True)
 
-        self.critic_target.load_state_dict(torch.load(model_path), strict=True)
+        self.critic_target.load_state_dict(torch.load(critic_target_model_path), strict=True)
 
     def save_model(self, filename=None, location=None):
         """Saving the model to a file."""
@@ -318,6 +331,7 @@ class Trainer(basic.Trainer):
         else:
             logging.info("[Client #%d] Model saved to %s.", self.client_id,
                          model_path)
+
 
 
 
