@@ -17,8 +17,11 @@ class TD3Actor(nn.Module):
     def __init__(self, state_dim, action_dim, max_action):
         super(TD3Actor, self).__init__()
         self.l1 = nn.Linear(state_dim, 400)
+        nn.init.uniform_(self.l1.weight.data)
         self.l2 = nn.Linear(400, 300)
+        nn.init.uniform_(self.l2.weight.data)
         self.l3 = nn.Linear(300, action_dim)
+        nn.init.uniform_(self.l3.weight.data)
         self.max_action = max_action
 
     def forward(self, x, hidden=None):
