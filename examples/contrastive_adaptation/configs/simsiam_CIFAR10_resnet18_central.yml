@@ -15,10 +15,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 5
+    total_clients: 1
 
     # The number of clients selected in each round
-    per_round: 3
+    per_round: 1
 
     # whether perform the eval test at the final round
     # on all clients
@@ -58,8 +58,8 @@ server:
     #   CIFAR10           : The CIFAR10 dataset
     #   resnet18  : The encoder follows a implement of central SimSiam
     #   pureMLP         : The pure MLP network (1 layer without any enhancements)
-    model_path: models/SimSiam_CIFAR10_resnet18_pureMLP
-    checkpoint_path: checkpoints/SimSiam_CIFAR10_resnet18_pureMLP
+    model_path: models/SimSiam_CIFAR10_central_resnet18_pureMLP
+    checkpoint_path: checkpoints/SimSiam_CIFAR10_central_resnet18_pureMLP
 
 data:
     # The training and testing dataset
@@ -104,7 +104,7 @@ trainer:
     # The type of the trainer
     type: basic
     # The maximum number of training rounds
-    rounds: 10
+    rounds: 1
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -119,7 +119,7 @@ trainer:
     #   The user is expected to carefully choose the batch_size to avoid
     # the memory allocation issue as the contrastive samples occupy more
     # space as more samples will be contained within one loading.
-    epochs: 2
+    epochs: 100
     batch_size: 128
     optimizer: Adam
     learning_rate: 0.003
@@ -139,7 +139,7 @@ trainer:
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
     # does not utilize the
-    pers_epochs: 10
+    pers_epochs: 100
     pers_batch_size: 64
     pers_optimizer: Adam
     pers_learning_rate: 0.005
@@ -197,4 +197,4 @@ algorithm:
     type: fedavg
 
 results:
-    result_path: results/SimSiam_CIFAR10_resnet18_pureMLP
+    result_path: results/SimSiam_CIFAR10_central_resnet18_pureMLP
