@@ -165,13 +165,14 @@ class Server(fedavg.Server):
         self.write_history(num_images, history)
 
         # Save the tensors into a .pt file
+        tensor_file_path = f"{dlg_result_path}/{os.getpid()}_tensors.pt"
         torch.save(
             {
                 i * log_interval:
                 {j: history[i][j][2]
                  for j in range(num_images)}
                 for i in range(len(history))
-            }, "tensor.pt")
+            }, tensor_file_path)
 
         logging.info("Attack complete")
 
