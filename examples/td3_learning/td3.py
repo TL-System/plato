@@ -23,9 +23,10 @@ def main():
     """ A Plato federated learning training session using a custom model. """
 
     model = td3_learning_model.Model(globals.state_dim, globals.action_dim, globals.max_action)
-    trainer = td3_learning_trainer.Trainer(globals.state_dim, globals.action_dim, globals.max_action, model)
+    trainer = td3_learning_trainer.Trainer
     algorithm = td3_learning_algorithm.Algorithm
     client = td3_learning_client.RLClient(model = model, trainer=trainer, algorithm = algorithm)
+    client.configure()
     server = td3_learning_server.TD3Server(model=model, algorithm = algorithm)
 
     server.run(client)

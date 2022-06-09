@@ -21,14 +21,20 @@ from plato.models import registry as models_registry
 from plato.trainers import basic
 from plato.utils import optimizers
 
+import td3_learning_client as client
+
+file_name = "TD3_RL"
+models_dir = "./pytorch_models"
+results_dir = "./results"
+
 class Trainer(basic.Trainer):
-    def __init__(self, state_dim, action_dim, max_action=None, model=None):
+    def __init__(self, model=None):
         #super().__init__(state_dim, action_dim, max_action, model)
-        super().__init__(model=model)
+        super().__init__()
         self.env = globals.env
         #Create actor and critic
         #Could have used the base class given's but for convenient sake we declare our own
-        self.max_action = max_action            
+        self.max_action = globals.max_action            
         self.model = model
         self.actor = self.model.actor
         self.critic = self.model.critic
@@ -43,12 +49,26 @@ class Trainer(basic.Trainer):
 
         #replay buffer initialization
         self.replay_buffer = base.ReplayMemory(
-            state_dim, action_dim, 
+            globals.state_dim, globals.action_dim, 
             Config().algorithm.replay_size, 
             Config().algorithm.replay_seed)
         
         self.policy_noise = Config().algorithm.policy_noise * self.max_action
         self.noise_clip = Config().algorithm.noise_clip * self.max_action
+
+        self.env = globals.env
+        self.evaluations = []
+        
+        if not os.path.exists(results_dir):
+            os.makedirs(results_dir)
+        if Config().algorithm.save_models and not os.path.exists(models_dir):
+            os.makedirs(models_dir)
+
+        self.timesteps_since_eval = 0
+        self.episode_num = 0
+        self.total_timesteps = 0
+        self.done = True
+
 
     def select_action(self, state):
         """Select action from policy"""
@@ -62,9 +82,86 @@ class Trainer(basic.Trainer):
             self.replay_buffer.push(transition)
 
 
-    def train_loop(self, config, trainset, sampler, cut_layer):
-        """Training"""
+    def train_model(self, config, trainset, sampler, cut_layer):
+        """Main Training"""
+        print("in line 87 of td3_learning_trainer!")
+        episode_reward = 0
+        episode_timesteps = 0 #fixing error about using before assignment
+        obs = 0 #fixing error about using before assignment
+        round_episode_steps = 0
+        if self.total_timesteps > Config().algorithm.max_steps:
+            # TODO: when max number of steps is hit, we should stop training and terminate the process. How?
+            print("Done training")
+            return
+        while round_episode_steps < globals.max_episode_steps:
+            print("in while loop line 97")
+            #If episode is done
+            if self.done:
+                #if not at beginning
+                if self.total_timesteps != 0:
+                    logging.info("Total Timesteps: {} Episode Num: {} Reward: {}".format(self.total_timesteps, self.episode_num, episode_reward))
+                    #train here call td3_trainer
+                    self.train_helper()
 
+                #evaluate episode and save policy
+                if self.timesteps_since_eval >= Config().algorithm.policy_freq:
+                    self.timesteps_since_eval %= Config().algorithm.policy_freq
+                    self.evaluations.append(client.evaluate_policy(self, self.env))
+                    np.save("./results/%s" % (file_name), self.evaluations)
+                
+                #When the training step is done, we reset the state of the env
+                obs = self.env.reset()
+
+                #Set done to false
+                self.done = False
+
+                # Set rewards and episode timesteps to zero
+                episode_reward = 0
+                episode_timesteps = 0
+                self.episode_num += 1
+            
+            #Before the number of specified timesteps from config file we sample random actions
+            if self.total_timesteps < Config().algorithm.start_steps:
+                action = self.env.action_space.sample()
+            else: #after we pass the threshold we switch model
+                action = self.select_action(np.array(obs))
+
+                #if not 0 we add noise
+                if Config().algorithm.expl_noise != 0:
+                    expl_noise = Config().algorithm.expl_noise
+                    action = (action+np.random.normal(0, expl_noise, size = self.env.action_space.shape[0])).clip(
+                        self.env.action_space.low, self.env.action_space.high
+                    )
+
+            #performs action in environment, then reaches next state and receives the reward
+            new_obs, reward, self.done, _ = self.env.step(action)
+            #print(reward)
+
+            #is episode done?
+            done_bool = 0 if episode_timesteps + 1 == self.env._max_episode_steps else float(self.done)
+            
+            #update total reward
+            episode_reward += reward
+           
+            #add to replay buffer in this order due to push method in replay buffer
+            new = (obs, action, reward, new_obs, done_bool)
+            self.add(new)
+
+            #Update state, episode time_step, total timesteps, and timesteps since last eval
+            obs = new_obs
+            episode_timesteps += 1
+            self.total_timesteps += 1
+            round_episode_steps += 1
+            self.timesteps_since_eval += 1
+        
+        #Add the last policy evaluation to our list of evaluations and save evaluations
+        self.evaluations.append(client.evaluate_policy(self, self.env))
+        np.save("./results/%s" % (file_name), self.evaluations)
+
+
+    def train_helper(self):
+        """Training Loop"""
+        print("line 165 in td3_learning_trainer")
         for it in range(Config().algorithm.iterations):
 
             #sample from replay buffer
@@ -128,7 +225,8 @@ class Trainer(basic.Trainer):
                                             (1 - Config().algorithm.tau) *
                                             target_param.data)
 
-        print("one client update done")    
+        print("one client update done") 
+
                 
             
     def load_model(self, filename=None, location=None):
@@ -158,6 +256,10 @@ class Trainer(basic.Trainer):
         self.actor_target.load_state_dict(torch.load(model_path), strict=True)
 
         self.critic_target.load_state_dict(torch.load(model_path), strict=True)
+
+    def save_model(self, filename=None, location=None):
+        print("line 261 of trainer of save model")
+
 
 
 
