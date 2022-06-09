@@ -42,6 +42,14 @@ tt = transforms.ToPILImage()
 loss_fn = lpips.LPIPS(net='vgg')
 torch.manual_seed(Config().algorithm.random_seed)
 
+dlg_result_path = f"{Config().params['result_path']}"
+dlg_result_file = f"{dlg_result_path}/{os.getpid()}_evals.csv"
+dlg_result_headers = [
+    "Iteration", "Loss", "Average MSE", "Average LPIPS"
+]
+csv_processor.initialize_csv(dlg_result_file, dlg_result_headers,
+                             dlg_result_path)
+
 
 class Server(fedavg.Server):
     """ An honest-but-curious federated learning server with gradient leakage attack. """
@@ -64,14 +72,6 @@ class Server(fedavg.Server):
 
     def deep_leakage_from_gradients(self, updates):
         """ Analyze periodic gradients from certain clients. """
-        dlg_result_path = f"{Config().params['result_path']}"
-        dlg_result_file = f"{dlg_result_path}/{os.getpid()}_evals.csv"
-        dlg_result_headers = [
-            "Iteration", "Loss", "Average MSE", "Average LPIPS"
-        ]
-        csv_processor.initialize_csv(dlg_result_file, dlg_result_headers,
-                                     dlg_result_path)
-
         # Process data from the victim client
         __, __, payload, __ = updates[Config().algorithm.victim_client]
         # The ground truth should be used only for evaluation
@@ -79,8 +79,9 @@ class Server(fedavg.Server):
         target_weight = payload[0]
 
         # Assume the reconstructed data shape is known, which can be also derived from the target dataset
-        data_size = gt_data.shape
-        num_images = data_size[0]
+        num_images = Config().data.partition_size
+        data_size = [num_images, gt_data.shape[1],
+                     gt_data.shape[2], gt_data.shape[3]]
         self.plot_gt(num_images, gt_data, gt_label)
 
         if not (hasattr(Config().algorithm, 'share_gradients') and Config().algorithm.share_gradients) and \
