@@ -44,6 +44,7 @@ tt = transforms.ToPILImage()
 loss_fn = lpips.LPIPS(net='vgg')
 torch.manual_seed(Config().algorithm.random_seed)
 
+num_iters = Config().algorithm.num_iters
 log_interval = Config().algorithm.log_interval
 dlg_result_path = f"{Config().params['result_path']}"
 dlg_result_file = f"{dlg_result_path}/{os.getpid()}_evals.csv"
@@ -65,6 +66,12 @@ class Server(fedavg.Server):
                 self.attack_method = Config().algorithm.attack_method
             else:
                 sys.exit('Error: Unknown attack method.')
+        self.share_gradients = True
+        if hasattr(Config().algorithm, 'share_gradients') and not Config().algorithm.share_gradients:
+            self.share_gradients = False
+        self.match_weight = False
+        if hasattr(Config().algorithm, 'match_weight') and Config().algorithm.match_weight:
+            self.match_weight = True
 
     async def process_reports(self):
         """ Process the client reports: before aggregating their weights,
@@ -93,8 +100,7 @@ class Server(fedavg.Server):
                      gt_data.shape[2], gt_data.shape[3]]
         self.plot_gt(num_images, gt_data, gt_label)
 
-        if not (hasattr(Config().algorithm, 'share_gradients') and Config().algorithm.share_gradients) and \
-                not (hasattr(Config().algorithm, 'match_weight') and Config().algorithm.match_weight):
+        if not self.share_gradients and not self.match_weight:
             # Obtain the local updates from clients
             deltas_received = self.compute_weight_deltas(updates)
             target_grad = []
@@ -130,8 +136,7 @@ class Server(fedavg.Server):
         history, losses, mses, avg_mses, lpipss, avg_lpips = [], [], [], [], [], []
 
         # Conduct gradients/weights/updates matching
-        if not (hasattr(Config().algorithm, 'share_gradients') and Config().algorithm.share_gradients) \
-                and hasattr(Config().algorithm, 'match_weight') and Config().algorithm.match_weight:
+        if not self.share_gradients and self.match_weight:
             model = deepcopy(self.trainer.model)
             closure = self.weight_closure(match_optimizer, dummy_data,
                                           dummy_label, target_weight, model)
@@ -139,7 +144,7 @@ class Server(fedavg.Server):
             closure = self.gradient_closure(match_optimizer, dummy_data,
                                             dummy_label, est_label, target_grad)
 
-        for iters in range(Config().algorithm.num_iters):
+        for iters in range(num_iters):
             match_optimizer.step(closure)
             current_loss = closure().item()
             losses.append(current_loss)
@@ -202,7 +207,6 @@ class Server(fedavg.Server):
 
         def closure():
             match_optimizer.zero_grad()
-            # self.trainer.model.zero_grad()
             dummy_pred = self.trainer.model(dummy_data)
             dummy_onehot_label = F.softmax(dummy_label, dim=-1)
             if self.attack_method == 'DLG':
@@ -256,12 +260,12 @@ class Server(fedavg.Server):
         #         print("before loss steps", param.data[0])
         #         break
 
+        # TODO: another parameter local steps instead of epoch here
         for epoch in range(epochs):
             if batch_size == 1:
                 dummy_pred = model(dummy_data)
                 labels_ = dummy_label
             else:
-                # TODO: local steps vs. epochs
                 idx = epoch % (dummy_data.shape[0] // batch_size)
                 dummy_pred = model(dummy_data[idx * batch_size:(idx + 1) *
                                               batch_size])
@@ -285,7 +289,6 @@ class Server(fedavg.Server):
 
     @staticmethod
     def reconstruction_costs(dummy, target):
-        # TODO: various indices, weights?
         indices = torch.arange(len(target))
         cost_fn = Config().algorithm.cost_fn
 
@@ -305,10 +308,8 @@ class Server(fedavg.Server):
                     pnorm[0] += trial[i].pow(2).sum()
                     pnorm[1] += target[i].pow(2).sum()
                 elif cost_fn == 'simlocal':
-                    costs += 1 - torch.nn.functional.cosine_similarity(trial[i].flatten(),
-                                                                       target[i].flatten(
-                    ),
-                        0, 1e-10)
+                    costs += 1 - torch.nn.functional.cosine_similarity(
+                        trial[i].flatten(), target[i].flatten(), 0, 1e-10)
             if cost_fn == 'sim':
                 costs = 1 + costs / pnorm[0].sqrt() / pnorm[1].sqrt()
 
@@ -343,14 +344,13 @@ class Server(fedavg.Server):
         rows = math.ceil(len(history) / 2)
         outer = gridspec.GridSpec(rows, 2, wspace=0.2, hspace=0.2)
 
-        for i in range(Config().algorithm.num_iters //
-                       Config().algorithm.log_interval):
+        for i in range(num_iters // log_interval):
             inner = gridspec.GridSpecFromSubplotSpec(1,
                                                      num_images,
                                                      subplot_spec=outer[i])
             outerplot = plt.Subplot(fig, outer[i])
             outerplot.set_title("Iter=%d" %
-                                (i * Config().algorithm.log_interval))
+                                (i * log_interval))
             outerplot.axis('off')
             fig.add_subplot(outerplot)
 
