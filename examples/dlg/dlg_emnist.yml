@@ -8,13 +8,13 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    random_seed: 20
+    random_seed: 1
 
 server:
     address: 127.0.0.1
     port: 8000
 
-    random_seed: 20
+    random_seed: 1
 
 data:
     # The training and testing dataset
@@ -30,7 +30,7 @@ data:
     concentration: 1
 
     # The random seed for sampling data
-    random_seed: 20
+    random_seed: 1
 
 trainer:
     # The maximum number of training rounds
@@ -58,14 +58,24 @@ algorithm:
     # Aggregation algorithm
     type: fedavg
 
-    # DLG related
-    # Resconstruct data from the model and gradients 
+    ## Data reconstruction related configurations
+    # Choose from DLG (default), iDLG, csDLG
+    attack_method: DLG
+    # For calculating the loss between dummy and target gradients/updates
+    # Choose from l2, l1, max, sim, simlocal
+    cost_fn: l2
+    # Weight for adding total data variation to the loss
+    total_variation: 0
+    # Learning rate of the optimizer to reconstruct data
+    lr: 1
+
     # in a particular communication round (starting from 1)
     attack_round: 1
     # One particular client, e.g., the first selected client
     victim_client: 0
-    num_iters: 4000
-    log_interval: 400
+    num_iters: 20
+    log_interval: 1
+
     # Whether or not use customized initialization for model weights
     init_params: true
     # Whether sharing gradients or model weights
@@ -73,8 +83,9 @@ algorithm:
     # Do reconstruction by directly matching updates when it's true,
     # otherwise by matching gradients calculated from updates
     match_weight: true
+
     # The random seed for dummy data and label
-    random_seed: 20
+    random_seed: 1
 
 results:
     result_path: results/EMNIST_lenet5/DLG
