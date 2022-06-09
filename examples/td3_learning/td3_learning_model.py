@@ -78,7 +78,17 @@ class Model:
         self.critic.cpu()
         self.actor_target.cpu()
         self.critic_target.cpu()
-        
+
+    def to(self, device):
+        self.actor.to(device)
+        self.critic.to(device)
+        self.actor_target.to(device)
+        self.critic_target.to(device)
+
+
+    #TODO IMPLEMENT EVAL!!!
+    
+
     @staticmethod
     def get_model(*args):
         """ Obtaining an instance of this model. """
