@@ -152,6 +152,18 @@ class Model():
                     dropout_ratios=[0, 0, 0],
                 ))
 
+        if model_type == 'simsiam_prediction_mlp':
+            return build_mlp_from_config(
+                dict(
+                    type='FullyConnectedHead',
+                    output_dim=Config.trainer.prediction_dim,
+                    input_dim=input_dim,
+                    hidden_layers_dim=[512],
+                    batch_norms=["default", None],
+                    activations=["relu", None],
+                    dropout_ratios=[0, 0],
+                ))
+
         if model_type == 'byol_prediction_mlp':
             return build_mlp_from_config(
                 dict(

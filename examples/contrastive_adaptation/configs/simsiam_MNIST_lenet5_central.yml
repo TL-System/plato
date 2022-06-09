@@ -1,0 +1,202 @@
+
+# For the central learning of SimSiam on the MNIST datase,
+
+general:
+    # The prefix of directories of dataset, models, checkpoints, and results
+    # on sim server
+    # base_path: /data/user/Projects/experiments
+
+    # locally
+    base_path: ./Projects/experiments
+
+
+clients:
+    # Type
+    type: simple
+
+    # The total number of clients
+    total_clients: 1
+
+    # The number of clients selected in each round
+    per_round: 1
+
+    # whether perform the eval test at the final round
+    # on all clients
+    do_final_eval_test: True
+
+    # Should the clients compute test accuracy locally?
+    do_test: True
+
+    # Minotor the self-supervised learning by knn for
+    # every 1 round
+    test_interval: 1
+
+    # Train the personalized model based on the
+    # learned representation every 1 rounds
+    eval_test_interval: 2
+
+    # Whether simulate clients or not
+    simulation: true
+
+    random_seed: 1
+
+server:
+    address: 127.0.0.1
+    port: 8000
+    synchronous: true
+    do_test: false
+
+    # for the models/checkpoints/results path, please keep their dir's
+    # name the same
+    # For example, the subdir name of model_path is
+    # 'SimSiam_MNIST_centralEncoder_pureMLP', it is desired to use the same name
+    # for checkpoint_path and result_path.
+
+    # Note, for the name of this subdir, it is desired to follow the same
+    # rule as:
+    # {ssl_method_name}_{dataset_name}_{encoder_backbone_name}_{personalized_model_name}
+    # For example, for the name here, it uses
+    #   SimSiam          : The SimSiam method
+    #   MNIST           : The MNIST dataset
+    #   centralEncoder  : The encoder follows a implement of central SimSiam
+    #   pureMLP         : The pure MLP network (1 layer without any enhancements)
+    model_path: models/SimSiam_MNIST_centralEncoder_pureMLP
+    checkpoint_path: checkpoints/SimSiam_MNIST_centralEncoder_pureMLP
+
+data:
+    # The training and testing dataset
+    datasource: MNIST
+
+    # Number of samples in each partition
+    #
+    # This is one important parameter that
+    # may lead the failure of the loss criterion part
+    # if your loss criterion relies on the batch_size
+    # as its argument. For example, the NT_Xent loss utilized
+    # by the BYOL method set the defined batch_size as the parameter.
+    # However, at the end of one epoch, the left samples may smaller than
+    # the batch_size. This makes the #loaded samples != batch_size.
+    # Working on criterion that is defined with batch_size but receives loaded
+    # samples whose size is smaller than the batch size may causes problems.
+    # drop_last can alleviate this issue
+    partition_size: 60000
+
+    # IID or non-IID?
+    sampler: iid
+    testset_sampler: iid
+    # The concentration parameter for the Dirichlet distribution
+    concentration: 5
+
+    # The random seed for sampling data
+    random_seed: 1
+
+    # set the data wrapper to further process the data
+    #   for the specific usage, such as constrastive learning
+    # data_wrapper: Null
+    data_wrapper: ContrastiveAugmentWrapper
+
+    # set the data augmentation
+    #   options: simsiam, byol, simclr
+    augment_transformer_name: simsiam
+    # some methods apply the normalization to samples
+    #   while others do not
+    is_norm: True
+
+trainer:
+    # The type of the trainer
+    type: basic
+    # The maximum number of training rounds
+    rounds: 1
+
+    # Whether the training should use multiple GPUs if available
+    parallelized: false
+
+    # The maximum number of clients running concurrently
+    max_concurrency: 10
+
+    # The target accuracy
+    target_accuracy: 0.98
+
+    # Number of epochs for local training in each communication round
+    #   The user is expected to carefully choose the batch_size to avoid
+    # the memory allocation issue as the contrastive samples occupy more
+    # space as more samples will be contained within one loading.
+    epochs: 50
+    batch_size: 128
+    optimizer: Adam
+    learning_rate: 0.003
+    betas:
+      - 0.9
+      - 0.999
+    eps: 0.00000008 # 1e-8
+    weight_decay: 0.001
+
+    lr_scheduler: StepLR
+    lr_step_size: 20
+    lr_gamma: 0.9
+
+    epoch_log_interval: 2
+    batch_log_interval: 1
+
+    # Number of epochs for local training in each communication round
+    #   The batch size for the downstream task can be larger as it
+    # does not utilize the
+    pers_epochs: 100
+    pers_batch_size: 64
+    pers_optimizer: Adam
+    pers_learning_rate: 0.005
+    pers_betas:
+        - 0.9
+        - 0.99
+    pers_eps: 0.00000009 # 1e-8
+    pers_weight_decay: 0.002
+
+    # currently, we only support CosineAnnealingLR
+    pers_lr_schedule: StepLR
+    pers_lr_step_size: 20
+    pers_lr_gamma: 0.9
+
+    pers_epoch_log_interval: 2
+    # temperature
+    temperature: 0.5
+
+    # image_size
+    #  - CIFAR10 (Image size=32)
+    #  - MNIST (Image size=28)
+    image_size: 28
+
+    # The machine learning model,
+    # it behaves as the encoder for the ssl method
+    # the final fc layer will be removed
+    # however, in the central test, we do not use this
+    #   but use the custom model
+    model_name: lenet5
+    # in general, the projection_dim = prediction_dim
+    projection_dim: 512
+    prediction_dim: 512
+    # here are two ways to determine this decay
+    # - constant value: 0.99
+    # - adaptive computed with traing epochs.
+    #   such as the one in "three-method" implementation
+    onlient_target_moving_average_decay: 0.99
+
+    # set which part of the model is used as the global model
+    # - whole: the whole model
+    # - online_embedder: the online_embedder is exchanged
+    # - target_embedder: the target_embedder is exchanged
+    global_model_name: whole
+    personalized_model_name: pure_one_layer_mlp
+
+    monitor_name: knn
+    knn_k: 200
+    knn_t: 0.1
+    hide_monitor_progress: False
+
+    num_classes: 10
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg
+
+results:
+    result_path: results/SimSiam_MNIST_centralEncoder_pureMLP
