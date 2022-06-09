@@ -36,24 +36,26 @@ class RLClient(simple.Client):
         print("we are in line 35 of td3_client") 
         report, weights = await super().train()
         print("line 37 in td3 client is exectued")
-        return Report(report.num_samples, report.accuracy, report.training_time, report.comm_time, report.update_response), weights
+        return Report(report.num_samples, report.accuracy, report.training_time, report.comm_time, report.update_response, self.client_id), weights
 
 
 #implement load model stuff!
+
+#TODO WHY IS ACTION THE SAME??
 
 def evaluate_policy(trainer, env, eval_episodes = 10):
         avg_reward = 0
         for i in range(eval_episodes):
             obs = env.reset()
-            print("obs in 129 in client evaluate policy", obs)
+            #print("obs in 129 in client evaluate policy", obs)
             done = False
             step_num = 0
             while not done:
                 action = trainer.select_action(np.array(obs))
-                print("episode num i", i)
-                print("step num", step_num)
-                print("action in 135 in eval policy in client", action)
-                print("obs in 136 in eval policy in client", np.array(obs))
+                #print("episode num i", i)
+                #print("step num", step_num)
+                #print("action in 135 in eval policy in client", action)
+                #print("obs in 136 in eval policy in client", np.array(obs))
                 obs, reward, done, _ = env.step(action)
                 step_num += 1
                 avg_reward += reward
