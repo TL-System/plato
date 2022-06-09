@@ -37,7 +37,8 @@ else:
         hybrid,
         efficientnet,
         regnet,
-        dcgan
+        dcgan,
+        multilayer,
     )
     registered_models = OrderedDict([
         ('lenet5', lenet5.Model),
@@ -54,6 +55,7 @@ else:
         ('efficientnet', efficientnet.Model),
         ('regnet', regnet.Model),
         ('dcgan', dcgan.Model),
+        ('multilayer', multilayer.Model),
     ])
 
 
