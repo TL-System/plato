@@ -80,6 +80,7 @@ class Server(fedavg.Server):
                 target_grad.append(-delta / Config().trainer.learning_rate)
 
         num_images = Config().data.partition_size
+        log_interval = Config().algorithm.log_interval
 
         dlg_result_path = f"{Config().params['result_path']}"
         dlg_result_file = f"{dlg_result_path}/{os.getpid()}_evals.csv"
@@ -144,7 +145,7 @@ class Server(fedavg.Server):
             avg_mses.append(mean(mses[iters]))
             avg_lpips.append(mean(lpipss[iters]))
 
-            if iters % Config().algorithm.log_interval == 0:
+            if iters % log_interval == 0:
                 logging.info(
                     "[Gradient Leakage Attacking...] Iter %d: Loss = %.10f, avg MSE = %.8f, avg LPIPS = %.8f",
                     iters, losses[-1], avg_mses[-1], avg_lpips[-1])
@@ -162,6 +163,15 @@ class Server(fedavg.Server):
         self.plot_reconstructed(num_images, history)
 
         self.write_history(num_images, history)
+
+        # Save the tensors into a .pt file
+        torch.save(
+            {
+                i * log_interval:
+                {j: history[i][j][2]
+                 for j in range(num_images)}
+                for i in range(len(history))
+            }, "tensor.pt")
 
         logging.info("Attack complete")
 
