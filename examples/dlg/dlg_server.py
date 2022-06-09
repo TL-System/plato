@@ -64,11 +64,24 @@ class Server(fedavg.Server):
 
     def deep_leakage_from_gradients(self, updates):
         """ Analyze periodic gradients from certain clients. """
+        dlg_result_path = f"{Config().params['result_path']}"
+        dlg_result_file = f"{dlg_result_path}/{os.getpid()}_evals.csv"
+        dlg_result_headers = [
+            "Iteration", "Loss", "Average MSE", "Average LPIPS"
+        ]
+        csv_processor.initialize_csv(dlg_result_file, dlg_result_headers,
+                                     dlg_result_path)
+
+        # Process data from the victim client
         __, __, payload, __ = updates[Config().algorithm.victim_client]
-        # Receive the ground truth for evaluation
-        # It will not be used for data reconstruction
+        # The ground truth should be used only for evaluation
         gt_data, gt_label, target_grad = payload[1]
         target_weight = payload[0]
+
+        # Assume the reconstructed data shape is known, which can be also derived from the target dataset
+        data_size = gt_data.shape
+        num_images = data_size[0]
+        self.plot_gt(num_images, gt_data, gt_label)
 
         if not (hasattr(Config().algorithm, 'share_gradients') and Config().algorithm.share_gradients) and \
                 not (hasattr(Config().algorithm, 'match_weight') and Config().algorithm.match_weight):
@@ -79,25 +92,7 @@ class Server(fedavg.Server):
                     Config().algorithm.victim_client].values():
                 target_grad.append(-delta / Config().trainer.learning_rate)
 
-        num_images = Config().data.partition_size
-
-        dlg_result_path = f"{Config().params['result_path']}"
-        dlg_result_file = f"{dlg_result_path}/{os.getpid()}_evals.csv"
-        dlg_result_headers = [
-            "Iteration", "Loss", "Average MSE", "Average LPIPS"
-        ]
-        csv_processor.initialize_csv(dlg_result_file, dlg_result_headers,
-                                     dlg_result_path)
-
-        self.plot_gt(num_images, gt_data, gt_label)
-
         # Generate dummy items
-        data_size = self.testset.data[0].shape
-        if len(data_size) == 2:
-            data_size = (num_images, 1, data_size[0], data_size[1])
-        else:
-            data_size = (num_images, data_size[2], data_size[0], data_size[1])
-
         dummy_data = torch.randn(data_size).to(
             Config().device()).requires_grad_(True)
 
@@ -112,13 +107,12 @@ class Server(fedavg.Server):
 
         history, losses, mses, avg_mses, lpipss, avg_lpips = [], [], [], [], [], []
 
-        # Sharing and matching updates
+        # Conduct gradients/weights/updates matching
         if not (hasattr(Config().algorithm, 'share_gradients') and Config().algorithm.share_gradients) \
                 and hasattr(Config().algorithm, 'match_weight') and Config().algorithm.match_weight:
             model = deepcopy(self.trainer.model)
             closure = self.weight_closure(match_optimizer, dummy_data,
                                           dummy_label, target_weight, model)
-        # Matching gradients
         else:
             closure = self.gradient_closure(match_optimizer, dummy_data,
                                             dummy_label, target_grad)
@@ -190,7 +184,7 @@ class Server(fedavg.Server):
 
     def weight_closure(self, match_optimizer, dummy_data, dummy_label,
                        target_weight, model):
-        """ Take a step to match the model weights. """
+        """ Take a step to match the weights. """
 
         def closure():
             match_optimizer.zero_grad()
@@ -252,7 +246,7 @@ class Server(fedavg.Server):
 
     @staticmethod
     def plot_gt(num_images, gt_data, gt_label):
-        """ Plot ground truth data """
+        """ Plot ground truth data. """
         gt_result_path = f"{Config().params['result_path']}/{os.getpid()}_gt.png"
         gt_figure = plt.figure(figsize=(12, 4))
 
