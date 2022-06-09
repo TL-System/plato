@@ -12,3 +12,10 @@ def label_to_onehot(target, num_classes=10):
 
 def cross_entropy_for_onehot(pred, target):
     return torch.mean(torch.sum(- target * F.log_softmax(pred, dim=-1), 1))
+
+
+def total_variation(x):
+    """Anisotropic TV."""
+    dx = torch.mean(torch.abs(x[:, :, :, :-1] - x[:, :, :, 1:]))
+    dy = torch.mean(torch.abs(x[:, :, :-1, :] - x[:, :, 1:, :]))
+    return dx + dy

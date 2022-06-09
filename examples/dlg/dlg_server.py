@@ -17,10 +17,10 @@ in Advances in Neural Information Processing Systems 2020.
 
 https://proceedings.neurips.cc/paper/2020/file/c4ede56bbd98819ae6112b20ac6bf145-Paper.pdf
 """
-
 import logging
 import math
 import os
+import sys
 from collections import OrderedDict
 from copy import deepcopy
 from statistics import mean
@@ -37,10 +37,21 @@ from torchvision import transforms
 
 from utils.modules import MetaMonkey
 from utils.utils import cross_entropy_for_onehot
+from utils.utils import total_variation as TV
 
+cross_entropy = torch.nn.CrossEntropyLoss()
 tt = transforms.ToPILImage()
 loss_fn = lpips.LPIPS(net='vgg')
 torch.manual_seed(Config().algorithm.random_seed)
+
+log_interval = Config().algorithm.log_interval
+dlg_result_path = f"{Config().params['result_path']}"
+dlg_result_file = f"{dlg_result_path}/{os.getpid()}_evals.csv"
+dlg_result_headers = [
+    "Iteration", "Loss", "Average MSE", "Average LPIPS"
+]
+csv_processor.initialize_csv(dlg_result_file, dlg_result_headers,
+                             dlg_result_path)
 
 
 class Server(fedavg.Server):
@@ -48,6 +59,12 @@ class Server(fedavg.Server):
 
     def __init__(self, model, trainer):
         super().__init__(model=model, trainer=trainer)
+        self.attack_method = 'DLG'
+        if hasattr(Config().algorithm, 'attack_method'):
+            if Config().algorithm.attack_method in ['DLG', 'iDLG', 'csDLG']:
+                self.attack_method = Config().algorithm.attack_method
+            else:
+                sys.exit('Error: Unknown attack method.')
 
     async def process_reports(self):
         """ Process the client reports: before aggregating their weights,
@@ -64,11 +81,17 @@ class Server(fedavg.Server):
 
     def deep_leakage_from_gradients(self, updates):
         """ Analyze periodic gradients from certain clients. """
+        # Process data from the victim client
         __, __, payload, __ = updates[Config().algorithm.victim_client]
-        # Receive the ground truth for evaluation
-        # It will not be used for data reconstruction
+        # The ground truth should be used only for evaluation
         gt_data, gt_label, target_grad = payload[1]
         target_weight = payload[0]
+
+        # Assume the reconstructed data shape is known, which can be also derived from the target dataset
+        num_images = Config().data.partition_size
+        data_size = [num_images, gt_data.shape[1],
+                     gt_data.shape[2], gt_data.shape[3]]
+        self.plot_gt(num_images, gt_data, gt_label)
 
         if not (hasattr(Config().algorithm, 'share_gradients') and Config().algorithm.share_gradients) and \
                 not (hasattr(Config().algorithm, 'match_weight') and Config().algorithm.match_weight):
@@ -79,50 +102,42 @@ class Server(fedavg.Server):
                     Config().algorithm.victim_client].values():
                 target_grad.append(-delta / Config().trainer.learning_rate)
 
-        num_images = Config().data.partition_size
-        log_interval = Config().algorithm.log_interval
-
-        dlg_result_path = f"{Config().params['result_path']}"
-        dlg_result_file = f"{dlg_result_path}/{os.getpid()}_evals.csv"
-        dlg_result_headers = [
-            "Iteration", "Loss", "Average MSE", "Average LPIPS"
-        ]
-        csv_processor.initialize_csv(dlg_result_file, dlg_result_headers,
-                                     dlg_result_path)
-
-        self.plot_gt(num_images, gt_data, gt_label)
-
-        # Generate dummy items
-        data_size = self.testset.data[0].shape
-        if len(data_size) == 2:
-            data_size = (num_images, 1, data_size[0], data_size[1])
-        else:
-            data_size = (num_images, data_size[2], data_size[0], data_size[1])
-
+        # Generate dummy items and initialize optimizer
         dummy_data = torch.randn(data_size).to(
             Config().device()).requires_grad_(True)
 
         dummy_label = torch.randn(
             (num_images, Config().trainer.num_classes)).to(
                 Config().device()).requires_grad_(True)
-        match_optimizer = torch.optim.LBFGS([dummy_data, dummy_label])
 
-        for i in range(num_images):
-            logging.info("[Gradient Leakage Attacking...] Dummy label is %d.",
-                         torch.argmax(dummy_label[i], dim=-1).item())
+        if self.attack_method == 'DLG':
+            match_optimizer = torch.optim.LBFGS(
+                [dummy_data, dummy_label], lr=Config().algorithm.lr)
+            est_label = [None] * num_images
+            for i in range(num_images):
+                logging.info("[%s Gradient Leakage Attacking...] Dummy label is %d.",
+                             self.attack_method, torch.argmax(dummy_label[i], dim=-1).item())
+        elif self.attack_method == 'iDLG':
+            match_optimizer = torch.optim.LBFGS(
+                [dummy_data, ], lr=Config().algorithm.lr)
+            # Estimate the gt label
+            est_label = torch.argmin(torch.sum(
+                target_grad[-2], dim=-1), dim=-1).detach().reshape((1,)).requires_grad_(False)
+            for i in range(num_images):
+                logging.info("[%s Gradient Leakage Attacking...] Estimated label is %d.",
+                             self.attack_method, est_label.item())
 
         history, losses, mses, avg_mses, lpipss, avg_lpips = [], [], [], [], [], []
 
-        # Sharing and matching updates
+        # Conduct gradients/weights/updates matching
         if not (hasattr(Config().algorithm, 'share_gradients') and Config().algorithm.share_gradients) \
                 and hasattr(Config().algorithm, 'match_weight') and Config().algorithm.match_weight:
             model = deepcopy(self.trainer.model)
             closure = self.weight_closure(match_optimizer, dummy_data,
                                           dummy_label, target_weight, model)
-        # Matching gradients
         else:
             closure = self.gradient_closure(match_optimizer, dummy_data,
-                                            dummy_label, target_grad)
+                                            dummy_label, est_label, target_grad)
 
         for iters in range(Config().algorithm.num_iters):
             match_optimizer.step(closure)
@@ -147,10 +162,19 @@ class Server(fedavg.Server):
 
             if iters % log_interval == 0:
                 logging.info(
-                    "[Gradient Leakage Attacking...] Iter %d: Loss = %.10f, avg MSE = %.8f, avg LPIPS = %.8f",
-                    iters, losses[-1], avg_mses[-1], avg_lpips[-1])
-                history.append([[tt(dummy_data[i][0].cpu()), dummy_label[i]]
-                                for i in range(num_images)])
+                    "[%s Gradient Leakage Attacking...] Iter %d: Loss = %.10f, avg MSE = %.8f, avg LPIPS = %.8f",
+                    self.attack_method, iters, losses[-1], avg_mses[-1], avg_lpips[-1])
+                if self.attack_method == 'DLG':
+                    history.append([[
+                        tt(dummy_data[i][0].cpu()
+                           ), torch.argmax(dummy_label[i], dim=-1).item(), dummy_data[i]
+                    ] for i in range(num_images)])
+                elif self.attack_method == 'iDLG':
+                    history.append([[
+                        tt(dummy_data[i][0].cpu()
+                           ), est_label[i].item(), dummy_data[i]
+                    ] for i in range(num_images)])
+
                 new_row = [
                     iters,
                     round(losses[-1], 8),
@@ -172,7 +196,7 @@ class Server(fedavg.Server):
 
         logging.info("Attack complete")
 
-    def gradient_closure(self, match_optimizer, dummy_data, dummy_label,
+    def gradient_closure(self, match_optimizer, dummy_data, dummy_label, est_label,
                          target_grad):
         """ Take a step to match the gradients. """
 
@@ -181,33 +205,38 @@ class Server(fedavg.Server):
             # self.trainer.model.zero_grad()
             dummy_pred = self.trainer.model(dummy_data)
             dummy_onehot_label = F.softmax(dummy_label, dim=-1)
-            dummy_loss = cross_entropy_for_onehot(dummy_pred,
-                                                  dummy_onehot_label)
+            if self.attack_method == 'DLG':
+                dummy_loss = cross_entropy_for_onehot(dummy_pred,
+                                                      dummy_onehot_label)
+            elif self.attack_method == 'iDLG':
+                dummy_loss = cross_entropy(dummy_pred, est_label)
+
             dummy_grad = torch.autograd.grad(dummy_loss,
                                              self.trainer.model.parameters(),
                                              create_graph=True)
 
-            grad_diff = 0
-            for gx, gy in zip(dummy_grad, target_grad):
-                grad_diff += ((gx - gy)**2).sum()
-            grad_diff.backward()
-            return grad_diff
+            rec_loss = self.reconstruction_costs([dummy_grad], target_grad)
+            if hasattr(Config().algorithm, 'total_variation') and Config().algorithm.total_variation > 0:
+                rec_loss += Config().algorithm.total_variation * TV(dummy_data)
+            rec_loss.backward()
+            return rec_loss
 
         return closure
 
     def weight_closure(self, match_optimizer, dummy_data, dummy_label,
                        target_weight, model):
-        """ Take a step to match the model weights. """
+        """ Take a step to match the weights. """
 
         def closure():
             match_optimizer.zero_grad()
             dummy_weight = self.loss_steps(dummy_data, dummy_label, model)
 
-            weight_diff = 0
-            for wx, wy in zip(dummy_weight, target_weight.values()):
-                weight_diff += ((wx - wy)**2).sum()
-            weight_diff.backward()
-            return weight_diff
+            rec_loss = self.reconstruction_costs(
+                [dummy_weight], list(target_weight.values()))
+            if hasattr(Config().algorithm, 'total_variation') and Config().algorithm.total_variation > 0:
+                rec_loss += Config().algorithm.total_variation * TV(dummy_data)
+            rec_loss.backward()
+            return rec_loss
 
         return closure
 
@@ -217,9 +246,6 @@ class Server(fedavg.Server):
 
         epochs = Config().trainer.epochs
         batch_size = Config().trainer.batch_size
-
-        # Initializing the loss criterion
-        loss_criterion = torch.nn.CrossEntropyLoss()
 
         # TODO: optional parameters: lr_schedule, create_graph...
 
@@ -241,8 +267,8 @@ class Server(fedavg.Server):
                                               batch_size])
                 labels_ = dummy_label[idx * batch_size:(idx + 1) * batch_size]
 
-            loss = loss_criterion(dummy_pred, torch.argmax(labels_,
-                                                           dim=-1)).sum()
+            loss = cross_entropy(dummy_pred, torch.argmax(labels_,
+                                                          dim=-1)).sum()
 
             grad = torch.autograd.grad(loss,
                                        patched_model.parameters.values(),
@@ -258,8 +284,42 @@ class Server(fedavg.Server):
         return list(patched_model.parameters.values())
 
     @staticmethod
+    def reconstruction_costs(dummy, target):
+        # TODO: various indices, weights?
+        indices = torch.arange(len(target))
+        cost_fn = Config().algorithm.cost_fn
+
+        total_costs = 0
+        for trial in dummy:
+            pnorm = [0, 0]
+            costs = 0
+            for i in indices:
+                if cost_fn == 'l2':
+                    costs += ((trial[i] - target[i]).pow(2)).sum()
+                elif cost_fn == 'l1':
+                    costs += ((trial[i] - target[i]).abs()).sum()
+                elif cost_fn == 'max':
+                    costs += ((trial[i] - target[i]).abs()).max()
+                elif cost_fn == 'sim':
+                    costs -= (trial[i] * target[i]).sum()
+                    pnorm[0] += trial[i].pow(2).sum()
+                    pnorm[1] += target[i].pow(2).sum()
+                elif cost_fn == 'simlocal':
+                    costs += 1 - torch.nn.functional.cosine_similarity(trial[i].flatten(),
+                                                                       target[i].flatten(
+                    ),
+                        0, 1e-10)
+            if cost_fn == 'sim':
+                costs = 1 + costs / pnorm[0].sqrt() / pnorm[1].sqrt()
+
+            # Accumulate final costs
+            total_costs += costs
+
+        return total_costs / len(dummy)
+
+    @staticmethod
     def plot_gt(num_images, gt_data, gt_label):
-        """ Plot ground truth data """
+        """ Plot ground truth data. """
         gt_result_path = f"{Config().params['result_path']}/{os.getpid()}_gt.png"
         gt_figure = plt.figure(figsize=(12, 4))
 
@@ -277,8 +337,7 @@ class Server(fedavg.Server):
         """ Plot the reconstructed data. """
         reconstructed_result_path = f"{Config().params['result_path']}/{os.getpid()}_reconstructed.png"
         for i in range(num_images):
-            logging.info("Reconstructed label is %d.",
-                         torch.argmax(history[-1][i][1], dim=-1).item())
+            logging.info("Reconstructed label is %d.", history[-1][i][1])
 
         fig = plt.figure(figsize=(12, 8))
         rows = math.ceil(len(history) / 2)
