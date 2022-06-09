@@ -15,3 +15,7 @@
 `match_weight: true` — reconstruct data by directly matching weights when it's true; reconstruct data by matching gradients calculated from updates otherwise; setting `share_gradients: false` is a prerequisite.
 
 `random_seed: 50` — the random seed for generating dummy data and label.
+
+## Plot instructions
+
+Run ```python plot.py -c configuration_file``` where ```configuration_file``` is the same one used to run the DLG attack.
