@@ -69,9 +69,12 @@ class Server(fedavg.Server):
         self.share_gradients = True
         if hasattr(Config().algorithm, 'share_gradients') and not Config().algorithm.share_gradients:
             self.share_gradients = False
-        self.match_weight = False
-        if hasattr(Config().algorithm, 'match_weight') and Config().algorithm.match_weight:
-            self.match_weight = True
+        self.match_weights = False
+        if hasattr(Config().algorithm, 'match_weights') and Config().algorithm.match_weights:
+            self.match_weights = True
+        self.use_updates = True
+        if hasattr(Config().algorithm, 'use_updates') and not Config().algorithm.use_updates:
+            self.use_updates = False
 
     async def process_reports(self):
         """ Process the client reports: before aggregating their weights,
@@ -89,10 +92,13 @@ class Server(fedavg.Server):
     def deep_leakage_from_gradients(self, updates):
         """ Analyze periodic gradients from certain clients. """
         # Process data from the victim client
+        deltas_received = self.compute_weight_deltas(updates)
         __, __, payload, __ = updates[Config().algorithm.victim_client]
         # The ground truth should be used only for evaluation
         gt_data, gt_label, target_grad = payload[1]
-        target_weight = payload[0]
+        target_weights = payload[0]
+        if not self.share_gradients and self.match_weights and self.use_updates:
+            target_weights = deltas_received[Config().algorithm.victim_client]
 
         # Assume the reconstructed data shape is known, which can be also derived from the target dataset
         num_images = Config().data.partition_size
@@ -100,9 +106,8 @@ class Server(fedavg.Server):
                      gt_data.shape[2], gt_data.shape[3]]
         self.plot_gt(num_images, gt_data, gt_label)
 
-        if not self.share_gradients and not self.match_weight:
+        if not self.share_gradients and not self.match_weights:
             # Obtain the local updates from clients
-            deltas_received = self.compute_weight_deltas(updates)
             target_grad = []
             for delta in deltas_received[
                     Config().algorithm.victim_client].values():
@@ -136,10 +141,10 @@ class Server(fedavg.Server):
         history, losses, mses, avg_mses, lpipss, avg_lpips = [], [], [], [], [], []
 
         # Conduct gradients/weights/updates matching
-        if not self.share_gradients and self.match_weight:
+        if not self.share_gradients and self.match_weights:
             model = deepcopy(self.trainer.model)
             closure = self.weight_closure(match_optimizer, dummy_data,
-                                          dummy_label, target_weight, model)
+                                          dummy_label, target_weights, model)
         else:
             closure = self.gradient_closure(match_optimizer, dummy_data,
                                             dummy_label, est_label, target_grad)
@@ -228,7 +233,7 @@ class Server(fedavg.Server):
         return closure
 
     def weight_closure(self, match_optimizer, dummy_data, dummy_label,
-                       target_weight, model):
+                       target_weights, model):
         """ Take a step to match the weights. """
 
         def closure():
@@ -236,7 +241,7 @@ class Server(fedavg.Server):
             dummy_weight = self.loss_steps(dummy_data, dummy_label, model)
 
             rec_loss = self.reconstruction_costs(
-                [dummy_weight], list(target_weight.values()))
+                [dummy_weight], list(target_weights.values()))
             if hasattr(Config().algorithm, 'total_variation') and Config().algorithm.total_variation > 0:
                 rec_loss += Config().algorithm.total_variation * TV(dummy_data)
             rec_loss.backward()
@@ -246,19 +251,14 @@ class Server(fedavg.Server):
 
     def loss_steps(self, dummy_data, dummy_label, model):
         """ Take a few gradient descent steps to fit the model to the given input. """
-        patched_model = MetaMonkey(model)
-
         epochs = Config().trainer.epochs
         batch_size = Config().trainer.batch_size
 
+        patched_model = MetaMonkey(model)
+        if self.use_updates:
+            patched_model_origin = deepcopy(patched_model)
+
         # TODO: optional parameters: lr_schedule, create_graph...
-
-        # TODO: use updates or weights
-
-        # for name, param in model.named_parameters():
-        #     if param.requires_grad:
-        #         print("before loss steps", param.data[0])
-        #         break
 
         # TODO: another parameter local steps instead of epoch here
         for epoch in range(epochs):
@@ -284,7 +284,10 @@ class Server(fedavg.Server):
                 (name, param - Config().trainer.learning_rate * grad_part)
                 for ((name, param),
                      grad_part) in zip(patched_model.parameters.items(), grad))
-
+        if self.use_updates:
+            patched_model.parameters = OrderedDict((name, param - param_origin)
+                                                   for ((name, param), (name_origin, param_origin))
+                                                   in zip(patched_model.parameters.items(), patched_model_origin.parameters.items()))
         return list(patched_model.parameters.values())
 
     @staticmethod
