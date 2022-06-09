@@ -85,6 +85,13 @@ class Model:
         self.actor_target.to(device)
         self.critic_target.to(device)
 
+    def eval(self):
+        self.actor.eval()
+        self.critic.eval()
+        self.actor_target.eval()
+        self.critic_target.eval()
+
+
 
     #TODO IMPLEMENT EVAL!!!
     
