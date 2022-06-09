@@ -12,7 +12,7 @@
 
 `share_gradients: false` — whether sharing gradients or model weights.
 
-`match_weight: true` — reconstruct data by directly matching weights when it's true; reconstruct data by matching gradients calculated from updates otherwise; setting `share_gradients: false` is a prerequisite.
+`match_weights: true` — reconstruct data by directly matching weights when it's true; reconstruct data by matching gradients calculated from updates otherwise; setting `share_gradients: false` is a prerequisite.
 
 `random_seed: 50` — the random seed for generating dummy data and label.
 

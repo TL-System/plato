@@ -80,9 +80,11 @@ algorithm:
     init_params: true
     # Whether sharing gradients or model weights
     share_gradients: false
-    # Do reconstruction by directly matching updates when it's true,
+    # Do reconstruction by directly matching weights when it's true,
     # otherwise by matching gradients calculated from updates
-    match_weight: false
+    match_weights: true
+    # Matching weights (absolute) or weight updates (delta)
+    use_updates: false
 
     # The random seed for dummy data and label
     random_seed: 1
