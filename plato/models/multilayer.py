@@ -1,11 +1,11 @@
-"""The Multi-Layer Perception model for PyTorch.
-   The model follows the previous work to use tanh as activation
-   Reference: https://arxiv.org/pdf/1807.05852.pdf
+"""
+The Multi-Layer Perception model for PyTorch.
+The model follows the previous work to use tanh as activation
+Reference: https://arxiv.org/pdf/1807.05852.pdf
 """
 import collections
 
 import torch.nn as nn
-import torch.nn.functional as F
 
 from plato.config import Config
 
@@ -16,15 +16,12 @@ class Model(nn.Module):
     Arguments:
         num_classes (int): The number of classes. Default: 10.
     """
+
     def __init__(self, input_dim=600, num_classes=10):
         super().__init__()
-        self.fc1 = nn.Sequential(
-            nn.Linear(input_dim, 2048),
-            nn.Tanh())
+        self.fc1 = nn.Sequential(nn.Linear(input_dim, 2048), nn.Tanh())
 
-        self.fc2 = nn.Sequential(
-            nn.Linear(2048, 1024),
-            nn.Tanh())
+        self.fc2 = nn.Sequential(nn.Linear(2048, 1024), nn.Tanh())
 
         self.fc3 = nn.Sequential(
             nn.Linear(1024, 512),
@@ -47,13 +44,12 @@ class Model(nn.Module):
         self.layerdict['fc3'] = self.fc3
         self.layerdict['fc4'] = self.fc4
         self.layerdict['fc5'] = self.fc5
-        
+
         self.layers.append('fc1')
         self.layers.append('fc2')
         self.layers.append('fc3')
         self.layers.append('fc4')
         self.layers.append('fc5')
-
 
     def forward(self, x):
         """Forward pass."""
@@ -87,5 +83,5 @@ class Model(nn.Module):
         """Obtaining an instance of this model."""
         if hasattr(Config().trainer, 'num_classes'):
             return Model(input_dim=Config().trainer.input_dim,
-                num_classes=Config().trainer.num_classes)
+                         num_classes=Config().trainer.num_classes)
         return Model()
