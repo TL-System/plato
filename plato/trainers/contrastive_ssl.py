@@ -759,6 +759,10 @@ class Trainer(basic.Trainer):
             test_encoded_filename = f"Round_{current_round}_test_encoded.npy"
             test_label_filename = f"Round_{current_round}_test_label.npy"
 
+            train_data_encoded = np.concatenate(train_data_encoded, axis=0)
+            train_data_labels = np.concatenate(train_data_labels, axis=0)
+            test_data_encoded = np.concatenate(test_data_encoded, axis=0)
+            test_data_labels = np.concatenate(test_data_labels, axis=0)
             self.save_encoded_data(data=train_data_encoded,
                                    filename=train_encoded_filename,
                                    location=save_location)
