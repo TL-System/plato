@@ -44,6 +44,7 @@ tt = transforms.ToPILImage()
 loss_fn = lpips.LPIPS(net='vgg')
 torch.manual_seed(Config().algorithm.random_seed)
 
+log_interval = Config().algorithm.log_interval
 dlg_result_path = f"{Config().params['result_path']}"
 dlg_result_file = f"{dlg_result_path}/{os.getpid()}_evals.csv"
 dlg_result_headers = [
@@ -159,7 +160,7 @@ class Server(fedavg.Server):
             avg_mses.append(mean(mses[iters]))
             avg_lpips.append(mean(lpipss[iters]))
 
-            if iters % Config().algorithm.log_interval == 0:
+            if iters % log_interval == 0:
                 logging.info(
                     "[%s Gradient Leakage Attacking...] Iter %d: Loss = %.10f, avg MSE = %.8f, avg LPIPS = %.8f",
                     self.attack_method, iters, losses[-1], avg_mses[-1], avg_lpips[-1])
@@ -173,6 +174,7 @@ class Server(fedavg.Server):
                         tt(dummy_data[i][0].cpu()
                            ), est_label[i].item(), dummy_data[i]
                     ] for i in range(num_images)])
+
                 new_row = [
                     iters,
                     round(losses[-1], 8),
@@ -183,7 +185,14 @@ class Server(fedavg.Server):
 
         self.plot_reconstructed(num_images, history)
 
-        self.write_history(num_images, history)
+        # Save the tensors into a .pt file
+        tensor_file_path = f"{dlg_result_path}/{os.getpid()}_tensors.pt"
+        result = {
+            i * log_interval: {j: history[i][j][0]
+                               for j in range(num_images)}
+            for i in range(len(history))
+        }
+        torch.save(result, tensor_file_path)
 
         logging.info("Attack complete")
 
@@ -331,12 +340,8 @@ class Server(fedavg.Server):
             logging.info("Reconstructed label is %d.", history[-1][i][1])
 
         fig = plt.figure(figsize=(12, 8))
-        outer = gridspec.GridSpec(
-            (Config().algorithm.num_iters // Config().algorithm.log_interval)
-            // 2,
-            2,
-            wspace=0.2,
-            hspace=0.2)
+        rows = math.ceil(len(history) / 2)
+        outer = gridspec.GridSpec(rows, 2, wspace=0.2, hspace=0.2)
 
         for i in range(Config().algorithm.num_iters //
                        Config().algorithm.log_interval):
@@ -355,15 +360,3 @@ class Server(fedavg.Server):
                 innerplot.axis('off')
                 fig.add_subplot(innerplot)
         fig.savefig(reconstructed_result_path)
-
-    @staticmethod
-    def write_history(num_images, history):
-        """ Write the history of the tensors into text file. """
-        log_interval = Config().algorithm.log_interval
-        file_path = f"{Config().params['result_path']}/{os.getpid()}_history.txt"
-        with open(file_path, 'w') as file:
-            for iter in range(len(history)):
-                file.write("Iteration: " + str(log_interval * iter) + "\n")
-                for img_num in range(num_images):
-                    file.write("Image number: " + str(img_num + 1) + "\n")
-                    file.write(str(history[iter][img_num][2]) + "\n")
