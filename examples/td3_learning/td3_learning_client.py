@@ -37,11 +37,11 @@ class RLClient(simple.Client):
             os.makedirs(models_dir)
         self.timesteps_since_eval = 0
         self.episode_num = 0
+        self.episode_reward = 0
         self.total_timesteps = 0
         self.done = True
 
     async def train(self):
-        episode_reward = 0
         episode_timesteps = 0 #fixing error about using before assignment
         obs = 0 #fixing error about using before assignment
         round_episode_steps = 0
@@ -55,7 +55,7 @@ class RLClient(simple.Client):
             if self.done:
                 #if not at beginning
                 if self.total_timesteps != 0:
-                    logging.info("Total Timesteps: {} Episode Num: {} Reward: {}".format(self.total_timesteps, self.episode_num, episode_reward))
+                    logging.info("Total Timesteps: {} Episode Num: {} Reward: {}".format(self.total_timesteps, self.episode_num, self.episode_reward))
                     #train here call td3_trainer
                     self.RL_Online_trainer.train_loop(config=None, trainset=None,sampler=None, cut_layer=None)
 
@@ -72,7 +72,7 @@ class RLClient(simple.Client):
                 self.done = False
 
                 # Set rewards and episode timesteps to zero
-                episode_reward = 0
+                self.episode_reward = 0
                 episode_timesteps = 0
                 self.episode_num += 1
                 
@@ -91,14 +91,12 @@ class RLClient(simple.Client):
 
             #performs action in environment, then reaches next state and receives the reward
             new_obs, reward, self.done, _ = self.env.step(action)
-            print(new_obs)
-            print(reward)
 
             #is episode done?
             done_bool = 0 if episode_timesteps + 1 == self.env._max_episode_steps else float(self.done)
             
             #update total reward
-            episode_reward += reward
+            self.episode_reward += reward
             
             #add to replay buffer in this order due to push method in replay buffer
             new = (obs, action, reward, new_obs, done_bool)
