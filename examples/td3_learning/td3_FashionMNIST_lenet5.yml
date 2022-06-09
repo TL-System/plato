@@ -3,7 +3,7 @@ clients:
     total_clients: 100
 
     # The number of clients selected in each round
-    per_round: 2
+    per_round: 1
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -123,6 +123,8 @@ algorithm:
     noise_clip: 0.5
     # Frequency of delayed policy updates
     policy_freq: 2
+    # Frequency of evaluation steps once every eval_freq episodes
+    eval_freq: 5
     # mini batch size
     batch_size: 64
     hidden_size: 256
@@ -142,7 +144,7 @@ algorithm:
 
     #Total number of iterations/timestpes
     max_steps: 500000
-    
+
     #Epsiode steps to run before stopping training
     max_round_episode_steps: 1000
 

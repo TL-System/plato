@@ -43,15 +43,22 @@ class RLClient(simple.Client):
 
 def evaluate_policy(trainer, env, eval_episodes = 10):
         avg_reward = 0
-        for _ in range(eval_episodes):
+        for i in range(eval_episodes):
             obs = env.reset()
+            print("obs in 129 in client evaluate policy", obs)
             done = False
+            step_num = 0
             while not done:
                 action = trainer.select_action(np.array(obs))
+                print("episode num i", i)
+                print("step num", step_num)
+                print("action in 135 in eval policy in client", action)
+                print("obs in 136 in eval policy in client", np.array(obs))
                 obs, reward, done, _ = env.step(action)
+                step_num += 1
                 avg_reward += reward
         avg_reward /= eval_episodes
-        #print ("---------------------------------------")
-        #print ("Average Reward over the Evaluation Step: %f" % (avg_reward))
-        #print ("---------------------------------------")
+        print ("---------------------------------------")
+        print ("Average Reward over the Evaluation Step: %f" % (avg_reward))
+        print ("---------------------------------------")
         return avg_reward
