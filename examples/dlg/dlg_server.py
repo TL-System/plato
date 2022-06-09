@@ -223,7 +223,7 @@ class Server(fedavg.Server):
             dummy_weight = self.loss_steps(dummy_data, dummy_label, model)
 
             rec_loss = self.reconstruction_costs(
-                [dummy_weight], target_weight.values())
+                [dummy_weight], list(target_weight.values()))
             if hasattr(Config().algorithm, 'total_variation') and Config().algorithm.total_variation > 0:
                 rec_loss += Config().algorithm.total_variation * TV(dummy_data)
             rec_loss.backward()
