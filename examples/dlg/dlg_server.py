@@ -17,10 +17,10 @@ in Advances in Neural Information Processing Systems 2020.
 
 https://proceedings.neurips.cc/paper/2020/file/c4ede56bbd98819ae6112b20ac6bf145-Paper.pdf
 """
-
 import logging
 import math
 import os
+import sys
 from collections import OrderedDict
 from copy import deepcopy
 from statistics import mean
@@ -38,6 +38,7 @@ from torchvision import transforms
 from utils.modules import MetaMonkey
 from utils.utils import cross_entropy_for_onehot
 
+cross_entropy = torch.nn.CrossEntropyLoss()
 tt = transforms.ToPILImage()
 loss_fn = lpips.LPIPS(net='vgg')
 torch.manual_seed(Config().algorithm.random_seed)
@@ -56,6 +57,12 @@ class Server(fedavg.Server):
 
     def __init__(self, model, trainer):
         super().__init__(model=model, trainer=trainer)
+        self.attack_method = 'DLG'
+        if hasattr(Config().algorithm, 'attack_method'):
+            if Config().algorithm.attack_method in ['DLG', 'iDLG', 'csDLG']:
+                self.attack_method = Config().algorithm.attack_method
+            else:
+                sys.exit('Error: Unknown attack method.')
 
     async def process_reports(self):
         """ Process the client reports: before aggregating their weights,
@@ -93,18 +100,31 @@ class Server(fedavg.Server):
                     Config().algorithm.victim_client].values():
                 target_grad.append(-delta / Config().trainer.learning_rate)
 
-        # Generate dummy items
+        # Generate dummy items and initialize optimizer
         dummy_data = torch.randn(data_size).to(
             Config().device()).requires_grad_(True)
 
         dummy_label = torch.randn(
             (num_images, Config().trainer.num_classes)).to(
                 Config().device()).requires_grad_(True)
-        match_optimizer = torch.optim.LBFGS([dummy_data, dummy_label])
 
-        for i in range(num_images):
-            logging.info("[Gradient Leakage Attacking...] Dummy label is %d.",
-                         torch.argmax(dummy_label[i], dim=-1).item())
+        if self.attack_method == 'DLG':
+            match_optimizer = torch.optim.LBFGS(
+                [dummy_data, dummy_label], lr=Config().algorithm.lr)
+            est_label = [None] * num_images
+            for i in range(num_images):
+                logging.info("[%s Gradient Leakage Attacking...] Dummy label is %d.",
+                             self.attack_method, torch.argmax(dummy_label[i], dim=-1).item())
+        elif self.attack_method == 'iDLG':
+            match_optimizer = torch.optim.LBFGS(
+                [dummy_data, ], lr=Config().algorithm.lr)
+            # Estimate the gt label
+            # TODO: why -2?
+            est_label = torch.argmin(torch.sum(
+                target_grad[-2], dim=-1), dim=-1).detach().reshape((1,)).requires_grad_(False)
+            for i in range(num_images):
+                logging.info("[%s Gradient Leakage Attacking...] Estimated label is %d.",
+                             self.attack_method, est_label.item())
 
         history, losses, mses, avg_mses, lpipss, avg_lpips = [], [], [], [], [], []
 
@@ -116,7 +136,7 @@ class Server(fedavg.Server):
                                           dummy_label, target_weight, model)
         else:
             closure = self.gradient_closure(match_optimizer, dummy_data,
-                                            dummy_label, target_grad)
+                                            dummy_label, est_label, target_grad)
 
         for iters in range(Config().algorithm.num_iters):
             match_optimizer.step(closure)
@@ -141,11 +161,18 @@ class Server(fedavg.Server):
 
             if iters % Config().algorithm.log_interval == 0:
                 logging.info(
-                    "[Gradient Leakage Attacking...] Iter %d: Loss = %.10f, avg MSE = %.8f, avg LPIPS = %.8f",
-                    iters, losses[-1], avg_mses[-1], avg_lpips[-1])
-                history.append([[
-                    tt(dummy_data[i][0].cpu()), dummy_label[i], dummy_data[i]
-                ] for i in range(num_images)])
+                    "[%s Gradient Leakage Attacking...] Iter %d: Loss = %.10f, avg MSE = %.8f, avg LPIPS = %.8f",
+                    self.attack_method, iters, losses[-1], avg_mses[-1], avg_lpips[-1])
+                if self.attack_method == 'DLG':
+                    history.append([[
+                        tt(dummy_data[i][0].cpu()
+                           ), torch.argmax(dummy_label[i], dim=-1).item(), dummy_data[i]
+                    ] for i in range(num_images)])
+                elif self.attack_method == 'iDLG':
+                    history.append([[
+                        tt(dummy_data[i][0].cpu()
+                           ), est_label[i].item(), dummy_data[i]
+                    ] for i in range(num_images)])
                 new_row = [
                     iters,
                     round(losses[-1], 8),
@@ -160,7 +187,7 @@ class Server(fedavg.Server):
 
         logging.info("Attack complete")
 
-    def gradient_closure(self, match_optimizer, dummy_data, dummy_label,
+    def gradient_closure(self, match_optimizer, dummy_data, dummy_label, est_label,
                          target_grad):
         """ Take a step to match the gradients. """
 
@@ -169,8 +196,12 @@ class Server(fedavg.Server):
             # self.trainer.model.zero_grad()
             dummy_pred = self.trainer.model(dummy_data)
             dummy_onehot_label = F.softmax(dummy_label, dim=-1)
-            dummy_loss = cross_entropy_for_onehot(dummy_pred,
-                                                  dummy_onehot_label)
+            if self.attack_method == 'DLG':
+                dummy_loss = cross_entropy_for_onehot(dummy_pred,
+                                                      dummy_onehot_label)
+            elif self.attack_method == 'iDLG':
+                dummy_loss = cross_entropy(dummy_pred, est_label)
+
             dummy_grad = torch.autograd.grad(dummy_loss,
                                              self.trainer.model.parameters(),
                                              create_graph=True)
@@ -206,9 +237,6 @@ class Server(fedavg.Server):
         epochs = Config().trainer.epochs
         batch_size = Config().trainer.batch_size
 
-        # Initializing the loss criterion
-        loss_criterion = torch.nn.CrossEntropyLoss()
-
         # TODO: optional parameters: lr_schedule, create_graph...
 
         # TODO: use updates or weights
@@ -229,8 +257,8 @@ class Server(fedavg.Server):
                                               batch_size])
                 labels_ = dummy_label[idx * batch_size:(idx + 1) * batch_size]
 
-            loss = loss_criterion(dummy_pred, torch.argmax(labels_,
-                                                           dim=-1)).sum()
+            loss = cross_entropy(dummy_pred, torch.argmax(labels_,
+                                                          dim=-1)).sum()
 
             grad = torch.autograd.grad(loss,
                                        patched_model.parameters.values(),
@@ -265,8 +293,7 @@ class Server(fedavg.Server):
         """ Plot the reconstructed data. """
         reconstructed_result_path = f"{Config().params['result_path']}/{os.getpid()}_reconstructed.png"
         for i in range(num_images):
-            logging.info("Reconstructed label is %d.",
-                         torch.argmax(history[-1][i][1], dim=-1).item())
+            logging.info("Reconstructed label is %d.", history[-1][i][1])
 
         fig = plt.figure(figsize=(12, 8))
         outer = gridspec.GridSpec(
