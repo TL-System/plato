@@ -57,7 +57,6 @@ class Trainer(basic.Trainer):
         self.policy_noise = Config().algorithm.policy_noise * self.max_action
         self.noise_clip = Config().algorithm.noise_clip * self.max_action
 
-        self.env = globals.env
         self.evaluations = []
         
         if not os.path.exists(results_dir):
@@ -66,8 +65,8 @@ class Trainer(basic.Trainer):
             os.makedirs(models_dir)
 
         self.timesteps_since_eval = 0
-        #self.episode_num = 0
-        #self.total_timesteps = 0
+        self.episode_num = 0
+        self.total_timesteps = 0
         self.done = True
 
         self.episode_reward = 0
@@ -95,7 +94,7 @@ class Trainer(basic.Trainer):
         episode_timesteps = 0 #fixing error about using before assignment
         obs = 0 #fixing error about using before assignment
         round_episode_steps = 0
-        if globals.total_timesteps > Config().algorithm.max_steps:
+        if self.total_timesteps > Config().algorithm.max_steps:
             # TODO: when max number of steps is hit, we should stop training and terminate the process. How?
             print("Done training")
             return
@@ -105,8 +104,8 @@ class Trainer(basic.Trainer):
             #If episode is done
             if self.done:
                 #if not at beginning
-                if globals.total_timesteps != 0:
-                    logging.info("Total Timesteps: {} Episode Num: {} Reward: {}".format(globals.total_timesteps, globals.episode_num, self.episode_reward))
+                if self.total_timesteps != 0:
+                    logging.info("Total Timesteps: {} Episode Num: {} Reward: {}".format(self.total_timesteps, self.episode_num, self.episode_reward))
                     #train here call td3_trainer
                     self.train_helper()
 
@@ -125,10 +124,10 @@ class Trainer(basic.Trainer):
                 # Set rewards and episode timesteps to zero
                 self.episode_reward = 0
                 episode_timesteps = 0
-                globals.episode_num += 1
+                self.episode_num += 1
             
             #Before the number of specified timesteps from config file we sample random actions
-            if globals.total_timesteps < Config().algorithm.start_steps:
+            if self.total_timesteps < Config().algorithm.start_steps:
                 action = self.env.action_space.sample()
             else: #after we pass the threshold we switch model
                 action = self.select_action(np.array(obs))
@@ -157,7 +156,7 @@ class Trainer(basic.Trainer):
             #Update state, episode time_step, total timesteps, and timesteps since last eval
             obs = new_obs
             episode_timesteps += 1
-            globals.total_timesteps += 1
+            self.total_timesteps += 1
             round_episode_steps += 1
             self.timesteps_since_eval += 1
         
