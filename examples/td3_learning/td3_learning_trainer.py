@@ -24,9 +24,35 @@ from plato.utils import optimizers
 
 import td3_learning_client as client
 
+import random
+
 file_name = "TD3_RL"
 models_dir = "./pytorch_models"
 results_dir = "./results"
+
+class ReplayMemory(base.ReplayMemory):
+    """ A simple example of replay memory buffer. """
+    def __init__(self, state_dim, action_dim, capacity, seed, client_id):
+        super().__init__(state_dim, action_dim, capacity, seed)
+        self.client_id = client_id
+
+    def save_buffer(self, dir):
+        # TODO: Save replay buffer
+        #self.state 
+        #self.action 
+        #self.reward 
+        #self.next_state 
+        #self.done 
+        pass
+
+    def load_buffer(self, dir):
+        # TODO: Load replay buffer
+        #self.state 
+        #self.action 
+        #self.reward 
+        #self.next_state 
+        #self.done
+        pass
 
 class Trainer(basic.Trainer):
     def __init__(self, model=None):
@@ -51,10 +77,10 @@ class Trainer(basic.Trainer):
             self.critic.parameters(), lr = Config().algorithm.learning_rate)
 
         #replay buffer initialization
-        self.replay_buffer = base.ReplayMemory(
+        self.replay_buffer = ReplayMemory(
             globals.state_dim, globals.action_dim, 
-            Config().algorithm.replay_size, 
-            Config().algorithm.replay_seed)
+            Config().algorithm.max_replay_size, 
+            Config().clients.random_seed, self.client_id)
         
         self.policy_noise = Config().algorithm.policy_noise * self.max_action
         self.noise_clip = Config().algorithm.noise_clip * self.max_action
@@ -112,8 +138,8 @@ class Trainer(basic.Trainer):
                     self.train_helper()
 
                 #evaluate episode and save policy
-                if self.timesteps_since_eval >= Config().algorithm.policy_freq:
-                    self.timesteps_since_eval %= Config().algorithm.policy_freq
+                if self.timesteps_since_eval >= Config().algorithm.eval_freq * globals.max_episode_steps:
+                    self.timesteps_since_eval %= Config().algorithm.eval_freq * globals.max_episode_steps
                     self.evaluations.append(client.evaluate_policy(self, self.env))
                     print(self.evaluations)
                     np.save("./results/%s" % (file_name), self.evaluations)
@@ -240,6 +266,7 @@ class Trainer(basic.Trainer):
             
     def load_model(self, filename=None, location=None):
         """Loading pre-trained model weights from a file."""
+        # TODO: here load replay buffer
         model_path = Config(
         ).params['model_path'] if location is None else location
         actor_model_name = 'actor_model'
@@ -284,6 +311,7 @@ class Trainer(basic.Trainer):
 
     def save_model(self, filename=None, location=None):
         """Saving the model to a file."""
+        # TODO: here save replay buffer
         model_path = Config(
         ).params['model_path'] if location is None else location
         actor_model_name = 'actor_model'
