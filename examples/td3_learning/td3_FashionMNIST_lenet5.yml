@@ -43,7 +43,7 @@ server:
     staleness_bound: 10
 
     random_seed: 1
-    
+
 data:
     # The training and testing dataset
     datasource: FashionMNIST
@@ -125,16 +125,17 @@ algorithm:
     policy_freq: 2
     # Frequency of evaluation steps once every eval_freq episodes
     eval_freq: 5
-    # mini batch size
-    batch_size: 64
+    # batch size to be sampled from reply buffer
+    batch_size: 100
+
     hidden_size: 256
     # steps sampling random actions
     start_steps: 10000
     # replay memory
     replay_size: 10000
-    replay_seed: 1234
+
     # whether use LSTM or FC nets
-    recurrent_actor: true
+    recurrent_actor: false
 
     #Number of iterations
     iterations: 1000
@@ -147,6 +148,9 @@ algorithm:
 
     #Epsiode steps to run before stopping training
     max_round_episode_steps: 1000
+
+    # Maximum replay buffer size
+    max_replay_size: 1000000
 
     #If we should save the model or not
     save_models: False
