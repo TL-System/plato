@@ -66,8 +66,8 @@ class Trainer(basic.Trainer):
             os.makedirs(models_dir)
 
         self.timesteps_since_eval = 0
-        self.episode_num = 0
-        self.total_timesteps = 0
+        #self.episode_num = 0
+        #self.total_timesteps = 0
         self.done = True
 
         self.episode_reward = 0
@@ -95,17 +95,18 @@ class Trainer(basic.Trainer):
         episode_timesteps = 0 #fixing error about using before assignment
         obs = 0 #fixing error about using before assignment
         round_episode_steps = 0
-        if self.total_timesteps > Config().algorithm.max_steps:
+        if globals.total_timesteps > Config().algorithm.max_steps:
             # TODO: when max number of steps is hit, we should stop training and terminate the process. How?
             print("Done training")
             return
         while round_episode_steps <= globals.max_episode_steps:
             #print("in while loop line 97")
+            #print(globals.total_timesteps)
             #If episode is done
             if self.done:
                 #if not at beginning
-                if self.total_timesteps != 0:
-                    logging.info("Total Timesteps: {} Episode Num: {} Reward: {}".format(self.total_timesteps, self.episode_num, self.episode_reward))
+                if globals.total_timesteps != 0:
+                    logging.info("Total Timesteps: {} Episode Num: {} Reward: {}".format(globals.total_timesteps, globals.episode_num, self.episode_reward))
                     #train here call td3_trainer
                     self.train_helper()
 
@@ -124,10 +125,10 @@ class Trainer(basic.Trainer):
                 # Set rewards and episode timesteps to zero
                 self.episode_reward = 0
                 episode_timesteps = 0
-                self.episode_num += 1
+                globals.episode_num += 1
             
             #Before the number of specified timesteps from config file we sample random actions
-            if self.total_timesteps < Config().algorithm.start_steps:
+            if globals.total_timesteps < Config().algorithm.start_steps:
                 action = self.env.action_space.sample()
             else: #after we pass the threshold we switch model
                 action = self.select_action(np.array(obs))
@@ -156,7 +157,7 @@ class Trainer(basic.Trainer):
             #Update state, episode time_step, total timesteps, and timesteps since last eval
             obs = new_obs
             episode_timesteps += 1
-            self.total_timesteps += 1
+            globals.total_timesteps += 1
             round_episode_steps += 1
             self.timesteps_since_eval += 1
         
@@ -244,7 +245,9 @@ class Trainer(basic.Trainer):
         actor_target_model_name = 'actor_target_model'
         critic_target_model_name = 'critic_target_model'
 
-        if filename is not None:
+        #going in here for some reason
+        #fixed by making it none
+        if filename is None:
             actor_filename = filename + '_actor'
             actor_model_path = f'{model_path}/{actor_filename}'
             critic_filename = filename + '_critic'
@@ -290,8 +293,10 @@ class Trainer(basic.Trainer):
                 os.makedirs(model_path)
         except FileExistsError:
             pass
-
-        if filename is not None:
+        
+        #going in here for some reason
+        #fixed by making it none
+        if filename is None:
            # model_path = f'{model_path}/{filename}'
            # model_filename = filename + _'model'
            # model path = Config().params stuff
@@ -326,11 +331,11 @@ class Trainer(basic.Trainer):
         #TODO What is the difference between .state_dict() & _state_dict
 
         if self.client_id == 0:
-            logging.info("[Server #%d] Model saved to %s.", os.getpid(),
-                         model_path)
+            logging.info("[Server #%d] Saving models from %s, %s, %s and %s.", os.getpid(),
+                         actor_model_path, critic_model_path, actor_target_model_path, critic_target_model_path)
         else:
-            logging.info("[Client #%d] Model saved to %s.", self.client_id,
-                         model_path)
+            logging.info("[Client #%d] Saving a model to %s, %s, %s and %s.",
+                         self.client_id, actor_model_path, critic_model_path, actor_target_model_path, critic_target_model_path)
 
     async def server_test(self, testset, sampler=None, **kwargs):
         return (client.evaluate_policy(self, self.env))
