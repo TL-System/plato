@@ -20,9 +20,6 @@ tt = transforms.ToPILImage()
 class Trainer(basic.Trainer):
     """ The federated learning trainer for the gradient leakage attack. """
 
-    def __init__(self, model):
-        super().__init__(model)
-
     def train_loop(self, config, trainset, sampler, cut_layer):
         """ The default training loop when a custom training loop is not supplied. """
         partition_size = Config().data.partition_size
