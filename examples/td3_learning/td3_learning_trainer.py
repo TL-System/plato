@@ -35,6 +35,8 @@ class Trainer(basic.Trainer):
         self.env = globals.env
         #Create actor and critic
         #Could have used the base class given's but for convenient sake we declare our own
+
+        print("are we consturcting more than once??") #no it does'nt get claled more than once
         self.max_action = globals.max_action            
         self.model = model
         self.actor = self.model.actor
@@ -113,6 +115,7 @@ class Trainer(basic.Trainer):
                 if self.timesteps_since_eval >= Config().algorithm.policy_freq:
                     self.timesteps_since_eval %= Config().algorithm.policy_freq
                     self.evaluations.append(client.evaluate_policy(self, self.env))
+                    print(self.evaluations)
                     np.save("./results/%s" % (file_name), self.evaluations)
                 
                 #When the training step is done, we reset the state of the env
