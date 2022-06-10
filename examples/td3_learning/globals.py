@@ -10,6 +10,7 @@ import numpy as np
 
 from torch import nn
 import pybullet_envs
+from plato.config import Config
 
 env_name = "halfcheetah"
 
@@ -19,7 +20,7 @@ algorithm_name = 'td3_'
 
 env = gym.make(env_gym_name)
 
-seed = 1
+seed = Config().clients.random_seed
 
 env.seed(seed)
 env.reset()
