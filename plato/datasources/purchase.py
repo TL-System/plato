@@ -7,6 +7,7 @@ import urllib
 import tarfile
 import torch
 import numpy as np
+from torch.utils import data
 from plato.config import Config
 from plato.datasources import base
 
@@ -62,8 +63,8 @@ class DataSource(base.DataSource):
         test_label = Y[num_train:num_train * 2]
 
         ## create datasets
-        train_dataset = create_tensor_dataset(train_data, train_label)
-        test_dataset = create_tensor_dataset(test_data, test_label)
+        train_dataset = VectorDataset(train_data, train_label)
+        test_dataset = VectorDataset(test_data, test_label)
 
         return train_dataset, test_dataset
 
@@ -74,11 +75,20 @@ class DataSource(base.DataSource):
         return 20000
 
 
-def create_tensor_dataset(features, labels):
+
+class VectorDataset(data.Dataset):
     """
-        Create a tensor dataset based on features and labels
+        Create a Purchase100 dataset based on features and labels
     """
-    tensor_x = torch.stack([torch.FloatTensor(i) for i in features])
-    tensor_y = torch.stack([torch.LongTensor([i]) for i in labels])[:, 0]
-    dataset = torch.utils.data.TensorDataset(tensor_x, tensor_y)
-    return dataset
+    def __init__(self, features, labels):
+        self.data = torch.stack([torch.FloatTensor(i) 
+                            for i in features])
+        self.targets = torch.stack([torch.LongTensor([i]) 
+                            for i in labels])[:, 0]
+        self.classes = [f'Style #{i}' for i in range(100)]
+
+    def __getitem__(self, index):
+        return self.data[index], self.targets[index]
+
+    def __len__(self):
+        return self.data.size(0)

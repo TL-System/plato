@@ -24,7 +24,7 @@ data:
     partition_size: 2000
 
     # IID or non-IID?
-    sampler: iid
+    sampler: noniid
 
     # The random seed for sampling data
     random_seed: 1
