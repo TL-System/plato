@@ -12,7 +12,7 @@ from plato.config import Config
 
 def main():
     """ A Plato federated learning training session with the honest-but-curious server. """
-    model = dlg_model.Model(Config().trainer.num_classes)
+    model = dlg_model.Model
     trainer = dlg_trainer.Trainer
     client = dlg_client.Client(model=model, trainer=trainer)
     server = dlg_server.Server(model=model, trainer=trainer)
