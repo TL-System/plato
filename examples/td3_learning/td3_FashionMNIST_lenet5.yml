@@ -78,7 +78,7 @@ trainer:
     # The target accuracy
     # TODO: we should have a train reward, or target number of steps
     # I think the target number of steps is in the algorithm.iterations down below
-    target_accuracy: 1.0
+    target_accuracy: 5000
 
     # Number of epoches for local training in each communication round
     epochs: 10

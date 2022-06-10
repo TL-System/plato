@@ -91,7 +91,7 @@ class Trainer(basic.Trainer):
 
     def train_model(self, config, trainset, sampler, cut_layer):
         """Main Training"""
-        print("in line 87 of td3_learning_trainer!")
+        #print("in line 87 of td3_learning_trainer!")
         episode_timesteps = 0 #fixing error about using before assignment
         obs = 0 #fixing error about using before assignment
         round_episode_steps = 0
@@ -100,7 +100,7 @@ class Trainer(basic.Trainer):
             print("Done training")
             return
         while round_episode_steps <= globals.max_episode_steps:
-            print("in while loop line 97")
+            #print("in while loop line 97")
             #If episode is done
             if self.done:
                 #if not at beginning
@@ -167,7 +167,7 @@ class Trainer(basic.Trainer):
 
     def train_helper(self):
         """Training Loop"""
-        print("line 165 in td3_learning_trainer")
+        #print("line 165 in td3_learning_trainer")
         for it in range(Config().algorithm.iterations):
 
             #sample from replay buffer
@@ -266,7 +266,7 @@ class Trainer(basic.Trainer):
             logging.info("[Client #%d] Loading a model from %s, %s, %s and %s.",
                          self.client_id, actor_model_path, critic_model_path, actor_target_model_path, critic_target_model_path)
 
-        print("in line 251 of trainer")
+        #print("in line 251 of trainer")
         #self.model.load_state_dict(torch.load(model_path), strict=True)
         self.actor.load_state_dict(torch.load(actor_model_path), strict=True)
 
@@ -333,9 +333,7 @@ class Trainer(basic.Trainer):
                          model_path)
 
     async def server_test(self, testset, sampler=None, **kwargs):
-        print("123123123")
-        return 98
-
+        return (client.evaluate_policy(self, self.env))
 
 
 

@@ -96,11 +96,6 @@ class Model:
         self.actor_target.eval()
         self.critic_target.eval()
 
-
-
-    #TODO IMPLEMENT EVAL!!!
-    
-
     @staticmethod
     def get_model(*args):
         """ Obtaining an instance of this model. """
