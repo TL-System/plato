@@ -16,7 +16,9 @@ import warnings
 
 torch.backends.cudnn.benchmark = True
 
-DEBUG = False  # Emit warning messages when patching. Use this to bootstrap new architectures.
+# Emit warning messages when patching. Use this to bootstrap new architectures.
+DEBUG = False
+
 
 class MetaMonkey(torch.nn.Module):
     """Trace a networks and then replace its module calls with functional calls.
@@ -29,7 +31,6 @@ class MetaMonkey(torch.nn.Module):
         super().__init__()
         self.net = net
         self.parameters = OrderedDict(net.named_parameters())
-
 
     def forward(self, inputs, parameters=None):
         """Live Patch ... :> ..."""
@@ -63,7 +64,8 @@ class MetaMonkey(torch.nn.Module):
                     if module.num_batches_tracked is not None:
                         module.num_batches_tracked += 1
                         if module.momentum is None:  # use cumulative moving average
-                            exponential_average_factor = 1.0 / float(module.num_batches_tracked)
+                            exponential_average_factor = 1.0 / \
+                                float(module.num_batches_tracked)
                         else:  # use exponential moving average
                             exponential_average_factor = module.momentum
 
@@ -79,7 +81,8 @@ class MetaMonkey(torch.nn.Module):
                 lin_weights = next(param_gen)
                 lin_bias = next(param_gen)
                 method_pile.append(module.forward)
-                module.forward = partial(F.linear, weight=lin_weights, bias=lin_bias)
+                module.forward = partial(
+                    F.linear, weight=lin_weights, bias=lin_bias)
 
             elif next(module.parameters(), None) is None:
                 # Pass over modules that do not contain parameters
@@ -90,7 +93,8 @@ class MetaMonkey(torch.nn.Module):
             else:
                 # Warn for other containers
                 if DEBUG:
-                    warnings.warn(f'Patching for module {module.__class__} is not implemented.')
+                    warnings.warn(
+                        f'Patching for module {module.__class__} is not implemented.')
 
         output = self.net(inputs)
 

@@ -12,6 +12,11 @@ from plato.utils import optimizers
 from torchvision import transforms
 
 from utils.utils import cross_entropy_for_onehot, label_to_onehot
+from defense.GradDefense.sensitivity import compute_sens
+# from examples.dlg.defense.perturb import noise
+from defense.GradDefense.perturb import noise
+from defense.GradDefense.dataloader import extract_root_set, get_root_set_loader
+
 
 criterion = cross_entropy_for_onehot
 tt = transforms.ToPILImage()
@@ -63,6 +68,11 @@ class Trainer(basic.Trainer):
 
         self.model.to(self.device)
         self.model.train()
+
+        if hasattr(Config().algorithm, 'defense') and Config().algorithm.defense == 'GradDefense':
+            root_set_loader = get_root_set_loader(trainset)
+            sensitivity = compute_sens(
+                model=self.model, rootset_loader=root_set_loader, device=Config().device())
 
         target_grad = None
         total_local_updates = epochs * math.ceil(partition_size / batch_size)
@@ -160,6 +170,18 @@ class Trainer(basic.Trainer):
                 target_grad = [x / total_local_updates for x in target_grad]
             except:
                 target_grad = None
+
+            if hasattr(Config().algorithm, 'defense') and Config().algorithm.defense == 'GradDefense':
+                perturbed_gradients = noise(dy_dx=target_grad,
+                                            sensitivity=sensitivity,
+                                            slices_num=Config().algorithm.slices_num,
+                                            perturb_slices_num=Config().algorithm.perturb_slices_num,
+                                            scale=Config().algorithm.scale)
+
+                new_target_grad = []
+                for layer in perturbed_gradients:
+                    layer = layer.to(self.device)
+                    new_target_grad.append(layer)
 
         file_path = f"{Config().params['model_path']}/{self.client_id}.pickle"
         with open(file_path, 'wb') as handle:
