@@ -65,19 +65,24 @@ class Algorithm(fedavg.Algorithm):
 
         updated_weights_actor = OrderedDict()
         for name, weight in baseline_weights_actor.items():
-            updated_weights_actor[name] = weight + updated_weights_actor[name]
+            print("are we in here?? line 68 of algorithm")
+            print("name is this")
+            print(name)
+            print("weight is this")
+            print(weight)
+            updated_weights_actor[name] = weight + update_actor[name]
         
         updated_weights_actor_target = OrderedDict()
         for name, weight in baseline_weights_actor_target.items():
-            updated_weights_actor_target[name] = weight + updated_weights_actor_target[name]
+            updated_weights_actor_target[name] = weight + update_actor_target[name]
 
         updated_weights_critic = OrderedDict()
         for name, weight in baseline_weights_critic.items():
-            updated_weights_critic[name] = weight + updated_weights_critic [name]
+            updated_weights_critic[name] = weight + update_critic[name]
 
         updated_weights_critic_target = OrderedDict()
         for name, weight in baseline_weights_critic_target.items():
-            updated_weights_critic_target[name] = weight + updated_weights_critic_target [name]
+            updated_weights_critic_target[name] = weight + update_critic_target[name]
 
         return updated_weights_actor, updated_weights_critic, updated_weights_actor_target, updated_weights_critic_target
     
