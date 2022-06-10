@@ -11,6 +11,8 @@ from torch import nn
 import asyncio
 from plato.servers import fedavg
 from plato.config import Config
+import globals
+import pickle
 
 
 class TD3Server(fedavg.Server):
@@ -77,5 +79,28 @@ class TD3Server(fedavg.Server):
         
         #print("line 78 ->exiting server??")
         return actor_avg_update, critic_avg_update, actor_target_avg_update, critic_target_avg_update
+
+    def save_to_checkpoint(self):
+        """ Save a checkpoint for resuming the training session. """
+        checkpoint_path = Config.params['checkpoint_path']
+
+        copy_algorithm = globals.algorithm_name
+        if '_' in copy_algorithm:
+            copy_algorithm= copy_algorithm.replace('_', '')
+        
+        env_algorithm = globals.env_name+copy_algorithm
+        model_name = env_algorithm
+        if '_' in model_name:
+            model_name.replace('_', '')
+        filename = f"checkpoint_{model_name}_{self.current_round}.pth"
+        logging.info("[%s] Saving the checkpoint to %s/%s.", self,
+                     checkpoint_path, filename)
+        self.trainer.save_model(filename, checkpoint_path)
+        self.save_random_states(self.current_round, checkpoint_path)
+
+        # Saving the current round in the server for resuming its session later on
+        with open(f"{checkpoint_path}/current_round.pkl",
+                  'wb') as checkpoint_file:
+            pickle.dump(self.current_round, checkpoint_file)
 
     

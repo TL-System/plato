@@ -11,8 +11,13 @@ import numpy as np
 from torch import nn
 import pybullet_envs
 
+env_name = "halfcheetah"
 
-env = gym.make("HalfCheetahBulletEnv-v0")
+env_gym_name = "HalfCheetahBulletEnv-v0"
+
+algorithm_name = 'td3_'
+
+env = gym.make(env_gym_name)
 
 seed = 1
 

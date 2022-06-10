@@ -244,6 +244,7 @@ class Trainer(basic.Trainer):
         critic_model_name = 'critic_model'
         actor_target_model_name = 'actor_target_model'
         critic_target_model_name = 'critic_target_model'
+        env_algorithm = globals.env_name+ globals.algorithm_name
 
         #going in here for some reason
         #fixed by making it none
@@ -257,10 +258,10 @@ class Trainer(basic.Trainer):
             critic_target_filename = filename + '_critic_target'
             critic_target_model_path = f'{model_path}/{critic_target_filename}'
         else:
-            actor_model_path = f'{model_path}/{actor_model_name}.pth'
-            critic_model_path = f'{model_path}/{critic_model_name}.pth'
-            actor_target_model_path = f'{model_path}/{actor_target_model_name}.pth'
-            critic_target_model_path = f'{model_path}/{critic_target_model_name}.pth'
+            actor_model_path = f'{model_path}/{env_algorithm+actor_model_name}.pth'
+            critic_model_path = f'{model_path}/{env_algorithm+critic_model_name}.pth'
+            actor_target_model_path = f'{model_path}/{env_algorithm+actor_target_model_name}.pth'
+            critic_target_model_path = f'{model_path}/{env_algorithm+critic_target_model_name}.pth'
 
         if self.client_id == 0:
             logging.info("[Server #%d] Loading models from %s, %s, %s and %s.", os.getpid(),
@@ -287,6 +288,7 @@ class Trainer(basic.Trainer):
         critic_model_name = 'critic_model'
         actor_target_model_name = 'actor_target_model'
         critic_target_model_name = 'critic_target_model'
+        env_algorithm = globals.env_name+ globals.algorithm_name
 
         try:
             if not os.path.exists(model_path):
@@ -309,10 +311,10 @@ class Trainer(basic.Trainer):
            actor_target_model_path = f'{model_path}/{actor_target_filename}'
            critic_target_model_path = f'{model_path}/{critic_target_filename}'
         else:
-            actor_model_path = f'{model_path}/{actor_model_name}.pth'
-            critic_model_path = f'{model_path}/{critic_model_name}.pth'
-            actor_target_model_path = f'{model_path}/{actor_target_model_name}.pth'
-            critic_target_model_path = f'{model_path}/{critic_target_model_name}.pth'
+            actor_model_path = f'{model_path}/{env_algorithm+actor_model_name}.pth'
+            critic_model_path = f'{model_path}/{env_algorithm+critic_model_name}.pth'
+            actor_target_model_path = f'{model_path}/{env_algorithm+actor_target_model_name}.pth'
+            critic_target_model_path = f'{model_path}/{env_algorithm+critic_target_model_name}.pth'
 
         if self.model_state_dict is None:
             #torch.save(self.model.state_dict(), model_path)

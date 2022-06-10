@@ -43,7 +43,7 @@ server:
     staleness_bound: 10
 
     random_seed: 1
-
+    
 data:
     # The training and testing dataset
     datasource: FashionMNIST
