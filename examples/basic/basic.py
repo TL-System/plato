@@ -18,7 +18,6 @@ class DataSource(base.DataSource):
     """
     A custom datasource with custom training and validation datasets.
     """
-
     def __init__(self):
         super().__init__()
 
@@ -34,7 +33,6 @@ class DataSource(base.DataSource):
 
 class Trainer(basic.Trainer):
     """ A custom trainer with custom training and testing loops. """
-
     def train_model(self, config, trainset, sampler, cut_layer=None):  # pylint: disable=unused-argument
         """A custom training loop. """
         optimizer = torch.optim.Adam(self.model.parameters(), lr=1e-3)
@@ -82,20 +80,35 @@ class Trainer(basic.Trainer):
         return accuracy
 
 
+class Model(nn.Module):
+    """ A custom model. """
+    def __init__(self):
+        super().__init__()
+
+        self.body = nn.Sequential(
+            nn.Linear(28 * 28, 128),
+            nn.ReLU(),
+            nn.Linear(128, 128),
+            nn.ReLU(),
+            nn.Linear(128, 10),
+        )
+
+    def forward(self, x):
+        return self.body(x)
+
+    @staticmethod
+    def get_model(*args):
+        """Obtaining an instance of this model."""
+        return Model()
+
+
 def main():
     """
        A Plato federated learning training session using a custom model,
        datasource, and trainer.
     """
-    model = nn.Sequential(
-        nn.Linear(28 * 28, 128),
-        nn.ReLU(),
-        nn.Linear(128, 128),
-        nn.ReLU(),
-        nn.Linear(128, 10),
-    )
-
     datasource = DataSource()
+    model = Model
     trainer = Trainer
 
     client = simple.Client(model=model, datasource=datasource, trainer=trainer)
