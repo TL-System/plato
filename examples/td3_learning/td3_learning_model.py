@@ -68,10 +68,15 @@ class TD3Critic(nn.Module):
 class Model:
     """A wrapper class that holds both actor and critic models"""
     def __init__(self, state_dim, action_dim, max_action):
-        self.actor = TD3Actor(state_dim, action_dim, max_action)
-        self.critic = TD3Critic(state_dim, action_dim)
+        self.actor = TD3Actor(globals.state_dim, globals.action_dim, globals.max_action)
+        self.critic = TD3Critic(globals.state_dim, globals.action_dim)
         self.actor_target = copy.deepcopy(self.actor)
         self.critic_target = copy.deepcopy(self.critic)
+
+       #self.actor = TD3Actor(state_dim, action_dim, max_action)
+        #self.critic = TD3Critic(state_dim, action_dim)
+        #self.actor_target = copy.deepcopy(self.actor)
+        #self.critic_target = copy.deepcopy(self.critic)
 
     def cpu(self):
         self.actor.cpu()

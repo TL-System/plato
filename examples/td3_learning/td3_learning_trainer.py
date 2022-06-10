@@ -304,10 +304,10 @@ class Trainer(basic.Trainer):
            actor_target_model_path = f'{model_path}/{actor_target_filename}'
            critic_target_model_path = f'{model_path}/{critic_target_filename}'
         else:
-            actor_model_path = f'{model_path}/{actor_model_name}'
-            critic_model_path = f'{model_path}/{critic_model_name}'
-            actor_target_model_path = f'{model_path}/{actor_target_model_name}'
-            critic_target_model_path = f'{model_path}/{critic_target_model_name}'
+            actor_model_path = f'{model_path}/{actor_model_name}.pth'
+            critic_model_path = f'{model_path}/{critic_model_name}.pth'
+            actor_target_model_path = f'{model_path}/{actor_target_model_name}.pth'
+            critic_target_model_path = f'{model_path}/{critic_target_model_name}.pth'
 
         if self.model_state_dict is None:
             #torch.save(self.model.state_dict(), model_path)
@@ -332,7 +332,9 @@ class Trainer(basic.Trainer):
             logging.info("[Client #%d] Model saved to %s.", self.client_id,
                          model_path)
 
-
+    async def server_test(self, testset, sampler=None, **kwargs):
+        print("123123123")
+        return 98
 
 
 
