@@ -1,5 +1,4 @@
 
-# For the central learning of Byol on the MNIST datase,
 
 general:
     # The prefix of directories of dataset, models, checkpoints, and results
@@ -9,25 +8,24 @@ general:
     # locally
     base_path: ./Projects/experiments
 
-
 clients:
     # Type
     type: simple
 
     # The total number of clients
-    total_clients: 1
+    total_clients: 50
 
     # The number of clients selected in each round
-    per_round: 1
+    per_round: 30
 
     # Should the clients compute test accuracy locally?
     do_test: True
     # Minotor the self-supervised learning by knn for
-    # every 1 round
-    test_interval: 1
+    # every 5 round
+    test_interval: 5
     # Train the personalized model based on the
-    # learned representation every 1 rounds
-    eval_test_interval: 1
+    # learned representation every 10 rounds
+    eval_test_interval: 10
     # Whether simulate clients or not
     simulation: true
 
@@ -42,23 +40,24 @@ server:
     # for the models/checkpoints/results path, please keep their dir's
     # name the same
     # For example, the subdir name of model_path is
-    # 'BYOL_MNIST_centralEncoder_pureMLP', it is desired to use the same name
+    # 'MoCo_CIFAR10_ResNet18_pureMLP', it is desired to use the same name
     # for checkpoint_path and result_path.
 
     # Note, for the name of this subdir, it is desired to follow the same
     # rule as:
     # {ssl_method_name}_{dataset_name}_{encoder_backbone_name}_{personalized_model_name}
     # For example, for the name here, it uses
-    #   BYOL          : The BYOL method
-    #   MNIST           : The MNIST dataset
-    #   centralEncoder  : The encoder follows a implement of central BYOL
-    #   pureMLP         : The pure MLP network (1 layer without any enhancements)
-    model_path: models/BYOL_MNIST_centralEncoder_pureMLP
-    checkpoint_path: checkpoints/BYOL_MNIST_centralEncoder_pureMLP
+    #   MoCo              : The MoCo method
+    #   CIFAR10             : The CIFAR10 dataset
+    #   ResNet18            : The ResNet18 network
+    #   pureMLP             : The pure MLP network (1 layer without any enhancements)
+    model_path: models/MoCo_CIFAR10_ResNet18_pureMLP
+    checkpoint_path: checkpoints/MoCo_CIFAR10_ResNet18_pureMLP
+
 
 data:
     # The training and testing dataset
-    datasource: MNIST
+    datasource: CIFAR10
 
     # Number of samples in each partition
     #
@@ -66,17 +65,21 @@ data:
     # may lead the failure of the loss criterion part
     # if your loss criterion relies on the batch_size
     # as its argument. For example, the NT_Xent loss utilized
-    # by the BYOL method set the defined batch_size as the parameter.
+    # by the MoCo method set the defined batch_size as the parameter.
     # However, at the end of one epoch, the left samples may smaller than
     # the batch_size. This makes the #loaded samples != batch_size.
     # Working on criterion that is defined with batch_size but receives loaded
     # samples whose size is smaller than the batch size may causes problems.
-    # drop_last can alleviate this issue
-    partition_size: 60000
+    # drop_last = True can alleviate this issue.
+    # Currently drop_last is default to be False in Plato.
+    # Under this case, to avoid this issue, we need to set:
+    #   partition_size / batch_size = integar
+    #   partition_size / pers_batch_size = integar
+    partition_size: 10000
 
     # IID or non-IID?
-    sampler: iid
-    testset_sampler: iid
+    sampler: noniid
+    testset_sampler: noniid
     # The concentration parameter for the Dirichlet distribution
     concentration: 5
 
@@ -89,17 +92,19 @@ data:
     data_wrapper: ContrastiveAugmentWrapper
 
     # set the data augmentation
-    #   options: simsiam, byol, simclr
-    augment_transformer_name: byol
+    #   options: simsiam, byol, MoCo
+    augment_transformer_name: moco
     # some methods apply the normalization to samples
     #   while others do not
-    is_norm: True
+    is_norm: False
 
 trainer:
     # The type of the trainer
     type: basic
+
+
     # The maximum number of training rounds
-    rounds: 1
+    rounds: 100
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -108,76 +113,58 @@ trainer:
     max_concurrency: 10
 
     # The target accuracy
-    target_accuracy: 0.98
+    target_accuracy: 0.80
 
     # Number of epochs for local training in each communication round
-    #   The user is expected to carefully choose the batch_size to avoid
-    # the memory allocation issue as the contrastive samples occupy more
-    # space as more samples will be contained within one loading.
-    epochs: 50
-    batch_size: 128
+    epochs: 5
+    batch_size: 20
     optimizer: Adam
     learning_rate: 0.003
-    betas:
-      - 0.9
-      - 0.999
-    eps: 0.00000008 # 1e-8
-    weight_decay: 0.001
+    weight_decay: 0.00001
 
-    lr_scheduler: StepLR
-    lr_step_size: 20
-    lr_gamma: 0.9
+    # Learning rate schedule
+    lr_schedule: LambdaLR
+    lr_gamma: 0.1
+    lr_milestone_steps: 80ep,120ep
 
-    epoch_log_interval: 2
-    batch_log_interval: 1
+    epoch_log_interval: 1
+    batch_log_interval: 100
 
     # Number of epochs for local training in each communication round
-    #   The batch size for the downstream task can be larger as it
-    # does not utilize the
-    pers_epochs: 100
-    pers_batch_size: 64
+    pers_epochs: 30
+    pers_batch_size: 32
     pers_optimizer: Adam
-    pers_learning_rate: 0.005
-    pers_betas:
-        - 0.9
-        - 0.99
-    pers_eps: 0.00000009 # 1e-8
-    pers_weight_decay: 0.002
+    pers_learning_rate: 0.003
+    pers_weight_decay: 0.000006
 
-    # currently, we only support CosineAnnealingLR
     pers_lr_schedule: StepLR
     pers_lr_step_size: 20
     pers_lr_gamma: 0.9
 
     pers_epoch_log_interval: 2
-    # temperature
-    temperature: 0.5
 
     # image_size
     #  - CIFAR10 (Image size=32)
     #  - MNIST (Image size=28)
-    image_size: 28
+    image_size: 32
 
     # The machine learning model,
     # it behaves as the encoder for the ssl method
     # the final fc layer will be removed
-    # however, in the central test, we do not use this
-    #   but use the custom model
-    model_name: lenet5
-    # in general, the projection_dim = prediction_dim
-    projection_dim: 128
-    prediction_dim: 128
-    # here are two ways to determine this decay
-    # - constant value: 0.99
-    # - adaptive computed with traing epochs.
-    #   such as the one in "three-method" implementation
-    onlient_target_moving_average_decay: 0.99
+    model_name: resnet_18
+    # in general,
+    feature_dim: 128
+
+    # temperature
+    temperature: 0.07
+    # queue_size, 65536 by default
+    queue_size: 65536
+    # moco momentum of updating key encoder (default: 0.999)
+    update_momentum: 0.999
 
     # set which part of the model is used as the global model
-    # - whole: the whole model
-    # - online_embedder: the online_embedder is exchanged
-    # - target_embedder: the target_embedder is exchanged
     global_model_name: whole
+
     personalized_model_name: pure_one_layer_mlp
 
     monitor_name: knn
@@ -191,5 +178,6 @@ algorithm:
     # Aggregation algorithm
     type: fedavg
 
+
 results:
-    result_path: results/BYOL_MNIST_centralEncoder_pureMLP
+    result_path: results/MoCo_CIFAR10_ResNet18_pureMLP

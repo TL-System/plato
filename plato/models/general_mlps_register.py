@@ -176,4 +176,15 @@ class Model():
                     dropout_ratios=[0, 0],
                 ))
 
+        if model_type == 'moco_final_mlp':
+            return build_mlp_from_config(
+                dict(
+                    type='FullyConnectedHead',
+                    output_dim=Config.trainer.feature_dim,
+                    input_dim=input_dim,
+                    hidden_layers_dim=[],
+                    batch_norms=[None],
+                    activations=[None],
+                    dropout_ratios=[0],
+                ))
         raise ValueError(f'No such MLP model: {model_type}')
