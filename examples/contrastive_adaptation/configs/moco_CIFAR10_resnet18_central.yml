@@ -1,5 +1,7 @@
 
-# For the central learning of Byol on the MNIST datase,
+# For the central learning of BYOL on the CIFAR10 datase,
+#   we directly follow the setting provided by:
+
 
 general:
     # The prefix of directories of dataset, models, checkpoints, and results
@@ -22,6 +24,11 @@ clients:
 
     # Should the clients compute test accuracy locally?
     do_test: True
+
+    # whether perform the eval test at the final round
+    # on all clients
+    do_final_eval_test: True
+
     # Minotor the self-supervised learning by knn for
     # every 1 round
     test_interval: 1
@@ -42,23 +49,23 @@ server:
     # for the models/checkpoints/results path, please keep their dir's
     # name the same
     # For example, the subdir name of model_path is
-    # 'BYOL_MNIST_centralEncoder_pureMLP', it is desired to use the same name
+    # 'BYOL_CIFAR10_resnet18_pureMLP', it is desired to use the same name
     # for checkpoint_path and result_path.
 
     # Note, for the name of this subdir, it is desired to follow the same
     # rule as:
     # {ssl_method_name}_{dataset_name}_{encoder_backbone_name}_{personalized_model_name}
     # For example, for the name here, it uses
-    #   BYOL          : The BYOL method
-    #   MNIST           : The MNIST dataset
-    #   centralEncoder  : The encoder follows a implement of central BYOL
+    #   BYOL            : The BYOL method
+    #   CIFAR10         : The CIFAR10 dataset
+    #   resnet18        : The encoder built upon resnet18
     #   pureMLP         : The pure MLP network (1 layer without any enhancements)
-    model_path: models/BYOL_MNIST_centralEncoder_pureMLP
-    checkpoint_path: checkpoints/BYOL_MNIST_centralEncoder_pureMLP
+    model_path: models/BYOL_CIFAR10_central_resnet18_pureMLP
+    checkpoint_path: checkpoints/BYOL_centralCIFAR10_resnet18_pureMLP
 
 data:
     # The training and testing dataset
-    datasource: MNIST
+    datasource: CIFAR10
 
     # Number of samples in each partition
     #
@@ -72,7 +79,7 @@ data:
     # Working on criterion that is defined with batch_size but receives loaded
     # samples whose size is smaller than the batch size may causes problems.
     # drop_last can alleviate this issue
-    partition_size: 60000
+    partition_size: 600
 
     # IID or non-IID?
     sampler: iid
@@ -89,8 +96,8 @@ data:
     data_wrapper: ContrastiveAugmentWrapper
 
     # set the data augmentation
-    #   options: simsiam, byol, simclr
-    augment_transformer_name: byol
+    #   options: simsiam, byol, simclr, moco
+    augment_transformer_name: moco
     # some methods apply the normalization to samples
     #   while others do not
     is_norm: True
@@ -108,13 +115,13 @@ trainer:
     max_concurrency: 10
 
     # The target accuracy
-    target_accuracy: 0.98
+    target_accuracy: 0.9
 
     # Number of epochs for local training in each communication round
     #   The user is expected to carefully choose the batch_size to avoid
     # the memory allocation issue as the contrastive samples occupy more
     # space as more samples will be contained within one loading.
-    epochs: 50
+    epochs: 1
     batch_size: 128
     optimizer: Adam
     learning_rate: 0.003
@@ -150,28 +157,27 @@ trainer:
     pers_lr_gamma: 0.9
 
     pers_epoch_log_interval: 2
-    # temperature
-    temperature: 0.5
 
     # image_size
     #  - CIFAR10 (Image size=32)
     #  - MNIST (Image size=28)
-    image_size: 28
+    image_size: 32
 
     # The machine learning model,
     # it behaves as the encoder for the ssl method
     # the final fc layer will be removed
     # however, in the central test, we do not use this
     #   but use the custom model
-    model_name: lenet5
-    # in general, the projection_dim = prediction_dim
-    projection_dim: 128
-    prediction_dim: 128
-    # here are two ways to determine this decay
-    # - constant value: 0.99
-    # - adaptive computed with traing epochs.
-    #   such as the one in "three-method" implementation
-    onlient_target_moving_average_decay: 0.99
+    model_name: resnet_18
+    # in general,
+    feature_dim: 128
+
+    # temperature
+    temperature: 0.07
+    # queue_size, 65536 by default
+    queue_size: 65536
+    # moco momentum of updating key encoder (default: 0.999)
+    update_momentum: 0.999
 
     # set which part of the model is used as the global model
     # - whole: the whole model
@@ -192,4 +198,4 @@ algorithm:
     type: fedavg
 
 results:
-    result_path: results/BYOL_MNIST_centralEncoder_pureMLP
+    result_path: results/MoCo_CIFAR10_central_resnet18_pureMLP

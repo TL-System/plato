@@ -172,8 +172,7 @@ trainer:
     # - adaptive computed with traing epochs.
     #   such as the one in "three-method" implementation
     onlient_target_moving_average_decay: 0.99
-    # mock image channel used to instantiate singleton parameters
-    mock_image_channel: 1
+
     # set which part of the model is used as the global model
     # - whole: the whole model
     # - online_embedder: the online_embedder is exchanged

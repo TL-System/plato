@@ -12,6 +12,7 @@ from .simsiam_aug import SimSiamTransform
 from .byol_aug import BYOLTransform
 from .simclr_aug import SimCLRTransform
 from .test_aug import TestTransform
+from .moco import MoCoTransform
 
 from .normalizations import datasets_norm
 
@@ -23,6 +24,7 @@ def get(name='simsiam', train=True, for_downstream_task=False):
         "simsiam": SimSiamTransform,
         "byol": BYOLTransform,
         "simclr": SimCLRTransform,
+        "moco": MoCoTransform,
         "test": TestTransform,
     }
     supported_transform_name = list(transform_mapper.keys())
