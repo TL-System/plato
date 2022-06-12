@@ -11,6 +11,7 @@ from typing import Any, IO
 
 import numpy as np
 import yaml
+from pathlib import Path
 
 
 class Loader(yaml.SafeLoader):
@@ -157,8 +158,13 @@ class Config:
             # The base path used for all datasets, models, checkpoints, and results
             Config.params['base_path'] = Config.args.base
 
+            if 'results' in config:
+                Config.results = Config.namedtuple_from_dict(config['results'])
+
             if 'general' in config:
                 Config.general = Config.namedtuple_from_dict(config['general'])
+
+                Config.switch_running_mode()
 
                 if hasattr(Config.general, 'base_path'):
                     Config.params['base_path'] = Config().general.base_path
@@ -191,9 +197,6 @@ class Config:
                 Config.params['checkpoint_path'] = os.path.join(
                     Config.params['base_path'], "checkpoints")
             os.makedirs(Config.params['checkpoint_path'], exist_ok=True)
-
-            if 'results' in config:
-                Config.results = Config.namedtuple_from_dict(config['results'])
 
             # Directory of the .csv file containing results
             if hasattr(Config, 'results') and hasattr(Config.results,
@@ -335,3 +338,96 @@ class Config:
                     device = 'cuda:0'
 
         return device
+
+    @staticmethod
+    def make_consistent_save_path() -> None:
+        """ Make the saving path of different parts
+            be the same.
+        """
+        # the path name should be the combination of
+        # ssl method name,
+        ssl_method_name = Config.data.augment_transformer_name
+        # the component name for the global model
+        global_model_name = Config.trainer.global_model_name
+        # personalized model name
+        personalized_model_name = Config.trainer.personalized_model_name
+        if personalized_model_name == "pure_one_layer_mlp":
+            personalized_model_name = "pureMLP"
+
+        # dataset name
+        datasource = Config.data.datasource
+        # encoder name
+        model_name = Config.trainer.model_name
+
+        target_name = "_".join([
+            ssl_method_name, model_name, global_model_name,
+            personalized_model_name, datasource
+        ])
+
+        return target_name
+
+    @staticmethod
+    def switch_running_mode() -> None:
+        """ Update the hyper-parameters based on the running mode.
+
+        We support four types of running mode:
+
+        """
+        current_project_dir = Path(os.getcwd())
+        running_mode = Config.general.running_mode
+        project_name = Config.general.project_name
+
+        # setting the base saving path
+        Config.server = Config.server._replace(model_path=Path(
+            os.path.join("models", Config.make_consistent_save_path())))
+        Config.server = Config.server._replace(checkpoint_path=Path(
+            os.path.join("checkpoints", Config.make_consistent_save_path())))
+        Config.results = Config.results._replace(result_path=Path(
+            os.path.join("results", Config.make_consistent_save_path())))
+
+        if running_mode == "user":
+            # do not make any changes if the program
+            # needs to follow the user's settings.
+            return None
+
+        if "local" in running_mode:
+            # the experiment will be performed in the local
+            # machine, such as the personal macos
+            Config.general = Config.general._replace(base_path=os.path.join(
+                current_project_dir, project_name, "experiments"))
+
+        if "sim" in running_mode:
+            # the experiment will be performed in the sim server
+            Config.general = Config.general._replace(
+                base_path="/data/sijia/INFOCOM23/experiments")
+
+        if "code_test" in running_mode:
+            # perform the code test mode by using simple consiguration
+            # these configurations are set to test the correcness of
+            # the code
+            logging.info(
+                "Performing the code test with simple configurations.")
+            Config.clients = Config.clients._replace(do_test=True)
+            Config.clients = Config.clients._replace(do_final_eval_test=True)
+            Config.clients = Config.clients._replace(test_interval=1)
+            Config.clients = Config.clients._replace(eval_test_interval=1)
+            Config.clients = Config.clients._replace(total_clients=5)
+            Config.clients = Config.clients._replace(per_round=3)
+            Config.data = Config.data._replace(partition_size=600)
+            Config.trainer = Config.trainer._replace(epochs=5)
+            Config.trainer = Config.trainer._replace(batch_size=30)
+            Config.trainer = Config.trainer._replace(epoch_log_interval=1)
+            Config.trainer = Config.trainer._replace(batch_log_interval=5)
+            Config.trainer = Config.trainer._replace(pers_epochs=10)
+            Config.trainer = Config.trainer._replace(pers_batch_size=30)
+            Config.trainer = Config.trainer._replace(pers_epoch_log_interval=1)
+
+        if "central" in running_mode:
+            logging.info(
+                "Performing the central learing with specific configurations.")
+            # apply the central learning
+            Config.clients = Config.clients._replace(total_clients=1)
+            Config.clients = Config.clients._replace(per_round=1)
+            Config.data = Config.data._replace(sampler="iid")
+            Config.data = Config.data._replace(testset_sampler="iid")
+            Config.trainer = Config.trainer._replace(rounds=1)

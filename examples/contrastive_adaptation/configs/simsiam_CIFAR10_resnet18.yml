@@ -1,38 +1,44 @@
 
-# For the central learning of Byol on the MNIST datase,
-
 general:
     # The prefix of directories of dataset, models, checkpoints, and results
     # on sim server
-    # base_path: /data/user/Projects/experiments
+    # base_path: /data/sijia/INFOCOM23/experiments
 
     # locally
-    base_path: ./Projects/experiments
-
+    base_path: ./INFOCOM23/experiments
+    project_name: INFOCOM23
+    # performing different running mode
+    # for different purposes
+    # - local_central_code_test
+    # - local_central
+    # - local_code_test
+    # - local
+    # - user
+    # - sim
+    running_mode: local
 
 clients:
     # Type
     type: simple
 
     # The total number of clients
-    total_clients: 5
+    total_clients: 50
 
     # The number of clients selected in each round
-    per_round: 3
-
-    # whether perform the eval test at the final round
-    # on all clients
-    do_final_eval_test: True
+    per_round: 30
 
     # Should the clients compute test accuracy locally?
     do_test: True
+    # whether perform the eval test at the final round
+    # on all clients
+    do_final_eval_test: True
     # Minotor the self-supervised learning by knn for
-    # every 1 round
-    test_interval: 1
+    # every 5 round
+    test_interval: 5
     # Train the personalized model based on the
-    # learned representation every 1 rounds
+    # learned representation every 10 rounds
+    eval_test_interval: 10
 
-    eval_test_interval: 1
     # Whether simulate clients or not
     simulation: true
 
@@ -44,22 +50,20 @@ server:
     synchronous: true
     do_test: false
 
-    # for the models/checkpoints/results path, please keep their dir's
-    # name the same
-    # For example, the subdir name of model_path is
-    # 'SimSiam_CIFAR10_resnet18_pureMLP', it is desired to use the same name
-    # for checkpoint_path and result_path.
+    # for the paths of models; checkpoints; results,
+    # they utilize the same name, following the one defined in
+    # plato.config:
+    # {ssl_method_name}_{model_name}_{global_model_name}_{personalized_model_name}_{datasource}
+    # - ssl_method_name: data.augment_transformer_name
+    # - model_name: trainer.model_name
+    # - global_model_name: data.global_model_name
+    # - personalized_model_name: data.personalized_model_name
+    # - datasource: data.datasource
 
-    # Note, for the name of this subdir, it is desired to follow the same
-    # rule as:
-    # {ssl_method_name}_{dataset_name}_{encoder_backbone_name}_{personalized_model_name}
-    # For example, for the name here, it uses
-    #   SimSiam          : The SimSiam method
-    #   CIFAR10           : The CIFAR10 dataset
-    #   resnet18  : The encoder follows a implement of central SimSiam
-    #   pureMLP         : The pure MLP network (1 layer without any enhancements)
-    model_path: models/SimSiam_CIFAR10_resnet18_pureMLP
-    checkpoint_path: checkpoints/SimSiam_CIFAR10_resnet18_pureMLP
+    # set xxx here as the config will set the path by itself
+    # thus we do not need to repeatly reset these paths
+    model_path: xxx
+    checkpoint_path: xxx
 
 data:
     # The training and testing dataset
@@ -77,7 +81,7 @@ data:
     # Working on criterion that is defined with batch_size but receives loaded
     # samples whose size is smaller than the batch size may causes problems.
     # drop_last can alleviate this issue
-    partition_size: 1000
+    partition_size: 5000
 
     # IID or non-IID?
     sampler: noniid
@@ -104,7 +108,7 @@ trainer:
     # The type of the trainer
     type: basic
     # The maximum number of training rounds
-    rounds: 10
+    rounds: 100
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -113,13 +117,13 @@ trainer:
     max_concurrency: 10
 
     # The target accuracy
-    target_accuracy: 0.98
+    target_accuracy: 0.8
 
     # Number of epochs for local training in each communication round
     #   The user is expected to carefully choose the batch_size to avoid
     # the memory allocation issue as the contrastive samples occupy more
     # space as more samples will be contained within one loading.
-    epochs: 2
+    epochs: 5
     batch_size: 128
     optimizer: Adam
     learning_rate: 0.003
@@ -133,14 +137,14 @@ trainer:
     lr_step_size: 20
     lr_gamma: 0.9
 
-    epoch_log_interval: 2
-    batch_log_interval: 1
+    epoch_log_interval: 1
+    batch_log_interval: 10
 
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
     # does not utilize the
-    pers_epochs: 10
-    pers_batch_size: 64
+    pers_epochs: 50
+    pers_batch_size: 128
     pers_optimizer: Adam
     pers_learning_rate: 0.005
     pers_betas:
@@ -155,8 +159,6 @@ trainer:
     pers_lr_gamma: 0.9
 
     pers_epoch_log_interval: 2
-    # temperature
-    temperature: 0.5
 
     # image_size
     #  - CIFAR10 (Image size=32)
@@ -172,17 +174,10 @@ trainer:
     # in general, the projection_dim = prediction_dim
     projection_dim: 512
     prediction_dim: 512
-    # here are two ways to determine this decay
-    # - constant value: 0.99
-    # - adaptive computed with traing epochs.
-    #   such as the one in "three-method" implementation
-    onlient_target_moving_average_decay: 0.99
 
-    # set which part of the model is used as the global model
-    # - whole: the whole model
-    # - online_embedder: the online_embedder is exchanged
-    # - target_embedder: the target_embedder is exchanged
+    # name of the component used as the global model
     global_model_name: whole
+
     personalized_model_name: pure_one_layer_mlp
 
     monitor_name: knn
@@ -197,4 +192,4 @@ algorithm:
     type: fedavg
 
 results:
-    result_path: results/SimSiam_CIFAR10_resnet18_pureMLP
+    result_path: xxx
