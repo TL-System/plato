@@ -42,7 +42,7 @@ class Trainer(base.Trainer):
         if model is None:
             self.model = models_registry.get()
         else:
-            self.model = model(Config().trainer.num_classes)
+            self.model = model.get_model()
 
         if hasattr(Config().algorithm,
                    'init_params') and Config().algorithm.init_params:
