@@ -2,7 +2,6 @@
 # For the central learning of BYOL on the CIFAR10 datase,
 #   we directly follow the setting provided by:
 
-
 general:
     # The prefix of directories of dataset, models, checkpoints, and results
     # on sim server

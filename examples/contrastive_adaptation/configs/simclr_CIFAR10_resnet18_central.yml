@@ -1,15 +1,20 @@
 
-# For the central learning of BYOL on the CIFAR10 datase,
-#   we directly follow the setting provided by:
-
-
 general:
     # The prefix of directories of dataset, models, checkpoints, and results
     # on sim server
-    # base_path: /data/user/Projects/experiments
+    # base_path: /data/sijia/INFOCOM23/experiments
 
     # locally
-    base_path: ./Projects/experiments
+    base_path: ./INFOCOM23/experiments
+    project_name: INFOCOM23
+    # performing different running mode
+    # for different purposes
+    # - local_central_code_test
+    # - local_central
+    # - local_code_test
+    # - user
+    # - sim
+    running_mode: local_central
 
 
 clients:
@@ -24,6 +29,9 @@ clients:
 
     # Should the clients compute test accuracy locally?
     do_test: True
+    # whether perform the eval test at the final round
+    # on all clients
+    do_final_eval_test: True
     # Minotor the self-supervised learning by knn for
     # every 1 round
     test_interval: 1
@@ -41,22 +49,20 @@ server:
     synchronous: true
     do_test: false
 
-    # for the models/checkpoints/results path, please keep their dir's
-    # name the same
-    # For example, the subdir name of model_path is
-    # 'SimCLR_CIFAR10_resnet18_pureMLP', it is desired to use the same name
-    # for checkpoint_path and result_path.
+    # for the paths of models; checkpoints; results,
+    # they utilize the same name, following the one defined in
+    # plato.config:
+    # {ssl_method_name}_{model_name}_{global_model_name}_{personalized_model_name}_{datasource}
+    # - ssl_method_name: data.augment_transformer_name
+    # - model_name: trainer.model_name
+    # - global_model_name: data.global_model_name
+    # - personalized_model_name: data.personalized_model_name
+    # - datasource: data.datasource
 
-    # Note, for the name of this subdir, it is desired to follow the same
-    # rule as:
-    # {ssl_method_name}_{dataset_name}_{encoder_backbone_name}_{personalized_model_name}
-    # For example, for the name here, it uses
-    #   SimCLR            : The SimCLR method
-    #   CIFAR10         : The CIFAR10 dataset
-    #   resnet18        : The encoder built upon resnet18
-    #   pureMLP         : The pure MLP network (1 layer without any enhancements)
-    model_path: models/SimCLR_CIFAR10_central_resnet18_pureMLP
-    checkpoint_path: checkpoints/SimCLR_CIFAR10_central_resnet18_pureMLP
+    # set xxx here as the config will set the path by itself
+    # thus we do not need to repeatly reset these paths
+    model_path: xxx
+    checkpoint_path: xxx
 
 data:
     # The training and testing dataset
@@ -74,13 +80,11 @@ data:
     # Working on criterion that is defined with batch_size but receives loaded
     # samples whose size is smaller than the batch size may causes problems.
     # drop_last can alleviate this issue
-    partition_size: 600
+    partition_size: 50000
 
     # IID or non-IID?
     sampler: iid
     testset_sampler: iid
-    # The concentration parameter for the Dirichlet distribution
-    concentration: 5
 
     # The random seed for sampling data
     random_seed: 1
@@ -116,7 +120,7 @@ trainer:
     #   The user is expected to carefully choose the batch_size to avoid
     # the memory allocation issue as the contrastive samples occupy more
     # space as more samples will be contained within one loading.
-    epochs: 1
+    epochs: 100
     batch_size: 120
     optimizer: Adam
     learning_rate: 0.003
@@ -130,14 +134,14 @@ trainer:
     lr_step_size: 20
     lr_gamma: 0.9
 
-    epoch_log_interval: 2
-    batch_log_interval: 1
+    epoch_log_interval: 1
+    batch_log_interval: 50
 
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
     # does not utilize the
     pers_epochs: 100
-    pers_batch_size: 64
+    pers_batch_size: 120
     pers_optimizer: Adam
     pers_learning_rate: 0.005
     pers_betas:
@@ -170,6 +174,9 @@ trainer:
     projection_dim: 256
     prediction_dim: 256
 
+    # name of the component used as the global model
+    global_model_name: whole
+
     personalized_model_name: pure_one_layer_mlp
 
     monitor_name: knn
@@ -184,4 +191,4 @@ algorithm:
     type: fedavg
 
 results:
-    result_path: results/SimCLR_CIFAR10_central_resnet18_pureMLP
+    result_path: xxx

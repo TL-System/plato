@@ -15,10 +15,10 @@ Source code: https://github.com/lucidrains/byol-pytorch
 
 import byol_net
 import byol_trainer
-import byol_server
 
 from plato.clients import ssl_simple as ssl_client
 from plato.algorithms import fedavg_ssl
+from plato.servers import fedavg_ssl_base as ssl_server
 
 
 def main():
@@ -33,9 +33,9 @@ def main():
     client = ssl_client.Client(model=byol_model,
                                trainer=trainer,
                                algorithm=algorithm)
-    server = byol_server.Server(model=byol_model,
-                                trainer=trainer,
-                                algorithm=algorithm)
+    server = ssl_server.Server(model=byol_model,
+                               trainer=trainer,
+                               algorithm=algorithm)
 
     server.run(client)
 

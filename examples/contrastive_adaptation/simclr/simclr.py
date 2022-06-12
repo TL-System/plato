@@ -18,7 +18,7 @@ import simclr_net
 
 from plato.trainers import contrastive_ssl as ssl_trainer
 from plato.clients import ssl_simple as ssl_client
-from plato.servers import fedavg
+from plato.servers import fedavg_ssl_base as ssl_server
 from plato.algorithms import fedavg_ssl
 
 
@@ -34,9 +34,9 @@ def main():
     client = ssl_client.Client(model=simclr_model,
                                trainer=trainer,
                                algorithm=algorithm)
-    server = fedavg.Server(model=simclr_model,
-                           trainer=trainer,
-                           algorithm=algorithm)
+    server = ssl_server.Server(model=simclr_model,
+                               trainer=trainer,
+                               algorithm=algorithm)
 
     server.run(client)
 

@@ -3,10 +3,20 @@
 general:
     # The prefix of directories of dataset, models, checkpoints, and results
     # on sim server
-    # base_path: /data/user/Projects/experiments
+    # base_path: /data/sijia/INFOCOM23/experiments
 
     # locally
-    base_path: ./Projects/experiments
+    base_path: ./INFOCOM23/experiments
+    project_name: INFOCOM23
+    # performing different running mode
+    # for different purposes
+    # - local_central_code_test
+    # - local_central
+    # - local_code_test
+    # - local
+    # - user
+    # - sim
+    running_mode: local
 
 clients:
     # Type
@@ -20,6 +30,9 @@ clients:
 
     # Should the clients compute test accuracy locally?
     do_test: True
+    # whether perform the eval test at the final round
+    # on all clients
+    do_final_eval_test: True
     # Minotor the self-supervised learning by knn for
     # every 5 round
     test_interval: 5
@@ -37,22 +50,20 @@ server:
     synchronous: true
     do_test: false
 
-    # for the models/checkpoints/results path, please keep their dir's
-    # name the same
-    # For example, the subdir name of model_path is
-    # 'SimCLR_CIFAR10_ResNet18_pureMLP', it is desired to use the same name
-    # for checkpoint_path and result_path.
+    # for the paths of models; checkpoints; results,
+    # they utilize the same name, following the one defined in
+    # plato.config:
+    # {ssl_method_name}_{model_name}_{global_model_name}_{personalized_model_name}_{datasource}
+    # - ssl_method_name: data.augment_transformer_name
+    # - model_name: trainer.model_name
+    # - global_model_name: data.global_model_name
+    # - personalized_model_name: data.personalized_model_name
+    # - datasource: data.datasource
 
-    # Note, for the name of this subdir, it is desired to follow the same
-    # rule as:
-    # {ssl_method_name}_{dataset_name}_{encoder_backbone_name}_{personalized_model_name}
-    # For example, for the name here, it uses
-    #   SimCLR              : The SimCLR method
-    #   CIFAR10             : The CIFAR10 dataset
-    #   ResNet18            : The ResNet18 network
-    #   pureMLP             : The pure MLP network (1 layer without any enhancements)
-    model_path: models/SimCLR_CIFAR10_ResNet18_pureMLP
-    checkpoint_path: checkpoints/SimCLR_CIFAR10_ResNet18_pureMLP
+    # set xxx here as the config will set the path by itself
+    # thus we do not need to repeatly reset these paths
+    model_path: xxx
+    checkpoint_path: xxx
 
 
 data:
@@ -75,7 +86,7 @@ data:
     # Under this case, to avoid this issue, we need to set:
     #   partition_size / batch_size = integar
     #   partition_size / pers_batch_size = integar
-    partition_size: 10000
+    partition_size: 6000
 
     # IID or non-IID?
     sampler: noniid
@@ -96,12 +107,12 @@ data:
     augment_transformer_name: simclr
     # some methods apply the normalization to samples
     #   while others do not
-    is_norm: False
+    is_norm: True
+
 
 trainer:
     # The type of the trainer
     type: basic
-
 
     # The maximum number of training rounds
     rounds: 100
@@ -117,7 +128,7 @@ trainer:
 
     # Number of epochs for local training in each communication round
     epochs: 5
-    batch_size: 20
+    batch_size: 120
     optimizer: Adam
     learning_rate: 0.003
     weight_decay: 0.00001
@@ -128,11 +139,11 @@ trainer:
     lr_milestone_steps: 80ep,120ep
 
     epoch_log_interval: 1
-    batch_log_interval: 100
+    batch_log_interval: 10
 
     # Number of epochs for local training in each communication round
     pers_epochs: 30
-    pers_batch_size: 32
+    pers_batch_size: 120
     pers_optimizer: Adam
     pers_learning_rate: 0.003
     pers_weight_decay: 0.000006
@@ -157,6 +168,9 @@ trainer:
     model_name: resnet_18
     projection_dim: 128
 
+    # name of the component used as the global model
+    global_model_name: whole
+
     personalized_model_name: pure_one_layer_mlp
 
     monitor_name: knn
@@ -172,4 +186,4 @@ algorithm:
 
 
 results:
-    result_path: results/SimCLR_CIFAR10_ResNet18_pureMLP
+    result_path: xxx

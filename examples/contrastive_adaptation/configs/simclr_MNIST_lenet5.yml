@@ -2,10 +2,20 @@
 general:
     # The prefix of directories of dataset, models, checkpoints, and results
     # on sim server
-    # base_path: /data/user/Projects/experiments
+    # base_path: /data/sijia/INFOCOM23/experiments
 
     # locally
-    base_path: ./Projects/experiments
+    base_path: ./INFOCOM23/experiments
+    project_name: INFOCOM23
+    # performing different running mode
+    # for different purposes
+    # - local_central_code_test
+    # - local_central
+    # - local_code_test
+    # - local
+    # - user
+    # - sim
+    running_mode: local
 
 clients:
     # Type
@@ -13,18 +23,21 @@ clients:
 
     # The total number of clients
     total_clients: 50
-
     # The number of clients selected in each round
     per_round: 30
 
     # Should the clients compute test accuracy locally?
     do_test: True
+    # whether perform the eval test at the final round
+    # on all clients
+    do_final_eval_test: True
     # Minotor the self-supervised learning by knn for
     # every 5 round
     test_interval: 5
     # Train the personalized model based on the
     # learned representation every 10 rounds
     eval_test_interval: 10
+
     # Whether simulate clients or not
     simulation: true
 
@@ -36,22 +49,20 @@ server:
     synchronous: true
     do_test: false
 
-    # for the models/checkpoints/results path, please keep their dir's
-    # name the same
-    # For example, the subdir name of model_path is
-    # 'SimCLR_MNIST_l5_pureMLP', it is desired to use the same name
-    # for checkpoint_path and result_path.
+    # for the paths of models; checkpoints; results,
+    # they utilize the same name, following the one defined in
+    # plato.config:
+    # {ssl_method_name}_{model_name}_{global_model_name}_{personalized_model_name}_{datasource}
+    # - ssl_method_name: data.augment_transformer_name
+    # - model_name: trainer.model_name
+    # - global_model_name: data.global_model_name
+    # - personalized_model_name: data.personalized_model_name
+    # - datasource: data.datasource
 
-    # Note, for the name of this subdir, it is desired to follow the same
-    # rule as:
-    # {ssl_method_name}_{dataset_name}_{encoder_backbone_name}_{personalized_model_name}
-    # For example, for the name here, it uses
-    #   SimCLR  : The SimCLR method
-    #   MNIST   : The MNIST dataset
-    #   l5      : The LeNet5 network
-    #   pureMLP : The pure MLP network (1 layer without any enhancements)
-    model_path: models/SimCLR_MNIST_l5_pureMLP
-    checkpoint_path: checkpoints/SimCLR_MNIST_l5_pureMLP
+    # set xxx here as the config will set the path by itself
+    # thus we do not need to repeatly reset these paths
+    model_path: xxx
+    checkpoint_path: xxx
 
 data:
     # The training and testing dataset
@@ -73,7 +84,7 @@ data:
     # Under this case, to avoid this issue, we need to set:
     #   partition_size / batch_size = integar
     #   partition_size / pers_batch_size = integar
-    partition_size: 20000
+    partition_size: 6400
 
     # IID or non-IID?
     sampler: noniid
@@ -94,12 +105,11 @@ data:
     augment_transformer_name: simclr
     # some methods apply the normalization to samples
     #   while others do not
-    is_norm: False
+    is_norm: True
 
 trainer:
     # The type of the trainer
     type: basic
-
 
     # The maximum number of training rounds
     rounds: 100
@@ -118,7 +128,7 @@ trainer:
     # the memory allocation issue as the contrastive samples occupy more
     # space as more samples will be contained within one loading.
     epochs: 5
-    batch_size: 30
+    batch_size: 128
     optimizer: Adam
     learning_rate: 0.003
     betas:
@@ -137,8 +147,8 @@ trainer:
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
     # does not utilize the contrastive samples
-    pers_epochs: 30
-    pers_batch_size: 64
+    pers_epochs: 50
+    pers_batch_size: 128
     pers_optimizer: Adam
     pers_learning_rate: 0.005
     pers_betas:
@@ -151,8 +161,10 @@ trainer:
     pers_lr_step_size: 20
     pers_lr_gamma: 0.9
 
+    # Logging information
     pers_epoch_log_interval: 1
-    # temperature
+
+    # the temperature used in the loss function
     temperature: 0.5
 
     # image_size
@@ -165,6 +177,9 @@ trainer:
     # the final fc layer will be removed
     model_name: lenet5
     projection_dim: 128
+
+    # name of the component used as the global model
+    global_model_name: whole
 
     personalized_model_name: pure_one_layer_mlp
 
@@ -180,4 +195,4 @@ algorithm:
     type: fedavg
 
 results:
-    result_path: results/SimCLR_MNIST_l5_pureMLP
+    result_path: xxx
