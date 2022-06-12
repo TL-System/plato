@@ -1,5 +1,5 @@
 """
-The CIFAR-10 dataset from the torchvision package.
+The CIFAR-100 dataset from the torchvision package.
 """
 
 from torchvision import datasets, transforms
@@ -9,7 +9,7 @@ from plato.datasources import base
 
 
 class DataSource(base.DataSource):
-    """The CIFAR-10 dataset."""
+    """The CIFAR-100 dataset."""
 
     def __init__(self):
         super().__init__()
@@ -27,11 +27,11 @@ class DataSource(base.DataSource):
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ])
 
-        self.trainset = datasets.CIFAR10(root=_path,
+        self.trainset = datasets.CIFAR100(root=_path,
                                          train=True,
                                          download=True,
                                          transform=train_transform)
-        self.testset = datasets.CIFAR10(root=_path,
+        self.testset = datasets.CIFAR100(root=_path,
                                         train=False,
                                         download=True,
                                         transform=test_transform)

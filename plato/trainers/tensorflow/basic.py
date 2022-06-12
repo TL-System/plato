@@ -30,7 +30,7 @@ class Trainer(base.Trainer):
         if model is None:
             self.model = models_registry.get()
         else:
-            self.model = model
+            self.model = model.get_model()
 
     def zeros(self, shape):
         """Returns a TensorFlow zero tensor with the given shape."""
