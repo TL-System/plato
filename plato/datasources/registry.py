@@ -59,6 +59,18 @@ def get(client_id=0):
         from plato.datasources import kinetics
         return kinetics.DataSource()
 
+    if datasource_name == 'Purchase':
+        from plato.datasources import purchase
+        return purchase.DataSource()
+
+    if datasource_name == 'Texas':
+        from plato.datasources import texas
+        return texas.DataSource()
+
+    if datasource_name == 'CIFAR100':
+        from plato.datasources import cifar100
+        return cifar100.DataSource()
+
     if datasource_name == 'Gym':
         from plato.datasources import gym
         return gym.DataSource()

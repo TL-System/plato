@@ -116,7 +116,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 
 | Attribute | Meaning | Valid Value | Note |
 |:---------:|:-------:|:-----------:|:----:|
-|**dataset**| The training and test datasets|`MNIST`, `FashionMNIST`, `EMNIST`, `CIFAR10`, `CINIC10`, `YOLO`, `HuggingFace`, `PASCAL_VOC`, `TinyImageNet`, or `CelebA`||
+|**dataset**| The training and test datasets|`MNIST`, `FashionMNIST`, `EMNIST`, `CIFAR10`, `CIFAR100`, `CINIC10`, `YOLO`, `HuggingFace`, `PASCAL_VOC`, `TinyImageNet`, `CelebA`, `Purchase`, or `Texas`||
 |data_path|Where the dataset is located||default: `./data`, except for the `CINIC10` dataset, the default is `./data/CINIC-10`; for the `TinyImageNet` dataset, the default is `./data/tiny-imagenet-200`|
 |train_path|Where the training dataset is located||Need to be specified for datasets using `YOLO`|
 |test_path|Where the test dataset is located||Need to be specified for datasets using `YOLO`|
@@ -151,7 +151,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |**momentum**||||
 |**weight_decay**|||When using `diff_privacy` trainer, set to 0|   
 |lr_schedule|Learning rate scheduler|`CosineAnnealingLR`, `LambdaLR`, `StepLR`, `ReduceLROnPlateau`|| 
-|**model_name**|The machine learning model|`lenet5`, `resnet_x`, `vgg_x`,`wideresnet`, `feedback_transformer`, `yolov5`, `HuggingFace_CausalLM`, `inceptionv3`, `googlenet`, `unet`, `alexnet`, `squeezenet_x`, `shufflenet_x`|For `resnet_x`, x = 18, 34, 50, 101, or 152; For `vgg_x`, x = 11, 13, 16, or 19; For `squeezenet_x`, x = 0 or 1; For `shufflenet_x`, x = 0.5, 1.0, 1.5, or 2.0|
+|**model_name**|The machine learning model|`lenet5`, `resnet_x`, `vgg_x`,`wideresnet`, `feedback_transformer`, `yolov5`, `HuggingFace_CausalLM`, `inceptionv3`, `googlenet`, `unet`, `alexnet`, `squeezenet_x`, `shufflenet_x`, `dcgan`, `multilayer`|For `resnet_x`, x = 18, 34, 50, 101, or 152; For `vgg_x`, x = 11, 13, 16, or 19; For `squeezenet_x`, x = 0 or 1; For `shufflenet_x`, x = 0.5, 1.0, 1.5, or 2.0|
 |pretrained|Use a model pretrained on ImageNet or not|`true` or `false`. Default is `false`|Can be used for `inceptionv3`, `alexnet`, and `squeezenet_x` models.|
 |dp_epsilon|Total privacy budget of epsilon with the `diff_privacy` trainer||default: 10.0|
 |dp_delta|Total privacy budget of delta with the `diff_privacy` trainer||default: 1e-5|

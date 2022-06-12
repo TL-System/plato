@@ -37,7 +37,8 @@ else:
         hybrid,
         efficientnet,
         regnet,
-        dcgan
+        dcgan,
+        multilayer,
     )
     registered_models = OrderedDict([
         ('lenet5', lenet5.Model),
@@ -54,6 +55,7 @@ else:
         ('efficientnet', efficientnet.Model),
         ('regnet', regnet.Model),
         ('dcgan', dcgan.Model),
+        ('multilayer', multilayer.Model),
     ])
 
 
@@ -86,6 +88,6 @@ def get():
                 model = registered_model.get_model(model_name)
 
     if model is None:
-        raise ValueError('No such model: {}'.format(model_name))
+        raise ValueError(f'No such model: {model_name}')
 
     return model
