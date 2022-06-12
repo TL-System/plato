@@ -33,14 +33,14 @@ class DataSource(base.DataSource):
         filename = "https://www.comp.nus.edu.sg/~reza/files/dataset_texas.tgz"
         urllib.request.urlretrieve(filename,
                                    os.path.join(root_path, 'tmp_texas.tgz'))
-        logging.info('Dataset downloaded')
+        logging.info('Dataset downloaded.')
         tar = tarfile.open(os.path.join(root_path, 'tmp_texas.tgz'))
         tar.extractall(path=root_path)
 
-        logging.info('Reading dataset...')
+        logging.info('Processing the dataset...')
         data_set_feats = np.genfromtxt(feat_path, delimiter=',')
         data_set_labels = np.genfromtxt(label_path, delimiter=',')
-        logging.info('Finish reading!')
+        logging.info('Finish processing the dataset.')
 
         X = data_set_feats.astype(np.float64)
         Y = data_set_labels.astype(np.int32) - 1

@@ -44,7 +44,7 @@ trainer:
     max_concurrency: 10
 
     # The target accuracy
-    target_accuracy: 0.95
+    target_accuracy: 0.80
 
     # Number of epoches for local training in each communication round
     epochs: 5
