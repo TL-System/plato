@@ -1,7 +1,7 @@
 """
 The Multi-Layer Perception model for PyTorch.
 The model follows the previous work to use tanh as activation
-Reference: https://arxiv.org/pdf/1807.05852.pdf
+Reference: https://www.comp.nus.edu.sg/~reza/files/Shokri-SP2019.pdf
 """
 import collections
 
@@ -19,21 +19,21 @@ class Model(nn.Module):
 
     def __init__(self, input_dim=600, num_classes=10):
         super().__init__()
-        self.fc1 = nn.Sequential(nn.Linear(input_dim, 2048), nn.Tanh())
+        self.fc1 = nn.Sequential(nn.Linear(input_dim, 1024), nn.Tanh())
 
-        self.fc2 = nn.Sequential(nn.Linear(2048, 1024), nn.Tanh())
+        self.fc2 = nn.Sequential(nn.Linear(1024, 512), nn.Tanh())
 
         self.fc3 = nn.Sequential(
-            nn.Linear(1024, 512),
-            nn.Tanh(),
-        )
-
-        self.fc4 = nn.Sequential(
             nn.Linear(512, 256),
             nn.Tanh(),
         )
 
-        self.fc5 = nn.Linear(256, num_classes)
+        self.fc4 = nn.Sequential(
+            nn.Linear(256, 128),
+            nn.Tanh(),
+        )
+
+        self.fc5 = nn.Linear(128, num_classes)
 
         # Preparing named layers so that the model can be split and straddle
         # across the client and the server
