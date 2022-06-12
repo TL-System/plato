@@ -38,21 +38,96 @@ class ReplayMemory(base.ReplayMemory):
 
     def save_buffer(self, dir):
         # TODO: Save replay buffer
+        buffer_path = dir
+
+        state_name = 'state'
+        action_name = 'action'
+        reward_name = 'reward'
+        next_state_name = 'next_state'
+        done_name = 'done'
+        default_name = 'replay'
+        buffer_path_exists = None
+        #f'{model_path}/{actor_filename}'
+        if buffer_path is None:
+            state_path = f'{default_name}/{state_name}'
+            action_path = f'{default_name}/{action_name}'
+            reward_path = f'{default_name}/{reward_name}'
+            next_state_path = f'{default_name}/{next_state_name}'
+            done_path = f'{default_name}/{done_name}'
+            buffer_path_exists = False
+        else:
+            state_path = f'{buffer_path}/{state_name}'
+            action_path = f'{buffer_path}/{action_name}'
+            reward_path = f'{buffer_path}/{reward_name}'
+            next_state_path = f'{buffer_path}/{next_state_name}'
+            done_path = f'{buffer_path}/{done_name}'
+            buffer_path_exists = True
+
+        #f'{buffer_path}/{actor_filename}'
+        if buffer_path_exists:
+            print("Loading the buffer from %s.", buffer_path)
+        else:
+            #logging.info("Loading the buffer from %s.", os.getpid(), default_name)
+            print("Loading the buffer from %s.", default_name)
+
+        #torch.save(self.state, state_path)
+       # torch.save(self.action, action_path)
+        #torch.save(self.reward, reward_path)
+        #torch.save(self.next_state, next_state_path)
+        #torch.save(self.done, done_path)
         #self.state 
         #self.action 
         #self.reward 
         #self.next_state 
         #self.done 
-        pass
 
     def load_buffer(self, dir):
         # TODO: Load replay buffer
+
+        # TODO: Save replay buffer
+        buffer_path = dir
+
+        state_name = 'state'
+        action_name = 'action'
+        reward_name = 'reward'
+        next_state_name = 'next_state'
+        done_name = 'done'
+        default_name = 'replay'
+        buffer_path_exists = None
+        #f'{model_path}/{actor_filename}'
+        if buffer_path is None:
+            state_path = f'{default_name}/{state_name}'
+            action_path = f'{default_name}/{action_name}'
+            reward_path = f'{default_name}/{reward_name}'
+            next_state_path = f'{default_name}/{next_state_name}'
+            done_path = f'{default_name}/{done_name}'
+            buffer_path_exists = False
+        else:
+            state_path = f'{buffer_path}/{state_name}'
+            action_path = f'{buffer_path}/{action_name}'
+            reward_path = f'{buffer_path}/{reward_name}'
+            next_state_path = f'{buffer_path}/{next_state_name}'
+            done_path = f'{buffer_path}/{done_name}'
+            buffer_path_exists = True
+
+        #f'{buffer_path}/{actor_filename}'
+        if buffer_path_exists:
+            #logging.info("Loading the buffer from %s.", os.getpid(), buffer_path)
+            print("Loading the buffer from %s.", buffer_path)
+        else:
+            #logging.info("Loading the buffer from %s.", os.getpid(), default_name)
+            print("Loading the buffer from %s.", default_name)
+        
+        #torch.load(state_path)
+        #torch.load(action_path)
+       # torch.load(reward_path)
+       # torch.load(next_state_path)
+        #torch.load(done_path)
         #self.state 
         #self.action 
         #self.reward 
         #self.next_state 
         #self.done
-        pass
 
 class Trainer(basic.Trainer):
     def __init__(self, model=None):
@@ -267,6 +342,8 @@ class Trainer(basic.Trainer):
     def load_model(self, filename=None, location=None):
         """Loading pre-trained model weights from a file."""
         # TODO: here load replay buffer
+
+        self.replay_buffer.load_buffer(file_name)
         model_path = Config(
         ).params['model_path'] if location is None else location
         actor_model_name = 'actor_model'
@@ -312,6 +389,8 @@ class Trainer(basic.Trainer):
     def save_model(self, filename=None, location=None):
         """Saving the model to a file."""
         # TODO: here save replay buffer
+        self.replay_buffer.save_buffer(file_name)
+
         model_path = Config(
         ).params['model_path'] if location is None else location
         actor_model_name = 'actor_model'
