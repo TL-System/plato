@@ -5,7 +5,7 @@ import logging
 import os
 from pyexpat import model
 import time
-
+import pandas as pd
 import copy
 
 import numpy as np
@@ -26,8 +26,9 @@ import td3_learning_client as client
 
 import random
 
+#TODO: think again about global variables
 file_name = "TD3_RL"
-models_dir = "./pytorch_models"
+models_dir = "./pytorch_models" # TODO: models are not stored here
 results_dir = "./results"
 
 class ReplayMemory(base.ReplayMemory):
@@ -37,22 +38,26 @@ class ReplayMemory(base.ReplayMemory):
         self.client_id = client_id
 
     def save_buffer(self, dir):
-        # TODO: Save replay buffer
-        #self.state 
-        #self.action 
-        #self.reward 
-        #self.next_state 
-        #self.done 
-        pass
+        size_np = np.array([self.size])
+        
+        np.savez(self.make_filename(dir, "replay_buffer"), a=self.state, b=self.action, c=self.reward, d=self.next_state, e=self.done, f = size_np)
 
     def load_buffer(self, dir):
-        # TODO: Load replay buffer
-        #self.state 
-        #self.action 
-        #self.reward 
-        #self.next_state 
-        #self.done
-        pass
+        data = np.load(self.make_filename(dir, "replay_buffer"))
+
+        self.state = data['a']
+        self.action = data['b']
+        self.reward = data['c']
+        self.next_state = data['d']
+        self.done = data['e']
+        print("Before load", self.size)
+        self.size = int((data['f'])[0]) # single element array
+        print("After load", self.size)
+
+    def make_filename(self, dir, name):
+        file_name = "%s_%s.npz" % (name, str(self.client_id)) 
+        file_path = os.path.join(dir, file_name)
+        return file_path
 
 class Trainer(basic.Trainer):
     def __init__(self, model=None):
@@ -82,8 +87,8 @@ class Trainer(basic.Trainer):
             Config().algorithm.max_replay_size, 
             Config().clients.random_seed, self.client_id)
         
-        self.policy_noise = Config().algorithm.policy_noise * self.max_action
-        self.noise_clip = Config().algorithm.noise_clip * self.max_action
+        self.policy_noise = Config().algorithm.policy_noise 
+        self.noise_clip = Config().algorithm.noise_clip
 
         self.evaluations = []
         
@@ -126,17 +131,8 @@ class Trainer(basic.Trainer):
             # TODO: when max number of steps is hit, we should stop training and terminate the process. How?
             print("Done training")
             return
-        while round_episode_steps <= globals.max_episode_steps:
-            #print("in while loop line 97")
-            #print(globals.total_timesteps)
-            #If episode is done
+        while round_episode_steps < Config().algorithm.max_round_episodes * globals.max_episode_steps:
             if self.done:
-                #if not at beginning
-                if self.total_timesteps != 0:
-                    logging.info("Total Timesteps: {} Episode Num: {} Reward: {}".format(self.total_timesteps, self.episode_num, self.episode_reward))
-                    #train here call td3_trainer
-                    self.train_helper()
-
                 #evaluate episode and save policy
                 if self.timesteps_since_eval >= Config().algorithm.eval_freq * globals.max_episode_steps:
                     self.timesteps_since_eval %= Config().algorithm.eval_freq * globals.max_episode_steps
@@ -154,7 +150,7 @@ class Trainer(basic.Trainer):
                 self.episode_reward = 0
                 episode_timesteps = 0
                 self.episode_num += 1
-            
+
             #Before the number of specified timesteps from config file we sample random actions
             if self.total_timesteps < Config().algorithm.start_steps:
                 action = self.env.action_space.sample()
@@ -164,9 +160,10 @@ class Trainer(basic.Trainer):
                 #if not 0 we add noise
                 if Config().algorithm.expl_noise != 0:
                     expl_noise = Config().algorithm.expl_noise
-                    action = (action+np.random.normal(0, expl_noise, size = self.env.action_space.shape[0])).clip(
+                    action = (action + np.random.normal(0, expl_noise, size = self.env.action_space.shape[0])).clip(
                         self.env.action_space.low, self.env.action_space.high
                     )
+            
 
             #performs action in environment, then reaches next state and receives the reward
             new_obs, reward, self.done, _ = self.env.step(action)
@@ -188,6 +185,13 @@ class Trainer(basic.Trainer):
             self.total_timesteps += 1
             round_episode_steps += 1
             self.timesteps_since_eval += 1
+
+            #If episode is done
+            if self.done:
+                if self.total_timesteps != 0:
+                    logging.info("Total Timesteps: {} Episode Num: {} Reward: {}".format(self.total_timesteps, self.episode_num, self.episode_reward))
+                    #train here call td3_trainer
+                    self.train_helper()
         
         #Add the last policy evaluation to our list of evaluations and save evaluations
         self.evaluations.append(client.evaluate_policy(self, self.env))
@@ -196,9 +200,7 @@ class Trainer(basic.Trainer):
 
     def train_helper(self):
         """Training Loop"""
-        #print("line 165 in td3_learning_trainer")
         for it in range(Config().algorithm.iterations):
-
             #sample from replay buffer
             batch_states, batch_actions, batch_rewards, batch_next_states, batch_dones = self.replay_buffer.sample()
             state = torch.FloatTensor(batch_states).to(self.device)
@@ -223,7 +225,7 @@ class Trainer(basic.Trainer):
             target_Q = torch.min(target_Q1, target_Q2)
 
             #Get final target of the two critic models
-            target_Q = reward + (1-done) * Config().algorithm.gamma * target_Q
+            target_Q = reward + ((1-done) * Config().algorithm.gamma * target_Q).detach()
 
             #Two critics take each couple (s,a) as input and return two Q-values
             current_Q1, current_Q2 = self.critic(state, action)
@@ -299,8 +301,13 @@ class Trainer(basic.Trainer):
             logging.info("[Client #%d] Loading a model from %s, %s, %s and %s.",
                          self.client_id, actor_model_path, critic_model_path, actor_target_model_path, critic_target_model_path)
 
-        #print("in line 251 of trainer")
-        #self.model.load_state_dict(torch.load(model_path), strict=True)
+        # Load episode_num and total_timesteps
+        file_name = "%s_%s.npz" % ("training_status", str(self.client_id)) 
+        file_path = os.path.join(model_path, file_name)
+        data = np.load(file_name)
+        self.episode_num = int((data['a'])[0])
+        self.total_timesteps = int((data['b'])[0])
+
         self.actor.load_state_dict(torch.load(actor_model_path), strict=True)
 
         self.critic.load_state_dict(torch.load(critic_model_path), strict=True)
@@ -309,9 +316,18 @@ class Trainer(basic.Trainer):
 
         self.critic_target.load_state_dict(torch.load(critic_target_model_path), strict=True)
 
+        self.replay_buffer.load_buffer(model_path)
+
+
+        # TODO: do we need those?
+        self.actor_optimizer = torch.optim.Adam(
+            self.actor.parameters(), lr = Config().algorithm.learning_rate)
+        
+        self.critic_optimizer = torch.optim.Adam(
+            self.critic.parameters(), lr = Config().algorithm.learning_rate)
+
     def save_model(self, filename=None, location=None):
         """Saving the model to a file."""
-        # TODO: here save replay buffer
         model_path = Config(
         ).params['model_path'] if location is None else location
         actor_model_name = 'actor_model'
@@ -360,6 +376,15 @@ class Trainer(basic.Trainer):
             torch.save(self.actor_target_state_dict, actor_target_model_path)
             torch.save(self.critic_target_state_dict, critic_target_model_path)
         
+        # Need to save buffer
+        self.replay_buffer.save_buffer(model_path)
+
+        # Need to save total_timesteps and episode_num that we stopped at (to resume training)
+        file_name = "%s_%s.npz" % ("training_status", str(self.client_id)) 
+        file_path = os.path.join(model_path, file_name)
+        np.savez(file_name, a=np.array([self.episode_num]), b=np.array([self.total_timesteps]))
+
+
         #TODO What is the difference between .state_dict() & _state_dict
 
         if self.client_id == 0:
