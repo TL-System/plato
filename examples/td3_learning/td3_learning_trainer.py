@@ -16,20 +16,20 @@ import globals
 from torch import nn
 from plato.utils.reinforcement_learning.policies import base
 from plato.trainers import basic
-from opacus.privacy_engine import PrivacyEngine
 from plato.config import Config
-from plato.models import registry as models_registry
 from plato.trainers import basic
-from plato.utils import optimizers
 
 import td3_learning_client as client
+
+import pickle
 
 import random
 
 #TODO: think again about global variables
 file_name = "TD3_RL"
 models_dir = "./pytorch_models" # TODO: models are not stored here
-results_dir = "./results"
+results_dir = "examples/td3_learning/results"
+
 
 class ReplayMemory(base.ReplayMemory):
     """ A simple example of replay memory buffer. """
@@ -50,9 +50,7 @@ class ReplayMemory(base.ReplayMemory):
         self.reward = data['c']
         self.next_state = data['d']
         self.done = data['e']
-        print("Before load", self.size)
         self.size = int((data['f'])[0]) # single element array
-        print("After load", self.size)
 
     def make_filename(self, dir, name):
         file_name = "%s_%s.npz" % (name, str(self.client_id)) 
@@ -269,6 +267,8 @@ class Trainer(basic.Trainer):
     def load_model(self, filename=None, location=None):
         """Loading pre-trained model weights from a file."""
         # TODO: here load replay buffer
+
+        self.replay_buffer.load_buffer(results_dir)
         model_path = Config(
         ).params['model_path'] if location is None else location
         actor_model_name = 'actor_model'
@@ -388,7 +388,7 @@ class Trainer(basic.Trainer):
         #TODO What is the difference between .state_dict() & _state_dict
 
         if self.client_id == 0:
-            logging.info("[Server #%d] Saving models from %s, %s, %s and %s.", os.getpid(),
+            logging.info("[Server #%d] Saving models to %s, %s, %s and %s.", os.getpid(),
                          actor_model_path, critic_model_path, actor_target_model_path, critic_target_model_path)
         else:
             logging.info("[Client #%d] Saving a model to %s, %s, %s and %s.",

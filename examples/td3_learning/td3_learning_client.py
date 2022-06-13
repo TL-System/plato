@@ -22,6 +22,7 @@ results_dir = "./results"
 class Report(simple.Report):
     """A client report to be sent to the federated learning server."""
     client_id: int
+    #average_reward: int
 
 
 class RLClient(simple.Client):
@@ -36,8 +37,10 @@ class RLClient(simple.Client):
         #print("we are in line 35 of td3_client") 
         
         report, weights = await super().train()
-        #print("line 37 in td3 client is exectued")
-        return Report(report.num_samples, report.accuracy, report.training_time, report.comm_time, report.update_response, self.client_id), weights
+        
+        print("line 37 in td3 client is exectued")
+        return Report(report.num_samples, report.accuracy, report.training_time, \
+         report.comm_time, report.update_response, self.client_id), weights
 
 
 #implement load model stuff!
