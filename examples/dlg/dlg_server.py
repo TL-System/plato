@@ -17,6 +17,7 @@ in Advances in Neural Information Processing Systems 2020.
 
 https://proceedings.neurips.cc/paper/2020/file/c4ede56bbd98819ae6112b20ac6bf145-Paper.pdf
 """
+import asyncio
 import logging
 import math
 import os
@@ -35,6 +36,7 @@ from plato.servers import fedavg
 from plato.utils import csv_processor
 from torchvision import transforms
 
+from defense.GradDefense.compensate import denoise
 from utils.modules import MetaMonkey
 from utils.utils import cross_entropy_for_onehot
 from utils.utils import total_variation as TV
@@ -86,6 +88,47 @@ class Server(fedavg.Server):
         if self.current_round == Config().algorithm.attack_round:
             self.deep_leakage_from_gradients(self.updates)
         await self.aggregate_weights(self.updates)
+
+    async def federated_averaging(self, updates):
+        """Aggregate weight updates from the clients using federated averaging with optional compensation."""
+        deltas_received = self.compute_weight_deltas(updates)
+
+        # Extract the total number of samples
+        self.total_samples = sum(
+            [report.num_samples for (__, report, __, __) in updates])
+
+        # Perform weighted averaging
+        avg_update = {
+            name: self.trainer.zeros(weights.shape)
+            for name, weights in deltas_received[0].items()
+        }
+
+        _scale = 0
+        for i, update in enumerate(deltas_received):
+            __, report, __, __ = updates[i]
+            num_samples = report.num_samples
+
+            for name, delta in update.items():
+                # Use weighted average by the number of samples
+                avg_update[name] += delta * (num_samples / self.total_samples)
+
+            if self.defense_method == 'GradDefense':
+                _scale += len(deltas_received) * Config().algorithm.perturb_slices_num / Config().algorithm.slices_num \
+                    * (Config().algorithm.scale ** 2) * (num_samples / self.total_samples)
+
+            # Yield to other tasks in the server
+            await asyncio.sleep(0)
+
+        if self.defense_method == 'GradDefense':
+            update_perturbed = []
+            for name, delta in avg_update.items():
+                update_perturbed.append(delta)
+            update_compensated = denoise(gradients=update_perturbed,
+                                 scale=math.sqrt(_scale), Q=Config().algorithm.Q)
+            for i, name in enumerate(avg_update.keys()):
+                avg_update[name] = update_compensated[i]
+
+        return avg_update
 
     def compute_weight_deltas(self, updates):
         """ Extract the model weight updates from client updates. """
