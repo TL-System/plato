@@ -55,6 +55,7 @@ from plato.datasources import multimodal_base
 
 class DataSource(multimodal_base.MultiModalDataSource):
     """ The COCO dataset."""
+
     def __init__(self):
         super().__init__()
 
@@ -63,13 +64,13 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         self.modality_names = ["image", "text"]
 
-        _path = Config().data.data_path
+        _path = Config().params['data_path']
         self._data_path_process(data_path=_path, base_data_name=self.data_name)
 
-        base_data_path = self.mm_data_info["base_data_dir_path"]
+        base_data_path = self.mm_data_info["data_path"]
         raw_data_name = self.data_name + "Raw"
         raw_data_path = os.path.join(base_data_path, raw_data_name)
-        if not self._exist_judgement(raw_data_path):
+        if not self._exists(raw_data_path):
             os.makedirs(raw_data_path, exist_ok=True)
 
         download_train_url = Config().data.download_train_url
@@ -89,18 +90,18 @@ class DataSource(multimodal_base.MultiModalDataSource):
             split_download_url = splits_downalods[split_name]
             split_file_name = self._download_arrange_data(
                 download_url_address=split_download_url,
-                put_data_dir=raw_data_path,
+                data_path=raw_data_path,
                 extract_to_dir=split_path)
-            # rename of the extracted file to "images"
-            extracted_dir_path = os.path.join(split_path, split_file_name)
-            rename_dir_path = os.path.join(split_path, "images")
-            os.rename(src=extracted_dir_path, dst=rename_dir_path)
+            # renaming the extracted file to "images"
+            extracted_path = os.path.join(split_path, split_file_name)
+            renamed_path = os.path.join(split_path, "images")
+            os.rename(src=extracted_path, dst=renamed_path)
 
         # Download the annotation
         self._download_arrange_data(
             download_url_address=download_annotation_url,
-            put_data_dir=raw_data_path)
-        anno_dir_path = os.path.join(raw_data_path, "annotations")
+            data_path=raw_data_path)
+        annotation_path = os.path.join(raw_data_path, "annotations")
 
         # Move the annotation to each split
         splits_caption_name = {
@@ -111,6 +112,6 @@ class DataSource(multimodal_base.MultiModalDataSource):
             split_caption_name = splits_caption_name[split_name]
             to_split_path = os.path.join(self.splits_info[split_name]["path"],
                                          "captions.json")
-            shutil.copyfile(src=os.path.join(anno_dir_path,
+            shutil.copyfile(src=os.path.join(annotation_path,
                                              split_caption_name),
                             dst=to_split_path)

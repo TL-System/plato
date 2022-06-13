@@ -16,7 +16,7 @@ import fedsarah_trainer
 
 def main():
     """ A Plato federated learning training session using the FedSarah algorithm. """
-    trainer = fedsarah_trainer.Trainer()
+    trainer = fedsarah_trainer.Trainer
     client = fedsarah_client.Client(trainer=trainer)
     server = fedsarah_server.Server(trainer=trainer)
 

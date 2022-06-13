@@ -10,6 +10,7 @@ from plato.utils import csv_processor
 
 class Server(fedavg.Server):
     """A federated learning server for personalized FL."""
+
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
         self.do_personalization_test = False
@@ -59,38 +60,33 @@ class Server(fedavg.Server):
     async def wrap_up_processing_reports(self):
         """Wrap up processing the reports with any additional work."""
         if self.do_personalization_test:
-            if hasattr(Config(), 'results'):
-                new_row = []
-                for item in self.recorded_items:
-                    item_value = {
-                        'round':
-                        self.current_round,
-                        'accuracy':
-                        self.accuracy * 100,
-                        'personalization_accuracy':
-                        self.personalization_accuracy * 100,
-                        'elapsed_time':
-                        self.wall_time - self.initial_wall_time,
-                        'comm_time':
-                        self.comm_time,
-                        'round_time':
-                        self.round_time,
-                    }[item]
-                    new_row.append(item_value)
+            # Record results into a .csv file
+            new_row = []
+            for item in self.recorded_items:
+                item_value = {
+                    'round': self.current_round,
+                    'accuracy': self.accuracy * 100,
+                    'personalization_accuracy':
+                    self.personalization_accuracy * 100,
+                    'elapsed_time': self.wall_time - self.initial_wall_time,
+                    'comm_time': self.comm_time,
+                    'round_time': self.round_time,
+                }[item]
+                new_row.append(item_value)
 
-                result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}.csv"
+            result_csv_file = f"{Config().params['result_path']}/{os.getpid()}.csv"
 
-                csv_processor.write_csv(result_csv_file, new_row)
+            csv_processor.write_csv(result_csv_file, new_row)
 
             self.do_personalization_test = False
 
         else:
             self.round_time = max([
                 report.training_time + report.comm_time
-                for (report, __, __) in self.updates
+                for (__, report, __, __) in self.updates
             ])
             self.comm_time = max(
-                [report.comm_time for (report, __, __) in self.updates])
+                [report.comm_time for (__, report, __, __) in self.updates])
 
     async def process_client_info(self, client_id, sid):
         """ Process the received metadata information from a reporting client. """
@@ -111,7 +107,7 @@ class Server(fedavg.Server):
         if self.do_personalization_test:
             client = client_info
         else:
-            client = client_info[1]
+            client = client_info[2]
             client_staleness = self.current_round - client['starting_round']
 
             self.updates.append(

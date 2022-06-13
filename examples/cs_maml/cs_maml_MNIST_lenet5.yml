@@ -8,17 +8,14 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: true
 
-    # Whether simulate clients or not
-    simulation: true
-
 server:
     type: fedavg_cross_silo
     address: 127.0.0.1
     port: 8000
     do_test: true
 
-    checkpoint_dir: ./results/test/checkpoint
-    model_dir: ./results/test/model
+    checkpoint_path: results/test/checkpoint
+    model_path: results/test/model
 
 data:
     # The training and testing dataset
@@ -39,9 +36,6 @@ data:
 trainer:
     # The maximum number of training rounds
     rounds: 2
-
-    # Whether the training should use multiple GPUs if available
-    parallelized: false
 
     # The maximum number of clients running concurrently
     max_concurrency: 1
@@ -79,4 +73,4 @@ algorithm:
 results:
     # Write the following parameter(s) into a CSV
     types: round, accuracy, personalization_accuracy, elapsed_time, comm_time, round_time
-    result_dir: ./results/test
+    result_path: results/test

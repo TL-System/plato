@@ -69,16 +69,16 @@ class DataSource(base.DataSource):
         self.trainset = None
         self.testset = None
 
-        root_path = os.path.join(Config().data.data_path, 'FEMNIST',
+        root_path = os.path.join(Config().params['data_path'], 'FEMNIST',
                                  'packaged_data')
         if client_id == 0:
             # If we are on the federated learning server
             data_dir = os.path.join(root_path, 'test')
-            data_url = "https://jiangzhifeng.s3.us-east-2.amazonaws.com/FEMNIST/test/" \
+            data_url = "http://iqua.ece.toronto.edu/FEMNIST/test/" \
                        + str(client_id) + ".zip"
         else:
             data_dir = os.path.join(root_path, 'train')
-            data_url = "https://jiangzhifeng.s3.us-east-2.amazonaws.com/FEMNIST/train/" \
+            data_url = "http://iqua.ece.toronto.edu/FEMNIST/train/" \
                        + str(client_id) + ".zip"
 
         if not os.path.exists(os.path.join(data_dir, str(client_id))):

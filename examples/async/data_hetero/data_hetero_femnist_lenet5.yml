@@ -11,9 +11,6 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    # Whether simulate clients or not
-    simulation: true
-
 server:
     address: 127.0.0.1
     port: 8000
@@ -26,9 +23,6 @@ data:
 
     # Whether data needs to be reloaded in client simulation mode
     reload_data: true
-
-    # Where the dataset is located
-    data_path: ./data
 
     # Should concurrent client-side dataset download be allowed?
     concurrent_download: true
@@ -45,9 +39,6 @@ trainer:
 
     # The maximum number of training rounds
     rounds: 5
-
-    # Whether the training should use multiple GPUs if available
-    parallelized: true
 
     # The maximum number of clients running concurrently
     max_concurrency: 1
@@ -73,6 +64,5 @@ algorithm:
     type: fedavg
 
 results:
-    result_dir: .
     types: accuracy, elapsed_time, round_time
     plot: elapsed_time & accuracy

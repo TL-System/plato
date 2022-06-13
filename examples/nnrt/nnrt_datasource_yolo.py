@@ -27,9 +27,10 @@ def check_img_size(img_size, s=32):
 
 class DataSource(base.DataSource):
     """The YOLO dataset."""
+
     def __init__(self):
         super().__init__()
-        _path = Config().data.data_path
+        _path = Config().params['data_path']
 
         if not os.path.exists(_path):
             os.makedirs(_path)

@@ -15,6 +15,7 @@ from plato.utils import optimizers
 
 class Trainer(basic.Trainer):
     """A federated learning trainer for personalized FL using MAML algorithm."""
+
     def __init__(self, model=None):
         """Initializing the trainer with the provided model."""
         super().__init__(model=model)
@@ -37,19 +38,14 @@ class Trainer(basic.Trainer):
                                                        batch_size=batch_size,
                                                        sampler=sampler)
 
-        iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
         epochs = config['epochs']
-
-        # Sending the model to the device used for training
-        self.model.to(self.device)
-        self.model.train()
 
         # Initializing the loss criterion
         _loss_criterion = getattr(self, "loss_criterion", None)
         if callable(_loss_criterion):
             loss_criterion = self.loss_criterion(self.model)
         else:
-            loss_criterion = nn.CrossEntropyLoss()
+            loss_criterion = torch.nn.CrossEntropyLoss()
 
         # Initializing the optimizer for the second stage of MAML
         # The learning rate here is the meta learning rate (beta)
@@ -58,12 +54,16 @@ class Trainer(basic.Trainer):
                                     momentum=Config().trainer.momentum,
                                     weight_decay=Config().trainer.weight_decay)
 
+        # Initializing the learning rate schedule, if necessary
         # Initializing the schedule for meta learning rate, if necessary
-        if hasattr(config, 'meta_lr_schedule'):
+        if 'meta_lr_schedule' in config:
             meta_lr_schedule = optimizers.get_lr_schedule(
-                optimizer, iterations_per_epoch, train_loader)
+                optimizer, len(train_loader), train_loader)
         else:
             meta_lr_schedule = None
+
+        self.model.to(self.device)
+        self.model.train()
 
         for epoch in range(1, epochs + 1):
             # Copy the current model due to using MAML
@@ -74,22 +74,22 @@ class Trainer(basic.Trainer):
 
             # Initializing the optimizer for the first stage of MAML
             # The learning rate here is the alpha in the paper
-            temp_optimizer = torch.optim.SGD(
+            local_optimizer = torch.optim.SGD(
                 current_model.parameters(),
                 lr=Config().trainer.learning_rate,
                 momentum=Config().trainer.momentum,
                 weight_decay=Config().trainer.weight_decay)
 
             # Initializing the learning rate schedule, if necessary
-            if hasattr(config, 'lr_schedule'):
+            if 'lr_schedule' in config:
                 lr_schedule = optimizers.get_lr_schedule(
-                    temp_optimizer, iterations_per_epoch, train_loader)
+                    local_optimizer, len(train_loader), train_loader)
             else:
                 lr_schedule = None
 
             # The first stage of MAML
             # Use half of the training dataset
-            self.training_per_stage(1, temp_optimizer, lr_schedule,
+            self.training_per_stage(1, local_optimizer, lr_schedule,
                                     train_loader, cut_layer, current_model,
                                     loss_criterion, log_interval, epoch,
                                     epochs)
@@ -151,7 +151,7 @@ class Trainer(basic.Trainer):
             if lr_schedule is not None:
                 lr_schedule.step()
 
-    def test_process(self, config, testset, sampler=None):
+    def test_process(self, config, testset, sampler=None, **kwargs):
         """ A customized testing loop for personalized FL. """
         self.model.to(self.device)
         self.model.eval()

@@ -3,16 +3,13 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 10
+    total_clients: 3
 
     # The number of clients selected in each round
-    per_round: 2
+    per_round: 1
 
     # Should the clients compute test accuracy locally?
-    do_test: true
-
-    # Whether simulate clients or not
-    simulation: true
+    do_test: false
 
 server:
     address: 127.0.0.1
@@ -20,16 +17,28 @@ server:
 
 data:
     # The training and testing dataset
-    datasource: MNIST
+    datasource: CelebA
 
-    # Where the dataset is located
-    data_path: ./data
+    # Only add face identity as labels for training
+    celeba_targets:
+        # For ResNet, do not set <attr> to True since it does not match the expected output of ResNet
+        attr: false
+        identity: true
+    
+    # Resize all images to 32x32; default is 64x64
+    celeba_img_size: 32
+
+    # Number of identity in CelebA
+    num_classes: 10178
 
     # Number of samples in each partition
     partition_size: 20000
 
     # IID or non-IID?
-    sampler: iid
+    sampler: noniid
+
+    # The concentration parameter for the Dirichlet distribution
+    concentration: 0.5
 
     # The random seed for sampling data
     random_seed: 1
@@ -41,17 +50,14 @@ trainer:
     # The maximum number of training rounds
     rounds: 5
 
-    # Whether the training should use multiple GPUs if available
-    parallelized: false
-
     # The maximum number of clients running concurrently
-    max_concurrency: 1
+    max_concurrency: 3
 
     # The target accuracy
-    target_accuracy: 0.98
+    target_accuracy: 0.94
 
     # Number of epoches for local training in each communication round
-    epochs: 1
+    epochs: 5
     batch_size: 32
     optimizer: SGD
     learning_rate: 0.01
@@ -59,15 +65,8 @@ trainer:
     weight_decay: 0.0
 
     # The machine learning model
-    model_name: lenet5
+    model_name: resnet_18
 
 algorithm:
     # Aggregation algorithm
     type: fedavg
-
-results:
-    # Write the following parameter(s) into a CSV
-    types: accuracy, elapsed_time, round_time
-
-    # Plot results (x_axis&y_axis)
-    plot: round & accuracy, round & elapsed_time

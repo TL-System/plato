@@ -1,4 +1,5 @@
 # include basic settings for the models and the learning process
+general: !include base_path.yml
 
 # clients settings
 clients:
@@ -19,7 +20,7 @@ data:
   datasource: Flickr30K
   data_path: data
 
-  download_file_id: 1mJ-Y0gLFyCLbB6C-M49dUtEsbfVkK4F-
+  download_url: http://iqua.ece.toronto.edu/baochun/Flickr30KEntitiesRaw.zip
 
   downloader:
     num_workers: 4
@@ -34,11 +35,6 @@ data:
 
   # The random seed for sampling data
   random_seed: 1
-
-  multi_modal_pipeliner:
-    rgb: !include Pipeline/kinetics_csn_rgb.yml
-    flow: !include Pipeline/kinetics_tsn_flow.yml
-    audio: !include Pipeline/kinetics_audio_feature.yml
 
 # Train settings
 
@@ -84,16 +80,11 @@ trainer:
   optimizer_config: *optimizer_config
   learning_rate_config: *lr_config
   rounds: *total_epochs
-  parallelized: False
   max_accuracy: 3
   target_accuracy: 0.67
 
   log_config: *log_config
   checkpoint_config: *checkpoint_config
-
-model:
-  model_name: rgb_flow_audio_model
-  model_config: !include Models/kinetics_full_models.yml
 
 evaluation:
   interval: 5

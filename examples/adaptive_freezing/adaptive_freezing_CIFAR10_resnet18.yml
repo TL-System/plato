@@ -16,10 +16,7 @@ server:
 
 data:
     # The training and testing dataset
-    datasource: CIFAR10 
-
-    # Where the dataset is located
-    data_path: ./data
+    datasource: CIFAR10
 
     # Number of samples in each partition
     partition_size: 20000
@@ -36,9 +33,6 @@ trainer:
 
     # The maximum number of clients running concurrently
     max_concurrency: 2
-
-    # Whether the training should use multiple GPUs if available
-    parallelized: false
 
     # The target accuracy
     target_accuracy: 0.80
@@ -64,4 +58,3 @@ algorithm:
     stability_threshold: 0.05
     tight_threshold: 0.8
     random_freezing: true
-
