@@ -20,7 +20,7 @@ data:
     datasource: CINIC10
 
     # Where the dataset is located
-    data_path: ./data/CINIC-10
+    data_path: data/CINIC-10
 
     #
     download_url: http://iqua.ece.toronto.edu/baochun/CINIC-10.tar.gz
