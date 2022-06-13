@@ -457,7 +457,7 @@ class Trainer(basic.Trainer):
         #TODO What is the difference between .state_dict() & _state_dict
 
         if self.client_id == 0:
-            logging.info("[Server #%d] Saving models to %s, %s, %s and %s.", os.getpid(),
+            logging.info("[Server #%d] Saving models from %s, %s, %s and %s.", os.getpid(),
                          actor_model_path, critic_model_path, actor_target_model_path, critic_target_model_path)
         else:
             logging.info("[Client #%d] Saving a model to %s, %s, %s and %s.",

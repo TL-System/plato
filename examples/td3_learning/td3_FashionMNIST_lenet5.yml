@@ -46,8 +46,6 @@ server:
 
     model_path: examples/td3_learning/models/pretrained
 
-    checkpoint_path: examples/td3_learning/checkpoints
-
 data:
     # The training and testing dataset
     datasource: FashionMNIST
