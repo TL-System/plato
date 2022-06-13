@@ -23,7 +23,7 @@ class RLServer(fedavg.Server):
         self.model = None
         self.trainer = None
         self.algorithm = None
-        self.load_trainer()
+        self.init_trainer()
 
         self.current_round = 0
 

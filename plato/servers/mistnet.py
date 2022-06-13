@@ -23,9 +23,9 @@ class Server(fedavg.Server):
         # MistNet requires one round of client-server communication
         assert Config().trainer.rounds == 1
 
-    def load_trainer(self):
-        """Setting up a pre-trained model to be loaded on the server."""
-        super().load_trainer()
+    def init_trainer(self):
+        """ Setting up a pre-trained model to be loaded on the server. """
+        super().init_trainer()
 
         model_path = Config().params['model_path']
         model_file_name = Config().trainer.pretrained_model if hasattr(

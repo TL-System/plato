@@ -82,24 +82,32 @@ class Trainer(basic.Trainer):
         return accuracy
 
 
+class Model():
+    """ A custom model. """
+
+    @staticmethod
+    def get_model():
+        """Obtaining an instance of this model."""
+        return nn.Sequential(
+            nn.Linear(28 * 28, 128),
+            nn.ReLU(),
+            nn.Linear(128, 128),
+            nn.ReLU(),
+            nn.Linear(128, 10),
+        )
+
+
 def main():
     """
        A Plato federated learning training session using a custom model,
        datasource, and trainer.
     """
-    model = nn.Sequential(
-        nn.Linear(28 * 28, 128),
-        nn.ReLU(),
-        nn.Linear(128, 128),
-        nn.ReLU(),
-        nn.Linear(128, 10),
-    )
-
-    datasource = DataSource()
+    model = Model
+    datasource = DataSource
     trainer = Trainer
 
     client = simple.Client(model=model, datasource=datasource, trainer=trainer)
-    server = fedavg.Server(model=model, trainer=trainer)
+    server = fedavg.Server(model=model, datasource=datasource, trainer=trainer)
     server.run(client)
 
 
