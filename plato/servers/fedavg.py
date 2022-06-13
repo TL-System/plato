@@ -78,7 +78,7 @@ class Server(base.Server):
         else:
             logging.info("Training: %s rounds\n", total_rounds)
 
-        self.load_trainer()
+        self.init_trainer()
 
         # Prepares this server for processors that processes outbound and inbound
         # data payloads
@@ -124,8 +124,8 @@ class Server(base.Server):
             csv_processor.initialize_csv(accuracy_csv_file, accuracy_headers,
                                          Config().params['result_path'])
 
-    def load_trainer(self):
-        """Setting up the global model to be trained via federated learning."""
+    def init_trainer(self):
+        """ Setting up the global model, trainer, and algorithm. """
         if self.model is None and self.custom_model is not None:
             self.model = self.custom_model
 
@@ -138,9 +138,6 @@ class Server(base.Server):
             self.algorithm = algorithms_registry.get(trainer=self.trainer)
         elif self.algorithm is None and self.custom_algorithm is not None:
             self.algorithm = self.custom_algorithm(trainer=self.trainer)
-
-    async def select_clients(self, for_next_batch=False):
-        await super().select_clients(for_next_batch=for_next_batch)
 
     def compute_weight_deltas(self, updates):
         """Extract the model weight updates from client updates."""

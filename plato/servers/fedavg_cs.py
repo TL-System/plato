@@ -106,7 +106,7 @@ class Server(fedavg.Server):
                 Config().args.id, os.getpid(),
                 Config().algorithm.local_rounds)
 
-            self.load_trainer()
+            self.init_trainer()
             self.trainer.set_client_id(Config().args.id)
 
             # Prepares this server for processors that processes outbound and inbound
