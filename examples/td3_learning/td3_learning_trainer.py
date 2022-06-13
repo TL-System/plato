@@ -266,9 +266,6 @@ class Trainer(basic.Trainer):
             
     def load_model(self, filename=None, location=None):
         """Loading pre-trained model weights from a file."""
-        # TODO: here load replay buffer
-
-        self.replay_buffer.load_buffer(results_dir)
         model_path = Config(
         ).params['model_path'] if location is None else location
         actor_model_name = 'actor_model'
