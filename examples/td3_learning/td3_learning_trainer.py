@@ -134,8 +134,6 @@ class Trainer(basic.Trainer):
                 if self.timesteps_since_eval >= Config().algorithm.eval_freq * globals.max_episode_steps:
                     self.timesteps_since_eval %= Config().algorithm.eval_freq * globals.max_episode_steps
                     self.evaluations.append(client.evaluate_policy(self, self.env))
-                    print(self.evaluations)
-                    print(results_dir+file_name)
                     np.savetxt("%s.csv" %(results_dir+"/"+file_name), self.evaluations, delimiter=",")
                 
                 #When the training step is done, we reset the state of the env
@@ -188,12 +186,13 @@ class Trainer(basic.Trainer):
             if self.done:
                 if self.total_timesteps != 0:
                     logging.info("Total Timesteps: {} Episode Num: {} Reward: {}".format(self.total_timesteps, self.episode_num, self.episode_reward))
-                    #train here call td3_trainer
+                    #train hehttps://github.com/park-project/parkre call td3_trainer
                     self.train_helper()
         
         #Add the last policy evaluation to our list of evaluations and save evaluations
         self.evaluations.append(client.evaluate_policy(self, self.env))
-        np.save("./results/%s" % (file_name), self.evaluations)
+        np.savetxt("%s.csv" %(results_dir+"/"+file_name), self.evaluations, delimiter=",")
+       
 
 
     def train_helper(self):
