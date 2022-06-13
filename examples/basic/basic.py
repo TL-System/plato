@@ -102,12 +102,12 @@ def main():
        A Plato federated learning training session using a custom model,
        datasource, and trainer.
     """
-    datasource = DataSource
     model = Model
+    datasource = DataSource
     trainer = Trainer
 
     client = simple.Client(model=model, datasource=datasource, trainer=trainer)
-    server = fedavg.Server(model=model, trainer=trainer)
+    server = fedavg.Server(model=model, datasource=datasource, trainer=trainer)
     server.run(client)
 
 

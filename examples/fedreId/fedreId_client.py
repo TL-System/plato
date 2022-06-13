@@ -12,10 +12,16 @@ from fedreId import DataSource, Trainer
 from plato.clients import simple
 from plato.config import Config
 
+
 class fedReIdClient(simple.Client):
-    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
+
+    def __init__(self,
+                 model=None,
+                 datasource=None,
+                 algorithm=None,
+                 trainer=None):
         super().__init__(model=model, datasource=datasource, trainer=trainer)
-    
+
     async def train(self):
         old_weights = self.algorithm.extract_weights()
         report, weights = await super().train()
@@ -45,22 +51,34 @@ class fedReIdClient(simple.Client):
 
         print(dis)
         return sum(dis) / len(dis)
-    
+
+
+class Model():
+    """ A custom model. """
+
+    @staticmethod
+    def get_model():
+        """Obtaining an instance of this model."""
+        return nn.Sequential(
+            nn.Linear(28 * 28, 128),
+            nn.ReLU(),
+            nn.Linear(128, 128),
+            nn.ReLU(),
+            nn.Linear(128, 10),
+        )
+
+
 def main():
     """A Plato federated learning training session using a custom client. """
-    model = nn.Sequential(
-        nn.Linear(28 * 28, 128),
-        nn.ReLU(),
-        nn.Linear(128, 128),
-        nn.ReLU(),
-        nn.Linear(128, 10),
-    )
-    datasource = DataSource()
-    trainer = Trainer(model=model)
+    model = Model
+    datasource = DataSource
+    trainer = Trainer
+
     client = fedReIdClient(model=model, datasource=datasource, trainer=trainer)
     client.configure()
     loop = asyncio.get_event_loop()
     loop.run_until_complete(client.start_client())
+
 
 if __name__ == "__main__":
     main()

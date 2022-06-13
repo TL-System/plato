@@ -49,9 +49,9 @@ class Server(fedavg.Server):
         logging.info("Representation_weights: %s",
                      self.representation_param_names)
 
-    def load_trainer(self):
-        """ Rewrite the load_trainer func to further extract the representaion keys """
-        super().load_trainer()
+    def init_trainer(self):
+        """ Extract representation parameter names after initializing the trainer. """
+        super().init_trainer()
 
         self.extract_representation_param_names()
 
