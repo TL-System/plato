@@ -118,7 +118,7 @@ algorithm:
     tau: 0.005
     learning_rate: 0.0003
     # Noise added to target policy during critic update
-    policy_noise: 0.25
+    policy_noise: 0.2
     # Range to clip target policy noise
     noise_clip: 0.5
     # Frequency of delayed policy updates
@@ -131,8 +131,8 @@ algorithm:
     hidden_size: 256
     # steps sampling random actions
     start_steps: 10000
-    # replay memory
-    replay_size: 10000
+    # Maximum replay buffer size
+    max_replay_size: 1000000
 
     # whether use LSTM or FC nets
     recurrent_actor: false
@@ -146,11 +146,8 @@ algorithm:
     #Total number of iterations/timestpes
     max_steps: 500000
 
-    #Epsiode steps to run before stopping training
-    max_round_episode_steps: 1000
-
-    # Maximum replay buffer size
-    max_replay_size: 1000000
+    # Number of episodes to run each round
+    max_round_episodes: 100
 
     #If we should save the model or not
     save_models: False
