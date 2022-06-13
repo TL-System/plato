@@ -1,8 +1,8 @@
 import logging
+import math
 import os
 import pickle
 import time
-import math
 
 import matplotlib.pyplot as plt
 import torch
@@ -11,12 +11,9 @@ from plato.trainers import basic
 from plato.utils import optimizers
 from torchvision import transforms
 
-from utils.utils import cross_entropy_for_onehot, label_to_onehot
+from defense.GradDefense.dataloader import get_root_set_loader
 from defense.GradDefense.sensitivity import compute_sens
-# from examples.dlg.defense.perturb import noise
-from defense.GradDefense.perturb import noise
-from defense.GradDefense.dataloader import extract_root_set, get_root_set_loader
-
+from utils.utils import cross_entropy_for_onehot, label_to_onehot
 
 criterion = cross_entropy_for_onehot
 tt = transforms.ToPILImage()
@@ -95,28 +92,58 @@ class Trainer(basic.Trainer):
 
                 optimizer.zero_grad()
 
-                if cut_layer is None:
-                    outputs = self.model(examples)
-                else:
-                    outputs = self.model.forward_from(examples, cut_layer)
-
-                # Save the ground truth and gradients
-                onehot_labels = label_to_onehot(
-                    labels, num_classes=Config().trainer.num_classes)
                 if hasattr(Config().algorithm, 'share_gradients') and Config(
                 ).algorithm.share_gradients:
-                    loss = criterion(outputs, onehot_labels)
-                    dy_dx = torch.autograd.grad(loss, self.model.parameters())
-                    current_grad = list((_.detach().clone() for _ in dy_dx))
+                    if hasattr(Config().algorithm, 'defense') and Config().algorithm.defense == 'GradDefense' and \
+                            hasattr(Config().algorithm, 'clip') and Config().algorithm.clip is True:
+                        current_grad = []
+                        for index in range(len(examples)):
+                            if cut_layer is None:
+                                outputs = self.model(
+                                    torch.unsqueeze(examples[index], dim=0))
+                            else:
+                                outputs = self.model.forward_from(
+                                    torch.unsqueeze(examples[index], dim=0), cut_layer)
+                            onehot_labels = label_to_onehot(
+                                torch.unsqueeze(labels[index], dim=0), num_classes=Config().trainer.num_classes)
+                            loss = criterion(outputs, onehot_labels)
+                            dy_dx = torch.autograd.grad(
+                                loss, self.model.parameters())
+                            current_grad.append(list((_.detach().clone()
+                                                      for _ in dy_dx)))
+                            # TODO: multiple batches or epochs?
+                    else:
+                        if cut_layer is None:
+                            outputs = self.model(examples)
+                        else:
+                            outputs = self.model.forward_from(
+                                examples, cut_layer)
 
-                    # Sum up the gradients for each local update
-                    try:
-                        target_grad = [
-                            sum(x) for x in zip(current_grad, target_grad)
-                        ]
-                    except:
-                        target_grad = list((_.detach().clone() for _ in dy_dx))
+                        # Save the ground truth and gradients
+                        onehot_labels = label_to_onehot(
+                            labels, num_classes=Config().trainer.num_classes)
+
+                        loss = criterion(outputs, onehot_labels)
+                        dy_dx = torch.autograd.grad(
+                            loss, self.model.parameters())
+                        current_grad = list((_.detach().clone()
+                                            for _ in dy_dx))
+
+                        # Sum up the gradients for each local update
+                        try:
+                            target_grad = [
+                                sum(x) for x in zip(current_grad, target_grad)
+                            ]
+                        except:
+                            target_grad = list((_.detach().clone()
+                                                for _ in dy_dx))
                 else:
+                    if cut_layer is None:
+                        outputs = self.model(examples)
+                    else:
+                        outputs = self.model.forward_from(
+                            examples, cut_layer)
+
                     loss = loss_criterion(outputs, labels)
 
                     if 'create_graph' in config:
@@ -172,11 +199,16 @@ class Trainer(basic.Trainer):
                 target_grad = None
 
             if hasattr(Config().algorithm, 'defense') and Config().algorithm.defense == 'GradDefense':
+                if hasattr(Config().algorithm, 'clip') and Config().algorithm.clip is True:
+                    from defense.GradDefense.clip import noise
+                    target_grad = current_grad
+                else:
+                    from defense.GradDefense.perturb import noise
                 perturbed_gradients = noise(dy_dx=target_grad,
                                             sensitivity=sensitivity,
                                             slices_num=Config().algorithm.slices_num,
                                             perturb_slices_num=Config().algorithm.perturb_slices_num,
-                                            scale=Config().algorithm.scale)
+                                            noise_intensity=Config().algorithm.scale)
 
                 target_grad = []
                 for layer in perturbed_gradients:
