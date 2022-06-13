@@ -14,6 +14,7 @@ from plato.servers import fedavg_cs
 
 class Server(fedavg_cs.Server):
     """Cross-silo federated learning server using Sub-FedAvg(Un)."""
+
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
 
@@ -29,8 +30,9 @@ class Server(fedavg_cs.Server):
         record_items_values['pruning_amount'] = Config().clients.pruning_amount
 
         if Config().is_central_server():
-            edge_comm_overhead = sum(
-                [report.comm_overhead for (report, __, __) in self.updates])
+            edge_comm_overhead = sum([
+                report.comm_overhead for (__, report, __, __) in self.updates
+            ])
             record_items_values[
                 'comm_overhead'] = edge_comm_overhead + self.comm_overhead
         else:
@@ -86,8 +88,8 @@ class Server(fedavg_cs.Server):
         if self.comm_simulation:
             model_name = Config().trainer.model_name if hasattr(
                 Config().trainer, 'model_name') else 'custom'
-            checkpoint_dir = Config().params['checkpoint_dir']
-            payload_filename = f"{checkpoint_dir}/{model_name}_client_{client_id}.pth"
+            checkpoint_path = Config().params['checkpoint_path']
+            payload_filename = f"{checkpoint_path}/{model_name}_client_{client_id}.pth"
             with open(payload_filename, 'rb') as payload_file:
                 self.client_payload[sid] = pickle.load(payload_file)
 

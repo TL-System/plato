@@ -11,10 +11,8 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    # Whether simulate clients or not
-    simulation: true
+    # Whether client heterogeneity should be simulated
     speed_simulation: true
-    comm_simulation: true
 
     # The simulation distribution
     simulation_distribution:
@@ -41,15 +39,12 @@ server:
         type: Polynomial
         a: 2
 
-    checkpoint_dir: ./models/fedasync/mnist
-    model_dir: ./models/fedasync/mnist
+    checkpoint_path: models/fedasync/mnist
+    model_path: models/fedasync/mnist
 
 data:
     # The training and testing dataset
     datasource: MNIST
-
-    # Where the dataset is located
-    data_path: ./data
 
     # Number of samples in each partition
     partition_size: 600
@@ -70,10 +65,7 @@ trainer:
     # The maximum number of training rounds
     rounds: 80
 
-    # Whether the training should use multiple GPUs if available
-    parallelized: false
-
-    # The maximum number of clients running concurrently 
+    # The maximum number of clients running concurrently
     max_concurrency: 10
 
     # The target accuracy
@@ -96,7 +88,7 @@ algorithm:
     type: fedavg
 
 results:
-    result_dir: ./results/fedasync/mnist
+    result_path: results/fedasync/mnist
     # Write the following parameter(s) into a CSV
     types: round, elapsed_time, accuracy
 

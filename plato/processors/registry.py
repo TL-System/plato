@@ -32,7 +32,8 @@ if not (hasattr(Config().trainer, 'use_tensorflow')
         model_compress,
         model_decompress,
         model_randomized_response,
-        model_pruning,
+        structured_pruning,
+        unstructured_pruning,
     )
 
     registered_processors = OrderedDict([
@@ -53,7 +54,8 @@ if not (hasattr(Config().trainer, 'use_tensorflow')
         ('model_compress', model_compress.Processor),
         ('model_decompress', model_decompress.Processor),
         ('model_randomized_response', model_randomized_response.Processor),
-        ('model_pruning', model_pruning.Processor),
+        ('structured_pruning', structured_pruning.Processor),
+        ('unstructured_pruning', unstructured_pruning.Processor),
     ])
 
 

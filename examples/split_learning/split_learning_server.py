@@ -50,14 +50,14 @@ class Server(fedavg.Server):
 
     def load_gradients(self):
         """ Loading gradients from a file. """
-        model_dir = Config().params['model_dir']
+        model_path = Config().params['model_path']
         model_name = Config().trainer.model_name
 
-        model_path = f'{model_dir}/{model_name}_gradients.pth'
+        model_gradients_path = f'{model_path}/{model_name}_gradients.pth'
         logging.info("[Server #%d] Loading gradients from %s.", os.getpid(),
-                     model_path)
+                     model_gradients_path)
 
-        return torch.load(model_path)
+        return torch.load(model_gradients_path)
 
     async def client_payload_done(self, sid, client_id, s3_key=None):
         if s3_key is None:

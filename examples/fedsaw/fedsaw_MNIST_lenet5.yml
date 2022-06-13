@@ -9,7 +9,7 @@ clients:
     per_round: 1
 
     # Should the clients compute test accuracy locally?
-    do_test: true
+    do_test: false
 
     # Whether simulate clients or not
     simulation: true
@@ -31,8 +31,8 @@ server:
     inbound_processors:
         - model_decompress
 
-    checkpoint_dir: ./results/test/checkpoint
-    model_dir: ./results/test/model
+    checkpoint_path: ./results/test/checkpoint
+    model_path: ./results/test/model
 
 data:
     # The training and testing dataset
@@ -96,6 +96,6 @@ algorithm:
 
 results:
     # Write the following parameter(s) into a CSV
-    types: round, accuracy, average_accuracy, elapsed_time, comm_time, round_time
+    types: round, accuracy, elapsed_time, comm_time, round_time, comm_overhead
 
-    result_dir: ./results/test
+    result_path: ./results/test

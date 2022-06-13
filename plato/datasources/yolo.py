@@ -28,6 +28,7 @@ def collate_fn(batch):
 
 class YOLODataset(torch.utils.data.Dataset):
     """Prepares the YOLO dataset for use in YOLOv5."""
+
     def __init__(self, dataset):
         self.dataset = dataset
 
@@ -41,9 +42,10 @@ class YOLODataset(torch.utils.data.Dataset):
 
 class DataSource(base.DataSource):
     """The YOLO dataset."""
+
     def __init__(self):
         super().__init__()
-        _path = Config().data.data_path
+        _path = Config().params['data_path']
 
         if not os.path.exists(_path):
             os.makedirs(_path)
@@ -78,9 +80,12 @@ class DataSource(base.DataSource):
     def get_train_set(self):
         single_class = (Config().data.num_classes == 1)
 
+        train_path = os.path.join(Config.params['base_path'],
+                                  Config().data.train_path)
+
         if self.train_set is None:
             self.train_set = LoadImagesAndLabels(
-                Config().data.train_path,
+                train_path,
                 self.image_size,
                 Config().trainer.batch_size,
                 augment=False,  # augment images
@@ -98,9 +103,12 @@ class DataSource(base.DataSource):
     def get_test_set(self):
         single_class = (Config().data.num_classes == 1)
 
+        test_path = os.path.join(Config.params['base_path'],
+                                 Config().data.test_path)
+
         if self.test_set is None:
             self.test_set = LoadImagesAndLabels(
-                Config().data.test_path,
+                test_path,
                 self.image_size,
                 Config().trainer.batch_size,
                 augment=False,  # augment images

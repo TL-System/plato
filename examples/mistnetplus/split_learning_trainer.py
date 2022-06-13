@@ -36,18 +36,14 @@ class Trainer(basic.Trainer):
                                                        batch_size=batch_size,
                                                        sampler=sampler)
 
-        iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
-
-        # Sending the model to the device used for training
-        self.model.to(self.device)
-        self.model.train()
+        epochs = config['epochs']
 
         # Initializing the loss criterion
         _loss_criterion = getattr(self, "loss_criterion", None)
         if callable(_loss_criterion):
             loss_criterion = self.loss_criterion(self.model)
         else:
-            loss_criterion = nn.CrossEntropyLoss()
+            loss_criterion = torch.nn.CrossEntropyLoss()
 
         # Initializing the optimizer
         get_optimizer = getattr(self, "get_optimizer",
@@ -55,12 +51,15 @@ class Trainer(basic.Trainer):
         optimizer = get_optimizer(self.model)
 
         # Initializing the learning rate schedule, if necessary
-        if hasattr(Config().trainer, 'lr_schedule'):
+        if 'lr_schedule' in config:
             lr_schedule = optimizers.get_lr_schedule(optimizer,
-                                                     iterations_per_epoch,
+                                                     len(train_loader),
                                                      train_loader)
         else:
             lr_schedule = None
+
+        self.model.to(self.device)
+        self.model.train()
 
         for __, (examples, labels) in enumerate(train_loader):
             examples, labels = examples.to(self.device), labels.to(self.device)
@@ -93,13 +92,13 @@ class Trainer(basic.Trainer):
     def save_gradients(self):
         """ Saving gradients to a file. """
         model_name = Config().trainer.model_name
-        model_dir = Config().params['model_dir']
+        model_path = Config().params['model_path']
 
-        if not os.path.exists(model_dir):
-            os.makedirs(model_dir)
+        if not os.path.exists(model_path):
+            os.makedirs(model_path)
 
-        model_path = f'{model_dir}/{model_name}_gradients.pth'
-        torch.save(self.cut_layer_grad, model_path)
+        model_gradients_path = f'{model_path}/{model_name}_gradients.pth'
+        torch.save(self.cut_layer_grad, model_gradients_path)
 
         logging.info("[Server #%d] Gradients saved to %s.", os.getpid(),
-                     model_path)
+                     model_gradients_path)

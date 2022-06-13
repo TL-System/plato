@@ -3,16 +3,9 @@ A federated learning server with RL Agent.
 """
 import asyncio
 import logging
-import os
 from abc import abstractmethod
 
-from plato.algorithms import registry as algorithms_registry
-from plato.config import Config
-from plato.datasources import registry as datasources_registry
-from plato.models import registry as models_registry
-from plato.processors import registry as processor_registry
 from plato.servers import fedavg
-from plato.trainers import registry as trainers_registry
 
 
 class RLServer(fedavg.Server):
@@ -22,54 +15,32 @@ class RLServer(fedavg.Server):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
         self.agent = agent
 
-    def configure(self):
-        """ Booting the federated learning server by setting up
-        the data, model, and creating the clients.
-            Called every time when reseting a new RL episode.
-        """
-        super().configure()
-        logging.info("[Server #%d] Configuring the server for episode %d",
-                     os.getpid(), self.agent.current_episode)
+    def reset(self):
+        """ Resetting the model, trainer, and algorithm on the server. """
+        logging.info("Reconfiguring the server for episode %d",
+                     self.agent.current_episode)
 
-        self.current_round = 0
-
+        self.model = None
+        self.trainer = None
+        self.algorithm = None
         self.load_trainer()
 
-        # Prepares this server for processors that processes outbound and inbound
-        # data payloads
-        self.outbound_processor, self.inbound_processor = processor_registry.get(
-            "Server", server_id=os.getpid(), trainer=self.trainer)
-
-        if not Config().clients.do_test:
-            dataset = datasources_registry.get(client_id=0)
-            self.testset = dataset.get_test_set()
-
-    def load_trainer(self):
-        """ Setting up the global model to be trained via federated learning. """
-        if self.trainer is None:
-            self.trainer = trainers_registry.get(model=self.model)
-
-        self.trainer.set_client_id(0)
-
-        # Reset model for new episode
-        self.trainer.model = models_registry.get()
-
-        self.algorithm = algorithms_registry.get(self.trainer)
+        self.current_round = 0
 
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using smart weighting."""
         # Extract weights udpates from the client updates
-        weights_received = self.extract_client_updates(updates)
+        deltas_received = self.compute_weight_deltas(updates)
         self.update_state()
 
         # Extract the total number of samples
-        num_samples = [report.num_samples for (report, __, __) in updates]
+        num_samples = [report.num_samples for (__, report, __, __) in updates]
         self.total_samples = sum(num_samples)
 
         # Perform weighted averaging
         avg_update = {
             name: self.trainer.zeros(weights.shape)
-            for name, weights in weights_received[0].items()
+            for name, weights in deltas_received[0].items()
         }
 
         # e.g., wait for the new action from RL agent
@@ -79,9 +50,12 @@ class RLServer(fedavg.Server):
         await self.update_action()
 
         # Use adaptive weighted average
-        for i, update in enumerate(weights_received):
+        for i, update in enumerate(deltas_received):
             for name, delta in update.items():
-                avg_update[name] += delta * self.smart_weighting[i]
+                if delta.type() == 'torch.LongTensor':
+                    avg_update[name] += delta * self.smart_weighting[i][0]
+                else:
+                    avg_update[name] += delta * self.smart_weighting[i]
 
             # Yield to other tasks in the server
             await asyncio.sleep(0)
@@ -116,7 +90,7 @@ class RLServer(fedavg.Server):
 
         if self.agent.reset_env:
             self.agent.reset_env = False
-            self.configure()
+            self.reset()
         if self.agent.finished:
             await self.close()
 

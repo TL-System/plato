@@ -60,8 +60,8 @@ class Server(fedavg.Server):
             self.mixing_hyperparam *= self.staleness_function(client_staleness)
 
         # Calculate updated weights from clients
-        payload_received = [payload for (__, payload, __) in self.updates]
-        weights_received = self.algorithm.compute_weight_updates(
+        payload_received = [payload for (__, __, payload, __) in self.updates]
+        deltas_received = self.algorithm.compute_weight_deltas(
             payload_received)
 
         # Actually update the global model's weights (PyTorch only)
@@ -71,12 +71,12 @@ class Server(fedavg.Server):
         for name, weight in baseline_weights.items():
             updated_weights[name] = weight * (
                 1 - self.mixing_hyperparam
-            ) + weights_received[0][name] * self.mixing_hyperparam
+            ) + deltas_received[0][name] * self.mixing_hyperparam
 
         self.algorithm.load_weights(updated_weights)
 
         # Testing the global model accuracy
-        if Config().clients.do_test:
+        if hasattr(Config().server, 'do_test') and not Config().server.do_test:
             # Compute the average accuracy from client reports
             self.accuracy = self.accuracy_averaging(self.updates)
             logging.info('[%s] Average client accuracy: %.2f%%.', self,

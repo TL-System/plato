@@ -6,7 +6,6 @@ import argparse
 import json
 import logging
 import os
-import sqlite3
 from collections import OrderedDict, namedtuple
 from typing import Any, IO
 
@@ -68,6 +67,11 @@ class Config:
                                 type=str,
                                 default='./config.yml',
                                 help='Federated learning configuration file.')
+            parser.add_argument('-b',
+                                '--base',
+                                type=str,
+                                default='./',
+                                help='The base path for datasets and models.')
             parser.add_argument('-s',
                                 '--server',
                                 type=str,
@@ -150,48 +154,73 @@ class Config:
             # A run ID is unique to each client in an experiment
             Config.params['run_id'] = os.getpid()
 
-            # Pretrained models
-            if hasattr(Config().server, 'model_dir'):
-                Config.params['model_dir'] = Config().server.model_dir
+            # The base path used for all datasets, models, checkpoints, and results
+            Config.params['base_path'] = Config.args.base
+
+            if 'general' in config:
+                Config.general = Config.namedtuple_from_dict(config['general'])
+
+                if hasattr(Config.general, 'base_path'):
+                    Config.params['base_path'] = Config().general.base_path
+
+            # Directory of dataset
+            if hasattr(Config().data, 'data_path'):
+                Config.params['data_path'] = os.path.join(
+                    Config.params['base_path'],
+                    Config().data.data_path)
             else:
-                Config.params['model_dir'] = "./models/pretrained"
-            os.makedirs(Config.params['model_dir'], exist_ok=True)
+                Config.params['data_path'] = os.path.join(
+                    Config.params['base_path'], "data")
+
+            # Pretrained models
+            if hasattr(Config().server, 'model_path'):
+                Config.params['model_path'] = os.path.join(
+                    Config.params['base_path'],
+                    Config().server.model_path)
+            else:
+                Config.params['model_path'] = os.path.join(
+                    Config.params['base_path'], "models/pretrained")
+            os.makedirs(Config.params['model_path'], exist_ok=True)
 
             # Resume checkpoint
-            if hasattr(Config().server, 'checkpoint_dir'):
-                Config.params['checkpoint_dir'] = Config(
-                ).server.checkpoint_dir
+            if hasattr(Config().server, 'checkpoint_path'):
+                Config.params['checkpoint_path'] = os.path.join(
+                    Config.params['base_path'],
+                    Config().server.checkpoint_path)
             else:
-                Config.params['checkpoint_dir'] = "./checkpoints"
-            os.makedirs(Config.params['checkpoint_dir'], exist_ok=True)
-
-            datasource = Config.data.datasource
-            model = Config.trainer.model_name
-            server_type = "custom"
-            if hasattr(Config().server, "type"):
-                server_type = Config.server.type
-            elif hasattr(Config().algorithm, "type"):
-                server_type = Config.algorithm.type
-            Config.params[
-                'result_dir'] = f'./results/{datasource}_{model}_{server_type}'
+                Config.params['checkpoint_path'] = os.path.join(
+                    Config.params['base_path'], "checkpoints")
+            os.makedirs(Config.params['checkpoint_path'], exist_ok=True)
 
             if 'results' in config:
                 Config.results = Config.namedtuple_from_dict(config['results'])
 
-                if hasattr(Config.results, 'result_dir'):
-                    Config.params['result_dir'] = Config.results.result_dir
+            # Directory of the .csv file containing results
+            if hasattr(Config, 'results') and hasattr(Config.results,
+                                                      'result_path'):
+                Config.params['result_path'] = os.path.join(
+                    Config.params['base_path'], Config.results.result_path)
+            else:
+                Config.params['result_path'] = os.path.join(
+                    Config.params['base_path'], "results")
+            os.makedirs(Config.params['result_path'], exist_ok=True)
 
-            os.makedirs(Config.params['result_dir'], exist_ok=True)
+            # The set of columns in the .csv file
+            if hasattr(Config, 'results') and hasattr(Config.results, 'types'):
+                Config().params['result_types'] = Config.results.types
+            else:
+                Config(
+                ).params['result_types'] = "round, accuracy, elapsed_time"
+
+            # The set of pairs to be plotted
+            if hasattr(Config, 'results') and hasattr(Config.results, 'plot'):
+                Config().params['plot_pairs'] = Config().results.plot
+            else:
+                Config().params[
+                    'plot_pairs'] = "round-accuracy, elapsed_time-accuracy"
 
             if 'model' in config:
                 Config.model = Config.namedtuple_from_dict(config['model'])
-
-            if hasattr(Config().trainer, 'max_concurrency'):
-                # Using a temporary SQLite database to limit the maximum number of concurrent
-                # trainers
-                Config.sql_connection = sqlite3.connect(
-                    f"{Config.params['result_dir']}/running_trainers.sqlitedb")
-                Config().cursor = Config.sql_connection.cursor()
 
         return cls._instance
 
@@ -268,6 +297,19 @@ class Config:
                        'cross_silo') and Config().args.port is None
 
     @staticmethod
+    def gpu_count() -> int:
+        """Returns the number of GPUs available for training."""
+        if hasattr(Config().trainer, 'use_mindspore'):
+            return 0
+
+        import torch
+
+        if torch.cuda.is_available():
+            return torch.cuda.device_count()
+        else:
+            return 0
+
+    @staticmethod
     def device() -> str:
         """Returns the device to be used for training."""
         device = 'cpu'
@@ -279,27 +321,17 @@ class Config:
             gpus = tf.config.experimental.list_physical_devices('GPU')
             if len(gpus) > 0:
                 device = 'GPU'
-                tf.config.experimental.set_visible_devices(
-                    gpus[np.random.randint(0, len(gpus))], 'GPU')
+                tf.config.experimental.set_visible_devices(gpus[0], 'GPU')
+
         else:
             import torch
 
             if torch.cuda.is_available() and torch.cuda.device_count() > 0:
-                if hasattr(Config().trainer,
-                           'parallelized') and Config().trainer.parallelized:
-                    device = 'cuda'
+                if Config.gpu_count() > 1 and isinstance(Config.args.id, int):
+                    # A client will always run on the same GPU
+                    gpu_id = Config.args.id % torch.cuda.device_count()
+                    device = f'cuda:{gpu_id}'
                 else:
-                    device = 'cuda:' + str(
-                        np.random.randint(0, torch.cuda.device_count()))
+                    device = 'cuda:0'
 
         return device
-
-    @staticmethod
-    def is_parallel() -> bool:
-        """Check if the hardware and OS support data parallelism."""
-        import torch
-
-        return hasattr(Config().trainer, 'parallelized') and Config(
-        ).trainer.parallelized and torch.cuda.is_available(
-        ) and torch.distributed.is_available(
-        ) and torch.cuda.device_count() > 1

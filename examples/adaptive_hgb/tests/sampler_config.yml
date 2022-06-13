@@ -11,9 +11,6 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    # Whether we should simulate clients
-    simulation: true
-
 server:
     address: 127.0.0.1
     port: 8000
@@ -23,9 +20,6 @@ server:
 data:
     # The training and testing dataset
     datasource: MNIST
-
-    # Where the dataset is located
-    data_path: ./data
 
     # Number of samples in each partition
     partition_size: 12000
@@ -44,16 +38,12 @@ data:
     label_concentration: 0.1
     client_quantity_concentration: 0.1
 
-
 trainer:
     # The type of the trainer
     type: basic
 
     # The maximum number of training rounds
     rounds: 10
-
-    # Whether the training should use multiple GPUs if available
-    parallelized: false
 
     # The maximum number of clients running concurrently
     max_concurrency: 5

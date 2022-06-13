@@ -1,6 +1,4 @@
-
 # include basic settings for the models and the learning process
-
 
 # clients settings
 clients:
@@ -17,9 +15,8 @@ server:
 
 # dataset settings for the original dataset and the corresponding multimodal data processor
 data:
-
   datasource: kinetics700
-  data_path: ./data/Kinetics
+  data_path: data/Kinetics
   download_url: https://storage.googleapis.com/deepmind-media/Datasets/kinetics700_2020.tar.gz
 
   downloader:
@@ -39,7 +36,7 @@ data:
   label_concentration: 0.1
 
   min_partition_size: 200
-  
+
   # The random seed for sampling data
   random_seed: 1
 
@@ -47,8 +44,7 @@ data:
     rgb: !include Pipeline/kinetics_csn_rgb.yml
     flow: !include Pipeline/kinetics_tsn_flow.yml
     audio: !include Pipeline/kinetics_audio_feature.yml
-    
-  
+
 # Train settings
 
 # optimizer
@@ -75,8 +71,7 @@ lr_configs: &lr_config
   warmup_by_epoch: True
   warmup_iters: 16
 
-total_epochs: &total_epochs
-  1000
+total_epochs: &total_epochs 1000
 
 log_config: &log_config
   interval: 20
@@ -94,13 +89,11 @@ trainer:
   optimizer_config: *optimizer_config
   learning_rate_config: *lr_config
   rounds: *total_epochs
-  parallelized: False
   max_accuracy: 3
   target_accuracy: 0.67
 
   log_config: *log_config
   checkpoint_config: *checkpoint_config
-
 
 model:
   model_name: rgb_flow_audio_model
@@ -111,14 +104,13 @@ evaluation:
   metrics:
     - top_k_accuracy
     - mean_class_accuracy
-  
+
 algorithm:
   type: fedavg
 
 # Aggregation algorithm
 # The number of local aggregation rounds on edge servers before sending
-# aggreagted weights to the central server 
-
+# aggreagted weights to the central server
 
 # runtime setting
 runner_setting:
@@ -129,6 +121,6 @@ runner_setting:
     load_from: null
     resume_from: null
     workflow:
-        - train
-        - 1
+      - train
+      - 1
     find_unused_parameters: True

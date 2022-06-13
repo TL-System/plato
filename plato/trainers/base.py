@@ -4,46 +4,20 @@ Base class for trainers.
 
 from abc import ABC, abstractmethod
 import os
-import sqlite3
-import time
-import numpy as np
 
 from plato.config import Config
 
 
 class Trainer(ABC):
     """Base class for all the trainers."""
+
     def __init__(self):
         self.device = Config().device()
         self.client_id = 0
 
-    @staticmethod
-    def run_sql_statement(statement: str, params: tuple = None):
-        """ Run a particular command with a SQLite database connection. """
-        while True:
-            try:
-                with Config().sql_connection:
-                    if params is None:
-                        Config().cursor.execute(statement)
-                    else:
-                        Config().cursor.execute(statement, params)
-
-                    return_value = Config().cursor.fetchone()
-                    if return_value is not None:
-                        return return_value[0]
-                break
-            except sqlite3.OperationalError:
-                time.sleep(np.random.random() * 2)
-
     def set_client_id(self, client_id):
-        """ Setting the client ID and initialize the shared database table for controlling
-            the maximum concurrency with respect to the number of training clients.
-        """
+        """ Setting the client ID """
         self.client_id = client_id
-
-        if hasattr(Config().trainer, 'max_concurrency'):
-            Trainer.run_sql_statement(
-                "CREATE TABLE IF NOT EXISTS trainers (run_id int)")
 
     @abstractmethod
     def save_model(self, filename=None, location=None):
@@ -58,62 +32,43 @@ class Trainer(ABC):
     @staticmethod
     def save_accuracy(accuracy, filename=None):
         """Saving the test accuracy to a file."""
-        model_dir = Config().params['model_dir']
+        model_path = Config().params['model_path']
         model_name = Config().trainer.model_name
 
-        if not os.path.exists(model_dir):
-            os.makedirs(model_dir)
+        if not os.path.exists(model_path):
+            os.makedirs(model_path)
 
         if filename is not None:
-            accuracy_path = f"{model_dir}/{filename}"
+            accuracy_path = f"{model_path}/{filename}"
         else:
-            accuracy_path = f'{model_dir}/{model_name}.acc'
+            accuracy_path = f'{model_path}/{model_name}.acc'
 
-        with open(accuracy_path, 'w', encoding='utf8') as file:
+        with open(accuracy_path, 'w', encoding='utf-8') as file:
             file.write(str(accuracy))
 
     @staticmethod
     def load_accuracy(filename=None):
         """Loading the test accuracy from a file."""
-        model_dir = Config().params['model_dir']
+        model_path = Config().params['model_path']
         model_name = Config().trainer.model_name
 
         if filename is not None:
-            accuracy_path = f"{model_dir}/{filename}"
+            accuracy_path = f"{model_path}/{filename}"
         else:
-            accuracy_path = f'{model_dir}/{model_name}.acc'
+            accuracy_path = f'{model_path}/{model_name}.acc'
 
-        with open(accuracy_path, 'r', encoding='utf8') as file:
+        with open(accuracy_path, 'r', encoding='utf-8') as file:
             accuracy = float(file.read())
 
         return accuracy
 
-    def start_training(self):
-        """Add to the list of running trainers if max_concurrency has not yet
-        been reached."""
-        if hasattr(Config().trainer, 'max_concurrency'):
-            time.sleep(np.random.random() * 2)
-            trainer_count = Trainer.run_sql_statement(
-                "SELECT COUNT(*) FROM trainers")
-
-            while trainer_count >= Config().trainer.max_concurrency:
-                time.sleep(np.random.random() * 2)
-                trainer_count = Trainer.run_sql_statement(
-                    "SELECT COUNT(*) FROM trainers")
-
-            Trainer.run_sql_statement("INSERT INTO trainers VALUES (?)",
-                                      (self.client_id, ))
-
     def pause_training(self):
-        """Remove from the list of running trainers."""
+        """Remove files of running trainers."""
         if hasattr(Config().trainer, 'max_concurrency'):
-            Trainer.run_sql_statement(
-                "DELETE FROM trainers WHERE run_id = (?)", (self.client_id, ))
-
             model_name = Config().trainer.model_name
-            model_dir = Config().params['model_dir']
-            model_file = f"{model_dir}/{model_name}_{self.client_id}_{Config().params['run_id']}.pth"
-            accuracy_file = f"{model_dir}/{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
+            model_path = Config().params['model_path']
+            model_file = f"{model_path}/{model_name}_{self.client_id}_{Config().params['run_id']}.pth"
+            accuracy_file = f"{model_path}/{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
 
             if os.path.exists(model_file):
                 os.remove(model_file)
@@ -122,7 +77,7 @@ class Trainer(ABC):
                 os.remove(accuracy_file)
 
     @abstractmethod
-    def train(self, trainset, sampler, cut_layer=None) -> float:
+    def train(self, trainset, sampler, cut_layer=None, **kwargs) -> float:
         """The main training loop in a federated learning workload.
 
         Arguments:
@@ -135,7 +90,7 @@ class Trainer(ABC):
         """
 
     @abstractmethod
-    def test(self, testset, sampler=None) -> float:
+    def test(self, testset, sampler=None, **kwargs) -> float:
         """Testing the model using the provided test dataset.
 
         Arguments:
@@ -144,7 +99,7 @@ class Trainer(ABC):
         """
 
     @abstractmethod
-    async def server_test(self, testset, sampler=None):
+    async def server_test(self, testset, sampler=None, **kwargs):
         """Testing the model on the server using the provided test dataset.
 
         Arguments:

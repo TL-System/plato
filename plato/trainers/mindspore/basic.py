@@ -42,6 +42,8 @@ class Trainer(base.Trainer):
 
         if model is None:
             self.model = models_registry.get()
+        else:
+            self.model = model.get_model()
 
         # Initializing the loss criterion
         loss_criterion = SoftmaxCrossEntropyWithLogits(sparse=True,
@@ -66,17 +68,17 @@ class Trainer(base.Trainer):
 
     def save_model(self, filename=None, location=None):
         """Saving the model to a file."""
-        model_dir = Config(
-        ).params['model_dir'] if location is None else location
+        model_path = Config(
+        ).params['model_path'] if location is None else location
         model_name = Config().trainer.model_name
 
-        if not os.path.exists(model_dir):
-            os.makedirs(model_dir)
+        if not os.path.exists(model_path):
+            os.makedirs(model_path)
 
         if filename is not None:
-            model_path = f'{model_dir}/{filename}'
+            model_path = f'{model_path}/{filename}'
         else:
-            model_path = f'{model_dir}/{model_name}.ckpt'
+            model_path = f'{model_path}/{model_name}.ckpt'
 
         mindspore.save_checkpoint(self.model, model_path)
 
@@ -89,14 +91,14 @@ class Trainer(base.Trainer):
 
     def load_model(self, filename=None, location=None):
         """Loading pre-trained model weights from a file."""
-        model_dir = Config(
-        ).params['model_dir'] if location is None else location
+        model_path = Config(
+        ).params['model_path'] if location is None else location
         model_name = Config().trainer.model_name
 
         if filename is not None:
-            model_path = f'{model_dir}/{filename}'
+            model_path = f'{model_path}/{filename}'
         else:
-            model_path = f'{model_dir}/{model_name}.ckpt'
+            model_path = f'{model_path}/{model_name}.ckpt'
 
         if self.client_id == 0:
             logging.info("[Server #%d] Loading a model from %s.", os.getpid(),
@@ -114,7 +116,6 @@ class Trainer(base.Trainer):
         Arguments:
         trainset: The training dataset.
         """
-        self.start_training()
         tic = time.perf_counter()
 
         self.mindspore_model.train(
@@ -135,7 +136,6 @@ class Trainer(base.Trainer):
         Arguments:
         testset: The test dataset.
         """
-        self.start_training()
 
         # Deactivate the cut layer so that testing uses all the layers
         self.mindspore_model._network.cut_layer = None

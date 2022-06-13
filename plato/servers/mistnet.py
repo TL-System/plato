@@ -16,6 +16,7 @@ from plato.servers import fedavg
 
 class Server(fedavg.Server):
     """The MistNet server for federated learning."""
+
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
 
@@ -26,12 +27,20 @@ class Server(fedavg.Server):
         """Setting up a pre-trained model to be loaded on the server."""
         super().load_trainer()
 
-        logging.info("[Server #%d] Loading a pre-trained model.", os.getpid())
-        self.trainer.load_model()
+        model_path = Config().params['model_path']
+        model_file_name = Config().trainer.pretrained_model if hasattr(
+            Config().trainer,
+            'pretrained_model') else f'{Config().trainer.model_name}.pth'
+        pretrained_model_path = f'{model_path}/{model_file_name}'
+
+        if os.path.exists(pretrained_model_path):
+            logging.info("[Server #%d] Loading a pre-trained model.",
+                         os.getpid())
+            self.trainer.load_model(filename=model_file_name)
 
     async def process_reports(self):
         """Process the features extracted by the client and perform server-side training."""
-        features = [features for (__, features, __) in self.updates]
+        features = [features for (__, __, features, __) in self.updates]
         feature_dataset = feature.DataSource(features)
 
         # Training the model using all the features received from the client
@@ -40,10 +49,9 @@ class Server(fedavg.Server):
                              Config().algorithm.cut_layer)
 
         # Test the updated model
-        if not Config().clients.do_test:
+        if not hasattr(Config().server, 'do_test') or Config().server.do_test:
             self.accuracy = self.trainer.test(self.testset)
-            logging.info(
-                '[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(
-                    os.getpid(), 100 * self.accuracy))
+            logging.info('[%s] Global model accuracy: %.2f%%\n', self,
+                         100 * self.accuracy)
 
         await self.wrap_up_processing_reports()

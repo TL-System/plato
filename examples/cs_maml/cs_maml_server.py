@@ -14,6 +14,7 @@ from plato.servers import fedavg_cs
 
 class Server(fedavg_cs.Server):
     """Cross-silo federated learning server using federated averaging."""
+
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
 
@@ -84,18 +85,18 @@ class Server(fedavg_cs.Server):
     async def wrap_up_processing_reports(self):
         """Wrap up processing the reports with any additional work."""
         if self.do_personalization_test or Config().is_edge_server():
-            if hasattr(Config(), 'results'):
-                new_row = []
-                for item in self.recorded_items:
-                    item_value = self.get_record_items_values()[item]
-                    new_row.append(item_value)
+            # Record results
+            new_row = []
+            for item in self.recorded_items:
+                item_value = self.get_record_items_values()[item]
+                new_row.append(item_value)
 
-                if Config().is_edge_server():
-                    result_csv_file = f"{Config().params['result_dir']}/edge_{os.getpid()}.csv"
-                else:
-                    result_csv_file = f"{Config().params['result_dir']}/{os.getpid()}.csv"
+            if Config().is_edge_server():
+                result_csv_file = f"{Config().params['result_path']}/edge_{os.getpid()}.csv"
+            else:
+                result_csv_file = f"{Config().params['result_path']}/{os.getpid()}.csv"
 
-                csv_processor.write_csv(result_csv_file, new_row)
+            csv_processor.write_csv(result_csv_file, new_row)
 
             if Config().is_edge_server():
                 if self.do_personalization_test:
@@ -116,10 +117,10 @@ class Server(fedavg_cs.Server):
         if not self.do_personalization_test:
             self.round_time = max([
                 report.training_time + report.comm_time
-                for (report, __, __) in self.updates
+                for (__, report, __, __) in self.updates
             ])
             self.comm_time = max(
-                [report.comm_time for (report, __, __) in self.updates])
+                [report.comm_time for (__, report, __, __) in self.updates])
 
     async def process_client_info(self, client_id, sid):
         """ Process the received metadata information from a reporting client. """
@@ -140,7 +141,7 @@ class Server(fedavg_cs.Server):
         if self.do_personalization_test:
             client = client_info
         else:
-            client = client_info[1]
+            client = client_info[2]
             client_staleness = self.current_round - client['starting_round']
 
             self.updates.append(

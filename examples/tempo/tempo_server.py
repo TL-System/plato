@@ -16,6 +16,7 @@ class Server(fedavg_cs.Server):
     A cross-silo federated learning server that tunes
     clients' local epoch numbers of each institution.
     """
+
     def __init__(self):
         super().__init__()
 
@@ -27,12 +28,9 @@ class Server(fedavg_cs.Server):
                 for i in range(Config().algorithm.total_silos)
             ]
 
-        if hasattr(Config(), 'results'):
-            if Config().is_edge_server():
-                if 'local_epoch_num' not in self.recorded_items:
-                    self.recorded_items = self.recorded_items + [
-                        'local_epoch_num'
-                    ]
+        if Config().is_edge_server():
+            if 'local_epoch_num' not in self.recorded_items:
+                self.recorded_items = self.recorded_items + ['local_epoch_num']
 
     async def customize_server_response(self, server_response):
         """Wrap up generating the server response with any additional information."""
@@ -89,13 +87,9 @@ class Server(fedavg_cs.Server):
         """
         weights_diff_list = []
         for i in range(Config().algorithm.total_silos):
-            if hasattr(Config().clients,
-                       'simulation') and Config().clients.simulation:
-                client_id = i + 1 + Config().clients.per_round
-            else:
-                client_id = i + 1 + Config().clients.total_clients
+            client_id = i + 1 + Config().clients.total_clients
             (report, weights) = [(report, payload)
-                                 for (report, payload, __) in self.updates
+                                 for (__, report, payload, __) in self.updates
                                  if int(report.client_id) == client_id][0]
             num_samples = report.num_samples
 

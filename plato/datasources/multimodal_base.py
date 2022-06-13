@@ -24,6 +24,7 @@ class MultiModalDataSource(base.DataSource):
     """
     The training or testing dataset that accommodates custom augmentation and transforms.
     """
+
     def __init__(self):
         super().__init__()
 
@@ -35,11 +36,11 @@ class MultiModalDataSource(base.DataSource):
 
         # define the information container for the source data
         #  - source_data_path: the original downloaded data
-        #  - base_data_dir_path: the source data used for the model
-        # For some datasets, we directly utilize the base_data_dir_path as
+        #  - data_path: the source data used for the model
+        # For some datasets, we directly utilize the data_path as
         #  there is no need to process the original downloaded data to put them
-        #  in the base_data_dir_path dir.
-        self.mm_data_info = {"source_data_path": "", "base_data_dir_path": ""}
+        #  in the data_path dir.
+        self.mm_data_info = {"source_data_path": "", "data_path": ""}
 
         # define the paths for the splited root data - train, test, and val
         self.splits_info = {
@@ -106,15 +107,13 @@ class MultiModalDataSource(base.DataSource):
         """ Generate the data structure based on the defined data path """
 
         # Create the full path by introducing the project path
-        proj_root_path = os.path.abspath(os.curdir)
-        base_data_path = os.path.join(proj_root_path, data_path,
-                                      base_data_name)
+        base_data_path = os.path.join(data_path, base_data_name)
 
         if not os.path.exists(base_data_path):
             os.makedirs(base_data_path)
 
         #
-        self.mm_data_info["base_data_dir_path"] = base_data_path
+        self.mm_data_info["data_path"] = base_data_path
 
         # create the split dirs for current dataset
         for split_type in list(self.splits_info.keys()):
@@ -129,31 +128,31 @@ class MultiModalDataSource(base.DataSource):
     def _download_arrange_data(
         self,
         download_url_address,
-        put_data_dir,
+        data_path,
         extract_to_dir=None,
         obtained_file_name=None,
     ):
         """ Download the raw data and arrange the data """
         # Extract to the same dir as the download dir
         if extract_to_dir is None:
-            extract_to_dir = put_data_dir
+            extract_to_dir = data_path
 
         download_file_name = os.path.basename(download_url_address)
-        download_file_path = os.path.join(put_data_dir, download_file_name)
+        download_file_path = os.path.join(data_path, download_file_name)
 
         download_extracted_file_name = download_file_name.split(".")[0]
-        download_extracted_dir_path = os.path.join(
-            extract_to_dir, download_extracted_file_name)
+        download_extracted_path = os.path.join(extract_to_dir,
+                                               download_extracted_file_name)
         # Download the raw data if necessary
-        if not self._exist_judgement(download_file_path):
+        if not self._exists(download_file_path):
             logging.info("Downloading the %s data.....", download_file_name)
             download_url(url=download_url_address,
-                         root=put_data_dir,
+                         root=data_path,
                          filename=obtained_file_name)
 
         # Extract the data to the specific dir
         if ".zip" in download_file_name or ".tar.gz" in download_file_name:
-            if not self._exist_judgement(download_extracted_dir_path):
+            if not self._exists(download_extracted_path):
                 logging.info("Extracting data to %s dir.....", extract_to_dir)
                 extract_archive(from_path=download_file_path,
                                 to_path=extract_to_dir,
@@ -165,48 +164,42 @@ class MultiModalDataSource(base.DataSource):
         self,
         download_file_id,
         extract_download_file_name,
-        put_data_dir,
+        data_path,
     ):
         download_data_file_name = extract_download_file_name + ".zip"
-        download_data_path = os.path.join(put_data_dir,
-                                          download_data_file_name)
-        extract_data_path = os.path.join(put_data_dir,
-                                         extract_download_file_name)
-        if not self._exist_judgement(download_data_path):
+        download_data_path = os.path.join(data_path, download_data_file_name)
+        extract_data_path = os.path.join(data_path, extract_download_file_name)
+        if not self._exists(download_data_path):
             logging.info("Downloading the data to %s", download_data_path)
             download_file_from_google_drive(file_id=download_file_id,
-                                            root=put_data_dir,
+                                            root=data_path,
                                             filename=download_data_file_name)
-        if not self._exist_judgement(extract_data_path):
+        if not self._exists(extract_data_path):
             extract_archive(from_path=download_data_path,
-                            to_path=put_data_dir,
+                            to_path=data_path,
                             remove_finished=True)
 
-    def _exist_file_in_dir(self,
-                           tg_file_name,
-                           search_dir,
-                           is_partial_name=True):
-        """ Judge whether the input file exists in the search_dir. """
+    def _file_exists(self, tg_file_name, search_path, is_partial_name=True):
+        """ Judge whether the input file exists in the search_path. """
         # the tg_file_name matches one file if it match part of the file name
         if is_partial_name:
-            is_included_fuc = lambda src_f_name: tg_file_name in src_f_name
+            is_included = lambda src_f_name: tg_file_name in src_f_name
         else:
-            is_included_fuc = lambda src_f_name: tg_file_name == src_f_name
-        is_existed = any(
-            [is_included_fuc(f_name) for f_name in os.listdir(search_dir)])
+            is_included = lambda src_f_name: tg_file_name == src_f_name
+        exists = any(is_included(f_name) for f_name in os.listdir(search_path))
 
-        return is_existed
+        return exists
 
-    def _exist_judgement(self, target_path):
-        """ Judeg whether the input file/dir existed and whether it contains useful data """
+    def _exists(self, target_path):
+        """ Does the input path/file exist and does the file contain useful data? """
         if not os.path.exists(target_path):
-            logging.info("The path %s does not exist", target_path)
+            logging.info("The path %s does not exist.", target_path)
             return False
 
         # remove all .DS_Store files
         command = ['find', '.', '-name', '".DS_Store"', '-delete']
         command = ' '.join(command)
-        #cmd = f"find . -name ".DS_Store" -delete"
+        # cmd = f"find . -name ".DS_Store" -delete"
         subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT)
 
         def get_size(folder):
@@ -219,7 +212,7 @@ class MultiModalDataSource(base.DataSource):
 
         def is_contain_useful_file(target_dir):
             """ Return True once reaching one useful file """
-            for _, _, files in os.walk(target_dir):
+            for __, __, files in os.walk(target_dir):
                 for file in files:
                     # whether a useful file
                     if not file.startswith('.'):
@@ -229,17 +222,17 @@ class MultiModalDataSource(base.DataSource):
         if os.path.isdir(target_path):
             if get_size(target_path
                         ) == 0 or not is_contain_useful_file(target_path):
-                logging.info("The path %s does exist but contains no data",
+                logging.info("The path %s exists but contains no data.",
                              target_path)
                 return False
-            else:
-                return True
 
-        logging.info("The file %s does exist", target_path)
+            return True
+
+        logging.info("The file %s exists.", target_path)
         return True
 
     def num_modalities(self) -> int:
-        """ Number of modalities """
+        """ The number of modalities. """
         return len(self.modality_names)
 
     @abstractmethod
@@ -247,25 +240,28 @@ class MultiModalDataSource(base.DataSource):
         """ Obtain the dataset with the modaltiy_sampler for the
             specific phase (train/test/val) """
         raise NotImplementedError(
-            "Please Implement 'get_phase_dataset' method")
+            "Please implement the 'get_phase_dataset' method.")
 
     @abstractmethod
     def get_train_set(self, modality_sampler):
         """ Obtain the train dataset with the modaltiy_sampler """
-        raise NotImplementedError("Please Implement 'get_train_set' method")
+        raise NotImplementedError(
+            "Please implement the 'get_train_set' method.")
 
     @abstractmethod
     def get_test_set(self, modality_sampler):
-        """ btain the test dataset with the modaltiy_sampler """
-        raise NotImplementedError("Please Implement 'get_test_set' method")
+        """ Obtain the test dataset with the modaltiy_sampler. """
+        raise NotImplementedError(
+            "Please implement the 'get_test_set' method.")
 
 
 class MultiModalDataset(torch.utils.data.Dataset):
-    """ The base interface for the multimodal data """
+    """ The base interface for multimodal data. """
+
     def __init__(self):
         self.phase = None  # the 'train' , 'test', 'val'
 
-        # the recorded samples for current dataset
+        # The recorded samples for current dataset:
         #   In flickr20K entities dataset, this presents as:
         #    this is a dict in which key is the 'sample name/id' ...
         #    the values are the sample's information,
@@ -275,7 +271,7 @@ class MultiModalDataset(torch.utils.data.Dataset):
         #    {"rgb": rgb_dataset, "flow": flow_dataset, "audio": audio_dataset}
         self.phase_multimodal_data_record = None
 
-        # the detailed info in selected split
+        # Detailed information in selected split:
         #   i.e., path, path for different modalities, et. al
         self.phase_info = None
         # the data types included,
@@ -326,7 +322,7 @@ class MultiModalDataset(torch.utils.data.Dataset):
         sampled_multimodal_data = self.get_one_multimodal_sample(sample_idx)
 
         # utilize the modality to mask specific modalities
-        sampled_modality_data = dict()
+        sampled_modality_data = {}
         for item_name, item_data in sampled_multimodal_data.items():
             # maintain the modality data based on the sampler
             # maintain the external data
