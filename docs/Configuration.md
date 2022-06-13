@@ -34,6 +34,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |outbound_processors|A list of processors to apply on the payload before sending| A list of processor names || 
 |inbound_processors|A list of processors to apply on the payload right after receiving| A list of processor names || 
 |comm_simulation|Whether client-server communication should be simulated with files|`true` or `false`|default: true|
+|compute_comm_time|Whether communication time should be computed with specified bandwidth when client-server communication is simulated with files|`true` or `false`||
 
 #### Valid processors for `clients.outbound_processors`
 
@@ -89,6 +90,9 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |checkpoint_path|The directory of checkpoints||default: `<base_path>/checkpoints`|
 |outbound_processors|A list of processors to apply on the payload before sending| A list of processor names || 
 |inbound_processors|A list of processors to apply on the payload right after receiving| A list of processor names || 
+|downlink_bandwidth|Bandwidth for downlink communication (server to clients) in MBps||default:1|
+|uplink_bandwidth|Bandwidth for uplink communication (clients to server) in MBps||default:1|
+
 
 #### Valid processors for `server.outbound_processors`
 
@@ -112,7 +116,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 
 | Attribute | Meaning | Valid Value | Note |
 |:---------:|:-------:|:-----------:|:----:|
-|**dataset**| The training and test datasets|`MNIST`, `FashionMNIST`, `EMNIST`, `CIFAR10`, `CINIC10`, `YOLO`, `HuggingFace`, `PASCAL_VOC`, `TinyImageNet`, or `CelebA`||
+|**dataset**| The training and test datasets|`MNIST`, `FashionMNIST`, `EMNIST`, `CIFAR10`, `CIFAR100`, `CINIC10`, `YOLO`, `HuggingFace`, `PASCAL_VOC`, `TinyImageNet`, `CelebA`, `Purchase`, or `Texas`||
 |data_path|Where the dataset is located||default: `./data`, except for the `CINIC10` dataset, the default is `./data/CINIC-10`; for the `TinyImageNet` dataset, the default is `./data/tiny-imagenet-200`|
 |train_path|Where the training dataset is located||Need to be specified for datasets using `YOLO`|
 |test_path|Where the test dataset is located||Need to be specified for datasets using `YOLO`|
@@ -147,7 +151,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |**momentum**||||
 |**weight_decay**|||When using `diff_privacy` trainer, set to 0|   
 |lr_schedule|Learning rate scheduler|`CosineAnnealingLR`, `LambdaLR`, `StepLR`, `ReduceLROnPlateau`|| 
-|**model_name**|The machine learning model|`lenet5`, `resnet_x`, `vgg_x`,`wideresnet`, `feedback_transformer`, `yolov5`, `HuggingFace_CausalLM`, `inceptionv3`, `googlenet`, `unet`, `alexnet`, `squeezenet_x`, `shufflenet_x`|For `resnet_x`, x = 18, 34, 50, 101, or 152; For `vgg_x`, x = 11, 13, 16, or 19; For `squeezenet_x`, x = 0 or 1; For `shufflenet_x`, x = 0.5, 1.0, 1.5, or 2.0|
+|**model_name**|The machine learning model|`lenet5`, `resnet_x`, `vgg_x`,`wideresnet`, `feedback_transformer`, `yolov5`, `HuggingFace_CausalLM`, `inceptionv3`, `googlenet`, `unet`, `alexnet`, `squeezenet_x`, `shufflenet_x`, `dcgan`, `multilayer`|For `resnet_x`, x = 18, 34, 50, 101, or 152; For `vgg_x`, x = 11, 13, 16, or 19; For `squeezenet_x`, x = 0 or 1; For `shufflenet_x`, x = 0.5, 1.0, 1.5, or 2.0|
 |pretrained|Use a model pretrained on ImageNet or not|`true` or `false`. Default is `false`|Can be used for `inceptionv3`, `alexnet`, and `squeezenet_x` models.|
 |dp_epsilon|Total privacy budget of epsilon with the `diff_privacy` trainer||default: 10.0|
 |dp_delta|Total privacy budget of delta with the `diff_privacy` trainer||default: 1e-5|

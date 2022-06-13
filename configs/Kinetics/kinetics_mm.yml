@@ -16,7 +16,7 @@ server:
 # dataset settings for the original dataset and the corresponding multimodal data processor
 data:
   datasource: kinetics700
-  data_path: ./data/Kinetics
+  data_path: data/Kinetics
   download_url: https://storage.googleapis.com/deepmind-media/Datasets/kinetics700_2020.tar.gz
 
   downloader:

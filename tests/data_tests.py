@@ -29,11 +29,11 @@ import unittest
 
 # os.environ['config_file'] = 'tests/TestsConfig/referitgame.yml'
 
-os.environ['config_file'] = 'tests/TestsConfig/flickr30k_entities.yml'
+# os.environ['config_file'] = 'tests/TestsConfig/flickr30k_entities.yml'
 
 # os.environ['config_file'] = 'tests/TestsConfig/coco.yml'
 
-# os.environ['config_file'] = 'tests/TestsConfig/kinetics.yml'
+os.environ['config_file'] = 'tests/TestsConfig/kinetics.yml'
 
 # os.environ['config_file'] = 'tests/TestsConfig/gym.yml'
 
@@ -47,10 +47,10 @@ from sampler_test_utils import define_sampler
 
 from plato.config import Config
 
-from plato.datasources.flickr30k_entities import DataSource as f30ke_DataSource
+# from plato.datasources.flickr30k_entities import DataSource as f30ke_DataSource
 # from plato.datasources.referitgame import DataSource as refer_Datasource
 # from plato.datasources.coco import DataSource as coco_Datasource
-# from plato.datasources.kinetics import DataSource as kinetics_Datasource
+from plato.datasources.kinetics import DataSource as kinetics_Datasource
 # from plato.datasources.gym import DataSource as GymDataSource
 from plato.samplers import registry as samplers_registry
 
@@ -113,10 +113,10 @@ class DatasetsTest(unittest.TestCase):
 
         return True
 
-    def test_f30ke_datasource(self):
-        """ Test the flickr30k entities dataset. """
-        self.utest_datasource = f30ke_DataSource()
-        assert self.assert_datasource_definition(self.utest_datasource)
+    # def test_f30ke_datasource(self):
+    #    """ Test the flickr30k entities dataset. """
+    #    self.utest_datasource = f30ke_DataSource()
+    #    assert self.assert_datasource_definition(self.utest_datasource)
 
     # def test_coco_datasource(self):
     #     """ Test the MSCOCO dataset. """
@@ -126,26 +126,26 @@ class DatasetsTest(unittest.TestCase):
     #     # assert self.assert_datasource_definition(self.utest_datasource)
 
     # def test_ref_datasource(self):
-    #     """ Test the ReferItGmae dataset. """
-    #     # set the specific
+    #    """ Test the ReferItGame dataset. """
+    #    # set the specific
 
-    #     self.utest_datasource = refer_Datasource()
-    #     assert self.assert_datasource_definition(self.utest_datasource)
+    #    self.utest_datasource = refer_Datasource()
+    #    assert self.assert_datasource_definition(self.utest_datasource)
 
-    # def test_kinetics_datasource(self):
-    #     """ Test the kinetics700 dataset. """
-    #     # set the specific
+    def test_kinetics_datasource(self):
+        """ Test the kinetics700 dataset. """
+        # set the specific
 
-    #     self.utest_datasource = kinetics_Datasource()
-    #     kinetics_train_dataset = self.utest_datasource.get_train_set(
-    #         modality_sampler=None)
+        self.utest_datasource = kinetics_Datasource()
+        kinetics_train_dataset = self.utest_datasource.get_train_set(
+            modality_sampler=None)
 
-    #     iter_data = kinetics_train_dataset[0]
-    #     print("rgb: ")
-    #     print(iter_data["rgb"]["imgs"].shape)
-    #     print(iter_data["rgb"]["label"].shape)
+        iter_data = kinetics_train_dataset[0]
+        print("rgb: ")
+        print(iter_data["rgb"]["imgs"].shape)
+        print(iter_data["rgb"]["label"].shape)
 
-    #     assert self.assert_datasource_definition(self.utest_datasource)
+        assert self.assert_datasource_definition(self.utest_datasource)
 
     # def test_gym_datasource(self):
     #     """ Test the Gym dataset. """

@@ -23,7 +23,7 @@ data:
     data_params: packages/yolov5/yolov5/data/coco128.yaml
 
     # Where the dataset is located
-    data_path: ./data/COCO
+    data_path: data/COCO
     train_path: ./data/COCO/coco128/images/train2017/
     test_path: ./data/COCO/coco128/images/train2017/
 
