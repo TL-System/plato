@@ -44,6 +44,8 @@ server:
 
     random_seed: 1
 
+    model_path: examples/td3_learning/models/pretrained
+
 data:
     # The training and testing dataset
     datasource: FashionMNIST

@@ -28,7 +28,7 @@ import random
 
 file_name = "TD3_RL"
 models_dir = "./pytorch_models"
-results_dir = "./results"
+results_dir = "examples/td3_learning/results"
 
 class ReplayMemory(base.ReplayMemory):
     """ A simple example of replay memory buffer. """
