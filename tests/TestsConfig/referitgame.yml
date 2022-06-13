@@ -1,4 +1,5 @@
 # include basic settings for the models and the learning process
+general: !include base_path.yml
 
 # clients settings
 clients:
@@ -17,7 +18,6 @@ server:
 data:
   dataname: ReferItGame
   datasource: ReferItGame
-  data_path: data/
 
   base_coco_images_path: data/COCO2017/train/images
 

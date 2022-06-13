@@ -51,7 +51,7 @@ data:
     datasource: FashionMNIST
 
     # Where the dataset is located
-    data_path: ./data
+    data_path: data
 
     # Number of samples in each partition
     partition_size: 200

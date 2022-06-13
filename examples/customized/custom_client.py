@@ -95,6 +95,21 @@ class CustomClient(simple.Client):
         logging.info("A customized client has been initialized.")
 
 
+class Model():
+    """ A custom model. """
+
+    @staticmethod
+    def get_model():
+        """Obtaining an instance of this model."""
+        return nn.Sequential(
+            nn.Linear(28 * 28, 128),
+            nn.ReLU(),
+            nn.Linear(128, 128),
+            nn.ReLU(),
+            nn.Linear(128, 10),
+        )
+
+
 def main():
     """
     A Plato federated learning training session using a custom client.
@@ -102,14 +117,8 @@ def main():
     To run this example:
     python custom_client.py -i <client_id>
     """
-    model = nn.Sequential(
-        nn.Linear(28 * 28, 128),
-        nn.ReLU(),
-        nn.Linear(128, 128),
-        nn.ReLU(),
-        nn.Linear(128, 10),
-    )
-    datasource = DataSource()
+    model = Model
+    datasource = DataSource
     trainer = Trainer
 
     client = CustomClient(model=model, datasource=datasource, trainer=trainer)

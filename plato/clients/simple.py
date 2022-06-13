@@ -35,7 +35,8 @@ class Client(base.Client):
         self.custom_model = model
         self.model = None
 
-        self.datasource = datasource
+        self.custom_datasource = datasource
+        self.datasource = None
 
         self.custom_algorithm = algorithm
         self.algorithm = None
@@ -53,15 +54,13 @@ class Client(base.Client):
     def configure(self) -> None:
         """Prepare this client for training."""
         super().configure()
-        if self.custom_model is not None:
+        if self.model is None and self.custom_model is not None:
             self.model = self.custom_model
-            self.custom_model = None
 
         if self.trainer is None and self.custom_trainer is None:
             self.trainer = trainers_registry.get(model=self.model)
         elif self.trainer is None and self.custom_trainer is not None:
             self.trainer = self.custom_trainer(model=self.model)
-            self.custom_trainer = None
 
         self.trainer.set_client_id(self.client_id)
 
@@ -69,7 +68,6 @@ class Client(base.Client):
             self.algorithm = algorithms_registry.get(trainer=self.trainer)
         elif self.algorithm is None and self.custom_algorithm is not None:
             self.algorithm = self.custom_algorithm(trainer=self.trainer)
-            self.custom_algorithm = None
 
         self.algorithm.set_client_id(self.client_id)
 
@@ -82,10 +80,17 @@ class Client(base.Client):
         """Generating data and loading them onto this client."""
         logging.info("[%s] Loading its data source...", self)
 
-        if self.datasource is None or (hasattr(Config().data, 'reload_data')
-                                       and Config().data.reload_data):
+        if self.datasource is None and self.custom_datasource is None or (
+                hasattr(Config().data, 'reload_data')
+                and Config().data.reload_data):
+            # The only case where Config().data.reload_data is set to true is
+            # when clients with different client IDs need to load from different datasets,
+            # such as in the pre-partitioned Federated EMNIST dataset. We do not support
+            # reloading data from a custom datasource at this time.
             self.datasource = datasources_registry.get(
                 client_id=self.client_id)
+        elif self.datasource is None and self.custom_datasource is not None:
+            self.datasource = self.custom_datasource()
 
         logging.info("[%s] Dataset size: %s", self,
                      self.datasource.num_train_examples())
