@@ -136,7 +136,8 @@ class Trainer(basic.Trainer):
                     self.timesteps_since_eval %= Config().algorithm.eval_freq * globals.max_episode_steps
                     self.evaluations.append(client.evaluate_policy(self, self.env))
                     print(self.evaluations)
-                    np.save("./results/%s" % (file_name), self.evaluations)
+                    print(results_dir+file_name)
+                    np.savetxt("%s.csv" %(results_dir+"/"+file_name), self.evaluations, delimiter=",")
                 
                 #When the training step is done, we reset the state of the env
                 obs = self.env.reset()
