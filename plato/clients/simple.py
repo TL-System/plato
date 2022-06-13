@@ -54,15 +54,13 @@ class Client(base.Client):
     def configure(self) -> None:
         """Prepare this client for training."""
         super().configure()
-        if self.custom_model is not None:
+        if self.model is None and self.custom_model is not None:
             self.model = self.custom_model
-            self.custom_model = None
 
         if self.trainer is None and self.custom_trainer is None:
             self.trainer = trainers_registry.get(model=self.model)
         elif self.trainer is None and self.custom_trainer is not None:
             self.trainer = self.custom_trainer(model=self.model)
-            self.custom_trainer = None
 
         self.trainer.set_client_id(self.client_id)
 
@@ -70,7 +68,6 @@ class Client(base.Client):
             self.algorithm = algorithms_registry.get(trainer=self.trainer)
         elif self.algorithm is None and self.custom_algorithm is not None:
             self.algorithm = self.custom_algorithm(trainer=self.trainer)
-            self.custom_algorithm = None
 
         self.algorithm.set_client_id(self.client_id)
 
@@ -94,7 +91,6 @@ class Client(base.Client):
                 client_id=self.client_id)
         elif self.datasource is None and self.custom_datasource is not None:
             self.datasource = self.custom_datasource()
-            self.custom_datasource = None
 
         logging.info("[%s] Dataset size: %s", self,
                      self.datasource.num_train_examples())
