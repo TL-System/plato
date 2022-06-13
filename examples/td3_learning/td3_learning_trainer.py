@@ -16,13 +16,12 @@ import globals
 from torch import nn
 from plato.utils.reinforcement_learning.policies import base
 from plato.trainers import basic
-from opacus.privacy_engine import PrivacyEngine
 from plato.config import Config
-from plato.models import registry as models_registry
 from plato.trainers import basic
-from plato.utils import optimizers
 
 import td3_learning_client as client
+
+import pickle
 
 import random
 
@@ -45,36 +44,37 @@ class ReplayMemory(base.ReplayMemory):
         reward_name = 'reward'
         next_state_name = 'next_state'
         done_name = 'done'
-        default_name = 'replay'
-        buffer_path_exists = None
         #f'{model_path}/{actor_filename}'
-        if buffer_path is None:
-            state_path = f'{default_name}/{state_name}'
-            action_path = f'{default_name}/{action_name}'
-            reward_path = f'{default_name}/{reward_name}'
-            next_state_path = f'{default_name}/{next_state_name}'
-            done_path = f'{default_name}/{done_name}'
-            buffer_path_exists = False
-        else:
-            state_path = f'{buffer_path}/{state_name}'
-            action_path = f'{buffer_path}/{action_name}'
-            reward_path = f'{buffer_path}/{reward_name}'
-            next_state_path = f'{buffer_path}/{next_state_name}'
-            done_path = f'{buffer_path}/{done_name}'
-            buffer_path_exists = True
 
-        #f'{buffer_path}/{actor_filename}'
-        if buffer_path_exists:
-            print("Loading the buffer from %s.", buffer_path)
-        else:
-            #logging.info("Loading the buffer from %s.", os.getpid(), default_name)
-            print("Loading the buffer from %s.", default_name)
+        state_path = f'{buffer_path}/{state_name}'
+        action_path = f'{buffer_path}/{action_name}'
+        reward_path = f'{buffer_path}/{reward_name}'
+        next_state_path = f'{buffer_path}/{next_state_name}'
+        done_path = f'{buffer_path}/{done_name}'
 
-        #torch.save(self.state, state_path)
-       # torch.save(self.action, action_path)
-        #torch.save(self.reward, reward_path)
-        #torch.save(self.next_state, next_state_path)
-        #torch.save(self.done, done_path)
+        #logging.info("Loading the buffer from %s.", os.getpid(), default_name)
+        print("---------------------------------------")
+        print("Saving the buffer to %s." %buffer_path)
+        print("---------------------------------------")
+
+        file_state_buf = open(state_path, "wb")
+        file_action_buf = open(action_path, "wb")
+        file_reward_buf = open(reward_path, "wb")
+        file_next_state_buf = open(next_state_path, "wb")
+        file_done_buf = open(done_path, "wb")
+        
+        pickle.dump(self.state, file_state_buf)
+        pickle.dump(self.action, file_action_buf)
+        pickle.dump(self.reward, file_reward_buf)
+        pickle.dump(self.next_state, file_next_state_buf)
+        pickle.dump(self.done, file_done_buf)
+
+        file_state_buf.close()
+        file_action_buf.close() 
+        file_reward_buf.close() 
+        file_next_state_buf.close()
+        file_done_buf.close()
+
         #self.state 
         #self.action 
         #self.reward 
@@ -92,31 +92,38 @@ class ReplayMemory(base.ReplayMemory):
         reward_name = 'reward'
         next_state_name = 'next_state'
         done_name = 'done'
-        default_name = 'replay'
-        buffer_path_exists = None
         #f'{model_path}/{actor_filename}'
-        if buffer_path is None:
-            state_path = f'{default_name}/{state_name}'
-            action_path = f'{default_name}/{action_name}'
-            reward_path = f'{default_name}/{reward_name}'
-            next_state_path = f'{default_name}/{next_state_name}'
-            done_path = f'{default_name}/{done_name}'
-            buffer_path_exists = False
-        else:
-            state_path = f'{buffer_path}/{state_name}'
-            action_path = f'{buffer_path}/{action_name}'
-            reward_path = f'{buffer_path}/{reward_name}'
-            next_state_path = f'{buffer_path}/{next_state_name}'
-            done_path = f'{buffer_path}/{done_name}'
-            buffer_path_exists = True
 
-        #f'{buffer_path}/{actor_filename}'
-        if buffer_path_exists:
-            #logging.info("Loading the buffer from %s.", os.getpid(), buffer_path)
-            print("Loading the buffer from %s.", buffer_path)
-        else:
-            #logging.info("Loading the buffer from %s.", os.getpid(), default_name)
-            print("Loading the buffer from %s.", default_name)
+        state_path = f'{buffer_path}/{state_name}'
+        action_path = f'{buffer_path}/{action_name}'
+        reward_path = f'{buffer_path}/{reward_name}'
+        next_state_path = f'{buffer_path}/{next_state_name}'
+        done_path = f'{buffer_path}/{done_name}'
+    
+
+        print("---------------------------------------")
+        print("Loading the buffer from %s." %buffer_path)
+        print("---------------------------------------")
+
+
+        file_state_buf = open(state_path, "rb")
+        file_action_buf = open(action_path, "rb")
+        file_reward_buf = open(reward_path, "rb")
+        file_next_state_buf = open(next_state_path, "rb")
+        file_done_buf = open(done_path, "rb")
+
+        self.state = pickle.load(file_state_buf)
+        self.action = pickle.load(file_action_buf)
+        self.reward = pickle.load(file_reward_buf)
+        self.next_state = pickle.load(file_next_state_buf)
+        self.done = pickle.load(file_done_buf)
+
+        file_state_buf.close()
+        file_action_buf.close() 
+        file_reward_buf.close() 
+        file_next_state_buf.close()
+        file_done_buf.close()
+
         
         #torch.load(state_path)
         #torch.load(action_path)
@@ -343,7 +350,7 @@ class Trainer(basic.Trainer):
         """Loading pre-trained model weights from a file."""
         # TODO: here load replay buffer
 
-        self.replay_buffer.load_buffer(file_name)
+        self.replay_buffer.load_buffer(results_dir)
         model_path = Config(
         ).params['model_path'] if location is None else location
         actor_model_name = 'actor_model'
@@ -389,7 +396,7 @@ class Trainer(basic.Trainer):
     def save_model(self, filename=None, location=None):
         """Saving the model to a file."""
         # TODO: here save replay buffer
-        self.replay_buffer.save_buffer(file_name)
+        self.replay_buffer.save_buffer(results_dir)
 
         model_path = Config(
         ).params['model_path'] if location is None else location
