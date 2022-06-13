@@ -87,7 +87,7 @@ algorithm:
 
     ## Defense related
     # Choose from GradDefense, ...
-    # defense: GradDefense
+    defense: no
     clip: false
     slices_num: 10
     perturb_slices_num: 5

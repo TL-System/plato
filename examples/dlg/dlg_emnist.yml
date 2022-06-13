@@ -88,10 +88,12 @@ algorithm:
 
     ## Defense related
     # Choose from GradDefense, ...
-    defense: GradDefense
+    defense: no
+    clip: false
     slices_num: 10
     perturb_slices_num: 5
     scale: 0.0005
+    Q: 6
 
     # The random seed for dummy data and label
     random_seed: 1
