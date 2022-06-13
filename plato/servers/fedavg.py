@@ -91,7 +91,6 @@ class Server(base.Server):
                 self.datasource = datasources_registry.get(client_id=0)
             elif self.datasource is None and self.custom_datasource is not None:
                 self.datasource = self.custom_datasource()
-                self.custom_datasource = None
 
             self.testset = self.datasource.get_test_set()
 
@@ -129,19 +128,16 @@ class Server(base.Server):
         """Setting up the global model to be trained via federated learning."""
         if self.model is None and self.custom_model is not None:
             self.model = self.custom_model
-            self.custom_model = None
 
         if self.trainer is None and self.custom_trainer is None:
             self.trainer = trainers_registry.get(model=self.model)
         elif self.trainer is None and self.custom_trainer is not None:
             self.trainer = self.custom_trainer(model=self.model)
-            self.custom_trainer = None
 
         if self.algorithm is None and self.custom_algorithm is None:
             self.algorithm = algorithms_registry.get(trainer=self.trainer)
         elif self.algorithm is None and self.custom_algorithm is not None:
             self.algorithm = self.custom_algorithm(trainer=self.trainer)
-            self.custom_algorithm = None
 
     async def select_clients(self, for_next_batch=False):
         await super().select_clients(for_next_batch=for_next_batch)
