@@ -138,11 +138,6 @@ class Trainer(basic.Trainer):
                 if self.timesteps_since_eval >= Config().algorithm.eval_freq * globals.max_episode_steps:
                     self.timesteps_since_eval %= Config().algorithm.eval_freq * globals.max_episode_steps
                     self.evaluations.append(client.evaluate_policy(self, self.env))
-                    print("--------_MIDDLE_------")
-                    print(self.evaluations)
-                    print("--------_MIDDLE_------")
-                    print("YOUR TOTAL TIME_STEPS IS THIS!")
-                    print(self.total_timesteps)
                     np.savetxt("%s.csv" %(results_dir+"/"+g_file_name), self.evaluations, delimiter=",")
                     np.savez("%s" %(results_dir+"/"+g_file_name), a=self.evaluations)
                     #np.savetxt("%s.csv" %(results_dir+"/"+file_name), self.evaluations, delimiter=",")
@@ -202,9 +197,6 @@ class Trainer(basic.Trainer):
         
         #Add the last policy evaluation to our list of evaluations and save evaluations
         self.evaluations.append(client.evaluate_policy(self, self.env))
-        print("--------_ENDING_------")
-        print(self.evaluations)
-        print("--------_ENDING_------")
         np.savetxt("%s.csv" %(results_dir+"/"+g_file_name), self.evaluations, delimiter=",")
         np.savez("%s" %(results_dir+"/"+g_file_name), a=self.evaluations)
        
@@ -332,7 +324,7 @@ class Trainer(basic.Trainer):
         #load evaluations so it doesn't overwrite
         arr = np.load("%s.npz" %(results_dir+"/"+g_file_name))
         self.evaluations = list(arr['a'])
-        
+
         # TODO: do we need those?
         self.actor_optimizer = torch.optim.Adam(
             self.actor.parameters(), lr = Config().algorithm.learning_rate)
