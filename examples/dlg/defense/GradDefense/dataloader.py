@@ -1,15 +1,16 @@
-import torch
 import numpy as np
-
-from torch.utils.data.dataset import Dataset
+import torch
 from torch.utils.data import Subset
 from torch.utils.data.dataloader import DataLoader
+from torch.utils.data.dataset import Dataset
 
 DEFAULT_NUM_WORKERS = 8
 rootset_per_class = 5
 rootset_size = 50
 
 # TODO: total_num_samples is not used
+
+
 def extract_root_set(
     dataset: Dataset,
     sample_per_class: int = rootset_per_class,
