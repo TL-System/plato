@@ -19,7 +19,11 @@ from plato.utils import csv_processor
 class Server(base.Server):
     """Federated learning server using federated averaging."""
 
-    def __init__(self, model=None, algorithm=None, trainer=None):
+    def __init__(self,
+                 model=None,
+                 datasource=None,
+                 algorithm=None,
+                 trainer=None):
         super().__init__()
 
         self.custom_model = model
@@ -31,7 +35,9 @@ class Server(base.Server):
         self.custom_trainer = trainer
         self.trainer = None
 
+        self.custom_datasource = datasource
         self.datasource = None
+
         self.testset = None
         self.testset_sampler = None
         self.total_samples = 0
@@ -81,7 +87,12 @@ class Server(base.Server):
 
         if not (hasattr(Config().server, 'do_test')
                 and not Config().server.do_test):
-            self.datasource = datasources_registry.get(client_id=0)
+            if self.datasource is None and self.custom_datasource is None:
+                self.datasource = datasources_registry.get(client_id=0)
+            elif self.datasource is None and self.custom_datasource is not None:
+                self.datasource = self.custom_datasource()
+                self.custom_datasource = None
+
             self.testset = self.datasource.get_test_set()
 
             if hasattr(Config().data, 'testset_size'):
