@@ -151,7 +151,7 @@ algorithm:
     max_steps: 500000
 
     # Number of episodes to run each round
-    max_round_episodes: 100
+    max_round_episodes: 20
 
     #If we should save the model or not
     save_models: False
