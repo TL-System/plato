@@ -65,7 +65,6 @@ class Trainer(basic.Trainer):
         #Create actor and critic
         #Could have used the base class given's but for convenient sake we declare our own
 
-        print("are we consturcting more than once??") #no it does'nt get claled more than once
         self.max_action = globals.max_action            
         self.model = model
         self.actor = self.model.actor
