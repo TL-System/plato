@@ -26,6 +26,7 @@ class DataSource(base.DataSource):
     """A custom datasource with custom training and validation
        datasets.
     """
+
     def __init__(self):
         super().__init__()
 
@@ -41,6 +42,7 @@ class DataSource(base.DataSource):
 
 class Trainer(basic.Trainer):
     """A custom trainer with custom training and testing loops. """
+
     def train_model(self, config, trainset, sampler, cut_layer=None):  # pylint: disable=unused-argument
         """A custom training loop. """
         criterion = nn.CrossEntropyLoss()
@@ -83,16 +85,24 @@ class Trainer(basic.Trainer):
         return accuracy
 
 
+class Model():
+    """ A custom model. """
+
+    @staticmethod
+    def get_model():
+        """Obtaining an instance of this model."""
+        return nn.Sequential(nn.Flatten(), nn.Linear(28 * 28, 10))
+
+
 def main():
     """A Plato federated learning training session using a custom model. """
 
-    model = nn.Sequential(nn.Flatten(), nn.Linear(28 * 28, 10))
-
-    datasource = DataSource()
-    trainer = Trainer(model=model)
+    model = Model
+    datasource = DataSource
+    trainer = Trainer
 
     client = simple.Client(model=model, datasource=datasource, trainer=trainer)
-    server = fedavg.Server(model=model, trainer=trainer)
+    server = fedavg.Server(model=model, datasource=datasource, trainer=trainer)
     server.run(client)
 
 
