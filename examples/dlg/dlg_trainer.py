@@ -178,10 +178,10 @@ class Trainer(basic.Trainer):
                                             perturb_slices_num=Config().algorithm.perturb_slices_num,
                                             scale=Config().algorithm.scale)
 
-                new_target_grad = []
+                target_grad = []
                 for layer in perturbed_gradients:
                     layer = layer.to(self.device)
-                    new_target_grad.append(layer)
+                    target_grad.append(layer)
 
         file_path = f"{Config().params['model_path']}/{self.client_id}.pickle"
         with open(file_path, 'wb') as handle:
