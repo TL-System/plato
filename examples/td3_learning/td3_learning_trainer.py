@@ -39,6 +39,10 @@ class ReplayMemory(base.ReplayMemory):
         # TODO: Save replay buffer
         buffer_path = dir
 
+        if buffer_path is None:
+            print("PLEASE ADD A DIRECTORY PATH")
+            return
+
         state_name = 'state'
         action_name = 'action'
         reward_name = 'reward'
@@ -86,6 +90,10 @@ class ReplayMemory(base.ReplayMemory):
 
         # TODO: Save replay buffer
         buffer_path = dir
+
+        if buffer_path is None:
+            print("PLEASE ADD A DIRECTORY PATH")
+            return
 
         state_name = 'state'
         action_name = 'action'
