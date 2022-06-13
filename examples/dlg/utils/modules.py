@@ -20,7 +20,7 @@ torch.backends.cudnn.benchmark = True
 DEBUG = False
 
 
-class MetaMonkey(torch.nn.Module):
+class PatchedModule(torch.nn.Module):
     """Trace a networks and then replace its module calls with functional calls.
 
     This allows for backpropagation w.r.t to weights for "normal" PyTorch networks.

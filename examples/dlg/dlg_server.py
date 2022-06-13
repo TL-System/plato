@@ -37,7 +37,7 @@ from plato.utils import csv_processor
 from torchvision import transforms
 
 from defense.GradDefense.compensate import denoise
-from utils.modules import MetaMonkey
+from utils.modules import PatchedModule
 from utils.utils import cross_entropy_for_onehot
 from utils.utils import total_variation as TV
 
@@ -124,7 +124,7 @@ class Server(fedavg.Server):
             for name, delta in avg_update.items():
                 update_perturbed.append(delta)
             update_compensated = denoise(gradients=update_perturbed,
-                                 scale=math.sqrt(_scale), Q=Config().algorithm.Q)
+                                         scale=math.sqrt(_scale), Q=Config().algorithm.Q)
             for i, name in enumerate(avg_update.keys()):
                 avg_update[name] = update_compensated[i]
 
@@ -300,7 +300,7 @@ class Server(fedavg.Server):
         epochs = Config().trainer.epochs
         batch_size = Config().trainer.batch_size
 
-        patched_model = MetaMonkey(model)
+        patched_model = PatchedModule(model)
         if self.use_updates:
             patched_model_origin = deepcopy(patched_model)
 
@@ -309,12 +309,13 @@ class Server(fedavg.Server):
         # TODO: another parameter local steps instead of epoch here
         for epoch in range(epochs):
             if batch_size == 1:
-                dummy_pred = model(dummy_data)
+                dummy_pred = patched_model(
+                    dummy_data, patched_model.parameters)
                 labels_ = dummy_label
             else:
                 idx = epoch % (dummy_data.shape[0] // batch_size)
-                dummy_pred = model(dummy_data[idx * batch_size:(idx + 1) *
-                                              batch_size])
+                dummy_pred = patched_model(dummy_data[idx * batch_size:(idx + 1) *
+                                                      batch_size], patched_model.parameters)
                 labels_ = dummy_label[idx * batch_size:(idx + 1) * batch_size]
 
             loss = cross_entropy(dummy_pred, torch.argmax(labels_,
