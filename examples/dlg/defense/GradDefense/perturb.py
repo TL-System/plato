@@ -97,7 +97,7 @@ def noise(dy_dx: list,
           sensitivity: list,
           slices_num: int,
           perturb_slices_num: int,
-          scale: float):
+          noise_intensity: float):
 
     layer_dims_pool, \
         layer_params_num_pool, \
@@ -124,7 +124,7 @@ def noise(dy_dx: list,
         for params_index in range(params_start_indice,
                                   params_end_indice + 1,
                                   1):
-            gradients_flatten[params_index] += getGause(scale=scale)
+            gradients_flatten[params_index] += getGause(scale=noise_intensity)
 
     gradients_perturbed = []
     params_start_indice = 0
