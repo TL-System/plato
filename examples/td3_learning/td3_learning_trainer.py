@@ -26,7 +26,7 @@ import pickle
 import random
 
 #TODO: think again about global variables
-file_name = "TD3_RL"
+g_file_name = "TD3_RL"
 models_dir = "./pytorch_models" # TODO: models are not stored here
 results_dir = "examples/td3_learning/results"
 
@@ -87,7 +87,8 @@ class Trainer(basic.Trainer):
         self.policy_noise = Config().algorithm.policy_noise 
         self.noise_clip = Config().algorithm.noise_clip
 
-        self.evaluations = []
+        #if(self.total_timesteps)
+        #np.loadtxt("%s.csv" %(results_dir+"/"+file_name), dtype=list, delimiter="\n")
         
         if not os.path.exists(results_dir):
             os.makedirs(results_dir)
@@ -98,6 +99,8 @@ class Trainer(basic.Trainer):
         self.episode_num = 0
         self.total_timesteps = 0
         self.done = True
+
+        self.evaluations = []
 
         self.episode_reward = 0
         
@@ -129,12 +132,20 @@ class Trainer(basic.Trainer):
             print("Done training")
             return
         while round_episode_steps < Config().algorithm.max_round_episodes * globals.max_episode_steps:
+            #print(self.total_timesteps)
             if self.done:
                 #evaluate episode and save policy
                 if self.timesteps_since_eval >= Config().algorithm.eval_freq * globals.max_episode_steps:
                     self.timesteps_since_eval %= Config().algorithm.eval_freq * globals.max_episode_steps
                     self.evaluations.append(client.evaluate_policy(self, self.env))
-                    np.savetxt("%s.csv" %(results_dir+"/"+file_name), self.evaluations, delimiter=",")
+                    print("--------_MIDDLE_------")
+                    print(self.evaluations)
+                    print("--------_MIDDLE_------")
+                    print("YOUR TOTAL TIME_STEPS IS THIS!")
+                    print(self.total_timesteps)
+                    np.savetxt("%s.csv" %(results_dir+"/"+g_file_name), self.evaluations, delimiter=",")
+                    np.savez("%s" %(results_dir+"/"+g_file_name), a=self.evaluations)
+                    #np.savetxt("%s.csv" %(results_dir+"/"+file_name), self.evaluations, delimiter=",")
                 
                 #When the training step is done, we reset the state of the env
                 obs = self.env.reset()
@@ -191,7 +202,11 @@ class Trainer(basic.Trainer):
         
         #Add the last policy evaluation to our list of evaluations and save evaluations
         self.evaluations.append(client.evaluate_policy(self, self.env))
-        np.savetxt("%s.csv" %(results_dir+"/"+file_name), self.evaluations, delimiter=",")
+        print("--------_ENDING_------")
+        print(self.evaluations)
+        print("--------_ENDING_------")
+        np.savetxt("%s.csv" %(results_dir+"/"+g_file_name), self.evaluations, delimiter=",")
+        np.savez("%s" %(results_dir+"/"+g_file_name), a=self.evaluations)
        
 
 
@@ -314,7 +329,10 @@ class Trainer(basic.Trainer):
 
         self.replay_buffer.load_buffer(model_path)
 
-
+        #load evaluations so it doesn't overwrite
+        arr = np.load("%s.npz" %(results_dir+"/"+g_file_name))
+        self.evaluations = list(arr['a'])
+        
         # TODO: do we need those?
         self.actor_optimizer = torch.optim.Adam(
             self.actor.parameters(), lr = Config().algorithm.learning_rate)
@@ -374,6 +392,9 @@ class Trainer(basic.Trainer):
         
         # Need to save buffer
         self.replay_buffer.save_buffer(model_path)
+
+        #Save evaluations
+        #np.savetxt("%s.csv" %(results_dir+"/"+file_name), self.evaluations, delimiter=",")
 
         # Need to save total_timesteps and episode_num that we stopped at (to resume training)
         file_name = "%s_%s.npz" % ("training_status", str(self.client_id)) 

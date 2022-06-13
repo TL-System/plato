@@ -21,12 +21,6 @@ def main():
     logging.info("Starting RL Environment's process.")
 
     """ A Plato federated learning training session using a custom model. """
-
-    #TODO
-    #Total episode timesteps is always 1000
-    #Total episode number is always 1
-    #Average reward is always the same
-
     model = td3_learning_model.Model(globals.state_dim, globals.action_dim, globals.max_action)
     trainer = td3_learning_trainer.Trainer
     algorithm = td3_learning_algorithm.Algorithm
