@@ -19,7 +19,7 @@ data:
     datasource: CIFAR10
 
     # Number of samples in each partition
-    partition_size: 5
+    partition_size: 1
 
     # IID or non-IID?
     sampler: iid
@@ -38,7 +38,7 @@ trainer:
 
     # Number of epoches for local training in each communication round
     epochs: 1
-    batch_size: 5
+    batch_size: 1
     optimizer: SGD
     learning_rate: 0.01
     momentum: 0.9
@@ -78,12 +78,12 @@ algorithm:
     # Whether or not use customized initialization for model weights
     init_params: true
     # Whether sharing gradients or model weights
-    share_gradients: true
+    share_gradients: false
     # Do reconstruction by directly matching weights when it's true,
     # otherwise by matching gradients calculated from updates
-    match_weights: false
+    match_weights: true
     # Matching weights (absolute) or weight updates (delta)
-    use_updates: false
+    use_updates: true
 
     ## Defense related
     # Choose from GradDefense, ...
