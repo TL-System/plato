@@ -75,6 +75,9 @@ class Server(fedavg.Server):
         self.use_updates = True
         if hasattr(Config().algorithm, 'use_updates') and not Config().algorithm.use_updates:
             self.use_updates = False
+        self.defense_method = 'no'
+        if hasattr(Config().algorithm, 'defense'):
+            self.defense_method = Config().algorithm.defense
 
     async def process_reports(self):
         """ Process the client reports: before aggregating their weights,
@@ -126,8 +129,8 @@ class Server(fedavg.Server):
                 [dummy_data, dummy_label], lr=Config().algorithm.lr)
             est_label = [None] * num_images
             for i in range(num_images):
-                logging.info("[%s Gradient Leakage Attacking...] Dummy label is %d.",
-                             self.attack_method, torch.argmax(dummy_label[i], dim=-1).item())
+                logging.info("[%s Gradient Leakage Attacking with %s defense...] Dummy label is %d.",
+                             self.attack_method, self.defense_method, torch.argmax(dummy_label[i], dim=-1).item())
         elif self.attack_method == 'iDLG':
             match_optimizer = torch.optim.LBFGS(
                 [dummy_data, ], lr=Config().algorithm.lr)
@@ -135,8 +138,8 @@ class Server(fedavg.Server):
             est_label = torch.argmin(torch.sum(
                 target_grad[-2], dim=-1), dim=-1).detach().reshape((1,)).requires_grad_(False)
             for i in range(num_images):
-                logging.info("[%s Gradient Leakage Attacking...] Estimated label is %d.",
-                             self.attack_method, est_label.item())
+                logging.info("[%s Gradient Leakage Attacking with %s defense...] Estimated label is %d.",
+                             self.attack_method, self.defense_method, est_label.item())
 
         history, losses, mses, avg_mses, lpipss, avg_lpips = [], [], [], [], [], []
 
@@ -172,8 +175,8 @@ class Server(fedavg.Server):
 
             if iters % log_interval == 0:
                 logging.info(
-                    "[%s Gradient Leakage Attacking...] Iter %d: Loss = %.10f, avg MSE = %.8f, avg LPIPS = %.8f",
-                    self.attack_method, iters, losses[-1], avg_mses[-1], avg_lpips[-1])
+                    "[%s Gradient Leakage Attacking with %s defense...] Iter %d: Loss = %.10f, avg MSE = %.8f, avg LPIPS = %.8f",
+                    self.attack_method, self.defense_method, iters, losses[-1], avg_mses[-1], avg_lpips[-1])
                 if self.attack_method == 'DLG':
                     history.append([[
                         tt(dummy_data[i][0].cpu()
