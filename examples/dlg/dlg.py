@@ -7,7 +7,6 @@ import dlg_client
 import dlg_server
 import dlg_trainer
 import dlg_model
-from plato.config import Config
 
 
 def main():

@@ -93,7 +93,6 @@ algorithm:
     perturb_slices_num: 5
     scale: 0.0005
 
-
     # The random seed for dummy data and label
     random_seed: 1
 
