@@ -60,18 +60,22 @@ server.run(client)
 
 ### Implementing custom models and data sources
 
-To define a custom model, one does not need to inherit from any base class in Plato, as Plato uses standard model classes in each machine learning framework. For example, Plato uses `nn.Module` as the base class in PyTorch, `nn.Cell` as the base class in MindSpore, and `keras.Model` as the base class in TensorFlow.
-
-For example (excerpt from `examples/custom_model.py`), one can define a simple model in PyTorch as follows:
+To define a custom model, one does not need to inherit from any base class in Plato, as Plato uses standard model classes in each machine learning framework. Only `get_model()` needs to be implemented in the `Model` class. For example (excerpt from `examples/basic/basic.py`), one can define a simple model in PyTorch as follows:
 
 ```python
-model = nn.Sequential(
-        nn.Linear(28 * 28, 128),
-        nn.ReLU(),
-        nn.Linear(128, 128),
-        nn.ReLU(),
-        nn.Linear(128, 10),
-    )
+class Model():
+    """ A custom model. """
+
+    @staticmethod
+    def get_model():
+        """Obtaining an instance of this model."""
+        return nn.Sequential(
+            nn.Linear(28 * 28, 128),
+            nn.ReLU(),
+            nn.Linear(128, 128),
+            nn.ReLU(),
+            nn.Linear(128, 10),
+        )
 ```
 
 If a custom `DataSource` is also needed for a custom training session, one can inherit from the `base.DataSource` class (assuming PyTorch is used as the framework), as in the following example (excerpt from `examples/custom_model.py`):
@@ -94,11 +98,12 @@ class DataSource(base.DataSource):
                              transform=ToTensor())
 ```
 
-Then, a `DataSource` object can be initialized and passed to the client, along with a custom model if desired:
+Then, a `DataSource` object can be initialized and passed to the client, along with a custom model and a custom trainer if desired:
 
 ```python
-datasource = DataSource()
-trainer = Trainer(model=model)
-client = simple.Client(model=model, datasource=datasource)
+model = Model
+datasource = DataSource
+trainer = Trainer
+client = simple.Client(model=model, datasource=datasource, trainer=trainer)
 ```
 
