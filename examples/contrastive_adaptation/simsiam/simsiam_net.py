@@ -127,3 +127,9 @@ class SimSiam(nn.Module):
     def encode_dim(self):
         """ Obtain the backbone's encoder. """
         return self.compound_encoder.backbone_dim
+
+    @staticmethod
+    def get_model():
+        """Obtaining an instance of this model provided that the name is valid."""
+
+        return SimSiam()
