@@ -15,10 +15,10 @@ Reference:
 """
 
 import contras_adap_net
-
-from plato.trainers import contrastive_ssl as ssl_trainer
-from plato.clients import ssl_simple as ssl_client
-from plato.servers import fedavg
+import contras_adap_server
+import contras_adap_client
+import contras_adap_trainer
+import contras_adap_algorithm
 
 
 def main():
@@ -27,10 +27,15 @@ def main():
         removing the final fully-connected layers of model defined by
         the 'model_name' in config file.
     """
-    trainer = ssl_trainer.Trainer
-    contras_adap_model = contras_adap_net.ContrasAdapNet()
-    client = ssl_client.Client(model=contras_adap_model, trainer=trainer)
-    server = fedavg.Server(model=contras_adap_model, trainer=trainer)
+    algorithm = contras_adap_algorithm.Algorithm
+    trainer = contras_adap_trainer.Trainer
+    contras_adap_model = contras_adap_net.ContrasAdap()
+    client = contras_adap_client.Client(model=contras_adap_model,
+                                        trainer=trainer,
+                                        algorithm=algorithm)
+    server = contras_adap_server.Server(model=contras_adap_model,
+                                        trainer=trainer,
+                                        algorithm=algorithm)
 
     server.run(client)
 

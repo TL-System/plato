@@ -17,7 +17,7 @@ def loss_fn_cn(outputs):
 
 
 class Trainer(contrastive_ssl.Trainer):
-    """ The federated learning trainer for the FedProx client. """
+    """ The federated learning trainer for the MOCO client. """
 
     @staticmethod
     def loss_criterion(model):
