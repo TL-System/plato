@@ -305,18 +305,16 @@ class Trainer(basic.Trainer):
                          self.client_id, actor_model_path, critic_model_path, actor_target_model_path, critic_target_model_path)
 
         # Load episode_num and total_timesteps
-        file_name = "%s_%s.npz" % ("training_status", str(self.client_id)) 
-        file_path = os.path.join(model_path, file_name)
-        data = np.load(file_name)
-        self.episode_num = int((data['a'])[0])
-        self.total_timesteps = int((data['b'])[0])
+        if self.client_id is not 0:
+            file_name = "%s_%s.npz" % ("training_status", str(self.client_id)) 
+            file_path = os.path.join(model_path, file_name)
+            data = np.load(file_path)
+            self.episode_num = int((data['a'])[0])
+            self.total_timesteps = int((data['b'])[0])
 
         self.actor.load_state_dict(torch.load(actor_model_path), strict=True)
-
         self.critic.load_state_dict(torch.load(critic_model_path), strict=True)
-
         self.actor_target.load_state_dict(torch.load(actor_target_model_path), strict=True)
-
         self.critic_target.load_state_dict(torch.load(critic_target_model_path), strict=True)
 
         self.replay_buffer.load_buffer(model_path)
@@ -389,9 +387,10 @@ class Trainer(basic.Trainer):
         #np.savetxt("%s.csv" %(results_dir+"/"+file_name), self.evaluations, delimiter=",")
 
         # Need to save total_timesteps and episode_num that we stopped at (to resume training)
-        file_name = "%s_%s.npz" % ("training_status", str(self.client_id)) 
-        file_path = os.path.join(model_path, file_name)
-        np.savez(file_name, a=np.array([self.episode_num]), b=np.array([self.total_timesteps]))
+        if self.client_id is not 0:
+            file_name = "%s_%s.npz" % ("training_status", str(self.client_id)) 
+            file_path = os.path.join(model_path, file_name)
+            np.savez(file_path, a=np.array([self.episode_num]), b=np.array([self.total_timesteps]))
 
 
         #TODO What is the difference between .state_dict() & _state_dict
