@@ -155,9 +155,20 @@ algorithm:
     #If we should save the model or not
     save_models: False
 
+    env_name: halfcheetah
+
+    env_gym_name: HalfCheetahBulletEnv-v0
+
+    algorithm_name: td3_
+
 results:
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time
 
     # Plot results (x_axis-y_axis)
     plot: round-accuracy, elapsed_time-accuracy
+
+    results_dir: examples/td3_learning/results
+
+    file_name: TD3_RL
+

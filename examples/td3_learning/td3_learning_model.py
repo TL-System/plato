@@ -69,11 +69,11 @@ class TD3Critic(nn.Module):
 
 class Model:
     """A wrapper class that holds both actor and critic models"""
-    def __init__(self, state_dim, action_dim, max_action, env, max_episode_steps, env_name, rl_algo):
+    def __init__(self, state_dim, action_dim, max_action, max_episode_steps, env_name, rl_algo):
         self.state_dim = state_dim
         self.action_dim = action_dim
         self.max_action = max_action
-        self.env = env
+        #self.env = env
         self.max_episode_steps = max_episode_steps
         self.env_name = env_name
         self.rl_algo = rl_algo
@@ -100,9 +100,6 @@ class Model:
 
     def get_max_action(self):
         return self.max_action
-
-    def get_env(self):
-        return self.env
 
     def get_max_episode_steps(self):
         return self.max_episode_steps
