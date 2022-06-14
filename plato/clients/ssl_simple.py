@@ -8,9 +8,6 @@ import logging
 import time
 from dataclasses import dataclass
 
-import torch
-from thop import profile, clever_format
-
 from plato.config import Config
 from plato.clients import simple
 from plato.clients import base
@@ -85,14 +82,13 @@ class Client(simple.Client):
                 model_type=personalized_model_name, input_dim=encode_dim)
             # present the personalzied model's info
             input_dim = self.personalized_model[0][0].in_features
-            flops, params = profile(self.personalized_model,
-                                    inputs=(torch.randn(1, input_dim)),
-                                    verbose=False)
-            format_outputs = clever_format([flops, params], "%.3f")
+            params = sum(p.numel()
+                         for p in self.personalized_model.parameters()
+                         if p.requires_grad)
 
             logging.info(
-                "   [Client #%d]'s personalized model: Params[%s], FLOPs[%s]",
-                self.client_id, format_outputs[1], format_outputs[0])
+                "   [Client #%d]'s personalized model: Trainable Params[%s]",
+                self.client_id, params)
 
         # assign the client's personalized model to its trainer
         self.trainer.set_client_personalized_model(self.personalized_model)
