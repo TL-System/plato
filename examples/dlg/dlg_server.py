@@ -22,6 +22,7 @@ import logging
 import math
 import os
 import sys
+from evaluations import get_evaluation_dict
 from collections import OrderedDict
 from copy import deepcopy
 from statistics import mean
@@ -43,7 +44,6 @@ from utils.utils import total_variation as TV
 
 cross_entropy = torch.nn.CrossEntropyLoss()
 tt = transforms.ToPILImage()
-loss_fn = lpips.LPIPS(net='vgg')
 torch.manual_seed(Config().algorithm.random_seed)
 
 num_iters = Config().algorithm.num_iters
@@ -51,10 +51,14 @@ log_interval = Config().algorithm.log_interval
 dlg_result_path = f"{Config().params['result_path']}"
 dlg_result_file = f"{dlg_result_path}/{os.getpid()}_evals.csv"
 dlg_result_headers = [
-    "Iteration", "Loss", "Average MSE", "Average LPIPS"
+    "Iteration", 
+    "Loss", 
+    "Average MSE", 
+    "Average LPIPS", 
+    "Average PSNR (dB)",
+    "Average SSIM",
+    "Average Library SSIM",
 ]
-csv_processor.initialize_csv(dlg_result_file, dlg_result_headers,
-                             dlg_result_path)
 
 
 class Server(fedavg.Server):
@@ -146,6 +150,9 @@ class Server(fedavg.Server):
         if not self.share_gradients and self.match_weights and self.use_updates:
             target_weights = deltas_received[Config().algorithm.victim_client]
 
+        # Initialize the csv file
+        csv_processor.initialize_csv(dlg_result_file, dlg_result_headers, dlg_result_path)
+
         # Assume the reconstructed data shape is known, which can be also derived from the target dataset
         num_images = Config().data.partition_size
         data_size = [num_images, gt_data.shape[1],
@@ -184,7 +191,8 @@ class Server(fedavg.Server):
                 logging.info("[%s Gradient Leakage Attacking with %s defense...] Estimated label is %d.",
                              self.attack_method, self.defense_method, est_label.item())
 
-        history, losses, mses, avg_mses, lpipss, avg_lpips = [], [], [], [], [], []
+        history, losses, mses, lpipss, psnrs, ssims, library_ssims = [], [], [], [], [], [], []
+        avg_mses, avg_lpips, avg_psnr, avg_ssim, avg_library_ssim = [], [], [], [], []
 
         # Conduct gradients/weights/updates matching
         if not self.share_gradients and self.match_weights:
@@ -199,27 +207,25 @@ class Server(fedavg.Server):
             match_optimizer.step(closure)
             current_loss = closure().item()
             losses.append(current_loss)
-            mses.append([])
-            lpipss.append([])
-            for i in range(num_images):
-                mses[iters].append(math.inf)
-                lpipss[iters].append(math.inf)
-                # Find the closest ground truth data after the misordering
-                for j in range(num_images):
-                    mses[iters][i] = min(
-                        mses[iters][i],
-                        torch.mean((dummy_data[i] - gt_data[j])**2).item())
-                    lpipss[iters][i] = min(
-                        lpipss[iters][i],
-                        loss_fn.forward(dummy_data[i], gt_data[j]).item())
-
-            avg_mses.append(mean(mses[iters]))
-            avg_lpips.append(mean(lpipss[iters]))
 
             if iters % log_interval == 0:
+                # Finding evaluation metrics
+                eval_dict = get_evaluation_dict(dummy_data, gt_data, num_images)
+                mses.append(eval_dict["mses"])
+                lpipss.append(eval_dict["lpipss"])
+                psnrs.append(eval_dict["psnrs"])
+                ssims.append(eval_dict["ssims"])
+                library_ssims.append(eval_dict["library_ssims"])
+                avg_mses.append(eval_dict["avg_mses"])
+                avg_lpips.append(eval_dict["avg_lpips"])
+                avg_psnr.append(eval_dict["avg_psnr"])
+                avg_ssim.append(eval_dict["avg_ssim"])
+                avg_library_ssim.append(eval_dict["avg_library_ssim"])
+
                 logging.info(
-                    "[%s Gradient Leakage Attacking with %s defense...] Iter %d: Loss = %.10f, avg MSE = %.8f, avg LPIPS = %.8f",
-                    self.attack_method, self.defense_method, iters, losses[-1], avg_mses[-1], avg_lpips[-1])
+                    "[%s Gradient Leakage Attacking with %s defense...] Iter %d: Loss = %.10f, avg MSE = %.8f, avg LPIPS = %.8f, avg PSNR = %.4f dB, avg SSIM = %.3f, avg library SSIM = %.3f",
+                    self.attack_method, self.defense_method, iters, losses[-1], avg_mses[-1], avg_lpips[-1], avg_psnr[-1], avg_ssim[-1], avg_library_ssim[-1])
+
                 if self.attack_method == 'DLG':
                     history.append([[
                         tt(dummy_data[i][0].cpu()
@@ -235,7 +241,10 @@ class Server(fedavg.Server):
                     iters,
                     round(losses[-1], 8),
                     round(avg_mses[-1], 8),
-                    round(avg_lpips[-1], 8)
+                    round(avg_lpips[-1], 8),
+                    round(avg_psnr[-1], 4),
+                    round(avg_ssim[-1], 3),
+                    round(avg_library_ssim[-1], 3)
                 ]
                 csv_processor.write_csv(dlg_result_file, new_row)
 
