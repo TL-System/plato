@@ -8,11 +8,30 @@ Thus, the 'extract_weights' functions extract the model' parameters
 based on the required 'global_model_name'.
 
 """
+
+import logging
 from collections import OrderedDict
 
 from plato.algorithms import fedavg
 from plato.config import Config
 from plato.trainers.base import Trainer
+
+
+def is_global_parameter(param_name, global_model_name):
+    """ whether the param_name in the desired global model name.
+
+        e.g. the global_model_name is:
+            - whole
+            - online_network
+            - online_network; online_predictor
+    """
+    flag = False
+    global_params_prefix = global_model_name.split("__")
+    for para_prefix in global_params_prefix:
+        if para_prefix in param_name:
+            flag = True
+
+    return flag
 
 
 class Algorithm(fedavg.Algorithm):
@@ -44,6 +63,10 @@ class Algorithm(fedavg.Algorithm):
         """
         if hasattr(Config().trainer, "global_model_name"):
             self.global_model_name = Config().trainer.global_model_name
+            prefix_names = self.global_model_name.split("__")
+            logging.info(
+                f"Extracting the global parameters with prefix {prefix_names}."
+            )
 
         if model is None:
             if self.global_model_name == "whole":
@@ -52,7 +75,7 @@ class Algorithm(fedavg.Algorithm):
                 full_weights = self.model.cpu().state_dict()
                 extracted_weights = OrderedDict([
                     (name, param) for name, param in full_weights.items()
-                    if self.global_model_name in name
+                    if is_global_parameter(name, self.global_model_name)
                 ])
                 return extracted_weights
 
