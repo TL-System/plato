@@ -4,6 +4,7 @@ Implementation of the FedEMA's clients
 """
 
 from plato.clients import ssl_simple as ssl_client
+from plato.config import Config
 
 
 class Client(ssl_client.Client):
@@ -23,19 +24,29 @@ class Client(ssl_client.Client):
 
         # the moving average weight used to
         # fusion the local and global model
-        self.local_global_ema_scale = 1.0
+        # set to 1.0 for only maintaining the previous model
+        # by rejecting the shared global model
+        self.local_global_ema_genrlz_scale = 1.0
+
+    def perform_local_global_moving_average(self, server_payload):
+        """ Perform the local global moving average when necessary. """
+
+        # computed the moving average weight based on the
+        # generalization scale sent from the server
+        self.local_global_ema_genrlz_scale = min(self.generality_scale, 1)
+
+        # update the model with moving average.
+        self.algorithm.load_weights_moving_average(
+            server_payload, average_scale=self.local_global_ema_genrlz_scale)
 
     def load_payload(self, server_payload) -> None:
         """Loading the server model onto this client
             using the method of moving average. """
         #self.algorithm.load_weights(server_payload)
-
-        # computed the moving average weight
-        self.local_global_ema_scale = min(self.generality_scale, 1)
-
-        # update the model with moving average.
-        self.algorithm.load_weights_moving_average(
-            server_payload, average_scale=self.local_global_ema_scale)
+        # the received server_payload is a ordered dict containing the
+        # parameter name and the parameter data as:
+        #   {para_name: para_data}
+        self.perform_local_global_moving_average(server_payload)
 
     def process_server_response(self, server_response) -> None:
         """Additional client-specific processing on the server response."""

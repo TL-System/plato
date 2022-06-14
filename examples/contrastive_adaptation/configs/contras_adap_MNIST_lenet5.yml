@@ -48,12 +48,17 @@ server:
     synchronous: true
     do_test: false
 
-
+    # the controller for opening or
+    # closing the generalization divergence scale
+    # computation
+    # if True: to compute based on the subsequence settings
+    # if False: not to perform the computation.
+    do_generalization_scale: True
     # whether to compute the generalization_scale adaptively
     # If False: use the same default generalization scale for all
     # clients
     # If True: compute the generalization scale
-    adaptive_generalization_scale: False
+    adaptive_generalization_scale: True
 
     # Based on the generalization of the model, there are two methods
     # to set the decay rate for the moving average update for
@@ -73,7 +78,7 @@ server:
     #     its scale has not been computed.
     # - 1, compute the scale in each round
     # - N >= 1, compute it every N rounds
-    generalization_autoscaler_round_interval: 0
+    generalization_autoscaler_round_interval: 1
 
 
     # for the paths of models; checkpoints; results,
@@ -206,6 +211,11 @@ trainer:
     projection_dim: 128
     prediction_dim: 128
 
+    # whether to perform the moving average update
+    # for the local model and the received global model
+    # on the clients
+    local_model_generalization_ema_update: True
+
     # here are two ways to determine this decay
     # - constant value: 0.99
     # - adaptive computed with traing epochs.
@@ -216,7 +226,8 @@ trainer:
     # - whole: the whole model
     # - online_network: the online_network is exchanged
     # - target_network: the target_network is exchanged
-    global_model_name: online_network
+    global_model_name: online_network__online_predictor
+    # global_model_name: whole
     personalized_model_name: pure_one_layer_mlp
 
     monitor_name: knn
