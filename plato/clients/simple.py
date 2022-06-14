@@ -120,8 +120,6 @@ class Client(base.Client):
             fonts.colourize(
                 f"[{self}] Started training in communication round #{self.current_round}."
             ))
-        
-        print("in here line 124 of simple")
         # Perform model training
         try:
             training_time = self.trainer.train(self.trainset, self.sampler)

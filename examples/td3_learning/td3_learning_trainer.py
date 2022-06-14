@@ -99,7 +99,8 @@ class Trainer(basic.Trainer):
         self.total_timesteps = 0
         self.done = True
 
-        self.evaluations = []
+        self.evaluations = [] #for clients average reward
+        self.server_evaluations = [] #for server average reward
 
         self.episode_reward = 0
         
@@ -137,8 +138,8 @@ class Trainer(basic.Trainer):
                 if self.timesteps_since_eval >= Config().algorithm.eval_freq * globals.max_episode_steps:
                     self.timesteps_since_eval %= Config().algorithm.eval_freq * globals.max_episode_steps
                     self.evaluations.append(client.evaluate_policy(self, self.env))
-                    np.savetxt("%s.csv" %(results_dir+"/"+g_file_name), self.evaluations, delimiter=",")
-                    np.savez("%s" %(results_dir+"/"+g_file_name), a=self.evaluations)
+                    np.savetxt("%s.csv" %(results_dir+"/"+g_file_name+"_"+str(self.client_id)), self.evaluations, delimiter=",")
+                    np.savez("%s" %(results_dir+"/"+g_file_name+"_"+str(self.client_id)), a=self.evaluations)
                     #np.savetxt("%s.csv" %(results_dir+"/"+file_name), self.evaluations, delimiter=",")
                 
                 #When the training step is done, we reset the state of the env
@@ -196,8 +197,8 @@ class Trainer(basic.Trainer):
         
         #Add the last policy evaluation to our list of evaluations and save evaluations
         self.evaluations.append(client.evaluate_policy(self, self.env))
-        np.savetxt("%s.csv" %(results_dir+"/"+g_file_name), self.evaluations, delimiter=",")
-        np.savez("%s" %(results_dir+"/"+g_file_name), a=self.evaluations)
+        np.savetxt("%s.csv" %(results_dir+"/"+g_file_name+"_"+str(self.client_id)), self.evaluations, delimiter=",")
+        np.savez("%s" %(results_dir+"/"+g_file_name+"_"+str(self.client_id)), a=self.evaluations)
        
 
 
@@ -319,7 +320,7 @@ class Trainer(basic.Trainer):
 
 
         #load evaluations so it doesn't overwrite
-        arr = np.load("%s.npz" %(results_dir+"/"+g_file_name))
+        arr = np.load("%s.npz" %(results_dir+"/"+g_file_name+"_"+str(self.client_id)))
         self.evaluations = list(arr['a'])
 
         # TODO: do we need those?
@@ -403,7 +404,10 @@ class Trainer(basic.Trainer):
                          self.client_id, actor_model_path, critic_model_path, actor_target_model_path, critic_target_model_path)
 
     async def server_test(self, testset, sampler=None, **kwargs):
-        return (client.evaluate_policy(self, self.env))
-
+        avg_reward = client.evaluate_policy(self, self.env)
+        self.server_evaluations.append(avg_reward)
+        file_name = "TD3_RL_SERVER"
+        np.savetxt("%s.csv" %(results_dir+"/"+file_name), self.server_evaluations, delimiter=",")
+        return avg_reward
 
 
