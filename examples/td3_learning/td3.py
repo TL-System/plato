@@ -25,7 +25,6 @@ def main():
     trainer = td3_learning_trainer.Trainer
     algorithm = td3_learning_algorithm.Algorithm
     client = td3_learning_client.RLClient(model = model, trainer=trainer, algorithm = algorithm)
-    client.configure()
     server = td3_learning_server.TD3Server(model=model, algorithm = algorithm, trainer=trainer)
 
     server.run(client)
