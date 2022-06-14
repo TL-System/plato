@@ -23,11 +23,11 @@ implemented by the work https://github.com/giakou4/MNIST_classification
 """
 
 import simclr_net
-from mnist_encoder_net import Encoder
 
 from plato.trainers import contrastive_ssl as ssl_trainer
 from plato.clients import ssl_simple as ssl_client
-from plato.servers import fedavg
+from plato.servers import fedavg_ssl_base as ssl_server
+from plato.algorithms import fedavg_ssl
 
 
 def main():
@@ -36,12 +36,15 @@ def main():
         This implementation of simclr utilizes the specifc encoder for the MNIST dataset.
         https://github.com/giakou4/MNIST_classification.
     """
-    mnist_encoder = Encoder()
+    algorithm = fedavg_ssl.Algorithm
     trainer = ssl_trainer.Trainer
-    simclr_model = simclr_net.SimCLR(
-        encoder=mnist_encoder, encoder_dim=mnist_encoder.get_encoding_dim())
-    client = ssl_client.Client(model=simclr_model, trainer=trainer)
-    server = fedavg.Server(model=simclr_model, trainer=trainer)
+    simclr_model = simclr_net.CentralSimCLR
+    client = ssl_client.Client(model=simclr_model,
+                               trainer=trainer,
+                               algorithm=algorithm)
+    server = ssl_server.Server(model=simclr_model,
+                               trainer=trainer,
+                               algorithm=algorithm)
 
     server.run(client)
 
