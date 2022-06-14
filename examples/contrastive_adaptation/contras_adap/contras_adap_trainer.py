@@ -12,7 +12,7 @@ from contras_adap_losses import ContrasAdapLoss
 
 
 class Trainer(contrastive_ssl.Trainer):
-    """ The federated learning trainer for the FedProx client. """
+    """ The federated learning trainer for the contrastive adaptation client. """
 
     @staticmethod
     def loss_criterion(model):
