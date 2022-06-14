@@ -29,7 +29,7 @@ def main():
     """
     trainer = simsiam_trainer.Trainer
     algorithm = fedavg_ssl.Algorithm
-    byol_model = simsiam_net.SimSiam()
+    byol_model = simsiam_net.SimSiam
     client = ssl_client.Client(model=byol_model,
                                trainer=trainer,
                                algorithm=algorithm)

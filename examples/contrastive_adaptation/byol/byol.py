@@ -29,7 +29,7 @@ def main():
     """
     trainer = byol_trainer.Trainer
     algorithm = fedavg_ssl.Algorithm
-    byol_model = byol_net.BYOL()
+    byol_model = byol_net.BYOL
     client = ssl_client.Client(model=byol_model,
                                trainer=trainer,
                                algorithm=algorithm)

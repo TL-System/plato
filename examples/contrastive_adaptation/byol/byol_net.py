@@ -181,3 +181,9 @@ class BYOL(nn.Module):
         """ Obtain the target network's encoder. """
 
         return self.online_network.encode_dim
+
+    @staticmethod
+    def get_model():
+        """Obtaining an instance of this model provided that the name is valid."""
+
+        return BYOL()
