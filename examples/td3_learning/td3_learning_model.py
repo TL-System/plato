@@ -69,9 +69,16 @@ class TD3Critic(nn.Module):
 
 class Model:
     """A wrapper class that holds both actor and critic models"""
-    def __init__(self, state_dim, action_dim, max_action):
-        self.actor = TD3Actor(globals.state_dim, globals.action_dim, globals.max_action)
-        self.critic = TD3Critic(globals.state_dim, globals.action_dim)
+    def __init__(self, state_dim, action_dim, max_action, env, max_episode_steps, env_name, rl_algo):
+        self.state_dim = state_dim
+        self.action_dim = action_dim
+        self.max_action = max_action
+        self.env = env
+        self.max_episode_steps = max_episode_steps
+        self.env_name = env_name
+        self.rl_algo = rl_algo
+        self.actor = TD3Actor(state_dim, action_dim, max_action)
+        self.critic = TD3Critic(state_dim, action_dim)
         self.actor_target = copy.deepcopy(self.actor)
         self.critic_target = copy.deepcopy(self.critic)
         #self.actor_target = TD3Actor(globals.state_dim, globals.action_dim, globals.max_action)
@@ -79,6 +86,26 @@ class Model:
         #self.critic_target = TD3Critic(globals.state_dim, globals.action_dim)
         #self.critic_target = self.critic_target.load_state_dict(self.critic.state_dict())
     
+    def get_env_name(self):
+        return self.env_name
+
+    def get_rl_algo(self):
+        return self.rl_algo
+
+    def get_state_dim(self):
+        return self.state_dim
+
+    def get_action_dim(self):
+        return self.action_dim
+
+    def get_max_action(self):
+        return self.max_action
+
+    def get_env(self):
+        return self.env
+
+    def get_max_episode_steps(self):
+        return self.max_episode_steps
 
     def cpu(self):
         self.actor.cpu()

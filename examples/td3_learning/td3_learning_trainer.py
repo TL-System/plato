@@ -11,8 +11,6 @@ import copy
 import numpy as np
 import torch
 import torch.nn.functional as F
-import globals
-
 from torch import nn
 from plato.utils.reinforcement_learning.policies import base
 from plato.trainers import basic
@@ -21,15 +19,18 @@ from plato.trainers import basic
 
 import td3_learning_client as client
 
+from td3_learning_model import Model
+
 import pickle
 
 import random
 
-#TODO: think again about global variables
-g_file_name = "TD3_RL"
-models_dir = "./pytorch_models" # TODO: models are not stored here
-results_dir = "examples/td3_learning/results"
+import gym
 
+#TODO: think again about global variables
+CONST_FILE_NAME = "TD3_RL"
+#models_dir = "./pytorch_models" # TODO: models are not stored here
+CONST_RESULTS_DIR = "examples/td3_learning/results"
 
 class ReplayMemory(base.ReplayMemory):
     """ A simple example of replay memory buffer. """
@@ -60,11 +61,35 @@ class Trainer(basic.Trainer):
     def __init__(self, model=None):
         #super().__init__(state_dim, action_dim, max_action, model)
         super().__init__()
-        self.env = globals.env
+
+        #env = gym.make(env_gym_name)
+
+        #seed = self.client_id
+
+        #env.seed(seed)
+        #env.reset()
+        #torch.manual_seed(seed)
+        #np.random.seed(seed)
+        #state_dim = env.observation_space.shape[0]
+        #action_dim = env.action_space.shape[0]
+        #max_action = float(env.action_space.high[0])
+        #max_episode_steps = env._max_episode_steps
+
+        self.env = model.get_env()
+       # print("ADWKJWAHDKLJAHWD")
+        #print(self.env)
+        self.max_episode_steps = model.get_max_episode_steps()
         #Create actor and critic
         #Could have used the base class given's but for convenient sake we declare our own
 
-        self.max_action = globals.max_action            
+        self.max_action = model.get_max_action()     
+        self.state_dim = model.get_state_dim()
+        self.action_dim = model.get_action_dim()
+        self.env_name = model.get_env_name()
+        #print("AKDHJAWJKJAWD")
+        #print(self.env_name)
+        self.algorithm_name = model.get_rl_algo()
+
         self.model = model
         self.actor = self.model.actor
         self.critic = self.model.critic
@@ -79,20 +104,20 @@ class Trainer(basic.Trainer):
 
         #replay buffer initialization
         self.replay_buffer = ReplayMemory(
-            globals.state_dim, globals.action_dim, 
+            self.state_dim, self.action_dim, 
             Config().algorithm.max_replay_size, 
-            Config().clients.random_seed)
+            Config().server.random_seed)
         
         self.policy_noise = Config().algorithm.policy_noise 
         self.noise_clip = Config().algorithm.noise_clip
 
         #if(self.total_timesteps)
-        #np.loadtxt("%s.csv" %(results_dir+"/"+file_name), dtype=list, delimiter="\n")
+        #np.loadtxt("%s.csv" %(CONST_RESULTS_DIR +"/"+file_name), dtype=list, delimiter="\n")
         
-        if not os.path.exists(results_dir):
-            os.makedirs(results_dir)
-        if Config().algorithm.save_models and not os.path.exists(models_dir):
-            os.makedirs(models_dir)
+        if not os.path.exists(CONST_RESULTS_DIR):
+            os.makedirs(CONST_RESULTS_DIR)
+        #if Config().algorithm.save_models and not os.path.exists(models_dir):
+            #os.makedirs(models_dir)
 
         self.timesteps_since_eval = 0
         self.episode_num = 0
@@ -131,18 +156,20 @@ class Trainer(basic.Trainer):
             # TODO: when max number of steps is hit, we should stop training and terminate the process. How?
             print("Done training")
             return
-        while round_episode_steps < Config().algorithm.max_round_episodes * globals.max_episode_steps:
+        while round_episode_steps < Config().algorithm.max_round_episodes * self.max_episode_steps:
             #print(self.total_timesteps)
             if self.done:
                 #evaluate episode and save policy
-                if self.timesteps_since_eval >= Config().algorithm.eval_freq * globals.max_episode_steps:
-                    self.timesteps_since_eval %= Config().algorithm.eval_freq * globals.max_episode_steps
+                if self.timesteps_since_eval >= Config().algorithm.eval_freq * self.max_episode_steps:
+                    self.timesteps_since_eval %= Config().algorithm.eval_freq * self.max_episode_steps
                     self.evaluations.append(client.evaluate_policy(self, self.env))
-                    np.savetxt("%s.csv" %(results_dir+"/"+g_file_name+"_"+str(self.client_id)), self.evaluations, delimiter=",")
-                    np.savez("%s" %(results_dir+"/"+g_file_name+"_"+str(self.client_id)), a=self.evaluations)
-                    #np.savetxt("%s.csv" %(results_dir+"/"+file_name), self.evaluations, delimiter=",")
+                    np.savetxt("%s.csv" %(CONST_RESULTS_DIR +"/"+CONST_FILE_NAME+"_"+str(self.client_id)), self.evaluations, delimiter=",")
+                    np.savez("%s" %(CONST_RESULTS_DIR +"/"+CONST_FILE_NAME+"_"+str(self.client_id)), a=self.evaluations)
+                    #np.savetxt("%s.csv" %(CONST_RESULTS_DIR +"/"+file_name), self.evaluations, delimiter=",")
                 
                 #When the training step is done, we reset the state of the env
+                print('AD:LKJWADJAWDLKAWHLWAs')
+                print(self.env)
                 obs = self.env.reset()
 
                 #Set done to false
@@ -197,8 +224,8 @@ class Trainer(basic.Trainer):
         
         #Add the last policy evaluation to our list of evaluations and save evaluations
         self.evaluations.append(client.evaluate_policy(self, self.env))
-        np.savetxt("%s.csv" %(results_dir+"/"+g_file_name+"_"+str(self.client_id)), self.evaluations, delimiter=",")
-        np.savez("%s" %(results_dir+"/"+g_file_name+"_"+str(self.client_id)), a=self.evaluations)
+        np.savetxt("%s.csv" %(CONST_RESULTS_DIR +"/"+CONST_FILE_NAME+"_"+str(self.client_id)), self.evaluations, delimiter=",")
+        np.savez("%s" %(CONST_RESULTS_DIR +"/"+CONST_FILE_NAME+"_"+str(self.client_id)), a=self.evaluations)
        
 
 
@@ -278,7 +305,7 @@ class Trainer(basic.Trainer):
         critic_model_name = 'critic_model'
         actor_target_model_name = 'actor_target_model'
         critic_target_model_name = 'critic_target_model'
-        env_algorithm = globals.env_name+ globals.algorithm_name
+        env_algorithm = self.env_name+ self.algorithm_name
 
         #going in here for some reason
         #fixed by making it none
@@ -320,7 +347,7 @@ class Trainer(basic.Trainer):
 
 
         #load evaluations so it doesn't overwrite
-        arr = np.load("%s.npz" %(results_dir+"/"+g_file_name+"_"+str(self.client_id)))
+        arr = np.load("%s.npz" %(CONST_RESULTS_DIR +"/"+CONST_FILE_NAME+"_"+str(self.client_id)))
         self.evaluations = list(arr['a'])
 
         # TODO: do we need those?
@@ -338,7 +365,7 @@ class Trainer(basic.Trainer):
         critic_model_name = 'critic_model'
         actor_target_model_name = 'actor_target_model'
         critic_target_model_name = 'critic_target_model'
-        env_algorithm = globals.env_name+ globals.algorithm_name
+        env_algorithm = self.env_name+ self.algorithm_name
 
         try:
             if not os.path.exists(model_path):
@@ -383,7 +410,7 @@ class Trainer(basic.Trainer):
         
 
         #Save evaluations
-        #np.savetxt("%s.csv" %(results_dir+"/"+file_name), self.evaluations, delimiter=",")
+        #np.savetxt("%s.csv" %(CONST_RESULTS_DIR +"/"+file_name), self.evaluations, delimiter=",")
 
         # Need to save total_timesteps and episode_num that we stopped at (to resume training)
         if self.client_id is not 0:
@@ -407,7 +434,7 @@ class Trainer(basic.Trainer):
         avg_reward = client.evaluate_policy(self, self.env)
         self.server_evaluations.append(avg_reward)
         file_name = "TD3_RL_SERVER"
-        np.savetxt("%s.csv" %(results_dir+"/"+file_name), self.server_evaluations, delimiter=",")
+        np.savetxt("%s.csv" %(CONST_RESULTS_DIR +"/"+file_name), self.server_evaluations, delimiter=",")
         return avg_reward
 
 

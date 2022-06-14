@@ -19,8 +19,10 @@ class TD3Server(fedavg.Server):
     """ Federated learning server using federated averaging to train Actor-Critic models. """
     """ A custom federated learning server. """
 
-    def __init__(self, model = None, trainer = None, algorithm = None):
+    def __init__(self, algorithm_name, env_name, model = None, trainer = None, algorithm = None):
         super().__init__(trainer = trainer, algorithm = algorithm, model = model)
+        self.algorithm_name = algorithm_name
+        self.env_name = env_name
         logging.info("A custom server has been initialized.")
         
     async def federated_averaging(self, updates):
@@ -84,11 +86,11 @@ class TD3Server(fedavg.Server):
         """ Save a checkpoint for resuming the training session. """
         checkpoint_path = Config.params['checkpoint_path']
 
-        copy_algorithm = globals.algorithm_name
+        copy_algorithm = self.algorithm_name
         if '_' in copy_algorithm:
             copy_algorithm= copy_algorithm.replace('_', '')
         
-        env_algorithm = globals.env_name+copy_algorithm
+        env_algorithm = self.env_name+copy_algorithm
         model_name = env_algorithm
         if '_' in model_name:
             model_name.replace('_', '')

@@ -24,11 +24,10 @@ clients:
     # If we are simulating client training times, what is the average training time?
     avg_training_time: 20
 
-    random_seed: 1
 
 server:
     address: 127.0.0.1
-    port: 8005
+    port: 8002
 
     # Should we operate in sychronous mode?
     synchronous: false

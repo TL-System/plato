@@ -10,8 +10,6 @@ import td3_learning_trainer
 import td3
 import os
 import numpy as np
-import globals
-
 from torch import nn
 
 file_name = "TD3_RL"
