@@ -84,7 +84,7 @@ data:
     # Under this case, to avoid this issue, we need to set:
     #   partition_size / batch_size = integar
     #   partition_size / pers_batch_size = integar
-    partition_size: 6400
+    partition_size: 3840
 
     # IID or non-IID?
     sampler: noniid
