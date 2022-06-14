@@ -149,6 +149,9 @@ logs/
 checkpoints/
 *.pth
 
+# Numpy files
+*.npz
+
 # macOS
 .DS_Store
 
