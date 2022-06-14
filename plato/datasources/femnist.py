@@ -74,11 +74,11 @@ class DataSource(base.DataSource):
         if client_id == 0:
             # If we are on the federated learning server
             data_dir = os.path.join(root_path, 'test')
-            data_url = "http://iqua.ece.toronto.edu/FEMNIST/test/" \
+            data_url = "http://iqua.ece.toronto.edu/baochun/FEMNIST/test/" \
                        + str(client_id) + ".zip"
         else:
             data_dir = os.path.join(root_path, 'train')
-            data_url = "http://iqua.ece.toronto.edu/FEMNIST/train/" \
+            data_url = "http://iqua.ece.toronto.edu/baochun/FEMNIST/train/" \
                        + str(client_id) + ".zip"
 
         if not os.path.exists(os.path.join(data_dir, str(client_id))):
