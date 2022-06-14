@@ -2,12 +2,14 @@
 The implementation of the contrastive adaptation's algorithm
 
 """
-
+import copy
 from collections import OrderedDict
 
 from plato.algorithms import fedavg_ssl
 from plato.config import Config
 from plato.trainers.base import Trainer
+
+from moving_average import ModelEMA
 
 
 class Algorithm(fedavg_ssl.Algorithm):
@@ -16,26 +18,17 @@ class Algorithm(fedavg_ssl.Algorithm):
     def __init__(self, trainer: Trainer):
         super().__init__(trainer=trainer)
 
-        # the most important parameter beta in the moving average
-        # update method.
-        # as the  Exponential Moving Average (EMA) update method is the most commonly used
-        # method in the self-supervised learning method. This mechanism
-        # should be supported as the foundation.
-        self.default_moving_average_scale = 0.999
-
     def load_weights_moving_average(self, weights, average_scale=None):
         """ Loading the moel weights passed in as a parameter
             and assign to the target model based on the moving
             average method. """
 
-        if hasattr(Config().trainer,
-                   "model_ema_update") and Config().trainer.model_ema_update:
+        model_ema_update = ModelEMA(average_scale)
 
-            if average_scale is None:
-                average_scale = self.default_moving_average_scale
+        existed_model_weights = self.extract_weights()
 
-            model_ema_update = ModelEMA(average_scale)
-            model_ema_update.update_model_moving_average(
-                previous_model=self.model, current_model=weights)
-        else:
-            self.model.load_state_dict(weights, strict=False)
+        moving_averaged_weights = model_ema_update.update_parameters_moving_average(
+            previous_parameters=existed_model_weights,
+            current_parameters=weights)
+
+        self.load_weights(moving_averaged_weights)
