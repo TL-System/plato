@@ -33,17 +33,16 @@ results_dir = "examples/td3_learning/results"
 
 class ReplayMemory(base.ReplayMemory):
     """ A simple example of replay memory buffer. """
-    def __init__(self, state_dim, action_dim, capacity, seed, client_id):
+    def __init__(self, state_dim, action_dim, capacity, seed):
         super().__init__(state_dim, action_dim, capacity, seed)
-        self.client_id = client_id
 
-    def save_buffer(self, dir):
+    def save_buffer(self, dir, client_id):
         size_np = np.array([self.size])
         
-        np.savez(self.make_filename(dir, "replay_buffer"), a=self.state, b=self.action, c=self.reward, d=self.next_state, e=self.done, f = size_np)
+        np.savez(self.make_filename(dir, "replay_buffer_" + str(client_id)), a=self.state, b=self.action, c=self.reward, d=self.next_state, e=self.done, f = size_np)
 
-    def load_buffer(self, dir):
-        data = np.load(self.make_filename(dir, "replay_buffer"))
+    def load_buffer(self, dir, client_id):
+        data = np.load(self.make_filename(dir, "replay_buffer_" + str(client_id)))
 
         self.state = data['a']
         self.action = data['b']
@@ -53,7 +52,7 @@ class ReplayMemory(base.ReplayMemory):
         self.size = int((data['f'])[0]) # single element array
 
     def make_filename(self, dir, name):
-        file_name = "%s_%s.npz" % (name, str(self.client_id)) 
+        file_name = "%s.npz" % (name) 
         file_path = os.path.join(dir, file_name)
         return file_path
 
@@ -82,7 +81,7 @@ class Trainer(basic.Trainer):
         self.replay_buffer = ReplayMemory(
             globals.state_dim, globals.action_dim, 
             Config().algorithm.max_replay_size, 
-            Config().clients.random_seed, self.client_id)
+            Config().clients.random_seed)
         
         self.policy_noise = Config().algorithm.policy_noise 
         self.noise_clip = Config().algorithm.noise_clip
@@ -306,6 +305,7 @@ class Trainer(basic.Trainer):
 
         # Load episode_num and total_timesteps
         if self.client_id is not 0:
+            self.replay_buffer.load_buffer(model_path, self.client_id)
             file_name = "%s_%s.npz" % ("training_status", str(self.client_id)) 
             file_path = os.path.join(model_path, file_name)
             data = np.load(file_path)
@@ -317,7 +317,6 @@ class Trainer(basic.Trainer):
         self.actor_target.load_state_dict(torch.load(actor_target_model_path), strict=True)
         self.critic_target.load_state_dict(torch.load(critic_target_model_path), strict=True)
 
-        self.replay_buffer.load_buffer(model_path)
 
         #load evaluations so it doesn't overwrite
         arr = np.load("%s.npz" %(results_dir+"/"+g_file_name))
@@ -380,14 +379,15 @@ class Trainer(basic.Trainer):
             torch.save(self.actor_target_state_dict, actor_target_model_path)
             torch.save(self.critic_target_state_dict, critic_target_model_path)
         
-        # Need to save buffer
-        self.replay_buffer.save_buffer(model_path)
+        
 
         #Save evaluations
         #np.savetxt("%s.csv" %(results_dir+"/"+file_name), self.evaluations, delimiter=",")
 
         # Need to save total_timesteps and episode_num that we stopped at (to resume training)
         if self.client_id is not 0:
+            # Need to save buffer and some variables
+            self.replay_buffer.save_buffer(model_path, self.client_id)
             file_name = "%s_%s.npz" % ("training_status", str(self.client_id)) 
             file_path = os.path.join(model_path, file_name)
             np.savez(file_path, a=np.array([self.episode_num]), b=np.array([self.total_timesteps]))
