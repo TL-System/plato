@@ -393,8 +393,12 @@ class Config:
         if "local" in running_mode:
             # the experiment will be performed in the local
             # machine, such as the personal macos
-            Config.general = Config.general._replace(base_path=os.path.join(
-                current_project_dir, project_name, "experiments"))
+            # to set the path just when the user did not set the
+            # the -b, i.e., base_path
+            if Config.params['base_path'] != "./":
+                Config.general = Config.general._replace(
+                    base_path=os.path.join(current_project_dir, project_name,
+                                           "experiments"))
 
         if "sim" in running_mode:
             # the experiment will be performed in the sim server
