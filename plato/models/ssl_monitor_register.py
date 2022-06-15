@@ -45,6 +45,7 @@ def knn_monitor(encoder, monitor_data_loader, test_data_loader, device):
     # for '_' here, we can set it to be other accuracy such as total_top5
 
     total_top1, _, total_num, feature_bank = 0.0, 0.0, 0, []
+    feature_labels = []
     with torch.no_grad():
         # generate feature bank
         for data, target in tqdm(monitor_data_loader,
@@ -55,16 +56,18 @@ def knn_monitor(encoder, monitor_data_loader, test_data_loader, device):
             feature = encoder(data)
             feature = F.normalize(feature, dim=1)
             feature_bank.append(feature)
+            feature_labels.append(target)
         # [D, N]
         feature_bank = torch.cat(feature_bank, dim=0).t().contiguous()
-
         # [N]
-        # conver to tensor if the obtained targets are stored in the list
-        feature_labels = monitor_data_loader.dataset.dataset.targets
-        if not torch.is_tensor(feature_labels):
-            feature_labels = torch.as_tensor(feature_labels)
+        feature_labels = torch.cat(feature_labels).contiguous()
 
-        feature_labels = feature_labels.clone().detach().requires_grad_(False)
+        # conver to tensor if the obtained targets are stored in the list
+        # feature_labels = monitor_data_loader.dataset.dataset.targets
+        # if not torch.is_tensor(feature_labels):
+        #     feature_labels = torch.as_tensor(feature_labels, device=device)
+
+        # feature_labels = feature_labels.clone().detach().requires_grad_(False)
 
         # loop test data to predict the label by weighted knn search
         test_bar = tqdm(test_data_loader, desc='kNN', disable=hide_progress)
