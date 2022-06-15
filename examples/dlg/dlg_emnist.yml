@@ -43,11 +43,11 @@ trainer:
     target_accuracy: 1.0
 
     # Number of epoches for local training in each communication round
-    epochs: 1
+    epochs: 2
     batch_size: 1
     optimizer: SGD
-    learning_rate: 0.01
-    momentum: 0.9
+    learning_rate: 1
+    momentum: 1.0
     weight_decay: 0.0
 
     # The machine learning model
@@ -82,7 +82,7 @@ algorithm:
     share_gradients: true
     # Do reconstruction by directly matching weights when it's true,
     # otherwise by matching gradients calculated from updates
-    match_weights: true
+    match_weights: false
     # Matching weights (absolute) or weight updates (delta)
     use_updates: false
 

@@ -150,6 +150,11 @@ class Server(fedavg.Server):
         if not self.share_gradients and self.match_weights and self.use_updates:
             target_weights = deltas_received[Config().algorithm.victim_client]
 
+        if self.share_gradients:
+            f = open('gradient.txt', 'w')
+            f.write(str(target_grad))
+            f.close()
+
         # Initialize the csv file
         csv_processor.initialize_csv(dlg_result_file, dlg_result_headers, dlg_result_path)
 
@@ -165,6 +170,10 @@ class Server(fedavg.Server):
             for delta in deltas_received[
                     Config().algorithm.victim_client].values():
                 target_grad.append(-delta / Config().trainer.learning_rate)
+
+            f = open('converted_gradient.txt', 'w')
+            f.write(str(target_grad))
+            f.close()
 
         # Generate dummy items and initialize optimizer
         dummy_data = torch.randn(data_size).to(
