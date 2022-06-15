@@ -49,12 +49,11 @@ if __name__ == '__main__':
 
     key_word = args.key
 
-    desired_files = [
-        file_name for file_name in experiment_script_files_name
-        if is_desired_file(key_word, file_name)
+    desired_files_path = [
+        file_path for file_path in experiment_script_files_name
+        if is_desired_file(key_word, file_path)
     ]
-    for file in desired_files:
+    for script_file_path in desired_files_path:
 
-        script_file_path = os.path.join(script_files_dir, file)
         print(f"Running script: {script_file_path}")
         os.system("sbatch %s" % script_file_path)
