@@ -395,10 +395,9 @@ class Config:
             # machine, such as the personal macos
             # to set the path just when the user did not set the
             # the -b, i.e., base_path
-            if Config.params['base_path'] != "./":
-                Config.general = Config.general._replace(
-                    base_path=os.path.join(current_project_dir, project_name,
-                                           "experiments"))
+            if Config.params['base_path'] == "./":
+                Config.params['base_path'] = os.path.join(
+                    current_project_dir, project_name, "experiments")
 
         if "sim" in running_mode:
             # the experiment will be performed in the sim server
