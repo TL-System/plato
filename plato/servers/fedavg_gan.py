@@ -34,13 +34,23 @@ class Server(fedavg.Server):
 
             update_from_gen, update_from_disc = update
 
+            weights_norm_gen = Server.compute_weights_norm(update_from_gen)
             for name, delta in update_from_gen.items():
-                gen_avg_update[name] += delta * (num_samples /
-                                                 self.total_samples)
+                if self.norm_bound is not None:
+                    # Apply norm bounding if required
+                    delta = delta / max(1, weights_norm_gen / self.norm_bound)
+                else:
+                    # Use weighted average by the number of samples
+                    delta = delta * (num_samples / self.total_samples)
+                gen_avg_update[name] += delta
 
+            weights_norm_disc = Server.compute_weights_norm(update_from_disc)
             for name, delta in update_from_disc.items():
-                disc_avg_update[name] += delta * (num_samples /
-                                                  self.total_samples)
+                if self.norm_bound is not None:
+                    delta = delta / max(1, weights_norm_disc / self.norm_bound)
+                else:
+                    delta = delta * (num_samples / self.total_samples)
+                disc_avg_update[name] += delta
 
             # Yield to other tasks in the server
             await asyncio.sleep(0)

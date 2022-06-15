@@ -43,6 +43,9 @@ class Server(base.Server):
         self.testset_sampler = None
         self.total_samples = 0
 
+        self.norm_bound = Config().server.norm_bounding_threshold if hasattr(
+            Config().server, 'norm_bounding_threshold') else None
+
         self.total_clients = Config().clients.total_clients
         self.clients_per_round = Config().clients.per_round
 
@@ -165,9 +168,6 @@ class Server(base.Server):
             for name, weights in deltas_received[0].items()
         }
 
-        norm_bound = Config().server.norm_bounding_threshold if hasattr(
-            Config().server, 'norm_bounding_threshold') else None
-
         for i, update in enumerate(deltas_received):
             __, report, __, __ = updates[i]
             num_samples = report.num_samples
@@ -175,9 +175,9 @@ class Server(base.Server):
             weights_norm = Server.compute_weights_norm(update)
 
             for name, delta in update.items():
-                if norm_bound is not None:
+                if self.norm_bound is not None:
                     # Apply norm bounding if required
-                    delta = delta / max(1, weights_norm / norm_bound)
+                    delta = delta / max(1, weights_norm / self.norm_bound)
                 else:
                     # Use weighted average by the number of samples
                     delta = delta * (num_samples / self.total_samples)
