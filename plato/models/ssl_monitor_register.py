@@ -57,13 +57,13 @@ def knn_monitor(encoder, monitor_data_loader, test_data_loader, device):
             feature_bank.append(feature)
         # [D, N]
         feature_bank = torch.cat(feature_bank, dim=0).t().contiguous()
+
         # [N]
         # conver to tensor if the obtained targets are stored in the list
         feature_labels = monitor_data_loader.dataset.dataset.targets
         if not torch.is_tensor(feature_labels):
             feature_labels = torch.as_tensor(feature_labels)
 
-        feature_labels.to(device)
         feature_labels = feature_labels.clone().detach().requires_grad_(False)
 
         # loop test data to predict the label by weighted knn search
@@ -75,7 +75,7 @@ def knn_monitor(encoder, monitor_data_loader, test_data_loader, device):
 
             pred_labels = knn_predict(feature, feature_bank, feature_labels,
                                       classes, num_nearest_neighbors,
-                                      neighbors_weight)
+                                      neighbors_weight, device)
 
             total_num += data.size(0)
             total_top1 += (pred_labels[:, 0] == target).float().sum().item()
@@ -84,13 +84,17 @@ def knn_monitor(encoder, monitor_data_loader, test_data_loader, device):
 
 
 # pylint: disable=too-many-arguments
-def knn_predict(feature, feature_bank, feature_labels, classes, knn_k, knn_t):
+def knn_predict(feature, feature_bank, feature_labels, classes, knn_k, knn_t,
+                device):
     """ Perform the prediction based on the knn.
 
         knn monitor as in InstDisc https://arxiv.org/abs/1805.01978
         This Implementation follows http://github.com/zhirongw/lemniscate.pytorch
          and https://github.com/leftthomas/SimCLR
     """
+    feature.to(device)
+    feature_bank.to(device)
+    feature_labels.to(device)
     # compute cos similarity between each feature vector and feature bank ---> [B, N]
     sim_matrix = torch.mm(feature, feature_bank)
     # [B, K]
