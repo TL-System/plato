@@ -8,8 +8,16 @@ general:
     # base_path: /data/user/Projects/experiments
 
     # locally
-    base_path: ./Projects/experiments
-
+    #base_path: ./Projects/experiments
+    project_name: INFOCOM23
+    # performing different running mode
+    # for different purposes
+    # - local_central_code_test
+    # - local_central
+    # - local_code_test
+    # - user
+    # - sim
+    running_mode: local
 
 clients:
     # Type

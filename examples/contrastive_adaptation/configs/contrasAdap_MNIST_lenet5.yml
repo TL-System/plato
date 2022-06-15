@@ -14,7 +14,7 @@ general:
     # - local_code_test
     # - user
     # - sim
-    running_mode: local_code_test
+    running_mode: local
 
 clients:
     # Type

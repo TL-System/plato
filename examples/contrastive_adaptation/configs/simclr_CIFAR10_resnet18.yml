@@ -6,7 +6,7 @@ general:
     # base_path: /data/sijia/INFOCOM23/experiments
 
     # locally
-    base_path: ./INFOCOM23/experiments
+    #base_path: ./INFOCOM23/experiments
     project_name: INFOCOM23
     # performing different running mode
     # for different purposes
@@ -165,6 +165,7 @@ trainer:
     # The machine learning model,
     # it behaves as the encoder for the ssl method
     # the final fc layer will be removed
+    external_encoder: False
     model_name: resnet_18
     projection_dim: 128
 
