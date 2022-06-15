@@ -5,7 +5,7 @@ general:
     # base_path: /data/sijia/INFOCOM23/experiments
 
     # locally
-    base_path: ./INFOCOM23/experiments
+    #base_path: ./INFOCOM23/experiments
     project_name: INFOCOM23
     # performing different running mode
     # for different purposes
@@ -169,6 +169,7 @@ trainer:
     # the final fc layer will be removed
     # however, in the central test, we do not use this
     #   but use the custom model
+    external_encoder: False
     model_name: resnet_18
     # in general, the projection_dim = prediction_dim
     projection_dim: 256
