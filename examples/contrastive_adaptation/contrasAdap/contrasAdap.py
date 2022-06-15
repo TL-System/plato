@@ -14,11 +14,11 @@ Reference:
 
 """
 
-import contras_adap_net
-import contras_adap_server
-import contras_adap_client
-import contras_adap_trainer
-import contras_adap_algorithm
+import contrasAdap_net
+import contrasAdap_server
+import contrasAdap_client
+import contrasAdap_trainer
+import contrasAdap_algorithm
 
 
 def main():
@@ -27,15 +27,15 @@ def main():
         removing the final fully-connected layers of model defined by
         the 'model_name' in config file.
     """
-    algorithm = contras_adap_algorithm.Algorithm
-    trainer = contras_adap_trainer.Trainer
-    contras_adap_model = contras_adap_net.ContrasAdap()
-    client = contras_adap_client.Client(model=contras_adap_model,
-                                        trainer=trainer,
-                                        algorithm=algorithm)
-    server = contras_adap_server.Server(model=contras_adap_model,
-                                        trainer=trainer,
-                                        algorithm=algorithm)
+    algorithm = contrasAdap_algorithm.Algorithm
+    trainer = contrasAdap_trainer.Trainer
+    contras_adap_model = contrasAdap_net.ContrasAdap()
+    client = contrasAdap_client.Client(model=contras_adap_model,
+                                       trainer=trainer,
+                                       algorithm=algorithm)
+    server = contrasAdap_server.Server(model=contras_adap_model,
+                                       trainer=trainer,
+                                       algorithm=algorithm)
 
     server.run(client)
 
