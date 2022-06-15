@@ -30,7 +30,7 @@ def main():
     """
     algorithm = fedavg_ssl.Algorithm
     trainer = ssl_trainer.Trainer
-    simclr_model = simclr_net.NormalSimCLR
+    simclr_model = simclr_net.SimCLR
     client = ssl_client.Client(model=simclr_model,
                                trainer=trainer,
                                algorithm=algorithm)

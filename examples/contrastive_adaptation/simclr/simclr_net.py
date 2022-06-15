@@ -8,6 +8,8 @@ from torch import nn
 from plato.models import encoders_register
 from plato.models import general_mlps_register
 
+from plato.config import Config
+
 from mnist_encoder_net import Encoder
 
 
@@ -54,20 +56,15 @@ class SimCLR(nn.Module):
         projected_z2 = self.projector(encoded_h2)
         return projected_z1, projected_z2
 
-
-class CentralSimCLR(object):
-
     @staticmethod
     def get_model():
 
-        mnist_encoder = Encoder()
-        return SimCLR(encoder=mnist_encoder,
-                      encoder_dim=mnist_encoder.get_encoding_dim())
-
-
-class NormalSimCLR(object):
-
-    @staticmethod
-    def get_model():
-
-        return SimCLR()
+        if Config().trainer.external_encoder:
+            # only use the external encoder for the MNIST data
+            # of the central learning.
+            # target: test the correcness
+            mnist_encoder = Encoder()
+            return SimCLR(encoder=mnist_encoder,
+                          encoder_dim=mnist_encoder.get_encoding_dim())
+        else:
+            return SimCLR()
