@@ -7,11 +7,9 @@ python examples/customized/custom_server.py -c examples/customized/server.yml
 """
 
 import logging
-from torch import nn
 import asyncio
 from plato.servers import fedavg
 from plato.config import Config
-import globals
 import pickle
 
 

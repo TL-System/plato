@@ -2,19 +2,10 @@
 A federated learning client for td3.
 """
 import logging
-import math
 from dataclasses import dataclass
 from plato.clients import simple
-from plato.config import Config
-import td3_learning_trainer
-import td3
-import os
 import numpy as np
-from torch import nn
-
-file_name = "TD3_RL"
-models_dir = "./pytorch_models"
-results_dir = "./results"
+import pybullet_envs
 
 @dataclass
 class Report(simple.Report):

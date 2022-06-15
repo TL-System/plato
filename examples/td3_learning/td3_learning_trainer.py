@@ -3,15 +3,10 @@ A customized trainer for td3.
 """
 import logging
 import os
-from pyexpat import model
-import time
-import pandas as pd
-import copy
 
 import numpy as np
 import torch
 import torch.nn.functional as F
-from torch import nn
 from plato.utils.reinforcement_learning.policies import base
 from plato.trainers import basic
 from plato.config import Config
@@ -19,9 +14,10 @@ from plato.trainers import basic
 
 import td3_learning_client as client
 
-from td3_learning_model import Model
-
 import td3
+
+import pybullet_envs
+
 
 class ReplayMemory(base.ReplayMemory):
     """ A simple example of replay memory buffer. """

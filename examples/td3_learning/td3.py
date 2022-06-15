@@ -11,13 +11,14 @@ import td3_learning_algorithm
 
 from plato.config import Config
 
-from torch import nn
 
 import torch
 
 import numpy as np
 
 import gym
+
+import pybullet_envs
 
 #to run
 #python examples/td3_learning/td3.py -c examples/td3_learning/td3_FashionMNIST_lenet5.yml

@@ -1,17 +1,12 @@
-
-
-import logging
-import os
-import time
-
 import copy
 
 import numpy as np
 import torch
 import torch.nn.functional as F
-import globals
 
 from torch import nn
+
+import pybullet_envs
 
 class TD3Actor(nn.Module):
     def __init__(self, state_dim, action_dim, max_action):
