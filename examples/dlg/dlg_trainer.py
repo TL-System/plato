@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 import torch
 from plato.config import Config
 from plato.trainers import basic
-from plato.utils import optimizers
 from torchvision import transforms
 
 from defense.GradDefense.dataloader import get_root_set_loader
@@ -52,19 +51,6 @@ class Trainer(basic.Trainer):
         else:
             loss_criterion = torch.nn.CrossEntropyLoss()
 
-        # Initializing the optimizer
-        get_optimizer = getattr(self, "get_optimizer",
-                                optimizers.get_optimizer)
-        optimizer = get_optimizer(self.model)
-
-        # Initializing the learning rate schedule, if necessary
-        if 'lr_schedule' in config:
-            lr_schedule = optimizers.get_lr_schedule(optimizer,
-                                                     len(train_loader),
-                                                     train_loader)
-        else:
-            lr_schedule = None
-
         self.model.to(self.device)
         self.model.train()
 
@@ -98,63 +84,49 @@ class Trainer(basic.Trainer):
                 plt.imshow(tt(examples[0].cpu()))
                 plt.title("Ground truth image")
 
-                optimizer.zero_grad()
-
-                if hasattr(Config().algorithm, 'share_gradients') and Config(
-                ).algorithm.share_gradients:
-                    if hasattr(Config().algorithm, 'defense') and Config().algorithm.defense == 'GradDefense' and \
-                            hasattr(Config().algorithm, 'clip') and Config().algorithm.clip is True:
-                        current_grad = []
-                        for index in range(len(examples)):
-                            outputs = self.model(
-                                torch.unsqueeze(examples[index], dim=0))
-                            onehot_labels = label_to_onehot(
-                                torch.unsqueeze(labels[index], dim=0), num_classes=Config().trainer.num_classes)
-                            loss = criterion(outputs, onehot_labels)
-                            grad = torch.autograd.grad(
-                                loss, self.model.parameters())
-                            current_grad.append(list((_.detach().clone()
-                                                      for _ in grad)))
-                            # TODO: multiple batches or epochs?
-                    else:
+                if hasattr(Config().algorithm, 'defense') and Config().algorithm.defense == 'GradDefense' and \
+                        hasattr(Config().algorithm, 'clip') and Config().algorithm.clip is True:
+                    current_grad = []
+                    for index in range(len(examples)):
                         outputs = patched_model(
-                            examples, patched_model.parameters)
-
-                        # Save the ground truth and gradients
-                        onehot_labels = label_to_onehot(
-                            labels, num_classes=Config().trainer.num_classes)
-
-                        loss = criterion(outputs, onehot_labels)
+                            torch.unsqueeze(examples[index], dim=0), patched_model.parameters)
+                        # onehot_labels = label_to_onehot(
+                        #     torch.unsqueeze(labels[index], dim=0), num_classes=Config().trainer.num_classes)
+                        loss = loss_criterion(outputs, labels)
                         grad = torch.autograd.grad(loss, patched_model.parameters.values(
                         ), retain_graph=True, create_graph=True, only_inputs=True)
-
-                        # TODO: momentum, weight_decay?
-                        patched_model.parameters = OrderedDict((name, param - Config().trainer.learning_rate * grad_part)
-                                                               for ((name, param), grad_part)
-                                                               in zip(patched_model.parameters.items(), grad))
-
-                        current_grad = list((_.detach().clone()
-                                            for _ in grad))
-
-                        # Sum up the gradients for each local update
-                        try:
-                            target_grad = [
-                                sum(x) for x in zip(current_grad, target_grad)
-                            ]
-                        except:
-                            target_grad = list((_.detach().clone()
-                                                for _ in grad))
+                        current_grad.append(list((_.detach().clone()
+                                                  for _ in grad)))
+                        # TODO: multiple batches or epochs?
                 else:
-                    outputs = self.model(examples)
+                    outputs = patched_model(
+                        examples, patched_model.parameters)
 
+                    # Save the ground truth and gradients
+                    # onehot_labels = label_to_onehot(
+                    #     labels, num_classes=Config().trainer.num_classes)
+
+                    # loss = criterion(outputs, onehot_labels)
                     loss = loss_criterion(outputs, labels)
+                    grad = torch.autograd.grad(loss, patched_model.parameters.values(
+                    ), retain_graph=True, create_graph=True, only_inputs=True)
 
-                    if 'create_graph' in config:
-                        loss.backward(create_graph=config['create_graph'])
-                    else:
-                        loss.backward()
+                    # TODO: momentum, weight_decay?
+                    patched_model.parameters = OrderedDict((name, param - Config().trainer.learning_rate * grad_part)
+                                                           for ((name, param), grad_part)
+                                                           in zip(patched_model.parameters.items(), grad))
 
-                    optimizer.step()
+                    current_grad = list((_.detach().clone()
+                                        for _ in grad))
+
+                    # Sum up the gradients for each local update
+                    try:
+                        target_grad = [
+                            sum(x) for x in zip(current_grad, target_grad)
+                        ]
+                    except:
+                        target_grad = list((_.detach().clone()
+                                            for _ in grad))
 
                 if batch_id % log_interval == 0:
                     if self.client_id == 0:
@@ -171,11 +143,8 @@ class Trainer(basic.Trainer):
             full_onehot_labels = label_to_onehot(
                 full_labels, num_classes=Config().trainer.num_classes)
 
-            if lr_schedule is not None:
-                lr_schedule.step()
-
-            if hasattr(optimizer, "params_state_update"):
-                optimizer.params_state_update()
+            for ((name, param), (name, new_param)) in zip(self.model.named_parameters(), patched_model.parameters.items()):
+                param.data = new_param
 
             # Simulate client's speed
             if self.client_id != 0 and hasattr(
@@ -200,9 +169,6 @@ class Trainer(basic.Trainer):
                 target_grad = [x / total_local_updates for x in target_grad]
             except:
                 target_grad = None
-
-            for ((name, param), (name, new_param)) in zip(self.model.named_parameters(), patched_model.parameters.items()):
-                param.data = new_param
 
             if hasattr(Config().algorithm, 'defense') and Config().algorithm.defense == 'GradDefense':
                 if hasattr(Config().algorithm, 'clip') and Config().algorithm.clip is True:
