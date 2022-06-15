@@ -103,6 +103,11 @@ def create_run_script(methods_root_dir,
 
 if __name__ == "__main__":
     all_config_files_name = os.listdir(configs_file_dir)
+
+    # create the output dir as the slurm will not create it
+    # for the experiments
+    os.makedirs(sbatch_output_dir, exist_ok=True)
+
     for config_file_name in all_config_files_name:
         create_run_script(methods_root_dir,
                           config_files_dir=configs_file_dir,
