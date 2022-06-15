@@ -16,7 +16,7 @@ One Example:
 """
 
 import os
-from pathlib import Path
+import stat
 
 current_path = "./"
 
@@ -87,6 +87,16 @@ def create_run_script(methods_root_dir,
     else:
         with open(script_file_save_path, 'w') as script_file:
             script_file.write(content)
+
+    # add
+    #   - stat.S_IRWXU: Read, write, and execute by owner 7
+    #   - stat.S_IRGRP : Read by group
+    #   - stat.S_IXGRP : Execute by group
+    #   - stat.S_IROTH : Read by others
+    #   - stat.S_IXOTH : Execute by others
+    os.chmod(
+        script_file_save_path, stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP
+        | stat.S_IROTH | stat.S_IXOTH)
 
 
 if __name__ == "__main__":
