@@ -172,13 +172,17 @@ class Server(base.Server):
             __, report, __, __ = updates[i]
             num_samples = report.num_samples
 
+            weights_norm = Server.compute_weights_norm(update)
+
             for name, delta in update.items():
-                # Use weighted average by the number of samples
-                avg_delta = delta * (num_samples / self.total_samples)
-                # Apply norm bounding if required
                 if norm_bound is not None:
-                    avg_delta /= max(1, np.linalg.norm(avg_delta) / norm_bound)
-                avg_update[name] += avg_delta
+                    # Apply norm bounding if required
+                    delta = delta / max(1, weights_norm / norm_bound)
+                else:
+                    # Use weighted average by the number of samples
+                    delta = delta * (num_samples / self.total_samples)
+
+                avg_update[name] += delta
 
             # Yield to other tasks in the server
             await asyncio.sleep(0)
@@ -261,6 +265,15 @@ class Server(base.Server):
             accuracy += report.accuracy * (report.num_samples / total_samples)
 
         return accuracy
+
+    @staticmethod
+    def compute_weights_norm(update):
+        """Compute the norm of the model update from a client."""
+        weights_norm = 0
+        for weight in update.values():
+            weights_norm += np.sum(np.array(weight)**2)
+        weights_norm = np.sqrt(weights_norm)
+        return weights_norm
 
     def customize_server_payload(self, payload):
         """ Customize the server payload before sending to the client. """
