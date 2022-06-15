@@ -554,7 +554,7 @@ class Trainer(basic.Trainer):
         clients.
         """
         self.personalized_model.to(self.device)
-
+        self.model.to(self.device)
         # Initialize accuracy to be returned to -1, so that the client can disconnect
         # from the server when testing fails
         accuracy = -1
@@ -661,8 +661,8 @@ class Trainer(basic.Trainer):
 
                         # Update the epoch loss container
                         epoch_loss_meter.update(loss.data.item())
-                        train_data_encoded.append(feature.numpy())
-                        train_data_labels.append(labels.numpy())
+                        train_data_encoded.append(feature)
+                        train_data_labels.append(labels)
 
                         if lr_schedule is not None:
                             lr_schedule = lr_schedule.step()
@@ -698,8 +698,8 @@ class Trainer(basic.Trainer):
                         preds = self.personalized_model(feature).argmax(dim=1)
                         correct = (preds == labels).sum().item()
                         acc_meter.update(correct / preds.shape[0])
-                        test_data_encoded.append(feature.numpy())
-                        test_data_labels.append(labels.numpy())
+                        test_data_encoded.append(feature)
+                        test_data_labels.append(labels)
 
                 accuracy = acc_meter.avg
         except Exception as testing_exception:
@@ -759,22 +759,27 @@ class Trainer(basic.Trainer):
             test_encoded_filename = f"Round_{current_round}_test_encoded.npy"
             test_label_filename = f"Round_{current_round}_test_label.npy"
 
-            train_data_encoded = np.concatenate(train_data_encoded, axis=0)
-            train_data_labels = np.concatenate(train_data_labels, axis=0)
-            test_data_encoded = np.concatenate(test_data_encoded, axis=0)
-            test_data_labels = np.concatenate(test_data_labels, axis=0)
-            self.save_encoded_data(data=train_data_encoded,
-                                   filename=train_encoded_filename,
-                                   location=save_location)
-            self.save_encoded_data(data=train_data_labels,
-                                   filename=train_label_filename,
-                                   location=save_location)
-            self.save_encoded_data(data=test_data_encoded,
-                                   filename=test_encoded_filename,
-                                   location=save_location)
-            self.save_encoded_data(data=test_data_labels,
-                                   filename=test_label_filename,
-                                   location=save_location)
+            train_data_encoded = torch.cat(train_data_encoded, axis=0)
+            train_data_labels = torch.cat(train_data_labels)
+            test_data_encoded = torch.cat(test_data_encoded, axis=0)
+            test_data_labels = torch.cat(test_data_labels)
+
+            self.save_encoded_data(
+                data=train_data_encoded.detach().to("cpu").numpy(),
+                filename=train_encoded_filename,
+                location=save_location)
+            self.save_encoded_data(
+                data=train_data_labels.detach().to("cpu").numpy(),
+                filename=train_label_filename,
+                location=save_location)
+            self.save_encoded_data(
+                data=test_data_encoded.detach().to("cpu").numpy(),
+                filename=test_encoded_filename,
+                location=save_location)
+            self.save_encoded_data(
+                data=test_data_labels.detach().to("cpu").numpy(),
+                filename=test_label_filename,
+                location=save_location)
         else:
             return accuracy
 
