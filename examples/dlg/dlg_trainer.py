@@ -165,11 +165,6 @@ class Trainer(basic.Trainer):
 
         if hasattr(Config().algorithm,
                    'share_gradients') and Config().algorithm.share_gradients:
-            try:
-                target_grad = [x / total_local_updates for x in target_grad]
-            except:
-                target_grad = None
-
             if hasattr(Config().algorithm, 'defense') and Config().algorithm.defense == 'GradDefense':
                 if hasattr(Config().algorithm, 'clip') and Config().algorithm.clip is True:
                     from defense.GradDefense.clip import noise
