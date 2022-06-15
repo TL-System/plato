@@ -63,6 +63,7 @@ def knn_monitor(encoder, monitor_data_loader, test_data_loader, device):
         if not torch.is_tensor(feature_labels):
             feature_labels = torch.as_tensor(feature_labels)
 
+        feature_labels.to(device)
         feature_labels = feature_labels.clone().detach().requires_grad_(False)
 
         # loop test data to predict the label by weighted knn search
