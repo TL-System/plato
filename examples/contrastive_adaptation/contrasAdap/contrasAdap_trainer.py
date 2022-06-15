@@ -9,7 +9,7 @@ import torch.nn.functional as F
 from plato.config import Config
 from plato.trainers import contrastive_ssl
 
-from contras_adap_losses import ContrasAdapLoss
+from contrasAdap_losses import ContrasAdapLoss
 
 # class Trainer(contrastive_ssl.Trainer):
 #     """ The federated learning trainer for the contrastive adaptation client. """
