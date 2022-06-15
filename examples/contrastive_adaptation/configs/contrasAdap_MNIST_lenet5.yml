@@ -5,7 +5,7 @@ general:
     # base_path: /data/sijia/INFOCOM23/experiments
 
     # locally
-    base_path: ./INFOCOM23/experiments
+    #base_path: ./INFOCOM23/experiments
     project_name: INFOCOM23
     # performing different running mode
     # for different purposes
