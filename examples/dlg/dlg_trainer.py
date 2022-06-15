@@ -3,6 +3,7 @@ import math
 import os
 import pickle
 import time
+from collections import OrderedDict
 
 import matplotlib.pyplot as plt
 import torch
@@ -13,6 +14,7 @@ from torchvision import transforms
 
 from defense.GradDefense.dataloader import get_root_set_loader
 from defense.GradDefense.sensitivity import compute_sens
+from utils.modules import PatchedModule
 from utils.utils import cross_entropy_for_onehot, label_to_onehot
 
 criterion = cross_entropy_for_onehot
@@ -74,6 +76,12 @@ class Trainer(basic.Trainer):
         target_grad = None
         total_local_updates = epochs * math.ceil(partition_size / batch_size)
 
+        for name, param in self.model.named_parameters():
+            print("initial model", param.data[0])
+            break
+
+        patched_model = PatchedModule(self.model)
+
         for epoch in range(1, epochs + 1):
             # Use a default training loop
             for batch_id, (examples, labels) in enumerate(train_loader):
@@ -98,36 +106,35 @@ class Trainer(basic.Trainer):
                             hasattr(Config().algorithm, 'clip') and Config().algorithm.clip is True:
                         current_grad = []
                         for index in range(len(examples)):
-                            if cut_layer is None:
-                                outputs = self.model(
-                                    torch.unsqueeze(examples[index], dim=0))
-                            else:
-                                outputs = self.model.forward_from(
-                                    torch.unsqueeze(examples[index], dim=0), cut_layer)
+                            outputs = self.model(
+                                torch.unsqueeze(examples[index], dim=0))
                             onehot_labels = label_to_onehot(
                                 torch.unsqueeze(labels[index], dim=0), num_classes=Config().trainer.num_classes)
                             loss = criterion(outputs, onehot_labels)
-                            dy_dx = torch.autograd.grad(
+                            grad = torch.autograd.grad(
                                 loss, self.model.parameters())
                             current_grad.append(list((_.detach().clone()
-                                                      for _ in dy_dx)))
+                                                      for _ in grad)))
                             # TODO: multiple batches or epochs?
                     else:
-                        if cut_layer is None:
-                            outputs = self.model(examples)
-                        else:
-                            outputs = self.model.forward_from(
-                                examples, cut_layer)
+                        outputs = patched_model(
+                            examples, patched_model.parameters)
 
                         # Save the ground truth and gradients
                         onehot_labels = label_to_onehot(
                             labels, num_classes=Config().trainer.num_classes)
 
                         loss = criterion(outputs, onehot_labels)
-                        dy_dx = torch.autograd.grad(
-                            loss, self.model.parameters())
+                        grad = torch.autograd.grad(loss, patched_model.parameters.values(
+                        ), retain_graph=True, create_graph=True, only_inputs=True)
+
+                        # TODO: momentum, weight_decay?
+                        patched_model.parameters = OrderedDict((name, param - Config().trainer.learning_rate * grad_part)
+                                                               for ((name, param), grad_part)
+                                                               in zip(patched_model.parameters.items(), grad))
+
                         current_grad = list((_.detach().clone()
-                                            for _ in dy_dx))
+                                            for _ in grad))
 
                         # Sum up the gradients for each local update
                         try:
@@ -136,13 +143,9 @@ class Trainer(basic.Trainer):
                             ]
                         except:
                             target_grad = list((_.detach().clone()
-                                                for _ in dy_dx))
+                                                for _ in grad))
                 else:
-                    if cut_layer is None:
-                        outputs = self.model(examples)
-                    else:
-                        outputs = self.model.forward_from(
-                            examples, cut_layer)
+                    outputs = self.model(examples)
 
                     loss = loss_criterion(outputs, labels)
 
@@ -198,6 +201,9 @@ class Trainer(basic.Trainer):
             except:
                 target_grad = None
 
+            for ((name, param), (name, new_param)) in zip(self.model.named_parameters(), patched_model.parameters.items()):
+                param.data = new_param
+
             if hasattr(Config().algorithm, 'defense') and Config().algorithm.defense == 'GradDefense':
                 if hasattr(Config().algorithm, 'clip') and Config().algorithm.clip is True:
                     from defense.GradDefense.clip import noise
@@ -214,6 +220,10 @@ class Trainer(basic.Trainer):
                 for layer in perturbed_gradients:
                     layer = layer.to(self.device)
                     target_grad.append(layer)
+
+        for name, param in self.model.named_parameters():
+            print("updated model", param.data[0])
+            break
 
         file_path = f"{Config().params['model_path']}/{self.client_id}.pickle"
         with open(file_path, 'wb') as handle:
