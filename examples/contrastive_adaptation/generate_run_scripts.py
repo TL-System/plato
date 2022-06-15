@@ -78,6 +78,8 @@ def create_run_script(methods_root_dir,
     script_file_name = '{}.{}'.format(file_name_no_extension, extension)
     script_file_save_path = os.path.join(script_save_dir, script_file_name)
 
+    os.makedirs(script_save_dir, exist_ok=True)
+
     print(("Creating sbatch running script {} for config file {}, ").format(
         script_file_save_path, config_file_name))
 
