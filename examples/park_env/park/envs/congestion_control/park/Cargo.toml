@@ -1,0 +1,16 @@
+[package]
+name = "park"
+version = "0.1.0"
+authors = ["Akshay Narayan <akshayn@mit.edu>"]
+edition = "2018"
+
+[dependencies]
+capnp = "0.9"
+capnp-rpc = "0.9"
+fnv = "1"
+futures = "0.1"
+portus = "0.5"
+tokio = "0.1"
+
+[build-dependencies]
+capnpc = "0.9"

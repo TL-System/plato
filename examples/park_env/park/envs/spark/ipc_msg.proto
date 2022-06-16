@@ -1,0 +1,56 @@
+// For interprocess calls
+
+// auto-generate code for Java:
+// protoc -I=./ --java_out=./src ./ipc_msg.proto
+
+// auto-generate code for Python:
+// protoc -I=./ --python_out=./ ./ipc_msg.proto
+
+syntax = "proto2";
+
+package rl;
+
+// scala -> python request message
+message IPCMessage {
+
+    // type of message
+    // ('register', 'inform', 'update', 'consult', 'deregister')
+    optional string msg_type = 1;
+
+    // application names
+    optional string app_name = 2;
+
+    // application ids
+    optional string app_id = 3;
+
+    // stage id
+    optional int32 stage_id = 4;
+
+    // executor id
+    optional int32 exec_id = 5;
+
+    // track id (re-used executors)
+    optional int32 track_id = 6;
+
+    // number of available executors
+    optional int32 num_available_executors = 7;
+
+    // list of number of completed tasks
+    optional int32 num_tasks_left = 8;
+}
+
+// python -> scala reply message
+message IPCReply {
+
+    // which app to run next stage
+    optional string app_id = 1;
+
+    // next stage to schedule
+    optional int32 stage_id = 2;
+
+    // number of executors to take
+    optional int32 num_executors_to_take = 3;
+
+    // communication message
+    optional string msg = 4;
+}

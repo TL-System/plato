@@ -1,0 +1,46 @@
+// For interprocess calls
+
+// auto-generate code for Java:
+// protoc -I=./ --java_out=./src ./ipc_msg.proto
+
+// auto-generate code for Python:
+// protoc -I=./ --python_out=./ ./ipc_msg.proto
+
+syntax = "proto2";
+
+package rl;
+
+// request message
+message IPCMessage {
+
+    // previous bitrate
+    optional float prev_bitrate = 1;
+
+    // buffer ahead
+    optional float buffer_ahead = 2;
+
+    // bandwidth downloading last chunk
+    optional float bandwidth = 3;
+
+    // download time
+    optional float download_time = 4;
+
+    // chunk sizes
+    repeated float chunks_size = 5;
+
+    // number of remaining chunks
+    optional int32 remaining_chunks = 6;
+
+    // reward
+    optional float reward = 7;
+
+    // done
+    optional bool done = 8;
+}
+
+// reply message
+message IPCReply {
+
+    // which bitrate index to choose next
+    optional int32 action = 1;
+}
