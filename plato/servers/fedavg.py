@@ -7,7 +7,6 @@ import logging
 import os
 import random
 
-import numpy as np
 from plato.algorithms import registry as algorithms_registry
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
@@ -165,20 +164,13 @@ class Server(base.Server):
             for name, weights in deltas_received[0].items()
         }
 
-        norm_bound = Config().server.norm_bounding_threshold if hasattr(
-            Config().server, 'norm_bounding_threshold') else None
-
         for i, update in enumerate(deltas_received):
             __, report, __, __ = updates[i]
             num_samples = report.num_samples
 
             for name, delta in update.items():
                 # Use weighted average by the number of samples
-                avg_delta = delta * (num_samples / self.total_samples)
-                # Apply norm bounding if required
-                if norm_bound is not None:
-                    avg_delta /= max(1, np.linalg.norm(avg_delta) / norm_bound)
-                avg_update[name] += avg_delta
+                avg_update[name] += delta * (num_samples / self.total_samples)
 
             # Yield to other tasks in the server
             await asyncio.sleep(0)
