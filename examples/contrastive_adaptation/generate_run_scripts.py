@@ -13,6 +13,20 @@ One Example:
 
 ./run -c configs/CIFAR10/fedavg_resnet18.yml -b /data/bli/plato
 
+
+Important:
+    Before setting the resource requirement, please check the
+exact resources on the server.
+
+Dell Precision 7920 Tower Workstation,
+    - 2 x Intel Xeon CPUs with 20 CPU cores each,
+    - 1TB Intel NVMe PCIe SSD boot drive
+    - 12TB data drive (two 6TB drives),
+    - 256GB physical memory
+    - 3 x NVIDIA RTX A4500 GPU
+        20GB CUDA memory each.
+#CPUs, lscpu
+
 """
 
 import os
@@ -57,9 +71,9 @@ def create_run_script(methods_root_dir,
     """
     header = "#!/bin/bash"
     time_line = "#SBATCH --time=5:00:00"
-    cpus_line = "#SBATCH --cpus-per-task=21"
+    cpus_line = "#SBATCH --cpus-per-task=10"
     gpu_line = "#SBATCH --gres=gpu:1"
-    mem_line = "#SBATCH --mem=100G"
+    mem_line = "#SBATCH --mem=32G"
 
     file_name_no_extension = config_file_name.split(".")[0]
 
