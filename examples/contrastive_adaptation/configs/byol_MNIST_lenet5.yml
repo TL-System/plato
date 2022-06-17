@@ -76,7 +76,7 @@ data:
     # Working on criterion that is defined with batch_size but receives loaded
     # samples whose size is smaller than the batch size may causes problems.
     # drop_last can alleviate this issue
-    partition_size: 6000
+    partition_size: 1000
 
     # IID or non-IID?
     sampler: noniid

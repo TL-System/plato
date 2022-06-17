@@ -167,7 +167,7 @@ trainer:
     # the final fc layer will be removed
     external_encoder: False
     model_name: resnet_18
-    projection_dim: 128
+    projection_dim: 512
 
     # name of the component used as the global model
     global_model_name: whole
