@@ -109,7 +109,7 @@ data:
     # Working on criterion that is defined with batch_size but receives loaded
     # samples whose size is smaller than the batch size may causes problems.
     # drop_last can alleviate this issue
-    partition_size: 6000
+    partition_size: 1200
 
     # IID or non-IID?
     sampler: noniid
@@ -150,7 +150,7 @@ trainer:
     # the memory allocation issue as the contrastive samples occupy more
     # space as more samples will be contained within one loading.
     epochs: 5
-    batch_size: 128
+    batch_size: 64
     optimizer: Adam
     learning_rate: 0.003
     betas:

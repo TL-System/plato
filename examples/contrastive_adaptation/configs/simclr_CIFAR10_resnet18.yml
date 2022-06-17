@@ -123,7 +123,7 @@ trainer:
 
     # Number of epochs for local training in each communication round
     epochs: 5
-    batch_size: 120
+    batch_size: 60
     optimizer: Adam
     learning_rate: 0.003
     weight_decay: 0.00001
@@ -138,7 +138,7 @@ trainer:
 
     # Number of epochs for local training in each communication round
     pers_epochs: 30
-    pers_batch_size: 120
+    pers_batch_size: 60
     pers_optimizer: Adam
     pers_learning_rate: 0.003
     pers_weight_decay: 0.000006
