@@ -46,15 +46,18 @@ cross_entropy = torch.nn.CrossEntropyLoss()
 tt = transforms.ToPILImage()
 torch.manual_seed(Config().algorithm.random_seed)
 
+partition_size = Config().data.partition_size
+epochs = Config().trainer.epochs
+batch_size = Config().trainer.batch_size
 num_iters = Config().algorithm.num_iters
 log_interval = Config().algorithm.log_interval
 dlg_result_path = f"{Config().params['result_path']}"
 dlg_result_file = f"{dlg_result_path}/{os.getpid()}_evals.csv"
 dlg_result_headers = [
-    "Iteration", 
-    "Loss", 
-    "Average MSE", 
-    "Average LPIPS", 
+    "Iteration",
+    "Loss",
+    "Average MSE",
+    "Average LPIPS",
     "Average PSNR (dB)",
     "Average SSIM",
     "Average Library SSIM",
@@ -150,16 +153,12 @@ class Server(fedavg.Server):
         if not self.share_gradients and self.match_weights and self.use_updates:
             target_weights = deltas_received[Config().algorithm.victim_client]
 
-        if self.share_gradients:
-            f = open('gradient.txt', 'w')
-            f.write(str(target_grad))
-            f.close()
-
         # Initialize the csv file
-        csv_processor.initialize_csv(dlg_result_file, dlg_result_headers, dlg_result_path)
+        csv_processor.initialize_csv(
+            dlg_result_file, dlg_result_headers, dlg_result_path)
 
         # Assume the reconstructed data shape is known, which can be also derived from the target dataset
-        num_images = Config().data.partition_size
+        num_images = partition_size
         data_size = [num_images, gt_data.shape[1],
                      gt_data.shape[2], gt_data.shape[3]]
         self.plot_gt(num_images, gt_data, gt_label)
@@ -171,9 +170,8 @@ class Server(fedavg.Server):
                     Config().algorithm.victim_client].values():
                 target_grad.append(-delta / Config().trainer.learning_rate)
 
-            f = open('converted_gradient.txt', 'w')
-            f.write(str(target_grad))
-            f.close()
+            total_local_steps = epochs * math.ceil(partition_size / batch_size)
+            target_grad = [x / total_local_steps for x in target_grad]
 
         # Generate dummy items and initialize optimizer
         dummy_data = torch.randn(data_size).to(
@@ -219,7 +217,8 @@ class Server(fedavg.Server):
 
             if iters % log_interval == 0:
                 # Finding evaluation metrics
-                eval_dict = get_evaluation_dict(dummy_data, gt_data, num_images)
+                eval_dict = get_evaluation_dict(
+                    dummy_data, gt_data, num_images)
                 mses.append(eval_dict["mses"])
                 lpipss.append(eval_dict["lpipss"])
                 psnrs.append(eval_dict["psnrs"])
@@ -315,9 +314,6 @@ class Server(fedavg.Server):
 
     def loss_steps(self, dummy_data, dummy_label, model):
         """ Take a few gradient descent steps to fit the model to the given input. """
-        epochs = Config().trainer.epochs
-        batch_size = Config().trainer.batch_size
-
         patched_model = PatchedModule(model)
         if self.use_updates:
             patched_model_origin = deepcopy(patched_model)

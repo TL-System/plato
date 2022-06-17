@@ -60,11 +60,7 @@ class Trainer(basic.Trainer):
                 model=self.model, rootset_loader=root_set_loader, device=Config().device())
 
         target_grad = None
-        total_local_updates = epochs * math.ceil(partition_size / batch_size)
-
-        for name, param in self.model.named_parameters():
-            print("initial model", param.data[0])
-            break
+        total_local_steps = epochs * math.ceil(partition_size / batch_size)
 
         patched_model = PatchedModule(self.model)
 
@@ -165,6 +161,11 @@ class Trainer(basic.Trainer):
 
         if hasattr(Config().algorithm,
                    'share_gradients') and Config().algorithm.share_gradients:
+            try:
+                target_grad = [x / total_local_steps for x in target_grad]
+            except:
+                target_grad = None
+
             if hasattr(Config().algorithm, 'defense') and Config().algorithm.defense == 'GradDefense':
                 if hasattr(Config().algorithm, 'clip') and Config().algorithm.clip is True:
                     from defense.GradDefense.clip import noise
@@ -181,10 +182,6 @@ class Trainer(basic.Trainer):
                 for layer in perturbed_gradients:
                     layer = layer.to(self.device)
                     target_grad.append(layer)
-
-        for name, param in self.model.named_parameters():
-            print("updated model", param.data[0])
-            break
 
         file_path = f"{Config().params['model_path']}/{self.client_id}.pickle"
         with open(file_path, 'wb') as handle:
