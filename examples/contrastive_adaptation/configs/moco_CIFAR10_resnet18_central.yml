@@ -42,27 +42,21 @@ clients:
     random_seed: 1
 
 server:
-    address: 127.0.0.1
-    port: 8005
-    synchronous: true
-    do_test: false
 
-    # for the models/checkpoints/results path, please keep their dir's
-    # name the same
-    # For example, the subdir name of model_path is
-    # 'BYOL_CIFAR10_resnet18_pureMLP', it is desired to use the same name
-    # for checkpoint_path and result_path.
+    # for the paths of models; checkpoints; results,
+    # they utilize the same name, following the one defined in
+    # plato.config:
+    # {ssl_method_name}_{model_name}_{global_model_name}_{personalized_model_name}_{datasource}
+    # - ssl_method_name: data.augment_transformer_name
+    # - model_name: trainer.model_name
+    # - global_model_name: data.global_model_name
+    # - personalized_model_name: data.personalized_model_name
+    # - datasource: data.datasource
 
-    # Note, for the name of this subdir, it is desired to follow the same
-    # rule as:
-    # {ssl_method_name}_{dataset_name}_{encoder_backbone_name}_{personalized_model_name}
-    # For example, for the name here, it uses
-    #   BYOL            : The BYOL method
-    #   CIFAR10         : The CIFAR10 dataset
-    #   resnet18        : The encoder built upon resnet18
-    #   pureMLP         : The pure MLP network (1 layer without any enhancements)
-    model_path: models/BYOL_CIFAR10_central_resnet18_pureMLP
-    checkpoint_path: checkpoints/BYOL_centralCIFAR10_resnet18_pureMLP
+    # set xxx here as the config will set the path by itself
+    # thus we do not need to repeatly reset these paths
+    model_path: xxx
+    checkpoint_path: xxx
 
 data:
     # The training and testing dataset
