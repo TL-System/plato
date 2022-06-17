@@ -45,7 +45,7 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8000
+    port: 8002
     synchronous: true
     do_test: false
 
