@@ -175,8 +175,9 @@ class ContrastiveAugmentDataWrapper(torch.utils.data.Dataset):
          The pipeline is:   dataset -> dataset loader -> a batch of samples
     """
 
-    def __init__(self, dataset, aug_transformer):
+    def __init__(self, dataset, datasource_name, aug_transformer):
         super().__init__()
+        self.datasource_name = datasource_name
         self.dataset = dataset
         self.raw_data = self.dataset.data
 
@@ -203,19 +204,15 @@ class ContrastiveAugmentDataWrapper(torch.utils.data.Dataset):
         raw_sample = self.raw_data[item_index]
         sample_label = self.dataset_labels[item_index]
 
-        # doing this so that it is consistent with all other datasets
-        # to return a PIL Image
-        # we must convert the data to raw data to PTL type before
-        #   applying the transformation.
-        # see the source code of torchvision.datasets.
-        if torch.is_tensor(raw_sample):
-            # this is for the MNIST dataset.
-            # from the torchvision datases, the raw MNIST is np.narray
-            # and the mode should be L
-            raw_sample = raw_sample.numpy()
-            raw_sample = Image.fromarray(raw_sample, mode="L")
-        else:
+        if self.datasource_name == "MNIST":
+            raw_sample = Image.fromarray(raw_sample.numpy(), mode="L")
+
+        elif self.datasource_name == "CIFAR10" or self.datasource_name == "CIFAR100":
             raw_sample = Image.fromarray(raw_sample)
+        elif self.datasource_name == "STL10":
+            raw_sample = Image.fromarray(np.transpose(raw_sample, (1, 2, 0)))
+        else:
+            raw_sample = Image.fromarray(raw_sample, mode="L")
 
         if self.dataset.target_transform is not None:
             sample_label = self.dataset.target_transform(sample_label)
