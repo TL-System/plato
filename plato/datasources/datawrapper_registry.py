@@ -20,8 +20,10 @@ registered_datasources_wrapper = OrderedDict([
 def get(datasource, augment_transformer=None):
     """Get the data source equipped with desired datasource_wrapper."""
     datasource_wrapper_name = Config().data.data_wrapper
+    datasource_name = Config().data.datasource
 
-    logging.info("Data source wrapper: %s", datasource_wrapper_name)
+    logging.info("Creating Data source wrapper %s for %s",
+                 datasource_wrapper_name, datasource_name)
 
     if datasource_wrapper_name in registered_datasources_wrapper:
         obtained_wrapper = registered_datasources_wrapper[
@@ -30,4 +32,4 @@ def get(datasource, augment_transformer=None):
         raise ValueError(
             f'No such data source wrapper: {datasource_wrapper_name}')
 
-    return obtained_wrapper(datasource, augment_transformer)
+    return obtained_wrapper(datasource, datasource_name, augment_transformer)
