@@ -5,13 +5,11 @@ based on the implemented method and configs
 One Example:
 
 #!/bin/bash
-#SBATCH --time=2:00:00
+#SBATCH --time=7:00:00
 #SBATCH --cpus-per-task=21
-#SBATCH --gres=gpu:3
-#SBATCH --mem=120G
-#SBATCH --output=<output_filename>.out
-
-./run -c configs/CIFAR10/fedavg_resnet18.yml -b /data/bli/plato
+#SBATCH --gres=gpu:1
+#SBATCH --mem=100G
+#SBATCH --output=./slurm_loggings/byol_CIFAR10_resnet18.out
 
 
 Important:
@@ -26,6 +24,11 @@ Dell Precision 7920 Tower Workstation,
     - 3 x NVIDIA RTX A4500 GPU
         20GB CUDA memory each.
 #CPUs, lscpu
+
+
+Just run:
+    python examples/contrastive_adaptation/generate_run_scripts.py
+
 
 """
 
@@ -70,7 +73,7 @@ def create_run_script(methods_root_dir,
     extension (str): the extension of the created scripts, default ".sh
     """
     header = "#!/bin/bash"
-    time_line = "#SBATCH --time=5:00:00"
+    time_line = "#SBATCH --time=7:00:00"
     cpus_line = "#SBATCH --cpus-per-task=10"
     gpu_line = "#SBATCH --gres=gpu:1"
     mem_line = "#SBATCH --mem=32G"
