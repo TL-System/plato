@@ -5,6 +5,8 @@ __pycache__/
 
 *.acc
 *.csv
+*.txt
+*.sh
 
 # C extensions
 *.so

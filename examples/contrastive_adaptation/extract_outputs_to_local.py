@@ -9,6 +9,7 @@ The type of the experimental results should be provided by:
 The type can be:
     - all, sending all logging/models/checkpoints/results to the local
     - logging, sending logging only
+    - textlogging, sending text logging
     - models, sending models only
     - checkpoints, sending checkpoints only
     - results, sending results only
@@ -38,7 +39,10 @@ sim_logging_dir = "sijia@sim.csl.toronto.edu:/home/sijia/works/sijia-infocom23/p
 models_dir_name = "models"
 checkpoints_dir_name = "checkpoints"
 results_dir_name = "results"
-data_folders_name = [models_dir_name, checkpoints_dir_name, results_dir_name]
+text_logging_name = "loggings"
+data_folders_name = [
+    models_dir_name, checkpoints_dir_name, results_dir_name, text_logging_name
+]
 
 
 def obtain_data_path(data_type):
@@ -61,6 +65,11 @@ def obtain_data_path(data_type):
     elif data_type == "logging":
         extract_sim_logging_dir = sim_logging_dir
         to_local_logging_dir = local_logging_dir
+
+    elif data_type == "textlogging":
+        extract_sim_logging_dir = sim_data_dir + "/experiments/" + text_logging_name
+        to_local_logging_dir = local_logging_dir
+
     elif data_type == "models":
         extract_sim_experiments_dirs = [sim_data_dir + "/experiments/models"]
         to_local_experiments_dir = local_experiments_dir + "/experiments"

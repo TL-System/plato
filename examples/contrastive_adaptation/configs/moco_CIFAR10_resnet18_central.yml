@@ -3,21 +3,15 @@
 #   we directly follow the setting provided by:
 
 general:
-    # The prefix of directories of dataset, models, checkpoints, and results
-    # on sim server
-    # base_path: /data/user/Projects/experiments
 
-    # locally
-    #base_path: ./Projects/experiments
-    project_name: INFOCOM23
     # performing different running mode
     # for different purposes
-    # - local_central_code_test
-    # - local_central
-    # - local_code_test
+    # - central_code_test
+    # - central
     # - user
-    # - sim
-    running_mode: local
+    running_mode: central
+
+    file_logging: True
 
 clients:
     # Type

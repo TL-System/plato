@@ -1,21 +1,14 @@
 
 general:
-    # The prefix of directories of dataset, models, checkpoints, and results
-    # on sim server
-    # base_path: /data/sijia/INFOCOM23/experiments
 
-    # locally
-    #base_path: ./INFOCOM23/experiments
-    project_name: INFOCOM23
     # performing different running mode
     # for different purposes
-    # - local_central_code_test
-    # - local_central
-    # - local_code_test
+    # - central_code_test
+    # - central
     # - user
-    # - sim
-    running_mode: local_central
+    running_mode: central
 
+    file_logging: True
 
 clients:
     # Type
