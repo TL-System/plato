@@ -13,6 +13,8 @@ from plato.trainers import basic
 import os
 import logging
 
+
+import a2c_plato
 # Memory
 # Stores results from the networks, instead of calculating the operations again from states, etc.
 class Memory():
@@ -78,7 +80,7 @@ class Trainer(basic.Trainer):
         #pass
 
         #TODO INITIALIZE NECESSARY THINGS!!
-        self.env = 2 #make it park env soon
+        self.env = a2c_plato.env #make it park env soon
 
         self.env_name = model.get_env_name()
         self.algorithm_name = model.get_rl_algo()
