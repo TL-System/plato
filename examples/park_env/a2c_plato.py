@@ -49,8 +49,8 @@ def main():
 
     model = a2c_park_model.Model(state_dim, n_actions, 
     Config().algorithm.env_name, Config().algorithm.algorithm_name)
-    trainer = a2c_park_trainer
-    algorithm = a2c_park_algorithm
+    trainer = a2c_park_trainer.Trainer
+    algorithm = a2c_park_algorithm.Algorithm
     client = a2c_park_client.RLClient(model=model,trainer=trainer,algorithm=algorithm)
     server = a2c_park_server.A2CServer(Config().algorithm.algorithm_name, Config().algorithm.env_park_name,
     model=model, algorithm=algorithm, trainer=trainer)
