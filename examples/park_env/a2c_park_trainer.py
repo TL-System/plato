@@ -111,11 +111,6 @@ class Trainer(basic.Trainer):
             os.makedirs(Config().results.results_dir)
 
 
-    
-    def add(self, log_prob, value, reward, done):
-        #We will add to the memory here
-        pass
-
     def t(self, x): 
         return torch.from_numpy(x).float()
 
