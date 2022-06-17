@@ -147,7 +147,7 @@ algorithm:
     expl_noise: 0.1
 
     #Total number of iterations/timestpes
-    max_steps: 500000
+    max_steps: 200
 
     # Number of episodes to run each round
     max_round_episodes: 20
@@ -157,7 +157,7 @@ algorithm:
 
     env_name: abr
 
-    env_gym_name: abr_sim
+    env_park_name: abr_sim
 
     algorithm_name: a2c_
 
@@ -168,7 +168,7 @@ results:
     # Plot results (x_axis-y_axis)
     plot: round-accuracy, elapsed_time-accuracy
 
-    results_dir: examples/td3_learning/results
+    results_dir: examples/park_env/results
 
-    file_name: TD3_RL
+    file_name: A2C_ABR
 
