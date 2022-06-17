@@ -35,27 +35,32 @@ else:
                                 modality_quantity_noniid)
 
     registered_samplers = OrderedDict([
-        ('iid', iid.Sampler),
-        ('noniid', dirichlet.Sampler),
-        ('mixed', mixed.Sampler),
-        ('orthogonal', orthogonal.Sampler),
+        ('iid', iid.Sampler), ('noniid', dirichlet.Sampler),
+        ('mixed', mixed.Sampler), ('orthogonal', orthogonal.Sampler),
         ('all_inclusive', all_inclusive.Sampler),
         ('distribution_noniid', distribution_noniid.Sampler),
         ('label_quantity_noniid', label_quantity_noniid.Sampler),
         ('mixed_label_quantity_noniid', mixed_label_quantity_noniid.Sampler),
         ('sample_quantity_noniid', sample_quantity_noniid.Sampler),
         ('modality_iid', modality_iid.Sampler),
-        ('modality_quantity_noniid', modality_quantity_noniid.Sampler),
+        ('modality_quantity_noniid', modality_quantity_noniid.Sampler)
     ])
 
 
 def get(datasource, client_id, testing=False):
     """Get an instance of the sampler."""
+
     if testing == 'edge':
         if hasattr(Config().data, 'edge_testset_sampler'):
             sampler_type = Config().data.edge_testset_sampler
             logging.info("[Edge Server #%d] Test set sampler: %s", client_id,
                          sampler_type)
+    elif testing == 'unlabelled':
+        # curently, the unlabeled's sampler only has iid
+        sampler_type = Config().data.unlabelled_set_sampler
+        assert sampler_type == 'iid'
+        logging.info("[Client #%d] Unlabeled set sampler: %s", client_id,
+                     sampler_type)
     elif testing:
         if hasattr(Config().data, 'testset_sampler'):
             sampler_type = Config().data.testset_sampler
