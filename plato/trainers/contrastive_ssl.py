@@ -19,6 +19,7 @@ import pandas as pd
 from plato.config import Config
 from plato.trainers import basic
 from plato.utils import optimizers
+from plato.utils import data_loaders_wrapper
 
 from plato.models import ssl_monitor_register
 
@@ -328,7 +329,26 @@ class Trainer(basic.Trainer):
                                                        batch_size=batch_size,
                                                        sampler=sampler)
 
+        # obtain the loader for unlabeledset if possible
+        # unlabeled_trainset, unlabeled_sampler
+        unlabeled_loader = None
+        unlabeled_trainset = []
+        if "unlabeled_trainset" in kwargs:
+            unlabeled_trainset = kwargs["unlabeled_trainset"]
+            unlabeled_sampler = kwargs["unlabeled_sampler"]
+            unlabeled_loader = torch.utils.data.DataLoader(
+                dataset=unlabeled_trainset,
+                shuffle=False,
+                batch_size=batch_size,
+                sampler=unlabeled_sampler)
+
+        # wrap the multiple loaders into one sequence loader
+        train_loader = data_loaders_wrapper.StreamBatchesLoader(
+            [train_loader, unlabeled_loader])
+
         iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
+        iterations_per_epoch += np.ceil(len(unlabeled_trainset) /
+                                        batch_size).astype(int)
 
         # Sending the model to the device used for training
         self.model.to(self.device)

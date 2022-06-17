@@ -8,11 +8,14 @@ import logging
 import time
 from dataclasses import dataclass
 
+from attr import has
+
 from plato.config import Config
 from plato.clients import simple
 from plato.clients import base
 from plato.models import general_mlps_register as general_MLP_model
 from plato.datasources import datawrapper_registry
+from plato.samplers import registry as samplers_registry
 
 from plato.datasources.augmentations.augmentation_register import get as get_aug
 
@@ -46,6 +49,17 @@ class Client(simple.Client):
         self.custom_contrastive_transform = contrastive_transform
         self.contrastive_transform = None
 
+        # the unlabeledset in which samples do not have labels
+        # in the self-supervised learning, there are many datasets,
+        # such as STL10, containing samples without annotations. This
+        # makes them contain two different datasets
+        #   - trainset, samples with labels
+        #   - unlabeled set, samples without labels
+        # Therefore, apart from the trainset and testset, it is necessary
+        # to load the unlabeled set when necessary (i.e., the corresponding
+        # datasource contain the unlabeled set)
+        self.unlabeledset = None
+        self.unlabeled_sampler = None
         # using the name monitor_trainset is general in this domain,
         #   it aims to record the train loader without using
         #   the data augmentation.
@@ -102,7 +116,6 @@ class Client(simple.Client):
         # the characteristics:
         #   - SSL's data augmentation transform for contrastive training
         #   - trainset
-
         # use the custom contrastive transfrom is possible
         if self.custom_contrastive_transform is not None:
             self.contrastive_transform = self.custom_contrastive_transform
@@ -114,6 +127,21 @@ class Client(simple.Client):
             self.contrastive_transform = get_aug(name=augment_transformer_name,
                                                  train=True,
                                                  for_downstream_task=False)
+
+        # obtain the unlabeled set if it is supported by datasource
+        if hasattr(self.datasource, 'get_unlabeled_set') and callable(
+                self.datasource.get_unlabeled_set):
+
+            self.unlabeledset = self.datasource.get_unlabeled_set()
+            # Setting up the data sampler for the self.unlabeledset
+            self.unlabeled_sampler = samplers_registry.get(
+                self.datasource, self.client_id, testing="unlabelled")
+            self.unlabeledset = datawrapper_registry.get(
+                self.unlabeledset, self.contrastive_transform)
+            logging.info(
+                "[Client #%d] loaded the [%d] unlabeled dataset",
+                self.client_id,
+                int(len(self.unlabeledset) / Config().clients.total_clients))
 
         self.trainset = datawrapper_registry.get(self.trainset,
                                                  self.contrastive_transform)
@@ -180,7 +208,11 @@ class Client(simple.Client):
 
         # Perform model training
         try:
-            training_time = self.trainer.train(self.trainset, self.sampler)
+            training_time = self.trainer.train(
+                self.trainset,
+                self.sampler,
+                unlabeled_trainset=self.unlabeledset,
+                unlabeled_sampler=self.unlabeled_sampler)
         except ValueError:
             await self.sio.disconnect()
 
