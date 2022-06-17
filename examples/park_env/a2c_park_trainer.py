@@ -152,7 +152,7 @@ class Trainer(basic.Trainer):
             self.episode_reward.append(self.total_reward)
             print("Episode number: %d, Reward: %d" % (self.episode_num, self.total_reward))
 
-    def train_helper(self, memory, last_q_val):
+    def train_helper(self, memory, q_val):
         #We will put the train loop here
         values = torch.stack(memory.values)
         q_vals = np.zeros((len(memory), 1))

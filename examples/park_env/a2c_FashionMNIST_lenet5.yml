@@ -43,9 +43,9 @@ server:
 
     random_seed: 1
 
-    model_path: examples/td3_learning/models/pretrained
+    model_path: examples/park_env/models/pretrained
 
-    checkpoint_path: examples/td3_learning/checkpoints
+    checkpoint_path: examples/park_env/checkpoints
 
 data:
     # The training and testing dataset

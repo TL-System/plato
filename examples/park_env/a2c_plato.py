@@ -36,8 +36,6 @@ torch.manual_seed(seed)
 np.random.seed(seed)
 
 
-
-
 def main():
     """ A Plato federated learning training session with clients running TD3. """
     logging.info("Starting RL Environment's process.")
