@@ -37,17 +37,17 @@ trainer:
     target_accuracy: 1.0
 
     # Number of epoches for local training in each communication round
-    epochs: 1
+    epochs: 2
     batch_size: 1
     optimizer: SGD
     learning_rate: 0.01
-    momentum: 0.9
-    weight_decay: 0.0001
+    momentum: 0.0
+    weight_decay: 0.0
 
     # Learning rate schedule
-    lr_schedule: LambdaLR
-    lr_gamma: 0.1
-    lr_milestone_steps: 80ep,120ep
+    # lr_schedule: LambdaLR
+    # lr_gamma: 0.1
+    # lr_milestone_steps: 80ep,120ep
 
     # The machine learning model
     model_name: dlg
@@ -78,7 +78,7 @@ algorithm:
     # Whether or not use customized initialization for model weights
     init_params: true
     # Whether sharing gradients or model weights
-    share_gradients: true
+    share_gradients: false
     # Do reconstruction by directly matching weights when it's true,
     # otherwise by matching gradients calculated from updates
     match_weights: false
@@ -95,7 +95,7 @@ algorithm:
     Q: 6
 
     # The random seed for dummy data and label
-    random_seed: 10
+    random_seed: 1
 
 results:
     result_path: results/CIAFR10_resnet18/DLG
