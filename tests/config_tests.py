@@ -24,7 +24,7 @@ class ConfigTest(unittest.TestCase):
         super().setUp()
 
         # define several example parameters that will be used as
-        #   a demo to test the loaded configuration file.
+        # a demo to test the loaded configuration file.
         data_params_config = {
             "downloader": {
                 "num_workers": 4
@@ -62,10 +62,12 @@ class ConfigTest(unittest.TestCase):
     def test_dataconfig(self):
         """ Test the structure and necessary parameters of the data configuration.
 
-            This function tests the core part of the configuration file. It tests:
-                downloader, num_workers, multi_modal_configs, and whether there are
-                three modalities, including rgb, flow, and audio and the corresponding
-                data types are correct.
+            This function tests the core part of the configuration file. It tests
+            the following elements:
+            
+            downloader, num_workers, multi_modal_configs, and whether there are
+            three modalities, including rgb, flow, and audio and the corresponding
+            data types are correct.
 
         """
         with warnings.catch_warnings():
