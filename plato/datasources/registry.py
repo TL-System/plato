@@ -30,7 +30,7 @@ else:
     from plato.datasources import (mnist, fashion_mnist, emnist, cifar10,
                                    cinic10, huggingface, pascal_voc,
                                    tiny_imagenet, femnist, feature, qoenflx,
-                                   celeba)
+                                   celeba, stl10)
 
     registered_datasources = OrderedDict([
         ('MNIST', mnist),
@@ -44,6 +44,7 @@ else:
         ('Feature', feature),
         ('QoENFLX', qoenflx),
         ('CelebA', celeba),
+        ('STL10', stl10),
     ])
 
     registered_partitioned_datasources = OrderedDict([('FEMNIST', femnist)])

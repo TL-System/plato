@@ -16,8 +16,12 @@ class Sampler(base.Sampler):
     def __init__(self, datasource, client_id, testing):
         super().__init__()
 
-        if testing:
+        if testing == True:
             dataset = datasource.get_test_set()
+        elif testing == False:
+            dataset = datasource.get_train_set()
+        elif testing == "unlabelled":
+            dataset = datasource.get_unlabeled_set()
         else:
             dataset = datasource.get_train_set()
 
@@ -27,6 +31,10 @@ class Sampler(base.Sampler):
         np.random.shuffle(indices)
 
         partition_size = Config().data.partition_size
+
+        if testing == "unlabelled":
+            partition_size = Config().data.unlabelled_partition_size
+
         total_clients = Config().clients.total_clients
         total_size = partition_size * total_clients
 
