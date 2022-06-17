@@ -340,7 +340,7 @@ class Config:
         return device
 
     @staticmethod
-    def make_consistent_save_path() -> None:
+    def make_consistent_save_path(running_mode) -> None:
         """ Make the saving path of different parts
             be the same.
         """
@@ -360,10 +360,11 @@ class Config:
         model_name = Config.trainer.model_name
 
         target_name = "_".join([
-            ssl_method_name, model_name, global_model_name,
-            personalized_model_name, datasource
+            ssl_method_name, datasource, model_name, global_model_name,
+            personalized_model_name
         ])
-
+        if "central" in running_mode:
+            target_name = target_name + "_central"
         return target_name
 
     @staticmethod
@@ -379,11 +380,14 @@ class Config:
 
         # setting the base saving path
         Config.server = Config.server._replace(model_path=Path(
-            os.path.join("models", Config.make_consistent_save_path())))
+            os.path.join("models",
+                         Config.make_consistent_save_path(running_mode))))
         Config.server = Config.server._replace(checkpoint_path=Path(
-            os.path.join("checkpoints", Config.make_consistent_save_path())))
+            os.path.join("checkpoints",
+                         Config.make_consistent_save_path(running_mode))))
         Config.results = Config.results._replace(result_path=Path(
-            os.path.join("results", Config.make_consistent_save_path())))
+            os.path.join("results",
+                         Config.make_consistent_save_path(running_mode))))
 
         if running_mode == "user":
             # do not make any changes if the program
