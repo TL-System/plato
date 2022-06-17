@@ -7,6 +7,8 @@ The type of the experiments should be provided by:
 
 Thus, the jobs containing the ids will be cancelled.
 
+python examples/contrastive_adaptation/scancel_slum_jobs.py -i 2340 2341 2344 2346
+
 """
 
 import argparse

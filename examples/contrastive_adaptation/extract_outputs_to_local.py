@@ -13,6 +13,11 @@ The type can be:
     - checkpoints, sending checkpoints only
     - results, sending results only
 
+For example:
+
+    python examples/contrastive_adaptation/extract_outputs_to_local.py -t models
+
+    just extracting the models saved on Sim to the local
 """
 
 import argparse

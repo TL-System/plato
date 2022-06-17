@@ -7,6 +7,13 @@ The type of the experiments should be provided by:
 
 Thus, the scripts containing the key will be performed.
 
+
+For example,
+to submit all methods using MNIST dataset
+
+python examples/contrastive_adaptation/submit_slurm_jobs.py -k MNIST
+
+
 """
 
 import argparse
