@@ -225,6 +225,29 @@ class Config:
             if 'model' in config:
                 Config.model = Config.namedtuple_from_dict(config['model'])
 
+            if hasattr(Config().general,
+                       "file_logging") and Config().general.file_logging:
+
+                formatter = logging.Formatter(
+                    fmt='[%(levelname)s][%(asctime)s]: %(message)s',
+                    datefmt='%H:%M:%S')
+                running_mode = Config.general.running_mode
+
+                logging_file_name = Config.make_consistent_save_path(
+                    running_mode)
+                os.makedirs(os.path.join(Config.params['base_path'],
+                                         "loggings"),
+                            exist_ok=True)
+                log_file_name = os.path.join(Config.params['base_path'],
+                                             "loggings",
+                                             logging_file_name + ".txt")
+
+                file_handler = logging.FileHandler(log_file_name)
+                file_handler.setLevel(numeric_level)
+                file_handler.setFormatter(formatter)
+
+                root_logger.addHandler(file_handler)
+
         return cls._instance
 
     @staticmethod
@@ -374,9 +397,8 @@ class Config:
         We support four types of running mode:
 
         """
-        current_project_dir = Path(os.getcwd())
+
         running_mode = Config.general.running_mode
-        project_name = Config.general.project_name
 
         # setting the base saving path
         Config.server = Config.server._replace(model_path=Path(
@@ -394,20 +416,6 @@ class Config:
             # needs to follow the user's settings.
             return None
 
-        if "local" in running_mode:
-            # the experiment will be performed in the local
-            # machine, such as the personal macos
-            # to set the path just when the user did not set the
-            # the -b, i.e., base_path
-            if Config.params['base_path'] == "./":
-                Config.params['base_path'] = os.path.join(
-                    current_project_dir, project_name, "experiments")
-
-        if "sim" in running_mode:
-            # the experiment will be performed in the sim server
-            Config.general = Config.general._replace(
-                base_path="/data/sijia/INFOCOM23/experiments")
-
         if "code_test" in running_mode:
             # perform the code test mode by using simple consiguration
             # these configurations are set to test the correcness of
@@ -419,8 +427,10 @@ class Config:
             Config.clients = Config.clients._replace(test_interval=1)
             Config.clients = Config.clients._replace(eval_test_interval=1)
             Config.clients = Config.clients._replace(total_clients=5)
+
             Config.clients = Config.clients._replace(per_round=3)
             Config.data = Config.data._replace(partition_size=600)
+            Config.trainer = Config.trainer._replace(rounds=5)
             Config.trainer = Config.trainer._replace(epochs=5)
             Config.trainer = Config.trainer._replace(batch_size=30)
             Config.trainer = Config.trainer._replace(epoch_log_interval=1)
