@@ -119,7 +119,7 @@ trainer:
     # the memory allocation issue as the contrastive samples occupy more
     # space as more samples will be contained within one loading.
     epochs: 5
-    batch_size: 128
+    batch_size: 64
     optimizer: Adam
     learning_rate: 0.003
     betas:
@@ -139,7 +139,7 @@ trainer:
     #   The batch size for the downstream task can be larger as it
     # does not utilize the
     pers_epochs: 50
-    pers_batch_size: 128
+    pers_batch_size: 64
     pers_optimizer: Adam
     pers_learning_rate: 0.005
     pers_betas:

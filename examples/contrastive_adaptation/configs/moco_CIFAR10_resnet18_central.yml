@@ -74,13 +74,11 @@ data:
     # Working on criterion that is defined with batch_size but receives loaded
     # samples whose size is smaller than the batch size may causes problems.
     # drop_last can alleviate this issue
-    partition_size: 600
+    partition_size: 50000
 
     # IID or non-IID?
     sampler: iid
     testset_sampler: iid
-    # The concentration parameter for the Dirichlet distribution
-    concentration: 5
 
     # The random seed for sampling data
     random_seed: 1
@@ -117,7 +115,7 @@ trainer:
     # the memory allocation issue as the contrastive samples occupy more
     # space as more samples will be contained within one loading.
     epochs: 1
-    batch_size: 128
+    batch_size: 64
     optimizer: Adam
     learning_rate: 0.003
     betas:

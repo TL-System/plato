@@ -79,7 +79,7 @@ data:
     # Under this case, to avoid this issue, we need to set:
     #   partition_size / batch_size = integar
     #   partition_size / pers_batch_size = integar
-    partition_size: 1000
+    partition_size: 1200
 
     # IID or non-IID?
     sampler: noniid
@@ -121,7 +121,7 @@ trainer:
 
     # Number of epochs for local training in each communication round
     epochs: 5
-    batch_size: 128
+    batch_size: 64
     optimizer: Adam
     learning_rate: 0.003
     weight_decay: 0.00001
