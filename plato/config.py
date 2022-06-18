@@ -8,6 +8,7 @@ import logging
 import os
 from collections import OrderedDict, namedtuple
 from typing import Any, IO
+import shutil
 
 import numpy as np
 import yaml
@@ -225,6 +226,24 @@ class Config:
             if 'model' in config:
                 Config.model = Config.namedtuple_from_dict(config['model'])
 
+            # Saving the given config file to the corresponding
+            # results/models/checkpoints
+
+            config_file_name = os.path.basename(filename)
+            config_result_path = os.path.join(Config.params['model_path'],
+                                              config_file_name)
+            config_checkpoint_path = os.path.join(
+                Config.params['checkpoint_path'], config_file_name)
+            config_result_path = os.path.join(Config.params['result_path'],
+                                              config_file_name)
+            for target_path in [
+                    config_result_path, config_checkpoint_path,
+                    config_result_path
+            ]:
+                if not os.path.exists(target_path):
+                    shutil.copyfile(src=filename, dst=target_path)
+
+            # Saving the logging information to the txt file
             if hasattr(Config().general,
                        "file_logging") and Config().general.file_logging:
 

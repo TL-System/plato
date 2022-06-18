@@ -68,7 +68,7 @@ def obtain_data_path(data_type):
 
     elif data_type == "textlogging":
         extract_sim_logging_dir = sim_data_dir + "/experiments/" + text_logging_name
-        to_local_logging_dir = local_logging_dir
+        to_local_logging_dir = to_local_experiments_dir = local_experiments_dir + "/experiments"
 
     elif data_type == "models":
         extract_sim_experiments_dirs = [sim_data_dir + "/experiments/models"]

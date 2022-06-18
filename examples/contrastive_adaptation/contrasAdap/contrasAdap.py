@@ -1,16 +1,6 @@
 """
 The implementation for our contrastive adaptation method.
 
-The official code: https://github.com/google-research/simclr
-
-The third-party code: https://github.com/PatrickHua/SimSiam
-
-The structure of our SimCLR and the classifier is the same as the ones used in
-the work https://github.com/spijkervet/SimCLR.git.
-
-Reference:
-
-[1]. https://arxiv.org/abs/2002.05709
 
 """
 

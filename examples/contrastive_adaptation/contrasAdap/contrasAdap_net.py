@@ -1,5 +1,5 @@
 """
-Implement the model, including the encoder and the projection, for the SimCLR method.
+Implement the model, including the encoder and the projection, for the contrastive adaptation method.
 
 """
 
