@@ -1,5 +1,5 @@
 """
-The implementation for FedEMA's server.
+The implementation for contrastive adaptation's server.
 
 This performs as a backup for potentially latter usage.
 

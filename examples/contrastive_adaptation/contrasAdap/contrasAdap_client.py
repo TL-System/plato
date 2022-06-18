@@ -1,5 +1,5 @@
 """
-Implementation of the FedEMA's clients
+Implementation of the contrastive adaptation's clients
 
 """
 
@@ -9,7 +9,7 @@ from plato.config import Config
 
 class Client(ssl_client.Client):
     """A personalized federated learning client with self-supervised support
-        for the FedEMA method."""
+        for the contrastive adaptation method."""
 
     def __init__(self,
                  model=None,
