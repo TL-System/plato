@@ -116,7 +116,7 @@ trainer:
     parallelized: false
 
     # The maximum number of clients running concurrently
-    max_concurrency: 10
+    max_concurrency: 5
 
     # The target accuracy
     target_accuracy: 0.80

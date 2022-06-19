@@ -19,7 +19,7 @@ def main():
     """
     algorithm = contrasAdap_algorithm.Algorithm
     trainer = contrasAdap_trainer.Trainer
-    contras_adap_model = contrasAdap_net.ContrasAdap()
+    contras_adap_model = contrasAdap_net.ContrasAdap
     client = contrasAdap_client.Client(model=contras_adap_model,
                                        trainer=trainer,
                                        algorithm=algorithm)
