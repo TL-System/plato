@@ -243,7 +243,7 @@ class Config:
                 if not os.path.exists(target_path):
                     shutil.copyfile(src=filename, dst=target_path)
 
-            # Saving the logging information to the txt file
+            # Saving the logging information to the .log file
             if hasattr(Config().general,
                        "file_logging") and Config().general.file_logging:
 
@@ -259,7 +259,7 @@ class Config:
                             exist_ok=True)
                 log_file_name = os.path.join(Config.params['base_path'],
                                              "loggings",
-                                             logging_file_name + ".txt")
+                                             logging_file_name + ".log")
 
                 file_handler = logging.FileHandler(log_file_name)
                 file_handler.setLevel(numeric_level)
@@ -445,9 +445,9 @@ class Config:
             Config.clients = Config.clients._replace(do_final_eval_test=True)
             Config.clients = Config.clients._replace(test_interval=1)
             Config.clients = Config.clients._replace(eval_test_interval=1)
-            Config.clients = Config.clients._replace(total_clients=5)
-
+            Config.clients = Config.clients._replace(total_clients=10)
             Config.clients = Config.clients._replace(per_round=3)
+
             Config.data = Config.data._replace(partition_size=600)
             Config.trainer = Config.trainer._replace(rounds=5)
             Config.trainer = Config.trainer._replace(epochs=5)
