@@ -13,8 +13,12 @@ from plato.utils import fonts
 class Server(fedavg.Server):
     """ Federated learning server to support the training of ssl models. """
 
-    def __init__(self, model=None, algorithm=None, trainer=None):
-        super().__init__(model, algorithm, trainer)
+    def __init__(self,
+                 model=None,
+                 datasource=None,
+                 algorithm=None,
+                 trainer=None):
+        super().__init__(model, datasource, algorithm, trainer)
 
         # the clients' id that has been selected to performed
         # the linear evaluation.
