@@ -43,7 +43,7 @@ async def test_fedavg_aggregation(self):
     server = fedavg_server.Server(model=model,
                                   algorithm=algorithm,
                                   trainer=trainer)
-    server.load_trainer()
+    server.init_trainer()
 
     weights = copy.deepcopy(self.algorithm.extract_weights())
     print(f"Report 1 weights: {weights}")
