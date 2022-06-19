@@ -192,6 +192,20 @@ trainer:
 
     personalized_model_name: pure_one_layer_mlp
 
+    # whether to maintain the state of the trained personalized
+    # model in each round
+    # In general, for the contrastive self-supervised learning
+    # every eval test should be a new learning process to train
+    # the randomly initialized personalized model
+    # Thus, setting do_maintain_per_state to be false to follow
+    # this rule.
+    # However, in some cases, we want to maintain the state of the
+    # trained personalized model in each round.
+    # Then, setting do_maintain_per_state to be True to follow this
+    # rule.
+    # For central learning with one round training, this is useless
+    do_maintain_per_state: false
+
     monitor_name: knn
     knn_k: 200
     knn_t: 0.1
