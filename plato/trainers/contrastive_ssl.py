@@ -7,6 +7,7 @@ import os
 import logging
 import time
 import multiprocessing as mp
+import copy
 
 import numpy as np
 import torch
@@ -573,7 +574,13 @@ class Trainer(basic.Trainer):
         in the federated learning implementation. As this is the only model shared among
         clients.
         """
-        self.personalized_model.to(self.device)
+        if hasattr(Config().trainer, "do_maintain_per_state") and Config(
+        ).trainer.do_maintain_per_state:
+            personalized_model = copy.deepcopy(self.personalized_model)
+        else:
+            personalized_model = self.personalized_model
+
+        personalized_model.to(self.device)
         self.model.to(self.device)
         # Initialize accuracy to be returned to -1, so that the client can disconnect
         # from the server when testing fails
@@ -612,7 +619,7 @@ class Trainer(basic.Trainer):
                 # Perform the evaluation in the downstream task
                 #   i.e., the client's personal local dataset
                 eval_optimizer = optimizers.get_dynamic_optimizer(
-                    self.personalized_model, prefix="pers_")
+                    personalized_model, prefix="pers_")
                 iterations_per_epoch = np.ceil(
                     len(kwargs["eval_trainset"]) /
                     Config().trainer.pers_batch_size).astype(int)
@@ -636,7 +643,7 @@ class Trainer(basic.Trainer):
                     eval_loss_criterion = torch.nn.CrossEntropyLoss()
 
                 self.model.eval()
-                self.personalized_model.train()
+                personalized_model.train()
 
                 # Define the training and logging information
                 epoch_log_interval = config['pers_epoch_log_interval']
@@ -672,7 +679,7 @@ class Trainer(basic.Trainer):
                             feature = self.model.encoder(examples)
 
                         # Perfrom the training and compute the loss
-                        preds = self.personalized_model(feature)
+                        preds = personalized_model(feature)
                         loss = eval_loss_criterion(preds, labels)
 
                         # Perfrom the optimization
@@ -705,7 +712,7 @@ class Trainer(basic.Trainer):
                 # Define the test phase of the eval stage
                 acc_meter = optimizers.AverageMeter(name='Accuracy')
 
-                self.personalized_model.eval()
+                personalized_model.eval()
                 correct = 0
                 test_data_encoded = list()
                 test_data_labels = list()
@@ -715,7 +722,7 @@ class Trainer(basic.Trainer):
                         self.device)
                     with torch.no_grad():
                         feature = self.model.encoder(examples)
-                        preds = self.personalized_model(feature).argmax(dim=1)
+                        preds = personalized_model(feature).argmax(dim=1)
                         correct = (preds == labels).sum().item()
                         acc_meter.update(correct / preds.shape[0])
                         test_data_encoded.append(feature)
@@ -730,14 +737,14 @@ class Trainer(basic.Trainer):
         # save the personalized model for current round
         # to the dir of this client
         if 'max_concurrency' in config:
-            self.personalized_model.cpu()
+            personalized_model.cpu()
             check_point_path = Config().params['checkpoint_path']
-
+            personalized_model_name = Config().trainer.personalized_model_name
             save_location = os.path.join(check_point_path,
                                          "client_" + str(self.client_id))
 
             current_round = kwargs['current_round']
-            filename = f"Round_{current_round}_personalization.pth"
+            filename = f"Round_{current_round}_personalization_{personalized_model_name}.pth"
 
             os.makedirs(save_location, exist_ok=True)
             self.save_personalized_model(filename=filename,
