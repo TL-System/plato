@@ -22,7 +22,7 @@ import a2c_learning_model
 import a2c_learning_server
 import a2c_learning_trainer
 #to run
-#python examples/park_env/a2c_plato.py -c examples/park_env/a2c_FashionMNIST_lenet5.yml
+#python examples/park_env/a2c.py -c examples/park_env/a2c_FashionMNIST_lenet5.yml
 
 env = park.make(Config().algorithm.env_park_name)
 

@@ -119,7 +119,7 @@ algorithm:
     # reward discounted factor
     gamma: 0.99
     tau: 0.005
-    learning_rate: 0.0003
+    learning_rate: 0.001
     # Noise added to target policy during critic update
     policy_noise: 0.2
     # Range to clip target policy noise
