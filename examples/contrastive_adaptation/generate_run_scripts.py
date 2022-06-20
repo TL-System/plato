@@ -99,8 +99,8 @@ def create_run_script(methods_root_dir,
 
     os.makedirs(script_save_dir, exist_ok=True)
 
-    print(("Creating sbatch running script {} for config file {}, ").format(
-        script_file_save_path, config_file_name))
+    print(("Creating sbatch running script {} for config file {}/{}, ").format(
+        script_file_save_path, config_files_dir, config_file_name))
 
     if os.path.exists(script_file_save_path):
         print(
