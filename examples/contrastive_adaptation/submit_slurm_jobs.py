@@ -9,9 +9,10 @@ Thus, the scripts containing the key will be performed.
 
 
 For example,
-to submit all methods using MNIST dataset
+to submit all methods with configs using the whole model as the
+global model based on the MNIST dataset
 
-python examples/contrastive_adaptation/submit_slurm_jobs.py -k MNIST
+python examples/contrastive_adaptation/submit_slurm_jobs.py -d whole_global_model -k MNIST
 
 
 """
@@ -42,10 +43,14 @@ def is_desired_file(key_word, file_name):
 
 if __name__ == '__main__':
 
-    experiment_script_files_name = glob.glob(
-        os.path.join(script_files_dir, "*.sh"))
-
     parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '-d',
+        '--dirname',
+        type=str,
+        default='whole_global_model',
+        help='the dir name in which the config files are stored.')
+
     parser.add_argument('-k',
                         '--key',
                         type=str,
@@ -54,10 +59,14 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    config_dir_name = args.dirname
     key_word = args.key
 
+    experiment_script_files_path = glob.glob(
+        os.path.join(script_files_dir, config_dir_name, "*.sh"))
+
     desired_files_path = [
-        file_path for file_path in experiment_script_files_name
+        file_path for file_path in experiment_script_files_path
         if is_desired_file(key_word, file_path)
     ]
     for script_file_path in desired_files_path:
