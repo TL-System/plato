@@ -48,9 +48,8 @@ class Trainer(basic.Trainer):
     def __init__(self, model=None):
         super().__init__()
 
-        self.env = td3.env
+        self.env = td3.env #using a getter for environment results in no connection to pybullet physics server
         self.max_episode_steps = model.get_max_episode_steps()
-
 
         self.max_action = model.get_max_action()     
         self.state_dim = model.get_state_dim()
@@ -116,7 +115,7 @@ class Trainer(basic.Trainer):
             print("Done training")
             return
         while round_episode_steps < Config().algorithm.max_round_episodes * self.max_episode_steps:
-            #print(self.total_timesteps)
+        
             if self.done:
                 #evaluate episode and save policy
                 if self.timesteps_since_eval >= Config().algorithm.eval_freq * self.max_episode_steps:
@@ -124,7 +123,7 @@ class Trainer(basic.Trainer):
                     self.evaluations.append(client.evaluate_policy(self, self.env))
                     np.savetxt("%s.csv" %(Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)), self.evaluations, delimiter=",")
                     np.savez("%s" %(Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)), a=self.evaluations)
-                    #np.savetxt("%s.csv" %(Config().results.results_dir +"/"+file_name), self.evaluations, delimiter=",")
+                    
                 
                 #When the training step is done, we reset the state of the env
                 obs = self.env.reset()
@@ -153,7 +152,6 @@ class Trainer(basic.Trainer):
 
             #performs action in environment, then reaches next state and receives the reward
             new_obs, reward, self.done, _ = self.env.step(action)
-            #print(reward)
 
             #is episode done?
             done_bool = 0 if episode_timesteps + 1 == self.env._max_episode_steps else float(self.done)
@@ -359,9 +357,6 @@ class Trainer(basic.Trainer):
             file_name = "%s_%s.npz" % ("training_status", str(self.client_id)) 
             file_path = os.path.join(model_path, file_name)
             np.savez(file_path, a=np.array([self.episode_num]), b=np.array([self.total_timesteps]))
-
-
-        #TODO What is the difference between .state_dict() & _state_dict
 
         if self.client_id == 0:
             logging.info("[Server #%d] Saving models to %s, %s, %s and %s.", os.getpid(),
