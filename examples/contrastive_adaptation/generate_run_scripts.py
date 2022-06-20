@@ -35,6 +35,8 @@ Just run:
 import os
 import stat
 
+import glob
+
 current_path = "./"
 
 sim_data_path = "/data/sijia/INFOCOM23/experiments"
@@ -44,7 +46,7 @@ desire_python = "/home/sijia/envs/miniconda3/envs/INFOCOM23/bin/python"
 methods_root_dir = os.path.join(current_path, "examples",
                                 "contrastive_adaptation")
 
-configs_file_dir = os.path.join(methods_root_dir, "configs")
+config_files_root_dir = os.path.join(methods_root_dir, "configs")
 script_files_dir = os.path.join(methods_root_dir, "run_scripts")
 sbatch_output_dir = os.path.join(current_path, "slurm_loggings")
 
@@ -119,15 +121,30 @@ def create_run_script(methods_root_dir,
 
 
 if __name__ == "__main__":
-    all_config_files_name = os.listdir(configs_file_dir)
+
+    configs_files_path = glob.glob(
+        os.path.join(config_files_root_dir, "*/", "*.yml"))
 
     # create the output dir as the slurm will not create it
     # for the experiments
     os.makedirs(sbatch_output_dir, exist_ok=True)
 
-    for config_file_name in all_config_files_name:
+    for config_file_path in configs_files_path:
+        # obtain the full path of the existed dir of the file
+        # such as ./examples/contrastive_adaptation/configs/whole_global_model
+        file_dir_path = os.path.dirname(config_file_path)
+        # obtain the config file name
+        file_name = os.path.basename(config_file_path)
+        # obtain the dir name of the config file
+        # such as whole_global_model
+        file_dir_name = os.path.basename(file_dir_path)
+
+        # save script to the same subdir with the same dir name
+        # of the config
+        to_save_dir = os.path.join(script_files_dir, file_dir_name)
+
         create_run_script(methods_root_dir,
-                          config_files_dir=configs_file_dir,
-                          config_file_name=config_file_name,
+                          config_files_dir=file_dir_path,
+                          config_file_name=file_name,
                           sbatch_logging_dir=sbatch_output_dir,
-                          script_save_dir=script_files_dir)
+                          script_save_dir=to_save_dir)
