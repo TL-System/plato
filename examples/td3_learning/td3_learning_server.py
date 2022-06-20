@@ -26,8 +26,6 @@ class TD3Server(fedavg.Server):
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using federated averaging."""
 
-        #print("line 27 in td3_server is being executed")
-
         weights_received = self.compute_weight_deltas(updates)
 
         # Total sample is the same for both Generator and Discriminator
@@ -76,8 +74,7 @@ class TD3Server(fedavg.Server):
         
             # Yield to other tasks in the server
             await asyncio.sleep(0)
-        
-        #print("line 78 ->exiting server??")
+            
         return actor_avg_update, critic_avg_update, actor_target_avg_update, critic_target_avg_update
 
     def save_to_checkpoint(self):

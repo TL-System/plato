@@ -68,18 +68,15 @@ class Model:
         self.state_dim = state_dim
         self.action_dim = action_dim
         self.max_action = max_action
-        #self.env = env
         self.max_episode_steps = max_episode_steps
+
         self.env_name = env_name
         self.rl_algo = rl_algo
+        
         self.actor = TD3Actor(state_dim, action_dim, max_action)
         self.critic = TD3Critic(state_dim, action_dim)
         self.actor_target = copy.deepcopy(self.actor)
         self.critic_target = copy.deepcopy(self.critic)
-        #self.actor_target = TD3Actor(globals.state_dim, globals.action_dim, globals.max_action)
-        #self.actor_target = self.actor_target.load_state_dict(self.actor.state_dict())
-        #self.critic_target = TD3Critic(globals.state_dim, globals.action_dim)
-        #self.critic_target = self.critic_target.load_state_dict(self.critic.state_dict())
     
     def get_env_name(self):
         return self.env_name
