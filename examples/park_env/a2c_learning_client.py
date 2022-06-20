@@ -27,3 +27,5 @@ class RLClient(simple.Client):
       
         return Report(report.num_samples, report.accuracy, report.training_time, \
          report.comm_time, report.update_response, self.client_id), weights
+
+

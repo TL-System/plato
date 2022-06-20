@@ -13,8 +13,10 @@ from plato.trainers import basic
 import os
 import logging
 
+import csv
 
-import a2c_plato
+
+import a2c
 # Memory
 # Stores results from the networks, instead of calculating the operations again from states, etc.
 class Memory():
@@ -53,34 +55,13 @@ class Memory():
     def __len__(self):
         return len(self.rewards)
 
-    #def save_buffer(self, dir, client_id):
-        #size_np = np.array([self.size])
-        
-        #np.savez(self.make_filename(dir, "memory" + str(client_id)), a=self.state, b=self.action, c=self.reward, d=self.next_state, e=self.done, f = size_np)
-
-    #def load_buffer(self, dir, client_id):
-     #   data = np.load(self.make_filename(dir, "memory" + str(client_id)))
-
-      #  self.state = data['a']
-       # self.action = data['b']
-        #self.reward = data['c']
-        #self.next_state = data['d']
-        #self.done = data['e']
-        #self.size = int((data['f'])[0]) # single element array
-
-    def make_filename(self, dir, name):
-        file_name = "%s.npz" % (name) 
-        file_path = os.path.join(dir, file_name)
-        return file_path
-
-
 class Trainer(basic.Trainer):
     def __init__(self, model=None):
         super().__init__()
         #pass
 
         #TODO INITIALIZE NECESSARY THINGS!!
-        self.env = a2c_plato.env #make it park env soon
+        self.env = a2c.env #make it park env soon
 
         self.env_name = model.get_env_name()
         self.algorithm_name = model.get_rl_algo()
@@ -97,7 +78,7 @@ class Trainer(basic.Trainer):
 
         self.episode_reward = []
         self.server_reward = []
-        self.avg_reward = 0
+        #self.avg_reward = 0
         self.episode_num = 0
         self.total_reward = 0
         self.done = True
@@ -158,8 +139,8 @@ class Trainer(basic.Trainer):
             round_episodes += 1
             print("Episode number: %d, Reward: %d" % (self.episode_num, self.total_reward))
         
-        self.avg_reward = self.avg_rewards(self.episode_reward,len(self.episode_reward))
-        self.server_reward.append(self.avg_reward)
+        #self.avg_reward = self.avg_rewards(self.episode_reward,len(self.episode_reward))
+        #self.server_reward.append(self.avg_reward)
 
         
 
@@ -296,16 +277,35 @@ class Trainer(basic.Trainer):
     async def server_test(self, testset, sampler=None, **kwargs):
         #We will return the average reward here
         #TODO RETURN THE AVERGE REWARD... IS IT THE SAME AS EVALUATE POLICY IN TD3??
+        avg_reward = self.evaluate_policy()
+        self.server_reward.append(avg_reward)
         file_name = "A2C_RL_SERVER"
         np.savetxt("%s.csv" %(Config().results.results_dir +"/"+file_name), self.server_reward, delimiter=",")
-        return self.avg_reward
+        return avg_reward
 
-    def avg_rewards(self, episode_reward_list, number_of_rewards):
-        #calculates mean of the rewards per episode
-        sum = 0
-        counter = 0
-        while counter < number_of_rewards:
-            sum += episode_reward_list[counter]
-            counter += 1
         
-        return (sum / number_of_rewards)
+    def evaluate_policy(self, eval_episodes = 10):
+        
+        for trace_idx in range(3):
+            avg_reward = 0
+            for _ in range(eval_episodes):
+                episode_reward = 0
+                done = False
+                state = self.env.reset(trace_idx=trace_idx)
+                while not done:
+                    probs = self.actor(self.t(state))
+                    dist = torch.distributions.Categorical(probs=probs)
+                    action = dist.sample()
+                
+                    next_state, reward, done, info = self.env.step(action.detach().data.numpy())
+                    
+                    state = next_state
+                    episode_reward += reward
+
+                avg_reward += episode_reward
+            avg_reward /= eval_episodes
+            print("Average Reward over trace %s is %s" % (str(trace_idx), str(avg_reward)))
+            return avg_reward
+        #with open("evaluations.csv", 'a') as f:
+            #writer = csv.writer(f)
+            #writer.writerow(avg_rewards)
