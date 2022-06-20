@@ -128,7 +128,7 @@ algorithm:
     policy_freq: 2
     # Frequency of evaluation steps once every eval_freq episodes
     eval_freq: 5
-    # batch size to be sampled from reply buffer
+    # batch size to be sampled from memory
     batch_size: 256
 
     hidden_size: 256
