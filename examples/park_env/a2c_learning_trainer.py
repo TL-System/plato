@@ -60,13 +60,10 @@ class Trainer(basic.Trainer):
         super().__init__()
         #pass
 
-        #TODO INITIALIZE NECESSARY THINGS!!
         self.env = a2c.env #make it park env soon
 
         self.env_name = model.get_env_name()
         self.algorithm_name = model.get_rl_algo()
-
-
 
         self.model = model
         self.actor = model.actor
@@ -88,7 +85,6 @@ class Trainer(basic.Trainer):
         self.actor_state_dict = None
         self.critic_state_dict = None
 
-        
 
               
         if not os.path.exists(Config().results.results_dir):
@@ -102,12 +98,14 @@ class Trainer(basic.Trainer):
     def train_model(self, config, trainset, sampler, cut_layer):
         """Main Training"""
         #We will put what exectues in the "main function of a2c_abr_sim.py here"
+        #TODO should call evaluate_policy periodically
 
         round_episodes = 0
         while round_episodes < Config().algorithm.max_round_episodes:
             self.done = False
             self.total_reward = 0
             self.trace_idx = 0
+            #TODO different clients with differnet traces
             if (self.episode_num % 700 == 0):
                 self.trace_idx = int(self.episode_num / 700)
                 print( "change trace to: ", self.trace_idx )
@@ -138,9 +136,6 @@ class Trainer(basic.Trainer):
             np.savetxt("%s.csv" %(Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)), self.episode_reward, delimiter=",")
             round_episodes += 1
             print("Episode number: %d, Reward: %d" % (self.episode_num, self.total_reward))
-        
-        #self.avg_reward = self.avg_rewards(self.episode_reward,len(self.episode_reward))
-        #self.server_reward.append(self.avg_reward)
 
         
 
