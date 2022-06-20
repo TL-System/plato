@@ -5,10 +5,8 @@ general:
     # for different purposes
     # - central_code_test
     # - central
-    # - code_test
     # - user
-
-    running_mode: user
+    running_mode: central
 
     file_logging: True
 
@@ -17,10 +15,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 50
+    total_clients: 1
 
     # The number of clients selected in each round
-    per_round: 30
+    per_round: 1
 
     # Should the clients compute test accuracy locally?
     do_test: True
@@ -28,12 +26,11 @@ clients:
     # on all clients
     do_final_eval_test: True
     # Minotor the self-supervised learning by knn for
-    # every 5 round
-    test_interval: 5
+    # every 1 round
+    test_interval: 1
     # Train the personalized model based on the
-    # learned representation every 10 rounds
-    eval_test_interval: 10
-
+    # learned representation every 1 rounds
+    eval_test_interval: 1
     # Whether simulate clients or not
     simulation: true
 
@@ -41,7 +38,7 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8013
+    port: 8005
     synchronous: true
     do_test: false
 
@@ -76,13 +73,11 @@ data:
     # Working on criterion that is defined with batch_size but receives loaded
     # samples whose size is smaller than the batch size may causes problems.
     # drop_last can alleviate this issue
-    partition_size: 1000
+    partition_size: 50000
 
     # IID or non-IID?
-    sampler: noniid
-    testset_sampler: noniid
-    # The concentration parameter for the Dirichlet distribution
-    concentration: 5
+    sampler: iid
+    testset_sampler: iid
 
     # The random seed for sampling data
     random_seed: 1
@@ -94,7 +89,7 @@ data:
 
     # set the data augmentation
     #   options: simsiam, byol, simclr
-    augment_transformer_name: simsiam
+    augment_transformer_name: byol
     # some methods apply the normalization to samples
     #   while others do not
     is_norm: True
@@ -103,7 +98,7 @@ trainer:
     # The type of the trainer
     type: basic
     # The maximum number of training rounds
-    rounds: 100
+    rounds: 1
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -118,7 +113,7 @@ trainer:
     #   The user is expected to carefully choose the batch_size to avoid
     # the memory allocation issue as the contrastive samples occupy more
     # space as more samples will be contained within one loading.
-    epochs: 5
+    epochs: 100
     batch_size: 64
     optimizer: Adam
     learning_rate: 0.003
@@ -132,13 +127,13 @@ trainer:
     lr_step_size: 20
     lr_gamma: 0.9
 
-    epoch_log_interval: 1
-    batch_log_interval: 10
+    epoch_log_interval: 2
+    batch_log_interval: 30
 
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
     # does not utilize the
-    pers_epochs: 15
+    pers_epochs: 100
     pers_batch_size: 64
     pers_optimizer: Adam
     pers_learning_rate: 0.005
@@ -167,12 +162,19 @@ trainer:
     #   but use the custom model
     model_name: resnet_18
     # in general, the projection_dim = prediction_dim
-    projection_dim: 512
-    prediction_dim: 512
+    projection_dim: 256
+    prediction_dim: 256
+    # here are two ways to determine this decay
+    # - constant value: 0.99
+    # - adaptive computed with traing epochs.
+    #   such as the one in "three-method" implementation
+    onlient_target_moving_average_decay: 0.99
 
-    # name of the component used as the global model
+    # set which part of the model is used as the global model
+    # - whole: the whole model
+    # - online_network: the online_network is exchanged
+    # - target_network: the target_network is exchanged
     global_model_name: whole
-
     personalized_model_name: pure_one_layer_mlp
 
     # whether to maintain the state of the trained personalized
@@ -186,7 +188,6 @@ trainer:
     # trained personalized model in each round.
     # Then, setting do_maintain_per_state to be True to follow this
     # rule.
-    # For central learning with one round training, this is useless
     do_maintain_per_state: false
 
     monitor_name: knn

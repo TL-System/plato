@@ -1,4 +1,5 @@
 
+
 general:
 
     # performing different running mode
@@ -11,7 +12,6 @@ general:
     running_mode: user
 
     file_logging: True
-
 
 clients:
     # Type
@@ -34,7 +34,6 @@ clients:
     # Train the personalized model based on the
     # learned representation every 10 rounds
     eval_test_interval: 10
-
     # Whether simulate clients or not
     simulation: true
 
@@ -42,7 +41,7 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8001
+    port: 8003
     synchronous: true
     do_test: false
 
@@ -61,6 +60,7 @@ server:
     model_path: xxx
     checkpoint_path: xxx
 
+
 data:
     # The training and testing dataset
     datasource: CIFAR10
@@ -71,18 +71,21 @@ data:
     # may lead the failure of the loss criterion part
     # if your loss criterion relies on the batch_size
     # as its argument. For example, the NT_Xent loss utilized
-    # by the BYOL method set the defined batch_size as the parameter.
+    # by the SimCLR method set the defined batch_size as the parameter.
     # However, at the end of one epoch, the left samples may smaller than
     # the batch_size. This makes the #loaded samples != batch_size.
     # Working on criterion that is defined with batch_size but receives loaded
     # samples whose size is smaller than the batch size may causes problems.
-    # drop_last can alleviate this issue
-    partition_size: 1000
+    # drop_last = True can alleviate this issue.
+    # Currently drop_last is default to be False in Plato.
+    # Under this case, to avoid this issue, we need to set:
+    #   partition_size / batch_size = integar
+    #   partition_size / pers_batch_size = integar
+    partition_size: 1200
 
     # IID or non-IID?
     sampler: noniid
     testset_sampler: noniid
-
     # The concentration parameter for the Dirichlet distribution
     concentration: 5
 
@@ -96,14 +99,16 @@ data:
 
     # set the data augmentation
     #   options: simsiam, byol, simclr
-    augment_transformer_name: byol
+    augment_transformer_name: simclr
     # some methods apply the normalization to samples
     #   while others do not
     is_norm: True
 
+
 trainer:
     # The type of the trainer
     type: basic
+
     # The maximum number of training rounds
     rounds: 100
 
@@ -114,48 +119,38 @@ trainer:
     max_concurrency: 5
 
     # The target accuracy
-    target_accuracy: 0.8
+    target_accuracy: 0.80
 
     # Number of epochs for local training in each communication round
-    #   The user is expected to carefully choose the batch_size to avoid
-    # the memory allocation issue as the contrastive samples occupy more
-    # space as more samples will be contained within one loading.
     epochs: 5
-    batch_size: 64
+    batch_size: 60
     optimizer: Adam
     learning_rate: 0.003
-    betas:
-      - 0.9
-      - 0.999
-    eps: 0.00000008 # 1e-8
-    weight_decay: 0.001
+    weight_decay: 0.00001
 
-    lr_scheduler: StepLR
-    lr_step_size: 20
-    lr_gamma: 0.9
+    # Learning rate schedule
+    lr_schedule: LambdaLR
+    lr_gamma: 0.1
+    lr_milestone_steps: 80ep,120ep
 
     epoch_log_interval: 1
     batch_log_interval: 10
 
     # Number of epochs for local training in each communication round
-    #   The batch size for the downstream task can be larger as it
-    # does not utilize the
     pers_epochs: 15
-    pers_batch_size: 64
+    pers_batch_size: 60
     pers_optimizer: Adam
-    pers_learning_rate: 0.005
-    pers_betas:
-        - 0.9
-        - 0.99
-    pers_eps: 0.00000009 # 1e-8
-    pers_weight_decay: 0.002
+    pers_learning_rate: 0.003
+    pers_weight_decay: 0.000006
 
-    # currently, we only support CosineAnnealingLR
     pers_lr_schedule: StepLR
     pers_lr_step_size: 20
     pers_lr_gamma: 0.9
 
     pers_epoch_log_interval: 2
+
+    # temperature
+    temperature: 0.5
 
     # image_size
     #  - CIFAR10 (Image size=32)
@@ -165,23 +160,13 @@ trainer:
     # The machine learning model,
     # it behaves as the encoder for the ssl method
     # the final fc layer will be removed
-    # however, in the central test, we do not use this
-    #   but use the custom model
+    external_encoder: False
     model_name: resnet_18
-    # in general, the projection_dim = prediction_dim
-    projection_dim: 256
-    prediction_dim: 256
-    # here are two ways to determine this decay
-    # - constant value: 0.99
-    # - adaptive computed with traing epochs.
-    #   such as the one in "three-method" implementation
-    onlient_target_moving_average_decay: 0.99
+    projection_dim: 128
 
-    # set which part of the model is used as the global model
-    # - whole: the whole model
-    # - online_network: the online_network is exchanged
-    # - target_network: the target_network is exchanged
-    global_model_name: target_network
+    # name of the component used as the global model
+    global_model_name: whole
+
     personalized_model_name: pure_one_layer_mlp
 
     # whether to maintain the state of the trained personalized
@@ -195,6 +180,7 @@ trainer:
     # trained personalized model in each round.
     # Then, setting do_maintain_per_state to be True to follow this
     # rule.
+    # For central learning with one round training, this is useless
     do_maintain_per_state: false
 
     monitor_name: knn
@@ -207,6 +193,7 @@ trainer:
 algorithm:
     # Aggregation algorithm
     type: fedavg
+
 
 results:
     result_path: xxx

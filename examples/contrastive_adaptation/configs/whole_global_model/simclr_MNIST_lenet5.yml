@@ -5,8 +5,10 @@ general:
     # for different purposes
     # - central_code_test
     # - central
+    # - code_test
     # - user
-    running_mode: central
+
+    running_mode: user
 
     file_logging: True
 
@@ -15,10 +17,9 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 1
-
+    total_clients: 50
     # The number of clients selected in each round
-    per_round: 1
+    per_round: 30
 
     # Should the clients compute test accuracy locally?
     do_test: True
@@ -26,11 +27,12 @@ clients:
     # on all clients
     do_final_eval_test: True
     # Minotor the self-supervised learning by knn for
-    # every 1 round
-    test_interval: 1
+    # every 5 round
+    test_interval: 5
     # Train the personalized model based on the
-    # learned representation every 1 rounds
-    eval_test_interval: 1
+    # learned representation every 10 rounds
+    eval_test_interval: 10
+
     # Whether simulate clients or not
     simulation: true
 
@@ -38,7 +40,7 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8002
+    port: 8006
     synchronous: true
     do_test: false
 
@@ -57,7 +59,6 @@ server:
     model_path: xxx
     checkpoint_path: xxx
 
-
 data:
     # The training and testing dataset
     datasource: MNIST
@@ -68,18 +69,23 @@ data:
     # may lead the failure of the loss criterion part
     # if your loss criterion relies on the batch_size
     # as its argument. For example, the NT_Xent loss utilized
-    # by the BYOL method set the defined batch_size as the parameter.
+    # by the SimCLR method set the defined batch_size as the parameter.
     # However, at the end of one epoch, the left samples may smaller than
     # the batch_size. This makes the #loaded samples != batch_size.
     # Working on criterion that is defined with batch_size but receives loaded
     # samples whose size is smaller than the batch size may causes problems.
-    # drop_last can alleviate this issue
-    partition_size: 60000
+    # drop_last = True can alleviate this issue.
+    # Currently drop_last is default to be False in Plato.
+    # Under this case, to avoid this issue, we need to set:
+    #   partition_size / batch_size = integar
+    #   partition_size / pers_batch_size = integar
+    partition_size: 1920
 
     # IID or non-IID?
-    sampler: iid
-    testset_sampler: iid
-
+    sampler: noniid
+    testset_sampler: noniid
+    # The concentration parameter for the Dirichlet distribution
+    concentration: 5
 
     # The random seed for sampling data
     random_seed: 1
@@ -91,7 +97,7 @@ data:
 
     # set the data augmentation
     #   options: simsiam, byol, simclr
-    augment_transformer_name: byol
+    augment_transformer_name: simclr
     # some methods apply the normalization to samples
     #   while others do not
     is_norm: True
@@ -99,8 +105,9 @@ data:
 trainer:
     # The type of the trainer
     type: basic
+
     # The maximum number of training rounds
-    rounds: 1
+    rounds: 100
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -115,7 +122,7 @@ trainer:
     #   The user is expected to carefully choose the batch_size to avoid
     # the memory allocation issue as the contrastive samples occupy more
     # space as more samples will be contained within one loading.
-    epochs: 50
+    epochs: 5
     batch_size: 64
     optimizer: Adam
     learning_rate: 0.003
@@ -129,13 +136,13 @@ trainer:
     lr_step_size: 20
     lr_gamma: 0.9
 
-    epoch_log_interval: 2
-    batch_log_interval: 50
+    epoch_log_interval: 1
+    batch_log_interval: 100
 
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
-    # does not utilize the
-    pers_epochs: 100
+    # does not utilize the contrastive samples
+    pers_epochs: 15
     pers_batch_size: 64
     pers_optimizer: Adam
     pers_learning_rate: 0.005
@@ -145,12 +152,15 @@ trainer:
     pers_eps: 0.00000009 # 1e-8
     pers_weight_decay: 0.002
 
-    # currently, we only support CosineAnnealingLR
     pers_lr_schedule: StepLR
     pers_lr_step_size: 20
     pers_lr_gamma: 0.9
 
-    pers_epoch_log_interval: 2
+    # Logging information
+    pers_epoch_log_interval: 1
+
+    # the temperature used in the loss function
+    temperature: 0.5
 
     # image_size
     #  - CIFAR10 (Image size=32)
@@ -160,23 +170,13 @@ trainer:
     # The machine learning model,
     # it behaves as the encoder for the ssl method
     # the final fc layer will be removed
-    # however, in the central test, we do not use this
-    #   but use the custom model
+    external_encoder: False
     model_name: lenet5
-    # in general, the projection_dim = prediction_dim
     projection_dim: 128
-    prediction_dim: 128
-    # here are two ways to determine this decay
-    # - constant value: 0.99
-    # - adaptive computed with traing epochs.
-    #   such as the one in "three-method" implementation
-    onlient_target_moving_average_decay: 0.99
 
-    # set which part of the model is used as the global model
-    # - whole: the whole model
-    # - online_network: the online_network is exchanged
-    # - target_network: the target_network is exchanged
+    # name of the component used as the global model
     global_model_name: whole
+
     personalized_model_name: pure_one_layer_mlp
 
     # whether to maintain the state of the trained personalized
@@ -191,6 +191,7 @@ trainer:
     # Then, setting do_maintain_per_state to be True to follow this
     # rule.
     do_maintain_per_state: false
+
 
     monitor_name: knn
     knn_k: 200
