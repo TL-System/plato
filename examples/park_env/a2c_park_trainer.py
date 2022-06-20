@@ -97,6 +97,7 @@ class Trainer(basic.Trainer):
 
         self.episode_reward = []
         self.server_reward = []
+        self.avg_reward = 0
         self.episode_num = 0
         self.total_reward = 0
         self.done = True
@@ -152,8 +153,15 @@ class Trainer(basic.Trainer):
 
             self.episode_num += 1
             self.episode_reward.append(self.total_reward)
+            np.savez("%s" %(Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)), a=self.episode_reward)
+            np.savetxt("%s.csv" %(Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)), self.episode_reward, delimiter=",")
             round_episodes += 1
             print("Episode number: %d, Reward: %d" % (self.episode_num, self.total_reward))
+        
+        self.avg_reward = self.avg_rewards(self.episode_reward,len(self.episode_reward))
+        self.server_reward.append(self.avg_reward)
+
+        
 
     def train_helper(self, memory, q_val):
         #We will put the train loop here
@@ -287,7 +295,17 @@ class Trainer(basic.Trainer):
 
     async def server_test(self, testset, sampler=None, **kwargs):
         #We will return the average reward here
-        self.server_reward.append(self.total_reward)
+        #TODO RETURN THE AVERGE REWARD... IS IT THE SAME AS EVALUATE POLICY IN TD3??
         file_name = "A2C_RL_SERVER"
         np.savetxt("%s.csv" %(Config().results.results_dir +"/"+file_name), self.server_reward, delimiter=",")
-        return self.total_reward
+        return self.avg_reward
+
+    def avg_rewards(self, episode_reward_list, number_of_rewards):
+        #calculates mean of the rewards per episode
+        sum = 0
+        counter = 0
+        while counter < number_of_rewards:
+            sum += episode_reward_list[counter]
+            counter += 1
+        
+        return (sum / number_of_rewards)
