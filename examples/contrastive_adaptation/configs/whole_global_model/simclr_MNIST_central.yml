@@ -1,4 +1,25 @@
 
+# For the central learning of SimCLR on the MNIST datase,
+#   we directly follow the setting provided by:
+# https://github.com/giakou4/MNIST_classification
+# They utilize:
+#   - num_epochs:100
+#   - use_scheduler
+#   - head_type: mlp
+#   - see the transform for details
+#   - projection dim (its feature dim): 128
+#   - temperature: 0.07
+#   - optimizer:
+#     - adam
+#     - lr 1e-3
+#     - betas (0.9, 0.999)
+#     - eps 1e-08
+#   - scheduler: StepLR
+#     - step_size 20
+#     - gamma 0.9
+#   - batch_size: 64
+#   - weight_decay=1e-3
+
 general:
 
     # performing different running mode
@@ -16,7 +37,6 @@ clients:
 
     # The total number of clients
     total_clients: 1
-
     # The number of clients selected in each round
     per_round: 1
 
@@ -31,7 +51,6 @@ clients:
     # Train the personalized model based on the
     # learned representation every 1 rounds
     eval_test_interval: 1
-
     # Whether simulate clients or not
     simulation: true
 
@@ -39,7 +58,7 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8012
+    port: 8007
     synchronous: true
     do_test: false
 
@@ -60,7 +79,7 @@ server:
 
 data:
     # The training and testing dataset
-    datasource: CIFAR10
+    datasource: MNIST
 
     # Number of samples in each partition
     #
@@ -68,13 +87,13 @@ data:
     # may lead the failure of the loss criterion part
     # if your loss criterion relies on the batch_size
     # as its argument. For example, the NT_Xent loss utilized
-    # by the BYOL method set the defined batch_size as the parameter.
+    # by the SimCLR method set the defined batch_size as the parameter.
     # However, at the end of one epoch, the left samples may smaller than
     # the batch_size. This makes the #loaded samples != batch_size.
     # Working on criterion that is defined with batch_size but receives loaded
     # samples whose size is smaller than the batch size may causes problems.
     # drop_last can alleviate this issue
-    partition_size: 50000
+    partition_size: 60000
 
     # IID or non-IID?
     sampler: iid
@@ -87,10 +106,9 @@ data:
     #   for the specific usage, such as constrastive learning
     # data_wrapper: Null
     data_wrapper: ContrastiveAugmentWrapper
-
     # set the data augmentation
     #   options: simsiam, byol, simclr
-    augment_transformer_name: simsiam
+    augment_transformer_name: simclr
     # some methods apply the normalization to samples
     #   while others do not
     is_norm: True
@@ -98,6 +116,7 @@ data:
 trainer:
     # The type of the trainer
     type: basic
+
     # The maximum number of training rounds
     rounds: 1
 
@@ -114,8 +133,8 @@ trainer:
     #   The user is expected to carefully choose the batch_size to avoid
     # the memory allocation issue as the contrastive samples occupy more
     # space as more samples will be contained within one loading.
-    epochs: 100
-    batch_size: 64
+    epochs: 50
+    batch_size: 60
     optimizer: Adam
     learning_rate: 0.003
     betas:
@@ -129,13 +148,13 @@ trainer:
     lr_gamma: 0.9
 
     epoch_log_interval: 2
-    batch_log_interval: 20
+    batch_log_interval: 50
 
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
     # does not utilize the
     pers_epochs: 100
-    pers_batch_size: 64
+    pers_batch_size: 60
     pers_optimizer: Adam
     pers_learning_rate: 0.005
     pers_betas:
@@ -151,20 +170,22 @@ trainer:
 
     pers_epoch_log_interval: 2
 
+    # temperature for the loss function
+    temperature: 0.5
+
     # image_size
     #  - CIFAR10 (Image size=32)
     #  - MNIST (Image size=28)
-    image_size: 32
+    image_size: 28
 
     # The machine learning model,
     # it behaves as the encoder for the ssl method
     # the final fc layer will be removed
     # however, in the central test, we do not use this
     #   but use the custom model
-    model_name: resnet_18
-    # in general, the projection_dim = prediction_dim
-    projection_dim: 512
-    prediction_dim: 512
+    external_encoder: True
+    model_name: lenet5
+    projection_dim: 128
 
     # name of the component used as the global model
     global_model_name: whole

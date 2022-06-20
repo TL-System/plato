@@ -5,20 +5,23 @@ general:
     # for different purposes
     # - central_code_test
     # - central
+    # - code_test
     # - user
-    running_mode: central
+
+    running_mode: user
 
     file_logging: True
+
 
 clients:
     # Type
     type: simple
 
     # The total number of clients
-    total_clients: 1
+    total_clients: 50
 
     # The number of clients selected in each round
-    per_round: 1
+    per_round: 30
 
     # Should the clients compute test accuracy locally?
     do_test: True
@@ -26,11 +29,11 @@ clients:
     # on all clients
     do_final_eval_test: True
     # Minotor the self-supervised learning by knn for
-    # every 1 round
-    test_interval: 1
+    # every 5 round
+    test_interval: 5
     # Train the personalized model based on the
-    # learned representation every 1 rounds
-    eval_test_interval: 1
+    # learned representation every 10 rounds
+    eval_test_interval: 10
     # Whether simulate clients or not
     simulation: true
 
@@ -38,7 +41,7 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8007
+    port: 8010
     synchronous: true
     do_test: false
 
@@ -57,9 +60,10 @@ server:
     model_path: xxx
     checkpoint_path: xxx
 
+
 data:
     # The training and testing dataset
-    datasource: CIFAR10
+    datasource: MNIST
 
     # Number of samples in each partition
     #
@@ -67,17 +71,20 @@ data:
     # may lead the failure of the loss criterion part
     # if your loss criterion relies on the batch_size
     # as its argument. For example, the NT_Xent loss utilized
-    # by the SimCLR method set the defined batch_size as the parameter.
+    # by the BYOL method set the defined batch_size as the parameter.
     # However, at the end of one epoch, the left samples may smaller than
     # the batch_size. This makes the #loaded samples != batch_size.
     # Working on criterion that is defined with batch_size but receives loaded
     # samples whose size is smaller than the batch size may causes problems.
     # drop_last can alleviate this issue
-    partition_size: 50000
+    partition_size: 1000
 
     # IID or non-IID?
-    sampler: iid
-    testset_sampler: iid
+    sampler: noniid
+    testset_sampler: noniid
+
+    # The concentration parameter for the Dirichlet distribution
+    concentration: 5
 
     # The random seed for sampling data
     random_seed: 1
@@ -89,7 +96,7 @@ data:
 
     # set the data augmentation
     #   options: simsiam, byol, simclr
-    augment_transformer_name: simclr
+    augment_transformer_name: simsiam
     # some methods apply the normalization to samples
     #   while others do not
     is_norm: True
@@ -98,7 +105,7 @@ trainer:
     # The type of the trainer
     type: basic
     # The maximum number of training rounds
-    rounds: 1
+    rounds: 100
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -107,14 +114,14 @@ trainer:
     max_concurrency: 5
 
     # The target accuracy
-    target_accuracy: 0.9
+    target_accuracy: 0.98
 
     # Number of epochs for local training in each communication round
     #   The user is expected to carefully choose the batch_size to avoid
     # the memory allocation issue as the contrastive samples occupy more
     # space as more samples will be contained within one loading.
-    epochs: 100
-    batch_size: 100
+    epochs: 5
+    batch_size: 64
     optimizer: Adam
     learning_rate: 0.003
     betas:
@@ -128,13 +135,13 @@ trainer:
     lr_gamma: 0.9
 
     epoch_log_interval: 1
-    batch_log_interval: 50
+    batch_log_interval: 10
 
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
     # does not utilize the
-    pers_epochs: 100
-    pers_batch_size: 100
+    pers_epochs: 15
+    pers_batch_size: 64
     pers_optimizer: Adam
     pers_learning_rate: 0.005
     pers_betas:
@@ -149,24 +156,26 @@ trainer:
     pers_lr_gamma: 0.9
 
     pers_epoch_log_interval: 2
-    # temperature
-    temperature: 0.5
 
     # image_size
     #  - CIFAR10 (Image size=32)
     #  - MNIST (Image size=28)
-    image_size: 32
+    image_size: 28
 
     # The machine learning model,
     # it behaves as the encoder for the ssl method
     # the final fc layer will be removed
     # however, in the central test, we do not use this
     #   but use the custom model
-    external_encoder: False
-    model_name: resnet_18
+    model_name: lenet5
     # in general, the projection_dim = prediction_dim
-    projection_dim: 256
-    prediction_dim: 256
+    projection_dim: 128
+    prediction_dim: 128
+    # here are two ways to determine this decay
+    # - constant value: 0.99
+    # - adaptive computed with traing epochs.
+    #   such as the one in "three-method" implementation
+    onlient_target_moving_average_decay: 0.99
 
     # name of the component used as the global model
     global_model_name: whole
