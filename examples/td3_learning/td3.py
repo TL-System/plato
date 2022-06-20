@@ -38,7 +38,7 @@ def main():
     """ A Plato federated learning training session with clients running TD3. """
     logging.info("Starting RL Environment's process.")
 
-    #TODO LOOK AT SEEDS, make dummy here and then make another trainer
+    #TODO LOOK AT SEEDS, make dummy here and then make another trainer?
 
     state_dim = env.observation_space.shape[0]
     action_dim = env.action_space.shape[0]

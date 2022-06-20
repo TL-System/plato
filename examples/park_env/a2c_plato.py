@@ -39,8 +39,10 @@ np.random.seed(seed)
 def main():
     """ A Plato federated learning training session with clients running TD3. """
     logging.info("Starting RL Environment's process.")
-    #def __init__(self, state_dim, n_actions, env_name, rl_algo):
+   
     #TODO instantiate classes
+
+    #TODO clients should have different seeds for different reward? How? I am unsure
 
     state_dim = env.observation_space.shape[0]
     n_actions = env.action_space.n

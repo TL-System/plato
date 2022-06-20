@@ -59,7 +59,7 @@ class Algorithm(fedavg.Algorithm):
 
     def update_weights(self, deltas):
         """ Update the existing model weights. """
-        #print("line 61 is being exectued in update weights")
+
         baseline_weights_actor, baseline_weights_critic, baseline_weights_actor_target, baseline_weights_critic_target = self.extract_weights()
         update_actor, update_critic, update_actor_target, update_critic_target = deltas
 

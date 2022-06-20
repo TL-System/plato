@@ -46,35 +46,16 @@ class ReplayMemory(base.ReplayMemory):
 
 class Trainer(basic.Trainer):
     def __init__(self, model=None):
-        #super().__init__(state_dim, action_dim, max_action, model)
         super().__init__()
 
-        #env = gym.make(env_gym_name)
-
-        #seed = self.client_id
-
-        #env.seed(seed)
-        #env.reset()
-        #torch.manual_seed(seed)
-        #np.random.seed(seed)
-        #state_dim = env.observation_space.shape[0]
-        #action_dim = env.action_space.shape[0]
-        #max_action = float(env.action_space.high[0])
-        #max_episode_steps = env._max_episode_steps
-
         self.env = td3.env
-       # print("ADWKJWAHDKLJAHWD")
-        #print(self.env)
         self.max_episode_steps = model.get_max_episode_steps()
-        #Create actor and critic
-        #Could have used the base class given's but for convenient sake we declare our own
+
 
         self.max_action = model.get_max_action()     
         self.state_dim = model.get_state_dim()
         self.action_dim = model.get_action_dim()
         self.env_name = model.get_env_name()
-        #print("AKDHJAWJKJAWD")
-        #print(self.env_name)
         self.algorithm_name = model.get_rl_algo()
 
         self.model = model
@@ -97,14 +78,9 @@ class Trainer(basic.Trainer):
         
         self.policy_noise = Config().algorithm.policy_noise 
         self.noise_clip = Config().algorithm.noise_clip
-
-        #if(self.total_timesteps)
-        #np.loadtxt("%s.csv" %(Config().results.results_dir +"/"+file_name), dtype=list, delimiter="\n")
         
         if not os.path.exists(Config().results.results_dir):
             os.makedirs(Config().results.results_dir)
-        #if Config().algorithm.save_models and not os.path.exists(models_dir):
-            #os.makedirs(models_dir)
 
         self.timesteps_since_eval = 0
         self.episode_num = 0
@@ -127,20 +103,16 @@ class Trainer(basic.Trainer):
         action = self.actor(state)
         return action.cpu().data.numpy().flatten()
 
-    #add to replay buffer
     def add(self, transition):
-            #adds to ReplayMemory, it always updates the pointer in the push method
-            self.replay_buffer.push(transition)
-
+        """Adds to replay buffer"""
+        self.replay_buffer.push(transition)
 
     def train_model(self, config, trainset, sampler, cut_layer):
         """Main Training"""
-        #print("in line 87 of td3_learning_trainer!")
         episode_timesteps = 0 #fixing error about using before assignment
         obs = 0 #fixing error about using before assignment
         round_episode_steps = 0
         if self.total_timesteps > Config().algorithm.max_steps:
-            # TODO: when max number of steps is hit, we should stop training and terminate the process. How?
             print("Done training")
             return
         while round_episode_steps < Config().algorithm.max_round_episodes * self.max_episode_steps:
@@ -155,8 +127,6 @@ class Trainer(basic.Trainer):
                     #np.savetxt("%s.csv" %(Config().results.results_dir +"/"+file_name), self.evaluations, delimiter=",")
                 
                 #When the training step is done, we reset the state of the env
-                #print('AD:LKJWADJAWDLKAWHLWAs')
-                #print(self.env)
                 obs = self.env.reset()
 
                 #Set done to false
@@ -206,7 +176,7 @@ class Trainer(basic.Trainer):
             if self.done:
                 if self.total_timesteps != 0:
                     logging.info("Total Timesteps: {} Episode Num: {} Reward: {}".format(self.total_timesteps, self.episode_num, self.episode_reward))
-                    #train hehttps://github.com/park-project/parkre call td3_trainer
+                    #train https://github.com/park-project/park here call td3_trainer
                     self.train_helper()
         
         #Add the last policy evaluation to our list of evaluations and save evaluations
@@ -214,8 +184,6 @@ class Trainer(basic.Trainer):
         np.savetxt("%s.csv" %(Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)), self.evaluations, delimiter=",")
         np.savez("%s" %(Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)), a=self.evaluations)
        
-
-
     def train_helper(self):
         """Training Loop"""
         for it in range(Config().algorithm.iterations):
@@ -282,8 +250,6 @@ class Trainer(basic.Trainer):
 
         print("one client update done") 
 
-                
-            
     def load_model(self, filename=None, location=None):
         """Loading pre-trained model weights from a file."""
         model_path = Config(
@@ -294,8 +260,6 @@ class Trainer(basic.Trainer):
         critic_target_model_name = 'critic_target_model'
         env_algorithm = self.env_name+ self.algorithm_name
 
-        #going in here for some reason
-        #fixed by making it none
         if filename is None:
             actor_filename = filename + '_actor'
             actor_model_path = f'{model_path}/{actor_filename}'
@@ -332,7 +296,6 @@ class Trainer(basic.Trainer):
         self.actor_target.load_state_dict(torch.load(actor_target_model_path), strict=True)
         self.critic_target.load_state_dict(torch.load(critic_target_model_path), strict=True)
 
-
         #load evaluations so it doesn't overwrite
         arr = np.load("%s.npz" %(Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)))
         self.evaluations = list(arr['a'])
@@ -359,13 +322,8 @@ class Trainer(basic.Trainer):
                 os.makedirs(model_path)
         except FileExistsError:
             pass
-        
-        #going in here for some reason
-        #fixed by making it none
+    
         if filename is None:
-           # model_path = f'{model_path}/{filename}'
-           # model_filename = filename + _'model'
-           # model path = Config().params stuff
            actor_filename = filename + '_actor'
            critic_filename = filename + '_critic'
            actor_target_filename = filename + '_actor_target'
@@ -393,11 +351,6 @@ class Trainer(basic.Trainer):
             torch.save(self.critic_state_dict, critic_model_path)
             torch.save(self.actor_target_state_dict, actor_target_model_path)
             torch.save(self.critic_target_state_dict, critic_target_model_path)
-        
-        
-
-        #Save evaluations
-        #np.savetxt("%s.csv" %(Config().results.results_dir +"/"+file_name), self.evaluations, delimiter=",")
 
         # Need to save total_timesteps and episode_num that we stopped at (to resume training)
         if self.client_id is not 0:
