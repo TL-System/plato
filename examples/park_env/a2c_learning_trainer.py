@@ -55,6 +55,7 @@ class Memory():
     def __len__(self):
         return len(self.rewards)
 
+# TODO: entropy and batch size is not set 
 class Trainer(basic.Trainer):
     def __init__(self, model=None):
         super().__init__()
@@ -133,7 +134,11 @@ class Trainer(basic.Trainer):
                 self.memory.add(dist.log_prob(action), self.critic(self.t(state)), reward, self.done)
 
                 state = next_state
-
+                # TODO: add batch of experience tuples in memory then train on the batch then clear batch
+                if len(self.memory) < Config().algorithm.batch_size:
+                    continue
+                
+                # TODO: Need to continue until batch size is reached 
                 if self.done or (self.steps % Config().algorithm.max_steps == 0):
                     last_q_val = self.critic(self.t(next_state)).detach().data.numpy()
                     self.train_helper(self.memory, last_q_val)

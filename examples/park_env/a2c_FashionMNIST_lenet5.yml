@@ -24,7 +24,6 @@ clients:
     # If we are simulating client training times, what is the average training time?
     avg_training_time: 20
 
-
 server:
     address: 127.0.0.1
     port: 8002
@@ -94,6 +93,7 @@ trainer:
     # The machine learning model
     model_name: lenet5
 
+# TODO: entropy and batch size is not set
 algorithm:
     # Aggregation algorithm
     type: fedavg
@@ -129,7 +129,7 @@ algorithm:
     # Frequency of evaluation steps once every eval_freq episodes
     eval_freq: 5
     # batch size to be sampled from reply buffer
-    batch_size: 100
+    batch_size: 256
 
     hidden_size: 256
     # steps sampling random actions
@@ -171,4 +171,3 @@ results:
     results_dir: examples/park_env/results
 
     file_name: A2C_ABR
-
