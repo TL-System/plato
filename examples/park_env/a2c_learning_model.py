@@ -10,10 +10,10 @@ class A2CActor(nn.Module):
     def __init__(self, state_dim, n_actions):
         super().__init__()
         self.model = nn.Sequential(
-            nn.Linear(state_dim, 64),
-            nn.Tanh(),
-            nn.Linear(64, 32),
-            nn.Tanh(),
+            nn.Linear(state_dim,16),
+            nn.LeakyReLU(),
+            nn.Linear(16, 32),
+            nn.LeakyReLU(),
             nn.Linear(32, n_actions),
             nn.Softmax(dim = 0)
         )
@@ -26,10 +26,10 @@ class A2CCritic(nn.Module):
     def __init__(self, state_dim):
         super().__init__()
         self.model = nn.Sequential(
-            nn.Linear(state_dim, 64),
-            nn.ReLU(),
-            nn.Linear(64, 32),
-            nn.ReLU(),
+            nn.Linear(state_dim, 16),
+            nn.LeakyReLU(),
+            nn.Linear(16, 32),
+            nn.LeakyReLU(),
             nn.Linear(32, 1)
         )
     
