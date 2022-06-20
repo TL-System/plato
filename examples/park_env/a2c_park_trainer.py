@@ -120,7 +120,9 @@ class Trainer(basic.Trainer):
     def train_model(self, config, trainset, sampler, cut_layer):
         """Main Training"""
         #We will put what exectues in the "main function of a2c_abr_sim.py here"
-        while True:
+
+        round_episodes = 0
+        while round_episodes < Config().algorithm.max_round_episodes:
             self.done = False
             self.total_reward = 0
             self.trace_idx = 0
@@ -150,6 +152,7 @@ class Trainer(basic.Trainer):
 
             self.episode_num += 1
             self.episode_reward.append(self.total_reward)
+            round_episodes += 1
             print("Episode number: %d, Reward: %d" % (self.episode_num, self.total_reward))
 
     def train_helper(self, memory, q_val):
