@@ -24,14 +24,6 @@ import a2c_learning_trainer
 #to run
 #python examples/park_env/a2c.py -c examples/park_env/a2c_FashionMNIST_lenet5.yml
 
-env = park.make(Config().algorithm.env_park_name)
-
-seed = Config().server.random_seed
-
-env.seed(seed)
-env.reset()
-torch.manual_seed(seed)
-np.random.seed(seed)
 
 
 def main():
@@ -41,6 +33,15 @@ def main():
     #TODO instantiate classes
 
     #TODO clients should have different seeds for different reward? How? I am unsure
+
+    env = park.make(Config().algorithm.env_park_name)
+
+    seed = Config().server.random_seed
+
+    env.seed(seed)
+    env.reset()
+    torch.manual_seed(seed)
+    np.random.seed(seed)
 
     state_dim = env.observation_space.shape[0]
     n_actions = env.action_space.n

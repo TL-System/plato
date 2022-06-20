@@ -15,7 +15,7 @@ import logging
 
 import csv
 
-
+import park
 import a2c
 # Memory
 # Stores results from the networks, instead of calculating the operations again from states, etc.
@@ -60,7 +60,16 @@ class Trainer(basic.Trainer):
         super().__init__()
         #pass
 
-        self.env = a2c.env #make it park env soon
+        self.env = park.make(Config().algorithm.env_park_name) #make it park env soon
+
+        #env = park.make(Config().algorithm.env_park_name)
+
+        seed = self.client_id
+
+        self.env.seed(seed)
+        self.env.reset()
+        torch.manual_seed(seed)
+        np.random.seed(seed)
 
         self.env_name = model.get_env_name()
         self.algorithm_name = model.get_rl_algo()
