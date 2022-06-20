@@ -186,6 +186,8 @@ class Trainer(basic.Trainer):
     def load_model(self, filename=None, location=None):
         """Loading pre-trained model weights from a file."""
         #We will load actor and critic models here
+
+        #TODO LOADING CAUSES A DISCONNECTION
         model_path = Config(
         ).params['model_path'] if location is None else location
         actor_model_name = 'actor_model'
@@ -205,7 +207,7 @@ class Trainer(basic.Trainer):
             logging.info("[Server #%d] Loading models from %s, and %s.", os.getpid(),
                          actor_model_path, critic_model_path)
         else:
-            logging.info("[Client #%d] Loading a model from %s, %s, %s and %s.",
+            logging.info("[Client #%d] Loading a model from %s, and %s.",
                          self.client_id, actor_model_path, critic_model_path)
 
         if self.client_id != 0:
