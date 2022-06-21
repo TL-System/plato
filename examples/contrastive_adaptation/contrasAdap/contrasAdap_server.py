@@ -20,8 +20,12 @@ from plato.utils import fonts
 class Server(ssl_server.Server):
     """A personalized federated learning server using the FedEMA method."""
 
-    def __init__(self, model=None, algorithm=None, trainer=None):
-        super().__init__(model, algorithm, trainer)
+    def __init__(self,
+                 model=None,
+                 datasource=None,
+                 algorithm=None,
+                 trainer=None):
+        super().__init__(model, datasource, algorithm, trainer)
 
         # the personalized lambda
         #   - dominated by the generalization

@@ -1,12 +1,36 @@
 """
 The implementation of the losses for our contrastive adaptation.
 
-"""
 
-import logging
+The major contribution is that: the representation learned by the
+contrastive ssl with similarity/dissimilarity measurements
+
+A. potentially forgets the distribution information of the client,
+such as the local samples' distance of inter-classes and intra-classes.
+
+B. is prone to over-learn the common representation for participating
+clients by extracting high-level principles from raw local samples but losts
+the ability of generalizing well to downstream tasks.
+
+The insight A motivates the introduce the loss containing clusters'
+information, i.e., supervision information, in a contrastive manner.
+
+The insight B motivates the meta-training procedure to be included
+in the ssl training stage in each client. This is to say the representation
+should be further used to complete the cliet-specific task based on the local
+dataset.
+
+The work most related to our idea of motivation A is the
+Supervised Contrastive Learning: https://arxiv.org/pdf/2004.11362.pdf. However,
+it belongs to one specific case, i.e., the fully-supervised, of our method.
+
+"""
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
+
+from plato.utils import ssl_losses
 
 
 class ContrasAdapLoss(nn.Module):
@@ -22,74 +46,108 @@ class ContrasAdapLoss(nn.Module):
                  temperature=0.07,
                  contrast_mode='all',
                  base_temperature=0.07,
-                 device=None):
+                 batch_size=128):
         super().__init__()
         # a hyper-parameter constant
         self.temperature = temperature
         self.contrast_mode = contrast_mode
         self.base_temperature = base_temperature
-        self.device = device
+        self.batch_size = batch_size
 
-    def client_specific_representation_loss(self,
-                                            features,
-                                            labels=None,
-                                            mask=None):
-        """Compute loss to support the a client specific representation.
-        The major contribution is that: the representation learned by the
-        contrastive ssl with similarity/dissimilarity measurements
+        self.cross_sg_criterion = ssl_losses.CrossStopGradientL2loss()
 
-        A. potentially forgets the distribution information of the client,
-        such as the local samples' distance of inter-classes and intra-classes.
+        self.ntx_criterion = ssl_losses.NTXent(self.batch_size,
+                                               self.temperature,
+                                               world_size=1)
 
-        B. is prone to over-learn the common representation for participating
-        clients by extracting high-level principles from raw local samples but losts
-        the ability of generalizing well to downstream tasks.
+    def clients_invariant_representation_similarity_loss(self, outputs):
+        """ Motivate the similarity of predicted features and projected features.
 
-        The insight A motivates the introduce the loss containing clusters'
-        information, i.e., supervision information, in a contrastive manner.
+            - Can be the loss function used in the BYOL method.
 
-        The insight B motivates the meta-training procedure to be included
-        in the ssl training stage in each client. This is to say the representation
-        should be further used to complete the cliet-specific task based on the local
-        dataset.
+            The losses in this case only denote similarity between one sample
+            and its augmented sample.
 
-        The work most related to our idea of motivation A is the
-        Supervised Contrastive Learning: https://arxiv.org/pdf/2004.11362.pdf. However,
-        it belongs to one specific case, i.e., the fully-supervised, of our method.
+            The outputs should contain two tuples of features
+            (online_pred_one, online_pred_two)
+            (target_proj_one, target_proj_two)
 
-        If both `labels` and `mask` are None, it degenerates to SimCLR's
-        unsupervised contrastive loss.
-
-        Args:
-            features (list): the obtaind features. Each item is a tensor with
-                            shape batch_size, feature_dim.
-            labels: ground truth of shape [bsz].
-            mask: contrastive mask of shape [bsz, bsz], mask_{i,j}=1 if sample j
-                has the same class as sample i. Can be asymmetric.
-        Returns:
-            A loss scalar.
         """
 
+        return self.cross_sg_criterion(outputs)
+
+    def clients_invariant_representation_loss(self, encoded_z1, encoded_z2):
+        """ Motivate the representation to be clients invariant by using the
+            within one batch:
+            1. data argument of one sample as its positive sample.
+            2. All other samples as the negative samples.
+
+            - Can be the loss function used in the SimCLR method.
+
+            The losses in this case do not introudce the supervision informaton
+            such as the labels but directly utilize the samples within one batch
+            to generate positive and negative samples.
+            For one sample,
+                the positive sample is its augmented sample obtained in the transform
+                the negative samples are all other samples within one batch.
+        """
+        ntx_loss = self.ntx_criterion(encoded_z1, encoded_z2)
+
+        return ntx_loss
+
+    def client_semi_invariant_prototype_representation_loss(
+            self, encoded_z1, encoded_z2, labels):
+        """ Compute loss to support the representation that is semi-invariant
+            among clients.
+
+            The name of the 'semi' is because we utilize the client's labels to
+            build the prototype within one batch.
+        """
+
+    def client_specific_representation_loss(self, encoded_z1, encoded_z2,
+                                            labels):
+        """ Compute loss to support the a client specific representation.
+
+            Takes `features` and `labels` as input, and return the loss.
+
+            If both `labels` and `mask` are None, it degenerates to SimCLR's
+            unsupervised contrastive loss.
+
+            Args:
+                encoded_z1 (torch.tensor): the obtaind features. batch_size, feature_dim.
+                encoded_z2 (torch.tensor): the obtaind features. batch_size, feature_dim.
+                labels: ground truth of shape [bsz].
+
+            Returns:
+                A loss scalar.
+
+        """
+        # Combine two inputs features into one
+        # encoded_z1: batch_size, fea_dim
+        # encoded_z2: batch_size, fea_dim
+        # features: batch_size, 2 * fea_dim
+
+        features = torch.cat(
+            [encoded_z1.unsqueeze(1),
+             encoded_z2.unsqueeze(1)], dim=1)
+
+        features = F.normalize(features, dim=-1, p=2)
         batch_size = features[0].shape[0]
         device = features[0].get_device()
-        if labels is not None and mask is not None:
-            raise ValueError('Cannot define both `labels` and `mask`')
-        elif labels is None and mask is None:
-            mask = torch.eye(batch_size, dtype=torch.float32).to(device)
-        elif labels is not None:
-            labels = labels.contiguous().view(-1, 1)
-            if labels.shape[0] != batch_size:
-                raise ValueError(
-                    'Num of labels does not match num of features')
-            mask = torch.eq(labels, labels.T).float().to(device)
-        else:
-            mask = mask.float().to(device)
+
+        labels = labels.contiguous().view(-1, 1)
+        if labels.shape[0] != batch_size:
+            raise ValueError('Num of labels does not match num of features')
+        # mask: contrastive mask of shape [bsz, bsz], mask_{i,j}=1 if sample j
+        #     has the same class as sample i. Can be asymmetric.
+        mask = torch.eq(labels, labels.T).float().to(device)
 
         # obtain the number of cotrastive items
-        contrast_count = len(contrast_feature)
+        contrast_count = features.shape[1]
         # obtain the combined features
         # batch_size * contrast_count, feature_dim
-        contrast_feature = torch.cat(contrast_feature, dim=0)
+        contrast_feature = torch.cat(torch.unbind(features, dim=1), dim=0)
+
         if self.contrast_mode == 'one':
             anchor_feature = features[:, 0]
             anchor_count = 1
@@ -126,3 +184,10 @@ class ContrasAdapLoss(nn.Module):
         loss = loss.view(anchor_count, batch_size).mean()
 
         return loss
+
+    def meta_learning_loss(self, logits, labels):
+        """ The meta learning is the performance of the pre-trained ssl method
+            on the local classification task. I.e., we directly utilize the
+            cross entropy loss. """
+
+        return torch.nn.CrossEntropyLoss(logits, labels)

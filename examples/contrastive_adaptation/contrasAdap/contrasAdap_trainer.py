@@ -6,6 +6,7 @@ Implementation of our contrastive adaptation trainer.
 import os
 import logging
 import time
+from attr import has
 
 import numpy as np
 import torch
@@ -19,44 +20,26 @@ from plato.utils import optimizers
 from contrasAdap_losses import ContrasAdapLoss
 
 
-def mean_squared_error(x, y):
-    """ Compute the mean square error. """
-    x = F.normalize(x, dim=-1, p=2)
-    y = F.normalize(y, dim=-1, p=2)
-    return 2 - 2 * (x * y).sum(dim=-1)
-
-
-def loss_fn_with_stop_gradients(outputs):
-    """ Compute the errors with stop gradients mechanism. """
-    (online_pred_one, online_pred_two), (target_proj_one,
-                                         target_proj_two) = outputs
-
-    # use the detach mechanism to stop the gradient for target learner
-    loss_one = mean_squared_error(online_pred_one, target_proj_two.detach())
-    loss_two = mean_squared_error(online_pred_two, target_proj_one.detach())
-
-    loss = loss_one + loss_two
-    return loss.mean()
-
-
 class Trainer(contrastive_ssl.Trainer):
     """ The federated learning trainer for the BYOL client. """
 
     @staticmethod
     def loss_criterion(model):
-        """ The loss computation.
-        """
+        """ The loss computation. """
+        temperature = Config().trainer.temperature
+        base_temperature = Config().trainer.base_temperature
+        contrast_mode = Config().trainer.contrast_mode
+        batch_size = Config().trainer.batch_size
+        contrastive_adaptation_criterion = ContrasAdapLoss(
+            temperature=temperature,
+            contrast_mode=contrast_mode,
+            base_temperature=base_temperature,
+            batch_size=batch_size)
 
-        # currently, the loss computation only supports the one-GPU learning.
-        def loss_compute(outputs, labels):
-            """ A wrapper for loss computation.
+        return contrastive_adaptation_criterion
 
-                Maintain labels here for potential usage.
-            """
-            loss = loss_fn_with_stop_gradients(outputs)
-            return loss
-
-        return loss_compute
+    def meta_train_loop(self, train_loader):
+        pass
 
     def train_loop(
         self,
@@ -108,7 +91,7 @@ class Trainer(contrastive_ssl.Trainer):
                 sampler=unlabeled_sampler)
 
         # wrap the multiple loaders into one sequence loader
-        train_loader = data_loaders_wrapper.StreamBatchesLoader(
+        streamed_train_loader = data_loaders_wrapper.StreamBatchesLoader(
             [train_loader, unlabeled_loader])
 
         iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
@@ -120,7 +103,7 @@ class Trainer(contrastive_ssl.Trainer):
         self.model.train()
 
         # Initializing the loss criterion
-        loss_criterion = self.loss_criterion(self.model)
+        cont_adap_loss_criterion = self.loss_criterion(self.model)
 
         # Initializing the optimizer
         optimizer = optimizers.get_dynamic_optimizer(self.model)
@@ -128,7 +111,7 @@ class Trainer(contrastive_ssl.Trainer):
         # Initializing the learning rate schedule, if necessary
         if 'lr_schedule' in config:
             lr_schedule = optimizers.get_dynamic_lr_schedule(
-                optimizer, iterations_per_epoch, train_loader)
+                optimizer, iterations_per_epoch, streamed_train_loader)
         else:
             lr_schedule = None
 
@@ -145,7 +128,8 @@ class Trainer(contrastive_ssl.Trainer):
         for epoch in range(1, epochs + 1):
             epoch_loss_meter.reset()
             # Use a default training loop
-            for batch_id, (examples, labels) in enumerate(train_loader):
+            for batch_id, (examples,
+                           labels) in enumerate(streamed_train_loader):
                 # Support a more general way to hold the loaded samples
                 # The defined model is responsible for processing the
                 # examples based on its requirements.
@@ -164,7 +148,7 @@ class Trainer(contrastive_ssl.Trainer):
 
                 # Forward the model and compute the loss
                 outputs = self.model(examples)
-                loss = loss_criterion(outputs, labels)
+                loss = cont_adap_loss_criterion.cross_sg_criterion(outputs)
 
                 # Perform the backpropagation
                 loss.backward()
@@ -180,13 +164,13 @@ class Trainer(contrastive_ssl.Trainer):
                         logging.info(
                             "[Server #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
                             os.getpid(), epoch, epochs, batch_id,
-                            len(train_loader), batch_loss_meter.avg)
+                            len(streamed_train_loader), batch_loss_meter.avg)
                     else:
                         logging.info(
                             "   [Client #%d] Contrastive Pre-train Epoch: \
                             [%d/%d][%d/%d]\tLoss: %.6f",
                             self.client_id, epoch, epochs, batch_id,
-                            len(train_loader), batch_loss_meter.avg)
+                            len(streamed_train_loader), batch_loss_meter.avg)
 
             # Performe logging of epochs
             if epoch - 1 % epoch_log_interval == 0:
@@ -217,3 +201,44 @@ class Trainer(contrastive_ssl.Trainer):
                 filename = f"{self.client_id}_{epoch}_{training_time}.pth"
                 self.save_model(filename)
                 self.model.to(self.device)
+
+        # whether it is required to perform the meta training
+        if hasattr(Config().trainer,
+                   "do_meta_training") and Config().trainer.do_meta_training:
+            meta_epochs = Config().trainer.meta_epochs
+
+            # Define the container to hold the logging information
+            epoch_loss_meter = optimizers.AverageMeter(name='Loss')
+            batch_loss_meter = optimizers.AverageMeter(name='Loss')
+
+            for epoch in range(1, meta_epochs + 1):
+                # Use a default training loop
+                for batch_id, (examples, labels) in enumerate(train_loader):
+                    # Support a more general way to hold the loaded samples
+                    # The defined model is responsible for processing the
+                    # examples based on its requirements.
+                    if torch.is_tensor(examples):
+                        examples = examples.to(self.device)
+                    else:
+                        examples = [
+                            each_sample.to(self.device)
+                            for each_sample in examples
+                        ]
+
+                    labels = labels.to(self.device)
+
+                    # Reset and clear previous data
+                    batch_loss_meter.reset()
+                    optimizer.zero_grad()
+
+                    # Forward the model and compute the loss
+                    outputs = self.model(examples)
+                    loss = cont_adap_loss_criterion.cross_sg_criterion(outputs)
+
+                    # Perform the backpropagation
+                    loss.backward()
+                    optimizer.step()
+
+                    # Update the loss data in the logging container
+                    epoch_loss_meter.update(loss.data.item())
+                    batch_loss_meter.update(loss.data.item())
