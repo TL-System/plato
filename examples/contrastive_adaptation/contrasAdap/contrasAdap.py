@@ -1,7 +1,6 @@
 """
 The implementation for our contrastive adaptation method.
 
-
 """
 
 import contrasAdap_net
