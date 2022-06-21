@@ -105,9 +105,9 @@ class ABRSimEnv(core.Env):
 
         return obs_arr
 
-    def reset(self, trace_idx = None):
+    def reset(self, trace_idx = None, test = False):
         self.trace, self.curr_t_idx = \
-            sample_trace(self.all_traces, self.np_random, trace_idx)
+             sample_trace(self.all_traces, self.np_random, trace_idx, test)
         self.chunk_time_left = get_chunk_time(
             self.trace, self.curr_t_idx)
         self.chunk_idx = 0

@@ -68,7 +68,7 @@ def load_traces():
     return all_traces
 
 
-def sample_trace(all_traces, np_random, trace_idx):
+def sample_trace(all_traces, np_random, trace_idx, test):
     # weighted random sample based on trace length
     all_p = [len(trace[1]) for trace in all_traces]
     sum_p = float(sum(all_p))
@@ -76,11 +76,17 @@ def sample_trace(all_traces, np_random, trace_idx):
     if trace_idx is None:
         # sample a trace
         trace_idx = np_random.choice(len(all_traces), p=all_p)
-        # sample a starting point
-        init_t_idx = np_random.choice(len(all_traces[trace_idx][0]))
+        # sample a starting point	
+        #init_t_idx = np_random.choice(len(all_traces[trace_idx][0]))	
+        init_t_idx = 0	
+    else:	
+        all_p = [len(trace[1]) for trace in all_traces[:trace_idx+1]]	
+        sum_p = float(sum(all_p))	
+        all_p = [p / sum_p for p in all_p]	
+        	
+        if not test:	
+            trace_idx = np_random.choice(len(all_traces[:trace_idx+1]), p=all_p)	
+        	
         init_t_idx = 0
-    else:
-        init_t_idx = np_random.choice(len(all_traces[trace_idx][0]))
-    
     # return a trace and the starting t
     return all_traces[trace_idx], init_t_idx
