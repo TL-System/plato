@@ -20,7 +20,7 @@ data:
     datasource: TinyImageNet
 
     # Where the dataset is located
-    data_path: ./data/tiny-imagenet-200
+    data_path: data/tiny-imagenet-200
 
     # Number of samples in each partition
     partition_size: 20000

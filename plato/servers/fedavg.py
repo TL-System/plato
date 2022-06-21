@@ -19,7 +19,11 @@ from plato.utils import csv_processor
 class Server(base.Server):
     """Federated learning server using federated averaging."""
 
-    def __init__(self, model=None, algorithm=None, trainer=None):
+    def __init__(self,
+                 model=None,
+                 datasource=None,
+                 algorithm=None,
+                 trainer=None):
         super().__init__()
 
         self.custom_model = model
@@ -31,7 +35,9 @@ class Server(base.Server):
         self.custom_trainer = trainer
         self.trainer = None
 
+        self.custom_datasource = datasource
         self.datasource = None
+
         self.testset = None
         self.testset_sampler = None
         self.total_samples = 0
@@ -72,7 +78,7 @@ class Server(base.Server):
         else:
             logging.info("Training: %s rounds\n", total_rounds)
 
-        self.load_trainer()
+        self.init_trainer()
 
         # Prepares this server for processors that processes outbound and inbound
         # data payloads
@@ -81,7 +87,11 @@ class Server(base.Server):
 
         if not (hasattr(Config().server, 'do_test')
                 and not Config().server.do_test):
-            self.datasource = datasources_registry.get(client_id=0)
+            if self.datasource is None and self.custom_datasource is None:
+                self.datasource = datasources_registry.get(client_id=0)
+            elif self.datasource is None and self.custom_datasource is not None:
+                self.datasource = self.custom_datasource()
+
             self.testset = self.datasource.get_test_set()
 
             if hasattr(Config().data, 'testset_size'):
@@ -114,26 +124,20 @@ class Server(base.Server):
             csv_processor.initialize_csv(accuracy_csv_file, accuracy_headers,
                                          Config().params['result_path'])
 
-    def load_trainer(self):
-        """Setting up the global model to be trained via federated learning."""
+    def init_trainer(self):
+        """ Setting up the global model, trainer, and algorithm. """
         if self.model is None and self.custom_model is not None:
             self.model = self.custom_model
-            self.custom_model = None
 
         if self.trainer is None and self.custom_trainer is None:
             self.trainer = trainers_registry.get(model=self.model)
         elif self.trainer is None and self.custom_trainer is not None:
             self.trainer = self.custom_trainer(model=self.model)
-            self.custom_trainer = None
 
         if self.algorithm is None and self.custom_algorithm is None:
             self.algorithm = algorithms_registry.get(trainer=self.trainer)
         elif self.algorithm is None and self.custom_algorithm is not None:
             self.algorithm = self.custom_algorithm(trainer=self.trainer)
-            self.custom_algorithm = None
-
-    async def select_clients(self, for_next_batch=False):
-        await super().select_clients(for_next_batch=for_next_batch)
 
     def compute_weight_deltas(self, updates):
         """Extract the model weight updates from client updates."""

@@ -32,10 +32,10 @@ data:
 trainer:
     # The type of the trainer
     type: basic
-    # type: diff_privacy 
+    # type: diff_privacy
     # dp_epsilon: 2
     # dp_delta: 0.00001
-    # dp_max_grad_norm: 1 
+    # dp_max_grad_norm: 1
 
     # The maximum number of training rounds
     rounds: 100
@@ -44,7 +44,7 @@ trainer:
     max_concurrency: 10
 
     # The target accuracy
-    target_accuracy: 0.95
+    target_accuracy: 0.80
 
     # Number of epoches for local training in each communication round
     epochs: 5

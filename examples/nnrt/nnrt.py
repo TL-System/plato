@@ -10,25 +10,32 @@ from plato.config import Config
 from plato.clients.mistnet import Client
 
 
+class Model():
+    """ A custom model. """
+
+    @staticmethod
+    def get_model():
+        """Obtaining an instance of this model."""
+        return acl_inference.Inference(int(Config().trainer.deviceID),
+                                       Config().trainer.om_path,
+                                       Config().data.input_height,
+                                       Config().data.input_width)
+
+
 def main():
-    """ A Plato mistnet training sesstion using a nnrt yolo model, datasource and trainer. """
-    datasource = nnrt_datasource.DataSource(
-    )  # special datasource for yolo model
-
-    model = acl_inference.Inference(int(Config().trainer.deviceID),
-                                    Config().trainer.om_path,
-                                    Config().data.input_height,
-                                    Config().data.input_width)
-
-    trainer = nnrt_trainer.Trainer(model=model)
-    algorithm = mistnet.Algorithm(trainer)
+    """ A Plato mistnet training session using an nnrt yolo model, datasource and trainer. """
+    model = Model
+    datasource = nnrt_datasource.DataSource  # special datasource for yolo model
+    trainer = nnrt_trainer.Trainer
+    algorithm = mistnet.Algorithm
 
     client = Client(model=model,
                     datasource=datasource,
                     algorithm=algorithm,
                     trainer=trainer)
+
     client.load_data()
-    _, features = client.train()
+    __, __ = client.train()
 
 
 if __name__ == "__main__":

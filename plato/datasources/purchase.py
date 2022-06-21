@@ -32,13 +32,13 @@ class DataSource(base.DataSource):
         filename = "https://www.comp.nus.edu.sg/~reza/files/dataset_purchase.tgz"
         urllib.request.urlretrieve(filename,
                                    os.path.join(root_path, 'tmp_purchase.tgz'))
-        logging.info('Dataset downloaded')
+        logging.info('Dataset downloaded.')
         tar = tarfile.open(os.path.join(root_path, 'tmp_purchase.tgz'))
         tar.extractall(path=root_path)
 
-        logging.info('Reading dataset...')
+        logging.info('Processing the dataset...')
         data_set = np.genfromtxt(dataset_path, delimiter=',')
-        logging.info('Finish reading!')
+        logging.info('Finish processing the dataset.')
 
         X = data_set[:, 1:].astype(np.float64)
         Y = (data_set[:, 0]).astype(np.int32) - 1
@@ -81,9 +81,9 @@ class VectorDataset(data.Dataset):
         Create a Purchase100 dataset based on features and labels
     """
     def __init__(self, features, labels):
-        self.data = torch.stack([torch.FloatTensor(i) 
+        self.data = torch.stack([torch.FloatTensor(i)
                             for i in features])
-        self.targets = torch.stack([torch.LongTensor([i]) 
+        self.targets = torch.stack([torch.LongTensor([i])
                             for i in labels])[:, 0]
         self.classes = [f'Style #{i}' for i in range(100)]
 

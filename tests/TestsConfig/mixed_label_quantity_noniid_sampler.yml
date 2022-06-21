@@ -1,4 +1,5 @@
 # include basic settings for the models and the learning process
+general: !include base_path.yml
 
 # clients settings
 clients:

@@ -42,6 +42,8 @@ class Trainer(base.Trainer):
 
         if model is None:
             self.model = models_registry.get()
+        else:
+            self.model = model.get_model()
 
         # Initializing the loss criterion
         loss_criterion = SoftmaxCrossEntropyWithLogits(sparse=True,

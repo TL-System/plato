@@ -46,11 +46,6 @@ class Client(simple.Client):
                 self,
                 Config().clients.deleted_data_ratio * 100)
 
-            if not hasattr(Config().data,
-                           'reload_data') or Config().data.reload_data:
-                logging.info("[%s] Loading the dataset.", self)
-                self.load_data()
-
             self.sampler = unlearning_iid.Sampler(self.datasource,
                                                   self.client_id, False)
 

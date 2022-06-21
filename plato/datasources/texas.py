@@ -33,14 +33,14 @@ class DataSource(base.DataSource):
         filename = "https://www.comp.nus.edu.sg/~reza/files/dataset_texas.tgz"
         urllib.request.urlretrieve(filename,
                                    os.path.join(root_path, 'tmp_texas.tgz'))
-        logging.info('Dataset downloaded')
+        logging.info('Dataset downloaded.')
         tar = tarfile.open(os.path.join(root_path, 'tmp_texas.tgz'))
         tar.extractall(path=root_path)
 
-        logging.info('Reading dataset...')
+        logging.info('Processing the dataset...')
         data_set_feats = np.genfromtxt(feat_path, delimiter=',')
         data_set_labels = np.genfromtxt(label_path, delimiter=',')
-        logging.info('Finish reading!')
+        logging.info('Finish processing the dataset.')
 
         X = data_set_feats.astype(np.float64)
         Y = data_set_labels.astype(np.int32) - 1
@@ -82,9 +82,9 @@ class VectorDataset(data.Dataset):
         Create a Texas100 dataset based on features and labels
     """
     def __init__(self, features, labels):
-        self.data = torch.stack([torch.FloatTensor(i) 
+        self.data = torch.stack([torch.FloatTensor(i)
                             for i in features])
-        self.targets = torch.stack([torch.LongTensor([i]) 
+        self.targets = torch.stack([torch.LongTensor([i])
                             for i in labels])[:, 0]
         self.classes = [f'Procedure #{i}' for i in range(100)]
 
@@ -93,4 +93,3 @@ class VectorDataset(data.Dataset):
 
     def __len__(self):
         return self.data.size(0)
-
