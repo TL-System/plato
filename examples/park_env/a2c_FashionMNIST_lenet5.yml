@@ -130,6 +130,10 @@ algorithm:
     eval_freq: 5
     # batch size to be sampled from memory
     batch_size: 256
+    #entropy ratio during training
+    entropy_ratio: 10.0 #or 5
+    #grad clip
+    grad_clip_val: 10
 
     hidden_size: 256
     # steps sampling random actions
@@ -145,9 +149,6 @@ algorithm:
 
     # Exploration noise - STD value of exploration Gaussian Noise
     expl_noise: 0.1
-
-    #Total number of iterations/timestpes
-    max_steps: 200
 
     # Number of episodes to run each round
     max_round_episodes: 20

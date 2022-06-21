@@ -9,6 +9,7 @@ from plato.utils.reinforcement_learning.policies import base
 from plato.trainers import basic
 from plato.config import Config
 from plato.trainers import basic
+from torch.nn.utils.clip_grad import clip_grad_norm_
 
 import os
 import logging
@@ -19,6 +20,15 @@ import park
 import a2c
 # Memory
 # Stores results from the networks, instead of calculating the operations again from states, etc.
+
+class StateNormalizer(object):
+    def __init__(self, obs_space):
+        self.shift = obs_space.low
+        self.range = obs_space.high - obs_space.low
+
+    def normalize(self, obs):
+        return (obs - self.shift) / self.range
+
 class Memory():
     def __init__(self):
         self.log_probs = []
@@ -55,7 +65,6 @@ class Memory():
     def __len__(self):
         return len(self.rewards)
 
-# TODO: entropy and batch size is not set 
 class Trainer(basic.Trainer):
     def __init__(self, model=None):
         super().__init__()
@@ -82,6 +91,7 @@ class Trainer(basic.Trainer):
         self.adam_critic = torch.optim.Adam(self.critic.parameters(), lr=Config().algorithm.learning_rate)
 
         self.memory = Memory()
+        self.obs_normalizer = StateNormalizer(self.env.observation_space)
 
         self.episode_reward = []
         self.server_reward = []
@@ -120,6 +130,7 @@ class Trainer(basic.Trainer):
                 self.trace_idx = int(self.episode_num / 700)
                 print( "change trace to: ", self.trace_idx )
             state = self.env.reset(trace_idx=self.trace_idx)
+            state = self.obs_normalizer.normalize(state)
             self.steps = 0
 
             while not self.done:
@@ -128,18 +139,15 @@ class Trainer(basic.Trainer):
                 action = dist.sample()
 
                 next_state, reward, self.done, info = self.env.step(action.detach().data.numpy())
+                next_state = self.obs_normalizer.normalize(next_state)
 
                 self.total_reward += reward
                 self.steps += 1
                 self.memory.add(dist.log_prob(action), self.critic(self.t(state)), reward, self.done)
 
                 state = next_state
-                # TODO: add batch of experience tuples in memory then train on the batch then clear batch
-                if len(self.memory) < Config().algorithm.batch_size:
-                    continue
                 
-                # TODO: Need to continue until batch size is reached 
-                if self.done or (self.steps % Config().algorithm.max_steps == 0):
+                if self.done or (self.steps % Config().algorithm.batch_size == 0):
                     last_q_val = self.critic(self.t(next_state)).detach().data.numpy()
                     self.train_helper(self.memory, last_q_val)
                     self.memory.clear()
@@ -168,14 +176,19 @@ class Trainer(basic.Trainer):
         #advantage function!!
         advantage = torch.Tensor(q_vals) - values
 
-        critic_loss = advantage.pow(2).mean()
+        critic_loss = advantage.pow(2).mean() #loss_value_v
         self.adam_critic.zero_grad()
         critic_loss.backward()
-        self.adam_critic.step()
+        
+        entropy_loss = (torch.stack(memory.log_probs) * torch.exp(torch.stack(memory.log_probs))).mean()
+        actor_loss = (-torch.stack(memory.log_probs)*advantage.detach()).mean() + entropy_loss * Config().algorithm.entropy_ratio
+        if Config().algorithm.grad_clip_val > 0:
+            clip_grad_norm_(self.actor.parameters(), Config().algorithm.grad_clip_val)
 
-        actor_loss = (-torch.stack(memory.log_probs)*advantage.detach()).mean()
         self.adam_actor.zero_grad()
         actor_loss.backward()
+
+        self.adam_critic.step()
         self.adam_actor.step()
 
 
@@ -301,13 +314,14 @@ class Trainer(basic.Trainer):
                 episode_reward = 0
                 done = False
                 state = self.env.reset(trace_idx=trace_idx)
+                state = self.obs_normalizer.normalize(state)
                 while not done:
                     probs = self.actor(self.t(state))
                     dist = torch.distributions.Categorical(probs=probs)
                     action = dist.sample()
                 
                     next_state, reward, done, info = self.env.step(action.detach().data.numpy())
-                    
+                    next_state = self.obs_normalizer.normalize(next_state)
                     state = next_state
                     episode_reward += reward
 
