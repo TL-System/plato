@@ -85,7 +85,7 @@ class Sampler(base.Sampler):
             num_clients=total_clients,
             per_client_classes_size=per_client_classes_size)
 
-        self.subset_indices = self.clients_dataidx_map[client_id]
+        self.subset_indices = self.clients_dataidx_map[client_id - 1]
 
     def quantity_label_skew(self, dataset_labels, dataset_classes, num_clients,
                             per_client_classes_size):
