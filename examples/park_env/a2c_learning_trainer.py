@@ -311,11 +311,12 @@ class Trainer(basic.Trainer):
         self.server_reward.append(avg_reward)
         file_name = "A2C_RL_SERVER"
         np.savetxt("%s.csv" %(Config().results.results_dir +"/"+file_name), self.server_reward, delimiter=",")
-        return avg_reward
+        return sum(avg_reward)/len(avg_reward)
 
         
     def evaluate_policy(self, eval_episodes = 10):
-        
+        # TODO: how does returning 3 rewards affect the server, when sever_test is called? it should compare to one number, right?
+        avg_rewards = []
         for trace_idx in range(3):
             avg_reward = 0
             for _ in range(eval_episodes):
@@ -338,5 +339,6 @@ class Trainer(basic.Trainer):
             print("------------------")
             print("Average Reward over trace %s is %s" % (str(trace_idx), str(avg_reward)))
             print("------------------")
-        return avg_reward
+            avg_rewards.append(avg_reward)
+        return avg_rewards
         
