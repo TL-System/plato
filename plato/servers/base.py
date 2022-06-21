@@ -558,14 +558,39 @@ class Server:
     def choose_clients(self, clients_pool, clients_count):
         """ Choose a subset of the clients to participate in each round. """
         assert clients_count <= len(clients_pool)
-        random.setstate(self.prng_state)
+        
+        if Config().server.random:
+            random.setstate(self.prng_state)
 
-        # Select clients randomly
-        selected_clients = random.sample(clients_pool, clients_count)
+            print("=======================")
+            print("THE CLIENT POOL IS THIS: ")
+            print(clients_pool)
+            print("=======================")
+            print("THE NUMBER OF CLIENTS IS THIS: ")
+            print(clients_count)
 
-        self.prng_state = random.getstate()
-        logging.info("[%s] Selected clients: %s", self, selected_clients)
-        return selected_clients
+            # Select clients randomly
+            selected_clients = random.sample(clients_pool, clients_count)
+
+            self.prng_state = random.getstate()
+            logging.info("[%s] Selected clients: %s", self, selected_clients)
+            return selected_clients
+        else:
+            selected_clients = []
+            print("Custom selection started!")
+            if(self.current_round <= 8):
+                selected_clients.append(clients_pool[0])
+                selected_clients.append(clients_pool[1])
+            else:
+                random.setstate(self.prng_state)
+                
+                selected_clients = random.sample(clients_pool, clients_count)
+                
+                self.prng_state = random.getstate()
+
+            logging.info("[%s] Selected clients: %s", self, selected_clients)
+            return selected_clients 
+
 
     async def periodic(self, periodic_interval):
         """ Runs periodic_task() periodically on the server. The time interval between
