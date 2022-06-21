@@ -69,6 +69,11 @@ class Trainer(basic.Trainer):
     def __init__(self, model=None):
         super().__init__()
 
+        print("A TRAINER HAS BEEN INITIALIZED!")
+        print("A TRAINER HAS BEEN INITIALIZED!")
+        print("A TRAINER HAS BEEN INITIALIZED!")
+
+
         self.env = park.make(Config().algorithm.env_park_name)
         seed = Config().data.random_seed * self.client_id
 
@@ -101,10 +106,18 @@ class Trainer(basic.Trainer):
         self.actor_state_dict = None
         self.critic_state_dict = None
 
+        self.critic_loss = []
+        self.actor_loss = []
+
+        self.avg_critic_loss = 0
+        self.avg_actor_loss = 0
+
         self.timesteps_since_eval = 0
 
         if not os.path.exists(Config().results.results_dir):
             os.makedirs(Config().results.results_dir)
+
+        self.path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
 
 
     def t(self, x): 
@@ -121,7 +134,7 @@ class Trainer(basic.Trainer):
             #Evaluates policy at a frequency set in config file
             if self.timesteps_since_eval >= Config().algorithm.eval_freq:
                 self.avg_reward.append(self.evaluate_policy())
-                path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)+"_avg_reward"
+                path = self.path+"_avg_reward"
                 np.savez("%s" %(path), a=self.avg_reward)
                 np.savetxt("%s.csv" %(path), self.avg_reward, delimiter=",")
                 self.timesteps_since_eval = 0
@@ -153,25 +166,27 @@ class Trainer(basic.Trainer):
                 
                 if self.done or (self.steps % Config().algorithm.batch_size == 0):
                     last_q_val = self.critic(self.t(next_state)).detach().data.numpy()
-                    self.train_helper(self.memory, last_q_val)
+                    critic_loss, actor_loss = self.train_helper(self.memory, last_q_val)
+
+                    self.critic_loss.append(critic_loss)
+                    self.actor_loss.append(actor_loss)
                     self.memory.clear()
 
             self.episode_num += 1
             self.timesteps_since_eval += 1
             self.episode_reward.append(self.total_reward)
-            np.savez("%s" %(Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)), a=self.episode_reward)
-            np.savetxt("%s.csv" %(Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)), self.episode_reward, delimiter=",")
+            np.savez("%s" %(self.path), a=self.episode_reward)
+            np.savetxt("%s.csv" %(self.path), self.episode_reward, delimiter=",")
             round_episodes += 1
             print("Episode number: %d, Reward: %d" % (self.episode_num, self.total_reward))
 
-        path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)+"_avg_reward"
+        path = self.path+"_avg_reward"
         self.avg_reward.append(self.evaluate_policy())
         np.savez("%s" %(path), a=self.avg_reward)
         np.savetxt("%s.csv" %(path), self.avg_reward, delimiter=',')
-
-
+        self.avg_actor_loss = sum(self.actor_loss)/len(self.actor_loss)
+        self.avg_critic_loss = sum(self.critic_loss)/len(self.critic_loss)
         
-
     def train_helper(self, memory, q_val):
         #We will put the train loop here
         values = torch.stack(memory.values)
@@ -202,14 +217,13 @@ class Trainer(basic.Trainer):
         self.adam_critic.step()
         self.adam_actor.step()
 
-
+        return critic_loss.item(), actor_loss.item()
 
                 
     def load_model(self, filename=None, location=None):
         """Loading pre-trained model weights from a file."""
         #We will load actor and critic models here
-
-        #TODO LOADING CAUSES A DISCONNECTION
+        
         model_path = Config(
         ).params['model_path'] if location is None else location
         actor_model_name = 'actor_model'
@@ -256,6 +270,18 @@ class Trainer(basic.Trainer):
             self.adam_critic = torch.optim.Adam(self.critic.parameters(), lr=Config().algorithm.learning_rate)
 
 
+    def load_loss(self, actor_passed):
+        loss_path = ""
+        if actor_passed:
+            loss_path = self.path+"_actor_loss"
+        else:
+            loss_path = self.path + "_critic_loss"
+
+        with open(loss_path, 'r', encoding='utf-8') as file:
+                loss = float(file.read())
+        
+        return loss
+
 
     def save_model(self, filename=None, location=None):
         """Saving the model to a file."""
@@ -266,6 +292,17 @@ class Trainer(basic.Trainer):
         actor_model_name = 'actor_model'
         critic_model_name = 'critic_model'
         env_algorithm = self.env_name+ self.algorithm_name
+
+        #call save loss here
+        Trainer.save_loss(self.avg_actor_loss, self.path, True)
+        Trainer.save_loss(self.avg_critic_loss, self.path, False)
+        
+
+        #print("AVERAGE ACTOR LOSS IN SAVE MODEL IS THIS: ")
+        #print(self.avg_actor_loss)
+        #print("AVERAGE CRITIC LOSS IN SAVE MODEL IS THIS: ")
+        #print(self.avg_critic_loss)
+
 
         try:
             if not os.path.exists(model_path):
@@ -304,9 +341,27 @@ class Trainer(basic.Trainer):
             logging.info("[Client #%d] Saving a model to %s, and %s.",
                          self.client_id, actor_model_path, critic_model_path)
 
+    @staticmethod
+    def save_loss(loss, path, actor_passed):
+        loss_path = ""
+        if actor_passed:
+            loss_path = path+"_actor_loss"
+        else:
+            loss_path = path + "_critic_loss"
+
+        with open(loss_path, 'w', encoding='utf-8') as file:
+                file.write(str(loss))
+    
+
+
 
     async def server_test(self, testset, sampler=None, **kwargs):
         #We will return the average reward here
+        #print("----------------")
+        #print(self.get_actor_loss())
+        #print("----------------")
+        #print(self.get_critic_loss())
+        #print("----------------")
         avg_reward = self.evaluate_policy()
         self.server_reward.append(avg_reward)
         file_name = "A2C_RL_SERVER"
