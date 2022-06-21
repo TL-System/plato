@@ -93,9 +93,9 @@ class Trainer(basic.Trainer):
         self.server_reward = []
         self.avg_reward = []
         self.episode_num = 0
+        self.trace_idx = 0
         self.total_reward = 0
         self.done = True
-        self.trace_idx = 0
         self.steps = 0
 
         self.actor_state_dict = None
@@ -128,11 +128,9 @@ class Trainer(basic.Trainer):
 
             self.done = False
             self.total_reward = 0
-            self.trace_idx = 0
-            #TODO different clients with differnet traces
-            if (self.episode_num % 700 == 0):
-                self.trace_idx = int(self.episode_num / 700)
-                print( "change trace to: ", self.trace_idx )
+            
+            # TODO different clients with differnet traces, should be easy
+            self.trace_idx = int(self.episode_num / 700)
             state = self.env.reset(trace_idx=self.trace_idx)
             state = self.obs_normalizer.normalize(state)
             self.steps = 0
