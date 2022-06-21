@@ -17,7 +17,7 @@ class Algorithm(fedavg.Algorithm):
 
     def compute_weight_deltas(self, weights_received):
         """ Extract the weights received from a client and compute the updates. """
-        #print("we need to compuete weight deltas")
+
         baseline_weights_actor, baseline_weights_critic = self.extract_weights()
 
         deltas = []
@@ -43,7 +43,7 @@ class Algorithm(fedavg.Algorithm):
 
     def update_weights(self, deltas):
         """ Update the existing model weights. """
-        #print("line 61 is being exectued in update weights")
+ 
         baseline_weights_actor, baseline_weights_critic = self.extract_weights()
         update_actor, update_critic = deltas
 
@@ -59,7 +59,7 @@ class Algorithm(fedavg.Algorithm):
     
     def extract_weights(self, model=None):
         """ Extract weights from the model. """
-        #print("line 84 in algorithm is being exectued")
+      
         actor = self.actor
         critic = self.critic
         if model is not None:

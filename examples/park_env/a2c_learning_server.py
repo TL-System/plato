@@ -26,15 +26,12 @@ class A2CServer(fedavg.Server):
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using federated averaging."""
 
-        #print("line 27 in td3_server is being executed")
-
         weights_received = self.compute_weight_deltas(updates)
 
-        # Total sample is the same for both Generator and Discriminator
         self.total_samples = sum(
             [report.num_samples for (__, report, __, __) in updates])
 
-        # Perform weighted averaging for both Generator and Discriminator
+        # Perform weighted averaging for both Actor and Critic
         actor_avg_update = {
             name: self.trainer.zeros(weights.shape)
             for name, weights in weights_received[0][0].items()
@@ -61,7 +58,6 @@ class A2CServer(fedavg.Server):
             # Yield to other tasks in the server
             await asyncio.sleep(0)
         
-        #print("line 78 ->exiting server??")
         return actor_avg_update, critic_avg_update
 
     def save_to_checkpoint(self):

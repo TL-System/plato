@@ -11,13 +11,11 @@ import pybullet_envs
 class Report(simple.Report):
     """A client report to be sent to the federated learning server."""
     client_id: int
-    #average_reward: int
 
 
 class RLClient(simple.Client):
     
     def __init__(self, trainer = None, model = None, algorithm = None):
-        #print("are we even ever in this consturctor line 30 of td_client")
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
         logging.info("A custom client has been initialized!")
 

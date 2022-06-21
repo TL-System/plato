@@ -68,12 +68,8 @@ class Memory():
 class Trainer(basic.Trainer):
     def __init__(self, model=None):
         super().__init__()
-        #pass
 
-        self.env = park.make(Config().algorithm.env_park_name) #make it park env soon
-
-        #env = park.make(Config().algorithm.env_park_name)
-
+        self.env = park.make(Config().algorithm.env_park_name)
         seed = self.client_id
 
         self.env.seed(seed)
@@ -96,7 +92,6 @@ class Trainer(basic.Trainer):
         self.episode_reward = []
         self.server_reward = []
         self.avg_reward = []
-        #self.avg_reward = 0
         self.episode_num = 0
         self.total_reward = 0
         self.done = True

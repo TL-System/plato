@@ -28,11 +28,11 @@ class TD3Server(fedavg.Server):
 
         weights_received = self.compute_weight_deltas(updates)
 
-        # Total sample is the same for both Generator and Discriminator
+
         self.total_samples = sum(
             [report.num_samples for (__, report, __, __) in updates])
 
-        # Perform weighted averaging for both Generator and Discriminator
+        # Perform weighted averaging for the actor, critic, actor target, and critic target
         actor_avg_update = {
             name: self.trainer.zeros(weights.shape)
             for name, weights in weights_received[0][0].items()
