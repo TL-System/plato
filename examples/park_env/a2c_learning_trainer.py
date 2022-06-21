@@ -108,8 +108,6 @@ class Trainer(basic.Trainer):
 
         self.timesteps_since_eval = 0
 
-
-              
         if not os.path.exists(Config().results.results_dir):
             os.makedirs(Config().results.results_dir)
 
@@ -121,7 +119,6 @@ class Trainer(basic.Trainer):
     def train_model(self, config, trainset, sampler, cut_layer):
         """Main Training"""
         #We will put what exectues in the "main function of a2c_abr_sim.py here"
-        #TODO should call evaluate_policy periodically
 
         round_episodes = 0
         while round_episodes < Config().algorithm.max_round_episodes:
@@ -241,15 +238,12 @@ class Trainer(basic.Trainer):
                          self.client_id, actor_model_path, critic_model_path)
 
         if self.client_id != 0:
-            #do we need to load memory here TODO
-            #self.memory.
-
+           
             file_name = "%s_%s.npz" % ("training_status", str(self.client_id)) 
             file_path = os.path.join(model_path, file_name)
             data = np.load(file_path)
             self.episode_num = int((data['a'])[0])
-            #self.steps = int((data['b'])[0])
-
+    
             self.actor.load_state_dict(torch.load(actor_model_path), strict=True)
             self.critic.load_state_dict(torch.load(critic_model_path), strict=True)
 
@@ -262,7 +256,7 @@ class Trainer(basic.Trainer):
             arr = np.load("%s.npz" %(path))
             self.avg_reward = list(arr['a'])
 
-            #unsure if we need tehse
+            #unsure if we need these
             self.adam_actor = torch.optim.Adam(self.actor.parameters(), lr=Config().algorithm.learning_rate)
             self.adam_critic = torch.optim.Adam(self.critic.parameters(), lr=Config().algorithm.learning_rate)
 
@@ -304,12 +298,9 @@ class Trainer(basic.Trainer):
             torch.save(self.critic_state_dict, critic_model_path)
 
         if self.client_id != 0:
-            # Need to save buffer and some variables
-            #TODO do we need to save memory?
-            #TODO do we need to save steps?
             file_name = "%s_%s.npz" % ("training_status", str(self.client_id)) 
             file_path = os.path.join(model_path, file_name)
-            np.savez(file_path, a=np.array([self.episode_num]))#, b=np.array([self.steps]))        
+            np.savez(file_path, a=np.array([self.episode_num]))       
 
         if self.client_id == 0:
             logging.info("[Server #%d] Saving models to %s, and %s.", os.getpid(),
@@ -321,7 +312,6 @@ class Trainer(basic.Trainer):
 
     async def server_test(self, testset, sampler=None, **kwargs):
         #We will return the average reward here
-        #TODO RETURN THE AVERGE REWARD... IS IT THE SAME AS EVALUATE POLICY IN TD3??
         avg_reward = self.evaluate_policy()
         self.server_reward.append(avg_reward)
         file_name = "A2C_RL_SERVER"

@@ -29,10 +29,6 @@ import a2c_learning_trainer
 def main():
     """ A Plato federated learning training session with clients running TD3. """
     logging.info("Starting RL Environment's process.")
-   
-    #TODO instantiate classes
-
-    #TODO clients should have different seeds for different reward? How? I am unsure
 
     env = park.make(Config().algorithm.env_park_name)
 
