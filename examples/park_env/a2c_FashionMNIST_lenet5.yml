@@ -46,6 +46,8 @@ server:
 
     checkpoint_path: examples/park_env/checkpoints
 
+    random: false
+
 data:
     # The training and testing dataset
     datasource: FashionMNIST
