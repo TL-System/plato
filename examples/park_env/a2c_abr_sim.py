@@ -179,7 +179,7 @@ while True:
     if (episode_num % 700 == 0):
         trace_idx = int(episode_num / 700)
         print( "changed trace to: ", trace_idx )
-    state = env.reset(trace_idx=trace_idx)
+    state = env.reset(trace_idx=None)
     state = obs_normalizer.normalize(state)
     steps = 0
 

@@ -70,7 +70,7 @@ class Trainer(basic.Trainer):
         super().__init__()
 
         self.env = park.make(Config().algorithm.env_park_name)
-        seed = self.client_id
+        seed = Config().data.random_seed * self.client_id
 
         self.env.seed(seed)
         self.env.reset()
@@ -338,7 +338,5 @@ class Trainer(basic.Trainer):
             print("------------------")
             print("Average Reward over trace %s is %s" % (str(trace_idx), str(avg_reward)))
             print("------------------")
-            return avg_reward
-        #with open("evaluations.csv", 'a') as f:
-            #writer = csv.writer(f)
-            #writer.writerow(avg_rewards)
+        return avg_reward
+        
