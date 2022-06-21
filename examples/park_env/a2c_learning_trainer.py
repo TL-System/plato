@@ -95,6 +95,7 @@ class Trainer(basic.Trainer):
 
         self.episode_reward = []
         self.server_reward = []
+        self.avg_reward = []
         #self.avg_reward = 0
         self.episode_num = 0
         self.total_reward = 0
@@ -104,6 +105,8 @@ class Trainer(basic.Trainer):
 
         self.actor_state_dict = None
         self.critic_state_dict = None
+
+        self.timesteps_since_eval = 0
 
 
               
@@ -122,6 +125,15 @@ class Trainer(basic.Trainer):
 
         round_episodes = 0
         while round_episodes < Config().algorithm.max_round_episodes:
+            
+            #Evaluates policy at a frequency set in config file
+            if self.timesteps_since_eval >= Config().algorithm.eval_freq:
+                self.avg_reward.append(self.evaluate_policy())
+                path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)+"_avg_reward"
+                np.savez("%s" %(path), a=self.avg_reward)
+                np.savetxt("%s.csv" %(path), self.avg_reward, delimiter=",")
+                self.timesteps_since_eval = 0
+
             self.done = False
             self.total_reward = 0
             self.trace_idx = 0
@@ -153,11 +165,18 @@ class Trainer(basic.Trainer):
                     self.memory.clear()
 
             self.episode_num += 1
+            self.timesteps_since_eval += 1
             self.episode_reward.append(self.total_reward)
             np.savez("%s" %(Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)), a=self.episode_reward)
             np.savetxt("%s.csv" %(Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)), self.episode_reward, delimiter=",")
             round_episodes += 1
             print("Episode number: %d, Reward: %d" % (self.episode_num, self.total_reward))
+
+        path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)+"_avg_reward"
+        self.avg_reward.append(self.evaluate_policy())
+        np.savez("%s" %(path), a=self.avg_reward)
+        np.savetxt("%s.csv" %(path), self.avg_reward, delimiter=',')
+
 
         
 
@@ -238,6 +257,10 @@ class Trainer(basic.Trainer):
             arr = np.load("%s.npz" %(Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)))
             self.episode_reward = list(arr['a'])
 
+            #load avg_reward so it doesn't overwrite
+            path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)+"_avg_reward"
+            arr = np.load("%s.npz" %(path))
+            self.avg_reward = list(arr['a'])
 
             #unsure if we need tehse
             self.adam_actor = torch.optim.Adam(self.actor.parameters(), lr=Config().algorithm.learning_rate)
@@ -327,7 +350,9 @@ class Trainer(basic.Trainer):
 
                 avg_reward += episode_reward
             avg_reward /= eval_episodes
+            print("------------------")
             print("Average Reward over trace %s is %s" % (str(trace_idx), str(avg_reward)))
+            print("------------------")
             return avg_reward
         #with open("evaluations.csv", 'a') as f:
             #writer = csv.writer(f)
