@@ -239,11 +239,6 @@ trainer:
     # rule.
     do_maintain_per_state: false
 
-
-    # whether to perform the meta training
-    do_meta_training: false
-    meta_epochs: 1
-
     monitor_name: knn
     knn_k: 200
     knn_t: 0.1
