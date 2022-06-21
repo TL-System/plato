@@ -153,6 +153,9 @@ algorithm:
     # Number of episodes to run each round
     max_round_episodes: 200
 
+    # Curriculum learning, fixed difficulty level for motivation experiment
+    difficulty_levels: 3
+
     #If we should save the model or not
     save_models: False
 

@@ -129,9 +129,11 @@ class Trainer(basic.Trainer):
             self.done = False
             self.total_reward = 0
             
-            # TODO different clients with differnet traces, should be easy
-            self.trace_idx = int(self.episode_num / 700)
-            state = self.env.reset(trace_idx=self.trace_idx)
+            
+            #Make difficulty level (trace file) depend on client_id
+            #self.trace_idx = int(self.episode_num / 700) #progresses with time
+            self.trace_idx = (self.client_id % Config().algorithm.difficulty_levels)
+            state = self.env.reset(trace_idx=None)
             state = self.obs_normalizer.normalize(state)
             self.steps = 0
 
