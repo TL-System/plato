@@ -44,7 +44,7 @@ trainer:
 
     # Number of epoches for local training in each communication round
     epochs: 1
-    batch_size: 1
+    batch_size: 2
     optimizer: SGD
     learning_rate: 0.01
     momentum: 0.0
@@ -74,7 +74,7 @@ algorithm:
     # One particular client, e.g., the first selected client
     victim_client: 0
     num_iters: 300
-    log_interval: 10
+    log_interval: 30
 
     # Whether or not use customized initialization for model weights
     init_params: true
@@ -85,6 +85,8 @@ algorithm:
     match_weights: false
     # Matching weights (absolute) or weight updates (delta)
     use_updates: false
+    # The number of times the attack will be attempted
+    trials: 8
 
     ## Defense related
     # Choose from GradDefense, ...
@@ -106,3 +108,9 @@ results:
 
     # Plot results (x_axis-y_axis)
     plot: round-accuracy, elapsed_time-accuracy
+
+    # DLG related parameters
+    # The specific subprocess number to use with plot.py
+    # subprocess: 79618
+    # The specific trial number to plot
+    # trial: 6

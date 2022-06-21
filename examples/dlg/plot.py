@@ -12,13 +12,42 @@ tt = transforms.ToPILImage()
 
 def main():
     result_path = Config().results.result_path
-    result_file = f"{result_path}/plot.png"
+    result_file = f"{result_path}/{os.getpid()}_plot.png"
     try:
-        load_file = os.path.join(result_path, [
+        # Gets all the directories for each individual run
+        subprocesses = [
             file for file in os.listdir(result_path)
-            if (file.endswith("tensors.pt"))
-        ][0])
-        history_dict = torch.load(load_file)
+            if (os.path.isdir(os.path.join(result_path, file)))
+        ]
+        if hasattr(Config().results, "subprocess"):
+            if str(Config().results.subprocess) in subprocesses:
+                subprocess_path = os.path.join(
+                    result_path, str(Config().results.subprocess))
+            else:
+                print("Subprocess not found")
+                exit()
+        else:
+            # Select the latest run
+            subprocess_path = os.path.join(result_path, subprocesses[0])
+
+        trials = [
+            file for file in os.listdir(subprocess_path)
+            if (os.path.isdir(os.path.join(subprocess_path, file)))
+        ]
+
+        if hasattr(Config().results, "trial"):
+            trial = f"t{Config().results.trial}"
+            if trial not in trials:
+                print("Trial not found")
+                exit()
+        else:
+            trial = [file_name for file_name in trials
+                     if "best" in file_name][0]
+
+        final_path = os.path.join(subprocess_path, trial)
+        tensor_file = f"{final_path}/tensors.pt"
+        print("loading", tensor_file)
+        history_dict = torch.load(tensor_file)
     except:
         print("File failed to load")
         exit()
@@ -46,6 +75,7 @@ def main():
             innerplot.axis('off')
             fig.add_subplot(innerplot)
     fig.savefig(result_file)
+    print("file saved to", result_file)
 
 
 if __name__ == "__main__":

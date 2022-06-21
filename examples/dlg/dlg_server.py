@@ -22,6 +22,7 @@ import logging
 import math
 import os
 import sys
+import shutil
 from evaluations import get_evaluation_dict
 from collections import OrderedDict
 from copy import deepcopy
@@ -51,8 +52,7 @@ epochs = Config().trainer.epochs
 batch_size = Config().trainer.batch_size
 num_iters = Config().algorithm.num_iters
 log_interval = Config().algorithm.log_interval
-dlg_result_path = f"{Config().params['result_path']}"
-dlg_result_file = f"{dlg_result_path}/{os.getpid()}_evals.csv"
+dlg_result_path = f"{Config().params['result_path']}/{os.getpid()}"
 dlg_result_headers = [
     "Iteration",
     "Loss",
@@ -76,17 +76,23 @@ class Server(fedavg.Server):
             else:
                 sys.exit('Error: Unknown attack method.')
         self.share_gradients = True
-        if hasattr(Config().algorithm, 'share_gradients') and not Config().algorithm.share_gradients:
+        if hasattr(
+                Config().algorithm,
+                'share_gradients') and not Config().algorithm.share_gradients:
             self.share_gradients = False
         self.match_weights = False
-        if hasattr(Config().algorithm, 'match_weights') and Config().algorithm.match_weights:
+        if hasattr(Config().algorithm,
+                   'match_weights') and Config().algorithm.match_weights:
             self.match_weights = True
         self.use_updates = True
-        if hasattr(Config().algorithm, 'use_updates') and not Config().algorithm.use_updates:
+        if hasattr(Config().algorithm,
+                   'use_updates') and not Config().algorithm.use_updates:
             self.use_updates = False
         self.defense_method = 'no'
         if hasattr(Config().algorithm, 'defense'):
             self.defense_method = Config().algorithm.defense
+        self.best_mse = math.inf
+        self.best_trial = 0
 
     async def process_reports(self):
         """ Process the client reports: before aggregating their weights,
@@ -131,7 +137,8 @@ class Server(fedavg.Server):
             for name, delta in avg_update.items():
                 update_perturbed.append(delta)
             update_compensated = denoise(gradients=update_perturbed,
-                                         scale=math.sqrt(_scale), Q=Config().algorithm.Q)
+                                         scale=math.sqrt(_scale),
+                                         Q=Config().algorithm.Q)
             for i, name in enumerate(avg_update.keys()):
                 avg_update[name] = update_compensated[i]
 
@@ -153,15 +160,19 @@ class Server(fedavg.Server):
         if not self.share_gradients and self.match_weights and self.use_updates:
             target_weights = deltas_received[Config().algorithm.victim_client]
 
-        # Initialize the csv file
-        csv_processor.initialize_csv(
-            dlg_result_file, dlg_result_headers, dlg_result_path)
-
         # Assume the reconstructed data shape is known, which can be also derived from the target dataset
         num_images = partition_size
-        data_size = [num_images, gt_data.shape[1],
-                     gt_data.shape[2], gt_data.shape[3]]
+        data_size = [
+            num_images, gt_data.shape[1], gt_data.shape[2], gt_data.shape[3]
+        ]
         self.plot_gt(num_images, gt_data, gt_label)
+
+        # The number of restarts
+        trials = 1
+        if hasattr(Config().algorithm, "trials"):
+            trials = Config().algorithm.trials
+
+        logging.info("Running %d Trials", trials)
 
         if not self.share_gradients and not self.match_weights:
             # Obtain the local updates from clients
@@ -173,6 +184,24 @@ class Server(fedavg.Server):
             total_local_steps = epochs * math.ceil(partition_size / batch_size)
             target_grad = [x / total_local_steps for x in target_grad]
 
+        for trial_number in range(trials):
+            self.run_trial(trial_number, num_images, data_size, target_weights,
+                           target_grad, gt_data)
+
+        self.save_best()
+
+    def run_trial(self, trial_number, num_images, data_size, target_weights,
+                  target_grad, gt_data):
+        """ Run the attack for one trial. """
+        logging.info("Starting Attack Number %d", (trial_number + 1))
+
+        trial_result_path = f"{dlg_result_path}/t{trial_number + 1}"
+        trial_csv_file = f"{trial_result_path}/evals.csv"
+
+        # Initialize the csv file
+        csv_processor.initialize_csv(trial_csv_file, dlg_result_headers,
+                                     trial_result_path)
+
         # Generate dummy items and initialize optimizer
         dummy_data = torch.randn(data_size).to(
             Config().device()).requires_grad_(True)
@@ -182,21 +211,28 @@ class Server(fedavg.Server):
                 Config().device()).requires_grad_(True)
 
         if self.attack_method == 'DLG':
-            match_optimizer = torch.optim.LBFGS(
-                [dummy_data, dummy_label], lr=Config().algorithm.lr)
+            match_optimizer = torch.optim.LBFGS([dummy_data, dummy_label],
+                                                lr=Config().algorithm.lr)
             est_label = [None] * num_images
             for i in range(num_images):
-                logging.info("[%s Gradient Leakage Attacking with %s defense...] Dummy label is %d.",
-                             self.attack_method, self.defense_method, torch.argmax(dummy_label[i], dim=-1).item())
+                logging.info(
+                    "[%s Gradient Leakage Attack %d with %s defense...] Dummy label is %d.",
+                    self.attack_method, trial_number, self.defense_method,
+                    torch.argmax(dummy_label[i], dim=-1).item())
         elif self.attack_method == 'iDLG':
-            match_optimizer = torch.optim.LBFGS(
-                [dummy_data, ], lr=Config().algorithm.lr)
+            match_optimizer = torch.optim.LBFGS([
+                dummy_data,
+            ],
+                                                lr=Config().algorithm.lr)
             # Estimate the gt label
-            est_label = torch.argmin(torch.sum(
-                target_grad[-2], dim=-1), dim=-1).detach().reshape((1,)).requires_grad_(False)
+            est_label = torch.argmin(torch.sum(target_grad[-2], dim=-1),
+                                     dim=-1).detach().reshape(
+                                         (1, )).requires_grad_(False)
             for i in range(num_images):
-                logging.info("[%s Gradient Leakage Attacking with %s defense...] Estimated label is %d.",
-                             self.attack_method, self.defense_method, est_label.item())
+                logging.info(
+                    "[%s Gradient Leakage Attack %d with %s defense...] Estimated label is %d.",
+                    self.attack_method, trial_number, self.defense_method,
+                    est_label.item())
 
         history, losses, mses, lpipss, psnrs, ssims, library_ssims = [], [], [], [], [], [], []
         avg_mses, avg_lpips, avg_psnr, avg_ssim, avg_library_ssim = [], [], [], [], []
@@ -208,7 +244,8 @@ class Server(fedavg.Server):
                                           dummy_label, target_weights, model)
         else:
             closure = self.gradient_closure(match_optimizer, dummy_data,
-                                            dummy_label, est_label, target_grad)
+                                            dummy_label, est_label,
+                                            target_grad)
 
         for iters in range(num_iters):
             match_optimizer.step(closure)
@@ -217,8 +254,8 @@ class Server(fedavg.Server):
 
             if iters % log_interval == 0:
                 # Finding evaluation metrics
-                eval_dict = get_evaluation_dict(
-                    dummy_data, gt_data, num_images)
+                eval_dict = get_evaluation_dict(dummy_data, gt_data,
+                                                num_images)
                 mses.append(eval_dict["mses"])
                 lpipss.append(eval_dict["lpipss"])
                 psnrs.append(eval_dict["psnrs"])
@@ -231,18 +268,21 @@ class Server(fedavg.Server):
                 avg_library_ssim.append(eval_dict["avg_library_ssim"])
 
                 logging.info(
-                    "[%s Gradient Leakage Attacking with %s defense...] Iter %d: Loss = %.10f, avg MSE = %.8f, avg LPIPS = %.8f, avg PSNR = %.4f dB, avg SSIM = %.3f, avg library SSIM = %.3f",
-                    self.attack_method, self.defense_method, iters, losses[-1], avg_mses[-1], avg_lpips[-1], avg_psnr[-1], avg_ssim[-1], avg_library_ssim[-1])
+                    "[%s Gradient Leakage Attack %d with %s defense...] Iter %d: Loss = %.10f, avg MSE = %.8f, avg LPIPS = %.8f, avg PSNR = %.4f dB, avg SSIM = %.3f, avg library SSIM = %.3f",
+                    self.attack_method, trial_number, self.defense_method,
+                    iters, losses[-1], avg_mses[-1], avg_lpips[-1],
+                    avg_psnr[-1], avg_ssim[-1], avg_library_ssim[-1])
 
                 if self.attack_method == 'DLG':
                     history.append([[
-                        tt(dummy_data[i][0].cpu()
-                           ), torch.argmax(dummy_label[i], dim=-1).item(), dummy_data[i]
+                        tt(dummy_data[i][0].cpu()),
+                        torch.argmax(dummy_label[i], dim=-1).item(),
+                        dummy_data[i]
                     ] for i in range(num_images)])
                 elif self.attack_method == 'iDLG':
                     history.append([[
-                        tt(dummy_data[i][0].cpu()
-                           ), est_label[i].item(), dummy_data[i]
+                        tt(dummy_data[i][0].cpu()), est_label[i].item(),
+                        dummy_data[i]
                     ] for i in range(num_images)])
 
                 new_row = [
@@ -254,12 +294,17 @@ class Server(fedavg.Server):
                     round(avg_ssim[-1], 3),
                     round(avg_library_ssim[-1], 3)
                 ]
-                csv_processor.write_csv(dlg_result_file, new_row)
+                csv_processor.write_csv(trial_csv_file, new_row)
 
-        self.plot_reconstructed(num_images, history)
+        if self.best_mse > avg_mses[-1]:
+            self.best_mse = avg_mses[-1]
+            self.best_trial = trial_number + 1  # the +1 is because we index from 1 and not 0
+
+        reconstructed_path = f"{trial_result_path}/reconstructed.png"
+        self.plot_reconstructed(num_images, history, reconstructed_path)
 
         # Save the tensors into a .pt file
-        tensor_file_path = f"{dlg_result_path}/{os.getpid()}_tensors.pt"
+        tensor_file_path = f"{trial_result_path}/tensors.pt"
         result = {
             i * log_interval: {j: history[i][j][0]
                                for j in range(num_images)}
@@ -267,10 +312,10 @@ class Server(fedavg.Server):
         }
         torch.save(result, tensor_file_path)
 
-        logging.info("Attack complete")
+        logging.info("Attack %d complete", (trial_number + 1))
 
-    def gradient_closure(self, match_optimizer, dummy_data, dummy_label, est_label,
-                         target_grad):
+    def gradient_closure(self, match_optimizer, dummy_data, dummy_label,
+                         est_label, target_grad):
         """ Take a step to match the gradients. """
 
         def closure():
@@ -288,7 +333,8 @@ class Server(fedavg.Server):
                                              create_graph=True)
 
             rec_loss = self.reconstruction_costs([dummy_grad], target_grad)
-            if hasattr(Config().algorithm, 'total_variation') and Config().algorithm.total_variation > 0:
+            if hasattr(Config().algorithm, 'total_variation'
+                       ) and Config().algorithm.total_variation > 0:
                 rec_loss += Config().algorithm.total_variation * TV(dummy_data)
             rec_loss.backward()
             return rec_loss
@@ -303,9 +349,10 @@ class Server(fedavg.Server):
             match_optimizer.zero_grad()
             dummy_weight = self.loss_steps(dummy_data, dummy_label, model)
 
-            rec_loss = self.reconstruction_costs(
-                [dummy_weight], list(target_weights.values()))
-            if hasattr(Config().algorithm, 'total_variation') and Config().algorithm.total_variation > 0:
+            rec_loss = self.reconstruction_costs([dummy_weight],
+                                                 list(target_weights.values()))
+            if hasattr(Config().algorithm, 'total_variation'
+                       ) and Config().algorithm.total_variation > 0:
                 rec_loss += Config().algorithm.total_variation * TV(dummy_data)
             rec_loss.backward()
             return rec_loss
@@ -323,13 +370,14 @@ class Server(fedavg.Server):
         # TODO: another parameter local steps instead of epoch here
         for epoch in range(epochs):
             if batch_size == 1:
-                dummy_pred = patched_model(
-                    dummy_data, patched_model.parameters)
+                dummy_pred = patched_model(dummy_data,
+                                           patched_model.parameters)
                 labels_ = dummy_label
             else:
                 idx = epoch % (dummy_data.shape[0] // batch_size)
-                dummy_pred = patched_model(dummy_data[idx * batch_size:(idx + 1) *
-                                                      batch_size], patched_model.parameters)
+                dummy_pred = patched_model(
+                    dummy_data[idx * batch_size:(idx + 1) * batch_size],
+                    patched_model.parameters)
                 labels_ = dummy_label[idx * batch_size:(idx + 1) * batch_size]
 
             loss = cross_entropy(dummy_pred, torch.argmax(labels_,
@@ -346,10 +394,25 @@ class Server(fedavg.Server):
                 for ((name, param),
                      grad_part) in zip(patched_model.parameters.items(), grad))
         if self.use_updates:
-            patched_model.parameters = OrderedDict((name, param - param_origin)
-                                                   for ((name, param), (name_origin, param_origin))
-                                                   in zip(patched_model.parameters.items(), patched_model_origin.parameters.items()))
+            patched_model.parameters = OrderedDict(
+                (name, param - param_origin)
+                for ((name, param), (name_origin, param_origin)
+                     ) in zip(patched_model.parameters.items(),
+                              patched_model_origin.parameters.items()))
         return list(patched_model.parameters.values())
+
+    def save_best(self):
+        src_folder = f"{dlg_result_path}/t{self.best_trial}"
+        dst_folder = f"{dlg_result_path}/best(t{self.best_trial})"
+
+        if not os.path.exists(dst_folder):
+            os.makedirs(dst_folder)
+
+        for file_name in os.listdir(src_folder):
+            src = os.path.join(src_folder, file_name)
+            dst = os.path.join(dst_folder, file_name)
+            if os.path.isfile(src):
+                shutil.copy(src, dst)
 
     @staticmethod
     def reconstruction_costs(dummy, target):
@@ -385,8 +448,12 @@ class Server(fedavg.Server):
     @staticmethod
     def plot_gt(num_images, gt_data, gt_label):
         """ Plot ground truth data. """
-        gt_result_path = f"{Config().params['result_path']}/{os.getpid()}_gt.png"
+        gt_result_path = f"{dlg_result_path}/ground_truth.png"
         gt_figure = plt.figure(figsize=(12, 4))
+
+        # Make the path if it does not exist yet
+        if not os.path.exists(dlg_result_path):
+            os.makedirs(dlg_result_path)
 
         for i in range(num_images):
             current_label = torch.argmax(gt_label[i], dim=-1).item()
@@ -398,9 +465,8 @@ class Server(fedavg.Server):
         plt.savefig(gt_result_path)
 
     @staticmethod
-    def plot_reconstructed(num_images, history):
+    def plot_reconstructed(num_images, history, reconstructed_result_path):
         """ Plot the reconstructed data. """
-        reconstructed_result_path = f"{Config().params['result_path']}/{os.getpid()}_reconstructed.png"
         for i in range(num_images):
             logging.info("Reconstructed label is %d.", history[-1][i][1])
 
@@ -413,8 +479,7 @@ class Server(fedavg.Server):
                                                      num_images,
                                                      subplot_spec=outer[i])
             outerplot = plt.Subplot(fig, outer[i])
-            outerplot.set_title("Iter=%d" %
-                                (i * log_interval))
+            outerplot.set_title("Iter=%d" % (i * log_interval))
             outerplot.axis('off')
             fig.add_subplot(outerplot)
 
