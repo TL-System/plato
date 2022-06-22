@@ -69,11 +69,6 @@ class Trainer(basic.Trainer):
     def __init__(self, model=None):
         super().__init__()
 
-        print("A TRAINER HAS BEEN INITIALIZED!")
-        print("A TRAINER HAS BEEN INITIALIZED!")
-        print("A TRAINER HAS BEEN INITIALIZED!")
-
-
         self.env = park.make(Config().algorithm.env_park_name)
         seed = Config().data.random_seed * self.client_id
 
@@ -223,7 +218,7 @@ class Trainer(basic.Trainer):
     def load_model(self, filename=None, location=None):
         """Loading pre-trained model weights from a file."""
         #We will load actor and critic models here
-        
+
         model_path = Config(
         ).params['model_path'] if location is None else location
         actor_model_name = 'actor_model'

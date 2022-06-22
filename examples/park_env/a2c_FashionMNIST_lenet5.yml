@@ -153,7 +153,7 @@ algorithm:
     expl_noise: 0.1
 
     # Number of episodes to run each round
-    max_round_episodes: 200
+    max_round_episodes: 2
 
     # Curriculum learning, fixed difficulty level for motivation experiment
     difficulty_levels: 3
