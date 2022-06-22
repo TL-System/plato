@@ -13,7 +13,7 @@ import logging
 import torch
 
 from plato.config import Config
-from plato.servers import fedavg_ssl_base as ssl_server
+from plato.servers import fedavg_pers as ssl_server
 from plato.utils import fonts
 
 
