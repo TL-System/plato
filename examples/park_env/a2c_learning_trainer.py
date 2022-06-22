@@ -132,8 +132,8 @@ class Trainer(basic.Trainer):
             if self.timesteps_since_eval >= Config().algorithm.eval_freq:
                 self.avg_reward = self.evaluate_policy()
                 path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)+"_avg_reward"
-                np.savez("%s" %(path), a=self.avg_reward)
-                np.savetxt("%s.csv" %(path), self.avg_reward, delimiter=",")
+                np.savez("%s" %(path), a=[self.avg_reward])
+                np.savetxt("%s.csv" %(path), [self.avg_reward], delimiter=",")
                 self.timesteps_since_eval = 0
 
             self.done = False
@@ -179,8 +179,8 @@ class Trainer(basic.Trainer):
 
         path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)+"_avg_reward"
         self.avg_reward = self.evaluate_policy()
-        np.savez("%s" %(path), a=self.avg_reward)
-        np.savetxt("%s.csv" %(path), self.avg_reward, delimiter=',')
+        np.savez("%s" %(path), a=[self.avg_reward])
+        np.savetxt("%s.csv" %(path), [self.avg_reward], delimiter=',')
         self.avg_actor_loss = sum(self.actor_loss)/len(self.actor_loss)
         self.avg_critic_loss = sum(self.critic_loss)/len(self.critic_loss)
         
@@ -361,7 +361,7 @@ class Trainer(basic.Trainer):
         avg_reward = self.evaluate_policy()
         self.server_reward = avg_reward
         file_name = "A2C_RL_SERVER"
-        np.savetxt("%s.csv" %(Config().results.results_dir +"/"+file_name), self.server_reward, delimiter=",")
+        np.savetxt("%s.csv" %(Config().results.results_dir +"/"+file_name), [self.server_reward], delimiter=",")
         return sum(avg_reward)/len(avg_reward)
 
         
