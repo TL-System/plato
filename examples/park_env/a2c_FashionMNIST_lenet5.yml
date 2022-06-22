@@ -82,11 +82,10 @@ trainer:
     max_concurrency: 4
 
     # The target accuracy
-    # TODO: we should have a train reward, or target number of steps
-    # I think the target number of steps is in the algorithm.iterations down below
     target_accuracy: 5000
 
     # Number of epoches for local training in each communication round
+    # TODO: removee those if no need for them
     epochs: 10
     batch_size: 32
     optimizer: SGD
