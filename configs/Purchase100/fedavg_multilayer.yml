@@ -32,17 +32,10 @@ data:
 trainer:
     # The type of the trainer
     type: basic
-<<<<<<< HEAD
-    # type: diff_privacy 
-    # dp_epsilon: 2
-    # dp_delta: 0.00001
-    # dp_max_grad_norm: 1 
-=======
     # type: diff_privacy
     # dp_epsilon: 2
     # dp_delta: 0.00001
     # dp_max_grad_norm: 1
->>>>>>> main
 
     # The maximum number of training rounds
     rounds: 100
