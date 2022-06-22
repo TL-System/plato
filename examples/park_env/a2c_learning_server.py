@@ -27,6 +27,20 @@ class A2CServer(fedavg.Server):
         
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using federated averaging."""
+        print("WE ARE FEDERATED AVERAGING!!!")
+        print("WE ARE FEDERATED AVERAGING!!!")
+
+        print("WE ARE FEDERATED AVERAGING!!!")
+
+        print("WE ARE FEDERATED AVERAGING!!!")
+
+        print("WE ARE FEDERATED AVERAGING!!!")
+
+        print("WE ARE FEDERATED AVERAGING!!!")
+
+        print("WE ARE FEDERATED AVERAGING!!!")
+
+
 
         weights_received = self.compute_weight_deltas(updates)
 
@@ -85,16 +99,22 @@ class A2CServer(fedavg.Server):
                   'wb') as checkpoint_file:
             pickle.dump(self.current_round, checkpoint_file)
 
-    def choose_clients(self, clients_pool, clients_count):
-        """ Choose a subset of the clients to participate in each round. """
+    async def process_clients(self, client_info):
+        print("WE WILL NOW PROCESS AND SELECT OUR OWN CLIENTS!!!!!!!!!!!!!!!!!")
+        #TODO
+        #Client_info holds a tuple of (useless, reports, useless, useless)
+        #Interested in the second element of tuple
+
+    """def choose_clients(self, clients_pool, clients_count):
+       
         assert clients_count <= len(clients_pool)
 
         print("IN CHOOSE CLIENTS!!!!")
         print(self.updates) #notice how this is none since no report is returned at this point
         #TODO
-        """If we want to aggregate CERTAIN clients out of ALL clients 
+        If we want to aggregate CERTAIN clients out of ALL clients 
         based on their actor and loss rate, we need to
-        receive a report from the ALL clients FIRST and then select them"""
+        receive a report from the ALL clients FIRST and then select them
         
         selected_clients = []
 
@@ -119,5 +139,5 @@ class A2CServer(fedavg.Server):
 
         logging.info("[%s] Selected clients: %s", self, selected_clients)
         return selected_clients 
-
+    """
     
