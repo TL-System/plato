@@ -112,7 +112,7 @@ class Trainer(basic.Trainer):
         if not os.path.exists(Config().results.results_dir):
             os.makedirs(Config().results.results_dir)
 
-        self.path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
+        #self.path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
 
 
     def t(self, x): 
@@ -128,8 +128,8 @@ class Trainer(basic.Trainer):
             
             #Evaluates policy at a frequency set in config file
             if self.timesteps_since_eval >= Config().algorithm.eval_freq:
-                self.avg_reward.append(self.evaluate_policy())
-                path = self.path+"_avg_reward"
+                self.avg_reward = self.evaluate_policy()
+                path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)+"_avg_reward"
                 np.savez("%s" %(path), a=self.avg_reward)
                 np.savetxt("%s.csv" %(path), self.avg_reward, delimiter=",")
                 self.timesteps_since_eval = 0
@@ -170,13 +170,13 @@ class Trainer(basic.Trainer):
             self.episode_num += 1
             self.timesteps_since_eval += 1
             self.episode_reward.append(self.total_reward)
-            np.savez("%s" %(self.path), a=self.episode_reward)
-            np.savetxt("%s.csv" %(self.path), self.episode_reward, delimiter=",")
+            np.savez("%s" %(Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)), a=self.episode_reward)
+            np.savetxt("%s.csv" %(Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)), self.episode_reward, delimiter=",")
             round_episodes += 1
             print("Episode number: %d, Reward: %d" % (self.episode_num, self.total_reward))
 
-        path = self.path+"_avg_reward"
-        self.avg_reward.append(self.evaluate_policy())
+        path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)+"_avg_reward"
+        self.avg_reward = self.evaluate_policy()
         np.savez("%s" %(path), a=self.avg_reward)
         np.savetxt("%s.csv" %(path), self.avg_reward, delimiter=',')
         self.avg_actor_loss = sum(self.actor_loss)/len(self.actor_loss)
@@ -218,7 +218,7 @@ class Trainer(basic.Trainer):
     def load_model(self, filename=None, location=None):
         """Loading pre-trained model weights from a file."""
         #We will load actor and critic models here
-
+        
         model_path = Config(
         ).params['model_path'] if location is None else location
         actor_model_name = 'actor_model'
@@ -267,10 +267,11 @@ class Trainer(basic.Trainer):
 
     def load_loss(self, actor_passed):
         loss_path = ""
+        path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
         if actor_passed:
-            loss_path = self.path+"_actor_loss"
+            loss_path = path+"_actor_loss"
         else:
-            loss_path = self.path + "_critic_loss"
+            loss_path = path + "_critic_loss"
 
         with open(loss_path, 'r', encoding='utf-8') as file:
                 loss = float(file.read())
@@ -289,9 +290,12 @@ class Trainer(basic.Trainer):
         env_algorithm = self.env_name+ self.algorithm_name
 
         #call save loss here
-        Trainer.save_loss(self.avg_actor_loss, self.path, True)
-        Trainer.save_loss(self.avg_critic_loss, self.path, False)
-        
+        check_point_save = "checkpoint" in filename
+        if not check_point_save:
+            path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
+            Trainer.save_loss(self.avg_actor_loss, path, True)
+            Trainer.save_loss(self.avg_critic_loss, path, False)
+            
 
         #print("AVERAGE ACTOR LOSS IN SAVE MODEL IS THIS: ")
         #print(self.avg_actor_loss)
@@ -338,6 +342,7 @@ class Trainer(basic.Trainer):
 
     @staticmethod
     def save_loss(loss, path, actor_passed):
+
         loss_path = ""
         if actor_passed:
             loss_path = path+"_actor_loss"
@@ -349,16 +354,10 @@ class Trainer(basic.Trainer):
     
 
 
-
     async def server_test(self, testset, sampler=None, **kwargs):
         #We will return the average reward here
-        #print("----------------")
-        #print(self.get_actor_loss())
-        #print("----------------")
-        #print(self.get_critic_loss())
-        #print("----------------")
         avg_reward = self.evaluate_policy()
-        self.server_reward.append(avg_reward)
+        self.server_reward = avg_reward
         file_name = "A2C_RL_SERVER"
         np.savetxt("%s.csv" %(Config().results.results_dir +"/"+file_name), self.server_reward, delimiter=",")
         return sum(avg_reward)/len(avg_reward)
