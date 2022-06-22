@@ -5,8 +5,10 @@ general:
     # for different purposes
     # - central_code_test
     # - central
+    # - code_test
     # - user
-    running_mode: central
+
+    running_mode: user
 
     file_logging: True
 
@@ -15,22 +17,23 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 1
+    total_clients: 50
 
     # The number of clients selected in each round
-    per_round: 1
+    per_round: 30
 
     # Should the clients compute test accuracy locally?
     do_test: True
+
     # whether perform the eval test at the final round
     # on all clients
     do_final_eval_test: True
     # Minotor the self-supervised learning by knn for
-    # every 1 round
-    test_interval: 1
+    # every 5 round
+    test_interval: 5
     # Train the personalized model based on the
-    # learned representation every 1 rounds
-    eval_test_interval: 1
+    # learned representation every 10 rounds
+    eval_test_interval: 10
     # Whether simulate clients or not
     simulation: true
 
@@ -38,9 +41,9 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8013
+    port: 8012
     synchronous: true
-    do_test: false
+    do_test: true
 
     # for the paths of models; checkpoints; results,
     # they utilize the same name, following the one defined in
@@ -60,7 +63,7 @@ server:
 
 data:
     # The training and testing dataset
-    datasource: MNIST
+    datasource: CIFAR10
 
     # Number of samples in each partition
     #
@@ -68,39 +71,30 @@ data:
     # may lead the failure of the loss criterion part
     # if your loss criterion relies on the batch_size
     # as its argument. For example, the NT_Xent loss utilized
-    # by the BYOL method set the defined batch_size as the parameter.
+    # by the SimCLR method set the defined batch_size as the parameter.
     # However, at the end of one epoch, the left samples may smaller than
     # the batch_size. This makes the #loaded samples != batch_size.
     # Working on criterion that is defined with batch_size but receives loaded
     # samples whose size is smaller than the batch size may causes problems.
     # drop_last can alleviate this issue
-    partition_size: 60000
+    partition_size: 1000
 
     # IID or non-IID?
-    sampler: iid
-    testset_sampler: iid
+    sampler: noniid
+    testset_sampler: noniid
 
+    # The concentration parameter for the Dirichlet distribution
+    concentration: 0.1
 
     # The random seed for sampling data
     random_seed: 1
 
-    # set the data wrapper to further process the data
-    #   for the specific usage, such as constrastive learning
-    # data_wrapper: Null
-    data_wrapper: ContrastiveAugmentWrapper
-
-    # set the data augmentation
-    #   options: simsiam, byol, simclr
-    augment_transformer_name: byol
-    # some methods apply the normalization to samples
-    #   while others do not
-    is_norm: True
 
 trainer:
     # The type of the trainer
     type: basic
     # The maximum number of training rounds
-    rounds: 1
+    rounds: 100
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -115,7 +109,7 @@ trainer:
     #   The user is expected to carefully choose the batch_size to avoid
     # the memory allocation issue as the contrastive samples occupy more
     # space as more samples will be contained within one loading.
-    epochs: 50
+    epochs: 5
     batch_size: 64
     optimizer: Adam
     learning_rate: 0.003
@@ -130,72 +124,14 @@ trainer:
     lr_gamma: 0.9
 
     epoch_log_interval: 2
-    batch_log_interval: 50
-
-    # Number of epochs for local training in each communication round
-    #   The batch size for the downstream task can be larger as it
-    # does not utilize the
-    pers_epochs: 100
-    pers_batch_size: 64
-    pers_optimizer: Adam
-    pers_learning_rate: 0.005
-    pers_betas:
-        - 0.9
-        - 0.99
-    pers_eps: 0.00000009 # 1e-8
-    pers_weight_decay: 0.002
-
-    # currently, we only support CosineAnnealingLR
-    pers_lr_schedule: StepLR
-    pers_lr_step_size: 20
-    pers_lr_gamma: 0.9
-
-    pers_epoch_log_interval: 2
-
-    # image_size
-    #  - CIFAR10 (Image size=32)
-    #  - MNIST (Image size=28)
-    image_size: 28
+    batch_log_interval: 5
 
     # The machine learning model,
     # it behaves as the encoder for the ssl method
     # the final fc layer will be removed
     # however, in the central test, we do not use this
     #   but use the custom model
-    model_name: lenet5
-    # in general, the projection_dim = prediction_dim
-    projection_dim: 128
-    prediction_dim: 128
-    # here are two ways to determine this decay
-    # - constant value: 0.99
-    # - adaptive computed with traing epochs.
-    #   such as the one in "three-method" implementation
-    onlient_target_moving_average_decay: 0.99
-
-    # set which part of the model is used as the global model
-    # - whole: the whole model
-    # - online_network: the online_network is exchanged
-    # - target_network: the target_network is exchanged
-    global_model_name: online_network; online_predictor
-    personalized_model_name: pure_one_layer_mlp
-
-    # whether to maintain the state of the trained personalized
-    # model in each round
-    # In general, for the contrastive self-supervised learning
-    # every eval test should be a new learning process to train
-    # the randomly initialized personalized model
-    # Thus, setting do_maintain_per_state to be false to follow
-    # this rule.
-    # However, in some cases, we want to maintain the state of the
-    # trained personalized model in each round.
-    # Then, setting do_maintain_per_state to be True to follow this
-    # rule.
-    do_maintain_per_state: false
-
-    monitor_name: knn
-    knn_k: 200
-    knn_t: 0.1
-    hide_monitor_progress: False
+    model_name: resnet_18
 
     num_classes: 10
 

@@ -177,7 +177,7 @@ trainer:
     # - whole: the whole model
     # - online_network: the online_network is exchanged
     # - target_network: the target_network is exchanged
-    global_model_name: online_network; online_predictor
+    global_model_name: online_network__online_predictor
     personalized_model_name: pure_one_layer_mlp
 
     # whether to maintain the state of the trained personalized

@@ -1,15 +1,15 @@
 
-# For the central learning of BYOL on the CIFAR10 datase,
-#   we directly follow the setting provided by:
-
 general:
 
     # performing different running mode
     # for different purposes
     # - central_code_test
     # - central
+    # - script
+    # - code_test
     # - user
-    running_mode: central
+
+    running_mode: script
 
     file_logging: True
 
@@ -18,30 +18,28 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 1
+    total_clients: 50
 
     # The number of clients selected in each round
-    per_round: 1
+    per_round: 30
 
     # Should the clients compute test accuracy locally?
     do_test: True
 
-    # whether perform the eval test at the final round
-    # on all clients
-    do_final_eval_test: True
-
     # Minotor the self-supervised learning by knn for
-    # every 1 round
+    # every 5 round
     test_interval: 1
-    # Train the personalized model based on the
-    # learned representation every 1 rounds
-    eval_test_interval: 1
+
     # Whether simulate clients or not
     simulation: true
 
     random_seed: 1
 
 server:
+    address: 127.0.0.1
+    port: 8012
+    synchronous: true
+    do_test: true
 
     # for the paths of models; checkpoints; results,
     # they utilize the same name, following the one defined in
@@ -58,6 +56,7 @@ server:
     model_path: xxx
     checkpoint_path: xxx
 
+
 data:
     # The training and testing dataset
     datasource: CIFAR10
@@ -68,32 +67,29 @@ data:
     # may lead the failure of the loss criterion part
     # if your loss criterion relies on the batch_size
     # as its argument. For example, the NT_Xent loss utilized
-    # by the BYOL method set the defined batch_size as the parameter.
+    # by the SimCLR method set the defined batch_size as the parameter.
     # However, at the end of one epoch, the left samples may smaller than
     # the batch_size. This makes the #loaded samples != batch_size.
     # Working on criterion that is defined with batch_size but receives loaded
     # samples whose size is smaller than the batch size may causes problems.
     # drop_last can alleviate this issue
-    partition_size: 50000
+    partition_size: 1000
 
     # IID or non-IID?
-    sampler: iid
-    testset_sampler: iid
+    sampler: noniid
+    testset_sampler: noniid
+
+    # The concentration parameter for the Dirichlet distribution
+    concentration: 0.1
+
+    # sampler: label_quantity_noniid
+    # testset_sampler: label_quantity_noniid
+
+    # per_client_classes_size: 2
 
     # The random seed for sampling data
     random_seed: 1
 
-    # set the data wrapper to further process the data
-    #   for the specific usage, such as constrastive learning
-    # data_wrapper: Null
-    data_wrapper: ContrastiveAugmentWrapper
-
-    # set the data augmentation
-    #   options: simsiam, byol, simclr, moco
-    augment_transformer_name: moco
-    # some methods apply the normalization to samples
-    #   while others do not
-    is_norm: True
 
 trainer:
     # The type of the trainer
@@ -108,13 +104,13 @@ trainer:
     max_concurrency: 5
 
     # The target accuracy
-    target_accuracy: 0.9
+    target_accuracy: 0.98
 
     # Number of epochs for local training in each communication round
     #   The user is expected to carefully choose the batch_size to avoid
     # the memory allocation issue as the contrastive samples occupy more
     # space as more samples will be contained within one loading.
-    epochs: 1
+    epochs: 30
     batch_size: 64
     optimizer: Adam
     learning_rate: 0.003
@@ -129,32 +125,7 @@ trainer:
     lr_gamma: 0.9
 
     epoch_log_interval: 2
-    batch_log_interval: 1
-
-    # Number of epochs for local training in each communication round
-    #   The batch size for the downstream task can be larger as it
-    # does not utilize the
-    pers_epochs: 100
-    pers_batch_size: 64
-    pers_optimizer: Adam
-    pers_learning_rate: 0.005
-    pers_betas:
-        - 0.9
-        - 0.99
-    pers_eps: 0.00000009 # 1e-8
-    pers_weight_decay: 0.002
-
-    # currently, we only support CosineAnnealingLR
-    pers_lr_schedule: StepLR
-    pers_lr_step_size: 20
-    pers_lr_gamma: 0.9
-
-    pers_epoch_log_interval: 2
-
-    # image_size
-    #  - CIFAR10 (Image size=32)
-    #  - MNIST (Image size=28)
-    image_size: 32
+    batch_log_interval: 5
 
     # The machine learning model,
     # it behaves as the encoder for the ssl method
@@ -162,41 +133,6 @@ trainer:
     # however, in the central test, we do not use this
     #   but use the custom model
     model_name: resnet_18
-    # in general,
-    feature_dim: 128
-
-    # temperature
-    temperature: 0.07
-    # queue_size, 65536 by default
-    queue_size: 65536
-    # moco momentum of updating key encoder (default: 0.999)
-    update_momentum: 0.999
-
-    # set which part of the model is used as the global model
-    # - whole: the whole model
-    # - encoder_q: the encoder_q is exchanged
-    # - encoder_k: the encoder_k is exchanged
-    global_model_name: encoder_q
-    personalized_model_name: pure_one_layer_mlp
-
-    # whether to maintain the state of the trained personalized
-    # model in each round
-    # In general, for the contrastive self-supervised learning
-    # every eval test should be a new learning process to train
-    # the randomly initialized personalized model
-    # Thus, setting do_maintain_per_state to be false to follow
-    # this rule.
-    # However, in some cases, we want to maintain the state of the
-    # trained personalized model in each round.
-    # Then, setting do_maintain_per_state to be True to follow this
-    # rule.
-    # For central learning with one round training, this is useless
-    do_maintain_per_state: false
-
-    monitor_name: knn
-    knn_k: 200
-    knn_t: 0.1
-    hide_monitor_progress: False
 
     num_classes: 10
 
@@ -205,4 +141,4 @@ algorithm:
     type: fedavg
 
 results:
-    result_path: results/MoCo_CIFAR10_central_resnet18_pureMLP
+    result_path: xxx
