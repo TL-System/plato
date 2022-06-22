@@ -24,6 +24,8 @@ clients:
     # If we are simulating client training times, what is the average training time?
     avg_training_time: 20
 
+    random_seed: 1
+
 server:
     address: 127.0.0.1
     port: 8002
@@ -153,7 +155,7 @@ algorithm:
     expl_noise: 0.1
 
     # Number of episodes to run each round
-    max_round_episodes: 2
+    max_round_episodes: 200
 
     # Curriculum learning, fixed difficulty level for motivation experiment
     difficulty_levels: 3

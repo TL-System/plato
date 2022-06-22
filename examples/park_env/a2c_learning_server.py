@@ -99,8 +99,8 @@ class A2CServer(fedavg.Server):
                   'wb') as checkpoint_file:
             pickle.dump(self.current_round, checkpoint_file)
 
-    async def process_clients(self, client_info):
-        print("WE WILL NOW PROCESS AND SELECT OUR OWN CLIENTS!!!!!!!!!!!!!!!!!")
+   # async def process_clients(self, client_info):
+    #    print("WE WILL NOW PROCESS AND SELECT OUR OWN CLIENTS!!!!!!!!!!!!!!!!!")
         #TODO
         #Client_info holds a tuple of (useless, reports, useless, useless)
         #Interested in the second element of tuple
