@@ -3,28 +3,34 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 100
+    total_clients: 1
 
     # The number of clients selected in each round
-    per_round: 5
+    per_round: 1
 
     # Should the clients compute test accuracy locally?
     do_test: false
 
 server:
     address: 127.0.0.1
-    port: 8080
+    port: 8000
     simulate_wall_time: true
 
 data:
     # The training and testing dataset
-    datasource: Purchase
+    datasource: EMNIST
 
     # Number of samples in each partition
-    partition_size: 2000
+    partition_size: 11280
 
     # IID or non-IID?
-    sampler: noniid
+    sampler: mixed_label_quantity_noniid
+
+    # per client classes size
+    consistent_clients_size: 1
+    anchor_classes: [2, 3, 9]
+    per_client_classes_size: 3
+    keep_anchor_classes_size: 1
 
     # The random seed for sampling data
     random_seed: 1
@@ -32,17 +38,6 @@ data:
 trainer:
     # The type of the trainer
     type: basic
-<<<<<<< HEAD
-    # type: diff_privacy 
-    # dp_epsilon: 2
-    # dp_delta: 0.00001
-    # dp_max_grad_norm: 1 
-=======
-    # type: diff_privacy
-    # dp_epsilon: 2
-    # dp_delta: 0.00001
-    # dp_max_grad_norm: 1
->>>>>>> main
 
     # The maximum number of training rounds
     rounds: 100
@@ -51,7 +46,7 @@ trainer:
     max_concurrency: 10
 
     # The target accuracy
-    target_accuracy: 0.80
+    target_accuracy: 0.95
 
     # Number of epoches for local training in each communication round
     epochs: 5
@@ -62,9 +57,8 @@ trainer:
     weight_decay: 0.0
 
     # The machine learning model
-    model_name: multilayer
-    input_dim: 600
-    num_classes: 100
+    model_name: lenet5
+    num_classes: 47
 
 algorithm:
     # Aggregation algorithm
