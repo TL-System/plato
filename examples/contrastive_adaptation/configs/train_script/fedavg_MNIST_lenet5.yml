@@ -21,7 +21,7 @@ clients:
     total_clients: 50
 
     # The number of clients selected in each round
-    per_round: 30
+    per_round: 50
 
     # Should the clients compute test accuracy locally?
     do_test: True
@@ -75,11 +75,13 @@ data:
     # drop_last can alleviate this issue
     partition_size: 1000
 
-    # IID or non-IID?
-    sampler: label_quantity_noniid
-    testset_sampler: label_quantity_noniid
 
-    per_client_classes_size: 2
+    # IID or non-IID?
+    sampler: noniid
+    testset_sampler: noniid
+
+    # The concentration parameter for the Dirichlet distribution
+    concentration: 0.5
 
     # The concentration parameter for the Dirichlet distribution
     # sampler: noniid
@@ -109,7 +111,7 @@ trainer:
     #   The user is expected to carefully choose the batch_size to avoid
     # the memory allocation issue as the contrastive samples occupy more
     # space as more samples will be contained within one loading.
-    epochs: 10
+    epochs: 50
     batch_size: 64
     optimizer: Adam
     learning_rate: 0.003

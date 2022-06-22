@@ -494,6 +494,13 @@ class Config:
             )
             # apply the central learning
             Config.clients = Config.clients._replace(test_interval=1)
+            if hasattr(Config.clients, "do_final_eval_test"):
+                Config.clients = Config.clients._replace(
+                    do_final_eval_test=True)
+            if hasattr(Config.clients, "eval_test_interval"):
+                Config.clients = Config.clients._replace(
+                    eval_test_interval=True)
+
             Config.server = Config.server._replace(do_test=True)
 
             Config.trainer = Config.trainer._replace(rounds=1)

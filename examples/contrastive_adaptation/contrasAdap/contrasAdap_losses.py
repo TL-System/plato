@@ -125,7 +125,7 @@ class ContrasAdapLoss(nn.Module):
         # Combine two inputs features into one
         # encoded_z1: batch_size, fea_dim
         # encoded_z2: batch_size, fea_dim
-        # features: batch_size, 2 * fea_dim
+        # features: batch_size, 2, fea_dim
 
         features = torch.cat(
             [encoded_z1.unsqueeze(1),
