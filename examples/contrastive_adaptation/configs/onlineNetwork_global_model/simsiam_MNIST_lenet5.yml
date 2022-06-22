@@ -178,7 +178,7 @@ trainer:
     onlient_target_moving_average_decay: 0.99
 
     # name of the component used as the global model
-    global_model_name: compound_encoder; predictor
+    global_model_name: compound_encoder__predictor
 
     personalized_model_name: pure_one_layer_mlp
 
