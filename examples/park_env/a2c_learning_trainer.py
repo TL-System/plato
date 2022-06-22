@@ -21,6 +21,8 @@ import a2c
 # Memory
 # Stores results from the networks, instead of calculating the operations again from states, etc.
 
+# TODO: see if decreasing entropy ratio improvees training.
+
 class StateNormalizer(object):
     def __init__(self, obs_space):
         self.shift = obs_space.low
@@ -365,7 +367,7 @@ class Trainer(basic.Trainer):
 
         
     def evaluate_policy(self, eval_episodes = 10):
-        # TODO: how does returning 3 rewards affect the server, when sever_test is called? it should compare to one number, right?
+        
         avg_rewards = []
         for trace_idx in range(3):
             avg_reward = 0
