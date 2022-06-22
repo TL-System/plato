@@ -21,8 +21,6 @@ import a2c
 # Memory
 # Stores results from the networks, instead of calculating the operations again from states, etc.
 
-# TODO: see if decreasing entropy ratio improvees training.
-
 class StateNormalizer(object):
     def __init__(self, obs_space):
         self.shift = obs_space.low
@@ -204,7 +202,8 @@ class Trainer(basic.Trainer):
         critic_loss.backward()
         
         entropy_loss = (torch.stack(memory.log_probs) * torch.exp(torch.stack(memory.log_probs))).mean()
-        actor_loss = (-torch.stack(memory.log_probs)*advantage.detach()).mean() + entropy_loss * Config().algorithm.entropy_ratio
+        entropy_coef = max((Config().algorithm.entropy_ratio - (self.episode_num/Config().algorithm.batch_size) * Config().algorithm.entropy_decay), Config().algorithm.entropy_min)
+        actor_loss = (-torch.stack(memory.log_probs)*advantage.detach()).mean() + entropy_loss * entropy_coef
         if Config().algorithm.grad_clip_val > 0:
             clip_grad_norm_(self.actor.parameters(), Config().algorithm.grad_clip_val)
 
