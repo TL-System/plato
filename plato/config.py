@@ -9,6 +9,7 @@ import os
 from collections import OrderedDict, namedtuple
 from typing import Any, IO
 import shutil
+from attr import has
 
 import numpy as np
 import yaml
@@ -388,13 +389,24 @@ class Config:
         """
         # the path name should be the combination of
         # ssl method name,
-        ssl_method_name = Config.data.augment_transformer_name
-        # the component name for the global model
-        global_model_name = Config.trainer.global_model_name
-        # personalized model name
-        personalized_model_name = Config.trainer.personalized_model_name
-        if personalized_model_name == "pure_one_layer_mlp":
-            personalized_model_name = "pureMLP"
+        ssl_method_name = "null"
+        if hasattr(Config.data, "augment_transformer_name"
+                   ) and Config.data.augment_transformer_name:
+            ssl_method_name = Config.data.augment_transformer_name
+
+        global_model_name = "null"
+        if hasattr(Config.trainer,
+                   "global_model_name") and Config.trainer.global_model_name:
+            global_model_name = Config.trainer.global_model_name
+
+        personalized_model_name = "null"
+        if hasattr(Config.trainer, "personalized_model_name"
+                   ) and Config.trainer.personalized_model_name:
+            # personalized model name
+            personalized_model_name = Config.trainer.personalized_model_name
+
+            if personalized_model_name == "pure_one_layer_mlp":
+                personalized_model_name = "pureMLP"
 
         # dataset name
         datasource = Config.data.datasource
@@ -407,6 +419,7 @@ class Config:
         ])
         if "central" in running_mode:
             target_name = target_name + "_central"
+
         return target_name
 
     @staticmethod
@@ -452,11 +465,18 @@ class Config:
             Config.trainer = Config.trainer._replace(rounds=5)
             Config.trainer = Config.trainer._replace(epochs=5)
             Config.trainer = Config.trainer._replace(batch_size=30)
-            Config.trainer = Config.trainer._replace(epoch_log_interval=1)
-            Config.trainer = Config.trainer._replace(batch_log_interval=5)
-            Config.trainer = Config.trainer._replace(pers_epochs=10)
-            Config.trainer = Config.trainer._replace(pers_batch_size=30)
-            Config.trainer = Config.trainer._replace(pers_epoch_log_interval=1)
+
+            if hasattr(Config.trainer, "epoch_log_interval"):
+                Config.trainer = Config.trainer._replace(epoch_log_interval=1)
+            if hasattr(Config.trainer, "batch_log_interval"):
+                Config.trainer = Config.trainer._replace(batch_log_interval=5)
+            if hasattr(Config.trainer, "pers_epochs"):
+                Config.trainer = Config.trainer._replace(pers_epochs=10)
+            if hasattr(Config.trainer, "pers_batch_size"):
+                Config.trainer = Config.trainer._replace(pers_batch_size=30)
+            if hasattr(Config.trainer, "pers_epoch_log_interval"):
+                Config.trainer = Config.trainer._replace(
+                    pers_epoch_log_interval=1)
 
         if "central" in running_mode:
             logging.info(
@@ -466,4 +486,14 @@ class Config:
             Config.clients = Config.clients._replace(per_round=1)
             Config.data = Config.data._replace(sampler="iid")
             Config.data = Config.data._replace(testset_sampler="iid")
+            Config.trainer = Config.trainer._replace(rounds=1)
+
+        if "script" in running_mode:
+            logging.info(
+                "Performing the learing from the script with specific configurations."
+            )
+            # apply the central learning
+            Config.clients = Config.clients._replace(test_interval=1)
+            Config.server = Config.server._replace(do_test=True)
+
             Config.trainer = Config.trainer._replace(rounds=1)

@@ -38,6 +38,7 @@ from plato.samplers import sampler_utils
 class Sampler(base.Sampler):
     """Create a data sampler for each client to use a divided partition of the
     dataset, biased across classes according to the parameter per_client_classes_size."""
+
     def __init__(self, datasource, client_id, testing):
         super().__init__()
         self.client_id = client_id
