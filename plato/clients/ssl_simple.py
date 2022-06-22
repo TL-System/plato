@@ -8,10 +8,8 @@ import logging
 import time
 from dataclasses import dataclass
 
-from attr import has
-
 from plato.config import Config
-from plato.clients import simple
+from plato.clients import pers_simple
 from plato.clients import base
 from plato.models import general_mlps_register as general_MLP_model
 from plato.datasources import datawrapper_registry
@@ -29,7 +27,7 @@ class Report(base.Report):
     update_response: bool
 
 
-class Client(simple.Client):
+class Client(pers_simple.Client):
     """A basic self-supervised federated learning client who completes
      learning process containing two stages."""
 

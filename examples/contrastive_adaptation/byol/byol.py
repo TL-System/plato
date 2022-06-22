@@ -18,7 +18,7 @@ import byol_trainer
 
 from plato.clients import ssl_simple as ssl_client
 from plato.algorithms import fedavg_ssl
-from plato.servers import fedavg_ssl_base as ssl_server
+from plato.servers import fedavg_pers as ssl_server
 
 
 def main():

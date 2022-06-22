@@ -18,7 +18,7 @@ import simclr_net
 
 from plato.trainers import contrastive_ssl as ssl_trainer
 from plato.clients import ssl_simple as ssl_client
-from plato.servers import fedavg_ssl_base as ssl_server
+from plato.servers import fedavg_pers as ssl_server
 from plato.algorithms import fedavg_ssl
 
 
