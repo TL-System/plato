@@ -30,18 +30,6 @@ class A2CServer(fedavg.Server):
         print("WE ARE FEDERATED AVERAGING!!!")
         print("WE ARE FEDERATED AVERAGING!!!")
 
-        print("WE ARE FEDERATED AVERAGING!!!")
-
-        print("WE ARE FEDERATED AVERAGING!!!")
-
-        print("WE ARE FEDERATED AVERAGING!!!")
-
-        print("WE ARE FEDERATED AVERAGING!!!")
-
-        print("WE ARE FEDERATED AVERAGING!!!")
-
-
-
         weights_received = self.compute_weight_deltas(updates)
 
         self.total_samples = sum(

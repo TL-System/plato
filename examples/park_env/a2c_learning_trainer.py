@@ -169,9 +169,6 @@ class Trainer(basic.Trainer):
 
             self.episode_num += 1
             self.timesteps_since_eval += 1
-            self.episode_reward.append(self.total_reward)
-            np.savez("%s" %(Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)), a=self.episode_reward)
-            np.savetxt("%s.csv" %(Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)), self.episode_reward, delimiter=",")
             round_episodes += 1
             print("Episode number: %d, Reward: %d" % (self.episode_num, self.total_reward))
 
@@ -179,6 +176,7 @@ class Trainer(basic.Trainer):
         self.avg_reward = self.evaluate_policy()
         np.savez("%s" %(path), a=[self.avg_reward])
         np.savetxt("%s.csv" %(path), [self.avg_reward], delimiter=',')
+
         self.avg_actor_loss = sum(self.actor_loss)/len(self.actor_loss)
         self.avg_critic_loss = sum(self.critic_loss)/len(self.critic_loss)
         
@@ -252,10 +250,6 @@ class Trainer(basic.Trainer):
             self.actor.load_state_dict(torch.load(actor_model_path), strict=True)
             self.critic.load_state_dict(torch.load(critic_model_path), strict=True)
 
-            #load episode_reward so it doesn't overwrite
-            arr = np.load("%s.npz" %(Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)))
-            self.episode_reward = list(arr['a'])
-
             #load avg_reward so it doesn't overwrite
             path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)+"_avg_reward"
             arr = np.load("%s.npz" %(path))
@@ -276,7 +270,7 @@ class Trainer(basic.Trainer):
 
         with open(loss_path, 'r', encoding='utf-8') as file:
                 loss = float(file.read())
-        
+
         return loss
 
 
@@ -352,6 +346,10 @@ class Trainer(basic.Trainer):
 
         with open(loss_path, 'w', encoding='utf-8') as file:
                 file.write(str(loss))
+
+        with open(loss_path+".csv", 'a', encoding='utf-8') as filehandle:
+            filehandle.write(str(loss)+'\n')
+        
     
 
 
