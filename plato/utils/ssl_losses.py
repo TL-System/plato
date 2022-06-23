@@ -52,15 +52,15 @@ class NTXent(nn.Module):
 
     """
 
-    def __init__(self, batch_size, temperature, world_size=1):
+    def __init__(self, temperature, world_size=1):
         super().__init__()
-        self.batch_size = batch_size
         self.temperature = temperature
         self.world_size = world_size
 
-        self.mask = self.mask_correlated_samples()
         self.criterion = nn.CrossEntropyLoss(reduction="sum")
         self.similarity_f = nn.CosineSimilarity(dim=2)
+        self.mask = None
+        self.batch_size = 0
 
     def mask_correlated_samples(self):
         """ Mask out the correlated samples. """
@@ -80,6 +80,9 @@ class NTXent(nn.Module):
         we treat the other 2(N - 1) augmented examples within
         a minibatch as negative examples.
         """
+        self.batch_size = z_i.shape[0]
+        self.mask = self.mask_correlated_samples()
+
         collected_samples = 2 * self.batch_size * self.world_size
         z_i = F.normalize(z_i, dim=1)
         z_j = F.normalize(z_j, dim=1)
