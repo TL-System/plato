@@ -108,6 +108,7 @@ class Trainer(basic.Trainer):
         self.avg_actor_loss = 0
 
         self.timesteps_since_eval = 0
+        self.train_first_ittr = True
 
         if not os.path.exists(Config().results.results_dir):
             os.makedirs(Config().results.results_dir)
@@ -124,16 +125,28 @@ class Trainer(basic.Trainer):
         #We will put what exectues in the "main function of a2c_abr_sim.py here"
 
         round_episodes = 0
+
         while round_episodes < Config().algorithm.max_round_episodes:
             
             #Evaluates policy at a frequency set in config file
             if self.timesteps_since_eval >= Config().algorithm.eval_freq:
                 self.avg_reward = self.evaluate_policy()
                 path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)+"_avg_reward"
-                np.savez("%s" %(path), a=[self.avg_reward])
-                np.savetxt("%s.csv" %(path), [self.avg_reward], delimiter=",")
+    
+                #If it is the first iteration write OVER potnetially existing files, else append
+                if self.train_first_ittr:
+                    self.train_first_ittr = False
+                    first_iteration_path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
+                    np.savez("%s" %(first_iteration_path+"_first_iteration_check"), a=[self.train_first_ittr])
+                    with open(path+".csv", 'w', encoding='utf-8') as filehandle:
+                        filehandle.write(",".join(map(str, self.avg_reward))+'\n')
+                else:
+                    with open(path+".csv", 'a', encoding='utf-8') as filehandle:
+                        filehandle.write(",".join(map(str, self.avg_reward))+'\n')
+    
+        
                 self.timesteps_since_eval = 0
-
+            
             self.done = False
             self.total_reward = 0
             
@@ -174,8 +187,16 @@ class Trainer(basic.Trainer):
 
         path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)+"_avg_reward"
         self.avg_reward = self.evaluate_policy()
-        np.savez("%s" %(path), a=[self.avg_reward])
-        np.savetxt("%s.csv" %(path), [self.avg_reward], delimiter=',')
+        #If it is the first iteration write OVER potnetially existing files, else append
+        if self.train_first_ittr:
+            self.train_first_ittr = False
+            first_iteration_path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
+            np.savez("%s" %(first_iteration_path+"_first_iteration_check"), a=[self.train_first_ittr])
+            with open(path+".csv", 'w', encoding='utf-8') as filehandle:
+                filehandle.write(",".join(map(str, self.avg_reward))+'\n')
+        else:
+            with open(path+".csv", 'a', encoding='utf-8') as filehandle:
+                filehandle.write(",".join(map(str, self.avg_reward))+'\n')
 
         self.avg_actor_loss = sum(self.actor_loss)/len(self.actor_loss)
         self.avg_critic_loss = sum(self.critic_loss)/len(self.critic_loss)
@@ -250,10 +271,15 @@ class Trainer(basic.Trainer):
             self.actor.load_state_dict(torch.load(actor_model_path), strict=True)
             self.critic.load_state_dict(torch.load(critic_model_path), strict=True)
 
+            #load that it's not the first iteration anymore
+            first_train_ittr_path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)+"_first_iteration_check"
+            arr = np.load("%s.npz" %(first_train_ittr_path))
+            self.train_first_ittr = bool((arr['a']))
+
             #load avg_reward so it doesn't overwrite
-            path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)+"_avg_reward"
-            arr = np.load("%s.npz" %(path))
-            self.avg_reward = list(arr['a'])
+            #path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)+"_avg_reward"
+            #arr = np.load("%s.npz" %(path))
+            #self.avg_reward = list(arr['a'])
 
             #unsure if we need these
             self.adam_actor = torch.optim.Adam(self.actor.parameters(), lr=Config().algorithm.learning_rate)
@@ -288,8 +314,8 @@ class Trainer(basic.Trainer):
         check_point_save = "checkpoint" in filename
         if not check_point_save:
             path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
-            Trainer.save_loss(self.avg_actor_loss, path, True)
-            Trainer.save_loss(self.avg_critic_loss, path, False)
+            self.save_loss(self.avg_actor_loss, path, True)
+            self.save_loss(self.avg_critic_loss, path, False)
             
 
         #print("AVERAGE ACTOR LOSS IN SAVE MODEL IS THIS: ")
@@ -335,8 +361,7 @@ class Trainer(basic.Trainer):
             logging.info("[Client #%d] Saving a model to %s, and %s.",
                          self.client_id, actor_model_path, critic_model_path)
 
-    @staticmethod
-    def save_loss(loss, path, actor_passed):
+    def save_loss(self, loss, path, actor_passed):
 
         loss_path = ""
         if actor_passed:
@@ -347,8 +372,15 @@ class Trainer(basic.Trainer):
         with open(loss_path, 'w', encoding='utf-8') as file:
                 file.write(str(loss))
 
-        with open(loss_path+".csv", 'a', encoding='utf-8') as filehandle:
-            filehandle.write(str(loss)+'\n')
+         #If it is the first iteration write OVER potnetially existing files, else append
+        if  self.episode_num <= Config().algorithm.max_round_episodes:
+            with open(loss_path+".csv", 'w', encoding='utf-8') as filehandle:
+                filehandle.write(str(loss)+'\n')
+        else:
+            with open(loss_path+".csv", 'a', encoding='utf-8') as filehandle:
+                filehandle.write(str(loss)+'\n')
+
+
         
     
 
@@ -358,7 +390,19 @@ class Trainer(basic.Trainer):
         avg_reward = self.evaluate_policy()
         self.server_reward = avg_reward
         file_name = "A2C_RL_SERVER"
-        np.savetxt("%s.csv" %(Config().results.results_dir +"/"+file_name), [self.server_reward], delimiter=",")
+        path = Config().results.results_dir +"/"+file_name
+        
+        #If it is the first iteration write OVER potnetially existing files, else append
+        if self.train_first_ittr:
+            self.train_first_ittr = False
+            first_iteration_path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
+            np.savez("%s" %(first_iteration_path+"_first_iteration_check"), a=[self.train_first_ittr])
+            with open(path+".csv", 'w', encoding='utf-8') as filehandle:
+                filehandle.write(",".join(map(str, self.server_reward))+'\n')
+        else:
+            with open(path+".csv", 'a', encoding='utf-8') as filehandle:
+                filehandle.write(",".join(map(str, self.server_reward))+'\n')
+
         return sum(avg_reward)/len(avg_reward)
 
         

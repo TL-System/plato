@@ -29,12 +29,6 @@ class RLClient(simple.Client):
 
         actor_loss = self.get_loss(True)
         critic_loss = self.get_loss(False)
-
-        print("========")
-        print(actor_loss)
-        print("========")
-        print(critic_loss)
-        
         
         return Report(report.num_samples, report.accuracy, report.training_time, \
          report.comm_time, report.update_response, self.client_id, actor_loss, critic_loss), weights
