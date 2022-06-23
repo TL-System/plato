@@ -106,12 +106,16 @@ class A2CServer(fedavg.Server):
                         self.save_files(client_path, client_id)
                         for name, delta in update_from_actor.items():
                             actor_avg_update[name] += delta 
+                        for name, delta in update_from_actor.items():
+                            critic_avg_update[name] += delta 
                 if critic_percentile_aggregation is not None:
                     if critic_loss > critic_percentile_aggregation and Config().server.critic_loss_aggregate:
                         print("\n-----------------------")
                         print("AGGREGATING ONLY BASED ON CRITIC LOSS")
                         print("-----------------------\n")
                         self.save_files(client_path, client_id)
+                        for name, delta in update_from_actor.items():
+                            actor_avg_update[name] += delta
                         for name, delta in update_from_critic.items():
                             critic_avg_update[name] += delta 
             # Yield to other tasks in the server
