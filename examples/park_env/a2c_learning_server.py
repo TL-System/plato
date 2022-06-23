@@ -12,6 +12,7 @@ from plato.servers import fedavg
 from plato.config import Config
 import pickle
 import random
+import numpy as np
 
 
 class A2CServer(fedavg.Server):
@@ -32,9 +33,35 @@ class A2CServer(fedavg.Server):
 
         weights_received = self.compute_weight_deltas(updates)
 
-        self.total_samples = sum(
-            [report.num_samples for (__, report, __, __) in updates])
+        #actor_loss_list = [report.actor_loss for (_, report, _, _) in updates]
 
+        samples_list = []
+        actor_loss_list = []
+        critic_loss_list = []
+
+        for (_, report, _, _) in updates:
+            samples_list.append(report.num_samples)
+            actor_loss_list.append(report.actor_loss)
+            critic_loss_list.append(report.critic_loss)
+
+        self.total_samples = sum(samples_list)
+        percentile = Config().server.percentile
+
+        #get the threshold for aggregation
+        critic_percentile_aggregation = np.percentile(np.array(critic_loss_list), percentile)
+        actor_percentile_aggregation = np.percentile(np.array(actor_loss_list), percentile)
+
+        print("ACTOR LOSS LIST IS THIS")
+        print(actor_loss_list)
+        print("CRITIC LOSS LIST IS THIS")
+        print(critic_loss_list)
+
+        print("ACTOR PERCENTILE IS THIS")
+        print(actor_percentile_aggregation)
+        print("CRITIC PERCENTILE IS THIS")
+        print(critic_percentile_aggregation)
+
+      
         # Perform weighted averaging for both Actor and Critic
         actor_avg_update = {
             name: self.trainer.zeros(weights.shape)
@@ -47,18 +74,20 @@ class A2CServer(fedavg.Server):
 
         for i, update in enumerate(weights_received):
             __, report, __, __ = updates[i]
-            num_samples = report.num_samples
+            actor_loss = report.actor_loss
+            critic_loss = report.critic_loss
 
             update_from_actor, update_from_critic = update
 
-            for name, delta in update_from_actor.items():
-                actor_avg_update[name] += delta * (num_samples /
-                                                 self.total_samples)
+            if actor_loss > actor_percentile_aggregation:
+                print("ACTOR LOSS IS THIS %f SO WE ARE HERE" %actor_loss)
+                for name, delta in update_from_actor.items():
+                    actor_avg_update[name] += delta 
 
-            for name, delta in update_from_critic.items():
-                critic_avg_update[name] += delta * (num_samples /
-                                                  self.total_samples)                                      
-        
+            if critic_loss > critic_percentile_aggregation:
+                print("CRITIC LOSS IS THIS %f so we are here" %critic_loss)
+                for name, delta in update_from_critic.items():
+                    critic_avg_update[name] += delta 
             # Yield to other tasks in the server
             await asyncio.sleep(0)
         

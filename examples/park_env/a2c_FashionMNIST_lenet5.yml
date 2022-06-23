@@ -50,6 +50,8 @@ server:
 
     random: false
 
+    percentile: 80
+
 data:
     # The training and testing dataset
     datasource: FashionMNIST
