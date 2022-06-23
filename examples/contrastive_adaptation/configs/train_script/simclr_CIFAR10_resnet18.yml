@@ -124,7 +124,7 @@ trainer:
 
     # Number of epochs for local training in each communication round
     epochs: 100
-    batch_size: 60
+    batch_size: 512
     optimizer: Adam
     learning_rate: 0.003
     weight_decay: 0.00001
@@ -139,7 +139,7 @@ trainer:
 
     # Number of epochs for local training in each communication round
     pers_epochs: 50
-    pers_batch_size: 60
+    pers_batch_size: 512
     pers_optimizer: Adam
     pers_learning_rate: 0.003
     pers_weight_decay: 0.000006
@@ -164,6 +164,7 @@ trainer:
     external_encoder: False
     model_name: resnet_18
     projection_dim: 128
+    projection_hidden_dim: 2048
 
     # name of the component used as the global model
     global_model_name: whole

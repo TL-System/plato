@@ -134,7 +134,7 @@ trainer:
     # the memory allocation issue as the contrastive samples occupy more
     # space as more samples will be contained within one loading.
     epochs: 50
-    batch_size: 60
+    batch_size: 512
     optimizer: Adam
     learning_rate: 0.003
     betas:
@@ -154,7 +154,7 @@ trainer:
     #   The batch size for the downstream task can be larger as it
     # does not utilize the
     pers_epochs: 100
-    pers_batch_size: 60
+    pers_batch_size: 512
     pers_optimizer: Adam
     pers_learning_rate: 0.005
     pers_betas:
@@ -186,6 +186,7 @@ trainer:
     external_encoder: True
     model_name: lenet5
     projection_dim: 128
+    projection_hidden_dim: 2048
 
     # name of the component used as the global model
     global_model_name: whole
