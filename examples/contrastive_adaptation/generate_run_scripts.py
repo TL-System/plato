@@ -82,7 +82,9 @@ def create_run_script(methods_root_dir,
 
     file_name_no_extension = config_file_name.split(".")[0]
 
-    output_file_path = os.path.join(sbatch_logging_dir, file_name_no_extension)
+    config_files_dir_name = os.path.basename(config_files_dir)
+    output_file_path = os.path.join(sbatch_logging_dir, config_files_dir_name,
+                                    file_name_no_extension)
     output_line = "#SBATCH --output=%s.out" % output_file_path
 
     method_code_file = extract_method_file(methods_root_dir, config_file_name)

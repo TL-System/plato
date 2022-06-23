@@ -14,6 +14,17 @@ Reference:
 import torchvision.transforms as T
 
 
+# color distortion composed by color jittering and color dropping.
+# See Section A of SimCLR: https://arxiv.org/abs/2002.05709
+def get_color_distortion(s=0.5):  # 0.5 for CIFAR10 by default
+    # s is the strength of color distortion
+    color_jitter = T.ColorJitter(0.8 * s, 0.8 * s, 0.8 * s, 0.2 * s)
+    rnd_color_jitter = T.RandomApply([color_jitter], p=0.8)
+    rnd_gray = T.RandomGrayscale(p=0.2)
+    color_distort = T.Compose([rnd_color_jitter, rnd_gray])
+    return color_distort
+
+
 class SimCLRTransform():
     """ This the contrastive data augmentation used by the SimCLR method. """
 
@@ -25,8 +36,7 @@ class SimCLRTransform():
         transform_functions = [
             T.RandomResizedCrop(size=image_size),
             T.RandomHorizontalFlip(),  # with 0.5 probability
-            T.RandomApply([color_jitter], p=0.8),
-            T.RandomGrayscale(p=0.2),
+            get_color_distortion(s=0.5),
             T.ToTensor(),
         ]
 

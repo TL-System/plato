@@ -104,6 +104,8 @@ class ContrasAdapLoss(nn.Module):
             build the prototype within one batch.
         """
 
+        pass
+
     def client_specific_representation_loss(self, encoded_z1, encoded_z2,
                                             labels):
         """ Compute loss to support the a client specific representation.
