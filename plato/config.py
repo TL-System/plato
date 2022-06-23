@@ -463,7 +463,7 @@ class Config:
 
             Config.data = Config.data._replace(partition_size=600)
             Config.trainer = Config.trainer._replace(rounds=5)
-            Config.trainer = Config.trainer._replace(epochs=5)
+            Config.trainer = Config.trainer._replace(epochs=2)
             Config.trainer = Config.trainer._replace(batch_size=30)
 
             if hasattr(Config.trainer, "epoch_log_interval"):

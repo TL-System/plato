@@ -31,8 +31,6 @@ class SimCLRTransform():
     def __init__(self, image_size, normalize):
         image_size = 224 if image_size is None else image_size
 
-        s = 1
-        color_jitter = T.ColorJitter(0.8 * s, 0.8 * s, 0.8 * s, 0.2 * s)
         transform_functions = [
             T.RandomResizedCrop(size=image_size),
             T.RandomHorizontalFlip(),  # with 0.5 probability

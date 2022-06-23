@@ -135,7 +135,7 @@ trainer:
     #   The batch size for the downstream task can be larger as it
     # does not utilize the
     pers_epochs: 100
-    pers_batch_size: 100
+    pers_batch_size: 512
     pers_optimizer: Adam
     pers_learning_rate: 0.005
     pers_betas:
@@ -167,7 +167,7 @@ trainer:
     model_name: resnet_18
     # in general, the projection_dim = prediction_dim
     projection_dim: 256
-    prediction_dim: 256
+    projection_hidden_dim: 2048
 
     # name of the component used as the global model
     global_model_name: whole
