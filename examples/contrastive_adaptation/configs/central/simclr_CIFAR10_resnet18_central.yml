@@ -5,6 +5,7 @@ general:
     # for different purposes
     # - central_code_test
     # - central
+    # - script
     # - user
     running_mode: central
 
@@ -114,7 +115,7 @@ trainer:
     # the memory allocation issue as the contrastive samples occupy more
     # space as more samples will be contained within one loading.
     epochs: 100
-    batch_size: 100
+    batch_size: 512
     optimizer: Adam
     learning_rate: 0.003
     betas:
