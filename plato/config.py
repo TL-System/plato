@@ -461,7 +461,7 @@ class Config:
             Config.clients = Config.clients._replace(total_clients=10)
             Config.clients = Config.clients._replace(per_round=3)
 
-            Config.data = Config.data._replace(partition_size=600)
+            Config.data = Config.data._replace(partition_size=800)
             Config.trainer = Config.trainer._replace(rounds=5)
             Config.trainer = Config.trainer._replace(epochs=2)
             Config.trainer = Config.trainer._replace(batch_size=30)

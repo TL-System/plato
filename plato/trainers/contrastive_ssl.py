@@ -55,10 +55,8 @@ class Trainer(basic.Trainer):
         """
         # define the loss computation instance
         defined_temperature = Config().trainer.temperature
-        batch_size = Config().trainer.batch_size
-        criterion = ssl_losses.NTXent(batch_size,
-                                      defined_temperature,
-                                      world_size=1)
+
+        criterion = ssl_losses.NTXent(defined_temperature, world_size=1)
 
         # currently, the loss computation only supports the one-GPU learning.
         def loss_compute(outputs, labels):
