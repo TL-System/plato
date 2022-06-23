@@ -92,6 +92,7 @@ class Client(pers_simple.Client):
             personalized_model_name = Config().trainer.personalized_model_name
             self.personalized_model = general_MLP_model.Model.get_model(
                 model_type=personalized_model_name, input_dim=encode_dim)
+
             # present the personalzied model's info
             input_dim = self.personalized_model[0][0].in_features
             params = sum(p.numel()

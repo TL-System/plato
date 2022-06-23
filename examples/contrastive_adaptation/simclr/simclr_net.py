@@ -19,15 +19,13 @@ class ProjectionMLP(nn.Module):
     def __init__(self, in_dim):
         super().__init__()
 
-        self.layers = general_mlps_register.Model.get_model(
+        self.mlp_layers = general_mlps_register.Model.get_model(
             model_type="simclr_projection_mlp", input_dim=in_dim)
 
     def forward(self, x):
         """ Forward the projection layer. """
-        for layer in self.layers:
-            x = layer(x)
 
-        return x
+        return self.mlp_layers(x)
 
 
 class SimCLR(nn.Module):

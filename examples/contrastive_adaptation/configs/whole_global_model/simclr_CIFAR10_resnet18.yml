@@ -9,7 +9,7 @@ general:
     # - code_test
     # - user
 
-    running_mode: user
+    running_mode: code_test
 
     file_logging: True
 
@@ -163,6 +163,7 @@ trainer:
     external_encoder: False
     model_name: resnet_18
     projection_dim: 128
+    projection_hidden_dim: 2048
 
     # name of the component used as the global model
     global_model_name: whole
