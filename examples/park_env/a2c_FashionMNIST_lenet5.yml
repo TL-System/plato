@@ -85,7 +85,7 @@ trainer:
     target_accuracy: 5000
 
     # Number of epoches for local training in each communication round
-    # TODO: removee those if no need for them
+    # Need all of these, essential for plato to run
     epochs: 10
     batch_size: 32
     optimizer: SGD
@@ -100,32 +100,11 @@ algorithm:
     # Aggregation algorithm
     type: fedavg
 
-    # RL agent
-    # TODO: what is discrete_action_space and n_features? If not used remove
-    discrete_action_space: false
-    n_features: 4
-    # TODO: what is max_action, min_action, max_episode? If not used remove
-    max_action: 1
-    min_action: -1
-    max_episode: 2000
-    # TODO: what is alpha? If not used remove
-    alpha: 5 # controls the decreasing rate of the mapping function
-    # TODO: what is beta? If not used remove
-    beta: 20 # coefficient used in reward function
-    # TODO: what is theta? If not used remove
-    theta: 0.005 # threshold for stdev(pre_acc)
-    # TODO: what is base? If not used remove
-    base: 1000 # for exponential function in state normalization
-
     log_interval: 10
     mode: train # train/test
     pretrained: false
     pretrained_iter: 0
     test_step: 100
-
-    # RL policy
-    # TODO: why is this td3? Is it used anywhere?
-    model_name: td3
 
     # reward discounted factor
     gamma: 0.99

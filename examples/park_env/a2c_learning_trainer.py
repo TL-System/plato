@@ -132,7 +132,7 @@ class Trainer(basic.Trainer):
             if self.timesteps_since_eval >= Config().algorithm.eval_freq:
                 self.avg_reward = self.evaluate_policy()
                 path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)+"_avg_reward"
-    
+                self.timesteps_since_eval = 0
                 #If it is the first iteration write OVER potnetially existing files, else append
                 if self.train_first_ittr:
                     self.train_first_ittr = False
@@ -143,13 +143,9 @@ class Trainer(basic.Trainer):
                 else:
                     with open(path+".csv", 'a', encoding='utf-8') as filehandle:
                         filehandle.write(",".join(map(str, self.avg_reward))+'\n')
-    
-        
-                self.timesteps_since_eval = 0
-            
+
             self.done = False
             self.total_reward = 0
-            
             
             #Make difficulty level (trace file) depend on client_id
             #self.trace_idx = int(self.episode_num / 700) #progresses with time
@@ -276,11 +272,6 @@ class Trainer(basic.Trainer):
             arr = np.load("%s.npz" %(first_train_ittr_path))
             self.train_first_ittr = bool((arr['a']))
 
-            #load avg_reward so it doesn't overwrite
-            #path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)+"_avg_reward"
-            #arr = np.load("%s.npz" %(path))
-            #self.avg_reward = list(arr['a'])
-
             #unsure if we need these
             self.adam_actor = torch.optim.Adam(self.actor.parameters(), lr=Config().algorithm.learning_rate)
             self.adam_critic = torch.optim.Adam(self.critic.parameters(), lr=Config().algorithm.learning_rate)
@@ -316,14 +307,7 @@ class Trainer(basic.Trainer):
             path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
             self.save_loss(self.avg_actor_loss, path, True)
             self.save_loss(self.avg_critic_loss, path, False)
-            
-
-        #print("AVERAGE ACTOR LOSS IN SAVE MODEL IS THIS: ")
-        #print(self.avg_actor_loss)
-        #print("AVERAGE CRITIC LOSS IN SAVE MODEL IS THIS: ")
-        #print(self.avg_critic_loss)
-
-
+    
         try:
             if not os.path.exists(model_path):
                 os.makedirs(model_path)
