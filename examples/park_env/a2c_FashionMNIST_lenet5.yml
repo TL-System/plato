@@ -52,6 +52,12 @@ server:
 
     percentile: 80
 
+    percentile_aggregate: true
+
+    actor_loss_aggregate: true
+
+    critic_loss_aggregate: false
+
 data:
     # The training and testing dataset
     datasource: FashionMNIST
@@ -129,7 +135,7 @@ algorithm:
     iterations: 1000
 
     # Number of episodes to run each round
-    max_round_episodes: 200
+    max_round_episodes: 2
 
     # Curriculum learning, fixed difficulty level for motivation experiment
     difficulty_levels: 3
