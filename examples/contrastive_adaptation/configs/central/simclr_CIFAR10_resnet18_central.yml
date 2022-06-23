@@ -83,6 +83,7 @@ data:
     # The random seed for sampling data
     random_seed: 1
 
+
     # set the data wrapper to further process the data
     #   for the specific usage, such as constrastive learning
     # data_wrapper: Null

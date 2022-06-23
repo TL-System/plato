@@ -123,6 +123,7 @@ trainer:
     lr_step_size: 20
     lr_gamma: 0.9
 
+
     epoch_log_interval: 2
     batch_log_interval: 5
 

@@ -107,6 +107,7 @@ trainer:
     # The target accuracy
     target_accuracy: 0.98
 
+
     # Number of epochs for local training in each communication round
     #   The user is expected to carefully choose the batch_size to avoid
     # the memory allocation issue as the contrastive samples occupy more

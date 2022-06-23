@@ -138,6 +138,7 @@ trainer:
 
     num_classes: 10
 
+
 algorithm:
     # Aggregation algorithm
     type: fedavg
