@@ -86,6 +86,8 @@ class Trainer(basic.Trainer):
         self.adam_actor = torch.optim.Adam(self.actor.parameters(), lr=Config().algorithm.learning_rate)
         self.adam_critic = torch.optim.Adam(self.critic.parameters(), lr=Config().algorithm.learning_rate)
 
+        self.l2_loss = torch.nn.MSELoss(reduction='mean')
+
         self.memory = Memory()
         self.obs_normalizer = StateNormalizer(self.env.observation_space)
 
@@ -150,7 +152,7 @@ class Trainer(basic.Trainer):
             #Make difficulty level (trace file) depend on client_id
             #self.trace_idx = int(self.episode_num / 700) #progresses with time
             self.trace_idx = (self.client_id % Config().algorithm.difficulty_levels)
-            state = self.env.reset(trace_idx=None)
+            state = self.env.reset(trace_idx=self.trace_idx)
             state = self.obs_normalizer.normalize(state)
             self.steps = 0
 
@@ -164,6 +166,7 @@ class Trainer(basic.Trainer):
 
                 self.total_reward += reward
                 self.steps += 1
+                
                 self.memory.add(dist.log_prob(action), self.critic(self.t(state)), reward, self.done)
 
                 state = next_state
@@ -210,9 +213,9 @@ class Trainer(basic.Trainer):
             q_vals[len(memory)-1 - i] = q_val #store values from end to the start
         
         #advantage function!!
-        advantage = torch.Tensor(q_vals) - values
-
-        critic_loss = advantage.pow(2).mean() #loss_value_v
+        advantage = torch.Tensor(q_vals) - values.detach()
+        
+        critic_loss = self.l2_loss(values, torch.Tensor(q_vals)) #advantage.pow(2).mean() #loss_value_v
         self.adam_critic.zero_grad()
         critic_loss.backward()
         
