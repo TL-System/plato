@@ -16,9 +16,6 @@ import time
 import logging
 
 import torch
-import numpy as np
-
-from opacus.privacy_engine import PrivacyEngine
 
 from plato.config import Config
 from plato.trainers import basic
@@ -59,14 +56,17 @@ class Trainer(basic.Trainer):
                      self.head_param_names)
 
     def train_model(self, config, trainset, sampler, cut_layer=None):
-        """The main training loop of FedRep in a federated learning workload.
+        """
+        The main training loop of FedRep in a federated learning workload.
 
-            The local training stage contains two parts:
-                - Head optimization:
-                Makes τ local gradient-based updates to solve for its optimal head given
-                the current global representation communicated by the server.
-                - Representation optimization:
-                Takes one local gradient-based update with respect to the current representation
+        The local training stage contains two parts:
+
+        - Head optimization:
+            Makes τ local gradient-based updates to solve for its optimal head given
+            the current global representation communicated by the server.
+
+        - Representation optimization:
+            Takes one local gradient-based update with respect to the current representation.
         """
         batch_size = config['batch_size']
         log_interval = 10
@@ -114,18 +114,16 @@ class Trainer(basic.Trainer):
         self.model.train()
 
         for epoch in range(1, epochs + 1):
-
-            # As presented in the Section 3 of the FedRep paper,
-            #   the head is optimized for (epochs - 1) while frozing
-            #   the representation
+            # As presented in Section 3 of the FedRep paper, the head is optimized
+            # for (epochs - 1) while freezing the representation.
             if epoch <= head_epochs:
                 for name, param in self.model.named_parameters():
                     if name in self.representation_param_names:
                         param.requires_grad = False
                     else:
                         param.requires_grad = True
-            # Then, the representation will be optimized for only one
-            #   epoch.
+
+            # The representation will then be optimized for only one epoch
             if epoch > head_epochs:
                 for name, param in self.model.named_parameters():
                     if name in self.representation_param_names:
