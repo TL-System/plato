@@ -188,10 +188,11 @@ class Trainer(basic.Trainer):
 
         path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)+"_avg_reward"
         self.avg_reward = self.evaluate_policy()
+        first_iteration_path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
+        grad_path = first_iteration_path
         #If it is the first iteration write OVER potnetially existing files, else append
         if self.train_first_ittr:
             self.train_first_ittr = False
-            first_iteration_path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
             np.savez("%s" %(first_iteration_path+"_first_iteration_check"), a=[self.train_first_ittr])
             with open(path+".csv", 'w') as filehandle:
                 writer = csv.writer(filehandle)
@@ -207,6 +208,8 @@ class Trainer(basic.Trainer):
         critic_grad, _ = np.polyfit(x, np.array(self.critic_loss), 1)
         print("Client %s: Actor avg improvement, %s" % (str(self.client_id), str(actor_grad)))
         # TODO: want to reeport entropy, critic_grad and actor_grad
+        #TODO which entropy? entropy loss or entropy coeff, critic_grad and actor_grad returned!
+        self.save_grads(grad_path, actor_grad, critic_grad)
         self.avg_actor_loss = sum(self.actor_loss)/len(self.actor_loss)
         self.avg_critic_loss =  sum(self.critic_loss)/len(self.critic_loss)
         
@@ -302,8 +305,44 @@ class Trainer(basic.Trainer):
             rows = file.readlines()
             for row in rows:
                 critic_loss = float(row)
+        
+       # print("IN LOAD LOSS")
+        #print(actor_loss)
+        #print(critic_loss)
 
         return actor_loss, critic_loss
+
+    def load_grads(self):
+        path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
+        actor_grad= []
+        critic_grad = []
+        with open(path + "_actor_grad.csv", 'r') as file:
+            rows = file.readlines()
+            for row in rows:
+                actor_grad = float(row)
+        with open(path + "_critic_grad.csv", 'r') as file:
+            rows = file.readlines()
+            for row in rows:
+                critic_grad = float(row)
+
+        return actor_grad, critic_grad
+
+    
+    def save_grads(self, path, actor_grads, critic_grads):
+       
+        actor_grad_path = path+"_actor_grad.csv"
+        critic_grad_path = path+"_critic_grad.csv"
+
+        #If it is the first iteration write OVER potnetially existing files, else append
+        first_itr = self.episode_num <= Config().algorithm.max_round_episodes
+
+        with open(actor_grad_path, 'w' if first_itr else 'a') as filehandle:
+            writer = csv.writer(filehandle)
+            writer.writerow([actor_grads])
+        
+        with open(critic_grad_path, 'w' if first_itr else 'a') as filehandle:
+            writer = csv.writer(filehandle)
+            writer.writerow([critic_grads])
 
 
     def save_model(self, filename=None, location=None):
