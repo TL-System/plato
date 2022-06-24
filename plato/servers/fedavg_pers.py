@@ -5,7 +5,7 @@ The major property of this server to perform the personalized learning
 on all participanting clients at the final round.
 .
 """
-
+import os
 import random
 import logging
 
@@ -108,6 +108,43 @@ class Server(fedavg.Server):
         self.prng_state = random.getstate()
 
         return selected_clients
+
+    def model_strucuture_logging(self):
+
+        # logging the personalzied model's info
+        datasources = Config().data.datasource
+
+        whole_model_file_name = f"defined_whole_model.log"
+        global_model_file_name = f"global_model.log"
+        model_path = Config().params['model_path']
+        to_save_dir = model_path
+        os.makedirs(to_save_dir, exist_ok=True)
+        to_save_path = os.path.join(to_save_dir, whole_model_file_name)
+        to_save_global_path = os.path.join(to_save_dir, global_model_file_name)
+        if not os.path.exists(to_save_path):
+            defined_model_state = str(self.trainer.model)
+
+            with open(to_save_path, 'w') as f:
+                f.write(defined_model_state)
+
+            logging.info("Logging the defined whole model' information to %s",
+                         to_save_dir)
+
+        if not os.path.exists(to_save_global_path):
+            # obtain the global model as ordered dict
+            global_model_state_dict = self.algorithm.extract_weights()
+            global_parameter_names = list(global_model_state_dict.keys())
+            with open(to_save_global_path, 'w') as f:
+                for item in global_parameter_names:
+                    f.write("%s\n" % item)
+
+            logging.info("Logging the global model' information to %s",
+                         to_save_global_path)
+
+    def init_trainer(self):
+        super().init_trainer()
+        # logging the defined model to dir
+        self.model_strucuture_logging()
 
     async def wrap_up(self):
         """ Wrapping up when each round of training is done.

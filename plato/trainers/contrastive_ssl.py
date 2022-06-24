@@ -8,6 +8,7 @@ import logging
 import time
 import multiprocessing as mp
 import copy
+from attr import has
 
 import numpy as np
 import torch
@@ -274,8 +275,13 @@ class Trainer(basic.Trainer):
 
         # Obtain the logging interval
         epochs = config['epochs']
+        # do not save the model during epoch training of each round
+        epoch_model_log_interval = epochs
         epoch_log_interval = config['epoch_log_interval']
         batch_log_interval = config['batch_log_interval']
+
+        if "epoch_model_log_interval" in config:
+            epoch_model_log_interval = config['epoch_model_log_interval']
 
         # Define the container to hold the logging information
         epoch_loss_meter = optimizers.AverageMeter(name='Loss')
@@ -330,10 +336,24 @@ class Trainer(basic.Trainer):
                             len(streamed_train_loader), batch_loss_meter.avg)
 
             # Performe logging of epochs
-            if epoch - 1 % epoch_log_interval == 0:
+            if (epoch - 1) % epoch_log_interval == 0:
                 logging.info(
                     "[Client #%d] Contrastive Pre-train Epoch: [%d/%d]\tLoss: %.6f",
                     self.client_id, epoch, epochs, epoch_loss_meter.avg)
+
+            if (epoch - 1) % epoch_model_log_interval == 0:
+                # the model generated during each round will be stored in the
+                # checkpoints
+                model_type = config['model_name']
+                current_round = kwargs['current_round']
+                filename = f"{model_type}_client{self.client_id}_round{current_round}_epoch{epoch}_runid{config['run_id']}.pth"
+                target_dir = Config().params['checkpoint_path']
+                to_save_dir = os.path.join(target_dir,
+                                           "client_" + str(self.client_id))
+                os.makedirs(to_save_dir, exist_ok=True)
+
+                torch.save(self.model.state_dict(),
+                           os.path.join(to_save_dir, filename))
 
             # Update the learning rate
             if lr_schedule is not None:
@@ -349,10 +369,12 @@ class Trainer(basic.Trainer):
                 self.simulate_sleep_time()
 
         if 'max_concurrency' in config:
+            # the final of each round, the trained model within this round
+            # will be saved as model to the '/models' dir
             self.model.cpu()
             model_type = config['model_name']
             current_round = kwargs['current_round']
-            filename = f"{model_type}_{self.client_id}_{current_round}_{config['run_id']}.pth"
+            filename = f"{model_type}_client{self.client_id}_round{current_round}_runid{config['run_id']}.pth"
             # if final round, save to the model path
             if current_round == Config().trainer.rounds:
                 target_dir = Config().params['model_path']
@@ -565,7 +587,7 @@ class Trainer(basic.Trainer):
                 #   To distanguish the eval training stage with the
                 # previous ssl's training stage. We utilize the progress bar
                 # to demonstrate the training progress details.
-                global_progress = tqdm(range(0, num_eval_train_epochs),
+                global_progress = tqdm(range(1, num_eval_train_epochs + 1),
                                        desc='Evaluating')
                 train_data_encoded = list()
                 train_data_labels = list()
@@ -573,7 +595,7 @@ class Trainer(basic.Trainer):
                     epoch_loss_meter.reset()
                     local_progress = tqdm(
                         eval_train_loader,
-                        desc=f'Epoch {epoch}/{num_eval_train_epochs}',
+                        desc=f'Epoch {epoch}/{num_eval_train_epochs+1}',
                         disable=True)
 
                     for _, (examples, labels) in enumerate(local_progress):
@@ -613,7 +635,7 @@ class Trainer(basic.Trainer):
                             epoch_loss_meter.avg
                         })
 
-                    if epoch % epoch_log_interval == 0:
+                    if (epoch - 1) % epoch_log_interval == 0:
                         logging.info(
                             "[Client #%d] Personalization Training Epoch: [%d/%d]\tLoss: %.6f",
                             self.client_id, epoch, num_eval_train_epochs,
@@ -657,7 +679,7 @@ class Trainer(basic.Trainer):
             personalized_model_name = Config().trainer.personalized_model_name
             save_location = os.path.join(target_dir,
                                          "client_" + str(self.client_id))
-            filename = f"Round_{current_round}_personalization_{personalized_model_name}.pth"
+            filename = f"personalized_({personalized_model_name})_client{self.client_id}_round{current_round}_.pth"
 
             os.makedirs(save_location, exist_ok=True)
             self.save_personalized_model(filename=filename,
