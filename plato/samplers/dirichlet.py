@@ -19,7 +19,13 @@ class Sampler(base.Sampler):
         # Different clients should have a different bias across the labels & partition size
         np.random.seed(self.random_seed * int(client_id))
 
-        self.partition_size = Config().data.partition_size
+        if testing:
+            target_list = datasource.get_test_set().targets
+            self.partition_size = Config().data.test_partition_size
+        else:
+            # The list of labels (targets) for all the examples
+            target_list = datasource.targets()
+            self.partition_size = Config().data.partition_size
 
         # Variable partition size across clients
         if hasattr(Config().data, 'partition_distribution'):
@@ -36,12 +42,6 @@ class Sampler(base.Sampler):
         # Concentration parameter to be used in the Dirichlet distribution
         concentration = Config().data.concentration if hasattr(
             Config().data, 'concentration') else 1.0
-
-        if testing:
-            target_list = datasource.get_test_set().targets
-        else:
-            # The list of labels (targets) for all the examples
-            target_list = datasource.targets()
 
         class_list = datasource.classes()
 

@@ -105,10 +105,10 @@ class Client(base.Client):
         else:
             # PyTorch uses samplers when loading data with a data loader
             self.trainset = self.datasource.get_train_set()
-
         if hasattr(Config().clients, 'do_test') and Config().clients.do_test:
             # Set the testset if local testing is needed
             self.testset = self.datasource.get_test_set()
+
             if hasattr(Config().data, 'testset_sampler'):
                 # Set the sampler for test set
                 self.testset_sampler = samplers_registry.get(self.datasource,
