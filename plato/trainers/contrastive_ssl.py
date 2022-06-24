@@ -197,7 +197,7 @@ class Trainer(basic.Trainer):
         logging.info("[Client #%d] Saving encoded data to %s.", self.client_id,
                      to_save_path)
 
-    def train_loop(
+    def train_model(
         self,
         config,
         trainset,
@@ -237,7 +237,8 @@ class Trainer(basic.Trainer):
         # unlabeled_trainset, unlabeled_sampler
         unlabeled_loader = None
         unlabeled_trainset = []
-        if "unlabeled_trainset" in kwargs:
+        if "unlabeled_trainset" in kwargs and kwargs[
+                "unlabeled_trainset"] is not None:
             unlabeled_trainset = kwargs["unlabeled_trainset"]
             unlabeled_sampler = kwargs["unlabeled_sampler"]
             unlabeled_loader = torch.utils.data.DataLoader(
@@ -347,16 +348,21 @@ class Trainer(basic.Trainer):
                     "speed_simulation") and Config().clients.speed_simulation:
                 self.simulate_sleep_time()
 
-            # Saving the model at the end of this epoch to a file so that
-            # it can later be retrieved to respond to server requests
-            # in asynchronous mode when the wall clock time is simulated
-            if hasattr(Config().server,
-                       'request_update') and Config().server.request_update:
-                self.model.cpu()
-                training_time = time.perf_counter() - tic
-                filename = f"{self.client_id}_{epoch}_{training_time}.pth"
-                self.save_model(filename)
-                self.model.to(self.device)
+        if 'max_concurrency' in config:
+            self.model.cpu()
+            model_type = config['model_name']
+            current_round = kwargs['current_round']
+            filename = f"{model_type}_{self.client_id}_{current_round}_{config['run_id']}.pth"
+            # if final round, save to the model path
+            if current_round == Config().trainer.rounds:
+                target_dir = Config().params['model_path']
+            else:
+                target_dir = Config().params['checkpoint_path']
+
+            to_save_dir = os.path.join(target_dir,
+                                       "client_" + str(self.client_id))
+
+            self.save_model(filename, location=to_save_dir)
 
     def test_process(self, config, testset, sampler=None, **kwargs):
         """The testing loop, run in a separate process with a new CUDA context,
@@ -642,12 +648,15 @@ class Trainer(basic.Trainer):
         # to the dir of this client
         if 'max_concurrency' in config:
             personalized_model.cpu()
-            check_point_path = Config().params['checkpoint_path']
-            personalized_model_name = Config().trainer.personalized_model_name
-            save_location = os.path.join(check_point_path,
-                                         "client_" + str(self.client_id))
 
             current_round = kwargs['current_round']
+            if current_round == Config().trainer.rounds:
+                target_dir = Config().params['model_path']
+            else:
+                target_dir = Config().params['checkpoint_path']
+            personalized_model_name = Config().trainer.personalized_model_name
+            save_location = os.path.join(target_dir,
+                                         "client_" + str(self.client_id))
             filename = f"Round_{current_round}_personalization_{personalized_model_name}.pth"
 
             os.makedirs(save_location, exist_ok=True)

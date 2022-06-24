@@ -484,6 +484,7 @@ class Config:
             # apply the central learning
             Config.clients = Config.clients._replace(total_clients=1)
             Config.clients = Config.clients._replace(per_round=1)
+            Config.clients = Config.clients._replace(do_final_eval_test=False)
             Config.data = Config.data._replace(sampler="iid")
             Config.data = Config.data._replace(testset_sampler="iid")
             Config.trainer = Config.trainer._replace(rounds=1)
