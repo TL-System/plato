@@ -63,9 +63,10 @@ class Client(simple.Client):
             with open(save_file_path, 'w') as fp:
                 json.dump({"train": train_data_sta, "test": test_data_sta}, fp)
             logging.info(
-                f"{self.client_id}'s local #train samples: {train_count}")
+                f"Client {self.client_id}'s local #train samples: {train_count}"
+            )
             logging.info(
-                f"{self.client_id}'s local #test samples: {test_count}")
+                f"Client {self.client_id}'s local #test samples: {test_count}")
             logging.info(f"Saved the {self.client_id}'s local data statistics")
 
     def load_data(self) -> None:

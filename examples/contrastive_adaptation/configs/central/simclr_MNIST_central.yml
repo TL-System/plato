@@ -94,6 +94,7 @@ data:
     # samples whose size is smaller than the batch size may causes problems.
     # drop_last can alleviate this issue
     partition_size: 60000
+    test_partition_size: 10000
 
     # IID or non-IID?
     sampler: iid
