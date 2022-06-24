@@ -275,14 +275,14 @@ class Server(fedavg.Server):
 
                 if self.attack_method == 'DLG':
                     history.append([[
-                        tt(dummy_data[i][0].cpu()),
+                        dummy_data[i].cpu().permute(1, 2, 0).detach().clone(),
                         torch.argmax(dummy_label[i], dim=-1).item(),
                         dummy_data[i]
                     ] for i in range(num_images)])
                 elif self.attack_method == 'iDLG':
                     history.append([[
-                        tt(dummy_data[i][0].cpu()), est_label[i].item(),
-                        dummy_data[i]
+                        dummy_data[i].cpu().permute(1, 2, 0).detach().clone(),
+                        est_label[i].item(), dummy_data[i]
                     ] for i in range(num_images)])
 
                 new_row = [
@@ -459,7 +459,7 @@ class Server(fedavg.Server):
             current_label = torch.argmax(gt_label[i], dim=-1).item()
             logging.info("Ground truth labels: %d", current_label)
             gt_figure.add_subplot(1, num_images, i + 1)
-            plt.imshow(tt(gt_data[i][0].cpu()))
+            plt.imshow(gt_data[i].cpu().permute(1, 2, 0))
             plt.axis('off')
             plt.title("GT image %d\nLabel: %d" % ((i + 1), current_label))
         plt.savefig(gt_result_path)
