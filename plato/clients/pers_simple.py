@@ -39,9 +39,9 @@ class Client(simple.Client):
         data_labels = []
         for _, label in data_loader:
             data_labels.extend(label.tolist())
-
+        num_samples = len(data_labels)
         labels_sample_count = Counter(data_labels)
-        return labels_sample_count
+        return labels_sample_count, num_samples
 
     def save_data_statistics(self):
 
@@ -55,14 +55,17 @@ class Client(simple.Client):
 
         if not os.path.exists(save_file_path):
 
-            train_data_sta = self.perform_data_statistics(
+            train_data_sta, train_count = self.perform_data_statistics(
                 self.trainset, self.sampler)
-            test_data_sta = self.perform_data_statistics(
+            test_data_sta, test_count = self.perform_data_statistics(
                 self.testset, self.testset_sampler)
 
             with open(save_file_path, 'w') as fp:
                 json.dump({"train": train_data_sta, "test": test_data_sta}, fp)
-
+            logging.info(
+                f"{self.client_id}'s local #train samples: {train_count}")
+            logging.info(
+                f"{self.client_id}'s local #test samples: {test_count}")
             logging.info(f"Saved the {self.client_id}'s local data statistics")
 
     def load_data(self) -> None:
