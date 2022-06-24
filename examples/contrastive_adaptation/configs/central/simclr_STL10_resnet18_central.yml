@@ -73,7 +73,7 @@ data:
     # samples whose size is smaller than the batch size may causes problems.
     # drop_last can alleviate this issue
     partition_size: 5000
-
+    test_partition_size: 8000
     unlabelled_partition_size: 100000
 
     # IID or non-IID?
