@@ -210,8 +210,6 @@ class Trainer(basic.Trainer):
         actor_grad, _ = np.polyfit(x, np.array(self.actor_loss), 1)
         critic_grad, _ = np.polyfit(x, np.array(self.critic_loss), 1)
         print("Client %s: Actor avg improvement, %s" % (str(self.client_id), str(actor_grad)))
-        # TODO: want to reeport entropy, critic_grad and actor_grad
-        #TODO which entropy? entropy loss or entropy coeff, critic_grad and actor_grad returned!
         self.save_grads(grad_path, actor_grad, critic_grad)
 
         self.avg_actor_loss = sum(self.actor_loss)/len(self.actor_loss)
@@ -306,7 +304,7 @@ class Trainer(basic.Trainer):
             rows = file.readlines()
             for row in rows:
                 actor_loss = float(row)
-                
+
         with open(path + "_critic_loss.csv", 'r') as file:
             rows = file.readlines()
             for row in rows:
