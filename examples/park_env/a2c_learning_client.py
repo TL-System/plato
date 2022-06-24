@@ -14,6 +14,7 @@ class Report(simple.Report):
     client_id: int
     actor_loss: float
     critic_loss: float
+    entropy_loss: float
     actor_grad: float
     critic_grad: float
 
@@ -29,12 +30,12 @@ class RLClient(simple.Client):
         """The machine learning training workload on a client."""
         report, weights = await super().train()
 
-        actor_loss, critic_loss = self.get_loss()
+        actor_loss, critic_loss, entropy_loss = self.get_loss()
         actor_grad, critic_grad = self.get_grad()
         
         return Report(report.num_samples, report.accuracy, report.training_time, \
          report.comm_time, report.update_response, self.client_id, actor_loss, critic_loss, \
-            actor_grad, critic_grad), weights
+          entropy_loss, actor_grad, critic_grad), weights
 
     def get_loss(self):
         return self.trainer.load_loss()

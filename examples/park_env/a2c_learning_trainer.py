@@ -91,9 +91,9 @@ class Trainer(basic.Trainer):
         self.memory = Memory()
         self.obs_normalizer = StateNormalizer(self.env.observation_space)
 
-        self.episode_reward = []
         self.server_reward = []
         self.avg_reward = []
+
         self.episode_num = 0
         self.trace_idx = 0
         self.total_reward = 0
@@ -105,9 +105,11 @@ class Trainer(basic.Trainer):
 
         self.critic_loss = []
         self.actor_loss = []
+        self.entropy_loss = []
 
         self.avg_critic_loss = 0
         self.avg_actor_loss = 0
+        self.avg_entropy_loss = 0
 
         self.timesteps_since_eval = 0
         self.train_first_ittr = True
@@ -175,10 +177,11 @@ class Trainer(basic.Trainer):
                 
                 if self.done or (self.steps % Config().algorithm.batch_size == 0):
                     last_q_val = self.critic(self.t(next_state)).detach().data.numpy()
-                    critic_loss, actor_loss = self.train_helper(self.memory, last_q_val)
+                    critic_loss, actor_loss, entropy_loss = self.train_helper(self.memory, last_q_val)
 
                     self.critic_loss.append(critic_loss)
                     self.actor_loss.append(actor_loss)
+                    self.entropy_loss.append(entropy_loss)
                     self.memory.clear()
 
             self.episode_num += 1
@@ -210,8 +213,11 @@ class Trainer(basic.Trainer):
         # TODO: want to reeport entropy, critic_grad and actor_grad
         #TODO which entropy? entropy loss or entropy coeff, critic_grad and actor_grad returned!
         self.save_grads(grad_path, actor_grad, critic_grad)
+
         self.avg_actor_loss = sum(self.actor_loss)/len(self.actor_loss)
         self.avg_critic_loss =  sum(self.critic_loss)/len(self.critic_loss)
+        self.avg_entropy_loss = sum(self.entropy_loss)/len(self.entropy_loss)
+        
         
     def train_helper(self, memory, q_val):
         #We will put the train loop here
@@ -244,7 +250,7 @@ class Trainer(basic.Trainer):
         self.adam_critic.step()
         self.adam_actor.step()
 
-        return critic_loss.item(), actor_loss.item()
+        return critic_loss.item(), actor_loss.item(), entropy_loss.item()
 
                 
     def load_model(self, filename=None, location=None):
@@ -295,22 +301,23 @@ class Trainer(basic.Trainer):
 
     def load_loss(self):
         path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
-        actor_loss = []
-        critic_loss = []
+        
         with open(path + "_actor_loss.csv", 'r') as file:
             rows = file.readlines()
             for row in rows:
                 actor_loss = float(row)
+                
         with open(path + "_critic_loss.csv", 'r') as file:
             rows = file.readlines()
             for row in rows:
                 critic_loss = float(row)
-        
-       # print("IN LOAD LOSS")
-        #print(actor_loss)
-        #print(critic_loss)
 
-        return actor_loss, critic_loss
+        with open(path + "_entropy_loss.csv", 'r') as file:
+            rows = file.readlines()
+            for row in rows:
+                entropy_loss = float(row)
+
+        return actor_loss, critic_loss, entropy_loss
 
     def load_grads(self):
         path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
@@ -326,7 +333,6 @@ class Trainer(basic.Trainer):
                 critic_grad = float(row)
 
         return actor_grad, critic_grad
-
     
     def save_grads(self, path, actor_grads, critic_grads):
        
@@ -402,19 +408,24 @@ class Trainer(basic.Trainer):
 
         actor_loss_path = path+"_actor_loss.csv"
         critic_loss_path = path + "_critic_loss.csv"
+        entropy_loss_path = path+"_entropy_loss.csv"
 
         #If it is the first iteration write OVER potnetially existing files, else append
         first_itr = self.episode_num <= Config().algorithm.max_round_episodes
         
         with open(actor_loss_path, 'w' if first_itr else 'a') as filehandle:
             writer = csv.writer(filehandle)
-            print("self.avg_actor_loss", self.avg_actor_loss)
-            print("self.avg_critic_loss", self.avg_critic_loss)
+            #print("self.avg_actor_loss", self.avg_actor_loss)
+            #print("self.avg_critic_loss", self.avg_critic_loss)
             writer.writerow([self.avg_actor_loss])
 
         with open(critic_loss_path, 'w' if first_itr else 'a') as filehandle:
             writer = csv.writer(filehandle)
             writer.writerow([self.avg_critic_loss])
+
+        with open(entropy_loss_path, 'w' if first_itr else 'a') as filehandle:
+            writer = csv.writer(filehandle)
+            writer.writerow([self.avg_entropy_loss])
 
 
     async def server_test(self, testset, sampler=None, **kwargs):
