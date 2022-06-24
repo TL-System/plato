@@ -8,6 +8,11 @@ __pycache__/
 *.txt
 *.sh
 
+examples/contrastive_adaptation/perfedavg/third-part
+examples/contrastive_adaptation/pfl_maml/third-part
+examples/contrastive_adaptation/contrasAdap/third-part
+examples/contrastive_adaptation/perfedavg/third-part
+
 # C extensions
 *.so
 

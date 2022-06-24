@@ -84,6 +84,7 @@ def create_run_script(methods_root_dir,
 
     config_files_dir_name = os.path.basename(config_files_dir)
     output_file_dir = os.path.join(sbatch_logging_dir, config_files_dir_name)
+    sim_data_dir_path = os.path.join(sim_data_path, config_files_dir_name)
 
     os.makedirs(output_file_dir, exist_ok=True)
 
@@ -94,7 +95,7 @@ def create_run_script(methods_root_dir,
     method_code_file = extract_method_file(methods_root_dir, config_file_name)
     config_file_path = os.path.join(config_files_dir, config_file_name)
     run_code_line = "%s %s -c %s -b %s" % (desire_python, method_code_file,
-                                           config_file_path, sim_data_path)
+                                           config_file_path, sim_data_dir_path)
 
     content = "%s \n%s \n%s \n%s \n%s \n%s \n \n%s \n" % (
         header, time_line, cpus_line, gpu_line, mem_line, output_line,
