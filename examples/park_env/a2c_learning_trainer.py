@@ -10,6 +10,7 @@ from plato.trainers import basic
 from plato.config import Config
 from plato.trainers import basic
 from torch.nn.utils.clip_grad import clip_grad_norm_
+from torch.autograd import Variable
 
 import os
 import logging
@@ -111,6 +112,11 @@ class Trainer(basic.Trainer):
         self.avg_actor_loss = 0
         self.avg_entropy_loss = 0
 
+        # Fisher estimation parameters
+        self.fisher_critic = {}
+        self.fisher_actor = {}
+        self.critic_fisher_sum, self.actor_fisher_sum = 0, 0
+
         self.timesteps_since_eval = 0
         self.train_first_ittr = True
 
@@ -177,7 +183,12 @@ class Trainer(basic.Trainer):
                 
                 if self.done or (self.steps % Config().algorithm.batch_size == 0):
                     last_q_val = self.critic(self.t(next_state)).detach().data.numpy()
+
                     critic_loss, actor_loss, entropy_loss = self.train_helper(self.memory, last_q_val)
+
+                    # Estimate diagonals of fisher information matrix
+                    self.estimate_fisher(self.train_helper(self.memory, last_q_val, fisher = True))
+                    self.sum_fisher_diagonals()
 
                     self.critic_loss.append(critic_loss)
                     self.actor_loss.append(actor_loss)
@@ -189,10 +200,13 @@ class Trainer(basic.Trainer):
             round_episodes += 1
             print("Episode number: %d, Reward: %d" % (self.episode_num, self.total_reward))
 
-        path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)+"_avg_reward"
+        # Evaluate policy on traces
         self.avg_reward = self.evaluate_policy()
+        
+        # TODO: every file writing should be in a separate function, preferable all file writing in one function
+        path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)+"_avg_reward"
         first_iteration_path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
-        grad_path = first_iteration_path
+        metrics_path = first_iteration_path
         #If it is the first iteration write OVER potnetially existing files, else append
         if self.train_first_ittr:
             self.train_first_ittr = False
@@ -205,21 +219,21 @@ class Trainer(basic.Trainer):
                 writer = csv.writer(filehandle)
                 writer.writerow(self.avg_reward)
         
-        #print("self.actor_loss", self.actor_loss)
+
+        
+        # Get gradients of change in actor and critic loss
         x = np.array(range(len(self.actor_loss)))+1
         actor_grad, _ = np.polyfit(x, np.array(self.actor_loss), 1)
         critic_grad, _ = np.polyfit(x, np.array(self.critic_loss), 1)
-        print("Client %s: Actor avg improvement, %s" % (str(self.client_id), str(actor_grad)))
-        # TODO: want to reeport entropy, critic_grad and actor_grad
-        #TODO which entropy? entropy loss or entropy coeff, critic_grad and actor_grad returned!
-        self.save_grads(grad_path, actor_grad, critic_grad)
+        
+        self.save_metrics(metrics_path, actor_grad, critic_grad)
 
         self.avg_actor_loss = sum(self.actor_loss)/len(self.actor_loss)
         self.avg_critic_loss =  sum(self.critic_loss)/len(self.critic_loss)
-        self.avg_entropy_loss = sum(self.entropy_loss)/len(self.entropy_loss)
+        self.avg_entropy_loss = sum(self.entropy_loss)/len(self.entropy_loss)        
         
         
-    def train_helper(self, memory, q_val):
+    def train_helper(self, memory, q_val, fisher = False):
         #We will put the train loop here
         values = torch.stack(memory.values)
         q_vals = np.zeros((len(memory), 1))
@@ -231,28 +245,73 @@ class Trainer(basic.Trainer):
             q_val = reward + Config().algorithm.gamma*q_val*(1.0-done)
             q_vals[len(memory)-1 - i] = q_val #store values from end to the start
         
-        #advantage function!!
+        # Advantage function
         advantage = torch.Tensor(q_vals) - values.detach()
         
-        critic_loss = self.l2_loss(values, torch.Tensor(q_vals)) #advantage.pow(2).mean() #loss_value_v
-        self.adam_critic.zero_grad()
-        critic_loss.backward()
+        critic_loss = self.l2_loss(values, torch.Tensor(q_vals)) 
         
         entropy_loss = (torch.stack(memory.log_probs) * torch.exp(torch.stack(memory.log_probs))).mean()
         entropy_coef = max((Config().algorithm.entropy_ratio - (self.episode_num/Config().algorithm.batch_size) * Config().algorithm.entropy_decay), Config().algorithm.entropy_min)
         actor_loss = (-torch.stack(memory.log_probs)*advantage.detach()).mean() + entropy_loss * entropy_coef
+
         if Config().algorithm.grad_clip_val > 0:
             clip_grad_norm_(self.actor.parameters(), Config().algorithm.grad_clip_val)
 
-        self.adam_actor.zero_grad()
+        if not fisher:
+            self.adam_critic.zero_grad()
+            critic_loss.backward()
+            self.adam_critic.step()
+
+            self.adam_actor.zero_grad()
+            actor_loss.backward()
+            self.adam_actor.step()
+
+            return critic_loss.item(), actor_loss.item(), entropy_loss.item()
+        else:
+            return critic_loss, actor_loss
+
+        
+
+    def estimate_fisher(self, loss):
+        """Estimate diagonals of fisher information matrix"""
+        critic_loss, actor_loss = loss
+        task = self.trace_idx
+        # Get fisher for critic model
+        self.critic_optimizer.zero_grad()
+        critic_loss.backward()
+        self.fisher_critic[task] = [] 
+        
+        for p in self.critic.parameters():
+            pg = p.grad.data.clone().pow(2)
+            self.fisher_critic[task].append(pg)
+
+        # Get fisher for actor model
+        self.actor_optimizer.zero_grad()
         actor_loss.backward()
+        self.fisher_actor[task] = []
+        for p in self.actor.parameters():
+            pg = p.grad.data.clone().pow(2)
+            self.fisher_actor[task].append(pg)
 
-        self.adam_critic.step()
-        self.adam_actor.step()
+    def sum_fisher_diagonals(self):
+        """Sum the diagonals of the Fisher Information Matrix"""
+        task = self.trace_idx
+        actor_fisher_sum = 0
+        critic_fisher_sum = 0
+        
+        for i, p in enumerate(self.critic.parameters()):
+            l = Variable(self.fisher_critic[task][i])
+            critic_fisher_sum += l.sum()
+    
+        for i, p in enumerate(self.actor.parameters()):
+            l = Variable(self.fisher_actor[task][i])
+            actor_fisher_sum += l.sum()
 
-        return critic_loss.item(), actor_loss.item(), entropy_loss.item()
+        self.critic_fisher_sum, self.actor_fisher_sum = critic_fisher_sum, actor_fisher_sum
+        
+    def load_fisher(self):
+        return self.critic_fisher_sum, self.actor_fisher_sum
 
-                
     def load_model(self, filename=None, location=None):
         """Loading pre-trained model weights from a file."""
         #We will load actor and critic models here
@@ -334,14 +393,17 @@ class Trainer(basic.Trainer):
 
         return actor_grad, critic_grad
     
-    def save_grads(self, path, actor_grads, critic_grads):
+    def save_metrics(self, path, actor_grads, critic_grads):
        
         actor_grad_path = path+"_actor_grad.csv"
         critic_grad_path = path+"_critic_grad.csv"
+        
+        actor_fisher_path = path + "_fisher_actor.csv"
+        critic_fisher_path = path + "_fisher_critic.csv"
 
         #If it is the first iteration write OVER potnetially existing files, else append
         first_itr = self.episode_num <= Config().algorithm.max_round_episodes
-
+        # TODO: make a function to write into a file to avoid repetitions in the following lines
         with open(actor_grad_path, 'w' if first_itr else 'a') as filehandle:
             writer = csv.writer(filehandle)
             writer.writerow([actor_grads])
@@ -350,6 +412,13 @@ class Trainer(basic.Trainer):
             writer = csv.writer(filehandle)
             writer.writerow([critic_grads])
 
+        with open(actor_fisher_path, 'w' if first_itr else 'a') as filehandle:
+            writer = csv.writer(filehandle)
+            writer.writerow([self.actor_fisher_sum])
+
+        with open(critic_fisher_path, 'w' if first_itr else 'a') as filehandle:
+            writer = csv.writer(filehandle)
+            writer.writerow([self.critic_fisher_sum])
 
     def save_model(self, filename=None, location=None):
         """Saving the model to a file."""
