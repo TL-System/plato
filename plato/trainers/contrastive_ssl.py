@@ -690,6 +690,13 @@ class Trainer(basic.Trainer):
             test_encoded_filename = f"Round_{current_round}_test_encoded.npy"
             test_label_filename = f"Round_{current_round}_test_label.npy"
 
+            # reduce the to save data size if the recorded data is too large
+            # to be saved
+            if len(train_data_encoded) > 5000:
+                interval = len(train_data_encoded) // 5000
+                select_index = range(0, train_data_encoded, interval)
+                train_data_encoded = train_data_encoded[select_index]
+                train_data_labels = train_data_labels[select_index]
             train_data_encoded = torch.cat(train_data_encoded, axis=0)
             train_data_labels = torch.cat(train_data_labels)
             test_data_encoded = torch.cat(test_data_encoded, axis=0)

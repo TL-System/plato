@@ -39,7 +39,16 @@ class Trainer(contrastive_ssl.Trainer):
         return contrastive_adaptation_criterion
 
     def meta_train_loop(self, train_loader):
-        pass
+        """ The train loop used in the proposed contrastive meta adaptation method.
+
+            It utilizes the
+        """
+
+    def meta_train_loop(self, train_loader):
+        """ The train loop used in the proposed contrastive meta adaptation method.
+
+            It utilizes the
+         """
 
     def train_loop(
         self,
