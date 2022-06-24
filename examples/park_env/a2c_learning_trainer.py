@@ -140,11 +140,13 @@ class Trainer(basic.Trainer):
                     self.train_first_ittr = False
                     first_iteration_path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
                     np.savez("%s" %(first_iteration_path+"_first_iteration_check"), a=[self.train_first_ittr])
-                    with open(path+".csv", 'w', encoding='utf-8') as filehandle:
-                        filehandle.write(",".join(map(str, self.avg_reward))+'\n')
+                    with open(path+".csv", 'w') as filehandle:
+                        writer = csv.writer(filehandle)
+                        writer.writerow(self.avg_reward)
                 else:
-                    with open(path+".csv", 'a', encoding='utf-8') as filehandle:
-                        filehandle.write(",".join(map(str, self.avg_reward))+'\n')
+                    with open(path+".csv", 'a') as filehandle:
+                        writer = csv.writer(filehandle)
+                        writer.writerow(self.avg_reward)
 
             self.done = False
             self.total_reward = 0
@@ -152,7 +154,7 @@ class Trainer(basic.Trainer):
             #Make difficulty level (trace file) depend on client_id
             #self.trace_idx = int(self.episode_num / 700) #progresses with time
             self.trace_idx = (self.client_id % Config().algorithm.difficulty_levels)
-            state = self.env.reset(trace_idx=self.trace_idx)
+            state = self.env.reset(trace_idx=self.trace_idx, test= True)
             state = self.obs_normalizer.normalize(state)
             self.steps = 0
 
@@ -191,14 +193,22 @@ class Trainer(basic.Trainer):
             self.train_first_ittr = False
             first_iteration_path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
             np.savez("%s" %(first_iteration_path+"_first_iteration_check"), a=[self.train_first_ittr])
-            with open(path+".csv", 'w', encoding='utf-8') as filehandle:
-                filehandle.write(",".join(map(str, self.avg_reward))+'\n')
+            with open(path+".csv", 'w') as filehandle:
+                writer = csv.writer(filehandle)
+                writer.writerow(self.avg_reward)
         else:
-            with open(path+".csv", 'a', encoding='utf-8') as filehandle:
-                filehandle.write(",".join(map(str, self.avg_reward))+'\n')
-
+            with open(path+".csv", 'a') as filehandle:
+                writer = csv.writer(filehandle)
+                writer.writerow(self.avg_reward)
+        
+        #print("self.actor_loss", self.actor_loss)
+        x = np.array(range(len(self.actor_loss)))+1
+        actor_grad, _ = np.polyfit(x, np.array(self.actor_loss), 1)
+        critic_grad, _ = np.polyfit(x, np.array(self.critic_loss), 1)
+        print("Client %s: Actor avg improvement, %s" % (str(self.client_id), str(actor_grad)))
+        # TODO: want to reeport entropy, critic_grad and actor_grad
         self.avg_actor_loss = sum(self.actor_loss)/len(self.actor_loss)
-        self.avg_critic_loss = sum(self.critic_loss)/len(self.critic_loss)
+        self.avg_critic_loss =  sum(self.critic_loss)/len(self.critic_loss)
         
     def train_helper(self, memory, q_val):
         #We will put the train loop here
@@ -280,18 +290,20 @@ class Trainer(basic.Trainer):
             self.adam_critic = torch.optim.Adam(self.critic.parameters(), lr=Config().algorithm.learning_rate)
 
 
-    def load_loss(self, actor_passed):
-        loss_path = ""
+    def load_loss(self):
         path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
-        if actor_passed:
-            loss_path = path+"_actor_loss"
-        else:
-            loss_path = path + "_critic_loss"
+        actor_loss = []
+        critic_loss = []
+        with open(path + "_actor_loss.csv", 'r') as file:
+            rows = file.readlines()
+            for row in rows:
+                actor_loss = float(row)
+        with open(path + "_critic_loss.csv", 'r') as file:
+            rows = file.readlines()
+            for row in rows:
+                critic_loss = float(row)
 
-        with open(loss_path, 'r', encoding='utf-8') as file:
-                loss = float(file.read())
-
-        return loss
+        return actor_loss, critic_loss
 
 
     def save_model(self, filename=None, location=None):
@@ -308,8 +320,7 @@ class Trainer(basic.Trainer):
         check_point_save = "checkpoint" in filename
         if not check_point_save:
             path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
-            self.save_loss(self.avg_actor_loss, path, True)
-            self.save_loss(self.avg_critic_loss, path, False)
+            self.save_loss(path)
     
         try:
             if not os.path.exists(model_path):
@@ -348,28 +359,23 @@ class Trainer(basic.Trainer):
             logging.info("[Client #%d] Saving a model to %s, and %s.",
                          self.client_id, actor_model_path, critic_model_path)
 
-    def save_loss(self, loss, path, actor_passed):
+    def save_loss(self, path):
 
-        loss_path = ""
-        if actor_passed:
-            loss_path = path+"_actor_loss"
-        else:
-            loss_path = path + "_critic_loss"
+        actor_loss_path = path+"_actor_loss.csv"
+        critic_loss_path = path + "_critic_loss.csv"
 
-        with open(loss_path, 'w', encoding='utf-8') as file:
-                file.write(str(loss))
-
-         #If it is the first iteration write OVER potnetially existing files, else append
-        if  self.episode_num <= Config().algorithm.max_round_episodes:
-            with open(loss_path+".csv", 'w', encoding='utf-8') as filehandle:
-                filehandle.write(str(loss)+'\n')
-        else:
-            with open(loss_path+".csv", 'a', encoding='utf-8') as filehandle:
-                filehandle.write(str(loss)+'\n')
-
-
+        #If it is the first iteration write OVER potnetially existing files, else append
+        first_itr = self.episode_num <= Config().algorithm.max_round_episodes
         
-    
+        with open(actor_loss_path, 'w' if first_itr else 'a') as filehandle:
+            writer = csv.writer(filehandle)
+            print("self.avg_actor_loss", self.avg_actor_loss)
+            print("self.avg_critic_loss", self.avg_critic_loss)
+            writer.writerow([self.avg_actor_loss])
+
+        with open(critic_loss_path, 'w' if first_itr else 'a') as filehandle:
+            writer = csv.writer(filehandle)
+            writer.writerow([self.avg_critic_loss])
 
 
     async def server_test(self, testset, sampler=None, **kwargs):
@@ -384,11 +390,13 @@ class Trainer(basic.Trainer):
             self.train_first_ittr = False
             first_iteration_path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
             np.savez("%s" %(first_iteration_path+"_first_iteration_check"), a=[self.train_first_ittr])
-            with open(path+".csv", 'w', encoding='utf-8') as filehandle:
-                filehandle.write(",".join(map(str, self.server_reward))+'\n')
+            with open(path+".csv", 'w') as filehandle:
+                writer = csv.writer(filehandle)
+                writer.writerow(self.server_reward)
         else:
-            with open(path+".csv", 'a', encoding='utf-8') as filehandle:
-                filehandle.write(",".join(map(str, self.server_reward))+'\n')
+            with open(path+".csv", 'a') as filehandle:
+                writer = csv.writer(filehandle)
+                writer.writerow(self.server_reward)
 
         return sum(avg_reward)/len(avg_reward)
 
@@ -401,7 +409,7 @@ class Trainer(basic.Trainer):
             for _ in range(eval_episodes):
                 episode_reward = 0
                 done = False
-                state = self.env.reset(trace_idx=trace_idx)
+                state = self.env.reset(trace_idx=trace_idx, test= True)
                 state = self.obs_normalizer.normalize(state)
                 while not done:
                     probs = self.actor(self.t(state))
@@ -416,7 +424,7 @@ class Trainer(basic.Trainer):
                 avg_reward += episode_reward
             avg_reward /= eval_episodes
             print("------------------")
-            print("Average Reward over trace %s is %s" % (str(trace_idx), str(avg_reward)))
+            print("Average Reward for client %s over trace %s is %s" % (str(self.client_id), str(trace_idx), str(avg_reward)))
             print("------------------")
             avg_rewards.append(avg_reward)
         return avg_rewards

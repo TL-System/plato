@@ -27,15 +27,13 @@ class RLClient(simple.Client):
         """The machine learning training workload on a client."""
         report, weights = await super().train()
 
-        actor_loss = self.get_loss(True)
-        critic_loss = self.get_loss(False)
+        actor_loss, critic_loss = self.get_loss()
         
         return Report(report.num_samples, report.accuracy, report.training_time, \
          report.comm_time, report.update_response, self.client_id, actor_loss, critic_loss), weights
 
-    def get_loss(self, actor_passed):
-         loss = self.trainer.load_loss(actor_passed)
-         return loss
+    def get_loss(self):
+        return self.trainer.load_loss()
 
 
 

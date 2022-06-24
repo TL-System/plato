@@ -14,7 +14,7 @@ from plato.config import Config
 import pickle
 import random
 import numpy as np
-
+import csv
 
 class A2CServer(fedavg.Server):
     """ Federated learning server using federated averaging to train Actor-Critic models. """
@@ -52,11 +52,14 @@ class A2CServer(fedavg.Server):
             if Config().server.actor_loss_aggregate:
                 actor_loss_list = self.create_loss_lists(True, updates)
                 actor_percentile_aggregation = np.percentile(np.array(actor_loss_list), percentile)
+                print("Actor percentile is ", actor_percentile_aggregation)
+                print("Actor loss list: ", actor_loss_list)
             
             if Config().server.critic_loss_aggregate:
                 critic_loss_list = self.create_loss_lists(False, updates)
                 critic_percentile_aggregation = np.percentile(np.array(critic_loss_list), percentile)
-
+                print("Critic percentile is ", critic_percentile_aggregation)
+                print("Critic loss list: ", critic_loss_list)
             actor_path = Config().results.results_dir +"/"+Config().results.file_name+"_percentile_actor_loss"
             critic_path =  Config().results.results_dir +"/"+Config().results.file_name+"_percentile_critic_loss"
 
@@ -83,6 +86,7 @@ class A2CServer(fedavg.Server):
         }
 
         for i, update in enumerate(weights_received):
+            print("Client# ", i)
             __, report, __, __ = updates[i]
             actor_loss = report.actor_loss
             critic_loss = report.critic_loss
@@ -93,31 +97,33 @@ class A2CServer(fedavg.Server):
 
             if Config().server.percentile_aggregate == False:
                 for name, delta in update_from_actor.items():
-                    actor_avg_update[name] += delta 
+                    actor_avg_update[name] += delta * 1.0/6.0
 
                 for name, delta in update_from_critic.items():
-                    critic_avg_update[name] += delta 
+                    critic_avg_update[name] += delta * 1.0/6.0
             else:
-                if actor_percentile_aggregation is not None:
-                    if actor_loss > actor_percentile_aggregation and Config().server.actor_loss_aggregate:
-                        print("\n-----------------------")
-                        print("AGGREGATING ONLY BASED ON ACTOR LOSS")
-                        print("-----------------------\n")
-                        self.save_files(client_path, client_id)
-                        for name, delta in update_from_actor.items():
-                            actor_avg_update[name] += delta 
-                        for name, delta in update_from_critic.items():
-                            critic_avg_update[name] += delta 
-                if critic_percentile_aggregation is not None:
-                    if critic_loss > critic_percentile_aggregation and Config().server.critic_loss_aggregate:
-                        print("\n-----------------------")
-                        print("AGGREGATING ONLY BASED ON CRITIC LOSS")
-                        print("-----------------------\n")
-                        self.save_files(client_path, client_id)
-                        for name, delta in update_from_actor.items():
-                            actor_avg_update[name] += delta
-                        for name, delta in update_from_critic.items():
-                            critic_avg_update[name] += delta 
+                # TODO: weight of delta should be the weightage of the client 1/number of clients choosen to be aggreggateed
+                if Config().server.actor_loss_aggregate and actor_loss >= actor_percentile_aggregation:
+                    print("\n-----------------------")
+                    print("AGGREGATING ONLY BASED ON ACTOR LOSS")
+                    print("-----------------------\n")
+                    print("Client %s is choosen" % str(client_id))
+                    self.save_files(client_path, client_id)
+                    for name, delta in update_from_actor.items():
+                        actor_avg_update[name] += delta * 2.0/6.0
+                    for name, delta in update_from_critic.items():
+                        critic_avg_update[name] += delta * 2.0/6.0
+                
+                if Config().server.critic_loss_aggregate and critic_loss >= critic_percentile_aggregation:
+                    print("\n-----------------------")
+                    print("AGGREGATING ONLY BASED ON CRITIC LOSS")
+                    print("-----------------------\n")
+                    print("Client %s is choosen" % str(client_id))
+                    self.save_files(client_path, client_id)
+                    for name, delta in update_from_actor.items():
+                        actor_avg_update[name] += delta * 2.0/6.0
+                    for name, delta in update_from_critic.items():
+                        critic_avg_update[name] += delta * 2.0/6.0
             # Yield to other tasks in the server
             await asyncio.sleep(0)
         
@@ -126,11 +132,13 @@ class A2CServer(fedavg.Server):
     def save_files(self, file_path, data):
         #To avoid appending to existing files, if the current roudn is one we write over
         if self.current_round == 1:
-            with open(file_path+".csv", 'w', encoding='utf-8') as filehandle:
-                filehandle.write(str(data)+'\n')
+            with open(file_path+".csv", 'w') as filehandle:
+                writer = csv.writer(filehandle)
+                writer.writerow([data])
         else:
-            with open(file_path+".csv", 'a', encoding='utf-8') as filehandle:
-                filehandle.write(str(data)+'\n')
+            with open(file_path+".csv", 'a') as filehandle:
+                writer = csv.writer(filehandle)
+                writer.writerow([data])
 
 
     def create_loss_lists(self, actor_passed, updates):
