@@ -173,7 +173,7 @@ class Client(pers_simple.Client):
             #   - testset
             augment_transformer = get_aug(name="test",
                                           train=False,
-                                          for_downstream_task=False)
+                                          for_downstream_task=True)
             self.testset = datawrapper_registry.get(self.testset,
                                                     augment_transformer)
 
@@ -211,7 +211,8 @@ class Client(pers_simple.Client):
                 self.trainset,
                 self.sampler,
                 unlabeled_trainset=self.unlabeledset,
-                unlabeled_sampler=self.unlabeled_sampler)
+                unlabeled_sampler=self.unlabeled_sampler,
+                current_round=self.current_round)
         except ValueError:
             await self.sio.disconnect()
 

@@ -24,8 +24,7 @@ class TestTransform():
             ]
         else:
             transform_functions = [
-                T.Resize(image_size),  # 224 -> 256
-                T.CenterCrop(image_size),
+                #T.Resize(image_size),  # 224 -> 256
                 T.ToTensor()
             ]
 

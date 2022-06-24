@@ -115,7 +115,7 @@ trainer:
     #   The user is expected to carefully choose the batch_size to avoid
     # the memory allocation issue as the contrastive samples occupy more
     # space as more samples will be contained within one loading.
-    epochs: 100
+    epochs: 800
     batch_size: 512
     optimizer: Adam
     learning_rate: 0.003
