@@ -3,7 +3,7 @@ A basic federated self-supervised learning client
 who performs the pre-train and evaluation stages locally.
 
 """
-
+import os
 import logging
 import time
 from dataclasses import dataclass
@@ -93,18 +93,26 @@ class Client(pers_simple.Client):
             self.personalized_model = general_MLP_model.Model.get_model(
                 model_type=personalized_model_name, input_dim=encode_dim)
 
-            # present the personalzied model's info
-            input_dim = self.personalized_model[0][0].in_features
-            params = sum(p.numel()
-                         for p in self.personalized_model.parameters()
-                         if p.requires_grad)
+            # logging the personalzied model's info
+            datasources = Config().data.datasource
+
+            file_name = f"client{self.client_id}_personalized_({personalized_model_name}).log"
+            model_path = Config().params['model_path']
+            to_save_dir = os.path.join(model_path,
+                                       "client_" + str(self.client_id))
+            os.makedirs(to_save_dir, exist_ok=True)
+
+            to_save_path = os.path.join(to_save_dir, file_name)
+            with open(to_save_path, 'w') as f:
+                f.write(str(self.personalized_model))
 
             logging.info(
-                "   [Client #%d]'s personalized model: Trainable Params[%s]",
-                self.client_id, params)
+                "Saved the client%d's personalized model (%s) information to %s",
+                self.client_id, personalized_model_name, to_save_dir)
 
         # assign the client's personalized model to its trainer
-        self.trainer.set_client_personalized_model(self.personalized_model)
+        if self.trainer.personalized_model is None:
+            self.trainer.set_client_personalized_model(self.personalized_model)
 
     def load_data(self) -> None:
         """Generating data and loading them onto this client."""

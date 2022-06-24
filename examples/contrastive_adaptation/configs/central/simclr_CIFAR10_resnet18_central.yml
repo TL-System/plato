@@ -131,6 +131,7 @@ trainer:
     lr_gamma: 0.9
 
     epoch_log_interval: 1
+    epoch_model_log_interval: 50
     batch_log_interval: 50
 
     # Number of epochs for local training in each communication round
