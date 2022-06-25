@@ -12,6 +12,7 @@ import json
 import logging
 
 from collections import Counter
+from attr import has
 
 import torch
 
@@ -61,16 +62,19 @@ class Client(simple.Client):
                 self.testset, self.testset_sampler)
 
             with open(save_file_path, 'w') as fp:
-                json.dump({"train": train_data_sta, "test": test_data_sta}, fp)
-            logging.info(
-                f"Client {self.client_id}'s local #train samples: {train_count}"
-            )
-            logging.info(
-                f"Client {self.client_id}'s local #test samples: {test_count}")
+                json.dump(
+                    {
+                        "train": train_data_sta,
+                        "test": test_data_sta,
+                        "train_size": train_count,
+                        "test_size": test_count
+                    }, fp)
             logging.info(f"Saved the {self.client_id}'s local data statistics")
 
     def load_data(self) -> None:
         """Generating data and loading them onto this client."""
         super().load_data()
 
-        self.save_data_statistics()
+        if hasattr(Config().clients, "do_data_tranform_logging") and Config(
+        ).clients.do_data_tranform_logging:
+            self.save_data_statistics()

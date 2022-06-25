@@ -6,6 +6,7 @@ who performs the pre-train and evaluation stages locally.
 import os
 import logging
 import time
+import json
 from dataclasses import dataclass
 
 from plato.config import Config
@@ -71,6 +72,8 @@ class Client(pers_simple.Client):
         #       use the general transform,
         #       i.e., eval_aug under 'datasource/augmentations/eval_aug.py'
         self.monitor_trainset = None
+        self.monitor_augment_transformer = None
+        self.task_test_augment_transformer = None
         self.eval_trainset = None
 
         # the personalized model here corresponds to the task-specific
@@ -113,6 +116,82 @@ class Client(pers_simple.Client):
         # assign the client's personalized model to its trainer
         if self.trainer.personalized_model is None:
             self.trainer.set_client_personalized_model(self.personalized_model)
+
+    def save_ssl_data_statistics(self):
+
+        result_path = Config().params['result_path']
+
+        save_location = os.path.join(result_path,
+                                     "client_" + str(self.client_id))
+        os.makedirs(save_location, exist_ok=True)
+        data_filename = f"client_{self.client_id}_ssl_train_data_statistics.json"
+        transform_filename = f"client_{self.client_id}_ssl_transform_statistics.json"
+        save_file_path = os.path.join(save_location, data_filename)
+        save_transform_file_path = os.path.join(save_location,
+                                                transform_filename)
+        if not os.path.exists(save_file_path):
+
+            train_data_sta, train_count = self.perform_data_statistics(
+                self.trainset, self.sampler)
+            test_data_sta, test_count = self.perform_data_statistics(
+                self.testset, self.testset_sampler)
+
+            monitor_trainset_sta, monitor_trainset_count = self.perform_data_statistics(
+                self.monitor_trainset, self.sampler)
+            eval_trainset_sta, eval_trainset_count = self.perform_data_statistics(
+                self.eval_trainset, self.sampler)
+
+            with open(save_file_path, 'w') as fp:
+                json.dump(
+                    {
+                        "train":
+                        train_data_sta,
+                        "test":
+                        test_data_sta,
+                        "monitor_trainset":
+                        monitor_trainset_sta,
+                        "eval_trainset":
+                        eval_trainset_sta,
+                        "train_size":
+                        train_count,
+                        "test_size":
+                        test_count,
+                        "monitor_size":
+                        monitor_trainset_count,
+                        "eval_trainset_size":
+                        eval_trainset_count,
+                        "unlabel_size":
+                        len(self.unlabeledset)
+                        if self.unlabeledset is not None else 0,
+                    }, fp)
+
+            logging.info(
+                f"Saved the {self.client_id}'s local ssl data statistics")
+
+        if not os.path.exists(save_transform_file_path):
+
+            with open(save_transform_file_path, 'w') as fp:
+
+                get_name_func = lambda x: [type(tr_fn).__name__ for tr_fn in x]
+                json.dump(
+                    {
+                        "contrastive_transform":
+                        get_name_func(
+                            self.contrastive_transform.transform.transforms),
+                        "minotor_transform":
+                        get_name_func(self.monitor_augment_transformer.
+                                      transform.transforms),
+                        "task_test_transform":
+                        get_name_func(self.task_test_augment_transformer.
+                                      transform.transforms),
+                        "eval_train_transform":
+                        get_name_func(self.task_train_augment_transformer.
+                                      transform.transforms),
+                    }, fp)
+
+            logging.info(
+                f"Saved the {self.client_id}'s local ssl data transform statistics"
+            )
 
     def load_data(self) -> None:
         """Generating data and loading them onto this client."""
@@ -161,13 +240,13 @@ class Client(pers_simple.Client):
         #       i.e., test transform of the 'datasources/test_aug.py'
         #   - trainset
         #   - the transform for the monitor, such as knn
-        monitor_augment_transformer = get_aug(name="test",
-                                              train=False,
-                                              for_downstream_task=False)
+        self.monitor_augment_transformer = get_aug(name="test",
+                                                   train=False,
+                                                   for_downstream_task=False)
 
         self.monitor_trainset = self.datasource.get_train_set()
         self.monitor_trainset = datawrapper_registry.get(
-            self.monitor_trainset, monitor_augment_transformer)
+            self.monitor_trainset, self.monitor_augment_transformer)
 
         if Config().clients.do_test:
 
@@ -179,11 +258,10 @@ class Client(pers_simple.Client):
             #   - the general data transform for upper mentioned two
             #   blocks
             #   - testset
-            augment_transformer = get_aug(name="test",
-                                          train=False,
-                                          for_downstream_task=True)
-            self.testset = datawrapper_registry.get(self.testset,
-                                                    augment_transformer)
+            self.task_test_augment_transformer = get_aug(
+                name="test", train=False, for_downstream_task=True)
+            self.testset = datawrapper_registry.get(
+                self.testset, self.task_test_augment_transformer)
 
             # obtain the trainset with the corresponding transform for
             #   - the train loader for downstream tasks, such as the
@@ -199,30 +277,41 @@ class Client(pers_simple.Client):
             #   evaluation fro the representation learning of ssl.
             #   Therefore, to make it consistent, we call it eval_trainset
 
-            augment_transformer = get_aug(name="test",
-                                          train=True,
-                                          for_downstream_task=True)
+            self.task_train_augment_transformer = get_aug(
+                name="test", train=True, for_downstream_task=True)
             self.eval_trainset = self.datasource.get_train_set()
             self.eval_trainset = datawrapper_registry.get(
-                self.eval_trainset, augment_transformer)
+                self.eval_trainset, self.task_train_augment_transformer)
+
+        if hasattr(Config().clients, "do_data_tranform_logging") and Config(
+        ).clients.do_data_tranform_logging:
+            self.save_ssl_data_statistics()
 
     async def train(self):
         """The machine learning training workload on a client."""
-        logging.info(
-            fonts.colourize(
-                f"[{self}] Started training in communication round #{self.current_round}."
-            ))
 
-        # Perform model training
-        try:
-            training_time = self.trainer.train(
-                self.trainset,
-                self.sampler,
-                unlabeled_trainset=self.unlabeledset,
-                unlabeled_sampler=self.unlabeled_sampler,
-                current_round=self.current_round)
-        except ValueError:
-            await self.sio.disconnect()
+        if hasattr(Config().clients,
+                   "only_eval_test") and not Config().clients.only_eval_test:
+            logging.info(
+                fonts.colourize(
+                    f"[{self}] Started training in communication round #{self.current_round}."
+                ))
+
+            # Perform model training
+            try:
+                training_time = self.trainer.train(
+                    self.trainset,
+                    self.sampler,
+                    unlabeled_trainset=self.unlabeledset,
+                    unlabeled_sampler=self.unlabeled_sampler,
+                    current_round=self.current_round)
+            except ValueError:
+                await self.sio.disconnect()
+
+        # test code
+        file_checkpoint_path = "/data/sijia/INFOCOM23/experiments/central"
+        filename = "resnet_18_client1_round1_epoch201_runid3942098.pth"
+        self.trainer.load_model(filename, file_checkpoint_path)
 
         # Extract model weights and biases
         weights = self.algorithm.extract_weights()

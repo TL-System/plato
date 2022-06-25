@@ -31,9 +31,9 @@ class TruncatedLeNetModel(nn.Module):
     def __init__(self, defined_lenet5_model):
         super().__init__()
         self.model = defined_lenet5_model
-        self.model.fc4 = Identity()
-        self.model.relu4 = Identity()
-        self.model.fc5 = Identity()
+        self.model.fc4 = nn.Identity()
+        self.model.relu4 = nn.Identity()
+        self.model.fc5 = nn.Identity()
 
     def forward(self, samples):
         """ Forward to specific layer (cut)_layer) of LeNet5. """
