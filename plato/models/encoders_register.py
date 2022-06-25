@@ -23,15 +23,6 @@ from plato.models import registry as model_register
 from plato.config import Config
 
 
-class Identity(nn.Module):
-    """ The constant layer. """
-
-    # pylint: disable=no-self-use
-    def forward(self, samples):
-        """ Forward the input without any operations. """
-        return samples
-
-
 class TruncatedLeNetModel(nn.Module):
     """The truncated LeNet-5 model.
 
@@ -71,7 +62,7 @@ def get():
         # get encoding dimensions
         #   i.e., the output dim of the encoder
         encode_output_dim = encoder.fc.in_features
-        encoder.fc = Identity()
+        encoder.fc = nn.Identity()
 
     if "resnet" in model_name:
         resnets = {
@@ -87,6 +78,6 @@ def get():
         # get encoding dimensions
         #   i.e., the output dim of the encoder
         encode_output_dim = encoder.fc.in_features
-        encoder.fc = Identity()
+        encoder.fc = nn.Identity()
 
     return encoder, encode_output_dim
