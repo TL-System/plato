@@ -21,8 +21,18 @@ clients:
     # The number of clients selected in each round
     per_round: 1
 
+    do_data_tranform_logging: True
+
     # Should the clients compute test accuracy locally?
     do_test: True
+
+    # Should the client only perfrom the eval test without training
+    # under the contrastive ssl.
+    # only perfrom the training and test for the downstream task,
+    # i.e., personalziation in each client
+    only_eval_test: True
+
+
     # whether perform the eval test at the final round
     # on all clients
     do_final_eval_test: True

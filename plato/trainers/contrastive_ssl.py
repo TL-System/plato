@@ -524,29 +524,18 @@ class Trainer(basic.Trainer):
             if callable(custom_test):
                 accuracy = self.eval_test_model(config, testset)
             else:
-                if sampler is None:
-                    test_loader = torch.utils.data.DataLoader(
-                        testset,
-                        batch_size=config['pers_batch_size'],
-                        shuffle=False)
-                    if "eval_trainset" in kwargs:
-                        eval_train_loader = torch.utils.data.DataLoader(
-                            kwargs["eval_trainset"],
-                            batch_size=config['pers_batch_size'],
-                            shuffle=False)
-                # Use a testing set following the same distribution as the training set
-                else:
-                    test_loader = torch.utils.data.DataLoader(
-                        testset,
+
+                test_loader = torch.utils.data.DataLoader(
+                    testset,
+                    batch_size=config['pers_batch_size'],
+                    shuffle=False,
+                    sampler=sampler.get())
+                if "eval_trainset" in kwargs:
+                    eval_train_loader = torch.utils.data.DataLoader(
+                        kwargs["eval_trainset"],
                         batch_size=config['pers_batch_size'],
                         shuffle=False,
-                        sampler=sampler.get())
-                    if "eval_trainset" in kwargs:
-                        eval_train_loader = torch.utils.data.DataLoader(
-                            kwargs["eval_trainset"],
-                            batch_size=config['pers_batch_size'],
-                            shuffle=False,
-                            sampler=kwargs["eval_trainset_sampler"].get())
+                        sampler=kwargs["eval_trainset_sampler"].get())
 
                 # Perform the evaluation in the downstream task
                 #   i.e., the client's personal local dataset
@@ -574,7 +563,7 @@ class Trainer(basic.Trainer):
                 else:
                     eval_loss_criterion = torch.nn.CrossEntropyLoss()
 
-                self.model.eval()
+                self.model.train()
                 personalized_model.train()
 
                 # Define the training and logging information
@@ -645,6 +634,7 @@ class Trainer(basic.Trainer):
                 acc_meter = optimizers.AverageMeter(name='Accuracy')
 
                 personalized_model.eval()
+                self.model.eval()
                 correct = 0
                 test_data_encoded = list()
                 test_data_labels = list()
