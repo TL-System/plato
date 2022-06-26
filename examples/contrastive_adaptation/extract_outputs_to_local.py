@@ -45,21 +45,23 @@ data_folders_name = [
 ]
 
 
-def obtain_data_path(data_type):
+def obtain_data_path(data_type, exp_dir):
     """ Obtain the data path required by the data type. """
     extract_sim_experiments_dirs = []
     extract_sim_logging_dir = None
     to_local_experiments_dir = None
     to_local_logging_dir = None
 
+    if exp_dir != "None":
+        base_experiment_path = os.path.join("/experiments", exp_dir)
     if data_type == "all":
 
         extract_sim_experiments_dirs = [
-            sim_data_dir + "/experiments/" + folder_name
+            sim_data_dir + os.path.join(base_experiment_path, folder_name)
             for folder_name in data_folders_name
         ]
         extract_sim_logging_dir = sim_logging_dir
-        to_local_experiments_dir = local_experiments_dir + "/experiments"
+        to_local_experiments_dir = local_experiments_dir + base_experiment_path
         to_local_logging_dir = local_logging_dir
 
     elif data_type == "logging":
@@ -67,20 +69,25 @@ def obtain_data_path(data_type):
         to_local_logging_dir = local_logging_dir
 
     elif data_type == "textlogging":
-        extract_sim_logging_dir = sim_data_dir + "/experiments/" + text_logging_name
-        to_local_logging_dir = to_local_experiments_dir = local_experiments_dir + "/experiments"
+        extract_sim_logging_dir = sim_data_dir + os.path.join(
+            base_experiment_path, text_logging_name)
+        to_local_logging_dir = to_local_experiments_dir = local_experiments_dir + base_experiment_path
 
     elif data_type == "models":
-        extract_sim_experiments_dirs = [sim_data_dir + "/experiments/models"]
-        to_local_experiments_dir = local_experiments_dir + "/experiments"
+        extract_sim_experiments_dirs = [
+            sim_data_dir + os.path.join(base_experiment_path, data_type)
+        ]
+        to_local_experiments_dir = local_experiments_dir + base_experiment_path
     elif data_type == "checkpoints":
         extract_sim_experiments_dirs = [
-            sim_data_dir + "/experiments/checkpoints"
+            sim_data_dir + os.path.join(base_experiment_path, data_type)
         ]
-        to_local_experiments_dir = local_experiments_dir + "/experiments"
+        to_local_experiments_dir = local_experiments_dir + base_experiment_path
     elif data_type == "results":
-        extract_sim_experiments_dirs = [sim_data_dir + "/experiments/results"]
-        to_local_experiments_dir = local_experiments_dir + "/experiments"
+        extract_sim_experiments_dirs = [
+            sim_data_dir + os.path.join(base_experiment_path, data_type)
+        ]
+        to_local_experiments_dir = local_experiments_dir + base_experiment_path
 
     return extract_sim_experiments_dirs, extract_sim_logging_dir, to_local_experiments_dir, to_local_logging_dir
 
@@ -88,6 +95,14 @@ def obtain_data_path(data_type):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        '-d',
+        '--dirname',
+        type=str,
+        default='None',
+        help='the dir name in which the experiments are stored.')
+
     parser.add_argument(
         '-t',
         '--type',
@@ -99,10 +114,11 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    exp_dir_name = args.dirname
     data_type = args.type
 
     extract_sim_experiments_dirs, extract_sim_logging_dir, \
-        to_local_experiments_dir, to_local_logging_dir = obtain_data_path(data_type)
+        to_local_experiments_dir, to_local_logging_dir = obtain_data_path(data_type, exp_dir_name)
 
     if extract_sim_experiments_dirs:
         print(

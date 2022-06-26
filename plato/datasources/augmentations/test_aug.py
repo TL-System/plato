@@ -19,7 +19,7 @@ class TestTransform():
         if train:
             transform_functions = [
                 T.RandomResizedCrop(image_size),
-                T.RandomHorizontalFlip(),
+                T.RandomHorizontalFlip(0.5),
                 T.ToTensor()
             ]
         else:
