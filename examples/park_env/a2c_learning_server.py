@@ -24,7 +24,6 @@ class A2CServer(fedavg.Server):
         super().__init__(trainer = trainer, algorithm = algorithm, model = model)
         self.algorithm_name = algorithm_name
         self.env_name = env_name
-        #self.updates = None
         logging.info("A custom server has been initialized.")
         
     async def federated_averaging(self, updates):
@@ -182,46 +181,3 @@ class A2CServer(fedavg.Server):
         with open(f"{checkpoint_path}/current_round.pkl",
                   'wb') as checkpoint_file:
             pickle.dump(self.current_round, checkpoint_file)
-
-   # async def process_clients(self, client_info):
-    #    print("WE WILL NOW PROCESS AND SELECT OUR OWN CLIENTS!!!!!!!!!!!!!!!!!")
-        #TODO
-        #Client_info holds a tuple of (useless, reports, useless, useless)
-        #Interested in the second element of tuple
-
-    """def choose_clients(self, clients_pool, clients_count):
-       
-        assert clients_count <= len(clients_pool)
-
-        print("IN CHOOSE CLIENTS!!!!")
-        print(self.updates) #notice how this is none since no report is returned at this point
-        #TODO
-        If we want to aggregate CERTAIN clients out of ALL clients 
-        based on their actor and loss rate, we need to
-        receive a report from the ALL clients FIRST and then select them
-        
-        selected_clients = []
-
-        if Config().server.random:
-            random.setstate(self.prng_state)
-            
-            # Select clients randomly
-            selected_clients = random.sample(clients_pool, clients_count)
-
-            self.prng_state = random.getstate()
-        else:
-            print("Custom selection started!")
-            if(self.current_round <= 8):
-                selected_clients.append(clients_pool[0])
-                selected_clients.append(clients_pool[1])
-            else:
-                random.setstate(self.prng_state)
-                
-                selected_clients = random.sample(clients_pool, clients_count)
-
-                self.prng_state = random.getstate()
-
-        logging.info("[%s] Selected clients: %s", self, selected_clients)
-        return selected_clients 
-    """
-    

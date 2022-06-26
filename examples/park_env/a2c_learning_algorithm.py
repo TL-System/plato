@@ -69,12 +69,10 @@ class Algorithm(fedavg.Algorithm):
         actor_weight = actor.cpu().state_dict()
         critic_weight = critic.cpu().state_dict()
 
-
         return actor_weight, critic_weight
 
     def load_weights(self, weights):
         """ Load the model weights passed in as a parameter. """
-        #print("weights are being loaded in line 104")
         weights_actor, weights_critic = weights
         # The client might only receive one or none of the Actor
         # and Critic model weight.

@@ -116,9 +116,9 @@ class Trainer(basic.Trainer):
         self.fisher_critic = {}
         self.fisher_actor = {}
         self.critic_fisher_sum, self.actor_fisher_sum = 0, 0
+        self.critic_fishers, self.actor_fishers = [], []
 
         self.timesteps_since_eval = 0
-        self.train_first_ittr = True
 
         if not os.path.exists(Config().results.results_dir):
             os.makedirs(Config().results.results_dir)
@@ -132,29 +132,20 @@ class Trainer(basic.Trainer):
 
     def train_model(self, config, trainset, sampler, cut_layer):
         """Main Training"""
-        #We will put what exectues in the "main function of a2c_abr_sim.py here"
-
+        common_path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
         round_episodes = 0
-
+        
         while round_episodes < Config().algorithm.max_round_episodes:
-            
+            first_itr = self.episode_num < Config().algorithm.max_round_episodes
             #Evaluates policy at a frequency set in config file
             if self.timesteps_since_eval >= Config().algorithm.eval_freq:
                 self.avg_reward = self.evaluate_policy()
-                path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)+"_avg_reward"
+                # Save avg reward
+                avg_reward_path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)+"_avg_reward"
                 self.timesteps_since_eval = 0
-                #If it is the first iteration write OVER potnetially existing files, else append
-                if self.train_first_ittr:
-                    self.train_first_ittr = False
-                    first_iteration_path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
-                    np.savez("%s" %(first_iteration_path+"_first_iteration_check"), a=[self.train_first_ittr])
-                    with open(path+".csv", 'w') as filehandle:
-                        writer = csv.writer(filehandle)
-                        writer.writerow(self.avg_reward)
-                else:
-                    with open(path+".csv", 'a') as filehandle:
-                        writer = csv.writer(filehandle)
-                        writer.writerow(self.avg_reward)
+                self.save_metric(avg_reward_path, self.avg_reward, first = self.episode_num <= Config().algorithm.eval_freq)
+
+                
 
             self.done = False
             self.total_reward = 0
@@ -183,12 +174,17 @@ class Trainer(basic.Trainer):
                 
                 if self.done or (self.steps % Config().algorithm.batch_size == 0):
                     last_q_val = self.critic(self.t(next_state)).detach().data.numpy()
-
-                    critic_loss, actor_loss, entropy_loss = self.train_helper(self.memory, last_q_val)
-
+                    
                     # Estimate diagonals of fisher information matrix
                     self.estimate_fisher(self.train_helper(self.memory, last_q_val, fisher = True))
                     self.sum_fisher_diagonals()
+                    # Save fisher matrix
+                    actor_fisher_path = common_path + "_actor_fisher"
+                    critic_fisher_path = common_path + "_critic_fisher"
+                    self.save_metric(actor_fisher_path, [self.actor_fisher_sum.tolist()], first = (self.episode_num == 0) and (self.steps == Config().algorithm.batch_size))
+                    self.save_metric(critic_fisher_path, [self.critic_fisher_sum.tolist()], first = (self.episode_num == 0) and (self.steps == Config().algorithm.batch_size))
+
+                    critic_loss, actor_loss, entropy_loss = self.train_helper(self.memory, last_q_val)
 
                     self.critic_loss.append(critic_loss)
                     self.actor_loss.append(actor_loss)
@@ -199,35 +195,24 @@ class Trainer(basic.Trainer):
             self.timesteps_since_eval += 1
             round_episodes += 1
             print("Episode number: %d, Reward: %d" % (self.episode_num, self.total_reward))
-
-        # Evaluate policy on traces
+        
+        # End of round: 
+        # 1- Evaluate policy on traces
+        first_itr = self.episode_num <= Config().algorithm.max_round_episodes
         self.avg_reward = self.evaluate_policy()
-        
-        # TODO: every file writing should be in a separate function, preferable all file writing in one function
-        path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)+"_avg_reward"
-        first_iteration_path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
-        metrics_path = first_iteration_path
-        #If it is the first iteration write OVER potnetially existing files, else append
-        if self.train_first_ittr:
-            self.train_first_ittr = False
-            np.savez("%s" %(first_iteration_path+"_first_iteration_check"), a=[self.train_first_ittr])
-            with open(path+".csv", 'w') as filehandle:
-                writer = csv.writer(filehandle)
-                writer.writerow(self.avg_reward)
-        else:
-            with open(path+".csv", 'a') as filehandle:
-                writer = csv.writer(filehandle)
-                writer.writerow(self.avg_reward)
-        
+        avg_reward_path = common_path + "_avg_reward"
+        self.save_metric(avg_reward_path, self.avg_reward, first=first_itr)
 
-        
-        # Get gradients of change in actor and critic loss
+        # 2- Get gradients of change in actor and critic loss
         x = np.array(range(len(self.actor_loss)))+1
         actor_grad, _ = np.polyfit(x, np.array(self.actor_loss), 1)
         critic_grad, _ = np.polyfit(x, np.array(self.critic_loss), 1)
+        # and save in file
+        critic_grad_path = common_path + "_critic_grad"
+        actor_grad_path = common_path + "_actor_grad"
+        self.save_metric(critic_grad_path, [critic_grad], first = first_itr)
+        self.save_metric(actor_grad_path, [actor_grad], first = first_itr)
         
-        self.save_metrics(metrics_path, actor_grad, critic_grad)
-
         self.avg_actor_loss = sum(self.actor_loss)/len(self.actor_loss)
         self.avg_critic_loss =  sum(self.critic_loss)/len(self.critic_loss)
         self.avg_entropy_loss = sum(self.entropy_loss)/len(self.entropy_loss)        
@@ -277,8 +262,8 @@ class Trainer(basic.Trainer):
         critic_loss, actor_loss = loss
         task = self.trace_idx
         # Get fisher for critic model
-        self.critic_optimizer.zero_grad()
-        critic_loss.backward()
+        self.adam_critic.zero_grad()
+        critic_loss.backward(retain_graph=True)
         self.fisher_critic[task] = [] 
         
         for p in self.critic.parameters():
@@ -286,8 +271,8 @@ class Trainer(basic.Trainer):
             self.fisher_critic[task].append(pg)
 
         # Get fisher for actor model
-        self.actor_optimizer.zero_grad()
-        actor_loss.backward()
+        self.adam_actor.zero_grad()
+        actor_loss.backward(retain_graph=True)
         self.fisher_actor[task] = []
         for p in self.actor.parameters():
             pg = p.grad.data.clone().pow(2)
@@ -348,11 +333,6 @@ class Trainer(basic.Trainer):
             self.actor.load_state_dict(torch.load(actor_model_path), strict=True)
             self.critic.load_state_dict(torch.load(critic_model_path), strict=True)
 
-            #load that it's not the first iteration anymore
-            first_train_ittr_path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)+"_first_iteration_check"
-            arr = np.load("%s.npz" %(first_train_ittr_path))
-            self.train_first_ittr = bool((arr['a']))
-
             #unsure if we need these
             self.adam_actor = torch.optim.Adam(self.actor.parameters(), lr=Config().algorithm.learning_rate)
             self.adam_critic = torch.optim.Adam(self.critic.parameters(), lr=Config().algorithm.learning_rate)
@@ -365,7 +345,7 @@ class Trainer(basic.Trainer):
             rows = file.readlines()
             for row in rows:
                 actor_loss = float(row)
-                
+
         with open(path + "_critic_loss.csv", 'r') as file:
             rows = file.readlines()
             for row in rows:
@@ -392,33 +372,11 @@ class Trainer(basic.Trainer):
                 critic_grad = float(row)
 
         return actor_grad, critic_grad
-    
-    def save_metrics(self, path, actor_grads, critic_grads):
-       
-        actor_grad_path = path+"_actor_grad.csv"
-        critic_grad_path = path+"_critic_grad.csv"
-        
-        actor_fisher_path = path + "_fisher_actor.csv"
-        critic_fisher_path = path + "_fisher_critic.csv"
 
-        #If it is the first iteration write OVER potnetially existing files, else append
-        first_itr = self.episode_num <= Config().algorithm.max_round_episodes
-        # TODO: make a function to write into a file to avoid repetitions in the following lines
-        with open(actor_grad_path, 'w' if first_itr else 'a') as filehandle:
+    def save_metric(self, path, value, first = False):
+        with open(path+".csv", 'w' if first else 'a') as filehandle:
             writer = csv.writer(filehandle)
-            writer.writerow([actor_grads])
-        
-        with open(critic_grad_path, 'w' if first_itr else 'a') as filehandle:
-            writer = csv.writer(filehandle)
-            writer.writerow([critic_grads])
-
-        with open(actor_fisher_path, 'w' if first_itr else 'a') as filehandle:
-            writer = csv.writer(filehandle)
-            writer.writerow([self.actor_fisher_sum])
-
-        with open(critic_fisher_path, 'w' if first_itr else 'a') as filehandle:
-            writer = csv.writer(filehandle)
-            writer.writerow([self.critic_fisher_sum])
+            writer.writerow(value)
 
     def save_model(self, filename=None, location=None):
         """Saving the model to a file."""
@@ -484,8 +442,6 @@ class Trainer(basic.Trainer):
         
         with open(actor_loss_path, 'w' if first_itr else 'a') as filehandle:
             writer = csv.writer(filehandle)
-            #print("self.avg_actor_loss", self.avg_actor_loss)
-            #print("self.avg_critic_loss", self.avg_critic_loss)
             writer.writerow([self.avg_actor_loss])
 
         with open(critic_loss_path, 'w' if first_itr else 'a') as filehandle:
@@ -504,16 +460,9 @@ class Trainer(basic.Trainer):
         file_name = "A2C_RL_SERVER"
         path = Config().results.results_dir +"/"+file_name
         
-        #If it is the first iteration write OVER potnetially existing files, else append
-        if self.train_first_ittr:
-            self.train_first_ittr = False
-            first_iteration_path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
-            np.savez("%s" %(first_iteration_path+"_first_iteration_check"), a=[self.train_first_ittr])
-            with open(path+".csv", 'w') as filehandle:
-                writer = csv.writer(filehandle)
-                writer.writerow(self.server_reward)
-        else:
-            with open(path+".csv", 'a') as filehandle:
+        first_itr = self.episode_num <= Config().algorithm.max_round_episodes
+
+        with open(path+".csv", 'w' if first_itr else 'a') as filehandle:
                 writer = csv.writer(filehandle)
                 writer.writerow(self.server_reward)
 
