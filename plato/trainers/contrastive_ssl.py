@@ -354,6 +354,8 @@ class Trainer(basic.Trainer):
 
                 torch.save(self.model.state_dict(),
                            os.path.join(to_save_dir, filename))
+                self.model.to(self.device)
+                self.model.train()
 
             # Update the learning rate
             if lr_schedule is not None:

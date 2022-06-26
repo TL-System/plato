@@ -97,7 +97,6 @@ class Client(pers_simple.Client):
                 model_type=personalized_model_name, input_dim=encode_dim)
 
             # logging the personalzied model's info
-            datasources = Config().data.datasource
 
             file_name = f"client{self.client_id}_personalized_({personalized_model_name}).log"
             model_path = Config().params['model_path']
@@ -307,11 +306,8 @@ class Client(pers_simple.Client):
                     current_round=self.current_round)
             except ValueError:
                 await self.sio.disconnect()
-
-        # test code
-        file_checkpoint_path = "/data/sijia/INFOCOM23/experiments/central"
-        filename = "resnet_18_client1_round1_epoch201_runid3942098.pth"
-        self.trainer.load_model(filename, file_checkpoint_path)
+        else:
+            training_time = 0.0
 
         # Extract model weights and biases
         weights = self.algorithm.extract_weights()
