@@ -295,7 +295,19 @@ class Trainer(basic.Trainer):
         self.critic_fisher_sum, self.actor_fisher_sum = critic_fisher_sum, actor_fisher_sum
         
     def load_fisher(self):
-        return self.critic_fisher_sum, self.actor_fisher_sum
+        """ Load laast fisher from file"""
+        path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
+        
+        with open(path + "_actor_fisher.csv", 'r') as file:
+            rows = file.readlines()
+            for row in rows:
+                actor_fisher_sum = float(row)
+        with open(path + "_critic_fisher.csv", 'r') as file:
+            rows = file.readlines()
+            for row in rows:
+                critic_fisher_sum = float(row)
+
+        return actor_fisher_sum, critic_fisher_sum
 
     def load_model(self, filename=None, location=None):
         """Loading pre-trained model weights from a file."""

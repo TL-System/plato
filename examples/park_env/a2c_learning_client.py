@@ -17,6 +17,8 @@ class Report(simple.Report):
     entropy_loss: float
     actor_grad: float
     critic_grad: float
+    actor_fisher: float
+    critic_fisher: float
 
 
 class RLClient(simple.Client):
@@ -32,16 +34,21 @@ class RLClient(simple.Client):
 
         actor_loss, critic_loss, entropy_loss = self.get_loss()
         actor_grad, critic_grad = self.get_grad()
+        actor_fisher, critic_fisher = self.get_fisher()
+        print("In client fisher", actor_fisher)
         
         return Report(report.num_samples, report.accuracy, report.training_time, \
          report.comm_time, report.update_response, self.client_id, actor_loss, critic_loss, \
-          entropy_loss, actor_grad, critic_grad), weights
+          entropy_loss, actor_grad, critic_grad, actor_fisher, critic_fisher), weights
 
     def get_loss(self):
         return self.trainer.load_loss()
 
     def get_grad(self):
         return self.trainer.load_grads()
+
+    def get_fisher(self): 
+        return self.trainer.load_fisher()
 
 
 
