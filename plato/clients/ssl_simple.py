@@ -289,8 +289,8 @@ class Client(pers_simple.Client):
     async def train(self):
         """The machine learning training workload on a client."""
 
-        if hasattr(Config().clients,
-                   "only_eval_test") and not Config().clients.only_eval_test:
+        if not (hasattr(Config().clients, "only_eval_test")
+                and Config().clients.only_eval_test):
             logging.info(
                 fonts.colourize(
                     f"[{self}] Started training in communication round #{self.current_round}."
