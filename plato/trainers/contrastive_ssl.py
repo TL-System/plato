@@ -267,11 +267,8 @@ class Trainer(basic.Trainer):
         optimizer = optimizers.get_dynamic_optimizer(self.model)
 
         # Initializing the learning rate schedule, if necessary
-        if 'lr_schedule' in config:
-            lr_schedule = optimizers.get_dynamic_lr_schedule(
-                optimizer, iterations_per_epoch, streamed_train_loader)
-        else:
-            lr_schedule = None
+        lr_schedule = optimizers.get_dynamic_lr_schedule(
+            optimizer, iterations_per_epoch, streamed_train_loader)
 
         # Obtain the logging interval
         epochs = config['epochs']
@@ -358,8 +355,7 @@ class Trainer(basic.Trainer):
                 self.model.train()
 
             # Update the learning rate
-            if lr_schedule is not None:
-                lr_schedule.step()
+            lr_schedule.step()
 
             if hasattr(optimizer, "params_state_update"):
                 optimizer.params_state_update()

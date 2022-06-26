@@ -16,7 +16,7 @@ The type can be:
 
 For example:
 
-    python examples/contrastive_adaptation/extract_outputs_to_local.py -t models
+    python examples/contrastive_adaptation/extract_outputs_to_local.py -d central -t models
 
     just extracting the models saved on Sim to the local
 """
