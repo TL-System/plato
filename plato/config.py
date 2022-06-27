@@ -383,6 +383,37 @@ class Config:
         return device
 
     @staticmethod
+    def to_dict() -> dict:
+        """ Converting the current run-time configuration to a dict. """
+
+        def items_convert_to_dict(base_dict):
+            for key, value in base_dict.items():
+
+                if not isinstance(value, dict):
+                    if hasattr(value, "_asdict"):
+                        value = value._asdict()
+                        value = items_convert_to_dict(value)
+                        base_dict[key] = value
+                else:
+                    value = items_convert_to_dict(value)
+                    base_dict[key] = value
+            return base_dict
+
+        config_data = dict()
+        config_data['clients'] = Config.clients._asdict()
+        config_data['server'] = Config.server._asdict()
+        config_data['data'] = Config.data._asdict()
+        config_data['trainer'] = Config.trainer._asdict()
+        config_data['algorithm'] = Config.algorithm._asdict()
+        config_data['params'] = Config.params
+        for term in [
+                "clients", "server", "data", "trainer", "algorithm", "params"
+        ]:
+            config_data[term] = items_convert_to_dict(config_data[term])
+
+        return config_data
+
+    @staticmethod
     def make_consistent_save_path(running_mode) -> None:
         """ Make the saving path of different parts
             be the same.
@@ -462,12 +493,16 @@ class Config:
             Config.clients = Config.clients._replace(per_round=3)
 
             Config.data = Config.data._replace(partition_size=800)
+            Config.data = Config.data._replace(test_partition_size=1000)
             Config.trainer = Config.trainer._replace(rounds=5)
             Config.trainer = Config.trainer._replace(epochs=2)
             Config.trainer = Config.trainer._replace(batch_size=30)
 
             if hasattr(Config.trainer, "epoch_log_interval"):
                 Config.trainer = Config.trainer._replace(epoch_log_interval=1)
+            if hasattr(Config.trainer, "epoch_model_log_interval"):
+                Config.trainer = Config.trainer._replace(
+                    epoch_model_log_interval=1)
             if hasattr(Config.trainer, "batch_log_interval"):
                 Config.trainer = Config.trainer._replace(batch_log_interval=5)
             if hasattr(Config.trainer, "pers_epochs"):
@@ -477,6 +512,9 @@ class Config:
             if hasattr(Config.trainer, "pers_epoch_log_interval"):
                 Config.trainer = Config.trainer._replace(
                     pers_epoch_log_interval=1)
+            if hasattr(Config.trainer, "pers_epoch_model_log_interval"):
+                Config.trainer = Config.trainer._replace(
+                    pers_epoch_model_log_interval=1)
 
         if "central" in running_mode:
             logging.info(
