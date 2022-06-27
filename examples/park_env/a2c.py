@@ -32,13 +32,6 @@ def main():
 
     env = park.make(Config().algorithm.env_park_name)
 
-    seed = Config().server.random_seed
-
-    env.seed(seed)
-    env.reset()
-    torch.manual_seed(seed)
-    np.random.seed(seed)
-
     state_dim = env.observation_space.shape[0]
     n_actions = env.action_space.n
 
