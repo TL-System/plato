@@ -109,8 +109,8 @@ class Client(pers_simple.Client):
                 f.write(str(self.personalized_model))
 
             logging.info(
-                "Saved the client%d's personalized model (%s) information to %s",
-                self.client_id, personalized_model_name, to_save_dir)
+                "Saved the client%d's personalized model (%s) information to models/",
+                self.client_id, personalized_model_name)
 
         # assign the client's personalized model to its trainer
         if self.trainer.personalized_model is None:

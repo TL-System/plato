@@ -23,7 +23,7 @@ from plato.utils import data_loaders_wrapper
 
 from plato.models import ssl_monitor_register
 
-from plato.utils import ssl_losses
+from plato.utils import ssl_losses, checkpoint_saver
 
 
 class Trainer(basic.Trainer):
@@ -252,9 +252,7 @@ class Trainer(basic.Trainer):
         streamed_train_loader = data_loaders_wrapper.StreamBatchesLoader(
             [train_loader, unlabeled_loader])
 
-        iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
-        iterations_per_epoch += np.ceil(len(unlabeled_trainset) /
-                                        batch_size).astype(int)
+        iterations_per_epoch = len(streamed_train_loader)
 
         # Sending the model to the device used for training
         self.model.to(self.device)
@@ -272,11 +270,14 @@ class Trainer(basic.Trainer):
 
         # Obtain the logging interval
         epochs = config['epochs']
-        # do not save the model during epoch training of each round
-        epoch_model_log_interval = epochs
-        epoch_log_interval = config['epoch_log_interval']
-        batch_log_interval = config['batch_log_interval']
-
+        # default not to perform any logging
+        epoch_log_interval = epochs + 1
+        batch_log_interval = iterations_per_epoch
+        epoch_model_log_interval = epochs + 1
+        if "epoch_log_interval" in config:
+            epoch_log_interval = config['epoch_log_interval']
+        if "batch_log_interval" in config:
+            batch_log_interval = config['batch_log_interval']
         if "epoch_model_log_interval" in config:
             epoch_model_log_interval = config['epoch_model_log_interval']
 
@@ -318,44 +319,48 @@ class Trainer(basic.Trainer):
                 epoch_loss_meter.update(loss.data.item())
                 batch_loss_meter.update(loss.data.item())
 
-                # Performe logging of batches
-                if batch_id % batch_log_interval == 0:
+                # Performe logging of one batch
+                if batch_id % batch_log_interval == 0 or batch_id == iterations_per_epoch - 1:
                     if self.client_id == 0:
                         logging.info(
                             "[Server #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
                             os.getpid(), epoch, epochs, batch_id,
-                            len(streamed_train_loader), batch_loss_meter.avg)
+                            iterations_per_epoch - 1, batch_loss_meter.avg)
                     else:
                         logging.info(
                             "   [Client #%d] Contrastive Pre-train Epoch: \
-                            [%d/%d][%d/%d]\tLoss: %.6f",
-                            self.client_id, epoch, epochs, batch_id,
-                            len(streamed_train_loader), batch_loss_meter.avg)
+                            [%d/%d][%d/%d]\tLoss: %.6f", self.client_id, epoch,
+                            epochs, batch_id, iterations_per_epoch - 1,
+                            batch_loss_meter.avg)
+
+            # Update the learning rate
+            lr_schedule.step()
 
             # Performe logging of epochs
-            if (epoch - 1) % epoch_log_interval == 0:
+            if (epoch - 1) % epoch_log_interval == 0 or epoch == epochs:
                 logging.info(
                     "[Client #%d] Contrastive Pre-train Epoch: [%d/%d]\tLoss: %.6f",
                     self.client_id, epoch, epochs, epoch_loss_meter.avg)
 
-            if (epoch - 1) % epoch_model_log_interval == 0:
+            if (epoch - 1) % epoch_model_log_interval == 0 or epoch == epochs:
                 # the model generated during each round will be stored in the
                 # checkpoints
-                model_type = config['model_name']
-                current_round = kwargs['current_round']
-                filename = f"{model_type}_client{self.client_id}_round{current_round}_epoch{epoch}_runid{config['run_id']}.pth"
                 target_dir = Config().params['checkpoint_path']
                 to_save_dir = os.path.join(target_dir,
                                            "client_" + str(self.client_id))
-                os.makedirs(to_save_dir, exist_ok=True)
+                cpk_saver = checkpoint_saver.CheckpointsSaver(
+                    checkpoints_dir=to_save_dir)
 
-                torch.save(self.model.state_dict(),
-                           os.path.join(to_save_dir, filename))
-                self.model.to(self.device)
-                self.model.train()
-
-            # Update the learning rate
-            lr_schedule.step()
+                model_type = config['model_name']
+                current_round = kwargs['current_round']
+                filename = f"{model_type}_client{self.client_id}_round{current_round}_epoch{epoch}_runid{config['run_id']}.pth"
+                cpk_saver.save_checkpoint(
+                    model_state_dict=self.model.state_dict(),
+                    check_points_name=[filename],
+                    optimizer_state_dict=optimizer.state_dict(),
+                    lr_scheduler_state_dict=lr_schedule.state_dict(),
+                    epoch=epoch,
+                    config_args=Config().to_dict())
 
             if hasattr(optimizer, "params_state_update"):
                 optimizer.params_state_update()
@@ -381,8 +386,15 @@ class Trainer(basic.Trainer):
 
             to_save_dir = os.path.join(target_dir,
                                        "client_" + str(self.client_id))
-
-            self.save_model(filename, location=to_save_dir)
+            cpk_saver = checkpoint_saver.CheckpointsSaver(
+                checkpoints_dir=to_save_dir)
+            cpk_saver.save_checkpoint(
+                model_state_dict=self.model.state_dict(),
+                check_points_name=[filename],
+                optimizer_state_dict=optimizer.state_dict(),
+                lr_scheduler_state_dict=lr_schedule.state_dict(),
+                epoch=epochs,
+                config_args=Config().to_dict())
 
     def test_process(self, config, testset, sampler=None, **kwargs):
         """The testing loop, run in a separate process with a new CUDA context,
@@ -414,40 +426,33 @@ class Trainer(basic.Trainer):
         accuracy = -1
 
         try:
-            custom_test = getattr(self, "test_model", None)
-
-            if callable(custom_test):
-                accuracy = self.test_model(config, testset)
-            else:
-                if sampler is None:
-                    test_loader = torch.utils.data.DataLoader(
-                        testset,
+            if sampler is None:
+                test_loader = torch.utils.data.DataLoader(
+                    testset, batch_size=config['batch_size'], shuffle=False)
+                if "monitor_trainset" in kwargs:
+                    monitor_train_loader = torch.utils.data.DataLoader(
+                        kwargs["monitor_trainset"],
                         batch_size=config['batch_size'],
                         shuffle=False)
-                    if "monitor_trainset" in kwargs:
-                        monitor_train_loader = torch.utils.data.DataLoader(
-                            kwargs["monitor_trainset"],
-                            batch_size=config['batch_size'],
-                            shuffle=False)
-                # Use a testing set following the same distribution as the training set
-                else:
-                    test_loader = torch.utils.data.DataLoader(
-                        testset,
+            # Use a testing set following the same distribution as the training set
+            else:
+                test_loader = torch.utils.data.DataLoader(
+                    testset,
+                    batch_size=config['batch_size'],
+                    shuffle=False,
+                    sampler=sampler.get())
+                if "monitor_trainset" in kwargs:
+                    monitor_train_loader = torch.utils.data.DataLoader(
+                        kwargs["monitor_trainset"],
                         batch_size=config['batch_size'],
                         shuffle=False,
-                        sampler=sampler.get())
-                    if "monitor_trainset" in kwargs:
-                        monitor_train_loader = torch.utils.data.DataLoader(
-                            kwargs["monitor_trainset"],
-                            batch_size=config['batch_size'],
-                            shuffle=False,
-                            sampler=kwargs["monitor_trainset_sampler"].get())
-                # Perform the monitor process to evaluate the representation
-                accuracy = ssl_monitor_register.get()(
-                    encoder=self.model.encoder,
-                    monitor_data_loader=monitor_train_loader,
-                    test_data_loader=test_loader,
-                    device=self.device)
+                        sampler=kwargs["monitor_trainset_sampler"].get())
+            # Perform the monitor process to evaluate the representation
+            accuracy = ssl_monitor_register.get()(
+                encoder=self.model.encoder,
+                monitor_data_loader=monitor_train_loader,
+                test_data_loader=test_loader,
+                device=self.device)
 
         except Exception as testing_exception:
             logging.info("Monitor Testing on client #%d failed.",
@@ -517,138 +522,159 @@ class Trainer(basic.Trainer):
         accuracy = -1
 
         try:
-            custom_test = getattr(self, "eval_test_model", None)
+            assert "eval_trainset" in kwargs and "eval_trainset_sampler" in kwargs
 
-            if callable(custom_test):
-                accuracy = self.eval_test_model(config, testset)
+            test_loader = torch.utils.data.DataLoader(
+                testset,
+                batch_size=config['pers_batch_size'],
+                shuffle=False,
+                sampler=sampler.get())
+
+            eval_train_loader = torch.utils.data.DataLoader(
+                kwargs["eval_trainset"],
+                batch_size=config['pers_batch_size'],
+                shuffle=False,
+                sampler=kwargs["eval_trainset_sampler"].get())
+
+            # Perform the evaluation in the downstream task
+            #   i.e., the client's personal local dataset
+            eval_optimizer = optimizers.get_dynamic_optimizer(
+                personalized_model, prefix="pers_")
+            iterations_per_epoch = np.ceil(
+                len(kwargs["eval_trainset"]) /
+                Config().trainer.pers_batch_size).astype(int)
+
+            # Initializing the learning rate schedule, if necessary
+            assert 'pers_lr_schedule' in config
+            lr_schedule = optimizers.get_dynamic_lr_schedule(
+                optimizer=eval_optimizer,
+                iterations_per_epoch=iterations_per_epoch,
+                train_loader=eval_train_loader,
+                prefix="pers_")
+
+            # Initializing the loss criterion
+            _eval_loss_criterion = getattr(self, "eval_loss_criterion", None)
+            if callable(_eval_loss_criterion):
+                eval_loss_criterion = self.eval_loss_criterion(self.model)
             else:
+                eval_loss_criterion = torch.nn.CrossEntropyLoss()
 
-                test_loader = torch.utils.data.DataLoader(
-                    testset,
-                    batch_size=config['pers_batch_size'],
-                    shuffle=False,
-                    sampler=sampler.get())
-                if "eval_trainset" in kwargs:
-                    eval_train_loader = torch.utils.data.DataLoader(
-                        kwargs["eval_trainset"],
-                        batch_size=config['pers_batch_size'],
-                        shuffle=False,
-                        sampler=kwargs["eval_trainset_sampler"].get())
+            self.model.train()
+            personalized_model.train()
 
-                # Perform the evaluation in the downstream task
-                #   i.e., the client's personal local dataset
-                eval_optimizer = optimizers.get_dynamic_optimizer(
-                    personalized_model, prefix="pers_")
-                iterations_per_epoch = np.ceil(
-                    len(kwargs["eval_trainset"]) /
-                    Config().trainer.pers_batch_size).astype(int)
+            # Define the training and logging information
+            # default not to perform any logging
+            pers_epochs = Config().trainer.pers_epochs
+            epoch_log_interval = pers_epochs + 1
+            epoch_model_log_interval = pers_epochs + 1
 
-                # Initializing the learning rate schedule, if necessary
-                if 'pers_lr_schedule' in config:
-                    lr_schedule = optimizers.get_dynamic_lr_schedule(
-                        optimizer=eval_optimizer,
-                        iterations_per_epoch=iterations_per_epoch,
-                        train_loader=eval_train_loader,
-                        prefix="pers_")
-                else:
-                    lr_schedule = None
-
-                # Initializing the loss criterion
-                _eval_loss_criterion = getattr(self, "eval_loss_criterion",
-                                               None)
-                if callable(_eval_loss_criterion):
-                    eval_loss_criterion = self.eval_loss_criterion(self.model)
-                else:
-                    eval_loss_criterion = torch.nn.CrossEntropyLoss()
-
-                self.model.train()
-                personalized_model.train()
-
-                # Define the training and logging information
+            if "pers_epoch_log_interval" in config:
                 epoch_log_interval = config['pers_epoch_log_interval']
-                num_eval_train_epochs = Config().trainer.pers_epochs
-                epoch_loss_meter = optimizers.AverageMeter(name='Loss')
 
-                # Start eval training
-                # Note:
-                #   To distanguish the eval training stage with the
-                # previous ssl's training stage. We utilize the progress bar
-                # to demonstrate the training progress details.
-                global_progress = tqdm(range(1, num_eval_train_epochs + 1),
-                                       desc='Evaluating')
-                train_data_encoded = list()
-                train_data_labels = list()
-                for epoch in global_progress:
-                    epoch_loss_meter.reset()
-                    local_progress = tqdm(
-                        eval_train_loader,
-                        desc=f'Epoch {epoch}/{num_eval_train_epochs+1}',
-                        disable=True)
+            if "epoch_model_log_interval" in config:
+                epoch_model_log_interval = config[
+                    'pers_epoch_model_log_interval']
 
-                    for _, (examples, labels) in enumerate(local_progress):
-                        examples, labels = examples.to(self.device), labels.to(
-                            self.device)
-                        # Clear the previous gradient
-                        eval_optimizer.zero_grad()
+            epoch_loss_meter = optimizers.AverageMeter(name='Loss')
 
-                        # Extract representation from the trained
-                        # frozen encoder of ssl.
-                        # No optimization is reuqired by this encoder.
-                        with torch.no_grad():
-                            feature = self.model.encoder(examples)
+            # Start eval training
+            # Note:
+            #   To distanguish the eval training stage with the
+            # previous ssl's training stage. We utilize the progress bar
+            # to demonstrate the training progress details.
+            global_progress = tqdm(range(1, pers_epochs + 1),
+                                   desc='Evaluating')
+            train_data_encoded = list()
+            train_data_labels = list()
+            for epoch in global_progress:
+                epoch_loss_meter.reset()
+                local_progress = tqdm(eval_train_loader,
+                                      desc=f'Epoch {epoch}/{pers_epochs+1}',
+                                      disable=True)
 
-                        # Perfrom the training and compute the loss
-                        preds = personalized_model(feature)
-                        loss = eval_loss_criterion(preds, labels)
-
-                        # Perfrom the optimization
-                        loss.backward()
-                        eval_optimizer.step()
-
-                        # Update the epoch loss container
-                        epoch_loss_meter.update(loss.data.item())
-                        train_data_encoded.append(feature)
-                        train_data_labels.append(labels)
-
-                        if lr_schedule is not None:
-                            lr_schedule = lr_schedule.step()
-
-                        local_progress.set_postfix({
-                            'lr':
-                            lr_schedule,
-                            "loss":
-                            epoch_loss_meter.val,
-                            'loss_avg':
-                            epoch_loss_meter.avg
-                        })
-
-                    if (epoch - 1) % epoch_log_interval == 0:
-                        logging.info(
-                            "[Client #%d] Personalization Training Epoch: [%d/%d]\tLoss: %.6f",
-                            self.client_id, epoch, num_eval_train_epochs,
-                            epoch_loss_meter.avg)
-
-                # Define the test phase of the eval stage
-                acc_meter = optimizers.AverageMeter(name='Accuracy')
-
-                personalized_model.eval()
-                self.model.eval()
-                correct = 0
-                test_data_encoded = list()
-                test_data_labels = list()
-                acc_meter.reset()
-                for _, (examples, labels) in enumerate(test_loader):
+                for _, (examples, labels) in enumerate(local_progress):
                     examples, labels = examples.to(self.device), labels.to(
                         self.device)
+                    # Clear the previous gradient
+                    eval_optimizer.zero_grad()
+
+                    # Extract representation from the trained
+                    # frozen encoder of ssl.
+                    # No optimization is reuqired by this encoder.
                     with torch.no_grad():
                         feature = self.model.encoder(examples)
-                        preds = personalized_model(feature).argmax(dim=1)
-                        correct = (preds == labels).sum().item()
-                        acc_meter.update(correct / preds.shape[0])
-                        test_data_encoded.append(feature)
-                        test_data_labels.append(labels)
 
-                accuracy = acc_meter.avg
+                    # Perfrom the training and compute the loss
+                    preds = personalized_model(feature)
+                    loss = eval_loss_criterion(preds, labels)
+
+                    # Perfrom the optimization
+                    loss.backward()
+                    eval_optimizer.step()
+
+                    # Update the epoch loss container
+                    epoch_loss_meter.update(loss.data.item())
+                    train_data_encoded.append(feature)
+                    train_data_labels.append(labels)
+
+                    local_progress.set_postfix({
+                        'lr': lr_schedule,
+                        "loss": epoch_loss_meter.val,
+                        'loss_avg': epoch_loss_meter.avg
+                    })
+
+                if (epoch -
+                        1) % epoch_log_interval == 0 or epoch == pers_epochs:
+                    logging.info(
+                        "[Client #%d] Personalization Training Epoch: [%d/%d]\tLoss: %.6f",
+                        self.client_id, epoch, pers_epochs,
+                        epoch_loss_meter.avg)
+
+                if (epoch - 1
+                    ) % epoch_model_log_interval == 0 or epoch == pers_epochs:
+                    # the model generated during each round will be stored in the
+                    # checkpoints
+                    target_dir = Config().params['checkpoint_path']
+                    to_save_dir = os.path.join(target_dir,
+                                               "client_" + str(self.client_id))
+                    cpk_saver = checkpoint_saver.CheckpointsSaver(
+                        checkpoints_dir=to_save_dir)
+                    personalized_model_name = Config(
+                    ).trainer.personalized_model_name
+                    current_round = kwargs['current_round']
+                    filename = f"personalized_({personalized_model_name})_client{self.client_id}_round{current_round}_epoch{epoch}_runid{config['run_id']}.pth"
+
+                    cpk_saver.save_checkpoint(
+                        model_state_dict=personalized_model.state_dict(),
+                        check_points_name=[filename],
+                        optimizer_state_dict=eval_optimizer.state_dict(),
+                        lr_scheduler_state_dict=lr_schedule.state_dict(),
+                        epoch=epoch,
+                        config_args=Config().to_dict())
+
+                lr_schedule.step()
+
+            # Define the test phase of the eval stage
+            acc_meter = optimizers.AverageMeter(name='Accuracy')
+
+            personalized_model.eval()
+            self.model.eval()
+            correct = 0
+            test_data_encoded = list()
+            test_data_labels = list()
+            acc_meter.reset()
+            for _, (examples, labels) in enumerate(test_loader):
+                examples, labels = examples.to(self.device), labels.to(
+                    self.device)
+                with torch.no_grad():
+                    feature = self.model.encoder(examples)
+                    preds = personalized_model(feature).argmax(dim=1)
+                    correct = (preds == labels).sum().item()
+                    acc_meter.update(correct / preds.shape[0])
+                    test_data_encoded.append(feature)
+                    test_data_labels.append(labels)
+
+            accuracy = acc_meter.avg
         except Exception as testing_exception:
             logging.info("Evaluation Testing on client #%d failed.",
                          self.client_id)
@@ -667,7 +693,7 @@ class Trainer(basic.Trainer):
             personalized_model_name = Config().trainer.personalized_model_name
             save_location = os.path.join(target_dir,
                                          "client_" + str(self.client_id))
-            filename = f"personalized_({personalized_model_name})_client{self.client_id}_round{current_round}_.pth"
+            filename = f"personalized_({personalized_model_name})_client{self.client_id}_round{current_round}.pth"
 
             os.makedirs(save_location, exist_ok=True)
             self.save_personalized_model(filename=filename,
