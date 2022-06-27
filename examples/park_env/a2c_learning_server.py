@@ -30,7 +30,11 @@ class A2CServer(fedavg.Server):
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using federated averaging."""
 
+        #print("We are in learning server", updates[0][2])
+
         weights_received = self.compute_weight_deltas(updates)
+
+      #  print("weights received is this", weights_received)
     
         if Config().server.percentile_aggregate:
             
@@ -74,6 +78,7 @@ class A2CServer(fedavg.Server):
             
             
             if not Config().server.percentile_aggregate:
+                self.save_files(client_path+"_Fed_avg", client_id)
                 for name, delta in update_from_actor.items():
                     actor_avg_update[name] += delta * 1.0/Config().clients.per_round
 
@@ -86,9 +91,16 @@ class A2CServer(fedavg.Server):
                 print("Metric", metric)
                 print("Metric percentile", metric_percentile)
                 
-                if (uni == client_id):#metric <= metric_percentile: #(self.current_round < 7 and client_id == 1) or (self.current_round > 7 and self.current_round < 14 and client_id == 2) or (self.current_round > 14 and client_id == 3): #metric <= metric_percentile:
+                #if (uni == client_id):#metric <= metric_percentile: #(self.current_round < 7 and client_id == 1) or (self.current_round > 7 and self.current_round < 14 and client_id == 2) or (self.current_round > 14 and client_id == 3): #metric <= metric_percentile: 
+                if self.current_round == 1 and client_id == 1 \
+                or self.current_round == 2 and client_id == 3 \
+                or self.current_round == 3 and client_id == 1 \
+                or self.current_round == 4 and client_id == 2\
+                or self.current_round == 5 and client_id == 1 \
+                or self.current_round == 6 and client_id == 2 \
+                or self.current_round == 7 and client_id == 2:
                     print("Client %s is choosen" % str(client_id))
-                    self.save_files(client_path, client_id)
+                    self.save_files(client_path+"_percentile", client_id)
                     for name, delta in update_from_actor.items():
                         actor_avg_update[name] += delta #* 2.0/6.0
                     for name, delta in update_from_critic.items():

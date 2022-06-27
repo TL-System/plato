@@ -15,7 +15,7 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8002
+    port: 8006
 
     # Should we simulate the wall-clock time on the server? Useful if max_concurrency is specified
     simulate_wall_time: true
@@ -26,7 +26,9 @@ server:
 
     percentile: 20
 
-    percentile_aggregate: actor_fisher #False, actor_loss, critic_loss, actor_grad, critic_grad, actor_fisher, critic_fisher
+    random_seed: 1
+
+    percentile_aggregate: false #False, actor_loss, critic_loss, actor_grad, critic_grad, actor_fisher, critic_fisher
 
 data:
     # The training and testing dataset

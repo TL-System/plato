@@ -30,13 +30,10 @@ def main():
     """ A Plato federated learning training session with clients running TD3. """
     logging.info("Starting RL Environment's process.")
 
-    env = park.make(Config().algorithm.env_park_name)
 
-    state_dim = env.observation_space.shape[0]
-    n_actions = env.action_space.n
-
-    model = a2c_learning_model.Model(state_dim, n_actions, 
-    Config().algorithm.env_name, Config().algorithm.algorithm_name)
+    model = a2c_learning_model.Model
+    #(state_dim, n_actions, 
+    #Config().algorithm.env_name, Config().algorithm.algorithm_name)
     trainer = a2c_learning_trainer.Trainer
     algorithm = a2c_learning_algorithm.Algorithm
     client = a2c_learning_client.RLClient(model=model,trainer=trainer,algorithm=algorithm)

@@ -68,7 +68,8 @@ class Memory():
 
 class Trainer(basic.Trainer):
     def __init__(self, model=None):
-        super().__init__()
+        print("Model in trainer is this", model)
+        super().__init__(model=model)
 
         self.env = park.make(Config().algorithm.env_park_name)
         seed = Config().data.random_seed * self.client_id
@@ -77,12 +78,11 @@ class Trainer(basic.Trainer):
         torch.manual_seed(seed)
         np.random.seed(seed)
 
-        self.env_name = model.get_env_name()
-        self.algorithm_name = model.get_rl_algo()
+        self.env_name = Config().algorithm.env_name
+        self.algorithm_name =  Config().algorithm.algorithm_name
 
-        self.model = model
-        self.actor = model.actor
-        self.critic = model.critic
+        self.actor = self.model.actor
+        self.critic = self.model.critic
         self.adam_actor = torch.optim.Adam(self.actor.parameters(), lr=Config().algorithm.learning_rate)
         self.adam_critic = torch.optim.Adam(self.critic.parameters(), lr=Config().algorithm.learning_rate)
 
@@ -146,8 +146,6 @@ class Trainer(basic.Trainer):
                 self.timesteps_since_eval = 0
                 first_itr = self.episode_num <= Config().algorithm.eval_freq
                 self.save_metric(avg_reward_path, self.avg_reward, first = first_itr)
-
-                
 
             self.done = False
             self.total_reward = 0
@@ -257,8 +255,6 @@ class Trainer(basic.Trainer):
         else:
             return critic_loss, actor_loss
 
-        
-
     def estimate_fisher(self, loss):
         """Estimate diagonals of fisher information matrix"""
         critic_loss, actor_loss = loss
@@ -365,7 +361,6 @@ class Trainer(basic.Trainer):
             #unsure if we need these
             self.adam_actor = torch.optim.Adam(self.actor.parameters(), lr=Config().algorithm.learning_rate)
             self.adam_critic = torch.optim.Adam(self.critic.parameters(), lr=Config().algorithm.learning_rate)
-
 
     def load_loss(self):
         path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
@@ -492,7 +487,7 @@ class Trainer(basic.Trainer):
         #We will return the average reward here
         avg_reward = self.evaluate_policy()
         self.server_reward = avg_reward
-        file_name = "A2C_RL_SERVER"
+        file_name = "A2C_RL_SERVER_FED_AVG"
 
         path = Config().results.results_dir +"/"+file_name
         
