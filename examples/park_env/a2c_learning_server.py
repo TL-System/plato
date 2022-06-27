@@ -24,14 +24,15 @@ class A2CServer(fedavg.Server):
         super().__init__(trainer = trainer, algorithm = algorithm, model = model)
         self.algorithm_name = algorithm_name
         self.env_name = env_name
+        random.seed(Config().server.random_seed)
         logging.info("A custom server has been initialized.")
         
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using federated averaging."""
 
         weights_received = self.compute_weight_deltas(updates)
-
-        if Config().server.percentile_aggregate is not None:
+    
+        if Config().server.percentile_aggregate:
             
             print("-----------------------")
             print("WE ARE AGGREGATING BASED ON PERCENTILE!")
@@ -42,7 +43,7 @@ class A2CServer(fedavg.Server):
             metric_list = self.create_loss_lists(updates)
             print("Metric list", metric_list)
             metric_percentile = np.percentile(np.array(metric_list), percentile)
-            # TODO: know  how many are >= percentile to have the correct ratio next to deltas
+            
 
             # Save percentile to files
             path = Config().results.results_dir +"/"+Config().results.file_name+"_percentile_"+Config().server.percentile_aggregate
@@ -61,34 +62,37 @@ class A2CServer(fedavg.Server):
             name: self.trainer.zeros(weights.shape)
             for name, weights in weights_received[0][1].items()
         }
-
+        uni = random.sample([1, 2, 3], 1)[0]
         for i, update in enumerate(weights_received):
             print("Client# ", i)
             __, report, __, __ = updates[i]
-            metric = self.select_metric(report)
-
+            # TODO: make sure this is the only place of aggregation, and there is not other place! 
             client_id = report.client_id
             client_path =  Config().results.results_dir +"/"+Config().results.file_name+"_client_saved"
 
             update_from_actor, update_from_critic = update
-
-            if Config().server.percentile_aggregate == None:
+            
+            
+            if not Config().server.percentile_aggregate:
                 for name, delta in update_from_actor.items():
                     actor_avg_update[name] += delta * 1.0/Config().clients.per_round
 
                 for name, delta in update_from_critic.items():
                     critic_avg_update[name] += delta * 1.0/Config().clients.per_round
             else:
+                metric = self.select_metric(report)
                 # TODO: weight of delta should be the weightage of the client 1/number of clients choosen to be aggregated
-                print("Metric percentile", metric_percentile)
+                # TODO: know how many are >= percentile to have the correct ratio next to deltas
                 print("Metric", metric)
-                if metric >= metric_percentile:
+                print("Metric percentile", metric_percentile)
+                
+                if (uni == client_id):#metric <= metric_percentile: #(self.current_round < 7 and client_id == 1) or (self.current_round > 7 and self.current_round < 14 and client_id == 2) or (self.current_round > 14 and client_id == 3): #metric <= metric_percentile:
                     print("Client %s is choosen" % str(client_id))
                     self.save_files(client_path, client_id)
                     for name, delta in update_from_actor.items():
-                        actor_avg_update[name] += delta * 2.0/6.0
+                        actor_avg_update[name] += delta #* 2.0/6.0
                     for name, delta in update_from_critic.items():
-                        critic_avg_update[name] += delta * 2.0/6.0
+                        critic_avg_update[name] += delta #* 2.0/6.0
             
             # Yield to other tasks in the server
             await asyncio.sleep(0)
