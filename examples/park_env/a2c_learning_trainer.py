@@ -74,7 +74,6 @@ class Trainer(basic.Trainer):
         seed = Config().data.random_seed * self.client_id
 
         self.env.seed(seed)
-        self.env.reset()
         torch.manual_seed(seed)
         np.random.seed(seed)
 
@@ -119,6 +118,7 @@ class Trainer(basic.Trainer):
         self.critic_fishers, self.actor_fishers = [], []
 
         self.timesteps_since_eval = 0
+        self.round_no = 0
 
         if not os.path.exists(Config().results.results_dir):
             os.makedirs(Config().results.results_dir)
@@ -152,11 +152,11 @@ class Trainer(basic.Trainer):
             
             #Make difficulty level (trace file) depend on client_id
             #self.trace_idx = int(self.episode_num / 700) #progresses with time
-            self.trace_idx = (self.client_id % Config().algorithm.difficulty_levels)
+            self.trace_idx = ((self.client_id - 1) % Config().algorithm.difficulty_levels)
             state = self.env.reset(trace_idx=self.trace_idx, test= True)
             state = self.obs_normalizer.normalize(state)
             self.steps = 0
-
+            # TODO: results are not reproducible, why is the seed not set const for some reason!
             while not self.done:
                 probs = self.actor(self.t(state))
                 dist = torch.distributions.Categorical(probs=probs)
@@ -297,17 +297,27 @@ class Trainer(basic.Trainer):
     def load_fisher(self):
         """ Load laast fisher from file"""
         path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
-        
+        #ALPHA = 0.85
+        SIZE = 10
+        actor_fisher = np.zeros(SIZE)
+        act_pos = 0
+        critic_fisher = np.zeros(SIZE)
+        cri_pos = 0
         with open(path + "_actor_fisher.csv", 'r') as file:
             rows = file.readlines()
+            # TODO: moving average of the last 10!
             for row in rows:
-                actor_fisher_sum = float(row)
+                #actor_fisher_sum = (1 - ALPHA) * float(row) + ALPHA * actor_fisher_sum 
+                actor_fisher[act_pos] = row
+                act_pos = (act_pos + 1) % SIZE
         with open(path + "_critic_fisher.csv", 'r') as file:
             rows = file.readlines()
             for row in rows:
-                critic_fisher_sum = float(row)
-
-        return actor_fisher_sum, critic_fisher_sum
+                #critic_fisher_sum = (1 - ALPHA) * float(row) + ALPHA * critic_fisher_sum
+                critic_fisher[cri_pos] = row
+                cri_pos = (cri_pos + 1) % SIZE
+        
+        return np.mean(actor_fisher), np.mean(critic_fisher)
 
     def load_model(self, filename=None, location=None):
         """Loading pre-trained model weights from a file."""
@@ -341,6 +351,11 @@ class Trainer(basic.Trainer):
             file_path = os.path.join(model_path, file_name)
             data = np.load(file_path)
             self.episode_num = int((data['a'])[0])
+
+            round_no_path = "%s_%s.npz" % ("training_status", str(0))
+            round_file_path = os.path.join(model_path, round_no_path)
+            data = np.load(round_file_path)
+            self.round_no = int((data['a'])[0])
     
             self.actor.load_state_dict(torch.load(actor_model_path), strict=True)
             self.critic.load_state_dict(torch.load(critic_model_path), strict=True)
@@ -434,7 +449,13 @@ class Trainer(basic.Trainer):
         if self.client_id != 0:
             file_name = "%s_%s.npz" % ("training_status", str(self.client_id)) 
             file_path = os.path.join(model_path, file_name)
-            np.savez(file_path, a=np.array([self.episode_num]))       
+            np.savez(file_path, a=np.array([self.episode_num])) 
+
+            self.round_no += 1
+            round_no_path = "%s_%s.npz" % ("training_status", str(0))
+            round_file_path = os.path.join(model_path, round_no_path)
+            np.savez(round_file_path, a=np.array([self.round_no]))
+
 
         if self.client_id == 0:
             logging.info("[Server #%d] Saving models to %s, and %s.", os.getpid(),
@@ -470,11 +491,17 @@ class Trainer(basic.Trainer):
         avg_reward = self.evaluate_policy()
         self.server_reward = avg_reward
         file_name = "A2C_RL_SERVER"
-        path = Config().results.results_dir +"/"+file_name
-        
-        first_itr = self.episode_num <= Config().algorithm.max_round_episodes
 
-        with open(path+".csv", 'w' if first_itr else 'a') as filehandle:
+
+        model_path = Config().params['model_path']
+        round_no_path = "%s_%s.npz" % ("training_status", str(0))
+        round_file_path = os.path.join(model_path, round_no_path)
+        data = np.load(round_file_path)
+        self.round_no = int((data['a'])[0])
+
+        path = Config().results.results_dir +"/"+file_name
+
+        with open(path+".csv", 'w' if self.round_no <= 1 else 'a') as filehandle:
                 writer = csv.writer(filehandle)
                 writer.writerow(self.server_reward)
 
