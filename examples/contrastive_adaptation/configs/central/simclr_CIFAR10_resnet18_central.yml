@@ -5,7 +5,9 @@ general:
     # for different purposes
     # - central_code_test
     # - central
+    # - script
     # - user
+
     running_mode: central
 
     file_logging: True
@@ -20,8 +22,17 @@ clients:
     # The number of clients selected in each round
     per_round: 1
 
+    do_data_tranform_logging: True
+
     # Should the clients compute test accuracy locally?
     do_test: True
+
+    # Should the client only perfrom the eval test without training
+    # under the contrastive ssl.
+    # only perfrom the training and test for the downstream task,
+    # i.e., personalziation in each client
+    only_eval_test: False
+
     # whether perform the eval test at the final round
     # on all clients
     do_final_eval_test: True
@@ -38,9 +49,12 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8013
+    port: 8014
     synchronous: true
     do_test: false
+
+    ping_interval: 120000
+    ping_timeout: 120000
 
     # for the paths of models; checkpoints; results,
     # they utilize the same name, following the one defined in
@@ -57,10 +71,9 @@ server:
     model_path: xxx
     checkpoint_path: xxx
 
-
 data:
     # The training and testing dataset
-    datasource: MNIST
+    datasource: CIFAR10
 
     # Number of samples in each partition
     #
@@ -68,19 +81,18 @@ data:
     # may lead the failure of the loss criterion part
     # if your loss criterion relies on the batch_size
     # as its argument. For example, the NT_Xent loss utilized
-    # by the BYOL method set the defined batch_size as the parameter.
+    # by the SimCLR method set the defined batch_size as the parameter.
     # However, at the end of one epoch, the left samples may smaller than
     # the batch_size. This makes the #loaded samples != batch_size.
     # Working on criterion that is defined with batch_size but receives loaded
     # samples whose size is smaller than the batch size may causes problems.
     # drop_last can alleviate this issue
-    partition_size: 60000
+    partition_size: 50000
     test_partition_size: 10000
 
     # IID or non-IID?
     sampler: iid
     testset_sampler: iid
-
 
     # The random seed for sampling data
     random_seed: 1
@@ -92,7 +104,7 @@ data:
 
     # set the data augmentation
     #   options: simsiam, byol, simclr
-    augment_transformer_name: byol
+    augment_transformer_name: simclr
     # some methods apply the normalization to samples
     #   while others do not
     is_norm: True
@@ -110,27 +122,37 @@ trainer:
     max_concurrency: 5
 
     # The target accuracy
-    target_accuracy: 0.98
+    target_accuracy: 0.9
 
     # Number of epochs for local training in each communication round
     #   The user is expected to carefully choose the batch_size to avoid
     # the memory allocation issue as the contrastive samples occupy more
     # space as more samples will be contained within one loading.
-    epochs: 50
+    epochs: 400
     batch_size: 512
-    optimizer: Adam
-    learning_rate: 0.003
-    betas:
-      - 0.9
-      - 0.999
-    eps: 0.00000008 # 1e-8
-    weight_decay: 0.001
+    # optimizer: Adam
+    # learning_rate: 0.003
+    # betas:
+    #   - 0.9
+    #   - 0.999
+    # eps: 0.00000008 # 1e-8
+    # weight_decay: 0.001
+    # lr_schedule: StepLR
+    # lr_step_size: 20
+    # lr_gamma: 0.9
 
-    lr_scheduler: StepLR
-    lr_step_size: 20
-    lr_gamma: 0.9
+    optimizer: SGD
+    learning_rate: 0.6
+    momentum: 0.9
+    weight_decay: 0.000001
 
-    epoch_log_interval: 2
+    # Learning rate schedule
+    lr_schedule: LambdaLR
+    lr_gamma: 0.1
+    lr_milestone_steps: 80ep,120ep
+
+    epoch_log_interval: 1
+    epoch_model_log_interval: 50
     batch_log_interval: 50
 
     # Number of epochs for local training in each communication round
@@ -152,32 +174,30 @@ trainer:
     pers_lr_gamma: 0.9
 
     pers_epoch_log_interval: 2
+    pers_epoch_model_log_interval: 10
+
+    # temperature
+    temperature: 0.5
 
     # image_size
     #  - CIFAR10 (Image size=32)
     #  - MNIST (Image size=28)
-    image_size: 28
+    image_size: 32
 
     # The machine learning model,
     # it behaves as the encoder for the ssl method
     # the final fc layer will be removed
     # however, in the central test, we do not use this
     #   but use the custom model
-    model_name: lenet5
+    external_encoder: False
+    model_name: resnet_18
     # in general, the projection_dim = prediction_dim
     projection_dim: 128
-    prediction_dim: 128
-    # here are two ways to determine this decay
-    # - constant value: 0.99
-    # - adaptive computed with traing epochs.
-    #   such as the one in "three-method" implementation
-    onlient_target_moving_average_decay: 0.99
+    projection_hidden_dim: 2048
 
-    # set which part of the model is used as the global model
-    # - whole: the whole model
-    # - online_network: the online_network is exchanged
-    # - target_network: the target_network is exchanged
+    # name of the component used as the global model
     global_model_name: whole
+
     personalized_model_name: pure_one_layer_mlp
 
     # whether to maintain the state of the trained personalized
@@ -191,6 +211,7 @@ trainer:
     # trained personalized model in each round.
     # Then, setting do_maintain_per_state to be True to follow this
     # rule.
+    # For central learning with one round training, this is useless
     do_maintain_per_state: false
 
     monitor_name: knn

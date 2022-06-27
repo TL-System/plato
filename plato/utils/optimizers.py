@@ -226,6 +226,7 @@ def get_dynamic_optimizer(model, **kwargs) -> optim.Optimizer:
                                   prefix,
                                   "momentum",
                                   is_manority=False)
+        kwargs["nesterov"] = True
 
     if optimizer_name == 'Adam':
         kwargs = insert_parameter(kwargs, prefix, "betas", is_manority=False)
