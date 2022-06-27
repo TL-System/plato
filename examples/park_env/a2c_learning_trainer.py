@@ -94,6 +94,7 @@ class Trainer(basic.Trainer):
 
         self.server_reward = []
         self.avg_reward = []
+        self.first_ittr_server = True
 
         self.episode_num = 0
         self.trace_idx = 0
@@ -141,9 +142,10 @@ class Trainer(basic.Trainer):
             if self.timesteps_since_eval >= Config().algorithm.eval_freq:
                 self.avg_reward = self.evaluate_policy()
                 # Save avg reward
-                avg_reward_path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)+"_avg_reward"
+                avg_reward_path = common_path+"_avg_reward"
                 self.timesteps_since_eval = 0
-                self.save_metric(avg_reward_path, self.avg_reward, first = self.episode_num <= Config().algorithm.eval_freq)
+                first_itr = self.episode_num <= Config().algorithm.eval_freq
+                self.save_metric(avg_reward_path, self.avg_reward, first = first_itr)
 
                 
 
@@ -198,7 +200,7 @@ class Trainer(basic.Trainer):
         
         # End of round: 
         # 1- Evaluate policy on traces
-        first_itr = self.episode_num <= Config().algorithm.max_round_episodes
+        first_itr = self.episode_num <= Config().algorithm.eval_freq
         self.avg_reward = self.evaluate_policy()
         avg_reward_path = common_path + "_avg_reward"
         self.save_metric(avg_reward_path, self.avg_reward, first=first_itr)
@@ -295,7 +297,7 @@ class Trainer(basic.Trainer):
         self.critic_fisher_sum, self.actor_fisher_sum = critic_fisher_sum, actor_fisher_sum
         
     def load_fisher(self):
-        """ Load laast fisher from file"""
+        """ Load last fisher from file"""
         path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
         
         with open(path + "_actor_fisher.csv", 'r') as file:
@@ -472,12 +474,15 @@ class Trainer(basic.Trainer):
         file_name = "A2C_RL_SERVER"
         path = Config().results.results_dir +"/"+file_name
         
-        first_itr = self.episode_num <= Config().algorithm.max_round_episodes
+        #first_itr = self.episode_num <= Config().algorithm.max_round_episodes
+        #the reason this doesn't work is because episode_num gets reset to 0 when we are in this function
 
-        with open(path+".csv", 'w' if first_itr else 'a') as filehandle:
+
+        with open(path+".csv", 'w' if self.first_ittr_server else 'a') as filehandle:
                 writer = csv.writer(filehandle)
                 writer.writerow(self.server_reward)
-
+                
+        self.first_ittr_server = False
         return sum(avg_reward)/len(avg_reward)
 
         
