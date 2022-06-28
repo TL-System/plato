@@ -168,7 +168,7 @@ trainer:
         - 0.9
         - 0.99
     pers_eps: 0.00000009 # 1e-8
-    pers_weight_decay: 0.002
+    pers_weight_decay: 0.0
 
     # currently, we only support CosineAnnealingLR
     pers_lr_schedule: StepLR
