@@ -6,8 +6,11 @@ import matplotlib.pyplot as plt
 import park
 import csv
 from torch.nn.utils.clip_grad import clip_grad_norm_
+from torch.autograd import Variable
 
 ENTROPY_RATIO = 10.0
+ENTROPY_DECAY = 0.00004
+ENTROPY_MIN = 0
 SEED = 10
 GRAD_CLIP_VAL = 10
 #Seed set:
@@ -104,6 +107,9 @@ actor = Actor(state_dim, n_actions)
 critic = Critic(state_dim)
 adam_actor = torch.optim.Adam(actor.parameters(), lr=1e-3)
 adam_critic = torch.optim.Adam(critic.parameters(), lr=1e-3)
+actor_loss = None
+critic_loss = None
+entropy_loss = None
 gamma = 0.99
 memory = Memory() 
 obs_normalizer = StateNormalizer(env.observation_space)
@@ -138,6 +144,12 @@ def evaluate_policy(eval_episodes = 10):
 
 # train function
 def train(memory, q_val):
+    # sorry for seeing global variables here!
+    global critic_loss
+    global actor_loss
+    global entropy_loss
+
+    l2_loss = torch.nn.MSELoss(reduction='mean')
     values = torch.stack(memory.values)
     q_vals = np.zeros((len(memory), 1))
 
@@ -148,29 +160,56 @@ def train(memory, q_val):
         q_val = reward + gamma*q_val*(1.0-done)
         q_vals[len(memory)-1 - i] = q_val # store values from the end to the beginning
         
-    advantage = torch.Tensor(q_vals) - values
+    critic_loss = l2_loss(values, torch.Tensor(q_vals)) #advantage.pow(2).mean()
     
-    critic_loss = advantage.pow(2).mean()
-    adam_critic.zero_grad()
-    critic_loss.backward()
-    adam_critic.step()
-    
-    
+    advantage = torch.Tensor(q_vals) - values.detach()
     entropy_loss = (torch.stack(memory.log_probs) * torch.exp(torch.stack(memory.log_probs))).mean()
-    actor_loss = (-torch.stack(memory.log_probs)*advantage.detach()).mean() + entropy_loss * ENTROPY_RATIO
+    entropy_coef = max((ENTROPY_RATIO - (episode_num/max_steps) * ENTROPY_DECAY), ENTROPY_MIN)
+    actor_loss = (-torch.stack(memory.log_probs)*advantage.detach()).mean() + entropy_loss * entropy_coef
     if GRAD_CLIP_VAL > 0:
             clip_grad_norm_(actor.parameters(), GRAD_CLIP_VAL)
+
+def estimate_fisher(last_q_val, trace_idx):
+    train(memory, last_q_val) #updates critic and actor loss
+    adam_critic.zero_grad()
+    critic_loss.backward()
+
     adam_actor.zero_grad()
     actor_loss.backward()
-    adam_actor.step()
+    
+    fisher_critic = {}
+    optpar_critic = {}
+    fisher_actor = {}
+    optpar_actor = {}
 
+    # Get fisher for critic model
+    fisher_critic[trace_idx] = [] #self.net.parameters().grad.data.clone().pow(2)
+    optpar_critic[trace_idx] = [] #self.net.parameters().data.clone()
+    for p in critic.parameters():
+      pd = p.data.clone()
+      pg = p.grad.data.clone().pow(2)
+      optpar_critic[trace_idx].append(pd)
+      fisher_critic[trace_idx].append(pg)
 
-    return critic_loss, actor_loss
+    # Get fisher for actor model
+    fisher_actor[trace_idx] = []
+    optpar_actor[trace_idx] = []
+    for p in actor.parameters():
+      pd = p.data.clone()
+      pg = p.grad.data.clone().pow(2)
+      optpar_actor[trace_idx].append(pd)
+      fisher_actor[trace_idx].append(pg)
+
+    return fisher_critic, fisher_actor
+
 
 episode_rewards = []
 episode_num = 0 
 critic_losses = []
 actor_losses = []
+entropy_losses = []
+fisher_actors = []
+fisher_critics = []
 
 trace_idx = 0
 while True:
@@ -179,7 +218,7 @@ while True:
     if (episode_num % 700 == 0):
         trace_idx = int(episode_num / 700)
         print( "changed trace to: ", trace_idx )
-    state = env.reset(trace_idx=None)
+    state = env.reset(trace_idx=trace_idx, test= True)
     state = obs_normalizer.normalize(state)
     steps = 0
 
@@ -201,7 +240,9 @@ while True:
         # train if done or num steps > max_steps
         if done or (steps % max_steps == 0):
             last_q_val = critic(t(next_state)).detach().data.numpy()
-            critic_loss, actor_loss = train(memory, last_q_val)
+            critic_fisher, actor_fisher = estimate_fisher(last_q_val, trace_idx)
+            adam_critic.step()
+            adam_actor.step()
             memory.clear()
 
     episode_num += 1        
@@ -209,9 +250,30 @@ while True:
     print("Episode number: %d, Reward: %d" % (episode_num, total_reward))
     critic_losses.append(critic_loss.detach().numpy())
     actor_losses.append(actor_loss.detach().numpy())
+    entropy_losses.append(entropy_loss.detach().numpy())
+    
+    
+    actor_fisher_sum = 0
+    
+    for i, p in enumerate(actor.parameters()):
+        l = Variable(actor_fisher[trace_idx][i])
+        actor_fisher_sum += l.sum()
+
+    fisher_actors.append(actor_fisher_sum)
+    
+    critic_fisher_sum = 0
+    
+    for i, p in enumerate(critic.parameters()):
+        l = Variable(critic_fisher[trace_idx][i])
+        critic_fisher_sum += l.sum()
+    fisher_critics.append(critic_fisher_sum)
+
     if episode_num % 50 == 0:
         evaluate_policy()
-    
+
     np.savetxt("episodic_reward.csv", episode_rewards, delimiter =", ")
     np.savetxt("critic_losses.csv", critic_losses, delimiter =", ")
     np.savetxt("actor_losses.csv", actor_losses, delimiter =", ")
+    np.savetxt("entropy_losses.csv", entropy_losses, delimiter =", ")
+    np.savetxt("fisher_actors.csv", fisher_actors, delimiter =", ")
+    np.savetxt("fisher_critics.csv", fisher_critics, delimiter =", ")
