@@ -8,12 +8,10 @@ python examples/customized/custom_server.py -c examples/customized/server.yml
 
 import logging
 import asyncio
-from multiprocessing.sharedctypes import Value
+
 from plato.servers import fedavg
 from plato.config import Config
 import pickle
-import random
-import torch
 import numpy as np
 import csv
 

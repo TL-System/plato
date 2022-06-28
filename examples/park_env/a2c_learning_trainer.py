@@ -1,11 +1,8 @@
 import numpy as np
 import torch
 import gym
-from torch import nn
-import matplotlib.pyplot as plt
 import park
 
-from plato.utils.reinforcement_learning.policies import base
 from plato.trainers import basic
 from plato.config import Config
 from plato.trainers import basic
@@ -19,7 +16,6 @@ import logging
 import csv
 
 import park
-import a2c
 # Memory
 # Stores results from the networks, instead of calculating the operations again from states, etc.
 
@@ -154,6 +150,8 @@ class Trainer(basic.Trainer):
             # TODO: results are not reproducible, although the seed is the same, but results are not always the same every run. Check this
             while not self.done:
                 probs = self.actor(self.t(state))
+                torch.manual_seed(1)
+
                 dist = torch.distributions.Categorical(probs=probs)
                 action = dist.sample()
 
@@ -510,6 +508,7 @@ class Trainer(basic.Trainer):
                 state = self.obs_normalizer.normalize(state)
                 while not done:
                     probs = self.actor(self.t(state))
+                    torch.manual_seed(1)
                     dist = torch.distributions.Categorical(probs=probs)
                     action = dist.sample()
                 
