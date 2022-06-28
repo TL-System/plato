@@ -79,6 +79,8 @@ class Trainer(basic.Trainer):
 
         self.l2_loss = torch.nn.MSELoss(reduction='mean')
 
+        self.dist = torch.distributions.Categorical        
+
         self.memory = Memory()
         self.obs_normalizer = StateNormalizer(self.env.observation_space)
 
@@ -124,10 +126,15 @@ class Trainer(basic.Trainer):
 
     def train_model(self, config, trainset, sampler, cut_layer):
         """Main Training"""
+        
+        print("Sampler in train model, ", sampler.generator)
+        print("seed used for torch, ", torch.initial_seed())
+        print("seed used for torch, ", torch.initial_seed())
         common_path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
         round_episodes = 0
-        
+        #torch.manual_seed(self.steps * self.episode_num)
         while round_episodes < Config().algorithm.max_round_episodes:
+            torch.manual_seed(self.steps * self.episode_num) # TODO: save and restore torch seed
             first_itr = self.episode_num < Config().algorithm.max_round_episodes
             #Evaluates policy at a frequency set in config file
             if self.timesteps_since_eval >= Config().algorithm.eval_freq:
@@ -150,18 +157,19 @@ class Trainer(basic.Trainer):
             # TODO: results are not reproducible, although the seed is the same, but results are not always the same every run. Check this
             while not self.done:
                 probs = self.actor(self.t(state))
-                torch.manual_seed(1)
+                
+                #torch.manual_seed(1)
 
-                dist = torch.distributions.Categorical(probs=probs)
-                action = dist.sample()
-
-                next_state, reward, self.done, info = self.env.step(action.detach().data.numpy())
+                action = self.dist(probs=probs).sample()
+                #action = np.random.choice(self.env.action_space.n, 1, p=probs.detach().data.numpy())
+                
+                next_state, reward, self.done, info = self.env.step(action.detach().data.numpy())#[0])#.detach().data.numpy())
                 next_state = self.obs_normalizer.normalize(next_state)
 
                 self.total_reward += reward
                 self.steps += 1
-                
-                self.memory.add(dist.log_prob(action), self.critic(self.t(state)), reward, self.done)
+                #torch.tensor(np.array(action))
+                self.memory.add(self.dist(probs=probs).log_prob(action), self.critic(self.t(state)), reward, self.done)
 
                 state = next_state
                 
@@ -208,7 +216,9 @@ class Trainer(basic.Trainer):
         
         self.avg_actor_loss = sum(self.actor_loss)/len(self.actor_loss)
         self.avg_critic_loss =  sum(self.critic_loss)/len(self.critic_loss)
-        self.avg_entropy_loss = sum(self.entropy_loss)/len(self.entropy_loss)        
+        self.avg_entropy_loss = sum(self.entropy_loss)/len(self.entropy_loss) 
+
+        print("torch.seed end of train_model", torch.seed())       
         
         
     def train_helper(self, memory, q_val, fisher = False):
@@ -478,6 +488,7 @@ class Trainer(basic.Trainer):
 
     async def server_test(self, testset, sampler=None, **kwargs):
         #We will return the average reward here
+        print("Sampler in server test", sampler)
         avg_reward = self.evaluate_policy()
         self.server_reward = avg_reward
         file_name = "A2C_RL_SERVER_PERCENTILE"
@@ -497,7 +508,7 @@ class Trainer(basic.Trainer):
 
         
     def evaluate_policy(self, eval_episodes = 10):
-        
+        torch.manual_seed(Config().data.random_seed)
         avg_rewards = []
         for trace_idx in range(3):
             avg_reward = 0
@@ -508,9 +519,8 @@ class Trainer(basic.Trainer):
                 state = self.obs_normalizer.normalize(state)
                 while not done:
                     probs = self.actor(self.t(state))
-                    torch.manual_seed(1)
-                    dist = torch.distributions.Categorical(probs=probs)
-                    action = dist.sample()
+                
+                    action = self.dist(probs=probs).sample()
                 
                     next_state, reward, done, info = self.env.step(action.detach().data.numpy())
                     next_state = self.obs_normalizer.normalize(next_state)

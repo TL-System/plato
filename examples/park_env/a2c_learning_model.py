@@ -1,4 +1,5 @@
 import gym
+import torch
 from torch import nn
 import park
 from plato.config import Config
@@ -16,6 +17,9 @@ class A2CActor(nn.Module):
             nn.Linear(32, n_actions),
             nn.Softmax(dim = 0)
         )
+        with torch.no_grad():
+            for param in self.model.parameters():
+                param.data = nn.parameter.Parameter(torch.ones_like(param))
     
     def forward(self, X):
         return self.model(X)
@@ -32,6 +36,10 @@ class A2CCritic(nn.Module):
             nn.LeakyReLU(),
             nn.Linear(32, 1)
         )
+
+        with torch.no_grad():
+            for param in self.model.parameters():
+                param.data = nn.parameter.Parameter(torch.ones_like(param))
     
     def forward(self, X):
         return self.model(X)
