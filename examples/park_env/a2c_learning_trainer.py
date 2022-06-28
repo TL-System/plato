@@ -72,12 +72,6 @@ class Trainer(basic.Trainer):
         super().__init__(model=model)
 
         self.env = park.make(Config().algorithm.env_park_name)
-        seed = Config().data.random_seed * self.client_id
-
-        self.env.seed(seed)
-        torch.manual_seed(seed)
-        random.seed(seed)
-        np.random.seed(seed)
 
         self.env_name = Config().algorithm.env_name
         self.algorithm_name =  Config().algorithm.algorithm_name
