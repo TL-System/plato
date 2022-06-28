@@ -24,6 +24,7 @@ from plato.utils import data_loaders_wrapper
 from plato.models import ssl_monitor_register
 
 from plato.utils import ssl_losses, checkpoint_saver
+from plato.utils.arrange_saving_name import client_get_name
 
 
 class Trainer(basic.Trainer):
@@ -186,15 +187,34 @@ class Trainer(basic.Trainer):
 
         return accuracy
 
-    def save_encoded_data(self, data, filename=None, location=None):
+    def get_checkppint_saver(self):
+        target_dir = Config().params['checkpoint_path']
+        to_save_dir = os.path.join(target_dir, "client_" + str(self.client_id))
+        cpk_saver = checkpoint_saver.CheckpointsSaver(
+            checkpoints_dir=to_save_dir)
+        return cpk_saver
+
+    def save_encoded_data(self,
+                          encoded_data,
+                          data_labels,
+                          filename=None,
+                          location=None):
         """ Save the encoded data (np.narray). """
+        # convert the list to tensor
+        encoded_data = torch.cat(encoded_data, axis=0)
+        data_labels = torch.cat(data_labels)
+        # combine the label to the final of the 2d
+        to_save_data = torch.cat(
+            [encoded_data, data_labels.reshape(-1, 1)], dim=1)
+        to_save_narray_data = to_save_data.detach().to("cpu").numpy()
+
         # process the arguments to obtain the to save path
         to_save_path = self.process_save_path(filename,
                                               location,
                                               work_model_name="model_name",
                                               desired_extenstion=".npy")
 
-        np.save(to_save_path, data, allow_pickle=True)
+        np.save(to_save_path, to_save_narray_data, allow_pickle=True)
         logging.info("[Client #%d] Saving encoded data to %s.", self.client_id,
                      to_save_path)
 
@@ -219,6 +239,9 @@ class Trainer(basic.Trainer):
 
         """
         batch_size = config['batch_size']
+        model_type = config['model_name']
+        current_round = kwargs['current_round']
+        run_id = config['run_id']
 
         tic = time.perf_counter()
 
@@ -254,10 +277,6 @@ class Trainer(basic.Trainer):
 
         iterations_per_epoch = len(streamed_train_loader)
 
-        # Sending the model to the device used for training
-        self.model.to(self.device)
-        self.model.train()
-
         # Initializing the loss criterion
         loss_criterion = self.loss_criterion(self.model)
 
@@ -268,6 +287,7 @@ class Trainer(basic.Trainer):
         lr_schedule = optimizers.get_dynamic_lr_schedule(
             optimizer, iterations_per_epoch, streamed_train_loader)
 
+        train_checkpoint_saver = self.get_checkppint_saver()
         # Obtain the logging interval
         epochs = config['epochs']
         # default not to perform any logging
@@ -280,6 +300,26 @@ class Trainer(basic.Trainer):
             batch_log_interval = config['batch_log_interval']
         if "epoch_model_log_interval" in config:
             epoch_model_log_interval = config['epoch_model_log_interval']
+
+        # Before the training, we expect to save the initial
+        # model of this round
+        initial_filename = client_get_name(model_name=model_type,
+                                           client_id=self.client_id,
+                                           round_n=current_round,
+                                           epoch_n=0,
+                                           run_id=run_id,
+                                           ext="pth")
+        train_checkpoint_saver.save_checkpoint(
+            model_state_dict=self.model.state_dict(),
+            check_points_name=[initial_filename],
+            optimizer_state_dict=optimizer.state_dict(),
+            lr_scheduler_state_dict=lr_schedule.state_dict(),
+            epoch=0,
+            config_args=Config().to_dict())
+
+        # Sending the model to the device used for training
+        self.model.to(self.device)
+        self.model.train()
 
         # Define the container to hold the logging information
         epoch_loss_meter = optimizers.AverageMeter(name='Loss')
@@ -345,16 +385,13 @@ class Trainer(basic.Trainer):
             if (epoch - 1) % epoch_model_log_interval == 0 or epoch == epochs:
                 # the model generated during each round will be stored in the
                 # checkpoints
-                target_dir = Config().params['checkpoint_path']
-                to_save_dir = os.path.join(target_dir,
-                                           "client_" + str(self.client_id))
-                cpk_saver = checkpoint_saver.CheckpointsSaver(
-                    checkpoints_dir=to_save_dir)
-
-                model_type = config['model_name']
-                current_round = kwargs['current_round']
-                filename = f"{model_type}_client{self.client_id}_round{current_round}_epoch{epoch}_runid{config['run_id']}.pth"
-                cpk_saver.save_checkpoint(
+                filename = client_get_name(model_name=model_type,
+                                           client_id=self.client_id,
+                                           round_n=current_round,
+                                           epoch_n=epoch,
+                                           run_id=run_id,
+                                           ext="pth")
+                train_checkpoint_saver.save_checkpoint(
                     model_state_dict=self.model.state_dict(),
                     check_points_name=[filename],
                     optimizer_state_dict=optimizer.state_dict(),
@@ -374,10 +411,13 @@ class Trainer(basic.Trainer):
         if 'max_concurrency' in config:
             # the final of each round, the trained model within this round
             # will be saved as model to the '/models' dir
-            self.model.cpu()
             model_type = config['model_name']
             current_round = kwargs['current_round']
-            filename = f"{model_type}_client{self.client_id}_round{current_round}_runid{config['run_id']}.pth"
+            filename = client_get_name(model_name=model_type,
+                                       client_id=self.client_id,
+                                       round_n=current_round,
+                                       run_id=config['run_id'],
+                                       ext="pth")
             # if final round, save to the model path
             if current_round == Config().trainer.rounds:
                 target_dir = Config().params['model_path']
@@ -469,8 +509,10 @@ class Trainer(basic.Trainer):
                                          "client_" + str(self.client_id))
 
             current_round = kwargs['current_round']
-            filename = f"client_{self.client_id}_monitor.csv"
-
+            filename = client_get_name(client_id=self.client_id,
+                                       suffix="monitor",
+                                       run_id=config['run_id'],
+                                       ext="csv")
             os.makedirs(save_location, exist_ok=True)
             self.save_personalized_accuracy(accuracy,
                                             round=current_round,
@@ -479,6 +521,8 @@ class Trainer(basic.Trainer):
                                             location=save_location)
             # save current accuracy directly for the latter usage
             # in the test(...)
+            # this is the one used in source plato,
+            # do not change
             model_name = config['model_name']
             filename = f"{model_name}_{self.client_id}_{config['run_id']}.acc"
             self.save_accuracy(accuracy, filename)
@@ -509,14 +553,9 @@ class Trainer(basic.Trainer):
         in the federated learning implementation. As this is the only model shared among
         clients.
         """
-        if hasattr(Config().trainer, "do_maintain_per_state") and Config(
-        ).trainer.do_maintain_per_state:
-            personalized_model = copy.deepcopy(self.personalized_model)
-        else:
-            personalized_model = self.personalized_model
+        personalized_model_name = Config().trainer.personalized_model_name
+        current_round = kwargs['current_round']
 
-        personalized_model.to(self.device)
-        self.model.to(self.device)
         # Initialize accuracy to be returned to -1, so that the client can disconnect
         # from the server when testing fails
         accuracy = -1
@@ -539,7 +578,7 @@ class Trainer(basic.Trainer):
             # Perform the evaluation in the downstream task
             #   i.e., the client's personal local dataset
             eval_optimizer = optimizers.get_dynamic_optimizer(
-                personalized_model, prefix="pers_")
+                self.personalized_model, prefix="pers_")
             iterations_per_epoch = np.ceil(
                 len(kwargs["eval_trainset"]) /
                 Config().trainer.pers_batch_size).astype(int)
@@ -552,6 +591,26 @@ class Trainer(basic.Trainer):
                 train_loader=eval_train_loader,
                 prefix="pers_")
 
+            eval_train_checkpoint_saver = self.get_checkppint_saver()
+
+            # Before the training, we expect to save the initial
+            # model of this round
+            initial_filename = client_get_name(
+                client_id=self.client_id,
+                prefix="personalized",
+                model_name=personalized_model_name,
+                round_n=current_round,
+                epoch_n=0,
+                run_id=config['run_id'],
+                ext="pth")
+            eval_train_checkpoint_saver.save_checkpoint(
+                model_state_dict=self.personalized_model.state_dict(),
+                check_points_name=[initial_filename],
+                optimizer_state_dict=eval_optimizer.state_dict(),
+                lr_scheduler_state_dict=lr_schedule.state_dict(),
+                epoch=0,
+                config_args=Config().to_dict())
+
             # Initializing the loss criterion
             _eval_loss_criterion = getattr(self, "eval_loss_criterion", None)
             if callable(_eval_loss_criterion):
@@ -559,8 +618,10 @@ class Trainer(basic.Trainer):
             else:
                 eval_loss_criterion = torch.nn.CrossEntropyLoss()
 
+            self.personalized_model.to(self.device)
+            self.model.to(self.device)
+            self.personalized_model.train()
             self.model.train()
-            personalized_model.train()
 
             # Define the training and logging information
             # default not to perform any logging
@@ -575,8 +636,13 @@ class Trainer(basic.Trainer):
                 epoch_model_log_interval = config[
                     'pers_epoch_model_log_interval']
 
+            # epoch loss tracker
             epoch_loss_meter = optimizers.AverageMeter(name='Loss')
-
+            # encoded data
+            train_encoded = list()
+            train_labels = list()
+            test_encoded = list()
+            test_labels = list()
             # Start eval training
             # Note:
             #   To distanguish the eval training stage with the
@@ -584,10 +650,10 @@ class Trainer(basic.Trainer):
             # to demonstrate the training progress details.
             global_progress = tqdm(range(1, pers_epochs + 1),
                                    desc='Evaluating')
-            train_data_encoded = list()
-            train_data_labels = list()
+
             for epoch in global_progress:
                 epoch_loss_meter.reset()
+
                 local_progress = tqdm(eval_train_loader,
                                       desc=f'Epoch {epoch}/{pers_epochs+1}',
                                       disable=True)
@@ -605,7 +671,7 @@ class Trainer(basic.Trainer):
                         feature = self.model.encoder(examples)
 
                     # Perfrom the training and compute the loss
-                    preds = personalized_model(feature)
+                    preds = self.personalized_model(feature)
                     loss = eval_loss_criterion(preds, labels)
 
                     # Perfrom the optimization
@@ -614,8 +680,11 @@ class Trainer(basic.Trainer):
 
                     # Update the epoch loss container
                     epoch_loss_meter.update(loss.data.item())
-                    train_data_encoded.append(feature)
-                    train_data_labels.append(labels)
+
+                    # save the encoded train data of current epoch
+                    if epoch == pers_epochs:
+                        train_encoded.append(feature)
+                        train_labels.append(labels)
 
                     local_progress.set_postfix({
                         'lr': lr_schedule,
@@ -634,18 +703,18 @@ class Trainer(basic.Trainer):
                     ) % epoch_model_log_interval == 0 or epoch == pers_epochs:
                     # the model generated during each round will be stored in the
                     # checkpoints
-                    target_dir = Config().params['checkpoint_path']
-                    to_save_dir = os.path.join(target_dir,
-                                               "client_" + str(self.client_id))
-                    cpk_saver = checkpoint_saver.CheckpointsSaver(
-                        checkpoints_dir=to_save_dir)
-                    personalized_model_name = Config(
-                    ).trainer.personalized_model_name
-                    current_round = kwargs['current_round']
-                    filename = f"personalized_({personalized_model_name})_client{self.client_id}_round{current_round}_epoch{epoch}_runid{config['run_id']}.pth"
 
-                    cpk_saver.save_checkpoint(
-                        model_state_dict=personalized_model.state_dict(),
+                    filename = client_get_name(
+                        client_id=self.client_id,
+                        prefix="personalized",
+                        model_name=personalized_model_name,
+                        round_n=current_round,
+                        epoch_n=epoch,
+                        run_id=config['run_id'],
+                        ext="pth")
+
+                    eval_train_checkpoint_saver.save_checkpoint(
+                        model_state_dict=self.personalized_model.state_dict(),
                         check_points_name=[filename],
                         optimizer_state_dict=eval_optimizer.state_dict(),
                         lr_scheduler_state_dict=lr_schedule.state_dict(),
@@ -657,22 +726,21 @@ class Trainer(basic.Trainer):
             # Define the test phase of the eval stage
             acc_meter = optimizers.AverageMeter(name='Accuracy')
 
-            personalized_model.eval()
+            self.personalized_model.eval()
             self.model.eval()
             correct = 0
-            test_data_encoded = list()
-            test_data_labels = list()
+
             acc_meter.reset()
             for _, (examples, labels) in enumerate(test_loader):
                 examples, labels = examples.to(self.device), labels.to(
                     self.device)
                 with torch.no_grad():
                     feature = self.model.encoder(examples)
-                    preds = personalized_model(feature).argmax(dim=1)
+                    preds = self.personalized_model(feature).argmax(dim=1)
                     correct = (preds == labels).sum().item()
                     acc_meter.update(correct / preds.shape[0])
-                    test_data_encoded.append(feature)
-                    test_data_labels.append(labels)
+                    test_encoded.append(feature)
+                    test_labels.append(labels)
 
             accuracy = acc_meter.avg
         except Exception as testing_exception:
@@ -681,9 +749,8 @@ class Trainer(basic.Trainer):
             raise testing_exception
 
         # save the personalized model for current round
-        # to the dir of this client
+        # to the model dir of this client
         if 'max_concurrency' in config:
-            personalized_model.cpu()
 
             current_round = kwargs['current_round']
             if current_round == Config().trainer.rounds:
@@ -693,11 +760,54 @@ class Trainer(basic.Trainer):
             personalized_model_name = Config().trainer.personalized_model_name
             save_location = os.path.join(target_dir,
                                          "client_" + str(self.client_id))
-            filename = f"personalized_({personalized_model_name})_client{self.client_id}_round{current_round}.pth"
-
+            filename = client_get_name(client_id=self.client_id,
+                                       model_name=personalized_model_name,
+                                       round_n=current_round,
+                                       run_id=config['run_id'],
+                                       prefix="personalized",
+                                       ext="pth")
             os.makedirs(save_location, exist_ok=True)
             self.save_personalized_model(filename=filename,
                                          location=save_location)
+
+        # save the accuracy of the client
+        if 'max_concurrency' in config:
+
+            # save the encoded data to the results dir
+            result_path = Config().params['result_path']
+            save_location = os.path.join(result_path,
+                                         "client_" + str(self.client_id))
+            train_filename = client_get_name(client_id=self.client_id,
+                                             round_n=current_round,
+                                             epoch_n=epoch,
+                                             run_id=config['run_id'],
+                                             suffix="trainEncoded",
+                                             ext="npy")
+            test_filename = train_filename.replace("trainEncoded",
+                                                   "testEncoded")
+            self.save_encoded_data(encoded_data=train_encoded,
+                                   data_labels=train_labels,
+                                   filename=train_filename,
+                                   location=save_location)
+
+            self.save_encoded_data(encoded_data=test_encoded,
+                                   data_labels=test_labels,
+                                   filename=test_filename,
+                                   location=save_location)
+        # if we do not want to keep the state of the personalized model
+        # at the end of this round,
+        # we need to load the initial model
+        if not (hasattr(Config().trainer, "do_maintain_per_state")
+                and Config().trainer.do_maintain_per_state):
+            location = eval_train_checkpoint_saver.checkpoints_dir
+            load_from_path = os.path.join(location, initial_filename)
+
+            self.personalized_model.load_state_dict(
+                torch.load(load_from_path)["model"], strict=True)
+
+            logging.info(
+                "[Client #%d] recall the initial personalized model of round %d",
+                self.client_id, current_round)
 
         # save the accuracy of the client
         if 'max_concurrency' in config:
@@ -708,7 +818,10 @@ class Trainer(basic.Trainer):
                                          "client_" + str(self.client_id))
 
             current_round = kwargs['current_round']
-            filename = f"client_{self.client_id}_personalization.csv"
+            filename = client_get_name(client_id=self.client_id,
+                                       run_id=config['run_id'],
+                                       suffix="personalization",
+                                       ext="csv")
             os.makedirs(save_location, exist_ok=True)
             self.save_personalized_accuracy(
                 accuracy,
@@ -723,46 +836,6 @@ class Trainer(basic.Trainer):
             filename = f"{model_name}_{self.client_id}_{config['run_id']}.acc"
             self.save_accuracy(accuracy, filename)
 
-        # save the encoded data to the clients
-        if 'max_concurrency' in config:
-            # save the encoded data to the results dir
-            result_path = Config().params['result_path']
-            save_location = os.path.join(result_path,
-                                         "client_" + str(self.client_id))
-            current_round = kwargs['current_round']
-            train_encoded_filename = f"Round_{current_round}_train_encoded.npy"
-            train_label_filename = f"Round_{current_round}_train_label.npy"
-            test_encoded_filename = f"Round_{current_round}_test_encoded.npy"
-            test_label_filename = f"Round_{current_round}_test_label.npy"
-
-            # reduce the to save data size if the recorded data is too large
-            # to be saved
-            if len(train_data_encoded) > 5000:
-                interval = len(train_data_encoded) // 5000
-                select_index = range(0, train_data_encoded, interval)
-                train_data_encoded = train_data_encoded[select_index]
-                train_data_labels = train_data_labels[select_index]
-            train_data_encoded = torch.cat(train_data_encoded, axis=0)
-            train_data_labels = torch.cat(train_data_labels)
-            test_data_encoded = torch.cat(test_data_encoded, axis=0)
-            test_data_labels = torch.cat(test_data_labels)
-
-            self.save_encoded_data(
-                data=train_data_encoded.detach().to("cpu").numpy(),
-                filename=train_encoded_filename,
-                location=save_location)
-            self.save_encoded_data(
-                data=train_data_labels.detach().to("cpu").numpy(),
-                filename=train_label_filename,
-                location=save_location)
-            self.save_encoded_data(
-                data=test_data_encoded.detach().to("cpu").numpy(),
-                filename=test_encoded_filename,
-                location=save_location)
-            self.save_encoded_data(
-                data=test_data_labels.detach().to("cpu").numpy(),
-                filename=test_label_filename,
-                location=save_location)
         else:
             return accuracy
 
@@ -773,7 +846,6 @@ class Trainer(basic.Trainer):
         testset: The test dataset.
         sampler: The sampler that extracts a partition of the test dataset.
         kwargs (optional): Additional keyword arguments.
-
 
         Note:
             It performs 'eval_test_process' that is responsible for evaluating

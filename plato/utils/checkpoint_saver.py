@@ -1,6 +1,5 @@
 import os
 import torch
-import logging
 
 
 class CheckpointsSaver(object):
