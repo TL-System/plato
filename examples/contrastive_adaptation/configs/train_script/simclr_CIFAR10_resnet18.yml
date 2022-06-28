@@ -55,8 +55,8 @@ server:
     synchronous: true
     do_test: false
 
-    ping_interval: 120000
-    ping_timeout: 120000
+    ping_interval: 12000
+    ping_timeout: 12000
 
     # for the paths of models; checkpoints; results,
     # they utilize the same name, following the one defined in
@@ -157,7 +157,7 @@ trainer:
     pers_batch_size: 512
     pers_optimizer: Adam
     # lr = 0.1 * batch_size / 256, see section B.6 and B.7 of SimCLR paper.
-    pers_learning_rate: 0.2
+    pers_learning_rate: 0.1
     pers_betas:
         - 0.9
         - 0.99
