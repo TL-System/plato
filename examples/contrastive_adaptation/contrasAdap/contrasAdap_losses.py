@@ -42,25 +42,72 @@ class ContrasAdapLoss(nn.Module):
 
     """
 
-    def __init__(self,
-                 temperature=0.07,
-                 contrast_mode='all',
-                 base_temperature=0.07,
-                 batch_size=128):
+    def __init__(
+        self,
+        losses,
+        supervision_contrastive_lambda=1.0,
+        similarity_lambda=0.0,
+        ntx_lambda=0.0,
+        meta_lambda=0.0,
+        meta_contrastive_lambda=0.0,
+        perform_label_distortion=False,
+        label_distrotion_type="random",
+        temperature=0.07,
+        base_temperature=0.07,
+        contrast_mode='all',
+    ):
         super().__init__()
-        # a hyper-parameter constant
+
+        # the losses to be computed
+        # the enabled losses can be:
+        # * sup_contrastive_loss  - client_specific_representation_loss
+        # * sim_contrastive_loss  - clients_invariant_representation_similarity_loss
+        # * ntx_contrastive_loss  - clients_invariant_representation_loss
+        # * prot_repre_loss       - prototype_representation_loss
+        # * prot_contrastive_loss - prototype_contrastive_representation_loss
+        self.losses = losses
+
+        # a hyper-parameter for the supervision_contrastive loss
+        self.supervision_contrastive_lambda = supervision_contrastive_lambda
         self.temperature = temperature
         self.contrast_mode = contrast_mode
         self.base_temperature = base_temperature
-        self.batch_size = batch_size
 
-        self.cross_sg_criterion = ssl_losses.CrossStopGradientL2loss()
+        # weight for the similarity contrastive loss
+        self.similarity_lambda = similarity_lambda
 
-        self.ntx_criterion = ssl_losses.NTXent(self.batch_size,
-                                               self.temperature,
-                                               world_size=1)
+        # weight for the ntx contrastive loss
+        self.ntx_lambda = ntx_lambda
 
-    def clients_invariant_representation_similarity_loss(self, outputs):
+        # weight for the prototype losses
+        self.meta_lambda = meta_lambda
+
+        self.meta_contrastive_lambda = meta_contrastive_lambda
+
+        # whether to perform the label distortion
+        self.perform_label_distortion = perform_label_distortion
+        self.label_distrotion_type = label_distrotion_type
+
+        self.losses_func = {
+            "sup_contrastive_loss": self.client_specific_representation_loss,
+            "sim_contrastive_loss":
+            self.clients_invariant_representation_similarity_loss,
+            "ntx_contrastive_loss": self.clients_invariant_representation_loss,
+            "prot_repre_loss": self.prototype_representation_loss,
+            "prot_contrastive_loss":
+            self.prototype_contrastive_representation_loss
+        }
+
+        self.losses_weight = {
+            "sup_contrastive_loss": self.supervision_contrastive_lambda,
+            "sim_contrastive_loss": self.similarity_lambda,
+            "ntx_contrastive_loss": self.ntx_lambda,
+            "prot_repre_loss": self.meta_lambda,
+            "prot_contrastive_loss": self.meta_contrastive_lambda
+        }
+
+    def clients_invariant_representation_similarity_loss(
+            self, outputs, labels=None):
         """ Motivate the similarity of predicted features and projected features.
 
             - Can be the loss function used in the BYOL method.
@@ -74,9 +121,11 @@ class ContrasAdapLoss(nn.Module):
 
         """
 
-        return self.cross_sg_criterion(outputs)
+        cross_sg_criterion = ssl_losses.CrossStopGradientL2loss()
 
-    def clients_invariant_representation_loss(self, encoded_z1, encoded_z2):
+        return cross_sg_criterion(outputs)
+
+    def clients_invariant_representation_loss(self, outputs, labels=None):
         """ Motivate the representation to be clients invariant by using the
             within one batch:
             1. data argument of one sample as its positive sample.
@@ -91,23 +140,75 @@ class ContrasAdapLoss(nn.Module):
                 the positive sample is its augmented sample obtained in the transform
                 the negative samples are all other samples within one batch.
         """
+        encoded_z1, encoded_z2 = outputs
+
+        self.ntx_criterion = ssl_losses.NTXent(self.temperature, world_size=1)
         ntx_loss = self.ntx_criterion(encoded_z1, encoded_z2)
 
         return ntx_loss
 
-    def client_semi_invariant_prototype_representation_loss(
-            self, encoded_z1, encoded_z2, labels):
+    def random_label_distortion(self, gt_labels):
+        """ To cover the label information for better generalization,
+            each client should perform the label distortion to shift the label
+            index. """
+        pseudo_labels = torch.zeros(gt_labels.shape)
+        gt_classes = torch.unique(gt_labels).cpu().numpy()
+        num_classes = len(num_classes)
+        new_classes_label_mapper = {
+            cls: cls_idx
+            for cls_idx, cls in enumerate(gt_classes)
+        }
+        for cls in gt_classes:
+            pseudo_labels[gt_classes == cls] = new_classes_label_mapper[cls]
+
+        return pseudo_labels
+
+    def prototype_representation_loss(self, outputs, labels):
         """ Compute loss to support the representation that is semi-invariant
             among clients.
 
             The name of the 'semi' is because we utilize the client's labels to
-            build the prototype within one batch.
+            build the prototype within one batch. By doing so, the training
+            process and the learning process do not utilize the supervision
+            information directly, making the learned representation generalize
+            well to downstream tasks.
+
+            To compute this loss, we first need to create:
+                - support set, S_i - encoded_z1
+                - query set, Q_i - encoded_z2
+            Then, there are two stages:
+                In the first stage, there are two schemas:
+            Schema A:
+                - the prototypes are generated based on the representation
+                of the support set
+                - a distribution over classes for the query set Q_i is
+                produced based on a softmax over distances to the
+                prototypes in the embedding space. The negative log-probability
+                is shown as
+
+            Schema B:
+
         """
+        encoded_z1, encoded_z2 = outputs
+        # Infer the number of different classes from the labels of the support set
+        prototypes = torch.unique(labels)
+        num_prototypes = len(prototypes)
+        # Prototype i is the mean of all instances of features corresponding to labels == i
+        encoded_prototypes = torch.cat([
+            encoded_z1[torch.nonzero(labels == label)].mean(0)
+            for label in range(num_prototypes)
+        ])
+        # Compute the euclidean distance from queries to prototypes
+        dists = torch.cdist(encoded_z2, encoded_prototypes)
 
-        pass
+        # And here is the super complicated operation to transform those distances into classification scores!
+        meta_scores = -dists
 
-    def client_specific_representation_loss(self, encoded_z1, encoded_z2,
-                                            labels):
+        meta_loss = nn.CrossEntropyLoss(meta_scores, labels)
+
+        return meta_loss
+
+    def client_specific_representation_loss(self, outputs, labels):
         """ Compute loss to support the a client specific representation.
 
             Takes `features` and `labels` as input, and return the loss.
@@ -128,7 +229,7 @@ class ContrasAdapLoss(nn.Module):
         # encoded_z1: batch_size, fea_dim
         # encoded_z2: batch_size, fea_dim
         # features: batch_size, 2, fea_dim
-
+        encoded_z1, encoded_z2 = outputs
         features = torch.cat(
             [encoded_z1.unsqueeze(1),
              encoded_z2.unsqueeze(1)], dim=1)
@@ -187,9 +288,43 @@ class ContrasAdapLoss(nn.Module):
 
         return loss
 
-    def meta_learning_loss(self, logits, labels):
-        """ The meta learning is the performance of the pre-trained ssl method
-            on the local classification task. I.e., we directly utilize the
-            cross entropy loss. """
+    def prototype_contrastive_representation_loss(self, outputs, labels):
+        """ Compute the contrastive loss based on the prototypes instead of
+            each sample.
 
-        return torch.nn.CrossEntropyLoss(logits, labels)
+            The support set (encoded_z1) is utilized to create the prototypes
+            in which each prototype is the averaged embedding of samples
+            Then, the contrastive loss is computed based in the built prototypes.
+
+             """
+        encoded_z1, encoded_z2 = outputs
+
+        # Infer the number of different classes from the labels of the support set
+        prototypes_label = torch.unique(labels)
+        num_prototypes = len(prototypes_label)
+
+        # Prototype i is the mean of all instances of features corresponding to labels == i
+        view1_prototypes = torch.cat([
+            encoded_z1[torch.nonzero(
+                labels == prototypes_label[label_idx])].mean(0)
+            for label_idx in range(num_prototypes)
+        ])
+        view2_prototypes = torch.cat([
+            encoded_z2[torch.nonzero(
+                labels == prototypes_label[label_idx])].mean(0)
+            for label_idx in range(num_prototypes)
+        ])
+
+        return self.client_specific_representation_loss(
+            [view1_prototypes, view2_prototypes], prototypes_label)
+
+    def forward(self, outputs, labels):
+        """ Forward the loss computaton module. """
+        total_loss = 0.0
+        for loss_name in self.losses:
+            loss_weight = self.losses_weight[loss_name]
+            computed_loss = self.losses_func[loss_name](outputs, labels)
+
+            total_loss += loss_weight * computed_loss
+
+        return total_loss
