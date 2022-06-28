@@ -4,10 +4,6 @@ A federated learning client for td3.
 import logging
 from dataclasses import dataclass
 from plato.clients import simple
-import numpy as np
-import torch
-import random
-from plato.config import Config
 
 @dataclass
 class Report(simple.Report):

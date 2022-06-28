@@ -5,11 +5,6 @@ from collections import OrderedDict
 
 from plato.algorithms import fedavg
 from plato.trainers.base import Trainer
-import torch
-from plato.config import Config
-import numpy as np
-import random
-
 
 class Algorithm(fedavg.Algorithm):
     """ Federated averaging algorithm for Actor-Critic models, used by both the client and the server. """

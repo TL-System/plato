@@ -1,11 +1,7 @@
-import numpy as np
-import torch
 import gym
 from torch import nn
-import matplotlib.pyplot as plt
 import park
 from plato.config import Config
-import random
 
 # Actor module, categorical actions only
 class A2CActor(nn.Module):
