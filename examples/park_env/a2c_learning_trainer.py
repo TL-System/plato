@@ -80,7 +80,7 @@ class Trainer(basic.Trainer):
 
         self.env_name = Config().algorithm.env_name
         self.algorithm_name =  Config().algorithm.algorithm_name
-
+        print("Model:", model)
         self.actor = self.model.actor
         self.critic = self.model.critic
         self.adam_actor = torch.optim.Adam(self.actor.parameters(), lr=Config().algorithm.learning_rate)
@@ -156,7 +156,7 @@ class Trainer(basic.Trainer):
             state = self.env.reset(trace_idx=self.trace_idx, test= True)
             state = self.obs_normalizer.normalize(state)
             self.steps = 0
-            # TODO: results are not reproducible, why is the seed not set const for some reason!
+            # TODO: results are not reproducible, although the seed is the same, but results are not always the same every run. Check this
             while not self.done:
                 probs = self.actor(self.t(state))
                 dist = torch.distributions.Categorical(probs=probs)
