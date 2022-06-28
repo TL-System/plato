@@ -41,8 +41,8 @@ server:
     synchronous: true
     do_test: false
 
-    ping_interval: 120000
-    ping_timeout: 120000
+    ping_interval: 12000
+    ping_timeout: 12000
 
     # for the paths of models; checkpoints; results,
     # they utilize the same name, following the one defined in
