@@ -142,6 +142,7 @@ trainer:
     # lr_gamma: 0.9
 
     optimizer: SGD
+    # lr = 0.3 * batch_size / 256, see section B.6 and B.7 of SimCLR paper.
     learning_rate: 0.6
     momentum: 0.9
     weight_decay: 0.000001
@@ -161,7 +162,8 @@ trainer:
     pers_epochs: 100
     pers_batch_size: 512
     pers_optimizer: Adam
-    pers_learning_rate: 0.005
+    # lr = 0.1 * batch_size / 256, see section B.6 and B.7 of SimCLR paper.
+    pers_learning_rate: 0.2
     pers_betas:
         - 0.9
         - 0.99
