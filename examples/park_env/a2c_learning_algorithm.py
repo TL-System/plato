@@ -5,6 +5,10 @@ from collections import OrderedDict
 
 from plato.algorithms import fedavg
 from plato.trainers.base import Trainer
+import torch
+from plato.config import Config
+import numpy as np
+import random
 
 
 class Algorithm(fedavg.Algorithm):
@@ -14,6 +18,11 @@ class Algorithm(fedavg.Algorithm):
         super().__init__(trainer)
         self.actor = self.model.actor
         self.critic = self.model.critic
+
+        seed = Config().data.random_seed 
+        torch.manual_seed(seed)
+        random.seed(seed)
+        np.random.seed(seed)
 
     def compute_weight_deltas(self, weights_received):
         """ Extract the weights received from a client and compute the updates. """

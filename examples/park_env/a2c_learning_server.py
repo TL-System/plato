@@ -13,6 +13,7 @@ from plato.servers import fedavg
 from plato.config import Config
 import pickle
 import random
+import torch
 import numpy as np
 import csv
 
@@ -24,6 +25,11 @@ class A2CServer(fedavg.Server):
         super().__init__(trainer = trainer, algorithm = algorithm, model = model)
         self.algorithm_name = algorithm_name
         self.env_name = env_name
+
+        seed = Config().data.random_seed 
+        torch.manual_seed(seed)
+        random.seed(seed)
+        np.random.seed(seed)
         
         logging.info("A custom server has been initialized.")
         
@@ -86,14 +92,23 @@ class A2CServer(fedavg.Server):
                 print("Metric", metric)
                 print("Metric percentile", metric_percentile)
                 
-                #if (uni == client_id):#metric <= metric_percentile: #(self.current_round < 7 and client_id == 1) or (self.current_round > 7 and self.current_round < 14 and client_id == 2) or (self.current_round > 14 and client_id == 3): #metric <= metric_percentile: 
-                if self.current_round == 1 and client_id == 1 \
-                or self.current_round == 2 and client_id == 3 \
-                or self.current_round == 3 and client_id == 1 \
-                or self.current_round == 4 and client_id == 2\
-                or self.current_round == 5 and client_id == 1 \
-                or self.current_round == 6 and client_id == 2 \
-                or self.current_round == 7 and client_id == 2:
+                if metric <= metric_percentile: #(self.current_round < 7 and client_id == 1) or (self.current_round > 7 and self.current_round < 14 and client_id == 2) or (self.current_round > 14 and client_id == 3): #metric <= metric_percentile: 
+                # if (self.current_round == 1 and client_id == 1) \
+                # or (self.current_round == 2 and client_id == 1) \
+                # or (self.current_round == 3 and client_id == 1) \
+                # or (self.current_round == 4 and client_id == 1) \
+                # or (self.current_round == 5 and client_id == 1) \
+                # or (self.current_round == 6 and client_id == 1) \
+                # or (self.current_round == 7 and client_id == 1) \
+                # or (self.current_round == 8 and client_id == 2) \
+                # or (self.current_round == 9 and client_id == 2) \
+                # or (self.current_round == 10 and client_id == 2) \
+                # or (self.current_round == 11 and client_id == 2) \
+                # or (self.current_round == 12 and client_id == 2) \
+                # or (self.current_round == 13 and client_id == 2) \
+                # or (self.current_round == 14 and client_id == 2) \
+                # or (self.current_round == 15 and client_id == 3) \
+                # or (self.current_round == 16 and client_id == 3):
                     print("Client %s is choosen" % str(client_id))
                     self.save_files(client_path+"_percentile", client_id)
                     for name, delta in update_from_actor.items():

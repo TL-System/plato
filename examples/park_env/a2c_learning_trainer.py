@@ -11,6 +11,7 @@ from plato.config import Config
 from plato.trainers import basic
 from torch.nn.utils.clip_grad import clip_grad_norm_
 from torch.autograd import Variable
+import random
 
 import os
 import logging
@@ -68,7 +69,6 @@ class Memory():
 
 class Trainer(basic.Trainer):
     def __init__(self, model=None):
-        print("Model in trainer is this", model)
         super().__init__(model=model)
 
         self.env = park.make(Config().algorithm.env_park_name)
@@ -76,11 +76,12 @@ class Trainer(basic.Trainer):
 
         self.env.seed(seed)
         torch.manual_seed(seed)
+        random.seed(seed)
         np.random.seed(seed)
 
         self.env_name = Config().algorithm.env_name
         self.algorithm_name =  Config().algorithm.algorithm_name
-        print("Model:", model)
+        
         self.actor = self.model.actor
         self.critic = self.model.critic
         self.adam_actor = torch.optim.Adam(self.actor.parameters(), lr=Config().algorithm.learning_rate)

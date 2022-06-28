@@ -5,7 +5,8 @@ import logging
 from dataclasses import dataclass
 from plato.clients import simple
 import numpy as np
-import pybullet_envs
+import torch
+import random
 from plato.config import Config
 
 @dataclass
@@ -26,6 +27,10 @@ class RLClient(simple.Client):
     def __init__(self, trainer = None, model = None, algorithm = None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
         logging.info("A custom client has been initialized!")
+        seed = Config().data.random_seed 
+        torch.manual_seed(seed)
+        random.seed(seed)
+        np.random.seed(seed)
         
 
     async def train(self):
