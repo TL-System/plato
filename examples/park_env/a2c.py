@@ -32,8 +32,6 @@ def main():
 
 
     model = a2c_learning_model.Model
-    #(state_dim, n_actions, 
-    #Config().algorithm.env_name, Config().algorithm.algorithm_name)
     trainer = a2c_learning_trainer.Trainer
     algorithm = a2c_learning_algorithm.Algorithm
     client = a2c_learning_client.RLClient(model=model,trainer=trainer,algorithm=algorithm)

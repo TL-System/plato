@@ -24,17 +24,14 @@ class A2CServer(fedavg.Server):
         super().__init__(trainer = trainer, algorithm = algorithm, model = model)
         self.algorithm_name = algorithm_name
         self.env_name = env_name
-        random.seed(Config().server.random_seed)
+        
         logging.info("A custom server has been initialized.")
         
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using federated averaging."""
 
-        #print("We are in learning server", updates[0][2])
-
         weights_received = self.compute_weight_deltas(updates)
 
-      #  print("weights received is this", weights_received)
     
         if Config().server.percentile_aggregate:
             
@@ -66,11 +63,9 @@ class A2CServer(fedavg.Server):
             name: self.trainer.zeros(weights.shape)
             for name, weights in weights_received[0][1].items()
         }
-        uni = random.sample([1, 2, 3], 1)[0]
+        
         for i, update in enumerate(weights_received):
-            print("Client# ", i)
-            __, report, __, __ = updates[i]
-            # TODO: make sure this is the only place of aggregation, and there is not other place! 
+            __, report, __, __ = updates[i] 
             client_id = report.client_id
             client_path =  Config().results.results_dir +"/"+Config().results.file_name+"_client_saved"
 
@@ -91,7 +86,6 @@ class A2CServer(fedavg.Server):
                 print("Metric", metric)
                 print("Metric percentile", metric_percentile)
                 
-                #TODO the percentile aggregation still seems to be aggregating 3 clients
                 #if (uni == client_id):#metric <= metric_percentile: #(self.current_round < 7 and client_id == 1) or (self.current_round > 7 and self.current_round < 14 and client_id == 2) or (self.current_round > 14 and client_id == 3): #metric <= metric_percentile: 
                 if self.current_round == 1 and client_id == 1 \
                 or self.current_round == 2 and client_id == 3 \

@@ -20,15 +20,13 @@ server:
     # Should we simulate the wall-clock time on the server? Useful if max_concurrency is specified
     simulate_wall_time: true
 
-    random_seed: 2
+    random_seed: 1
 
     model_path: models/pretrained
 
     percentile: 20
 
-    random_seed: 1
-
-    percentile_aggregate: actor_fisher #False, actor_loss, critic_loss, actor_grad, critic_grad, actor_fisher, critic_fisher
+    percentile_aggregate: actor_loss #False, actor_loss, critic_loss, actor_grad, critic_grad, actor_fisher, critic_fisher
 
 data:
     # The training and testing dataset
@@ -123,7 +121,6 @@ algorithm:
 
 results:
     # Write the following parameter(s) into a CSV
-    # TODO: does the current code write these into csv file? If yes, where?
     types: round, accuracy, elapsed_time, comm_time, round_time
 
     # Plot results (x_axis-y_axis)
