@@ -19,11 +19,6 @@ class Algorithm(fedavg.Algorithm):
         self.actor = self.model.actor
         self.critic = self.model.critic
 
-        seed = Config().data.random_seed 
-        torch.manual_seed(seed)
-        random.seed(seed)
-        np.random.seed(seed)
-
     def compute_weight_deltas(self, weights_received):
         """ Extract the weights received from a client and compute the updates. """
 

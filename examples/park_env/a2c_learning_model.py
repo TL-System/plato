@@ -11,10 +11,7 @@ import random
 class A2CActor(nn.Module):
     def __init__(self, state_dim, n_actions):
         super().__init__()
-        seed = Config().data.random_seed 
-        torch.manual_seed(seed)
-        random.seed(seed)
-        np.random.seed(seed)
+
         self.model = nn.Sequential(
             nn.Linear(state_dim,16),
             nn.LeakyReLU(),
@@ -31,9 +28,7 @@ class A2CActor(nn.Module):
 class A2CCritic(nn.Module):
     def __init__(self, state_dim):
         super().__init__()
-        seed = Config().data.random_seed 
-        torch.manual_seed(seed)
-        np.random.seed(seed)
+
         self.model = nn.Sequential(
             nn.Linear(state_dim, 16),
             nn.LeakyReLU(),
@@ -59,10 +54,6 @@ class Model:
         self.n_action = n_actions
         self.actor = A2CActor(state_dim, n_actions)
         self.critic = A2CCritic(state_dim)
-
-        seed = Config().data.random_seed 
-        torch.manual_seed(seed)
-        np.random.seed(seed)
 
     def get_state_dim(self):
         return self.state_dim

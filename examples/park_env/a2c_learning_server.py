@@ -25,12 +25,6 @@ class A2CServer(fedavg.Server):
         super().__init__(trainer = trainer, algorithm = algorithm, model = model)
         self.algorithm_name = algorithm_name
         self.env_name = env_name
-
-        seed = Config().data.random_seed 
-        torch.manual_seed(seed)
-        random.seed(seed)
-        np.random.seed(seed)
-        
         logging.info("A custom server has been initialized.")
         
     async def federated_averaging(self, updates):

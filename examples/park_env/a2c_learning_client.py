@@ -26,12 +26,7 @@ class RLClient(simple.Client):
     
     def __init__(self, trainer = None, model = None, algorithm = None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
-        logging.info("A custom client has been initialized!")
-        seed = Config().data.random_seed 
-        torch.manual_seed(seed)
-        random.seed(seed)
-        np.random.seed(seed)
-        
+        logging.info("A custom client has been initialized!")        
 
     async def train(self):
         """The machine learning training workload on a client."""
