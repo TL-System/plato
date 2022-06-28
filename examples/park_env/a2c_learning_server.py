@@ -91,6 +91,7 @@ class A2CServer(fedavg.Server):
                 print("Metric", metric)
                 print("Metric percentile", metric_percentile)
                 
+                #TODO the percentile aggregation still seems to be aggregating 3 clients
                 #if (uni == client_id):#metric <= metric_percentile: #(self.current_round < 7 and client_id == 1) or (self.current_round > 7 and self.current_round < 14 and client_id == 2) or (self.current_round > 14 and client_id == 3): #metric <= metric_percentile: 
                 if self.current_round == 1 and client_id == 1 \
                 or self.current_round == 2 and client_id == 3 \

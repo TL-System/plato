@@ -487,7 +487,7 @@ class Trainer(basic.Trainer):
         #We will return the average reward here
         avg_reward = self.evaluate_policy()
         self.server_reward = avg_reward
-        file_name = "A2C_RL_SERVER_FED_AVG"
+        file_name = "A2C_RL_SERVER_PERCENTILE"
 
         path = Config().results.results_dir +"/"+file_name
         

@@ -6,7 +6,7 @@ clients:
     total_clients: 3
 
     # The number of clients selected in each round
-    per_round: 1
+    per_round: 3
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -28,7 +28,7 @@ server:
 
     random_seed: 1
 
-    percentile_aggregate: false #False, actor_loss, critic_loss, actor_grad, critic_grad, actor_fisher, critic_fisher
+    percentile_aggregate: actor_fisher #False, actor_loss, critic_loss, actor_grad, critic_grad, actor_fisher, critic_fisher
 
 data:
     # The training and testing dataset
