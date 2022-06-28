@@ -28,6 +28,7 @@ class Algorithm(fedavg.Algorithm):
                 baseline = baseline_weights_actor[name]
 
                 delta = current_weight - baseline
+               # print(delta)
                 delta_actor[name] = delta
 
             delta_critic = OrderedDict()

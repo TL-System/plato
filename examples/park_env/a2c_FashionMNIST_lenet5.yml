@@ -6,7 +6,7 @@ clients:
     total_clients: 3
 
     # The number of clients selected in each round
-    per_round: 1
+    per_round: 3
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -15,7 +15,7 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8002
+    port: 8006
 
     # Should we simulate the wall-clock time on the server? Useful if max_concurrency is specified
     simulate_wall_time: true
@@ -25,6 +25,8 @@ server:
     model_path: models/pretrained
 
     percentile: 20
+
+    random_seed: 1
 
     percentile_aggregate: actor_fisher #False, actor_loss, critic_loss, actor_grad, critic_grad, actor_fisher, critic_fisher
 

@@ -4,6 +4,7 @@ import gym
 from torch import nn
 import matplotlib.pyplot as plt
 import park
+from plato.config import Config
 
 # Actor module, categorical actions only
 class A2CActor(nn.Module):
@@ -36,21 +37,20 @@ class A2CCritic(nn.Module):
     def forward(self, X):
         return self.model(X)
 
+
 class Model:
     """Wrapper class that holds both models"""
-    def __init__(self, state_dim, n_actions, env_name, rl_algo):
+    def __init__(self):
+
+        env = park.make(Config().algorithm.env_park_name)
+
+        state_dim = env.observation_space.shape[0]
+        n_actions = env.action_space.n
+
         self.state_dim = state_dim
         self.n_action = n_actions
-        self.env_name = env_name
-        self.rl_algo = rl_algo
         self.actor = A2CActor(state_dim, n_actions)
         self.critic = A2CCritic(state_dim)
-    
-    def get_env_name(self):
-        return self.env_name
-
-    def get_rl_algo(self):
-        return self.rl_algo
 
     def get_state_dim(self):
         return self.state_dim
@@ -70,4 +70,5 @@ class Model:
     @staticmethod
     def get_model(*args):
         """ Obtaining an instance of this model. """
+        print("in line 73")
         return Model()

@@ -26,7 +26,7 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8002
+    port: 8005
 
     # Should we operate in sychronous mode?
     synchronous: false
@@ -149,7 +149,7 @@ algorithm:
     max_steps: 500000
 
     # Number of episodes to run each round
-    max_round_episodes: 20
+    max_round_episodes: 2
 
     #If we should save the model or not
     save_models: False
