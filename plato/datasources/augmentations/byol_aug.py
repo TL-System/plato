@@ -51,44 +51,48 @@ One template is:
 
 """
 
-from ssl_transform_base import get_ssl_base_transform
+from plato.datasources.augmentations.ssl_transform_base import get_ssl_base_transform
 
 
 class BYOLTransform():
     """ This the contrastive data augmentation used by the BYOL method. """
 
     def __init__(self, image_size, normalize):
-        self.transform1 = get_ssl_base_transform(image_size,
-                                                 normalize,
-                                                 brightness=0.4,
-                                                 contrast=0.4,
-                                                 saturation=0.2,
-                                                 hue=0.1,
-                                                 color_jitter_prob=0.8,
-                                                 gray_scale_prob=0.2,
-                                                 horizontal_flip_prob=0.5,
-                                                 gaussian_prob=1.0,
-                                                 solarization_prob=0.0,
-                                                 equalization_prob=0.0,
-                                                 min_scale=0.08,
-                                                 max_scale=1.0,
-                                                 crop_size=image_size)
+        self.transform1, transform_funcs1 = get_ssl_base_transform(
+            image_size,
+            normalize,
+            brightness=0.4,
+            contrast=0.4,
+            saturation=0.2,
+            hue=0.1,
+            color_jitter_prob=0.8,
+            gray_scale_prob=0.2,
+            horizontal_flip_prob=0.5,
+            gaussian_prob=1.0,
+            solarization_prob=0.0,
+            equalization_prob=0.0,
+            min_scale=0.08,
+            max_scale=1.0,
+            crop_size=image_size)
 
-        self.transform2 = get_ssl_base_transform(image_size,
-                                                 normalize,
-                                                 brightness=0.4,
-                                                 contrast=0.4,
-                                                 saturation=0.2,
-                                                 hue=0.1,
-                                                 color_jitter_prob=0.8,
-                                                 gray_scale_prob=0.2,
-                                                 horizontal_flip_prob=0.5,
-                                                 gaussian_prob=0.1,
-                                                 solarization_prob=0.2,
-                                                 equalization_prob=0.0,
-                                                 min_scale=0.08,
-                                                 max_scale=1.0,
-                                                 crop_size=image_size)
+        self.transform2, transform_funcs2 = get_ssl_base_transform(
+            image_size,
+            normalize,
+            brightness=0.4,
+            contrast=0.4,
+            saturation=0.2,
+            hue=0.1,
+            color_jitter_prob=0.8,
+            gray_scale_prob=0.2,
+            horizontal_flip_prob=0.5,
+            gaussian_prob=0.1,
+            solarization_prob=0.2,
+            equalization_prob=0.0,
+            min_scale=0.08,
+            max_scale=1.0,
+            crop_size=image_size)
+
+        self.transform_funcs = [transform_funcs1, transform_funcs2]
 
     def __call__(self, x):
         """ Perform data augmentation. """

@@ -33,7 +33,7 @@ if normalize is not None:
 
 """
 
-from ssl_transform_base import get_ssl_base_transform
+from plato.datasources.augmentations.ssl_transform_base import get_ssl_base_transform
 
 
 class SimCLRTransform():
@@ -41,21 +41,23 @@ class SimCLRTransform():
 
     def __init__(self, image_size, normalize):
         image_size = 224 if image_size is None else image_size
-        self.transform = get_ssl_base_transform(image_size,
-                                                normalize,
-                                                brightness=0.4,
-                                                contrast=0.4,
-                                                saturation=0.4,
-                                                hue=0.1,
-                                                color_jitter_prob=0.8,
-                                                gray_scale_prob=0.2,
-                                                horizontal_flip_prob=0.5,
-                                                gaussian_prob=0.0,
-                                                solarization_prob=0.0,
-                                                equalization_prob=0.0,
-                                                min_scale=0.08,
-                                                max_scale=1.0,
-                                                crop_size=image_size)
+        self.transform, transform_funcs = get_ssl_base_transform(
+            image_size,
+            normalize,
+            brightness=0.4,
+            contrast=0.4,
+            saturation=0.4,
+            hue=0.1,
+            color_jitter_prob=0.8,
+            gray_scale_prob=0.2,
+            horizontal_flip_prob=0.5,
+            gaussian_prob=0.0,
+            solarization_prob=0.0,
+            equalization_prob=0.0,
+            min_scale=0.08,
+            max_scale=1.0,
+            crop_size=image_size)
+        self.transform_funcs = transform_funcs
 
     def __call__(self, x):
         """ Perform the contrastive data augmentation. """

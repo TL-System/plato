@@ -62,7 +62,7 @@ The implementation of the SWAV's [1] augmentation function.
 #     return color_distort
 """
 
-from ssl_transform_base import get_ssl_base_transform
+from plato.datasources.augmentations.ssl_transform_base import get_ssl_base_transform
 
 
 class SvAVTransform():
@@ -70,21 +70,23 @@ class SvAVTransform():
 
     def __init__(self, image_size, normalize):
         p_blur = 0.5 if image_size > 32 else 0  # exclude cifar
-        self.transform = get_ssl_base_transform(image_size,
-                                                normalize,
-                                                brightness=0.8,
-                                                contrast=0.8,
-                                                saturation=0.8,
-                                                hue=0.2,
-                                                color_jitter_prob=0.8,
-                                                gray_scale_prob=0.2,
-                                                horizontal_flip_prob=0.5,
-                                                gaussian_prob=p_blur,
-                                                solarization_prob=0.0,
-                                                equalization_prob=0.0,
-                                                min_scale=0.08,
-                                                max_scale=1.0,
-                                                crop_size=image_size)
+        self.transform, transform_funcs = get_ssl_base_transform(
+            image_size,
+            normalize,
+            brightness=0.8,
+            contrast=0.8,
+            saturation=0.8,
+            hue=0.2,
+            color_jitter_prob=0.8,
+            gray_scale_prob=0.2,
+            horizontal_flip_prob=0.5,
+            gaussian_prob=p_blur,
+            solarization_prob=0.0,
+            equalization_prob=0.0,
+            min_scale=0.08,
+            max_scale=1.0,
+            crop_size=image_size)
+        self.transform_funcs = transform_funcs
 
     def __call__(self, x):
         return self.transform(x)
