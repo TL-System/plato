@@ -484,7 +484,7 @@ class Trainer(basic.Trainer):
             actor_model_path = f'{model_path}/{env_algorithm+actor_model_name}.pth'
             critic_model_path = f'{model_path}/{env_algorithm+critic_model_name}.pth'
 
-        if True:
+        if self.model_state_dict is None:
             torch.save(self.actor.state_dict(), actor_model_path)
             torch.save(self.critic.state_dict(),critic_model_path)
         else:
