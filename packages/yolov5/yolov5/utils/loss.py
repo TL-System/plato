@@ -7,7 +7,7 @@ import torch
 import torch.nn as nn
 
 from yolov5.utils.metrics import bbox_iou
-from yolov5.utils.torch_utils import de_parallel
+from yolov5.utils.torch_utils import is_parallel
 
 
 def smooth_BCE(
@@ -92,10 +92,9 @@ class QFocalLoss(nn.Module):
 
 
 class ComputeLoss:
-    sort_obj_iou = False
-
     # Compute losses
     def __init__(self, model, autobalance=False):
+        self.sort_obj_iou = False
         device = next(model.parameters()).device  # get model device
         h = model.hyp  # hyperparameters
 
@@ -114,62 +113,57 @@ class ComputeLoss:
         if g > 0:
             BCEcls, BCEobj = FocalLoss(BCEcls, g), FocalLoss(BCEobj, g)
 
-        m = de_parallel(model).model[-1]  # Detect() module
+        det = model.module.model[-1] if is_parallel(model) else model.model[
+            -1]  # Detect() module
         self.balance = {
             3: [4.0, 1.0, 0.4]
-        }.get(m.nl, [4.0, 1.0, 0.25, 0.06, 0.02])  # P3-P7
+        }.get(det.nl, [4.0, 1.0, 0.25, 0.06, 0.02])  # P3-P7
         self.ssi = list(
-            m.stride).index(16) if autobalance else 0  # stride 16 index
+            det.stride).index(16) if autobalance else 0  # stride 16 index
         self.BCEcls, self.BCEobj, self.gr, self.hyp, self.autobalance = BCEcls, BCEobj, 1.0, h, autobalance
-        self.na = m.na  # number of anchors
-        self.nc = m.nc  # number of classes
-        self.nl = m.nl  # number of layers
-        self.anchors = m.anchors
-        self.device = device
+        for k in 'na', 'nc', 'nl', 'anchors':
+            setattr(self, k, getattr(det, k))
 
-    def __call__(self, p, targets):  # predictions, targets
-        lcls = torch.zeros(1, device=self.device)  # class loss
-        lbox = torch.zeros(1, device=self.device)  # box loss
-        lobj = torch.zeros(1, device=self.device)  # object loss
+    def __call__(self, p, targets):  # predictions, targets, model
+        device = targets.device
+        lcls, lbox, lobj = torch.zeros(1, device=device), torch.zeros(
+            1, device=device), torch.zeros(1, device=device)
         tcls, tbox, indices, anchors = self.build_targets(p,
                                                           targets)  # targets
 
         # Losses
         for i, pi in enumerate(p):  # layer index, layer predictions
             b, a, gj, gi = indices[i]  # image, anchor, gridy, gridx
-            tobj = torch.zeros(pi.shape[:4],
-                               dtype=pi.dtype,
-                               device=self.device)  # target obj
+            tobj = torch.zeros_like(pi[..., 0], device=device)  # target obj
 
             n = b.shape[0]  # number of targets
             if n:
-                # pxy, pwh, _, pcls = pi[b, a, gj, gi].tensor_split((2, 4, 5), dim=1)  # faster, requires torch 1.8.0
-                pxy, pwh, _, pcls = pi[b, a, gj, gi].split(
-                    (2, 2, 1, self.nc), 1)  # target-subset of predictions
+                ps = pi[b, a, gj,
+                        gi]  # prediction subset corresponding to targets
 
                 # Regression
-                pxy = pxy.sigmoid() * 2 - 0.5
-                pwh = (pwh.sigmoid() * 2)**2 * anchors[i]
+                pxy = ps[:, :2].sigmoid() * 2 - 0.5
+                pwh = (ps[:, 2:4].sigmoid() * 2)**2 * anchors[i]
                 pbox = torch.cat((pxy, pwh), 1)  # predicted box
-                iou = bbox_iou(pbox, tbox[i],
-                               CIoU=True).squeeze()  # iou(prediction, target)
+                iou = bbox_iou(pbox.T, tbox[i], x1y1x2y2=False,
+                               CIoU=True)  # iou(prediction, target)
                 lbox += (1.0 - iou).mean()  # iou loss
 
                 # Objectness
-                iou = iou.detach().clamp(0).type(tobj.dtype)
+                score_iou = iou.detach().clamp(0).type(tobj.dtype)
                 if self.sort_obj_iou:
-                    j = iou.argsort()
-                    b, a, gj, gi, iou = b[j], a[j], gj[j], gi[j], iou[j]
-                if self.gr < 1:
-                    iou = (1.0 - self.gr) + self.gr * iou
-                tobj[b, a, gj, gi] = iou  # iou ratio
+                    sort_id = torch.argsort(score_iou)
+                    b, a, gj, gi, score_iou = b[sort_id], a[sort_id], gj[
+                        sort_id], gi[sort_id], score_iou[sort_id]
+                tobj[b, a, gj,
+                     gi] = (1.0 - self.gr) + self.gr * score_iou  # iou ratio
 
                 # Classification
                 if self.nc > 1:  # cls loss (only if multiple classes)
-                    t = torch.full_like(pcls, self.cn,
-                                        device=self.device)  # targets
+                    t = torch.full_like(ps[:, 5:], self.cn,
+                                        device=device)  # targets
                     t[range(n), tcls[i]] = self.cp
-                    lcls += self.BCEcls(pcls, t)  # BCE
+                    lcls += self.BCEcls(ps[:, 5:], t)  # BCE
 
                 # Append targets to text file
                 # with open('targets.txt', 'a') as file:
