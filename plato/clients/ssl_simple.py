@@ -169,24 +169,18 @@ class Client(pers_simple.Client):
 
         if not os.path.exists(save_transform_file_path):
 
-            with open(save_transform_file_path, 'w') as fp:
-
-                get_name_func = lambda x: [type(tr_fn).__name__ for tr_fn in x]
-                json.dump(
-                    {
-                        "contrastive_transform":
-                        get_name_func(
-                            self.contrastive_transform.transform.transforms),
-                        "minotor_transform":
-                        get_name_func(self.monitor_augment_transformer.
-                                      transform.transforms),
-                        "task_test_transform":
-                        get_name_func(self.task_test_augment_transformer.
-                                      transform.transforms),
-                        "eval_train_transform":
-                        get_name_func(self.task_train_augment_transformer.
-                                      transform.transforms),
-                    }, fp)
+            with open(save_transform_file_path, 'a+') as fp:
+                print("\n self.contrastive_transform: ", file=fp)
+                print(self.contrastive_transform.transform_funcs, file=fp)
+                print("\n self.minotor_transform: ", file=fp)
+                print(self.monitor_augment_transformer.transform_funcs,
+                      file=fp)
+                print("\n self.task_test_augment_transformer: ", file=fp)
+                print(self.task_test_augment_transformer.transform_funcs,
+                      file=fp)
+                print("\n self.task_train_augment_transformer: ", file=fp)
+                print(self.task_train_augment_transformer.transform_funcs,
+                      file=fp)
 
             logging.info(
                 f"Saved the {self.client_id}'s local ssl data transform statistics"

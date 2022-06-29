@@ -33,6 +33,7 @@ class TestTransform():
             transform_functions.append(T.Normalize(*normalize))
 
         self.transform = T.Compose(transform_functions)
+        self.transform_funcs = transform_functions
 
     def __call__(self, x):
 

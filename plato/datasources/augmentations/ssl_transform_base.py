@@ -92,4 +92,4 @@ def get_ssl_base_transform(
     if normalize is not None:
         transform_funcs.append(transforms.Normalize(*normalize))
 
-    return transforms.Compose(transform_funcs)
+    return transforms.Compose(transform_funcs), transform_funcs
