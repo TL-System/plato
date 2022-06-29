@@ -13,8 +13,6 @@ class Processor(model.Processor):
     """
     Implements a Processor for dequantizing model parameters.
     """
-    def __init__(self, **kwargs) -> None:
-        super().__init__(**kwargs)
 
     def process(self, data: Any) -> Any:
         """
@@ -23,12 +21,15 @@ class Processor(model.Processor):
 
         output = super().process(data)
 
-        logging.info("[Server #%d] Dequantized features.", self.server_id)
+        if self.client_id is None:
+            logging.info("[Server #%d] Dequantized received update.",
+                         self.server_id)
+        else:
+            logging.info("[Client #%d] Dequantized received global model.",
+                         self.client_id)
 
         return output
 
     def _process_layer(self, layer: torch.Tensor) -> torch.Tensor:
 
-        layer = torch.dequantize(layer)
-
-        return layer
+        return layer.to(torch.float32)
