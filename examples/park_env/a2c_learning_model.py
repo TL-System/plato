@@ -77,5 +77,4 @@ class Model:
     @staticmethod
     def get_model(*args):
         """ Obtaining an instance of this model. """
-        print("in line 73")
         return Model()

@@ -74,6 +74,8 @@ trainer:
     # The machine learning model
     model_name: lenet5
 
+    manual_seed: 1
+
 algorithm:
     # Aggregation algorithm
     type: fedavg
@@ -129,3 +131,5 @@ results:
     results_dir: examples/park_env/results
 
     file_name: A2C_ABR
+
+    seed_random_path: examples/park_env/seeds

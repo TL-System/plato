@@ -1,3 +1,4 @@
+from difflib import restore
 import numpy as np
 import torch
 import gym
@@ -14,6 +15,7 @@ import os
 import logging
 
 import csv
+import pickle
 
 import park
 # Memory
@@ -114,8 +116,16 @@ class Trainer(basic.Trainer):
         self.timesteps_since_eval = 0
         self.round_no = 0
 
+        #TODO args.resume = true?
+
         if not os.path.exists(Config().results.results_dir):
             os.makedirs(Config().results.results_dir)
+
+        if not os.path.exists(Config().results.seed_random_path):
+            os.makedirs(Config().results.seed_random_path)
+        
+        #TODO if pathway already exists what to do?
+
 
         #self.path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
 
@@ -126,15 +136,23 @@ class Trainer(basic.Trainer):
 
     def train_model(self, config, trainset, sampler, cut_layer):
         """Main Training"""
-        
-        print("Sampler in train model, ", sampler.generator)
-        print("seed used for torch, ", torch.initial_seed())
-        print("seed used for torch, ", torch.initial_seed())
+
         common_path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
         round_episodes = 0
-        #torch.manual_seed(self.steps * self.episode_num)
+        
+        if self.episode_num == 0:
+            torch.manual_seed(Config().trainer.manual_seed)
+
+        seed_file_name = "id_"+str(self.client_id)
+        seed_path = Config().results.seed_random_path+"/"+seed_file_name
+
         while round_episodes < Config().algorithm.max_round_episodes:
-            torch.manual_seed(self.steps * self.episode_num) # TODO: save and restore torch seed
+            #torch.manual_seed(self.seed) # TODO: save and restore torch seed
+
+                #torch.manual_seed(self.seed)
+            if self.episode_num != 0:
+                self.save_seeds(self.episode_num, seed_path)
+
             first_itr = self.episode_num < Config().algorithm.max_round_episodes
             #Evaluates policy at a frequency set in config file
             if self.timesteps_since_eval >= Config().algorithm.eval_freq:
@@ -192,6 +210,9 @@ class Trainer(basic.Trainer):
                     self.entropy_loss.append(entropy_loss)
                     self.memory.clear()
 
+            if self.episode_num != 0:
+                self.restore_seeds(self.episode_num, seed_path)
+
             self.episode_num += 1
             self.timesteps_since_eval += 1
             round_episodes += 1
@@ -218,9 +239,43 @@ class Trainer(basic.Trainer):
         self.avg_critic_loss =  sum(self.critic_loss)/len(self.critic_loss)
         self.avg_entropy_loss = sum(self.entropy_loss)/len(self.entropy_loss) 
 
-        print("torch.seed end of train_model", torch.seed())       
+        #if first round, we save the first seed, we set the first seed to self.seed in load_model
+       # if self.seed is None:
+        #    np.savez(seed_path, a=np.array([first_seed]))
+            #FOR TESTING PURPOSES
+            #self.save_metric(seed_path, [first_seed], first_itr)
+            #print("torch.seed end of train_model", first_seed)
+        #else:
+         #   np.savez(seed_path, a=np.array([self.seed]))
+            #FOR TESTING PURPOSES
+            #self.save_metric(seed_path, [self.seed], first_itr)
+            #print("torch.seed end of train_model", self.seed)
+    #TODO get_rng_state,set_rng_state
+
+
+    def save_seeds(self, episode_num, seed_path):
+        """ Saving the random seeds in the trainer for resuming its session later on. """
+       # pkl_save_path = f"{seed_path}/{round_to_restore}.pkl"
+
+       # if not os.path.exists(pkl_save_path):
+          #  os.makedirs(os.path.dirname(pkl_save_path), exist_ok=True)
+
+        with open(seed_path+"_round_"+str(episode_num)+".pkl", 'wb') as checkpoint_file:
+           # print("CHECKPOINT FILE IS THIS",checkpoint_file)
+            pickle.dump(torch.get_rng_state(), checkpoint_file)
+
+        #round_to_restore = episode_num / max_round_episodes
+
+    def restore_seeds(self, episode_num, seed_path):
+        """Restoring the random seeds in the trainer for resuming its session later on"""
+        #seed_path should have client id in it!!!!!
+        rng_state_to_load = None
+
+        with open(seed_path+"_round_"+str(episode_num)+".pkl", 'rb') as checkpoint_file:
+            rng_state_to_load = pickle.load(checkpoint_file)
         
-        
+        torch.set_rng_state(rng_state_to_load)
+               
     def train_helper(self, memory, q_val, fisher = False):
         #We will put the train loop here
         values = torch.stack(memory.values)
@@ -357,6 +412,15 @@ class Trainer(basic.Trainer):
             round_file_path = os.path.join(model_path, round_no_path)
             data = np.load(round_file_path)
             self.round_no = int((data['a'])[0])
+
+            #Load previous round's seeds
+            seed_file_name = "id_"+str(self.client_id)
+            seed_path = Config().results.seed_random_path+"/"+seed_file_name
+            self.restore_seeds((self.episode_num/Config().algorithm.max_round_episodes), seed_path)
+
+    
+           # data = np.load(seed_path)
+           # self.seed = int((data['a'])[0]) #int does not truncate the long
     
             self.actor.load_state_dict(torch.load(actor_model_path), strict=True)
             self.critic.load_state_dict(torch.load(critic_model_path), strict=True)
@@ -455,6 +519,11 @@ class Trainer(basic.Trainer):
             round_no_path = "%s_%s.npz" % ("training_status", str(0))
             round_file_path = os.path.join(model_path, round_no_path)
             np.savez(round_file_path, a=np.array([self.round_no]))
+
+            #save seeds here
+            seed_file_name = "id_"+str(self.client_id)
+            seed_path = Config().results.seed_random_path+"/"+seed_file_name
+            self.save_seeds((self.episode_num/Config().algorithm.max_round_episodes),seed_path)#Config().results.seed_random_path)
 
 
         if self.client_id == 0:
