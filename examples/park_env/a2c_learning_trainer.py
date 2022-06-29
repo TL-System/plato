@@ -123,6 +123,7 @@ class Trainer(basic.Trainer):
 
         if not os.path.exists(Config().results.seed_random_path):
             os.makedirs(Config().results.seed_random_path)
+
         
         #TODO if pathway already exists what to do?
 
@@ -136,27 +137,23 @@ class Trainer(basic.Trainer):
 
     def train_model(self, config, trainset, sampler, cut_layer):
         """Main Training"""
+        seed_file_name = "id_"+str(self.client_id)
+        self.seed_path = Config().results.seed_random_path+"/"+seed_file_name
+        if self.episode_num == 0:
+            torch.manual_seed(Config().trainer.manual_seed)
+        else:
+            self.restore_seeds()
 
         common_path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
         round_episodes = 0
-        
-        if self.episode_num == 0:
-            torch.manual_seed(Config().trainer.manual_seed)
-
-        seed_file_name = "id_"+str(self.client_id)
-        seed_path = Config().results.seed_random_path+"/"+seed_file_name
 
         while round_episodes < Config().algorithm.max_round_episodes:
-            #torch.manual_seed(self.seed) # TODO: save and restore torch seed
-
-                #torch.manual_seed(self.seed)
-            if self.episode_num != 0:
-                self.save_seeds(self.episode_num, seed_path)
-
             first_itr = self.episode_num < Config().algorithm.max_round_episodes
             #Evaluates policy at a frequency set in config file
             if self.timesteps_since_eval >= Config().algorithm.eval_freq:
+                self.save_seeds()
                 self.avg_reward = self.evaluate_policy()
+                self.restore_seeds()
                 # Save avg reward
                 avg_reward_path = common_path+"_avg_reward"
                 self.timesteps_since_eval = 0
@@ -210,9 +207,6 @@ class Trainer(basic.Trainer):
                     self.entropy_loss.append(entropy_loss)
                     self.memory.clear()
 
-            if self.episode_num != 0:
-                self.restore_seeds(self.episode_num, seed_path)
-
             self.episode_num += 1
             self.timesteps_since_eval += 1
             round_episodes += 1
@@ -221,7 +215,9 @@ class Trainer(basic.Trainer):
         # End of round: 
         # 1- Evaluate policy on traces
         first_itr = self.episode_num <= Config().algorithm.eval_freq
+        self.save_seeds()
         self.avg_reward = self.evaluate_policy()
+        self.restore_seeds()
         avg_reward_path = common_path + "_avg_reward"
         self.save_metric(avg_reward_path, self.avg_reward, first=first_itr)
 
@@ -250,28 +246,24 @@ class Trainer(basic.Trainer):
             #FOR TESTING PURPOSES
             #self.save_metric(seed_path, [self.seed], first_itr)
             #print("torch.seed end of train_model", self.seed)
-    #TODO get_rng_state,set_rng_state
+        #TODO get_rng_state,set_rng_state
+    
+        self.save_seeds()
 
 
-    def save_seeds(self, episode_num, seed_path):
+    def save_seeds(self):
         """ Saving the random seeds in the trainer for resuming its session later on. """
-       # pkl_save_path = f"{seed_path}/{round_to_restore}.pkl"
-
-       # if not os.path.exists(pkl_save_path):
-          #  os.makedirs(os.path.dirname(pkl_save_path), exist_ok=True)
-
-        with open(seed_path+"_round_"+str(episode_num)+".pkl", 'wb') as checkpoint_file:
-           # print("CHECKPOINT FILE IS THIS",checkpoint_file)
+        with open(self.seed_path + ".pkl", 'wb') as checkpoint_file:
+            print("CHECKPOINT FILE IS THIS",checkpoint_file)
             pickle.dump(torch.get_rng_state(), checkpoint_file)
 
-        #round_to_restore = episode_num / max_round_episodes
-
-    def restore_seeds(self, episode_num, seed_path):
+    def restore_seeds(self):
         """Restoring the random seeds in the trainer for resuming its session later on"""
         #seed_path should have client id in it!!!!!
         rng_state_to_load = None
 
-        with open(seed_path+"_round_"+str(episode_num)+".pkl", 'rb') as checkpoint_file:
+        with open(self.seed_path + ".pkl", 'rb') as checkpoint_file:
+            print("Restore seeds")
             rng_state_to_load = pickle.load(checkpoint_file)
         
         torch.set_rng_state(rng_state_to_load)
@@ -412,15 +404,6 @@ class Trainer(basic.Trainer):
             round_file_path = os.path.join(model_path, round_no_path)
             data = np.load(round_file_path)
             self.round_no = int((data['a'])[0])
-
-            #Load previous round's seeds
-            #seed_file_name = "id_"+str(self.client_id)
-            #seed_path = Config().results.seed_random_path+"/"+seed_file_name
-            #self.restore_seeds((self.episode_num/Config().algorithm.max_round_episodes), seed_path)
-
-    
-           # data = np.load(seed_path)
-           # self.seed = int((data['a'])[0]) #int does not truncate the long
     
             self.actor.load_state_dict(torch.load(actor_model_path), strict=True)
             self.critic.load_state_dict(torch.load(critic_model_path), strict=True)
@@ -520,11 +503,6 @@ class Trainer(basic.Trainer):
             round_file_path = os.path.join(model_path, round_no_path)
             np.savez(round_file_path, a=np.array([self.round_no]))
 
-            #save seeds here
-           # seed_file_name = "id_"+str(self.client_id)
-            #seed_path = Config().results.seed_random_path+"/"+seed_file_name
-            #self.save_seeds((self.episode_num/Config().algorithm.max_round_episodes),seed_path)#Config().results.seed_random_path)
-
 
         if self.client_id == 0:
             logging.info("[Server #%d] Saving models to %s, and %s.", os.getpid(),
@@ -577,7 +555,19 @@ class Trainer(basic.Trainer):
 
         
     def evaluate_policy(self, eval_episodes = 10):
-        torch.manual_seed(Config().data.random_seed)
+        # TODO: after aggregation, rewards are not saame across different runs, why?
+
+        if self.client_id == 0:
+            seed_file_name = "id_"+str(self.client_id)
+            self.seed_path = Config().results.seed_random_path+"/"+seed_file_name
+            checkpoint_path = Config.params['checkpoint_path']
+            if not (os.path.exists(f"{checkpoint_path}/current_round.pkl")):
+                torch.manual_seed(Config().trainer.manual_seed)
+            else:
+                self.restore_seeds()
+        else:
+            self.restore_seeds()
+
         avg_rewards = []
         for trace_idx in range(3):
             avg_reward = 0
@@ -602,5 +592,6 @@ class Trainer(basic.Trainer):
             print("Average Reward for client %s over trace %s is %s" % (str(self.client_id), str(trace_idx), str(avg_reward)))
             print("------------------")
             avg_rewards.append(avg_reward)
+        self.save_seeds()
         return avg_rewards
         
