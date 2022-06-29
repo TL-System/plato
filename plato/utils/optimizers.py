@@ -9,6 +9,8 @@ import numpy as np
 from torch import optim
 from torch import nn
 import torch_optimizer as torch_optim
+import lars_optimizer
+from pl_bolts.optimizers.lr_scheduler import LinearWarmupCosineAnnealingLR
 
 from plato.config import Config
 from plato.utils.step import Step
@@ -17,14 +19,17 @@ optimizers_pool = {
     "SGD": optim.SGD,
     "Adam": optim.Adam,
     "Adadelta": optim.Adadelta,
-    "Adahessian": torch_optim.Adahessian
+    "Adahessian": torch_optim.Adahessian,
+    "Lars": lars_optimizer.LARS,
 }
 
 lr_schedulers_pool = {
     "CosineAnnealingLR": optim.lr_scheduler.CosineAnnealingLR,
     "LambdaLR": optim.lr_scheduler.LambdaLR,
     "StepLR": optim.lr_scheduler.StepLR,
-    "ReduceLROnPlateau": optim.lr_scheduler.ReduceLROnPlateau
+    "MultiStepLR": optim.lr_scheduler.MultiStepLR,
+    "ReduceLROnPlateau": optim.lr_scheduler.ReduceLROnPlateau,
+    "WarmupCosine": LinearWarmupCosineAnnealingLR
 }
 
 
@@ -244,6 +249,22 @@ def get_dynamic_optimizer(model, **kwargs) -> optim.Optimizer:
                                   "hessian_power",
                                   is_manority=False)
 
+    if optimizer_name == 'Lars':
+        kwargs = insert_parameter(kwargs,
+                                  prefix,
+                                  "grad_clip_lars",
+                                  desired_parameter_name="clip_lars_lr",
+                                  is_manority=False)
+        kwargs = insert_parameter(kwargs,
+                                  prefix,
+                                  "eta_lars",
+                                  desired_parameter_name="eta",
+                                  is_manority=False)
+        kwargs = insert_parameter(kwargs,
+                                  prefix,
+                                  "exclude_bias_n_norm",
+                                  is_manority=False)
+
     supported_optimziers = list(optimizers_pool.keys())
     if optimizer_name not in supported_optimziers:
         raise ValueError(f'No such optimizer: {optimizer_name}')
@@ -337,6 +358,53 @@ def get_dynamic_lr_schedule(optimizer: optim.Optimizer,
                                   desired_parameter_name="patience",
                                   default_value=10)
         kwargs["mode"] = "min"
+
+    if lr_schedule == "MultiStepLR":
+        kwargs = insert_parameter(kwargs,
+                                  prefix,
+                                  "lr_milestones",
+                                  is_manority=True,
+                                  desired_parameter_name="milestones")
+        kwargs = insert_parameter(kwargs,
+                                  prefix,
+                                  "lr_gamma",
+                                  is_manority=True,
+                                  desired_parameter_name="gamma",
+                                  default_value=0.1)
+        kwargs["milestones"] = kwargs["milestones"].split(",")
+
+    if lr_schedule == "WarmupCosine":
+        kwargs = insert_parameter(kwargs,
+                                  prefix,
+                                  "learning_rate",
+                                  is_manority=True)
+        kwargs = insert_parameter(kwargs,
+                                  prefix,
+                                  "warmup_epochs",
+                                  is_manority=True,
+                                  default_value=0)
+        kwargs = insert_parameter(kwargs,
+                                  prefix,
+                                  "epochs",
+                                  desired_parameter_name="max_epochs",
+                                  is_manority=True,
+                                  default_value=500)
+        kwargs = insert_parameter(kwargs,
+                                  prefix,
+                                  "warmup_start_lr",
+                                  is_manority=True,
+                                  default_value=0)
+        kwargs = insert_parameter(kwargs,
+                                  prefix,
+                                  "min_lr",
+                                  desired_parameter_name="eta_min",
+                                  is_manority=True,
+                                  default_value=0)
+        learning_rate = kwargs.pop("learning_rate")
+        kwargs['warmup_epochs'] *= iterations_per_epoch
+        kwargs['max_epochs'] *= iterations_per_epoch
+        if kwargs['warmup_epochs'] == 0:
+            kwargs['warmup_start_lr'] = learning_rate
 
     supported_schedulers = list(lr_schedulers_pool.keys())
     if lr_schedule not in supported_schedulers:
