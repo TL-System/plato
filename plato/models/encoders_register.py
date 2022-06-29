@@ -45,7 +45,7 @@ def get():
         final fully-connected blocks. """
 
     model_name = Config().trainer.model_name
-
+    datasource = Config().data.datasource
     logging.info(
         "Define the encoder from the model: %s without final fully-connected layers",
         model_name)
@@ -74,6 +74,17 @@ def get():
         if hasattr(Config().data, 'num_classes'):
             num_classes = Config().data.num_classes
         encoder = resnets[model_name](num_classes=num_classes)
+
+        if datasource == "CIFAR10":
+            # Customize for CIFAR10. Replace conv 7x7 with conv 3x3, and remove first max pooling.
+            # See Section B.9 of SimCLR paper.
+            encoder.conv1 = nn.Conv2d(3,
+                                      64,
+                                      kernel_size=3,
+                                      stride=1,
+                                      padding=2,
+                                      bias=False)
+            encoder.maxpool = nn.Identity()
 
         # get encoding dimensions
         #   i.e., the output dim of the encoder
