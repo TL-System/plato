@@ -41,11 +41,6 @@ class SimCLR(nn.Module):
         else:
             self.encoder, self.encode_dim = encoder, encoder_dim
 
-        # Customize for CIFAR10. Replace conv 7x7 with conv 3x3, and remove first max pooling.
-        # See Section B.9 of SimCLR paper.
-        self.encoder.conv1 = nn.Conv2d(3, 64, 3, 1, 1, bias=False)
-        self.encoder.maxpool = nn.Identity()
-
         # build the projector proposed in the simclr net
         self.projector = ProjectionMLP(in_dim=self.encode_dim)
 
