@@ -30,7 +30,6 @@ class A2CServer(fedavg.Server):
 
         weights_received = self.compute_weight_deltas(updates)
 
-    
         if Config().server.percentile_aggregate:
             
             print("-----------------------")

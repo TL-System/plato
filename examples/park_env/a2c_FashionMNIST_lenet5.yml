@@ -1,6 +1,8 @@
 general:
     base_path: examples/park_env
 
+    untrained_model_path: models/untrained
+
 clients:
     # The total number of clients
     total_clients: 3
@@ -42,7 +44,7 @@ data:
         high: 1.0
 
     # IID or non-IID?
-    sampler: noniid
+    sampler: iid
 
     # The concentration parameter for the Dirichlet distribution
     concentration: 0.5
@@ -107,7 +109,7 @@ algorithm:
     iterations: 1000
 
     # Number of episodes to run each round
-    max_round_episodes: 100
+    max_round_episodes: 10
 
     # Curriculum learning, fixed difficulty level for motivation experiment
     difficulty_levels: 3

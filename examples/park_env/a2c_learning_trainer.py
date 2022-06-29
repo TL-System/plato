@@ -173,10 +173,8 @@ class Trainer(basic.Trainer):
             while not self.done:
                 probs = self.actor(self.t(state))
                 
-                #torch.manual_seed(1)
 
                 action = self.dist(probs=probs).sample()
-                #action = np.random.choice(self.env.action_space.n, 1, p=probs.detach().data.numpy())
                 
                 next_state, reward, self.done, info = self.env.step(action.detach().data.numpy())#[0])#.detach().data.numpy())
                 next_state = self.obs_normalizer.normalize(next_state)
@@ -486,12 +484,13 @@ class Trainer(basic.Trainer):
             actor_model_path = f'{model_path}/{env_algorithm+actor_model_name}.pth'
             critic_model_path = f'{model_path}/{env_algorithm+critic_model_name}.pth'
 
-        if self.model_state_dict is None:
+        if True:
             torch.save(self.actor.state_dict(), actor_model_path)
             torch.save(self.critic.state_dict(),critic_model_path)
         else:
             torch.save(self.actor_state_dict, actor_model_path)
             torch.save(self.critic_state_dict, critic_model_path)
+
 
         if self.client_id != 0:
             file_name = "%s_%s.npz" % ("training_status", str(self.client_id)) 
@@ -555,32 +554,26 @@ class Trainer(basic.Trainer):
 
         
     def evaluate_policy(self, eval_episodes = 10):
-        # TODO: after aggregation, rewards are not saame across different runs, why?
-
-        if self.client_id == 0:
-            seed_file_name = "id_"+str(self.client_id)
-            self.seed_path = Config().results.seed_random_path+"/"+seed_file_name
-            checkpoint_path = Config.params['checkpoint_path']
-            if not (os.path.exists(f"{checkpoint_path}/current_round.pkl")):
-                torch.manual_seed(Config().trainer.manual_seed)
-            else:
-                self.restore_seeds()
-        else:
-            self.restore_seeds()
-
+        # TODO: after aggregation, rewards are not same across different runs, why?
+        self.model.eval()
+        
         avg_rewards = []
         for trace_idx in range(3):
             avg_reward = 0
+            if self.client_id == 0:
+                torch.manual_seed(Config().trainer.manual_seed)
             for _ in range(eval_episodes):
                 episode_reward = 0
                 done = False
                 state = self.env.reset(trace_idx=trace_idx, test= True)
                 state = self.obs_normalizer.normalize(state)
+                steps = 0
                 while not done:
                     probs = self.actor(self.t(state))
                 
+
                     action = self.dist(probs=probs).sample()
-                
+                    steps += 1
                     next_state, reward, done, info = self.env.step(action.detach().data.numpy())
                     next_state = self.obs_normalizer.normalize(next_state)
                     state = next_state
@@ -589,9 +582,9 @@ class Trainer(basic.Trainer):
                 avg_reward += episode_reward
             avg_reward /= eval_episodes
             print("------------------")
-            print("Average Reward for client %s over trace %s is %s" % (str(self.client_id), str(trace_idx), str(avg_reward)))
+            print("Average Reward for client %s over trace %s for %s steps is %s" % (str(self.client_id), str(trace_idx), str(steps), str(avg_reward)))
             print("------------------")
             avg_rewards.append(avg_reward)
-        self.save_seeds()
+        self.model.train()
         return avg_rewards
         
