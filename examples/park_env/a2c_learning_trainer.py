@@ -414,9 +414,9 @@ class Trainer(basic.Trainer):
             self.round_no = int((data['a'])[0])
 
             #Load previous round's seeds
-            seed_file_name = "id_"+str(self.client_id)
-            seed_path = Config().results.seed_random_path+"/"+seed_file_name
-            self.restore_seeds((self.episode_num/Config().algorithm.max_round_episodes), seed_path)
+            #seed_file_name = "id_"+str(self.client_id)
+            #seed_path = Config().results.seed_random_path+"/"+seed_file_name
+            #self.restore_seeds((self.episode_num/Config().algorithm.max_round_episodes), seed_path)
 
     
            # data = np.load(seed_path)
@@ -521,9 +521,9 @@ class Trainer(basic.Trainer):
             np.savez(round_file_path, a=np.array([self.round_no]))
 
             #save seeds here
-            seed_file_name = "id_"+str(self.client_id)
-            seed_path = Config().results.seed_random_path+"/"+seed_file_name
-            self.save_seeds((self.episode_num/Config().algorithm.max_round_episodes),seed_path)#Config().results.seed_random_path)
+           # seed_file_name = "id_"+str(self.client_id)
+            #seed_path = Config().results.seed_random_path+"/"+seed_file_name
+            #self.save_seeds((self.episode_num/Config().algorithm.max_round_episodes),seed_path)#Config().results.seed_random_path)
 
 
         if self.client_id == 0:
