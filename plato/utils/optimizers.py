@@ -9,11 +9,12 @@ import numpy as np
 from torch import optim
 from torch import nn
 import torch_optimizer as torch_optim
-import lars_optimizer
+
 from pl_bolts.optimizers.lr_scheduler import LinearWarmupCosineAnnealingLR
 
 from plato.config import Config
 from plato.utils.step import Step
+from plato.utils import lars_optimizer
 
 optimizers_pool = {
     "SGD": optim.SGD,
@@ -401,8 +402,10 @@ def get_dynamic_lr_schedule(optimizer: optim.Optimizer,
                                   is_manority=True,
                                   default_value=0)
         learning_rate = kwargs.pop("learning_rate")
-        kwargs['warmup_epochs'] *= iterations_per_epoch
-        kwargs['max_epochs'] *= iterations_per_epoch
+        # the lr schedule of plato is placed with the
+        # the epoch loop. No need to multiple the iterations_per_epoch
+        # kwargs['warmup_epochs'] *= iterations_per_epoch
+        # kwargs['max_epochs'] *= iterations_per_epoch
         if kwargs['warmup_epochs'] == 0:
             kwargs['warmup_start_lr'] = learning_rate
 
