@@ -170,7 +170,7 @@ class Model():
                     type='FullyConnectedHead',
                     output_dim=Config.trainer.prediction_dim,
                     input_dim=input_dim,
-                    hidden_layers_dim=[512],
+                    hidden_layers_dim=[Config.trainer.projection_hidden_dim],
                     batch_norms=["default", None],
                     activations=["relu", None],
                     dropout_ratios=[0, 0],

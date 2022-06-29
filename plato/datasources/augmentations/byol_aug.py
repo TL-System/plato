@@ -8,16 +8,8 @@ The implementation of the BYLO's [1] augmentation function.
 This augmentaion is directly extracted from the 'augmentaions/' of
  https://github.com/PatrickHua/SimSiam.
 
-"""
 
-from torchvision import transforms as T
-from PIL import Image, ImageOps
-
-
-class BYOLTransform():
-    """ This the contrastive data augmentation used by the BYOL method. """
-
-    def __init__(self, image_size, normalize):
+One template is:
 
         transform_functions1 = [
             T.RandomResizedCrop(image_size,
@@ -56,8 +48,47 @@ class BYOLTransform():
             transform_functions1.append(T.Normalize(*normalize))
             transform_functions2.append(T.Normalize(*normalize))
 
-        self.transform1 = T.Compose(transform_functions1)
-        self.transform2 = T.Compose(transform_functions2)
+
+"""
+
+from ssl_transform_base import get_ssl_base_transform
+
+
+class BYOLTransform():
+    """ This the contrastive data augmentation used by the BYOL method. """
+
+    def __init__(self, image_size, normalize):
+        self.transform1 = get_ssl_base_transform(image_size,
+                                                 normalize,
+                                                 brightness=0.4,
+                                                 contrast=0.4,
+                                                 saturation=0.2,
+                                                 hue=0.1,
+                                                 color_jitter_prob=0.8,
+                                                 gray_scale_prob=0.2,
+                                                 horizontal_flip_prob=0.5,
+                                                 gaussian_prob=1.0,
+                                                 solarization_prob=0.0,
+                                                 equalization_prob=0.0,
+                                                 min_scale=0.08,
+                                                 max_scale=1.0,
+                                                 crop_size=image_size)
+
+        self.transform2 = get_ssl_base_transform(image_size,
+                                                 normalize,
+                                                 brightness=0.4,
+                                                 contrast=0.4,
+                                                 saturation=0.2,
+                                                 hue=0.1,
+                                                 color_jitter_prob=0.8,
+                                                 gray_scale_prob=0.2,
+                                                 horizontal_flip_prob=0.5,
+                                                 gaussian_prob=0.1,
+                                                 solarization_prob=0.2,
+                                                 equalization_prob=0.0,
+                                                 min_scale=0.08,
+                                                 max_scale=1.0,
+                                                 crop_size=image_size)
 
     def __call__(self, x):
         """ Perform data augmentation. """
@@ -65,13 +96,3 @@ class BYOLTransform():
         x1 = self.transform1(x)
         x2 = self.transform2(x)
         return x1, x2
-
-
-class Solarization():
-    """ Behave as the Image Filter """
-
-    def __init__(self, threshold=128):
-        self.threshold = threshold
-
-    def __call__(self, image):
-        return ImageOps.solarize(image, self.threshold)
