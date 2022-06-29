@@ -21,25 +21,29 @@ import torchvision.transforms as T
 #     normalize
 # ]
 
+from ssl_transform_base import get_ssl_base_transform
+
 
 class MoCoTransform():
     """ This the contrastive data augmentation used by the MoCo method. """
 
     def __init__(self, image_size, normalize):
         image_size = 224 if image_size is None else image_size
-
-        transform_functions = [
-            T.RandomResizedCrop(size=image_size, scale=(0.2, 1.)),
-            T.RandomGrayscale(p=0.2),
-            T.ColorJitter(0.4, 0.4, 0.4, 0.4),
-            T.RandomHorizontalFlip(),
-            T.ToTensor(),
-        ]
-
-        if normalize is not None:
-            transform_functions.append(T.Normalize(*normalize))
-
-        self.transform = T.Compose(transform_functions)
+        self.transform = get_ssl_base_transform(image_size,
+                                                normalize,
+                                                brightness=0.4,
+                                                contrast=0.4,
+                                                saturation=0.4,
+                                                hue=0.4,
+                                                color_jitter_prob=1.0,
+                                                gray_scale_prob=0.2,
+                                                horizontal_flip_prob=0.5,
+                                                gaussian_prob=0.0,
+                                                solarization_prob=0.0,
+                                                equalization_prob=0.0,
+                                                min_scale=0.2,
+                                                max_scale=1.0,
+                                                crop_size=image_size)
 
     def __call__(self, x):
         """ Perform the contrastive data augmentation. """
