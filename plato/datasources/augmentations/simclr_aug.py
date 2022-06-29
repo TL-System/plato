@@ -9,9 +9,6 @@ The third-party code: https://github.com/PatrickHua/SimSiam
 Reference:
 
 [1]. https://arxiv.org/abs/2002.05709
-"""
-
-import torchvision.transforms as T
 
 
 # color distortion composed by color jittering and color dropping.
@@ -24,24 +21,41 @@ def get_color_distortion(s=0.5):  # 0.5 for CIFAR10 by default
     color_distort = T.Compose([rnd_color_jitter, rnd_gray])
     return color_distort
 
+transform_functions = [
+    T.RandomResizedCrop(size=image_size),
+    T.RandomHorizontalFlip(),  # with 0.5 probability
+    get_color_distortion(s=0.5),
+    T.ToTensor(),
+]
+
+if normalize is not None:
+    transform_functions.append(T.Normalize(*normalize))
+
+"""
+
+from ssl_transform_base import get_ssl_base_transform
+
 
 class SimCLRTransform():
     """ This the contrastive data augmentation used by the SimCLR method. """
 
     def __init__(self, image_size, normalize):
         image_size = 224 if image_size is None else image_size
-
-        transform_functions = [
-            T.RandomResizedCrop(size=image_size),
-            T.RandomHorizontalFlip(),  # with 0.5 probability
-            get_color_distortion(s=0.5),
-            T.ToTensor(),
-        ]
-
-        if normalize is not None:
-            transform_functions.append(T.Normalize(*normalize))
-
-        self.transform = T.Compose(transform_functions)
+        self.transform = get_ssl_base_transform(image_size,
+                                                normalize,
+                                                brightness=0.4,
+                                                contrast=0.4,
+                                                saturation=0.4,
+                                                hue=0.1,
+                                                color_jitter_prob=0.8,
+                                                gray_scale_prob=0.2,
+                                                horizontal_flip_prob=0.5,
+                                                gaussian_prob=0.0,
+                                                solarization_prob=0.0,
+                                                equalization_prob=0.0,
+                                                min_scale=0.08,
+                                                max_scale=1.0,
+                                                crop_size=image_size)
 
     def __call__(self, x):
         """ Perform the contrastive data augmentation. """
