@@ -11,47 +11,25 @@ from plato.config import Config
 from plato.models import encoders_register
 from plato.models import general_mlps_register
 
-
 # utils
-@torch.no_grad()
-def concat_all_gather(tensor):
-    """
-    Performs all_gather operation on the provided tensors.
-    *** Warning ***: torch.distributed.all_gather has no gradient.
-    """
-    tensors_gather = [
-        torch.ones_like(tensor)
-        for _ in range(torch.distributed.get_world_size())
-    ]
-    torch.distributed.all_gather(tensors_gather, tensor, async_op=False)
+# @torch.no_grad()
+# def concat_all_gather(tensor):
+#     """
+#     Performs all_gather operation on the provided tensors.
+#     *** Warning ***: torch.distributed.all_gather has no gradient.
+#     """
+#     tensors_gather = [
+#         torch.ones_like(tensor)
+#         for _ in range(torch.distributed.get_world_size())
+#     ]
+#     torch.distributed.all_gather(tensors_gather, tensor, async_op=False)
 
-    output = torch.cat(tensors_gather, dim=0)
-    return output
-
-
-class ProjectionMLP(nn.Module):
-    """ The implementation of SimCLR's projection layer. """
-
-    def __init__(self, in_dim):
-        super().__init__()
-
-        self.layers = general_mlps_register.Model.get_model(
-            model_type="simsiam_projection_mlp", input_dim=in_dim)
-
-    def forward(self, x):
-        """ Forward the projection layer. """
-        for layer in self.layers:
-            x = layer(x)
-
-        return x
-
-    def output_dim(self):
-        """ Obtain the output dimension. """
-        return self.layers[-1].fc.out_features
+#     output = torch.cat(tensors_gather, dim=0)
+#     return output
 
 
 class FinalMLP(nn.Module):
-    """ The implementation of SimSiam's prediction layer. """
+    """ The implementation of MoCO's prediction layer. """
 
     def __init__(self, in_dim):
         super().__init__()
@@ -131,7 +109,7 @@ class MoCo(nn.Module):
         # create the queue
         self.register_buffer("queue", torch.randn(feature_dim,
                                                   self.queue_size))
-        self.queue = nn.functional.normalize(self.queue, dim=0)
+        self.queue = nn.functional.normalize(self.queue, dim=1)
 
         self.register_buffer("queue_ptr", torch.zeros(1, dtype=torch.long))
 
@@ -155,7 +133,7 @@ class MoCo(nn.Module):
     @torch.no_grad()
     def _dequeue_and_enqueue(self, keys):
         # gather keys before updating queue
-        keys = concat_all_gather(keys)
+        #keys = concat_all_gather(keys)
 
         batch_size = keys.shape[0]
 
@@ -168,52 +146,52 @@ class MoCo(nn.Module):
 
         self.queue_ptr[0] = ptr
 
-    @torch.no_grad()
-    def _batch_shuffle_ddp(self, x):
-        """
-        Batch shuffle, for making use of BatchNorm.
-        *** Only support DistributedDataParallel (DDP) model. ***
-        """
-        # gather from all gpus
-        batch_size_this = x.shape[0]
-        x_gather = concat_all_gather(x)
-        batch_size_all = x_gather.shape[0]
+    # @torch.no_grad()
+    # def _batch_shuffle_ddp(self, x):
+    #     """
+    #     Batch shuffle, for making use of BatchNorm.
+    #     *** Only support DistributedDataParallel (DDP) model. ***
+    #     """
+    #     # gather from all gpus
+    #     batch_size_this = x.shape[0]
+    #     x_gather = concat_all_gather(x)
+    #     batch_size_all = x_gather.shape[0]
 
-        num_gpus = batch_size_all // batch_size_this
+    #     num_gpus = batch_size_all // batch_size_this
 
-        # random shuffle index
-        idx_shuffle = torch.randperm(batch_size_all).cuda()
+    #     # random shuffle index
+    #     idx_shuffle = torch.randperm(batch_size_all).cuda()
 
-        # broadcast to all gpus
-        torch.distributed.broadcast(idx_shuffle, src=0)
+    #     # broadcast to all gpus
+    #     torch.distributed.broadcast(idx_shuffle, src=0)
 
-        # index for restoring
-        idx_unshuffle = torch.argsort(idx_shuffle)
+    #     # index for restoring
+    #     idx_unshuffle = torch.argsort(idx_shuffle)
 
-        # shuffled index for this gpu
-        gpu_idx = torch.distributed.get_rank()
-        idx_this = idx_shuffle.view(num_gpus, -1)[gpu_idx]
+    #     # shuffled index for this gpu
+    #     gpu_idx = torch.distributed.get_rank()
+    #     idx_this = idx_shuffle.view(num_gpus, -1)[gpu_idx]
 
-        return x_gather[idx_this], idx_unshuffle
+    #     return x_gather[idx_this], idx_unshuffle
 
-    @torch.no_grad()
-    def _batch_unshuffle_ddp(self, x, idx_unshuffle):
-        """
-        Undo batch shuffle.
-        *** Only support DistributedDataParallel (DDP) model. ***
-        """
-        # gather from all gpus
-        batch_size_this = x.shape[0]
-        x_gather = concat_all_gather(x)
-        batch_size_all = x_gather.shape[0]
+    # @torch.no_grad()
+    # def _batch_unshuffle_ddp(self, x, idx_unshuffle):
+    #     """
+    #     Undo batch shuffle.
+    #     *** Only support DistributedDataParallel (DDP) model. ***
+    #     """
+    #     # gather from all gpus
+    #     batch_size_this = x.shape[0]
+    #     x_gather = concat_all_gather(x)
+    #     batch_size_all = x_gather.shape[0]
 
-        num_gpus = batch_size_all // batch_size_this
+    #     num_gpus = batch_size_all // batch_size_this
 
-        # restored index for this gpu
-        gpu_idx = torch.distributed.get_rank()
-        idx_this = idx_unshuffle.view(num_gpus, -1)[gpu_idx]
+    #     # restored index for this gpu
+    #     gpu_idx = torch.distributed.get_rank()
+    #     idx_this = idx_unshuffle.view(num_gpus, -1)[gpu_idx]
 
-        return x_gather[idx_this]
+    #     return x_gather[idx_this]
 
     def forward(self, augmented_samples):
         """
@@ -235,13 +213,13 @@ class MoCo(nn.Module):
             self._momentum_update_key_encoder()  # update the key encoder
 
             # shuffle for making use of BN
-            im_k, idx_unshuffle = self._batch_shuffle_ddp(im_k)
+            #im_k, idx_unshuffle = self._batch_shuffle_ddp(im_k)
 
             k = self.encoder_k(im_k)  # keys: NxC
             k = nn.functional.normalize(k, dim=1)
 
             # undo shuffle
-            k = self._batch_unshuffle_ddp(k, idx_unshuffle)
+            #k = self._batch_unshuffle_ddp(k, idx_unshuffle)
 
         # compute logits
         # Einstein sum is more intuitive
@@ -257,7 +235,9 @@ class MoCo(nn.Module):
         logits /= self.temperature
 
         # labels: positive key indicators
-        labels = torch.zeros(logits.shape[0], dtype=torch.long).cuda()
+        labels = torch.zeros(logits.shape[0],
+                             device=im_q.device,
+                             dtype=torch.long)
 
         # dequeue and enqueue
         self._dequeue_and_enqueue(k)
@@ -273,3 +253,9 @@ class MoCo(nn.Module):
     def encode_dim(self):
         """ Obtain the  encoder. """
         return self.encoder_q.encode_dim
+
+    @staticmethod
+    def get_model():
+        """Obtaining an instance of this model provided that the name is valid."""
+
+        return MoCo()

@@ -31,6 +31,7 @@ class STL10Dataset(Dataset):
         self.data = self.dataset.data
         self.targets = self.dataset.labels
         self.target_transform = self.dataset.target_transform
+        self.classes = self.dataset.classes
 
     def __getitem__(self, index):
 

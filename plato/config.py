@@ -492,11 +492,11 @@ class Config:
             Config.clients = Config.clients._replace(total_clients=10)
             Config.clients = Config.clients._replace(per_round=3)
 
-            Config.data = Config.data._replace(partition_size=800)
+            Config.data = Config.data._replace(partition_size=768)
             Config.data = Config.data._replace(test_partition_size=1000)
             Config.trainer = Config.trainer._replace(rounds=5)
             Config.trainer = Config.trainer._replace(epochs=2)
-            Config.trainer = Config.trainer._replace(batch_size=30)
+            Config.trainer = Config.trainer._replace(batch_size=256)
 
             if hasattr(Config.trainer, "epoch_log_interval"):
                 Config.trainer = Config.trainer._replace(epoch_log_interval=1)

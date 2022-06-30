@@ -146,7 +146,10 @@ class Model():
                     type='FullyConnectedHead',
                     output_dim=Config.trainer.projection_dim,
                     input_dim=input_dim,
-                    hidden_layers_dim=[2048, 2048],
+                    hidden_layers_dim=[
+                        Config.trainer.projection_hidden_dim,
+                        Config.trainer.projection_hidden_dim
+                    ],
                     batch_norms=["default", "default", "default"],
                     activations=["relu", "relu", None],
                     dropout_ratios=[0, 0, 0],
@@ -158,7 +161,19 @@ class Model():
                     type='FullyConnectedHead',
                     output_dim=Config.trainer.prediction_dim,
                     input_dim=input_dim,
-                    hidden_layers_dim=[512],
+                    hidden_layers_dim=[Config.trainer.prediction_hidden_dim],
+                    batch_norms=["default", None],
+                    activations=["relu", None],
+                    dropout_ratios=[0, 0],
+                ))
+
+        if model_type == 'byol_projection_mlp':
+            return build_mlp_from_config(
+                dict(
+                    type='FullyConnectedHead',
+                    output_dim=Config.trainer.projection_dim,
+                    input_dim=input_dim,
+                    hidden_layers_dim=[Config.trainer.projection_hidden_dim],
                     batch_norms=["default", None],
                     activations=["relu", None],
                     dropout_ratios=[0, 0],
@@ -170,21 +185,20 @@ class Model():
                     type='FullyConnectedHead',
                     output_dim=Config.trainer.prediction_dim,
                     input_dim=input_dim,
-                    hidden_layers_dim=[Config.trainer.projection_hidden_dim],
+                    hidden_layers_dim=[Config.trainer.prediction_hidden_dim],
                     batch_norms=["default", None],
                     activations=["relu", None],
                     dropout_ratios=[0, 0],
                 ))
-
         if model_type == 'moco_final_mlp':
             return build_mlp_from_config(
                 dict(
                     type='FullyConnectedHead',
-                    output_dim=Config.trainer.feature_dim,
+                    output_dim=Config.trainer.projection_dim,
                     input_dim=input_dim,
-                    hidden_layers_dim=[],
-                    batch_norms=[None],
-                    activations=[None],
-                    dropout_ratios=[0],
+                    hidden_layers_dim=[Config.trainer.projection_hidden_dim],
+                    batch_norms=[None, None],
+                    activations=["relu", None],
+                    dropout_ratios=[0, 0],
                 ))
         raise ValueError(f'No such MLP model: {model_type}')

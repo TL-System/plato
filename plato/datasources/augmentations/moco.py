@@ -33,14 +33,14 @@ class MoCoTransform():
             brightness=0.4,
             contrast=0.4,
             saturation=0.4,
-            hue=0.4,
-            color_jitter_prob=1.0,
+            hue=0.1,
+            color_jitter_prob=0.8,
             gray_scale_prob=0.2,
             horizontal_flip_prob=0.5,
             gaussian_prob=0.0,
             solarization_prob=0.0,
             equalization_prob=0.0,
-            min_scale=0.2,
+            min_scale=0.08,
             max_scale=1.0,
             crop_size=image_size)
         self.transform_funcs = transform_funcs

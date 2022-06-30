@@ -75,7 +75,7 @@ def create_run_script(methods_root_dir,
     extension (str): the extension of the created scripts, default ".sh
     """
     header = "#!/bin/bash"
-    time_line = "#SBATCH --time=7:00:00"
+    time_line = "#SBATCH --time=20:00:00"
     cpus_line = "#SBATCH --cpus-per-task=10"
     gpu_line = "#SBATCH --gres=gpu:1"
     mem_line = "#SBATCH --mem=32G"
