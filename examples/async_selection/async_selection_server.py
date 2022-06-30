@@ -23,8 +23,17 @@ class Server(fedavg.Server):
         Probability Variables are q_i
 
     """
-    F1 = np.eye(numberOfClient)
-    F2 = -1 * np.eye(numberOfClient)
+
+    aggre_weight_square = np.square(aggre_weight)  # p_i^2
+    local_gradient_bound_square = np.square(local_gradient_bound)  # G_i^2
+
+    F1_params = alpha * np.multiply(aggre_weight_square,
+                            local_gradient_bound_square)  # p_i^2 * G_i^2
+    F1 = matrix(np.eye(num) * F1_params)
+
+    F2_params = BigA * np.multiply(local_staleness, local_gradient_bound) # \tau_i * G_i
+    F2 = matrix(-1 * np.eye(num) * F2_params )
+
     F = sparse([[F1,F2]])
 
     g = log( matrix( np.ones(2 * numberOfClient)))
