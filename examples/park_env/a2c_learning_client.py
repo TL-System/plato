@@ -31,7 +31,6 @@ class RLClient(simple.Client):
         actor_loss, critic_loss, entropy_loss = self.get_loss()
         actor_grad, critic_grad = self.get_grad()
         actor_fisher, critic_fisher = self.get_fisher()
-        print("In client fisher", actor_fisher)
         
         return Report(report.num_samples, report.accuracy, report.training_time, \
          report.comm_time, report.update_response, self.client_id, actor_loss, critic_loss, \

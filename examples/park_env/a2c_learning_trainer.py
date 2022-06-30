@@ -124,12 +124,6 @@ class Trainer(basic.Trainer):
         if not os.path.exists(Config().results.seed_random_path):
             os.makedirs(Config().results.seed_random_path)
 
-        
-        #TODO if pathway already exists what to do?
-
-
-        #self.path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
-
 
     def t(self, x): 
         return torch.from_numpy(x).float()
@@ -169,7 +163,7 @@ class Trainer(basic.Trainer):
             state = self.env.reset(trace_idx=self.trace_idx, test= True)
             state = self.obs_normalizer.normalize(state)
             self.steps = 0
-            # TODO: results are not reproducible, although the seed is the same, but results are not always the same every run. Check this
+            
             while not self.done:
                 probs = self.actor(self.t(state))
                 
@@ -231,21 +225,8 @@ class Trainer(basic.Trainer):
         
         self.avg_actor_loss = sum(self.actor_loss)/len(self.actor_loss)
         self.avg_critic_loss =  sum(self.critic_loss)/len(self.critic_loss)
-        self.avg_entropy_loss = sum(self.entropy_loss)/len(self.entropy_loss) 
-
-        #if first round, we save the first seed, we set the first seed to self.seed in load_model
-       # if self.seed is None:
-        #    np.savez(seed_path, a=np.array([first_seed]))
-            #FOR TESTING PURPOSES
-            #self.save_metric(seed_path, [first_seed], first_itr)
-            #print("torch.seed end of train_model", first_seed)
-        #else:
-         #   np.savez(seed_path, a=np.array([self.seed]))
-            #FOR TESTING PURPOSES
-            #self.save_metric(seed_path, [self.seed], first_itr)
-            #print("torch.seed end of train_model", self.seed)
-        #TODO get_rng_state,set_rng_state
-    
+        self.avg_entropy_loss = sum(self.entropy_loss)/len(self.entropy_loss)
+        
         self.save_seeds()
 
 

@@ -8,4 +8,4 @@
 
 module load python
 source ~/.federated/bin/activate
-python examples/park_env/a2c.py -c examples/park_env/a2c_FashionMNIST_lenet5.yml
+python examples/park_env/a2c.py -c examples/park_env/a2c_FashionMNIST_lenet5_2.yml
