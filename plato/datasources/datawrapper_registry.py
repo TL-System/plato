@@ -17,13 +17,13 @@ registered_datasources_wrapper = OrderedDict([
 ])
 
 
-def get(datasource, augment_transformer=None):
+def get(datasource, augment_transformer=None, purpose="trainset"):
     """Get the data source equipped with desired datasource_wrapper."""
     datasource_wrapper_name = Config().data.data_wrapper
     datasource_name = Config().data.datasource
 
-    logging.info("Creating Data source wrapper %s for %s",
-                 datasource_wrapper_name, datasource_name)
+    logging.info("Creating %s Data wrapper %s for %s", datasource_name,
+                 datasource_wrapper_name, purpose)
 
     if datasource_wrapper_name in registered_datasources_wrapper:
         obtained_wrapper = registered_datasources_wrapper[

@@ -265,6 +265,10 @@ def get_dynamic_optimizer(model, **kwargs) -> optim.Optimizer:
                                   prefix,
                                   "exclude_bias_n_norm",
                                   is_manority=False)
+        kwargs = insert_parameter(kwargs,
+                                  prefix,
+                                  "momentum",
+                                  is_manority=False)
 
     supported_optimziers = list(optimizers_pool.keys())
     if optimizer_name not in supported_optimziers:
