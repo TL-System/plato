@@ -126,7 +126,7 @@ class Trainer(basic.Trainer):
             os.makedirs(Config().results.seed_random_path)
         else:
             shutil.rmtree(Config().results.seed_random_path)
-            os.makedirs(Config().results.seed_random_path)
+            os.makedirs(Config().results.seed_random_path, exist_ok=True)
 
 
     def t(self, x): 
