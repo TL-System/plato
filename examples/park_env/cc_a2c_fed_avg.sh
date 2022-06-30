@@ -4,7 +4,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --mem=128G
 #SBATCH --account=def-baochun
-#SBATCH --output=results_1.out
+#SBATCH --output=results_fed_avg.out
 
 module load python
 source ~/.federated/bin/activate

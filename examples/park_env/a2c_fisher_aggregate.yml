@@ -24,9 +24,9 @@ server:
 
     random_seed: 1
 
-    checkpoint_path: checkpoints_2
+    checkpoint_path: checkpoints_fisher_aggregate
 
-    model_path: models/pretrained_2
+    model_path: models/pretrained_fisher_aggregate
 
     percentile: 20
 
@@ -132,8 +132,8 @@ results:
     # Plot results (x_axis-y_axis)
     plot: round-accuracy, elapsed_time-accuracy
 
-    results_dir: examples/park_env/results_2
+    results_dir: examples/park_env/results_fisher_aggregate
 
     file_name: A2C_ABR
 
-    seed_random_path: examples/park_env/seeds_2
+    seed_random_path: examples/park_env/seeds_fisher_aggregate

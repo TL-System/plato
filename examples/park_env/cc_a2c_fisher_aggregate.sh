@@ -4,7 +4,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --mem=128G
 #SBATCH --account=def-baochun
-#SBATCH --output=results_2.out
+#SBATCH --output=results_fisher.out
 
 module load python
 source ~/.federated/bin/activate

@@ -24,13 +24,13 @@ server:
 
     random_seed: 1
 
-    checkpoint_path: checkpoints_2
+    checkpoint_path: checkpoints_fed_avg
 
-    model_path: models/pretrained_2
+    model_path: models/pretrained_fed_avg
 
     percentile: 20
 
-    percentile_aggregate: actor_fisher #False, actor_loss, critic_loss, actor_grad, critic_grad, actor_fisher, critic_fisher
+    percentile_aggregate: False #False, actor_loss, critic_loss, actor_grad, critic_grad, actor_fisher, critic_fisher
 
 data:
     # The training and testing dataset
@@ -132,8 +132,8 @@ results:
     # Plot results (x_axis-y_axis)
     plot: round-accuracy, elapsed_time-accuracy
 
-    results_dir: examples/park_env/results_2
+    results_dir: examples/park_env/results_fed_avg
 
     file_name: A2C_ABR
 
-    seed_random_path: examples/park_env/seeds_2
+    seed_random_path: examples/park_env/seeds_fed_avg
