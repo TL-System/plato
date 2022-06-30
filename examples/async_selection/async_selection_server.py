@@ -11,19 +11,28 @@ class Server(fedavg.Server):
     """A federated learning server."""
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model, algorithm, trainer)
+        self.local_gradient_norms = []
+        self.staleness = []
+
 
     def choose_clients(self, clients_pool, clients_count):
-        return super().choose_clients(clients_pool, clients_count)
+        
+        # update records of local gradient norm and local staleness.
 
-    def compute_weight_deltas(self, updates):
-        """ Extract the model weights and local gradeint info & staleness from clients updates. """
-        weights_received = [payload[0] for (__, payload, __) in updates]
+        # here use calculated selection probability to choose client
 
-        self.control_variates_received = [
-            payload[1] for (__, payload, __) in updates
-        ]
+        return #super().choose_clients(clients_pool, clients_count)
 
-        return self.algorithm.compute_weight_deltas(weights_received)
+    async def federated_averaging(self, updates):
+        update = await super().federated_averaging(updates)
+
+        # Extract the local gradient norm
+        self.local_gradient_norms = [report.local_gradient_norm for (__, report, __, __) in updates]
+
+        # Extract the local staleness
+        self.staleness = [client_staleness for (__, __, __, client_staleness) in updates]
+
+        # Extract the aggre_weight
     
     def calculate_selection_probability(self, aggre_weight, local_gradient_bound, local_staleness)
     """Calculte selection probability based on the formulated geometric optimization problem
