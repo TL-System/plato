@@ -17,7 +17,7 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8006
+    port: 8008
 
     # Should we simulate the wall-clock time on the server? Useful if max_concurrency is specified
     simulate_wall_time: true
