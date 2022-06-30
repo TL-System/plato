@@ -1,6 +1,9 @@
 """
 A customized server with asynchronous client selection
 """
+import logging
+
+from dataclasses import replace
 from plato.config import Config
 from plato.servers import fedavg
 from cvxopt import matrix, log, solvers,sparse
@@ -16,15 +19,27 @@ class Server(fedavg.Server):
 
 
     def choose_clients(self, clients_pool, clients_count):
-        
+    """ Choose a subset of the clients to participate in each round. """
         # update records of local gradient norm and local staleness.
 
         # here use calculated selection probability to choose client
+        
+        assert clients_count <= len(clients_pool)
 
-        return #super().choose_clients(clients_pool, clients_count)
+        # Select clients randomly
+        p = self.calculate_selection_probability(aggre_weight, local_gradient_bound, local_staleness)
+
+        selected_clients = np.random.choice(clients_pool, clients_count, replace=False,p=p)
+
+        logging.info("[%s] Selected clients: %s", self, selected_clients)
+        return selected_clients
+
 
     async def federated_averaging(self, updates):
         update = await super().federated_averaging(updates)
+
+        # Extract the deltas.
+        deltas_received = self.compute_weight_deltas(updates)
 
         # Extract the local gradient norm
         self.local_gradient_norms = [report.local_gradient_norm for (__, report, __, __) in updates]
