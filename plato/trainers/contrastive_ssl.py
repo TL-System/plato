@@ -246,16 +246,16 @@ class Trainer(basic.Trainer):
         tic = time.perf_counter()
 
         logging.info("[Client #%d] Loading the dataset.", self.client_id)
-        _train_loader = getattr(self, "train_loader", None)
 
-        if callable(_train_loader):
-            train_loader = self.train_loader(batch_size, trainset, sampler,
-                                             cut_layer)
-        else:
-            train_loader = torch.utils.data.DataLoader(dataset=trainset,
-                                                       shuffle=False,
-                                                       batch_size=batch_size,
-                                                       sampler=sampler)
+        # to get the specific sampler, Plato's sampler should perform
+        # Sampler.get()
+        # However, for train's ssampler, the self.sampler.get() has been
+        # performed within the train_process of the trainer/basic.py
+        # Thus, there is no need to further perform .get() here.
+        train_loader = torch.utils.data.DataLoader(dataset=trainset,
+                                                   shuffle=False,
+                                                   batch_size=batch_size,
+                                                   sampler=sampler)
 
         # obtain the loader for unlabeledset if possible
         # unlabeled_trainset, unlabeled_sampler
@@ -269,7 +269,7 @@ class Trainer(basic.Trainer):
                 dataset=unlabeled_trainset,
                 shuffle=False,
                 batch_size=batch_size,
-                sampler=unlabeled_sampler)
+                sampler=unlabeled_sampler.get())
 
         # wrap the multiple loaders into one sequence loader
         streamed_train_loader = data_loaders_wrapper.StreamBatchesLoader(

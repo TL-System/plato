@@ -216,14 +216,17 @@ class Client(pers_simple.Client):
             self.unlabeled_sampler = samplers_registry.get(
                 self.datasource, self.client_id, testing="unlabelled")
             self.unlabeledset = datawrapper_registry.get(
-                self.unlabeledset, self.contrastive_transform)
+                self.unlabeledset,
+                self.contrastive_transform,
+                purpose="unlabeledset")
             logging.info(
                 "[Client #%d] loaded the [%d] unlabeled dataset",
                 self.client_id,
                 int(len(self.unlabeledset) / Config().clients.total_clients))
 
         self.trainset = datawrapper_registry.get(self.trainset,
-                                                 self.contrastive_transform)
+                                                 self.contrastive_transform,
+                                                 purpose="trainset")
 
         # get the same trainset again for monitor trainset
         # this dataset is prepared to monitor the representation learning
@@ -239,7 +242,9 @@ class Client(pers_simple.Client):
 
         self.monitor_trainset = self.datasource.get_train_set()
         self.monitor_trainset = datawrapper_registry.get(
-            self.monitor_trainset, self.monitor_augment_transformer)
+            self.monitor_trainset,
+            self.monitor_augment_transformer,
+            purpose="monitor_trainset")
 
         if Config().clients.do_test:
 
@@ -254,7 +259,9 @@ class Client(pers_simple.Client):
             self.task_test_augment_transformer = get_aug(
                 name="test", train=False, for_downstream_task=True)
             self.testset = datawrapper_registry.get(
-                self.testset, self.task_test_augment_transformer)
+                self.testset,
+                self.task_test_augment_transformer,
+                purpose="test")
 
             # obtain the trainset with the corresponding transform for
             #   - the train loader for downstream tasks, such as the
@@ -274,7 +281,9 @@ class Client(pers_simple.Client):
                 name="test", train=True, for_downstream_task=True)
             self.eval_trainset = self.datasource.get_train_set()
             self.eval_trainset = datawrapper_registry.get(
-                self.eval_trainset, self.task_train_augment_transformer)
+                self.eval_trainset,
+                self.task_train_augment_transformer,
+                purpose="eval_trainset")
 
         if hasattr(Config().clients, "do_data_tranform_logging") and Config(
         ).clients.do_data_tranform_logging:
