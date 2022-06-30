@@ -24,7 +24,9 @@ server:
 
     random_seed: 1
 
-    model_path: models/pretrained
+    checkpoint_path: checkpoints_1
+
+    model_path: models/pretrained_1
 
     percentile: 20
 
@@ -109,7 +111,7 @@ algorithm:
     iterations: 1000
 
     # Number of episodes to run each round
-    max_round_episodes: 10
+    max_round_episodes: 2
 
     # Curriculum learning, fixed difficulty level for motivation experiment
     difficulty_levels: 3
@@ -130,8 +132,8 @@ results:
     # Plot results (x_axis-y_axis)
     plot: round-accuracy, elapsed_time-accuracy
 
-    results_dir: examples/park_env/results
+    results_dir: examples/park_env/results_1
 
     file_name: A2C_ABR
 
-    seed_random_path: examples/park_env/seeds
+    seed_random_path: examples/park_env/seeds_1

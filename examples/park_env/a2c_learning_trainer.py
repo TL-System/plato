@@ -18,6 +18,7 @@ import csv
 import pickle
 
 import park
+import shutil
 # Memory
 # Stores results from the networks, instead of calculating the operations again from states, etc.
 
@@ -123,6 +124,9 @@ class Trainer(basic.Trainer):
 
         if not os.path.exists(Config().results.seed_random_path):
             os.makedirs(Config().results.seed_random_path)
+        else:
+            shutil.rmtree(Config().results.seed_random_path)
+            os.makedirs(Config().results.seed_random_path)
 
 
     def t(self, x): 
@@ -133,7 +137,7 @@ class Trainer(basic.Trainer):
         """Main Training"""
         seed_file_name = "id_"+str(self.client_id)
         self.seed_path = Config().results.seed_random_path+"/"+seed_file_name
-        if self.episode_num == 0:
+        if not os.path.exists(self.seed_path):
             torch.manual_seed(Config().trainer.manual_seed)
         else:
             self.restore_seeds()
@@ -226,14 +230,13 @@ class Trainer(basic.Trainer):
         self.avg_actor_loss = sum(self.actor_loss)/len(self.actor_loss)
         self.avg_critic_loss =  sum(self.critic_loss)/len(self.critic_loss)
         self.avg_entropy_loss = sum(self.entropy_loss)/len(self.entropy_loss)
-        
+
         self.save_seeds()
 
 
     def save_seeds(self):
         """ Saving the random seeds in the trainer for resuming its session later on. """
         with open(self.seed_path + ".pkl", 'wb') as checkpoint_file:
-            print("CHECKPOINT FILE IS THIS",checkpoint_file)
             pickle.dump(torch.get_rng_state(), checkpoint_file)
 
     def restore_seeds(self):
@@ -518,7 +521,12 @@ class Trainer(basic.Trainer):
         print("Sampler in server test", sampler)
         avg_reward = self.evaluate_policy()
         self.server_reward = avg_reward
-        file_name = "A2C_RL_SERVER_PERCENTILE"
+        file_name = ""
+
+        if not Config().server.percentile_aggregate:
+            file_name = "A2C_RL_SERVER_FED_AVG"
+        else:
+            file_name = "A2C_RL_SERVER_PERCENTILE_AGGREGATE"
 
         path = Config().results.results_dir +"/"+file_name
         
