@@ -7,8 +7,7 @@ general:
     # - central
     # - script
     # - user
-
-    running_mode: central
+    running_mode: script
 
     file_logging: True
 
@@ -17,10 +16,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 1
+    total_clients: 50
 
     # The number of clients selected in each round
-    per_round: 1
+    per_round: 50
 
     do_data_tranform_logging: True
 
@@ -42,7 +41,6 @@ clients:
     # Train the personalized model based on the
     # learned representation every 1 rounds
     eval_test_interval: 1
-
     # Whether simulate clients or not
     simulation: true
 
@@ -50,12 +48,12 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8011
+    port: 8005
     synchronous: true
     do_test: false
 
-    ping_interval: 120000
-    ping_timeout: 120000
+    ping_interval: 12000
+    ping_timeout: 12000
 
     # for the paths of models; checkpoints; results,
     # they utilize the same name, following the one defined in
@@ -88,12 +86,14 @@ data:
     # Working on criterion that is defined with batch_size but receives loaded
     # samples whose size is smaller than the batch size may causes problems.
     # drop_last can alleviate this issue
-    partition_size: 50000
-    test_partition_size: 10000
+    partition_size: 1500
+    test_partition_size: 300
 
     # IID or non-IID?
-    sampler: iid
-    testset_sampler: iid
+    sampler: noniid
+    testset_sampler: noniid
+    # The concentration parameter for the Dirichlet distribution
+    concentration: 0.3
 
     # The random seed for sampling data
     random_seed: 1
@@ -105,7 +105,7 @@ data:
 
     # set the data augmentation
     #   options: simsiam, byol, simclr
-    augment_transformer_name: simsiam
+    augment_transformer_name: byol
     # some methods apply the normalization to samples
     #   while others do not
     is_norm: True
@@ -120,7 +120,7 @@ trainer:
     parallelized: false
 
     # The maximum number of clients running concurrently
-    max_concurrency: 5
+    max_concurrency: 2
 
     # The target accuracy
     target_accuracy: 0.9
@@ -129,14 +129,14 @@ trainer:
     #   The user is expected to carefully choose the batch_size to avoid
     # the memory allocation issue as the contrastive samples occupy more
     # space as more samples will be contained within one loading.
-    epochs: 500
+    epochs: 400
     batch_size: 256
     optimizer: Lars
-    learning_rate: 0.5
-    eta_lars: 0.001
+    learning_rate: 1.0
+    eta_lars: 0.02
     momentum: 0.9
-    grad_clip_lars: False
-    exclude_bias_n_norm: False
+    grad_clip_lars: True
+    exclude_bias_n_norm: True
     weight_decay: 0.00001
 
     lr_schedule: WarmupCosine
@@ -152,7 +152,7 @@ trainer:
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
     # does not utilize the
-    pers_epochs: 100
+    pers_epochs: 30
     pers_batch_size: 256
     pers_optimizer: SGD
     # lr = 0.1 * batch_size / 256, see section B.6 and B.7 of SimCLR paper.
@@ -168,7 +168,6 @@ trainer:
     pers_epoch_log_interval: 2
     pers_epoch_model_log_interval: 10
 
-
     # image_size
     #  - CIFAR10 (Image size=32)
     #  - MNIST (Image size=28)
@@ -181,14 +180,24 @@ trainer:
     #   but use the custom model
     model_name: resnet_18
     # in general, the projection_dim = prediction_dim
-    projection_dim: 2048
+    # in byol the prediction and projection share the same
+    # structure
+    projection_dim: 256
     projection_hidden_dim: 2048
-    prediction_dim: 2048
-    prediction_hidden_dim: 512
+    prediction_dim: 256
+    prediction_hidden_dim: 2048
 
-    # name of the component used as the global model
+    # here are two ways to determine this decay
+    # - constant value: 0.99
+    # - adaptive computed with traing epochs.
+    #   such as the one in "three-method" implementation
+    onlient_target_moving_average_decay: 0.99
+
+    # set which part of the model is used as the global model
+    # - whole: the whole model
+    # - online_network: the online_network is exchanged
+    # - target_network: the target_network is exchanged
     global_model_name: whole
-
     personalized_model_name: pure_one_layer_mlp
 
     # whether to maintain the state of the trained personalized
@@ -202,7 +211,6 @@ trainer:
     # trained personalized model in each round.
     # Then, setting do_maintain_per_state to be True to follow this
     # rule.
-    # For central learning with one round training, this is useless
     do_maintain_per_state: false
 
     monitor_name: knn

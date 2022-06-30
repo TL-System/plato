@@ -6,7 +6,7 @@ general:
     # - central_code_test
     # - central
     # - user
-    running_mode: central_code_test
+    running_mode: central
 
     file_logging: True
 
@@ -19,8 +19,17 @@ clients:
     # The number of clients selected in each round
     per_round: 1
 
+    do_data_tranform_logging: True
+
     # Should the clients compute test accuracy locally?
     do_test: True
+
+    # Should the client only perfrom the eval test without training
+    # under the contrastive ssl.
+    # only perfrom the training and test for the downstream task,
+    # i.e., personalziation in each client
+    only_eval_test: False
+
     # whether perform the eval test at the final round
     # on all clients
     do_final_eval_test: True
@@ -40,6 +49,9 @@ server:
     port: 8002
     synchronous: true
     do_test: false
+
+    ping_interval: 120000
+    ping_timeout: 120000
 
     # for the paths of models; checkpoints; results,
     # they utilize the same name, following the one defined in
@@ -110,48 +122,50 @@ trainer:
     max_concurrency: 5
 
     # The target accuracy
-    target_accuracy: 0.8
+    target_accuracy: 0.9
 
     # Number of epochs for local training in each communication round
     #   The user is expected to carefully choose the batch_size to avoid
     # the memory allocation issue as the contrastive samples occupy more
     # space as more samples will be contained within one loading.
-    epochs: 50
-    batch_size: 512
-    optimizer: Adam
-    learning_rate: 0.003
-    betas:
-      - 0.9
-      - 0.999
-    eps: 0.00000008 # 1e-8
-    weight_decay: 0.001
+    epochs: 500
+    batch_size: 256
+    optimizer: Lars
+    learning_rate: 1.0
+    eta_lars: 0.02
+    momentum: 0.9
+    grad_clip_lars: True
+    exclude_bias_n_norm: True
+    weight_decay: 0.00001
 
-    lr_scheduler: StepLR
-    lr_step_size: 20
-    lr_gamma: 0.9
+    lr_schedule: WarmupCosine
+    warmup_epochs: 10
+    max_epochs: 500
+    warmup_start_lr: 0.00003
+    min_lr: 0.0
 
-    epoch_log_interval: 2
+    epoch_log_interval: 1
+    epoch_model_log_interval: 50
     batch_log_interval: 50
 
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
     # does not utilize the
     pers_epochs: 100
-    pers_batch_size: 512
-    pers_optimizer: Adam
-    pers_learning_rate: 0.005
-    pers_betas:
-        - 0.9
-        - 0.99
-    pers_eps: 0.00000009 # 1e-8
-    pers_weight_decay: 0.002
+    pers_batch_size: 256
+    pers_optimizer: SGD
+    # lr = 0.1 * batch_size / 256, see section B.6 and B.7 of SimCLR paper.
+    pers_learning_rate: 0.1
+    pers_momentum: 0.9
+    pers_weight_decay: 0.0
 
     # currently, we only support CosineAnnealingLR
-    pers_lr_schedule: StepLR
-    pers_lr_step_size: 20
-    pers_lr_gamma: 0.9
+    pers_lr_schedule: MultiStepLR
+    pers_lr_milestones: 60,80
+    pers_lr_gamma: 0.1
 
     pers_epoch_log_interval: 2
+    pers_epoch_model_log_interval: 10
 
     # temperature for the loss function
     temperature: 0.5
@@ -167,7 +181,8 @@ trainer:
     # the final fc layer will be removed
     external_encoder: False
     model_name: resnet_18
-    projection_dim: 512
+    projection_dim: 256
+    projection_hidden_dim: 2048
 
     # name of the component used as the global model
     global_model_name: whole
