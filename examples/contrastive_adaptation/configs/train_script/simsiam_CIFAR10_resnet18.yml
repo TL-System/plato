@@ -8,7 +8,7 @@ general:
     # - script
     # - user
 
-    running_mode: central
+    running_mode: script
 
     file_logging: True
 
@@ -17,10 +17,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 1
+    total_clients: 50
 
     # The number of clients selected in each round
-    per_round: 1
+    per_round: 50
 
     do_data_tranform_logging: True
 
@@ -54,8 +54,8 @@ server:
     synchronous: true
     do_test: false
 
-    ping_interval: 120000
-    ping_timeout: 120000
+    ping_interval: 12000
+    ping_timeout: 12000
 
     # for the paths of models; checkpoints; results,
     # they utilize the same name, following the one defined in
@@ -88,12 +88,14 @@ data:
     # Working on criterion that is defined with batch_size but receives loaded
     # samples whose size is smaller than the batch size may causes problems.
     # drop_last can alleviate this issue
-    partition_size: 50000
-    test_partition_size: 10000
+    partition_size: 1500
+    test_partition_size: 300
 
     # IID or non-IID?
-    sampler: iid
-    testset_sampler: iid
+    sampler: noniid
+    testset_sampler: noniid
+    # The concentration parameter for the Dirichlet distribution
+    concentration: 0.3
 
     # The random seed for sampling data
     random_seed: 1
@@ -120,7 +122,7 @@ trainer:
     parallelized: false
 
     # The maximum number of clients running concurrently
-    max_concurrency: 5
+    max_concurrency: 2
 
     # The target accuracy
     target_accuracy: 0.9
@@ -129,7 +131,7 @@ trainer:
     #   The user is expected to carefully choose the batch_size to avoid
     # the memory allocation issue as the contrastive samples occupy more
     # space as more samples will be contained within one loading.
-    epochs: 500
+    epochs: 400
     batch_size: 256
     optimizer: Lars
     learning_rate: 0.5
@@ -152,7 +154,7 @@ trainer:
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
     # does not utilize the
-    pers_epochs: 100
+    pers_epochs: 30
     pers_batch_size: 256
     pers_optimizer: SGD
     # lr = 0.1 * batch_size / 256, see section B.6 and B.7 of SimCLR paper.

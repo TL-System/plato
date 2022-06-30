@@ -91,7 +91,7 @@ data:
     # samples whose size is smaller than the batch size may causes problems.
     # drop_last can alleviate this issue
     partition_size: 1500
-    test_partition_size: 200
+    test_partition_size: 300
 
     # IID or non-IID?
     sampler: noniid
@@ -126,18 +126,18 @@ trainer:
     parallelized: false
 
     # The maximum number of clients running concurrently
-    max_concurrency: 5
+    max_concurrency: 2
 
     # The target accuracy
-    target_accuracy: 0.80
+    target_accuracy: 0.9
 
     # Number of epochs for local training in each communication round
     epochs: 400
-    batch_size: 512
+    batch_size: 256
 
     optimizer: SGD
     # lr = 0.3 * batch_size / 256, see section B.6 and B.7 of SimCLR paper.
-    learning_rate: 0.6
+    learning_rate: 0.3
     momentum: 0.9
     weight_decay: 0.000001
 
@@ -153,8 +153,8 @@ trainer:
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
     # does not utilize the
-    pers_epochs: 100
-    pers_batch_size: 512
+    pers_epochs: 30
+    pers_batch_size: 256
     pers_optimizer: Adam
     # lr = 0.1 * batch_size / 256, see section B.6 and B.7 of SimCLR paper.
     pers_learning_rate: 0.1

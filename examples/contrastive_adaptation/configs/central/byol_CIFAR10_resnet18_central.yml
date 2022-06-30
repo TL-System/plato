@@ -132,6 +132,7 @@ trainer:
     optimizer: Lars
     learning_rate: 1.0
     eta_lars: 0.02
+    momentum: 0.9
     grad_clip_lars: True
     exclude_bias_n_norm: True
     weight_decay: 0.00001
@@ -177,9 +178,12 @@ trainer:
     #   but use the custom model
     model_name: resnet_18
     # in general, the projection_dim = prediction_dim
+    # in byol the prediction and projection share the same
+    # structure
     projection_dim: 256
     projection_hidden_dim: 2048
     prediction_dim: 256
+    prediction_hidden_dim: 2048
 
     # here are two ways to determine this decay
     # - constant value: 0.99

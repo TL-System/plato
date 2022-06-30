@@ -5,7 +5,7 @@ general:
     # for different purposes
     # - central_code_test
     # - central
-    # - code_test
+    # - script
     # - user
 
     running_mode: user
@@ -22,8 +22,17 @@ clients:
     # The number of clients selected in each round
     per_round: 30
 
+    do_data_tranform_logging: True
+
     # Should the clients compute test accuracy locally?
     do_test: True
+
+    # Should the client only perfrom the eval test without training
+    # under the contrastive ssl.
+    # only perfrom the training and test for the downstream task,
+    # i.e., personalziation in each client
+    only_eval_test: False
+
     # whether perform the eval test at the final round
     # on all clients
     do_final_eval_test: True
@@ -41,9 +50,12 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8000
+    port: 8011
     synchronous: true
     do_test: false
+
+    ping_interval: 12000
+    ping_timeout: 12000
 
     # for the paths of models; checkpoints; results,
     # they utilize the same name, following the one defined in
@@ -76,13 +88,14 @@ data:
     # Working on criterion that is defined with batch_size but receives loaded
     # samples whose size is smaller than the batch size may causes problems.
     # drop_last can alleviate this issue
-    partition_size: 1000
+    partition_size: 1500
+    test_partition_size: 300
 
     # IID or non-IID?
     sampler: noniid
     testset_sampler: noniid
     # The concentration parameter for the Dirichlet distribution
-    concentration: 5
+    concentration: 0.3
 
     # The random seed for sampling data
     random_seed: 1
@@ -109,51 +122,54 @@ trainer:
     parallelized: false
 
     # The maximum number of clients running concurrently
-    max_concurrency: 5
+    max_concurrency: 2
 
     # The target accuracy
-    target_accuracy: 0.8
+    target_accuracy: 0.9
 
     # Number of epochs for local training in each communication round
     #   The user is expected to carefully choose the batch_size to avoid
     # the memory allocation issue as the contrastive samples occupy more
     # space as more samples will be contained within one loading.
     epochs: 5
-    batch_size: 512
-    optimizer: Adam
-    learning_rate: 0.003
-    betas:
-      - 0.9
-      - 0.999
-    eps: 0.00000008 # 1e-8
-    weight_decay: 0.001
+    batch_size: 256
+    optimizer: Lars
+    learning_rate: 0.5
+    eta_lars: 0.001
+    momentum: 0.9
+    grad_clip_lars: False
+    exclude_bias_n_norm: False
+    weight_decay: 0.00001
 
-    lr_scheduler: StepLR
-    lr_step_size: 20
-    lr_gamma: 0.9
+    lr_schedule: WarmupCosine
+    warmup_epochs: 10
+    max_epochs: 500
+    warmup_start_lr: 0.00003
+    min_lr: 0.0
 
     epoch_log_interval: 1
-    batch_log_interval: 10
+    epoch_model_log_interval: 2
+    batch_log_interval: 1
 
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
     # does not utilize the
-    pers_epochs: 15
-    pers_batch_size: 512
-    pers_optimizer: Adam
-    pers_learning_rate: 0.005
-    pers_betas:
-        - 0.9
-        - 0.99
-    pers_eps: 0.00000009 # 1e-8
-    pers_weight_decay: 0.002
+    pers_epochs: 30
+    pers_batch_size: 256
+    pers_optimizer: SGD
+    # lr = 0.1 * batch_size / 256, see section B.6 and B.7 of SimCLR paper.
+    pers_learning_rate: 0.1
+    pers_momentum: 0.9
+    pers_weight_decay: 0.0
 
     # currently, we only support CosineAnnealingLR
-    pers_lr_schedule: StepLR
-    pers_lr_step_size: 20
-    pers_lr_gamma: 0.9
+    pers_lr_schedule: MultiStepLR
+    pers_lr_milestones: 60,80
+    pers_lr_gamma: 0.1
 
     pers_epoch_log_interval: 2
+    pers_epoch_model_log_interval: 10
+
 
     # image_size
     #  - CIFAR10 (Image size=32)
@@ -167,8 +183,10 @@ trainer:
     #   but use the custom model
     model_name: resnet_18
     # in general, the projection_dim = prediction_dim
-    projection_dim: 512
-    prediction_dim: 512
+    projection_dim: 2048
+    projection_hidden_dim: 2048
+    prediction_dim: 2048
+    prediction_hidden_dim: 512
 
     # name of the component used as the global model
     global_model_name: whole
