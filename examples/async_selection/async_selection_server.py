@@ -14,6 +14,16 @@ class Server(fedavg.Server):
 
     def choose_clients(self, clients_pool, clients_count):
         return super().choose_clients(clients_pool, clients_count)
+
+    def compute_weight_deltas(self, updates):
+        """ Extract the model weights and local gradeint info & staleness from clients updates. """
+        weights_received = [payload[0] for (__, payload, __) in updates]
+
+        self.control_variates_received = [
+            payload[1] for (__, payload, __) in updates
+        ]
+
+        return self.algorithm.compute_weight_deltas(weights_received)
     
     def calculate_selection_probability(self, aggre_weight, local_gradient_bound, local_staleness)
     """Calculte selection probability based on the formulated geometric optimization problem
@@ -23,7 +33,7 @@ class Server(fedavg.Server):
         Probability Variables are q_i
 
     """
-
+    # read aggre_weight from somewhere
     aggre_weight_square = np.square(aggre_weight)  # p_i^2
     local_gradient_bound_square = np.square(local_gradient_bound)  # G_i^2
 
