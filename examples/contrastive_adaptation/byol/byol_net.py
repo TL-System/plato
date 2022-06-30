@@ -45,7 +45,7 @@ class ProjectionMLP(nn.Module):
         super().__init__()
 
         self.layers = general_mlps_register.Model.get_model(
-            model_type="byol_prediction_mlp", input_dim=in_dim)
+            model_type="byol_projection_mlp", input_dim=in_dim)
 
     def forward(self, x):
         """ Forward the projection layer. """

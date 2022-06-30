@@ -13,8 +13,8 @@ Reference:
 Source code: https://github.com/facebookresearch/simsiam
 """
 
-import moco_net
-import moco_trainer
+import mocov2_net
+import mocov2_trainer
 
 from plato.clients import ssl_simple as ssl_client
 from plato.servers import fedavg_pers as ssl_server
@@ -25,13 +25,13 @@ def main():
     """ A Plato federated learning training session using the MoCo algorithm.
 
     """
-    trainer = moco_trainer.Trainer
+    trainer = mocov2_trainer.Trainer
     algorithm = fedavg_ssl.Algorithm
-    byol_model = moco_net.MoCo()
-    client = ssl_client.Client(model=byol_model,
+    moco_model = mocov2_net.MoCo
+    client = ssl_client.Client(model=moco_model,
                                trainer=trainer,
                                algorithm=algorithm)
-    server = ssl_server.Server(model=byol_model,
+    server = ssl_server.Server(model=moco_model,
                                trainer=trainer,
                                algorithm=algorithm)
 
