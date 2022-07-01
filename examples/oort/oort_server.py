@@ -95,7 +95,7 @@ class Server(fedavg.Server):
             self.last_round[client_id - 1] = self.current_round
 
         # Calculating updated client utilities on explored clients
-        for client_id in self.explored_clients:
+        for (client_id,__,__,__) in updates:
             self.client_utilities[client_id] = self.calc_client_util(client_id)
 
         # Adjusts pacer
