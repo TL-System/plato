@@ -70,12 +70,15 @@ class Trainer(basic.Trainer):
                 examples, labels = examples.to(self.device), labels.to(
                     self.device)
 
-                try:
-                    full_examples = torch.cat((examples, full_examples), dim=0)
-                    full_labels = torch.cat((labels, full_labels), dim=0)
-                except:
-                    full_examples = examples
-                    full_labels = labels
+                # Store data in the first epoch (later epochs will still have the same partitioned data)
+                if epoch == 1:
+                    try:
+                        full_examples = torch.cat(
+                            (examples, full_examples), dim=0)
+                        full_labels = torch.cat((labels, full_labels), dim=0)
+                    except:
+                        full_examples = examples
+                        full_labels = labels
 
                 plt.imshow(tt(examples[0].cpu()))
                 plt.title("Ground truth image")
@@ -99,10 +102,6 @@ class Trainer(basic.Trainer):
                         examples, patched_model.parameters)
 
                     # Save the ground truth and gradients
-                    # onehot_labels = label_to_onehot(
-                    #     labels, num_classes=Config().trainer.num_classes)
-
-                    # loss = criterion(outputs, onehot_labels)
                     loss = loss_criterion(outputs, labels)
                     grad = torch.autograd.grad(loss, patched_model.parameters.values(
                     ), retain_graph=True, create_graph=True, only_inputs=True)
