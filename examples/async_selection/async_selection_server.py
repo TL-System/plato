@@ -18,23 +18,27 @@ class Server(fedavg.Server):
         super().__init__(model, algorithm, trainer)
 
         self.number_of_client = Config().clients.total_clients
+        self.local_gradient_bounds = None
+        self.aggregate_weights = None
+        self.local_stalenesses = None
+        self.squared_deltas_current_round = None
 
-        # create a record on server
+    def configure(self):
+        """ Initializes necessary variables. """
+        super().configure()
+
         self.local_gradient_bounds = 0.01 * np.ones(
             self.number_of_client
         )  # 0.01 is a hyperparameter that's used as a starting point.
         self.local_stalenesses = np.zeros(self.number_of_client)
         self.aggregate_weights = np.ones(self.number_of_client)
-        self.squared_deltas_current_round = np.zeros(self.number_of_client)
 
     def choose_clients(self, clients_pool, clients_count):
         """ Choose a subset of the clients to participate in each round. """
         assert clients_count <= len(clients_pool)
 
         # Select clients based on calculated probability
-        p = self.calculate_selection_probability(
-            self.aggre_weights, self.local_gradient_bounds,
-            self.local_stalenesses)  # arguments are np.array s
+        p = self.calculate_selection_probability()
 
         selected_clients = np.random.choice(clients_pool,
                                             clients_count,
@@ -66,31 +70,26 @@ class Server(fedavg.Server):
                 delta[name] = _delta
             deltas.append(delta)
 
-            self.squared_deltas[client_id] = np.square(
+            self.squared_deltas_current_round[client_id] = np.square(
                 delta)  # may need to sum up
         return deltas  #, squared_deltas
 
-    async def federated_averaging(self, updates):
-        update = await super().federated_averaging(updates)
-        # update records of local gradient norm and local staleness for corresponding client. update based on client_id
-        # update here cause we have updates here!
+    async def aggregate_weights(self, updates):
+        """Aggregate the reported weight updates from the selected clients."""
+        deltas = await self.federated_averaging(updates)
+        self.update_records(updates)
+        updated_weights = self.algorithm.update_weights(deltas)
+        self.algorithm.load_weights(updated_weights)
 
-        # Extract the deltas.
-        #deltas_received, squared_deltas = self.compute_weight_deltas(updates)
-        #delta_ids = [id for (id, __, __, __) in updates]
-        # update record of local gradient bound.
+    def update_records(self, updates):
+        """"Update clients record on the server"""
+        # Extract the local staleness and update the record of client staleness.
+        for (client_id, __, __, client_staleness) in updates:
+            self.local_stalenesses[client_id] = client_staleness
+        # Update local gradient bounds
         self.local_gradient_bounds += self.squared_deltas_current_round
 
-        # Extract the local staleness and update the record of client staleness.
-        for (id, __, __, client_staleness) in updates:
-            self.local_stalenesses[
-                id] = client_staleness  # replace old with new ones; can be improved using exponential moving averaging later.
-
-        # Extract the aggre_weight
-        
-
-    def calculate_selection_probability(self, aggre_weight,
-                                        local_gradient_bound, local_staleness):
+    def calculate_selection_probability(self):
         """Calculte selection probability based on the formulated geometric optimization problem
             Minimize \alpha \sum_{i=1}^N \frac{p_i^2 * G_i^2}{q_i} + A \sum_{i=1}^N q_i * \tau_i * G_i
             Subject to \sum_{i=1}{N} q_i = 1
@@ -99,17 +98,16 @@ class Server(fedavg.Server):
 
         """
         # read aggre_weight from somewhere
-        aggre_weight_square = np.square(self.aggre_weight)  # p_i^2
+        aggre_weight_square = np.square(self.aggregate_weights)  # p_i^2
         local_gradient_bound_square = np.square(
-            self.local_gradient_bound)  # G_i^2
+            self.local_gradient_bounds)  # G_i^2
 
         f1_params = alpha * np.multiply(
-            self.aggre_weight_square,
-            self.local_gradient_bound_square)  # p_i^2 * G_i^2
+            aggre_weight_square, local_gradient_bound_square)  # p_i^2 * G_i^2
         f1 = matrix(np.eye(self.num_of_client) * f1_params)
 
         f2_params = BigA * np.multiply(
-            self.local_staleness, self.local_gradient_bound)  # \tau_i * G_i
+            self.local_stalenesses, self.local_gradient_bounds)  # \tau_i * G_i
         f2 = matrix(-1 * np.eye(self.num_of_client) * f2_params)
 
         F = sparse([[f1, f2]])
