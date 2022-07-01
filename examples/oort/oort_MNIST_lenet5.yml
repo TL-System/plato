@@ -16,7 +16,9 @@ server:
     port: 8000
     do_test: true
     random_seed: 1
-
+    synchronous: false
+    simulate_wall_time: true
+    minimum_clients_aggregated: 1
     step_window: 2
     penalty: 2
     exploration_factor: 0.9
