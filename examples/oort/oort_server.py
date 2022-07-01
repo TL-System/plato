@@ -119,30 +119,35 @@ class Server(fedavg.Server):
 
             # In asychronous FL, avoid selecting new clients to replace those that are still
             # training at this time
+            unselectable_clients = []
+            sample_size = self.clients_per_round
+            if self.asynchronous_mode and self.selected_clients is not None and len(
+                    self.reported_clients) > 0 and len(
+                        self.reported_clients) < self.clients_per_round:
 
-            # We need to exclude the clients who are still training.
-            training_client_ids = [
-                self.training_clients[client_id]['id']
-                for client_id in list(self.training_clients.keys())
-            ]
+                # We need to exclude the clients who are still training.
+                training_client_ids = [
+                    self.training_clients[client_id]['id']
+                    for client_id in list(self.training_clients.keys())
+                ]
 
-            # If the server is simulating the wall clock time, some of the clients who
-            # reported may not have been aggregated; they should be excluded from the next
-            # round of client selection
-            reporting_client_ids = [
-                client[2]['client_id'] for client in self.reported_clients
-            ]
+                # If the server is simulating the wall clock time, some of the clients who
+                # reported may not have been aggregated; they should be excluded from the next
+                # round of client selection
+                reporting_client_ids = [
+                    client[2]['client_id'] for client in self.reported_clients
+                ]
+                unselectable_clients = training_client_ids + reporting_client_ids
 
-            unselectable_clients = training_client_ids + reporting_client_ids
-
-            # Selects clients according the oort algorithm
-            if self.selected_clients is not None:
-                if self.simulate_wall_time:
-                    sample_size = len(self.current_processed_clients)
+                # Sets the number of clients to be selected
+                if self.selected_clients is not None:
+                    if self.simulate_wall_time:
+                        sample_size = len(self.current_processed_clients)
+                    else:
+                        sample_size = len(self.reported_clients)
                 else:
-                    sample_size = len(self.reported_clients)
-            else:
-                sample_size = self.clients_per_round
+                    sample_size = self.clients_per_round
+
             # Exploitation
             exploit_len = math.ceil(
                 (1.0 - self.exploration_factor) * sample_size)
