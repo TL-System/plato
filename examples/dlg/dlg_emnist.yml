@@ -82,7 +82,7 @@ algorithm:
     share_gradients: false
     # Do reconstruction by directly matching weights when it's true,
     # otherwise by matching gradients calculated from updates
-    match_weights: false
+    match_weights: true
     # Matching weights (absolute) or weight updates (delta)
     use_updates: false
     # The number of times the attack will be attempted
