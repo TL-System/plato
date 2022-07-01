@@ -1,5 +1,4 @@
 from plato.clients import simple
-from dataclasses import dataclass
 
 
 class Client(simple.Client):
