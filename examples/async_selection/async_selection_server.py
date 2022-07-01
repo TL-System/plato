@@ -4,6 +4,7 @@ A customized server with asynchronous client selection
 import logging
 
 from dataclasses import replace
+from turtle import up, update
 from plato.config import Config
 from plato.servers import fedavg
 from cvxopt import matrix, log, solvers, sparse
@@ -31,7 +32,8 @@ class Server(fedavg.Server):
             self.number_of_client
         )  # 0.01 is a hyperparameter that's used as a starting point.
         self.local_stalenesses = np.zeros(self.number_of_client)
-        self.aggregate_weights = np.ones(self.number_of_client)
+        self.aggregate_weights = np.ones(
+            self.number_of_client) * (1.0 / self.number_of_client)
 
     def choose_clients(self, clients_pool, clients_count):
         """ Choose a subset of the clients to participate in each round. """
@@ -88,6 +90,19 @@ class Server(fedavg.Server):
             self.local_stalenesses[client_id] = client_staleness
         # Update local gradient bounds
         self.local_gradient_bounds += self.squared_deltas_current_round
+        self.extract_aggregation_weights(updates)
+
+    def extract_aggregation_weights(self, updates):
+        """Extract aggregation weights"""
+
+        # below is for fedavg only; complex ones would be added later
+        # Extract the total number of samples
+        self.total_samples = sum(
+            [report.num_samples for (__, report, __, __) in updates])
+
+        for client_id, report, __, __ in updates:
+            self.aggregation_weights[
+                client_id] = report.num_samples / self.total_samples
 
     def calculate_selection_probability(self):
         """Calculte selection probability based on the formulated geometric optimization problem
