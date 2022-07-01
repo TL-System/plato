@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 100
+    total_clients: 5
 
     # The number of clients selected in each round
-    per_round: 20
+    per_round: 4
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -32,15 +32,15 @@ server:
 
     # Parameters for FedAsync
     staleness_bound: 1000 # FedAsync doesn't have any staleness bound
-    minimum_clients_aggregated: 1
+    minimum_clients_aggregated: 2
     mixing_hyperparameter: 0.9
     adaptive_mixing: true
-    staleness_weighting_function:
-        type: Polynomial
-        a: 2
+    #staleness_weighting_function:
+    #    type: Polynomial
+    #    a: 2
 
-    checkpoint_path: models/fedasync/mnist
-    model_path: models/fedasync/mnist
+    checkpoint_path: models/async_selection/mnist
+    model_path: models/async_selection/mnist
 
 data:
     # The training and testing dataset
@@ -88,7 +88,7 @@ algorithm:
     type: fedavg
 
 results:
-    result_path: results/fedasync/mnist
+    result_path: results/async_selection/mnist
     # Write the following parameter(s) into a CSV
     types: round, elapsed_time, accuracy
 
