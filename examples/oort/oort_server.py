@@ -18,7 +18,6 @@ from plato.utils import fonts
 
 class Server(fedavg.Server):
     """A federated learning server using oort client selection."""
-
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
 
@@ -95,7 +94,7 @@ class Server(fedavg.Server):
             self.last_round[client_id - 1] = self.current_round
 
         # Calculating updated client utilities on explored clients
-        for client_id in self.explored_clients:
+        for (client_id, __, __, __) in updates:
             self.client_utilities[client_id] = self.calc_client_util(client_id)
 
         # Adjusts pacer
