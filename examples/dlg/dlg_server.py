@@ -236,7 +236,7 @@ class Server(fedavg.Server):
         elif self.attack_method == 'csDLG':
             match_optimizer = torch.optim.LBFGS(
                 [dummy_data, ], lr=Config().algorithm.lr)
-            labels_ = torch.unsqueeze(gt_labels[0], 0)
+            labels_ = gt_labels
             for i in range(num_images):
                 logging.info(
                     "[%s Gradient Leakage Attack %d with %s defense...] Known label is %d.",
@@ -379,8 +379,6 @@ class Server(fedavg.Server):
             patched_model_origin = deepcopy(patched_model)
 
         # TODO: optional parameters: lr_schedule, create_graph...
-
-        # TODO: another parameter local steps instead of epoch here
         for epoch in range(epochs):
             if batch_size == 1:
                 dummy_pred = patched_model(dummy_data,
