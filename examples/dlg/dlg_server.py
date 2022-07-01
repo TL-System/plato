@@ -155,7 +155,7 @@ class Server(fedavg.Server):
         deltas_received = self.compute_weight_deltas(updates)
         __, __, payload, __ = updates[Config().algorithm.victim_client]
         # The ground truth should be used only for evaluation
-        gt_data, gt_label, target_grad = payload[1]
+        gt_data, gt_labels, target_grad = payload[1]
         target_weights = payload[0]
         if not self.share_gradients and self.match_weights and self.use_updates:
             target_weights = deltas_received[Config().algorithm.victim_client]
@@ -165,7 +165,7 @@ class Server(fedavg.Server):
         data_size = [
             num_images, gt_data.shape[1], gt_data.shape[2], gt_data.shape[3]
         ]
-        self.plot_gt(num_images, gt_data, gt_label)
+        self.plot_gt(num_images, gt_data, gt_labels)
 
         # The number of restarts
         trials = 1
@@ -186,12 +186,12 @@ class Server(fedavg.Server):
 
         for trial_number in range(trials):
             self.run_trial(trial_number, num_images, data_size, target_weights,
-                           target_grad, gt_data)
+                           target_grad, gt_data, gt_labels)
 
         self.save_best()
 
     def run_trial(self, trial_number, num_images, data_size, target_weights,
-                  target_grad, gt_data):
+                  target_grad, gt_data, gt_labels):
         """ Run the attack for one trial. """
         logging.info("Starting Attack Number %d", (trial_number + 1))
 
@@ -206,33 +206,42 @@ class Server(fedavg.Server):
         dummy_data = torch.randn(data_size).to(
             Config().device()).requires_grad_(True)
 
-        dummy_label = torch.randn(
+        dummy_labels = torch.randn(
             (num_images, Config().trainer.num_classes)).to(
                 Config().device()).requires_grad_(True)
 
         if self.attack_method == 'DLG':
-            match_optimizer = torch.optim.LBFGS([dummy_data, dummy_label],
+            match_optimizer = torch.optim.LBFGS([dummy_data, dummy_labels],
                                                 lr=Config().algorithm.lr)
-            est_label = [None] * num_images
+            labels_ = dummy_labels
             for i in range(num_images):
                 logging.info(
                     "[%s Gradient Leakage Attack %d with %s defense...] Dummy label is %d.",
                     self.attack_method, trial_number, self.defense_method,
-                    torch.argmax(dummy_label[i], dim=-1).item())
+                    torch.argmax(dummy_labels[i], dim=-1).item())
+
         elif self.attack_method == 'iDLG':
-            match_optimizer = torch.optim.LBFGS([
-                dummy_data,
-            ],
-                                                lr=Config().algorithm.lr)
+            match_optimizer = torch.optim.LBFGS(
+                [dummy_data, ], lr=Config().algorithm.lr)
             # Estimate the gt label
-            est_label = torch.argmin(torch.sum(target_grad[-2], dim=-1),
-                                     dim=-1).detach().reshape(
-                                         (1, )).requires_grad_(False)
+            est_labels = torch.argmin(torch.sum(target_grad[-2], dim=-1),
+                                      dim=-1).detach().reshape(
+                (1, )).requires_grad_(False)
+            labels_ = est_labels
             for i in range(num_images):
                 logging.info(
                     "[%s Gradient Leakage Attack %d with %s defense...] Estimated label is %d.",
                     self.attack_method, trial_number, self.defense_method,
-                    est_label.item())
+                    est_labels.item())
+        elif self.attack_method == 'csDLG':
+            match_optimizer = torch.optim.LBFGS(
+                [dummy_data, ], lr=Config().algorithm.lr)
+            labels_ = torch.unsqueeze(gt_labels[0], 0)
+            for i in range(num_images):
+                logging.info(
+                    "[%s Gradient Leakage Attack %d with %s defense...] Known label is %d.",
+                    self.attack_method, trial_number, self.defense_method,
+                    torch.argmax(gt_labels[i], dim=-1).item())
 
         history, losses, mses, lpipss, psnrs, ssims, library_ssims = [], [], [], [], [], [], []
         avg_mses, avg_lpips, avg_psnr, avg_ssim, avg_library_ssim = [], [], [], [], []
@@ -240,12 +249,11 @@ class Server(fedavg.Server):
         # Conduct gradients/weights/updates matching
         if not self.share_gradients and self.match_weights:
             model = deepcopy(self.trainer.model)
-            closure = self.weight_closure(match_optimizer, dummy_data,
-                                          dummy_label, target_weights, model)
+            closure = self.weight_closure(
+                match_optimizer, dummy_data, labels_, target_weights, model)
         else:
-            closure = self.gradient_closure(match_optimizer, dummy_data,
-                                            dummy_label, est_label,
-                                            target_grad)
+            closure = self.gradient_closure(
+                match_optimizer, dummy_data, labels_, target_grad)
 
         for iters in range(num_iters):
             match_optimizer.step(closure)
@@ -276,13 +284,20 @@ class Server(fedavg.Server):
                 if self.attack_method == 'DLG':
                     history.append([[
                         dummy_data[i].cpu().permute(1, 2, 0).detach().clone(),
-                        torch.argmax(dummy_label[i], dim=-1).item(),
+                        torch.argmax(dummy_labels[i], dim=-1).item(),
                         dummy_data[i]
                     ] for i in range(num_images)])
                 elif self.attack_method == 'iDLG':
                     history.append([[
                         dummy_data[i].cpu().permute(1, 2, 0).detach().clone(),
-                        est_label[i].item(), dummy_data[i]
+                        est_labels[i].item(),
+                        dummy_data[i]
+                    ] for i in range(num_images)])
+                elif self.attack_method == 'csDLG':
+                    history.append([[
+                        dummy_data[i].cpu().permute(1, 2, 0).detach().clone(),
+                        torch.argmax(gt_labels[i], dim=-1),
+                        dummy_data[i]
                     ] for i in range(num_images)])
 
                 new_row = [
@@ -314,19 +329,18 @@ class Server(fedavg.Server):
 
         logging.info("Attack %d complete", (trial_number + 1))
 
-    def gradient_closure(self, match_optimizer, dummy_data, dummy_label,
-                         est_label, target_grad):
+    def gradient_closure(self, match_optimizer, dummy_data, labels, target_grad):
         """ Take a step to match the gradients. """
 
         def closure():
             match_optimizer.zero_grad()
             dummy_pred = self.trainer.model(dummy_data)
-            dummy_onehot_label = F.softmax(dummy_label, dim=-1)
+            dummy_onehot_label = F.softmax(labels, dim=-1)
             if self.attack_method == 'DLG':
                 dummy_loss = cross_entropy_for_onehot(dummy_pred,
                                                       dummy_onehot_label)
-            elif self.attack_method == 'iDLG':
-                dummy_loss = cross_entropy(dummy_pred, est_label)
+            elif self.attack_method in ['iDLG', 'csDLG']:
+                dummy_loss = cross_entropy(dummy_pred, labels)
 
             dummy_grad = torch.autograd.grad(dummy_loss,
                                              self.trainer.model.parameters(),
@@ -341,13 +355,12 @@ class Server(fedavg.Server):
 
         return closure
 
-    def weight_closure(self, match_optimizer, dummy_data, dummy_label,
-                       target_weights, model):
+    def weight_closure(self, match_optimizer, dummy_data, labels, target_weights, model):
         """ Take a step to match the weights. """
 
         def closure():
             match_optimizer.zero_grad()
-            dummy_weight = self.loss_steps(dummy_data, dummy_label, model)
+            dummy_weight = self.loss_steps(dummy_data, labels, model)
 
             rec_loss = self.reconstruction_costs([dummy_weight],
                                                  list(target_weights.values()))
@@ -359,7 +372,7 @@ class Server(fedavg.Server):
 
         return closure
 
-    def loss_steps(self, dummy_data, dummy_label, model):
+    def loss_steps(self, dummy_data, labels, model):
         """ Take a few gradient descent steps to fit the model to the given input. """
         patched_model = PatchedModule(model)
         if self.use_updates:
@@ -372,16 +385,15 @@ class Server(fedavg.Server):
             if batch_size == 1:
                 dummy_pred = patched_model(dummy_data,
                                            patched_model.parameters)
-                labels_ = dummy_label
+                labels_ = labels
             else:
                 idx = epoch % (dummy_data.shape[0] // batch_size)
                 dummy_pred = patched_model(
                     dummy_data[idx * batch_size:(idx + 1) * batch_size],
                     patched_model.parameters)
-                labels_ = dummy_label[idx * batch_size:(idx + 1) * batch_size]
+                labels_ = labels[idx * batch_size:(idx + 1) * batch_size]
 
-            loss = cross_entropy(dummy_pred, torch.argmax(labels_,
-                                                          dim=-1)).sum()
+            loss = cross_entropy(dummy_pred, labels_).sum()
 
             grad = torch.autograd.grad(loss,
                                        patched_model.parameters.values(),
@@ -446,7 +458,7 @@ class Server(fedavg.Server):
         return total_costs / len(dummy)
 
     @staticmethod
-    def plot_gt(num_images, gt_data, gt_label):
+    def plot_gt(num_images, gt_data, gt_labels):
         """ Plot ground truth data. """
         gt_result_path = f"{dlg_result_path}/ground_truth.png"
         gt_figure = plt.figure(figsize=(12, 4))
@@ -456,7 +468,7 @@ class Server(fedavg.Server):
             os.makedirs(dlg_result_path)
 
         for i in range(num_images):
-            current_label = torch.argmax(gt_label[i], dim=-1).item()
+            current_label = torch.argmax(gt_labels[i], dim=-1).item()
             logging.info("Ground truth labels: %d", current_label)
             gt_figure.add_subplot(1, num_images, i + 1)
             plt.imshow(gt_data[i].cpu().permute(1, 2, 0))
