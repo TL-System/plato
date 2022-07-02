@@ -6,19 +6,26 @@ clients:
     total_clients: 10
 
     # The number of clients selected in each round
-    per_round: 4
+    per_round: 5
 
     # Should the clients compute test accuracy locally?
     do_test: false
 
+    # Whether client heterogeneity should be simulated
+    speed_simulation: true
+
+    # The simulation distribution
+    simulation_distribution:
+        distribution: pareto
+        alpha: 1
+
 server:
     address: 127.0.0.1
     port: 8000
-    do_test: true
     random_seed: 1
     synchronous: false
     simulate_wall_time: true
-    minimum_clients_aggregated: 1
+    minimum_clients_aggregated: 2
     step_window: 2
     penalty: 2
     exploration_factor: 0.9
@@ -56,7 +63,7 @@ trainer:
     max_concurrency: 2
 
     # The target accuracy
-    target_accuracy: 0.99
+    target_accuracy: 0.98
 
     # Number of epoches for local training in each communication round
     epochs: 3

@@ -116,6 +116,24 @@ class Server(fedavg.Server):
         """ Select a subset of the clients and send messages to them to start training. """
 
         if not for_next_batch:
+            self.updates = []
+            self.current_round += 1
+            self.round_start_wall_time = self.wall_time
+
+            if hasattr(Config().trainer, 'max_concurrency'):
+                self.trained_clients = []
+
+            logging.info(
+                fonts.colourize(
+                    f"\n[{self}] Starting round {self.current_round}/{Config().trainer.rounds}."
+                ))
+
+            if Config().is_central_server():
+                # In cross-silo FL, the central server selects from the pool of edge servers
+                self.clients_pool = list(self.clients)
+
+            elif not Config().is_edge_server():
+                self.clients_pool = list(range(1, 1 + self.total_clients))
 
             # In asychronous FL, avoid selecting new clients to replace those that are still
             # training at this time
@@ -204,7 +222,7 @@ class Server(fedavg.Server):
                 picked_clients = picked_clients.tolist()
 
             # If the result of exploitation wasn't enough to meet the required length.
-            if len(picked_clients) < exploit_len and self.current_round != 0:
+            if len(picked_clients) < exploit_len and self.current_round != 1:
                 for step in range(last_index + 1, len(sorted_util)):
                     if not sorted_util[step] in (
                             self.blacklist or unselectable_clients
@@ -232,26 +250,7 @@ class Server(fedavg.Server):
             for client in picked_clients:
                 self.times_selected[client] += 1
 
-            self.updates = []
-            self.current_round += 1
-            self.round_start_wall_time = self.wall_time
-
-            if hasattr(Config().trainer, 'max_concurrency'):
-                self.trained_clients = []
-
-            logging.info(
-                fonts.colourize(
-                    f"\n[{self}] Starting round {self.current_round}/{Config().trainer.rounds}."
-                ))
-
             logging.info("[%s] Selected clients: %s", self, picked_clients)
-
-            if Config().is_central_server():
-                # In cross-silo FL, the central server selects from the pool of edge servers
-                self.clients_pool = list(self.clients)
-
-            elif not Config().is_edge_server():
-                self.clients_pool = list(range(1, 1 + self.total_clients))
 
             self.selected_clients = picked_clients
 
