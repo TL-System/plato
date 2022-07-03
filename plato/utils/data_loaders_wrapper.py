@@ -20,10 +20,6 @@ one epoch.
 
 """
 
-import torchvision
-from torch.utils.data import DataLoader
-from torchvision import transforms
-
 import numpy as np
 
 
@@ -166,6 +162,11 @@ class StreamBatchesLoader(object):
 
 
 # # For test:
+
+# import torchvision
+# from torch.utils.data import DataLoader
+# from torchvision import transforms
+
 # loader1 = DataLoader(torchvision.datasets.MNIST('data',
 #                                                 train=True,
 #                                                 download=True,

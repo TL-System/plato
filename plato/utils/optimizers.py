@@ -333,6 +333,7 @@ def get_dynamic_lr_schedule(optimizer: optim.Optimizer,
             warmup_iters = Step.from_str(lr_warmup_steps,
                                          iterations_per_epoch).iteration
             lambdas.append(lambda it: min(1.0, it / warmup_iters))
+
         kwargs["lr_lambda"] = lambda it: np.product([l(it) for l in lambdas])
 
     if lr_schedule == "StepLR":
@@ -390,8 +391,7 @@ def get_dynamic_lr_schedule(optimizer: optim.Optimizer,
                                   default_value=0)
         kwargs = insert_parameter(kwargs,
                                   prefix,
-                                  "epochs",
-                                  desired_parameter_name="max_epochs",
+                                  "max_epochs",
                                   is_manority=True,
                                   default_value=500)
         kwargs = insert_parameter(kwargs,
@@ -406,10 +406,10 @@ def get_dynamic_lr_schedule(optimizer: optim.Optimizer,
                                   is_manority=True,
                                   default_value=0)
         learning_rate = kwargs.pop("learning_rate")
-        # the lr schedule of plato is placed with the
-        # the epoch loop. No need to multiple the iterations_per_epoch
-        # kwargs['warmup_epochs'] *= iterations_per_epoch
-        # kwargs['max_epochs'] *= iterations_per_epoch
+
+        # the max_epochs maximum epoches of lr schedule should be
+        # local epochs * communication rounds
+
         if kwargs['warmup_epochs'] == 0:
             kwargs['warmup_start_lr'] = learning_rate
 
