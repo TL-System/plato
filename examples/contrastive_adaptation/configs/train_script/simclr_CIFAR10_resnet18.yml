@@ -135,16 +135,20 @@ trainer:
     epochs: 400
     batch_size: 256
 
-    optimizer: SGD
-    # lr = 0.3 * batch_size / 256, see section B.6 and B.7 of SimCLR paper.
-    learning_rate: 0.3
+    optimizer: Lars
+    learning_rate: 0.4
+    eta_lars: 0.02
     momentum: 0.9
-    weight_decay: 0.000001
+    grad_clip_lars: True
+    exclude_bias_n_norm: True
+    weight_decay: 0.00001
 
     # Learning rate schedule
-    lr_schedule: LambdaLR
-    lr_gamma: 0.1
-    lr_milestone_steps: 80ep,120ep
+    lr_schedule: WarmupCosine
+    warmup_epochs: 10
+    max_epochs: 400 # should be epochs * rounds
+    warmup_start_lr: 0.00003
+    min_lr: 0.0
 
     epoch_log_interval: 1
     epoch_model_log_interval: 50
@@ -155,19 +159,16 @@ trainer:
     # does not utilize the
     pers_epochs: 30
     pers_batch_size: 256
-    pers_optimizer: Adam
+    pers_optimizer: SGD
     # lr = 0.1 * batch_size / 256, see section B.6 and B.7 of SimCLR paper.
     pers_learning_rate: 0.1
-    pers_betas:
-        - 0.9
-        - 0.99
-    pers_eps: 0.00000009 # 1e-8
+    pers_momentum: 0.9
     pers_weight_decay: 0.0
 
     # currently, we only support CosineAnnealingLR
-    pers_lr_schedule: StepLR
-    pers_lr_step_size: 20
-    pers_lr_gamma: 0.9
+    pers_lr_schedule: MultiStepLR
+    pers_lr_milestones: 60,80
+    pers_lr_gamma: 0.1
 
     pers_epoch_log_interval: 2
     pers_epoch_model_log_interval: 10
@@ -185,7 +186,7 @@ trainer:
     # the final fc layer will be removed
     external_encoder: False
     model_name: resnet_18
-    projection_dim: 128
+    projection_dim: 256
     projection_hidden_dim: 2048
 
     # name of the component used as the global model
