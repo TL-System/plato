@@ -134,17 +134,19 @@ trainer:
     # space as more samples will be contained within one loading.
     epochs: 500
     batch_size: 256
+
     optimizer: Lars
-    learning_rate: 1.0
+    learning_rate: 0.4
     eta_lars: 0.02
     momentum: 0.9
     grad_clip_lars: True
     exclude_bias_n_norm: True
     weight_decay: 0.00001
 
+    # Learning rate schedule
     lr_schedule: WarmupCosine
     warmup_epochs: 10
-    max_epochs: 500
+    max_epochs: 400 # should be epochs * rounds
     warmup_start_lr: 0.00003
     min_lr: 0.0
 
