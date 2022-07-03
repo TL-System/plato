@@ -9,7 +9,6 @@ import os
 from collections import OrderedDict, namedtuple
 from typing import Any, IO
 import shutil
-from attr import has
 
 import numpy as np
 import yaml

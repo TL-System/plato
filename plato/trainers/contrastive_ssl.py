@@ -7,8 +7,6 @@ import os
 import logging
 import time
 import multiprocessing as mp
-import copy
-from attr import has
 
 import numpy as np
 import torch
@@ -236,12 +234,32 @@ class Trainer(basic.Trainer):
             Therefore, the train loop here utilize the
             - trainset with one specific transform (contrastive data augmentation)
             - self.model, the ssl method to be trained.
-
         """
+
         batch_size = config['batch_size']
         model_type = config['model_name']
         current_round = kwargs['current_round']
         run_id = config['run_id']
+        # Obtain the logging interval
+        epochs = config['epochs']
+
+        # Note, the lr_schedule_base_epoch is an important term to make the
+        # lr_schedulr work correctly.
+        # The main reason is that the trainer will create a new lr schedule
+        # in each round. Then, the epoch within one round will always start
+        # from 0. Therefore, if the lr schedule works based this local epoch,
+        # the lr will never be modified correctly as that in the central learning.
+        # Thus, we need a term to denote the global epoch.
+        # In round 1, the base global epoch should be 0. Thus, the local epoch
+        # can start from 1 * 0 to epochs, i.e., [0, epochs].
+        # In round 2, the base global epoch should be 'epochs'. Thus, the local epoch
+        # can start from 1 * 'epochs' to epochs + 'epochs', i.e, [epochs, epochs + epochs]
+        # Then, in round r, the base global epoch should be (current_round - 1) * epochs
+        # Therefore, the local epoch for the lr schedule can:
+        #   start from lr_schedule_base_epoch + 0,
+        #   to
+        #   lr_schedule_base_epoch + epochs
+        lr_schedule_base_epoch = (current_round - 1) * epochs
 
         tic = time.perf_counter()
 
@@ -276,6 +294,16 @@ class Trainer(basic.Trainer):
             [train_loader, unlabeled_loader])
 
         iterations_per_epoch = len(streamed_train_loader)
+        # default not to perform any logging
+        epoch_log_interval = epochs + 1
+        batch_log_interval = iterations_per_epoch
+        epoch_model_log_interval = epochs + 1
+        if "epoch_log_interval" in config:
+            epoch_log_interval = config['epoch_log_interval']
+        if "batch_log_interval" in config:
+            batch_log_interval = config['batch_log_interval']
+        if "epoch_model_log_interval" in config:
+            epoch_model_log_interval = config['epoch_model_log_interval']
 
         # Initializing the loss criterion
         loss_criterion = self.loss_criterion(self.model)
@@ -287,19 +315,12 @@ class Trainer(basic.Trainer):
         lr_schedule = optimizers.get_dynamic_lr_schedule(
             optimizer, iterations_per_epoch, streamed_train_loader)
 
+        # Updated the lr_schedule to the latest status
+        if lr_schedule_base_epoch != 0:
+            for visit_epoch in range(1, lr_schedule_base_epoch + 1):
+                lr_schedule.step(visit_epoch)
+
         train_checkpoint_saver = self.get_checkppint_saver()
-        # Obtain the logging interval
-        epochs = config['epochs']
-        # default not to perform any logging
-        epoch_log_interval = epochs + 1
-        batch_log_interval = iterations_per_epoch
-        epoch_model_log_interval = epochs + 1
-        if "epoch_log_interval" in config:
-            epoch_log_interval = config['epoch_log_interval']
-        if "batch_log_interval" in config:
-            batch_log_interval = config['batch_log_interval']
-        if "epoch_model_log_interval" in config:
-            epoch_model_log_interval = config['epoch_model_log_interval']
 
         # Before the training, we expect to save the initial
         # model of this round
@@ -314,7 +335,7 @@ class Trainer(basic.Trainer):
             check_points_name=[initial_filename],
             optimizer_state_dict=optimizer.state_dict(),
             lr_scheduler_state_dict=lr_schedule.state_dict(),
-            epoch=0,
+            epoch=lr_schedule_base_epoch,
             config_args=Config().to_dict())
 
         # Sending the model to the device used for training
@@ -374,7 +395,8 @@ class Trainer(basic.Trainer):
                             batch_loss_meter.avg)
 
             # Update the learning rate
-            lr_schedule.step()
+            # based on the
+            lr_schedule.step(lr_schedule_base_epoch + epoch)
 
             # Performe logging of epochs
             if (epoch - 1) % epoch_log_interval == 0 or epoch == epochs:
