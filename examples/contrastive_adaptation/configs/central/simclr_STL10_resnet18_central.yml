@@ -131,7 +131,7 @@ trainer:
     epochs: 500
     batch_size: 256
     optimizer: Lars
-    learning_rate: 1.0
+    learning_rate: 0.4
     eta_lars: 0.02
     momentum: 0.9
     grad_clip_lars: True

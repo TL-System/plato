@@ -142,7 +142,7 @@ trainer:
 
     lr_schedule: WarmupCosine
     warmup_epochs: 10
-    max_epochs: 500
+    max_epochs: 500 # should be epochs * rounds
     warmup_start_lr: 0.00003
     min_lr: 0.0
 
