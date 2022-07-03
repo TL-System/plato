@@ -173,6 +173,7 @@ trainer:
     temperature: 0.5
 
     # image_size
+    #  - STL10 (Image size=96)
     #  - CIFAR10 (Image size=32)
     #  - MNIST (Image size=28)
     image_size: 32
@@ -185,7 +186,7 @@ trainer:
     external_encoder: False
     model_name: resnet_18
     # in general, the projection_dim = prediction_dim
-    projection_dim: 128
+    projection_dim: 256
     projection_hidden_dim: 2048
 
     # name of the component used as the global model
