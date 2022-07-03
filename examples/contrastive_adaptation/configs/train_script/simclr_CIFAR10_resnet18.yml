@@ -174,7 +174,7 @@ trainer:
     pers_epoch_model_log_interval: 10
 
     # temperature
-    temperature: 0.5
+    temperature: 0.2
 
     # image_size
     #  - CIFAR10 (Image size=32)
