@@ -8,7 +8,7 @@ general:
     # - script
     # - user
 
-    running_mode: script
+    running_mode: user
 
     file_logging: True
 
@@ -17,10 +17,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 50
+    total_clients: 1
 
     # The number of clients selected in each round
-    per_round: 50
+    per_round: 1
 
     do_data_tranform_logging: True
 
@@ -37,11 +37,11 @@ clients:
     # on all clients
     do_final_eval_test: True
     # Minotor the self-supervised learning by knn for
-    # every 1 round
-    test_interval: 1
+    # every 5 round
+    test_interval: 5
     # Train the personalized model based on the
-    # learned representation every 1 rounds
-    eval_test_interval: 1
+    # learned representation every 10 rounds
+    eval_test_interval: 10
 
     # Whether simulate clients or not
     simulation: true
@@ -50,7 +50,7 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8011
+    port: 8014
     synchronous: true
     do_test: false
 
@@ -74,7 +74,7 @@ server:
 
 data:
     # The training and testing dataset
-    datasource: CIFAR10
+    datasource: MNIST
 
     # Number of samples in each partition
     #
@@ -82,7 +82,7 @@ data:
     # may lead the failure of the loss criterion part
     # if your loss criterion relies on the batch_size
     # as its argument. For example, the NT_Xent loss utilized
-    # by the BYOL method set the defined batch_size as the parameter.
+    # by the SimCLR method set the defined batch_size as the parameter.
     # However, at the end of one epoch, the left samples may smaller than
     # the batch_size. This makes the #loaded samples != batch_size.
     # Working on criterion that is defined with batch_size but receives loaded
@@ -94,6 +94,7 @@ data:
     # IID or non-IID?
     sampler: noniid
     testset_sampler: noniid
+
     # The concentration parameter for the Dirichlet distribution
     concentration: 0.3
 
@@ -107,7 +108,7 @@ data:
 
     # set the data augmentation
     #   options: simsiam, byol, simclr
-    augment_transformer_name: simsiam
+    augment_transformer_name: simclr
     # some methods apply the normalization to samples
     #   while others do not
     is_norm: True
@@ -116,7 +117,7 @@ trainer:
     # The type of the trainer
     type: basic
     # The maximum number of training rounds
-    rounds: 1
+    rounds: 100
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -131,62 +132,67 @@ trainer:
     #   The user is expected to carefully choose the batch_size to avoid
     # the memory allocation issue as the contrastive samples occupy more
     # space as more samples will be contained within one loading.
-    epochs: 400
+    epochs: 5
     batch_size: 256
-    optimizer: Lars
-    learning_rate: 0.5
-    eta_lars: 0.001
+
+    optimizer: SGD
+    # lr = 0.4 * batch_size / 256, see section B.6 and B.7 of SimCLR paper.
+    learning_rate: 0.4
     momentum: 0.9
-    grad_clip_lars: False
-    exclude_bias_n_norm: False
     weight_decay: 0.00001
 
+    # Learning rate schedule
     lr_schedule: WarmupCosine
     warmup_epochs: 10
-    max_epochs: 400 # should be epochs * rounds
+    max_epochs: 500
     warmup_start_lr: 0.00003
     min_lr: 0.0
 
     epoch_log_interval: 1
-    epoch_model_log_interval: 50
-    batch_log_interval: 50
+    epoch_model_log_interval: 2
+    batch_log_interval: 1
 
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
     # does not utilize the
     pers_epochs: 30
     pers_batch_size: 256
-    pers_optimizer: SGD
+    pers_optimizer: Adam
     # lr = 0.1 * batch_size / 256, see section B.6 and B.7 of SimCLR paper.
     pers_learning_rate: 0.1
-    pers_momentum: 0.9
+    pers_betas:
+        - 0.9
+        - 0.99
+    pers_eps: 0.00000009 # 1e-8
     pers_weight_decay: 0.0
 
     # currently, we only support CosineAnnealingLR
-    pers_lr_schedule: MultiStepLR
-    pers_lr_milestones: 60,80
-    pers_lr_gamma: 0.1
+    pers_lr_schedule: StepLR
+    pers_lr_step_size: 10
+    pers_lr_gamma: 0.9
 
     pers_epoch_log_interval: 2
     pers_epoch_model_log_interval: 10
 
+    # temperature
+    temperature: 0.5
 
     # image_size
+    #  - STL10 (Image size=96)
     #  - CIFAR10 (Image size=32)
     #  - MNIST (Image size=28)
-    image_size: 32
+    image_size: 28
 
     # The machine learning model,
     # it behaves as the encoder for the ssl method
     # the final fc layer will be removed
     # however, in the central test, we do not use this
     #   but use the custom model
-    model_name: resnet_18
+    external_encoder: False
+    model_name: lenet5
     # in general, the projection_dim = prediction_dim
-    projection_dim: 2048
+    projection_dim: 128
     projection_hidden_dim: 2048
-    prediction_dim: 2048
-    prediction_hidden_dim: 512
 
     # name of the component used as the global model
     global_model_name: whole

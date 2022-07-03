@@ -164,7 +164,7 @@ trainer:
 
     # currently, we only support CosineAnnealingLR
     pers_lr_schedule: MultiStepLR
-    pers_lr_milestones: 60,80
+    pers_lr_milestones: 20,25
     pers_lr_gamma: 0.1
 
     pers_epoch_log_interval: 2
