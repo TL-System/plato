@@ -32,6 +32,7 @@ server:
 
     percentile_aggregate: actor_fisher #False, actor_loss, critic_loss, actor_grad, critic_grad, actor_fisher, critic_fisher
 
+    percentile_increase: 15
 data:
     # The training and testing dataset
     datasource: FashionMNIST
@@ -111,7 +112,7 @@ algorithm:
     iterations: 1000
 
     # Number of episodes to run each round
-    max_round_episodes: 100
+    max_round_episodes: 400
 
     # Curriculum learning, fixed difficulty level for motivation experiment
     difficulty_levels: 3
