@@ -4,6 +4,8 @@ baseline.
 
 """
 
+import backbone_cls
+
 from plato.servers import fedavg
 from plato.trainers import basic
 from plato.algorithms import fedavg as fedavg_algo
@@ -17,8 +19,13 @@ def main():
 
     algo = fedavg_algo.Algorithm
     trainer = basic.Trainer
-    client = pers_simple.Client(algorithm=algo, trainer=trainer)
-    server = fedavg.Server(algorithm=algo, trainer=trainer)
+    backbone_cls_model = backbone_cls.BackBoneCls
+    client = pers_simple.Client(algorithm=algo,
+                                model=backbone_cls_model,
+                                trainer=trainer)
+    server = fedavg.Server(algorithm=algo,
+                           model=backbone_cls_model,
+                           trainer=trainer)
 
     server.run(client)
 

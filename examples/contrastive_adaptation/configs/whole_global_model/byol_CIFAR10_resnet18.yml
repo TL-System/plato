@@ -153,7 +153,7 @@ trainer:
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
     # does not utilize the
-    pers_epochs: 30
+    pers_epochs: 50
     pers_batch_size: 256
     pers_optimizer: SGD
     # lr = 0.1 * batch_size / 256, see section B.6 and B.7 of SimCLR paper.
@@ -163,7 +163,7 @@ trainer:
 
     # currently, we only support CosineAnnealingLR
     pers_lr_schedule: MultiStepLR
-    pers_lr_milestones: 60,80
+    pers_lr_milestones: 30,40
     pers_lr_gamma: 0.1
 
     pers_epoch_log_interval: 2
