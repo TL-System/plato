@@ -36,12 +36,12 @@ class A2CServer(fedavg.Server):
             print("WE ARE AGGREGATING BASED ON PERCENTILE!")
             print("-----------------------")
 
-            percentile = Config().server.percentile
+            percentile = min(Config().server.percentile + Config().server.percentile_increase * self.current_round, 100)
             
             metric_list = self.create_loss_lists(updates)
             print("Metric list", metric_list)
             metric_percentile = np.percentile(np.array(metric_list), percentile)
-            
+            clients_selected_size = len([i for i in metric_list if i <= metric_percentile])
 
             # Save percentile to files
             path = Config().results.results_dir +"/"+Config().results.file_name+"_percentile_"+Config().server.percentile_aggregate
@@ -103,9 +103,9 @@ class A2CServer(fedavg.Server):
                     print("Client %s is choosen" % str(client_id))
                     self.save_files(client_path+"_percentile", client_id)
                     for name, delta in update_from_actor.items():
-                        actor_avg_update[name] += delta #* 2.0/6.0
+                        actor_avg_update[name] += delta * 1.0/clients_selected_size
                     for name, delta in update_from_critic.items():
-                        critic_avg_update[name] += delta #* 2.0/6.0
+                        critic_avg_update[name] += delta * 1.0/clients_selected_size
             
             # Yield to other tasks in the server
             await asyncio.sleep(0)
