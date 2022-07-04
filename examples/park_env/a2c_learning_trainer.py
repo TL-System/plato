@@ -119,14 +119,14 @@ class Trainer(basic.Trainer):
 
         #TODO args.resume = true?
 
-        if not os.path.exists(Config().results.results_dir):
-            os.makedirs(Config().results.results_dir)
+        if not os.path.exists(f'{Config().results.results_dir}_seed_{Config().server.random_seed}'):
+            os.makedirs(f'{Config().results.results_dir}_seed_{Config().server.random_seed}', exist_ok=True)
 
-        if not os.path.exists(Config().results.seed_random_path):
-            os.makedirs(Config().results.seed_random_path)
+        if not os.path.exists(f'{Config().results.seed_random_path}_seed_{Config().server.random_seed}'):
+            os.makedirs(f'{Config().results.seed_random_path}_seed_{Config().server.random_seed}', exist_ok=True)
         else:
-            shutil.rmtree(Config().results.seed_random_path)
-            os.makedirs(Config().results.seed_random_path, exist_ok=True)
+            shutil.rmtree(f'{Config().results.seed_random_path}_seed_{Config().server.random_seed}', ignore_errors=True)
+            os.makedirs(f'{Config().results.seed_random_path}_seed_{Config().server.random_seed}', exist_ok=True)
 
 
     def t(self, x): 
@@ -135,14 +135,18 @@ class Trainer(basic.Trainer):
 
     def train_model(self, config, trainset, sampler, cut_layer):
         """Main Training"""
-        seed_file_name = "id_"+str(self.client_id)
-        self.seed_path = Config().results.seed_random_path+"/"+seed_file_name
+        seed_file_name = f'{"id_"}{str(self.client_id)}'
+        #"id_"+str(self.client_id)
+        self.seed_path = f'{Config().results.seed_random_path}_seed_{Config().server.random_seed}/{seed_file_name}'
+        #Config().results.seed_random_path+"/"+seed_file_name
         if not os.path.exists(self.seed_path):
             torch.manual_seed(Config().trainer.manual_seed)
         else:
             self.restore_seeds()
 
-        common_path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
+        common_path = f'{Config().results.results_dir}_seed_{Config().server.random_seed}/{Config().results.file_name}_{str(self.client_id)}'
+        
+        #Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
         round_episodes = 0
 
         while round_episodes < Config().algorithm.max_round_episodes:
@@ -153,7 +157,8 @@ class Trainer(basic.Trainer):
                 self.avg_reward = self.evaluate_policy()
                 self.restore_seeds()
                 # Save avg reward
-                avg_reward_path = common_path+"_avg_reward"
+                avg_reward_path = f'{common_path}{"_avg_reward"}'
+                #common_path+"_avg_reward"
                 self.timesteps_since_eval = 0
                 first_itr = self.episode_num <= Config().algorithm.eval_freq
                 self.save_metric(avg_reward_path, self.avg_reward, first = first_itr)
@@ -191,8 +196,10 @@ class Trainer(basic.Trainer):
                     self.estimate_fisher(self.train_helper(self.memory, last_q_val, fisher = True))
                     self.sum_fisher_diagonals()
                     # Save fisher matrix
-                    actor_fisher_path = common_path + "_actor_fisher"
-                    critic_fisher_path = common_path + "_critic_fisher"
+                    actor_fisher_path = f'{common_path}{"_actor_fisher"}'
+                    #common_path + "_actor_fisher"
+                    critic_fisher_path = f'{common_path}{"_critic_fisher"}'
+                    #common_path + "_critic_fisher"
                     self.save_metric(actor_fisher_path, [self.actor_fisher_sum.tolist()], first = (self.episode_num == 0) and (self.steps == Config().algorithm.batch_size))
                     self.save_metric(critic_fisher_path, [self.critic_fisher_sum.tolist()], first = (self.episode_num == 0) and (self.steps == Config().algorithm.batch_size))
 
@@ -214,7 +221,8 @@ class Trainer(basic.Trainer):
         self.save_seeds()
         self.avg_reward = self.evaluate_policy()
         self.restore_seeds()
-        avg_reward_path = common_path + "_avg_reward"
+        avg_reward_path = f'{common_path}{"_avg_reward"}'
+        #common_path + "_avg_reward"
         self.save_metric(avg_reward_path, self.avg_reward, first=first_itr)
 
         # 2- Get gradients of change in actor and critic loss
@@ -222,8 +230,10 @@ class Trainer(basic.Trainer):
         actor_grad, _ = np.polyfit(x, np.array(self.actor_loss), 1)
         critic_grad, _ = np.polyfit(x, np.array(self.critic_loss), 1)
         # and save in file
-        critic_grad_path = common_path + "_critic_grad"
-        actor_grad_path = common_path + "_actor_grad"
+        critic_grad_path = f'{common_path}{"_critic_grad"}'
+        #common_path + "_critic_grad"
+        actor_grad_path =  f'{common_path}{"_actor_grad"}'
+        #common_path + "_actor_grad"
         self.save_metric(critic_grad_path, [critic_grad], first = first_itr)
         self.save_metric(actor_grad_path, [actor_grad], first = first_itr)
         
@@ -236,7 +246,7 @@ class Trainer(basic.Trainer):
 
     def save_seeds(self):
         """ Saving the random seeds in the trainer for resuming its session later on. """
-        with open(self.seed_path + ".pkl", 'wb') as checkpoint_file:
+        with open(f'{self.seed_path}.pkl', 'wb') as checkpoint_file:
             pickle.dump(torch.get_rng_state(), checkpoint_file)
 
     def restore_seeds(self):
@@ -244,7 +254,7 @@ class Trainer(basic.Trainer):
         #seed_path should have client id in it!!!!!
         rng_state_to_load = None
 
-        with open(self.seed_path + ".pkl", 'rb') as checkpoint_file:
+        with open(f'{self.seed_path}.pkl', 'rb') as checkpoint_file:
             print("Restore seeds")
             rng_state_to_load = pickle.load(checkpoint_file)
         
@@ -326,19 +336,20 @@ class Trainer(basic.Trainer):
         
     def load_fisher(self):
         """ Load last fisher from file"""
-        path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
+        path = f'{Config().results.results_dir}_seed_{Config().server.random_seed}/{Config().results.file_name}_{self.client_id}'
+        #Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
         SIZE = 10
         act_pos, cri_pos = 0, 0
         GRAD_SIZE = 2 * Config().algorithm.max_round_episodes
         actor_fisher_round, critic_fisher_round = np.zeros(GRAD_SIZE), np.zeros(GRAD_SIZE)
-        with open(path + "_actor_fisher.csv", 'r') as file:
+        with open(f'{path}{"_actor_fisher.csv"}', 'r') as file:
             rows = file.readlines()
             # TODO: moving average of the last 10 or more! 
             # One round: 2 * max_round_episodes episodes each episode, two fishers
             for row in rows:
                 actor_fisher_round[act_pos] = row
                 act_pos = (act_pos + 1) % GRAD_SIZE
-        with open(path + "_critic_fisher.csv", 'r') as file:
+        with open(f'{path}{"_critic_fisher.csv"}', 'r') as file:
             rows = file.readlines()
             for row in rows:
                 critic_fisher_round[cri_pos] = row
@@ -350,8 +361,8 @@ class Trainer(basic.Trainer):
         critic_fisher_grad, _ = np.polyfit(x, critic_fisher_round, 1)
 
         # Save fisher grads, may need later, may delete later
-        self.save_metric(path + "_actor_fisher_grad", [actor_fisher_grad], first = self.episode_num <= Config().algorithm.max_round_episodes)
-        self.save_metric(path + "_critic_fisher_grad", [critic_fisher_grad], first = self.episode_num <= Config().algorithm.max_round_episodes)
+        self.save_metric(f'{path}{"_actor_fisher_grad"}', [actor_fisher_grad], first = self.episode_num <= Config().algorithm.max_round_episodes)
+        self.save_metric(f'{path}{"_critic_fisher_grad"}', [critic_fisher_grad], first = self.episode_num <= Config().algorithm.max_round_episodes)
 
         return avg_actor_fisher, avg_critic_fisher, actor_fisher_grad, critic_fisher_grad
 
@@ -364,16 +375,18 @@ class Trainer(basic.Trainer):
         actor_model_name = 'actor_model'
         critic_model_name = 'critic_model'
         env_algorithm = self.env_name+ self.algorithm_name
+        model_seed_path = f'_seed_{Config().server.random_seed}'
+        #"_"+str(Config().server.random_seed)
 
-        if filename is None:
-            actor_filename = filename + '_actor'
+        if filename is not None and self.client_id == 0:
+            actor_filename = f'{filename}{"_actor_seed"}{model_seed_path}.pth'
             actor_model_path = f'{model_path}/{actor_filename}'
-            critic_filename = filename + '_critic'
+            critic_filename = f'{filename}{"_critic_seed"}{model_seed_path}.pth'
             critic_model_path = f'{model_path}/{critic_filename}'
         else:
-            actor_model_path = f'{model_path}/{env_algorithm+actor_model_name}.pth'
-            critic_model_path = f'{model_path}/{env_algorithm+critic_model_name}.pth'
-    
+            actor_model_path = f'{model_path}/{env_algorithm}{actor_model_name}{model_seed_path}.pth'
+            critic_model_path = f'{model_path}/{env_algorithm}{critic_model_name}{model_seed_path}.pth'
+
         if self.client_id == 0:
             logging.info("[Server #%d] Loading models from %s, and %s.", os.getpid(),
                          actor_model_path, critic_model_path)
@@ -401,19 +414,19 @@ class Trainer(basic.Trainer):
             self.adam_critic = torch.optim.Adam(self.critic.parameters(), lr=Config().algorithm.learning_rate)
 
     def load_loss(self):
-        path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
-        
-        with open(path + "_actor_loss.csv", 'r') as file:
+        path = f'{Config().results.results_dir}_seed_{Config().server.random_seed}/{Config().results.file_name}_{self.client_id}'
+       # Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
+        with open(f'{path}{"_actor_loss.csv"}', 'r') as file:
             rows = file.readlines()
             for row in rows:
                 actor_loss = float(row)
 
-        with open(path + "_critic_loss.csv", 'r') as file:
+        with open(f'{path}{"_critic_loss.csv"}', 'r') as file:
             rows = file.readlines()
             for row in rows:
                 critic_loss = float(row)
 
-        with open(path + "_entropy_loss.csv", 'r') as file:
+        with open(f'{path}{"_entropy_loss.csv"}', 'r') as file:
             rows = file.readlines()
             for row in rows:
                 entropy_loss = float(row)
@@ -421,14 +434,14 @@ class Trainer(basic.Trainer):
         return actor_loss, critic_loss, entropy_loss
 
     def load_grads(self):
-        path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
+        path = f'{Config().results.results_dir}_seed_{Config().server.random_seed}/{Config().results.file_name}_{self.client_id}'
         actor_grad= []
         critic_grad = []
-        with open(path + "_actor_grad.csv", 'r') as file:
+        with open(f'{path}{"_actor_grad.csv"}', 'r') as file:
             rows = file.readlines()
             for row in rows:
                 actor_grad = float(row)
-        with open(path + "_critic_grad.csv", 'r') as file:
+        with open(f'{path}{"_critic_grad.csv"}', 'r') as file:
             rows = file.readlines()
             for row in rows:
                 critic_grad = float(row)
@@ -436,7 +449,7 @@ class Trainer(basic.Trainer):
         return actor_grad, critic_grad
 
     def save_metric(self, path, value, first = False):
-        with open(path+".csv", 'w' if first else 'a') as filehandle:
+        with open(f'{path}.csv', 'w' if first else 'a') as filehandle:
             writer = csv.writer(filehandle)
             writer.writerow(value)
 
@@ -448,12 +461,14 @@ class Trainer(basic.Trainer):
         ).params['model_path'] if location is None else location
         actor_model_name = 'actor_model'
         critic_model_name = 'critic_model'
-        env_algorithm = self.env_name+ self.algorithm_name
+        env_algorithm = f'{self.env_name}{self.algorithm_name}'
+        #self.env_name+ self.algorithm_name
+        model_seed_path = f'_seed_{Config().server.random_seed}'
 
         #call save loss here
         check_point_save = "checkpoint" in filename
         if not check_point_save:
-            path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
+            path = f'{Config().results.results_dir}_seed_{Config().server.random_seed}/{Config().results.file_name}_{self.client_id}'
             self.save_loss(path)
     
         try:
@@ -462,17 +477,17 @@ class Trainer(basic.Trainer):
         except FileExistsError:
             pass
 
-        if filename is None:
+        if filename is not None and self.client_id == 0:
            # model_path = f'{model_path}/{filename}'
            # model_filename = filename + _'model'
            # model path = Config().params stuff
-           actor_filename = filename + '_actor'
-           critic_filename = filename + '_critic'
-           actor_model_path = f'{model_path}/{actor_filename}'
-           critic_model_path = f'{model_path}/{critic_filename}'
+            actor_filename = f'{filename}{"_actor_seed"}{model_seed_path}.pth'
+            actor_model_path = f'{model_path}/{actor_filename}'
+            critic_filename = f'{filename}{"_critic_seed"}{model_seed_path}.pth'
+            critic_model_path = f'{model_path}/{critic_filename}'
         else:
-            actor_model_path = f'{model_path}/{env_algorithm+actor_model_name}.pth'
-            critic_model_path = f'{model_path}/{env_algorithm+critic_model_name}.pth'
+            actor_model_path = f'{model_path}/{env_algorithm}{actor_model_name}{model_seed_path}.pth'
+            critic_model_path = f'{model_path}/{env_algorithm}{critic_model_name}{model_seed_path}.pth'
 
         if self.model_state_dict is None:
             torch.save(self.actor.state_dict(), actor_model_path)
@@ -502,9 +517,12 @@ class Trainer(basic.Trainer):
 
     def save_loss(self, path):
 
-        actor_loss_path = path+"_actor_loss.csv"
-        critic_loss_path = path + "_critic_loss.csv"
-        entropy_loss_path = path+"_entropy_loss.csv"
+        actor_loss_path = f'{path}{"_actor_loss.csv"}'
+        #path+"_actor_loss.csv"
+        critic_loss_path = f'{path}{"_critic_loss.csv"}'
+        #path + "_critic_loss.csv"
+        entropy_loss_path = f'{path}{"_entropy_loss.csv"}'
+        #path+"_entropy_loss.csv"
 
         #If it is the first iteration write OVER potnetially existing files, else append
         first_itr = self.episode_num <= Config().algorithm.max_round_episodes
@@ -524,7 +542,6 @@ class Trainer(basic.Trainer):
 
     async def server_test(self, testset, sampler=None, **kwargs):
         #We will return the average reward here
-        print("Sampler in server test", sampler)
         avg_reward = self.evaluate_policy()
         self.server_reward = avg_reward
         file_name = ""
@@ -533,14 +550,15 @@ class Trainer(basic.Trainer):
             file_name = "A2C_RL_SERVER_FED_AVG"
         else:
             file_name = "A2C_RL_SERVER_PERCENTILE_AGGREGATE"
-
-        path = Config().results.results_dir +"/"+file_name
+        results_seed_path = f'{Config().results.results_dir}_seed_{Config().server.random_seed}'
+        path = f'{results_seed_path}/{file_name}.csv'
+        #Config().results.results_dir +"/"+file_name
         
         #first_itr = self.episode_num <= Config().algorithm.max_round_episodes
         #the reason this doesn't work is because episode_num gets reset to 0 when we are in this function
 
 
-        with open(path+".csv", 'w' if self.first_ittr_server else 'a') as filehandle:
+        with open(path, 'w' if self.first_ittr_server else 'a') as filehandle:
                 writer = csv.writer(filehandle)
                 writer.writerow(self.server_reward)
                 

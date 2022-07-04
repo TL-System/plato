@@ -64,13 +64,14 @@ class A2CServer(fedavg.Server):
         for i, update in enumerate(weights_received):
             __, report, __, __ = updates[i] 
             client_id = report.client_id
-            client_path =  Config().results.results_dir +"/"+Config().results.file_name+"_client_saved"
+            client_path = f'{Config().results.results_dir}_seed_{Config().server.random_seed}/{Config().results.file_name}_client_saved'
+            #Config().results.results_dir +"/"+Config().results.file_name+"_client_saved"
 
             update_from_actor, update_from_critic = update
             
             
             if not Config().server.percentile_aggregate:
-                self.save_files(client_path+"_Fed_avg", client_id)
+                self.save_files(f'{client_path}{"_Fed_avg"}', client_id)
                 for name, delta in update_from_actor.items():
                     actor_avg_update[name] += delta * 1.0/Config().clients.per_round
 
@@ -101,7 +102,7 @@ class A2CServer(fedavg.Server):
                 # or (self.current_round == 15 and client_id == 3) \
                 # or (self.current_round == 16 and client_id == 3):
                     print("Client %s is choosen" % str(client_id))
-                    self.save_files(client_path+"_percentile", client_id)
+                    self.save_files(f'{client_path}{"_percentile"}', client_id)
                     for name, delta in update_from_actor.items():
                         actor_avg_update[name] += delta * 1.0/clients_selected_size
                     for name, delta in update_from_critic.items():
@@ -114,7 +115,7 @@ class A2CServer(fedavg.Server):
 
     def save_files(self, file_path, data):
         #To avoid appending to existing files, if the current roudn is one we write over
-        with open(file_path+".csv", 'w'if self.current_round == 1 else 'a') as filehandle:
+        with open(f'{file_path}.csv"', 'w'if self.current_round == 1 else 'a') as filehandle:
             writer = csv.writer(filehandle)
             writer.writerow([data])
 
@@ -162,11 +163,10 @@ class A2CServer(fedavg.Server):
         if '_' in copy_algorithm:
             copy_algorithm= copy_algorithm.replace('_', '')
         
-        env_algorithm = self.env_name+copy_algorithm
+        env_algorithm = f'{self.env_name}{copy_algorithm}'
         model_name = env_algorithm
-        if '_' in model_name:
-            model_name.replace('_', '')
-        filename = f"checkpoint_{model_name}_{self.current_round}.pth"
+     
+        filename = f"{model_name}_{self.current_round}"
         logging.info("[%s] Saving the checkpoint to %s/%s.", self,
                      checkpoint_path, filename)
         self.trainer.save_model(filename, checkpoint_path)
