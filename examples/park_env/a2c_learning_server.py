@@ -14,6 +14,7 @@ from plato.config import Config
 import pickle
 import numpy as np
 import csv
+import random
 
 class A2CServer(fedavg.Server):
     """ Federated learning server using federated averaging to train Actor-Critic models. """
@@ -166,6 +167,44 @@ class A2CServer(fedavg.Server):
         self.save_random_states(self.current_round, checkpoint_path)
 
         # Saving the current round in the server for resuming its session later on
-        with open(f"{checkpoint_path}/current_round.pkl",
+        with open(f"{checkpoint_path}/current_round_seed_{Config().server.random_seed}.pkl",
                   'wb') as checkpoint_file:
             pickle.dump(self.current_round, checkpoint_file)
+
+
+    def save_random_states(self, round_to_save, checkpoint_path):
+        """ Saving the random states in the server for resuming its session later on. """
+        states_to_save = [
+            f'numpy_prng_state_{round_to_save}_seed_{Config().server.random_seed}', 
+            f'prng_state_{round_to_save}_seed_{Config().server.random_seed}'
+        ]
+
+        variables_to_save = [
+            np.random.get_state(),
+            random.getstate(),
+        ]
+
+        for i, state in enumerate(states_to_save):
+            with open(f"{checkpoint_path}/{state}.pkl",
+                      'wb') as checkpoint_file:
+                pickle.dump(variables_to_save[i], checkpoint_file)
+
+    
+    def restore_random_states(self, round_to_restore, checkpoint_path):
+        """ Restoring the numpy.random and random states from previously saved checkpoints
+            for a particular round.
+        """
+        states_to_load = [ f'numpy_prng_state_{round_to_restore}_seed_{Config().server.random_seed}', 
+            f'prng_state_{round_to_restore}_seed_{Config().server.random_seed}']
+        variables_to_load = {}
+
+        for i, state in enumerate(states_to_load):
+            with open(f"{checkpoint_path}/{state}_{round_to_restore}.pkl",
+                      'rb') as checkpoint_file:
+                variables_to_load[i] = pickle.load(checkpoint_file)
+
+        numpy_prng_state = variables_to_load[0]
+        self.prng_state = variables_to_load[1]
+
+        np.random.set_state(numpy_prng_state)
+        random.setstate(self.prng_state)
