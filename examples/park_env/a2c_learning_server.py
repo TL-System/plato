@@ -84,24 +84,17 @@ class A2CServer(fedavg.Server):
                 print("Metric", metric)
                 print("Metric percentile", metric_percentile)
                 
-                if metric <= metric_percentile: #(self.current_round < 7 and client_id == 1) or (self.current_round > 7 and self.current_round < 14 and client_id == 2) or (self.current_round > 14 and client_id == 3): #metric <= metric_percentile: 
-                # if (self.current_round == 1 and client_id == 1) \
-                # or (self.current_round == 2 and client_id == 1) \
-                # or (self.current_round == 3 and client_id == 1) \
-                # or (self.current_round == 4 and client_id == 1) \
-                # or (self.current_round == 5 and client_id == 1) \
-                # or (self.current_round == 6 and client_id == 1) \
-                # or (self.current_round == 7 and client_id == 1) \
-                # or (self.current_round == 8 and client_id == 2) \
-                # or (self.current_round == 9 and client_id == 2) \
-                # or (self.current_round == 10 and client_id == 2) \
-                # or (self.current_round == 11 and client_id == 2) \
-                # or (self.current_round == 12 and client_id == 2) \
-                # or (self.current_round == 13 and client_id == 2) \
-                # or (self.current_round == 14 and client_id == 2) \
-                # or (self.current_round == 15 and client_id == 3) \
-                # or (self.current_round == 16 and client_id == 3):
+               # if metric <= metric_percentile:
+                if (client_id == 1 and self.current_round >= 1 and self.current_round <= 3) \
+                or ((client_id == 1 or client_id == 2) and self.current_round > 3 and self.current_round <= 6) \
+                or ((client_id == 1 or client_id == 2 or client_id == 3) and self.current_round > 6):
                     print("Client %s is choosen" % str(client_id))
+                    if self.current_round <= 3:
+                        clients_selected_size = 1
+                    elif self.current_round > 3 and self.current_round <= 6:
+                        clients_selected_size = 2
+                    else:
+                        clients_selected_size = 3
                     self.save_files(f'{client_path}{"_percentile"}', client_id)
                     for name, delta in update_from_actor.items():
                         actor_avg_update[name] += delta * 1.0/clients_selected_size
@@ -115,7 +108,7 @@ class A2CServer(fedavg.Server):
 
     def save_files(self, file_path, data):
         #To avoid appending to existing files, if the current roudn is one we write over
-        with open(f'{file_path}.csv"', 'w'if self.current_round == 1 else 'a') as filehandle:
+        with open(f'{file_path}.csv', 'w'if self.current_round == 1 else 'a') as filehandle:
             writer = csv.writer(filehandle)
             writer.writerow([data])
 
