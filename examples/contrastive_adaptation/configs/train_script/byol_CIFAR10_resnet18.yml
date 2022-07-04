@@ -214,7 +214,7 @@ trainer:
     do_maintain_per_state: false
 
     monitor_name: knn
-    knn_k: 200
+    knn_k: 20
     knn_t: 0.1
     hide_monitor_progress: False
 
