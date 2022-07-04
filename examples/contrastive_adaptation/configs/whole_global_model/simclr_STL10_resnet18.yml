@@ -135,17 +135,19 @@ trainer:
     # space as more samples will be contained within one loading.
     epochs: 5
     batch_size: 256
+
     optimizer: Lars
-    learning_rate: 1.0
+    learning_rate: 0.4
     eta_lars: 0.02
     momentum: 0.9
     grad_clip_lars: True
     exclude_bias_n_norm: True
     weight_decay: 0.00001
 
+    # Learning rate schedule
     lr_schedule: WarmupCosine
     warmup_epochs: 10
-    max_epochs: 500
+    max_epochs: 500 # should be epochs * rounds
     warmup_start_lr: 0.00003
     min_lr: 0.0
 
@@ -156,7 +158,7 @@ trainer:
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
     # does not utilize the
-    pers_epochs: 30
+    pers_epochs: 50
     pers_batch_size: 256
     pers_optimizer: SGD
     # lr = 0.1 * batch_size / 256, see section B.6 and B.7 of SimCLR paper.
@@ -166,14 +168,14 @@ trainer:
 
     # currently, we only support CosineAnnealingLR
     pers_lr_schedule: MultiStepLR
-    pers_lr_milestones: 60,80
+    pers_lr_milestones: 30,40
     pers_lr_gamma: 0.1
 
     pers_epoch_log_interval: 2
     pers_epoch_model_log_interval: 10
 
     # temperature for the loss function
-    temperature: 0.5
+    temperature: 0.2
 
     # image_size
     #  - STL10 (Image size=96)
