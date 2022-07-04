@@ -327,27 +327,33 @@ class Trainer(basic.Trainer):
     def load_fisher(self):
         """ Load last fisher from file"""
         path = Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
-        #ALPHA = 0.85
         SIZE = 10
-        actor_fisher = np.zeros(SIZE)
-        act_pos = 0
-        critic_fisher = np.zeros(SIZE)
-        cri_pos = 0
+        act_pos, cri_pos = 0, 0
+        GRAD_SIZE = 2 * Config().algorithm.max_round_episodes
+        actor_fisher_round, critic_fisher_round = np.zeros(GRAD_SIZE), np.zeros(GRAD_SIZE)
         with open(path + "_actor_fisher.csv", 'r') as file:
             rows = file.readlines()
-            # TODO: moving average of the last 10!
+            # TODO: moving average of the last 10 or more! 
+            # One round: 2 * max_round_episodes episodes each episode, two fishers
             for row in rows:
-                #actor_fisher_sum = (1 - ALPHA) * float(row) + ALPHA * actor_fisher_sum 
-                actor_fisher[act_pos] = row
-                act_pos = (act_pos + 1) % SIZE
+                actor_fisher_round[act_pos] = row
+                act_pos = (act_pos + 1) % GRAD_SIZE
         with open(path + "_critic_fisher.csv", 'r') as file:
             rows = file.readlines()
             for row in rows:
-                #critic_fisher_sum = (1 - ALPHA) * float(row) + ALPHA * critic_fisher_sum
-                critic_fisher[cri_pos] = row
-                cri_pos = (cri_pos + 1) % SIZE
-        
-        return np.mean(actor_fisher), np.mean(critic_fisher)
+                critic_fisher_round[cri_pos] = row
+                cri_pos = (cri_pos + 1) % GRAD_SIZE
+        avg_actor_fisher = np.mean(actor_fisher_round[-SIZE:])
+        avg_critic_fisher = np.mean(critic_fisher_round[-SIZE:])
+        x = np.array(range(len(actor_fisher_round)))+1
+        actor_fisher_grad, _ = np.polyfit(x, actor_fisher_round, 1)
+        critic_fisher_grad, _ = np.polyfit(x, critic_fisher_round, 1)
+
+        # Save fisher grads, may need later, may delete later
+        self.save_metric(path + "_actor_fisher_grad", [actor_fisher_grad], first = self.episode_num <= Config().algorithm.max_round_episodes)
+        self.save_metric(path + "_critic_fisher_grad", [critic_fisher_grad], first = self.episode_num <= Config().algorithm.max_round_episodes)
+
+        return avg_actor_fisher, avg_critic_fisher, actor_fisher_grad, critic_fisher_grad
 
     def load_model(self, filename=None, location=None):
         """Loading pre-trained model weights from a file."""
