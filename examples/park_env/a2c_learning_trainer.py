@@ -379,9 +379,9 @@ class Trainer(basic.Trainer):
         #"_"+str(Config().server.random_seed)
 
         if filename is not None and self.client_id == 0:
-            actor_filename = f'{filename}{"_actor_seed"}{model_seed_path}.pth'
+            actor_filename = f'{filename}{"_actor"}{model_seed_path}.pth'
             actor_model_path = f'{model_path}/{actor_filename}'
-            critic_filename = f'{filename}{"_critic_seed"}{model_seed_path}.pth'
+            critic_filename = f'{filename}{"_critic"}{model_seed_path}.pth'
             critic_model_path = f'{model_path}/{critic_filename}'
         else:
             actor_model_path = f'{model_path}/{env_algorithm}{actor_model_name}{model_seed_path}.pth'
@@ -481,9 +481,9 @@ class Trainer(basic.Trainer):
            # model_path = f'{model_path}/{filename}'
            # model_filename = filename + _'model'
            # model path = Config().params stuff
-            actor_filename = f'{filename}{"_actor_seed"}{model_seed_path}.pth'
+            actor_filename = f'{filename}{"_actor"}{model_seed_path}.pth'
             actor_model_path = f'{model_path}/{actor_filename}'
-            critic_filename = f'{filename}{"_critic_seed"}{model_seed_path}.pth'
+            critic_filename = f'{filename}{"_critic"}{model_seed_path}.pth'
             critic_model_path = f'{model_path}/{critic_filename}'
         else:
             actor_model_path = f'{model_path}/{env_algorithm}{actor_model_name}{model_seed_path}.pth'
