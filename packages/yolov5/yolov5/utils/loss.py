@@ -189,11 +189,12 @@ class ComputeLoss:
         # Build targets for compute_loss(), input targets(image,class,x,y,w,h)
         na, nt = self.na, targets.shape[0]  # number of anchors, targets
         tcls, tbox, indices, anch = [], [], [], []
-        gain = torch.ones(7,
-                          device=self.device)  # normalized to gridspace gain
-        ai = torch.arange(na, device=self.device).float().view(na, 1).repeat(
-            1, nt)  # same as .repeat_interleave(nt)
-        targets = torch.cat((targets.repeat(na, 1, 1), ai[..., None]),
+        gain = torch.ones(
+            7, device=targets.device)  # normalized to gridspace gain
+        ai = torch.arange(na,
+                          device=targets.device).float().view(na, 1).repeat(
+                              1, nt)  # same as .repeat_interleave(nt)
+        targets = torch.cat((targets.repeat(na, 1, 1), ai[:, :, None]),
                             2)  # append anchor indices
 
         g = 0.5  # bias
@@ -206,17 +207,17 @@ class ComputeLoss:
                 [0, -1],  # j,k,l,m
                 # [1, 1], [1, -1], [-1, 1], [-1, -1],  # jk,jm,lk,lm
             ],
-            device=self.device).float() * g  # offsets
+            device=targets.device).float() * g  # offsets
 
         for i in range(self.nl):
-            anchors, shape = self.anchors[i], p[i].shape
-            gain[2:6] = torch.tensor(shape)[[3, 2, 3, 2]]  # xyxy gain
+            anchors = self.anchors[i]
+            gain[2:6] = torch.tensor(p[i].shape)[[3, 2, 3, 2]]  # xyxy gain
 
             # Match targets to anchors
-            t = targets * gain  # shape(3,n,7)
+            t = targets * gain
             if nt:
                 # Matches
-                r = t[..., 4:6] / anchors[:, None]  # wh ratio
+                r = t[:, :, 4:6] / anchors[:, None]  # wh ratio
                 j = torch.max(
                     r, 1 / r).max(2)[0] < self.hyp['anchor_t']  # compare
                 # j = wh_iou(anchors, t[:, 4:6]) > model.hyp['iou_t']  # iou(3,n)=wh_iou(anchors(3,2), gwh(n,2))
@@ -235,15 +236,17 @@ class ComputeLoss:
                 offsets = 0
 
             # Define
-            bc, gxy, gwh, a = t.chunk(
-                4, 1)  # (image, class), grid xy, grid wh, anchors
-            a, (b, c) = a.long().view(-1), bc.long().T  # anchors, image, class
+            b, c = t[:, :2].long().T  # image, class
+            gxy = t[:, 2:4]  # grid xy
+            gwh = t[:, 4:6]  # grid wh
             gij = (gxy - offsets).long()
-            gi, gj = gij.T  # grid indices
+            gi, gj = gij.T  # grid xy indices
 
             # Append
-            indices.append((b, a, gj.clamp_(0, shape[2] - 1),
-                            gi.clamp_(0, shape[3] - 1)))  # image, anchor, grid
+            a = t[:, 6].long()  # anchor indices
+            indices.append(
+                (b, a, gj.clamp_(0, gain[3] - 1),
+                 gi.clamp_(0, gain[2] - 1)))  # image, anchor, grid indices
             tbox.append(torch.cat((gxy - gij, gwh), 1))  # box
             anch.append(anchors[a])  # anchors
             tcls.append(c)  # class
