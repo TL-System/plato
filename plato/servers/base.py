@@ -98,13 +98,13 @@ class Server:
         # Accumulated communication overhead (MB) throughout the FL training session
         self.comm_overhead = 0
 
-        # Downlink and uplink bandwidth (MBps)
+        # Downlink and uplink bandwidth (Mbps)
         # for computing communication time in communication simulation mode
         self.downlink_bandwidth = Config(
         ).server.downlink_bandwidth if hasattr(Config().server,
-                                               'downlink_bandwidth') else 1
+                                               'downlink_bandwidth') else 100
         self.uplink_bandwidth = Config().server.uplink_bandwidth if hasattr(
-            Config().server, 'uplink_bandwidth') else 1
+            Config().server, 'uplink_bandwidth') else 100
 
         # Use dictionaries to record downlink/uplink communication time of each client
         self.downlink_comm_time = {}
@@ -536,7 +536,7 @@ class Server:
                     # Compute the communication time to transfer the current global model to client
                     self.downlink_comm_time[
                         self.selected_client_id] = payload_size / (
-                            self.downlink_bandwidth /
+                            (self.downlink_bandwidth / 8) /
                             len(self.selected_clients))
 
                 server_response = await self.customize_server_response(
@@ -679,6 +679,11 @@ class Server:
                 self, payload_size, client_id)
 
             self.comm_overhead += payload_size
+
+            if self.asynchronous_mode:
+                self.uplink_bandwidth = self.uplink_bandwidth / 8 / self.minimum_clients
+            else:
+                self.uplink_bandwidth = self.uplink_bandwidth / 8 / self.clients_per_round
 
             self.uplink_comm_time[
                 client_id] = payload_size / self.uplink_bandwidth
