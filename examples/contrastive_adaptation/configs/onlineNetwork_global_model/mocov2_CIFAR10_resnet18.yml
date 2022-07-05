@@ -19,7 +19,7 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 50
+    total_clients: 100
 
     # The number of clients selected in each round
     per_round: 30
@@ -85,8 +85,8 @@ data:
     # The main reason is that the relation between queen size and
     # batch size should be:
     # queen_size % batch_size == 0
-    partition_size: 1536
-    test_partition_size: 1536
+    partition_size: 768
+    test_partition_size: 768
 
     # IID or non-IID?
     sampler: noniid
@@ -193,7 +193,7 @@ trainer:
     # - whole: the whole model
     # - online_embedder: the online_embedder is exchanged
     # - target_embedder: the target_embedder is exchanged
-    global_model_name: whole
+    global_model_name: encoder_q
     personalized_model_name: pure_one_layer_mlp
 
     # whether to maintain the state of the trained personalized

@@ -17,7 +17,7 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 50
+    total_clients: 100
 
     # The number of clients selected in each round
     per_round: 30
@@ -63,7 +63,7 @@ server:
 
 data:
     # The training and testing dataset
-    datasource: CIFAR10
+    datasource: STL10
 
     # Number of samples in each partition
     #
@@ -77,8 +77,8 @@ data:
     # Working on criterion that is defined with batch_size but receives loaded
     # samples whose size is smaller than the batch size may causes problems.
     # drop_last can alleviate this issue
-    partition_size: 1500
-    test_partition_size: 1500
+    partition_size: 70
+    test_partition_size: 160
 
     # IID or non-IID?
     sampler: noniid
@@ -128,6 +128,9 @@ trainer:
     # however, in the central test, we do not use this
     #   but use the custom model
     model_name: resnet_18
+
+    # image size
+    image_size: 96
 
     num_classes: 10
 

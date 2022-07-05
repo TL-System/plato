@@ -5,7 +5,7 @@ general:
     # for different purposes
     # - central_code_test
     # - central
-    # - code_test
+    # - script
     # - user
 
     running_mode: user
@@ -17,13 +17,22 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 50
+    total_clients: 100
 
     # The number of clients selected in each round
     per_round: 30
 
+    do_data_tranform_logging: True
+
     # Should the clients compute test accuracy locally?
     do_test: True
+
+    # Should the client only perfrom the eval test without training
+    # under the contrastive ssl.
+    # only perfrom the training and test for the downstream task,
+    # i.e., personalziation in each client
+    only_eval_test: False
+
     # whether perform the eval test at the final round
     # on all clients
     do_final_eval_test: True
@@ -33,6 +42,7 @@ clients:
     # Train the personalized model based on the
     # learned representation every 10 rounds
     eval_test_interval: 10
+
     # Whether simulate clients or not
     simulation: true
 
@@ -40,9 +50,12 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8004
+    port: 8011
     synchronous: true
     do_test: false
+
+    ping_interval: 12000
+    ping_timeout: 12000
 
     # for the paths of models; checkpoints; results,
     # they utilize the same name, following the one defined in
@@ -69,24 +82,20 @@ data:
     # may lead the failure of the loss criterion part
     # if your loss criterion relies on the batch_size
     # as its argument. For example, the NT_Xent loss utilized
-    # by the MoCo method set the defined batch_size as the parameter.
+    # by the BYOL method set the defined batch_size as the parameter.
     # However, at the end of one epoch, the left samples may smaller than
     # the batch_size. This makes the #loaded samples != batch_size.
     # Working on criterion that is defined with batch_size but receives loaded
     # samples whose size is smaller than the batch size may causes problems.
-    # drop_last = True can alleviate this issue.
-    # Currently drop_last is default to be False in Plato.
-    # Under this case, to avoid this issue, we need to set:
-    #   partition_size / batch_size = integar
-    #   partition_size / pers_batch_size = integar
-    partition_size: 1200
+    # drop_last can alleviate this issue
+    partition_size: 600
+    test_partition_size: 600
 
     # IID or non-IID?
     sampler: noniid
     testset_sampler: noniid
-
     # The concentration parameter for the Dirichlet distribution
-    concentration: 5
+    concentration: 0.3
 
     # The random seed for sampling data
     random_seed: 1
@@ -97,8 +106,8 @@ data:
     data_wrapper: ContrastiveAugmentWrapper
 
     # set the data augmentation
-    #   options: simsiam, byol, moco
-    augment_transformer_name: moco
+    #   options: simsiam, byol, simclr
+    augment_transformer_name: simsiam
     # some methods apply the normalization to samples
     #   while others do not
     is_norm: True
@@ -106,7 +115,6 @@ data:
 trainer:
     # The type of the trainer
     type: basic
-
     # The maximum number of training rounds
     rounds: 100
 
@@ -114,38 +122,54 @@ trainer:
     parallelized: false
 
     # The maximum number of clients running concurrently
-    max_concurrency: 5
+    max_concurrency: 2
 
     # The target accuracy
-    target_accuracy: 0.80
+    target_accuracy: 0.9
 
     # Number of epochs for local training in each communication round
+    #   The user is expected to carefully choose the batch_size to avoid
+    # the memory allocation issue as the contrastive samples occupy more
+    # space as more samples will be contained within one loading.
     epochs: 5
-    batch_size: 512
-    optimizer: Adam
-    learning_rate: 0.003
+    batch_size: 256
+    optimizer: Lars
+    learning_rate: 0.5
+    eta_lars: 0.001
+    momentum: 0.9
+    grad_clip_lars: False
+    exclude_bias_n_norm: False
     weight_decay: 0.00001
 
-    # Learning rate schedule
-    lr_schedule: LambdaLR
-    lr_gamma: 0.1
-    lr_milestone_steps: 80ep,120ep
+    lr_schedule: WarmupCosine
+    warmup_epochs: 10
+    max_epochs: 500
+    warmup_start_lr: 0.00003
+    min_lr: 0.0
 
     epoch_log_interval: 1
-    batch_log_interval: 5
+    epoch_model_log_interval: 2
+    batch_log_interval: 1
 
     # Number of epochs for local training in each communication round
-    pers_epochs: 15
-    pers_batch_size: 512
-    pers_optimizer: Adam
-    pers_learning_rate: 0.003
-    pers_weight_decay: 0.000006
+    #   The batch size for the downstream task can be larger as it
+    # does not utilize the
+    pers_epochs: 50
+    pers_batch_size: 256
+    pers_optimizer: SGD
+    # lr = 0.1 * batch_size / 256, see section B.6 and B.7 of SimCLR paper.
+    pers_learning_rate: 0.1
+    pers_momentum: 0.9
+    pers_weight_decay: 0.0
 
-    pers_lr_schedule: StepLR
-    pers_lr_step_size: 20
-    pers_lr_gamma: 0.9
+    # currently, we only support CosineAnnealingLR
+    pers_lr_schedule: MultiStepLR
+    pers_lr_milestones: 30,40
+    pers_lr_gamma: 0.1
 
     pers_epoch_log_interval: 2
+    pers_epoch_model_log_interval: 10
+
 
     # image_size
     #  - CIFAR10 (Image size=32)
@@ -155,23 +179,17 @@ trainer:
     # The machine learning model,
     # it behaves as the encoder for the ssl method
     # the final fc layer will be removed
+    # however, in the central test, we do not use this
+    #   but use the custom model
     model_name: resnet_18
-    # in general,
-    feature_dim: 128
+    # in general, the projection_dim = prediction_dim
+    projection_dim: 2048
+    projection_hidden_dim: 2048
+    prediction_dim: 2048
+    prediction_hidden_dim: 512
 
-    # temperature
-    temperature: 0.07
-    # queue_size, 65536 by default
-    queue_size: 65536
-    # moco momentum of updating key encoder (default: 0.999)
-    update_momentum: 0.999
-
-
-    # set which part of the model is used as the global model
-    # - whole: the whole model
-    # - encoder_q: the encoder_q is exchanged
-    # - encoder_k: the encoder_k is exchanged
-    global_model_name: encoder_q
+    # name of the component used as the global model
+    global_model_name: whole
 
     personalized_model_name: pure_one_layer_mlp
 
@@ -190,7 +208,7 @@ trainer:
     do_maintain_per_state: false
 
     monitor_name: knn
-    knn_k: 200
+    knn_k: 20
     knn_t: 0.1
     hide_monitor_progress: False
 
@@ -199,7 +217,6 @@ trainer:
 algorithm:
     # Aggregation algorithm
     type: fedavg
-
 
 results:
     result_path: xxx

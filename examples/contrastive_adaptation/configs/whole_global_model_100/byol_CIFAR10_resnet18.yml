@@ -1,7 +1,4 @@
 
-# For the central learning of BYOL on the CIFAR10 datase,
-#   we directly follow the setting provided by:
-
 general:
 
     # performing different running mode
@@ -19,7 +16,7 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 50
+    total_clients: 100
 
     # The number of clients selected in each round
     per_round: 30
@@ -38,13 +35,13 @@ clients:
     # whether perform the eval test at the final round
     # on all clients
     do_final_eval_test: True
-
     # Minotor the self-supervised learning by knn for
     # every 5 round
     test_interval: 5
     # Train the personalized model based on the
-    # learned representation every 1 rounds
+    # learned representation every 10 rounds
     eval_test_interval: 10
+
     # Whether simulate clients or not
     simulation: true
 
@@ -52,7 +49,7 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8011
+    port: 8005
     synchronous: true
     do_test: false
 
@@ -81,17 +78,21 @@ data:
     # Number of samples in each partition
     #
     # This is one important parameter that
-    # may lead the failure of some methods such as the MoCo
-    # The main reason is that the relation between queen size and
-    # batch size should be:
-    # queen_size % batch_size == 0
-    partition_size: 1536
-    test_partition_size: 1536
+    # may lead the failure of the loss criterion part
+    # if your loss criterion relies on the batch_size
+    # as its argument. For example, the NT_Xent loss utilized
+    # by the BYOL method set the defined batch_size as the parameter.
+    # However, at the end of one epoch, the left samples may smaller than
+    # the batch_size. This makes the #loaded samples != batch_size.
+    # Working on criterion that is defined with batch_size but receives loaded
+    # samples whose size is smaller than the batch size may causes problems.
+    # drop_last can alleviate this issue
+    partition_size: 600
+    test_partition_size: 600
 
     # IID or non-IID?
     sampler: noniid
     testset_sampler: noniid
-
     # The concentration parameter for the Dirichlet distribution
     concentration: 0.3
 
@@ -104,8 +105,8 @@ data:
     data_wrapper: ContrastiveAugmentWrapper
 
     # set the data augmentation
-    #   options: simsiam, byol, simclr, moco
-    augment_transformer_name: moco
+    #   options: simsiam, byol, simclr
+    augment_transformer_name: byol
     # some methods apply the normalization to samples
     #   while others do not
     is_norm: True
@@ -131,16 +132,17 @@ trainer:
     # space as more samples will be contained within one loading.
     epochs: 5
     batch_size: 256
-
-    optimizer: SGD
-    # lr = 0.3 * batch_size / 256, see section B.6 and B.7 of SimCLR paper.
-    learning_rate: 0.3
+    optimizer: Lars
+    learning_rate: 1.0
+    eta_lars: 0.02
     momentum: 0.9
-    weight_decay: 0.0001
+    grad_clip_lars: True
+    exclude_bias_n_norm: True
+    weight_decay: 0.00001
 
     lr_schedule: WarmupCosine
     warmup_epochs: 10
-    max_epochs: 500 # should be epochs * rounds
+    max_epochs: 500
     warmup_start_lr: 0.00003
     min_lr: 0.0
 
@@ -178,21 +180,24 @@ trainer:
     # however, in the central test, we do not use this
     #   but use the custom model
     model_name: resnet_18
-    # in general,
-    projection_dim: 128
+    # in general, the projection_dim = prediction_dim
+    # in byol the prediction and projection share the same
+    # structure
+    projection_dim: 256
     projection_hidden_dim: 2048
+    prediction_dim: 256
+    prediction_hidden_dim: 2048
 
-    # temperature
-    temperature: 0.2
-    # queue_size, 32768 by default
-    queue_size: 32768
-    # moco momentum of updating key encoder (default: 0.999)
-    update_momentum: 0.999
+    # here are two ways to determine this decay
+    # - constant value: 0.99
+    # - adaptive computed with traing epochs.
+    #   such as the one in "three-method" implementation
+    onlient_target_moving_average_decay: 0.99
 
     # set which part of the model is used as the global model
     # - whole: the whole model
-    # - online_embedder: the online_embedder is exchanged
-    # - target_embedder: the target_embedder is exchanged
+    # - online_network: the online_network is exchanged
+    # - target_network: the target_network is exchanged
     global_model_name: whole
     personalized_model_name: pure_one_layer_mlp
 
@@ -207,7 +212,6 @@ trainer:
     # trained personalized model in each round.
     # Then, setting do_maintain_per_state to be True to follow this
     # rule.
-    # For central learning with one round training, this is useless
     do_maintain_per_state: false
 
     monitor_name: knn

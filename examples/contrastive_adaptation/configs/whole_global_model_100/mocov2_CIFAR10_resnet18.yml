@@ -19,7 +19,7 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 50
+    total_clients: 100
 
     # The number of clients selected in each round
     per_round: 30
@@ -85,8 +85,8 @@ data:
     # The main reason is that the relation between queen size and
     # batch size should be:
     # queen_size % batch_size == 0
-    partition_size: 1536
-    test_partition_size: 1536
+    partition_size: 768
+    test_partition_size: 768
 
     # IID or non-IID?
     sampler: noniid
