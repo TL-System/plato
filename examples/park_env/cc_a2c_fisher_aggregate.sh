@@ -12,3 +12,6 @@ python examples/park_env/a2c.py -c examples/park_env/a2c_fisher_aggregate.yml
 #To run, connect to Graham, follow the Running.md file under docs, move this file to the main plato directory and run from there
 #Remember to copy over data folder as Graham does not allow external downloads
 #Tip: make the output file seed specific
+#Make sure that before submitting another batch that it runs the yml file you want, otherwise
+#if you make changes to your yml file it will run that LATEST version of that yml file
+#change port numbers everytime
