@@ -198,6 +198,12 @@ class Server:
             Config().server,
             'disable_clients') and Config().server.disable_clients
 
+        # Compute the per-client uplink bandwidth
+        if self.asynchronous_mode:
+            self.uplink_bandwidth = self.uplink_bandwidth / self.minimum_clients
+        else:
+            self.uplink_bandwidth = self.uplink_bandwidth / self.clients_per_round
+
     def run(self,
             client=None,
             edge_server=None,
@@ -680,13 +686,8 @@ class Server:
 
             self.comm_overhead += payload_size
 
-            if self.asynchronous_mode:
-                self.uplink_bandwidth = self.uplink_bandwidth / 8 / self.minimum_clients
-            else:
-                self.uplink_bandwidth = self.uplink_bandwidth / 8 / self.clients_per_round
-
-            self.uplink_comm_time[
-                client_id] = payload_size / self.uplink_bandwidth
+            self.uplink_comm_time[client_id] = payload_size / (
+                self.uplink_bandwidth / 8)
 
             await self.process_client_info(client_id, sid)
 
