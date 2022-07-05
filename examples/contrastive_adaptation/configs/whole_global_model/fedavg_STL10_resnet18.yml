@@ -17,10 +17,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 5
+    total_clients: 50
 
     # The number of clients selected in each round
-    per_round: 3
+    per_round: 30
 
     # Should the clients compute test accuracy locally?
     do_test: True
@@ -78,7 +78,7 @@ data:
     # samples whose size is smaller than the batch size may causes problems.
     # drop_last can alleviate this issue
     partition_size: 100
-    test_partition_size: 160
+    test_partition_size: 600
 
     # IID or non-IID?
     sampler: noniid

@@ -1,7 +1,4 @@
 
-# For the central learning of BYOL on the CIFAR10 datase,
-#   we directly follow the setting provided by:
-
 general:
 
     # performing different running mode
@@ -10,6 +7,7 @@ general:
     # - central
     # - script
     # - user
+
     running_mode: user
 
     file_logging: True
@@ -19,7 +17,7 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 50
+    total_clients: 100
 
     # The number of clients selected in each round
     per_round: 30
@@ -38,13 +36,13 @@ clients:
     # whether perform the eval test at the final round
     # on all clients
     do_final_eval_test: True
-
     # Minotor the self-supervised learning by knn for
     # every 5 round
     test_interval: 5
     # Train the personalized model based on the
-    # learned representation every 1 rounds
+    # learned representation every 10 rounds
     eval_test_interval: 10
+
     # Whether simulate clients or not
     simulation: true
 
@@ -52,7 +50,7 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8011
+    port: 8014
     synchronous: true
     do_test: false
 
@@ -81,12 +79,17 @@ data:
     # Number of samples in each partition
     #
     # This is one important parameter that
-    # may lead the failure of some methods such as the MoCo
-    # The main reason is that the relation between queen size and
-    # batch size should be:
-    # queen_size % batch_size == 0
-    partition_size: 1536
-    test_partition_size: 1536
+    # may lead the failure of the loss criterion part
+    # if your loss criterion relies on the batch_size
+    # as its argument. For example, the NT_Xent loss utilized
+    # by the SimCLR method set the defined batch_size as the parameter.
+    # However, at the end of one epoch, the left samples may smaller than
+    # the batch_size. This makes the #loaded samples != batch_size.
+    # Working on criterion that is defined with batch_size but receives loaded
+    # samples whose size is smaller than the batch size may causes problems.
+    # drop_last can alleviate this issue
+    partition_size: 600
+    test_partition_size: 600
 
     # IID or non-IID?
     sampler: noniid
@@ -104,8 +107,8 @@ data:
     data_wrapper: ContrastiveAugmentWrapper
 
     # set the data augmentation
-    #   options: simsiam, byol, simclr, moco
-    augment_transformer_name: moco
+    #   options: simsiam, byol, simclr
+    augment_transformer_name: simclr
     # some methods apply the normalization to samples
     #   while others do not
     is_norm: True
@@ -132,12 +135,15 @@ trainer:
     epochs: 5
     batch_size: 256
 
-    optimizer: SGD
-    # lr = 0.3 * batch_size / 256, see section B.6 and B.7 of SimCLR paper.
-    learning_rate: 0.3
+    optimizer: Lars
+    learning_rate: 0.4
+    eta_lars: 0.02
     momentum: 0.9
-    weight_decay: 0.0001
+    grad_clip_lars: True
+    exclude_bias_n_norm: True
+    weight_decay: 0.00001
 
+    # Learning rate schedule
     lr_schedule: WarmupCosine
     warmup_epochs: 10
     max_epochs: 500 # should be epochs * rounds
@@ -167,7 +173,11 @@ trainer:
     pers_epoch_log_interval: 2
     pers_epoch_model_log_interval: 10
 
+    # temperature
+    temperature: 0.2
+
     # image_size
+    #  - STL10 (Image size=96)
     #  - CIFAR10 (Image size=32)
     #  - MNIST (Image size=28)
     image_size: 32
@@ -177,23 +187,15 @@ trainer:
     # the final fc layer will be removed
     # however, in the central test, we do not use this
     #   but use the custom model
+    external_encoder: False
     model_name: resnet_18
-    # in general,
-    projection_dim: 128
+    # in general, the projection_dim = prediction_dim
+    projection_dim: 256
     projection_hidden_dim: 2048
 
-    # temperature
-    temperature: 0.2
-    # queue_size, 32768 by default
-    queue_size: 32768
-    # moco momentum of updating key encoder (default: 0.999)
-    update_momentum: 0.999
+    # name of the component used as the global model
+    global_model_name: encoder
 
-    # set which part of the model is used as the global model
-    # - whole: the whole model
-    # - online_embedder: the online_embedder is exchanged
-    # - target_embedder: the target_embedder is exchanged
-    global_model_name: whole
     personalized_model_name: pure_one_layer_mlp
 
     # whether to maintain the state of the trained personalized
