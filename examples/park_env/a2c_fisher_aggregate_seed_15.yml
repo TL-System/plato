@@ -13,16 +13,16 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    random_seed: 1
+    random_seed: 15
 
 server:
     address: 127.0.0.1
-    port: 8008
+    port: 8010
 
     # Should we simulate the wall-clock time on the server? Useful if max_concurrency is specified
     simulate_wall_time: true
 
-    random_seed: 1
+    random_seed: 15
 
     checkpoint_path: checkpoints_fisher_aggregate
 
@@ -53,7 +53,7 @@ data:
     concentration: 0.5
 
     # The random seed for sampling data
-    random_seed: 1
+    random_seed: 15
 
 trainer:
     #The type of trainer
@@ -79,7 +79,7 @@ trainer:
     # The machine learning model
     model_name: lenet5
 
-    manual_seed: 1
+    manual_seed: 15
 
 algorithm:
     # Aggregation algorithm
@@ -112,7 +112,7 @@ algorithm:
     iterations: 1000
 
     # Number of episodes to run each round
-    max_round_episodes: 400
+    max_round_episodes: 2
 
     # Curriculum learning, fixed difficulty level for motivation experiment
     difficulty_levels: 3
