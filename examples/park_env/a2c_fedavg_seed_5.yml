@@ -13,7 +13,7 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    random_seed: 1
+    random_seed: 5
 
 server:
     address: 127.0.0.1
@@ -22,7 +22,7 @@ server:
     # Should we simulate the wall-clock time on the server? Useful if max_concurrency is specified
     simulate_wall_time: true
 
-    random_seed: 1
+    random_seed: 5
 
     checkpoint_path: checkpoints_fed_avg
 
@@ -52,7 +52,7 @@ data:
     concentration: 0.5
 
     # The random seed for sampling data
-    random_seed: 1
+    random_seed: 5
 
 trainer:
     #The type of trainer
@@ -78,7 +78,7 @@ trainer:
     # The machine learning model
     model_name: lenet5
 
-    manual_seed: 1
+    manual_seed: 5
 
 algorithm:
     # Aggregation algorithm
