@@ -112,12 +112,19 @@ class NTXent(nn.Module):
 class CrossStopGradientL2loss(nn.Module):
     """ The l2 loss with the stop gradients. """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, simplified=True):
 
-    @staticmethod
-    def mean_squared_error(x, y):
+        super().__init__()
+        # simplified (bool): faster computation,
+        # but with same result. Defaults to True.
+        self.simplified = simplified
+
+    def mean_squared_error(self, x, y):
         """ Compute the mean square error. """
+
+        if self.simplified:
+            return 2 - 2 * F.cosine_similarity(x, y, dim=-1).mean()
+
         x = F.normalize(x, dim=-1, p=2)
         y = F.normalize(y, dim=-1, p=2)
         return 2 - 2 * (x * y).sum(dim=-1)
@@ -128,10 +135,11 @@ class CrossStopGradientL2loss(nn.Module):
                                              target_proj_two) = outputs
 
         # use the detach mechanism to stop the gradient for target learner
-        loss_one = CrossStopGradientL2loss.mean_squared_error(
-            online_pred_one, target_proj_two.detach())
-        loss_two = CrossStopGradientL2loss.mean_squared_error(
-            online_pred_two, target_proj_one.detach())
+
+        loss_one = self.mean_squared_error(online_pred_one,
+                                           target_proj_two.detach())
+        loss_two = self.mean_squared_error(online_pred_two,
+                                           target_proj_one.detach())
 
         loss = loss_one + loss_two
         return loss.mean()
