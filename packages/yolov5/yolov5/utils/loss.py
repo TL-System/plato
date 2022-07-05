@@ -95,14 +95,14 @@ class ComputeLoss:
     # Compute losses
     def __init__(self, model, autobalance=False):
         self.sort_obj_iou = False
-        device = next(model.parameters()).device  # get model device
+        self.device = next(model.parameters()).device  # get model device
         h = model.hyp  # hyperparameters
 
         # Define criteria
         BCEcls = nn.BCEWithLogitsLoss(
-            pos_weight=torch.tensor([h['cls_pw']], device=device))
+            pos_weight=torch.tensor([h['cls_pw']], device=self.device))
         BCEobj = nn.BCEWithLogitsLoss(
-            pos_weight=torch.tensor([h['obj_pw']], device=device))
+            pos_weight=torch.tensor([h['obj_pw']], device=self.device))
 
         # Class label smoothing https://arxiv.org/pdf/1902.04103.pdf eqn 3
         self.cp, self.cn = smooth_BCE(eps=h.get(
