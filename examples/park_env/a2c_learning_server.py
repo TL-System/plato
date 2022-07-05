@@ -45,7 +45,8 @@ class A2CServer(fedavg.Server):
             clients_selected_size = len([i for i in metric_list if i <= metric_percentile])
 
             # Save percentile to files
-            path = Config().results.results_dir +"/"+Config().results.file_name+"_percentile_"+Config().server.percentile_aggregate
+            path = f'{Config().results.results_dir}_seed_{Config().server.random_seed}/{Config().results.file_name}_percentile_{Config().server.percentile_aggregate}'
+            #Config().results.results_dir +"/"+Config().results.file_name+"_percentile_"+Config().server.percentile_aggregate
             self.save_files(path, metric_percentile)
         else:
             print("-----------------------")
