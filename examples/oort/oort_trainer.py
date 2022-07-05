@@ -1,20 +1,10 @@
-"""
-A personalized federated learning trainer using FedRep.
+"""The training loop that takes place on clients"""
 
-Reference:
-
-Collins et al., "Exploiting Shared Representations for Personalized Federated
-Learning", in the Proceedings of ICML 2021.
-
-https://arxiv.org/abs/2102.07078
-
-Source code: https://github.com/lgcollins/FedRep
-"""
+from collections import OrderedDict
 
 import os
-import time
 import logging
-
+import time
 import torch
 
 from plato.config import Config
@@ -23,51 +13,10 @@ from plato.utils import optimizers
 
 
 class Trainer(basic.Trainer):
-    """A personalized federated learning trainer using the FedRep algorithm."""
+    """A federated learning trainer used by the Oort that keeps track of losses."""
 
-    def __init__(self, model=None):
-        super().__init__(model)
-
-        self.representation_param_names = []
-        self.head_param_names = []
-
-    def set_representation_and_head(self, representation_param_names):
-        """ Setting the parameter names for global (representation)
-         and local (the head) models. """
-
-        # set the parameter names for the representation
-        #   As mentioned by Eq. 1 and Fig. 2 of the paper, the representation
-        #   behaves as the global model.
-        self.representation_param_names = representation_param_names
-
-        # FedRep calls the weights and biases of the final fully-connected layer
-        # in each of the models as the "head"
-        # This insight is obtained from the source code of FedRep.
-        model_parameter_names = self.model.state_dict().keys()
-
-        self.head_param_names = [
-            name for name in model_parameter_names
-            if name not in representation_param_names
-        ]
-
-        logging.info("[Client #%s] Representation layers: %s", self.client_id,
-                     self.representation_param_names)
-        logging.info("[Client #%s] Head layers: %s", self.client_id,
-                     self.head_param_names)
-
-    def train_model(self, config, trainset, sampler, cut_layer=None):
-        """
-        The main training loop of FedRep in a federated learning workload.
-
-        The local training stage contains two parts:
-
-        - Head optimization:
-            Makes τ local gradient-based updates to solve for its optimal head given
-            the current global representation communicated by the server.
-
-        - Representation optimization:
-            Takes one local gradient-based update with respect to the current representation.
-        """
+    def train_loop(self, config, trainset, sampler, cut_layer):
+        """Saves the loss after each batch pass."""
         batch_size = config['batch_size']
         log_interval = 10
         tic = time.perf_counter()
@@ -85,10 +34,6 @@ class Trainer(basic.Trainer):
                                                        sampler=sampler)
 
         epochs = config['epochs']
-
-        # load the local update epochs for head optimization
-        head_epochs = config[
-            'head_epochs'] if 'head_epochs' in config else epochs - 1
 
         # Initializing the loss criterion
         _loss_criterion = getattr(self, "loss_criterion", None)
@@ -113,24 +58,9 @@ class Trainer(basic.Trainer):
         self.model.to(self.device)
         self.model.train()
 
+        loss_dict = OrderedDict()
+
         for epoch in range(1, epochs + 1):
-            # As presented in Section 3 of the FedRep paper, the head is optimized
-            # for (epochs - 1) while freezing the representation.
-            if epoch <= head_epochs:
-                for name, param in self.model.named_parameters():
-                    if name in self.representation_param_names:
-                        param.requires_grad = False
-                    else:
-                        param.requires_grad = True
-
-            # The representation will then be optimized for only one epoch
-            if epoch > head_epochs:
-                for name, param in self.model.named_parameters():
-                    if name in self.representation_param_names:
-                        param.requires_grad = True
-                    else:
-                        param.requires_grad = False
-
             # Use a default training loop
             for batch_id, (examples, labels) in enumerate(train_loader):
                 examples, labels = examples.to(self.device), labels.to(
@@ -144,7 +74,17 @@ class Trainer(basic.Trainer):
 
                 loss = loss_criterion(outputs, labels)
 
-                loss.backward()
+                # Track the loss
+                if epoch == 1:
+                    loss_dict[batch_id] = torch.square(loss)
+                else:
+                    loss_dict[batch_id] += torch.square(loss)
+
+                if 'create_graph' in config:
+                    loss.backward(create_graph=config['create_graph'])
+                else:
+                    loss.backward()
+
                 optimizer.step()
 
                 if batch_id % log_interval == 0:
@@ -181,3 +121,12 @@ class Trainer(basic.Trainer):
                 filename = f"{self.client_id}_{epoch}_{training_time}.pth"
                 self.save_model(filename)
                 self.model.to(self.device)
+
+        model_name = Config().trainer.model_name
+        model_path = Config().params['checkpoint_path']
+        sum_loss = 0
+        for batch_id in loss_dict:
+            sum_loss += loss_dict[batch_id]
+        sum_loss /= epochs
+        filename = f"{model_path}/{model_name}_{self.client_id}__squred_batch_loss.pth"
+        torch.save(sum_loss, filename)
