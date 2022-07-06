@@ -3,7 +3,7 @@ A federated learning training session with asynchronous client selection.
 """
 import os
 
-#os.environ['config_file'] =
+os.environ['config_file'] = './async_mnist_lenet5.yml'
 
 import async_selection_server
 #import async_selection_client
