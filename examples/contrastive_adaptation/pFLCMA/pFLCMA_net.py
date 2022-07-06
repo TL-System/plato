@@ -63,7 +63,7 @@ class EncoderwithProjection(nn.Module):
         return self.projection_dim
 
 
-class ContrasAdap(nn.Module):
+class pFLCMANet(nn.Module):
     """ The implementation of ContrasAdap method.
 
     """
@@ -152,4 +152,4 @@ class ContrasAdap(nn.Module):
     def get_model():
         """Obtaining an instance of this model provided that the name is valid."""
 
-        return ContrasAdap()
+        return pFLCMANet()
