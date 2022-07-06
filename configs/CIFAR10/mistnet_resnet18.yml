@@ -11,6 +11,10 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
+    outbound_processors:
+        - feature_randomized_response
+        - feature_unbatch
+        
 server:
     address: 127.0.0.1
     port: 8000
@@ -27,7 +31,7 @@ data:
 
 trainer:
     # The type of the trainer
-    type: mistnet
+    type: basic
 
     # The maximum number of training rounds
     rounds: 1
