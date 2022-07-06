@@ -45,6 +45,10 @@ class Server(fedavg.Server):
         p = self.calculate_selection_probability()
         print("The calculated probability is: ", p)
         print("current clients pool: ", clients_pool)
+        clients_pool_temp = [index - 1 for index in clients_pool]
+        p = p[clients_pool_temp]
+        print("The calculated probability is: ", p)
+        print("current clients pool temp: ", clients_pool_temp)
         selected_clients = np.random.choice(clients_pool,
                                             clients_count,
                                             replace=False,
@@ -142,8 +146,8 @@ class Server(fedavg.Server):
         g = log(matrix(np.ones(2 * self.number_of_client)))
 
         K = [2 * self.number_of_client]
-        G = None
-        h = None
+        G = matrix(-1 * np.eye(self.number_of_client))  #None
+        h = matrix(np.zeros((self.number_of_client, 1)))  #None
 
         A1 = matrix([[1.]])
         A = matrix([[1.]])
