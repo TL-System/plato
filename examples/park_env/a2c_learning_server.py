@@ -63,17 +63,18 @@ class A2CServer(fedavg.Server):
             for name, weights in weights_received[0][1].items()
         }
         
+        client_list = []
+        client_path = f'{Config().results.results_dir}_seed_{Config().server.random_seed}/{Config().results.file_name}_client_saved'
+
         for i, update in enumerate(weights_received):
             __, report, __, __ = updates[i] 
             client_id = report.client_id
-            client_path = f'{Config().results.results_dir}_seed_{Config().server.random_seed}/{Config().results.file_name}_client_saved'
             #Config().results.results_dir +"/"+Config().results.file_name+"_client_saved"
 
             update_from_actor, update_from_critic = update
             
-            
             if not Config().server.percentile_aggregate:
-                self.save_files(f'{client_path}{"_Fed_avg"}', client_id)
+                client_list.append(client_id)
                 for name, delta in update_from_actor.items():
                     actor_avg_update[name] += delta * 1.0/Config().clients.per_round
 
@@ -85,19 +86,20 @@ class A2CServer(fedavg.Server):
                 # TODO: know how many are >= percentile to have the correct ratio next to deltas
                 print("Metric", metric)
                 print("Metric percentile", metric_percentile)
-                
                # if metric <= metric_percentile:
                 if (client_id == 1 and self.current_round >= 1 and self.current_round <= 3) \
                 or ((client_id == 1 or client_id == 2) and self.current_round > 3 and self.current_round <= 6) \
                 or ((client_id == 1 or client_id == 2 or client_id == 3) and self.current_round > 6):
                     print("Client %s is choosen" % str(client_id))
+                    client_list.append(client_id)
+
                     if self.current_round <= 3:
                         clients_selected_size = 1
                     elif self.current_round > 3 and self.current_round <= 6:
                         clients_selected_size = 2
                     else:
                         clients_selected_size = 3
-                    self.save_files(f'{client_path}{"_percentile"}', client_id)
+
                     for name, delta in update_from_actor.items():
                         actor_avg_update[name] += delta * 1.0/clients_selected_size
                     for name, delta in update_from_critic.items():
@@ -106,13 +108,23 @@ class A2CServer(fedavg.Server):
             # Yield to other tasks in the server
             await asyncio.sleep(0)
         
+        #save lists of clients
+        if not Config().server.percentile_aggregate:
+            self.save_files(f'{client_path}{"_Fed_avg"}', client_list)
+        else:
+            self.save_files(f'{client_path}{"_percentile"}', client_list)
+        
         return actor_avg_update, critic_avg_update
 
     def save_files(self, file_path, data):
         #To avoid appending to existing files, if the current roudn is one we write over
         with open(f'{file_path}.csv', 'w'if self.current_round == 1 else 'a') as filehandle:
             writer = csv.writer(filehandle)
-            writer.writerow([data])
+            #writerow only takes iterables
+            if type(data) is not list:
+                writer.writerow([data])
+            else:
+                writer.writerow(data)
 
     def select_metric(self, report):
         if Config().server.percentile_aggregate == "actor_loss":

@@ -466,8 +466,7 @@ class Trainer(basic.Trainer):
         model_seed_path = f'_seed_{Config().server.random_seed}'
 
         #call save loss here
-        check_point_save = "checkpoint" in filename
-        if not check_point_save:
+        if self.client_id != 0:
             path = f'{Config().results.results_dir}_seed_{Config().server.random_seed}/{Config().results.file_name}_{self.client_id}'
             self.save_loss(path)
     
