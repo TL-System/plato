@@ -33,7 +33,7 @@ import torch.nn.functional as F
 from plato.utils import ssl_losses
 
 
-class ContrasAdapLoss(nn.Module):
+class pFLCMALoss(nn.Module):
     """
     The contrastive adaptation losses for our proposed method.
     It mainly includes:

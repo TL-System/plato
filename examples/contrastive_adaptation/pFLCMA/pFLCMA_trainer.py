@@ -17,7 +17,7 @@ from plato.trainers import contrastive_ssl
 from plato.utils import data_loaders_wrapper
 from plato.utils import optimizers
 
-from contrasAdap_losses import ContrasAdapLoss
+from pFLCMA_losses import pFLCMALoss
 
 
 class Trainer(contrastive_ssl.Trainer):
@@ -30,7 +30,7 @@ class Trainer(contrastive_ssl.Trainer):
         base_temperature = Config().trainer.base_temperature
         contrast_mode = Config().trainer.contrast_mode
         batch_size = Config().trainer.batch_size
-        contrastive_adaptation_criterion = ContrasAdapLoss(
+        contrastive_adaptation_criterion = pFLCMALoss(
             temperature=temperature,
             contrast_mode=contrast_mode,
             base_temperature=base_temperature,
