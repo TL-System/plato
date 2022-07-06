@@ -40,15 +40,12 @@ class Server(fedavg.Server):
         """ Choose a subset of the clients to participate in each round. """
         assert clients_count <= len(clients_pool)
 
-        # Select clients based on calculated probability
+        # Select clients based on calculated probability (within clients_pool)
 
-        p = self.calculate_selection_probability()
+        p = self.calculate_selection_probability(clients_pool)
         print("The calculated probability is: ", p)
         print("current clients pool: ", clients_pool)
-        clients_pool_temp = [index - 1 for index in clients_pool]
-        p = p[clients_pool_temp]
-        print("The calculated probability is: ", p)
-        print("current clients pool temp: ", clients_pool_temp)
+
         selected_clients = np.random.choice(clients_pool,
                                             clients_count,
                                             replace=False,
@@ -70,7 +67,7 @@ class Server(fedavg.Server):
         # find delat bound for each client.
         for client_id, delta in zip(id_received, weights_deltas):
             #print("what's an orderdict of deltas like: ", delta)
-            self.squared_deltas_current_round[client_id - 1]  #
+            #self.squared_deltas_current_round[client_id - 1]  #
             # calculate the largest value in each layer and sum them up for the bound
             for layer, value in delta.items():
                 temp_max = torch.max(value).detach().cpu().numpy()
@@ -117,7 +114,7 @@ class Server(fedavg.Server):
         print("!!!!!!The aggregation weights of this round are: ",
               self.aggregation_weights)
 
-    def calculate_selection_probability(self):
+    def calculate_selection_probability(self, clients_pool):
         """Calculte selection probability based on the formulated geometric optimization problem
             Minimize \alpha \sum_{i=1}^N \frac{p_i^2 * G_i^2}{q_i} + A \sum_{i=1}^N q_i * \tau_i * G_i
             Subject to \sum_{i=1}{N} q_i = 1
@@ -128,30 +125,40 @@ class Server(fedavg.Server):
         print("Calculating selection probabitliy ... ")
         alpha = 1
         BigA = 1
+        # extract info for clients in the pool
+        clients_pool = [
+            index - 1 for index in clients_pool
+        ]  # index in clients_pool starts from 1 rather than 0 in other np.arrays.
+        num_of_clients_inpool = len(clients_pool)
+        aggregation_weights_inpool = self.aggregation_weights[clients_pool]
+        local_gradient_bounds_inpool = self.local_gradient_bounds[clients_pool]
+        local_staleness_inpool = self.local_stalenesses[clients_pool]
+
         # read aggre_weight from somewhere
-        aggre_weight_square = np.square(self.aggregation_weights)  # p_i^2
+        aggre_weight_square = np.square(aggregation_weights_inpool)  # p_i^2
         local_gradient_bound_square = np.square(
-            self.local_gradient_bounds)  # G_i^2
+            local_gradient_bounds_inpool)  # G_i^2
 
         f1_params = alpha * np.multiply(
             aggre_weight_square, local_gradient_bound_square)  # p_i^2 * G_i^2
-        f1 = matrix(np.eye(self.number_of_client) * f1_params)
+        f1 = matrix(np.eye(num_of_clients_inpool) * f1_params)
 
         f2_params = BigA * np.multiply(
-            self.local_stalenesses, self.local_gradient_bounds)  # \tau_i * G_i
-        f2 = matrix(-1 * np.eye(self.number_of_client) * f2_params)
+            local_staleness_inpool,
+            local_gradient_bounds_inpool)  # \tau_i * G_i
+        f2 = matrix(-1 * np.eye(num_of_clients_inpool) * f2_params)
 
         F = sparse([[f1, f2]])
 
-        g = log(matrix(np.ones(2 * self.number_of_client)))
+        g = log(matrix(np.ones(2 * num_of_clients_inpool)))
 
-        K = [2 * self.number_of_client]
-        G = matrix(-1 * np.eye(self.number_of_client))  #None
-        h = matrix(np.zeros((self.number_of_client, 1)))  #None
+        K = [2 * num_of_clients_inpool]
+        G = matrix(-1 * np.eye(num_of_clients_inpool))  #None
+        h = matrix(np.zeros((num_of_clients_inpool, 1)))  #None
 
         A1 = matrix([[1.]])
         A = matrix([[1.]])
-        for i in range(self.number_of_client - 1):
+        for i in range(num_of_clients_inpool - 1):
             A = sparse([[A], [A1]])
 
         b = matrix([1.])
