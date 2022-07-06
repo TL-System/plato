@@ -97,7 +97,8 @@ class Server(fedavg.Server):
             self.local_stalenesses[client_id - 1] = client_staleness
         print("!!!The staleness of this round are: ", self.local_stalenesses)
         # Update local gradient bounds
-        self.local_gradient_bounds += self.squared_deltas_current_round
+        self.local_gradient_bounds = self.squared_deltas_current_round
+        print("local_gradient_bounds: ", self.local_gradient_bounds)
         self.extract_aggregation_weights(updates)
 
     def extract_aggregation_weights(self, updates):
@@ -130,6 +131,7 @@ class Server(fedavg.Server):
             index - 1 for index in clients_pool
         ]  # index in clients_pool starts from 1 rather than 0 in other np.arrays.
         num_of_clients_inpool = len(clients_pool)
+
         aggregation_weights_inpool = self.aggregation_weights[clients_pool]
         local_gradient_bounds_inpool = self.local_gradient_bounds[clients_pool]
         local_staleness_inpool = self.local_stalenesses[clients_pool]
