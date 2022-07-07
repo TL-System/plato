@@ -105,6 +105,26 @@ class Server(fedavg.Server):
             self.deep_leakage_from_gradients(self.updates)
         await self.aggregate_weights(self.updates)
 
+        # Testing the global model accuracy
+        if hasattr(Config().server, 'do_test') and not Config().server.do_test:
+            # Compute the average accuracy from client reports
+            self.accuracy = self.accuracy_averaging(self.updates)
+            logging.info('[%s] Average client accuracy: %.2f%%.', self,
+                         100 * self.accuracy)
+        else:
+            # Testing the updated model directly at the server
+            self.accuracy = await self.trainer.server_test(
+                self.testset, self.testset_sampler)
+
+        if hasattr(Config().trainer, 'target_perplexity'):
+            logging.info('[%s] Global model perplexity: %.2f\n', self,
+                         self.accuracy)
+        else:
+            logging.info('[%s] Global model accuracy: %.2f%%\n', self,
+                         100 * self.accuracy)
+
+        await self.wrap_up_processing_reports()
+
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using federated averaging with optional compensation."""
         deltas_received = self.compute_weight_deltas(updates)
