@@ -16,7 +16,10 @@ def compute_sens(model: nn.Module,
     y = y.to(device)
 
     # Compute prediction and loss
-    pred, _ = model(x)
+    try:
+        pred, _ = model(x)
+    except:
+        pred = model(x)
     loss = loss_fn(pred, y)
     # Backward propagation
     dy_dx = torch.autograd.grad(outputs=loss,
