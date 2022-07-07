@@ -6,6 +6,7 @@ import time
 from collections import OrderedDict
 
 import matplotlib.pyplot as plt
+import numpy as np
 import torch
 from plato.config import Config
 from plato.trainers import basic
@@ -54,10 +55,12 @@ class Trainer(basic.Trainer):
         self.model.to(self.device)
         self.model.train()
 
-        if hasattr(Config().algorithm, 'defense') and Config().algorithm.defense == 'GradDefense':
+        if hasattr(Config().algorithm,
+                   'defense') and Config().algorithm.defense == 'GradDefense':
             root_set_loader = get_root_set_loader(trainset)
-            sensitivity = compute_sens(
-                model=self.model, rootset_loader=root_set_loader, device=Config().device())
+            sensitivity = compute_sens(model=self.model,
+                                       rootset_loader=root_set_loader,
+                                       device=Config().device())
 
         target_grad = None
         total_local_steps = epochs * math.ceil(partition_size / batch_size)
@@ -88,31 +91,40 @@ class Trainer(basic.Trainer):
                     current_grad = []
                     for index in range(len(examples)):
                         outputs = patched_model(
-                            torch.unsqueeze(examples[index], dim=0), patched_model.parameters)
+                            torch.unsqueeze(examples[index], dim=0),
+                            patched_model.parameters)
                         # onehot_labels = label_to_onehot(
                         #     torch.unsqueeze(labels[index], dim=0), num_classes=Config().trainer.num_classes)
                         loss = loss_criterion(outputs, labels)
-                        grad = torch.autograd.grad(loss, patched_model.parameters.values(
-                        ), retain_graph=True, create_graph=True, only_inputs=True)
-                        current_grad.append(list((_.detach().clone()
-                                                  for _ in grad)))
+                        grad = torch.autograd.grad(
+                            loss,
+                            patched_model.parameters.values(),
+                            retain_graph=True,
+                            create_graph=True,
+                            only_inputs=True)
+                        current_grad.append(
+                            list((_.detach().clone() for _ in grad)))
                         # TODO: multiple batches or epochs?
                 else:
-                    outputs = patched_model(
-                        examples, patched_model.parameters)
+                    outputs = patched_model(examples, patched_model.parameters)
 
                     # Save the ground truth and gradients
                     loss = loss_criterion(outputs, labels)
-                    grad = torch.autograd.grad(loss, patched_model.parameters.values(
-                    ), retain_graph=True, create_graph=True, only_inputs=True)
+                    grad = torch.autograd.grad(
+                        loss,
+                        patched_model.parameters.values(),
+                        retain_graph=True,
+                        create_graph=True,
+                        only_inputs=True)
 
                     # TODO: momentum, weight_decay?
-                    patched_model.parameters = OrderedDict((name, param - Config().trainer.learning_rate * grad_part)
-                                                           for ((name, param), grad_part)
-                                                           in zip(patched_model.parameters.items(), grad))
+                    patched_model.parameters = OrderedDict(
+                        (name,
+                         param - Config().trainer.learning_rate * grad_part)
+                        for ((name, param), grad_part
+                             ) in zip(patched_model.parameters.items(), grad))
 
-                    current_grad = list((_.detach().clone()
-                                        for _ in grad))
+                    current_grad = list((_.detach().clone() for _ in grad))
 
                     # Sum up the gradients for each local update
                     try:
@@ -120,8 +132,7 @@ class Trainer(basic.Trainer):
                             sum(x) for x in zip(current_grad, target_grad)
                         ]
                     except:
-                        target_grad = list((_.detach().clone()
-                                            for _ in grad))
+                        target_grad = list((_.detach().clone() for _ in grad))
 
                 if batch_id % log_interval == 0:
                     if self.client_id == 0:
@@ -138,7 +149,9 @@ class Trainer(basic.Trainer):
             full_onehot_labels = label_to_onehot(
                 full_labels, num_classes=Config().trainer.num_classes)
 
-            for ((name, param), (name, new_param)) in zip(self.model.named_parameters(), patched_model.parameters.items()):
+            for ((name, param),
+                 (name, new_param)) in zip(self.model.named_parameters(),
+                                           patched_model.parameters.items()):
                 param.data = new_param
 
             # Simulate client's speed
@@ -165,23 +178,58 @@ class Trainer(basic.Trainer):
             except:
                 target_grad = None
 
-            if hasattr(Config().algorithm, 'defense') and Config().algorithm.defense == 'GradDefense':
-                if hasattr(Config().algorithm, 'clip') and Config().algorithm.clip is True:
+            if hasattr(
+                    Config().algorithm,
+                    'defense') and Config().algorithm.defense == 'GradDefense':
+                if hasattr(Config().algorithm,
+                           'clip') and Config().algorithm.clip is True:
                     from defense.GradDefense.clip import noise
                     target_grad = current_grad
                 else:
                     from defense.GradDefense.perturb import noise
-                perturbed_gradients = noise(dy_dx=target_grad,
-                                            sensitivity=sensitivity,
-                                            slices_num=Config().algorithm.slices_num,
-                                            perturb_slices_num=Config().algorithm.perturb_slices_num,
-                                            noise_intensity=Config().algorithm.scale)
+                perturbed_gradients = noise(
+                    dy_dx=target_grad,
+                    sensitivity=sensitivity,
+                    slices_num=Config().algorithm.slices_num,
+                    perturb_slices_num=Config().algorithm.perturb_slices_num,
+                    noise_intensity=Config().algorithm.scale)
 
                 target_grad = []
                 for layer in perturbed_gradients:
                     layer = layer.to(self.device)
                     target_grad.append(layer)
 
+            if hasattr(Config().algorithm,
+                       'defense') and Config().algorithm.defense == 'Soteria':
+
+                full_examples.requires_grad = True
+                out, feature_fc1_graph = self.model.forward(full_examples)
+                deviation_f1_target = torch.zeros_like(feature_fc1_graph)
+                deviation_f1_x_norm = torch.zeros_like(feature_fc1_graph)
+                for f in range(deviation_f1_x_norm.size(1)):
+                    deviation_f1_target[:, f] = 1
+                    feature_fc1_graph.backward(deviation_f1_target,
+                                               retain_graph=True)
+                    deviation_f1_x = full_examples.grad.data
+                    deviation_f1_x_norm[:, f] = torch.norm(
+                        deviation_f1_x.view(deviation_f1_x.size(0), -1),
+                        dim=1) / (feature_fc1_graph.data[:, f])
+                    self.model.zero_grad()
+                    full_examples.grad.data.zero_()
+                    deviation_f1_target[:, f] = 0
+
+                deviation_f1_x_norm_sum = deviation_f1_x_norm.sum(axis=0)
+                thresh = np.percentile(
+                    deviation_f1_x_norm_sum.flatten().cpu().numpy(), 1)
+                mask = np.where(
+                    abs(deviation_f1_x_norm_sum.cpu()) < thresh, 0,
+                    1).astype(np.float32)
+                target_grad = current_grad
+                # print(sum(mask))
+                target_grad[6] = current_grad[6] * torch.Tensor(mask).to(
+                    self.device)
+
+        full_examples = full_examples.detach()
         file_path = f"{Config().params['model_path']}/{self.client_id}.pickle"
         with open(file_path, 'wb') as handle:
             pickle.dump([full_examples, full_onehot_labels, target_grad],
