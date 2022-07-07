@@ -36,7 +36,10 @@ class PatchedModule(torch.nn.Module):
         """Live Patch ... :> ..."""
         # If no parameter dictionary is given, everything is normal
         if parameters is None:
-            out, _ = self.net(inputs)
+            try:
+                out, _ = self.net(inputs)
+            except:
+                out = self.net(inputs)
             return out
 
         # But if not ...
@@ -53,8 +56,13 @@ class PatchedModule(torch.nn.Module):
                     ext_bias = None
 
                 method_pile.append(module.forward)
-                module.forward = partial(F.conv2d, weight=ext_weight, bias=ext_bias, stride=module.stride,
-                                         padding=module.padding, dilation=module.dilation, groups=module.groups)
+                module.forward = partial(F.conv2d,
+                                         weight=ext_weight,
+                                         bias=ext_bias,
+                                         stride=module.stride,
+                                         padding=module.padding,
+                                         dilation=module.dilation,
+                                         groups=module.groups)
             elif isinstance(module, torch.nn.BatchNorm2d):
                 if module.momentum is None:
                     exponential_average_factor = 0.0
@@ -73,17 +81,23 @@ class PatchedModule(torch.nn.Module):
                 ext_weight = next(param_gen)
                 ext_bias = next(param_gen)
                 method_pile.append(module.forward)
-                module.forward = partial(F.batch_norm, running_mean=module.running_mean, running_var=module.running_var,
-                                         weight=ext_weight, bias=ext_bias,
-                                         training=module.training or not module.track_running_stats,
-                                         momentum=exponential_average_factor, eps=module.eps)
+                module.forward = partial(F.batch_norm,
+                                         running_mean=module.running_mean,
+                                         running_var=module.running_var,
+                                         weight=ext_weight,
+                                         bias=ext_bias,
+                                         training=module.training
+                                         or not module.track_running_stats,
+                                         momentum=exponential_average_factor,
+                                         eps=module.eps)
 
             elif isinstance(module, torch.nn.Linear):
                 lin_weights = next(param_gen)
                 lin_bias = next(param_gen)
                 method_pile.append(module.forward)
-                module.forward = partial(
-                    F.linear, weight=lin_weights, bias=lin_bias)
+                module.forward = partial(F.linear,
+                                         weight=lin_weights,
+                                         bias=lin_bias)
 
             elif next(module.parameters(), None) is None:
                 # Pass over modules that do not contain parameters
@@ -95,9 +109,13 @@ class PatchedModule(torch.nn.Module):
                 # Warn for other containers
                 if DEBUG:
                     warnings.warn(
-                        f'Patching for module {module.__class__} is not implemented.')
+                        f'Patching for module {module.__class__} is not implemented.'
+                    )
 
-        output, _ = self.net(inputs)
+        try:
+            output, _ = self.net(inputs)
+        except:
+            output = self.net(inputs)
 
         # Undo Patch
         for name, module in self.net.named_modules():
