@@ -36,7 +36,8 @@ class PatchedModule(torch.nn.Module):
         """Live Patch ... :> ..."""
         # If no parameter dictionary is given, everything is normal
         if parameters is None:
-            return self.net(inputs)
+            out, _ = self.net(inputs)
+            return out
 
         # But if not ...
         param_gen = iter(parameters.values())
@@ -96,7 +97,7 @@ class PatchedModule(torch.nn.Module):
                     warnings.warn(
                         f'Patching for module {module.__class__} is not implemented.')
 
-        output = self.net(inputs)
+        output, _ = self.net(inputs)
 
         # Undo Patch
         for name, module in self.net.named_modules():
