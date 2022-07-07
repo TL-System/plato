@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import math
 import os
@@ -234,3 +235,51 @@ class Trainer(basic.Trainer):
         with open(file_path, 'wb') as handle:
             pickle.dump([full_examples, full_onehot_labels, target_grad],
                         handle)
+
+    async def server_test(self, testset, sampler=None, **kwargs):
+        """Testing the model on the server using the provided test dataset.
+
+        Arguments:
+        testset: The test dataset.
+        sampler: The sampler that extracts a partition of the test dataset.
+        **kwargs (optional): Additional keyword arguments.
+        """
+        config = Config().trainer._asdict()
+        config['run_id'] = Config().params['run_id']
+
+        self.model.to(self.device)
+        self.model.eval()
+
+        custom_test = getattr(self, "test_model", None)
+
+        if callable(custom_test):
+            return self.test_model(config, testset)
+
+        if sampler is None:
+            test_loader = torch.utils.data.DataLoader(
+                testset, batch_size=config['batch_size'], shuffle=False)
+        else:
+            test_loader = torch.utils.data.DataLoader(
+                testset,
+                batch_size=config['batch_size'],
+                shuffle=False,
+                sampler=sampler)
+
+        correct = 0
+        total = 0
+
+        with torch.no_grad():
+            for examples, labels in test_loader:
+                examples, labels = examples.to(self.device), labels.to(
+                    self.device)
+
+                outputs, _ = self.model(examples)
+
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
+
+                # Yield to other tasks in the server
+                await asyncio.sleep(0)
+
+        return correct / total
