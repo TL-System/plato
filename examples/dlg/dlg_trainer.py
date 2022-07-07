@@ -77,8 +77,8 @@ class Trainer(basic.Trainer):
                 # Store data in the first epoch (later epochs will still have the same partitioned data)
                 if epoch == 1:
                     try:
-                        full_examples = torch.cat(
-                            (examples, full_examples), dim=0)
+                        full_examples = torch.cat((examples, full_examples),
+                                                  dim=0)
                         full_labels = torch.cat((labels, full_labels), dim=0)
                     except:
                         full_examples = examples
@@ -273,7 +273,10 @@ class Trainer(basic.Trainer):
                 examples, labels = examples.to(self.device), labels.to(
                     self.device)
 
-                outputs, _ = self.model(examples)
+                try:
+                    outputs, _ = self.model(examples)
+                except:
+                    outputs = self.model(examples)
 
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
