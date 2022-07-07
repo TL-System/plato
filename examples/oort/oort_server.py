@@ -95,7 +95,7 @@ class Server(fedavg.Server):
             self.last_round[client_id - 1] = self.current_round
 
         # Calculating updated client utilities on explored clients
-        for (client_id,__,__,__) in updates:
+        for (client_id, __, __, __) in updates:
             self.client_utilities[client_id] = self.calc_client_util(client_id)
 
         # Adjusts pacer
@@ -116,17 +116,63 @@ class Server(fedavg.Server):
         """ Select a subset of the clients and send messages to them to start training. """
 
         if not for_next_batch:
-            # Selects clients according the oort algorithm
+            self.updates = []
+            self.current_round += 1
+            self.round_start_wall_time = self.wall_time
+
+            if hasattr(Config().trainer, 'max_concurrency'):
+                self.trained_clients = []
+
+            logging.info(
+                fonts.colourize(
+                    f"\n[{self}] Starting round {self.current_round}/{Config().trainer.rounds}."
+                ))
+
+            if Config().is_central_server():
+                # In cross-silo FL, the central server selects from the pool of edge servers
+                self.clients_pool = list(self.clients)
+
+            elif not Config().is_edge_server():
+                self.clients_pool = list(range(1, 1 + self.total_clients))
+
+            # In asychronous FL, avoid selecting new clients to replace those that are still
+            # training at this time
+            unselectable_clients = []
+            sample_size = self.clients_per_round
+            if self.asynchronous_mode and self.selected_clients is not None and len(
+                    self.reported_clients) > 0 and len(
+                        self.reported_clients) < self.clients_per_round:
+
+                # We need to exclude the clients who are still training.
+                training_client_ids = [
+                    self.training_clients[client_id]['id']
+                    for client_id in list(self.training_clients.keys())
+                ]
+
+                # If the server is simulating the wall clock time, some of the clients who
+                # reported may not have been aggregated; they should be excluded from the next
+                # round of client selection
+                reporting_client_ids = [
+                    client[2]['client_id'] for client in self.reported_clients
+                ]
+                unselectable_clients = training_client_ids + reporting_client_ids
+
+                # Sets the number of clients to be selected
+                if self.selected_clients is not None:
+                    if self.simulate_wall_time:
+                        sample_size = len(self.current_processed_clients)
+                    else:
+                        sample_size = len(self.reported_clients)
+                else:
+                    sample_size = self.clients_per_round
 
             # Exploitation
             exploit_len = math.ceil(
-                (1.0 - self.exploration_factor) * self.clients_per_round)
+                (1.0 - self.exploration_factor) * sample_size)
 
             # If there aren't enough unexplored clients for exploration.
-            if (self.clients_per_round - exploit_len) > len(
-                    self.unexplored_clients):
-                exploit_len = (self.clients_per_round -
-                               len(self.unexplored_clients))
+            if (sample_size - exploit_len) > len(self.unexplored_clients):
+                exploit_len = (sample_size - len(self.unexplored_clients))
 
             # take the top-k, sample by probability, take 95% of the cut-off loss by default
             sorted_util = sorted(self.client_utilities,
@@ -141,7 +187,8 @@ class Server(fedavg.Server):
             exploit_clients = []
             for client_id in sorted_util:
                 if self.client_utilities[
-                        client_id] > cut_off_util and client_id not in self.blacklist:
+                        client_id] > cut_off_util and client_id not in (
+                            self.blacklist or unselectable_clients):
                     exploit_clients.append(client_id)
 
             if len(exploit_clients) != 0:
@@ -175,10 +222,11 @@ class Server(fedavg.Server):
                 picked_clients = picked_clients.tolist()
 
             # If the result of exploitation wasn't enough to meet the required length.
-            if len(picked_clients) < exploit_len and self.current_round != 0:
+            if len(picked_clients) < exploit_len and self.current_round != 1:
                 for step in range(last_index + 1, len(sorted_util)):
-                    if not sorted_util[step] in self.blacklist and len(
-                            picked_clients) != exploit_len:
+                    if not sorted_util[step] in (
+                            self.blacklist or unselectable_clients
+                    ) and len(picked_clients) != exploit_len:
                         picked_clients.append(sorted_util[step])
 
             # Exploration
@@ -186,9 +234,8 @@ class Server(fedavg.Server):
             random.setstate(self.prng_state)
 
             # Select unexplored clients randomly
-            explore_clients = random.sample(
-                self.unexplored_clients,
-                self.clients_per_round - len(picked_clients))
+            explore_clients = random.sample(self.unexplored_clients,
+                                            sample_size - len(picked_clients))
 
             self.prng_state = random.getstate()
             self.explored_clients += explore_clients
@@ -203,69 +250,9 @@ class Server(fedavg.Server):
             for client in picked_clients:
                 self.times_selected[client] += 1
 
-            self.updates = []
-            self.current_round += 1
-            self.round_start_wall_time = self.wall_time
-
-            if hasattr(Config().trainer, 'max_concurrency'):
-                self.trained_clients = []
-
-            logging.info(
-                fonts.colourize(
-                    f"\n[{self}] Starting round {self.current_round}/{Config().trainer.rounds}."
-                ))
-
             logging.info("[%s] Selected clients: %s", self, picked_clients)
 
-            if Config().is_central_server():
-                # In cross-silo FL, the central server selects from the pool of edge servers
-                self.clients_pool = list(self.clients)
-
-            elif not Config().is_edge_server():
-                self.clients_pool = list(range(1, 1 + self.total_clients))
-
-            # In asychronous FL, avoid selecting new clients to replace those that are still
-            # training at this time
-
-            # When simulating the wall clock time, if len(self.reported_clients) is 0, the
-            # server has aggregated all reporting clients already
-            if self.asynchronous_mode and self.selected_clients is not None and len(
-                    self.reported_clients) > 0 and len(
-                        self.reported_clients) < self.clients_per_round:
-                # If self.selected_clients is None, it implies that it is the first iteration;
-                # If len(self.reported_clients) == self.clients_per_round, it implies that
-                # all selected clients have already reported.
-
-                # Except for these two cases, we need to exclude the clients who are still
-                # training.
-                training_client_ids = [
-                    self.training_clients[client_id]['id']
-                    for client_id in list(self.training_clients.keys())
-                ]
-
-                # If the server is simulating the wall clock time, some of the clients who
-                # reported may not have been aggregated; they should be excluded from the next
-                # round of client selection
-                reporting_client_ids = [
-                    client[2]['client_id'] for client in self.reported_clients
-                ]
-
-                selectable_clients = [
-                    client for client in self.clients_pool
-                    if client not in training_client_ids
-                    and client not in reporting_client_ids
-                ]
-
-                # Selects clients according to the oort algorithm.
-                if self.simulate_wall_time:
-                    self.selected_clients = self.choose_clients(
-                        selectable_clients,
-                        len(self.current_processed_clients))
-                else:
-                    self.selected_clients = self.choose_clients(
-                        selectable_clients, len(self.reported_clients))
-            else:
-                self.selected_clients = picked_clients
+            self.selected_clients = picked_clients
 
             self.current_reported_clients = {}
             self.current_processed_clients = {}
