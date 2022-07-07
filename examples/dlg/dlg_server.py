@@ -363,7 +363,11 @@ class Server(fedavg.Server):
 
         def closure():
             match_optimizer.zero_grad()
-            dummy_pred, _ = self.trainer.model(dummy_data)
+            try:
+                dummy_pred, _ = self.trainer.model(dummy_data)
+            except:
+                dummy_pred = self.trainer.model(dummy_data)
+
             dummy_onehot_label = F.softmax(labels, dim=-1)
 
             if self.attack_method == 'DLG':
