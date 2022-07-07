@@ -24,7 +24,7 @@ data:
     # IID or non-IID?
     sampler: iid
 
-    random_seed: 1
+    random_seed: 2
 
 trainer:
     # The maximum number of training rounds
@@ -37,7 +37,7 @@ trainer:
     target_accuracy: 1.0
 
     # Number of epoches for local training in each communication round
-    epochs: 5
+    epochs: 1
     batch_size: 1
     optimizer: SGD
     learning_rate: 0.01
@@ -72,22 +72,24 @@ algorithm:
     attack_round: 1
     # One particular client, e.g., the first selected client
     victim_client: 0
-    num_iters: 300
-    log_interval: 10
+    num_iters: 3000
+    log_interval: 300
 
     # Whether or not use customized initialization for model weights
     init_params: true
     # Whether sharing gradients or model weights
-    share_gradients: false
+    share_gradients: true
     # Do reconstruction by directly matching weights when it's true,
     # otherwise by matching gradients calculated from updates
     match_weights: true
     # Matching weights (absolute) or weight updates (delta)
     use_updates: false
+    # The number of times the attack will be attempted
+    trials: 5
 
     ## Defense related
-    # Choose from GradDefense, ...
-    defense: no
+    # Choose from GradDefense, Soteria ...
+    defense: Soteria
     clip: false
     slices_num: 10
     perturb_slices_num: 5
@@ -98,7 +100,7 @@ algorithm:
     random_seed: 13
 
 results:
-    result_path: results/CIAFR10_resnet18/DLG
+    result_path: results/Soteria_tests/soteria
 
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time
