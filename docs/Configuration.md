@@ -156,6 +156,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |dp_epsilon|Total privacy budget of epsilon with the `diff_privacy` trainer||default: 10.0|
 |dp_delta|Total privacy budget of delta with the `diff_privacy` trainer||default: 1e-5|
 |dp_max_grad_norm|The maximum norm of the per-sample gradients with the `diff_privacy` trainer. Any gradient with norm higher than this will be clipped to this value.||default: 1.0|
+|num_classes|The number of classes.||Default: 10|
 
 ### algorithm
 
