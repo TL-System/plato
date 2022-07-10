@@ -41,9 +41,8 @@ class Server(fedavg.Server):
         random.setstate(self.prng_state)
 
         # if we decide to perfrom the eval test in the final round
-        if hasattr(
-                Config().clients,
-                "do_final_eval_test") and Config().clients.do_final_eval_test:
+        if hasattr(Config().clients, "do_final_personalization") and Config(
+        ).clients.do_final_personalization:
 
             # the number of clients have not been visited
             non_visited_clients_count = len(clients_pool) - len(
@@ -55,7 +54,7 @@ class Server(fedavg.Server):
             if self.current_round >= Config().trainer.rounds:
                 # perfrom the eval test by mandotary
                 Config().clients = Config().clients._replace(
-                    eval_test_interval=1)
+                    pers_learning_interval=1)
                 Config().clients = Config().clients._replace(do_test=True)
 
                 # to perfrom the eval at final round
@@ -84,7 +83,7 @@ class Server(fedavg.Server):
 
                 logging.info(
                     fonts.colourize(
-                        f"\n Performing {Config().data.augment_transformer_name}'s linear evaluation on {clients_count} clients at final round {self.current_round}.",
+                        f"\n Performing personalization on {clients_count} clients at final round {self.current_round}.",
                         colour='red',
                         style='bold'))
                 # remove the visited clients from the clients_pool

@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from plato.config import Config
 from plato.clients import pers_simple
 from plato.clients import base
-from plato.models import general_mlps_register as general_MLP_model
+
 from plato.datasources import datawrapper_registry
 from plato.samplers import registry as samplers_registry
 
@@ -76,45 +76,7 @@ class Client(pers_simple.Client):
         self.task_test_augment_transformer = None
         self.eval_trainset = None
 
-        # the personalized model here corresponds to the task-specific
-        #   model in the general ssl
-        self.custom_personalized_model = personalized_model
-        self.personalized_model = None
-
-    def configure(self) -> None:
-        """ Performing the general client's configure and then initialize the
-            personalized model for the client. """
-        super().configure()
-        if self.custom_personalized_model is not None:
-            self.personalized_model = self.custom_model
-            self.custom_personalized_model = None
-
-        if self.personalized_model is None:
-
-            encode_dim = self.trainer.model.encode_dim
-            personalized_model_name = Config().trainer.personalized_model_name
-            self.personalized_model = general_MLP_model.Model.get_model(
-                model_type=personalized_model_name, input_dim=encode_dim)
-
-            # logging the personalzied model's info
-
-            file_name = f"client{self.client_id}_personalized_({personalized_model_name}).log"
-            model_path = Config().params['model_path']
-            to_save_dir = os.path.join(model_path,
-                                       "client_" + str(self.client_id))
-            os.makedirs(to_save_dir, exist_ok=True)
-
-            to_save_path = os.path.join(to_save_dir, file_name)
-            with open(to_save_path, 'w') as f:
-                f.write(str(self.personalized_model))
-
-            logging.info(
-                "Saved the client%d's personalized model (%s) information to models/",
-                self.client_id, personalized_model_name)
-
-        # assign the client's personalized model to its trainer
-        if self.trainer.personalized_model is None:
-            self.trainer.set_client_personalized_model(self.personalized_model)
+        # task-specific model in the general ssl
 
     def save_ssl_data_statistics(self):
 
@@ -292,8 +254,8 @@ class Client(pers_simple.Client):
     async def train(self):
         """The machine learning training workload on a client."""
 
-        if not (hasattr(Config().clients, "only_eval_test")
-                and Config().clients.only_eval_test):
+        if not (hasattr(Config().clients, "only_personalization")
+                and Config().clients.only_personalization):
             logging.info(
                 fonts.colourize(
                     f"[{self}] Started training in communication round #{self.current_round}."
@@ -361,7 +323,7 @@ class Client(pers_simple.Client):
             # is conducted after completing the training of self-supervised learning
             # methods. However, in federated learning, it is expected to track its
             # performance after several rounds of communication. Therefore, in every
-            # #eval_test_interval round, the linear evaluation will be conducted to
+            # #pers_learning_interval round, the linear evaluation will be conducted to
             # obtain accuracy or other metrics. The procedures are:
             # 1.- Design a simple personalized model (i.e., self.personalized_model)
             # for the client's downstream task, such as the image classification.
@@ -374,9 +336,10 @@ class Client(pers_simple.Client):
             # the designed model to complete the task. This encoder/backbone is
             # frozen without any changes. Only the designed model (self.personalized_model)
             # is optimized.
-            if hasattr(Config().clients,
-                       'eval_test_interval') and self.current_round % Config(
-                       ).clients.eval_test_interval == 0:
+            if hasattr(
+                    Config().clients,
+                    'pers_learning_interval') and self.current_round % Config(
+                    ).clients.pers_learning_interval == 0:
                 # it is important to also point out
                 # which current is the personalized model
                 # trained.
