@@ -485,9 +485,10 @@ class Config:
             logging.info(
                 "Performing the code test with simple configurations.")
             Config.clients = Config.clients._replace(do_test=True)
-            Config.clients = Config.clients._replace(do_final_eval_test=True)
+            Config.clients = Config.clients._replace(
+                do_final_personalization=True)
             Config.clients = Config.clients._replace(test_interval=1)
-            Config.clients = Config.clients._replace(eval_test_interval=1)
+            Config.clients = Config.clients._replace(pers_learning_interval=1)
             Config.clients = Config.clients._replace(total_clients=10)
             Config.clients = Config.clients._replace(per_round=3)
 
@@ -521,7 +522,8 @@ class Config:
             # apply the central learning
             Config.clients = Config.clients._replace(total_clients=1)
             Config.clients = Config.clients._replace(per_round=1)
-            Config.clients = Config.clients._replace(do_final_eval_test=False)
+            Config.clients = Config.clients._replace(
+                do_final_personalization=False)
             Config.data = Config.data._replace(sampler="iid")
             Config.data = Config.data._replace(testset_sampler="iid")
             Config.trainer = Config.trainer._replace(rounds=1)
@@ -532,13 +534,11 @@ class Config:
             )
             # apply the central learning
             Config.clients = Config.clients._replace(test_interval=1)
-            if hasattr(Config.clients, "do_final_eval_test"):
+            if hasattr(Config.clients, "do_final_personalization"):
                 Config.clients = Config.clients._replace(
-                    do_final_eval_test=True)
-            if hasattr(Config.clients, "eval_test_interval"):
+                    do_final_personalization=True)
+            if hasattr(Config.clients, "pers_learning_interval"):
                 Config.clients = Config.clients._replace(
-                    eval_test_interval=True)
-
-            Config.server = Config.server._replace(do_test=True)
+                    pers_learning_interval=True)
 
             Config.trainer = Config.trainer._replace(rounds=1)

@@ -6,7 +6,7 @@ This is to make sure that the saving file share the same name logic
 """
 
 
-def client_get_name(client_id,
+def get_format_name(client_id,
                     model_name=None,
                     round_n=None,
                     epoch_n=None,
