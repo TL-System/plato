@@ -14,8 +14,10 @@ class Report(simple.Report):
     entropy_loss: float
     actor_grad: float
     critic_grad: float
-    actor_fisher: float
-    critic_fisher: float
+    sum_actor_fisher: float
+    sum_critic_fisher: float
+    fisher_actor: dict[str, float]
+    fisher_critic: dict[str, float]
 
 
 class RLClient(simple.Client):
@@ -30,11 +32,11 @@ class RLClient(simple.Client):
 
         actor_loss, critic_loss, entropy_loss = self.get_loss()
         actor_grad, critic_grad = self.get_grad()
-        actor_fisher, critic_fisher, actor_fisher_grad, critic_fisher_grad = self.get_fisher()
+        sum_actor_fisher, sum_critic_fisher, actor_fisher_grad, critic_fisher_grad, fisher_actor, fisher_critic = self.get_fisher()
         
         return Report(report.num_samples, report.accuracy, report.training_time, \
          report.comm_time, report.update_response, self.client_id, actor_loss, critic_loss, \
-          entropy_loss, actor_grad, critic_grad, actor_fisher, critic_fisher), weights
+          entropy_loss, actor_grad, critic_grad, sum_actor_fisher, sum_critic_fisher, fisher_actor, fisher_critic), weights
 
     def get_loss(self):
         return self.trainer.load_loss()
