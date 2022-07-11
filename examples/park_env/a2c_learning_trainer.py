@@ -109,11 +109,11 @@ class Trainer(basic.Trainer):
         self.avg_entropy_loss = 0
 
         # Fisher estimation parameters
-        self.fisher_critic = {}
-        self.fisher_actor = {}
+        self.fisher_critic, self.fisher_actor = {}, {}
+        self.fisher_critic_old, self.fisher_actor_old = {}, {}
         self.critic_fisher_sum, self.actor_fisher_sum = 0, 0
-        self.critic_fishers, self.actor_fishers = [], []
-
+        
+        self.updates = 0
         self.timesteps_since_eval = 0
         self.round_no = 0
 
@@ -135,6 +135,9 @@ class Trainer(basic.Trainer):
 
     def train_model(self, config, trainset, sampler, cut_layer):
         """Main Training"""
+        # Fisher information matrix 
+        self.fisher_critic, self.fisher_actor = {}, {}
+        # Seeds path
         seed_file_name = f'{"id_"}{str(self.client_id)}'
         #"id_"+str(self.client_id)
         self.seed_path = f'{Config().results.seed_random_path}_seed_{Config().server.random_seed}/{seed_file_name}'
@@ -191,11 +194,25 @@ class Trainer(basic.Trainer):
                 
                 if self.done or (self.steps % Config().algorithm.batch_size == 0):
                     last_q_val = self.critic(self.t(next_state)).detach().data.numpy()
-                    
+                    if self.steps > Config().algorithm.batch_size:
+                        fisher_critic_old = {}
+                        fisher_actor_old = {}
+                        for (n, _) in self.critic.named_parameters():
+                            fisher_critic_old[n] = self.fisher_critic[n].clone()
+                        for (n, _) in self.actor.named_parameters():
+                            fisher_actor_old[n] = self.fisher_actor[n].clone()
                     # Estimate diagonals of fisher information matrix
                     self.estimate_fisher(self.train_helper(self.memory, last_q_val, fisher = True))
                     self.sum_fisher_diagonals()
-                    # Save fisher matrix
+                    # Accumulate fishers
+                    if self.updates > 1:
+                        for n,_ in self.critic.named_parameters():
+                            self.fisher_critic[n] = (self.fisher_critic[n] + fisher_critic_old[n] * self.updates)/(self.updates + 1)
+                        for n,_ in self.actor.named_parameters():
+                            self.fisher_actor[n] = (self.fisher_actor[n] + fisher_actor_old[n] * self.updates)/(self.updates + 1)
+                        
+
+                    # Save sum of diagonals in fisher
                     actor_fisher_path = f'{common_path}{"_actor_fisher"}'
                     #common_path + "_actor_fisher"
                     critic_fisher_path = f'{common_path}{"_critic_fisher"}'
@@ -204,6 +221,9 @@ class Trainer(basic.Trainer):
                     self.save_metric(critic_fisher_path, [self.critic_fisher_sum.tolist()], first = (self.episode_num == 0) and (self.steps == Config().algorithm.batch_size))
 
                     critic_loss, actor_loss, entropy_loss = self.train_helper(self.memory, last_q_val)
+                    self.updates += 1
+                    
+
 
                     self.critic_loss.append(critic_loss)
                     self.actor_loss.append(actor_loss)
@@ -243,6 +263,18 @@ class Trainer(basic.Trainer):
 
         self.save_seeds()
 
+        # Save Fisher Information Matrix
+        model_path = Config().params['model_path']
+        env_algorithm = self.env_name + self.algorithm_name
+        client_id = str(self.client_id)
+        model_seed_path = f'_seed_{Config().server.random_seed}'
+        actor, critic = "actor_fisher_matrix", "critic_fisher_matrix"
+        actor_fisher_path = f'{model_path}/{env_algorithm}{actor}{model_seed_path}{client_id}.pth'
+        critic_fisher_path = f'{model_path}/{env_algorithm}{critic}{model_seed_path}{client_id}.pth'
+        
+        torch.save(self.fisher_actor, actor_fisher_path)
+        torch.save(self.fisher_critic, critic_fisher_path)
+
 
     def save_seeds(self):
         """ Saving the random seeds in the trainer for resuming its session later on. """
@@ -255,7 +287,6 @@ class Trainer(basic.Trainer):
         rng_state_to_load = None
 
         with open(f'{self.seed_path}.pkl', 'rb') as checkpoint_file:
-            print("Restore seeds")
             rng_state_to_load = pickle.load(checkpoint_file)
         
         torch.set_rng_state(rng_state_to_load)
@@ -300,36 +331,33 @@ class Trainer(basic.Trainer):
     def estimate_fisher(self, loss):
         """Estimate diagonals of fisher information matrix"""
         critic_loss, actor_loss = loss
-        task = self.trace_idx
         # Get fisher for critic model
         self.adam_critic.zero_grad()
         critic_loss.backward(retain_graph=True)
-        self.fisher_critic[task] = [] 
         
-        for p in self.critic.parameters():
+        for n, p in self.critic.named_parameters():
             pg = p.grad.data.clone().pow(2)
-            self.fisher_critic[task].append(pg)
+            self.fisher_critic[n] = pg
 
         # Get fisher for actor model
         self.adam_actor.zero_grad()
         actor_loss.backward(retain_graph=True)
-        self.fisher_actor[task] = []
-        for p in self.actor.parameters():
+        
+        for n, p in self.actor.named_parameters():
             pg = p.grad.data.clone().pow(2)
-            self.fisher_actor[task].append(pg)
+            self.fisher_actor[n] = pg
 
     def sum_fisher_diagonals(self):
         """Sum the diagonals of the Fisher Information Matrix"""
-        task = self.trace_idx
         actor_fisher_sum = 0
         critic_fisher_sum = 0
         
-        for i, p in enumerate(self.critic.parameters()):
-            l = Variable(self.fisher_critic[task][i])
+        for n, _ in self.critic.named_parameters():
+            l = Variable(self.fisher_critic[n])
             critic_fisher_sum += l.sum()
     
-        for i, p in enumerate(self.actor.parameters()):
-            l = Variable(self.fisher_actor[task][i])
+        for n, _ in self.actor.named_parameters():
+            l = Variable(self.fisher_actor[n])
             actor_fisher_sum += l.sum()
 
         self.critic_fisher_sum, self.actor_fisher_sum = critic_fisher_sum, actor_fisher_sum
@@ -363,8 +391,17 @@ class Trainer(basic.Trainer):
         # Save fisher grads, may need later, may delete later
         self.save_metric(f'{path}{"_actor_fisher_grad"}', [actor_fisher_grad], first = self.episode_num <= Config().algorithm.max_round_episodes)
         self.save_metric(f'{path}{"_critic_fisher_grad"}', [critic_fisher_grad], first = self.episode_num <= Config().algorithm.max_round_episodes)
+        
+        actor, critic = "actor_fisher_matrix", "critic_fisher_matrix"
+        model_path = Config().params['model_path']
+        client_id = str(self.client_id)
+        env_algorithm = self.env_name+ self.algorithm_name
+        model_seed_path = f'_seed_{Config().server.random_seed}'
+        actor_fisher_path = f'{model_path}/{env_algorithm}{actor}{model_seed_path}{client_id}.pth'
+        critic_fisher_path = f'{model_path}/{env_algorithm}{critic}{model_seed_path}{client_id}.pth'
+        self.fisher_actor, self.fisher_critic = torch.load(actor_fisher_path), torch.load(critic_fisher_path)
 
-        return avg_actor_fisher, avg_critic_fisher, actor_fisher_grad, critic_fisher_grad
+        return avg_actor_fisher, avg_critic_fisher, actor_fisher_grad, critic_fisher_grad, self.fisher_actor, self.fisher_critic
 
     def load_model(self, filename=None, location=None):
         """Loading pre-trained model weights from a file."""
@@ -376,7 +413,6 @@ class Trainer(basic.Trainer):
         critic_model_name = 'critic_model'
         env_algorithm = self.env_name+ self.algorithm_name
         model_seed_path = f'_seed_{Config().server.random_seed}'
-        #"_"+str(Config().server.random_seed)
 
         if filename is not None and self.client_id == 0:
             actor_filename = f'{filename}{"_actor"}{model_seed_path}.pth'
@@ -395,16 +431,11 @@ class Trainer(basic.Trainer):
                          self.client_id, actor_model_path, critic_model_path)
 
         if self.client_id != 0:
-           
             file_name = "%s_%s.npz" % ("training_status", str(self.client_id)) 
             file_path = os.path.join(model_path, file_name)
             data = np.load(file_path)
             self.episode_num = int((data['a'])[0])
 
-            round_no_path = "%s_%s.npz" % ("training_status", str(0))
-            round_file_path = os.path.join(model_path, round_no_path)
-            data = np.load(round_file_path)
-            self.round_no = int((data['a'])[0])
     
             self.actor.load_state_dict(torch.load(actor_model_path), strict=True)
             self.critic.load_state_dict(torch.load(critic_model_path), strict=True)
@@ -454,9 +485,8 @@ class Trainer(basic.Trainer):
             writer.writerow(value)
 
     def save_model(self, filename=None, location=None):
-        """Saving the model to a file."""
+        """Saving the model, training status and fisher information matrix here to a file."""
         #We will save actor and critic models here
-        """Saving the model to a file."""
         model_path = Config(
         ).params['model_path'] if location is None else location
         actor_model_name = 'actor_model'
@@ -477,9 +507,6 @@ class Trainer(basic.Trainer):
             pass
 
         if filename is not None and self.client_id == 0:
-           # model_path = f'{model_path}/{filename}'
-           # model_filename = filename + _'model'
-           # model path = Config().params stuff
             actor_filename = f'{filename}{"_actor"}{model_seed_path}.pth'
             actor_model_path = f'{model_path}/{actor_filename}'
             critic_filename = f'{filename}{"_critic"}{model_seed_path}.pth'
@@ -497,15 +524,11 @@ class Trainer(basic.Trainer):
 
 
         if self.client_id != 0:
+            # Training status
             file_name = "%s_%s.npz" % ("training_status", str(self.client_id)) 
             file_path = os.path.join(model_path, file_name)
             np.savez(file_path, a=np.array([self.episode_num])) 
-
-            self.round_no += 1
-            round_no_path = "%s_%s.npz" % ("training_status", str(0))
-            round_file_path = os.path.join(model_path, round_no_path)
-            np.savez(round_file_path, a=np.array([self.round_no]))
-
+            
 
         if self.client_id == 0:
             logging.info("[Server #%d] Saving models to %s, and %s.", os.getpid(),
