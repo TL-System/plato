@@ -117,8 +117,6 @@ class Trainer(basic.Trainer):
         self.timesteps_since_eval = 0
         self.round_no = 0
 
-        #TODO args.resume = true?
-
         if not os.path.exists(f'{Config().results.results_dir}_seed_{Config().server.random_seed}'):
             os.makedirs(f'{Config().results.results_dir}_seed_{Config().server.random_seed}', exist_ok=True)
 
@@ -135,13 +133,24 @@ class Trainer(basic.Trainer):
 
     def train_model(self, config, trainset, sampler, cut_layer):
         """Main Training"""
-        # Fisher information matrix 
-        self.fisher_critic, self.fisher_actor = {}, {}
+        # Fisher information matrix load from previous rounds of training
+        # Fisher Information matrix path
+        model_path = Config().params['model_path']
+        env_algorithm = self.env_name + self.algorithm_name
+        client_id = str(self.client_id)
+        model_seed_path = f'_seed_{Config().server.random_seed}'
+        actor, critic = "actor_fisher_matrix", "critic_fisher_matrix"
+        actor_fisher_path = f'{model_path}/{env_algorithm}{actor}{model_seed_path}{client_id}.pth'
+        critic_fisher_path = f'{model_path}/{env_algorithm}{critic}{model_seed_path}{client_id}.pth'
+        
+        if self.episode_num > 1:
+            self.load_fisher()
+        else:
+            self.fisher_critic, self.fisher_actor = {}, {}
         # Seeds path
         seed_file_name = f'{"id_"}{str(self.client_id)}'
-        #"id_"+str(self.client_id)
         self.seed_path = f'{Config().results.seed_random_path}_seed_{Config().server.random_seed}/{seed_file_name}'
-        #Config().results.seed_random_path+"/"+seed_file_name
+        
         if not os.path.exists(self.seed_path):
             torch.manual_seed(Config().trainer.manual_seed)
         else:
@@ -149,7 +158,6 @@ class Trainer(basic.Trainer):
 
         common_path = f'{Config().results.results_dir}_seed_{Config().server.random_seed}/{Config().results.file_name}_{str(self.client_id)}'
         
-        #Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
         round_episodes = 0
 
         while round_episodes < Config().algorithm.max_round_episodes:
@@ -170,7 +178,6 @@ class Trainer(basic.Trainer):
             self.total_reward = 0
             
             #Make difficulty level (trace file) depend on client_id
-            #self.trace_idx = int(self.episode_num / 700) #progresses with time
             self.trace_idx = ((self.client_id - 1) % Config().algorithm.difficulty_levels)
             state = self.env.reset(trace_idx=self.trace_idx, test= True)
             state = self.obs_normalizer.normalize(state)
@@ -178,23 +185,21 @@ class Trainer(basic.Trainer):
             
             while not self.done:
                 probs = self.actor(self.t(state))
-                
-
                 action = self.dist(probs=probs).sample()
                 
-                next_state, reward, self.done, info = self.env.step(action.detach().data.numpy())#[0])#.detach().data.numpy())
+                next_state, reward, self.done, info = self.env.step(action.detach().data.numpy())
                 next_state = self.obs_normalizer.normalize(next_state)
 
                 self.total_reward += reward
                 self.steps += 1
-                #torch.tensor(np.array(action))
+                
                 self.memory.add(self.dist(probs=probs).log_prob(action), self.critic(self.t(state)), reward, self.done)
 
                 state = next_state
                 
                 if self.done or (self.steps % Config().algorithm.batch_size == 0):
                     last_q_val = self.critic(self.t(next_state)).detach().data.numpy()
-                    if self.steps > Config().algorithm.batch_size:
+                    if self.updates > 1 or self.episode_num > 1:
                         fisher_critic_old = {}
                         fisher_actor_old = {}
                         for (n, _) in self.critic.named_parameters():
@@ -205,7 +210,7 @@ class Trainer(basic.Trainer):
                     self.estimate_fisher(self.train_helper(self.memory, last_q_val, fisher = True))
                     self.sum_fisher_diagonals()
                     # Accumulate fishers
-                    if self.updates > 1:
+                    if self.updates > 1 or self.episode_num > 1:
                         for n,_ in self.critic.named_parameters():
                             self.fisher_critic[n] = (self.fisher_critic[n] + fisher_critic_old[n] * self.updates)/(self.updates + 1)
                         for n,_ in self.actor.named_parameters():
@@ -223,8 +228,6 @@ class Trainer(basic.Trainer):
                     critic_loss, actor_loss, entropy_loss = self.train_helper(self.memory, last_q_val)
                     self.updates += 1
                     
-
-
                     self.critic_loss.append(critic_loss)
                     self.actor_loss.append(actor_loss)
                     self.entropy_loss.append(entropy_loss)
@@ -264,14 +267,6 @@ class Trainer(basic.Trainer):
         self.save_seeds()
 
         # Save Fisher Information Matrix
-        model_path = Config().params['model_path']
-        env_algorithm = self.env_name + self.algorithm_name
-        client_id = str(self.client_id)
-        model_seed_path = f'_seed_{Config().server.random_seed}'
-        actor, critic = "actor_fisher_matrix", "critic_fisher_matrix"
-        actor_fisher_path = f'{model_path}/{env_algorithm}{actor}{model_seed_path}{client_id}.pth'
-        critic_fisher_path = f'{model_path}/{env_algorithm}{critic}{model_seed_path}{client_id}.pth'
-        
         torch.save(self.fisher_actor, actor_fisher_path)
         torch.save(self.fisher_critic, critic_fisher_path)
 
@@ -365,7 +360,7 @@ class Trainer(basic.Trainer):
     def load_fisher(self):
         """ Load last fisher from file"""
         path = f'{Config().results.results_dir}_seed_{Config().server.random_seed}/{Config().results.file_name}_{self.client_id}'
-        #Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
+        
         SIZE = 10
         act_pos, cri_pos = 0, 0
         GRAD_SIZE = 2 * Config().algorithm.max_round_episodes
