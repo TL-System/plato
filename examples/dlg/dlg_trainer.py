@@ -118,6 +118,79 @@ class Trainer(basic.Trainer):
                         create_graph=True,
                         only_inputs=True)
 
+                    current_grad = list((_.detach().clone() for _ in grad))
+
+                    perturbed_gradients = None
+
+                    if hasattr(Config().algorithm, 'defense') and Config(
+                    ).algorithm.defense == 'GradDefense':
+                        # this if statement will never be entered
+                        if hasattr(Config().algorithm,
+                                   'clip') and Config().algorithm.clip is True:
+                            from defense.GradDefense.clip import noise
+                            # moved the line below to after the if-else statement
+                            # target_grad = current_grad
+                        # else statement will always be the one
+                        else:
+                            from defense.GradDefense.perturb import noise
+                        # added the statement here, but i think it is unnecessary
+                        target_grad = current_grad
+                        perturbed_gradients = noise(
+                            # dy_dx=target_grad,
+                            dy_dx=current_grad,
+                            sensitivity=sensitivity,
+                            slices_num=Config().algorithm.slices_num,
+                            perturb_slices_num=Config().algorithm.
+                            perturb_slices_num,
+                            noise_intensity=Config().algorithm.scale)
+
+                        # i think the lines below are also unnecessary so i commented them out
+                        # target_grad = []
+                        # for layer in perturbed_gradients:
+                        #     layer = layer.to(self.device)
+                        #     target_grad.append(layer)
+
+                    if hasattr(Config().algorithm, 'defense') and Config(
+                    ).algorithm.defense == 'Soteria':
+                        examples.requires_grad = True
+                        out, feature_fc1_graph = self.model.forward(examples)
+                        deviation_f1_target = torch.zeros_like(
+                            feature_fc1_graph)
+                        deviation_f1_x_norm = torch.zeros_like(
+                            feature_fc1_graph)
+                        for f in range(deviation_f1_x_norm.size(1)):
+                            deviation_f1_target[:, f] = 1
+                            feature_fc1_graph.backward(deviation_f1_target,
+                                                       retain_graph=True)
+                            deviation_f1_x = examples.grad.data
+                            deviation_f1_x_norm[:, f] = torch.norm(
+                                deviation_f1_x.view(deviation_f1_x.size(0),
+                                                    -1),
+                                dim=1) / (feature_fc1_graph.data[:, f])
+                            self.model.zero_grad()
+                            examples.grad.data.zero_()
+                            deviation_f1_target[:, f] = 0
+
+                        deviation_f1_x_norm_sum = deviation_f1_x_norm.sum(
+                            axis=0)
+                        thresh = np.percentile(
+                            deviation_f1_x_norm_sum.flatten().cpu().numpy(),
+                            10)
+                        mask = np.where(
+                            abs(deviation_f1_x_norm_sum.cpu()) < thresh, 0,
+                            1).astype(np.float32)
+                        perturbed_gradients = current_grad
+                        print(sum(mask))
+                        perturbed_gradients[6] = current_grad[
+                            6] * torch.Tensor(mask).to(self.device)
+
+                    # change the gradients if a defense was applied
+                    if perturbed_gradients is not None:
+                        grad = perturbed_gradients
+
+                    # cast grad back to tuple type
+                    grad = tuple(grad)
+
                     # TODO: momentum, weight_decay?
                     patched_model.parameters = OrderedDict(
                         (name,
@@ -125,12 +198,12 @@ class Trainer(basic.Trainer):
                         for ((name, param), grad_part
                              ) in zip(patched_model.parameters.items(), grad))
 
-                    current_grad = list((_.detach().clone() for _ in grad))
-
                     # Sum up the gradients for each local update
                     try:
                         target_grad = [
-                            sum(x) for x in zip(current_grad, target_grad)
+                            sum(x) for x in zip(
+                                list((_.detach().clone()
+                                      for _ in grad)), target_grad)
                         ]
                     except:
                         target_grad = list((_.detach().clone() for _ in grad))
@@ -178,57 +251,6 @@ class Trainer(basic.Trainer):
                 target_grad = [x / total_local_steps for x in target_grad]
             except:
                 target_grad = None
-
-            if hasattr(
-                    Config().algorithm,
-                    'defense') and Config().algorithm.defense == 'GradDefense':
-                if hasattr(Config().algorithm,
-                           'clip') and Config().algorithm.clip is True:
-                    from defense.GradDefense.clip import noise
-                    target_grad = current_grad
-                else:
-                    from defense.GradDefense.perturb import noise
-                perturbed_gradients = noise(
-                    dy_dx=target_grad,
-                    sensitivity=sensitivity,
-                    slices_num=Config().algorithm.slices_num,
-                    perturb_slices_num=Config().algorithm.perturb_slices_num,
-                    noise_intensity=Config().algorithm.scale)
-
-                target_grad = []
-                for layer in perturbed_gradients:
-                    layer = layer.to(self.device)
-                    target_grad.append(layer)
-
-            if hasattr(Config().algorithm,
-                       'defense') and Config().algorithm.defense == 'Soteria':
-
-                full_examples.requires_grad = True
-                out, feature_fc1_graph = self.model.forward(full_examples)
-                deviation_f1_target = torch.zeros_like(feature_fc1_graph)
-                deviation_f1_x_norm = torch.zeros_like(feature_fc1_graph)
-                for f in range(deviation_f1_x_norm.size(1)):
-                    deviation_f1_target[:, f] = 1
-                    feature_fc1_graph.backward(deviation_f1_target,
-                                               retain_graph=True)
-                    deviation_f1_x = full_examples.grad.data
-                    deviation_f1_x_norm[:, f] = torch.norm(
-                        deviation_f1_x.view(deviation_f1_x.size(0), -1),
-                        dim=1) / (feature_fc1_graph.data[:, f])
-                    self.model.zero_grad()
-                    full_examples.grad.data.zero_()
-                    deviation_f1_target[:, f] = 0
-
-                deviation_f1_x_norm_sum = deviation_f1_x_norm.sum(axis=0)
-                thresh = np.percentile(
-                    deviation_f1_x_norm_sum.flatten().cpu().numpy(), 1)
-                mask = np.where(
-                    abs(deviation_f1_x_norm_sum.cpu()) < thresh, 0,
-                    1).astype(np.float32)
-                target_grad = current_grad
-                # print(sum(mask))
-                target_grad[6] = current_grad[6] * torch.Tensor(mask).to(
-                    self.device)
 
         full_examples = full_examples.detach()
         file_path = f"{Config().params['model_path']}/{self.client_id}.pickle"
