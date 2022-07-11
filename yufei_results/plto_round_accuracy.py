@@ -49,8 +49,8 @@ def read_csv_to_dict(result_csv_file: str, x_item, y_item) -> Dict[str, List]:
     return result_dict
 
 
-def plot(x_label, x_value1, x_value2, y_label, y_value1, y_value2,
-         figure_file_name):
+def plot(x_label, x_value1, x_value2, x_value3, y_label, y_value1, y_value2,
+         y_value3, figure_file_name):
     """Plot a figure."""
     fig, ax = plt.subplots()
     ax.plot(x_value1,
@@ -67,6 +67,14 @@ def plot(x_label, x_value1, x_value2, y_label, y_value1, y_value2,
             linestyle='-.',
             marker='v',
             label='Oort')
+
+    ax.plot(x_value3,
+            y_value3,
+            color='blue',
+            linewidth=1.5,
+            linestyle=':',
+            marker='s',
+            label='FedBuff')
     ax.legend(loc='lower right')
     ax.set(xlabel=x_label, ylabel=y_label)
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
@@ -80,26 +88,31 @@ def main():
     x_item = 'round'
     y_item = 'accuracy'
 
-    result_csv_file1 = './async_selection_1000_50.csv'
+    result_csv_file1 = './async_selection_500_20.csv'
     result_dict1 = read_csv_to_dict(result_csv_file1, x_item, y_item)
 
-    result_csv_file2 = './oort_1000_50.csv'
+    result_csv_file2 = './oort_500_20.csv'
     result_dict2 = read_csv_to_dict(result_csv_file2, x_item, y_item)
+
+    result_csv_file3 = './FedBuff_500_20eachRound_10least.csv'
+    result_dict3 = read_csv_to_dict(result_csv_file3, x_item, y_item)
 
     #x_item = 'round'
     x_label = 'Round'
     x_value1 = result_dict1[x_item]
     x_value2 = result_dict2[x_item]
+    x_value3 = result_dict3[x_item]
 
     #y_item = 'accuracy'
     y_label = 'Accuracy (%)'
     y_value1 = result_dict1[y_item]
     y_value2 = result_dict2[y_item]
+    y_value3 = result_dict3[y_item]
 
-    figure_file_name = './round_accuracy_1000_50.pdf'
+    figure_file_name = './round_accuracy_500_20.pdf'
 
-    plot(x_label, x_value1, x_value2, y_label, y_value1, y_value2,
-         figure_file_name)
+    plot(x_label, x_value1, x_value2, x_value3, y_label, y_value1, y_value2,
+         y_value3, figure_file_name)
 
 
 if __name__ == "__main__":
