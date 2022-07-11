@@ -8,6 +8,7 @@ python examples/customized/custom_server.py -c examples/customized/server.yml
 
 import logging
 import asyncio
+from torch.autograd import Variable
 
 from plato.servers import fedavg
 from plato.config import Config
@@ -15,6 +16,7 @@ import pickle
 import numpy as np
 import csv
 import random
+import torch
 
 class A2CServer(fedavg.Server):
     """ Federated learning server using federated averaging to train Actor-Critic models. """
@@ -82,8 +84,6 @@ class A2CServer(fedavg.Server):
                     critic_avg_update[name] += delta * 1.0/Config().clients.per_round
             else:
                 metric = self.select_metric(report)
-                # TODO: weight of delta should be the weightage of the client 1/number of clients choosen to be aggregated
-                # TODO: know how many are >= percentile to have the correct ratio next to deltas
                 print("Metric", metric)
                 print("Metric percentile", metric_percentile)
                # if metric <= metric_percentile:
@@ -100,10 +100,12 @@ class A2CServer(fedavg.Server):
                     else:
                         clients_selected_size = 3
 
+                    norm_fisher_actor, norm_fisher_critic =  self.standardize_fisher(report)
+                    
                     for name, delta in update_from_actor.items():
-                        actor_avg_update[name] += delta * 1.0/clients_selected_size
+                        actor_avg_update[name] += delta * 1.0/clients_selected_size * (norm_fisher_actor[name] if Config().server.mul_fisher else 1.0)
                     for name, delta in update_from_critic.items():
-                        critic_avg_update[name] += delta * 1.0/clients_selected_size
+                        critic_avg_update[name] += delta * 1.0/clients_selected_size * (norm_fisher_critic[name] if Config().server.mul_fisher else 1.0)
             
             # Yield to other tasks in the server
             await asyncio.sleep(0)
@@ -115,6 +117,49 @@ class A2CServer(fedavg.Server):
             self.save_files(f'{client_path}{"_percentile"}', client_list)
         
         return actor_avg_update, critic_avg_update
+
+    def standardize_fisher(self, report):
+        sum_actor, count_actor, sum_critic, count_critic = 0, 0, 0, 0
+        norm_fisher_actor, norm_fisher_critic = {}, {}
+
+        for name in report.fisher_actor:
+            avg_actor = Variable(report.fisher_actor[name]).mean()
+            std_actor = Variable(report.fisher_actor[name]).std() 
+            norm_fisher_actor[name] = (report.fisher_actor[name] - avg_actor)/ (std_actor + 1e-3)
+            min_actor = Variable(norm_fisher_actor[name]).min()
+            norm_fisher_actor[name] += -1 * min(min_actor, -1)
+            norm_fisher_actor[name][torch.isnan(norm_fisher_actor[name])] = 1.0
+            print("std: %s, avg: %s, min: %s" % (std_actor, avg_actor, min_actor))
+            print("norm fisher actor", norm_fisher_actor[name])
+
+        for name in report.fisher_critic:
+            avg_critic = Variable(report.fisher_critic[name]).mean()
+            std_critic = Variable(report.fisher_critic[name]).std()
+            norm_fisher_critic[name] = (report.fisher_critic[name] - avg_critic) / (std_critic + 1e-3) 
+            min_critic = Variable(norm_fisher_critic[name]).min()
+            norm_fisher_critic[name] += -1 * min(min_critic, -1) 
+            norm_fisher_critic[name][torch.isnan(norm_fisher_critic[name])] = 1.0
+            
+            print("std: %s, avg: %s, min: %s" % (std_critic, avg_critic, min_critic))
+            print("norm fisher critic", norm_fisher_critic[name])
+        
+        """
+        avg_fisher_actor = sum_actor/count_actor
+        avg_fisher_critic = sum_critic/count_critic
+        print("Avg fisher actor", avg_fisher_actor)
+        norm_fisher_actor, norm_fisher_critic = {}, {}
+        # Bring average of fisher values to 1, we just want the values to be reflecting importance of the parameters
+        for name in report.fisher_actor:
+            norm_fisher_actor[name] = report.fisher_actor[name]/sum_actor
+        for name in report.fisher_critic:
+            norm_fisher_critic[name] = report.fisher_critic[name]/sum_critic
+        """
+        return norm_fisher_actor, norm_fisher_critic
+
+
+
+        
+        
 
     def save_files(self, file_path, data):
         #To avoid appending to existing files, if the current roudn is one we write over
@@ -135,10 +180,10 @@ class A2CServer(fedavg.Server):
             return report.actor_grad
         elif Config().server.percentile_aggregate == "critic_grad":
             return report.critic_grad
-        elif Config().server.percentile_aggregate == "actor_fisher":
-            return report.actor_fisher
-        elif Config().server.percentile_aggregate == "critic_fisher":
-            return report.critic_fisher
+        elif Config().server.percentile_aggregate == "sum_actor_fisher":
+            return report.sum_actor_fisher
+        elif Config().server.percentile_aggregate == "sum_critic_fisher":
+            return report.sum_critic_fisher
 
 
 
@@ -154,10 +199,10 @@ class A2CServer(fedavg.Server):
                 loss_list.append(report.actor_grad)
             elif Config().server.percentile_aggregate == "critic_grad":
                 loss_list.append(report.critic_grad)
-            elif Config().server.percentile_aggregate == "actor_fisher":
-                loss_list.append(report.actor_fisher)
-            elif Config().server.percentile_aggregate == "critic_fisher":
-                loss_list.append(report.critic_fisher)
+            elif Config().server.percentile_aggregate == "sum_actor_fisher":
+                loss_list.append(report.sum_actor_fisher)
+            elif Config().server.percentile_aggregate == "sum_critic_fisher":
+                loss_list.append(report.sum_critic_fisher)
 
         return loss_list
 
