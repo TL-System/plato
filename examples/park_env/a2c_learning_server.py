@@ -71,7 +71,6 @@ class A2CServer(fedavg.Server):
         for i, update in enumerate(weights_received):
             __, report, __, __ = updates[i] 
             client_id = report.client_id
-            #Config().results.results_dir +"/"+Config().results.file_name+"_client_saved"
 
             update_from_actor, update_from_critic = update
             
@@ -119,47 +118,45 @@ class A2CServer(fedavg.Server):
         return actor_avg_update, critic_avg_update
 
     def standardize_fisher(self, report):
-        sum_actor, count_actor, sum_critic, count_critic = 0, 0, 0, 0
         norm_fisher_actor, norm_fisher_critic = {}, {}
 
         for name in report.fisher_actor:
+            """
             avg_actor = Variable(report.fisher_actor[name]).mean()
             std_actor = Variable(report.fisher_actor[name]).std() 
             norm_fisher_actor[name] = (report.fisher_actor[name] - avg_actor)/ (std_actor + 1e-3)
             min_actor = Variable(norm_fisher_actor[name]).min()
             norm_fisher_actor[name] += -1 * min(min_actor, -1)
+            """
+            min_actor = Variable(report.fisher_actor[name]).min()
+            max_actor = Variable(report.fisher_actor[name]).max()
+            norm_fisher_actor[name] = (report.fisher_actor[name] - min_actor) / (max_actor - min_actor)
             norm_fisher_actor[name][torch.isnan(norm_fisher_actor[name])] = 1.0
-            print("std: %s, avg: %s, min: %s" % (std_actor, avg_actor, min_actor))
-            print("norm fisher actor", norm_fisher_actor[name])
+            mean_norm_actor = Variable(norm_fisher_actor[name]).mean()
+            norm_fisher_actor[name] += (1 - mean_norm_actor)
+            #print("std: %s, avg: %s, min: %s" % (std_actor, avg_actor, min_actor))
+            #print("norm fisher actor", norm_fisher_actor[name])
 
         for name in report.fisher_critic:
+            """
             avg_critic = Variable(report.fisher_critic[name]).mean()
             std_critic = Variable(report.fisher_critic[name]).std()
             norm_fisher_critic[name] = (report.fisher_critic[name] - avg_critic) / (std_critic + 1e-3) 
             min_critic = Variable(norm_fisher_critic[name]).min()
             norm_fisher_critic[name] += -1 * min(min_critic, -1) 
             norm_fisher_critic[name][torch.isnan(norm_fisher_critic[name])] = 1.0
-            
-            print("std: %s, avg: %s, min: %s" % (std_critic, avg_critic, min_critic))
-            print("norm fisher critic", norm_fisher_critic[name])
+            """
+            min_critic = Variable(report.fisher_critic[name]).min()
+            max_critic = Variable(report.fisher_critic[name]).max()
+            norm_fisher_critic[name] = (report.fisher_critic[name] - min_critic) / (max_critic - min_critic)
+            norm_fisher_critic[name][torch.isnan(norm_fisher_critic[name])] = 1.0
+            mean_norm_critic = Variable(norm_fisher_critic[name]).mean()
+            norm_fisher_critic[name] += (1 -  mean_norm_critic)
+            #print("std: %s, avg: %s, min: %s" % (std_critic, avg_critic, min_critic))
+            #print("norm fisher critic", norm_fisher_critic[name])
         
-        """
-        avg_fisher_actor = sum_actor/count_actor
-        avg_fisher_critic = sum_critic/count_critic
-        print("Avg fisher actor", avg_fisher_actor)
-        norm_fisher_actor, norm_fisher_critic = {}, {}
-        # Bring average of fisher values to 1, we just want the values to be reflecting importance of the parameters
-        for name in report.fisher_actor:
-            norm_fisher_actor[name] = report.fisher_actor[name]/sum_actor
-        for name in report.fisher_critic:
-            norm_fisher_critic[name] = report.fisher_critic[name]/sum_critic
-        """
         return norm_fisher_actor, norm_fisher_critic
 
-
-
-        
-        
 
     def save_files(self, file_path, data):
         #To avoid appending to existing files, if the current roudn is one we write over
