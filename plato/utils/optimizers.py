@@ -48,11 +48,34 @@ def get_lr_schedule(optimizer: optim.Optimizer,
                     iterations_per_epoch: int,
                     train_loader=None):
     """Returns a learning rate scheduler according to the configuration."""
-    if Config().trainer.lr_schedule == 'CosineAnnealingLR':
-        return optim.lr_scheduler.CosineAnnealingLR(
-            optimizer,
-            len(train_loader) * Config().trainer.epochs)
-    elif Config().trainer.lr_schedule == 'LambdaLR':
+
+    lr_schedule = Config().trainer.lr_schedule
+
+    # Use a dictionary to keep track of learning rate schedules that need to be returned
+    # for chained learning and sequential learning rate schedulers
+    returned_schedules = {}
+
+    use_chained = False
+    use_sequential = False
+    if 'ChainedScheduler' in lr_schedule:
+        use_chained = True
+        lr_schedule = [
+            schedule for schedule in Config().trainer.lr_schedule.split(',')
+            if schedule != ('ChainedScheduler')
+        ]
+    elif 'SequentialLR' in lr_schedule:
+        use_sequential = True
+        lr_schedule = [
+            schedule for schedule in Config().trainer.lr_schedule.split(',')
+            if schedule != ('SequentialLR')
+        ]
+
+    if 'CosineAnnealingLR' in lr_schedule:
+        returned_schedules[
+            'CosineAnnealingLR'] = optim.lr_scheduler.CosineAnnealingLR(
+                optimizer,
+                len(train_loader) * Config().trainer.epochs)
+    if 'LambdaLR' in lr_schedule:
         lambdas = [lambda it: 1.0]
 
         if hasattr(Config().trainer, 'lr_gamma') and hasattr(
@@ -71,27 +94,97 @@ def get_lr_schedule(optimizer: optim.Optimizer,
             lambdas.append(lambda it: min(1.0, it / warmup_iters))
 
         # Combine the lambdas
-        return optim.lr_scheduler.LambdaLR(
+        returned_schedules['LambdaLR'] = optim.lr_scheduler.LambdaLR(
             optimizer, lambda it: np.product([l(it) for l in lambdas]))
-    elif Config().trainer.lr_schedule == 'StepLR':
+    if 'StepLR' in lr_schedule:
         step_size = Config().trainer.lr_step_size if hasattr(
             Config().trainer, 'lr_step_size') else 30
         gamma = Config().trainer.lr_gamma if hasattr(Config().trainer,
                                                      'lr_gamma') else 0.1
-        return optim.lr_scheduler.StepLR(optimizer,
-                                         step_size=step_size,
-                                         gamma=gamma)
-    elif Config().trainer.lr_schedule == 'ReduceLROnPlateau':
+        returned_schedules['StepLR'] = (optim.lr_scheduler.StepLR(
+            optimizer, step_size=step_size, gamma=gamma))
+    if 'ReduceLROnPlateau' in lr_schedule:
         factor = Config().trainer.lr_factor if hasattr(Config().trainer,
                                                        'lr_factor') else 0.1
         patience = Config().trainer.lr_patience if hasattr(
             Config().trainer, 'lr_patience') else 10
-        return optim.lr_scheduler.ReduceLROnPlateau(optimizer,
-                                                    mode='min',
-                                                    factor=factor,
-                                                    patience=patience)
-    else:
+        returned_schedules['ReduceLROnPlateau'] = (
+            optim.lr_scheduler.ReduceLROnPlateau(optimizer,
+                                                 mode='min',
+                                                 factor=factor,
+                                                 patience=patience))
+    if 'MultiStepLR' in lr_schedule:
+        milestones = [
+            int(x.split('ep')[0])
+            for x in Config().trainer.lr_milestone_steps.split(',')
+        ]
+        gamma = Config().trainer.lr_gamma
+        returned_schedules['MultiStepLR'] = (optim.lr_scheduler.MultiStepLR(
+            optimizer, milestones, gamma))
+    if 'ConstantLR' in lr_schedule:
+        factor = Config().trainer.lr_factor if hasattr(
+            Config().trainer, 'lr_factor') else 1.0 / 3.0
+        total_iters = Config().trainer.lr_total_iters if hasattr(
+            Config().trainer, 'lr_total_iters') else 5
+        returned_schedules['ConstantLR'] = (optim.lr_scheduler.ConstantLR(
+            optimizer, factor, total_iters))
+    if 'LinearLR' in lr_schedule:
+        start_factor = Config().trainer.lr_start_factor if hasattr(
+            Config().trainer, 'lr_start_factor') else 1.0 / 3.0
+        end_factor = Config().trainer.lr_end_factor if hasattr(
+            Config().trainer, 'lr_end_factor') else 1.0
+        total_iters = Config().trainer.lr_total_iters if hasattr(
+            Config().trainer, 'lr_total_iters') else 5
+        returned_schedules['LinearLR'] = (optim.lr_scheduler.LinearLR(
+            optimizer, start_factor, end_factor, total_iters))
+    if 'ExponentialLR' in lr_schedule:
+        gamma = Config().trainer.lr_gamma
+        returned_schedules['ExponentialLR'] = (
+            optim.lr_scheduler.ExponentialLR(optimizer, gamma))
+    if 'CyclicLR' in lr_schedule:
+        base_lr = Config().trainer.lr_base if hasattr(Config().trainer,
+                                                      'lr_base') else 0.01
+        max_lr = Config().trainer.lr_max if hasattr(Config().trainer,
+                                                    'lr_max') else 0.1
+        # Step size is the number of training iterations
+        step_size_up = Config().trainer.lr_step_up if hasattr(
+            Config().trainer, 'lr_step_up') else 2000
+        step_size_down = Config().trainer.lr_step_down if hasattr(
+            Config().trainer, 'lr_step_down') else 2000
+
+        mode = Config().trainer.mode if hasattr(Config().trainer,
+                                                'mode') else "triangular"
+        returned_schedules['CyclicLR'] = (optim.lr_scheduler.CyclicLR(
+            optimizer, base_lr, max_lr, step_size_up, step_size_down, mode))
+    if 'CosineAnnealingWarmRestarts' in lr_schedule:
+        T_0 = Config().trainer.num_iters if hasattr(Config().trainer,
+                                                    "num_iters") else 50
+        returned_schedules[
+            'CosineAnnealingWarmRestarts'] = optim.lr_scheduler.CosineAnnealingWarmRestarts(
+                optimizer, T_0)
+
+    if len(returned_schedules.keys()) == 0:
         sys.exit('Error: Unknown learning rate scheduler.')
+
+    if use_chained:
+        return optim.lr_scheduler.ChainedScheduler(
+            list(returned_schedules.values()))
+    elif use_sequential:
+        sequential_milestones = Config(
+        ).trainer.lr_sequential_milestones if hasattr(
+            Config().trainer, 'lr_sequential_milestones') else 2
+        sequential_milestones = [
+            int(epoch) for epoch in sequential_milestones.split(',')
+        ]
+
+        # Sequencing the schedulers based on their order in the config file
+        ordered_schedules = [
+            returned_schedules[schedule] for schedule in returned_schedules
+        ]
+        return optim.lr_scheduler.SequentialLR(optimizer, ordered_schedules,
+                                               sequential_milestones)
+    else:
+        return list(returned_schedules.values())[0]
 
 
 def get_loss_criterion():
