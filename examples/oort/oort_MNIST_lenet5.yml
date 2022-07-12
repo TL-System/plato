@@ -26,6 +26,7 @@ server:
     synchronous: false
     simulate_wall_time: true
     minimum_clients_aggregated: 2
+    # Oort specific parameters
     step_window: 2
     penalty: 2
     exploration_factor: 0.9

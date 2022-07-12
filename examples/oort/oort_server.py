@@ -158,7 +158,7 @@ class Server(fedavg.Server):
                 unselectable_clients = training_client_ids + reporting_client_ids
 
                 # Sets the number of clients to be selected
-                if self.selected_clients is not None:
+                if self.selected_clients is not None: # not the first iteration
                     if self.simulate_wall_time:
                         sample_size = len(self.current_processed_clients)
                     else:
