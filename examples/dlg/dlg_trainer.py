@@ -90,7 +90,7 @@ class Trainer(basic.Trainer):
                 # Compute gradients in the current step
                 if hasattr(Config().algorithm, 'defense') and Config().algorithm.defense == 'GradDefense' and \
                         hasattr(Config().algorithm, 'clip') and Config().algorithm.clip is True:
-                    current_grad = []
+                    list_grad = []
                     for index in range(len(examples)):
                         outputs = patched_model(
                             torch.unsqueeze(examples[index], dim=0),
@@ -102,7 +102,7 @@ class Trainer(basic.Trainer):
                             retain_graph=True,
                             create_graph=True,
                             only_inputs=True)
-                        current_grad.append(
+                        list_grad.append(
                             list((_.detach().clone() for _ in grad)))
                         # TODO: multiple batches or epochs?
                 else:
@@ -116,20 +116,18 @@ class Trainer(basic.Trainer):
                         retain_graph=True,
                         create_graph=True,
                         only_inputs=True)
-                    current_grad = list((_.detach().clone() for _ in grad))
+                    list_grad = list((_.detach().clone() for _ in grad))
 
                 # Apply defense if needed
                 if hasattr(Config().algorithm, 'defense'):
-                    perturbed_gradients = None
-
                     if Config().algorithm.defense == 'GradDefense':
                         if hasattr(Config().algorithm,
                                    'clip') and Config().algorithm.clip is True:
                             from defense.GradDefense.clip import noise
                         else:
                             from defense.GradDefense.perturb import noise
-                        perturbed_gradients = noise(
-                            dy_dx=current_grad,
+                        list_grad = noise(
+                            dy_dx=list_grad,
                             sensitivity=sensitivity,
                             slices_num=Config().algorithm.slices_num,
                             perturb_slices_num=Config().algorithm.
@@ -164,17 +162,21 @@ class Trainer(basic.Trainer):
                         mask = np.where(
                             abs(deviation_f1_x_norm_sum.cpu()) < thresh, 0,
                             1).astype(np.float32)
-                        perturbed_gradients = current_grad
                         print(sum(mask))
-                        perturbed_gradients[6] = current_grad[
+                        list_grad[6] = list_grad[
                             6] * torch.Tensor(mask).to(self.device)
 
-                    # change the gradients if a defense was applied
-                    if perturbed_gradients is not None:
-                        grad = perturbed_gradients
+                    if Config().algorithm.defense == 'MC':
+                        for i in range(len(list_grad)):
+                            grad_tensor = list_grad[i].cpu().numpy()
+                            flattened_weights = np.abs(grad_tensor.flatten())
+                            # Generate the pruning threshold according to 'prune by percentage'.
+                            thresh = np.percentile(flattened_weights, Config().algorithm.prune_pct)
+                            grad_tensor = np.where(abs(grad_tensor) < thresh, 0, grad_tensor)
+                            list_grad[i] = torch.Tensor(grad_tensor).to(self.device)
 
-                        # cast grad back to tuple type
-                        grad = tuple(grad)
+                    # cast grad back to tuple type
+                    grad = tuple(list_grad)
 
                 # TODO: momentum, weight_decay?
                 patched_model.parameters = OrderedDict(

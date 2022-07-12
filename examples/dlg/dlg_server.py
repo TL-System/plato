@@ -90,7 +90,7 @@ class Server(fedavg.Server):
             self.use_updates = False
         self.defense_method = 'no'
         if hasattr(Config().algorithm, 'defense'):
-            if Config().algorithm.defense in ['GradDefense', 'Soteria']:
+            if Config().algorithm.defense in ['GradDefense', 'Soteria', 'MC', 'DP']:
                 self.defense_method = Config().algorithm.defense
             else:
                 logging.info("No Defense Applied")
