@@ -17,7 +17,7 @@ import byol_net
 import byol_trainer
 
 from plato.clients import ssl_simple as ssl_client
-from plato.algorithms import fedavg_ssl
+from plato.algorithms import fedavg_pers
 from plato.servers import fedavg_pers as ssl_server
 
 
@@ -28,7 +28,7 @@ def main():
         the 'model_name' in config file.
     """
     trainer = byol_trainer.Trainer
-    algorithm = fedavg_ssl.Algorithm
+    algorithm = fedavg_pers.Algorithm
     byol_model = byol_net.BYOL
     client = ssl_client.Client(model=byol_model,
                                trainer=trainer,

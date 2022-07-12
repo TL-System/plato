@@ -95,7 +95,7 @@ trainer:
     # The type of the trainer
     type: basic
     # The maximum number of training rounds
-    rounds: 200
+    rounds: 150
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -125,7 +125,7 @@ trainer:
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
     # does not utilize the
-    pers_epochs: 10
+    pers_epochs: 5
     pers_batch_size: 64
     pers_optimizer: SGD
     # lr = 0.1 * batch_size / 256, see section B.6 and B.7 of SimCLR paper.
