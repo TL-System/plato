@@ -257,8 +257,11 @@ class Client(pers_simple.Client):
     async def train(self):
         """The machine learning training workload on a client."""
 
-        if not (hasattr(Config().clients, "only_personalization")
-                and Config().clients.only_personalization):
+        rounds = Config().trainer.rounds
+        # Perform model training
+        if self.current_round < rounds and (
+                not (hasattr(Config().clients, "only_personalization")
+                     and Config().clients.only_personalization)):
             logging.info(
                 fonts.colourize(
                     f"[{self}] Started training in communication round #{self.current_round}."

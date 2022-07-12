@@ -27,11 +27,12 @@ from tqdm import tqdm
 from plato.config import Config
 from plato.trainers import pers_basic
 from plato.utils import optimizers
-from plato.utils import data_loaders_wrapper
-
+from plato.utils.checkpoint_operator import perform_client_checkpoint_saving
+from plato.utils.checkpoint_operator import get_client_checkpoint_operator
+from plato.utils.arrange_saving_name import get_format_name
 from plato.models import ssl_monitor_register
 
-from plato.utils import ssl_losses, checkpoint_saver
+from plato.utils import ssl_losses
 from plato.utils.arrange_saving_name import get_format_name
 
 
@@ -300,25 +301,18 @@ class Trainer(pers_basic.Trainer):
                 train_loader=eval_train_loader,
                 prefix="pers_")
 
-            eval_train_checkpoint_saver = self.get_checkppint_saver()
-
             # Before the training, we expect to save the initial
             # model of this round
-            initial_filename = get_format_name(
+            initial_filename = perform_client_checkpoint_saving(
                 client_id=self.client_id,
-                prefix="personalized",
                 model_name=personalized_model_name,
-                round_n=current_round,
-                epoch_n=0,
-                run_id=config['run_id'],
-                ext="pth")
-            eval_train_checkpoint_saver.save_checkpoint(
                 model_state_dict=self.personalized_model.state_dict(),
-                check_points_name=[initial_filename],
+                config=config,
+                kwargs=kwargs,
                 optimizer_state_dict=eval_optimizer.state_dict(),
-                lr_scheduler_state_dict=lr_schedule.state_dict(),
-                epoch=0,
-                config_args=Config().to_dict())
+                lr_schedule_state_dict=lr_schedule.state_dict(),
+                present_epoch=0,
+                base_epoch=0)
 
             accuracy, _, _ = self.perform_test_op(test_loader)
             # save the personaliation accuracy to the results dir
@@ -425,23 +419,17 @@ class Trainer(pers_basic.Trainer):
                     ) % epoch_model_log_interval == 0 or epoch == pers_epochs:
                     # the model generated during each round will be stored in the
                     # checkpoints
-
-                    filename = get_format_name(
+                    perform_client_checkpoint_saving(
                         client_id=self.client_id,
-                        prefix="personalized",
                         model_name=personalized_model_name,
-                        round_n=current_round,
-                        epoch_n=epoch,
-                        run_id=config['run_id'],
-                        ext="pth")
-
-                    eval_train_checkpoint_saver.save_checkpoint(
                         model_state_dict=self.personalized_model.state_dict(),
-                        check_points_name=[filename],
+                        config=config,
+                        kwargs=kwargs,
                         optimizer_state_dict=eval_optimizer.state_dict(),
-                        lr_scheduler_state_dict=lr_schedule.state_dict(),
-                        epoch=epoch,
-                        config_args=Config().to_dict())
+                        lr_schedule_state_dict=lr_schedule.state_dict(),
+                        present_epoch=epoch,
+                        base_epoch=epoch,
+                        prefix="personalized")
 
                 lr_schedule.step()
 
@@ -494,9 +482,12 @@ class Trainer(pers_basic.Trainer):
         # if we do not want to keep the state of the personalized model
         # at the end of this round,
         # we need to load the initial model
-        if not (hasattr(Config().trainer, "do_maintain_per_state")
+        if current_round < Config().trainer.rounds and not (
+                hasattr(Config().trainer, "do_maintain_per_state")
                 and Config().trainer.do_maintain_per_state):
-            location = eval_train_checkpoint_saver.checkpoints_dir
+            cpk_saver = get_client_checkpoint_operator(
+                client_id=self.client_id, current_round=current_round)
+            location = cpk_saver.checkpoints_dir
             load_from_path = os.path.join(location, initial_filename)
 
             self.personalized_model.load_state_dict(
