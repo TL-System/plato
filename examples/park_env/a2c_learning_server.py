@@ -32,28 +32,16 @@ class A2CServer(fedavg.Server):
         """Aggregate weight updates from the clients using federated averaging."""
 
         weights_received = self.compute_weight_deltas(updates)
-
+        # Calculate metric percentile 
         if Config().server.percentile_aggregate:
-            
-            print("-----------------------")
-            print("WE ARE AGGREGATING BASED ON PERCENTILE!")
-            print("-----------------------")
-
             percentile = min(Config().server.percentile + Config().server.percentile_increase * self.current_round, 100)
-            
             metric_list = self.create_loss_lists(updates)
-            print("Metric list", metric_list)
             metric_percentile = np.percentile(np.array(metric_list), percentile)
             clients_selected_size = len([i for i in metric_list if i <= metric_percentile])
 
             # Save percentile to files
             path = f'{Config().results.results_dir}_seed_{Config().server.random_seed}/{Config().results.file_name}_percentile_{Config().server.percentile_aggregate}'
-            #Config().results.results_dir +"/"+Config().results.file_name+"_percentile_"+Config().server.percentile_aggregate
             self.save_files(path, metric_percentile)
-        else:
-            print("-----------------------")
-            print("WE ARE NOT AGGREGATING BASED ON PERCENTILE!")
-            print("-----------------------")
           
         # Perform weighted averaging for both Actor and Critic
         actor_avg_update = {
@@ -83,8 +71,6 @@ class A2CServer(fedavg.Server):
                     critic_avg_update[name] += delta * 1.0/Config().clients.per_round
             else:
                 metric = self.select_metric(report)
-                print("Metric", metric)
-                print("Metric percentile", metric_percentile)
                # if metric <= metric_percentile:
                 if (client_id == 1 and self.current_round >= 1 and self.current_round <= 3) \
                 or ((client_id == 1 or client_id == 2) and self.current_round > 3 and self.current_round <= 6) \
@@ -109,51 +95,49 @@ class A2CServer(fedavg.Server):
             # Yield to other tasks in the server
             await asyncio.sleep(0)
         
-        #save lists of clients
+        #Save lists of clients
         if not Config().server.percentile_aggregate:
             self.save_files(f'{client_path}{"_Fed_avg"}', client_list)
         else:
             self.save_files(f'{client_path}{"_percentile"}', client_list)
-        
+
+        #Get omega for each client!
+        for id in range(0, Config().clients.total_clients):
+            omega_actor = actor_avg_update
+            omega_critic = critic_avg_update
+            for i, update in enumerate(weights_received):
+                __, report, __, __ = updates[i] 
+                client_id = report.client_id
+                update_from_actor, update_from_critic = update
+                if client_id == id + 1:
+                    # Calculate omega 
+                    for name, delta in update_from_actor.items():
+                        omega_actor[name] -= delta * 1.0/clients_selected_size * (norm_fisher_actor[name] if Config().server.mul_fisher else 1.0)
+                    for name, delta in update_from_critic.items():
+                        omega_critic[name] -= delta * 1.0/clients_selected_size * (norm_fisher_critic[name] if Config().server.mul_fisher else 1.0)  
+                    break
+            # Save omega in a file with client id and exit
+            self.save_omega(id + 1, omega_actor, omega_critic)
         return actor_avg_update, critic_avg_update
 
     def standardize_fisher(self, report):
         norm_fisher_actor, norm_fisher_critic = {}, {}
 
         for name in report.fisher_actor:
-            """
-            avg_actor = Variable(report.fisher_actor[name]).mean()
-            std_actor = Variable(report.fisher_actor[name]).std() 
-            norm_fisher_actor[name] = (report.fisher_actor[name] - avg_actor)/ (std_actor + 1e-3)
-            min_actor = Variable(norm_fisher_actor[name]).min()
-            norm_fisher_actor[name] += -1 * min(min_actor, -1)
-            """
             min_actor = Variable(report.fisher_actor[name]).min()
             max_actor = Variable(report.fisher_actor[name]).max()
             norm_fisher_actor[name] = (report.fisher_actor[name] - min_actor) / (max_actor - min_actor)
             norm_fisher_actor[name][torch.isnan(norm_fisher_actor[name])] = 1.0
             mean_norm_actor = Variable(norm_fisher_actor[name]).mean()
             norm_fisher_actor[name] += (1 - mean_norm_actor)
-            #print("std: %s, avg: %s, min: %s" % (std_actor, avg_actor, min_actor))
-            #print("norm fisher actor", norm_fisher_actor[name])
 
         for name in report.fisher_critic:
-            """
-            avg_critic = Variable(report.fisher_critic[name]).mean()
-            std_critic = Variable(report.fisher_critic[name]).std()
-            norm_fisher_critic[name] = (report.fisher_critic[name] - avg_critic) / (std_critic + 1e-3) 
-            min_critic = Variable(norm_fisher_critic[name]).min()
-            norm_fisher_critic[name] += -1 * min(min_critic, -1) 
-            norm_fisher_critic[name][torch.isnan(norm_fisher_critic[name])] = 1.0
-            """
             min_critic = Variable(report.fisher_critic[name]).min()
             max_critic = Variable(report.fisher_critic[name]).max()
             norm_fisher_critic[name] = (report.fisher_critic[name] - min_critic) / (max_critic - min_critic)
             norm_fisher_critic[name][torch.isnan(norm_fisher_critic[name])] = 1.0
             mean_norm_critic = Variable(norm_fisher_critic[name]).mean()
             norm_fisher_critic[name] += (1 -  mean_norm_critic)
-            #print("std: %s, avg: %s, min: %s" % (std_critic, avg_critic, min_critic))
-            #print("norm fisher critic", norm_fisher_critic[name])
         
         return norm_fisher_actor, norm_fisher_critic
 
@@ -263,3 +247,16 @@ class A2CServer(fedavg.Server):
 
         np.random.set_state(numpy_prng_state)
         random.setstate(self.prng_state)
+
+    def save_omega(self, client_id, omega_actor, omega_critic):
+        omega_path = f"{Config().general.base_path}/{Config().server.model_path}"
+        actor_path = f"{omega_path}/{self.env_name}{self.algorithm_name}omega_actor_client_{client_id}_seed_{Config().server.random_seed}.pth"
+        critic_path = f"{omega_path}/{self.env_name}{self.algorithm_name}omega_critic_client_{client_id}_seed_{Config().server.random_seed}.pth"
+        
+        with open(actor_path, 'wb') as omg_actor_path:
+            torch.save(omega_actor, omg_actor_path)
+        with open(critic_path, 'wb') as omg_critic_path:
+            torch.save(omega_critic, omg_critic_path)
+
+
+
