@@ -39,7 +39,7 @@ class Trainer(basic.Trainer):
         """ Setting the client's personalized model """
         self.personalized_model = personalized_model
 
-    def initial_personalized_model(self):
+    def initial_personalized_model(self, config, current_round):
         """ Initial the personalized model with the global model. """
 
         model_name = Config().trainer.model_name
@@ -190,12 +190,89 @@ class Trainer(basic.Trainer):
             filename=filename,
             location=save_location)
 
-    def get_checkppint_saver(self):
-        target_dir = Config().params['checkpoint_path']
+    def get_client_checkppint_saver(self, current_round):
+        if current_round == Config().trainer.rounds:
+            target_dir = Config().params['model_path']
+        else:
+            target_dir = Config().params['checkpoint_path']
+
         to_save_dir = os.path.join(target_dir, "client_" + str(self.client_id))
         cpk_saver = checkpoint_saver.CheckpointsSaver(
             checkpoints_dir=to_save_dir)
         return cpk_saver
+
+    def perform_checkpoint_saving(self,
+                                  model_name,
+                                  model_state_dict,
+                                  optimizer_state_dict,
+                                  lr_schedule_state_dict,
+                                  config,
+                                  kwargs,
+                                  present_epoch,
+                                  base_epoch,
+                                  prefix=None):
+
+        current_round = kwargs['current_round']
+        run_id = config['run_id']
+        cpk_saver = self.get_client_checkppint_saver(current_round)
+
+        # Before the training, we expect to save the initial
+        # model of this round
+        filename = get_format_name(model_name=model_name,
+                                   client_id=self.client_id,
+                                   round_n=current_round,
+                                   epoch_n=present_epoch,
+                                   run_id=run_id,
+                                   prefix=prefix,
+                                   ext="pth")
+        cpk_saver.save_checkpoint(
+            model_state_dict=model_state_dict,
+            check_points_name=[filename],
+            optimizer_state_dict=optimizer_state_dict,
+            lr_scheduler_state_dict=lr_schedule_state_dict,
+            epoch=base_epoch,
+            config_args=Config().to_dict())
+
+        return filename
+
+    def prepare_train_lr(self, optimizer, train_data_loader, config,
+                         current_round):
+        """ Prepare the lr schedule for training process.
+
+            The obtained lr should be scheduled in the whole learning
+            process, i.e., communication_rounds * local_epochs
+        """
+
+        epochs = config['epochs']
+        iterations_per_epoch = len(train_data_loader)
+        # Note, the lr_schedule_base_epoch is an important term to make the
+        # lr_schedulr work correctly.
+        # The main reason is that the trainer will create a new lr schedule
+        # in each round. Then, the epoch within one round will always start
+        # from 0. Therefore, if the lr schedule works based this local epoch,
+        # the lr will never be modified correctly as that in the central learning.
+        # Thus, we need a term to denote the global epoch.
+        # In round 1, the base global epoch should be 0. Thus, the local epoch
+        # can start from 1 * 0 to epochs, i.e., [0, epochs].
+        # In round 2, the base global epoch should be 'epochs'. Thus, the local epoch
+        # can start from 1 * 'epochs' to epochs + 'epochs', i.e, [epochs, epochs + epochs]
+        # Then, in round r, the base global epoch should be (current_round - 1) * epochs
+        # Therefore, the local epoch for the lr schedule can:
+        #   start from lr_schedule_base_epoch + 0,
+        #   to
+        #   lr_schedule_base_epoch + epochs
+        lr_schedule_base_epoch = (current_round - 1) * epochs
+
+        # Initializing the learning rate schedule, if necessary
+        lr_schedule = optimizers.get_dynamic_lr_schedule(
+            optimizer, iterations_per_epoch, train_data_loader)
+
+        # Updated the lr_schedule to the latest status
+        if lr_schedule_base_epoch != 0:
+            for _ in range(1, lr_schedule_base_epoch + 1):
+                lr_schedule.step()
+
+        return lr_schedule, lr_schedule_base_epoch
 
     def train_one_epoch(self, config, epoch, defined_model, optimizer,
                         loss_criterion, train_data_loader, epoch_loss_meter,
@@ -284,24 +361,6 @@ class Trainer(basic.Trainer):
         # Obtain the logging interval
         epochs = config['epochs']
 
-        # Note, the lr_schedule_base_epoch is an important term to make the
-        # lr_schedulr work correctly.
-        # The main reason is that the trainer will create a new lr schedule
-        # in each round. Then, the epoch within one round will always start
-        # from 0. Therefore, if the lr schedule works based this local epoch,
-        # the lr will never be modified correctly as that in the central learning.
-        # Thus, we need a term to denote the global epoch.
-        # In round 1, the base global epoch should be 0. Thus, the local epoch
-        # can start from 1 * 0 to epochs, i.e., [0, epochs].
-        # In round 2, the base global epoch should be 'epochs'. Thus, the local epoch
-        # can start from 1 * 'epochs' to epochs + 'epochs', i.e, [epochs, epochs + epochs]
-        # Then, in round r, the base global epoch should be (current_round - 1) * epochs
-        # Therefore, the local epoch for the lr schedule can:
-        #   start from lr_schedule_base_epoch + 0,
-        #   to
-        #   lr_schedule_base_epoch + epochs
-        lr_schedule_base_epoch = (current_round - 1) * epochs
-
         tic = time.perf_counter()
 
         logging.info("[Client #%d] Loading the dataset.", self.client_id)
@@ -334,12 +393,9 @@ class Trainer(basic.Trainer):
         streamed_train_loader = data_loaders_wrapper.StreamBatchesLoader(
             [train_loader, unlabeled_loader])
 
-        iterations_per_epoch = len(streamed_train_loader)
         epoch_model_log_interval = epochs + 1
         if "epoch_model_log_interval" in config:
             epoch_model_log_interval = config['epoch_model_log_interval']
-
-        # Initializing the loss criterion
 
         # Initializing the loss criterion
         _loss_criterion = getattr(self, "loss_criterion", None)
@@ -352,31 +408,20 @@ class Trainer(basic.Trainer):
         optimizer = optimizers.get_dynamic_optimizer(self.model)
 
         # Initializing the learning rate schedule, if necessary
-        lr_schedule = optimizers.get_dynamic_lr_schedule(
-            optimizer, iterations_per_epoch, streamed_train_loader)
-
-        # Updated the lr_schedule to the latest status
-        if lr_schedule_base_epoch != 0:
-            for _ in range(1, lr_schedule_base_epoch + 1):
-                lr_schedule.step()
-
-        train_checkpoint_saver = self.get_checkppint_saver()
+        lr_schedule, lr_schedule_base_epoch = self.prepare_train_lr(
+            optimizer, streamed_train_loader, config, current_round)
 
         # Before the training, we expect to save the initial
         # model of this round
-        initial_filename = get_format_name(model_name=model_type,
-                                           client_id=self.client_id,
-                                           round_n=current_round,
-                                           epoch_n=0,
-                                           run_id=run_id,
-                                           ext="pth")
-        train_checkpoint_saver.save_checkpoint(
+        self.perform_checkpoint_saving(
+            model_name=model_type,
             model_state_dict=self.model.state_dict(),
-            check_points_name=[initial_filename],
-            optimizer_state_dict=optimizer.state_dict(),
-            lr_scheduler_state_dict=lr_schedule.state_dict(),
-            epoch=lr_schedule_base_epoch,
-            config_args=Config().to_dict())
+            config=config,
+            kwargs=kwargs,
+            optimizer=optimizer.state_dict(),
+            lr_schedule=lr_schedule.state_dict(),
+            present_epoch=0,
+            base_epoch=lr_schedule_base_epoch)
 
         # Sending the model to the device used for training
         self.model.to(self.device)
@@ -404,19 +449,15 @@ class Trainer(basic.Trainer):
             if (epoch - 1) % epoch_model_log_interval == 0 or epoch == epochs:
                 # the model generated during each round will be stored in the
                 # checkpoints
-                filename = get_format_name(model_name=model_type,
-                                           client_id=self.client_id,
-                                           round_n=current_round,
-                                           epoch_n=epoch,
-                                           run_id=run_id,
-                                           ext="pth")
-                train_checkpoint_saver.save_checkpoint(
+                self.perform_checkpoint_saving(
+                    model_name=model_type,
                     model_state_dict=self.model.state_dict(),
-                    check_points_name=[filename],
-                    optimizer_state_dict=optimizer.state_dict(),
-                    lr_scheduler_state_dict=lr_schedule.state_dict(),
-                    epoch=epoch,
-                    config_args=Config().to_dict())
+                    config=config,
+                    kwargs=kwargs,
+                    optimizer=optimizer.state_dict(),
+                    lr_schedule=lr_schedule.state_dict(),
+                    present_epoch=epoch,
+                    base_epoch=lr_schedule_base_epoch + epoch)
 
             # Simulate client's speed
             if self.client_id != 0 and hasattr(
@@ -427,30 +468,16 @@ class Trainer(basic.Trainer):
         if 'max_concurrency' in config:
             # the final of each round, the trained model within this round
             # will be saved as model to the '/models' dir
-            model_type = config['model_name']
-            current_round = kwargs['current_round']
-            filename = get_format_name(model_name=model_type,
-                                       client_id=self.client_id,
-                                       round_n=current_round,
-                                       run_id=config['run_id'],
-                                       ext="pth")
-            # if final round, save to the model path
-            if current_round == Config().trainer.rounds:
-                target_dir = Config().params['model_path']
-            else:
-                target_dir = Config().params['checkpoint_path']
 
-            to_save_dir = os.path.join(target_dir,
-                                       "client_" + str(self.client_id))
-            cpk_saver = checkpoint_saver.CheckpointsSaver(
-                checkpoints_dir=to_save_dir)
-            cpk_saver.save_checkpoint(
+            self.perform_checkpoint_saving(
+                model_name=model_type,
                 model_state_dict=self.model.state_dict(),
-                check_points_name=[filename],
-                optimizer_state_dict=optimizer.state_dict(),
-                lr_scheduler_state_dict=lr_schedule.state_dict(),
-                epoch=epochs,
-                config_args=Config().to_dict())
+                config=config,
+                kwargs=kwargs,
+                optimizer=optimizer.state_dict(),
+                lr_schedule=lr_schedule.state_dict(),
+                epoch=None,
+                base_epoch=lr_schedule_base_epoch + epochs)
 
     def perform_test_op(
         self,
@@ -523,25 +550,17 @@ class Trainer(basic.Trainer):
                 train_loader=pers_train_loader,
                 prefix="pers_")
 
-            pers_train_checkpoint_saver = self.get_checkppint_saver()
-
             # Before the training, we expect to save the initial
             # model of this round
-            initial_filename = get_format_name(
-                client_id=self.client_id,
-                prefix="personalized",
+            initial_filename = self.perform_checkpoint_saving(
                 model_name=personalized_model_name,
-                round_n=current_round,
-                epoch_n=0,
-                run_id=config['run_id'],
-                ext="pth")
-            pers_train_checkpoint_saver.save_checkpoint(
                 model_state_dict=self.personalized_model.state_dict(),
-                check_points_name=[initial_filename],
-                optimizer_state_dict=pers_optimizer.state_dict(),
-                lr_scheduler_state_dict=lr_schedule.state_dict(),
-                epoch=0,
-                config_args=Config().to_dict())
+                config=config,
+                kwargs=kwargs,
+                optimizer=pers_optimizer.state_dict(),
+                lr_schedule=lr_schedule.state_dict(),
+                present_epoch=0,
+                base_epoch=0)
 
             accuracy = self.perform_test_op(test_loader)
             # save the personaliation accuracy to the results dir
@@ -633,23 +652,16 @@ class Trainer(basic.Trainer):
                     ) % epoch_model_log_interval == 0 or epoch == pers_epochs:
                     # the model generated during each round will be stored in the
                     # checkpoints
-
-                    filename = get_format_name(
-                        client_id=self.client_id,
-                        prefix="personalized",
+                    self.perform_checkpoint_saving(
                         model_name=personalized_model_name,
-                        round_n=current_round,
-                        epoch_n=epoch,
-                        run_id=config['run_id'],
-                        ext="pth")
-
-                    pers_train_checkpoint_saver.save_checkpoint(
                         model_state_dict=self.personalized_model.state_dict(),
-                        check_points_name=[filename],
-                        optimizer_state_dict=pers_optimizer.state_dict(),
-                        lr_scheduler_state_dict=lr_schedule.state_dict(),
-                        epoch=epoch,
-                        config_args=Config().to_dict())
+                        config=config,
+                        kwargs=kwargs,
+                        optimizer=pers_optimizer.state_dict(),
+                        lr_schedule=lr_schedule.state_dict(),
+                        present_epoch=epoch,
+                        base_epoch=epoch,
+                        prefix="personalized")
 
                 lr_schedule.step()
 
@@ -685,7 +697,8 @@ class Trainer(basic.Trainer):
         # we need to load the initial model
         if not (hasattr(Config().trainer, "do_maintain_per_state")
                 and Config().trainer.do_maintain_per_state):
-            location = pers_train_checkpoint_saver.checkpoints_dir
+            cpk_saver = self.get_client_checkppint_saver(current_round)
+            location = cpk_saver.checkpoints_dir
             load_from_path = os.path.join(location, initial_filename)
 
             self.personalized_model.load_state_dict(
@@ -757,13 +770,14 @@ class Trainer(basic.Trainer):
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']
 
+        current_round = kwargs['current_round']
         # Set the start time of training in absolute time
         self.training_start_time = time.time()
 
         accuracy = -1
         # Initial the personalized model with the
         # global model
-        self.initial_personalized_model()
+        self.initial_personalized_model(config, current_round)
 
         if 'max_concurrency' in config:
             tic = time.perf_counter()

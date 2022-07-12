@@ -8,6 +8,9 @@ import logging
 import time
 import json
 from dataclasses import dataclass
+import warnings
+
+warnings.simplefilter('ignore')
 
 from plato.config import Config
 from plato.clients import pers_simple
