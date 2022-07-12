@@ -87,6 +87,7 @@ class Trainer(basic.Trainer):
                 plt.imshow(tt(examples[0].cpu()))
                 plt.title("Ground truth image")
 
+                # Compute gradients in the current step
                 if hasattr(Config().algorithm, 'defense') and Config().algorithm.defense == 'GradDefense' and \
                         hasattr(Config().algorithm, 'clip') and Config().algorithm.clip is True:
                     current_grad = []
@@ -115,13 +116,13 @@ class Trainer(basic.Trainer):
                         retain_graph=True,
                         create_graph=True,
                         only_inputs=True)
-
                     current_grad = list((_.detach().clone() for _ in grad))
 
+                # Apply defense if needed
+                if hasattr(Config().algorithm, 'defense'):
                     perturbed_gradients = None
 
-                    if hasattr(Config().algorithm, 'defense') and Config(
-                    ).algorithm.defense == 'GradDefense':
+                    if Config().algorithm.defense == 'GradDefense':
                         if hasattr(Config().algorithm,
                                    'clip') and Config().algorithm.clip is True:
                             from defense.GradDefense.clip import noise
@@ -135,8 +136,7 @@ class Trainer(basic.Trainer):
                             perturb_slices_num,
                             noise_intensity=Config().algorithm.scale)
 
-                    if hasattr(Config().algorithm, 'defense') and Config(
-                    ).algorithm.defense == 'Soteria':
+                    if Config().algorithm.defense == 'Soteria':
                         examples.requires_grad = True
                         out, feature_fc1_graph = self.model.forward(examples)
                         deviation_f1_target = torch.zeros_like(
@@ -173,25 +173,25 @@ class Trainer(basic.Trainer):
                     if perturbed_gradients is not None:
                         grad = perturbed_gradients
 
-                    # cast grad back to tuple type
-                    grad = tuple(grad)
+                        # cast grad back to tuple type
+                        grad = tuple(grad)
 
-                    # TODO: momentum, weight_decay?
-                    patched_model.parameters = OrderedDict(
-                        (name,
-                         param - Config().trainer.learning_rate * grad_part)
-                        for ((name, param), grad_part
-                             ) in zip(patched_model.parameters.items(), grad))
+                # TODO: momentum, weight_decay?
+                patched_model.parameters = OrderedDict(
+                    (name,
+                        param - Config().trainer.learning_rate * grad_part)
+                    for ((name, param), grad_part
+                         ) in zip(patched_model.parameters.items(), grad))
 
-                    # Sum up the gradients for each local update
-                    try:
-                        target_grad = [
-                            sum(x) for x in zip(
-                                list((_.detach().clone()
-                                      for _ in grad)), target_grad)
-                        ]
-                    except:
-                        target_grad = list((_.detach().clone() for _ in grad))
+                # Sum up the gradients for each local update
+                try:
+                    target_grad = [
+                        sum(x) for x in zip(
+                            list((_.detach().clone()
+                                  for _ in grad)), target_grad)
+                    ]
+                except:
+                    target_grad = list((_.detach().clone() for _ in grad))
 
                 if batch_id % log_interval == 0:
                     if self.client_id == 0:
