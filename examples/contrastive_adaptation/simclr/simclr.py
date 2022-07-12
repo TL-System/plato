@@ -19,7 +19,7 @@ import simclr_net
 from plato.trainers import contrastive_ssl as ssl_trainer
 from plato.clients import ssl_simple as ssl_client
 from plato.servers import fedavg_pers as ssl_server
-from plato.algorithms import fedavg_ssl
+from plato.algorithms import fedavg_pers
 
 
 def main():
@@ -28,7 +28,7 @@ def main():
         removing the final fully-connected layers of model defined by
         the 'model_name' in config file.
     """
-    algorithm = fedavg_ssl.Algorithm
+    algorithm = fedavg_pers.Algorithm
     trainer = ssl_trainer.Trainer
     simclr_model = simclr_net.SimCLR
     client = ssl_client.Client(model=simclr_model,

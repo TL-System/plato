@@ -21,22 +21,22 @@ from tqdm import tqdm
 from plato.config import Config
 from plato.trainers import pers_basic
 from plato.utils import optimizers
-from plato.utils.arrange_saving_name import get_format_name
+from plato.utils.checkpoint_operator import perform_client_checkpoint_saving
+
 from plato.utils import data_loaders_wrapper
-from plato.utils import checkpoint_saver
 
 
 class Trainer(pers_basic.Trainer):
     """A personalized federated learning trainer using the FedRep algorithm."""
 
     def freeze_model(self, model, param_prefix=None):
-        for param in model.parameters():
-            if param_prefix is not None and param in param_prefix:
+        for name, param in model.named_parameters():
+            if param_prefix is not None and param_prefix in name:
                 param.requires_grad = False
 
     def active_model(self, model, param_prefix=None):
-        for param in model.parameters():
-            if param_prefix is not None and param in param_prefix:
+        for name, param in model.named_parameters():
+            if param_prefix is not None and param_prefix in name:
                 param.requires_grad = True
 
     def train_model(
@@ -114,13 +114,14 @@ class Trainer(pers_basic.Trainer):
 
         # Before the training, we expect to save the initial
         # model of this round
-        self.perform_checkpoint_saving(
+        perform_client_checkpoint_saving(
+            client_id=self.client_id,
             model_name=model_type,
             model_state_dict=self.model.state_dict(),
             config=config,
             kwargs=kwargs,
-            optimizer=optimizer.state_dict(),
-            lr_schedule=lr_schedule.state_dict(),
+            optimizer_state_dict=optimizer.state_dict(),
+            lr_schedule_state_dict=lr_schedule.state_dict(),
             present_epoch=0,
             base_epoch=lr_schedule_base_epoch)
 
@@ -161,13 +162,14 @@ class Trainer(pers_basic.Trainer):
             if (epoch - 1) % epoch_model_log_interval == 0 or epoch == epochs:
                 # the model generated during each round will be stored in the
                 # checkpoints
-                self.perform_checkpoint_saving(
+                perform_client_checkpoint_saving(
+                    client_id=self.client_id,
                     model_name=model_type,
                     model_state_dict=self.model.state_dict(),
                     config=config,
                     kwargs=kwargs,
-                    optimizer=optimizer.state_dict(),
-                    lr_schedule=lr_schedule.state_dict(),
+                    optimizer_state_dict=optimizer.state_dict(),
+                    lr_schedule_state_dict=lr_schedule.state_dict(),
                     present_epoch=epoch,
                     base_epoch=lr_schedule_base_epoch + epoch)
 
@@ -181,12 +183,13 @@ class Trainer(pers_basic.Trainer):
             # the final of each round, the trained model within this round
             # will be saved as model to the '/models' dir
 
-            self.perform_checkpoint_saving(
+            perform_client_checkpoint_saving(
+                client_id=self.client_id,
                 model_name=model_type,
                 model_state_dict=self.model.state_dict(),
                 config=config,
                 kwargs=kwargs,
-                optimizer=optimizer.state_dict(),
-                lr_schedule=lr_schedule.state_dict(),
-                epoch=None,
+                optimizer_state_dict=optimizer.state_dict(),
+                lr_schedule_state_dict=lr_schedule.state_dict(),
+                present_epoch=None,
                 base_epoch=lr_schedule_base_epoch + epochs)

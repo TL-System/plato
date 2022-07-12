@@ -82,6 +82,40 @@ class Algorithm(fedavg.Algorithm):
         else:
             return model.cpu().state_dict()
 
+    def is_incomplete_weights(self, weights):
+        model_params = self.model.state_dict()
+        for para_name in list(model_params.keys()):
+            if para_name not in weights:
+                return True
+
+        return False
+
+    def complete_weights(self, weights, pool_weights):
+        """ Completet the weights based on the pool_weights. """
+        model_params = self.model.state_dict()
+        completed_weights = OrderedDict()
+        for para_name in list(model_params.keys()):
+            if para_name in weights:
+                completed_weights[para_name] = weights[para_name]
+            else:
+                completed_weights[para_name] = pool_weights[para_name]
+
+        return completed_weights
+
     def load_weights(self, weights):
-        """Load the model weights passed in as a parameter."""
+        """Load the model weights passed in as a parameter.
+
+            In the client side, we should complete the weights (OrderDict) from the
+            server if the weights only contain part of the whole model.
+            Thus, the 'strict' should be True, as the completed weights should
+            contain same paras as the client's model.
+            In the server side, there is no need to complete the weights as the
+            server will always extract weights by self.extract_weights to obtain the
+            desired weights, i.e., ensure always operate on the global model.
+            Thus, the 'strict' should be False as we only load the operated weights to
+            the model.
+
+            But wihout losing generality, we set strict = False here as the algorithm class
+            is utilized by the server and the client simutaneously.
+        """
         self.model.load_state_dict(weights, strict=False)

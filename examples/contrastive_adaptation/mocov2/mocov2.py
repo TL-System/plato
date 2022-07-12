@@ -18,7 +18,7 @@ import mocov2_trainer
 
 from plato.clients import ssl_simple as ssl_client
 from plato.servers import fedavg_pers as ssl_server
-from plato.algorithms import fedavg_ssl
+from plato.algorithms import fedavg_pers
 
 
 def main():
@@ -26,7 +26,7 @@ def main():
 
     """
     trainer = mocov2_trainer.Trainer
-    algorithm = fedavg_ssl.Algorithm
+    algorithm = fedavg_pers.Algorithm
     moco_model = mocov2_net.MoCo
     client = ssl_client.Client(model=moco_model,
                                trainer=trainer,

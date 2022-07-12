@@ -5,14 +5,14 @@ The implementation of the contrastive adaptation's algorithm
 import copy
 from collections import OrderedDict
 
-from plato.algorithms import fedavg_ssl
+from plato.algorithms import fedavg_pers
 from plato.config import Config
 from plato.trainers.base import Trainer
 
 from moving_average import ModelEMA
 
 
-class Algorithm(fedavg_ssl.Algorithm):
+class Algorithm(fedavg_pers.Algorithm):
     """ Federated averaging algorithm for Byol models, used by both the client and the server. """
 
     def __init__(self, trainer: Trainer):
