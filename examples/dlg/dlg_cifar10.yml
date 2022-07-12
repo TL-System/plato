@@ -59,7 +59,7 @@ algorithm:
 
     ## Data reconstruction related configurations
     # Choose from DLG (default), iDLG, csDLG
-    attack_method: csDLG
+    attack_method: DLG
     # For calculating the loss between dummy and target gradients/updates
     # Choose from l2, l1, max, sim, simlocal
     cost_fn: l2
@@ -85,16 +85,19 @@ algorithm:
     # Matching weights (absolute) or weight updates (delta)
     use_updates: false
     # The number of times the attack will be attempted
-    trials: 5
+    trials: 1
 
     ## Defense related
-    # Choose from GradDefense, Soteria ...
-    defense: Soteria
+    # Choose from GradDefense, Soteria, MC (model compression), DP (differential privacy)...
+    defense: MC
+    # for GradDefense
     clip: false
     slices_num: 10
     perturb_slices_num: 5
     scale: 0.0005
     Q: 6
+    # for MC
+    prune_pct: 10
 
     # The random seed for dummy data and label
     random_seed: 13
