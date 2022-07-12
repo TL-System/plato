@@ -29,6 +29,7 @@ from plato.config import Config
 from plato.clients import simple
 from plato.models import general_mlps_register as general_MLP_model
 from plato.utils.arrange_saving_name import get_format_name
+from plato.utils.checkpoint_operator import perform_client_checkpoint_loading
 from plato.clients import base
 from plato.utils import fonts
 
@@ -148,6 +149,62 @@ class Client(simple.Client):
         # assign the client's personalized model to its trainer
         if self.trainer.personalized_model is None:
             self.trainer.set_client_personalized_model(self.personalized_model)
+
+    def load_payload(self, server_payload) -> None:
+        """Loading the server model onto this client.
+
+            We need to address this case:
+                There is a big model containing sub-modules A, B, and C
+                We only utilize the module A as the global model.
+                Then, in each round, only the parameter of A will be exchanged
+                among the server and the client. This makes the client receive
+                only the parameters of A from the server.
+                As each client initializes the local model with random weights
+                at each round and then relies on the received parameters to assign
+                trained weights.
+                Therefore, at the begining of local training, only the module A
+                is initialized by the received parameters. However, the B and C
+                is still the random weights.
+
+            What we want:
+                1.- If the received parameters contain all weights of the model,
+                    these parameters will be assigned to the model direclty.
+                2.- If the received parameters can only be assigned to one part
+                    of the model, other parts' checkpoint from previous round
+                    will be loaded and assigned to the model.
+        """
+        if self.algorithm.is_incomplete_weights(server_payload):
+            logging.info(
+                "[Client #%d] Received server payload with '%s', which is incompleted for the local model.",
+                self.client_id,
+                Config().trainer.global_model_name)
+
+            filename, cpk_oper = perform_client_checkpoint_loading(
+                client_id=self.client_id,
+                model_name=Config().trainer.model_name,
+                current_round=self.current_round - 1,
+                run_id=Config().params['run_id'],
+                epoch=Config().trainer.epochs,
+                prefix=None)
+
+            if not cpk_oper.invaild_checkpoint_file(filename):
+                # using the client's local model that is randomly initialized
+                # at this round
+                pool_weights = copy.deepcopy(self.trainer.model).state_dict()
+                logging.info(
+                    "[Client #%d]. no checkpoint %s, complete server's payload with local initial model.",
+                    self.client_id, filename)
+            else:
+                pool_weights = cpk_oper.load_checkpoint(filename)["model"]
+                logging.info(
+                    "[Client #%d]. Loaded round#%d checkpoint %s to complete",
+                    self.client_id, self.current_round - 1, filename)
+
+            completed_payload = self.algorithm.complete_weights(
+                server_payload, pool_weights=pool_weights)
+        else:
+            completed_payload = server_payload
+        self.algorithm.load_weights(completed_payload)
 
     async def train(self):
         """The machine learning training workload on a client."""
