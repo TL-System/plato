@@ -1,0 +1,898 @@
+[INFO][18:00:08]: [Server #1270050] Started training on 1000 clients with 50 per round.
+[INFO][18:00:08]: [Server #1270050] Configuring the server...
+[INFO][18:00:08]: Training: 100 rounds or accuracy above 98.0%
+
+[INFO][18:00:08]: Algorithm: fedavg
+[INFO][18:00:08]: Data source: FEMNIST
+[INFO][18:00:21]: Starting client #1's process.
+[INFO][18:00:21]: Starting client #2's process.
+[INFO][18:00:21]: Starting client #3's process.
+[INFO][18:00:21]: Starting client #4's process.
+[INFO][18:00:21]: Starting client #5's process.
+[INFO][18:00:21]: Starting client #6's process.
+[INFO][18:00:21]: Starting client #7's process.
+[INFO][18:00:21]: Starting client #8's process.
+[INFO][18:00:21]: Starting client #9's process.
+[INFO][18:00:21]: Starting client #10's process.
+[INFO][18:00:21]: Setting the random seed for selecting clients: 1
+[INFO][18:00:21]: Starting a server at address 127.0.0.1 and port 2600.
+[INFO][18:00:24]: Starting a custom client #8
+[INFO][18:00:24]: Algorithm: fedavg
+[INFO][18:00:24]: Starting a custom client #7
+[INFO][18:00:24]: Algorithm: fedavg
+[INFO][18:00:24]: Starting a custom client #6
+[INFO][18:00:24]: Algorithm: fedavg
+[INFO][18:00:24]: Starting a custom client #3
+[INFO][18:00:24]: Algorithm: fedavg
+[INFO][18:00:24]: Starting a custom client #4
+[INFO][18:00:24]: Algorithm: fedavg
+[INFO][18:00:24]: Starting a custom client #1
+[INFO][18:00:24]: Algorithm: fedavg
+[INFO][18:00:24]: Starting a custom client #2
+[INFO][18:00:24]: Algorithm: fedavg
+[INFO][18:00:24]: Starting a custom client #5
+[INFO][18:00:24]: Algorithm: fedavg
+[INFO][18:00:24]: Starting a custom client #9
+[INFO][18:00:24]: Algorithm: fedavg
+[INFO][18:00:25]: Starting a custom client #10
+[INFO][18:00:25]: Algorithm: fedavg
+[INFO][18:00:29]: [Client #8] Contacting the server.
+[INFO][18:00:29]: [Client #8] Connecting to the server at http://127.0.0.1:2600.
+[INFO][18:00:29]: 127.0.0.1 [11/Jul/2022:22:00:29 +0000] "GET /socket.io/?transport=polling&EIO=4&t=1657576829.1866515 HTTP/1.1" 200 293 "-" "Python/3.9 aiohttp/3.8.1"
+[INFO][18:00:29]: [Server #1270050] A new client just connected.
+[INFO][18:00:29]: [Client #8] Connected to the server.
+[INFO][18:00:29]: [Client #8] Waiting to be selected.
+[INFO][18:00:29]: [Server #1270050] New client with id #8 arrived.
+[INFO][18:00:29]: [Client #7] Contacting the server.
+[INFO][18:00:29]: [Client #7] Connecting to the server at http://127.0.0.1:2600.
+[INFO][18:00:29]: 127.0.0.1 [11/Jul/2022:22:00:29 +0000] "GET /socket.io/?transport=polling&EIO=4&t=1657576829.254981 HTTP/1.1" 200 293 "-" "Python/3.9 aiohttp/3.8.1"
+[INFO][18:00:29]: [Server #1270050] A new client just connected.
+[INFO][18:00:29]: [Client #7] Connected to the server.
+[INFO][18:00:29]: [Client #7] Waiting to be selected.
+[INFO][18:00:29]: [Server #1270050] New client with id #7 arrived.
+[INFO][18:00:29]: [Client #6] Contacting the server.
+[INFO][18:00:29]: [Client #6] Connecting to the server at http://127.0.0.1:2600.
+[INFO][18:00:29]: 127.0.0.1 [11/Jul/2022:22:00:29 +0000] "GET /socket.io/?transport=polling&EIO=4&t=1657576829.7519972 HTTP/1.1" 200 293 "-" "Python/3.9 aiohttp/3.8.1"
+[INFO][18:00:29]: [Server #1270050] A new client just connected.
+[INFO][18:00:29]: [Client #6] Connected to the server.
+[INFO][18:00:29]: [Client #6] Waiting to be selected.
+[INFO][18:00:29]: [Server #1270050] New client with id #6 arrived.
+[INFO][18:00:29]: [Client #3] Contacting the server.
+[INFO][18:00:29]: [Client #3] Connecting to the server at http://127.0.0.1:2600.
+[INFO][18:00:29]: 127.0.0.1 [11/Jul/2022:22:00:29 +0000] "GET /socket.io/?transport=polling&EIO=4&t=1657576829.821045 HTTP/1.1" 200 293 "-" "Python/3.9 aiohttp/3.8.1"
+[INFO][18:00:29]: [Server #1270050] A new client just connected.
+[INFO][18:00:29]: [Client #3] Connected to the server.
+[INFO][18:00:29]: [Client #3] Waiting to be selected.
+[INFO][18:00:29]: [Server #1270050] New client with id #3 arrived.
+[INFO][18:00:29]: [Client #4] Contacting the server.
+[INFO][18:00:29]: [Client #4] Connecting to the server at http://127.0.0.1:2600.
+[INFO][18:00:29]: 127.0.0.1 [11/Jul/2022:22:00:29 +0000] "GET /socket.io/?transport=polling&EIO=4&t=1657576829.8458512 HTTP/1.1" 200 293 "-" "Python/3.9 aiohttp/3.8.1"
+[INFO][18:00:29]: [Client #1] Contacting the server.
+[INFO][18:00:29]: [Client #1] Connecting to the server at http://127.0.0.1:2600.
+[INFO][18:00:29]: [Server #1270050] A new client just connected.
+[INFO][18:00:29]: 127.0.0.1 [11/Jul/2022:22:00:29 +0000] "GET /socket.io/?transport=polling&EIO=4&t=1657576829.8516786 HTTP/1.1" 200 293 "-" "Python/3.9 aiohttp/3.8.1"
+[INFO][18:00:29]: [Client #4] Connected to the server.
+[INFO][18:00:29]: [Client #4] Waiting to be selected.
+[INFO][18:00:29]: [Server #1270050] New client with id #4 arrived.
+[INFO][18:00:29]: [Server #1270050] A new client just connected.
+[INFO][18:00:29]: [Client #1] Connected to the server.
+[INFO][18:00:29]: [Client #1] Waiting to be selected.
+[INFO][18:00:29]: [Server #1270050] New client with id #1 arrived.
+[INFO][18:00:29]: [Client #2] Contacting the server.
+[INFO][18:00:29]: [Client #2] Connecting to the server at http://127.0.0.1:2600.
+[INFO][18:00:29]: 127.0.0.1 [11/Jul/2022:22:00:29 +0000] "GET /socket.io/?transport=polling&EIO=4&t=1657576829.8683577 HTTP/1.1" 200 293 "-" "Python/3.9 aiohttp/3.8.1"
+[INFO][18:00:29]: [Server #1270050] A new client just connected.
+[INFO][18:00:29]: [Client #2] Connected to the server.
+[INFO][18:00:29]: [Client #2] Waiting to be selected.
+[INFO][18:00:29]: [Server #1270050] New client with id #2 arrived.
+[INFO][18:00:29]: [Client #5] Contacting the server.
+[INFO][18:00:29]: [Client #5] Connecting to the server at http://127.0.0.1:2600.
+[INFO][18:00:29]: 127.0.0.1 [11/Jul/2022:22:00:29 +0000] "GET /socket.io/?transport=polling&EIO=4&t=1657576829.894965 HTTP/1.1" 200 293 "-" "Python/3.9 aiohttp/3.8.1"
+[INFO][18:00:29]: [Server #1270050] A new client just connected.
+[INFO][18:00:29]: [Client #5] Connected to the server.
+[INFO][18:00:29]: [Client #5] Waiting to be selected.
+[INFO][18:00:29]: [Server #1270050] New client with id #5 arrived.
+[INFO][18:00:29]: [Client #9] Contacting the server.
+[INFO][18:00:29]: [Client #9] Connecting to the server at http://127.0.0.1:2600.
+[INFO][18:00:29]: 127.0.0.1 [11/Jul/2022:22:00:29 +0000] "GET /socket.io/?transport=polling&EIO=4&t=1657576829.9935403 HTTP/1.1" 200 293 "-" "Python/3.9 aiohttp/3.8.1"
+[INFO][18:00:30]: [Server #1270050] A new client just connected.
+[INFO][18:00:30]: [Client #9] Connected to the server.
+[INFO][18:00:30]: [Client #9] Waiting to be selected.
+[INFO][18:00:30]: [Server #1270050] New client with id #9 arrived.
+[INFO][18:00:30]: [Client #10] Contacting the server.
+[INFO][18:00:30]: [Client #10] Connecting to the server at http://127.0.0.1:2600.
+[INFO][18:00:30]: 127.0.0.1 [11/Jul/2022:22:00:30 +0000] "GET /socket.io/?transport=polling&EIO=4&t=1657576830.0165124 HTTP/1.1" 200 293 "-" "Python/3.9 aiohttp/3.8.1"
+[INFO][18:00:30]: [Server #1270050] A new client just connected.
+[INFO][18:00:30]: [Client #10] Connected to the server.
+[INFO][18:00:30]: [Client #10] Waiting to be selected.
+[INFO][18:00:30]: [Server #1270050] New client with id #10 arrived.
+[INFO][18:00:30]: [Server #1270050] Starting training.
+[INFO][18:00:30]: [93m[1m
+[Server #1270050] Starting round 1/100.[0m
+[INFO][18:00:30]: [Server #1270050] Selected clients: [138, 583, 868, 822, 783, 65, 262, 121, 508, 780, 461, 484, 668, 389, 808, 215, 97, 500, 30, 915, 856, 400, 444, 623, 781, 786, 3, 713, 457, 273, 739, 235, 606, 968, 105, 924, 326, 32, 23, 27, 666, 555, 10, 962, 903, 391, 703, 222, 993, 433]
+[INFO][18:00:30]: [Server #1270050] Selecting client #138 for training.
+[INFO][18:00:30]: [Server #1270050] Sending the current model to client #138 (simulated).
+[INFO][18:00:30]: [Server #1270050] Sending 0.26 MB of payload data to client #138 (simulated).
+[INFO][18:00:30]: [Server #1270050] Selecting client #583 for training.
+[INFO][18:00:30]: [Server #1270050] Sending the current model to client #583 (simulated).
+[INFO][18:00:30]: [Server #1270050] Sending 0.26 MB of payload data to client #583 (simulated).
+[INFO][18:00:30]: [Server #1270050] Selecting client #868 for training.
+[INFO][18:00:30]: [Client #138] Selected by the server.
+[INFO][18:00:30]: [Server #1270050] Sending the current model to client #868 (simulated).
+[INFO][18:00:30]: [Client #138] Loading its data source...
+[INFO][18:00:30]: Data source: FEMNIST
+[INFO][18:00:30]: [Server #1270050] Sending 0.26 MB of payload data to client #868 (simulated).
+[INFO][18:00:30]: [Server #1270050] Selecting client #822 for training.
+[INFO][18:00:30]: [Client #583] Selected by the server.
+[INFO][18:00:30]: [Server #1270050] Sending the current model to client #822 (simulated).
+[INFO][18:00:30]: [Client #583] Loading its data source...
+[INFO][18:00:30]: Data source: FEMNIST
+[INFO][18:00:30]: [Server #1270050] Sending 0.26 MB of payload data to client #822 (simulated).
+[INFO][18:00:30]: [Server #1270050] Selecting client #783 for training.
+[INFO][18:00:30]: [Client #868] Selected by the server.
+[INFO][18:00:30]: [Server #1270050] Sending the current model to client #783 (simulated).
+[INFO][18:00:30]: [Client #868] Loading its data source...
+[INFO][18:00:30]: Data source: FEMNIST
+[INFO][18:00:30]: [Client #138] Dataset size: 162
+[INFO][18:00:30]: [Client #138] Sampler: all_inclusive
+[INFO][18:00:30]: [Client #138] Received 0.26 MB of payload data from the server (simulated).
+[INFO][18:00:30]: [Server #1270050] Sending 0.26 MB of payload data to client #783 (simulated).
+[INFO][18:00:30]: [Server #1270050] Selecting client #65 for training.
+[INFO][18:00:30]: [Client #822] Selected by the server.
+[INFO][18:00:30]: [Client #822] Loading its data source...
+[INFO][18:00:30]: [Server #1270050] Sending the current model to client #65 (simulated).
+[INFO][18:00:30]: Data source: FEMNIST
+[INFO][18:00:30]: [Client #583] Dataset size: 122
+[INFO][18:00:30]: [Client #583] Sampler: all_inclusive
+[INFO][18:00:30]: [Client #583] Received 0.26 MB of payload data from the server (simulated).
+[INFO][18:00:30]: [Server #1270050] Sending 0.26 MB of payload data to client #65 (simulated).
+[INFO][18:00:30]: [Server #1270050] Selecting client #262 for training.
+[INFO][18:00:30]: [Server #1270050] Sending the current model to client #262 (simulated).
+[INFO][18:00:30]: [Client #783] Selected by the server.
+[INFO][18:00:30]: [Client #783] Loading its data source...
+[INFO][18:00:30]: Data source: FEMNIST
+[INFO][18:00:30]: [93m[1m[Client #138] Started training in communication round #1.[0m
+[INFO][18:00:30]: [93m[1m[Client #583] Started training in communication round #1.[0m
+[INFO][18:00:30]: [Client #868] Dataset size: 161
+[INFO][18:00:30]: [Client #868] Sampler: all_inclusive
+[INFO][18:00:30]: [Client #868] Received 0.26 MB of payload data from the server (simulated).
+[INFO][18:00:30]: [Server #1270050] Sending 0.26 MB of payload data to client #262 (simulated).
+[INFO][18:00:30]: [Server #1270050] Selecting client #121 for training.
+[INFO][18:00:30]: [Server #1270050] Sending the current model to client #121 (simulated).
+[INFO][18:00:30]: [Client #65] Selected by the server.
+[INFO][18:00:30]: [Client #65] Loading its data source...
+[INFO][18:00:30]: Data source: FEMNIST
+[INFO][18:00:30]: [Client #783] Dataset size: 153
+[INFO][18:00:30]: [Client #783] Sampler: all_inclusive
+[INFO][18:00:30]: [93m[1m[Client #868] Started training in communication round #1.[0m
+[INFO][18:00:30]: [Client #783] Received 0.26 MB of payload data from the server (simulated).
+[INFO][18:00:30]: [Client #822] Dataset size: 231
+[INFO][18:00:30]: [Client #822] Sampler: all_inclusive
+[INFO][18:00:30]: [Server #1270050] Sending 0.26 MB of payload data to client #121 (simulated).
+[INFO][18:00:30]: [Server #1270050] Selecting client #508 for training.
+[INFO][18:00:30]: [Server #1270050] Sending the current model to client #508 (simulated).
+[INFO][18:00:30]: [Client #262] Selected by the server.
+[INFO][18:00:30]: [Client #822] Received 0.26 MB of payload data from the server (simulated).
+[INFO][18:00:30]: [Client #262] Loading its data source...
+[INFO][18:00:30]: Data source: FEMNIST
+[INFO][18:00:30]: [93m[1m[Client #783] Started training in communication round #1.[0m
+[INFO][18:00:30]: [93m[1m[Client #822] Started training in communication round #1.[0m
+[INFO][18:00:30]: [Server #1270050] Sending 0.26 MB of payload data to client #508 (simulated).
+[INFO][18:00:30]: [Server #1270050] Selecting client #780 for training.
+[INFO][18:00:30]: [Server #1270050] Sending the current model to client #780 (simulated).
+[INFO][18:00:30]: [Client #121] Selected by the server.
+[INFO][18:00:30]: [Client #121] Loading its data source...
+[INFO][18:00:30]: Data source: FEMNIST
+[INFO][18:00:30]: [Client #65] Dataset size: 162
+[INFO][18:00:30]: [Client #65] Sampler: all_inclusive
+[INFO][18:00:30]: [Client #65] Received 0.26 MB of payload data from the server (simulated).
+[INFO][18:00:30]: [Server #1270050] Sending 0.26 MB of payload data to client #780 (simulated).
+[INFO][18:00:30]: [Client #508] Selected by the server.
+[INFO][18:00:30]: [Client #508] Loading its data source...
+[INFO][18:00:30]: [Client #780] Selected by the server.
+[INFO][18:00:30]: Data source: FEMNIST
+[INFO][18:00:30]: [Client #780] Loading its data source...
+[INFO][18:00:30]: Data source: FEMNIST
+[INFO][18:00:30]: [Client #262] Dataset size: 140
+[INFO][18:00:30]: [Client #262] Sampler: all_inclusive
+[INFO][18:00:30]: [Client #262] Received 0.26 MB of payload data from the server (simulated).
+[INFO][18:00:30]: [93m[1m[Client #65] Started training in communication round #1.[0m
+[INFO][18:00:30]: [93m[1m[Client #262] Started training in communication round #1.[0m
+[INFO][18:00:30]: [Client #121] Dataset size: 159
+[INFO][18:00:30]: [Client #121] Sampler: all_inclusive
+[INFO][18:00:30]: [Client #508] Dataset size: 154
+[INFO][18:00:30]: [Client #508] Sampler: all_inclusive
+[INFO][18:00:30]: [Client #508] Received 0.26 MB of payload data from the server (simulated).
+[INFO][18:00:30]: [Client #121] Received 0.26 MB of payload data from the server (simulated).
+[INFO][18:00:30]: [Client #780] Dataset size: 138
+[INFO][18:00:30]: [Client #780] Sampler: all_inclusive
+[INFO][18:00:30]: [93m[1m[Client #508] Started training in communication round #1.[0m
+[INFO][18:00:30]: [93m[1m[Client #121] Started training in communication round #1.[0m
+[INFO][18:00:30]: [Client #780] Received 0.26 MB of payload data from the server (simulated).
+[INFO][18:00:30]: [93m[1m[Client #780] Started training in communication round #1.[0m
+[INFO][18:00:32]: [Client #783] Loading the dataset.
+[INFO][18:00:32]: [Client #868] Loading the dataset.
+[INFO][18:00:34]: [Client #121] Loading the dataset.
+[INFO][18:00:34]: [Client #822] Loading the dataset.
+[INFO][18:00:34]: [Client #780] Loading the dataset.
+[INFO][18:00:34]: [Client #138] Loading the dataset.
+[INFO][18:00:34]: [Client #583] Loading the dataset.
+[INFO][18:00:34]: [Client #508] Loading the dataset.
+[INFO][18:00:34]: [Client #262] Loading the dataset.
+[INFO][18:00:34]: [Client #65] Loading the dataset.
+[INFO][18:00:35]: [Client #783] Epoch: [1/5][0/16]	Loss: 4.160241
+[INFO][18:00:35]: [Client #868] Epoch: [1/5][0/17]	Loss: 4.140848
+[INFO][18:00:36]: [Client #121] Epoch: [1/5][0/16]	Loss: 4.177058
+[INFO][18:00:37]: [Client #583] Epoch: [1/5][0/13]	Loss: 4.124702
+[INFO][18:00:37]: [Client #508] Epoch: [1/5][0/16]	Loss: 4.112319
+[INFO][18:00:38]: [Client #138] Epoch: [1/5][0/17]	Loss: 4.135957
+[INFO][18:00:38]: [Client #822] Epoch: [1/5][0/24]	Loss: 4.162262
+[INFO][18:00:38]: [Client #780] Epoch: [1/5][0/14]	Loss: 4.105155
+[INFO][18:00:38]: [Client #262] Epoch: [1/5][0/14]	Loss: 4.173554
+[INFO][18:00:39]: [Client #65] Epoch: [1/5][0/17]	Loss: 4.125419
+[INFO][18:01:09]: [Client #783] Epoch: [1/5][10/16]	Loss: 4.084123
+[INFO][18:01:17]: [Client #868] Epoch: [1/5][10/17]	Loss: 4.099164
+[INFO][18:01:18]: [Client #508] Epoch: [1/5][10/16]	Loss: 4.072227
+[INFO][18:01:19]: [Client #583] Epoch: [1/5][10/13]	Loss: 4.048352
+[INFO][18:01:19]: [Client #65] Epoch: [1/5][10/17]	Loss: 4.089285
+[INFO][18:01:19]: [Client #121] Epoch: [1/5][10/16]	Loss: 4.068170
+[INFO][18:01:21]: [Client #780] Epoch: [1/5][10/14]	Loss: 4.030463
+[INFO][18:01:21]: [Client #262] Epoch: [1/5][10/14]	Loss: 4.102481
+[INFO][18:01:21]: [Client #822] Epoch: [1/5][10/24]	Loss: 4.191054
+[INFO][18:01:24]: [Client #138] Epoch: [1/5][10/17]	Loss: 4.099319
+[INFO][18:01:31]: [Client #583] Epoch: [2/5][0/13]	Loss: 4.068181
+[INFO][18:01:35]: [Client #783] Epoch: [2/5][0/16]	Loss: 4.045781
+[INFO][18:01:36]: [Client #262] Epoch: [2/5][0/14]	Loss: 3.897782
+[INFO][18:01:39]: [Client #780] Epoch: [2/5][0/14]	Loss: 3.968386
+[INFO][18:01:40]: [Client #508] Epoch: [2/5][0/16]	Loss: 3.911081
+[INFO][18:01:45]: [Client #868] Epoch: [2/5][0/17]	Loss: 3.942387
+[INFO][18:01:46]: [Client #121] Epoch: [2/5][0/16]	Loss: 3.940362
+[INFO][18:01:52]: [Client #65] Epoch: [2/5][0/17]	Loss: 3.914223
+[INFO][18:01:52]: [Client #138] Epoch: [2/5][0/17]	Loss: 3.943523
+[INFO][18:02:02]: [Client #822] Epoch: [1/5][20/24]	Loss: 4.051959
+[INFO][18:02:07]: [Client #583] Epoch: [2/5][10/13]	Loss: 3.963067
+[INFO][18:02:15]: [Client #583] Epoch: [3/5][0/13]	Loss: 2.838625
+[INFO][18:02:18]: [Client #822] Epoch: [2/5][0/24]	Loss: 3.846483
+[INFO][18:02:18]: [Client #262] Epoch: [2/5][10/14]	Loss: 3.326818
+[INFO][18:02:19]: [Client #783] Epoch: [2/5][10/16]	Loss: 3.287473
+[INFO][18:02:20]: [Client #780] Epoch: [2/5][10/14]	Loss: 3.565262
+[INFO][18:02:23]: [Client #508] Epoch: [2/5][10/16]	Loss: 3.356756
+[INFO][18:02:25]: [Client #121] Epoch: [2/5][10/16]	Loss: 3.195820
+[INFO][18:02:30]: [Client #868] Epoch: [2/5][10/17]	Loss: 3.574714
+[INFO][18:02:32]: [Client #138] Epoch: [2/5][10/17]	Loss: 3.416743
+[INFO][18:02:34]: [Client #262] Epoch: [3/5][0/14]	Loss: 2.901122
+[INFO][18:02:34]: [Client #65] Epoch: [2/5][10/17]	Loss: 3.310499
+[INFO][18:02:38]: [Client #780] Epoch: [3/5][0/14]	Loss: 3.431786
+[INFO][18:02:46]: [Client #783] Epoch: [3/5][0/16]	Loss: 3.298574
+[INFO][18:02:47]: [Client #121] Epoch: [3/5][0/16]	Loss: 3.828124
+[INFO][18:02:49]: [Client #508] Epoch: [3/5][0/16]	Loss: 3.364131
+[INFO][18:02:55]: [Client #583] Epoch: [3/5][10/13]	Loss: 3.737845
+[INFO][18:02:58]: [Client #822] Epoch: [2/5][10/24]	Loss: 3.729534
+[INFO][18:02:58]: [Client #138] Epoch: [3/5][0/17]	Loss: 4.163692
+[INFO][18:03:01]: [Client #868] Epoch: [3/5][0/17]	Loss: 3.721345
+[INFO][18:03:02]: [Client #65] Epoch: [3/5][0/17]	Loss: 3.593268
+[INFO][18:03:08]: [Client #583] Epoch: [4/5][0/13]	Loss: 3.470084
+[INFO][18:03:18]: [Client #262] Epoch: [3/5][10/14]	Loss: 3.323172
+[INFO][18:03:20]: [Client #780] Epoch: [3/5][10/14]	Loss: 3.820382
+[INFO][18:03:28]: [Client #121] Epoch: [3/5][10/16]	Loss: 3.892450
+[INFO][18:03:30]: [Client #783] Epoch: [3/5][10/16]	Loss: 3.782314
+[INFO][18:03:33]: [Client #508] Epoch: [3/5][10/16]	Loss: 3.299409
+[INFO][18:03:34]: [Client #262] Epoch: [4/5][0/14]	Loss: 3.136014
+[INFO][18:03:35]: [Client #138] Epoch: [3/5][10/17]	Loss: 3.941130
+[INFO][18:03:37]: [Client #780] Epoch: [4/5][0/14]	Loss: 2.970173
+[INFO][18:03:41]: [Client #822] Epoch: [2/5][20/24]	Loss: 3.422472
+[INFO][18:03:44]: [Client #65] Epoch: [3/5][10/17]	Loss: 3.674559
+[INFO][18:03:46]: [Client #868] Epoch: [3/5][10/17]	Loss: 3.235563
+[INFO][18:03:49]: [Client #121] Epoch: [4/5][0/16]	Loss: 3.009135
+[INFO][18:03:53]: [Client #783] Epoch: [4/5][0/16]	Loss: 3.342867
+[INFO][18:03:54]: [Client #508] Epoch: [4/5][0/16]	Loss: 3.481756
+[INFO][18:03:54]: [Client #583] Epoch: [4/5][10/13]	Loss: 3.461829
+[INFO][18:03:56]: [Client #822] Epoch: [3/5][0/24]	Loss: 3.759816
+[INFO][18:04:03]: [Client #138] Epoch: [4/5][0/17]	Loss: 3.847172
+[INFO][18:04:06]: [Client #583] Epoch: [5/5][0/13]	Loss: 2.724356
+[INFO][18:04:12]: [Client #65] Epoch: [4/5][0/17]	Loss: 3.032852
+[INFO][18:04:14]: [Client #868] Epoch: [4/5][0/17]	Loss: 3.937890
+[INFO][18:04:17]: [Client #262] Epoch: [4/5][10/14]	Loss: 2.953810
+[INFO][18:04:18]: [Client #780] Epoch: [4/5][10/14]	Loss: 3.465009
+[INFO][18:04:29]: [Client #121] Epoch: [4/5][10/16]	Loss: 3.514631
+[INFO][18:04:32]: [Client #780] Epoch: [5/5][0/14]	Loss: 3.230745
+[INFO][18:04:33]: [Client #783] Epoch: [4/5][10/16]	Loss: 3.566643
+[INFO][18:04:35]: [Client #262] Epoch: [5/5][0/14]	Loss: 3.371587
+[INFO][18:04:37]: [Client #508] Epoch: [4/5][10/16]	Loss: 3.804000
+[INFO][18:04:39]: [Client #822] Epoch: [3/5][10/24]	Loss: 3.845022
+[INFO][18:04:47]: [Client #583] Epoch: [5/5][10/13]	Loss: 3.375523
+[INFO][18:04:47]: [Client #138] Epoch: [4/5][10/17]	Loss: 3.905584
+[INFO][18:04:51]: [Client #868] Epoch: [4/5][10/17]	Loss: 3.845280
+[INFO][18:04:52]: [Client #583] Model saved to /data/ykang/plato/results/FEMNIST/test/model/lenet5_583_1270248.pth.
+[INFO][18:04:54]: [Client #583] Loading a model from /data/ykang/plato/results/FEMNIST/test/model/lenet5_583_1270248.pth.
+[INFO][18:04:55]: [Client #121] Epoch: [5/5][0/16]	Loss: 3.871664
+[INFO][18:04:57]: [Client #783] Epoch: [5/5][0/16]	Loss: 2.787379
+[INFO][18:04:58]: [Client #65] Epoch: [4/5][10/17]	Loss: 3.794398
+[INFO][18:05:00]: [Client #508] Epoch: [5/5][0/16]	Loss: 3.516460
+[INFO][18:05:06]: Testing on client #583 failed.
+Process Process-2:2:
+Traceback (most recent call last):
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/multiprocessing/process.py", line 315, in _bootstrap
+    self.run()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 348, in test_process
+    raise testing_exception
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 335, in test_process
+    for examples, labels in test_loader:
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 530, in __next__
+    data = self._next_data()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 569, in _next_data
+    index = self._next_index()  # may raise StopIteration
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 521, in _next_index
+    return next(self._sampler_iter)  # may raise StopIteration
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/sampler.py", line 226, in __iter__
+    for idx in self.sampler:
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/sampler.py", line 66, in __iter__
+    return iter(range(len(self.data_source)))
+TypeError: object of type 'NoneType' has no len()
+[ERROR][18:05:09]: Task exception was never retrieved
+future: <Task finished name='Task-15' coro=<AsyncClient._handle_eio_message() done, defined at /home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py:505> exception=ValueError('Testing on client #583 failed.')>
+Traceback (most recent call last):
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 384, in test
+    accuracy = self.load_accuracy(filename)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/base.py", line 60, in load_accuracy
+    with open(accuracy_path, 'r', encoding='utf-8') as file:
+FileNotFoundError: [Errno 2] No such file or directory: '/data/ykang/plato/results/FEMNIST/test/model/lenet5_583_1270248.acc'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py", line 522, in _handle_eio_message
+    await self._handle_event(pkt.namespace, pkt.id, pkt.data)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py", line 381, in _handle_event
+    r = await self._trigger_event(data[0], namespace, *data[1:])
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py", line 450, in _trigger_event
+    return await self.namespace_handlers[namespace].trigger_event(
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_namespace.py", line 175, in trigger_event
+    ret = await handler(*args)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/base.py", line 56, in on_payload_to_arrive
+    await self.plato_client.payload_to_arrive(data['response'])
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/base.py", line 176, in payload_to_arrive
+    await self.start_training()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/base.py", line 248, in start_training
+    report, payload = await self.train()
+  File "/home/ykang/plato/examples/oort/oort_client.py", line 34, in train
+    report, weights = await super().train()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/simple.py", line 137, in train
+    accuracy = self.trainer.test(self.testset, self.testset_sampler)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 386, in test
+    raise ValueError(
+ValueError: Testing on client #583 failed.
+[INFO][18:05:14]: [Client #138] Epoch: [5/5][0/17]	Loss: 3.499385
+[INFO][18:05:16]: [Client #868] Epoch: [5/5][0/17]	Loss: 3.194011
+[INFO][18:05:16]: [Client #822] Epoch: [3/5][20/24]	Loss: 3.702407
+[INFO][18:05:16]: [Client #780] Epoch: [5/5][10/14]	Loss: 2.658290
+[INFO][18:05:16]: [Client #262] Epoch: [5/5][10/14]	Loss: 3.272301
+[INFO][18:05:27]: [Client #65] Epoch: [5/5][0/17]	Loss: 3.348947
+[INFO][18:05:27]: [Client #780] Model saved to /data/ykang/plato/results/FEMNIST/test/model/lenet5_780_1270333.pth.
+[INFO][18:05:28]: [Client #262] Model saved to /data/ykang/plato/results/FEMNIST/test/model/lenet5_262_1270286.pth.
+[INFO][18:05:29]: [Client #780] Loading a model from /data/ykang/plato/results/FEMNIST/test/model/lenet5_780_1270333.pth.
+[INFO][18:05:29]: [Client #822] Epoch: [4/5][0/24]	Loss: 3.709946
+[INFO][18:05:29]: [Client #262] Loading a model from /data/ykang/plato/results/FEMNIST/test/model/lenet5_262_1270286.pth.
+[INFO][18:05:33]: [Client #783] Epoch: [5/5][10/16]	Loss: 3.181407
+[INFO][18:05:33]: [Client #121] Epoch: [5/5][10/16]	Loss: 3.934412
+[INFO][18:05:34]: [Client #508] Epoch: [5/5][10/16]	Loss: 3.757123
+[INFO][18:05:37]: Testing on client #780 failed.
+Process Process-10:2:
+Traceback (most recent call last):
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/multiprocessing/process.py", line 315, in _bootstrap
+    self.run()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 348, in test_process
+    raise testing_exception
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 335, in test_process
+    for examples, labels in test_loader:
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 530, in __next__
+    data = self._next_data()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 569, in _next_data
+    index = self._next_index()  # may raise StopIteration
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 521, in _next_index
+    return next(self._sampler_iter)  # may raise StopIteration
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/sampler.py", line 226, in __iter__
+    for idx in self.sampler:
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/sampler.py", line 66, in __iter__
+    return iter(range(len(self.data_source)))
+TypeError: object of type 'NoneType' has no len()
+[INFO][18:05:39]: Testing on client #262 failed.
+Process Process-7:2:
+Traceback (most recent call last):
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/multiprocessing/process.py", line 315, in _bootstrap
+    self.run()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 348, in test_process
+    raise testing_exception
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 335, in test_process
+    for examples, labels in test_loader:
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 530, in __next__
+    data = self._next_data()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 569, in _next_data
+    index = self._next_index()  # may raise StopIteration
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 521, in _next_index
+    return next(self._sampler_iter)  # may raise StopIteration
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/sampler.py", line 226, in __iter__
+    for idx in self.sampler:
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/sampler.py", line 66, in __iter__
+    return iter(range(len(self.data_source)))
+TypeError: object of type 'NoneType' has no len()
+[ERROR][18:05:39]: Task exception was never retrieved
+future: <Task finished name='Task-15' coro=<AsyncClient._handle_eio_message() done, defined at /home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py:505> exception=ValueError('Testing on client #780 failed.')>
+Traceback (most recent call last):
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 384, in test
+    accuracy = self.load_accuracy(filename)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/base.py", line 60, in load_accuracy
+    with open(accuracy_path, 'r', encoding='utf-8') as file:
+FileNotFoundError: [Errno 2] No such file or directory: '/data/ykang/plato/results/FEMNIST/test/model/lenet5_780_1270333.acc'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py", line 522, in _handle_eio_message
+    await self._handle_event(pkt.namespace, pkt.id, pkt.data)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py", line 381, in _handle_event
+    r = await self._trigger_event(data[0], namespace, *data[1:])
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py", line 450, in _trigger_event
+    return await self.namespace_handlers[namespace].trigger_event(
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_namespace.py", line 175, in trigger_event
+    ret = await handler(*args)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/base.py", line 56, in on_payload_to_arrive
+    await self.plato_client.payload_to_arrive(data['response'])
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/base.py", line 176, in payload_to_arrive
+    await self.start_training()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/base.py", line 248, in start_training
+    report, payload = await self.train()
+  File "/home/ykang/plato/examples/oort/oort_client.py", line 34, in train
+    report, weights = await super().train()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/simple.py", line 137, in train
+    accuracy = self.trainer.test(self.testset, self.testset_sampler)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 386, in test
+    raise ValueError(
+ValueError: Testing on client #780 failed.
+[ERROR][18:05:39]: Task exception was never retrieved
+future: <Task finished name='Task-15' coro=<AsyncClient._handle_eio_message() done, defined at /home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py:505> exception=ValueError('Testing on client #262 failed.')>
+Traceback (most recent call last):
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 384, in test
+    accuracy = self.load_accuracy(filename)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/base.py", line 60, in load_accuracy
+    with open(accuracy_path, 'r', encoding='utf-8') as file:
+FileNotFoundError: [Errno 2] No such file or directory: '/data/ykang/plato/results/FEMNIST/test/model/lenet5_262_1270286.acc'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py", line 522, in _handle_eio_message
+    await self._handle_event(pkt.namespace, pkt.id, pkt.data)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py", line 381, in _handle_event
+    r = await self._trigger_event(data[0], namespace, *data[1:])
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py", line 450, in _trigger_event
+    return await self.namespace_handlers[namespace].trigger_event(
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_namespace.py", line 175, in trigger_event
+    ret = await handler(*args)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/base.py", line 56, in on_payload_to_arrive
+    await self.plato_client.payload_to_arrive(data['response'])
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/base.py", line 176, in payload_to_arrive
+    await self.start_training()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/base.py", line 248, in start_training
+    report, payload = await self.train()
+  File "/home/ykang/plato/examples/oort/oort_client.py", line 34, in train
+    report, weights = await super().train()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/simple.py", line 137, in train
+    accuracy = self.trainer.test(self.testset, self.testset_sampler)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 386, in test
+    raise ValueError(
+ValueError: Testing on client #262 failed.
+[INFO][18:05:47]: [Client #783] Model saved to /data/ykang/plato/results/FEMNIST/test/model/lenet5_783_1270273.pth.
+[INFO][18:05:47]: [Client #121] Model saved to /data/ykang/plato/results/FEMNIST/test/model/lenet5_121_1270309.pth.
+[INFO][18:05:48]: [Client #783] Loading a model from /data/ykang/plato/results/FEMNIST/test/model/lenet5_783_1270273.pth.
+[INFO][18:05:48]: [Client #138] Epoch: [5/5][10/17]	Loss: 4.193870
+[INFO][18:05:48]: [Client #121] Loading a model from /data/ykang/plato/results/FEMNIST/test/model/lenet5_121_1270309.pth.
+[INFO][18:05:49]: [Client #508] Model saved to /data/ykang/plato/results/FEMNIST/test/model/lenet5_508_1270321.pth.
+[INFO][18:05:50]: [Client #868] Epoch: [5/5][10/17]	Loss: 3.792308
+[INFO][18:05:50]: [Client #508] Loading a model from /data/ykang/plato/results/FEMNIST/test/model/lenet5_508_1270321.pth.
+[INFO][18:05:52]: Testing on client #783 failed.
+Process Process-5:2:
+Traceback (most recent call last):
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/multiprocessing/process.py", line 315, in _bootstrap
+    self.run()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 348, in test_process
+    raise testing_exception
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 335, in test_process
+    for examples, labels in test_loader:
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 530, in __next__
+    data = self._next_data()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 569, in _next_data
+    index = self._next_index()  # may raise StopIteration
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 521, in _next_index
+    return next(self._sampler_iter)  # may raise StopIteration
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/sampler.py", line 226, in __iter__
+    for idx in self.sampler:
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/sampler.py", line 66, in __iter__
+    return iter(range(len(self.data_source)))
+TypeError: object of type 'NoneType' has no len()
+[INFO][18:05:53]: Testing on client #121 failed.
+Process Process-8:2:
+Traceback (most recent call last):
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/multiprocessing/process.py", line 315, in _bootstrap
+    self.run()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 348, in test_process
+    raise testing_exception
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 335, in test_process
+    for examples, labels in test_loader:
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 530, in __next__
+    data = self._next_data()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 569, in _next_data
+    index = self._next_index()  # may raise StopIteration
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 521, in _next_index
+    return next(self._sampler_iter)  # may raise StopIteration
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/sampler.py", line 226, in __iter__
+    for idx in self.sampler:
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/sampler.py", line 66, in __iter__
+    return iter(range(len(self.data_source)))
+TypeError: object of type 'NoneType' has no len()
+[ERROR][18:05:54]: Task exception was never retrieved
+future: <Task finished name='Task-15' coro=<AsyncClient._handle_eio_message() done, defined at /home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py:505> exception=ValueError('Testing on client #783 failed.')>
+Traceback (most recent call last):
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 384, in test
+    accuracy = self.load_accuracy(filename)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/base.py", line 60, in load_accuracy
+    with open(accuracy_path, 'r', encoding='utf-8') as file:
+FileNotFoundError: [Errno 2] No such file or directory: '/data/ykang/plato/results/FEMNIST/test/model/lenet5_783_1270273.acc'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py", line 522, in _handle_eio_message
+    await self._handle_event(pkt.namespace, pkt.id, pkt.data)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py", line 381, in _handle_event
+    r = await self._trigger_event(data[0], namespace, *data[1:])
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py", line 450, in _trigger_event
+    return await self.namespace_handlers[namespace].trigger_event(
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_namespace.py", line 175, in trigger_event
+    ret = await handler(*args)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/base.py", line 56, in on_payload_to_arrive
+    await self.plato_client.payload_to_arrive(data['response'])
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/base.py", line 176, in payload_to_arrive
+    await self.start_training()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/base.py", line 248, in start_training
+    report, payload = await self.train()
+  File "/home/ykang/plato/examples/oort/oort_client.py", line 34, in train
+    report, weights = await super().train()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/simple.py", line 137, in train
+    accuracy = self.trainer.test(self.testset, self.testset_sampler)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 386, in test
+    raise ValueError(
+ValueError: Testing on client #783 failed.
+[INFO][18:05:54]: [Client #65] Epoch: [5/5][10/17]	Loss: 2.881517
+[ERROR][18:05:54]: Task exception was never retrieved
+future: <Task finished name='Task-15' coro=<AsyncClient._handle_eio_message() done, defined at /home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py:505> exception=ValueError('Testing on client #121 failed.')>
+Traceback (most recent call last):
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 384, in test
+    accuracy = self.load_accuracy(filename)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/base.py", line 60, in load_accuracy
+    with open(accuracy_path, 'r', encoding='utf-8') as file:
+FileNotFoundError: [Errno 2] No such file or directory: '/data/ykang/plato/results/FEMNIST/test/model/lenet5_121_1270309.acc'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py", line 522, in _handle_eio_message
+    await self._handle_event(pkt.namespace, pkt.id, pkt.data)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py", line 381, in _handle_event
+    r = await self._trigger_event(data[0], namespace, *data[1:])
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py", line 450, in _trigger_event
+    return await self.namespace_handlers[namespace].trigger_event(
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_namespace.py", line 175, in trigger_event
+    ret = await handler(*args)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/base.py", line 56, in on_payload_to_arrive
+    await self.plato_client.payload_to_arrive(data['response'])
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/base.py", line 176, in payload_to_arrive
+    await self.start_training()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/base.py", line 248, in start_training
+    report, payload = await self.train()
+  File "/home/ykang/plato/examples/oort/oort_client.py", line 34, in train
+    report, weights = await super().train()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/simple.py", line 137, in train
+    accuracy = self.trainer.test(self.testset, self.testset_sampler)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 386, in test
+    raise ValueError(
+ValueError: Testing on client #121 failed.
+[INFO][18:05:54]: Testing on client #508 failed.
+Process Process-9:2:
+Traceback (most recent call last):
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/multiprocessing/process.py", line 315, in _bootstrap
+    self.run()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 348, in test_process
+    raise testing_exception
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 335, in test_process
+    for examples, labels in test_loader:
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 530, in __next__
+    data = self._next_data()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 569, in _next_data
+    index = self._next_index()  # may raise StopIteration
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 521, in _next_index
+    return next(self._sampler_iter)  # may raise StopIteration
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/sampler.py", line 226, in __iter__
+    for idx in self.sampler:
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/sampler.py", line 66, in __iter__
+    return iter(range(len(self.data_source)))
+TypeError: object of type 'NoneType' has no len()
+[ERROR][18:05:55]: Task exception was never retrieved
+future: <Task finished name='Task-15' coro=<AsyncClient._handle_eio_message() done, defined at /home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py:505> exception=ValueError('Testing on client #508 failed.')>
+Traceback (most recent call last):
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 384, in test
+    accuracy = self.load_accuracy(filename)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/base.py", line 60, in load_accuracy
+    with open(accuracy_path, 'r', encoding='utf-8') as file:
+FileNotFoundError: [Errno 2] No such file or directory: '/data/ykang/plato/results/FEMNIST/test/model/lenet5_508_1270321.acc'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py", line 522, in _handle_eio_message
+    await self._handle_event(pkt.namespace, pkt.id, pkt.data)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py", line 381, in _handle_event
+    r = await self._trigger_event(data[0], namespace, *data[1:])
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py", line 450, in _trigger_event
+    return await self.namespace_handlers[namespace].trigger_event(
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_namespace.py", line 175, in trigger_event
+    ret = await handler(*args)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/base.py", line 56, in on_payload_to_arrive
+    await self.plato_client.payload_to_arrive(data['response'])
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/base.py", line 176, in payload_to_arrive
+    await self.start_training()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/base.py", line 248, in start_training
+    report, payload = await self.train()
+  File "/home/ykang/plato/examples/oort/oort_client.py", line 34, in train
+    report, weights = await super().train()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/simple.py", line 137, in train
+    accuracy = self.trainer.test(self.testset, self.testset_sampler)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 386, in test
+    raise ValueError(
+ValueError: Testing on client #508 failed.
+[INFO][18:05:56]: [Client #822] Epoch: [4/5][10/24]	Loss: 3.908651
+[INFO][18:05:59]: [Client #138] Model saved to /data/ykang/plato/results/FEMNIST/test/model/lenet5_138_1270247.pth.
+[INFO][18:06:00]: [Client #138] Loading a model from /data/ykang/plato/results/FEMNIST/test/model/lenet5_138_1270247.pth.
+[INFO][18:06:00]: [Client #868] Model saved to /data/ykang/plato/results/FEMNIST/test/model/lenet5_868_1270249.pth.
+[INFO][18:06:01]: [Client #868] Loading a model from /data/ykang/plato/results/FEMNIST/test/model/lenet5_868_1270249.pth.
+[INFO][18:06:02]: [Client #65] Model saved to /data/ykang/plato/results/FEMNIST/test/model/lenet5_65_1270285.pth.
+[INFO][18:06:02]: [Client #65] Loading a model from /data/ykang/plato/results/FEMNIST/test/model/lenet5_65_1270285.pth.
+[INFO][18:06:03]: Testing on client #138 failed.
+Process Process-1:2:
+Traceback (most recent call last):
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/multiprocessing/process.py", line 315, in _bootstrap
+    self.run()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 348, in test_process
+    raise testing_exception
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 335, in test_process
+    for examples, labels in test_loader:
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 530, in __next__
+    data = self._next_data()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 569, in _next_data
+    index = self._next_index()  # may raise StopIteration
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 521, in _next_index
+    return next(self._sampler_iter)  # may raise StopIteration
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/sampler.py", line 226, in __iter__
+    for idx in self.sampler:
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/sampler.py", line 66, in __iter__
+    return iter(range(len(self.data_source)))
+TypeError: object of type 'NoneType' has no len()
+[INFO][18:06:03]: Testing on client #868 failed.
+Process Process-3:2:
+Traceback (most recent call last):
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/multiprocessing/process.py", line 315, in _bootstrap
+    self.run()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 348, in test_process
+    raise testing_exception
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 335, in test_process
+    for examples, labels in test_loader:
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 530, in __next__
+    data = self._next_data()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 569, in _next_data
+    index = self._next_index()  # may raise StopIteration
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 521, in _next_index
+    return next(self._sampler_iter)  # may raise StopIteration
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/sampler.py", line 226, in __iter__
+    for idx in self.sampler:
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/sampler.py", line 66, in __iter__
+    return iter(range(len(self.data_source)))
+TypeError: object of type 'NoneType' has no len()
+[ERROR][18:06:03]: Task exception was never retrieved
+future: <Task finished name='Task-15' coro=<AsyncClient._handle_eio_message() done, defined at /home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py:505> exception=ValueError('Testing on client #138 failed.')>
+Traceback (most recent call last):
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 384, in test
+    accuracy = self.load_accuracy(filename)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/base.py", line 60, in load_accuracy
+    with open(accuracy_path, 'r', encoding='utf-8') as file:
+FileNotFoundError: [Errno 2] No such file or directory: '/data/ykang/plato/results/FEMNIST/test/model/lenet5_138_1270247.acc'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py", line 522, in _handle_eio_message
+    await self._handle_event(pkt.namespace, pkt.id, pkt.data)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py", line 381, in _handle_event
+    r = await self._trigger_event(data[0], namespace, *data[1:])
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py", line 450, in _trigger_event
+    return await self.namespace_handlers[namespace].trigger_event(
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_namespace.py", line 175, in trigger_event
+    ret = await handler(*args)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/base.py", line 56, in on_payload_to_arrive
+    await self.plato_client.payload_to_arrive(data['response'])
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/base.py", line 176, in payload_to_arrive
+    await self.start_training()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/base.py", line 248, in start_training
+    report, payload = await self.train()
+  File "/home/ykang/plato/examples/oort/oort_client.py", line 34, in train
+    report, weights = await super().train()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/simple.py", line 137, in train
+    accuracy = self.trainer.test(self.testset, self.testset_sampler)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 386, in test
+    raise ValueError(
+ValueError: Testing on client #138 failed.
+[ERROR][18:06:04]: Task exception was never retrieved
+future: <Task finished name='Task-15' coro=<AsyncClient._handle_eio_message() done, defined at /home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py:505> exception=ValueError('Testing on client #868 failed.')>
+Traceback (most recent call last):
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 384, in test
+    accuracy = self.load_accuracy(filename)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/base.py", line 60, in load_accuracy
+    with open(accuracy_path, 'r', encoding='utf-8') as file:
+FileNotFoundError: [Errno 2] No such file or directory: '/data/ykang/plato/results/FEMNIST/test/model/lenet5_868_1270249.acc'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py", line 522, in _handle_eio_message
+    await self._handle_event(pkt.namespace, pkt.id, pkt.data)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py", line 381, in _handle_event
+    r = await self._trigger_event(data[0], namespace, *data[1:])
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py", line 450, in _trigger_event
+    return await self.namespace_handlers[namespace].trigger_event(
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_namespace.py", line 175, in trigger_event
+    ret = await handler(*args)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/base.py", line 56, in on_payload_to_arrive
+    await self.plato_client.payload_to_arrive(data['response'])
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/base.py", line 176, in payload_to_arrive
+    await self.start_training()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/base.py", line 248, in start_training
+    report, payload = await self.train()
+  File "/home/ykang/plato/examples/oort/oort_client.py", line 34, in train
+    report, weights = await super().train()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/simple.py", line 137, in train
+    accuracy = self.trainer.test(self.testset, self.testset_sampler)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 386, in test
+    raise ValueError(
+ValueError: Testing on client #868 failed.
+[INFO][18:06:04]: [Client #822] Epoch: [4/5][20/24]	Loss: 3.820529
+[INFO][18:06:04]: [Client #822] Epoch: [5/5][0/24]	Loss: 3.380032
+[INFO][18:06:05]: Testing on client #65 failed.
+Process Process-6:2:
+Traceback (most recent call last):
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/multiprocessing/process.py", line 315, in _bootstrap
+    self.run()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 348, in test_process
+    raise testing_exception
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 335, in test_process
+    for examples, labels in test_loader:
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 530, in __next__
+    data = self._next_data()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 569, in _next_data
+    index = self._next_index()  # may raise StopIteration
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 521, in _next_index
+    return next(self._sampler_iter)  # may raise StopIteration
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/sampler.py", line 226, in __iter__
+    for idx in self.sampler:
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/sampler.py", line 66, in __iter__
+    return iter(range(len(self.data_source)))
+TypeError: object of type 'NoneType' has no len()
+[ERROR][18:06:05]: Task exception was never retrieved
+future: <Task finished name='Task-15' coro=<AsyncClient._handle_eio_message() done, defined at /home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py:505> exception=ValueError('Testing on client #65 failed.')>
+Traceback (most recent call last):
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 384, in test
+    accuracy = self.load_accuracy(filename)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/base.py", line 60, in load_accuracy
+    with open(accuracy_path, 'r', encoding='utf-8') as file:
+FileNotFoundError: [Errno 2] No such file or directory: '/data/ykang/plato/results/FEMNIST/test/model/lenet5_65_1270285.acc'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py", line 522, in _handle_eio_message
+    await self._handle_event(pkt.namespace, pkt.id, pkt.data)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py", line 381, in _handle_event
+    r = await self._trigger_event(data[0], namespace, *data[1:])
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py", line 450, in _trigger_event
+    return await self.namespace_handlers[namespace].trigger_event(
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_namespace.py", line 175, in trigger_event
+    ret = await handler(*args)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/base.py", line 56, in on_payload_to_arrive
+    await self.plato_client.payload_to_arrive(data['response'])
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/base.py", line 176, in payload_to_arrive
+    await self.start_training()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/base.py", line 248, in start_training
+    report, payload = await self.train()
+  File "/home/ykang/plato/examples/oort/oort_client.py", line 34, in train
+    report, weights = await super().train()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/simple.py", line 137, in train
+    accuracy = self.trainer.test(self.testset, self.testset_sampler)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 386, in test
+    raise ValueError(
+ValueError: Testing on client #65 failed.
+[INFO][18:06:05]: [Client #822] Epoch: [5/5][10/24]	Loss: 3.343294
+[INFO][18:06:05]: [Client #822] Epoch: [5/5][20/24]	Loss: 3.587281
+[INFO][18:06:05]: [Client #822] Model saved to /data/ykang/plato/results/FEMNIST/test/model/lenet5_822_1270261.pth.
+[INFO][18:06:06]: [Client #822] Loading a model from /data/ykang/plato/results/FEMNIST/test/model/lenet5_822_1270261.pth.
+[INFO][18:06:08]: Testing on client #822 failed.
+Process Process-4:2:
+Traceback (most recent call last):
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/multiprocessing/process.py", line 315, in _bootstrap
+    self.run()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 348, in test_process
+    raise testing_exception
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 335, in test_process
+    for examples, labels in test_loader:
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 530, in __next__
+    data = self._next_data()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 569, in _next_data
+    index = self._next_index()  # may raise StopIteration
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 521, in _next_index
+    return next(self._sampler_iter)  # may raise StopIteration
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/sampler.py", line 226, in __iter__
+    for idx in self.sampler:
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/torch/utils/data/sampler.py", line 66, in __iter__
+    return iter(range(len(self.data_source)))
+TypeError: object of type 'NoneType' has no len()
+[ERROR][18:06:08]: Task exception was never retrieved
+future: <Task finished name='Task-15' coro=<AsyncClient._handle_eio_message() done, defined at /home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py:505> exception=ValueError('Testing on client #822 failed.')>
+Traceback (most recent call last):
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 384, in test
+    accuracy = self.load_accuracy(filename)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/base.py", line 60, in load_accuracy
+    with open(accuracy_path, 'r', encoding='utf-8') as file:
+FileNotFoundError: [Errno 2] No such file or directory: '/data/ykang/plato/results/FEMNIST/test/model/lenet5_822_1270261.acc'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py", line 522, in _handle_eio_message
+    await self._handle_event(pkt.namespace, pkt.id, pkt.data)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py", line 381, in _handle_event
+    r = await self._trigger_event(data[0], namespace, *data[1:])
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_client.py", line 450, in _trigger_event
+    return await self.namespace_handlers[namespace].trigger_event(
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/socketio/asyncio_namespace.py", line 175, in trigger_event
+    ret = await handler(*args)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/base.py", line 56, in on_payload_to_arrive
+    await self.plato_client.payload_to_arrive(data['response'])
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/base.py", line 176, in payload_to_arrive
+    await self.start_training()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/base.py", line 248, in start_training
+    report, payload = await self.train()
+  File "/home/ykang/plato/examples/oort/oort_client.py", line 34, in train
+    report, weights = await super().train()
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/clients/simple.py", line 137, in train
+    accuracy = self.trainer.test(self.testset, self.testset_sampler)
+  File "/home/ykang/miniforge3/envs/plato/lib/python3.9/site-packages/plato/trainers/basic.py", line 386, in test
+    raise ValueError(
+ValueError: Testing on client #822 failed.
+slurmstepd-sim: error: *** JOB 3022 ON sim CANCELLED AT 2022-07-11T19:17:01 ***
