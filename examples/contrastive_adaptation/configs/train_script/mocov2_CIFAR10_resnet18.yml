@@ -19,10 +19,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 50
+    total_clients: 100
 
     # The number of clients selected in each round
-    per_round: 50
+    per_round: 100
 
     do_data_tranform_logging: True
 
@@ -33,18 +33,18 @@ clients:
     # under the contrastive ssl.
     # only perfrom the training and test for the downstream task,
     # i.e., personalziation in each client
-    only_eval_test: False
+    only_personalization: False
 
     # whether perform the eval test at the final round
     # on all clients
-    do_final_eval_test: True
+    do_final_personalization: True
 
     # Minotor the self-supervised learning by knn for
     # every 1 round
     test_interval: 1
     # Train the personalized model based on the
     # learned representation every 1 rounds
-    eval_test_interval: 1
+    pers_learning_interval: 1
     # Whether simulate clients or not
     simulation: true
 
@@ -85,8 +85,8 @@ data:
     # The main reason is that the relation between queen size and
     # batch size should be:
     # queen_size % batch_size == 0
-    partition_size: 1536
-    test_partition_size: 300
+    partition_size: 768
+    test_partition_size: 768
 
     # IID or non-IID?
     sampler: noniid
@@ -133,7 +133,7 @@ trainer:
     #   The user is expected to carefully choose the batch_size to avoid
     # the memory allocation issue as the contrastive samples occupy more
     # space as more samples will be contained within one loading.
-    epochs: 400
+    epochs: 200
     batch_size: 256
 
     optimizer: SGD
@@ -144,7 +144,7 @@ trainer:
 
     lr_schedule: WarmupCosine
     warmup_epochs: 10
-    max_epochs: 400 # should be epochs * rounds
+    max_epochs: 200 # should be epochs * rounds
     warmup_start_lr: 0.00003
     min_lr: 0.0
 
@@ -165,7 +165,7 @@ trainer:
 
     # currently, we only support CosineAnnealingLR
     pers_lr_schedule: MultiStepLR
-    pers_lr_milestones: 60,80
+    pers_lr_milestones: 15,25
     pers_lr_gamma: 0.1
 
     pers_epoch_log_interval: 2

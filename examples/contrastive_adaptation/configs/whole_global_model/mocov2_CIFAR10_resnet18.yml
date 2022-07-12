@@ -19,7 +19,7 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 50
+    total_clients: 100
 
     # The number of clients selected in each round
     per_round: 30
@@ -33,18 +33,18 @@ clients:
     # under the contrastive ssl.
     # only perfrom the training and test for the downstream task,
     # i.e., personalziation in each client
-    only_eval_test: False
+    only_personalization: False
 
     # whether perform the eval test at the final round
     # on all clients
-    do_final_eval_test: True
+    do_final_personalization: True
 
     # Minotor the self-supervised learning by knn for
     # every 5 round
     test_interval: 5
     # Train the personalized model based on the
     # learned representation every 1 rounds
-    eval_test_interval: 10
+    pers_learning_interval: 10
     # Whether simulate clients or not
     simulation: true
 
@@ -85,8 +85,8 @@ data:
     # The main reason is that the relation between queen size and
     # batch size should be:
     # queen_size % batch_size == 0
-    partition_size: 1536
-    test_partition_size: 1536
+    partition_size: 768
+    test_partition_size: 768
 
     # IID or non-IID?
     sampler: noniid
@@ -114,7 +114,7 @@ trainer:
     # The type of the trainer
     type: basic
     # The maximum number of training rounds
-    rounds: 100
+    rounds: 200
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -129,7 +129,7 @@ trainer:
     #   The user is expected to carefully choose the batch_size to avoid
     # the memory allocation issue as the contrastive samples occupy more
     # space as more samples will be contained within one loading.
-    epochs: 5
+    epochs: 3
     batch_size: 256
 
     optimizer: SGD
@@ -145,13 +145,13 @@ trainer:
     min_lr: 0.0
 
     epoch_log_interval: 1
-    epoch_model_log_interval: 2
+    epoch_model_log_interval: 1
     batch_log_interval: 1
 
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
     # does not utilize the
-    pers_epochs: 50
+    pers_epochs: 10
     pers_batch_size: 256
     pers_optimizer: SGD
     # lr = 0.1 * batch_size / 256, see section B.6 and B.7 of SimCLR paper.
@@ -164,8 +164,8 @@ trainer:
     pers_lr_milestones: 30,40
     pers_lr_gamma: 0.1
 
-    pers_epoch_log_interval: 2
-    pers_epoch_model_log_interval: 10
+    pers_epoch_log_interval: 1
+    pers_epoch_model_log_interval: 1
 
     # image_size
     #  - CIFAR10 (Image size=32)

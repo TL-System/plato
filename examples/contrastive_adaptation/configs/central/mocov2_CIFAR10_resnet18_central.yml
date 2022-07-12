@@ -33,18 +33,18 @@ clients:
     # under the contrastive ssl.
     # only perfrom the training and test for the downstream task,
     # i.e., personalziation in each client
-    only_eval_test: False
+    only_personalization: False
 
     # whether perform the eval test at the final round
     # on all clients
-    do_final_eval_test: True
+    do_final_personalization: True
 
     # Minotor the self-supervised learning by knn for
     # every 1 round
     test_interval: 1
     # Train the personalized model based on the
-    # learned representation every 1 rounds
-    eval_test_interval: 1
+    # learned global model every 1 rounds
+    pers_learning_interval: 1
     # Whether simulate clients or not
     simulation: true
 

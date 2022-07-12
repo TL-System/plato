@@ -5,8 +5,9 @@ general:
     # for different purposes
     # - central_code_test
     # - central
-    # - script
+    # - code_test
     # - user
+
     running_mode: user
 
     file_logging: True
@@ -17,30 +18,22 @@ clients:
 
     # The total number of clients
     total_clients: 100
+
     # The number of clients selected in each round
     per_round: 30
-
-    do_data_tranform_logging: True
 
     # Should the clients compute test accuracy locally?
     do_test: True
 
-    # Should the client only perfrom the eval test without training
-    # under the contrastive ssl.
-    # only perfrom the training and test for the downstream task,
-    # i.e., personalziation in each client
-    only_eval_test: False
-
     # whether perform the eval test at the final round
     # on all clients
-    do_final_eval_test: True
+    do_final_personalization: True
     # Minotor the self-supervised learning by knn for
     # every 5 round
     test_interval: 5
     # Train the personalized model based on the
     # learned representation every 10 rounds
-    eval_test_interval: 10
-
+    pers_learning_interval: 10
     # Whether simulate clients or not
     simulation: true
 
@@ -48,12 +41,9 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8002
+    port: 8012
     synchronous: true
     do_test: false
-
-    ping_interval: 12000
-    ping_timeout: 12000
 
     # for the paths of models; checkpoints; results,
     # they utilize the same name, following the one defined in
@@ -70,9 +60,10 @@ server:
     model_path: xxx
     checkpoint_path: xxx
 
+
 data:
     # The training and testing dataset
-    datasource: STL10
+    datasource: CIFAR10
 
     # Number of samples in each partition
     #
@@ -86,14 +77,12 @@ data:
     # Working on criterion that is defined with batch_size but receives loaded
     # samples whose size is smaller than the batch size may causes problems.
     # drop_last can alleviate this issue
-    partition_size: 100
-    test_partition_size: 160
-    unlabelled_partition_size: 2000
+    partition_size: 600
+    test_partition_size: 600
 
     # IID or non-IID?
     sampler: noniid
     testset_sampler: noniid
-    unlabelled_set_sampler: iid
 
     # The concentration parameter for the Dirichlet distribution
     concentration: 0.3
@@ -101,30 +90,18 @@ data:
     # The random seed for sampling data
     random_seed: 1
 
-    # set the data wrapper to further process the data
-    #   for the specific usage, such as constrastive learning
-    # data_wrapper: Null
-    data_wrapper: ContrastiveAugmentWrapper
-
-    # set the data augmentation
-    #   options: simsiam, byol, simclr
-    augment_transformer_name: simclr
-    # some methods apply the normalization to samples
-    #   while others do not
-    is_norm: True
 
 trainer:
     # The type of the trainer
     type: basic
-
     # The maximum number of training rounds
-    rounds: 100
+    rounds: 200
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
 
     # The maximum number of clients running concurrently
-    max_concurrency: 2
+    max_concurrency: 5
 
     # The target accuracy
     target_accuracy: 0.9
@@ -133,33 +110,23 @@ trainer:
     #   The user is expected to carefully choose the batch_size to avoid
     # the memory allocation issue as the contrastive samples occupy more
     # space as more samples will be contained within one loading.
-    epochs: 5
-    batch_size: 256
-
-    optimizer: Lars
-    learning_rate: 0.4
-    eta_lars: 0.02
+    epochs: 3
+    batch_size: 64
+    optimizer: SGD
+    learning_rate: 0.1
     momentum: 0.9
-    grad_clip_lars: True
-    exclude_bias_n_norm: True
-    weight_decay: 0.00001
+    weight_decay: 0.0001
 
     # Learning rate schedule
-    lr_schedule: WarmupCosine
-    warmup_epochs: 10
-    max_epochs: 500 # should be epochs * rounds
-    warmup_start_lr: 0.00003
-    min_lr: 0.0
-
-    epoch_log_interval: 1
-    epoch_model_log_interval: 2
-    batch_log_interval: 1
+    lr_schedule: LambdaLR
+    lr_gamma: 0.1
+    lr_milestone_steps: 80ep,120ep
 
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
     # does not utilize the
-    pers_epochs: 50
-    pers_batch_size: 256
+    pers_epochs: 10
+    pers_batch_size: 64
     pers_optimizer: SGD
     # lr = 0.1 * batch_size / 256, see section B.6 and B.7 of SimCLR paper.
     pers_learning_rate: 0.1
@@ -168,52 +135,20 @@ trainer:
 
     # currently, we only support CosineAnnealingLR
     pers_lr_schedule: MultiStepLR
-    pers_lr_milestones: 30,40
+    pers_lr_milestones: 60,80
     pers_lr_gamma: 0.1
 
-    pers_epoch_log_interval: 2
-    pers_epoch_model_log_interval: 10
-
-    # temperature for the loss function
-    temperature: 0.2
-
-    # image_size
-    #  - STL10 (Image size=96)
-    #  - CIFAR10 (Image size=32)
-    #  - MNIST (Image size=28)
-    image_size: 96
+    pers_epoch_log_interval: 1
+    pers_epoch_model_log_interval: 1
 
     # The machine learning model,
     # it behaves as the encoder for the ssl method
     # the final fc layer will be removed
-    external_encoder: False
+    # however, in the central test, we do not use this
+    #   but use the custom model
     model_name: resnet_18
-    projection_dim: 256
-    projection_hidden_dim: 2048
-
-    # name of the component used as the global model
-    global_model_name: whole
-
     personalized_model_name: pure_one_layer_mlp
 
-    # whether to maintain the state of the trained personalized
-    # model in each round
-    # In general, for the contrastive self-supervised learning
-    # every eval test should be a new learning process to train
-    # the randomly initialized personalized model
-    # Thus, setting do_maintain_per_state to be false to follow
-    # this rule.
-    # However, in some cases, we want to maintain the state of the
-    # trained personalized model in each round.
-    # Then, setting do_maintain_per_state to be True to follow this
-    # rule.
-    # For central learning with one round training, this is useless
-    do_maintain_per_state: false
-
-    monitor_name: knn
-    knn_k: 20
-    knn_t: 0.1
-    hide_monitor_progress: False
 
     num_classes: 10
 
