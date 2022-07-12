@@ -94,8 +94,6 @@ class Trainer(basic.Trainer):
                         outputs = patched_model(
                             torch.unsqueeze(examples[index], dim=0),
                             patched_model.parameters)
-                        # onehot_labels = label_to_onehot(
-                        #     torch.unsqueeze(labels[index], dim=0), num_classes=Config().trainer.num_classes)
                         loss = loss_criterion(outputs, labels)
                         grad = torch.autograd.grad(
                             loss,
@@ -124,31 +122,18 @@ class Trainer(basic.Trainer):
 
                     if hasattr(Config().algorithm, 'defense') and Config(
                     ).algorithm.defense == 'GradDefense':
-                        # this if statement will never be entered
                         if hasattr(Config().algorithm,
                                    'clip') and Config().algorithm.clip is True:
                             from defense.GradDefense.clip import noise
-                            # moved the line below to after the if-else statement
-                            # target_grad = current_grad
-                        # else statement will always be the one
                         else:
                             from defense.GradDefense.perturb import noise
-                        # added the statement here, but i think it is unnecessary
-                        target_grad = current_grad
                         perturbed_gradients = noise(
-                            # dy_dx=target_grad,
                             dy_dx=current_grad,
                             sensitivity=sensitivity,
                             slices_num=Config().algorithm.slices_num,
                             perturb_slices_num=Config().algorithm.
                             perturb_slices_num,
                             noise_intensity=Config().algorithm.scale)
-
-                        # i think the lines below are also unnecessary so i commented them out
-                        # target_grad = []
-                        # for layer in perturbed_gradients:
-                        #     layer = layer.to(self.device)
-                        #     target_grad.append(layer)
 
                     if hasattr(Config().algorithm, 'defense') and Config(
                     ).algorithm.defense == 'Soteria':
