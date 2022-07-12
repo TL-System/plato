@@ -3,7 +3,7 @@ import numpy as np
 import torch
 import gym
 import park
-
+from copy import deepcopy
 from plato.trainers import basic
 from plato.config import Config
 from plato.trainers import basic
@@ -77,6 +77,8 @@ class Trainer(basic.Trainer):
         
         self.actor = self.model.actor
         self.critic = self.model.critic
+        self.actor_old = deepcopy(self.actor.state_dict())
+        self.critic_old = deepcopy(self.critic.state_dict())
         self.adam_actor = torch.optim.Adam(self.actor.parameters(), lr=Config().algorithm.learning_rate)
         self.adam_critic = torch.optim.Adam(self.critic.parameters(), lr=Config().algorithm.learning_rate)
 
@@ -112,6 +114,9 @@ class Trainer(basic.Trainer):
         self.fisher_critic, self.fisher_actor = {}, {}
         self.fisher_critic_old, self.fisher_actor_old = {}, {}
         self.critic_fisher_sum, self.actor_fisher_sum = 0, 0
+
+        # Omega holding important parameters for other parameters
+        self.omega_actor, self.omega_critic = {}, {}
         
         self.updates = 0
         self.timesteps_since_eval = 0
@@ -143,10 +148,15 @@ class Trainer(basic.Trainer):
         actor_fisher_path = f'{model_path}/{env_algorithm}{actor}{model_seed_path}{client_id}.pth'
         critic_fisher_path = f'{model_path}/{env_algorithm}{critic}{model_seed_path}{client_id}.pth'
         
-        if self.episode_num > 1:
+        if self.episode_num >= Config().algorithm.max_round_episodes:
             self.load_fisher()
         else:
             self.fisher_critic, self.fisher_actor = {}, {}
+
+        # Load Omega 
+        if self.episode_num >= Config().algorithm.max_round_episodes:
+            self.load_omega()
+
         # Seeds path
         seed_file_name = f'{"id_"}{str(self.client_id)}'
         self.seed_path = f'{Config().results.seed_random_path}_seed_{Config().server.random_seed}/{seed_file_name}'
@@ -267,8 +277,10 @@ class Trainer(basic.Trainer):
         self.save_seeds()
 
         # Save Fisher Information Matrix
-        torch.save(self.fisher_actor, actor_fisher_path)
-        torch.save(self.fisher_critic, critic_fisher_path)
+        with open(actor_fisher_path, "wb") as file:
+            torch.save(self.fisher_actor, file)
+        with open(critic_fisher_path, "wb") as file:
+            torch.save(self.fisher_critic, file)
 
 
     def save_seeds(self):
@@ -306,6 +318,11 @@ class Trainer(basic.Trainer):
         entropy_loss = (torch.stack(memory.log_probs) * torch.exp(torch.stack(memory.log_probs))).mean()
         entropy_coef = max((Config().algorithm.entropy_ratio - (self.episode_num/Config().algorithm.batch_size) * Config().algorithm.entropy_decay), Config().algorithm.entropy_min)
         actor_loss = (-torch.stack(memory.log_probs)*advantage.detach()).mean() + entropy_loss * entropy_coef
+
+        if Config().trainer.penalize_omega and self.episode_num >= 3 * Config().algorithm.max_round_episodes:
+            actor_reg_term, critic_reg_term = self.criterion_reg()
+            actor_loss += actor_reg_term
+            critic_loss += critic_reg_term
 
         if Config().algorithm.grad_clip_val > 0:
             clip_grad_norm_(self.actor.parameters(), Config().algorithm.grad_clip_val)
@@ -356,7 +373,17 @@ class Trainer(basic.Trainer):
             actor_fisher_sum += l.sum()
 
         self.critic_fisher_sum, self.actor_fisher_sum = critic_fisher_sum, actor_fisher_sum
-        
+    
+    def criterion_reg(self):
+        loss_reg_actor = 0
+        loss_reg_critic = 0 
+        for (name,param), (_, param_old) in zip(self.actor.named_parameters(), self.actor_old.named_parameters()):
+            loss_reg_actor += torch.sum(self.omega_actor[name]*(param_old-param).pow(2))/2
+        for (name,param), (_, param_old) in zip(self.critic.named_parameters(), self.critic_old.named_parameters()):
+            loss_reg_critic += torch.sum(self.omega_critic[name]*(param_old-param).pow(2))/2
+        return Config().trainer.lamda * loss_reg_actor, Config().trainer.lamda * loss_reg_critic
+
+
     def load_fisher(self):
         """ Load last fisher from file"""
         path = f'{Config().results.results_dir}_seed_{Config().server.random_seed}/{Config().results.file_name}_{self.client_id}'
@@ -394,9 +421,23 @@ class Trainer(basic.Trainer):
         model_seed_path = f'_seed_{Config().server.random_seed}'
         actor_fisher_path = f'{model_path}/{env_algorithm}{actor}{model_seed_path}{client_id}.pth'
         critic_fisher_path = f'{model_path}/{env_algorithm}{critic}{model_seed_path}{client_id}.pth'
-        self.fisher_actor, self.fisher_critic = torch.load(actor_fisher_path), torch.load(critic_fisher_path)
+        
+        with open(actor_fisher_path, "rb") as file:
+            self.fisher_actor = torch.load(file)
+        with open(critic_fisher_path, "rb") as file:
+            self.fisher_critic = torch.load(file)
 
         return avg_actor_fisher, avg_critic_fisher, actor_fisher_grad, critic_fisher_grad, self.fisher_actor, self.fisher_critic
+
+    def load_omega(self):
+        omega_path = f"{Config().general.base_path}/{Config().server.model_path}"
+        actor_path = f"{omega_path}/{self.env_name}{self.algorithm_name}omega_actor_client_{self.client_id}_seed_{Config().server.random_seed}.pth"
+        critic_path = f"{omega_path}/{self.env_name}{self.algorithm_name}omega_critic_client_{self.client_id}_seed_{Config().server.random_seed}.pth"
+        
+        with open(actor_path, 'rb') as omg_actor_path:
+            self.omega_actor = torch.load(omg_actor_path)
+        with open(critic_path, 'rb') as omg_critic_path:
+            self.omega_critic = torch.load(omg_critic_path)
 
     def load_model(self, filename=None, location=None):
         """Loading pre-trained model weights from a file."""
@@ -434,6 +475,8 @@ class Trainer(basic.Trainer):
     
             self.actor.load_state_dict(torch.load(actor_model_path), strict=True)
             self.critic.load_state_dict(torch.load(critic_model_path), strict=True)
+            self.actor_old = deepcopy(self.actor)
+            self.critic_old = deepcopy(self.critic)
 
             #unsure if we need these
             self.adam_actor = torch.optim.Adam(self.actor.parameters(), lr=Config().algorithm.learning_rate)
