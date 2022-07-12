@@ -200,6 +200,7 @@ class A2CServer(fedavg.Server):
                 loss_list.append(report.sum_actor_fisher)
             elif Config().server.percentile_aggregate == "sum_critic_fisher":
                 loss_list.append(report.sum_critic_fisher)
+            #elif
 
         return loss_list
 
