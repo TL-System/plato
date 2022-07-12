@@ -54,6 +54,7 @@ def obtain_data_path(data_type, exp_dir):
 
     if exp_dir != "None":
         base_experiment_path = os.path.join("/experiments", exp_dir)
+
     if data_type == "all":
 
         extract_sim_experiments_dirs = [

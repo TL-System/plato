@@ -8,7 +8,7 @@ general:
     # - script
     # - user
 
-    running_mode: user
+    running_mode: code_test
 
     file_logging: True
 
@@ -31,17 +31,17 @@ clients:
     # under the contrastive ssl.
     # only perfrom the training and test for the downstream task,
     # i.e., personalziation in each client
-    only_eval_test: False
+    only_personalization: False
 
     # whether perform the eval test at the final round
     # on all clients
-    do_final_eval_test: True
+    do_final_personalization: True
     # Minotor the self-supervised learning by knn for
     # every 5 round
     test_interval: 5
     # Train the personalized model based on the
     # learned representation every 10 rounds
-    eval_test_interval: 10
+    pers_learning_interval: 10
 
     # Whether simulate clients or not
     simulation: true
