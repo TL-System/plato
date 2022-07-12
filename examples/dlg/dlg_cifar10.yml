@@ -89,7 +89,7 @@ algorithm:
 
     ## Defense related
     # Choose from GradDefense, Soteria, MC (model compression), DP (differential privacy)...
-    defense: MC
+    defense: DP
     # for GradDefense
     clip: false
     slices_num: 10
