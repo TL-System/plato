@@ -499,24 +499,6 @@ class Trainer(pers_basic.Trainer):
 
         # save the accuracy of the client
         if 'max_concurrency' in config:
-            # save the personaliation accuracy to the results dir
-            result_path = Config().params['result_path']
-
-            save_location = os.path.join(result_path,
-                                         "client_" + str(self.client_id))
-
-            current_round = kwargs['current_round']
-            filename = get_format_name(client_id=self.client_id,
-                                       run_id=config['run_id'],
-                                       suffix="personalization",
-                                       ext="csv")
-            os.makedirs(save_location, exist_ok=True)
-            self.save_personalized_accuracy(
-                accuracy,
-                round=current_round,
-                accuracy_type="personalization_accuracy",
-                filename=filename,
-                location=save_location)
 
             # save the accuracy directly for latter usage
             # in the eval_test(...)

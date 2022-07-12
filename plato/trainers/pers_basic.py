@@ -118,7 +118,7 @@ class Trainer(basic.Trainer):
     @staticmethod
     def save_personalized_accuracy(accuracy,
                                    round=None,
-                                   epoch=5,
+                                   epoch=None,
                                    accuracy_type="monitor_accuracy",
                                    filename=None,
                                    location=None):
