@@ -93,6 +93,30 @@ class Trainer(pers_basic.Trainer):
         logging.info("[Client #%d] Saving encoded data to %s.", self.client_id,
                      to_save_path)
 
+    def checkpoint_encoded_samples(self,
+                                   encoded_samples,
+                                   encoded_labels,
+                                   current_round,
+                                   epoch,
+                                   run_id,
+                                   encoded_type="trainEncoded"):
+
+        # save the encoded data to the results dir
+        result_path = Config().params['result_path']
+        save_location = os.path.join(result_path,
+                                     "client_" + str(self.client_id))
+        save_filename = get_format_name(client_id=self.client_id,
+                                        round_n=current_round,
+                                        epoch_n=epoch,
+                                        run_id=run_id,
+                                        suffix=encoded_type,
+                                        ext="npy")
+
+        self.save_encoded_data(encoded_data=encoded_samples,
+                               data_labels=encoded_labels,
+                               filename=save_filename,
+                               location=save_location)
+
     def test_process(self, config, testset, sampler=None, **kwargs):
         """The testing loop, run in a separate process with a new CUDA context,
         so that CUDA memory can be released after the training completes.
@@ -296,7 +320,7 @@ class Trainer(pers_basic.Trainer):
                 epoch=0,
                 config_args=Config().to_dict())
 
-            accuracy = self.perform_test_op(test_loader)
+            accuracy, _, _ = self.perform_test_op(test_loader)
             # save the personaliation accuracy to the results dir
             self.checkpoint_personalized_accuracy(
                 accuracy=accuracy,
@@ -313,7 +337,6 @@ class Trainer(pers_basic.Trainer):
 
             self.personalized_model.to(self.device)
             self.model.to(self.device)
-
 
             # Define the training and logging information
             # default not to perform any logging
@@ -344,7 +367,7 @@ class Trainer(pers_basic.Trainer):
             for epoch in global_progress:
                 epoch_loss_meter.reset()
                 self.personalized_model.train()
-                self.model.train()
+                self.model.eval()
                 local_progress = tqdm(eval_train_loader,
                                       desc=f'Epoch {epoch}/{pers_epochs+1}',
                                       disable=True)
@@ -455,27 +478,19 @@ class Trainer(pers_basic.Trainer):
         # save the accuracy of the client
         if 'max_concurrency' in config:
 
-            # save the encoded data to the results dir
-            result_path = Config().params['result_path']
-            save_location = os.path.join(result_path,
-                                         "client_" + str(self.client_id))
-            train_filename = get_format_name(client_id=self.client_id,
-                                             round_n=current_round,
-                                             epoch_n=epoch,
-                                             run_id=config['run_id'],
-                                             suffix="trainEncoded",
-                                             ext="npy")
-            test_filename = train_filename.replace("trainEncoded",
-                                                   "testEncoded")
-            self.save_encoded_data(encoded_data=train_encoded,
-                                   data_labels=train_labels,
-                                   filename=train_filename,
-                                   location=save_location)
+            self.checkpoint_encoded_samples(encoded_samples=train_encoded,
+                                            encoded_labels=train_labels,
+                                            current_round=current_round,
+                                            epoch=epoch,
+                                            run_id=config['run_id'],
+                                            encoded_type="trainEncoded")
+            self.checkpoint_encoded_samples(encoded_samples=test_encoded,
+                                            encoded_labels=test_labels,
+                                            current_round=current_round,
+                                            epoch=epoch,
+                                            run_id=config['run_id'],
+                                            encoded_type="testEncoded")
 
-            self.save_encoded_data(encoded_data=test_encoded,
-                                   data_labels=test_labels,
-                                   filename=test_filename,
-                                   location=save_location)
         # if we do not want to keep the state of the personalized model
         # at the end of this round,
         # we need to load the initial model
