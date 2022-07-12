@@ -83,6 +83,9 @@ trainer:
 
     manual_seed: 10
 
+    penalize_omega: True
+    lamda: 5
+
 algorithm:
     # Aggregation algorithm
     type: fedavg
