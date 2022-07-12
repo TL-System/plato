@@ -18,7 +18,7 @@ import simsiam_trainer
 
 from plato.clients import ssl_simple as ssl_client
 from plato.servers import fedavg_pers as ssl_server
-from plato.algorithms import fedavg_ssl
+from plato.algorithms import fedavg_pers
 
 
 def main():
@@ -28,7 +28,7 @@ def main():
         the 'model_name' in config file.
     """
     trainer = simsiam_trainer.Trainer
-    algorithm = fedavg_ssl.Algorithm
+    algorithm = fedavg_pers.Algorithm
     byol_model = simsiam_net.SimSiam
     client = ssl_client.Client(model=byol_model,
                                trainer=trainer,

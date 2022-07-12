@@ -5,11 +5,12 @@ pFL code.
 """
 
 import fedrep_net
-import fedrep_trainer
+#import fedrep_trainer
 
 from plato.servers import fedavg_pers
-from plato.algorithms import fedavg_ssl
+from plato.algorithms import fedavg_pers as algo_fedavg_pers
 from plato.clients import pers_simple
+from plato.trainers import pers_basic as fedrep_trainer
 
 
 def main():
@@ -17,7 +18,7 @@ def main():
         supervised learning setting.
     """
 
-    algo = fedavg_ssl.Algorithm
+    algo = algo_fedavg_pers.Algorithm
     trainer = fedrep_trainer.Trainer
     backbone_cls_model = fedrep_net.BackBoneEnc
     client = pers_simple.Client(algorithm=algo,
