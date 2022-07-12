@@ -228,12 +228,12 @@ class Trainer(basic.Trainer):
                         
 
                     # Save sum of diagonals in fisher
-                    actor_fisher_path = f'{common_path}{"_actor_fisher"}'
+                    actor_fisher_sum_path = f'{common_path}{"_actor_fisher"}'
                     #common_path + "_actor_fisher"
-                    critic_fisher_path = f'{common_path}{"_critic_fisher"}'
+                    critic_fisher_sum_path = f'{common_path}{"_critic_fisher"}'
                     #common_path + "_critic_fisher"
-                    self.save_metric(actor_fisher_path, [self.actor_fisher_sum.tolist()], first = (self.episode_num == 0) and (self.steps == Config().algorithm.batch_size))
-                    self.save_metric(critic_fisher_path, [self.critic_fisher_sum.tolist()], first = (self.episode_num == 0) and (self.steps == Config().algorithm.batch_size))
+                    self.save_metric(actor_fisher_sum_path, [self.actor_fisher_sum.tolist()], first = (self.episode_num == 0) and (self.steps == Config().algorithm.batch_size))
+                    self.save_metric(critic_fisher_sum_path, [self.critic_fisher_sum.tolist()], first = (self.episode_num == 0) and (self.steps == Config().algorithm.batch_size))
 
                     critic_loss, actor_loss, entropy_loss = self.train_helper(self.memory, last_q_val)
                     self.updates += 1

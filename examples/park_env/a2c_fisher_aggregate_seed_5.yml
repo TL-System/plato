@@ -30,9 +30,11 @@ server:
 
     percentile: 20
 
-    percentile_aggregate: actor_fisher #False, actor_loss, critic_loss, actor_grad, critic_grad, actor_fisher, critic_fisher
+    percentile_aggregate: sum_actor_fisher #False, actor_loss, critic_loss, actor_grad, critic_grad, sum_actor_fisher, sum_critic_fisher
 
     percentile_increase: 15
+
+    mul_fisher: True
 data:
     # The training and testing dataset
     datasource: FashionMNIST
