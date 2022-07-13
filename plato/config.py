@@ -159,6 +159,10 @@ class Config:
             # The base path used for all datasets, models, checkpoints, and results
             Config.params['base_path'] = Config.args.base
 
+            # Obtain the method name from the config file
+            Config.params['method_name'] = os.path.splitext(
+                os.path.basename(filename))[0]
+
             if 'results' in config:
                 Config.results = Config.namedtuple_from_dict(config['results'])
 
@@ -419,10 +423,7 @@ class Config:
         """
         # the path name should be the combination of
         # ssl method name,
-        ssl_method_name = "null"
-        if hasattr(Config.data, "augment_transformer_name"
-                   ) and Config.data.augment_transformer_name:
-            ssl_method_name = Config.data.augment_transformer_name
+        method_name = Config.params['method_name']
 
         global_model_name = "null"
         if hasattr(Config.trainer,
@@ -444,7 +445,7 @@ class Config:
         model_name = Config.trainer.model_name
 
         target_name = "_".join([
-            ssl_method_name, datasource, model_name, global_model_name,
+            method_name, datasource, model_name, global_model_name,
             personalized_model_name
         ])
         if "central" in running_mode:
