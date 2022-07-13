@@ -1,4 +1,6 @@
 import os
+import re
+
 import torch
 
 from plato.utils.arrange_saving_name import get_format_name
@@ -62,7 +64,27 @@ class CheckpointsOperator(object):
 
         return torch.load(checkpoint_path)
 
-    def invaild_checkpoint_file(self, filename):
+    def search_latest_checkpoint_file(self,
+                                      anchor_metric="round",
+                                      mask_anchors="epoch"):
+        """ Search the latest checkpoint file under the checkpoint dir. """
+        checkpoint_files = [
+            ckp_file for ckp_file in os.listdir(self.checkpoints_dir)
+            if all([anchor not in ckp_file for anchor in mask_anchors])
+        ]
+        print("checkpoint_files: ", checkpoint_files)
+        latest_checkpoint_filename = None
+        latest_number = 0
+        for ckp_file in checkpoint_files:
+            obtained_anchor = re.findall(r'%s\d+' % anchor_metric, ckp_file)[0]
+            anchor_value = int(re.findall(r'\d+', obtained_anchor)[0])
+            if anchor_value >= latest_number:
+                latest_number = anchor_value
+                latest_checkpoint_filename = ckp_file
+
+        return latest_checkpoint_filename
+
+    def vaild_checkpoint_file(self, filename):
         file_path = os.path.join(self.checkpoints_dir, filename)
         if os.path.exists(file_path):
             return True
@@ -93,7 +115,10 @@ def perform_client_checkpoint_saving(client_id,
                                      prefix=None):
 
     current_round = kwargs['current_round']
-    run_id = config['run_id']
+    # run_id = config['run_id']
+    # we have to set the run_id to be None here as the client can
+    # have different run id in the whole training process.
+    run_id = None
     cpk_oper = get_client_checkpoint_operator(client_id, current_round)
 
     # Before the training, we expect to save the initial
@@ -120,8 +145,15 @@ def perform_client_checkpoint_loading(client_id,
                                       current_round,
                                       run_id,
                                       epoch,
-                                      prefix=None):
+                                      prefix=None,
+                                      anchor_metric="round",
+                                      mask_anchors=["epoch"],
+                                      use_latest=True):
+    """ Performing checkpoint loading.
 
+        use_latest: Using the latest checkpoint file if the required file does not
+                    exist.
+    """
     cpk_oper = get_client_checkpoint_operator(client_id, current_round)
 
     # Before the training, we expect to save the initial
@@ -133,5 +165,10 @@ def perform_client_checkpoint_loading(client_id,
                                run_id=run_id,
                                prefix=prefix,
                                ext="pth")
+    if use_latest:
+        if not cpk_oper.vaild_checkpoint_file(filename):
+            # Loading the latest checkpoint file
+            filename = cpk_oper.search_latest_checkpoint_file(
+                anchor_metric=anchor_metric, mask_anchors=mask_anchors)
 
     return filename, cpk_oper

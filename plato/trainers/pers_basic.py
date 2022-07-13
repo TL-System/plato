@@ -370,16 +370,16 @@ class Trainer(basic.Trainer):
 
         # Before the training, we expect to save the initial
         # model of this round
-        perform_client_checkpoint_saving(
-            client_id=self.client_id,
-            model_name=model_type,
-            model_state_dict=self.model.state_dict(),
-            config=config,
-            kwargs=kwargs,
-            optimizer_state_dict=optimizer.state_dict(),
-            lr_schedule_state_dict=lr_schedule.state_dict(),
-            present_epoch=0,
-            base_epoch=lr_schedule_base_epoch)
+        # perform_client_checkpoint_saving(
+        #     client_id=self.client_id,
+        #     model_name=model_type,
+        #     model_state_dict=self.model.state_dict(),
+        #     config=config,
+        #     kwargs=kwargs,
+        #     optimizer_state_dict=optimizer.state_dict(),
+        #     lr_schedule_state_dict=lr_schedule.state_dict(),
+        #     present_epoch=0,
+        #     base_epoch=lr_schedule_base_epoch)
 
         # Sending the model to the device used for training
         self.model.to(self.device)
@@ -404,19 +404,19 @@ class Trainer(basic.Trainer):
             # based on the base epoch
             lr_schedule.step()
 
-            if (epoch - 1) % epoch_model_log_interval == 0 or epoch == epochs:
-                # the model generated during each round will be stored in the
-                # checkpoints
-                perform_client_checkpoint_saving(
-                    client_id=self.client_id,
-                    model_name=model_type,
-                    model_state_dict=self.model.state_dict(),
-                    config=config,
-                    kwargs=kwargs,
-                    optimizer_state_dict=optimizer.state_dict(),
-                    lr_schedule_state_dict=lr_schedule.state_dict(),
-                    present_epoch=epoch,
-                    base_epoch=lr_schedule_base_epoch + epoch)
+            # if (epoch - 1) % epoch_model_log_interval == 0 or epoch == epochs:
+            #     # the model generated during each round will be stored in the
+            #     # checkpoints
+            #     perform_client_checkpoint_saving(
+            #         client_id=self.client_id,
+            #         model_name=model_type,
+            #         model_state_dict=self.model.state_dict(),
+            #         config=config,
+            #         kwargs=kwargs,
+            #         optimizer_state_dict=optimizer.state_dict(),
+            #         lr_schedule_state_dict=lr_schedule.state_dict(),
+            #         present_epoch=epoch,
+            #         base_epoch=lr_schedule_base_epoch + epoch)
 
             # Simulate client's speed
             if self.client_id != 0 and hasattr(
@@ -521,7 +521,8 @@ class Trainer(basic.Trainer):
                 optimizer_state_dict=pers_optimizer.state_dict(),
                 lr_schedule_state_dict=lr_schedule.state_dict(),
                 present_epoch=0,
-                base_epoch=0)
+                base_epoch=0,
+                prefix="personalized")
 
             accuracy = self.perform_test_op(test_loader)
             # save the personaliation accuracy to the results dir
@@ -529,7 +530,7 @@ class Trainer(basic.Trainer):
                 accuracy=accuracy,
                 current_round=kwargs['current_round'],
                 epoch=0,
-                run_id=config['run_id'])
+                run_id=None)
 
             # Initializing the loss criterion
             _pers_loss_criterion = getattr(self, "pers_loss_criterion", None)
@@ -607,7 +608,7 @@ class Trainer(basic.Trainer):
                         accuracy=accuracy,
                         current_round=kwargs['current_round'],
                         epoch=epoch,
-                        run_id=config['run_id'])
+                        run_id=None)
 
                 if (epoch - 1
                     ) % epoch_model_log_interval == 0 or epoch == pers_epochs:
@@ -647,7 +648,7 @@ class Trainer(basic.Trainer):
             filename = get_format_name(client_id=self.client_id,
                                        model_name=personalized_model_name,
                                        round_n=current_round,
-                                       run_id=config['run_id'],
+                                       run_id=None,
                                        prefix="personalized",
                                        ext="pth")
             os.makedirs(save_location, exist_ok=True)

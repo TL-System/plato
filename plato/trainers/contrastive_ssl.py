@@ -193,7 +193,7 @@ class Trainer(pers_basic.Trainer):
             current_round = kwargs['current_round']
             filename = get_format_name(client_id=self.client_id,
                                        suffix="monitor",
-                                       run_id=config['run_id'],
+                                       run_id=None,
                                        ext="csv")
             os.makedirs(save_location, exist_ok=True)
             self.save_personalized_accuracy(accuracy,
@@ -312,7 +312,8 @@ class Trainer(pers_basic.Trainer):
                 optimizer_state_dict=eval_optimizer.state_dict(),
                 lr_schedule_state_dict=lr_schedule.state_dict(),
                 present_epoch=0,
-                base_epoch=0)
+                base_epoch=0,
+                prefix="personalized")
 
             accuracy, _, _ = self.perform_test_op(test_loader)
             # save the personaliation accuracy to the results dir
@@ -320,7 +321,7 @@ class Trainer(pers_basic.Trainer):
                 accuracy=accuracy,
                 current_round=kwargs['current_round'],
                 epoch=0,
-                run_id=config['run_id'])
+                run_id=None)
 
             # Initializing the loss criterion
             _eval_loss_criterion = getattr(self, "pers_loss_criterion", None)
@@ -413,7 +414,7 @@ class Trainer(pers_basic.Trainer):
                         accuracy=accuracy,
                         current_round=kwargs['current_round'],
                         epoch=epoch,
-                        run_id=config['run_id'])
+                        run_id=None)
 
                 if (epoch - 1
                     ) % epoch_model_log_interval == 0 or epoch == pers_epochs:
@@ -456,7 +457,7 @@ class Trainer(pers_basic.Trainer):
             filename = get_format_name(client_id=self.client_id,
                                        model_name=personalized_model_name,
                                        round_n=current_round,
-                                       run_id=config['run_id'],
+                                       run_id=None,
                                        prefix="personalized",
                                        ext="pth")
             os.makedirs(save_location, exist_ok=True)
@@ -470,13 +471,13 @@ class Trainer(pers_basic.Trainer):
                                             encoded_labels=train_labels,
                                             current_round=current_round,
                                             epoch=epoch,
-                                            run_id=config['run_id'],
+                                            run_id=None,
                                             encoded_type="trainEncoded")
             self.checkpoint_encoded_samples(encoded_samples=test_encoded,
                                             encoded_labels=test_labels,
                                             current_round=current_round,
                                             epoch=epoch,
-                                            run_id=config['run_id'],
+                                            run_id=None,
                                             encoded_type="testEncoded")
 
         # if we do not want to keep the state of the personalized model
