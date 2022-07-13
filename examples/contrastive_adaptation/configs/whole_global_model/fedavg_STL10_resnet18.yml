@@ -149,6 +149,9 @@ trainer:
     model_name: resnet_18
     personalized_model_name: resnet_18
 
+    # encoder
+    global_model_name: encoder
+
     # image size
     image_size: 96
 
