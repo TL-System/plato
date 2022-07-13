@@ -5,12 +5,12 @@ pFL code.
 """
 
 import fedrep_net
-#import fedrep_trainer
+import fedrep_trainer
 
 from plato.servers import fedavg_pers
 from plato.algorithms import fedavg_pers as algo_fedavg_pers
 from plato.clients import pers_simple
-from plato.trainers import pers_basic as fedrep_trainer
+#from plato.trainers import pers_basic as fedrep_trainer
 
 
 def main():
