@@ -11,12 +11,13 @@ https://arxiv.org/abs/2102.07078
 Source code: https://github.com/lgcollins/FedRep
 """
 
-import os
 import time
 import logging
+import warnings
+
+warnings.simplefilter('ignore')
 
 import torch
-from tqdm import tqdm
 
 from plato.config import Config
 from plato.trainers import pers_basic
@@ -114,16 +115,16 @@ class Trainer(pers_basic.Trainer):
 
         # Before the training, we expect to save the initial
         # model of this round
-        perform_client_checkpoint_saving(
-            client_id=self.client_id,
-            model_name=model_type,
-            model_state_dict=self.model.state_dict(),
-            config=config,
-            kwargs=kwargs,
-            optimizer_state_dict=optimizer.state_dict(),
-            lr_schedule_state_dict=lr_schedule.state_dict(),
-            present_epoch=0,
-            base_epoch=lr_schedule_base_epoch)
+        # perform_client_checkpoint_saving(
+        #     client_id=self.client_id,
+        #     model_name=model_type,
+        #     model_state_dict=self.model.state_dict(),
+        #     config=config,
+        #     kwargs=kwargs,
+        #     optimizer_state_dict=optimizer.state_dict(),
+        #     lr_schedule_state_dict=lr_schedule.state_dict(),
+        #     present_epoch=0,
+        #     base_epoch=lr_schedule_base_epoch)
 
         # Sending the model to the device used for training
         self.model.to(self.device)
@@ -159,19 +160,19 @@ class Trainer(pers_basic.Trainer):
             # based on the base epoch
             lr_schedule.step()
 
-            if (epoch - 1) % epoch_model_log_interval == 0 or epoch == epochs:
-                # the model generated during each round will be stored in the
-                # checkpoints
-                perform_client_checkpoint_saving(
-                    client_id=self.client_id,
-                    model_name=model_type,
-                    model_state_dict=self.model.state_dict(),
-                    config=config,
-                    kwargs=kwargs,
-                    optimizer_state_dict=optimizer.state_dict(),
-                    lr_schedule_state_dict=lr_schedule.state_dict(),
-                    present_epoch=epoch,
-                    base_epoch=lr_schedule_base_epoch + epoch)
+            # if (epoch - 1) % epoch_model_log_interval == 0 or epoch == epochs:
+            #     # the model generated during each round will be stored in the
+            #     # checkpoints
+            #     perform_client_checkpoint_saving(
+            #         client_id=self.client_id,
+            #         model_name=model_type,
+            #         model_state_dict=self.model.state_dict(),
+            #         config=config,
+            #         kwargs=kwargs,
+            #         optimizer_state_dict=optimizer.state_dict(),
+            #         lr_schedule_state_dict=lr_schedule.state_dict(),
+            #         present_epoch=epoch,
+            #         base_epoch=lr_schedule_base_epoch + epoch)
 
             # Simulate client's speed
             if self.client_id != 0 and hasattr(

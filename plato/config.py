@@ -160,8 +160,8 @@ class Config:
             Config.params['base_path'] = Config.args.base
 
             # Obtain the method name from the config file
-            Config.params['method_name'] = os.path.splitext(
-                os.path.basename(filename))[0]
+            config_filename = os.path.splitext(os.path.basename(filename))[0]
+            Config.params['method_name'] = config_filename.split("_")[0]
 
             if 'results' in config:
                 Config.results = Config.namedtuple_from_dict(config['results'])

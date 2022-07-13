@@ -183,11 +183,14 @@ class Client(simple.Client):
                 client_id=self.client_id,
                 model_name=Config().trainer.model_name,
                 current_round=self.current_round - 1,
-                run_id=Config().params['run_id'],
+                run_id=None,
                 epoch=Config().trainer.epochs,
-                prefix=None)
+                prefix=None,
+                anchor_metric="round",
+                mask_anchors=["epoch", "personalized"],
+                use_latest=True)
 
-            if not cpk_oper.invaild_checkpoint_file(filename):
+            if filename is None:
                 # using the client's local model that is randomly initialized
                 # at this round
                 pool_weights = copy.deepcopy(self.trainer.model).state_dict()
@@ -195,10 +198,11 @@ class Client(simple.Client):
                     "[Client #%d]. no checkpoint %s, complete server's payload with local initial model.",
                     self.client_id, filename)
             else:
+                print("filename: ", filename)
                 pool_weights = cpk_oper.load_checkpoint(filename)["model"]
                 logging.info(
-                    "[Client #%d]. Loaded round#%d checkpoint %s to complete",
-                    self.client_id, self.current_round - 1, filename)
+                    "[Client #%d]. Loaded latest round's checkpoint %s to complete",
+                    self.client_id, filename)
 
             completed_payload = self.algorithm.complete_weights(
                 server_payload, pool_weights=pool_weights)
@@ -210,6 +214,7 @@ class Client(simple.Client):
         """The machine learning training workload on a client."""
 
         rounds = Config().trainer.rounds
+        accuracy = -1
         # Perform model training
         if self.current_round < rounds and (
                 not (hasattr(Config().clients, "only_personalization")
@@ -264,10 +269,13 @@ class Client(simple.Client):
             # The testing process failed, disconnect from the server
             await self.sio.disconnect()
 
-        if hasattr(Config().trainer, 'target_perplexity'):
-            logging.info("[%s] Test perplexity: %.2f", self, accuracy)
-        else:
-            logging.info("[%s] Test accuracy: %.2f%%", self, 100 * accuracy)
+        # Do not print the accuracy if it is not computed
+        if accuracy == 0:
+            if hasattr(Config().trainer, 'target_perplexity'):
+                logging.info("[%s] Test perplexity: %.2f", self, accuracy)
+            else:
+                logging.info("[%s] Test accuracy: %.2f%%", self,
+                             100 * accuracy)
 
         comm_time = time.time()
 
