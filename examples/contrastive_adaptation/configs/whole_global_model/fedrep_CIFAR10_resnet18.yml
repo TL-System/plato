@@ -152,6 +152,7 @@ trainer:
     # encoder
     global_model_name: encoder
 
+    do_maintain_per_state: False
     num_classes: 10
 
 
