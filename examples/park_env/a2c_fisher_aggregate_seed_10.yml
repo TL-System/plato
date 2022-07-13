@@ -34,7 +34,7 @@ server:
 
     percentile_increase: 15
 
-    mul_fisher: True
+    mul_fisher: False
 data:
     # The training and testing dataset
     datasource: FashionMNIST
@@ -84,7 +84,7 @@ trainer:
     manual_seed: 10
 
     penalize_omega: True
-    lamda: 5
+    lamda: 2.5
 
 algorithm:
     # Aggregation algorithm
