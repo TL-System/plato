@@ -30,11 +30,11 @@ server:
 
     percentile: 20
 
-    percentile_aggregate: sum_actor_fisher #False, actor_loss, critic_loss, actor_grad, critic_grad, sum_actor_fisher, sum_critic_fisher
+     percentile_aggregate: sum_actor_fisher #False, actor_loss, critic_loss, actor_grad, critic_grad, sum_actor_fisher, sum_critic_fisher
 
     percentile_increase: 15
 
-    mul_fisher: True
+    mul_fisher: False
 data:
     # The training and testing dataset
     datasource: FashionMNIST
@@ -82,6 +82,9 @@ trainer:
     model_name: lenet5
 
     manual_seed: 15
+
+    penalize_omega: True
+    lamda: 2.5
 
 algorithm:
     # Aggregation algorithm
