@@ -8,6 +8,7 @@ python examples/customized/custom_server.py -c examples/customized/server.yml
 
 import logging
 import asyncio
+from copy import deepcopy
 from torch.autograd import Variable
 
 from plato.servers import fedavg
@@ -103,8 +104,8 @@ class A2CServer(fedavg.Server):
 
         #Get omega for each client!
         for id in range(0, Config().clients.total_clients):
-            omega_actor = actor_avg_update
-            omega_critic = critic_avg_update
+            omega_actor = deepcopy(actor_avg_update)
+            omega_critic = deepcopy(critic_avg_update)
             for i, update in enumerate(weights_received):
                 __, report, __, __ = updates[i] 
                 client_id = report.client_id
@@ -117,6 +118,7 @@ class A2CServer(fedavg.Server):
                         omega_critic[name] -= delta * 1.0/clients_selected_size * (norm_fisher_critic[name] if Config().server.mul_fisher else 1.0)  
                     break
             # Save omega in a file with client id and exit
+            # TODO: Aggregate omega if there is an omega that exists?!
             self.save_omega(id + 1, omega_actor, omega_critic)
         return actor_avg_update, critic_avg_update
 
@@ -254,10 +256,26 @@ class A2CServer(fedavg.Server):
         actor_path = f"{omega_path}/{self.env_name}{self.algorithm_name}omega_actor_client_{client_id}_seed_{Config().server.random_seed}.pth"
         critic_path = f"{omega_path}/{self.env_name}{self.algorithm_name}omega_critic_client_{client_id}_seed_{Config().server.random_seed}.pth"
         
+        # read and aggregate omega if in round > 1
+        if self.current_round > 1:
+            with open(actor_path, 'rb') as omg_actor_path:
+                omega_actor_old = torch.load(omg_actor_path)
+            with open(critic_path, 'rb') as omg_critic_path:
+                omega_critic_old = torch.load(omg_critic_path)
+
+            for name, _ in omega_actor.items():
+                omega_actor[name] =  (omega_actor[name] + (self.current_round - 1) * omega_actor_old[name]) / self.current_round
+        
+            for name, _ in omega_critic.items():
+                omega_critic[name] =  (omega_critic[name] + (self.current_round - 1) * omega_critic_old[name]) / self.current_round
+
+        # Write omega in file
         with open(actor_path, 'wb') as omg_actor_path:
-            torch.save(omega_actor, omg_actor_path)
+            torch.save(omega_actor, omg_actor_path)            
         with open(critic_path, 'wb') as omg_critic_path:
-            torch.save(omega_critic, omg_critic_path)
+            torch.save(omega_critic, omg_critic_path)     
+
+
 
 
 
