@@ -34,7 +34,7 @@ server:
 
     percentile_increase: 15
 
-    mul_fisher: True
+    mul_fisher: False
 data:
     # The training and testing dataset
     datasource: FashionMNIST
