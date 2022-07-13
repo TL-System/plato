@@ -150,6 +150,9 @@ trainer:
     personalized_model_name: resnet_18
 
 
+    # encoder
+    global_model_name: encoder
+
     num_classes: 10
 
 algorithm:
