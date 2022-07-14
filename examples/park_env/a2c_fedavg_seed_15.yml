@@ -30,7 +30,11 @@ server:
 
     percentile: 20
 
-    percentile_aggregate: False #False, actor_loss, critic_loss, actor_grad, critic_grad, actor_fisher, critic_fisher
+    percentile_aggregate: False #False, actor_loss, critic_loss, actor_grad, critic_grad, sum_actor_fisher, sum_critic_fisher
+
+    percentile_increase: 15
+
+    mul_fisher: False
 
 data:
     # The training and testing dataset
@@ -79,6 +83,9 @@ trainer:
     model_name: lenet5
 
     manual_seed: 15
+
+    penalize_omega: True
+    lamda: 2.5
 
 algorithm:
     # Aggregation algorithm
