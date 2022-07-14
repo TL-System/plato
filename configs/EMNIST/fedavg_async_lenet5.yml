@@ -21,8 +21,8 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8000
-    synchronous: true
+    port: 1200
+    synchronous: false
     simulate_wall_time: true
 
 data:
@@ -46,13 +46,13 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 50
+    rounds: 100
 
     # The maximum number of clients running concurrently
-    max_concurrency: 10
+    max_concurrency: 2
 
     # The target accuracy
-    target_accuracy: 0.95
+    target_accuracy: 0.98
 
     # Number of epoches for local training in each communication round
     epochs: 5
