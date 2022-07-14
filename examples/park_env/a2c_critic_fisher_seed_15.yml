@@ -101,7 +101,7 @@ algorithm:
     learning_rate: 0.001
 
     # Frequency of evaluation steps once every eval_freq episodes
-    eval_freq: 50
+    eval_freq: 1
     # batch size to be sampled from memory
     batch_size: 256
     #entropy ratio during training
@@ -117,7 +117,7 @@ algorithm:
     iterations: 1000
 
     # Number of episodes to run each round
-    max_round_episodes: 400
+    max_round_episodes: 2
 
     # Curriculum learning, fixed difficulty level for motivation experiment
     difficulty_levels: 3
