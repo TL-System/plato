@@ -49,32 +49,42 @@ def read_csv_to_dict(result_csv_file: str, x_item, y_item) -> Dict[str, List]:
     return result_dict
 
 
-def plot(x_label, x_value1, x_value2, x_value3, y_label, y_value1, y_value2,
-         y_value3, figure_file_name):
+def plot(x_label, x_value1, x_value2, x_value3, x_value4, y_label, y_value1,
+         y_value2, y_value3, y_value4, figure_file_name):
     """Plot a figure."""
     fig, ax = plt.subplots()
-    ax.plot(x_value1,
-            y_value1,
-            color='red',
-            linewidth=1.5,
-            linestyle='--',
-            marker='o',
-            label='Async_selection')
-    ax.plot(x_value2,
-            y_value2,
-            color='orange',
-            linewidth=1.5,
-            linestyle='-.',
-            marker='v',
-            label='Oort')
-
-    ax.plot(x_value3,
-            y_value3,
-            color='blue',
-            linewidth=1.5,
-            linestyle=':',
-            marker='s',
-            label='FedBuff')
+    ax.plot(
+        x_value1,
+        y_value1,
+        color='red',
+        linewidth=1.,
+        linestyle='--',
+        #marker='o',
+        label='Async_selection')
+    ax.plot(
+        x_value2,
+        y_value2,
+        color='orange',
+        linewidth=1.,
+        linestyle='-.',
+        #marker='v',
+        label='Oort')
+    ax.plot(
+        x_value3,
+        y_value3,
+        color='blue',
+        linewidth=1.,
+        linestyle=':',
+        #marker='s',
+        label='FedBuff')
+    ax.plot(
+        x_value4,
+        y_value4,
+        color='green',
+        linewidth=1.,
+        linestyle='--',
+        #marker='',
+        label='FedAvg')
     ax.legend(loc='lower right')
     ax.set(xlabel=x_label, ylabel=y_label)
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
@@ -85,34 +95,39 @@ def plot(x_label, x_value1, x_value2, x_value3, y_label, y_value1, y_value2,
 def main():
     # load comparison files
 
-    x_item = 'round'
+    x_item = 'elapsed_time'
     y_item = 'accuracy'
 
-    result_csv_file1 = './Async_selection_500_20_5h_10staleness.csv'
+    result_csv_file1 = './Async_selection_EMNIST_lenet5_500_20eachRound_10least_10stalenss_sleep10.csv'
     result_dict1 = read_csv_to_dict(result_csv_file1, x_item, y_item)
 
-    result_csv_file2 = './oort_500_20_10staleness.csv'
+    result_csv_file2 = './oort_EMNIST_lenet5_500_20eachRound_10least_no_test_stalenss_10.csv'
     result_dict2 = read_csv_to_dict(result_csv_file2, x_item, y_item)
 
-    result_csv_file3 = './FedBuff_500_20_10staleness.csv'
+    result_csv_file3 = './FedBuff_EMNIST_500_20_10sta_10sleep.csv'
     result_dict3 = read_csv_to_dict(result_csv_file3, x_item, y_item)
 
+    result_csv_file4 = './FedAvg_EMNIST_500_20.csv'
+    result_dict4 = read_csv_to_dict(result_csv_file4, x_item, y_item)
+
     #x_item = 'round'
-    x_label = 'Round'
+    x_label = 'Elapsed Time'
     x_value1 = result_dict1[x_item]
     x_value2 = result_dict2[x_item]
     x_value3 = result_dict3[x_item]
+    x_value4 = result_dict4[x_item]
 
     #y_item = 'accuracy'
     y_label = 'Accuracy (%)'
     y_value1 = result_dict1[y_item]
     y_value2 = result_dict2[y_item]
     y_value3 = result_dict3[y_item]
+    y_value4 = result_dict4[y_item]
 
-    figure_file_name = './round_accuracy_500_20.pdf'
+    figure_file_name = './elapsedTime_accuracy_500_20.pdf'
 
-    plot(x_label, x_value1, x_value2, x_value3, y_label, y_value1, y_value2,
-         y_value3, figure_file_name)
+    plot(x_label, x_value1, x_value2, x_value3, x_value4, y_label, y_value1,
+         y_value2, y_value3, y_value4, figure_file_name)
 
 
 if __name__ == "__main__":

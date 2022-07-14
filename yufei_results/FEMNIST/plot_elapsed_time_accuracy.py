@@ -67,7 +67,6 @@ def plot(x_label, x_value1, x_value2, x_value3, y_label, y_value1, y_value2,
             linestyle='-.',
             marker='v',
             label='Oort')
-
     ax.plot(x_value3,
             y_value3,
             color='blue',
@@ -85,7 +84,7 @@ def plot(x_label, x_value1, x_value2, x_value3, y_label, y_value1, y_value2,
 def main():
     # load comparison files
 
-    x_item = 'round'
+    x_item = 'elapsed_time'
     y_item = 'accuracy'
 
     result_csv_file1 = './Async_selection_500_20_5h_10staleness.csv'
@@ -98,7 +97,7 @@ def main():
     result_dict3 = read_csv_to_dict(result_csv_file3, x_item, y_item)
 
     #x_item = 'round'
-    x_label = 'Round'
+    x_label = 'Elapsed Time'
     x_value1 = result_dict1[x_item]
     x_value2 = result_dict2[x_item]
     x_value3 = result_dict3[x_item]
@@ -109,7 +108,7 @@ def main():
     y_value2 = result_dict2[y_item]
     y_value3 = result_dict3[y_item]
 
-    figure_file_name = './round_accuracy_500_20.pdf'
+    figure_file_name = './elapsedTime_accuracy_500_20.pdf'
 
     plot(x_label, x_value1, x_value2, x_value3, y_label, y_value1, y_value2,
          y_value3, figure_file_name)
