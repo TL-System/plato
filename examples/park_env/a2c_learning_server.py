@@ -72,10 +72,11 @@ class A2CServer(fedavg.Server):
                     critic_avg_update[name] += delta * 1.0/Config().clients.per_round
             else:
                 metric = self.select_metric(report)
-               # if metric <= metric_percentile:
-                if (client_id == 1 and self.current_round >= 1 and self.current_round <= 3) \
-                or ((client_id == 1 or client_id == 2) and self.current_round > 3 and self.current_round <= 6) \
-                or ((client_id == 1 or client_id == 2 or client_id == 3) and self.current_round > 6):
+                
+                #if (client_id == 1 and self.current_round >= 1 and self.current_round <= 3) \
+                #or ((client_id == 1 or client_id == 2) and self.current_round > 3 and self.current_round <= 6) \
+                #or ((client_id == 1 or client_id == 2 or client_id == 3) and self.current_round > 6):
+                if metric <= metric_percentile:
                     print("Client %s is choosen" % str(client_id))
                     client_list.append(client_id)
 
