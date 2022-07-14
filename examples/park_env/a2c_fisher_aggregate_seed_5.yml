@@ -34,7 +34,7 @@ server:
 
     percentile_increase: 15
 
-    mul_fisher: True
+    mul_fisher: False
 data:
     # The training and testing dataset
     datasource: FashionMNIST
@@ -82,6 +82,9 @@ trainer:
     model_name: lenet5
 
     manual_seed: 5
+
+    penalize_omega: True
+    lamda: 2.5
 
 algorithm:
     # Aggregation algorithm
