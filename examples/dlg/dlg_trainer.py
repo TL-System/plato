@@ -134,7 +134,7 @@ class Trainer(basic.Trainer):
                             perturb_slices_num,
                             noise_intensity=Config().algorithm.scale)
 
-                    if Config().algorithm.defense == 'Soteria':
+                    elif Config().algorithm.defense == 'Soteria':
                         examples.requires_grad = True
                         out, feature_fc1_graph = self.model.forward(examples)
                         deviation_f1_target = torch.zeros_like(
@@ -166,21 +166,26 @@ class Trainer(basic.Trainer):
                         list_grad[6] = list_grad[
                             6] * torch.Tensor(mask).to(self.device)
 
-                    if Config().algorithm.defense == 'MC':
+                    elif Config().algorithm.defense == 'GC':
                         for i in range(len(list_grad)):
                             grad_tensor = list_grad[i].cpu().numpy()
                             flattened_weights = np.abs(grad_tensor.flatten())
                             # Generate the pruning threshold according to 'prune by percentage'
-                            thresh = np.percentile(flattened_weights, Config().algorithm.prune_pct)
-                            grad_tensor = np.where(abs(grad_tensor) < thresh, 0, grad_tensor)
-                            list_grad[i] = torch.Tensor(grad_tensor).to(self.device)
+                            thresh = np.percentile(
+                                flattened_weights, Config().algorithm.prune_pct)
+                            grad_tensor = np.where(
+                                abs(grad_tensor) < thresh, 0, grad_tensor)
+                            list_grad[i] = torch.Tensor(
+                                grad_tensor).to(self.device)
 
-                    if Config().algorithm.defense == 'DP':
+                    elif Config().algorithm.defense == 'DP':
                         for i in range(len(list_grad)):
                             grad_tensor = list_grad[i].cpu().numpy()
-                            noise = np.random.laplace(0,1e-1, size=grad_tensor.shape)
+                            noise = np.random.laplace(
+                                0, 1e-1, size=grad_tensor.shape)
                             grad_tensor = grad_tensor + noise
-                            list_grad[i] = torch.Tensor(grad_tensor).to(self.device)
+                            list_grad[i] = torch.Tensor(
+                                grad_tensor).to(self.device)
 
                     # cast grad back to tuple type
                     grad = tuple(list_grad)
