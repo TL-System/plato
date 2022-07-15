@@ -73,7 +73,7 @@ python upgrade_packages.py
 brew install miniforge
 ```
 
-**Tip #3:** Before installing the required packages in the conda environment, you may need to install the [Rust compiler](https://www.rust-lang.org/tools/install) first in order to install the `tokenizers` package:
+**Tip #3:** On M1 Mac computers, before installing the required packages in the conda environment, you may need to install the [Rust compiler](https://www.rust-lang.org/tools/install) first in order to install the `tokenizers` package:
 
 ```shell
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
