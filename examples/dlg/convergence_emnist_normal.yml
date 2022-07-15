@@ -1,0 +1,123 @@
+clients:
+    # The total number of clients
+    total_clients: 200
+
+    # The number of clients selected in each round
+    per_round: 20
+
+    # Should the clients compute test accuracy locally?
+    do_test: false
+
+    random_seed: 1
+
+server:
+    address: 127.0.0.1
+    port: 8001
+    ping_timeout: 36000
+    ping_interval: 36000
+    simulate_wall_time: true
+
+    # The paths for storing temporary checkpoints and models
+    checkpoint_path: models/emnist
+    model_path: models/emnist
+
+    random_seed: 1
+
+data:
+    # The training and testing dataset
+    datasource: EMNIST
+
+    # Number of samples in each partition
+    partition_size: 564
+
+    # IID or non-IID?
+    sampler: noniid
+
+    # The concentration parameter for the Dirichlet distribution
+    concentration: 1
+
+    # Where the dataset is located
+    data_path: data/EMNIST
+
+    # The random seed for sampling data
+    random_seed: 1
+
+trainer:
+    # The maximum number of training rounds
+    rounds: 100
+
+    # The maximum number of clients running concurrently
+    max_concurrency: 5
+
+    # The target accuracy
+    target_accuracy: 0.95
+
+    # Number of epoches for local training in each communication round
+    epochs: 5
+    batch_size: 32
+    optimizer: SGD
+    learning_rate: 0.1
+    momentum: 0.9
+    weight_decay: 0.0
+
+    # The machine learning model
+    model_name: dlg
+    num_classes: 47
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg
+
+    ## Data reconstruction related configurations
+    # Choose from DLG (default), iDLG, csDLG
+    attack_method: no
+    # For calculating the loss between dummy and target gradients/updates
+    # Choose from l2, l1, max, sim, simlocal
+    cost_fn: l2
+    # Weight for adding total data variation to the loss
+    total_variation: 0
+    # Learning rate of the optimizer to reconstruct data
+    lr: 1
+
+    # in a particular communication round (starting from 1)
+    attack_round: 1
+    # One particular client, e.g., the first selected client
+    victim_client: 0
+    num_iters: 3000
+    log_interval: 300
+
+    # Whether or not use customized initialization for model weights
+    init_params: true
+    # Whether sharing gradients or model weights
+    share_gradients: true
+    # Do reconstruction by directly matching weights when it's true,
+    # otherwise by matching gradients calculated from updates
+    match_weights: true
+    # Matching weights (absolute) or weight updates (delta)
+    use_updates: false
+    # The number of times the attack will be attempted
+    trials: 1
+
+    ## Defense related
+    # Choose from GradDefense, Soteria, GC (model compression), DP (differential privacy)...
+    defense: no
+    # for GradDefense
+    clip: false
+    slices_num: 10
+    perturb_slices_num: 5
+    scale: 0.0005
+    Q: 6
+    # for GC
+    prune_pct: 80
+
+    # The random seed for dummy data and label
+    random_seed: 1
+
+results:
+    result_path: results/emnist
+
+    # Write the following parameter(s) into a CSV
+    types: round, accuracy, elapsed_time, round_time
+
+    # Plot results (x_axis-y_axis)
+    plot: round-accuracy, elapsed_time-accuracy
