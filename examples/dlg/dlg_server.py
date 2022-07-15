@@ -69,12 +69,7 @@ class Server(fedavg.Server):
 
     def __init__(self, model, trainer):
         super().__init__(model=model, trainer=trainer)
-        self.attack_method = 'DLG'
-        if hasattr(Config().algorithm, 'attack_method'):
-            if Config().algorithm.attack_method in ['DLG', 'iDLG', 'csDLG']:
-                self.attack_method = Config().algorithm.attack_method
-            else:
-                sys.exit('Error: Unknown attack method.')
+        self.attack_method = None
         self.share_gradients = True
         if hasattr(
                 Config().algorithm,
@@ -101,7 +96,8 @@ class Server(fedavg.Server):
         """ Process the client reports: before aggregating their weights,
             perform the gradient leakage attacks and reconstruct the training data.
         """
-        if self.current_round == Config().algorithm.attack_round:
+        if self.current_round == Config().algorithm.attack_round and Config().algorithm.attack_method in ['DLG', 'iDLG', 'csDLG']:
+            self.attack_method = Config().algorithm.attack_method
             self.deep_leakage_from_gradients(self.updates)
         await self.aggregate_weights(self.updates)
 
@@ -244,10 +240,8 @@ class Server(fedavg.Server):
                     torch.argmax(dummy_labels[i], dim=-1).item())
 
         elif self.attack_method == 'iDLG':
-            match_optimizer = torch.optim.LBFGS([
-                dummy_data,
-            ],
-                                                lr=Config().algorithm.lr)
+            match_optimizer = torch.optim.LBFGS(
+                [dummy_data, ], lr=Config().algorithm.lr)
             # Estimate the gt label
             est_labels = torch.argmin(torch.sum(target_grad[-2], dim=-1),
                                       dim=-1).detach().reshape(
@@ -259,10 +253,8 @@ class Server(fedavg.Server):
                     self.attack_method, trial_number, self.defense_method,
                     est_labels.item())
         elif self.attack_method == 'csDLG':
-            match_optimizer = torch.optim.LBFGS([
-                dummy_data,
-            ],
-                                                lr=Config().algorithm.lr)
+            match_optimizer = torch.optim.LBFGS(
+                [dummy_data, ], lr=Config().algorithm.lr)
             labels_ = gt_labels
             for i in range(num_images):
                 logging.info(
@@ -368,9 +360,8 @@ class Server(fedavg.Server):
             except:
                 dummy_pred = self.trainer.model(dummy_data)
 
-            dummy_onehot_label = F.softmax(labels, dim=-1)
-
             if self.attack_method == 'DLG':
+                dummy_onehot_label = F.softmax(labels, dim=-1)
                 dummy_loss = cross_entropy_for_onehot(dummy_pred,
                                                       dummy_onehot_label)
             elif self.attack_method in ['iDLG', 'csDLG']:
