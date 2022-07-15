@@ -1,9 +1,9 @@
 clients:
     # The total number of clients
-    total_clients: 200
+    total_clients: 100
 
     # The number of clients selected in each round
-    per_round: 20
+    per_round: 10
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -28,7 +28,7 @@ data:
     datasource: EMNIST
 
     # Number of samples in each partition
-    partition_size: 564
+    partition_size: 1128
 
     # IID or non-IID?
     sampler: noniid
