@@ -83,7 +83,7 @@ trainer:
 
     manual_seed: 15
 
-    penalize_omega: False
+    penalize_omega: True
     lamda: 5
 
 algorithm:

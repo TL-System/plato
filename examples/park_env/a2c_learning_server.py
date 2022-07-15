@@ -65,6 +65,7 @@ class A2CServer(fedavg.Server):
             
             if not Config().server.percentile_aggregate:
                 client_list.append(client_id)
+                clients_selected_size = Config().clients.per_round
                 for name, delta in update_from_actor.items():
                     actor_avg_update[name] += delta * 1.0/Config().clients.per_round
 
