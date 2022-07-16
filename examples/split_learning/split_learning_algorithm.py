@@ -18,6 +18,7 @@ class Algorithm(fedavg.Algorithm):
     """The PyTorch-based split learning algorithm, used by both the client and the
     server.
     """
+
     def __init__(self, trainer=None):
         super().__init__(trainer)
         self.gradients_list = []
@@ -67,7 +68,7 @@ class Algorithm(fedavg.Algorithm):
         logging.info("[Client #{}] Time used: {:.2f} seconds.".format(
             self.client_id, toc - tic))
 
-        return feature_dataset
+        return feature_dataset, toc - tic
 
     def complete_train(self, config, dataset, sampler, cut_layer: str):
         """ Sending the model to the device used for training. """
@@ -100,7 +101,7 @@ class Algorithm(fedavg.Algorithm):
         for __, (examples, __) in enumerate(data_loader):
             optimizer.zero_grad()
             outputs = self.model.forward_to(examples, cut_layer)
-            outputs.backward(self.gradients_list[grad_index])
+            outputs.backward(self.gradients_list[grad_index].cpu())
             grad_index = grad_index + 1
             optimizer.step()
 
@@ -109,6 +110,8 @@ class Algorithm(fedavg.Algorithm):
         logging.info("[Client #%d] Training completed.", self.client_id)
         logging.info("[Client #{}] Time used: {:.2f} seconds.".format(
             self.client_id, toc - tic))
+
+        return toc - tic
 
     def train(self, trainset, sampler, cut_layer=None):
         self.trainer.train(feature_dataset.FeatureDataset(trainset), sampler,

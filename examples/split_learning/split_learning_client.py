@@ -3,6 +3,7 @@ A split learning client.
 """
 
 import logging
+import time
 from dataclasses import dataclass
 
 from plato.clients import simple
@@ -10,14 +11,14 @@ from plato.config import Config
 
 
 @dataclass
-class Report:
+class Report(simple.Report):
     """Client report sent to the split learning server."""
-    num_samples: int
     phase: str
 
 
 class Client(simple.Client):
     """ A split learning client. """
+
     def __init__(self,
                  model=None,
                  datasource=None,
@@ -49,20 +50,27 @@ class Client(simple.Client):
         logging.info("Training on split learning client #%d", self.client_id)
 
         assert not Config().clients.do_test
+        accuracy = 0
+        comm_time = time.time()
+        training_time = 0
 
         if self.gradient_received == False:
             # Perform a forward pass till the cut layer in the model
-            features = self.algorithm.extract_features(
+            features, training_time = self.algorithm.extract_features(
                 self.trainset, self.sampler,
                 Config().algorithm.cut_layer)
 
             # Generate a report for the server, performing model testing if applicable
-            return Report(self.sampler.trainset_size(), "features"), features
+            return Report(self.sampler.trainset_size(), accuracy,
+                          training_time, comm_time, False,
+                          "features"), features
         else:
             # Perform a complete training with gradients received
             config = Config().trainer._asdict()
-            self.algorithm.complete_train(config, self.trainset, self.sampler,
-                                          Config().algorithm.cut_layer)
+            training_time = self.algorithm.complete_train(
+                config, self.trainset, self.sampler,
+                Config().algorithm.cut_layer)
             weights = self.algorithm.extract_weights()
             # Generate a report, signal the end of train
-            return Report(self.sampler.trainset_size(), "weights"), weights
+            return Report(self.sampler.trainset_size(), accuracy,
+                          training_time, comm_time, False, "weights"), weights

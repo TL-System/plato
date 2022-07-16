@@ -4,8 +4,6 @@ A split learning server.
 
 import logging
 import os
-import pickle
-import sys
 
 import torch
 from plato.config import Config
@@ -59,26 +57,8 @@ class Server(fedavg.Server):
 
         return torch.load(model_gradients_path)
 
-    async def client_payload_done(self, sid, client_id, s3_key=None):
-        if s3_key is None:
-            assert self.client_payload[sid] is not None
-
-            payload_size = 0
-            if isinstance(self.client_payload[sid], list):
-                for _data in self.client_payload[sid]:
-                    payload_size += sys.getsizeof(pickle.dumps(_data))
-            else:
-                payload_size = sys.getsizeof(
-                    pickle.dumps(self.client_payload[sid]))
-        else:
-            self.client_payload[sid] = self.s3_client.receive_from_s3(s3_key)
-            payload_size = sys.getsizeof(pickle.dumps(
-                self.client_payload[sid]))
-
-        logging.info(
-            "[Server #%d] Received %s MB of payload data from client #%d.",
-            os.getpid(), round(payload_size / 1024**2, 2), client_id)
-
+    async def process_client_info(self, client_id, sid):
+        """ Process the received payload and report from a reporting client. """
         # if clients send features, train it and return gradient
         if self.reports[sid].phase == "features":
             logging.info(
@@ -99,13 +79,13 @@ class Server(fedavg.Server):
             logging.info("[Server #%d] Reporting gradients to client #%d.",
                          os.getpid(), client_id)
 
-            sid = self.clients[client_id]['sid']
             # Sending the server payload to the clients
             payload = self.load_gradients()
             await self.send(sid, payload, client_id)
             return
 
-        self.updates.append((self.reports[sid], self.client_payload[sid]))
+        self.updates.append(
+            (client_id, self.reports[sid], self.client_payload[sid], 0))
 
         if len(self.updates) > 0 and len(self.updates) >= len(
                 self.selected_clients):

@@ -23,8 +23,13 @@ class Trainer(basic.Trainer):
 
     def train_model(self, config, trainset, sampler, cut_layer=None):
         batch_size = config['batch_size']
+        log_interval = 10
 
-        logging.info("[Client #%d] Loading the dataset.", self.client_id)
+        if self.client_id == 0:
+            logging.info("[Server #%d] Loading the dataset.", os.getpid())
+        else:
+            logging.info("[Client #%d] Loading the dataset.", self.client_id)
+
         _train_loader = getattr(self, "train_loader", None)
 
         if callable(_train_loader):
@@ -62,8 +67,12 @@ class Trainer(basic.Trainer):
         else:
             lr_schedule = None
 
-        logging.info("[Client #%d] Begining to train.", self.client_id)
-        for __, (examples, labels) in enumerate(train_loader):
+        if self.client_id == 0:
+            logging.info("[Server #%d] Begining to train.", os.getpid())
+        else:
+            logging.info("[Client #%d] Begining to train.", self.client_id)
+
+        for batch_id, (examples, labels) in enumerate(train_loader):
             examples, labels = examples.to(self.device), labels.to(self.device)
             optimizer.zero_grad()
 
@@ -75,14 +84,22 @@ class Trainer(basic.Trainer):
                 outputs = self.model.forward_from(examples, cut_layer)
 
             loss = loss_criterion(outputs, labels)
-            logging.info("[Client #{}] \tLoss: {:.6f}".format(
-                self.client_id, loss.data.item()))
             loss.backward()
 
             # Record gradients within the cut layer
             self.cut_layer_grad.append(examples.grad.clone().detach())
 
             optimizer.step()
+
+            if batch_id % log_interval == 0:
+                if self.client_id == 0:
+                    logging.info("[Server #%d] Batch [%d/%d]\tLoss: %.6f",
+                                 os.getpid(), batch_id, len(train_loader),
+                                 loss.data.item())
+                else:
+                    logging.info("[Client #%d] Batch [%d/%d]\tLoss: %.6f",
+                                 os.getpid(), batch_id, len(train_loader),
+                                 loss.data.item())
 
             if lr_schedule is not None:
                 lr_schedule.step()
