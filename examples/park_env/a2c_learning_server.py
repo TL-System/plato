@@ -33,16 +33,23 @@ class A2CServer(fedavg.Server):
         """Aggregate weight updates from the clients using federated averaging."""
 
         weights_received = self.compute_weight_deltas(updates)
+        clients_selected_size = Config().clients.per_round
         # Calculate metric percentile 
         if Config().server.percentile_aggregate:
             percentile = min(Config().server.percentile + Config().server.percentile_increase * self.current_round, 100)
             metric_list = self.create_loss_lists(updates)
             metric_percentile = np.percentile(np.array(metric_list), percentile)
-            clients_selected_size = len([i for i in metric_list if i <= metric_percentile])
+            
 
             # Save percentile to files
             path = f'{Config().results.results_dir}_seed_{Config().server.random_seed}/{Config().results.file_name}_percentile_{Config().server.percentile_aggregate}'
+            last_metric = self.read_last_entry(path)
+            print("last_metric", last_metric)
+            #if last_metric is not None:
+            #    metric_percentile = min(float(last_metric), metric_percentile)
             self.save_files(path, metric_percentile)
+            clients_selected_size = len([i for i in metric_list if i <= metric_percentile])
+            
           
         # Perform weighted averaging for both Actor and Critic
         actor_avg_update = {
@@ -79,13 +86,6 @@ class A2CServer(fedavg.Server):
                 if metric <= metric_percentile:
                     print("Client %s is choosen" % str(client_id))
                     client_list.append(client_id)
-
-                    if self.current_round <= 3:
-                        clients_selected_size = 1
-                    elif self.current_round > 3 and self.current_round <= 6:
-                        clients_selected_size = 2
-                    else:
-                        clients_selected_size = 3
 
                     norm_fisher_actor, norm_fisher_critic =  self.standardize_fisher(report)
                     
@@ -154,6 +154,18 @@ class A2CServer(fedavg.Server):
                 writer.writerow([data])
             else:
                 writer.writerow(data)
+    
+    def read_last_entry(self, file_path):
+        if self.current_round == 1: 
+            return None
+        else:
+            with open(f'{file_path}.csv', 'r') as filehandle:
+                rows = filehandle.readlines()
+                last_entry = 0
+                for row in rows:
+                    last_entry = row
+        return last_entry
+            
 
     def select_metric(self, report):
         if Config().server.percentile_aggregate == "actor_loss":
