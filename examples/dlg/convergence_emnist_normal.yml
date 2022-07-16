@@ -100,13 +100,15 @@ algorithm:
 
     ## Defense related
     # Choose from GradDefense, Soteria, GC (model compression), DP (differential privacy)...
-    defense: no
+    defense: Soteria
     # for GradDefense
     clip: false
     slices_num: 10
     perturb_slices_num: 5
     scale: 0.0005
     Q: 6
+    # for Soteria
+    threshold: 50
     # for GC
     prune_pct: 80
 

@@ -158,7 +158,7 @@ class Trainer(basic.Trainer):
                             axis=0)
                         thresh = np.percentile(
                             deviation_f1_x_norm_sum.flatten().cpu().numpy(),
-                            10)
+                            Config().algorithm.threshold)
                         mask = np.where(
                             abs(deviation_f1_x_norm_sum.cpu()) < thresh, 0,
                             1).astype(np.float32)
