@@ -10,56 +10,48 @@ clients:
 
     # Should the clients compute test accuracy locally?
     do_test: false
-# Whether client heterogeneity should be simulated
+
+    # Whether client heterogeneity should be simulated
     speed_simulation: true
     sleep_simulation: true
     avg_training_time: 10
     # The simulation distribution
-    #sleep_simulation: true
     simulation_distribution:
         distribution: pareto
         alpha: 1
 
 server:
     address: 127.0.0.1
-    port: 7792
-    do_test: true
+    port: 6300
     random_seed: 1
-    # What is the staleness bound, beyond which the server should wait for stale clients?
-    staleness_bound: 10
     synchronous: false
     simulate_wall_time: true
     minimum_clients_aggregated: 10
-
-
     step_window: 2
     penalty: 2
     exploration_factor: 0.9
     desired_duration: 50
+      # What is the staleness bound, beyond which the server should wait for stale clients?
+    staleness_bound: 10
 
-    checkpoint_path: results/test/checkpoint
-    model_path: results/test/model
+    checkpoint_path: results/FEMNIST/test/checkpoint
+    model_path: results/FEMNIST/test/model
 
 data:
     # The training and testing dataset
-    datasource: MNIST
+    datasource: FEMNIST
 
-    # Where the dataset is located
-    #data_path: ../../data
+    # Whether data needs to be reloaded in client simulation mode
+    reload_data: true
 
-    # Number of samples in each partition
-    partition_size: 100
+    # Should concurrent client-side dataset download be allowed?
+    concurrent_download: true
 
     # IID or non-IID?
-    sampler: noniid
-
-    #testset_size: 1000
-    concentration: 0.1
+    sampler: all_inclusive
 
     # The random seed for sampling data
-    random_seed: 1
-
-
+    random_seed: 4
 trainer:
     # The type of the trainer
     type: basic
@@ -68,10 +60,10 @@ trainer:
     rounds: 100
 
     # The maximum number of clients running concurrently
-    max_concurrency: 3
+    max_concurrency: 2
 
     # The target accuracy
-    target_accuracy: 0.99
+    target_accuracy: 0.98
 
     # Number of epoches for local training in each communication round
     epochs: 5
@@ -84,6 +76,8 @@ trainer:
     # The machine learning model
     model_name: lenet5
 
+    num_classes: 62
+
 algorithm:
     # Aggregation algorithm
     type: fedavg
@@ -92,4 +86,5 @@ results:
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time
 
-    result_path: /data/ykang/plato/results/MNIST/oort
+    result_path: results/FEMNIST/test
+
