@@ -4,6 +4,7 @@ general:
     untrained_model_path: models/untrained
 
 clients:
+    #TODO CHANGE TO 3 and 3 if you want to use
     # The total number of clients
     total_clients: 6
 
