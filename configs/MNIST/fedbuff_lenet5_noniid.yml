@@ -9,43 +9,36 @@ clients:
     per_round: 20
 
     # Should the clients compute test accuracy locally?
-    do_test: false
-# Whether client heterogeneity should be simulated
+    do_test: true
+
+    # Whether client heterogeneity should be simulated
     speed_simulation: true
-    sleep_simulation: true
-    avg_training_time: 10
+
     # The simulation distribution
-    #sleep_simulation: true
     simulation_distribution:
         distribution: pareto
         alpha: 1
+    max_sleep_time: 30
+    sleep_simulation: true
+    avg_training_time: 10
+
 
 server:
     address: 127.0.0.1
-    port: 7792
-    do_test: true
-    random_seed: 1
-    # What is the staleness bound, beyond which the server should wait for stale clients?
-    staleness_bound: 10
+    port: 4567
+    minimum_clients_aggregated: 10
+    disable_clients: false
     synchronous: false
     simulate_wall_time: true
-    minimum_clients_aggregated: 10
+    checkpoint_path: results/FEMNIST/test/checkpoint
+    model_path: results/FEMNIST/test/model
+      # What is the staleness bound, beyond which the server should wait for stale clients?
+    staleness_bound: 10
 
-
-    step_window: 2
-    penalty: 2
-    exploration_factor: 0.9
-    desired_duration: 50
-
-    checkpoint_path: results/test/checkpoint
-    model_path: results/test/model
 
 data:
     # The training and testing dataset
     datasource: MNIST
-
-    # Where the dataset is located
-    #data_path: ../../data
 
     # Number of samples in each partition
     partition_size: 100
@@ -53,12 +46,13 @@ data:
     # IID or non-IID?
     sampler: noniid
 
-    #testset_size: 1000
+    # The concentration parameter for the Dirichlet distribution
     concentration: 0.1
+
+    #testset_size: 1000
 
     # The random seed for sampling data
     random_seed: 1
-
 
 trainer:
     # The type of the trainer
@@ -92,4 +86,5 @@ results:
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time
 
-    result_path: /data/ykang/plato/results/MNIST/oort
+    result_path: /data/ykang/plato/results/MNIST/fedbuff
+    

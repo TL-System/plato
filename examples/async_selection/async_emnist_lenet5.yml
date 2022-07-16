@@ -10,55 +10,40 @@ clients:
 
     # Should the clients compute test accuracy locally?
     do_test: false
-# Whether client heterogeneity should be simulated
+
+    # Whether client heterogeneity should be simulated
     speed_simulation: true
-    sleep_simulation: true
+    sleep_simulation: true 
     avg_training_time: 10
+
     # The simulation distribution
-    #sleep_simulation: true
     simulation_distribution:
         distribution: pareto
         alpha: 1
 
 server:
+    minimum_clients_aggregated: 10
     address: 127.0.0.1
-    port: 7792
-    do_test: true
-    random_seed: 1
-    # What is the staleness bound, beyond which the server should wait for stale clients?
-    staleness_bound: 10
+    port: 3800
     synchronous: false
     simulate_wall_time: true
-    minimum_clients_aggregated: 10
-
-
-    step_window: 2
-    penalty: 2
-    exploration_factor: 0.9
-    desired_duration: 50
-
-    checkpoint_path: results/test/checkpoint
-    model_path: results/test/model
+    staleness_bound: 10
 
 data:
     # The training and testing dataset
-    datasource: MNIST
-
-    # Where the dataset is located
-    #data_path: ../../data
+    datasource: EMNIST
 
     # Number of samples in each partition
-    partition_size: 100
+    partition_size: 1128
 
     # IID or non-IID?
     sampler: noniid
 
-    #testset_size: 1000
-    concentration: 0.1
+    # The concentration parameter for the Dirichlet distribution
+    concentration: 0.3
 
     # The random seed for sampling data
     random_seed: 1
-
 
 trainer:
     # The type of the trainer
@@ -68,14 +53,14 @@ trainer:
     rounds: 100
 
     # The maximum number of clients running concurrently
-    max_concurrency: 3
+    max_concurrency: 2
 
     # The target accuracy
-    target_accuracy: 0.99
+    target_accuracy: 0.98
 
     # Number of epoches for local training in each communication round
     epochs: 5
-    batch_size: 10
+    batch_size: 32
     optimizer: SGD
     learning_rate: 0.01
     momentum: 0.9
@@ -83,13 +68,13 @@ trainer:
 
     # The machine learning model
     model_name: lenet5
+    num_classes: 47
 
 algorithm:
     # Aggregation algorithm
     type: fedavg
 
 results:
-    # Write the following parameter(s) into a CSV
-    types: round, accuracy, elapsed_time, comm_time, round_time
-
-    result_path: /data/ykang/plato/results/MNIST/oort
+    types: round, accuracy, elapsed_time, round_time 
+    plot: elapsed_time & accuracy
+    result_path: /data/ykang/plato/results/EMNIST/test/async_selection
