@@ -5,10 +5,10 @@ general:
 
 clients:
     # The total number of clients
-    total_clients: 3
+    total_clients: 6
 
     # The number of clients selected in each round
-    per_round: 3
+    per_round: 6
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -30,7 +30,7 @@ server:
 
     percentile: 20
 
-    percentile_aggregate: sum_actor_fisher #False, actor_loss, critic_loss, actor_grad, critic_grad, sum_actor_fisher, sum_critic_fisher
+    percentile_aggregate: sum_critic_fisher #False, actor_loss, critic_loss, actor_grad, critic_grad, sum_actor_fisher, sum_critic_fisher
 
     percentile_increase: 15
 
@@ -84,7 +84,7 @@ trainer:
     manual_seed: 10
 
     penalize_omega: True
-    lamda: 2.5
+    lamda: 10
 
 algorithm:
     # Aggregation algorithm
@@ -120,7 +120,8 @@ algorithm:
     max_round_episodes: 400
 
     # Curriculum learning, fixed difficulty level for motivation experiment
-    difficulty_levels: 3
+    difficulty_levels: 6
+    traces_per_task: 10
 
     #If we should save the model or not
     save_models: False
