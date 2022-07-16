@@ -84,8 +84,8 @@ class Trainer(basic.Trainer):
                         full_examples = examples
                         full_labels = labels
 
-                plt.imshow(tt(examples[0].cpu()))
-                plt.title("Ground truth image")
+                # plt.imshow(tt(examples[0].cpu()))
+                # plt.title("Ground truth image")
 
                 # Compute gradients in the current step
                 if hasattr(Config().algorithm, 'defense') and Config().algorithm.defense == 'GradDefense' and \
@@ -162,7 +162,7 @@ class Trainer(basic.Trainer):
                         mask = np.where(
                             abs(deviation_f1_x_norm_sum.cpu()) < thresh, 0,
                             1).astype(np.float32)
-                        print(sum(mask))
+                        # print(sum(mask))
                         list_grad[6] = list_grad[
                             6] * torch.Tensor(mask).to(self.device)
 
