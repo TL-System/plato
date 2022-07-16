@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --time=5:00:00
 #SBATCH --cpus-per-task=20
-#SBATCH --gres=gpu:2
+#SBATCH --gres=gpu:1
 #SBATCH --mem=128G
 #SBATCH --output=c_emnist_normal.out
 
