@@ -24,9 +24,9 @@ server:
 
     random_seed: 15
 
-    checkpoint_path: checkpoints_fisher_aggregate
+    checkpoint_path: checkpoints_actor_fisher_aggregate
 
-    model_path: models/pretrained_fisher_aggregate
+    model_path: models/pretrained_actor_fisher_aggregate
 
     percentile: 20
 
@@ -61,7 +61,7 @@ trainer:
     #The type of trainer
     type: basic
     # The maximum number of training rounds
-    rounds: 30
+    rounds: 20
 
     # The maximum number of clients running concurrently
     max_concurrency: 6
@@ -83,8 +83,8 @@ trainer:
 
     manual_seed: 15
 
-    penalize_omega: True
-    lamda: 2.5
+    penalize_omega: False
+    lamda: 5
 
 algorithm:
     # Aggregation algorithm
@@ -138,8 +138,8 @@ results:
     # Plot results (x_axis-y_axis)
     plot: round-accuracy, elapsed_time-accuracy
 
-    results_dir: examples/park_env/results_fisher_aggregate
+    results_dir: examples/park_env/results_actor_fisher_aggregate
 
     file_name: A2C_ABR
 
-    seed_random_path: examples/park_env/seeds_fisher_aggregate
+    seed_random_path: examples/park_env/seeds_actor_fisher_aggregate
