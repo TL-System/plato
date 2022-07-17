@@ -196,6 +196,11 @@ class Trainer(basic.Trainer):
                         param - Config().trainer.learning_rate * grad_part)
                     for ((name, param), grad_part
                          ) in zip(patched_model.parameters.items(), grad))
+                
+                for ((name, param),
+                 (name, new_param)) in zip(self.model.named_parameters(),
+                                           patched_model.parameters.items()):
+                    param.data = new_param
 
                 # Sum up the gradients for each local update
                 try:
@@ -221,11 +226,6 @@ class Trainer(basic.Trainer):
 
             full_onehot_labels = label_to_onehot(
                 full_labels, num_classes=Config().trainer.num_classes)
-
-            for ((name, param),
-                 (name, new_param)) in zip(self.model.named_parameters(),
-                                           patched_model.parameters.items()):
-                param.data = new_param
 
             # Simulate client's speed
             if self.client_id != 0 and hasattr(
