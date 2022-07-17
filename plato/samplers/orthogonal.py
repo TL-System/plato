@@ -4,7 +4,7 @@ Each insitution's clients have data of different classes.
 """
 import numpy as np
 import torch
-from torch.utils.data import WeightedRandomSampler
+from torch.utils.data import WeightedRandomSampler, SubsetRandomSampler
 from plato.config import Config
 
 from plato.samplers import base
@@ -76,10 +76,13 @@ class Sampler(base.Sampler):
         gen.manual_seed(self.random_seed)
 
         # Samples without replacement using the sample weights
-        return WeightedRandomSampler(weights=self.sample_weights,
-                                     num_samples=self.partition_size,
-                                     replacement=False,
-                                     generator=gen)
+        subset_indices = list(
+            WeightedRandomSampler(weights=self.sample_weights,
+                                  num_samples=self.partition_size,
+                                  replacement=False,
+                                  generator=gen))
+
+        return SubsetRandomSampler(subset_indices, generator=gen)
 
     def trainset_size(self):
         """Returns the length of the dataset after sampling. """
