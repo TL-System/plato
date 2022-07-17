@@ -102,7 +102,7 @@ class Algorithm(fedavg.Algorithm):
 
         return completed_weights
 
-    def load_weights(self, weights):
+    def load_weights(self, weights, strict=False):
         """Load the model weights passed in as a parameter.
 
             In the client side, we should complete the weights (OrderDict) from the
@@ -118,4 +118,4 @@ class Algorithm(fedavg.Algorithm):
             But wihout losing generality, we set strict = False here as the algorithm class
             is utilized by the server and the client simutaneously.
         """
-        self.model.load_state_dict(weights, strict=False)
+        self.model.load_state_dict(weights, strict=strict)

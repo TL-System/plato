@@ -128,20 +128,6 @@ class Client(simple.Client):
             elif personalized_model_name == model_name:
                 self.personalized_model = copy.deepcopy(self.trainer.model)
 
-            # logging the personalzied model's info
-            file_name = get_format_name(client_id=self.client_id,
-                                        model_name=personalized_model_name,
-                                        suffix="personalized",
-                                        ext="log")
-            model_path = Config().params['model_path']
-            to_save_dir = os.path.join(model_path,
-                                       "client_" + str(self.client_id))
-            os.makedirs(to_save_dir, exist_ok=True)
-
-            to_save_path = os.path.join(to_save_dir, file_name)
-            with open(to_save_path, 'w') as f:
-                f.write(str(self.personalized_model))
-
             logging.info(
                 "Saved the client%d's personalized model (%s) information to models/",
                 self.client_id, personalized_model_name)
@@ -149,6 +135,21 @@ class Client(simple.Client):
         # assign the client's personalized model to its trainer
         if self.trainer.personalized_model is None:
             self.trainer.set_client_personalized_model(self.personalized_model)
+
+        personalized_model_name = Config().trainer.personalized_model_name
+        # logging the personalzied model's info
+        file_name = get_format_name(client_id=self.client_id,
+                                    model_name=personalized_model_name,
+                                    suffix="personalized",
+                                    ext="log")
+        model_path = Config().params['model_path']
+        to_save_dir = os.path.join(model_path, "client_" + str(self.client_id))
+        os.makedirs(to_save_dir, exist_ok=True)
+
+        to_save_path = os.path.join(to_save_dir, file_name)
+        if not os.path.exists(to_save_path):
+            with open(to_save_path, 'w') as f:
+                f.write(str(self.personalized_model))
 
     def load_payload(self, server_payload) -> None:
         """Loading the server model onto this client.
@@ -193,12 +194,11 @@ class Client(simple.Client):
             if filename is None:
                 # using the client's local model that is randomly initialized
                 # at this round
-                pool_weights = copy.deepcopy(self.trainer.model).state_dict()
+                pool_weights = self.trainer.model.state_dict()
                 logging.info(
                     "[Client #%d]. no checkpoint %s, complete server's payload with local initial model.",
                     self.client_id, filename)
             else:
-                print("filename: ", filename)
                 pool_weights = cpk_oper.load_checkpoint(filename)["model"]
                 logging.info(
                     "[Client #%d]. Loaded latest round's checkpoint %s to complete",
@@ -208,7 +208,8 @@ class Client(simple.Client):
                 server_payload, pool_weights=pool_weights)
         else:
             completed_payload = server_payload
-        self.algorithm.load_weights(completed_payload)
+
+        self.algorithm.load_weights(completed_payload, strict=True)
 
     async def train(self):
         """The machine learning training workload on a client."""
@@ -253,10 +254,9 @@ class Client(simple.Client):
             except ValueError:
                 await self.sio.disconnect()
 
-        elif (hasattr(Config().clients, 'do_test')
-              and Config().clients.do_test) and (
-                  not hasattr(Config().clients, 'test_interval')
-                  or self.current_round % Config().clients.test_interval == 0):
+        elif (hasattr(Config().clients, 'do_test') and Config().clients.do_test
+              ) and (hasattr(Config().clients, 'test_interval') and
+                     self.current_round % Config().clients.test_interval == 0):
             accuracy = self.trainer.test(self.testset, self.testset_sampler)
         else:
             accuracy = 0
@@ -270,7 +270,7 @@ class Client(simple.Client):
             await self.sio.disconnect()
 
         # Do not print the accuracy if it is not computed
-        if accuracy == 0:
+        if accuracy != 0:
             if hasattr(Config().trainer, 'target_perplexity'):
                 logging.info("[%s] Test perplexity: %.2f", self, accuracy)
             else:

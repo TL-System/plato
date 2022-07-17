@@ -8,7 +8,7 @@ import backbone_cls
 
 from plato.servers import fedavg_pers
 from plato.trainers import pers_basic
-from plato.algorithms import fedavg as fedavg_algo
+from plato.algorithms import fedavg_pers as fedavg_algo
 from plato.clients import pers_simple
 
 

@@ -328,6 +328,7 @@ def get_dynamic_lr_schedule(optimizer: optim.Optimizer,
                 for x in lr_milestone_steps.split(',')
             ]
             lambdas.append(lambda it: lr_gamma**bisect.bisect(milestones, it))
+
         if "lr_warmup_steps" in kwargs:
             lr_warmup_steps = kwargs.pop("lr_warmup_steps")
             warmup_iters = Step.from_str(lr_warmup_steps,
@@ -377,7 +378,9 @@ def get_dynamic_lr_schedule(optimizer: optim.Optimizer,
                                   is_manority=True,
                                   desired_parameter_name="gamma",
                                   default_value=0.1)
-        kwargs["milestones"] = kwargs["milestones"].split(",")
+        kwargs["milestones"] = [
+            int(mt) for mt in kwargs["milestones"].split(",")
+        ]
 
     if lr_schedule == "WarmupCosine":
         kwargs = insert_parameter(kwargs,

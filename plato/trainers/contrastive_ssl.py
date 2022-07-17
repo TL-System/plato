@@ -70,54 +70,6 @@ class Trainer(pers_basic.Trainer):
 
         return loss_compute
 
-    def save_encoded_data(self,
-                          encoded_data,
-                          data_labels,
-                          filename=None,
-                          location=None):
-        """ Save the encoded data (np.narray). """
-        # convert the list to tensor
-        encoded_data = torch.cat(encoded_data, axis=0)
-        data_labels = torch.cat(data_labels)
-        # combine the label to the final of the 2d
-        to_save_data = torch.cat(
-            [encoded_data, data_labels.reshape(-1, 1)], dim=1)
-        to_save_narray_data = to_save_data.detach().to("cpu").numpy()
-
-        # process the arguments to obtain the to save path
-        to_save_path = self.process_save_path(filename,
-                                              location,
-                                              work_model_name="model_name",
-                                              desired_extenstion=".npy")
-
-        np.save(to_save_path, to_save_narray_data, allow_pickle=True)
-        logging.info("[Client #%d] Saving encoded data to %s.", self.client_id,
-                     to_save_path)
-
-    def checkpoint_encoded_samples(self,
-                                   encoded_samples,
-                                   encoded_labels,
-                                   current_round,
-                                   epoch,
-                                   run_id,
-                                   encoded_type="trainEncoded"):
-
-        # save the encoded data to the results dir
-        result_path = Config().params['result_path']
-        save_location = os.path.join(result_path,
-                                     "client_" + str(self.client_id))
-        save_filename = get_format_name(client_id=self.client_id,
-                                        round_n=current_round,
-                                        epoch_n=epoch,
-                                        run_id=run_id,
-                                        suffix=encoded_type,
-                                        ext="npy")
-
-        self.save_encoded_data(encoded_data=encoded_samples,
-                               data_labels=encoded_labels,
-                               filename=save_filename,
-                               location=save_location)
-
     def test_process(self, config, testset, sampler=None, **kwargs):
         """The testing loop, run in a separate process with a new CUDA context,
         so that CUDA memory can be released after the training completes.

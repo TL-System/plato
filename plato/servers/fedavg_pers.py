@@ -106,7 +106,7 @@ class Server(fedavg.Server):
             self.visited_clients_id += selected_clients
 
         self.prng_state = random.getstate()
-
+        logging.info("[%s] Selected clients: %s", self, selected_clients)
         return selected_clients
 
     def model_strucuture_logging(self):
