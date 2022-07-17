@@ -13,6 +13,7 @@ clients:
 server:
     address: 127.0.0.1
     port: 8000
+    simulate_wall_time: true
 
     random_seed: 1
 
@@ -21,10 +22,10 @@ data:
     datasource: EMNIST
 
     # Number of samples in each partition
-    partition_size: 2
+    partition_size: 1
 
     # IID or non-IID?
-    sampler: iid
+    sampler: noniid
 
     # The concentration parameter for the Dirichlet distribution
     concentration: 1
@@ -43,8 +44,8 @@ trainer:
     target_accuracy: 1.0
 
     # Number of epoches for local training in each communication round
-    epochs: 1
-    batch_size: 2
+    epochs: 5
+    batch_size: 1
     optimizer: SGD
     learning_rate: 0.01
     momentum: 0.0
@@ -60,7 +61,7 @@ algorithm:
 
     ## Data reconstruction related configurations
     # Choose from DLG (default), iDLG, csDLG
-    attack_method: DLG
+    attack_method: no
     # For calculating the loss between dummy and target gradients/updates
     # Choose from l2, l1, max, sim, simlocal
     cost_fn: l2
@@ -86,25 +87,30 @@ algorithm:
     # Matching weights (absolute) or weight updates (delta)
     use_updates: false
     # The number of times the attack will be attempted
-    trials: 8
+    trials: 4
 
     ## Defense related
-    # Choose from GradDefense, ...
+    # Choose from GradDefense, Soteria, GC (model compression), DP (differential privacy)...
     defense: no
-    clip: false
+    # for GradDefense
+    clip: true
     slices_num: 10
     perturb_slices_num: 5
     scale: 0.0005
     Q: 6
+    # for Soteria
+    threshold: 50
+    # for GC
+    prune_pct: 80
 
     # The random seed for dummy data and label
     random_seed: 1
 
 results:
-    result_path: results/EMNIST_lenet5/DLG
+    result_path: results/EMNIST/DLG
 
     # Write the following parameter(s) into a CSV
-    types: round, accuracy, elapsed_time, comm_time, round_time
+    types: round, accuracy, elapsed_time, round_time
 
     # Plot results (x_axis-y_axis)
     plot: round-accuracy, elapsed_time-accuracy
