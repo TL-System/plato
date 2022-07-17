@@ -1,20 +1,13 @@
 clients:
-    # Type
-    type: mistnet
-
     # The total number of clients
-    total_clients: 1
+    total_clients: 10
 
     # The number of clients selected in each round
-    per_round: 1
+    per_round: 3
 
     # Should the clients compute test accuracy locally?
-    do_test: false
+    do_test: true
 
-    outbound_processors:
-        - feature_randomized_response
-        - feature_unbatch
-        
 server:
     address: 127.0.0.1
     port: 8000
@@ -23,18 +16,21 @@ data:
     # The training and testing dataset
     datasource: CIFAR10
 
+    # Where the dataset is located
+    data_path: ./data
+
     # Number of samples in each partition
-    partition_size: 200
+    partition_size: 20000
 
     # IID or non-IID?
-    sampler: iid
+    sampler: noniid
 
 trainer:
     # The type of the trainer
     type: basic
 
     # The maximum number of training rounds
-    rounds: 1
+    rounds: 20
 
     # The maximum number of clients running concurrently
     max_concurrency: 3
@@ -43,19 +39,24 @@ trainer:
     target_accuracy: 0.95
 
     # Number of epoches for local training in each communication round
-    epochs: 10
-    batch_size: 16
+    epochs: 1
+    batch_size: 128
     optimizer: SGD
-    learning_rate: 0.01
-    momentum: 0.5
+    learning_rate: 0.1 # 0.01
+    momentum: 0.9
     weight_decay: 0.0
+    lr_schedule: StepLR
+    lr_step_size: 1
+    lr_gamma: 1
+
+    alpha: 0.1
 
     # The machine learning model
     model_name: resnet_18
 
 algorithm:
-    # Aggregation algorithm
-    type: mistnet
+    # The initial synchronization frequency
+    global_learning_rate: 1
+    lr_decay: 0.998
 
-    cut_layer: layer1
-    epsilon: null
+
