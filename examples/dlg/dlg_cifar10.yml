@@ -13,6 +13,9 @@ clients:
 server:
     address: 127.0.0.1
     port: 8001
+    simulate_wall_time: true
+
+    random_seed: 1
 
 data:
     # The training and testing dataset
@@ -88,7 +91,7 @@ algorithm:
     trials: 1
 
     ## Defense related
-    # Choose from GradDefense, Soteria, MC (model compression), DP (differential privacy)...
+    # Choose from GradDefense, Soteria, GC (model compression), DP (differential privacy)...
     defense: DP
     # for GradDefense
     clip: false
@@ -96,17 +99,19 @@ algorithm:
     perturb_slices_num: 5
     scale: 0.0005
     Q: 6
-    # for MC
-    prune_pct: 10
+    # for Soteria
+    threshold: 50
+    # for GC
+    prune_pct: 80
 
     # The random seed for dummy data and label
     random_seed: 13
 
 results:
-    result_path: results/Soteria_tests/soteria
+    result_path: results/CIFAR10/DLG/DP
 
     # Write the following parameter(s) into a CSV
-    types: round, accuracy, elapsed_time, comm_time, round_time
+    types: round, accuracy, elapsed_time, round_time
 
     # Plot results (x_axis-y_axis)
     plot: round-accuracy, elapsed_time-accuracy
