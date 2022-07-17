@@ -1,61 +1,61 @@
 clients:
     # Type
-    type: mistnet
+    type: simple
 
     # The total number of clients
-    total_clients: 1
+    total_clients: 3
 
     # The number of clients selected in each round
-    per_round: 1
+    per_round: 2
 
     # Should the clients compute test accuracy locally?
-    do_test: false
+    do_test: true
 
-    outbound_processors:
-        - feature_randomized_response
-        - feature_unbatch
-        
 server:
     address: 127.0.0.1
     port: 8000
+    norm_bounding_threshold: 5 # norm bound should not be 0
 
 data:
     # The training and testing dataset
-    datasource: CIFAR10
+    datasource: MNIST
 
     # Number of samples in each partition
-    partition_size: 200
+    partition_size: 20000
 
     # IID or non-IID?
-    sampler: iid
+    sampler: noniid
+
+    # The concentration parameter for the Dirichlet distribution
+    concentration: 0.5
+
+    # The random seed for sampling data
+    random_seed: 1
 
 trainer:
     # The type of the trainer
     type: basic
 
     # The maximum number of training rounds
-    rounds: 1
+    rounds: 5
 
     # The maximum number of clients running concurrently
     max_concurrency: 3
 
     # The target accuracy
-    target_accuracy: 0.95
+    target_accuracy: 0.94
 
     # Number of epoches for local training in each communication round
-    epochs: 10
-    batch_size: 16
+    epochs: 1
+    batch_size: 32
     optimizer: SGD
     learning_rate: 0.01
-    momentum: 0.5
+    momentum: 0.9
     weight_decay: 0.0
 
     # The machine learning model
-    model_name: resnet_18
+    model_name: lenet5
 
 algorithm:
     # Aggregation algorithm
-    type: mistnet
-
-    cut_layer: layer1
-    epsilon: null
+    type: fedavg

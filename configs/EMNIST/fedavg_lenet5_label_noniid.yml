@@ -1,6 +1,6 @@
 clients:
     # Type
-    type: mistnet
+    type: simple
 
     # The total number of clients
     total_clients: 1
@@ -11,51 +11,59 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    outbound_processors:
-        - feature_randomized_response
-        - feature_unbatch
-        
 server:
     address: 127.0.0.1
     port: 8000
+    simulate_wall_time: true
 
 data:
     # The training and testing dataset
-    datasource: CIFAR10
+    datasource: EMNIST
 
     # Number of samples in each partition
-    partition_size: 200
+    partition_size: 11280
 
     # IID or non-IID?
-    sampler: iid
+    sampler: label_quantity_noniid
+
+    # per client classes size
+    per_client_classes_size: 5
+
+    # The random seed for sampling data
+    random_seed: 1
 
 trainer:
     # The type of the trainer
     type: basic
 
     # The maximum number of training rounds
-    rounds: 1
+    rounds: 100
 
     # The maximum number of clients running concurrently
-    max_concurrency: 3
+    max_concurrency: 10
 
     # The target accuracy
     target_accuracy: 0.95
 
     # Number of epoches for local training in each communication round
-    epochs: 10
-    batch_size: 16
+    epochs: 5
+    batch_size: 32
     optimizer: SGD
     learning_rate: 0.01
-    momentum: 0.5
+    momentum: 0.9
     weight_decay: 0.0
 
     # The machine learning model
-    model_name: resnet_18
+    model_name: lenet5
+    num_classes: 47
 
 algorithm:
     # Aggregation algorithm
-    type: mistnet
+    type: fedavg
 
-    cut_layer: layer1
-    epsilon: null
+results:
+    # Write the following parameter(s) into a CSV
+    types: round, elapsed_time, accuracy
+
+    # Plot results (x_axis-y_axis)
+    plot: round-accuracy, elapsed_time-accuracy
