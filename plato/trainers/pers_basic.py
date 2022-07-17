@@ -11,6 +11,7 @@ import warnings
 warnings.simplefilter('ignore')
 
 import pandas as pd
+import numpy as np
 import torch
 from tqdm import tqdm
 
@@ -191,6 +192,54 @@ class Trainer(basic.Trainer):
             accuracy_type="personalization_accuracy",
             filename=filename,
             location=save_location)
+
+    def save_encoded_data(self,
+                          encoded_data,
+                          data_labels,
+                          filename=None,
+                          location=None):
+        """ Save the encoded data (np.narray). """
+        # convert the list to tensor
+        encoded_data = torch.cat(encoded_data, axis=0)
+        data_labels = torch.cat(data_labels)
+        # combine the label to the final of the 2d
+        to_save_data = torch.cat(
+            [encoded_data, data_labels.reshape(-1, 1)], dim=1)
+        to_save_narray_data = to_save_data.detach().to("cpu").numpy()
+
+        # process the arguments to obtain the to save path
+        to_save_path = self.process_save_path(filename,
+                                              location,
+                                              work_model_name="model_name",
+                                              desired_extenstion=".npy")
+
+        np.save(to_save_path, to_save_narray_data, allow_pickle=True)
+        logging.info("[Client #%d] Saving encoded data to %s.", self.client_id,
+                     to_save_path)
+
+    def checkpoint_encoded_samples(self,
+                                   encoded_samples,
+                                   encoded_labels,
+                                   current_round,
+                                   epoch,
+                                   run_id,
+                                   encoded_type="trainEncoded"):
+
+        # save the encoded data to the results dir
+        result_path = Config().params['result_path']
+        save_location = os.path.join(result_path,
+                                     "client_" + str(self.client_id))
+        save_filename = get_format_name(client_id=self.client_id,
+                                        round_n=current_round,
+                                        epoch_n=epoch,
+                                        run_id=run_id,
+                                        suffix=encoded_type,
+                                        ext="npy")
+
+        self.save_encoded_data(encoded_data=encoded_samples,
+                               data_labels=encoded_labels,
+                               filename=save_filename,
+                               location=save_location)
 
     def prepare_train_lr(self, optimizer, train_data_loader, config,
                          current_round):
@@ -459,7 +508,91 @@ class Trainer(basic.Trainer):
 
         accuracy = acc_meter.avg
 
-        return accuracy
+        test_outputs = {"accuracy": accuracy}
+
+        return test_outputs
+
+    def pers_train_one_epoch(
+        self,
+        config,
+        kwargs,
+        epoch,
+        pers_optimizer,
+        lr_schedule,
+        pers_loss_criterion,
+        pers_train_loader,
+        test_loader,
+        epoch_loss_meter,
+    ):
+        """ Performing one epoch of learning for the personalization. """
+        personalized_model_name = Config().trainer.personalized_model_name
+
+        epoch_loss_meter.reset()
+        self.personalized_model.train()
+
+        pers_epochs = config["pers_epochs"]
+        epoch_log_interval = pers_epochs + 1
+        epoch_model_log_interval = pers_epochs + 1
+
+        if "pers_epoch_log_interval" in config:
+            epoch_log_interval = config['pers_epoch_log_interval']
+
+        if "pers_epoch_model_log_interval" in config:
+            epoch_model_log_interval = config['pers_epoch_model_log_interval']
+
+        local_progress = tqdm(pers_train_loader,
+                              desc=f'Epoch {epoch}/{pers_epochs+1}',
+                              disable=True)
+
+        for _, (examples, labels) in enumerate(local_progress):
+            examples, labels = examples.to(self.device), labels.to(self.device)
+            # Clear the previous gradient
+            pers_optimizer.zero_grad()
+
+            # Perfrom the training and compute the loss
+            preds = self.personalized_model(examples)
+            loss = pers_loss_criterion(preds, labels)
+
+            # Perfrom the optimization
+            loss.backward()
+            pers_optimizer.step()
+
+            # Update the epoch loss container
+            epoch_loss_meter.update(loss.data.item())
+
+            local_progress.set_postfix({
+                'lr': lr_schedule,
+                "loss": epoch_loss_meter.val,
+                'loss_avg': epoch_loss_meter.avg
+            })
+
+        if (epoch - 1) % epoch_log_interval == 0 or epoch == pers_epochs:
+            logging.info(
+                "[Client #%d] Personalization Training Epoch: [%d/%d]\tLoss: %.6f",
+                self.client_id, epoch, pers_epochs, epoch_loss_meter.avg)
+
+            accuracy = self.perform_test_op(test_loader)["accuracy"]
+            # save the personaliation accuracy to the results dir
+            self.checkpoint_personalized_accuracy(
+                accuracy=accuracy,
+                current_round=kwargs['current_round'],
+                epoch=epoch,
+                run_id=None)
+
+        if (epoch - 1) % epoch_model_log_interval == 0 or epoch == pers_epochs:
+            # the model generated during each round will be stored in the
+            # checkpoints
+            perform_client_checkpoint_saving(
+                client_id=self.client_id,
+                model_name=personalized_model_name,
+                model_state_dict=self.personalized_model.state_dict(),
+                config=config,
+                kwargs=kwargs,
+                optimizer_state_dict=pers_optimizer.state_dict(),
+                lr_schedule_state_dict=lr_schedule.state_dict(),
+                present_epoch=epoch,
+                base_epoch=epoch,
+                prefix="personalized")
 
     def pers_train_model(
         self,
@@ -473,8 +606,8 @@ class Trainer(basic.Trainer):
 
         """
 
-        personalized_model_name = Config().trainer.personalized_model_name
         current_round = kwargs['current_round']
+        personalized_model_name = Config().trainer.personalized_model_name
 
         # Initialize accuracy to be returned to -1, so that the client can disconnect
         # from the server when testing fails
@@ -524,7 +657,7 @@ class Trainer(basic.Trainer):
                 base_epoch=0,
                 prefix="personalized")
 
-            accuracy = self.perform_test_op(test_loader)
+            accuracy = self.perform_test_op(test_loader)["accuracy"]
             # save the personaliation accuracy to the results dir
             self.checkpoint_personalized_accuracy(
                 accuracy=accuracy,
@@ -544,15 +677,6 @@ class Trainer(basic.Trainer):
             # Define the training and logging information
             # default not to perform any logging
             pers_epochs = Config().trainer.pers_epochs
-            epoch_log_interval = pers_epochs + 1
-            epoch_model_log_interval = pers_epochs + 1
-
-            if "pers_epoch_log_interval" in config:
-                epoch_log_interval = config['pers_epoch_log_interval']
-
-            if "pers_epoch_model_log_interval" in config:
-                epoch_model_log_interval = config[
-                    'pers_epoch_model_log_interval']
 
             # epoch loss tracker
             epoch_loss_meter = optimizers.AverageMeter(name='Loss')
@@ -566,72 +690,26 @@ class Trainer(basic.Trainer):
                                    desc='Personalization')
 
             for epoch in global_progress:
-                epoch_loss_meter.reset()
-                self.personalized_model.train()
-                local_progress = tqdm(pers_train_loader,
-                                      desc=f'Epoch {epoch}/{pers_epochs+1}',
-                                      disable=True)
-
-                for _, (examples, labels) in enumerate(local_progress):
-                    examples, labels = examples.to(self.device), labels.to(
-                        self.device)
-                    # Clear the previous gradient
-                    pers_optimizer.zero_grad()
-
-                    # Perfrom the training and compute the loss
-                    preds = self.personalized_model(examples)
-                    loss = pers_loss_criterion(preds, labels)
-
-                    # Perfrom the optimization
-                    loss.backward()
-                    pers_optimizer.step()
-
-                    # Update the epoch loss container
-                    epoch_loss_meter.update(loss.data.item())
-
-                    local_progress.set_postfix({
-                        'lr': lr_schedule,
-                        "loss": epoch_loss_meter.val,
-                        'loss_avg': epoch_loss_meter.avg
-                    })
-
-                if (epoch -
-                        1) % epoch_log_interval == 0 or epoch == pers_epochs:
-                    logging.info(
-                        "[Client #%d] Personalization Training Epoch: [%d/%d]\tLoss: %.6f",
-                        self.client_id, epoch, pers_epochs,
-                        epoch_loss_meter.avg)
-
-                    accuracy = self.perform_test_op(test_loader)
-                    # save the personaliation accuracy to the results dir
-                    self.checkpoint_personalized_accuracy(
-                        accuracy=accuracy,
-                        current_round=kwargs['current_round'],
-                        epoch=epoch,
-                        run_id=None)
-
-                if (epoch - 1
-                    ) % epoch_model_log_interval == 0 or epoch == pers_epochs:
-                    # the model generated during each round will be stored in the
-                    # checkpoints
-                    perform_client_checkpoint_saving(
-                        client_id=self.client_id,
-                        model_name=personalized_model_name,
-                        model_state_dict=self.personalized_model.state_dict(),
-                        config=config,
-                        kwargs=kwargs,
-                        optimizer_state_dict=pers_optimizer.state_dict(),
-                        lr_schedule_state_dict=lr_schedule.state_dict(),
-                        present_epoch=epoch,
-                        base_epoch=epoch,
-                        prefix="personalized")
+                self.pers_train_one_epoch(
+                    config,
+                    kwargs,
+                    epoch=epoch,
+                    pers_optimizer=pers_optimizer,
+                    lr_schedule=lr_schedule,
+                    pers_loss_criterion=pers_loss_criterion,
+                    pers_train_loader=pers_train_loader,
+                    test_loader=test_loader,
+                    epoch_loss_meter=epoch_loss_meter)
 
                 lr_schedule.step()
 
         except Exception as testing_exception:
-            logging.info("Evaluation Testing on client #%d failed.",
+            logging.info("Personalization Learning on client #%d failed.",
                          self.client_id)
             raise testing_exception
+
+        # get the accuracy of the client
+        accuracy = self.perform_test_op(test_loader)["accuracy"]
 
         # save the personalized model for current round
         # to the model dir of this client
@@ -673,7 +751,6 @@ class Trainer(basic.Trainer):
                 "[Client #%d] recall the initial personalized model of round %d",
                 self.client_id, current_round)
 
-        # save the accuracy of the client
         if 'max_concurrency' in config:
 
             # save the accuracy directly for latter usage
