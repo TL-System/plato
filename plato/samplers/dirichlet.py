@@ -3,7 +3,7 @@ Samples data from a dataset, biased across labels according to the Dirichlet dis
 """
 import numpy as np
 import torch
-from torch.utils.data import WeightedRandomSampler
+from torch.utils.data import WeightedRandomSampler, SubsetRandomSampler
 from plato.config import Config
 
 from plato.samplers import base
@@ -58,12 +58,14 @@ class Sampler(base.Sampler):
         """Obtains an instance of the sampler. """
         gen = torch.Generator()
         gen.manual_seed(self.random_seed)
+        subset_indices = list(
+            WeightedRandomSampler(self.sample_weights,
+                                  self.partition_size,
+                                  replacement=False,
+                                  generator=gen))
 
         # Samples without replacement using the sample weights
-        return WeightedRandomSampler(weights=self.sample_weights,
-                                     num_samples=self.partition_size,
-                                     replacement=False,
-                                     generator=gen)
+        return SubsetRandomSampler(subset_indices, generator=gen)
 
     def trainset_size(self):
         """Returns the length of the dataset after sampling. """
