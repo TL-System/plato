@@ -64,11 +64,13 @@ class A2CServer(fedavg.Server):
             #    metric_percentile = min(float(last_metric), metric_percentile)
             self.save_files(path, metric_percentile)
             clients_selected_size = len([i for i in metric_list if i <= metric_percentile])
-            
+        
+        #error here i think
         self.global_actor_grads = {
             name: self.trainer.zeros(weights.shape)
             for name, weights in weights_received[0][0].items()
         }
+
         self.global_critic_grads = {
             name: self.trainer.zeros(weights.shape)
             for name, weights in weights_received[0][1].items()
@@ -82,9 +84,6 @@ class A2CServer(fedavg.Server):
             name: self.trainer.zeros(weights.shape)
             for name, weights in weights_received[0][1].items()
         }
-        self.actor_adaptive_weighting, self.critic_adaptive_weighting = self.calc_adaptive_weighting(
-            weights_received, num_samples
-        )
         client_list = []
         client_path = f'{Config().results.results_dir}_seed_{Config().server.random_seed}/{Config().results.file_name}_client_saved'
 
@@ -100,6 +99,10 @@ class A2CServer(fedavg.Server):
                 for name, delta in update_from_critic.items():
                     self.global_critic_grads[name] += delta * (num_samples[i] /
                                                     total_samples)
+
+        self.actor_adaptive_weighting, self.critic_adaptive_weighting = self.calc_adaptive_weighting(
+            weights_received, num_samples
+        )
 
         #self.adaptive_weighting
         for i, update in enumerate(weights_received):
@@ -177,10 +180,10 @@ class A2CServer(fedavg.Server):
         total_critic_weight = total_actor_weight
 
         for i, actor_contrib in enumerate(actor_contribs):
-            actor_total_weight += num_samples[i] * math.exp(actor_contrib)
+            total_actor_weight += num_samples[i] * math.exp(actor_contrib)
 
         for i, critic_contrib in enumerate(critic_contribs):
-            critic_total_weight += num_samples[i] * math.exp(critic_contrib)
+            total_critic_weight += num_samples[i] * math.exp(critic_contrib)
 
         for i, actor_contrib in enumerate(actor_contribs):
             actor_adap_weighting[i] = (num_samples[i] * math.exp(actor_contrib)) / total_actor_weight
@@ -213,7 +216,7 @@ class A2CServer(fedavg.Server):
 
         #could use critic angles as well
         for i, angle in enumerate(actor_angles):
-            client_id = self.selected_client_id[i]
+            client_id = self.selected_clients[i]
 
             if client_id not in self.actor_local_angles.keys():
                 self.actor_local_angles[client_id] = angle
@@ -225,7 +228,7 @@ class A2CServer(fedavg.Server):
             ) * self.actor_local_angles[client_id] + (1 / self.current_round) * angle
 
             self.critic_local_angles[client_id] = (
-                (self.currnet_round - 1) / self.current_round
+                (self.current_round - 1) / self.current_round
             ) * self.critic_local_angles[client_id] + (1 / self.current_round) * angle
 
             # Non-linear mapping to node contribution
