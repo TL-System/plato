@@ -7,7 +7,7 @@ BITS_IN_BYTE = 8.0
 MBITS_IN_BITS = 1000000.0
 MILLISECONDS_IN_SECONDS = 1000.0
 N = 100
-LINK_FILE = './3bandwidth_generated_changing.log'
+LINK_FILE = './norway_tram_30'
 
 
 bandwidth_all, time_all = [], []
