@@ -37,7 +37,7 @@ This sampler can introduce the hardest non-IID data scenarios because it contain
 import numpy as np
 import torch
 
-from torch.utils.data import WeightedRandomSampler
+from torch.utils.data import WeightedRandomSampler, SubsetRandomSampler
 
 from plato.config import Config
 from plato.samplers import base
@@ -48,6 +48,7 @@ class Sampler(base.Sampler):
     """Create a data sampler for each client to use a divided partition of the
     dataset, biased across labels according to the Dirichlet distribution
     and biased partition size."""
+
     def __init__(self, datasource, client_id, testing):
         super().__init__()
         self.client_id = client_id
@@ -100,6 +101,15 @@ class Sampler(base.Sampler):
         """Obtains an instance of the sampler. """
         gen = torch.Generator()
         gen.manual_seed(self.random_seed)
+
+        # Samples without replacement using the sample weights
+        subset_indices = list(
+            WeightedRandomSampler(weights=self.sample_weights,
+                                  num_samples=self.client_partition_size,
+                                  replacement=False,
+                                  generator=gen))
+
+        return SubsetRandomSampler(subset_indices, generator=gen)
 
         # Samples without replacement using the sample weights
         return WeightedRandomSampler(weights=self.sample_weights,
