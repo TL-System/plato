@@ -95,7 +95,8 @@ class Trainer(basic.Trainer):
                         outputs = patched_model(
                             torch.unsqueeze(examples[index], dim=0),
                             patched_model.parameters)
-                        loss = loss_criterion(outputs, labels)
+                        loss = loss_criterion(
+                            outputs, torch.unsqueeze(labels[index], dim=0))
                         grad = torch.autograd.grad(
                             loss,
                             patched_model.parameters.values(),
@@ -104,7 +105,6 @@ class Trainer(basic.Trainer):
                             only_inputs=True)
                         list_grad.append(
                             list((_.detach().clone() for _ in grad)))
-                        # TODO: multiple batches or epochs?
                 else:
                     outputs = patched_model(examples, patched_model.parameters)
 
@@ -190,16 +190,15 @@ class Trainer(basic.Trainer):
                     # cast grad back to tuple type
                     grad = tuple(list_grad)
 
-                # TODO: momentum, weight_decay?
                 patched_model.parameters = OrderedDict(
                     (name,
                         param - Config().trainer.learning_rate * grad_part)
                     for ((name, param), grad_part
                          ) in zip(patched_model.parameters.items(), grad))
-                
+
                 for ((name, param),
-                 (name, new_param)) in zip(self.model.named_parameters(),
-                                           patched_model.parameters.items()):
+                     (name, new_param)) in zip(self.model.named_parameters(),
+                                               patched_model.parameters.items()):
                     param.data = new_param
 
                 # Sum up the gradients for each local update
