@@ -5,10 +5,10 @@ general:
 
 clients:
     # The total number of clients
-    total_clients: 6
+    total_clients: 3
 
     # The number of clients selected in each round
-    per_round: 6
+    per_round: 3
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -84,7 +84,7 @@ trainer:
     manual_seed: 15
 
     penalize_omega: True
-    lamda: 5
+    lamda: 10
 
 algorithm:
     # Aggregation algorithm
@@ -120,8 +120,8 @@ algorithm:
     max_round_episodes: 400
 
     # Curriculum learning, fixed difficulty level for motivation experiment
-    difficulty_levels: 6
-    traces_per_task: 10
+    difficulty_levels: 3
+    traces_per_task: 1
 
     #If we should save the model or not
     save_models: False
