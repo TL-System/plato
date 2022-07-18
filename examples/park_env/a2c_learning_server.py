@@ -45,8 +45,7 @@ class A2CServer(fedavg.Server):
             path = f'{Config().results.results_dir}_seed_{Config().server.random_seed}/{Config().results.file_name}_percentile_{Config().server.percentile_aggregate}'
             last_metric = self.read_last_entry(path)
             print("last_metric", last_metric)
-            #if last_metric is not None:
-            #    metric_percentile = min(float(last_metric), metric_percentile)
+            
             self.save_files(path, metric_percentile)
             clients_selected_size = len([i for i in metric_list if i <= metric_percentile])
             
@@ -112,7 +111,7 @@ class A2CServer(fedavg.Server):
                 __, report, __, __ = updates[i] 
                 client_id = report.client_id
                 update_from_actor, update_from_critic = update
-                if client_id == id + 1:
+                if client_id == id + 1 and client_list.count(client_id):
                     # Calculate omega 
                     for name, delta in update_from_actor.items():
                         omega_actor[name] -= delta * 1.0/clients_selected_size * (norm_fisher_actor[name] if Config().server.mul_fisher else 1.0)
