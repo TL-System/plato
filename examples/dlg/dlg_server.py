@@ -90,7 +90,8 @@ class Server(fedavg.Server):
             else:
                 logging.info("No Defense Applied")
         self.best_mse = math.inf
-        self.best_trial = 0
+        # Save trail 1 as the best as default when results are all bad
+        self.best_trial = 1
 
     async def process_reports(self):
         """ Process the client reports: before aggregating their weights,
