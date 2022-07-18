@@ -148,10 +148,11 @@ class Trainer(basic.Trainer):
         actor_fisher_path = f'{model_path}/{env_algorithm}{actor}{model_seed_path}{client_id}.pth'
         critic_fisher_path = f'{model_path}/{env_algorithm}{critic}{model_seed_path}{client_id}.pth'
         
-        if self.episode_num >= Config().algorithm.max_round_episodes:
-            self.load_fisher()
-        else:
-            self.fisher_critic, self.fisher_actor = {}, {}
+        #if self.episode_num >= Config().algorithm.max_round_episodes:
+        #    self.load_fisher()
+        #else:
+        # Each round has its own fisher calculation
+        self.fisher_critic, self.fisher_actor = {}, {}
 
         # Load Omega 
         if self.episode_num >= Config().algorithm.max_round_episodes:
@@ -188,7 +189,8 @@ class Trainer(basic.Trainer):
             self.total_reward = 0
             
             #Make difficulty level (trace file) depend on client_id
-            self.trace_idx = ((self.client_id - 1) % Config().algorithm.difficulty_levels)
+            self.trace_idx = ((self.client_id - 1) % Config().algorithm.difficulty_levels) * Config().algorithm.traces_per_task
+            
             state = self.env.reset(trace_idx=self.trace_idx, test= True)
             state = self.obs_normalizer.normalize(state)
             self.steps = 0
@@ -209,7 +211,7 @@ class Trainer(basic.Trainer):
                 
                 if self.done or (self.steps % Config().algorithm.batch_size == 0):
                     last_q_val = self.critic(self.t(next_state)).detach().data.numpy()
-                    if self.updates > 1 or self.episode_num > 1:
+                    if self.updates > 1:# or self.episode_num > 1:
                         fisher_critic_old = {}
                         fisher_actor_old = {}
                         for (n, _) in self.critic.named_parameters():
@@ -220,7 +222,7 @@ class Trainer(basic.Trainer):
                     self.estimate_fisher(self.train_helper(self.memory, last_q_val, fisher = True))
                     self.sum_fisher_diagonals()
                     # Accumulate fishers
-                    if self.updates > 1 or self.episode_num > 1:
+                    if self.updates > 1:# or self.episode_num > 1:
                         for n,_ in self.critic.named_parameters():
                             self.fisher_critic[n] = (self.fisher_critic[n] + fisher_critic_old[n] * self.updates)/(self.updates + 1)
                         for n,_ in self.actor.named_parameters():
@@ -319,7 +321,7 @@ class Trainer(basic.Trainer):
         entropy_coef = max((Config().algorithm.entropy_ratio - (self.episode_num/Config().algorithm.batch_size) * Config().algorithm.entropy_decay), Config().algorithm.entropy_min)
         actor_loss = (-torch.stack(memory.log_probs)*advantage.detach()).mean() + entropy_loss * entropy_coef
 
-        if Config().trainer.penalize_omega and self.episode_num >= 3 * Config().algorithm.max_round_episodes:
+        if Config().trainer.penalize_omega and self.episode_num >= Config().algorithm.max_round_episodes:
             actor_reg_term, critic_reg_term = self.criterion_reg()
             actor_loss += actor_reg_term
             critic_loss += critic_reg_term
@@ -631,14 +633,14 @@ class Trainer(basic.Trainer):
         self.model.eval()
         
         avg_rewards = []
-        for trace_idx in range(3):
+        for trace_idx in range(Config().algorithm.difficulty_levels):
             avg_reward = 0
             if self.client_id == 0:
                 torch.manual_seed(Config().trainer.manual_seed)
-            for _ in range(eval_episodes):
+            for epi in range(eval_episodes):
                 episode_reward = 0
                 done = False
-                state = self.env.reset(trace_idx=trace_idx, test= True)
+                state = self.env.reset(trace_idx=trace_idx * Config().algorithm.traces_per_task, test= True)
                 state = self.obs_normalizer.normalize(state)
                 steps = 0
                 while not done:
