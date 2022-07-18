@@ -89,12 +89,13 @@ class Trainer(base.Trainer):
         else:
             logging.info("[Client #%d] Loading a model from %s.",
                          self.client_id, model_path)
-        
+
         pretrained = None
         if torch.cuda.is_available():
             pretrained = torch.load(model_path)
         else:
-            pretrained = torch.load(model_path, map_location=torch.device('cpu'))
+            pretrained = torch.load(model_path,
+                                    map_location=torch.device('cpu'))
         self.model.load_state_dict(pretrained, strict=True)
 
     def simulate_sleep_time(self):
