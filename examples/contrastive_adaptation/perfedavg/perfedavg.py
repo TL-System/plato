@@ -1,11 +1,16 @@
 """
-The implementation of FedRep method based on the plato's
-pFL code.
+PyTorch Implementation of Personalized federated learning with theoretical guarantees: A model-agnostic meta-learning approach
+NIPS 2020
+
+
+https://proceedings.neurips.cc/paper/2020/hash/24389bfe4fe2eba8bf9aa9203a44cdad-Abstract.html
+
+
 
 """
 
-import fedrep_net
-import fedrep_trainer
+import perfedavg_net
+import perfedavg_trainer
 
 from plato.servers import fedavg_pers
 from plato.algorithms import fedavg_pers as algo_fedavg_pers
@@ -18,8 +23,8 @@ def main():
     """
 
     algo = algo_fedavg_pers.Algorithm
-    trainer = fedrep_trainer.Trainer
-    backbone_cls_model = fedrep_net.BackBoneEnc
+    trainer = perfedavg_trainer.Trainer
+    backbone_cls_model = perfedavg_net.BackBoneEnc
     client = pers_simple.Client(algorithm=algo,
                                 model=backbone_cls_model,
                                 trainer=trainer)

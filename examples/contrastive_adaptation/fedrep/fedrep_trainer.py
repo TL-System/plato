@@ -70,10 +70,10 @@ class Trainer(pers_basic.Trainer):
             self.freeze_model(defined_model, param_prefix="clf_fc")
             self.active_model(defined_model, param_prefix="encoder")
 
-        print("epoch: ", epoch)
-        for name, param in defined_model.named_parameters():
-            if param.requires_grad:
-                print(name)
+        # print("epoch: ", epoch)
+        # for name, param in defined_model.named_parameters():
+        #     if param.requires_grad:
+        #         print(name)
 
         epoch_loss_meter.reset()
         # Use a default training loop
@@ -103,8 +103,8 @@ class Trainer(pers_basic.Trainer):
             optimizer.step()
 
             # Update the loss data in the logging container
-            epoch_loss_meter.update(loss.data.item())
-            batch_loss_meter.update(loss.data.item())
+            epoch_loss_meter.update(loss.data.item(), labels.size(0))
+            batch_loss_meter.update(loss.data.item(), labels.size(0))
 
             # Performe logging of one batch
             if batch_id % batch_log_interval == 0 or batch_id == iterations_per_epoch - 1:
@@ -128,14 +128,11 @@ class Trainer(pers_basic.Trainer):
         if hasattr(optimizer, "params_state_update"):
             optimizer.params_state_update()
 
-    def perform_test_op(
-        self,
-        test_loader,
-    ):
+    def perform_test_op(self, test_loader, define_model):
 
         # Define the test phase of the eval stage
         acc_meter = optimizers.AverageMeter(name='Accuracy')
-        self.personalized_model.eval()
+        define_model.eval()
         correct = 0
 
         test_encoded = list()
@@ -147,11 +144,11 @@ class Trainer(pers_basic.Trainer):
             with torch.no_grad():
                 # preds = self.personalized_model(examples).argmax(dim=1)
 
-                features = self.personalized_model.encoder(examples)
-                preds = self.personalized_model.clf_fc(features).argmax(dim=1)
+                features = define_model.encoder(examples)
+                preds = define_model.clf_fc(features).argmax(dim=1)
 
                 correct = (preds == labels).sum().item()
-                acc_meter.update(correct / preds.shape[0])
+                acc_meter.update(correct / preds.shape[0], labels.size(0))
 
                 test_encoded.append(features)
                 test_labels.append(labels)
@@ -171,6 +168,7 @@ class Trainer(pers_basic.Trainer):
         config,
         kwargs,
         epoch,
+        define_model,
         pers_optimizer,
         lr_schedule,
         pers_loss_criterion,
@@ -183,7 +181,7 @@ class Trainer(pers_basic.Trainer):
         current_round = kwargs['current_round']
 
         epoch_loss_meter.reset()
-        self.personalized_model.train()
+        define_model.train()
 
         pers_epochs = config["pers_epochs"]
         epoch_log_interval = pers_epochs + 1
@@ -209,8 +207,8 @@ class Trainer(pers_basic.Trainer):
 
             # Perfrom the training and compute the loss
             # preds = self.personalized_model(examples)
-            features = self.personalized_model.encoder(examples)
-            preds = self.personalized_model.clf_fc(features)
+            features = define_model.encoder(examples)
+            preds = define_model.clf_fc(features)
 
             loss = pers_loss_criterion(preds, labels)
 
@@ -219,7 +217,7 @@ class Trainer(pers_basic.Trainer):
             pers_optimizer.step()
 
             # Update the epoch loss container
-            epoch_loss_meter.update(loss.data.item())
+            epoch_loss_meter.update(loss.data.item(), labels.size(0))
 
             # save the encoded train data of current epoch
             if epoch == pers_epochs:
@@ -237,7 +235,7 @@ class Trainer(pers_basic.Trainer):
                 "[Client #%d] Personalization Training Epoch: [%d/%d]\tLoss: %.6f",
                 self.client_id, epoch, pers_epochs, epoch_loss_meter.avg)
 
-            test_outputs = self.perform_test_op(test_loader)
+            test_outputs = self.perform_test_op(test_loader, define_model)
 
             # save the personaliation accuracy to the results dir
             self.checkpoint_personalized_accuracy(
@@ -252,7 +250,7 @@ class Trainer(pers_basic.Trainer):
             perform_client_checkpoint_saving(
                 client_id=self.client_id,
                 model_name=personalized_model_name,
-                model_state_dict=self.personalized_model.state_dict(),
+                model_state_dict=define_model.state_dict(),
                 config=config,
                 kwargs=kwargs,
                 optimizer_state_dict=pers_optimizer.state_dict(),

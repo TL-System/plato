@@ -81,7 +81,6 @@ class Client(simple.Client):
         filename = get_format_name(client_id=self.client_id,
                                    suffix="data_statistics",
                                    ext="json")
-
         save_file_path = os.path.join(save_location, filename)
 
         if not os.path.exists(save_file_path):
@@ -174,9 +173,13 @@ class Client(simple.Client):
                     of the model, other parts' checkpoint from previous round
                     will be loaded and assigned to the model.
         """
+        logging.info("[Client #%d] Received the global model: [%s].",
+                     self.client_id,
+                     Config().trainer.global_model_name)
+
         if self.algorithm.is_incomplete_weights(server_payload):
             logging.info(
-                "[Client #%d] Received server payload with '%s', which is incompleted for the local model.",
+                "[Client #%d] Received [%s], is incompleted to be assigned to the local model.",
                 self.client_id,
                 Config().trainer.global_model_name)
 
