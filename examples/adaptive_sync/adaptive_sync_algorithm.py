@@ -26,14 +26,14 @@ class Algorithm(fedavg.Algorithm):
         super().__init__(trainer)
 
         self.sync_frequency = Config().algorithm.initial_sync_frequency
-
+        weights = self.model.cpu().state_dict()
         self.average_positive_deltas = {
             name: torch.zeros(param.data.shape)
-            for name, param in self.model.named_parameters()
+            for name, param in weights.items()
         }
         self.average_negative_deltas = {
             name: torch.zeros(param.data.shape)
-            for name, param in self.model.named_parameters()
+            for name, param in weights.items()
         }
 
         self.sliding_window_size = 5
@@ -87,11 +87,13 @@ class Algorithm(fedavg.Algorithm):
                         delta = current_weight - previous_weight
 
                         # Calculate both positive and negative updates
-                        positive_deltas += torch.where(
-                            delta > 0, delta, torch.zeros(delta.shape))
-
-                        negative_deltas += torch.where(
-                            delta < 0, delta, torch.zeros(delta.shape))
+                        _delta = torch.where(
+                            delta > 0.0, delta, torch.zeros(delta.shape, dtype=delta.dtype))
+                        positive_deltas += _delta
+                        
+                        _delta = torch.where(
+                            delta < 0.0, delta, torch.zeros(delta.shape, dtype=delta.dtype))
+                        negative_deltas += _delta
 
                         self.average_positive_deltas[
                             name] = self.moving_average(

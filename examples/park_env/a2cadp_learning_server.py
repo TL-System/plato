@@ -6,6 +6,9 @@ To run this example:
 python examples/customized/custom_server.py -c examples/customized/server.yml
 """
 
+import math
+import enum
+from http import client
 import logging
 import asyncio
 from copy import deepcopy
@@ -27,12 +30,25 @@ class A2CServer(fedavg.Server):
         super().__init__(trainer = trainer, algorithm = algorithm, model = model)
         self.algorithm_name = algorithm_name
         self.env_name = env_name
+
+        self.actor_local_angles = {}
+        self.critic_local_angles = {}
+        self.last_global_actor_grads = None
+        self.last_global_critic_grads = None
+        self.actor_adaptive_weighting = None
+        self.critic_adaptive_weighting = None
+        self.global_actor_grads = None
+        self.global_critic_grads = None
+
         logging.info("A custom server has been initialized.")
         
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using federated averaging."""
 
         weights_received = self.compute_weight_deltas(updates)
+        num_samples = [report.num_samples for (__, report, __, __) in updates]
+        total_samples = sum(num_samples)
+        clients_selected_size = Config().clients.per_round
         # Calculate metric percentile 
         if Config().server.percentile_aggregate:
             percentile = min(Config().server.percentile + Config().server.percentile_increase * self.current_round, 100)
@@ -44,11 +60,19 @@ class A2CServer(fedavg.Server):
             path = f'{Config().results.results_dir}_seed_{Config().server.random_seed}/{Config().results.file_name}_percentile_{Config().server.percentile_aggregate}'
             last_metric = self.read_last_entry(path)
             print("last_metric", last_metric)
-            
+            #if last_metric is not None:
+            #    metric_percentile = min(float(last_metric), metric_percentile)
             self.save_files(path, metric_percentile)
             clients_selected_size = len([i for i in metric_list if i <= metric_percentile])
             
-          
+        self.global_actor_grads = {
+            name: self.trainer.zeros(weights.shape)
+            for name, weights in weights_received[0][0].items()
+        }
+        self.global_critic_grads = {
+            name: self.trainer.zeros(weights.shape)
+            for name, weights in weights_received[0][1].items()
+        }
         # Perform weighted averaging for both Actor and Critic
         actor_avg_update = {
             name: self.trainer.zeros(weights.shape)
@@ -58,10 +82,26 @@ class A2CServer(fedavg.Server):
             name: self.trainer.zeros(weights.shape)
             for name, weights in weights_received[0][1].items()
         }
-        
+        self.actor_adaptive_weighting, self.critic_adaptive_weighting = self.calc_adaptive_weighting(
+            weights_received, num_samples
+        )
         client_list = []
         client_path = f'{Config().results.results_dir}_seed_{Config().server.random_seed}/{Config().results.file_name}_client_saved'
 
+        if not Config().server.percentile_aggregate:
+            for i, update in enumerate(weights_received):
+                _, report, _, _ = updates[i]
+                update_from_actor, update_from_critic = update
+
+                for name, delta in update_from_actor.items():
+                    self.global_actor_grads[name] += delta * (num_samples[i] /
+                                                    total_samples)
+
+                for name, delta in update_from_critic.items():
+                    self.global_critic_grads[name] += delta * (num_samples[i] /
+                                                    total_samples)
+
+        #self.adaptive_weighting
         for i, update in enumerate(weights_received):
             __, report, __, __ = updates[i] 
             client_id = report.client_id
@@ -70,12 +110,13 @@ class A2CServer(fedavg.Server):
             
             if not Config().server.percentile_aggregate:
                 client_list.append(client_id)
-                clients_selected_size = Config().clients.per_round
-                for name, delta in update_from_actor.items():
-                    actor_avg_update[name] += delta * 1.0/Config().clients.per_round
 
-                for name, delta in update_from_critic.items():
-                    critic_avg_update[name] += delta * 1.0/Config().clients.per_round
+                for i, update in enumerate(weights_received):
+                    for name, delta in update_from_actor.items():
+                        actor_avg_update[name] += delta * self.actor_adaptive_weighting[i]
+
+                    for name, delta in update_from_critic.items():
+                        critic_avg_update[name] += delta * self.critic_adaptive_weighting[i]
             else:
                 metric = self.select_metric(report)
                 
@@ -110,7 +151,7 @@ class A2CServer(fedavg.Server):
                 __, report, __, __ = updates[i] 
                 client_id = report.client_id
                 update_from_actor, update_from_critic = update
-                if client_id == id + 1 and client_list.count(client_id):
+                if client_id == id + 1:
                     # Calculate omega 
                     for name, delta in update_from_actor.items():
                         omega_actor[name] -= delta * 1.0/clients_selected_size * (norm_fisher_actor[name] if Config().server.mul_fisher else 1.0)
@@ -121,6 +162,103 @@ class A2CServer(fedavg.Server):
             # TODO: Aggregate omega if there is an omega that exists?!
             self.save_omega(id + 1, omega_actor, omega_critic)
         return actor_avg_update, critic_avg_update
+
+
+    def calc_adaptive_weighting(self, updates, num_samples):
+        """ Compute the weights for model aggregation considering both node contribution
+        and data size. """
+        # Get the node contribution
+        actor_contribs, critic_contribs = self.calc_contribution(updates)
+
+        actor_adap_weighting = [None] * len(updates)
+        critic_adap_weighting = actor_adap_weighting
+        
+        total_actor_weight = 0.0
+        total_critic_weight = total_actor_weight
+
+        for i, actor_contrib in enumerate(actor_contribs):
+            actor_total_weight += num_samples[i] * math.exp(actor_contrib)
+
+        for i, critic_contrib in enumerate(critic_contribs):
+            critic_total_weight += num_samples[i] * math.exp(critic_contrib)
+
+        for i, actor_contrib in enumerate(actor_contribs):
+            actor_adap_weighting[i] = (num_samples[i] * math.exp(actor_contrib)) / total_actor_weight
+        
+        for i, critic_contrib in enumerate(critic_contribs):
+            critic_adap_weighting[i] = (num_samples[i] * math.exp(critic_contrib)) / total_critic_weight
+
+        return actor_adap_weighting, critic_adap_weighting
+
+    def calc_contribution(self, updates):
+        """ Calculate the node contribution based on the angle between the local
+        and global gradients. """
+        actor_angles, actor_contribs = [None] * len(updates), [None] * len(updates)
+        critic_angles, critic_contribs = actor_angles, actor_contribs
+
+        self.global_actor_grads, self.global_critic_grads = self.process_grad(self.global_actor_grads, self.global_critic_grads)
+
+        for i, update in enumerate(updates):
+            update_from_actor, update_from_critic = update
+            local_actor_grads, local_critic_grads = self.process_grad(update_from_actor, update_from_critic)
+            
+            inner_actor = np.inner(self.global_actor_grads, local_actor_grads)
+            inner_critic = np.inner(self.global_critic_grads, local_critic_grads)
+
+            norms_actor = np.linalg.norm(self.global_actor_grads) * np.linalg.norm(local_actor_grads)
+            norms_critic = np.linalg.norm(self.global_critic_grads) * np.linalg.norm(local_critic_grads)
+
+            actor_angles[i] = np.arccos(np.clip(inner_actor / norms_actor, -1.0, 1.0))
+            critic_angles[i] = np.arccos(np.clip(inner_critic / norms_critic, -1.0, 1.0))
+
+        #could use critic angles as well
+        for i, angle in enumerate(actor_angles):
+            client_id = self.selected_client_id[i]
+
+            if client_id not in self.actor_local_angles.keys():
+                self.actor_local_angles[client_id] = angle
+            if client_id not in self.critic_local_angles.keys():
+                self.critic_local_angles[client_id] = angle
+            
+            self.actor_local_angles[client_id] = (
+                (self.current_round - 1) / self.current_round
+            ) * self.actor_local_angles[client_id] + (1 / self.current_round) * angle
+
+            self.critic_local_angles[client_id] = (
+                (self.currnet_round - 1) / self.current_round
+            ) * self.critic_local_angles[client_id] + (1 / self.current_round) * angle
+
+            # Non-linear mapping to node contribution
+            alpha = Config().algorithm.alpha if hasattr(
+                Config().algorithm, 'alpha') else 5
+
+            actor_contribs[i] = alpha * (
+                1 - math.exp(-math.exp(-alpha * 
+                                        (self.actor_local_angles[client_id] - 1))))
+
+
+            critic_contribs[i] = alpha * (
+                1 - math.exp(-math.exp(-alpha * 
+                                        (self.critic_local_angles[client_id] - 1))))
+
+        return actor_contribs, critic_contribs
+
+   
+    @staticmethod
+    def process_grad(actor_grads, critic_grads):
+        actor_grads = list(dict(sorted(actor_grads.items(), key=lambda x: x[0].lower())).values())
+        critic_grads = list(dict(sorted(critic_grads.items(), key=lambda x: x[0].lower())).values())
+
+        actor_flattened = actor_grads[0]
+        critic_flattend = critic_grads[0]
+
+        for i in range(1, len(actor_grads)):
+            actor_flattened = np.append(actor_flattened, -actor_grads[i] / Config().trainer.learning_rate)
+
+        for i in range(1, len(critic_grads)):
+            critic_flattend = np.append(critic_flattend, -critic_grads[i] / Config().trainer.learning_rate)
+
+        return actor_flattened, critic_flattend
 
     def standardize_fisher(self, report):
         norm_fisher_actor, norm_fisher_critic = {}, {}

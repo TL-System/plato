@@ -6,11 +6,11 @@ Welcome to *Plato*, a new software framework to facilitate scalable federated le
 
 ### Setting up your Python environment
 
-It is recommended that [Miniconda](https://docs.conda.io/en/latest/miniconda.html) is used to manage Python packages. Before using *Plato*, first install [Miniconda](https://docs.conda.io/en/latest/miniconda.html), update your `conda` environment, and then create a new `conda` environment with Python 3.9 using the command:
+It is recommended that [Miniforge](https://github.com/conda-forge/miniforge) is used to manage Python packages. Before using *Plato*, first install Miniforge, update your `conda` environment, and then create a new `conda` environment with Python 3.9 using the command:
 
 ```shell
 conda update conda -y
-conda create -n plato python=3.9
+conda create -n plato -y python=3.9
 conda activate plato
 ```
 
@@ -28,10 +28,10 @@ The CUDA version, used in the command above, can be obtained on Ubuntu Linux sys
 nvidia-smi
 ```
 
-In macOS (without GPU support), the typical command would be:
+In macOS (without GPU support), the recommended command would be:
 
 ```shell
-conda install pytorch torchvision -c pytorch
+pip install torch torchvision
 ```
 
 ### Installing Plato as a pip package
@@ -61,10 +61,22 @@ pip install .
 pip install yapf mypy pylint
 ```
 
-**Tip:** After the initial installation of the required Python packages, use the following command to upgrade all the installed packages at any time:
+**Tip #1:** After the initial installation of the required Python packages, use the following command to upgrade all the installed packages at any time:
 
 ```shell
 python upgrade_packages.py
+```
+
+**Tip #2:** If you are using a M1 Mac computer, a handy way to install [Miniforge](https://github.com/conda-forge/miniforge) is to do it using the command:
+
+```shell
+brew install miniforge
+```
+
+**Tip #3:** On M1 Mac computers, before installing the required packages in the conda environment, you may need to install the [Rust compiler](https://www.rust-lang.org/tools/install) first in order to install the `tokenizers` package:
+
+```shell
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
 If you use Visual Studio Code, it is possible to use `yapf` to reformat the code every time it is saved by adding the following settings to .`.vscode/settings.json`:

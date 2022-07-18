@@ -90,8 +90,8 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |checkpoint_path|The directory of checkpoints||default: `<base_path>/checkpoints`|
 |outbound_processors|A list of processors to apply on the payload before sending| A list of processor names || 
 |inbound_processors|A list of processors to apply on the payload right after receiving| A list of processor names || 
-|downlink_bandwidth|Bandwidth for downlink communication (server to clients) in MBps||default:1|
-|uplink_bandwidth|Bandwidth for uplink communication (clients to server) in MBps||default:1|
+|downlink_bandwidth|Bandwidth for downlink communication (server to clients) in Mbps||default:100|
+|uplink_bandwidth|Bandwidth for uplink communication (clients to server) in Mbps||default:100|
 
 
 #### Valid processors for `server.outbound_processors`
@@ -156,6 +156,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |dp_epsilon|Total privacy budget of epsilon with the `diff_privacy` trainer||default: 10.0|
 |dp_delta|Total privacy budget of delta with the `diff_privacy` trainer||default: 1e-5|
 |dp_max_grad_norm|The maximum norm of the per-sample gradients with the `diff_privacy` trainer. Any gradient with norm higher than this will be clipped to this value.||default: 1.0|
+|num_classes|The number of classes.||Default: 10|
 
 ### algorithm
 
