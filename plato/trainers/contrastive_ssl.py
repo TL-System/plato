@@ -183,7 +183,7 @@ class Trainer(pers_basic.Trainer):
                 feature = self.model.encoder(examples)
                 preds = self.personalized_model(feature).argmax(dim=1)
                 correct = (preds == labels).sum().item()
-                acc_meter.update(correct / preds.shape[0])
+                acc_meter.update(correct / preds.shape[0], labels.size(0))
                 test_encoded.append(feature)
                 test_labels.append(labels)
 
@@ -340,7 +340,7 @@ class Trainer(pers_basic.Trainer):
                     eval_optimizer.step()
 
                     # Update the epoch loss container
-                    epoch_loss_meter.update(loss.data.item())
+                    epoch_loss_meter.update(loss.data.item(), labels.size(0))
 
                     # save the encoded train data of current epoch
                     if epoch == pers_epochs:
@@ -481,6 +481,12 @@ class Trainer(pers_basic.Trainer):
         """
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']
+        # Initial the personalized model with the
+
+        current_round = kwargs['current_round']
+        if hasattr(Config().trainer, "do_maintain_per_state") and Config(
+        ).trainer.do_maintain_per_state:
+            self.initial_personalized_model(config, current_round)
 
         if hasattr(Config().trainer, 'max_concurrency'):
             if mp.get_start_method(allow_none=True) != 'spawn':

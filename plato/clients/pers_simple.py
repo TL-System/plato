@@ -188,7 +188,7 @@ class Client(simple.Client):
                 model_name=Config().trainer.model_name,
                 current_round=self.current_round - 1,
                 run_id=None,
-                epoch=Config().trainer.epochs,
+                epoch=None,
                 prefix=None,
                 anchor_metric="round",
                 mask_anchors=["epoch", "personalized"],

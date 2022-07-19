@@ -72,7 +72,7 @@ class CheckpointsOperator(object):
             ckp_file for ckp_file in os.listdir(self.checkpoints_dir)
             if all([anchor not in ckp_file for anchor in mask_anchors])
         ]
-
+        print("checkpoint_files: ", checkpoint_files)
         latest_checkpoint_filename = None
         latest_number = 0
         for ckp_file in checkpoint_files:
@@ -165,6 +165,7 @@ def perform_client_checkpoint_loading(client_id,
                                run_id=run_id,
                                prefix=prefix,
                                ext="pth")
+    print("filename: ", filename)
     if use_latest:
         if not cpk_oper.vaild_checkpoint_file(filename):
             # Loading the latest checkpoint file
