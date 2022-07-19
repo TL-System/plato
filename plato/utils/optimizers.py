@@ -274,7 +274,14 @@ def get_dynamic_optimizer(model, **kwargs) -> optim.Optimizer:
     if optimizer_name not in supported_optimziers:
         raise ValueError(f'No such optimizer: {optimizer_name}')
 
-    return optimizers_pool[optimizer_name](model.parameters(), **kwargs)
+    if not isinstance(model, list):
+        model = [model]
+
+    opt_params = [
+        param for sub_model in model for param in sub_model.parameters()
+    ]
+
+    return optimizers_pool[optimizer_name](opt_params, **kwargs)
 
 
 def get_dynamic_lr_schedule(optimizer: optim.Optimizer,
