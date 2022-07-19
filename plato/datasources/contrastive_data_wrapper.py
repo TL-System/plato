@@ -206,7 +206,8 @@ class ContrastiveAugmentDataWrapper(torch.utils.data.Dataset):
 
         if self.datasource_name == "MNIST":
             raw_sample = Image.fromarray(raw_sample.numpy(), mode="L")
-
+        elif self.datasource_name == "FashionMNIST":
+            raw_sample = Image.fromarray(raw_sample.numpy(), mode="L")
         elif self.datasource_name == "CIFAR10" or self.datasource_name == "CIFAR100":
             raw_sample = Image.fromarray(raw_sample)
         elif self.datasource_name == "STL10":

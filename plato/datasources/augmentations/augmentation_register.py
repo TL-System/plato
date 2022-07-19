@@ -13,7 +13,6 @@ from .byol_aug import BYOLTransform
 from .simclr_aug import SimCLRTransform
 from .test_aug import TestTransform
 from .moco import MoCoTransform
-from .contras_adap_aug import ContrastiveAdapTransform
 
 from .normalizations import datasets_norm
 
@@ -26,8 +25,7 @@ def get(name='simsiam', train=True, for_downstream_task=False):
         "byol": BYOLTransform,
         "simclr": SimCLRTransform,
         "moco": MoCoTransform,
-        "test": TestTransform,
-        "contras_adap": ContrastiveAdapTransform,
+        "test": TestTransform
     }
     supported_transform_name = list(transform_mapper.keys())
     if name not in supported_transform_name:
