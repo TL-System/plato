@@ -18,7 +18,7 @@ from plato.utils import fonts
 
 
 class Server(ssl_server.Server):
-    """A personalized federated learning server using the FedEMA method."""
+    """A personalized federated learning server using the pFL-CMA's EMA method."""
 
     def __init__(self,
                  model=None,

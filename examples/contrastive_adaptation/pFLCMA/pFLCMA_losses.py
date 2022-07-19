@@ -45,9 +45,9 @@ class pFLCMALoss(nn.Module):
     def __init__(
         self,
         losses,
-        supervision_contrastive_lambda=1.0,
         similarity_lambda=0.0,
         ntx_lambda=0.0,
+        prototype_contrastive_repr_lambda=1.0,
         meta_lambda=0.0,
         meta_contrastive_lambda=0.0,
         perform_label_distortion=False,
@@ -60,15 +60,20 @@ class pFLCMALoss(nn.Module):
 
         # the losses to be computed
         # the enabled losses can be:
-        # * sup_contrastive_loss  - client_specific_representation_loss
         # * sim_contrastive_loss  - clients_invariant_representation_similarity_loss
+        #   - similarity_lambda
         # * ntx_contrastive_loss  - clients_invariant_representation_loss
-        # * prot_repre_loss       - prototype_representation_loss
-        # * prot_contrastive_loss - prototype_contrastive_representation_loss
+        #   - ntx_lambda
+        # * prototype_contrastive_repr_loss  - client_prototype_contrastive_representation_loss
+        #   - prototype_contrastive_repr_lambda
+        # * meta_prototype_repre_loss       - meta_prototype_representation_loss
+        #   - meta_lambda
+        # * meta_prototype_contrastive_repre_loss - meta_prototype_contrastive_representation_loss
+        #   - meta_contrastive_lambda
         self.losses = losses
 
         # a hyper-parameter for the supervision_contrastive loss
-        self.supervision_contrastive_lambda = supervision_contrastive_lambda
+
         self.temperature = temperature
         self.contrast_mode = contrast_mode
         self.base_temperature = base_temperature
@@ -78,6 +83,9 @@ class pFLCMALoss(nn.Module):
 
         # weight for the ntx contrastive loss
         self.ntx_lambda = ntx_lambda
+
+        # weight for the
+        self.prototype_contrastive_repr_lambda = prototype_contrastive_repr_lambda
 
         # weight for the prototype losses
         self.meta_lambda = meta_lambda
@@ -89,21 +97,26 @@ class pFLCMALoss(nn.Module):
         self.label_distrotion_type = label_distrotion_type
 
         self.losses_func = {
-            "sup_contrastive_loss": self.client_specific_representation_loss,
             "sim_contrastive_loss":
             self.clients_invariant_representation_similarity_loss,
-            "ntx_contrastive_loss": self.clients_invariant_representation_loss,
-            "prot_repre_loss": self.prototype_representation_loss,
-            "prot_contrastive_loss":
-            self.prototype_contrastive_representation_loss
+            "ntx_contrastive_loss":
+            self.clients_invariant_representation_loss,
+            "prototype_contrastive_repr_loss":
+            self.client_prototype_contrastive_representation_loss,
+            "meta_prototype_repre_loss":
+            self.meta_prototype_representation_loss,
+            "meta_prototype_contrastive_repre_loss":
+            self.meta_prototype_contrastive_representation_loss
         }
 
         self.losses_weight = {
-            "sup_contrastive_loss": self.supervision_contrastive_lambda,
             "sim_contrastive_loss": self.similarity_lambda,
             "ntx_contrastive_loss": self.ntx_lambda,
-            "prot_repre_loss": self.meta_lambda,
-            "prot_contrastive_loss": self.meta_contrastive_lambda
+            "prototype_contrastive_repr_loss":
+            self.prototype_contrastive_repr_lambda,
+            "meta_prototype_repre_loss": self.meta_lambda,
+            "meta_prototype_contrastive_repre_loss":
+            self.meta_contrastive_lambda
         }
 
     def clients_invariant_representation_similarity_loss(
@@ -163,7 +176,7 @@ class pFLCMALoss(nn.Module):
 
         return pseudo_labels
 
-    def prototype_representation_loss(self, outputs, labels):
+    def meta_prototype_representation_loss(self, outputs, labels):
         """ Compute loss to support the representation that is semi-invariant
             among clients.
 
@@ -208,7 +221,8 @@ class pFLCMALoss(nn.Module):
 
         return meta_loss
 
-    def client_specific_representation_loss(self, outputs, labels):
+    def client_prototype_contrastive_representation_loss(
+            self, outputs, labels):
         """ Compute loss to support the a client specific representation.
 
             Takes `features` and `labels` as input, and return the loss.
@@ -230,13 +244,20 @@ class pFLCMALoss(nn.Module):
         # encoded_z2: batch_size, fea_dim
         # features: batch_size, 2, fea_dim
         encoded_z1, encoded_z2 = outputs
+        batch_size = encoded_z1.shape[0]
+
+        device = encoded_z1.get_device(
+        ) if encoded_z1.is_cuda else torch.device('cpu')
+
+        encoded_z1 = F.normalize(encoded_z1, dim=1)
+        encoded_z2 = F.normalize(encoded_z2, dim=1)
+
+        # batch_size, 2, dim
         features = torch.cat(
             [encoded_z1.unsqueeze(1),
              encoded_z2.unsqueeze(1)], dim=1)
 
-        features = F.normalize(features, dim=-1, p=2)
-        batch_size = features[0].shape[0]
-        device = features[0].get_device()
+        features = features.view(features.shape[0], features.shape[1], -1)
 
         labels = labels.contiguous().view(-1, 1)
         if labels.shape[0] != batch_size:
@@ -288,7 +309,7 @@ class pFLCMALoss(nn.Module):
 
         return loss
 
-    def prototype_contrastive_representation_loss(self, outputs, labels):
+    def meta_prototype_contrastive_representation_loss(self, outputs, labels):
         """ Compute the contrastive loss based on the prototypes instead of
             each sample.
 
@@ -315,7 +336,7 @@ class pFLCMALoss(nn.Module):
             for label_idx in range(num_prototypes)
         ])
 
-        return self.client_specific_representation_loss(
+        return self.client_prototype_contrastive_representation_loss(
             [view1_prototypes, view2_prototypes], prototypes_label)
 
     def forward(self, outputs, labels):
