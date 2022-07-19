@@ -17,25 +17,24 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8004
+    port: 8001
 
     # Should we simulate the wall-clock time on the server? Useful if max_concurrency is specified
     simulate_wall_time: true
 
     random_seed: 5
 
-    checkpoint_path: checkpoints_fed_avg
+    checkpoint_path: checkpoints_critic_grad_lamda1_aggregate
 
-    model_path: models/pretrained_fed_avg
+    model_path: models/pretrained_critic_grad_lamda1_aggregate
 
     percentile: 20
 
-    percentile_aggregate: False #False, actor_loss, critic_loss, actor_grad, critic_grad, sum_actor_fisher, sum_critic_fisher
+    percentile_aggregate: critic_grad #False, actor_loss, critic_loss, actor_grad, critic_grad, sum_actor_fisher, sum_critic_fisher
 
     percentile_increase: 15
 
     mul_fisher: False
-
 data:
     # The training and testing dataset
     datasource: FashionMNIST
@@ -62,7 +61,7 @@ trainer:
     #The type of trainer
     type: basic
     # The maximum number of training rounds
-    rounds: 30
+    rounds: 20
 
     # The maximum number of clients running concurrently
     max_concurrency: 6
@@ -85,7 +84,7 @@ trainer:
     manual_seed: 5
 
     penalize_omega: True
-    lamda: 2.5
+    lamda: 1
 
 algorithm:
     # Aggregation algorithm
@@ -140,8 +139,8 @@ results:
     # Plot results (x_axis-y_axis)
     plot: round-accuracy, elapsed_time-accuracy
 
-    results_dir: examples/park_env/results_fed_avg
+    results_dir: examples/park_env/results_critic_grad_lamda1_aggregate
 
     file_name: A2C_ABR
 
-    seed_random_path: examples/park_env/seeds_fed_avg
+    seed_random_path: examples/park_env/seeds_critic_grad_lamda1_aggregate

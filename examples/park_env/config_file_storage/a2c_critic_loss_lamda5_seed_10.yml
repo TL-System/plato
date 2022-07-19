@@ -1,0 +1,146 @@
+general:
+    base_path: examples/park_env
+
+    untrained_model_path: models/untrained
+
+clients:
+    # The total number of clients
+    total_clients: 3
+
+    # The number of clients selected in each round
+    per_round: 3
+
+    # Should the clients compute test accuracy locally?
+    do_test: false
+
+    random_seed: 10
+
+server:
+    address: 127.0.0.1
+    port: 8018
+
+    # Should we simulate the wall-clock time on the server? Useful if max_concurrency is specified
+    simulate_wall_time: true
+
+    random_seed: 10
+
+    checkpoint_path: checkpoints_critic_loss_lamda5_aggregate
+
+    model_path: models/pretrained_critic_loss_lamda5_aggregate
+
+    percentile: 20
+
+    percentile_aggregate: critic_loss #False, actor_loss, critic_loss, actor_grad, critic_grad, sum_actor_fisher, sum_critic_fisher
+
+    percentile_increase: 15
+
+    mul_fisher: False
+data:
+    # The training and testing dataset
+    datasource: FashionMNIST
+
+    # Number of samples in each partition
+    partition_size: 200
+
+    # Client's partition size distribution
+    partition_distribution:
+        distribution: uniform
+        low: 0.4
+        high: 1.0
+
+    # IID or non-IID?
+    sampler: iid
+
+    # The concentration parameter for the Dirichlet distribution
+    concentration: 0.5
+
+    # The random seed for sampling data
+    random_seed: 10
+
+trainer:
+    #The type of trainer
+    type: basic
+    # The maximum number of training rounds
+    rounds: 20
+
+    # The maximum number of clients running concurrently
+    max_concurrency: 6
+
+    # The target accuracy
+    target_accuracy: 5000
+
+    # Number of epoches for local training in each communication round
+    # Need all of these, essential for plato to run
+    epochs: 10
+    batch_size: 32
+    optimizer: SGD
+    learning_rate: 0.01
+    momentum: 0.9
+    weight_decay: 0.0
+
+    # The machine learning model
+    model_name: lenet5
+
+    manual_seed: 10
+
+    penalize_omega: True
+    lamda: 5
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg
+
+    log_interval: 10
+    mode: train # train/test
+    pretrained: false
+    pretrained_iter: 0
+    test_step: 100
+
+    # reward discounted factor
+    gamma: 0.99
+    learning_rate: 0.001
+
+    # Frequency of evaluation steps once every eval_freq episodes
+    eval_freq: 50
+    # batch size to be sampled from memory
+    batch_size: 256
+    #entropy ratio during training
+    entropy_ratio: 10.0 #or 5
+    entropy_decay: 0.00004
+    entropy_min: 0.0
+    #grad clip
+    grad_clip_val: 10
+
+    hidden_size: 256
+
+    #Number of iterations
+    iterations: 1000
+
+    # Number of episodes to run each round
+    max_round_episodes: 400
+
+    # Curriculum learning, fixed difficulty level for motivation experiment
+    difficulty_levels: 3
+    traces_per_task: 1
+
+    #If we should save the model or not
+    save_models: False
+
+    env_name: abr
+
+    env_park_name: abr_sim
+
+    algorithm_name: a2c_
+
+results:
+    # Write the following parameter(s) into a CSV
+    types: round, accuracy, elapsed_time, comm_time, round_time
+
+    # Plot results (x_axis-y_axis)
+    plot: round-accuracy, elapsed_time-accuracy
+
+    results_dir: examples/park_env/results_critic_loss_lamda5_aggregate
+
+    file_name: A2C_ABR
+
+    seed_random_path: examples/park_env/seeds_critic_loss_lamda5_aggregate
