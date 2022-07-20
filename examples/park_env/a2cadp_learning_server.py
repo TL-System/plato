@@ -74,6 +74,7 @@ class A2CServer(fedavg.Server):
             name: self.trainer.zeros(weights.shape)
             for name, weights in weights_received[0][1].items()
         }
+
         # Perform weighted averaging for both Actor and Critic
         actor_avg_update = {
             name: self.trainer.zeros(weights.shape)
@@ -99,6 +100,7 @@ class A2CServer(fedavg.Server):
                     self.global_critic_grads[name] += delta * (num_samples[i] /
                                                     total_samples)
 
+
         self.actor_adaptive_weighting, self.critic_adaptive_weighting = self.calc_adaptive_weighting(
             weights_received, num_samples
         )
@@ -113,12 +115,11 @@ class A2CServer(fedavg.Server):
             if not Config().server.percentile_aggregate:
                 client_list.append(client_id)
 
-                for i, update in enumerate(weights_received):
-                    for name, delta in update_from_actor.items():
-                        actor_avg_update[name] += delta * self.actor_adaptive_weighting[i]
+                for name, delta in update_from_actor.items():
+                    actor_avg_update[name] += delta * self.actor_adaptive_weighting[i]
 
-                    for name, delta in update_from_critic.items():
-                        critic_avg_update[name] += delta * self.critic_adaptive_weighting[i]
+                for name, delta in update_from_critic.items():
+                    critic_avg_update[name] += delta * self.critic_adaptive_weighting[i]
             else:
                 metric = self.select_metric(report)
                 
