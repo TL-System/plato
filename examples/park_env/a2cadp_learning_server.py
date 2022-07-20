@@ -48,22 +48,6 @@ class A2CServer(fedavg.Server):
         weights_received = self.compute_weight_deltas(updates)
         num_samples = [report.num_samples for (__, report, __, __) in updates]
         total_samples = sum(num_samples)
-        clients_selected_size = Config().clients.per_round
-        # Calculate metric percentile 
-        if Config().server.percentile_aggregate:
-            percentile = min(Config().server.percentile + Config().server.percentile_increase * self.current_round, 100)
-            metric_list = self.create_loss_lists(updates)
-            metric_percentile = np.percentile(np.array(metric_list), percentile)
-            
-
-            # Save percentile to files
-            path = f'{Config().results.results_dir}_seed_{Config().server.random_seed}/{Config().results.file_name}_percentile_{Config().server.percentile_aggregate}'
-            last_metric = self.read_last_entry(path)
-            print("last_metric", last_metric)
-            #if last_metric is not None:
-            #    metric_percentile = min(float(last_metric), metric_percentile)
-            self.save_files(path, metric_percentile)
-            clients_selected_size = len([i for i in metric_list if i <= metric_percentile])
         
         self.global_actor_grads = {
             name: self.trainer.zeros(weights.shape)
@@ -87,18 +71,18 @@ class A2CServer(fedavg.Server):
         client_list = []
         client_path = f'{Config().results.results_dir}_seed_{Config().server.random_seed}/{Config().results.file_name}_client_saved'
 
-        if not Config().server.percentile_aggregate:
-            for i, update in enumerate(weights_received):
-                _, report, _, _ = updates[i]
-                update_from_actor, update_from_critic = update
+        
+        for i, update in enumerate(weights_received):
+            _, report, _, _ = updates[i]
+            update_from_actor, update_from_critic = update
 
-                for name, delta in update_from_actor.items():
-                    self.global_actor_grads[name] += delta * (num_samples[i] /
-                                                    total_samples)
+            for name, delta in update_from_actor.items():
+                self.global_actor_grads[name] += delta * (num_samples[i] /
+                                                total_samples)
 
-                for name, delta in update_from_critic.items():
-                    self.global_critic_grads[name] += delta * (num_samples[i] /
-                                                    total_samples)
+            for name, delta in update_from_critic.items():
+                self.global_critic_grads[name] += delta * (num_samples[i] /
+                                                total_samples)
 
 
         self.actor_adaptive_weighting, self.critic_adaptive_weighting = self.calc_adaptive_weighting(
@@ -112,30 +96,14 @@ class A2CServer(fedavg.Server):
 
             update_from_actor, update_from_critic = update
             
-            if not Config().server.percentile_aggregate:
-                client_list.append(client_id)
+            client_list.append(client_id)
 
-                for name, delta in update_from_actor.items():
-                    actor_avg_update[name] += delta * self.actor_adaptive_weighting[i]
+            for name, delta in update_from_actor.items():
+                actor_avg_update[name] += delta * self.actor_adaptive_weighting[i]
 
-                for name, delta in update_from_critic.items():
-                    critic_avg_update[name] += delta * self.critic_adaptive_weighting[i]
-            else:
-                metric = self.select_metric(report)
-                
-                #if (client_id == 1 and self.current_round >= 1 and self.current_round <= 3) \
-                #or ((client_id == 1 or client_id == 2) and self.current_round > 3 and self.current_round <= 6) \
-                #or ((client_id == 1 or client_id == 2 or client_id == 3) and self.current_round > 6):
-                if metric <= metric_percentile:
-                    print("Client %s is choosen" % str(client_id))
-                    client_list.append(client_id)
-
-                    norm_fisher_actor, norm_fisher_critic =  self.standardize_fisher(report)
-                    
-                    for name, delta in update_from_actor.items():
-                        actor_avg_update[name] += delta * 1.0/clients_selected_size * (norm_fisher_actor[name] if Config().server.mul_fisher else 1.0)
-                    for name, delta in update_from_critic.items():
-                        critic_avg_update[name] += delta * 1.0/clients_selected_size * (norm_fisher_critic[name] if Config().server.mul_fisher else 1.0)
+            for name, delta in update_from_critic.items():
+                critic_avg_update[name] += delta * self.critic_adaptive_weighting[i]
+            
             
             # Yield to other tasks in the server
             await asyncio.sleep(0)
@@ -146,24 +114,6 @@ class A2CServer(fedavg.Server):
         else:
             self.save_files(f'{client_path}{"_percentile"}', client_list)
 
-        #Get omega for each client!
-        for id in range(0, Config().clients.total_clients):
-            omega_actor = deepcopy(actor_avg_update)
-            omega_critic = deepcopy(critic_avg_update)
-            for i, update in enumerate(weights_received):
-                __, report, __, __ = updates[i] 
-                client_id = report.client_id
-                update_from_actor, update_from_critic = update
-                if client_id == id + 1:
-                    # Calculate omega 
-                    for name, delta in update_from_actor.items():
-                        omega_actor[name] -= delta * 1.0/clients_selected_size * (norm_fisher_actor[name] if Config().server.mul_fisher else 1.0)
-                    for name, delta in update_from_critic.items():
-                        omega_critic[name] -= delta * 1.0/clients_selected_size * (norm_fisher_critic[name] if Config().server.mul_fisher else 1.0)  
-                    break
-            # Save omega in a file with client id and exit
-            # TODO: Aggregate omega if there is an omega that exists?!
-            self.save_omega(id + 1, omega_actor, omega_critic)
         return actor_avg_update, critic_avg_update
 
 
@@ -262,10 +212,10 @@ class A2CServer(fedavg.Server):
         critic_flattend = critic_grads[0]
 
         for i in range(1, len(actor_grads)):
-            actor_flattened = np.append(actor_flattened, -actor_grads[i] / Config().trainer.learning_rate)
+            actor_flattened = np.append(actor_flattened, -actor_grads[i] / Config().algorithm.learning_rate)
 
         for i in range(1, len(critic_grads)):
-            critic_flattend = np.append(critic_flattend, -critic_grads[i] / Config().trainer.learning_rate)
+            critic_flattend = np.append(critic_flattend, -critic_grads[i] / Config().algorithm.learning_rate)
 
         return actor_flattened, critic_flattend
 
