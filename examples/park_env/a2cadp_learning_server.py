@@ -214,22 +214,15 @@ class A2CServer(fedavg.Server):
             actor_angles[i] = np.arccos(np.clip(inner_actor / norms_actor, -1.0, 1.0))
             critic_angles[i] = np.arccos(np.clip(inner_critic / norms_critic, -1.0, 1.0))
 
-        #could use critic angles as well
         for i, angle in enumerate(actor_angles):
             client_id = self.selected_clients[i]
 
             if client_id not in self.actor_local_angles.keys():
                 self.actor_local_angles[client_id] = angle
-            if client_id not in self.critic_local_angles.keys():
-                self.critic_local_angles[client_id] = angle
             
             self.actor_local_angles[client_id] = (
                 (self.current_round - 1) / self.current_round
             ) * self.actor_local_angles[client_id] + (1 / self.current_round) * angle
-
-            self.critic_local_angles[client_id] = (
-                (self.current_round - 1) / self.current_round
-            ) * self.critic_local_angles[client_id] + (1 / self.current_round) * angle
 
             # Non-linear mapping to node contribution
             alpha = Config().algorithm.alpha if hasattr(
@@ -239,7 +232,20 @@ class A2CServer(fedavg.Server):
                 1 - math.exp(-math.exp(-alpha * 
                                         (self.actor_local_angles[client_id] - 1))))
 
+        for i, angle in enumerate(critic_angles):
+            client_id = self.selected_clients[i]
 
+            if client_id not in self.critic_local_angles.keys():
+                self.critic_local_angles[client_id] = angle
+
+            self.critic_local_angles[client_id] = (
+                (self.current_round - 1) / self.current_round
+            ) * self.critic_local_angles[client_id] + (1 / self.current_round) * angle
+
+             # Non-linear mapping to node contribution
+            alpha = Config().algorithm.alpha if hasattr(
+                Config().algorithm, 'alpha') else 5
+                
             critic_contribs[i] = alpha * (
                 1 - math.exp(-math.exp(-alpha * 
                                         (self.critic_local_angles[client_id] - 1))))
