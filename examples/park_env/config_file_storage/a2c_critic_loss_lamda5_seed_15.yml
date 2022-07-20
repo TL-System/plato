@@ -17,20 +17,20 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8051
+    port: 8019
 
     # Should we simulate the wall-clock time on the server? Useful if max_concurrency is specified
     simulate_wall_time: true
 
     random_seed: 15
 
-    checkpoint_path: checkpoints_a2cadp_aggregate
+    checkpoint_path: checkpoints_critic_loss_lamda5_aggregate
 
-    model_path: models/pretrained_a2cadp_aggregate
+    model_path: models/pretrained_critic_loss_lamda5_aggregate
 
     percentile: 20
 
-    percentile_aggregate: False #False, actor_loss, critic_loss, actor_grad, critic_grad, sum_actor_fisher, sum_critic_fisher
+    percentile_aggregate: critic_loss #False, actor_loss, critic_loss, actor_grad, critic_grad, sum_actor_fisher, sum_critic_fisher
 
     percentile_increase: 15
 
@@ -83,7 +83,7 @@ trainer:
 
     manual_seed: 15
 
-    penalize_omega: False
+    penalize_omega: True
     lamda: 5
 
 algorithm:
@@ -117,7 +117,7 @@ algorithm:
     iterations: 1000
 
     # Number of episodes to run each round
-    max_round_episodes: 2
+    max_round_episodes: 400
 
     # Curriculum learning, fixed difficulty level for motivation experiment
     difficulty_levels: 3
@@ -139,8 +139,8 @@ results:
     # Plot results (x_axis-y_axis)
     plot: round-accuracy, elapsed_time-accuracy
 
-    results_dir: examples/park_env/results_a2cadp_aggregate
+    results_dir: examples/park_env/results_critic_loss_lamda5_aggregate
 
     file_name: A2C_ABR
 
-    seed_random_path: examples/park_env/seeds_a2cadp_aggregate
+    seed_random_path: examples/park_env/seeds_critic_loss_lamda5_aggregate

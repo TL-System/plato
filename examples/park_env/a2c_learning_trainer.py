@@ -609,7 +609,10 @@ class Trainer(basic.Trainer):
         file_name = ""
 
         if not Config().server.percentile_aggregate:
-            file_name = "A2C_RL_SERVER_FED_AVG"
+            if "adp" in Config().results.results_dir:
+                file_name = "A2C_RL_SERVER_FED_ADP"
+            else:
+                file_name = "A2C_RL_SERVER_FED_AVG"
         else:
             file_name = "A2C_RL_SERVER_PERCENTILE_AGGREGATE"
         results_seed_path = f'{Config().results.results_dir}_seed_{Config().server.random_seed}'

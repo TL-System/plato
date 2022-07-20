@@ -8,7 +8,7 @@ from plato.config import Config
 import a2c_learning_algorithm
 import a2c_learning_client
 import a2c_learning_model
-import a2c_learning_server
+import a2cadp_learning_server
 import a2c_learning_trainer
 #to run
 #python examples/park_env/a2cadp.py -c examples/park_env/a2cadp_seed_15.yml
@@ -24,7 +24,7 @@ def main():
     trainer = a2c_learning_trainer.Trainer
     algorithm = a2c_learning_algorithm.Algorithm
     client = a2c_learning_client.RLClient(model=model,trainer=trainer,algorithm=algorithm)
-    server = a2c_learning_server.A2CServer(Config().algorithm.algorithm_name, Config().algorithm.env_name,
+    server = a2cadp_learning_server.A2CServer(Config().algorithm.algorithm_name, Config().algorithm.env_name,
     model=model, algorithm=algorithm, trainer=trainer)
 
     server.run(client)
