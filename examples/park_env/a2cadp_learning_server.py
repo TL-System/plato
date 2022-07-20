@@ -65,7 +65,6 @@ class A2CServer(fedavg.Server):
             self.save_files(path, metric_percentile)
             clients_selected_size = len([i for i in metric_list if i <= metric_percentile])
         
-        #error here i think
         self.global_actor_grads = {
             name: self.trainer.zeros(weights.shape)
             for name, weights in weights_received[0][0].items()
