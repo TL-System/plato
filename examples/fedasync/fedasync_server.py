@@ -54,7 +54,7 @@ class Server(fedavg.Server):
     async def process_reports(self):
         """Process the client reports by aggregating their weights."""
         # Calculate the new mixing hyperparameter with client's staleness
-        __, __, client_staleness = self.updates[0]
+        __, __, __, client_staleness = self.updates[0]
 
         if self.adaptive_mixing:
             self.mixing_hyperparam *= self.staleness_function(client_staleness)
