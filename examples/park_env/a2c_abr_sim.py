@@ -13,6 +13,7 @@ ENTROPY_DECAY = 0.00004
 ENTROPY_MIN = 0
 SEED = 10
 GRAD_CLIP_VAL = 10
+MAX_EPISODES = 24000
 #Seed set:
 torch.manual_seed(SEED)
 
@@ -212,13 +213,13 @@ fisher_actors = []
 fisher_critics = []
 
 trace_idx = 0
-while True:
+while episode_num < MAX_EPISODES:
     done = False
     total_reward = 0
-    if (episode_num % 700 == 0):
-        trace_idx = int(episode_num / 700)
-        print( "changed trace to: ", trace_idx )
-    state = env.reset(trace_idx=trace_idx, test= True)
+    #if (episode_num % 700 == 0):
+    #    trace_idx = int(episode_num / 700)
+    #    print( "changed trace to: ", trace_idx )
+    state = env.reset()
     state = obs_normalizer.normalize(state)
     steps = 0
 
