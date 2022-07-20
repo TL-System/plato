@@ -15,7 +15,6 @@ from torchvision import transforms
 
 from defense.GradDefense.dataloader import get_root_set_loader
 from defense.GradDefense.sensitivity import compute_sens
-from utils.modules import PatchedModule
 from utils.utils import cross_entropy_for_onehot, label_to_onehot
 
 criterion = cross_entropy_for_onehot
@@ -66,13 +65,12 @@ class Trainer(basic.Trainer):
         target_grad = None
         total_local_steps = epochs * math.ceil(partition_size / batch_size)
 
-        patched_model = PatchedModule(self.model)
-
         for epoch in range(1, epochs + 1):
             # Use a default training loop
             for batch_id, (examples, labels) in enumerate(train_loader):
                 examples, labels = examples.to(self.device), labels.to(
                     self.device)
+                examples.requires_grad = True
 
                 # Store data in the first epoch (later epochs will still have the same partitioned data)
                 if epoch == 1:
@@ -92,27 +90,26 @@ class Trainer(basic.Trainer):
                         hasattr(Config().algorithm, 'clip') and Config().algorithm.clip is True:
                     list_grad = []
                     for index in range(len(examples)):
-                        outputs = patched_model(
-                            torch.unsqueeze(examples[index], dim=0),
-                            patched_model.parameters)
+                        outputs, _ = self.model(
+                            torch.unsqueeze(examples[index], dim=0))
                         loss = loss_criterion(
                             outputs, torch.unsqueeze(labels[index], dim=0))
                         grad = torch.autograd.grad(
                             loss,
-                            patched_model.parameters.values(),
+                            self.model.parameters(),
                             retain_graph=True,
                             create_graph=True,
                             only_inputs=True)
                         list_grad.append(
                             list((_.detach().clone() for _ in grad)))
                 else:
-                    outputs = patched_model(examples, patched_model.parameters)
+                    outputs, feature_fc1_graph = self.model(examples)
 
                     # Save the ground truth and gradients
                     loss = loss_criterion(outputs, labels)
                     grad = torch.autograd.grad(
                         loss,
-                        patched_model.parameters.values(),
+                        self.model.parameters(),
                         retain_graph=True,
                         create_graph=True,
                         only_inputs=True)
@@ -135,8 +132,6 @@ class Trainer(basic.Trainer):
                             noise_intensity=Config().algorithm.scale)
 
                     elif Config().algorithm.defense == 'Soteria':
-                        examples.requires_grad = True
-                        out, feature_fc1_graph = self.model.forward(examples)
                         deviation_f1_target = torch.zeros_like(
                             feature_fc1_graph)
                         deviation_f1_x_norm = torch.zeros_like(
@@ -190,16 +185,9 @@ class Trainer(basic.Trainer):
                     # cast grad back to tuple type
                     grad = tuple(list_grad)
 
-                patched_model.parameters = OrderedDict(
-                    (name,
-                        param - Config().trainer.learning_rate * grad_part)
-                    for ((name, param), grad_part
-                         ) in zip(patched_model.parameters.items(), grad))
-
-                for ((name, param),
-                     (name, new_param)) in zip(self.model.named_parameters(),
-                                               patched_model.parameters.items()):
-                    param.data = new_param
+                # Update model weights with gradients and learning rate
+                for ((name, param), grad_part) in zip(self.model.named_parameters(), grad):
+                    param.data = param.data - Config().trainer.learning_rate * grad_part
 
                 # Sum up the gradients for each local update
                 try:
