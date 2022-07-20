@@ -99,4 +99,7 @@ python examples/contrastive_adaptation/simsiam/simsiam.py -c examples/contrastiv
 python examples/contrastive_adaptation/moco/moco.py -c examples/contrastive_adaptation/configs/whole_global_model/moco_CIFAR10_resnet18.yml -b ./INFOCOM23/experiments/whole_global_model/whole_global_model
 ```
 
+The more general way is to run `generate_run_scripts.py` and then `generate_unique_port_id.py` in the Sim server to generate the job running scripts. Then, the user can submit the corresponding jobs by using `submit_slurm_jobs.py` with key words or directly submit the script files under `run_scripts/*`.
+
+
 
