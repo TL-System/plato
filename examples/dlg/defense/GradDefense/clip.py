@@ -45,8 +45,8 @@ def noise(dy_dx: list,
             norm = np.linalg.norm(
                 gradients_flatten_pool[sample_id][params_start_indice: params_end_indice + 1])
             clipping_rate = max(1, norm / noise_intensity)
-            gradients_flatten_pool[sample_id][params_start_indice: params_end_indice + 1] /= \
-                clipping_rate
+            gradients_flatten_pool[sample_id][params_start_indice: params_end_indice + 1] = \
+                [x / clipping_rate for x in gradients_flatten_pool[sample_id][params_start_indice: params_end_indice + 1]]
      
     gradients_flatten = np.mean(gradients_flatten_pool, axis=0)
     
