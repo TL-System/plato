@@ -280,9 +280,9 @@ while episode_num < MAX_EPISODES:
     if episode_num % 50 == 0:
         evaluate_policy()
 
-    np.savetxt("episodic_reward.csv", episode_rewards, delimiter =", ")
-    np.savetxt("critic_losses.csv", critic_losses, delimiter =", ")
-    np.savetxt("actor_losses.csv", actor_losses, delimiter =", ")
-    np.savetxt("entropy_losses.csv", entropy_losses, delimiter =", ")
-    np.savetxt("fisher_actors.csv", fisher_actors, delimiter =", ")
-    np.savetxt("fisher_critics.csv", fisher_critics, delimiter =", ")
+    np.savetxt("episodic_reward_"+str(SEED)+".csv", episode_rewards, delimiter =", ")
+    np.savetxt("critic_losses_"+str(SEED)+".csv", critic_losses, delimiter =", ")
+    np.savetxt("actor_losses_"+str(SEED)+".csv", actor_losses, delimiter =", ")
+    np.savetxt("entropy_losses_"+str(SEED)+".csv", entropy_losses, delimiter =", ")
+    np.savetxt("fisher_actors_"+str(SEED)+".csv", fisher_actors, delimiter =", ")
+    np.savetxt("fisher_critics_"+str(SEED)+".csv", fisher_critics, delimiter =", ")
