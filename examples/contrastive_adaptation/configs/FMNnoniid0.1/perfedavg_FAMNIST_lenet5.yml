@@ -182,7 +182,7 @@ trainer:
     # trained personalized model in each round.
     # Then, setting do_maintain_per_state to be True to follow this
     # rule.
-    do_maintain_per_state: False
+    do_maintain_per_state: True
 
     # Important hyper-parameters
     # 0 for performing Per-FedAvg(FO), others for Per-FedAvg(HF)
