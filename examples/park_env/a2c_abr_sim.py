@@ -121,15 +121,17 @@ gamma = 0.99
 memory = Memory() 
 obs_normalizer = StateNormalizer(env.observation_space)
 max_steps = 256
+traces_per_task = 10
+difficulty_levels = 6
 
-def evaluate_policy(eval_episodes = 10):
+def evaluate_policy(eval_episodes = traces_per_task):
     avg_rewards = []
-    for trace_idx in range(3):
+    for trace_idx in range(difficulty_levels):
         avg_reward = 0
-        for _ in range(eval_episodes):
+        for epi in range(eval_episodes):
             episode_reward = 0
             done = False
-            state = env.reset(trace_idx=trace_idx, test= True)
+            state = env.reset(trace_idx=trace_idx * traces_per_task + epi, test= True)
             state = obs_normalizer.normalize(state)
             while not done:
                 probs = actor(t(state))
