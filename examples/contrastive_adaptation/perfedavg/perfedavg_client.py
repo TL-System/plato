@@ -1,5 +1,5 @@
 """
-Implementation of the pfedavg clients
+Implementation of the perfedavg clients
 
 """
 
@@ -10,7 +10,7 @@ from plato.config import Config
 
 
 class Client(pers_simple.Client):
-    """A personalized federated learning client with pFL-FedAvg."""
+    """A personalized federated learning client for perfedavg method."""
 
     def load_personalized_model(self):
         """ Initial the personalized model with the global model. """
