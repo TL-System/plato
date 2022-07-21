@@ -186,7 +186,7 @@ trainer:
 
     # Important hyper-parameters
     # 0 for performing Per-FedAvg(FO), others for Per-FedAvg(HF)
-    hessian_free: False
+    hessian_free: True
     alpha: 0.01 # 1e-2
     beta: 0.001
 
