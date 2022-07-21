@@ -7,11 +7,17 @@ import park
 import csv
 from torch.nn.utils.clip_grad import clip_grad_norm_
 from torch.autograd import Variable
+import sys
+
+print("Number of arguments: ", len(sys.argv), " arguments.")
+print("Argument List:", str(sys.argv))
+
+seed_number = int(''.join(filter(str.isdigit, str(sys.argv[1]))))
 
 ENTROPY_RATIO = 10.0
 ENTROPY_DECAY = 0.00004
 ENTROPY_MIN = 0
-SEED = 10
+SEED = seed_number
 GRAD_CLIP_VAL = 10
 MAX_EPISODES = 24000
 #Seed set:
@@ -139,7 +145,7 @@ def evaluate_policy(eval_episodes = 10):
         avg_reward /= eval_episodes
         avg_rewards.append(avg_reward)
         print("Average Reward over trace %s is %s" % (str(trace_idx), str(avg_reward)))
-    with open("evaluations.csv", 'a') as f:
+    with open("evaluations_"+str(SEED)+".csv", 'a') as f:
         writer = csv.writer(f)
         writer.writerow(avg_rewards)
 
