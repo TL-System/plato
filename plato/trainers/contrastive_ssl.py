@@ -432,24 +432,6 @@ class Trainer(pers_basic.Trainer):
                                             run_id=None,
                                             encoded_type="testEncoded")
 
-        # if we do not want to keep the state of the personalized model
-        # at the end of this round,
-        # we need to load the initial model
-        if current_round < Config().trainer.rounds and not (
-                hasattr(Config().trainer, "do_maintain_per_state")
-                and Config().trainer.do_maintain_per_state):
-            cpk_saver = get_client_checkpoint_operator(
-                client_id=self.client_id, current_round=current_round)
-            location = cpk_saver.checkpoints_dir
-            load_from_path = os.path.join(location, initial_filename)
-
-            self.personalized_model.load_state_dict(
-                torch.load(load_from_path)["model"], strict=True)
-
-            logging.info(
-                "[Client #%d] recall the initial personalized model of round %d",
-                self.client_id, current_round)
-
         # save the accuracy of the client
         if 'max_concurrency' in config:
 
@@ -481,12 +463,6 @@ class Trainer(pers_basic.Trainer):
         """
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']
-        # Initial the personalized model with the
-
-        current_round = kwargs['current_round']
-        if hasattr(Config().trainer, "do_maintain_per_state") and Config(
-        ).trainer.do_maintain_per_state:
-            self.initial_personalized_model(config, current_round)
 
         if hasattr(Config().trainer, 'max_concurrency'):
             if mp.get_start_method(allow_none=True) != 'spawn':

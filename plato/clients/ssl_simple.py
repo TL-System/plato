@@ -32,8 +32,8 @@ class Report(base.Report):
 
 
 class Client(pers_simple.Client):
-    """A basic self-supervised federated learning client who completes
-     learning process containing two stages."""
+    """ A basic self-supervised federated learning client who completes
+     learning process containing two stages. """
 
     # pylint: disable=too-many-instance-attributes
     # pylint: disable=too-many-arguments
@@ -304,14 +304,20 @@ class Client(pers_simple.Client):
             # encoder of the self-supervised methods. The monitor trainset is a duplicate
             # of the trainset but without applying the contrastive data augmentation.
             # It only utilizes the normal test transform, as shown in
-            # 'datasources/augmentations/test_aug.py' .
+            # 'datasources/augmentations/test_aug.py'.
             # 2.- Train the KNN method based on the extracted representation
             # of the monitor trainset.
             # 3.- Using the trained KNN method to classify the testset to obtain accuracy.
+            is_perform_monitor = hasattr(
+                Config().clients, 'test_interval'
+            ) and self.current_round % Config().clients.test_interval == 0
+            is_do_final_personalization = hasattr(
+                Config().clients, "do_final_personalization") and Config(
+                ).clients.do_final_personalization
+            is_final_round = self.current_round >= Config().trainer.rounds
 
-            if hasattr(
-                    Config().clients, 'test_interval'
-            ) and self.current_round % Config().clients.test_interval == 0:
+            if is_perform_monitor or (is_do_final_personalization
+                                      and is_final_round):
 
                 accuracy = self.trainer.test(
                     testset=self.testset,
@@ -342,10 +348,12 @@ class Client(pers_simple.Client):
             # the designed model to complete the task. This encoder/backbone is
             # frozen without any changes. Only the designed model (self.personalized_model)
             # is optimized.
-            if hasattr(
-                    Config().clients,
-                    'pers_learning_interval') and self.current_round % Config(
-                    ).clients.pers_learning_interval == 0:
+            is_do_pers_learn = hasattr(
+                Config().clients,
+                'pers_learning_interval') and self.current_round % Config(
+                ).clients.pers_learning_interval == 0
+            if is_do_pers_learn or (is_do_final_personalization
+                                    and is_final_round):
                 # it is important to also point out
                 # which current is the personalized model
                 # trained.
