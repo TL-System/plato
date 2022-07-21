@@ -9,7 +9,7 @@ from plato.config import Config
 from plato.trainers import basic
 from torch.nn.utils.clip_grad import clip_grad_norm_
 from torch.autograd import Variable
-import random
+from random_trace import rand_trace
 
 import os
 import logging
@@ -189,9 +189,9 @@ class Trainer(basic.Trainer):
             self.total_reward = 0
             
             #Make difficulty level (trace file) depend on client_id
-            self.trace_idx = ((self.client_id - 1) % Config().algorithm.difficulty_levels) * Config().algorithm.traces_per_task
-            
-            state = self.env.reset(trace_idx=self.trace_idx, test= True)
+            self.trace_idx = ((self.client_id - 1) % Config().algorithm.difficulty_levels) * Config().algorithm.traces_per_task 
+            # need to add a random # to self.trace_idx a number between 0 and Config().algorithm.traces_per_task 
+            state = self.env.reset(trace_idx=self.trace_idx + rand_trace[self.episode_num], test= True)
             state = self.obs_normalizer.normalize(state)
             self.steps = 0
             
@@ -643,7 +643,7 @@ class Trainer(basic.Trainer):
             for epi in range(eval_episodes):
                 episode_reward = 0
                 done = False
-                state = self.env.reset(trace_idx=trace_idx * Config().algorithm.traces_per_task, test= True)
+                state = self.env.reset(trace_idx=trace_idx * Config().algorithm.traces_per_task + epi, test= True)
                 state = self.obs_normalizer.normalize(state)
                 steps = 0
                 while not done:

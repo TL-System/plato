@@ -38,6 +38,8 @@ class A2CServer(fedavg.Server):
             percentile = min(Config().server.percentile + Config().server.percentile_increase * self.current_round, 100)
             metric_list = self.create_loss_lists(updates)
             metric_percentile = np.percentile(np.array(metric_list), percentile)
+
+            
             
 
             # Save percentile to files
