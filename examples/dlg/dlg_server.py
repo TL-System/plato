@@ -85,7 +85,9 @@ class Server(fedavg.Server):
             self.use_updates = False
         self.defense_method = 'no'
         if hasattr(Config().algorithm, 'defense'):
-            if Config().algorithm.defense in ['GradDefense', 'Soteria', 'MC', 'DP']:
+            if Config().algorithm.defense in [
+                    'GradDefense', 'Soteria', 'GC', 'DP'
+            ]:
                 self.defense_method = Config().algorithm.defense
             else:
                 logging.info("No Defense Applied")
@@ -97,7 +99,8 @@ class Server(fedavg.Server):
         """ Process the client reports: before aggregating their weights,
             perform the gradient leakage attacks and reconstruct the training data.
         """
-        if self.current_round == Config().algorithm.attack_round and Config().algorithm.attack_method in ['DLG', 'iDLG', 'csDLG']:
+        if self.current_round == Config().algorithm.attack_round and Config(
+        ).algorithm.attack_method in ['DLG', 'iDLG', 'csDLG']:
             self.attack_method = Config().algorithm.attack_method
             self.deep_leakage_from_gradients(self.updates)
         await self.aggregate_weights(self.updates)
@@ -241,8 +244,10 @@ class Server(fedavg.Server):
                     torch.argmax(dummy_labels[i], dim=-1).item())
 
         elif self.attack_method == 'iDLG':
-            match_optimizer = torch.optim.LBFGS(
-                [dummy_data, ], lr=Config().algorithm.lr)
+            match_optimizer = torch.optim.LBFGS([
+                dummy_data,
+            ],
+                                                lr=Config().algorithm.lr)
             # Estimate the gt label
             est_labels = torch.argmin(torch.sum(target_grad[-2], dim=-1),
                                       dim=-1).detach().reshape(
@@ -254,8 +259,10 @@ class Server(fedavg.Server):
                     self.attack_method, trial_number, self.defense_method,
                     est_labels.item())
         elif self.attack_method == 'csDLG':
-            match_optimizer = torch.optim.LBFGS(
-                [dummy_data, ], lr=Config().algorithm.lr)
+            match_optimizer = torch.optim.LBFGS([
+                dummy_data,
+            ],
+                                                lr=Config().algorithm.lr)
             labels_ = gt_labels
             for i in range(num_images):
                 logging.info(
