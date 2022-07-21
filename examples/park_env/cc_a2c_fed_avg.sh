@@ -1,6 +1,7 @@
 #!/bin/bash
 #SBATCH --time=10:00:00
 #SBATCH --gres=gpu:1
+#SBATCH --nodes=1
 #SBATCH --mem=128G
 #SBATCH --account=def-baochun
 #SBATCH --output=results_fed_avg_seed_5.out

@@ -4,13 +4,12 @@
 #SBATCH --nodes=1
 #SBATCH --mem=128G
 #SBATCH --account=def-baochun
-#SBATCH --output=results_a2c_abr_sim_seed_5.out
+#SBATCH --output=results_critic_grad_lamda_seed_5.out
 
 module load gcc/9.3.0 arrow cuda/11 python/3.9 scipy-stack
 source ~/.federated/bin/activate
-python examples/park_env/a2c_abr_sim.py --seed5
+python examples/park_env/a2c.py -c examples/park_env/a2c_critic_grad_lamda5_seed_5.yml
 
-#Change --seed10 to --seedX where X is the seed you want
 #To run, connect to Graham, follow the Running.md file under docs, move this file to the main plato directory and run from there
 #Remember to copy over data folder as Graham does not allow external downloads
 #Tip: make the output file seed specific

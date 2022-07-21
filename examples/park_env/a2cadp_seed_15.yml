@@ -117,11 +117,11 @@ algorithm:
     iterations: 1000
 
     # Number of episodes to run each round
-    max_round_episodes: 2
+    max_round_episodes: 400
 
     # Curriculum learning, fixed difficulty level for motivation experiment
-    difficulty_levels: 3
-    traces_per_task: 1
+    difficulty_levels: 6
+    traces_per_task: 10
 
     #If we should save the model or not
     save_models: False
