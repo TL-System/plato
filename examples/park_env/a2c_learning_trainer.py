@@ -191,7 +191,7 @@ class Trainer(basic.Trainer):
             #Make difficulty level (trace file) depend on client_id
             self.trace_idx = ((self.client_id - 1) % Config().algorithm.difficulty_levels) * Config().algorithm.traces_per_task 
             # need to add a random # to self.trace_idx a number between 0 and Config().algorithm.traces_per_task 
-            state = self.env.reset(trace_idx=self.trace_idx + rand_trace[self.episode_num], test= True)
+            state = self.env.reset(trace_idx=self.trace_idx + rand_trace[self.episode_num % (len(rand_trace))], test= True)
             state = self.obs_normalizer.normalize(state)
             self.steps = 0
             
