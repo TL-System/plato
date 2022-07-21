@@ -29,7 +29,7 @@ from plato.config import Config
 from plato.clients import simple
 from plato.models import general_mlps_register as general_MLP_model
 from plato.utils.arrange_saving_name import get_format_name
-from plato.utils.checkpoint_operator import perform_client_checkpoint_loading
+from plato.utils.checkpoint_operator import perform_client_checkpoint_loading, reset_all_weights
 from plato.clients import base
 from plato.utils import fonts
 
@@ -112,12 +112,12 @@ class Client(simple.Client):
         """ Performing the general client's configure and then initialize the
             personalized model for the client. """
         super().configure()
+
         if self.custom_personalized_model is not None:
             self.personalized_model = self.custom_personalized_model
             self.custom_personalized_model = None
 
         if self.personalized_model is None:
-
             encode_dim = self.trainer.model.encode_dim
             model_name = Config().trainer.model_name
             personalized_model_name = Config().trainer.personalized_model_name
@@ -150,8 +150,62 @@ class Client(simple.Client):
             with open(to_save_path, 'w') as f:
                 f.write(str(self.personalized_model))
 
+    def load_personalized_model(self):
+        """ Initial the personalized model.
+
+            There are three conditions to load the personalized model.
+            1.- If it is required to maintain the personalized model,
+                do_maintain_per_state: True
+                if there is one existed personalized model
+                    load the personalized model from previous round to initialize
+                else
+                    initialize the personalized model
+
+
+        """
+
+        # model_name = Config().trainer.model_name
+        personalized_model_name = Config().trainer.personalized_model_name
+        logging.info("[Client #%d] loading its personalized model [%s].",
+                     self.client_id, personalized_model_name)
+
+        filename, cpk_oper = perform_client_checkpoint_loading(
+            client_id=self.client_id,
+            model_name=personalized_model_name,
+            current_round=self.current_round - 1,
+            run_id=None,
+            epoch=None,
+            prefix="personalized",
+            anchor_metric="round",
+            mask_anchors=["epoch"],
+            use_latest=True)
+
+        if not (hasattr(Config().trainer, "do_maintain_per_state")
+                and Config().trainer.do_maintain_per_state):
+            # Do not use any previous personalized model, initial it from script
+            logging.info(
+                "[Client #%d]. does maintain personzalization status, thus initialize from script.",
+                self.client_id, filename)
+            reset_all_weights(self.trainer.personalized_model)
+
+        elif filename is None:
+            # the personalized model has not been trained, the client needs to
+            # start the training from script
+            logging.info(
+                "[Client #%d]. has no trained personalized model (%s), thus initialize from script.",
+                self.client_id, filename)
+            reset_all_weights(self.trainer.personalized_model)
+        else:
+            loaded_weights = cpk_oper.load_checkpoint(filename)
+            self.trainer.personalized_model.load_state_dict(loaded_weights,
+                                                            strict=True)
+            logging.info(
+                "[Client #%d]. Loaded latest round's checkpoint %s to for initializing personalization.",
+                self.client_id, filename)
+
     def load_payload(self, server_payload) -> None:
         """Loading the server model onto this client.
+            Loading the personalized model for current round.
 
             We need to address this case:
                 There is a big model containing sub-modules A, B, and C
@@ -172,6 +226,14 @@ class Client(simple.Client):
                 2.- If the received parameters can only be assigned to one part
                     of the model, other parts' checkpoint from previous round
                     will be loaded and assigned to the model.
+
+            Then, if the client is activated and receives the payload from the server,
+            it should load its personalized model for latter usage.
+
+            What we want:
+                1.- If no personalized model saved, the client will reinitialize its model.
+                2.- If it has trained its personalized model, just load the latest one.
+
         """
         logging.info("[Client #%d] Received the global model: [%s].",
                      self.client_id,
@@ -197,7 +259,9 @@ class Client(simple.Client):
             if filename is None:
                 # using the client's local model that is randomly initialized
                 # at this round
-                pool_weights = self.trainer.model.state_dict()
+                tmpl_model = copy.deepcopy(self.trainer.model)
+                reset_all_weights(tmpl_model)
+                pool_weights = tmpl_model.state_dict()
                 logging.info(
                     "[Client #%d]. no checkpoint %s, complete server's payload with local initial model.",
                     self.client_id, filename)
@@ -214,11 +278,15 @@ class Client(simple.Client):
 
         self.algorithm.load_weights(completed_payload, strict=True)
 
+        # Also, we load the personalization model.
+        self.load_personalized_model()
+
     async def train(self):
         """The machine learning training workload on a client."""
 
         rounds = Config().trainer.rounds
         accuracy = -1
+        training_time = 0.0
         # Perform model training
         if self.current_round < rounds and (
                 not (hasattr(Config().clients, "only_personalization")

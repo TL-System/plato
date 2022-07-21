@@ -42,17 +42,6 @@ class Trainer(basic.Trainer):
         """ Setting the client's personalized model """
         self.personalized_model = personalized_model
 
-    def initial_personalized_model(self, config, current_round):
-        """ Initial the personalized model with the global model. """
-
-        model_name = Config().trainer.model_name
-        personalized_model_name = Config().trainer.personalized_model_name
-        if model_name == personalized_model_name:
-            """ If they share the same name, we need to copy the
-            global model to the personalized model directly. """
-            self.personalized_model.load_state_dict(self.model.state_dict(),
-                                                    strict=True)
-
     @staticmethod
     def process_save_path(filename, location, work_model_name,
                           desired_extenstion):
@@ -417,6 +406,10 @@ class Trainer(basic.Trainer):
         lr_schedule, lr_schedule_base_epoch = self.prepare_train_lr(
             optimizer, streamed_train_loader, config, current_round)
 
+        print("lr_schedule_base_epoch: ", lr_schedule_base_epoch)
+        print("lr_schedule: ", lr_schedule)
+        print("lr_schedule lr: ", lr_schedule.get_lr())
+
         # Before the training, we expect to save the initial
         # model of this round
         # perform_client_checkpoint_saving(
@@ -452,7 +445,7 @@ class Trainer(basic.Trainer):
             # Update the learning rate
             # based on the base epoch
             lr_schedule.step()
-
+            print("lr_schedule lr: ", lr_schedule.get_lr())
             # if (epoch - 1) % epoch_model_log_interval == 0 or epoch == epochs:
             #     # the model generated during each round will be stored in the
             #     # checkpoints
@@ -488,18 +481,18 @@ class Trainer(basic.Trainer):
                 present_epoch=None,
                 base_epoch=lr_schedule_base_epoch + epochs)
 
-    def perform_test_op(self, test_loader, define_model):
+    def perform_test_op(self, test_loader, defined_model):
 
         # Define the test phase of the eval stage
         acc_meter = optimizers.AverageMeter(name='Accuracy')
-        define_model.eval()
+        defined_model.eval()
         correct = 0
 
         acc_meter.reset()
         for _, (examples, labels) in enumerate(test_loader):
             examples, labels = examples.to(self.device), labels.to(self.device)
             with torch.no_grad():
-                preds = define_model(examples).argmax(dim=1)
+                preds = defined_model(examples).argmax(dim=1)
                 correct = (preds == labels).sum().item()
                 acc_meter.update(correct / preds.shape[0], labels.size(0))
 
@@ -514,7 +507,7 @@ class Trainer(basic.Trainer):
         config,
         kwargs,
         epoch,
-        define_model,
+        defined_model,
         pers_optimizer,
         lr_schedule,
         pers_loss_criterion,
@@ -526,7 +519,7 @@ class Trainer(basic.Trainer):
         personalized_model_name = Config().trainer.personalized_model_name
 
         epoch_loss_meter.reset()
-        define_model.train()
+        defined_model.train()
 
         pers_epochs = config["pers_epochs"]
         epoch_log_interval = pers_epochs + 1
@@ -548,7 +541,7 @@ class Trainer(basic.Trainer):
             pers_optimizer.zero_grad()
 
             # Perfrom the training and compute the loss
-            preds = define_model(examples)
+            preds = defined_model(examples)
             loss = pers_loss_criterion(preds, labels)
 
             # Perfrom the optimization
@@ -569,7 +562,7 @@ class Trainer(basic.Trainer):
                 "[Client #%d] Personalization Training Epoch: [%d/%d]\tLoss: %.6f",
                 self.client_id, epoch, pers_epochs, epoch_loss_meter.avg)
 
-            output = self.perform_test_op(test_loader, define_model)
+            output = self.perform_test_op(test_loader, defined_model)
             accuracy = output["accuracy"]
 
             # save the personaliation accuracy to the results dir
@@ -696,7 +689,7 @@ class Trainer(basic.Trainer):
                     config,
                     kwargs,
                     epoch=epoch,
-                    define_model=self.personalized_model,
+                    defined_model=self.personalized_model,
                     pers_optimizer=pers_optimizer,
                     lr_schedule=lr_schedule,
                     pers_loss_criterion=pers_loss_criterion,
@@ -736,24 +729,6 @@ class Trainer(basic.Trainer):
             os.makedirs(save_location, exist_ok=True)
             self.save_personalized_model(filename=filename,
                                          location=save_location)
-
-        # if we do not want to keep the state of the personalized model
-        # at the end of this round,
-        # we need to load the initial model
-        if current_round < Config().trainer.rounds and not (
-                hasattr(Config().trainer, "do_maintain_per_state")
-                and Config().trainer.do_maintain_per_state):
-            cpk_saver = get_client_checkpoint_operator(
-                client_id=self.client_id, current_round=current_round)
-            location = cpk_saver.checkpoints_dir
-            load_from_path = os.path.join(location, initial_filename)
-
-            self.personalized_model.load_state_dict(
-                torch.load(load_from_path)["model"], strict=True)
-
-            logging.info(
-                "[Client #%d] recall the initial personalized model of round %d",
-                self.client_id, current_round)
 
         if 'max_concurrency' in config:
 
@@ -821,9 +796,6 @@ class Trainer(basic.Trainer):
         self.training_start_time = time.time()
 
         accuracy = -1
-        # Initial the personalized model with the
-        # global model
-        self.initial_personalized_model(config, current_round)
 
         if 'max_concurrency' in config:
             tic = time.perf_counter()
