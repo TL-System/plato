@@ -128,11 +128,11 @@ class Trainer(pers_basic.Trainer):
         if hasattr(optimizer, "params_state_update"):
             optimizer.params_state_update()
 
-    def perform_test_op(self, test_loader, define_model):
+    def perform_test_op(self, test_loader, defined_model):
 
         # Define the test phase of the eval stage
         acc_meter = optimizers.AverageMeter(name='Accuracy')
-        define_model.eval()
+        defined_model.eval()
         correct = 0
 
         test_encoded = list()
@@ -144,8 +144,8 @@ class Trainer(pers_basic.Trainer):
             with torch.no_grad():
                 # preds = self.personalized_model(examples).argmax(dim=1)
 
-                features = define_model.encoder(examples)
-                preds = define_model.clf_fc(features).argmax(dim=1)
+                features = defined_model.encoder(examples)
+                preds = defined_model.clf_fc(features).argmax(dim=1)
 
                 correct = (preds == labels).sum().item()
                 acc_meter.update(correct / preds.shape[0], labels.size(0))
@@ -168,7 +168,7 @@ class Trainer(pers_basic.Trainer):
         config,
         kwargs,
         epoch,
-        define_model,
+        defined_model,
         pers_optimizer,
         lr_schedule,
         pers_loss_criterion,
@@ -181,7 +181,7 @@ class Trainer(pers_basic.Trainer):
         current_round = kwargs['current_round']
 
         epoch_loss_meter.reset()
-        define_model.train()
+        defined_model.train()
 
         pers_epochs = config["pers_epochs"]
         epoch_log_interval = pers_epochs + 1
@@ -200,6 +200,9 @@ class Trainer(pers_basic.Trainer):
         train_encoded = list()
         train_labels = list()
 
+        self.freeze_model(defined_model, param_prefix="encoder")
+        self.active_model(defined_model, param_prefix="clf_fc")
+
         for _, (examples, labels) in enumerate(local_progress):
             examples, labels = examples.to(self.device), labels.to(self.device)
             # Clear the previous gradient
@@ -207,8 +210,8 @@ class Trainer(pers_basic.Trainer):
 
             # Perfrom the training and compute the loss
             # preds = self.personalized_model(examples)
-            features = define_model.encoder(examples)
-            preds = define_model.clf_fc(features)
+            features = defined_model.encoder(examples)
+            preds = defined_model.clf_fc(features)
 
             loss = pers_loss_criterion(preds, labels)
 
@@ -235,7 +238,7 @@ class Trainer(pers_basic.Trainer):
                 "[Client #%d] Personalization Training Epoch: [%d/%d]\tLoss: %.6f",
                 self.client_id, epoch, pers_epochs, epoch_loss_meter.avg)
 
-            test_outputs = self.perform_test_op(test_loader, define_model)
+            test_outputs = self.perform_test_op(test_loader, defined_model)
 
             # save the personaliation accuracy to the results dir
             self.checkpoint_personalized_accuracy(
@@ -250,7 +253,7 @@ class Trainer(pers_basic.Trainer):
             perform_client_checkpoint_saving(
                 client_id=self.client_id,
                 model_name=personalized_model_name,
-                model_state_dict=define_model.state_dict(),
+                model_state_dict=defined_model.state_dict(),
                 config=config,
                 kwargs=kwargs,
                 optimizer_state_dict=pers_optimizer.state_dict(),
