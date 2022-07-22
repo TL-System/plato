@@ -4,7 +4,7 @@ Samples data from a dataset, biased across labels according to the Dirichlet dis
 import numpy as np
 
 import mindspore.dataset as ds
-from mindspore.dataset import WeightedRandomSampler
+from mindspore.dataset import WeightedRandomSampler, SubsetRandomSampler
 
 from plato.samplers import base
 from plato.config import Config
@@ -13,6 +13,7 @@ from plato.config import Config
 class Sampler(base.Sampler):
     """Create a data sampler for each client to use a divided partition of the
     dataset, biased across labels according to the Dirichlet distribution."""
+
     def __init__(self, datasource, client_id=0, testing=False):
         super().__init__(datasource)
         self.client_id = client_id
@@ -40,9 +41,12 @@ class Sampler(base.Sampler):
         ds.config.set_seed(self.random_seed)
 
         # Samples without replacement using the sample weights
-        return WeightedRandomSampler(weights=self.sample_weights,
-                                     num_samples=self.partition_size,
-                                     replacement=False)
+        subset_indices = list(
+            WeightedRandomSampler(weights=self.sample_weights,
+                                  num_samples=self.partition_size,
+                                  replacement=False))
+
+        return SubsetRandomSampler(subset_indices)
 
     def trainset_size(self):
         """Returns the length of the dataset after sampling. """
