@@ -95,8 +95,6 @@ class A2CServer(fedavg.Server):
                     for name, delta in update_from_critic.items():
                         critic_avg_update[name] += delta * 1.0/clients_selected_size * (norm_fisher_critic[name] if Config().server.mul_fisher else 1.0)
             
-            # Yield to other tasks in the server
-            await asyncio.sleep(0)
         
         #Save lists of clients
         if not Config().server.percentile_aggregate:
