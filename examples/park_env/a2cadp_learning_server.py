@@ -110,7 +110,10 @@ class A2CServer(fedavg.Server):
         
         #Save lists of clients
         if not Config().server.percentile_aggregate:
-            self.save_files(f'{client_path}{"_Fed_avg"}', client_list)
+            if "adp" not in Config().results.results_dir:
+                self.save_files(f'{client_path}{"_Fed_avg"}', client_list)
+            else:
+                self.save_files(f'{client_path}{"_Fed_ADP"}', client_list)
         else:
             self.save_files(f'{client_path}{"_percentile"}', client_list)
 
