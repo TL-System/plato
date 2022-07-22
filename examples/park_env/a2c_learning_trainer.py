@@ -155,7 +155,7 @@ class Trainer(basic.Trainer):
         self.fisher_critic, self.fisher_actor = {}, {}
 
         # Load Omega 
-        if self.episode_num >= Config().algorithm.max_round_episodes:
+        if self.episode_num >= Config().algorithm.max_round_episodes and Config().trainer.penalize_omega:
             self.load_omega()
 
         # Seeds path
