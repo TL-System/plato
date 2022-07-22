@@ -110,7 +110,7 @@ trainer:
     # The type of the trainer
     type: basic
     # The maximum number of training rounds
-    rounds: 200
+    rounds: 150
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -129,14 +129,14 @@ trainer:
     batch_size: 64
 
     optimizer: SGD
-    learning_rate: 0.1
+    learning_rate: 0.05
     momentum: 0.9
     weight_decay: 0.000001
 
     # Learning rate schedule
     lr_schedule: MultiStepLR
     lr_gamma: 0.1
-    lr_milestones: 250,450
+    lr_milestones: 150,350
 
     epoch_log_interval: 1
     epoch_model_log_interval: 50
@@ -149,14 +149,10 @@ trainer:
     pers_batch_size: 64
     pers_optimizer: SGD
     # lr = 0.1 * batch_size / 256, see section B.6 and B.7 of SimCLR paper.
-    pers_learning_rate: 0.1
+    pers_learning_rate: 0.05
     pers_momentum: 0.9
     pers_weight_decay: 0.0
 
-    # currently, we only support CosineAnnealingLR
-    pers_lr_schedule: MultiStepLR
-    pers_lr_milestones: 30,40
-    pers_lr_gamma: 0.1
 
     pers_epoch_log_interval: 2
     pers_epoch_model_log_interval: 10
