@@ -24,9 +24,9 @@ server:
 
     random_seed: 10
 
-    checkpoint_path: checkpoints_critic_grad_lamda5_aggregate
+    checkpoint_path: checkpoints_critic_grad_lamda5_aggregate_seed_10
 
-    model_path: models/pretrained_critic_grad_lamda5_aggregate
+    model_path: models/pretrained_critic_grad_lamda5_aggregate_seed_10
 
     percentile: 20
 

@@ -24,9 +24,9 @@ server:
 
     random_seed: 15
 
-    checkpoint_path: checkpoints_MAS_aggregate
+    checkpoint_path: checkpoints_MAS_aggregate_seed_15
 
-    model_path: models/pretrained_MAS_aggregate
+    model_path: models/pretrained_MAS_aggregate_seed_15
 
     percentile: 20
 
