@@ -631,7 +631,7 @@ class Trainer(basic.Trainer):
         return sum(avg_reward)/len(avg_reward)
 
         
-    def evaluate_policy(self, eval_episodes = 10):
+    def evaluate_policy(self, eval_episodes = Config().algorithm.traces_per_task):
         # TODO: after aggregation, rewards are not same across different runs, why?
         self.model.eval()
         
