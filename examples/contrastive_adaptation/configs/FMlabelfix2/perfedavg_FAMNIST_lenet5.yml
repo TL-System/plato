@@ -109,8 +109,9 @@ data:
 trainer:
     # The type of the trainer
     type: basic
+
     # The maximum number of training rounds
-    rounds: 200
+    rounds: 150
 
     # Whether the training should use multiple GPUs if available
     parallelized: false

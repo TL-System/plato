@@ -486,6 +486,8 @@ class Trainer(basic.Trainer):
         # Define the test phase of the eval stage
         acc_meter = optimizers.AverageMeter(name='Accuracy')
         defined_model.eval()
+        defined_model.to(self.device)
+
         correct = 0
 
         acc_meter.reset()
@@ -520,6 +522,7 @@ class Trainer(basic.Trainer):
 
         epoch_loss_meter.reset()
         defined_model.train()
+        defined_model.to(self.device)
 
         pers_epochs = config["pers_epochs"]
         epoch_log_interval = pers_epochs + 1
