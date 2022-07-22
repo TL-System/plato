@@ -5,10 +5,10 @@ general:
 
 clients:
     # The total number of clients
-    total_clients: 3
+    total_clients: 6
 
     # The number of clients selected in each round
-    per_round: 3
+    per_round: 6
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -61,7 +61,7 @@ trainer:
     #The type of trainer
     type: basic
     # The maximum number of training rounds
-    rounds: 20
+    rounds: 30
 
     # The maximum number of clients running concurrently
     max_concurrency: 6
