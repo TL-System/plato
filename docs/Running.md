@@ -111,7 +111,8 @@ Then add your configuration parameters in the job script. The following is an ex
 
 module load gcc/9.3.0 arrow cuda/11 python/3.9 scipy-stack
 source ~/.federated/bin/activate
-./run -c configs/CIFAR10/fedavg_wideresnet.yml --log=info
+
+./run -c configs/CIFAR10/fedavg_wideresnet.yml
 ```
 
 **Note:** On `cedar` and `graham`, one should remove the `--nodes=1` option.
@@ -184,6 +185,35 @@ If runtime exceptions occur that prevent a federated learning session from runni
 * The time that a client waits for the server to respond before disconnecting is too short. This could happen when training with large neural network models. If you get an `AssertionError` saying that there are not enough launched clients for the server to select, this could be the reason. But make sure you first check if it is due to the *out of CUDA memory* error.
 
   *Potential solutions:* Add `ping_timeout` in the `server` section in your configuration file. The default value for `ping_timeout` is 360 (seconds). 
+
+
+### Running jobs of HuggingFace
+
+Running a job of HuggingFace requires connecting to the Internet to download the dataset and the model. However, Compute Canada doesn't allow Internet connections inside sbatch/salloc. Therefore, they need to be pre-downloaded via the following steps:
+
+1. Run the command first outside sbatch/salloc, for example,
+```
+./run -c <your configuration file>
+```
+, and use `control + C` to terminate the program right after the first client starts training. After this step, the dataset and the model should be automatically downloaded.
+
+2. Switch to running it inside sbatch/salloc, and add `TRANSFORMERS_OFFLINE=1` before the command. The above is a sample job script:
+
+```
+#!/bin/bash
+#SBATCH --time=4:00:00
+#SBATCH --nodes=1
+#SBATCH --gres=gpu:7
+#SBATCH --mem=498G
+#SBATCH --account=def-baochun
+#SBATCH --output=<output file>
+
+module load gcc/9.3.0 arrow cuda/11 python/3.9 scipy-stack
+source ~/.federated/bin/activate
+
+TRANSFORMERS_OFFLINE=1 ./run -c <your configuration file>
+```
+
 
 ### Removing the Python virtual environment
 
