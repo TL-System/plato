@@ -191,13 +191,9 @@ If runtime exceptions occur that prevent a federated learning session from runni
 
 Running a job of HuggingFace requires connecting to the Internet to download the dataset and the model. However, Compute Canada doesn't allow Internet connections inside sbatch/salloc. Therefore, they need to be pre-downloaded via the following steps:
 
-1. Run the command first outside sbatch/salloc, for example,
-```
-./run -c <your configuration file>
-```
-, and use `control + C` to terminate the program right after the first client starts training. After this step, the dataset and the model should be automatically downloaded.
+1. Run the command first outside sbatch/salloc, for example, `./run -c <your configuration file>`, and use `control + C` to terminate the program right after the first client starts training. After this step, the dataset and the model should be automatically downloaded.
 
-2. Switch to running it inside sbatch/salloc, and add `TRANSFORMERS_OFFLINE=1` before the command. The above is a sample job script:
+2. Switch to running it inside sbatch/salloc, and add `TRANSFORMERS_OFFLINE=1` before the command. The below is a sample job script:
 
 ```
 #!/bin/bash
