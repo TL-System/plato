@@ -8,8 +8,6 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    random_seed: 1
-
 server:
     address: 127.0.0.1
     port: 8000
@@ -21,36 +19,31 @@ server:
     checkpoint_path: models/cifar10
     model_path: models/cifar10
 
-    random_seed: 1
-
 data:
     # The training and testing dataset
     datasource: CIFAR10
 
     # Number of samples in each partition
-    partition_size: 500
+    partition_size: 1000
 
     # IID or non-IID?
-    sampler: noniid
+    sampler: iid
 
     # The concentration parameter for the Dirichlet distribution
-    concentration: 5
+    concentration: 10
 
     # Where the dataset is located
     data_path: data/CIFAR10
 
-    # The random seed for sampling data
-    random_seed: 1
-
 trainer:
     # The maximum number of training rounds
-    rounds: 500
+    rounds: 150
 
     # The maximum number of clients running concurrently
-    max_concurrency: 5
+    max_concurrency: 10
 
     # The target accuracy
-    target_accuracy: 0.75
+    target_accuracy: 0.80
 
     # Number of epoches for local training in each communication round
     epochs: 5
@@ -58,7 +51,7 @@ trainer:
     optimizer: SGD
     learning_rate: 0.1
     momentum: 0.9
-    weight_decay: 0.0001
+    weight_decay: 0.0
 
     # Learning rate schedule
     lr_schedule: LambdaLR
@@ -66,7 +59,7 @@ trainer:
     lr_milestone_steps: 80ep,120ep
 
     # The machine learning model
-    model_name: dlg
+    model_name: resnet_18
     num_classes: 10
 
 algorithm:
@@ -114,9 +107,6 @@ algorithm:
     Q: 6
     # for GC
     prune_pct: 80
-
-    # The random seed for dummy data and label
-    random_seed: 1
 
 results:
     result_path: results/cifar10
