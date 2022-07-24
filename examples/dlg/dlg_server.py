@@ -45,7 +45,6 @@ from utils.utils import total_variation as TV
 
 cross_entropy = torch.nn.CrossEntropyLoss()
 tt = transforms.ToPILImage()
-torch.manual_seed(Config().algorithm.random_seed)
 
 partition_size = Config().data.partition_size
 epochs = Config().trainer.epochs
@@ -226,6 +225,7 @@ class Server(fedavg.Server):
                                      trial_result_path)
 
         # Generate dummy items and initialize optimizer
+        torch.manual_seed(Config().algorithm.random_seed)
         dummy_data = torch.randn(data_size).to(
             Config().device()).requires_grad_(True)
 
