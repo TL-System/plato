@@ -5,28 +5,28 @@ general:
 
 clients:
     # The total number of clients
-    total_clients: 6
+    total_clients: 3
 
     # The number of clients selected in each round
-    per_round: 6
+    per_round: 3
 
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    random_seed: 15
+    random_seed: 10
 
 server:
     address: 127.0.0.1
-    port: 8025
+    port: 8027
 
     # Should we simulate the wall-clock time on the server? Useful if max_concurrency is specified
     simulate_wall_time: true
 
-    random_seed: 15
+    random_seed: 10
 
-    checkpoint_path: checkpoints_critic_grad_lamda5_aggregate_seed_15
+    checkpoint_path: checkpoints_critic_grad_lamda6_aggregate_seed_10
 
-    model_path: models/pretrained_critic_grad_lamda5_aggregate_seed_15
+    model_path: models/pretrained_critic_grad_lamda6_aggregate_seed_10
 
     percentile: 20
 
@@ -55,7 +55,7 @@ data:
     concentration: 0.5
 
     # The random seed for sampling data
-    random_seed: 15
+    random_seed: 10
 
 trainer:
     #The type of trainer
@@ -81,10 +81,10 @@ trainer:
     # The machine learning model
     model_name: lenet5
 
-    manual_seed: 15
+    manual_seed: 10
 
     penalize_omega: True
-    lamda: 5
+    lamda: 6
 
 algorithm:
     # Aggregation algorithm
@@ -120,8 +120,8 @@ algorithm:
     max_round_episodes: 400
 
     # Curriculum learning, fixed difficulty level for motivation experiment
-    difficulty_levels: 6
-    traces_per_task: 10
+    difficulty_levels: 3
+    traces_per_task: 1
 
     #If we should save the model or not
     save_models: False
@@ -139,8 +139,8 @@ results:
     # Plot results (x_axis-y_axis)
     plot: round-accuracy, elapsed_time-accuracy
 
-    results_dir: examples/park_env/results_critic_grad_lamda5_aggregate
+    results_dir: examples/park_env/results_critic_grad_lamda6_aggregate
 
     file_name: A2C_ABR
 
-    seed_random_path: examples/park_env/seeds_critic_grad_lamda5_aggregate
+    seed_random_path: examples/park_env/seeds_critic_grad_lamda6_aggregate
