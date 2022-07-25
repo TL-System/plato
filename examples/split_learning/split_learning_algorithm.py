@@ -52,7 +52,7 @@ class Algorithm(fedavg.Algorithm):
 
         tic = time.perf_counter()
 
-        feature_dataset = []
+        features_dataset = []
 
         for inputs, targets, *__ in data_loader:
             logits = self.model.forward_to(inputs, cut_layer)
@@ -60,15 +60,15 @@ class Algorithm(fedavg.Algorithm):
             logits = logits.clone().detach().requires_grad_(True)
 
             for i in np.arange(logits.shape[0]):  # each sample in the batch
-                feature_dataset.append((logits[i], targets[i]))
+                features_dataset.append((logits[i], targets[i]))
 
         toc = time.perf_counter()
         logging.info("[Client #%d] Features extracted from %s examples.",
-                     self.client_id, len(feature_dataset))
-        logging.info("[Client #{}] Time used: {:.2f} seconds.".format(
-            self.client_id, toc - tic))
+                     self.client_id, len(features_dataset))
+        logging.info("[Client #%d] Time used: %.2f seconds.", self.client_id,
+                     toc - tic)
 
-        return feature_dataset, toc - tic
+        return features_dataset, toc - tic
 
     def complete_train(self, config, dataset, sampler, cut_layer: str):
         """ Sending the model to the device used for training. """
@@ -108,8 +108,8 @@ class Algorithm(fedavg.Algorithm):
         toc = time.perf_counter()
 
         logging.info("[Client #%d] Training completed.", self.client_id)
-        logging.info("[Client #{}] Time used: {:.2f} seconds.".format(
-            self.client_id, toc - tic))
+        logging.info("[Client #%d] Time used: %.2f seconds.", self.client_id,
+                     toc - tic)
 
         return toc - tic
 

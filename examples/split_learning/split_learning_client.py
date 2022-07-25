@@ -54,7 +54,7 @@ class Client(simple.Client):
         comm_time = time.time()
         training_time = 0
 
-        if self.gradient_received == False:
+        if not self.gradient_received:
             # Perform a forward pass till the cut layer in the model
             features, training_time = self.algorithm.extract_features(
                 self.trainset, self.sampler,

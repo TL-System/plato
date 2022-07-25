@@ -70,17 +70,14 @@ class Server(fedavg.Server):
             self.algorithm.train(feature_dataset, sampler,
                                  Config().algorithm.cut_layer)
             # Test the updated model
-            self.accuracy = self.trainer.test(self.testset)
-            logging.info(
-                '[Server #{:d}] Global model accuracy: {:.2f}%\n'.format(
-                    os.getpid(), 100 * self.accuracy))
-
-            payload = self.load_gradients()
-            logging.info("[Server #%d] Reporting gradients to client #%d.",
-                         os.getpid(), client_id)
+            accuracy = self.trainer.test(self.testset)
+            logging.info('[Server #%d] Global model accuracy: %.2f%%\n',
+                         os.getpid(), 100 * accuracy)
 
             # Sending the server payload to the clients
             payload = self.load_gradients()
+            logging.info("[Server #%d] Reporting gradients to client #%d.",
+                         os.getpid(), client_id)
             await self.send(sid, payload, client_id)
             return
 
