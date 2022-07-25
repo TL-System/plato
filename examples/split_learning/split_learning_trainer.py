@@ -30,13 +30,12 @@ class Trainer(basic.Trainer):
         _train_loader = getattr(self, "train_loader", None)
 
         if callable(_train_loader):
-            train_loader = self.train_loader(batch_size, trainset, sampler,
+            train_loader = self.train_loader(batch_size, trainset,
                                              cut_layer)
         else:
             train_loader = torch.utils.data.DataLoader(dataset=trainset,
                                                        shuffle=False,
-                                                       batch_size=batch_size,
-                                                       sampler=sampler)
+                                                       batch_size=batch_size)
 
         iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
 
