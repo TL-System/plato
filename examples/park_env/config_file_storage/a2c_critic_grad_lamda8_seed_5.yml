@@ -139,8 +139,8 @@ results:
   # Plot results (x_axis-y_axis)
   plot: round-accuracy, elapsed_time-accuracy
 
-  results_dir: examples/park_env/results_critic_grad_lamda6_aggregate
+  results_dir: examples/park_env/results_critic_grad_lamda8_aggregate
 
   file_name: A2C_ABR
 
-  seed_random_path: examples/park_env/seeds_critic_grad_lamda6_aggregate
+  seed_random_path: examples/park_env/seeds_critic_grad_lamda8_aggregate
