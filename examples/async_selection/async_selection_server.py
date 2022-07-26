@@ -70,10 +70,16 @@ class Server(fedavg.Server):
             #self.squared_deltas_current_round[client_id - 1]  #
             # calculate the largest value in each layer and sum them up for the bound
             for layer, value in delta.items():
-                temp_max = torch.max(value).detach().cpu().numpy()
-                temp_max_square = np.square(temp_max)
-                self.squared_deltas_current_round[client_id -
-                                                  1] += temp_max_square
+                if 'conv' in layer: 
+                    temp_max = torch.max(value).detach().cpu().numpy()
+                    temp_max_abs = np.absolute(temp_max)
+                    #print(value)
+                    #print("max_abs: ", temp_max_abs)
+                    if temp_max_abs > self.squared_deltas_current_round[client_id -
+                                                    1]:
+                    
+                        self.squared_deltas_current_round[client_id -
+                                                    1] = temp_max_abs
 
             #self.squared_deltas_current_round[client_id - 1] = np.square(
             #torch.max(delta).detach().cpu().numpy())
@@ -164,6 +170,7 @@ class Server(fedavg.Server):
             A = sparse([[A], [A1]])
 
         b = matrix([1.])
+        solvers.options['maxiters']=500
         sol = solvers.gp(
             K, F, g, G, h, A, b,
             solver='mosek')['x']  # solve out the probabitliy of each client
