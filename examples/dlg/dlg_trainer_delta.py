@@ -17,7 +17,7 @@ from torchvision import transforms
 
 from defense.GradDefense.dataloader import get_root_set_loader
 from defense.GradDefense.sensitivity import compute_sens
-from defense.pluto.perturb import compute_risk
+from defense.outpost.perturb import compute_risk
 from utils.utils import cross_entropy_for_onehot, label_to_onehot
 
 criterion = cross_entropy_for_onehot
