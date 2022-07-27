@@ -93,7 +93,11 @@ algorithm:
 
     ## Defense related
     # Choose from GradDefense, Soteria, GC (model compression), DP (differential privacy)...
-    defense: Soteria
+    defense: Pluto
+    # for Pluto
+    beta: 0.125
+    prune_base: 100
+    perturb_base: 0.05
     # for GradDefense
     clip: true
     slices_num: 10
