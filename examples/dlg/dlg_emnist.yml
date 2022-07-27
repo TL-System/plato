@@ -25,7 +25,7 @@ data:
     partition_size: 1
 
     # IID or non-IID?
-    sampler: noniid
+    sampler: iid
 
     # The concentration parameter for the Dirichlet distribution
     concentration: 1
@@ -44,7 +44,7 @@ trainer:
     target_accuracy: 1.0
 
     # Number of epoches for local training in each communication round
-    epochs: 5
+    epochs: 1
     batch_size: 1
     optimizer: SGD
     learning_rate: 0.01
@@ -61,12 +61,12 @@ algorithm:
 
     ## Data reconstruction related configurations
     # Choose from DLG (default), iDLG, csDLG
-    attack_method: no
+    attack_method: csDLG
     # For calculating the loss between dummy and target gradients/updates
     # Choose from l2, l1, max, sim, simlocal
-    cost_fn: l2
+    cost_fn: sim
     # Weight for adding total data variation to the loss
-    total_variation: 0
+    total_variation: 0.0
     # Learning rate of the optimizer to reconstruct data
     lr: 1
 
@@ -85,18 +85,22 @@ algorithm:
     # otherwise by matching gradients calculated from updates
     match_weights: true
     # Matching weights (absolute) or weight updates (delta)
-    use_updates: false
+    use_updates: true
     # The number of times the attack will be attempted
-    trials: 4
+    trials: 5
 
     ## Defense related
     # Choose from GradDefense, Soteria, GC (model compression), DP (differential privacy)...
-    defense: no
+    defense: Pluto
+    # for Pluto
+    beta: 0.125
+    prune_base: 100
+    perturb_base: 0.05
     # for GradDefense
     clip: true
     slices_num: 10
     perturb_slices_num: 5
-    scale: 0.0005
+    scale: 0.01
     Q: 6
     # for Soteria
     threshold: 50
