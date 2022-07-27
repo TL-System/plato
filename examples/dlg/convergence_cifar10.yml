@@ -47,7 +47,7 @@ trainer:
 
     # Number of epoches for local training in each communication round
     epochs: 5
-    batch_size: 128
+    batch_size: 32
     optimizer: SGD
     learning_rate: 0.1
     momentum: 0.9
@@ -58,9 +58,11 @@ trainer:
     lr_gamma: 0.1
     lr_milestone_steps: 80ep,120ep
 
-    # The machine learning model
-    model_name: resnet_18
+    # # The machine learning model
+    model_name: dlg
     num_classes: 10
+    # The machine learning model
+    # model_name: resnet_18
 
 algorithm:
     # Aggregation algorithm
@@ -98,13 +100,19 @@ algorithm:
 
     ## Defense related
     # Choose from GradDefense, Soteria, GC (model compression), DP (differential privacy)...
-    defense: no
+    defense: Pluto
+    # for Pluto
+    beta: 0.125
+    prune_base: 100
+    perturb_base: 0.05
     # for GradDefense
-    clip: false
+    clip: true
     slices_num: 10
     perturb_slices_num: 5
-    scale: 0.0005
+    scale: 0.01
     Q: 6
+    # for Soteria
+    threshold: 50
     # for GC
     prune_pct: 80
 

@@ -3,6 +3,7 @@ import logging
 import math
 import os
 import pickle
+import random
 import time
 from collections import OrderedDict
 
@@ -15,6 +16,7 @@ from torchvision import transforms
 
 from defense.GradDefense.dataloader import get_root_set_loader
 from defense.GradDefense.sensitivity import compute_sens
+from defense.pluto.perturb import compute_risk
 from utils.utils import cross_entropy_for_onehot, label_to_onehot
 
 criterion = cross_entropy_for_onehot
@@ -55,12 +57,12 @@ class Trainer(basic.Trainer):
         self.model.to(self.device)
         self.model.train()
 
-        if hasattr(Config().algorithm,
-                   'defense') and Config().algorithm.defense == 'GradDefense':
-            root_set_loader = get_root_set_loader(trainset)
-            sensitivity = compute_sens(model=self.model,
-                                       rootset_loader=root_set_loader,
-                                       device=Config().device())
+        if hasattr(Config().algorithm, 'defense'):
+            if Config().algorithm.defense == 'GradDefense':
+                root_set_loader = get_root_set_loader(trainset)
+                sensitivity = compute_sens(model=self.model,
+                                           rootset_loader=root_set_loader,
+                                           device=Config().device())
 
         target_grad = None
         total_local_steps = epochs * math.ceil(partition_size / batch_size)
@@ -92,6 +94,7 @@ class Trainer(basic.Trainer):
                     for index in range(len(examples)):
                         outputs, _ = self.model(
                             torch.unsqueeze(examples[index], dim=0))
+
                         loss = loss_criterion(
                             outputs, torch.unsqueeze(labels[index], dim=0))
                         grad = torch.autograd.grad(
@@ -181,6 +184,17 @@ class Trainer(basic.Trainer):
                             grad_tensor = grad_tensor + noise
                             list_grad[i] = torch.Tensor(
                                 grad_tensor).to(self.device)
+
+                    elif Config().algorithm.defense == 'Pluto':
+                        iteration = epoch * (batch_id + 1)
+                        # Probability decay
+                        if random.random() < 1 / (1 + Config().algorithm.beta * iteration):
+                            # Risk evaluation
+                            risk = compute_risk(self.model)
+                            # Perturb
+                            from defense.pluto.perturb import noise
+                            list_grad = noise(dy_dx=list_grad, risk=risk)
+
 
                     # cast grad back to tuple type
                     grad = tuple(list_grad)
