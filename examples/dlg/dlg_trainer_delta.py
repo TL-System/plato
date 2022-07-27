@@ -6,6 +6,7 @@ import pickle
 import random
 import time
 from collections import OrderedDict
+from copy import deepcopy
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -56,13 +57,7 @@ class Trainer(basic.Trainer):
 
         self.model.to(self.device)
         self.model.train()
-
-        if hasattr(Config().algorithm, 'defense'):
-            if Config().algorithm.defense == 'GradDefense':
-                root_set_loader = get_root_set_loader(trainset)
-                sensitivity = compute_sens(model=self.model,
-                                           rootset_loader=root_set_loader,
-                                           device=Config().device())
+        last_model = deepcopy(self.model)
 
         target_grad = None
         total_local_steps = epochs * math.ceil(partition_size / batch_size)
@@ -119,89 +114,11 @@ class Trainer(basic.Trainer):
                         only_inputs=True)
                     list_grad = list((_.detach().clone() for _ in grad))
 
-                # Apply defense if needed
-                if hasattr(Config().algorithm, 'defense'):
-                    if Config().algorithm.defense == 'GradDefense':
-                        if hasattr(Config().algorithm,
-                                   'clip') and Config().algorithm.clip is True:
-                            from defense.GradDefense.clip import noise
-                        else:
-                            from defense.GradDefense.perturb import noise
-                        list_grad = noise(
-                            dy_dx=list_grad,
-                            sensitivity=sensitivity,
-                            slices_num=Config().algorithm.slices_num,
-                            perturb_slices_num=Config().algorithm.
-                            perturb_slices_num,
-                            noise_intensity=Config().algorithm.scale)
-
-                    elif Config().algorithm.defense == 'Soteria':
-                        deviation_f1_target = torch.zeros_like(
-                            feature_fc1_graph)
-                        deviation_f1_x_norm = torch.zeros_like(
-                            feature_fc1_graph)
-                        for f in range(deviation_f1_x_norm.size(1)):
-                            deviation_f1_target[:, f] = 1
-                            feature_fc1_graph.backward(deviation_f1_target,
-                                                       retain_graph=True)
-                            deviation_f1_x = examples.grad.data
-                            deviation_f1_x_norm[:, f] = torch.norm(
-                                deviation_f1_x.view(deviation_f1_x.size(0),
-                                                    -1),
-                                dim=1) / (feature_fc1_graph.data[:, f])
-                            self.model.zero_grad()
-                            examples.grad.data.zero_()
-                            deviation_f1_target[:, f] = 0
-
-                        deviation_f1_x_norm_sum = deviation_f1_x_norm.sum(
-                            axis=0)
-                        thresh = np.percentile(
-                            deviation_f1_x_norm_sum.flatten().cpu().numpy(),
-                            Config().algorithm.threshold)
-                        mask = np.where(
-                            abs(deviation_f1_x_norm_sum.cpu()) < thresh, 0,
-                            1).astype(np.float32)
-                        # print(sum(mask))
-                        list_grad[6] = list_grad[
-                            6] * torch.Tensor(mask).to(self.device)
-
-                    elif Config().algorithm.defense == 'GC':
-                        for i in range(len(list_grad)):
-                            grad_tensor = list_grad[i].cpu().numpy()
-                            flattened_weights = np.abs(grad_tensor.flatten())
-                            # Generate the pruning threshold according to 'prune by percentage'
-                            thresh = np.percentile(
-                                flattened_weights, Config().algorithm.prune_pct)
-                            grad_tensor = np.where(
-                                abs(grad_tensor) < thresh, 0, grad_tensor)
-                            list_grad[i] = torch.Tensor(
-                                grad_tensor).to(self.device)
-
-                    elif Config().algorithm.defense == 'DP':
-                        for i in range(len(list_grad)):
-                            grad_tensor = list_grad[i].cpu().numpy()
-                            noise = np.random.laplace(
-                                0, 1e-1, size=grad_tensor.shape)
-                            grad_tensor = grad_tensor + noise
-                            list_grad[i] = torch.Tensor(
-                                grad_tensor).to(self.device)
-
-                    elif Config().algorithm.defense == 'Pluto':
-                        iteration = epoch * (batch_id + 1)
-                        # Probability decay
-                        if random.random() < 1 / (1 + Config().algorithm.beta * iteration):
-                            # Risk evaluation
-                            risk = compute_risk(self.model)
-                            # Perturb
-                            from defense.pluto.perturb import noise
-                            list_grad = noise(dy_dx=list_grad, risk=risk)
-
-
                     # cast grad back to tuple type
                     grad = tuple(list_grad)
 
                 # Update model weights with gradients and learning rate
-                for ((name, param), grad_part) in zip(self.model.named_parameters(), grad):
+                for (param, grad_part) in zip(self.model.parameters(), grad):
                     param.data = param.data - Config().trainer.learning_rate * grad_part
 
                 # Sum up the gradients for each local update
@@ -245,6 +162,54 @@ class Trainer(basic.Trainer):
                 filename = f"{self.client_id}_{epoch}_{training_time}.pth"
                 self.save_model(filename)
                 self.model.to(self.device)
+
+        # Apply defense on model update (delta)
+        if hasattr(Config().algorithm, 'defense') and Config().algorithm.defense != 'no':
+            delta = []
+            for (param, last_param) in zip(self.model.parameters(), last_model.parameters()):
+                delta.append((param - last_param).detach().clone())
+            if Config().algorithm.defense == 'GradDefense':
+                root_set_loader = get_root_set_loader(trainset)
+                sensitivity = compute_sens(model=self.model,
+                                           rootset_loader=root_set_loader,
+                                           device=Config().device())
+                if hasattr(Config().algorithm,
+                            'clip') and Config().algorithm.clip is True:
+                    from defense.GradDefense.clip import noise
+                else:
+                    from defense.GradDefense.perturb import noise
+                delta = noise(
+                    dy_dx=[delta],
+                    sensitivity=sensitivity,
+                    slices_num=Config().algorithm.slices_num,
+                    perturb_slices_num=Config().algorithm.
+                    perturb_slices_num,
+                    noise_intensity=Config().algorithm.scale)
+
+            elif Config().algorithm.defense == 'GC':
+                for i in range(len(delta)):
+                    grad_tensor = delta[i].cpu().numpy()
+                    flattened_weights = np.abs(grad_tensor.flatten())
+                    # Generate the pruning threshold according to 'prune by percentage'
+                    thresh = np.percentile(
+                        flattened_weights, Config().algorithm.prune_pct)
+                    grad_tensor = np.where(
+                        abs(grad_tensor) < thresh, 0, grad_tensor)
+                    delta[i] = torch.Tensor(
+                        grad_tensor).to(self.device)
+
+            elif Config().algorithm.defense == 'DP':
+                for i in range(len(delta)):
+                    grad_tensor = delta[i].cpu().numpy()
+                    noise = np.random.laplace(
+                        0, 1e-1, size=grad_tensor.shape)
+                    grad_tensor = grad_tensor + noise
+                    delta[i] = torch.Tensor(
+                        grad_tensor).to(self.device)
+            
+            for (param, last_param, d) in zip(self.model.parameters(), last_model.parameters(), delta):
+                param.data = last_param.data + d
+
 
         if hasattr(Config().algorithm,
                    'share_gradients') and Config().algorithm.share_gradients:
