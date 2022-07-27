@@ -10,13 +10,13 @@ from collections import OrderedDict
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
+from defense.outpost.perturb import compute_risk
 from plato.config import Config
 from plato.trainers import basic
 from torchvision import transforms
 
 from defense.GradDefense.dataloader import get_root_set_loader
 from defense.GradDefense.sensitivity import compute_sens
-from defense.pluto.perturb import compute_risk
 from utils.utils import cross_entropy_for_onehot, label_to_onehot
 
 criterion = cross_entropy_for_onehot
@@ -98,12 +98,11 @@ class Trainer(basic.Trainer):
 
                         loss = loss_criterion(
                             outputs, torch.unsqueeze(labels[index], dim=0))
-                        grad = torch.autograd.grad(
-                            loss,
-                            self.model.parameters(),
-                            retain_graph=True,
-                            create_graph=True,
-                            only_inputs=True)
+                        grad = torch.autograd.grad(loss,
+                                                   self.model.parameters(),
+                                                   retain_graph=True,
+                                                   create_graph=True,
+                                                   only_inputs=True)
                         list_grad.append(
                             list((_.detach().clone() for _ in grad)))
                 else:
@@ -111,12 +110,11 @@ class Trainer(basic.Trainer):
 
                     # Save the ground truth and gradients
                     loss = loss_criterion(outputs, labels)
-                    grad = torch.autograd.grad(
-                        loss,
-                        self.model.parameters(),
-                        retain_graph=True,
-                        create_graph=True,
-                        only_inputs=True)
+                    grad = torch.autograd.grad(loss,
+                                               self.model.parameters(),
+                                               retain_graph=True,
+                                               create_graph=True,
+                                               only_inputs=True)
                     list_grad = list((_.detach().clone() for _ in grad))
 
                 # Apply defense if needed
@@ -131,8 +129,8 @@ class Trainer(basic.Trainer):
                             dy_dx=list_grad,
                             sensitivity=sensitivity,
                             slices_num=Config().algorithm.slices_num,
-                            perturb_slices_num=Config().algorithm.
-                            perturb_slices_num,
+                            perturb_slices_num=Config(
+                            ).algorithm.perturb_slices_num,
                             noise_intensity=Config().algorithm.scale)
 
                     elif Config().algorithm.defense == 'Soteria':
@@ -162,8 +160,8 @@ class Trainer(basic.Trainer):
                             abs(deviation_f1_x_norm_sum.cpu()) < thresh, 0,
                             1).astype(np.float32)
                         # print(sum(mask))
-                        list_grad[6] = list_grad[
-                            6] * torch.Tensor(mask).to(self.device)
+                        list_grad[6] = list_grad[6] * torch.Tensor(mask).to(
+                            self.device)
 
                     elif Config().algorithm.defense == 'GC':
                         for i in range(len(list_grad)):
@@ -171,45 +169,49 @@ class Trainer(basic.Trainer):
                             flattened_weights = np.abs(grad_tensor.flatten())
                             # Generate the pruning threshold according to 'prune by percentage'
                             thresh = np.percentile(
-                                flattened_weights, Config().algorithm.prune_pct)
+                                flattened_weights,
+                                Config().algorithm.prune_pct)
                             grad_tensor = np.where(
                                 abs(grad_tensor) < thresh, 0, grad_tensor)
-                            list_grad[i] = torch.Tensor(
-                                grad_tensor).to(self.device)
+                            list_grad[i] = torch.Tensor(grad_tensor).to(
+                                self.device)
 
                     elif Config().algorithm.defense == 'DP':
                         for i in range(len(list_grad)):
                             grad_tensor = list_grad[i].cpu().numpy()
-                            noise = np.random.laplace(
-                                0, 1e-1, size=grad_tensor.shape)
+                            noise = np.random.laplace(0,
+                                                      1e-1,
+                                                      size=grad_tensor.shape)
                             grad_tensor = grad_tensor + noise
-                            list_grad[i] = torch.Tensor(
-                                grad_tensor).to(self.device)
+                            list_grad[i] = torch.Tensor(grad_tensor).to(
+                                self.device)
 
-                    elif Config().algorithm.defense == 'Pluto':
+                    elif Config().algorithm.defense == 'Outpost':
                         iteration = epoch * (batch_id + 1)
                         # Probability decay
-                        if random.random() < 1 / (1 + Config().algorithm.beta * iteration):
+                        if random.random() < 1 / (
+                                1 + Config().algorithm.beta * iteration):
                             # Risk evaluation
                             risk = compute_risk(self.model)
                             # Perturb
-                            from defense.pluto.perturb import noise
+                            from defense.outpost.perturb import noise
                             list_grad = noise(dy_dx=list_grad, risk=risk)
-
 
                     # cast grad back to tuple type
                     grad = tuple(list_grad)
 
                 # Update model weights with gradients and learning rate
-                for ((name, param), grad_part) in zip(self.model.named_parameters(), grad):
-                    param.data = param.data - Config().trainer.learning_rate * grad_part
+                for ((name, param),
+                     grad_part) in zip(self.model.named_parameters(), grad):
+                    param.data = param.data - Config(
+                    ).trainer.learning_rate * grad_part
 
                 # Sum up the gradients for each local update
                 try:
                     target_grad = [
-                        sum(x) for x in zip(
-                            list((_.detach().clone()
-                                  for _ in grad)), target_grad)
+                        sum(x)
+                        for x in zip(list((_.detach().clone()
+                                           for _ in grad)), target_grad)
                     ]
                 except:
                     target_grad = list((_.detach().clone() for _ in grad))

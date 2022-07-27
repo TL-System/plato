@@ -91,9 +91,9 @@ algorithm:
     trials: 5
 
     ## Defense related
-    # Choose from GradDefense, Soteria, GC (model compression), DP (differential privacy)...
-    defense: Pluto
-    # for Pluto
+    # Choose from GradDefense, Soteria, GC (model compression), DP (differential privacy), Outpost (ours)...
+    defense: Outpost
+    # for Outpost
     beta: 0.125
     prune_base: 100
     perturb_base: 0.05
