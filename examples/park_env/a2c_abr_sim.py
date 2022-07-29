@@ -8,18 +8,20 @@ import csv
 from torch.nn.utils.clip_grad import clip_grad_norm_
 from torch.autograd import Variable
 import sys
+import os
 
 print("Number of arguments: ", len(sys.argv), " arguments.")
 print("Argument List:", str(sys.argv))
 
 seed_number = int(''.join(filter(str.isdigit, str(sys.argv[1]))))
+model_path = "./examples/park_env/"
 
 ENTROPY_RATIO = 10.0
 ENTROPY_DECAY = 0.00004
 ENTROPY_MIN = 0
 SEED = seed_number
 GRAD_CLIP_VAL = 10
-MAX_EPISODES = 24000
+MAX_EPISODES = 32000
 #Seed set:
 torch.manual_seed(SEED)
 
@@ -279,6 +281,8 @@ while episode_num < MAX_EPISODES:
 
     if episode_num % 50 == 0:
         evaluate_policy()
+        torch.save(actor.state_dict(), model_path+"/actor_model_seed_%s.pth" % str(SEED))
+        torch.save(critic.state_dict(),model_path + "/critic_model_seed_%s.pth" % str(SEED))
 
     np.savetxt("episodic_reward_"+str(SEED)+".csv", episode_rewards, delimiter =", ")
     np.savetxt("critic_losses_"+str(SEED)+".csv", critic_losses, delimiter =", ")
