@@ -3,7 +3,7 @@ clients:
     type: split_learning
 
     # The total number of clients
-    total_clients: 3
+    total_clients: 1
 
     # The number of clients selected in each round
     per_round: 1
@@ -44,11 +44,11 @@ trainer:
     target_accuracy: 0.95
 
     # Number of epoches for local training in each communication round
-    epochs: 10
+    epochs: 1
     batch_size: 32
     optimizer: SGD
-    learning_rate: 0.01
-    momentum: 0.9
+    learning_rate: 0.001
+    momentum: 0.0
     weight_decay: 0.0
 
     # The machine learning model
