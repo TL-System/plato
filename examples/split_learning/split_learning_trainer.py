@@ -30,8 +30,7 @@ class Trainer(basic.Trainer):
         _train_loader = getattr(self, "train_loader", None)
 
         if callable(_train_loader):
-            train_loader = self.train_loader(batch_size, trainset,
-                                             cut_layer)
+            train_loader = self.train_loader(batch_size, trainset, cut_layer)
         else:
             train_loader = torch.utils.data.DataLoader(dataset=trainset,
                                                        shuffle=False,
