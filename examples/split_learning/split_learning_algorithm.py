@@ -59,7 +59,8 @@ class Algorithm(fedavg.Algorithm):
         self.input_dataset = []
 
         for inputs, targets, *__ in data_loader:
-            inputs, targets = inputs.to(self.trainer.device), targets.to(self.trainer.device)
+            inputs, targets = inputs.to(self.trainer.device), targets.to(
+                self.trainer.device)
             logits = self.model.forward_to(inputs, cut_layer)
 
             logits = logits.clone().detach().requires_grad_(True)
@@ -67,6 +68,9 @@ class Algorithm(fedavg.Algorithm):
 
             for i in np.arange(logits.shape[0]):  # each sample in the batch
                 features_dataset.append((logits[i], targets[i]))
+                # remember the order of the input train data s.t. we can
+                # update the weights with gradients from the server in the
+                # correct order.
                 self.input_dataset.append((examples[i], targets[i]))
 
         toc = time.perf_counter()
@@ -87,13 +91,15 @@ class Algorithm(fedavg.Algorithm):
         _train_loader = getattr(self.trainer, "train_loader", None)
 
         if callable(_train_loader):
-            data_loader = self.trainer.train_loader(batch_size=batch_size,
-                                                    trainset=self.input_dataset,
-                                                    extract_features=True)
+            data_loader = self.trainer.train_loader(
+                batch_size=batch_size,
+                trainset=self.input_dataset,
+                extract_features=True)
         else:
-            data_loader = torch.utils.data.DataLoader(dataset=self.input_dataset,
-                                                      shuffle=False,
-                                                      batch_size=batch_size)
+            data_loader = torch.utils.data.DataLoader(
+                dataset=self.input_dataset,
+                shuffle=False,
+                batch_size=batch_size)
 
         tic = time.perf_counter()
 
@@ -105,11 +111,13 @@ class Algorithm(fedavg.Algorithm):
         grad_index = 0
 
         for batch_id, (examples, labels) in enumerate(data_loader):
-            examples, labels = examples.to(self.trainer.device), labels.to(self.trainer.device)
+            examples, labels = examples.to(self.trainer.device), labels.to(
+                self.trainer.device)
 
             optimizer.zero_grad()
             outputs = self.model.forward_to(examples, cut_layer)
-            outputs.backward(self.gradients_list[grad_index].to(self.trainer.device))
+            outputs.backward(self.gradients_list[grad_index].to(
+                self.trainer.device))
             grad_index = grad_index + 1
             optimizer.step()
 
@@ -128,6 +136,8 @@ class Algorithm(fedavg.Algorithm):
 
         ignored_layers = []
         cut_layer_idx = self.model.layers.index(Config().algorithm.cut_layer)
+        # These layers are trained on the server, so we should ignore the weights
+        # of these layers reported by the client
         for i in range(cut_layer_idx + 1, len(self.model.layers)):
             ignored_layers.append(f"{self.model.layers[i]}.weight")
             ignored_layers.append(f"{self.model.layers[i]}.bias")
@@ -139,6 +149,7 @@ class Algorithm(fedavg.Algorithm):
             for name, current_weight in weight.items():
                 baseline = baseline_weights[name]
                 if name in ignored_layers:
+                    # Do not update the layers that are not trained on clients
                     _delta = torch.zeros(baseline.shape)
                 else:
                     # Calculate update
