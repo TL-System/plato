@@ -8,6 +8,7 @@ def compute_risk(model: nn.Module):
     var = []
     for param in model.parameters():
         var.append(torch.var(param).detach().numpy())
+    var = [min(v, 1) for v in var]
     return var
 
 
@@ -16,7 +17,7 @@ def noise(dy_dx: list, risk: list):
     fim = []
     flattened_fim = None
     for i in range(len(dy_dx)):
-        squared_grad = dy_dx[i].clone().pow(2).cpu().numpy()
+        squared_grad = dy_dx[i].clone().pow(2).mean(0).cpu().numpy()
         fim.append(squared_grad)
         if flattened_fim is None:
             flattened_fim = squared_grad.flatten()
@@ -37,7 +38,7 @@ def noise(dy_dx: list, risk: list):
                                   dy_dx[i].shape)
         noise_mask = np.where(fim[i] < fim_thresh, 0, 1)
         gauss_noise = noise_base * noise_mask
-        dy_dx[i] = (torch.Tensor(grad_tensor).to(
-            Config().device()) + gauss_noise.to(Config().device())).float()
+        dy_dx[i] = (torch.Tensor(grad_tensor).to(Config().device()) +
+                    gauss_noise.to(Config().device())).float()
 
     return dy_dx
