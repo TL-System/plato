@@ -5,18 +5,17 @@ import os
 import pickle
 import random
 import time
-from collections import OrderedDict
 
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
-from defense.outpost.perturb import compute_risk
 from plato.config import Config
 from plato.trainers import basic
 from torchvision import transforms
 
 from defense.GradDefense.dataloader import get_root_set_loader
 from defense.GradDefense.sensitivity import compute_sens
+from defense.Outpost.perturb import compute_risk
 from utils.utils import cross_entropy_for_onehot, label_to_onehot
 
 criterion = cross_entropy_for_onehot
@@ -194,15 +193,14 @@ class Trainer(basic.Trainer):
                             # Risk evaluation
                             risk = compute_risk(self.model)
                             # Perturb
-                            from defense.outpost.perturb import noise
+                            from defense.Outpost.perturb import noise
                             list_grad = noise(dy_dx=list_grad, risk=risk)
 
                     # cast grad back to tuple type
                     grad = tuple(list_grad)
 
                 # Update model weights with gradients and learning rate
-                for ((name, param),
-                     grad_part) in zip(self.model.named_parameters(), grad):
+                for (param, grad_part) in zip(self.model.parameters(), grad):
                     param.data = param.data - Config(
                     ).trainer.learning_rate * grad_part
 

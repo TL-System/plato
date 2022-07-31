@@ -1,36 +1,43 @@
-import math
-
 import numpy as np
 import torch
 import torch.nn as nn
 from plato.config import Config
-from plato.utils import csv_processor
-from utils.pseudorandom import getGause
 
-csv_file = f"var.csv"
 
 def compute_risk(model: nn.Module):
     var = []
-    for name, param in model.named_parameters():
+    for param in model.parameters():
         var.append(torch.var(param).detach().numpy())
-
-    csv_processor.write_csv(csv_file, var)
-
-    # Normalize values in [0,1]
-    norm_var = [(float(i)-min(var))/(max(var)-min(var)) for i in var]
-    return norm_var
+    return var
 
 
 def noise(dy_dx: list, risk: list):
+    # Calculate empirical FIM
+    fim = []
+    flattened_fim = None
     for i in range(len(dy_dx)):
+        squared_grad = dy_dx[i].clone().pow(2).cpu().numpy()
+        fim.append(squared_grad)
+        if flattened_fim is None:
+            flattened_fim = squared_grad.flatten()
+        else:
+            flattened_fim = np.append(flattened_fim, squared_grad.flatten())
+
+    fim_thresh = np.percentile(flattened_fim, 100 - Config().algorithm.phi)
+
+    for i in range(len(dy_dx)):
+        # pruning
         grad_tensor = dy_dx[i].cpu().numpy()
         flattened_weights = np.abs(grad_tensor.flatten())
-        thresh = np.percentile(
-            flattened_weights, Config().algorithm.prune_pct)
-        grad_tensor = np.where(
-            abs(grad_tensor) < thresh, 0, grad_tensor)
-        grad_tensor += getGause(scale=risk[i]*Config().algorithm.perturb_base)
-        dy_dx[i] = torch.Tensor(
-            grad_tensor).to(Config().device())
-    
+        thresh = np.percentile(flattened_weights,
+                               Config().algorithm.prune_base)
+        grad_tensor = np.where(abs(grad_tensor) < thresh, 0, grad_tensor)
+        # noise
+        noise_base = torch.normal(0, risk[i] * Config().algorithm.noise_base,
+                                  dy_dx[i].shape)
+        noise_mask = np.where(fim[i] < fim_thresh, 0, 1)
+        gauss_noise = noise_base * noise_mask
+        dy_dx[i] = torch.Tensor(grad_tensor).to(
+            Config().device()) + gauss_noise.to(Config().device())
+
     return dy_dx
