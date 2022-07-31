@@ -37,7 +37,7 @@ def noise(dy_dx: list, risk: list):
                                   dy_dx[i].shape)
         noise_mask = np.where(fim[i] < fim_thresh, 0, 1)
         gauss_noise = noise_base * noise_mask
-        dy_dx[i] = torch.Tensor(grad_tensor).to(
-            Config().device()) + gauss_noise.to(Config().device())
+        dy_dx[i] = (torch.Tensor(grad_tensor).to(
+            Config().device()) + gauss_noise.to(Config().device())).float()
 
     return dy_dx
