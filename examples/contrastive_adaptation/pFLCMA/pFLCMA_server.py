@@ -256,7 +256,7 @@ class Server(ssl_server.Server):
         """Aggregate the reported weight updates from the selected clients."""
         deltas = await self.federated_averaging(updates)
         updated_weights = self.algorithm.update_weights(deltas)
-        self.algorithm.load_weights(updated_weights)
+        self.algorithm.load_weights(updated_weights, strict=True)
 
         # perform the generalization_scales amend
         self.amend_generalization_scales(updates)
