@@ -1,5 +1,5 @@
 """
-A personalized federated learning trainer using FedRep.
+A personalized federated learning trainer for the FedPer method.
 
 Reference:
 
@@ -44,105 +44,6 @@ class Trainer(pers_basic.Trainer):
 
         return train_encoded, train_labels, test_outputs[
             "test_encoded"], test_outputs["test_labels"]
-
-    def freeze_model(self, model, param_prefix=None):
-        for name, param in model.named_parameters():
-            if param_prefix is not None and param_prefix in name:
-                param.requires_grad = False
-
-    def active_model(self, model, param_prefix=None):
-        for name, param in model.named_parameters():
-            if param_prefix is not None and param_prefix in name:
-                param.requires_grad = True
-
-    def train_one_epoch(self, config, epoch, defined_model, optimizer,
-                        loss_criterion, train_data_loader, epoch_loss_meter,
-                        batch_loss_meter):
-        defined_model.train()
-        epochs = config['epochs']
-
-        # load the local update epochs for head optimization
-        head_epochs = config[
-            'head_epochs'] if 'head_epochs' in config else epochs - 1
-
-        iterations_per_epoch = len(train_data_loader)
-        # default not to perform any logging
-        epoch_log_interval = epochs + 1
-        batch_log_interval = iterations_per_epoch
-
-        if "epoch_log_interval" in config:
-            epoch_log_interval = config['epoch_log_interval']
-        if "batch_log_interval" in config:
-            batch_log_interval = config['batch_log_interval']
-
-        # As presented in Section 3 of the FedRep paper, the head is optimized
-        # for (epochs - 1) while freezing the representation.
-        if epoch <= head_epochs:
-            self.freeze_model(defined_model, param_prefix="encoder")
-            self.active_model(defined_model, param_prefix="clf_fc")
-
-        # The representation will then be optimized for only one epoch
-        if epoch > head_epochs:
-            self.freeze_model(defined_model, param_prefix="clf_fc")
-            self.active_model(defined_model, param_prefix="encoder")
-
-        # print("epoch: ", epoch)
-        # for name, param in defined_model.named_parameters():
-        #     if param.requires_grad:
-        #         print(name)
-
-        epoch_loss_meter.reset()
-        # Use a default training loop
-        for batch_id, (examples, labels) in enumerate(train_data_loader):
-            # Support a more general way to hold the loaded samples
-            # The defined model is responsible for processing the
-            # examples based on its requirements.
-            if torch.is_tensor(examples):
-                examples = examples.to(self.device)
-            else:
-                examples = [
-                    each_sample.to(self.device) for each_sample in examples
-                ]
-
-            labels = labels.to(self.device)
-
-            # Reset and clear previous data
-            batch_loss_meter.reset()
-            optimizer.zero_grad()
-
-            # Forward the model and compute the loss
-            outputs = defined_model(examples)
-            loss = loss_criterion(outputs, labels)
-
-            # Perform the backpropagation
-            loss.backward()
-            optimizer.step()
-
-            # Update the loss data in the logging container
-            epoch_loss_meter.update(loss.data.item(), labels.size(0))
-            batch_loss_meter.update(loss.data.item(), labels.size(0))
-
-            # Performe logging of one batch
-            if batch_id % batch_log_interval == 0 or batch_id == iterations_per_epoch - 1:
-                if self.client_id == 0:
-                    logging.info(
-                        "[Server #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
-                        os.getpid(), epoch, epochs, batch_id,
-                        iterations_per_epoch - 1, batch_loss_meter.avg)
-                else:
-                    logging.info(
-                        "   [Client #%d] Training Epoch: \
-                        [%d/%d][%d/%d]\tLoss: %.6f", self.client_id, epoch,
-                        epochs, batch_id, iterations_per_epoch - 1,
-                        batch_loss_meter.avg)
-
-        # Performe logging of epochs
-        if (epoch - 1) % epoch_log_interval == 0 or epoch == epochs:
-            logging.info("[Client #%d] Training Epoch: [%d/%d]\tLoss: %.6f",
-                         self.client_id, epoch, epochs, epoch_loss_meter.avg)
-
-        if hasattr(optimizer, "params_state_update"):
-            optimizer.params_state_update()
 
     def perform_test_op(self, test_loader, defined_model):
 
@@ -194,6 +95,7 @@ class Trainer(pers_basic.Trainer):
         epoch_loss_meter,
     ):
         """ Performing one epoch of learning for the personalization. """
+
         personalized_model_name = Config().trainer.personalized_model_name
         current_round = kwargs['current_round']
 
@@ -213,6 +115,7 @@ class Trainer(pers_basic.Trainer):
                                             epoch=epoch - 1,
                                             run_id=None,
                                             encoded_type="testEncoded")
+
         epoch_loss_meter.reset()
         defined_model.train()
 
@@ -229,12 +132,10 @@ class Trainer(pers_basic.Trainer):
         local_progress = tqdm(pers_train_loader,
                               desc=f'Epoch {epoch}/{pers_epochs+1}',
                               disable=True)
+
         # encoded data
         train_encoded = list()
         train_labels = list()
-
-        self.freeze_model(defined_model, param_prefix="encoder")
-        self.active_model(defined_model, param_prefix="clf_fc")
 
         for _, (examples, labels) in enumerate(local_progress):
             examples, labels = examples.to(self.device), labels.to(self.device)
