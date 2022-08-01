@@ -76,31 +76,15 @@ server:
 
 data:
     # The training and testing dataset
-    datasource: FashionMNIST
+    datasource: CIFAR100
 
-    # Number of samples in each partition
-    #
-    # This is one important parameter that
-    # may lead the failure of the loss criterion part
-    # if your loss criterion relies on the batch_size
-    # as its argument. For example, the NT_Xent loss utilized
-    # by the SimCLR method set the defined batch_size as the parameter.
-    # However, at the end of one epoch, the left samples may smaller than
-    # the batch_size. This makes the #loaded samples != batch_size.
-    # Working on criterion that is defined with batch_size but receives loaded
-    # samples whose size is smaller than the batch size may causes problems.
-    # drop_last can alleviate this issue
-    # partition_size: 50000
-    # test_partition_size: 10000
-    partition_size: 600
-    test_partition_size: 600
 
     # IID or non-IID?
-    sampler: noniid
-    testset_sampler: noniid
+    sampler: label_quantity_noniid
+    testset_sampler: label_quantity_noniid
 
     # The concentration parameter for the Dirichlet distribution
-    concentration: 0.1
+    per_client_classes_size: 5
 
     # The random seed for sampling data
     random_seed: 1
@@ -109,8 +93,9 @@ data:
 trainer:
     # The type of the trainer
     type: basic
+
     # The maximum number of training rounds
-    rounds: 150
+    rounds: 200
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -129,14 +114,14 @@ trainer:
     batch_size: 64
 
     optimizer: SGD
-    learning_rate: 0.05
+    learning_rate: 0.1
     momentum: 0.9
     weight_decay: 0.000001
 
     # Learning rate schedule
     lr_schedule: MultiStepLR
     lr_gamma: 0.1
-    lr_milestones: 150,350
+    lr_milestones: 200,400
 
     epoch_log_interval: 1
     epoch_model_log_interval: 50
@@ -149,7 +134,7 @@ trainer:
     pers_batch_size: 64
     pers_optimizer: SGD
     # lr = 0.1 * batch_size / 256, see section B.6 and B.7 of SimCLR paper.
-    pers_learning_rate: 0.05
+    pers_learning_rate: 0.1
     pers_momentum: 0.9
     pers_weight_decay: 0.0
 
@@ -166,8 +151,11 @@ trainer:
     # the final fc layer will be removed
     # however, in the central test, we do not use this
     #   but use the custom model
-    model_name: lenet5
-    personalized_model_name: lenet5
+    model_name: resnet_18
+    personalized_model_name: resnet_18
+
+    # encoder, whole
+    global_model_name: whole
     # whether to maintain the state of the trained personalized
     # model in each round
     # In general, for the contrastive self-supervised learning
@@ -179,11 +167,15 @@ trainer:
     # trained personalized model in each round.
     # Then, setting do_maintain_per_state to be True to follow this
     # rule.
-    do_maintain_per_state: False
-    # encoder, whole
-    global_model_name: encoder
+    do_maintain_per_state: True
 
-    num_classes: 10
+    # Important hyper-parameters
+    # 0 for performing Per-FedAvg(FO), others for Per-FedAvg(HF)
+    hessian_free: False
+    alpha: 0.01 # 1e-2
+    beta: 0.001
+
+    num_classes: 100
 
 algorithm:
     # Aggregation algorithm

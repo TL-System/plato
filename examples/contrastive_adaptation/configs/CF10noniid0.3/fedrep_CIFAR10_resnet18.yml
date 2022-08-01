@@ -154,8 +154,14 @@ trainer:
     pers_weight_decay: 0.0
 
 
+    # currently, we only support CosineAnnealingLR
+    pers_lr_schedule: MultiStepLR
+    pers_lr_milestones: 30,40
+    pers_lr_gamma: 0.1
+
     pers_epoch_log_interval: 2
     pers_epoch_model_log_interval: 10
+
 
     # The machine learning model,
     # it behaves as the encoder for the ssl method

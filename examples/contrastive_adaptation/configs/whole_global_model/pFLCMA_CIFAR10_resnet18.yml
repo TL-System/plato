@@ -6,7 +6,6 @@ general:
     # - central_code_test
     # - central
     # - script
-    # - code_test
     # - user
 
     running_mode: user
@@ -38,10 +37,10 @@ clients:
     # on all clients
     do_final_personalization: True
     # Minotor the self-supervised learning by knn for
-    # every 1 round
-    test_interval: 10
+    # every 5 round
+    test_interval: 5
     # Train the personalized model based on the
-    # learned representation every 1 rounds
+    # learned representation every 10 rounds
     pers_learning_interval: 10
 
     # Whether simulate clients or not
@@ -51,7 +50,7 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8012
+    port: 8014
     synchronous: true
     do_test: false
 
@@ -73,10 +72,9 @@ server:
     model_path: xxx
     checkpoint_path: xxx
 
-
 data:
     # The training and testing dataset
-    datasource: FashionMNIST
+    datasource: CIFAR10
 
     # Number of samples in each partition
     #
@@ -90,8 +88,6 @@ data:
     # Working on criterion that is defined with batch_size but receives loaded
     # samples whose size is smaller than the batch size may causes problems.
     # drop_last can alleviate this issue
-    # partition_size: 50000
-    # test_partition_size: 10000
     partition_size: 600
     test_partition_size: 600
 
@@ -100,11 +96,22 @@ data:
     testset_sampler: noniid
 
     # The concentration parameter for the Dirichlet distribution
-    concentration: 0.1
+    concentration: 0.3
 
     # The random seed for sampling data
     random_seed: 1
 
+    # set the data wrapper to further process the data
+    #   for the specific usage, such as constrastive learning
+    # data_wrapper: Null
+    data_wrapper: ContrastiveAugmentWrapper
+
+    # set the data augmentation
+    #   options: simsiam, byol, simclr
+    augment_transformer_name: simclr
+    # some methods apply the normalization to samples
+    #   while others do not
+    is_norm: True
 
 trainer:
     # The type of the trainer
@@ -116,7 +123,7 @@ trainer:
     parallelized: false
 
     # The maximum number of clients running concurrently
-    max_concurrency: 3
+    max_concurrency: 2
 
     # The target accuracy
     target_accuracy: 0.9
@@ -126,30 +133,35 @@ trainer:
     # the memory allocation issue as the contrastive samples occupy more
     # space as more samples will be contained within one loading.
     epochs: 3
-    batch_size: 64
+    batch_size: 256
 
-    optimizer: SGD
-    learning_rate: 0.05
+    optimizer: Lars
+    learning_rate: 0.4
+    eta_lars: 0.02
     momentum: 0.9
-    weight_decay: 0.000001
+    grad_clip_lars: True
+    exclude_bias_n_norm: True
+    weight_decay: 0.00001
 
     # Learning rate schedule
-    lr_schedule: MultiStepLR
-    lr_gamma: 0.1
-    lr_milestones: 150,350
+    lr_schedule: WarmupCosine
+    warmup_epochs: 10
+    max_epochs: 450 # should be epochs * rounds
+    warmup_start_lr: 0.00003
+    min_lr: 0.0
 
     epoch_log_interval: 1
-    epoch_model_log_interval: 50
-    batch_log_interval: 50
+    epoch_model_log_interval: 1
+    batch_log_interval: 1
 
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
     # does not utilize the
-    pers_epochs: 1
-    pers_batch_size: 64
+    pers_epochs: 5
+    pers_batch_size: 256
     pers_optimizer: SGD
     # lr = 0.1 * batch_size / 256, see section B.6 and B.7 of SimCLR paper.
-    pers_learning_rate: 0.05
+    pers_learning_rate: 0.1
     pers_momentum: 0.9
     pers_weight_decay: 0.0
 
@@ -158,16 +170,34 @@ trainer:
     pers_lr_milestones: 30,40
     pers_lr_gamma: 0.1
 
-    pers_epoch_log_interval: 2
-    pers_epoch_model_log_interval: 10
+    pers_epoch_log_interval: 1
+    pers_epoch_model_log_interval: 1
+
+    # temperature
+    temperature: 0.2
+
+    # image_size
+    #  - STL10 (Image size=96)
+    #  - CIFAR10 (Image size=32)
+    #  - MNIST (Image size=28)
+    image_size: 32
 
     # The machine learning model,
     # it behaves as the encoder for the ssl method
     # the final fc layer will be removed
     # however, in the central test, we do not use this
     #   but use the custom model
-    model_name: lenet5
-    personalized_model_name: lenet5
+    external_encoder: False
+    model_name: resnet_18
+    # in general, the projection_dim = prediction_dim
+    projection_dim: 256
+    projection_hidden_dim: 2048
+
+    # name of the component used as the global model
+    global_model_name: whole
+
+    personalized_model_name: pure_one_layer_mlp
+
     # whether to maintain the state of the trained personalized
     # model in each round
     # In general, for the contrastive self-supervised learning
@@ -179,9 +209,13 @@ trainer:
     # trained personalized model in each round.
     # Then, setting do_maintain_per_state to be True to follow this
     # rule.
-    do_maintain_per_state: False
-    # encoder, whole
-    global_model_name: encoder
+    # For central learning with one round training, this is useless
+    do_maintain_per_state: false
+
+    monitor_name: knn
+    knn_k: 20
+    knn_t: 0.1
+    hide_monitor_progress: False
 
     num_classes: 10
 

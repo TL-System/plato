@@ -76,7 +76,7 @@ server:
 
 data:
     # The training and testing dataset
-    datasource: FashionMNIST
+    datasource: CIFAR100
 
     # Number of samples in each partition
     #
@@ -110,7 +110,7 @@ trainer:
     # The type of the trainer
     type: basic
     # The maximum number of training rounds
-    rounds: 150
+    rounds: 200
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -129,14 +129,14 @@ trainer:
     batch_size: 64
 
     optimizer: SGD
-    learning_rate: 0.05
+    learning_rate: 0.02
     momentum: 0.9
     weight_decay: 0.000001
 
     # Learning rate schedule
     lr_schedule: MultiStepLR
     lr_gamma: 0.1
-    lr_milestones: 150,350
+    lr_milestones: 200,400
 
     epoch_log_interval: 1
     epoch_model_log_interval: 50
@@ -166,8 +166,8 @@ trainer:
     # the final fc layer will be removed
     # however, in the central test, we do not use this
     #   but use the custom model
-    model_name: lenet5
-    personalized_model_name: lenet5
+    model_name: resnet_18
+    personalized_model_name: resnet_18
     # whether to maintain the state of the trained personalized
     # model in each round
     # In general, for the contrastive self-supervised learning
@@ -183,7 +183,7 @@ trainer:
     # encoder, whole
     global_model_name: encoder
 
-    num_classes: 10
+    num_classes: 100
 
 algorithm:
     # Aggregation algorithm

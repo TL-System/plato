@@ -164,19 +164,9 @@ checkpoints/
 *.pth
 
 # macOS
-.DS_Store
 
 # Plain text files in the root working directory are most likely temporary
 /*.txt
 examples/contrastive_adaptation/visualization/libs
 examples/contrastive_adaptation/visualization
-examples/contrastive_adaptation/visualization/libs/plot_libs/box_plot.py
-examples/contrastive_adaptation/visualization/libs/plot_libs/axes_set.py
-examples/contrastive_adaptation/visualization/libs/plot_libs/axes_set.py
-examples/contrastive_adaptation/visualization/libs/plot_libs/box_plot.py
-examples/contrastive_adaptation/visualization/libs/plot_libs/axes_set.py
-examples/contrastive_adaptation/visualization/libs/plot_libs/box_plot.py
-examples/contrastive_adaptation/visualization/libs/plot_libs/configs.py
-examples/contrastive_adaptation/visualization/libs/plot_libs/curve_plot.py
-examples/contrastive_adaptation/visualization/libs/plot_libs/embedding_2d_plot.py
-examples/contrastive_adaptation/visualization/libs/utils/data_to_format.py
+.DS_Store
