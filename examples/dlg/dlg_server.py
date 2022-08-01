@@ -288,6 +288,10 @@ class Server(fedavg.Server):
             current_loss = closure().item()
             losses.append(current_loss)
 
+            if (math.isnan(current_loss)):
+                logging.info("Not a number, ending attack")
+                break
+
             if iters % log_interval == 0:
                 # Finding evaluation metrics
                 eval_dict = get_evaluation_dict(dummy_data, gt_data,
@@ -336,6 +340,16 @@ class Server(fedavg.Server):
                     round(avg_library_ssim[-1], 3)
                 ]
                 csv_processor.write_csv(trial_csv_file, new_row)
+
+        if len(history) == 1:
+            tensor_file_path = f"{trial_result_path}/tensors.pt"
+            result = {
+                i * log_interval: {j: history[i][j][0]
+                                for j in range(num_images)}
+                for i in range(len(history))
+            }
+            torch.save(result, tensor_file_path)
+            return
 
         if self.best_mse > avg_mses[-1]:
             self.best_mse = avg_mses[-1]
@@ -493,21 +507,38 @@ class Server(fedavg.Server):
     @staticmethod
     def plot_gt(num_images, gt_data, gt_labels):
         """ Plot ground truth data. """
-        gt_result_path = f"{dlg_result_path}/ground_truth.png"
-        gt_figure = plt.figure(figsize=(12, 4))
+        # gt_result_path = f"{dlg_result_path}/ground_truth.png"
+        # gt_figure = plt.figure(figsize=(12, 4))
+
+        # # Make the path if it does not exist yet
+        # if not os.path.exists(dlg_result_path):
+        #     os.makedirs(dlg_result_path)
+
+        # for i in range(num_images):
+        #     current_label = torch.argmax(gt_labels[i], dim=-1).item()
+        #     logging.info("Ground truth labels: %d", current_label)
+        #     gt_figure.add_subplot(1, num_images, i + 1)
+        #     plt.imshow(gt_data[i].cpu().permute(1, 2, 0))
+        #     # torch.save(gt_data[i].cpu().permute(1, 2, 0), "gt3.pt")
+        #     plt.axis('off')
+        #     plt.title("GT image %d\nLabel: %d" % ((i + 1), current_label))
+        # plt.savefig(gt_result_path)
+
+        gt_result_path = f"{dlg_result_path}/ground_truth.pdf"
+        # gt_figure = plt.figure(figsize=(8, 8))
 
         # Make the path if it does not exist yet
         if not os.path.exists(dlg_result_path):
             os.makedirs(dlg_result_path)
 
-        for i in range(num_images):
-            current_label = torch.argmax(gt_labels[i], dim=-1).item()
-            logging.info("Ground truth labels: %d", current_label)
-            gt_figure.add_subplot(1, num_images, i + 1)
-            plt.imshow(gt_data[i].cpu().permute(1, 2, 0))
-            # torch.save(gt_data[i].cpu().permute(1, 2, 0), "gt3.pt")
-            plt.axis('off')
-            plt.title("GT image %d\nLabel: %d" % ((i + 1), current_label))
+        # for i in range(num_images):
+        #     current_label = torch.argmax(gt_labels[i], dim=-1).item()
+        #     logging.info("Ground truth labels: %d", current_label)
+        fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(8, 16))
+        for ind, title in enumerate(gt_data):
+            axes.ravel()[ind].imshow(gt_data[ind].cpu().permute(1, 2, 0))
+            axes.ravel()[ind].set_axis_off()
+        plt.tight_layout()
         plt.savefig(gt_result_path)
 
     @staticmethod
@@ -520,7 +551,7 @@ class Server(fedavg.Server):
         rows = math.ceil(len(history) / 2)
         outer = gridspec.GridSpec(rows, 2, wspace=0.2, hspace=0.2)
 
-        for i in range(num_iters // log_interval):
+        for i, item in enumerate(history):
             inner = gridspec.GridSpecFromSubplotSpec(1,
                                                      num_images,
                                                      subplot_spec=outer[i])
