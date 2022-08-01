@@ -206,6 +206,9 @@ class Server(fedavg.Server):
             total_local_steps = epochs * math.ceil(partition_size / batch_size)
             target_grad = [x / total_local_steps for x in target_grad]
 
+        # Generate dummy items and initialize optimizer
+        torch.manual_seed(Config().algorithm.random_seed)
+
         for trial_number in range(trials):
             self.run_trial(trial_number, num_images, data_size, target_weights,
                            target_grad, gt_data, gt_labels)
@@ -224,8 +227,6 @@ class Server(fedavg.Server):
         csv_processor.initialize_csv(trial_csv_file, dlg_result_headers,
                                      trial_result_path)
 
-        # Generate dummy items and initialize optimizer
-        torch.manual_seed(Config().algorithm.random_seed)
         dummy_data = torch.randn(data_size).to(
             Config().device()).requires_grad_(True)
 
