@@ -98,7 +98,7 @@ def main():
     x_item = 'elapsed_time'
     y_item = 'accuracy'
 
-    result_csv_file1 = './fedavg_CIFAR_500_20_10_10_concen5.csv'  #
+    result_csv_file1 = './fedavg_CIFAR_500_20_10_10_concen5.csv'
     result_dict1 = read_csv_to_dict(result_csv_file1, x_item, y_item)
 
     result_csv_file2 = './oort_CIFAR_500_20_10_10_concen5.csv'
