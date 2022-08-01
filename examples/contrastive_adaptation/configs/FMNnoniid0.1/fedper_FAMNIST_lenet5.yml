@@ -109,6 +109,7 @@ data:
 trainer:
     # The type of the trainer
     type: basic
+
     # The maximum number of training rounds
     rounds: 150
 
@@ -153,6 +154,7 @@ trainer:
     pers_momentum: 0.9
     pers_weight_decay: 0.0
 
+
     # currently, we only support CosineAnnealingLR
     pers_lr_schedule: MultiStepLR
     pers_lr_milestones: 30,40
@@ -168,6 +170,9 @@ trainer:
     #   but use the custom model
     model_name: lenet5
     personalized_model_name: lenet5
+
+    # encoder, whole
+    global_model_name: encoder
     # whether to maintain the state of the trained personalized
     # model in each round
     # In general, for the contrastive self-supervised learning
@@ -180,8 +185,6 @@ trainer:
     # Then, setting do_maintain_per_state to be True to follow this
     # rule.
     do_maintain_per_state: False
-    # encoder, whole
-    global_model_name: encoder
 
     num_classes: 10
 
