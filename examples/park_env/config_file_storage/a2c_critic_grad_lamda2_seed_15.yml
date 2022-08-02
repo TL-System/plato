@@ -5,10 +5,10 @@ general:
 
 clients:
     # The total number of clients
-    total_clients: 6
+    total_clients: 12
 
     # The number of clients selected in each round
-    per_round: 6
+    per_round: 12
 
     # Should the clients compute test accuracy locally?
     do_test: false
