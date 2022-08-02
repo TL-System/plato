@@ -5,6 +5,10 @@ from plato.config import Config
 import a2c_learning_model
 import park
 import csv
+import os
+import shutil
+# Run this like
+# python examples/park_env/interference.py -c examples/park_env/config_file_storage/a2c_critic_grad_lamda2_seed_15.yml
 
 class StateNormalizer(object):
     def __init__(self, obs_space):
@@ -14,19 +18,17 @@ class StateNormalizer(object):
     def normalize(self, obs):
         return (obs-self.shift) / self.range
 
-def evaluate_policy(model, env, obs_normalizer, dist, exp_name, eval_episodes = 10):
+def evaluate_policy(model, env, obs_normalizer, dist, exp_name, eval_episodes = 5):
 
         model.eval()
         
         avg_rewards = []
-        for trace_idx in range(Config().algorithm.difficulty_levels):
+        for trace_idx in range(30):
             avg_reward = 0
-        # if self.client_id == 0:
-            #    torch.manual_seed(Config().trainer.manual_seed)
-            for epi in range(eval_episodes):
+            for _ in range(eval_episodes):
                 episode_reward = 0
                 done = False
-                state = env.reset(trace_idx=trace_idx * Config().algorithm.traces_per_task, test= True)
+                state = env.reset(trace_idx=trace_idx, test= True)
                 state = obs_normalizer.normalize(state)
                 steps = 0
                 while not done:
@@ -89,4 +91,15 @@ if __name__ == "__main__":
 
     load_model(model)
     save_list = evaluate_policy(model, env, normalizer, dist, "FedAvg")
+    results_seed_path = f'{Config().results.results_dir}'
+    filename = "testing_seed_" + str(Config().server.random_seed)
+    path = f'{results_seed_path}/{filename}.csv'
 
+    if not os.path.exists(results_seed_path):
+        os.makedirs(results_seed_path, exist_ok=True)
+    
+
+    with open(path, 'w') as filehandle:
+        writer = csv.writer(filehandle)
+        writer.writerow(save_list)
+    
