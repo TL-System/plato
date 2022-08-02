@@ -89,7 +89,7 @@ def compute_grad(
 
 
 class Trainer(pers_basic.Trainer):
-    """A personalized federated learning trainer using the FedRep algorithm."""
+    """A personalized federated learning trainer using the Per-FedAvg algorithm."""
 
     def train_one_epoch(self, config, epoch, defined_model, optimizer,
                         loss_criterion, train_data_loader, epoch_loss_meter,
@@ -100,69 +100,100 @@ class Trainer(pers_basic.Trainer):
         alpha = config['alpha']
         beta = config['beta']
         epochs = config['epochs']
+        iterations_per_epoch = len(train_data_loader)
 
         # default not to perform any logging
         epoch_log_interval = epochs + 1
+        batch_log_interval = iterations_per_epoch
+
         if "epoch_log_interval" in config:
             epoch_log_interval = config['epoch_log_interval']
+        if "batch_log_interval" in config:
+            batch_log_interval = config['batch_log_interval']
 
         iter_trainloader = iter(train_data_loader)
 
-        if is_hessian_free:  # Per-FedAvg(HF)
-            temp_model = deepcopy(defined_model)
-            data_batch_1 = get_data_batch(train_data_loader, iter_trainloader,
-                                          self.device)
-            grads, _ = compute_grad(temp_model, loss_criterion, data_batch_1)
-            for param, grad in zip(temp_model.parameters(), grads):
-                param.data.sub_(alpha * grad)
+        epoch_loss_meter.reset()
+        # Use a default training loop
+        for batch_id, (_, _) in enumerate(train_data_loader):
+            # Reset and clear previous data
+            batch_loss_meter.reset()
+            if is_hessian_free:  # Per-FedAvg(HF)
+                temp_model = deepcopy(defined_model)
+                data_batch_1 = get_data_batch(train_data_loader,
+                                              iter_trainloader, self.device)
+                grads, _ = compute_grad(temp_model, loss_criterion,
+                                        data_batch_1)
+                for param, grad in zip(temp_model.parameters(), grads):
+                    param.data.sub_(alpha * grad)
 
-            data_batch_2 = get_data_batch(train_data_loader, iter_trainloader,
-                                          self.device)
-            grads_1st, _ = compute_grad(temp_model, loss_criterion,
-                                        data_batch_2)
+                data_batch_2 = get_data_batch(train_data_loader,
+                                              iter_trainloader, self.device)
+                grads_1st, _ = compute_grad(temp_model, loss_criterion,
+                                            data_batch_2)
 
-            data_batch_3 = get_data_batch(train_data_loader, iter_trainloader,
-                                          self.device)
+                data_batch_3 = get_data_batch(train_data_loader,
+                                              iter_trainloader, self.device)
 
-            grads_2nd, loss = compute_grad(defined_model,
-                                           loss_criterion,
-                                           data_batch_3,
-                                           v=grads_1st,
-                                           second_order_grads=True)
+                grads_2nd, loss = compute_grad(defined_model,
+                                               loss_criterion,
+                                               data_batch_3,
+                                               v=grads_1st,
+                                               second_order_grads=True)
+                batch_size = data_batch_3[1].size(0)
+                for param, grad1, grad2 in zip(defined_model.parameters(),
+                                               grads_1st, grads_2nd):
+                    param.data.sub_(beta * grad1 - beta * alpha * grad2)
+            else:
+                # Per-FedAvg(FO)
+                # ========================== FedAvg ==========================
+                # NOTE: You can uncomment those codes for running FedAvg.
+                #       When you're trying to run FedAvg, comment other codes in this branch.
 
-            for param, grad1, grad2 in zip(defined_model.parameters(),
-                                           grads_1st, grads_2nd):
-                param.data.sub_(beta * grad1 - beta * alpha * grad2)
-        else:
-            # Per-FedAvg(FO)
-            # ========================== FedAvg ==========================
-            # NOTE: You can uncomment those codes for running FedAvg.
-            #       When you're trying to run FedAvg, comment other codes in this branch.
+                # data_batch = utils.get_data_batch(
+                #     self.trainloader, self.iter_trainloader, self.device
+                # )
+                # grads = self.compute_grad(defined_model, data_batch)
+                # for param, grad in zip(defined_model.parameters(), grads):
+                #     param.data.sub_(beta * grad)
 
-            # data_batch = utils.get_data_batch(
-            #     self.trainloader, self.iter_trainloader, self.device
-            # )
-            # grads = self.compute_grad(defined_model, data_batch)
-            # for param, grad in zip(defined_model.parameters(), grads):
-            #     param.data.sub_(beta * grad)
+                # ============================================================
 
-            # ============================================================
+                temp_model = deepcopy(defined_model)
+                data_batch_1 = get_data_batch(train_data_loader,
+                                              iter_trainloader, self.device)
+                grads, _ = compute_grad(temp_model, loss_criterion,
+                                        data_batch_1)
 
-            temp_model = deepcopy(defined_model)
-            data_batch_1 = get_data_batch(train_data_loader, iter_trainloader,
-                                          self.device)
-            grads, _ = compute_grad(temp_model, loss_criterion, data_batch_1)
+                for param, grad in zip(temp_model.parameters(), grads):
+                    param.data.sub_(alpha * grad)
 
-            for param, grad in zip(temp_model.parameters(), grads):
-                param.data.sub_(alpha * grad)
+                data_batch_2 = get_data_batch(train_data_loader,
+                                              iter_trainloader, self.device)
+                grads, loss = compute_grad(temp_model, loss_criterion,
+                                           data_batch_2)
 
-            data_batch_2 = get_data_batch(train_data_loader, iter_trainloader,
-                                          self.device)
-            grads, loss = compute_grad(temp_model, loss_criterion,
-                                       data_batch_2)
+                batch_size = data_batch_2[1].size(0)
+                for param, grad in zip(defined_model.parameters(), grads):
+                    param.data.sub_(beta * grad)
 
-            for param, grad in zip(defined_model.parameters(), grads):
-                param.data.sub_(beta * grad)
+            # Update the loss data in the logging container
+            epoch_loss_meter.update(loss.data.item(), batch_size)
+            batch_loss_meter.update(loss.data.item(), batch_size)
+
+            # Performe logging of one batch
+            if batch_id % batch_log_interval == 0 or batch_id == iterations_per_epoch - 1:
+                if self.client_id == 0:
+                    logging.info(
+                        "[Server #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
+                        os.getpid(), epoch, epochs, batch_id,
+                        iterations_per_epoch - 1, batch_loss_meter.avg)
+                else:
+                    logging.info(
+                        "   [Client #%d] Training Epoch: \
+                        [%d/%d][%d/%d]\tLoss: %.6f", self.client_id, epoch,
+                        epochs, batch_id, iterations_per_epoch - 1,
+                        batch_loss_meter.avg)
 
         # Performe logging of epochs
         if (epoch - 1) % epoch_log_interval == 0 or epoch == epochs:
