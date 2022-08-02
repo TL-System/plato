@@ -1,14 +1,6 @@
 """
 A personalized federated learning trainer using FedRep.
 
-Reference:
-
-Collins et al., "Exploiting Shared Representations for Personalized Federated
-Learning", in the Proceedings of ICML 2021.
-
-https://arxiv.org/abs/2102.07078
-
-Source code: https://github.com/lgcollins/FedRep
 """
 
 import os

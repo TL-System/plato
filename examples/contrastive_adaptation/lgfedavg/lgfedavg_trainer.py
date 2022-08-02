@@ -1,13 +1,6 @@
 """
 A personalized federated learning trainer using LG-FedAvg.
 
-Reference:
-
-Liang et al., "Think Locally, Act Globally: Federated Learning with Local and Global Representations", in the Proceedings of ICML 2021.
-
-https://arxiv.org/pdf/2001.01523.pdf
-
-https://github.com/pliang279/LG-FedAvg
 """
 
 import os

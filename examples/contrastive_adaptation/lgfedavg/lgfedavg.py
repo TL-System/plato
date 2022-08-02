@@ -1,6 +1,12 @@
 """
-The implementation of FedRep method based on the plato's
+The implementation of LG-FedAvg method based on the plato's
 pFL code.
+
+Paul Pu Liang, et.al, Think Locally, Act Globally: Federated Learning with Local and Global Representations
+
+paper address: https://arxiv.org/abs/2001.01523
+
+Official code: https://github.com/pliang279/LG-FedAvg
 
 """
 
@@ -13,8 +19,7 @@ from plato.algorithms import fedavg_pers as algo_fedavg_pers
 
 
 def main():
-    """ An interface for running the fedavg method under the
-        supervised learning setting.
+    """ An interface for running the LG-FedAvg method.
     """
 
     algo = algo_fedavg_pers.Algorithm

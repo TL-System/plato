@@ -1,6 +1,11 @@
 """
-The implementation of FedRep method based on the plato's
-pFL code.
+The implementation of FedRep method based on the plato's pFL code.
+
+Liam Collins, et.al, Exploiting Shared Representations for Personalized Federated Learning.
+in the Proceedings of ICML 2021.
+
+Paper address: https://arxiv.org/abs/2102.07078
+Official code: https://github.com/lgcollins/FedRep
 
 """
 

@@ -1,5 +1,5 @@
 """
-Implementation of the perfedavg clients
+Implementation of the Per-FedAvg's clients
 
 """
 

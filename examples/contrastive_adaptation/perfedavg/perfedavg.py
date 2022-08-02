@@ -1,10 +1,14 @@
 """
-PyTorch Implementation of Personalized federated learning with theoretical guarantees: A model-agnostic meta-learning approach
-NIPS 2020
+The implementation of Per-FedAvg method based on the plato's
+pFL code.
 
+Alireza Fallah, et.al, Personalized federated learning with theoretical guarantees:
+A model-agnostic meta-learning approach, NIPS2020.
 
-https://proceedings.neurips.cc/paper/2020/hash/24389bfe4fe2eba8bf9aa9203a44cdad-Abstract.html
+paper address: https://proceedings.neurips.cc/paper/2020/hash/24389bfe4fe2eba8bf9aa9203a44cdad-Abstract.html
 
+Official code: None
+Third-part code: https://github.com/jhoon-oh/FedBABU
 
 
 """

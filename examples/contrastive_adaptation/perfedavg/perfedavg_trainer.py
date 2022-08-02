@@ -1,13 +1,5 @@
 """
-A personalized federated learning trainer using perFedAvg.
-
-Reference:
-
-Alireza Fallah, et al., "Personalized federated learning with theoretical guarantees: A model-agnostic meta-learning approach", in the Proceedings of ICML 2021.
-
-https://proceedings.neurips.cc/paper/2020/hash/24389bfe4fe2eba8bf9aa9203a44cdad-Abstract.html
-
-Source code: https://github.com/lgcollins/FedRep
+A personalized federated learning trainer using Per-FedAvg
 """
 
 import os

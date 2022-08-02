@@ -2,6 +2,8 @@
 The interface of applying the fedavg on different datasets as the
 baseline.
 
+The fedavg with finetune.
+
 """
 
 import backbone_cls
