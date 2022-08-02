@@ -113,7 +113,7 @@ trainer:
     batch_size: 64
 
     optimizer: SGD
-    learning_rate: 0.02
+    learning_rate: 0.001
     momentum: 0.9
     weight_decay: 0.000001
 
@@ -133,7 +133,7 @@ trainer:
     pers_batch_size: 64
     pers_optimizer: SGD
     # lr = 0.1 * batch_size / 256, see section B.6 and B.7 of SimCLR paper.
-    pers_learning_rate: 0.05
+    pers_learning_rate: 0.005
     pers_momentum: 0.9
     pers_weight_decay: 0.0
 
