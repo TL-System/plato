@@ -1,5 +1,5 @@
 """
-Implementation of the pfedavg clients
+Implementation of the fedvg with finetune clients
 
 """
 

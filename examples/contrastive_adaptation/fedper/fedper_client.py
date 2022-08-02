@@ -1,5 +1,5 @@
 """
-Implementation of the fedrep clients.
+Implementation of the FedPer's clients.
 
 """
 
@@ -10,8 +10,7 @@ from plato.config import Config
 
 
 class Client(pers_simple.Client):
-    """A personalized federated learning client with self-supervised support
-        for the contrastive adaptation method."""
+    """A personalized federated learning client with FedPer method."""
 
     def load_personalized_model(self):
         """ Initial the personalized model with the global model. """

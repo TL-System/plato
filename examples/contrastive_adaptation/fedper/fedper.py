@@ -1,6 +1,13 @@
 """
-The interface of applying the fedavg on different datasets as the
-baseline.
+The implementation of FedPer method based on the plato's pFL code.
+
+Manoj Ghuhan Arivazhagan, et.al, Federated learning with personalization layers.
+
+paper address: https://arxiv.org/abs/1912.00818
+
+Official code: None
+Third-part code: https://github.com/jhoon-oh/FedBABU
+
 
 """
 
@@ -14,8 +21,7 @@ from plato.algorithms import fedavg_pers as fedavg_algo
 
 
 def main():
-    """ An interface for running the fedavg method under the
-        supervised learning setting.
+    """ An interface for running the FedPer method.
     """
 
     algo = fedavg_algo.Algorithm
