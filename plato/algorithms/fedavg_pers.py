@@ -23,7 +23,9 @@ def is_global_parameter(param_name, global_model_name):
         e.g. the global_model_name is:
             - whole
             - online_network
-            - online_network; online_predictor
+            - online_network__online_predictor
+            - encoder
+            - encoder__cls_fc
     """
     flag = False
     global_params_prefix = global_model_name.split("__")
@@ -90,17 +92,72 @@ class Algorithm(fedavg.Algorithm):
 
         return False
 
+    def extract_parameters_prefix(self, parameters_name):
+        """ Extracting the major prefixs of a group of parameters. """
+        extracted_prefix = []
+
+        # the para name is presented as encoder.xxx.xxx
+        # that is combined by the key_word "."
+        # we aim to extract the encoder
+        split_str = "."
+        for para_name in parameters_name:
+            splitted_names = para_name.split(split_str)
+            prefix = splitted_names[0]
+            # add the obtained prefix to the list, if
+            #   - empty list
+            #   - a new prefix
+            # add to the empty list directly
+            if prefix not in extracted_prefix:
+                extracted_prefix.append(prefix)
+
+        return extracted_prefix
+
     def complete_weights(self, weights, pool_weights):
-        """ Completet the weights based on the pool_weights. """
+        """ Completet the weights for self.model based on the
+            'weights' and 'pool_weights'.
+
+            The 'weights' has the highes pariority, thus the para data
+            in 'weights' will be used for self.model's completation.
+            Then, if 'weights' does not contain the parameters of self.model,
+            the weights in 'pool_weights' will be utilized.
+
+            Therefore, the 'pool_weights' is regarded as a parameters pool for
+            others to select from.
+
+            Args:
+                weights (OrderDict): the obtained OrderDict containing
+                    parameters that are generally extracted by state_dict
+                pool_weights (OrderDict): the same structure and data type
+                    as 'weights'.
+
+            Returns:
+                completed_weights (OrderDict): contains the full parameters
+                    as self.model, thus can be directly assigned to the
+                    self.model
+                prefixes_of_existence (list): the prefixes for parameters
+                    in 'weights'
+                prefixes_of_completion (list): the prefixes for parameters
+                    that are selected from the 'pool_weights' to be used
+                    for completion.
+        """
+        weights_of_completion = list()
+        weights_of_existence = list()
         model_params = self.model.state_dict()
         completed_weights = OrderedDict()
         for para_name in list(model_params.keys()):
             if para_name in weights:
                 completed_weights[para_name] = weights[para_name]
+                weights_of_existence.append(para_name)
             else:
                 completed_weights[para_name] = pool_weights[para_name]
+                weights_of_completion.append(para_name)
 
-        return completed_weights
+        prefixes_of_existence = self.extract_parameters_prefix(
+            weights_of_existence)
+        prefixes_of_completion = self.extract_parameters_prefix(
+            weights_of_completion)
+
+        return completed_weights, prefixes_of_existence, prefixes_of_completion
 
     def load_weights(self, weights, strict=False):
         """Load the model weights passed in as a parameter.

@@ -18,7 +18,7 @@ class Client(pers_simple.Client):
         model_name = Config().trainer.model_name
         personalized_model_name = Config().trainer.personalized_model_name
         logging.info(
-            "[Client #%d] copy the downloaded global model [%s] (after completion) as its personalized model [%s].",
+            "[Client #%d] copy [%s] (after completion) as its personalized model [%s].",
             self.client_id, model_name, personalized_model_name)
         # should directly copy from the downloaded model
         self.trainer.personalized_model.load_state_dict(

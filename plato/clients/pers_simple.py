@@ -161,7 +161,6 @@ class Client(simple.Client):
                 else
                     initialize the personalized model
 
-
         """
 
         # model_name = Config().trainer.model_name
@@ -184,7 +183,7 @@ class Client(simple.Client):
                 and Config().trainer.do_maintain_per_state):
             # Do not use any previous personalized model, initial it from script
             logging.info(
-                "[Client #%d]. does maintain personzalization status, thus initialize from script.",
+                "[Client #%d] does not maintain personzalization status, thus initialize from script.",
                 self.client_id, filename)
             reset_all_weights(self.trainer.personalized_model)
 
@@ -192,7 +191,7 @@ class Client(simple.Client):
             # the personalized model has not been trained, the client needs to
             # start the training from script
             logging.info(
-                "[Client #%d]. has no trained personalized model (%s), thus initialize from script.",
+                "[Client #%d] has no trained personalized model (%s), thus initialize from script.",
                 self.client_id, filename)
             reset_all_weights(self.trainer.personalized_model)
         else:
@@ -200,7 +199,7 @@ class Client(simple.Client):
             self.trainer.personalized_model.load_state_dict(loaded_weights,
                                                             strict=True)
             logging.info(
-                "[Client #%d]. Loaded latest round's checkpoint %s to for initializing personalization.",
+                "[Client #%d] Loaded latest round's checkpoint %s to for initializing personalization.",
                 self.client_id, filename)
 
     def load_payload(self, server_payload) -> None:
@@ -259,20 +258,26 @@ class Client(simple.Client):
             if filename is None:
                 # using the client's local model that is randomly initialized
                 # at this round
+                global_model_name = Config().trainer.global_model_name
                 tmpl_model = copy.deepcopy(self.trainer.model)
                 reset_all_weights(tmpl_model)
                 pool_weights = tmpl_model.state_dict()
                 logging.info(
-                    "[Client #%d]. no checkpoint %s, complete server's payload with local initial model.",
-                    self.client_id, filename)
+                    "[Client #%d] no checkpoint %s, complete server's payload (the downloaded global model [%s]) with the local initial model.",
+                    self.client_id, filename, global_model_name)
             else:
                 pool_weights = cpk_oper.load_checkpoint(filename)["model"]
                 logging.info(
-                    "[Client #%d]. Loaded latest round's checkpoint %s to complete",
+                    "[Client #%d] Loaded latest round's checkpoint %s to complete",
                     self.client_id, filename)
 
-            completed_payload = self.algorithm.complete_weights(
+            completed_payload, existed_prefixes, completed_prefixes = self.algorithm.complete_weights(
                 server_payload, pool_weights=pool_weights)
+            logging.info("[Client #%d] prefixes of the downloaded payload: %s",
+                         self.client_id, ",".join(existed_prefixes))
+            if completed_prefixes:
+                logging.info("[Client #%d] prefixes used for completation: %s",
+                             self.client_id, ",".join(completed_prefixes))
         else:
             completed_payload = server_payload
 
