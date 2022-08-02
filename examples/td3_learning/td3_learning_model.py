@@ -6,8 +6,11 @@ import torch.nn.functional as F
 
 from torch import nn
 
+import gym
+
 import pybullet_envs
 
+from plato.config import Config
 class TD3Actor(nn.Module):
     def __init__(self, state_dim, action_dim, max_action):
         super(TD3Actor, self).__init__()
@@ -62,16 +65,33 @@ class TD3Critic(nn.Module):
         q1 = self.l3(q1)
         return q1
 
+env = gym.make(Config().algorithm.env_gym_name)
+
+seed = Config().server.random_seed
+
+env.seed(seed)
+env.reset()
+torch.manual_seed(seed)
+np.random.seed(seed)
 class Model:
     """A wrapper class that holds both actor and critic models"""
-    def __init__(self, state_dim, action_dim, max_action, max_episode_steps, env_name, rl_algo):
+    def __init__(self):
+
+
+        state_dim = env.observation_space.shape[0]
+        action_dim = env.action_space.shape[0]
+        max_action = float(env.action_space.high[0])
+        max_episode_steps = env._max_episode_steps
+            
+
+
         self.state_dim = state_dim
         self.action_dim = action_dim
         self.max_action = max_action
         self.max_episode_steps = max_episode_steps
 
-        self.env_name = env_name
-        self.rl_algo = rl_algo
+        self.env_name = Config().algorithm.env_name
+        self.rl_algo = Config().algorithm.algorithm_name
         
         self.actor = TD3Actor(state_dim, action_dim, max_action)
         self.critic = TD3Critic(state_dim, action_dim)

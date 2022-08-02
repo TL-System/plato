@@ -14,6 +14,8 @@ from plato.trainers import basic
 
 import td3_learning_client as client
 
+import td3_learning_model
+
 import td3
 
 import pybullet_envs
@@ -46,18 +48,18 @@ class ReplayMemory(base.ReplayMemory):
 
 class Trainer(basic.Trainer):
     def __init__(self, model=None):
-        super().__init__()
+        super().__init__(model)
 
-        self.env = td3.env #using a getter for environment results in no connection to pybullet physics server
-        self.max_episode_steps = model.get_max_episode_steps()
+        self.env = td3_learning_model.env #using a getter for environment results in no connection to pybullet physics server
+        self.max_episode_steps = self.model.get_max_episode_steps()
 
-        self.max_action = model.get_max_action()     
-        self.state_dim = model.get_state_dim()
-        self.action_dim = model.get_action_dim()
-        self.env_name = model.get_env_name()
-        self.algorithm_name = model.get_rl_algo()
+        self.max_action = self.model.get_max_action()     
+        self.state_dim = self.model.get_state_dim()
+        self.action_dim = self.model.get_action_dim()
+        self.env_name = self.model.get_env_name()
+        self.algorithm_name = self.model.get_rl_algo()
 
-        self.model = model
+       #self.model = model
         self.actor = self.model.actor
         self.critic = self.model.critic
         self.actor_target = self.model.actor_target
