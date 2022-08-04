@@ -1,5 +1,32 @@
 """
 The training and testing loops for PyTorch.
+
+Very important notes:
+    1.- For all model saving filename that contains 'epoch', it is a checkpoint file.
+    Our checkpoint file is saved by the function 'perform_client_checkpoint_saving'.
+    Therefore, loading the model parameter of the checkpoint file should be:
+        load_checkpoint(filepath)['model']
+
+    2.- For all model saving filename without containing 'epoch', there are two
+    types of model saving files, including:
+        - lenet5__client4_round1.pth -> corresponds to self.model
+        - personalized_lenet5__client4_round1.pth -> corresponds to self.personalized_model
+
+    For the self.model, we save it as the checkpoint as this model can
+    be regarded as the trained model during the whole training stage of FL.
+        -> Therefore, loading the model parameter of the checkpoint file should be:
+        load_checkpoint(filepath)['model']
+
+    However, for the self.personalized model, we directly save it as model.state_dict()
+    instead of the checkpoint file.
+        -> Therefore, loading the model parameter of the checkpoint file should be:
+        torch.load(filepath)
+
+
+    These settings induce our recall self.model and self.personalized_model in each round
+    Please access the 'load_personalized_model' and 'load_payload' in the
+    clients/pers_simple.py.
+
 """
 
 import logging
