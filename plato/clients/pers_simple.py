@@ -195,12 +195,15 @@ class Client(simple.Client):
                 self.client_id, filename)
             reset_all_weights(self.trainer.personalized_model)
         else:
+            logging.info(
+                "[Client #%d] Loading latest round's trained personalized model %s.",
+                self.client_id, filename)
             loaded_weights = cpk_oper.load_checkpoint(filename)
             self.trainer.personalized_model.load_state_dict(loaded_weights,
                                                             strict=True)
             logging.info(
-                "[Client #%d] Loaded latest round's checkpoint %s to for initializing personalization.",
-                self.client_id, filename)
+                "[Client #%d] Completed the loading for initializing the personalized model.",
+                self.client_id)
 
     def load_payload(self, server_payload) -> None:
         """Loading the server model onto this client.

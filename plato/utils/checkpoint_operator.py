@@ -65,12 +65,21 @@ class CheckpointsOperator(object):
         return torch.load(checkpoint_path)
 
     def search_latest_checkpoint_file(self,
+                                      key_words,
                                       anchor_metric="round",
-                                      mask_anchors="epoch"):
+                                      mask_anchors=["epoch"]):
         """ Search the latest checkpoint file under the checkpoint dir. """
+
+        def is_masked_file(ckp_file):
+            return any([anchor in ckp_file for anchor in mask_anchors])
+
+        def is_required_file(ckp_file):
+            return all(
+                [word in ckp_file for word in key_words if word is not None])
+
         checkpoint_files = [
             ckp_file for ckp_file in os.listdir(self.checkpoints_dir)
-            if all([anchor not in ckp_file for anchor in mask_anchors])
+            if not is_masked_file(ckp_file) and is_required_file(ckp_file)
         ]
 
         latest_checkpoint_filename = None
@@ -169,8 +178,11 @@ def perform_client_checkpoint_loading(client_id,
     if use_latest:
         if not cpk_oper.vaild_checkpoint_file(filename):
             # Loading the latest checkpoint file
+            key_words = [model_name, prefix]
             filename = cpk_oper.search_latest_checkpoint_file(
-                anchor_metric=anchor_metric, mask_anchors=mask_anchors)
+                key_words=key_words,
+                anchor_metric=anchor_metric,
+                mask_anchors=mask_anchors)
 
     return filename, cpk_oper
 
