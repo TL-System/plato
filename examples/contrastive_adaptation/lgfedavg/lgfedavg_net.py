@@ -1,5 +1,5 @@
 """
-The implementation of the model structure used in the FedRep method,
+The implementation of the model structure used in the LG-FedAvg method,
 which is the combination of
     - backbone encoder
     - multiple fc layer.

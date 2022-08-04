@@ -65,7 +65,7 @@ class Trainer(basic.Trainer):
         else:
             to_save_path = f'{model_path}/{model_name}'
 
-        # check the filr extension
+        # check the file extension
         save_prefix, save_extension = os.path.splitext(to_save_path)
         # the save file must contain a 'pth' as its extension
         if save_extension != desired_extenstion:
@@ -406,9 +406,9 @@ class Trainer(basic.Trainer):
         lr_schedule, lr_schedule_base_epoch = self.prepare_train_lr(
             optimizer, streamed_train_loader, config, current_round)
 
-        print("lr_schedule_base_epoch: ", lr_schedule_base_epoch)
-        print("lr_schedule: ", lr_schedule)
-        print("lr_schedule lr: ", lr_schedule.get_lr())
+        logging.info(
+            f"With {lr_schedule}, we get lr={lr_schedule.get_lr()} under the global epoch {lr_schedule_base_epoch}"
+        )
 
         # Before the training, we expect to save the initial
         # model of this round
@@ -445,7 +445,7 @@ class Trainer(basic.Trainer):
             # Update the learning rate
             # based on the base epoch
             lr_schedule.step()
-            print("lr_schedule lr: ", lr_schedule.get_lr())
+
             # if (epoch - 1) % epoch_model_log_interval == 0 or epoch == epochs:
             #     # the model generated during each round will be stored in the
             #     # checkpoints

@@ -184,7 +184,7 @@ class Client(simple.Client):
             # Do not use any previous personalized model, initial it from script
             logging.info(
                 "[Client #%d] does not maintain personzalization status, thus initialize from script.",
-                self.client_id, filename)
+                self.client_id)
             reset_all_weights(self.trainer.personalized_model)
 
         elif filename is None:
