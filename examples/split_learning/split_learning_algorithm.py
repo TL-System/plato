@@ -159,5 +159,7 @@ class Algorithm(fedavg.Algorithm):
         return deltas
 
     def train(self, trainset, sampler, cut_layer=None):
-        self.trainer.train(feature_dataset.FeatureDataset(trainset), sampler,
-                           cut_layer)
+        """ Train the neural network model after the cut layer. """
+        self.trainer.train(
+            feature_dataset.FeatureDataset(trainset.feature_dataset), sampler,
+            cut_layer)

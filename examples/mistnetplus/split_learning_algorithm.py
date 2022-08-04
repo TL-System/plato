@@ -19,6 +19,7 @@ class Algorithm(fedavg.Algorithm):
     """The PyTorch-based split learning algorithm, used by both the client and the
     server.
     """
+
     def __init__(self, trainer=None):
         super().__init__(trainer)
         self.gradients_list = []
@@ -122,5 +123,7 @@ class Algorithm(fedavg.Algorithm):
         toc = time.perf_counter()
 
     def train(self, trainset, sampler, cut_layer=None):
-        self.trainer.train(feature_dataset.FeatureDataset(trainset), sampler,
-                           cut_layer)
+        """ Train the neural network model after the cut layer. """
+        self.trainer.train(
+            feature_dataset.FeatureDataset(trainset.feature_dataset), sampler,
+            cut_layer)
