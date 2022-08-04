@@ -47,8 +47,6 @@ class Client(simple.Client):
 
     async def train(self):
         """A split learning client only uses the first several layers in a forward pass."""
-        logging.info("Training on split learning client #%d", self.client_id)
-
         assert not Config().clients.do_test
         accuracy = 0
         comm_time = time.time()
@@ -56,10 +54,15 @@ class Client(simple.Client):
 
         if not self.gradient_received:
             # Perform a forward pass till the cut layer in the model
+            logging.info(
+                "Performing a forward pass till the cut layer on client #%d",
+                self.client_id)
+
             features, training_time = self.algorithm.extract_features(
                 self.trainset, self.sampler,
                 Config().algorithm.cut_layer)
 
+            logging.info("Finished extracting features.")
             # Generate a report for the server, performing model testing if applicable
             return Report(self.sampler.trainset_size(), accuracy,
                           training_time, comm_time, False,

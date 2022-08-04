@@ -59,19 +59,17 @@ class Algorithm(fedavg.Algorithm):
         self.input_dataset = []
 
         for inputs, targets, *__ in data_loader:
-            inputs, targets = inputs.to(self.trainer.device), targets.to(
-                self.trainer.device)
-            logits = self.model.forward_to(inputs, cut_layer)
+            with torch.no_grad():
+                inputs, targets = inputs.to(self.trainer.device), targets.to(
+                    self.trainer.device)
+                logits = self.model.forward_to(inputs, cut_layer)
 
-            logits = logits.clone().detach().requires_grad_(True)
-            examples = inputs.clone().detach().requires_grad_(True)
+            features_dataset.append((logits, targets))
+            self.input_dataset.append((inputs, targets))
 
-            for i in np.arange(logits.shape[0]):  # each sample in the batch
-                features_dataset.append((logits[i], targets[i]))
-                # remember the order of the input train data s.t. we can
-                # update the weights with gradients from the server in the
-                # correct order.
-                self.input_dataset.append((examples[i], targets[i]))
+        toc = time.perf_counter()
+        logging.info("[Client #%s] Time used: %.2f seconds.", self.client_id,
+                     toc - tic)
 
         toc = time.perf_counter()
         logging.info("[Client #%d] Features extracted from %s examples.",
