@@ -55,11 +55,4 @@ trainer:
     model_name: lenet5
 
 algorithm:
-    # Aggregation algorithm
-    type: split_learning
-
-    # Split learning flag
-    split_learning: true
-
     cut_layer: relu4
-    epsilon: null

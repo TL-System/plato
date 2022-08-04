@@ -15,37 +15,6 @@ from plato.servers import fedavg
 class Server(fedavg.Server):
     """The split learning server."""
 
-    def __init__(self, model=None, algorithm=None, trainer=None):
-        super().__init__(model=model, algorithm=algorithm, trainer=trainer)
-
-        # a FIFO queue(list) for choosing the running client
-        self.clients_running_queue = []
-
-    def choose_clients(self, clients_pool, clients_count):
-        assert len(clients_pool) > 0 and clients_count == 1
-
-        # fist step: make sure that the sl running queue sync with the clients pool
-        new_client_id_set = set(clients_pool)
-        old_client_id_set = set(self.clients_running_queue)
-        # delete the disconnected clients
-        remove_clients = old_client_id_set - new_client_id_set
-        for i in remove_clients:
-            self.clients_running_queue.remove(i)
-        # add the new registered clients
-        add_clients = new_client_id_set - old_client_id_set
-        for i in add_clients:
-            insert_index = len(self.clients_running_queue) - 1
-            self.clients_running_queue.insert(insert_index, i)
-
-        # second step: use FIFO strategy to choose one client
-        res_list = []
-        if len(self.clients_running_queue) > 0:
-            queue_head = self.clients_running_queue.pop(0)
-            res_list.append(queue_head)
-            self.clients_running_queue.append(queue_head)
-
-        return res_list
-
     def load_gradients(self):
         """ Loading gradients from a file. """
         model_path = Config().params['model_path']
@@ -57,40 +26,20 @@ class Server(fedavg.Server):
 
         return torch.load(model_gradients_path)
 
-    async def process_client_info(self, client_id, sid):
-        """ Process the received payload and report from a reporting client. """
-        # if clients send features, train it and return gradient
-        if self.reports[sid].phase == "features":
-            logging.info(
-                "[Server #%d] client #%d features received. Processing.",
-                os.getpid(), client_id)
-            features = [self.client_payload[sid]]
-            feature_dataset = feature.DataSource(features)
-            sampler = all_inclusive.Sampler(feature_dataset)
+    async def process_reports(self):
+        """Process the features extracted by the client and perform server-side training."""
+        features = [features for (__, __, features, __) in self.updates]
+        feature_dataset = feature.DataSource(features)
 
-            self.algorithm.train(feature_dataset, sampler,
-                                 Config().algorithm.cut_layer)
-            # Test the updated model
-            self.accuracy = await self.trainer.server_test(
-                self.testset, self.testset_sampler)
-            logging.info('[Server #%d] Global model accuracy: %.2f%%\n',
-                         os.getpid(), 100 * self.accuracy)
+        # Training the model using all the features received from the client
+        sampler = all_inclusive.Sampler(feature_dataset)
+        self.algorithm.train(feature_dataset, sampler,
+                             Config().algorithm.cut_layer)
 
-            # Sending the server payload to the clients
-            payload = self.load_gradients()
-            logging.info("[Server #%d] Reporting gradients to client #%d.",
-                         os.getpid(), client_id)
-            await self.send(sid, payload, client_id)
-            return
+        # Test the updated model
+        if not hasattr(Config().server, 'do_test') or Config().server.do_test:
+            self.accuracy = self.trainer.test(self.testset)
+            logging.info('[%s] Global model accuracy: %.2f%%\n', self,
+                         100 * self.accuracy)
 
-        self.updates.append(
-            (client_id, self.reports[sid], self.client_payload[sid], 0))
-
-        if len(self.updates) > 0 and len(self.updates) >= len(
-                self.selected_clients):
-            logging.info(
-                "[Server #%d] All %d client reports received. Processing.",
-                os.getpid(), len(self.updates))
-            await self.process_reports()
-            await self.wrap_up()
-            await self.select_clients()
+        await self.wrap_up_processing_reports()

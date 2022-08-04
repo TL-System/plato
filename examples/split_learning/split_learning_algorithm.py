@@ -64,8 +64,10 @@ class Algorithm(fedavg.Algorithm):
                     self.trainer.device)
                 logits = self.model.forward_to(inputs, cut_layer)
 
-            features_dataset.append((logits, targets))
-            self.input_dataset.append((inputs, targets))
+            features_dataset.append(
+                (logits.detach().cpu(), targets.detach().cpu()))
+            self.input_dataset.append(
+                (inputs.detach().cpu(), targets.detach().cpu()))
 
         toc = time.perf_counter()
         logging.info("[Client #%s] Time used: %.2f seconds.", self.client_id,

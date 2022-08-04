@@ -60,9 +60,9 @@ class Trainer(basic.Trainer):
             lr_schedule = None
 
         if self.client_id == 0:
-            logging.info("[Server #%d] Begining to train.", os.getpid())
+            logging.info("[Server #%d] Beginning to train.", os.getpid())
         else:
-            logging.info("[Client #%d] Begining to train.", self.client_id)
+            logging.info("[Client #%d] Beginning to train.", self.client_id)
 
         # Record the gradients of the cut layer
         cut_layer_grad = []
