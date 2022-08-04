@@ -3,17 +3,19 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.ticker as plticker
-
+import matplotlib
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['ps.fonttype'] = 42
 
 def plot(csv_to_plot, csv_std_min, csv_std_max, file_task_names, exp_task_name, num_tasks, num_experiments):
     #We start plotting here
     TSBOARD_SMOOTHING = 0.4
-    INTERVAL = 2.0 #interval for how much you want to space out the grpah
+    INTERVAL = 5 #interval for how much you want to space out the grpah
     sns.color_palette("flare", as_cmap=True)
 
     csv = csv_to_plot
 
-    sns.set(font_scale=1.4)
+    sns.set(font_scale=2)
     sns.set_style("whitegrid")
     f, ax1 = plt.subplots(figsize=(8.5,5))
 
@@ -21,15 +23,18 @@ def plot(csv_to_plot, csv_std_min, csv_std_max, file_task_names, exp_task_name, 
     csv_std_min = csv_std_min.ewm(alpha=(1 - TSBOARD_SMOOTHING)).mean()
     csv_std_max = csv_std_max.ewm(alpha=(1 - TSBOARD_SMOOTHING)).mean()
 
+    marker_line = [(None, '-'), ('s', '-'), ('^', '-'), ('D', '-'), ('o', '-'), ('8', ':'), ('^', ':'), ('D', ':'),  ('s', ':'), (None, ':')]
+
     #Loop through the tasks
     #If there are n tasks & m experiments and nxm columns, # of tasks = nxm//m
-
     for i in range((len(csv.columns)//(num_experiments))):
         #retrive the column
         rewards = csv[i]
+        rewards.index = [i+1 for i in range(len(rewards))]
         exp_task_index = 0
         #Axes for the first algorithm
-        ax1 = sns.lineplot(data=rewards, linewidth=2.5, label= exp_task_name[exp_task_index])
+        marker, line = marker_line[i%len(marker_line)]
+        ax1 = sns.lineplot(data=rewards, linewidth=2.5, label= exp_task_name[exp_task_index], marker=marker, markersize=8,  linestyle=line)
         #std deviation
         #ax1.fill_between(rewards.index, csv_std_max[i].values, csv_std_min[i].values, alpha=0.5)
        
@@ -37,9 +42,10 @@ def plot(csv_to_plot, csv_std_min, csv_std_max, file_task_names, exp_task_name, 
         for j in range(i+num_tasks, len(csv.columns), num_tasks):
             rewards = csv[j]
             exp_task_index += 1
-            ax1 = sns.lineplot(data=rewards, linewidth=2.5, label= exp_task_name[exp_task_index])
-           # ax1.fill_between(rewards.index, csv_std_max[j].values, csv_std_min[j].values, alpha=0.5)
-            #exp_task_index += 1
+            rewards.index = [i+1 for i in range(len(rewards))]
+            marker, line = marker_line[j%len(marker_line)]
+            ax1 = sns.lineplot(data=rewards, linewidth=2.5, label= exp_task_name[exp_task_index], marker=marker, markersize=8,  linestyle=line)
+            ax1.fill_between(rewards.index, csv_std_max[j].values, csv_std_min[j].values, alpha=0.5)
 
         ax1.set_xlabel("Training round", fontstyle='normal')
         ax1.set_ylabel(f'Average reward for {file_task_names[i]}')
@@ -49,12 +55,13 @@ def plot(csv_to_plot, csv_std_min, csv_std_max, file_task_names, exp_task_name, 
         loc = plticker.MultipleLocator(base=INTERVAL) # this locator puts ticks at regular intervals of two
         ax1.xaxis.set_major_locator(loc)
 
-        plt.xlim(0, len(csv)-1)
+        plt.xlim(1, len(csv))
 
         pdf_name = file_task_names[i]
         if " " in pdf_name:
             pdf_name = pdf_name.replace(" ", "")
 
+        #pdf_name = pdf_name + "_fedadp"
         #save each task in their own file
         f.savefig(f'{pdf_name}.pdf', bbox_inches='tight')
 
@@ -85,6 +92,7 @@ def combine_n_dataframes(csv_list, csv_min_list, csv_max_list, num_tasks):
 
 def generate_avg(seeds, experiment, target_file, num_columns, num_tasks):
     
+    NUM_ROWS = 16#24 #For only reading 20 rows of abr_sim
     eval_all_file = f'{experiment}_ALL'
     names_of_columns = []
     num_seeds = len(seeds)
@@ -94,11 +102,29 @@ def generate_avg(seeds, experiment, target_file, num_columns, num_tasks):
         names_of_columns.append(i)
 
     rewards = pd.read_csv(f'{eval_all_file}.csv', names=names_of_columns)
+    
+    if "ABR_SIM" in experiment:
+        abr_sim_rows = []
+        row_names = []
+        curr_row_count = 0
+        while True:
+            if curr_row_count == 0:
+                abr_sim_rows.append(curr_row_count*NUM_ROWS)
+            else:
+                abr_sim_rows.append(curr_row_count*NUM_ROWS-1)
+            row_names.append(curr_row_count)
+            curr_row_count += 1
+            #We're done reading and  at the end of the file
+            if(curr_row_count*NUM_ROWS == len(rewards)):
+                break
+
+        rewards = rewards.iloc[abr_sim_rows] #Read only every 24th row
+        rewards.index = row_names #Renaming rows
 
     rewards_min = []
     rewards_max = []
 
-    for i in range(num_seeds):
+    for i in range(num_tasks):
         #For generating the number of columns for number of seeds
         avglist = []
         curr_seed_count = 0
@@ -108,12 +134,11 @@ def generate_avg(seeds, experiment, target_file, num_columns, num_tasks):
         
         #Calculate the mean down the rows of the columns we want
         rewards[i] = rewards[avglist].mean(axis=1)
-
         #Calculate the minimum and maximum bound with the standard deviation
         rewards_min.append(rewards[i] - rewards[avglist].std(axis=1))
         rewards_max.append(rewards[i] + rewards[avglist].std(axis=1))
 
-    rewards = rewards.iloc[:, 0:num_seeds]
+    rewards = rewards.iloc[:, 0:num_tasks]
 
     rewards_min = pd.DataFrame(rewards_min).transpose()
     rewards_max = pd.DataFrame(rewards_max).transpose()
@@ -138,11 +163,12 @@ if __name__ == '__main__':
     where you wawnt to save fisher experiments while exp_task_names[0+0] = fisher_task_1
     exp_task_names[0+1] = fisher_task_2, exp_task_names[0+2] = fisher_task_3"""
 
-    experiments = ["A2C_RL_SERVER_PERCENTILE_AGGREGATE_LAMDA5", "A2C_RL_SERVER_FED_AVG", "A2C_RL_SERVER_PERCENTILE_ACTOR", "A2C_RL_SERVER_PERCENTILE_CRITIC", "A2C_RL_SERVER_PERCENTILE_ACTOR_LOSS", "A2C_RL_SERVER_PERCENTILE_ACTOR_GRAD", "A2C_RL_SERVER_PERCENTILE_CRITIC_LOSS", "A2C_RL_SERVER_PERCENTILE_CRITIC_GRAD"]
-    target_files = ["AVG_OF_LAMDA5_EXPERIMENTS.csv", "AVG_OF_FEDAVG_EXPERIMENTS.csv", "AVG_OF_ACTOR_EXPERIMENTS.csv", "AVG_OF_CRITIC_EXPERIMENTS.csv", "AVG_OF_ACTOR_LOSS_EXPERIMENTS.csv", "AVG_OF_ACTOR_GRAD_EXPERIMENTS.csv", "AVG_OF_CRITIC_LOSS_EXPERIMENTS.csv", "AVG_OF_CRITIC_GRAD_EXPERIMENTS.csv"]
-   # exp_task_names = ["fisher_task_1", "fisher_task_2", "fisher_task_3", "fedavg_task_1", "fedavg_task_2", "fedavg_task_3"]
-    exp_task_names = ["Curriculum + MAS", "FedAvg", "Curriculum actor", "Curriculum critic", "Curriculum actor loss", "Curriculum actor grad", "Curriculum critic loss", "Curriculum critic grad"]
-    file_task_names = ["task 1", "task 2", "task 3"]
+    experiments = [ "A2C_RL_SERVER_LAMDA2", "A2C_RL_SERVER_GRAD", "A2C_RL_SERVER_FEDADP", "A2C_RL_SERVER_FEDAVG",
+    "A2C_RL_SERVER_MAS" ]
+    target_files = ["AVG_OF_LAMDA2_EXPERIMENT.csv", "AVG_OF_GRAD_EXPERIMENT.csv", "AVG_OF_ADP_EXPERIMENT.csv", "AVG_OF_FEDAVG_EXPERIMENT.csv", 
+    "AVG_OF_MAS_EXPERIMENT.csv"]
+    exp_task_names = [ "Curriculum Critic Loss Grad + MAS lamda 2", "Curriculum Critic Loss Grad", "FedADP", "FedAvg", "MAS Lamda 2"]
+    file_task_names = ["task 1", "task 2", "task 3", "task 4", "task 5", "task 6"]
     
     num_columns = len(file_task_names) * len(seeds)
    
@@ -160,4 +186,3 @@ if __name__ == '__main__':
     
     plot_rewards, plot_min, plot_max = combine_n_dataframes(avg_rewards_of_experiments, min_bound, max_bound, len(file_task_names))
     plot(plot_rewards, plot_min, plot_max, file_task_names, exp_task_names, len(file_task_names), len(experiments))
-
