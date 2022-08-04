@@ -67,12 +67,14 @@ class Server(fedavg.Server):
             features = [self.client_payload[sid]]
             feature_dataset = feature.DataSource(features)
             sampler = all_inclusive.Sampler(feature_dataset)
+
             self.algorithm.train(feature_dataset, sampler,
                                  Config().algorithm.cut_layer)
             # Test the updated model
-            accuracy = self.trainer.test(self.testset)
+            self.accuracy = await self.trainer.server_test(
+                self.testset, self.testset_sampler)
             logging.info('[Server #%d] Global model accuracy: %.2f%%\n',
-                         os.getpid(), 100 * accuracy)
+                         os.getpid(), 100 * self.accuracy)
 
             # Sending the server payload to the clients
             payload = self.load_gradients()

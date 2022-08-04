@@ -15,9 +15,6 @@ from plato.trainers import basic
 
 class Trainer(basic.Trainer):
 
-    def __init__(self, model=None):
-        super().__init__(model)
-
     def train_model(self, config, trainset, sampler, cut_layer=None):
         batch_size = config['batch_size']
         log_interval = 10
