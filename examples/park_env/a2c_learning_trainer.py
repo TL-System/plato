@@ -70,11 +70,12 @@ class Trainer(basic.Trainer):
     def __init__(self, model=None):
         super().__init__(model=model)
 
+        #Create environement and its name
         self.env = park.make(Config().algorithm.env_park_name)
-
         self.env_name = Config().algorithm.env_name
         self.algorithm_name =  Config().algorithm.algorithm_name
         
+        #Set actor and critic models and optimizers
         self.actor = self.model.actor
         self.critic = self.model.critic
         self.actor_old = deepcopy(self.actor.state_dict())
@@ -82,6 +83,7 @@ class Trainer(basic.Trainer):
         self.adam_actor = torch.optim.Adam(self.actor.parameters(), lr=Config().algorithm.learning_rate)
         self.adam_critic = torch.optim.Adam(self.critic.parameters(), lr=Config().algorithm.learning_rate)
 
+        #Loss function and replay memory
         self.l2_loss = torch.nn.MSELoss(reduction='mean')
 
         self.dist = torch.distributions.Categorical        
@@ -89,23 +91,28 @@ class Trainer(basic.Trainer):
         self.memory = Memory()
         self.obs_normalizer = StateNormalizer(self.env.observation_space)
 
+        #Collects average rewards and a check to see if it's the first round or not
         self.server_reward = []
         self.avg_reward = []
         self.first_ittr_server = True
 
+        #Total episode count
         self.episode_num = 0
         self.trace_idx = 0
         self.total_reward = 0
         self.done = True
         self.steps = 0
 
+
         self.actor_state_dict = None
         self.critic_state_dict = None
 
+        #Collects loss
         self.critic_loss = []
         self.actor_loss = []
         self.entropy_loss = []
 
+        #Average loss
         self.avg_critic_loss = 0
         self.avg_actor_loss = 0
         self.avg_entropy_loss = 0
@@ -122,22 +129,24 @@ class Trainer(basic.Trainer):
         self.timesteps_since_eval = 0
         self.round_no = 0
 
+        #Creates result folder if doens't exist
         if not os.path.exists(f'{Config().results.results_dir}_seed_{Config().server.random_seed}'):
             os.makedirs(f'{Config().results.results_dir}_seed_{Config().server.random_seed}', exist_ok=True)
 
+        #Creates seed folder if doesn't exist, if exists, remove and create new
         if not os.path.exists(f'{Config().results.seed_random_path}_seed_{Config().server.random_seed}'):
             os.makedirs(f'{Config().results.seed_random_path}_seed_{Config().server.random_seed}', exist_ok=True)
         else:
             shutil.rmtree(f'{Config().results.seed_random_path}_seed_{Config().server.random_seed}', ignore_errors=True)
             os.makedirs(f'{Config().results.seed_random_path}_seed_{Config().server.random_seed}', exist_ok=True)
 
-
+    #Creates a tensor from numpy array
     def t(self, x): 
         return torch.from_numpy(x).float()
 
-
     def train_model(self, config, trainset, sampler, cut_layer):
         """Main Training"""
+        
         # Fisher information matrix load from previous rounds of training
         # Fisher Information matrix path
         model_path = Config().params['model_path']
@@ -163,8 +172,10 @@ class Trainer(basic.Trainer):
         self.seed_path = f'{Config().results.seed_random_path}_seed_{Config().server.random_seed}/{seed_file_name}'
         
         if not os.path.exists(self.seed_path):
+            #for reproduciability
             torch.manual_seed(Config().trainer.manual_seed)
         else:
+            #Restore seeds from previous round
             self.restore_seeds()
 
         common_path = f'{Config().results.results_dir}_seed_{Config().server.random_seed}/{Config().results.file_name}_{str(self.client_id)}'
@@ -267,9 +278,8 @@ class Trainer(basic.Trainer):
         critic_grad, _ = np.polyfit(x, np.array(self.critic_loss), 1)
         # and save in file
         critic_grad_path = f'{common_path}{"_critic_grad"}'
-        #common_path + "_critic_grad"
         actor_grad_path =  f'{common_path}{"_actor_grad"}'
-        #common_path + "_actor_grad"
+
         self.save_metric(critic_grad_path, [critic_grad], first = first_itr)
         self.save_metric(actor_grad_path, [actor_grad], first = first_itr)
         
@@ -417,6 +427,7 @@ class Trainer(basic.Trainer):
         self.save_metric(f'{path}{"_actor_fisher_grad"}', [actor_fisher_grad], first = self.episode_num <= Config().algorithm.max_round_episodes)
         self.save_metric(f'{path}{"_critic_fisher_grad"}', [critic_fisher_grad], first = self.episode_num <= Config().algorithm.max_round_episodes)
         
+        #Set paths and names for saving
         actor, critic = "actor_fisher_matrix", "critic_fisher_matrix"
         model_path = Config().params['model_path']
         client_id = str(self.client_id)
@@ -444,10 +455,12 @@ class Trainer(basic.Trainer):
 
     def load_model(self, filename=None, location=None):
         """Loading pre-trained model weights from a file."""
-        #We will load actor and critic models here
+        """#We will load actor and critic models here"""
         
         model_path = Config(
         ).params['model_path'] if location is None else location
+        
+        #Model path names & algorithm names
         actor_model_name = 'actor_model'
         critic_model_name = 'critic_model'
         env_algorithm = self.env_name+ self.algorithm_name
@@ -486,8 +499,10 @@ class Trainer(basic.Trainer):
             self.adam_critic = torch.optim.Adam(self.critic.parameters(), lr=Config().algorithm.learning_rate)
 
     def load_loss(self):
+        """Loading previous round loss from a file"""
+
         path = f'{Config().results.results_dir}_seed_{Config().server.random_seed}/{Config().results.file_name}_{self.client_id}'
-       # Config().results.results_dir +"/"+Config().results.file_name+"_"+str(self.client_id)
+
         with open(f'{path}{"_actor_loss.csv"}', 'r') as file:
             rows = file.readlines()
             for row in rows:
@@ -506,9 +521,11 @@ class Trainer(basic.Trainer):
         return actor_loss, critic_loss, entropy_loss
 
     def load_grads(self):
+        """ Loading previous round gradients from a file """
         path = f'{Config().results.results_dir}_seed_{Config().server.random_seed}/{Config().results.file_name}_{self.client_id}'
         actor_grad= []
         critic_grad = []
+
         with open(f'{path}{"_actor_grad.csv"}', 'r') as file:
             rows = file.readlines()
             for row in rows:
@@ -521,22 +538,24 @@ class Trainer(basic.Trainer):
         return actor_grad, critic_grad
 
     def save_metric(self, path, value, first = False):
+        """Save whatever metric is passed in value to a file"""
         with open(f'{path}.csv', 'w' if first else 'a') as filehandle:
             writer = csv.writer(filehandle)
             writer.writerow(value)
 
     def save_model(self, filename=None, location=None):
         """Saving the model, training status and fisher information matrix here to a file."""
-        #We will save actor and critic models here
+        """We will save actor and critic models here"""
         model_path = Config(
         ).params['model_path'] if location is None else location
+
+        """Set model path & names"""
         actor_model_name = 'actor_model'
         critic_model_name = 'critic_model'
         env_algorithm = f'{self.env_name}{self.algorithm_name}'
-        #self.env_name+ self.algorithm_name
         model_seed_path = f'_seed_{Config().server.random_seed}'
 
-        #call save loss here
+        #Save the loss if it's not the server loss
         if self.client_id != 0:
             path = f'{Config().results.results_dir}_seed_{Config().server.random_seed}/{Config().results.file_name}_{self.client_id}'
             self.save_loss(path)
@@ -546,6 +565,7 @@ class Trainer(basic.Trainer):
                 os.makedirs(model_path)
         except FileExistsError:
             pass
+
 
         if filename is not None and self.client_id == 0:
             actor_filename = f'{filename}{"_actor"}{model_seed_path}.pth'
@@ -563,14 +583,12 @@ class Trainer(basic.Trainer):
             torch.save(self.actor_state_dict, actor_model_path)
             torch.save(self.critic_state_dict, critic_model_path)
 
-
         if self.client_id != 0:
             # Training status
             file_name = "%s_%s.npz" % ("training_status", str(self.client_id)) 
             file_path = os.path.join(model_path, file_name)
             np.savez(file_path, a=np.array([self.episode_num])) 
             
-
         if self.client_id == 0:
             logging.info("[Server #%d] Saving models to %s, and %s.", os.getpid(),
                          actor_model_path, critic_model_path)
@@ -579,13 +597,10 @@ class Trainer(basic.Trainer):
                          self.client_id, actor_model_path, critic_model_path)
 
     def save_loss(self, path):
-
+        """Save the loss"""
         actor_loss_path = f'{path}{"_actor_loss.csv"}'
-        #path+"_actor_loss.csv"
         critic_loss_path = f'{path}{"_critic_loss.csv"}'
-        #path + "_critic_loss.csv"
         entropy_loss_path = f'{path}{"_entropy_loss.csv"}'
-        #path+"_entropy_loss.csv"
 
         #If it is the first iteration write OVER potnetially existing files, else append
         first_itr = self.episode_num <= Config().algorithm.max_round_episodes
@@ -604,7 +619,8 @@ class Trainer(basic.Trainer):
 
 
     async def server_test(self, testset, sampler=None, **kwargs):
-        #We will return the average reward here
+        """We will return the average reward of the server here"""
+        
         avg_reward = self.evaluate_policy()
         self.server_reward = avg_reward
         file_name = ""
@@ -618,12 +634,8 @@ class Trainer(basic.Trainer):
             file_name = "A2C_RL_SERVER_PERCENTILE_AGGREGATE"
         results_seed_path = f'{Config().results.results_dir}_seed_{Config().server.random_seed}'
         path = f'{results_seed_path}/{file_name}.csv'
-        #Config().results.results_dir +"/"+file_name
-        
-        #first_itr = self.episode_num <= Config().algorithm.max_round_episodes
-        #the reason this doesn't work is because episode_num gets reset to 0 when we are in this function
-
-
+      
+        #We use self.first_ittr_server since episode_num is reset to 0 when we are in this function
         with open(path, 'w' if self.first_ittr_server else 'a') as filehandle:
                 writer = csv.writer(filehandle)
                 writer.writerow(self.server_reward)
@@ -631,9 +643,8 @@ class Trainer(basic.Trainer):
         self.first_ittr_server = False
         return sum(avg_reward)/len(avg_reward)
 
-        
     def evaluate_policy(self, eval_episodes = Config().algorithm.traces_per_task):
-        # TODO: after aggregation, rewards are not same across different runs, why?
+        """Evaluate policy and return average reward"""
         self.model.eval()
         
         avg_rewards = []

@@ -1,17 +1,10 @@
 """
-A federated learning server using federated averaging to train Actor-Critic models.
-
-To run this example:
-
-python examples/customized/custom_server.py -c examples/customized/server.yml
+A federated learning server using FedADp to aggregate the training of Actor-Critic models.
 """
 
 import math
-import enum
-from http import client
 import logging
 import asyncio
-from copy import deepcopy
 from torch.autograd import Variable
 
 from plato.servers import fedavg
@@ -23,7 +16,7 @@ import random
 import torch
 
 class A2CServer(fedavg.Server):
-    """ Federated learning server using federated averaging to train Actor-Critic models. """
+    """ Federated learning server using FedADP to agrregate Actor-Critic models. """
     """ A custom federated learning server. """
 
     def __init__(self, algorithm_name, env_name, model = None, trainer = None, algorithm = None):
@@ -208,6 +201,7 @@ class A2CServer(fedavg.Server):
    
     @staticmethod
     def process_grad(actor_grads, critic_grads):
+        """Process by flattening the gradients"""
         actor_grads = list(dict(sorted(actor_grads.items(), key=lambda x: x[0].lower())).values())
         critic_grads = list(dict(sorted(critic_grads.items(), key=lambda x: x[0].lower())).values())
 
@@ -245,7 +239,7 @@ class A2CServer(fedavg.Server):
 
 
     def save_files(self, file_path, data):
-        #To avoid appending to existing files, if the current roudn is one we write over
+        #To avoid appending to existing files, if the current round is one we write over
         with open(f'{file_path}.csv', 'w'if self.current_round == 1 else 'a') as filehandle:
             writer = csv.writer(filehandle)
             #writerow only takes iterables
@@ -255,6 +249,7 @@ class A2CServer(fedavg.Server):
                 writer.writerow(data)
     
     def read_last_entry(self, file_path):
+        """Reads the last entry of the file"""
         if self.current_round == 1: 
             return None
         else:
@@ -267,6 +262,7 @@ class A2CServer(fedavg.Server):
             
 
     def select_metric(self, report):
+        """Select which metric to use"""
         if Config().server.percentile_aggregate == "actor_loss":
             return report.actor_loss
         elif Config().server.percentile_aggregate == "critic_loss":

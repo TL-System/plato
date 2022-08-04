@@ -30,10 +30,12 @@ class RLClient(simple.Client):
         """The machine learning training workload on a client."""
         report, weights = await super().train()
 
+        #Retrives loss and gradients from a file
         actor_loss, critic_loss, entropy_loss = self.get_loss()
         actor_grad, critic_grad = self.get_grad()
         sum_actor_fisher, sum_critic_fisher, actor_fisher_grad, critic_fisher_grad, fisher_actor, fisher_critic = self.get_fisher()
         
+        #Return a report to the server
         return Report(report.num_samples, report.accuracy, report.training_time, \
          report.comm_time, report.update_response, self.client_id, actor_loss, critic_loss, \
           entropy_loss, actor_grad, critic_grad, sum_actor_fisher, sum_critic_fisher, fisher_actor, fisher_critic), weights

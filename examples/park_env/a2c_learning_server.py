@@ -1,13 +1,8 @@
 """
-A federated learning server using federated averaging to train Actor-Critic models.
-
-To run this example:
-
-python examples/customized/custom_server.py -c examples/customized/server.yml
+A federated learning server using federated averaging to aggregate Actor-Critic models.
 """
 
 import logging
-import asyncio
 from copy import deepcopy
 from torch.autograd import Variable
 
@@ -38,9 +33,6 @@ class A2CServer(fedavg.Server):
             percentile = min(Config().server.percentile + Config().server.percentile_increase * self.current_round, 100)
             metric_list = self.create_loss_lists(updates)
             metric_percentile = np.percentile(np.array(metric_list), percentile)
-
-            
-            
 
             # Save percentile to files
             path = f'{Config().results.results_dir}_seed_{Config().server.random_seed}/{Config().results.file_name}_percentile_{Config().server.percentile_aggregate}'
@@ -80,10 +72,12 @@ class A2CServer(fedavg.Server):
                     critic_avg_update[name] += delta * 1.0/Config().clients.per_round
             else:
                 metric = self.select_metric(report)
-                
+                #For preset curriculum
                 #if (client_id == 1 and self.current_round >= 1 and self.current_round <= 3) \
                 #or ((client_id == 1 or client_id == 2) and self.current_round > 3 and self.current_round <= 6) \
                 #or ((client_id == 1 or client_id == 2 or client_id == 3) and self.current_round > 6):
+
+                #For not preset curriculum
                 if metric <= metric_percentile:
                     print("Client %s is choosen" % str(client_id))
                     client_list.append(client_id)
@@ -145,7 +139,7 @@ class A2CServer(fedavg.Server):
 
 
     def save_files(self, file_path, data):
-        #To avoid appending to existing files, if the current roudn is one we write over
+        #To avoid appending to existing files, if the current round is one we write over
         with open(f'{file_path}.csv', 'w'if self.current_round == 1 else 'a') as filehandle:
             writer = csv.writer(filehandle)
             #writerow only takes iterables
@@ -155,6 +149,7 @@ class A2CServer(fedavg.Server):
                 writer.writerow(data)
     
     def read_last_entry(self, file_path):
+        """Reads the last entry of the saved path"""
         if self.current_round == 1: 
             return None
         else:
@@ -167,6 +162,7 @@ class A2CServer(fedavg.Server):
             
 
     def select_metric(self, report):
+        """Selects metric"""
         if Config().server.percentile_aggregate == "actor_loss":
             return report.actor_loss
         elif Config().server.percentile_aggregate == "critic_loss":
@@ -198,7 +194,6 @@ class A2CServer(fedavg.Server):
                 loss_list.append(report.sum_actor_fisher)
             elif Config().server.percentile_aggregate == "sum_critic_fisher":
                 loss_list.append(report.sum_critic_fisher)
-            #elif
 
         return loss_list
 

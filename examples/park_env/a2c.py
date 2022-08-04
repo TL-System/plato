@@ -1,5 +1,5 @@
 """
-A federated learning training session with clients running td3
+A federated learning training session with clients running A2C
 """
 import logging
 
@@ -11,14 +11,11 @@ import a2c_learning_model
 import a2c_learning_server
 import a2c_learning_trainer
 #to run
-#python examples/park_env/a2c.py -c examples/park_env/a2c_FashionMNIST_lenet5.yml
-
-
+#python examples/park_env/a2c.py -c examples/park_env/config_file_name_here.yml
 
 def main():
-    """ A Plato federated learning training session with clients running TD3. """
+    """ A Plato federated learning training session with clients running A2C. """
     logging.info("Starting RL Environment's process.")
-
 
     model = a2c_learning_model.Model
     trainer = a2c_learning_trainer.Trainer

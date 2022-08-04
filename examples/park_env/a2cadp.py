@@ -1,5 +1,5 @@
 """
-A federated learning training session with clients running td3
+A federated learning training session with clients running A2Cs
 """
 import logging
 
@@ -16,7 +16,7 @@ import a2c_learning_trainer
 
 
 def main():
-    """ A Plato federated learning training session with clients running TD3. """
+    """ A Plato federated learning training session with clients running A2C. """
     logging.info("Starting RL Environment's process.")
 
 

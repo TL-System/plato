@@ -21,6 +21,7 @@ class A2CActor(nn.Module):
             nn.Softmax(dim = 0)
         )
         
+        #Load initial untrained model
         self.model.load_state_dict(torch.load(untrained_model_path), strict=True)
     
     def forward(self, X):
@@ -39,8 +40,8 @@ class A2CCritic(nn.Module):
             nn.LeakyReLU(),
             nn.Linear(32, 1)
         )
-        #torch.save(self.model.state_dict(), untrained_model_path)
-        
+
+        #Load initial unitrained model
         self.model.load_state_dict(torch.load(untrained_model_path), strict=True)        
 
     
