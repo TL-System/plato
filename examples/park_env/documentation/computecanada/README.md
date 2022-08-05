@@ -56,7 +56,7 @@ After running this, there should be some patches to patch version differences. R
 ### Running abr_sim
 * This does not take a configuration file but a seed name, change the X in the --seedX argument in ```cc_a2c_abr_sim.sh``` to whichever seed you would like.
 
-For more information on the configuration of the configuration files, readers are directly to the configuration documentation in this directory
+For more information on the configuration of the configuration files, readers are directed to the configuration documentation in this directory
 
 ## If running jobs prompts errors related to pickle
 **1.** Install newest version of torch. At the time this was written, the newest version was 1.12.0 and could be installled with this command:
