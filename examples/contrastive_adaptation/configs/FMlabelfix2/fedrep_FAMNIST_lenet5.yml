@@ -163,6 +163,23 @@ trainer:
     # trained personalized model in each round.
     # Then, setting do_maintain_per_state to be True to follow this
     # rule.
+    # For the FedRep method, there is no need to hold the state of
+    # the personalized model, i.e., do_maintain_per_state: False.
+    # The main reasons are that:
+    #   1.- based on the FedRep's official code only the head is
+    #       trained in the final round for personalization.
+    #   2.- as we set the 'global_model_name' to be 'encoder', the
+    #       client will complete the downloaded global model based on
+    #       client's saved trained global model in the previous round.
+    #       This achieves the:  φ^t, h_i^(t-1) mentioned in the paper
+    #       Please access func 'load_payload' for details.
+    #   3.- we copy the completed global model to the personalized model
+    #       in the personalization. Thus, based on the paper, only the head
+    #       of the personalized model is optimized to obtain the performance
+    #       in each client.
+    # Therefore, we do not need to maintain the state of the personalized model
+    # to recovery the trained personalized model.
+
     do_maintain_per_state: False
     # encoder, whole
     global_model_name: encoder
