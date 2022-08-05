@@ -90,12 +90,8 @@ algorithm:
     # Aggregation algorithm
     type: fedavg
 
-    log_interval: 10
     mode: train # train/test
-    pretrained: false
-    pretrained_iter: 0
-    test_step: 100
-
+    
     # reward discounted factor
     gamma: 0.99
     learning_rate: 0.001
@@ -110,11 +106,6 @@ algorithm:
     entropy_min: 0.0
     #grad clip
     grad_clip_val: 10
-
-    hidden_size: 256
-
-    #Number of iterations
-    iterations: 1000
 
     # Number of episodes to run each round
     max_round_episodes: 400

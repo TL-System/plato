@@ -64,7 +64,7 @@ trainer:
   rounds: 80
 
   # The maximum number of clients running concurrently
-  max_concurrency: 6
+  max_concurrency: 12
 
   # The target accuracy
   target_accuracy: 5000
@@ -90,11 +90,7 @@ algorithm:
   # Aggregation algorithm
   type: fedavg
 
-  log_interval: 10
   mode: train # train/test
-  pretrained: false
-  pretrained_iter: 0
-  test_step: 100
 
   # reward discounted factor
   gamma: 0.99
@@ -111,20 +107,12 @@ algorithm:
   #grad clip
   grad_clip_val: 10
 
-  hidden_size: 256
-
-  #Number of iterations
-  iterations: 1000
-
   # Number of episodes to run each round
-  max_round_episodes: 400
+  max_round_episodes: 2
 
   # Curriculum learning, fixed difficulty level for motivation experiment
   difficulty_levels: 12
   traces_per_task: 5
-
-  #If we should save the model or not
-  save_models: False
 
   env_name: abr
 
