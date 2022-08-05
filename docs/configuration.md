@@ -1,4 +1,4 @@
-# Configuration settings
+# Configuration Settings
 
 In Plato, all configuration settings are read from a configuration file when the clients and the servers launch, and the configuration file follows the YAML format for the sake of simplicity and readability. This document introduces all the possible settings in the configuration file.
 
@@ -24,10 +24,18 @@ The type of the federated learning client. Valid values include `simple`, which 
 The total number of clients in a training session.
 ```
 
-| Attribute | Meaning | Valid Value | Note |
-|:---------:|:-------:|:-----------:|:----:|
-|**per_round**|The number of clients selected in each round| Any positive integer that is not larger than **total_clients**||
-|do_test|Whether the clients compute test accuracy locally| `true` or `false`|if `true` and the configuration file has `results` section, a CSV file will log test accuracy of every selected client in each round| 
+```{admonition} **per_round**
+The number of clients selected in each round. It should be lower than `total_clients`.
+```
+
+```{admonition} do_test
+Whether or not the clients compute test accuracies locally using local testsets. Computing test accuracies locally may be useful in certain cases, such as personalized federated learning. Valid values are `true` or `false`.
+
+```{note}
+If this setting is `true` and the configuration file has a `results` section, test accuracies of every selected client in each round will be logged in a `.csv` file.
+```
+```
+
 |speed_simulation|Whether we simulate client heterogeneity in training speed|
 |simulation_distribution|Parameters for simulating client heterogeneity in training speed|`distribution`|`normal` for normal or `zipf` for Zipf|
 |||`s`|the parameter `s` in Zipf distribution|
