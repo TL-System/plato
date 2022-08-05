@@ -39,7 +39,15 @@ If this setting is `true` and the configuration file has a `results` section, te
 `````{admonition} speed_simulation
 Whether or not the training speed of the clients are simulated. Simulating the training speed of the clients is useful when simulating *client heterogeneity*, where asynchronous federated learning may outperform synchronous federated learning. Valid values are `true` or `false`.
 
-If `speed_simulation` is `true`, we need to specify the probability distribution used for speed simulation using the following setting:
+If `speed_simulation` is `true`, we need to specify the probability distribution used for generating a sleep time (in seconds per epoch) for each client, using the following setting:
+
+```{admonition} random_seed
+This random seed is used exclusively for generating the sleep time (in seconds per epoch). The default value is `1`.
+```
+
+```{admonition} max_sleep_time
+This is used to specify the longest possible sleep time in seconds. The default value is `60`.
+```
 
 ````{admonition} simulation_distribution
 Parameters for simulating client heterogeneity in training speed. It has an embedded parameter `distribution`, which can be set to `normal` for the normal distribution, `zipf` for the Zipf distribution (which is discrete), or `pareto` for the Pareto distribution (which is continuous).
@@ -51,11 +59,10 @@ speed_simulation: true
 simulation_distribution: pareto
     distribution: pareto
     alpha: 1
+```
 ````
 `````
 
-|random_seed|The random seed for generating a sleep time (in seconds per epoch) for each of the clients||default: 1|
-|max_sleep_time|The maximum simulated sleep time (in seconds)||default: 60|
 |outbound_processors|A list of processors to apply on the payload before sending| A list of processor names || 
 |inbound_processors|A list of processors to apply on the payload right after receiving| A list of processor names || 
 |comm_simulation|Whether client-server communication should be simulated with files|`true` or `false`|default: true|
