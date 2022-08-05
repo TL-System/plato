@@ -1,7 +1,7 @@
 ## Running the algorithms on Compute Canada
 
 ### Installation
-The installation process can be done from referring to this readme written [here](https://github.com/TL-System/plato/blob/main/docs/Running.md)\
+The installation process can be done from referring to the running.md docs written [here](https://github.com/TL-System/plato/blob/main/docs)\
 This is a very important command
 ```shell
 bash ./docs/patches/patch_cc.sh
