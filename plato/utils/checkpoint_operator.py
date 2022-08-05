@@ -124,6 +124,7 @@ def perform_client_checkpoint_saving(client_id,
                                      prefix=None):
 
     current_round = kwargs['current_round']
+    config['current_round'] = current_round
     # run_id = config['run_id']
     # we have to set the run_id to be None here as the client can
     # have different run id in the whole training process.
@@ -144,7 +145,7 @@ def perform_client_checkpoint_saving(client_id,
                              optimizer_state_dict=optimizer_state_dict,
                              lr_scheduler_state_dict=lr_schedule_state_dict,
                              epoch=base_epoch,
-                             config_args=Config().to_dict())
+                             config_args=config)
 
     return filename
 
