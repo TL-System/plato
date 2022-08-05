@@ -48,11 +48,11 @@ After running this, there should be some patches to patch version differences. R
 * The status of each cluster can be found [here](https://status.computecanada.ca/)
 
 ## Running multiple jobs
-* If multiple jobs with differnet algorithms are running, make sure each checkpoint, results, seeds, model folders have their respective algorithm names attached to them to prevent overwriting. Please refer to the documentation on configuration files to know which parameters to change to do this
+* If multiple jobs with differnet algorithms are running, make sure each checkpoint, model folders have their respective algorithm names attached to them to prevent overwriting. Please refer to the documentation on configuration files to know which parameters to change to do this
 * Different port numbers with each algorithm
 * **HIGHLY RECOMMENDED:** Having multiple configuration files if one wants to run multiple algorithms and just changing the configuration file argument in the batch file to avoid changing configuration file each submission. Changing each configuration file will also lead to potential submission of the wrong version of a configuration file.
 
-**Note:** One should also make sure that if the same algorithm with a different seed (i.e. seed 5 vs seed 10) are running concurrently that the respective checkpoint, results, seeds, model folders should have a seed number appended to the name to avoid seed 10 overwriting seed 5 for example
+**Note:** One should also make sure that if the same algorithm with a different seed (i.e. seed 5 vs seed 10) are running concurrently that the respective checkpoint, model folders should have a seed number appended to the name to avoid seed 10 overwriting seed 5 for example
 ### Running abr_sim
 * This does not take a configuration file but a seed name, change the X in the --seedX argument in ```cc_a2c_abr_sim.sh``` to whichever seed you would like.
 
