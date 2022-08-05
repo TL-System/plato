@@ -1,4 +1,4 @@
-# Deploying Plato
+# Deployment Guide
 
 The Plato federated learning server is designed to use Socket.IO over HTTP and HTTPS, and can be easily deployed in a production server environment in the public cloud. 
 

@@ -1,5 +1,5 @@
 
-# Design
+# Developer's Guide 
 
 The Plato framework is designed to be extensible, hopefully making it easy to add new data sources for datasets, models, and custom trainers for models. This document discusses the current design of the framework from a software engineering perspective.
 
