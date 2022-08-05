@@ -439,16 +439,20 @@ class Trainer(basic.Trainer):
 
         # Before the training, we expect to save the initial
         # model of this round
-        # perform_client_checkpoint_saving(
-        #     client_id=self.client_id,
-        #     model_name=model_type,
-        #     model_state_dict=self.model.state_dict(),
-        #     config=config,
-        #     kwargs=kwargs,
-        #     optimizer_state_dict=optimizer.state_dict(),
-        #     lr_schedule_state_dict=lr_schedule.state_dict(),
-        #     present_epoch=0,
-        #     base_epoch=lr_schedule_base_epoch)
+        # this is determinted by whether to perform the detailed
+        # checkpoints of the training models
+        if 'do_detailed_checkpoint' in config and config[
+                'do_detailed_checkpoint']:
+            perform_client_checkpoint_saving(
+                client_id=self.client_id,
+                model_name=model_type,
+                model_state_dict=self.model.state_dict(),
+                config=config,
+                kwargs=kwargs,
+                optimizer_state_dict=optimizer.state_dict(),
+                lr_schedule_state_dict=lr_schedule.state_dict(),
+                present_epoch=0,
+                base_epoch=lr_schedule_base_epoch)
 
         # Sending the model to the device used for training
         self.model.to(self.device)
@@ -472,20 +476,24 @@ class Trainer(basic.Trainer):
             # Update the learning rate
             # based on the base epoch
             lr_schedule.step()
-
-            # if (epoch - 1) % epoch_model_log_interval == 0 or epoch == epochs:
-            #     # the model generated during each round will be stored in the
-            #     # checkpoints
-            #     perform_client_checkpoint_saving(
-            #         client_id=self.client_id,
-            #         model_name=model_type,
-            #         model_state_dict=self.model.state_dict(),
-            #         config=config,
-            #         kwargs=kwargs,
-            #         optimizer_state_dict=optimizer.state_dict(),
-            #         lr_schedule_state_dict=lr_schedule.state_dict(),
-            #         present_epoch=epoch,
-            #         base_epoch=lr_schedule_base_epoch + epoch)
+            # this is determinted by whether to perform the detailed
+            # checkpoints of the training models
+            if 'do_detailed_checkpoint' in config and config[
+                    'do_detailed_checkpoint']:
+                if (epoch -
+                        1) % epoch_model_log_interval == 0 or epoch == epochs:
+                    # the model generated during each round will be stored in the
+                    # checkpoints
+                    perform_client_checkpoint_saving(
+                        client_id=self.client_id,
+                        model_name=model_type,
+                        model_state_dict=self.model.state_dict(),
+                        config=config,
+                        kwargs=kwargs,
+                        optimizer_state_dict=optimizer.state_dict(),
+                        lr_schedule_state_dict=lr_schedule.state_dict(),
+                        present_epoch=epoch,
+                        base_epoch=lr_schedule_base_epoch + epoch)
 
             # Simulate client's speed
             if self.client_id != 0 and hasattr(
@@ -601,21 +609,24 @@ class Trainer(basic.Trainer):
                 current_round=kwargs['current_round'],
                 epoch=epoch,
                 run_id=None)
-
-        if (epoch - 1) % epoch_model_log_interval == 0 or epoch == pers_epochs:
-            # the model generated during each round will be stored in the
-            # checkpoints
-            perform_client_checkpoint_saving(
-                client_id=self.client_id,
-                model_name=personalized_model_name,
-                model_state_dict=self.personalized_model.state_dict(),
-                config=config,
-                kwargs=kwargs,
-                optimizer_state_dict=pers_optimizer.state_dict(),
-                lr_schedule_state_dict=lr_schedule.state_dict(),
-                present_epoch=epoch,
-                base_epoch=epoch,
-                prefix="personalized")
+        # Whether to store the checkpoints
+        if 'do_detailed_pers_checkpoint' in config and config[
+                'do_detailed_pers_checkpoint']:
+            if (epoch -
+                    1) % epoch_model_log_interval == 0 or epoch == pers_epochs:
+                # the model generated during each round will be stored in the
+                # checkpoints
+                perform_client_checkpoint_saving(
+                    client_id=self.client_id,
+                    model_name=personalized_model_name,
+                    model_state_dict=self.personalized_model.state_dict(),
+                    config=config,
+                    kwargs=kwargs,
+                    optimizer_state_dict=pers_optimizer.state_dict(),
+                    lr_schedule_state_dict=lr_schedule.state_dict(),
+                    present_epoch=epoch,
+                    base_epoch=epoch,
+                    prefix="personalized")
 
     def pers_train_model(
         self,
@@ -668,17 +679,19 @@ class Trainer(basic.Trainer):
 
             # Before the training, we expect to save the initial
             # model of this round
-            initial_filename = perform_client_checkpoint_saving(
-                client_id=self.client_id,
-                model_name=personalized_model_name,
-                model_state_dict=self.personalized_model.state_dict(),
-                config=config,
-                kwargs=kwargs,
-                optimizer_state_dict=pers_optimizer.state_dict(),
-                lr_schedule_state_dict=lr_schedule.state_dict(),
-                present_epoch=0,
-                base_epoch=0,
-                prefix="personalized")
+            if 'do_detailed_pers_checkpoint' in config and config[
+                    'do_detailed_pers_checkpoint']:
+                initial_filename = perform_client_checkpoint_saving(
+                    client_id=self.client_id,
+                    model_name=personalized_model_name,
+                    model_state_dict=self.personalized_model.state_dict(),
+                    config=config,
+                    kwargs=kwargs,
+                    optimizer_state_dict=pers_optimizer.state_dict(),
+                    lr_schedule_state_dict=lr_schedule.state_dict(),
+                    present_epoch=0,
+                    base_epoch=0,
+                    prefix="personalized")
 
             output = self.perform_test_op(test_loader, self.personalized_model)
             initial_accuracy = output["accuracy"]
@@ -804,6 +817,14 @@ class Trainer(basic.Trainer):
             filename = f"{model_type}_{self.client_id}_{config['run_id']}.pth"
             self.save_personalized_model(filename)
 
+    def customize_train_config(self, config):
+        """ Customize the training config based on the user's own requirement. """
+
+        # By default, we save all checkpoints in the personalization stage.
+        # this can also be regarded as a demo of how to change the trainer's config.
+        config['do_detailed_pers_checkpoint'] = True
+        return config
+
     def pers_train(self, trainset, sampler, cut_layer=None, **kwargs) -> float:
         """The main training loop in a federated learning workload for
             the personalization.
@@ -820,8 +841,9 @@ class Trainer(basic.Trainer):
 
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']
+        # Customize the config
+        self.customize_train_config(config)
 
-        current_round = kwargs['current_round']
         # Set the start time of training in absolute time
         self.training_start_time = time.time()
 
