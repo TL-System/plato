@@ -1,0 +1,25 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+numpy = "*"
+python-socketio = "*"
+aiohttp = "*"
+requests = "*"
+boto3 = "*"
+pyyaml = "*"
+datasets = "*"
+transformers = "*"
+opacus = "*"
+gym = "*"
+zstd = "*"
+torch-optimizer = "*"
+sphinx = "*"
+furo = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.8"
