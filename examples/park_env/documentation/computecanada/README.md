@@ -48,7 +48,7 @@ After running this, there should be some patches to patch version differences. R
 * The status of each cluster can be found [here](https://status.computecanada.ca/)
 
 ## Running multiple jobs
-* If multiple jobs with differnet algorithms are running, make sure each checkpoint, results, seeds, model folders have their respective algorithm names attached to them to prevent overwriting 
+* If multiple jobs with differnet algorithms are running, make sure each checkpoint, results, seeds, model folders have their respective algorithm names attached to them to prevent overwriting. Please refer to the documentation on configuration files to know which parameters to change to do this
 * Different port numbers with each algorithm
 * **HIGHLY RECOMMENDED:** Having multiple configuration files if one wants to run multiple algorithms and just changing the configuration file argument in the batch file to avoid changing configuration file each submission. Changing each configuration file will also lead to potential submission of the wrong version of a configuration file.
 
