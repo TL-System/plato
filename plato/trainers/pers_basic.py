@@ -375,6 +375,8 @@ class Trainer(basic.Trainer):
         """ The default personalized training loop when a custom training loop is not supplied.
 
         """
+        # Customize the config
+        config = self.customize_train_config(config)
 
         batch_size = config['batch_size']
         model_type = config['model_name']
@@ -639,6 +641,8 @@ class Trainer(basic.Trainer):
         """ The default training loop when a custom training loop is not supplied.
 
         """
+        # Customize the config
+        config = self.customize_train_config(config)
 
         current_round = kwargs['current_round']
         personalized_model_name = Config().trainer.personalized_model_name
@@ -817,14 +821,6 @@ class Trainer(basic.Trainer):
             filename = f"{model_type}_{self.client_id}_{config['run_id']}.pth"
             self.save_personalized_model(filename)
 
-    def customize_train_config(self, config):
-        """ Customize the training config based on the user's own requirement. """
-
-        # By default, we save all checkpoints in the personalization stage.
-        # this can also be regarded as a demo of how to change the trainer's config.
-        config['do_detailed_pers_checkpoint'] = True
-        return config
-
     def pers_train(self, trainset, sampler, cut_layer=None, **kwargs) -> float:
         """The main training loop in a federated learning workload for
             the personalization.
@@ -841,8 +837,6 @@ class Trainer(basic.Trainer):
 
         config = Config().trainer._asdict()
         config['run_id'] = Config().params['run_id']
-        # Customize the config
-        self.customize_train_config(config)
 
         # Set the start time of training in absolute time
         self.training_start_time = time.time()
@@ -885,3 +879,11 @@ class Trainer(basic.Trainer):
         training_time = toc - tic
 
         return training_time, accuracy
+
+    def customize_train_config(self, config):
+        """ Customize the training config based on the user's own requirement. """
+
+        # By default, we save all checkpoints in the personalization stage.
+        # this can also be regarded as a demo of how to change the trainer's config.
+        config['do_detailed_pers_checkpoint'] = False
+        return config
