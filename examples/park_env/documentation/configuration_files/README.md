@@ -56,7 +56,7 @@ The other parameters can be answered in the already exisiting documentation abov
 ```file_name:``` The name of the files \
 ```seed_random_path:``` The path of the seed folders
 
-
+The other parameters can be answered in the already exisiting documentation above
 
 ## Different parameter configurations for each respective algorithm
 
