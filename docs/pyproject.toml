@@ -5,8 +5,10 @@ description = ""
 authors = ["Baochun Li <bli@ece.toronto.edu>"]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 Sphinx = "^5.1.1"
+furo = "^2022.6.21"
+myst-parser = "^0.18.0"
 
 [tool.poetry.dev-dependencies]
 
