@@ -1,7 +1,7 @@
 ## Running the algorithms on Compute Canada
 
 ### Installation
-The installation process can be done from referring to the running.md docs written [here](https://github.com/TL-System/plato/blob/main/docs)\
+The installation process can be done from referring to the running.md docs written [here](https://platodocs.netlify.app/running.html)\
 This is a very important command
 ```shell
 bash ./docs/patches/patch_cc.sh
