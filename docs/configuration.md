@@ -28,19 +28,32 @@ The total number of clients in a training session.
 The number of clients selected in each round. It should be lower than `total_clients`.
 ```
 
-```{admonition} do_test
+````{admonition} do_test
 Whether or not the clients compute test accuracies locally using local testsets. Computing test accuracies locally may be useful in certain cases, such as personalized federated learning. Valid values are `true` or `false`.
 
 ```{note}
 If this setting is `true` and the configuration file has a `results` section, test accuracies of every selected client in each round will be logged in a `.csv` file.
 ```
-```
+````
 
-|speed_simulation|Whether we simulate client heterogeneity in training speed|
-|simulation_distribution|Parameters for simulating client heterogeneity in training speed|`distribution`|`normal` for normal or `zipf` for Zipf|
-|||`s`|the parameter `s` in Zipf distribution|
-|||`mean`|The mean in normal distribution|
-|||`sd`|The standard deviation in normal distribution|
+`````{admonition} speed_simulation
+Whether or not the training speed of the clients are simulated. Simulating the training speed of the clients is useful when simulating *client heterogeneity*, where asynchronous federated learning may outperform synchronous federated learning. Valid values are `true` or `false`.
+
+If `speed_simulation` is `true`, we need to specify the probability distribution used for speed simulation using the following setting:
+
+````{admonition} simulation_distribution
+Parameters for simulating client heterogeneity in training speed. It has an embedded parameter `distribution`, which can be set to `normal` for the normal distribution, `zipf` for the Zipf distribution (which is discrete), or `pareto` for the Pareto distribution (which is continuous).
+
+For the normal distribution, we can specify `mean` for its mean value and `sd` for its standard deviation; for the Zipf distribution, we can specify `s`; and for the Pareto distribution, we can specify `alpha` to adjust how heavy-tailed it is. Here is an example:
+
+```yaml
+speed_simulation: true
+simulation_distribution: pareto
+    distribution: pareto
+    alpha: 1
+````
+`````
+
 |random_seed|The random seed for generating a sleep time (in seconds per epoch) for each of the clients||default: 1|
 |max_sleep_time|The maximum simulated sleep time (in seconds)||default: 60|
 |outbound_processors|A list of processors to apply on the payload before sending| A list of processor names || 
