@@ -108,7 +108,7 @@ algorithm:
   grad_clip_val: 10
 
   # Number of episodes to run each round
-  max_round_episodes: 2
+  max_round_episodes: 400
 
   # Curriculum learning, fixed difficulty level for motivation experiment
   difficulty_levels: 12
