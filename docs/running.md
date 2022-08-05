@@ -1,3 +1,5 @@
+# Running Plato
+
 ## Running Plato on Google Colaboratory
 
 Go to [Google Colaboratory](https://colab.research.google.com/notebooks/intro.ipynb).
@@ -8,7 +10,7 @@ Under directory `plato/examples/colab/`, the notebook `colab_use_terminal.ipynb`
 
 ### Installation
 
-SSH into a cluster on Compute Canada. Here we take [Graham](https://docs.computecanada.ca/wiki/Graham) as an example, while [Cedar]((https://docs.computecanada.ca/wiki/Cedar)) and [Narval](https://docs.computecanada.ca/wiki/Narval/en) are also available. Then clone the *Plato* repository to your own directory:
+SSH into a cluster on Compute Canada. Here we take [Graham](https://docs.alliancecan.ca/wiki/Graham) as an example, while [Cedar](https://docs.alliancecan.ca/wiki/Cedar) and [Narval](https://docs.alliancecan.ca/wiki/Narval/en) are also available. Then clone the *Plato* repository to your own directory:
 
 ```shell
 ssh <CCDB username>@graham.computecanada.ca
@@ -129,7 +131,7 @@ For example:
 sbatch cifar_wideresnet.sh
 ```
 
-To check the status of a submitted job, use the `sq` command. Refer to the [official Computer Canada documentation](https://docs.computecanada.ca/wiki/Running_jobs#Use_sbatch_to_submit_jobs) for more details.
+To check the status of a submitted job, use the `sq` command. Refer to the [official Computer Canada documentation](https://docs/alliancecan.ca/wiki/Running_jobs#Use_sbatch_to_submit_jobs) for more details.
 
 To monitor the output as it is generated live, use the command:
 

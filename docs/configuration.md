@@ -1,4 +1,4 @@
-## Configuration File
+# Configuration File
 
 **To be completed**
 
@@ -8,14 +8,14 @@ This document introduces all the possible parameters in the configuration file.
 
 Attributes in **bold** must be included in a configuration file, while attributes in *italic* only need to be included under certain conditions.
 
-### general (optional)
+## general (optional)
 
 | Attribute | Meaning | Valid Value | Note |
 |:---------:|:-------:|:-----------:|:----:|
 |base_path|The prefix of directory of dataset, models, checkpoints, and results||default: `./`|
 
 
-### clients
+## clients
 
 | Attribute | Meaning | Valid Value | Note |
 |:---------:|:-------:|:-----------:|:----:|
@@ -36,7 +36,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |comm_simulation|Whether client-server communication should be simulated with files|`true` or `false`|default: true|
 |compute_comm_time|Whether communication time should be computed with specified bandwidth when client-server communication is simulated with files|`true` or `false`||
 
-#### Valid processors for `clients.outbound_processors`
+### Valid processors for `clients.outbound_processors`
 
 - `feature_randomized_response`: Activate randomized response on features for PyTorch MistNet, must also set `algorithm.epsilon` to activate. Must be placed before `feature_unbatch`.
 
@@ -62,12 +62,11 @@ Attributes in **bold** must be included in a configuration file, while attribute
 
 - `model_compress`: Compress model parameters with `Zstandard` compression algorithm. Must be placed as the last processor if applied.
 
-
-#### Valid processors for `clients.inbound_processors`
+### Valid processors for `clients.inbound_processors`
 
 - `model_decompress`: Decompress model parameters. Must be placed as the first processor if `model_compress` is applied on the server side.
 
-### server
+## server
 
 | Attribute | Meaning | Valid Values | Note |
 |:---------:|:-------:|:-----------:|:----:|
@@ -93,8 +92,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |downlink_bandwidth|Bandwidth for downlink communication (server to clients) in Mbps||default:100|
 |uplink_bandwidth|Bandwidth for uplink communication (clients to server) in Mbps||default:100|
 
-
-#### Valid processors for `server.outbound_processors`
+### Valid processors for `server.outbound_processors`
 
 - `unstructured_pruning`: Process unstructured pruning on model weights for PyTorch. The `model_compress` processor needs to be applied after it in the configuration file or the communication overhead will not be reduced.
 
@@ -102,7 +100,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 
 - `model_compress`: Compress model parameters with `Zstandard` compression algorithm. Must be placed as the last processor if applied.
 
-#### Valid processors for `server.inbound_processors`
+### Valid processors for `server.inbound_processors`
 
 - `model_decompress`: Decompress model parameters. Must be placed as the first processor if `model_compress` is applied on the client side.
 
@@ -112,7 +110,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 
 - `model_dequantize`: Dequantize features for PyTorch model parameters.
 
-### data
+## data
 
 | Attribute | Meaning | Valid Value | Note |
 |:---------:|:-------:|:-----------:|:----:|
@@ -134,7 +132,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |*institution_class_ids*|Indexs of classes of local data of each institution's clients|e.g., 0,1;2,3 (the first institution's clients only have data of class #0 and #1; the second institution's clients only have data of class #2 and #3) |Could have this attribute if the **sampler** is `orthogonal`|
 |*label_distribution*|The class distribution of every client's local data|`iid` or `noniid` |Could have this attribute if the **sampler** is `orthogonal`. Default is `iid`|
 
-### trainer
+## trainer
 
 | Attribute | Meaning | Valid Value | Note |
 |:---------:|:-------:|:-----------:|:----:|
@@ -158,7 +156,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |dp_max_grad_norm|The maximum norm of the per-sample gradients with the `diff_privacy` trainer. Any gradient with norm higher than this will be clipped to this value.||default: 1.0|
 |num_classes|The number of classes.||Default: 10|
 
-### algorithm
+## algorithm
 
 | Attribute | Meaning | Valid Value | Note |
 |:---------:|:-------:|:-----------:|:----:|
@@ -168,7 +166,7 @@ Attributes in **bold** must be included in a configuration file, while attribute
 |*total_silos*|The total number of silos (edge servers)|Any positive integer||
 |*local_rounds*|The number of local aggregation rounds on edge servers before sending aggregated weights to the central server|Any positive integer||
 
-### results
+## results
 
 | Attribute | Meaning | Valid Value | Note |
 |:---------:|:-------:|:-----------:|:----:|

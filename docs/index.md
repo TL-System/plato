@@ -7,7 +7,10 @@ Welcome to *Plato*, a new software framework to facilitate scalable federated le
 :caption: Getting Started
 installation
 quickstart
+running
+configuration
 development
+examples
 deployment
 misc
 ```
