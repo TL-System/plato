@@ -1,27 +1,31 @@
-# Configuration File
+# Configuration settings
 
-**To be completed**
+In Plato, all configuration settings are read from a configuration file when the clients and the servers launch, and the configuration file follows the YAML format for the sake of simplicity and readability. This document introduces all the possible settings in the configuration file.
 
-In Plato, all configuration parameters are read from a configuration file when the clients and the servers launch, and the configuration file follows the YAML format for the sake of simplicity and readability. 
-
-This document introduces all the possible parameters in the configuration file.
-
+```{note}
 Attributes in **bold** must be included in a configuration file, while attributes in *italic* only need to be included under certain conditions.
+```
 
-## general (optional)
+## general
 
-| Attribute | Meaning | Valid Value | Note |
-|:---------:|:-------:|:-----------:|:----:|
-|base_path|The prefix of directory of dataset, models, checkpoints, and results||default: `./`|
+```{admonition} base_path
+The path prefix for datasets, models, checkpoints, and results.
 
+The default value is `./`.
+```
 
 ## clients
 
+```{admonition} **type**
+The type of the federated learning client. Valid values include `simple`, which represents a basic client who sends weight updates to the server; and `mistnet`, which is client following the MistNet algorithm.
+```
+
+```{admonition} **total_clients**
+The total number of clients in a training session.
+```
+
 | Attribute | Meaning | Valid Value | Note |
 |:---------:|:-------:|:-----------:|:----:|
-**type**|Type of federated learning client|`simple`|A basic client who sends weight updates to the server|
-|||`mistnet`|A client for MistNet|
-|**total_clients**|The total number of clients|A positive number||
 |**per_round**|The number of clients selected in each round| Any positive integer that is not larger than **total_clients**||
 |do_test|Whether the clients compute test accuracy locally| `true` or `false`|if `true` and the configuration file has `results` section, a CSV file will log test accuracy of every selected client in each round| 
 |speed_simulation|Whether we simulate client heterogeneity in training speed|

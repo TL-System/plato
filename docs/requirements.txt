@@ -145,6 +145,9 @@ soupsieve==2.3.2.post1; python_full_version >= "3.6.0" and python_version >= "3.
 sphinx-basic-ng==0.0.1a12; python_version >= "3.7" \
     --hash=sha256:e8b6efd2c5ece014156de76065eda01ddfca0fee465aa020b1e3c12f84570bbe \
     --hash=sha256:cffffb14914ddd26c94b1330df1d72dab5a42e220aaeb5953076a40b9c50e801
+sphinx-copybutton==0.5.0; python_version >= "3.6" \
+    --hash=sha256:a0c059daadd03c27ba750da534a92a63e7a36a7736dcf684f26ee346199787f6 \
+    --hash=sha256:9684dec7434bd73f0eea58dda93f9bb879d24bff2d8b187b1f2ec08dfe7b5f48
 sphinx==5.1.1; python_version >= "3.6" \
     --hash=sha256:309a8da80cb6da9f4713438e5b55861877d5d7976b69d87e336733637ea12693 \
     --hash=sha256:ba3224a4e206e1fbdecf98a4fae4992ef9b24b85ebf7b584bb340156eaf08d89
