@@ -15,9 +15,17 @@ To start a federated learning training workload, run `./run` from the repository
  
 *Plato* uses the YAML format for its configuration files to manage the runtime configuration parameters. Example configuration files have been provided in the `configs` directory.
 
+## Running examples built with Plato
+
+In `examples/`, a number of research projects that were developed using Plato as the federated learning framework have been included. To run them, just run the main Python program in each of the directories with a suitable configuration file. For example, to run the FedRep project which implements the FedRep algorithm, run the command:
+
+```shell
+python examples/FedRep/fedrep.py -c examples/FedRep/fedrep_MNIST_lenet5.yml
+```
+
 ## Running Plato with MindSpore or TensorFlow
 
-Plato is designed to support multiple deep learning frameworks, including PyTorch, TensorFlow, and MindSpore. 
+Plato is designed to support multiple deep learning frameworks, including PyTorch, TensorFlow, and MindSpore.
 
 **TensorFlow.** Install the `tensorflow` and `tensorflow-datasets` pip packages first:
 
