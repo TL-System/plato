@@ -54,7 +54,7 @@ Finally, we will install the current GitHub version of *Plato* as a local pip pa
 
 ```shell
 pip install .
-pip install yapf mypy pylint
+pip install black mypy pylint
 ```
 
 **Tip #1:** After the initial installation of the required Python packages, use the following command to upgrade all the installed packages at any time:
@@ -75,10 +75,10 @@ brew install miniforge
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
-If you use Visual Studio Code, it is possible to use `yapf` to reformat the code every time it is saved by adding the following settings to .`.vscode/settings.json`:
+If you use Visual Studio Code, it is recommended to use `black` to reformat the code every time it is saved by adding the following settings to .`.vscode/settings.json`:
 
 ```
-"python.formatting.provider": "yapf", 
+"python.formatting.provider": "black", 
 "editor.formatOnSave": true
 ```
 
@@ -88,7 +88,7 @@ In general, the following is the recommended starting point for `.vscode/setting
 {
 	"python.linting.enabled": true,
 	"python.linting.pylintEnabled": true,
-	"python.formatting.provider": "yapf", 
+	"python.formatting.provider": "black", 
 	"editor.formatOnSave": true,
 	"python.linting.pylintArgs": [
 	    "--init-hook",

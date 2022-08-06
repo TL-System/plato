@@ -4,18 +4,11 @@ when creating new trainer callbacks.
 
 Defines two default callbacks to log metrics and print training progress.
 """
-import os
 import logging
+import os
 from abc import ABC
 
-
-def get_default_callbacks():
-    """
-    Obtains a list of default trainer callbacks.
-    """
-    default_callbacks = PrintProgressCallback
-
-    return default_callbacks
+from plato.utils import fonts
 
 
 class TrainerCallback(ABC):
@@ -117,7 +110,18 @@ class PrintProgressCallback(TrainerCallback):
         logging.info("\nStarting training run")
 
     def on_train_epoch_start(self, trainer, **kwargs):
-        logging.info(f"\nStarting epoch {trainer.current_epoch}")
+        if trainer.client_id == 0:
+            logging.info(
+                fonts.colourize(
+                    f"[Server #{os.getpid()}] Starting epoch {trainer.current_epoch}."
+                )
+            )
+        else:
+            logging.info(
+                fonts.colourize(
+                    f"[Client #{trainer.client_id}] Starting epoch {trainer.current_epoch}."
+                )
+            )
 
     def on_train_step_end(self, trainer, batch, loss, **kwargs):
         """

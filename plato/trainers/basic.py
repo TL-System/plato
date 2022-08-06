@@ -183,7 +183,9 @@ class Trainer(base.Trainer):
         self.model.train()
 
         for self.current_epoch in range(1, self.total_epochs + 1):
-            # Use a default training loop
+            self.train_epoch_start()
+            self.callback_handler.call_event("on_train_epoch_start", self)
+
             for batch_id, (examples, labels) in enumerate(self.train_loader):
                 examples, labels = examples.to(self.device), labels.to(self.device)
                 optimizer.zero_grad()
@@ -488,6 +490,11 @@ class Trainer(base.Trainer):
         return torch.utils.data.DataLoader(
             dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler
         )
+
+    def train_epoch_start(self):
+        """
+        Method called at the beginning of a training epoch.
+        """
 
     def train_step_end(self, batch, loss):
         """
