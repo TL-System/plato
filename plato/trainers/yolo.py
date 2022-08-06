@@ -36,7 +36,7 @@ class Trainer(basic.Trainer):
         super().__init__()
         Config().params["grid_size"] = int(self.model.stride.max())
 
-    def create_train_loader(
+    def get_train_loader(
         cls, batch_size, trainset, sampler, extract_features=False, cut_layer=None
     ):
         """The train loader for training YOLOv5 using the COCO dataset or other datasets for the
@@ -133,7 +133,7 @@ class Trainer(basic.Trainer):
 
         # Trainloader
         logging.info("[Client #%d] Loading the dataset.", self.client_id)
-        train_loader = Trainer.create_train_loader(
+        train_loader = Trainer.get_train_loader(
             batch_size, trainset, sampler, cut_layer=cut_layer
         )
         nb = len(train_loader)

@@ -156,7 +156,7 @@ class Trainer(base.Trainer):
         self.train_run_start(config)
         self.callback_handler.call_event("on_train_run_start", self, config)
 
-        self.train_loader = Trainer.create_train_loader(
+        self.train_loader = Trainer.get_train_loader(
             batch_size, trainset, sampler, cut_layer=cut_layer
         )
 
@@ -421,13 +421,13 @@ class Trainer(base.Trainer):
         return self.model
 
     @classmethod
-    def create_train_loader(cls, batch_size, trainset, sampler, **kwargs):
+    def get_train_loader(cls, batch_size, trainset, sampler, **kwargs):
         """
         Creates an instance of the trainloader.
 
         :param batch_size: the batch size.
         :param trainset: the training dataset.
-        :param sampler: the sampler for the trainloader.
+        :param sampler: the sampler for the trainloader to use.
         """
         return torch.utils.data.DataLoader(
             dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler

@@ -21,7 +21,7 @@ A `Datasource` instance is used to obtain the dataset, labels, and any data augm
 
 A data source must subclass the `Datasource` abstract base classes in `datasources/base.py`. This class may use third-party frameworks to load datasets, and may add additional functionality to support build-in transformations.
 
-The external interface of this module is contained in `datasources/registry.py`. The registry contains a list of all existing datasources in the framework, so that they can be discovered and loaded. Its most important function is `get()`, which returns a `DataSource` instance.
+The external interface of this module is contained in `datasources/registry.py`. The registry contains a list of provided datasources in the framework, so that they can be discovered and loaded. Its most important function is `get()`, which returns a `DataSource` instance.
 
 ### Samplers 
 
@@ -29,9 +29,7 @@ A `Sampler` is responsible for sampling a dataset for local training or testing 
 
 ### Models
 
-Each model is created by subclassing the `Model` abstract base class in `models/base.py`. This base class is a valid PyTorch `nn.Module` with several additional abstract methods that support other functionality throughout the framework. In particular, any subclass must have static methods to determine whether a string model name (e.g., `cifar_resnet_18`) is valid and to create a model object from a string name, a number of outputs, and an initializer.
-
-The external interface of this module is contained in `models/registry.py`. Just like `datasets/registry.py`, there is a list of all existing models in the framework so that they can be discovered and loaded. The registry similarly contains a `get()` function that returns the corresponding `Model` as specified. 
+A model class can be arbitrarily defined, as long as it implements a method called `get_model()`, which returns an instance of the model. Just like `datasources/registry.py`, there is also a list of provided models in Plato they can be discovered and loaded. The registry similarly contains a `get()` function that returns a `Model` instance corresponding to the name of the model in the configuration file.
 
 ## Extending Plato with new federated learning algorithms
 

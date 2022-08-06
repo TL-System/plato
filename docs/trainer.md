@@ -4,6 +4,23 @@
 
 The common practice is to customize the training loop using inheritance for important features that change the state of the training process. To customize the training loop using inheritance, subclass the `basic.Trainer` class in `plato.trainers`, and override the following methods:
 
+````{admonition} **get_train_loader(cls, batch_size, trainset, sampler, \*\*kwargs)**
+This is a class method that is called to create an instance of the trainloader to be used in the training loop.
+
+`batch_size` the batch size.
+
+`trainset` the training dataset.
+
+`sampler` the sampler for the trainloader to use.
+
+```py
+def get_train_loader(cls, batch_size, trainset, sampler, **kwargs):
+    return torch.utils.data.DataLoader(
+        dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler
+    )
+```
+````
+
 ````{admonition} **train_run_start(self, config)**
 Overide this method to complete additional tasks before the training loop starts.
 
