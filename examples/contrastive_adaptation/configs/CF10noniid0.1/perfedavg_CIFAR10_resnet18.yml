@@ -38,10 +38,10 @@ clients:
     # on all clients
     do_final_personalization: True
     # Minotor the self-supervised learning by knn for
-    # every 1 round
+    # every 10 round
     test_interval: 10
     # Train the personalized model based on the
-    # learned representation every 1 rounds
+    # learned representation every 10 rounds
     pers_learning_interval: 10
 
     # Whether simulate clients or not
@@ -183,7 +183,7 @@ trainer:
     # trained personalized model in each round.
     # Then, setting do_maintain_per_state to be True to follow this
     # rule.
-    do_maintain_per_state: True
+    do_maintain_per_state: False
 
     # Important hyper-parameters
     # 0 for performing Per-FedAvg(FO), others for Per-FedAvg(HF)

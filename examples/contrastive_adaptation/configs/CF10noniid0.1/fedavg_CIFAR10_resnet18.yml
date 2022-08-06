@@ -38,10 +38,10 @@ clients:
     # on all clients
     do_final_personalization: True
     # Minotor the self-supervised learning by knn for
-    # every 1 round
+    # every 10 round
     test_interval: 10
     # Train the personalized model based on the
-    # learned representation every 1 rounds
+    # learned representation every 10 rounds
     pers_learning_interval: 10
 
     # Whether simulate clients or not

@@ -129,7 +129,7 @@ trainer:
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
     # does not utilize the
-    pers_epochs: 1
+    pers_epochs: 3
     pers_batch_size: 64
     pers_optimizer: SGD
     # lr = 0.1 * batch_size / 256, see section B.6 and B.7 of SimCLR paper.
@@ -166,7 +166,7 @@ trainer:
     # trained personalized model in each round.
     # Then, setting do_maintain_per_state to be True to follow this
     # rule.
-    do_maintain_per_state: True
+    do_maintain_per_state: False
 
     # Important hyper-parameters
     # 0 for performing Per-FedAvg(FO), others for Per-FedAvg(HF)
