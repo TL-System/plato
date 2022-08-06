@@ -3,7 +3,7 @@
 
 The Plato framework is designed to be extensible, hopefully making it easy to add new data sources for datasets, models, and custom trainers for models. This document discusses the current design of the framework from a software engineering perspective.
 
-This framework makes extensive use of object oriented subclassing with the help of Python 3's [ABC library](https://docs.python.org/3/library/abc.html). It is a good idea to review Python 3's support for base classes with abstract methods before proceeding. It also makes sporadic use of Python 3's [Data Classes](https://docs.python.org/3/library/dataclasses.html).
+This framework makes extensive use of object oriented subclassing with the help of Python 3's [ABC library](https://docs.python.org/3/library/abc.html). It is a good idea to review Python 3's support for base classes with abstract methods before proceeding. It also makes sporadic use of Python 3's [Data Classes](https://docs.python.org/3/library/dataclasses.html). It also supports defining callback classes, and customizing a trainer by providing it with a list of custom callback classes.
 
 ## Configuration parameters
 
@@ -37,30 +37,45 @@ The external interface of this module is contained in `models/registry.py`. Just
 
 Most federated learning algorithms can be divided into four components: a *client*, a *server*, an *algorithm*, and a *trainer*.
 
-- The *client* implements all algorithm logic on the client side. Typically, one would inherit from the `simple.Client` class to reuse some of the useful methods there, but it is also possible to inherit from the `base.Client` class.
+- The *client* implements all algorithm logic on the client side. Typically, one would subclass from the `simple.Client` class to reuse some of the useful methods there, but it is also possible to subclass from the `base.Client` class.
 
-- The *server* implements all algorithm logic on the server side. Typically, one would inherit from the `fedavg.Server` class to reuse some of the useful methods there, but it is also possible to inherit from the `base.Server` class.
+- The *server* implements all algorithm logic on the server side. Typically, one would subclass from the `fedavg.Server` class to reuse some of the useful methods there, but it is also possible to subclass from the `base.Server` class.
 
-    *Note:* Implementations for both the client and the server should be neutral across various deep learning frameworks, such as PyTorch, TensorFlow, and MindSpore.
+    ```{note}
+    Implementations for both the client and the server should be neutral across various deep learning frameworks, such as PyTorch, TensorFlow, and MindSpore.
+    ```
 
-- Framework-specific algorithm logic should be implemented in an *algorithm* module. Typically, one would inherit from the PyTorch-based `fedavg.Algorithm` class if PyTorch is to be used. If other frameworks, for example TensorFlow, is to be used, one can inherit from the `tensorflow.fedavg.Algorithm` class. Several frequently-used algorithms are provided in `algorithms/`, while more examples are provided outside the framework in `examples/`.
+- Framework-specific algorithm logic should be implemented in an *algorithm* module. Typically, one would subclass from the PyTorch-based `fedavg.Algorithm` class if PyTorch is to be used. If other frameworks, for example TensorFlow, is to be used, one can subclass from the `tensorflow.fedavg.Algorithm` class. Several frequently-used algorithms are provided in `algorithms/`, while more examples are provided outside the framework in `examples/`.
 
-- Custom training loops should be implemented as a *trainer* class. If a PyTorch-based trainer is to be implemented, one may inherit from the `basic.Trainer` class. Typically, the `train_model` method should be overridden with a custom implementation.
+- Custom training loops should be implemented as a *trainer* class. If a PyTorch-based trainer is to be implemented, one may subclass from the `basic.Trainer` class. See the **Trainers** section in API reference documentation for customizing the training loops using inheritance or callbacks.
 
-Once the custom *client*, *server*, *algorithm*, *trainer* classes have been implemented, they can be initialized using the following example code (from `examples/split_learning`):
+Once the custom *client*, *server*, *algorithm*, *trainer* classes have been implemented, they can be initialized using the following examples:
+
+From `examples/basic/basic.py`:
 
 ```python
-trainer = split_learning_trainer.Trainer()
-algorithm = split_learning_algorithm.Algorithm(trainer=trainer)
-client = split_learning_client.Client(algorithm=algorithm, trainer=trainer)
-server = split_learning_server.Server(algorithm=algorithm, trainer=trainer)
+model = Model
+datasource = DataSource
+trainer = Trainer
+client = simple.Client(model=model, datasource=datasource, trainer=trainer)
+server = fedavg.Server(model=model, datasource=datasource, trainer=trainer)
+server.run(client)
+```
+
+From `examples/FedRep/fedrep.py`:
+
+```python
+trainer = fedrep_trainer.Trainer
+algorithm = fedrep_algorithm.Algorithm
+client = fedrep_client.Client(algorithm=algorithm, trainer=trainer)
+server = fedrep_server.Server(algorithm=algorithm, trainer=trainer)
 
 server.run(client)
 ```
 
 ## Implementing custom models and data sources
 
-To define a custom model, one does not need to inherit from any base class in Plato, as Plato uses standard model classes in each machine learning framework. Only `get_model()` needs to be implemented in the `Model` class. For example (excerpt from `examples/basic/basic.py`), one can define a simple model in PyTorch as follows:
+To define a custom model, one does not need to subclass from any base class in Plato, as Plato uses standard model classes in each machine learning framework. Only `get_model()` needs to be implemented in the `Model` class. For example (excerpt from `examples/basic/basic.py`), one can define a simple model in PyTorch as follows:
 
 ```python
 class Model():
@@ -78,7 +93,7 @@ class Model():
         )
 ```
 
-If a custom `DataSource` is also needed for a custom training session, one can inherit from the `base.DataSource` class (assuming PyTorch is used as the framework), as in the following example (excerpt from `examples/custom_model.py`):
+If a custom `DataSource` is also needed for a custom training session, one can subclass from the `base.DataSource` class (assuming PyTorch is used as the framework), as in the following example (excerpt from `examples/custom_model.py`):
 
 ```python
 class DataSource(base.DataSource):

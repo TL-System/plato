@@ -11,11 +11,8 @@ https://arxiv.org/abs/2102.07078
 Source code: https://github.com/lgcollins/FedRep
 """
 
-import os
-import time
 import logging
 
-import torch
 from plato.trainers import basic
 
 
