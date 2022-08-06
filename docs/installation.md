@@ -54,25 +54,33 @@ Finally, we will install the current GitHub version of *Plato* as a local pip pa
 
 ```shell
 pip install .
-pip install black mypy pylint
+pip install black pylint
 ```
 
-**Tip #1:** After the initial installation of the required Python packages, use the following command to upgrade all the installed packages at any time:
+````{tip}
+
+After the initial installation of the required Python packages, use the following command to upgrade all the installed packages at any time:
 
 ```shell
 python upgrade_packages.py
 ```
 
-**Tip #2:** If you are using a M1 Mac computer, a handy way to install [Miniforge](https://github.com/conda-forge/miniforge) is to do it using the command:
+If you are using a M1 or M2 Mac computer, a handy way to install [Miniforge](https://github.com/conda-forge/miniforge) is to do it using the command:
 
 ```shell
 brew install miniforge
 ```
 
-**Tip #3:** On M1 Mac computers, before installing the required packages in the conda environment, you may need to install the [Rust compiler](https://www.rust-lang.org/tools/install) first in order to install the `tokenizers` package:
+On M1 or M2 Mac computers, before installing the required packages in the conda environment, you may need to install the [Rust compiler](https://www.rust-lang.org/tools/install) first in order to install the `tokenizers` package:
 
 ```shell
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+or simply
+
+```shell
+brew install rust
 ```
 
 If you use Visual Studio Code, it is recommended to use `black` to reformat the code every time it is saved by adding the following settings to .`.vscode/settings.json`:
@@ -100,7 +108,11 @@ In general, the following is the recommended starting point for `.vscode/setting
 
 It goes without saying that `/absolute/path/to/project/home/directory` should be replaced with the actual path in the specific development environment.
 
-**Tip:** When working in Visual Studio Code as your development environment, two of our colour theme favourites are called `Bluloco` (both of its light and dark variants) and `City Lights` (dark). They are both excellent and very thoughtfully designed. The `Python` extension is also required, which represents Microsoft's modern language server for Python.
+When working in Visual Studio Code as your development environment, two of our colour theme favourites are called `Bluloco` (both of its light and dark variants) and `City Lights` (dark). They are both excellent and very thoughtfully designed.
+
+It goes without saying that the `Python` extension is required to be installed in Visual Studio Code, which represents Microsoft's modern language server for Python.
+
+````
 
 ## Installing YOLOv5 as a Python package
 
