@@ -75,42 +75,51 @@ simulation_distribution: pareto
 ```{admonition} outbound_processors
 A list of processors for the client to apply on the payload before sending it out to the server. Multiple processors are permitted.
 
-- `feature_randomized_response`: Activate randomized response on features for PyTorch MistNet, must also set `algorithm.epsilon` to activate. Must be placed before `feature_unbatch`.
+- `feature_randomized_response` Activate randomized response on features for PyTorch MistNet, must also set `algorithm.epsilon` to activate. Must be placed before `feature_unbatch`.
 
-- `feature_laplace`: Add random noise with laplace distribution to features for PyTorch MistNet. Must be placed before `feature_unbatch`.
+- `feature_laplace` Add random noise with laplace distribution to features for PyTorch MistNet. Must be placed before `feature_unbatch`.
 
-- `feature_gaussian`: Add random noise with gaussian distribution to features for PyTorch MistNet. Must be placed before `feature_unbatch`.
+- `feature_gaussian` Add random noise with gaussian distribution to features for PyTorch MistNet. Must be placed before `feature_unbatch`.
 
-- `feature_quantize`: Quantize features for PyTorch MistNet. Must not be used together with `outbound_feature_ndarrays`.
+- `feature_quantize` Quantize features for PyTorch MistNet. Must not be used together with `outbound_feature_ndarrays`.
 
-- `feature_unbatch`: Unbatch features for PyTorch MistNet clients, must use this processor for every PyTorch MistNet client before sending.
+- `feature_unbatch` Unbatch features for PyTorch MistNet clients, must use this processor for every PyTorch MistNet client before sending.
 
-- `outbound_feature_ndarrays`: Convert PyTorch tensor features into NumPy arrays before sending to the server, for the benefit of saving a substantial amount of communication overhead if the feature dataset is large. Must be placed after `feature_unbatch`.
+- `outbound_feature_ndarrays` Convert PyTorch tensor features into NumPy arrays before sending to the server, for the benefit of saving a substantial amount of communication overhead if the feature dataset is large. Must be placed after `feature_unbatch`.
 
-- `model_deepcopy`: Return a deepcopy of the state_dict to prevent changing internal parameters of the model within clients.
+- `model_deepcopy` Return a deepcopy of the state_dict to prevent changing internal parameters of the model within clients.
 
-- `model_randomized_response`: Activate randomized response on model parameters for PyTorch, must also set `algorithm.epsilon` to activate.
+- `model_randomized_response` Activate randomized response on model parameters for PyTorch, must also set `algorithm.epsilon` to activate.
 
-- `model_quantize`: Quantize features for model parameters for PyTorch.
+- `model_quantize` Quantize features for model parameters for PyTorch.
 
-- `unstructured_pruning`: Process unstructured pruning on model weights for PyTorch. The `model_compress` processor needs to be applied after it in the configuration file or the communication overhead will not be reduced.
+- `unstructured_pruning` Process unstructured pruning on model weights for PyTorch. The `model_compress` processor needs to be applied after it in the configuration file or the communication overhead will not be reduced.
 
-- `structured_pruning`: Process structured pruning on model weights for PyTorch. The `model_compress` processor needs to be applied after it in the configuration file or the communication overhead will not be reduced.
+- `structured_pruning` Process structured pruning on model weights for PyTorch. The `model_compress` processor needs to be applied after it in the configuration file or the communication overhead will not be reduced.
 
-- `model_compress`: Compress model parameters with `Zstandard` compression algorithm. Must be placed as the last processor if applied.
+- `model_compress` Compress model parameters with `Zstandard` compression algorithm. Must be placed as the last processor if applied.
 ```
 
 ```{admonition} inbound_processors
 A list of processors for the client to apply on the payload before receiving it from the server. Multiple processors are permitted.
 
-- `model_decompress`: Decompress model parameters. Must be placed as the first processor if `model_compress` is applied on the server side.
+- `model_decompress` Decompress model parameters. Must be placed as the first processor if `model_compress` is applied on the server side.
 ```
 
 ## server
 
+
+```{admonition} type
+The type of the server.
+
+- `fedavg` a Federated Averaging (FedAvg) server.
+- `fedavg_cross_silo` a Federated Averaging server that handles cross-silo federated learning by interacting with edge servers rather than with clients directly. When this server is used, `algorithm.type` must be `fedavg`.
+- `mistnet` a MistNet server.
+- `fedavg_gan` a Federated Averaging server that handles Generative Adversarial Networks (GANs).
+```
+
 | Attribute | Meaning | Valid Values | Note |
 |:---------:|:-------:|:-----------:|:----:|
-|*type*|The type of the server|`fedavg_cross_silo`|**algorithm.type** must be `fedavg`|
 |**address**|The address of the central server|e.g., `127.0.0.1`||
 |**port**|The port number of the central server|e.g., `8000`||
 |disable_clients|If this optional setting is enabled as `true`, the server will not launched client processes on the same machine.||
