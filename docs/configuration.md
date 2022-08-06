@@ -118,21 +118,79 @@ The type of the server.
 - `fedavg_gan` a Federated Averaging server that handles Generative Adversarial Networks (GANs).
 ```
 
+```{admonition} address
+The address of the central server.
+
+e.g., `127.0.0.1`
+```
+
+```{admonition} port
+The port number of the central server.
+
+e.g., `8000`, `8005`
+```
+
+```{admonition} disable_clients
+If this optional setting is enabled as `true`, the server will not launched client processes on the same machine.
+```
+
+```{admonition} s3_endpoint_url
+The endpoint URL for an S3-compatible storage service, used for transferring payloads between clients and servers.
+```
+
+```{admonition} s3_bucket
+The bucket name for an S3-compatible storage service, used for transferring payloads between clients and servers.
+```
+
+```{admonition} random_seed
+Use a fixed random seed for selecting clients (and sampling testset if needed) so that experiments are reproducible.
+```
+
+```{admonition} ping_interval
+The time interval in seconds at which the server pings the client.
+
+The default value is 3600.
+```
+
+```{admonition} ping_timeout
+The time in seconds that the client waits for the server to respond before disconnecting.
+
+The default value is 3600.
+```
+
+```{admonition} synchronous
+Conduct training in synchronous or asynchronous mode.
+
+The value could be `true` or `false`.
+```
+
+```{admonition} periodic_interval
+The time interval for a server operating in asynchronous mode to aggregate received updates
+
+Any positive integer could be used for `periodic_interval`. The default value is 5 seconds.
+```
+
+```{admonition} simulate_wall_time
+Whether the wall clock time on the server is simulated.
+
+The value could be `true` or `false`.
+```
+
+```{admonition} staleness_bound
+In asynchronous mode, should we wait for stale clients who are behind the current round by more than this bound?
+
+Any positive integer could be used for `staleness_bound`. The default value is 0.
+```
+
+```{admonition} minimum_clients_aggregated
+The minimum number of clients that need to arrive before aggregation and processing by the server when operating in asynchronous mode. 
+
+Any positive integer could be used for `minimum_clients_aggregated`. The default value is 1.
+```
+
 | Attribute | Meaning | Valid Values | Note |
 |:---------:|:-------:|:-----------:|:----:|
-|**address**|The address of the central server|e.g., `127.0.0.1`||
-|**port**|The port number of the central server|e.g., `8000`||
-|disable_clients|If this optional setting is enabled as `true`, the server will not launched client processes on the same machine.||
-|s3_endpoint_url|The endpoint URL for an S3-compatible storage service, used for transferring payloads between clients and servers.||
-|s3_bucket|The bucket name for an S3-compatible storage service, used for transferring payloads between clients and servers.||
-|random_seed|Use a fixed random seed for selecting clients (and sampling testset if needed) so that experiments are reproducible||
-|ping_interval|The time interval in seconds at which the server pings the client. ||default: 3600|
-|ping_timeout| The time in seconds that the client waits for the server to respond before disconnecting.|| default: 3600|
-|synchronous|Synchronous or asynchronous mode|`true` or `false`||
-|periodic_interval|The time interval for a server operating in asynchronous mode to aggregate received updates|Any positive integer|default: 5 seconds|
-|simulate_wall_time|Whether the wall clock time on the server is simulated|`true` or `false`||
-|staleness_bound|In asynchronous mode, should we wait for stale clients who are behind the current round by more than this bound?|Any positive integer|default: 0|
-|minimum_clients_aggregated|The minimum number of clients that need to arrive before aggregation and processing by the server when operating in asynchronous mode|Any positive integer|default: 1|
+||
 |do_test|Whether the central server computes test accuracy locally| `true` or `false`|| 
 |model_path|The directory of pretrained and trained models||default: `<base_path>/models/pretrained`|
 |checkpoint_path|The directory of checkpoints||default: `<base_path>/checkpoints`|
