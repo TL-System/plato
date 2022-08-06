@@ -1,8 +1,8 @@
 """
 Defines the TrainerCallback class, which is the abstract base class to be subclassed
-when creating new trainer callbacks. 
+when creating new trainer callbacks.
 
-Defines two default callbacks to log metrics and print training progress.
+Defines a default callback to print training progress.
 """
 import logging
 import os
@@ -16,12 +16,7 @@ class TrainerCallback(ABC):
     The abstract base class to be subclassed when creating new trainer callbacks.
     """
 
-    def on_init_end(self, trainer, **kwargs):
-        """
-        Event called at the end of trainer initialisation.
-        """
-
-    def on_training_run_start(self, trainer, **kwargs):
+    def on_train_run_start(self, trainer, **kwargs):
         """
         Event called at the start of training run.
         """
@@ -29,11 +24,6 @@ class TrainerCallback(ABC):
     def on_train_epoch_start(self, trainer, **kwargs):
         """
         Event called at the beginning of a training epoch.
-        """
-
-    def on_train_step_start(self, trainer, **kwargs):
-        """
-        Event called at the beginning of a training step.
         """
 
     def on_train_step_end(self, trainer, batch, loss, **kwargs):
@@ -49,77 +39,35 @@ class TrainerCallback(ABC):
         Event called at the end of a training epoch.
         """
 
-    def on_eval_epoch_start(self, trainer, **kwargs):
-        """
-        Event called at the beginning of an evaluation epoch.
-        """
-
-    def on_eval_step_start(self, trainer, **kwargs):
-        """
-        Event called at the beginning of a evaluation step.
-        """
-
-    def on_eval_step_end(self, trainer, batch, batch_output, **kwargs):
-        """
-        Event called at the end of an evaluation step.
-
-        :param batch: the current batch of evaluation data.
-        :param batch_output: the outputs returned by
-            :meth:`plato.trainers.base.Trainer.calculate_eval_batch_loss`.
-        """
-
-    def on_eval_epoch_end(self, trainer, **kwargs):
-        """
-        Event called at the end of evaluation.
-        """
-
-    def on_training_run_epoch_end(self, trainer, **kwargs):
-        """
-        Event called during a training run after both training and evaluation epochs have
-        been completed.
-        """
-
-    def on_training_run_end(self, trainer, **kwargs):
-        """
-        Event called at the end of training run.
-        """
-
-    def on_evaluation_run_start(self, trainer, **kwargs):
-        """
-        Event called at the start of an evaluation run.
-        """
-
-    def on_evaluation_run_end(self, trainer, **kwargs):
-        """
-        Event called at the end of an evaluation run.
-        """
-
-    def on_stop_training_error(self, trainer, **kwargs):
-        """
-        Event called when a stop training error is raised.
-        """
-
 
 class PrintProgressCallback(TrainerCallback):
     """
-    A callback which prints a message at the start and end of a run,
-    as well as at the start of each epoch.
+    A callback which prints a message at the start of each epoch, and at the end of each step.
     """
 
-    def on_training_run_start(self, trainer, **kwargs):
-        logging.info("\nStarting training run")
+    def on_train_run_start(self, trainer, **kwargs):
+        """
+        Event called at the start of training run.
+        """
+        if trainer.client_id == 0:
+            logging.info("[Server #%s] Loading the dataset.", os.getpid())
+        else:
+            logging.info("[Client #%d] Loading the dataset.", trainer.client_id)
 
     def on_train_epoch_start(self, trainer, **kwargs):
+        """
+        Event called at the beginning of a training epoch.
+        """
         if trainer.client_id == 0:
             logging.info(
                 fonts.colourize(
-                    f"[Server #{os.getpid()}] Starting epoch {trainer.current_epoch}."
+                    f"[Server #{os.getpid()}] Started training epoch {trainer.current_epoch}."
                 )
             )
         else:
             logging.info(
                 fonts.colourize(
-                    f"[Client #{trainer.client_id}] Starting epoch {trainer.current_epoch}."
+                    f"[Client #{trainer.client_id}] Started traing epoch {trainer.current_epoch}."
                 )
             )
 
@@ -153,9 +101,3 @@ class PrintProgressCallback(TrainerCallback):
                     len(trainer.train_loader),
                     loss.data.item(),
                 )
-
-    def on_evaluation_run_start(self, trainer, **kwargs):
-        logging.info("\nStarting evaluation run")
-
-    def on_evaluation_run_end(self, trainer, **kwargs):
-        logging.info("Finishing evaluation run")

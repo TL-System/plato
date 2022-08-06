@@ -154,7 +154,8 @@ class Trainer(base.Trainer):
         batch_size = config["batch_size"]
         tic = time.perf_counter()
 
-        logging.info("[Client #%d] Loading the dataset.", self.client_id)
+        self.train_run_start()
+        self.callback_handler.call_event("on_train_run_start", self)
 
         self.train_loader = Trainer.create_train_loader(
             batch_size, trainset, sampler, cut_layer=cut_layer
@@ -307,40 +308,7 @@ class Trainer(base.Trainer):
         accuracy = -1
 
         try:
-            custom_test = getattr(self, "test_model", None)
-
-            if callable(custom_test):
-                accuracy = self.test_model(config, testset)
-            else:
-                if sampler is None:
-                    test_loader = torch.utils.data.DataLoader(
-                        testset, batch_size=config["batch_size"], shuffle=False
-                    )
-                # Use a testing set following the same distribution as the training set
-                else:
-                    test_loader = torch.utils.data.DataLoader(
-                        testset,
-                        batch_size=config["batch_size"],
-                        shuffle=False,
-                        sampler=sampler.get(),
-                    )
-
-                correct = 0
-                total = 0
-
-                with torch.no_grad():
-                    for examples, labels in test_loader:
-                        examples, labels = examples.to(self.device), labels.to(
-                            self.device
-                        )
-
-                        outputs = self.model(examples)
-
-                        _, predicted = torch.max(outputs.data, 1)
-                        total += labels.size(0)
-                        correct += (predicted == labels).sum().item()
-
-                accuracy = correct / total
+            accuracy = self.test_model(config, testset, sampler)
         except Exception as testing_exception:
             logging.info("Testing on client #%d failed.", self.client_id)
             raise testing_exception
@@ -407,37 +375,7 @@ class Trainer(base.Trainer):
         self.model.to(self.device)
         self.model.eval()
 
-        custom_test = getattr(self, "test_model", None)
-
-        if callable(custom_test):
-            return self.test_model(config, testset)
-
-        if sampler is None:
-            test_loader = torch.utils.data.DataLoader(
-                testset, batch_size=config["batch_size"], shuffle=False
-            )
-        else:
-            test_loader = torch.utils.data.DataLoader(
-                testset, batch_size=config["batch_size"], shuffle=False, sampler=sampler
-            )
-
-        correct = 0
-        total = 0
-
-        with torch.no_grad():
-            for examples, labels in test_loader:
-                examples, labels = examples.to(self.device), labels.to(self.device)
-
-                outputs = self.model(examples)
-
-                _, predicted = torch.max(outputs.data, 1)
-                total += labels.size(0)
-                correct += (predicted == labels).sum().item()
-
-                # Yield to other tasks in the server
-                await asyncio.sleep(0)
-
-        return correct / total
+        return await self.server_test_model(config, testset, sampler)
 
     def obtain_model_update(self, wall_time):
         """
@@ -490,6 +428,71 @@ class Trainer(base.Trainer):
         return torch.utils.data.DataLoader(
             dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler
         )
+
+    def test_model(self, config, testset, sampler):
+        """
+        Evaluates the model with the provided test dataset and test sampler.
+
+        :param testset: the test dataset.
+        :param sampler: the test sampler.
+        """
+        batch_size = config["batch_size"]
+
+        test_loader = torch.utils.data.DataLoader(
+            testset, batch_size=batch_size, shuffle=False, sampler=sampler
+        )
+
+        correct = 0
+        total = 0
+
+        with torch.no_grad():
+            for examples, labels in test_loader:
+                examples, labels = examples.to(self.device), labels.to(self.device)
+
+                outputs = self.model(examples)
+
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
+
+        return correct / total
+
+    async def server_test_model(self, config, testset, sampler):
+        """
+        Evaluates the model with the provided test dataset and test sampler. To be used on the
+        server as it yields to the other asyncio threads after each step of testing.
+
+        :param testset: the test dataset.
+        :param sampler: the test sampler.
+        """
+        batch_size = config["batch_size"]
+
+        test_loader = torch.utils.data.DataLoader(
+            testset, batch_size=batch_size, shuffle=False, sampler=sampler
+        )
+
+        correct = 0
+        total = 0
+
+        with torch.no_grad():
+            for examples, labels in test_loader:
+                examples, labels = examples.to(self.device), labels.to(self.device)
+
+                outputs = self.model(examples)
+
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
+
+                # Yield to other tasks in the server
+                await asyncio.sleep(0)
+
+        return correct / total
+
+    def train_run_start(self):
+        """
+        Method called at the start of training run.
+        """
 
     def train_epoch_start(self):
         """
