@@ -16,10 +16,7 @@ import time
 import logging
 
 import torch
-
-from plato.config import Config
 from plato.trainers import basic
-from plato.utils import optimizers
 
 
 class Trainer(basic.Trainer):

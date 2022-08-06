@@ -6,10 +6,10 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'Plato'
-copyright = 'The Plato developers' 
-author = 'Baochun Li'
-release = '0.4.3'
+project = "Plato"
+copyright = "The Plato developers"
+author = "Baochun Li"
+release = "0.4.3"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -31,16 +31,16 @@ source_suffix = [".rst", ".md"]
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ["outdated_docs/*.md", "Thumbs.db", ".DS_Store"]
 
-templates_path = ['_templates']
+templates_path = ["_templates"]
 exclude_patterns = []
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'furo'
+html_theme = "furo"
 html_theme_options = {
     "source_repository": "https://github.com/TL-System/plato/",
     "source_branch": "main",
     "source_directory": "docs/",
 }
-#html_static_path = ['_static']
+# html_static_path = ['_static']
