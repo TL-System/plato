@@ -238,6 +238,9 @@ class Trainer(base.Trainer):
                 self.save_model(filename)
                 self.model.to(self.device)
 
+            self.train_epoch_end(config)
+            self.callback_handler.call_event("on_train_epoch_end", self, config)
+
     def train(self, trainset, sampler, cut_layer=None, **kwargs) -> float:
         """The main training loop in a federated learning workload.
 
@@ -510,6 +513,11 @@ class Trainer(base.Trainer):
     def train_epoch_start(self, config):
         """
         Method called at the beginning of a training epoch.
+        """
+
+    def train_epoch_end(self, config):
+        """
+        Method called at the end of a training epoch.
         """
 
     def train_step_end(self, config, batch=None, loss=None):
