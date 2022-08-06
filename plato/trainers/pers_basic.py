@@ -429,7 +429,11 @@ class Trainer(basic.Trainer):
             loss_criterion = torch.nn.CrossEntropyLoss()
 
         # Initializing the optimizer
-        optimizer = optimizers.get_dynamic_optimizer(self.model)
+        _optimizer_func = getattr(self, "get_optimizer", None)
+        if callable(_optimizer_func):
+            optimizer = self.get_optimizer(self.model, config)
+        else:
+            optimizer = optimizers.get_dynamic_optimizer(self.model)
 
         # Initializing the learning rate schedule, if necessary
         lr_schedule, lr_schedule_base_epoch = self.prepare_train_lr(

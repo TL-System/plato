@@ -1,11 +1,46 @@
 """
-The federated averaging algorithm for self-supervised method.
+The enhanced federated averaging algorithm for PyTorch.
 
-The main target of this algorithm is to achieve the property of
-randomly exchanging the whole defined or its sub-module between
-the server and clients.
-Thus, the 'extract_weights' functions extract the model' parameters
-based on the required 'global_model_name'.
+It adds more properties to the original implementation of fedavg.py.
+
+These properties are:
+
+    - support: (extract_weights)
+                Randomly set one part of the whole model as the global model
+                that will be exchanged between clients and the server.
+               This can be defined by the hyper-parameter in the config file
+               'global_model_name: xxx'.
+
+               For example, when the whole model is the combination of
+                encoder + classifier
+                the global model can be set to be:
+                * only the encoder as the global model
+                    global_model_name: encoder
+                * only the classifier as the global model
+                    global_model_name: classifier
+                * equalivent to the whole model as the global model
+                    global_model_name: encoder__classifier
+                 or global_model_name: whole
+
+    - support: (extract_parameters_prefix)
+                Extract the prefixes of the parameters in one model.
+                For example, if the model is the combination of encoder and classifier,
+                i.e., encoder + classifier.
+                The parameters of the encoder will be added prefix 'encoder.'
+                while the prefix for parameters of classifier is 'classifier'.
+                With this function, we can extract these unique prefixes.
+    - support: (complete_weights)
+                Complete the given weights to make the completed weights have same
+                parameters as the self.model.
+
+
+In general, this enhanced fedavg is generally utilized in personalized federated learning.
+The main reason is that each client can hold models on its side to complete the downloaded global
+model.
+
+This is why to denote this implementation to be 'fedavg_pers.py'
+
+This fedavg_pers is commonly utilized in cooperation with the clients/pers_simple.py
 
 """
 
