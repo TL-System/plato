@@ -188,26 +188,36 @@ The minimum number of clients that need to arrive before aggregation and process
 Any positive integer could be used for `minimum_clients_aggregated`. The default value is 1.
 ```
 
-| Attribute | Meaning | Valid Values | Note |
-|:---------:|:-------:|:-----------:|:----:|
-||
-|do_test|Whether the central server computes test accuracy locally| `true` or `false`|| 
-|model_path|The directory of pretrained and trained models||default: `<base_path>/models/pretrained`|
-|checkpoint_path|The directory of checkpoints||default: `<base_path>/checkpoints`|
-|outbound_processors|A list of processors to apply on the payload before sending| A list of processor names || 
-|inbound_processors|A list of processors to apply on the payload right after receiving| A list of processor names || 
-|downlink_bandwidth|Bandwidth for downlink communication (server to clients) in Mbps||default:100|
-|uplink_bandwidth|Bandwidth for uplink communication (clients to server) in Mbps||default:100|
+```{admonition} do_test
+Whether the central server computes test accuracy locally.
 
-### Valid processors for `server.outbound_processors`
+The value could be `true` or `false`.
+```
+
+```{admonition} model_path
+The directory of pretrained and trained models.
+
+The deafult path is `<base_path>/models/pretrained`.
+```
+
+```{admonition} checkpoint_path
+The directory of checkpoints.
+
+The default path is `<base_path>/checkpoints`.
+```
+
+```{admonition} outbound_processors
+A list of processors to apply on the payload before sending. Multiple processor options are available:
 
 - `unstructured_pruning`: Process unstructured pruning on model weights for PyTorch. The `model_compress` processor needs to be applied after it in the configuration file or the communication overhead will not be reduced.
 
 - `structured_pruning`: Process structured pruning on model weights for PyTorch. The `model_compress` processor needs to be applied after it in the configuration file or the communication overhead will not be reduced.
 
 - `model_compress`: Compress model parameters with `Zstandard` compression algorithm. Must be placed as the last processor if applied.
+```
 
-### Valid processors for `server.inbound_processors`
+```{admonition} inbound_processors
+A list of processors to apply on the payload right after receiving. Multiple processor options are available:
 
 - `model_decompress`: Decompress model parameters. Must be placed as the first processor if `model_compress` is applied on the client side.
 
@@ -216,6 +226,19 @@ Any positive integer could be used for `minimum_clients_aggregated`. The default
 - `feature_dequantize`: Dequantize features for PyTorch MistNet. Must not be used together with `inbound_feature_tensors`.
 
 - `model_dequantize`: Dequantize features for PyTorch model parameters.
+```
+
+```{admonition} downlink_bandwidth
+Bandwidth for downlink communication (server to clients) in Mbps.
+
+The default value is 100.
+```
+
+```{admonition} uplink_bandwidth
+Bandwidth for uplink communication (clients to server) in Mbps.
+
+The default value is 100.
+```
 
 ## data
 
