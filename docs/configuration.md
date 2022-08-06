@@ -36,6 +36,15 @@ If this setting is `true` and the configuration file has a `results` section, te
 ```
 ````
 
+````{admonition} comm_simulation
+Whether client-server communication should be simulated with reading and writing files. This is useful when the clients and the server are launched on the same machine and share a filesystem. The default value is `true`.
+
+```{admonition} compute_comm_time
+When client-server communication is simulated, whether or not the transmission time — the time it takes for the payload to be completely transmitted to the server — should be computed with a pre-specified server bandwidth.
+```
+
+````
+
 `````{admonition} speed_simulation
 Whether or not the training speed of the clients are simulated. Simulating the training speed of the clients is useful when simulating *client heterogeneity*, where asynchronous federated learning may outperform synchronous federated learning. Valid values are `true` or `false`.
 
@@ -63,12 +72,8 @@ simulation_distribution: pareto
 ````
 `````
 
-|outbound_processors|A list of processors to apply on the payload before sending| A list of processor names || 
-|inbound_processors|A list of processors to apply on the payload right after receiving| A list of processor names || 
-|comm_simulation|Whether client-server communication should be simulated with files|`true` or `false`|default: true|
-|compute_comm_time|Whether communication time should be computed with specified bandwidth when client-server communication is simulated with files|`true` or `false`||
-
-### Valid processors for `clients.outbound_processors`
+```{admonition} outbound_processors
+A list of processors for the client to apply on the payload before sending it out to the server. Multiple processors are permitted.
 
 - `feature_randomized_response`: Activate randomized response on features for PyTorch MistNet, must also set `algorithm.epsilon` to activate. Must be placed before `feature_unbatch`.
 
@@ -93,10 +98,13 @@ simulation_distribution: pareto
 - `structured_pruning`: Process structured pruning on model weights for PyTorch. The `model_compress` processor needs to be applied after it in the configuration file or the communication overhead will not be reduced.
 
 - `model_compress`: Compress model parameters with `Zstandard` compression algorithm. Must be placed as the last processor if applied.
+```
 
-### Valid processors for `clients.inbound_processors`
+```{admonition} inbound_processors
+A list of processors for the client to apply on the payload before receiving it from the server. Multiple processors are permitted.
 
 - `model_decompress`: Decompress model parameters. Must be placed as the first processor if `model_compress` is applied on the server side.
+```
 
 ## server
 
