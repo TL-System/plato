@@ -242,10 +242,42 @@ The default value is 100.
 
 ## data
 
+
+```{admonition} dataset
+The training and test datasets. The following options are available:
+
+- `MNIST`
+- `FashionMNIST`
+- `EMNIST`
+- `CIFAR10`
+- `CIFAR100`-
+- `CINIC10`
+- `YOLO`
+- `HuggingFace`
+- `PASCAL_VOC`
+- `TinyImageNet`
+- `CelebA`
+- `Purchase`
+- `Texas`
+```
+
+````{admonition} data_path
+Where the dataset is located.
+
+The default is `./data`.
+
+```{note}
+For the `CINIC10` dataset, the default is `./data/CINIC-10`
+
+For the `TinyImageNet` dataset, the default is `./data/tiny-imagenet-200`
+```
+````
+
+
 | Attribute | Meaning | Valid Value | Note |
 |:---------:|:-------:|:-----------:|:----:|
-|**dataset**| The training and test datasets|`MNIST`, `FashionMNIST`, `EMNIST`, `CIFAR10`, `CIFAR100`, `CINIC10`, `YOLO`, `HuggingFace`, `PASCAL_VOC`, `TinyImageNet`, `CelebA`, `Purchase`, or `Texas`||
-|data_path|Where the dataset is located||default: `./data`, except for the `CINIC10` dataset, the default is `./data/CINIC-10`; for the `TinyImageNet` dataset, the default is `./data/tiny-imagenet-200`|
+||
+
 |train_path|Where the training dataset is located||Need to be specified for datasets using `YOLO`|
 |test_path|Where the test dataset is located||Need to be specified for datasets using `YOLO`|
 |**sampler**|How to divide the entire dataset to the clients|`iid`||
