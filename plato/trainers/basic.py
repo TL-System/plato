@@ -46,7 +46,6 @@ class Trainer(base.Trainer):
 
         self.train_loader = None
         self.current_epoch = 0
-        self.total_epochs = Config().trainer.epochs
 
     def zeros(self, shape):
         """Returns a PyTorch zero tensor with the given shape."""
@@ -154,8 +153,8 @@ class Trainer(base.Trainer):
         batch_size = config["batch_size"]
         tic = time.perf_counter()
 
-        self.train_run_start()
-        self.callback_handler.call_event("on_train_run_start", self)
+        self.train_run_start(config)
+        self.callback_handler.call_event("on_train_run_start", self, config)
 
         self.train_loader = Trainer.create_train_loader(
             batch_size, trainset, sampler, cut_layer=cut_layer
@@ -183,9 +182,11 @@ class Trainer(base.Trainer):
         self.model.to(self.device)
         self.model.train()
 
-        for self.current_epoch in range(1, self.total_epochs + 1):
-            self.train_epoch_start()
-            self.callback_handler.call_event("on_train_epoch_start", self)
+        total_epochs = config["epochs"]
+
+        for self.current_epoch in range(1, total_epochs + 1):
+            self.train_epoch_start(config)
+            self.callback_handler.call_event("on_train_epoch_start", self, config)
 
             for batch_id, (examples, labels) in enumerate(self.train_loader):
                 examples, labels = examples.to(self.device), labels.to(self.device)
@@ -205,9 +206,9 @@ class Trainer(base.Trainer):
 
                 optimizer.step()
 
-                self.train_step_end(batch=batch_id, loss=loss)
+                self.train_step_end(config, batch=batch_id, loss=loss)
                 self.callback_handler.call_event(
-                    "on_train_step_end", self, batch=batch_id, loss=loss
+                    "on_train_step_end", self, config, batch=batch_id, loss=loss
                 )
 
             if lr_schedule is not None:
@@ -438,9 +439,15 @@ class Trainer(base.Trainer):
         """
         batch_size = config["batch_size"]
 
-        test_loader = torch.utils.data.DataLoader(
-            testset, batch_size=batch_size, shuffle=False, sampler=sampler
-        )
+        if sampler is None:
+            test_loader = torch.utils.data.DataLoader(
+                testset, batch_size=batch_size, shuffle=False
+            )
+        else:
+            # Use a testing set following the same distribution as the training set
+            test_loader = torch.utils.data.DataLoader(
+                testset, batch_size=batch_size, shuffle=False, sampler=sampler.get()
+            )
 
         correct = 0
         total = 0
@@ -467,9 +474,15 @@ class Trainer(base.Trainer):
         """
         batch_size = config["batch_size"]
 
-        test_loader = torch.utils.data.DataLoader(
-            testset, batch_size=batch_size, shuffle=False, sampler=sampler
-        )
+        if sampler is None:
+            test_loader = torch.utils.data.DataLoader(
+                testset, batch_size=batch_size, shuffle=False
+            )
+        else:
+            # Use a testing set following the same distribution as the training set
+            test_loader = torch.utils.data.DataLoader(
+                testset, batch_size=batch_size, shuffle=False, sampler=sampler.get()
+            )
 
         correct = 0
         total = 0
@@ -489,17 +502,17 @@ class Trainer(base.Trainer):
 
         return correct / total
 
-    def train_run_start(self):
+    def train_run_start(self, config):
         """
         Method called at the start of training run.
         """
 
-    def train_epoch_start(self):
+    def train_epoch_start(self, config):
         """
         Method called at the beginning of a training epoch.
         """
 
-    def train_step_end(self, batch, loss):
+    def train_step_end(self, config, batch=None, loss=None):
         """
         Method called at the end of a training step.
 
