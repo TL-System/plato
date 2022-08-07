@@ -17,39 +17,42 @@ from plato.algorithms import fedavg
 
 
 class Algorithm(fedavg.Algorithm):
-    """ The federated learning algorithm for FedRep, used by the server. """
+    """The federated learning algorithm for FedRep, used by the server."""
 
     def __init__(self, trainer=None):
         super().__init__(trainer)
 
         # parameter names of the representation
-        #   As mentioned by Eq. 1 and Fig. 2 of the paper, the representation
-        #   behaves as the global model.
+        # As mentioned by Eq. 1 and Fig. 2 of the paper, the representation
+        # behaves as the global model.
         self.representation_param_names = []
 
     def set_representation_param_names(self, representation_param_names):
-        """ Setting the parameter names belonging to the representation. """
+        """Setting the parameter names belonging to the representation."""
         self.representation_param_names = representation_param_names
 
     def extract_weights(self, model=None):
-        """ Extract weights from the model. """
+        """Extract weights from the model."""
 
         def extract_required_weights(model, parameter_names):
-            """ Extract weights with required parameter_names """
+            """Extract weights with required parameter_names"""
             full_weights = model.state_dict()
 
-            extracted_weights = OrderedDict([
-                (name, param) for name, param in full_weights.items()
-                if name in parameter_names
-            ])
+            extracted_weights = OrderedDict(
+                [
+                    (name, param)
+                    for name, param in full_weights.items()
+                    if name in parameter_names
+                ]
+            )
             return extracted_weights
 
         if model is None:
-            return extract_required_weights(self.model.cpu(),
-                                            self.representation_param_names)
+            return extract_required_weights(
+                self.model.cpu(), self.representation_param_names
+            )
 
-        return extract_required_weights(model.cpu(),
-                                        self.representation_param_names)
+        return extract_required_weights(model.cpu(), self.representation_param_names)
 
     def load_weights(self, weights):
         """Load the model weights passed in as a parameter."""
