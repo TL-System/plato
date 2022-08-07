@@ -21,23 +21,20 @@ from plato.utils.checkpoint_operator import perform_client_checkpoint_saving
 class Trainer(pers_basic.Trainer):
     """ A personalized federated learning trainer using the FedRep algorithm. """
 
-    def obtain_encoded_data(self, defined_model, pers_train_loader,
-                            test_loader):
+    def obtain_encoded_data(self, defined_model, data_loader):
         # encoded data
-        train_encoded = list()
-        train_labels = list()
-        test_outputs = {}
-        for _, (examples, labels) in enumerate(pers_train_loader):
+        obtained_encoded_data = list()
+        obtained_labels = list()
+
+        for _, (examples, labels) in enumerate(data_loader):
             examples, labels = examples.to(self.device), labels.to(self.device)
             features = defined_model.encoder(examples)
-            train_encoded.append(features)
-            train_labels.append(labels)
-        test_outputs = self.perform_test_op(test_loader, defined_model)
+            obtained_encoded_data.append(features)
+            obtained_labels.append(labels)
 
-        return train_encoded, train_labels, test_outputs[
-            "test_encoded"], test_outputs["test_labels"]
+        return obtained_encoded_data, obtained_labels
 
-    def perform_test_op(self, test_loader, defined_model):
+    def perform_evaluation_op(self, to_eval_data_loader, defined_model):
 
         # Define the test phase of the eval stage
         acc_meter = optimizers.AverageMeter(name='Accuracy')
@@ -45,11 +42,11 @@ class Trainer(pers_basic.Trainer):
         defined_model.to(self.device)
         correct = 0
 
-        test_encoded = list()
-        test_labels = list()
+        encoded_samples = list()
+        loaded_labels = list()
 
         acc_meter.reset()
-        for _, (examples, labels) in enumerate(test_loader):
+        for _, (examples, labels) in enumerate(to_eval_data_loader):
             examples, labels = examples.to(self.device), labels.to(self.device)
             with torch.no_grad():
                 # preds = self.personalized_model(examples).argmax(dim=1)
@@ -60,15 +57,15 @@ class Trainer(pers_basic.Trainer):
                 correct = (preds == labels).sum().item()
                 acc_meter.update(correct / preds.shape[0], labels.size(0))
 
-                test_encoded.append(features)
-                test_labels.append(labels)
+                encoded_samples.append(features)
+                loaded_labels.append(labels)
 
         accuracy = acc_meter.avg
 
         test_outputs = {
             "accuracy": accuracy,
-            "test_encoded": test_encoded,
-            "test_labels": test_labels
+            "encoded_samples": encoded_samples,
+            "loaded_labels": loaded_labels
         }
 
         return test_outputs
@@ -161,7 +158,8 @@ class Trainer(pers_basic.Trainer):
                 "[Client #%d] Personalization Training Epoch: [%d/%d]\tLoss: %.6f",
                 self.client_id, epoch, pers_epochs, epoch_loss_meter.avg)
 
-            test_outputs = self.perform_test_op(test_loader, defined_model)
+            test_outputs = self.perform_evaluation_op(test_loader,
+                                                      defined_model)
 
             # save the personaliation accuracy to the results dir
             self.checkpoint_personalized_accuracy(
@@ -193,8 +191,8 @@ class Trainer(pers_basic.Trainer):
                                             run_id=None,
                                             encoded_type="trainEncoded")
             self.checkpoint_encoded_samples(
-                encoded_samples=test_outputs["test_encoded"],
-                encoded_labels=test_outputs["test_labels"],
+                encoded_samples=test_outputs["encoded_samples"],
+                encoded_labels=test_outputs["loaded_labels"],
                 current_round=current_round,
                 epoch=epoch,
                 run_id=None,
