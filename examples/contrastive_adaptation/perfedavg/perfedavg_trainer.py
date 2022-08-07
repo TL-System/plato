@@ -17,8 +17,6 @@ from plato.config import Config
 from plato.trainers import pers_basic
 from plato.utils import optimizers
 
-from plato.utils.checkpoint_operator import perform_client_checkpoint_saving
-
 
 def get_data_batch(
         dataloader: torch.utils.data.DataLoader,

@@ -15,8 +15,6 @@ from plato.config import Config
 from plato.trainers import pers_basic
 from plato.utils import optimizers
 
-from plato.utils.checkpoint_operator import perform_client_checkpoint_saving
-
 
 class Trainer(pers_basic.Trainer):
     """A personalized federated learning trainer using the FedRep algorithm."""
@@ -211,7 +209,6 @@ class Trainer(pers_basic.Trainer):
         defined_model,
         model_name,
         data_loader,
-        current_round,
         epoch,
         global_epoch,
         config,
@@ -222,11 +219,12 @@ class Trainer(pers_basic.Trainer):
         """ The customize behavior before performing one epoch of personalized training.
             By default, we need to save the encoded data, the accuracy, and the model when possible.
         """
+        current_round = config['current_round']
         eval_outputs, _ = super().on_start_pers_train(defined_model,
                                                       model_name, data_loader,
-                                                      current_round, epoch,
-                                                      global_epoch, config,
-                                                      optimizer, lr_schedule)
+                                                      epoch, global_epoch,
+                                                      config, optimizer,
+                                                      lr_schedule)
         self.checkpoint_encoded_samples(
             encoded_samples=eval_outputs['encoded_samples'],
             encoded_labels=eval_outputs['loaded_labels'],
@@ -242,7 +240,6 @@ class Trainer(pers_basic.Trainer):
         defined_model,
         model_name,
         data_loader,
-        current_round,
         epoch,
         global_epoch,
         config,
@@ -251,9 +248,10 @@ class Trainer(pers_basic.Trainer):
         epoch_loss_meter,
         **kwargs,
     ):
+        current_round = config['current_round']
         eval_outputs = super().on_end_pers_train_epoch(
-            defined_model, model_name, data_loader, current_round, epoch,
-            global_epoch, config, optimizer, lr_schedule, epoch_loss_meter)
+            defined_model, model_name, data_loader, epoch, global_epoch,
+            config, optimizer, lr_schedule, epoch_loss_meter)
         if eval_outputs:
             self.checkpoint_encoded_samples(
                 encoded_samples=eval_outputs['encoded_samples'],

@@ -384,6 +384,7 @@ class Trainer(basic.Trainer):
         run_id = config['run_id']
         # Obtain the logging interval
         epochs = config['epochs']
+        config['current_round'] = current_round
 
         tic = time.perf_counter()
 
@@ -447,18 +448,17 @@ class Trainer(basic.Trainer):
         # model of this round
         # this is determinted by whether to perform the detailed
         # checkpoints of the training models
-        if 'do_detailed_checkpoint' in config and config[
-                'do_detailed_checkpoint']:
-            perform_client_checkpoint_saving(
-                client_id=self.client_id,
-                model_name=model_type,
-                model_state_dict=self.model.state_dict(),
-                config=config,
-                current_round=current_round,
-                optimizer_state_dict=optimizer.state_dict(),
-                lr_schedule_state_dict=lr_schedule.state_dict(),
-                present_epoch=0,
-                base_epoch=lr_schedule_base_epoch)
+        # if 'do_detailed_checkpoint' in config and config[
+        #         'do_detailed_checkpoint']:
+        #     perform_client_checkpoint_saving(
+        #         client_id=self.client_id,
+        #         model_name=model_type,
+        #         model_state_dict=self.model.state_dict(),
+        #         config=config,
+        #         optimizer_state_dict=optimizer.state_dict(),
+        #         lr_schedule_state_dict=lr_schedule.state_dict(),
+        #         present_epoch=0,
+        #         base_epoch=lr_schedule_base_epoch)
 
         # Sending the model to the device used for training
         self.model.to(self.device)
@@ -484,22 +484,21 @@ class Trainer(basic.Trainer):
             lr_schedule.step()
             # this is determinted by whether to perform the detailed
             # checkpoints of the training models
-            if 'do_detailed_checkpoint' in config and config[
-                    'do_detailed_checkpoint']:
-                if (epoch -
-                        1) % epoch_model_log_interval == 0 or epoch == epochs:
-                    # the model generated during each round will be stored in the
-                    # checkpoints
-                    perform_client_checkpoint_saving(
-                        client_id=self.client_id,
-                        model_name=model_type,
-                        model_state_dict=self.model.state_dict(),
-                        config=config,
-                        current_round=current_round,
-                        optimizer_state_dict=optimizer.state_dict(),
-                        lr_schedule_state_dict=lr_schedule.state_dict(),
-                        present_epoch=epoch,
-                        base_epoch=lr_schedule_base_epoch + epoch)
+            # if 'do_detailed_checkpoint' in config and config[
+            #         'do_detailed_checkpoint']:
+            #     if (epoch -
+            #             1) % epoch_model_log_interval == 0 or epoch == epochs:
+            #         # the model generated during each round will be stored in the
+            #         # checkpoints
+            #         perform_client_checkpoint_saving(
+            #             client_id=self.client_id,
+            #             model_name=model_type,
+            #             model_state_dict=self.model.state_dict(),
+            #             config=config,
+            #             optimizer_state_dict=optimizer.state_dict(),
+            #             lr_schedule_state_dict=lr_schedule.state_dict(),
+            #             present_epoch=epoch,
+            #             base_epoch=lr_schedule_base_epoch + epoch)
 
             # Simulate client's speed
             if self.client_id != 0 and hasattr(
@@ -516,7 +515,6 @@ class Trainer(basic.Trainer):
                 model_name=model_type,
                 model_state_dict=self.model.state_dict(),
                 config=config,
-                current_round=current_round,
                 optimizer_state_dict=optimizer.state_dict(),
                 lr_schedule_state_dict=lr_schedule.state_dict(),
                 present_epoch=None,
@@ -550,7 +548,6 @@ class Trainer(basic.Trainer):
         defined_model,
         model_name,
         data_loader,
-        current_round,
         epoch,
         global_epoch,
         config,
@@ -562,14 +559,16 @@ class Trainer(basic.Trainer):
 
             By default, we need to save the the accuracy, and the model when possible.
         """
+        current_round = config['current_round']
         save_checkpoint_filename = perform_client_checkpoint_saving(
             client_id=self.client_id,
             model_name=model_name,
             model_state_dict=defined_model.state_dict(),
             config=config,
-            current_round=current_round,
-            optimizer_state_dict=optimizer.state_dict(),
-            lr_schedule_state_dict=lr_schedule.state_dict(),
+            optimizer_state_dict=optimizer.state_dict()
+            if optimizer is not None else None,
+            lr_schedule_state_dict=lr_schedule.state_dict()
+            if lr_schedule is not None else None,
             present_epoch=epoch,
             base_epoch=global_epoch,
             prefix="personalized")
@@ -590,7 +589,6 @@ class Trainer(basic.Trainer):
         defined_model,
         model_name,
         data_loader,
-        current_round,
         epoch,
         global_epoch,
         config,
@@ -605,6 +603,7 @@ class Trainer(basic.Trainer):
         """
 
         pers_epochs = config["pers_epochs"]
+        current_round = config['current_round']
         epoch_log_interval = pers_epochs + 1
         epoch_model_log_interval = pers_epochs + 1
         eval_outputs = {}
@@ -638,7 +637,6 @@ class Trainer(basic.Trainer):
                 model_name=model_name,
                 model_state_dict=self.personalized_model.state_dict(),
                 config=config,
-                current_round=current_round,
                 optimizer_state_dict=optimizer.state_dict(),
                 lr_schedule_state_dict=lr_schedule.state_dict(),
                 present_epoch=epoch,
@@ -709,7 +707,8 @@ class Trainer(basic.Trainer):
         config = self.customize_train_config(config)
 
         current_round = kwargs['current_round']
-        personalized_model_name = Config().trainer.personalized_model_name
+        personalized_model_name = config['personalized_model_name']
+        config['current_round'] = current_round
 
         # Initialize accuracy to be returned to -1, so that the client can disconnect
         # from the server when testing fails
@@ -773,7 +772,6 @@ class Trainer(basic.Trainer):
                 defined_model=self.personalized_model,
                 model_name=personalized_model_name,
                 data_loader=test_loader,
-                current_round=current_round,
                 epoch=0,
                 global_epoch=0,
                 config=config,
@@ -799,7 +797,6 @@ class Trainer(basic.Trainer):
                     defined_model=self.personalized_model,
                     model_name=personalized_model_name,
                     data_loader=test_loader,
-                    current_round=current_round,
                     epoch=epoch,
                     global_epoch=epoch,
                     config=config,
@@ -820,11 +817,11 @@ class Trainer(basic.Trainer):
         if 'max_concurrency' in config:
 
             current_round = kwargs['current_round']
-            if current_round == Config().trainer.rounds:
+            if current_round == config['rounds']:
                 target_dir = Config().params['model_path']
             else:
                 target_dir = Config().params['checkpoint_path']
-            personalized_model_name = Config().trainer.personalized_model_name
+            personalized_model_name = config['personalized_model_name']
             save_location = os.path.join(target_dir,
                                          "client_" + str(self.client_id))
             filename = get_format_name(client_id=self.client_id,

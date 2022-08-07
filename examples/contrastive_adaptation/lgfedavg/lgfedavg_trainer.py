@@ -15,24 +15,9 @@ from plato.config import Config
 from plato.trainers import pers_basic
 from plato.utils import optimizers
 
-from plato.utils.checkpoint_operator import perform_client_checkpoint_saving
-
 
 class Trainer(pers_basic.Trainer):
     """ A personalized federated learning trainer using the FedRep algorithm. """
-
-    def obtain_encoded_data(self, defined_model, data_loader):
-        # encoded data
-        obtained_encoded_data = list()
-        obtained_labels = list()
-
-        for _, (examples, labels) in enumerate(data_loader):
-            examples, labels = examples.to(self.device), labels.to(self.device)
-            features = defined_model.encoder(examples)
-            obtained_encoded_data.append(features)
-            obtained_labels.append(labels)
-
-        return obtained_encoded_data, obtained_labels
 
     def perform_evaluation_op(self, to_eval_data_loader, defined_model):
 
@@ -70,130 +55,61 @@ class Trainer(pers_basic.Trainer):
 
         return test_outputs
 
-    def pers_train_one_epoch(
+    def on_start_pers_train(
         self,
-        config,
-        kwargs,
-        epoch,
         defined_model,
-        pers_optimizer,
+        model_name,
+        data_loader,
+        epoch,
+        global_epoch,
+        config,
+        optimizer,
         lr_schedule,
-        pers_loss_criterion,
-        pers_train_loader,
-        test_loader,
-        epoch_loss_meter,
+        **kwargs,
     ):
-        """ Performing one epoch of learning for the personalization. """
-        personalized_model_name = Config().trainer.personalized_model_name
-        current_round = kwargs['current_round']
+        """ The customize behavior before performing one epoch of personalized training.
+            By default, we need to save the encoded data, the accuracy, and the model when possible.
+        """
+        current_round = config['current_round']
+        eval_outputs, _ = super().on_start_pers_train(defined_model,
+                                                      model_name, data_loader,
+                                                      epoch, global_epoch,
+                                                      config, optimizer,
+                                                      lr_schedule)
+        self.checkpoint_encoded_samples(
+            encoded_samples=eval_outputs['encoded_samples'],
+            encoded_labels=eval_outputs['loaded_labels'],
+            current_round=current_round,
+            epoch=epoch,
+            run_id=None,
+            encoded_type="testEncoded")
 
-        # also record the encoded data in the first epoch
-        if epoch == 1:
-            train_encoded, train_labels, test_encoded, test_labels = self.obtain_encoded_data(
-                defined_model, pers_train_loader, test_loader)
-            self.checkpoint_encoded_samples(encoded_samples=train_encoded,
-                                            encoded_labels=train_labels,
-                                            current_round=current_round,
-                                            epoch=epoch - 1,
-                                            run_id=None,
-                                            encoded_type="trainEncoded")
-            self.checkpoint_encoded_samples(encoded_samples=test_encoded,
-                                            encoded_labels=test_labels,
-                                            current_round=current_round,
-                                            epoch=epoch - 1,
-                                            run_id=None,
-                                            encoded_type="testEncoded")
-        epoch_loss_meter.reset()
-        defined_model.train()
+        return eval_outputs, _
 
-        pers_epochs = config["pers_epochs"]
-        epoch_log_interval = pers_epochs + 1
-        epoch_model_log_interval = pers_epochs + 1
-
-        if "pers_epoch_log_interval" in config:
-            epoch_log_interval = config['pers_epoch_log_interval']
-
-        if "pers_epoch_model_log_interval" in config:
-            epoch_model_log_interval = config['pers_epoch_model_log_interval']
-
-        local_progress = tqdm(pers_train_loader,
-                              desc=f'Epoch {epoch}/{pers_epochs+1}',
-                              disable=True)
-        # encoded data
-        train_encoded = list()
-        train_labels = list()
-
-        for _, (examples, labels) in enumerate(local_progress):
-            examples, labels = examples.to(self.device), labels.to(self.device)
-            # Clear the previous gradient
-            pers_optimizer.zero_grad()
-
-            # Perfrom the training and compute the loss
-            # preds = self.personalized_model(examples)
-            features = defined_model.encoder(examples)
-            preds = defined_model.clf_fc(features)
-
-            loss = pers_loss_criterion(preds, labels)
-
-            # Perfrom the optimization
-            loss.backward()
-            pers_optimizer.step()
-
-            # Update the epoch loss container
-            epoch_loss_meter.update(loss.data.item(), labels.size(0))
-
-            # save the encoded train data of current epoch
-            if epoch == pers_epochs:
-                train_encoded.append(features)
-                train_labels.append(labels)
-
-            local_progress.set_postfix({
-                'lr': lr_schedule,
-                "loss": epoch_loss_meter.val,
-                'loss_avg': epoch_loss_meter.avg
-            })
-
-        if (epoch - 1) % epoch_log_interval == 0 or epoch == pers_epochs:
-            logging.info(
-                "[Client #%d] Personalization Training Epoch: [%d/%d]\tLoss: %.6f",
-                self.client_id, epoch, pers_epochs, epoch_loss_meter.avg)
-
-            test_outputs = self.perform_evaluation_op(test_loader,
-                                                      defined_model)
-
-            # save the personaliation accuracy to the results dir
-            self.checkpoint_personalized_accuracy(
-                accuracy=test_outputs["accuracy"],
-                current_round=current_round,
-                epoch=epoch,
-                run_id=None)
-
-        if (epoch - 1) % epoch_model_log_interval == 0 or epoch == pers_epochs:
-            # the model generated during each round will be stored in the
-            # checkpoints
-            perform_client_checkpoint_saving(
-                client_id=self.client_id,
-                model_name=personalized_model_name,
-                model_state_dict=defined_model.state_dict(),
-                config=config,
-                kwargs=kwargs,
-                optimizer_state_dict=pers_optimizer.state_dict(),
-                lr_schedule_state_dict=lr_schedule.state_dict(),
-                present_epoch=epoch,
-                base_epoch=epoch,
-                prefix="personalized")
-
-        if epoch == pers_epochs:
-            self.checkpoint_encoded_samples(encoded_samples=train_encoded,
-                                            encoded_labels=train_labels,
-                                            current_round=current_round,
-                                            epoch=epoch,
-                                            run_id=None,
-                                            encoded_type="trainEncoded")
+    def on_end_pers_train_epoch(
+        self,
+        defined_model,
+        model_name,
+        data_loader,
+        epoch,
+        global_epoch,
+        config,
+        optimizer,
+        lr_schedule,
+        epoch_loss_meter,
+        **kwargs,
+    ):
+        current_round = config['current_round']
+        eval_outputs = super().on_end_pers_train_epoch(
+            defined_model, model_name, data_loader, epoch, global_epoch,
+            config, optimizer, lr_schedule, epoch_loss_meter)
+        if eval_outputs:
             self.checkpoint_encoded_samples(
-                encoded_samples=test_outputs["encoded_samples"],
-                encoded_labels=test_outputs["loaded_labels"],
+                encoded_samples=eval_outputs['encoded_samples'],
+                encoded_labels=eval_outputs['loaded_labels'],
                 current_round=current_round,
                 epoch=epoch,
                 run_id=None,
                 encoded_type="testEncoded")
+
+        return eval_outputs
