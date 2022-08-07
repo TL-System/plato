@@ -361,27 +361,155 @@ Could have this attribute if the **sampler** is `orthogonal`.
 
 ## trainer
 
-| Attribute | Meaning | Valid Value | Note |
-|:---------:|:-------:|:-----------:|:----:|
-|**type**|The type of the trainer|`basic` or `diff_privacy`|
-|max_physical_batch_size|The limit on the physical batch size when using `diff_privacy` trainer|defualt: 128|GPU memory usage of one process training the ResNet-18 model is 2817 MB|
-|**rounds**|The maximum number of training rounds|Any positive integer||
-|max_concurrency|The maximum number of clients (of each edge server in cross-silo training) running concurrently on one available device. If this is not defined, no new processes are spawned for training|Any positive integer|Plato will automatically use all available GPUs to maximize the speed of training, launching the same number of clients on every GPU.|
-|target_accuracy|The target accuracy of the global model|||
-|target_perplexity|The target perplexity of the global NLP model|
-|**epochs**|Number of epoches for local training in each communication round|Any positive integer||
-|**optimizer**||`SGD`, `Adam` or `FedProx`||
-|**batch_size**||Any positive integer||
-|**learning_rate**|||Decrease value when using `diff_privacy` trainer|
-|**momentum**||||
-|**weight_decay**|||When using `diff_privacy` trainer, set to 0|   
-|lr_schedule|Learning rate scheduler|`CosineAnnealingLR`, `LambdaLR`, `StepLR`, `ReduceLROnPlateau`|| 
-|**model_name**|The machine learning model|`lenet5`, `resnet_x`, `vgg_x`,`wideresnet`, `feedback_transformer`, `yolov5`, `HuggingFace_CausalLM`, `inceptionv3`, `googlenet`, `unet`, `alexnet`, `squeezenet_x`, `shufflenet_x`, `dcgan`, `multilayer`|For `resnet_x`, x = 18, 34, 50, 101, or 152; For `vgg_x`, x = 11, 13, 16, or 19; For `squeezenet_x`, x = 0 or 1; For `shufflenet_x`, x = 0.5, 1.0, 1.5, or 2.0|
-|pretrained|Use a model pretrained on ImageNet or not|`true` or `false`. Default is `false`|Can be used for `inceptionv3`, `alexnet`, and `squeezenet_x` models.|
-|dp_epsilon|Total privacy budget of epsilon with the `diff_privacy` trainer||default: 10.0|
-|dp_delta|Total privacy budget of delta with the `diff_privacy` trainer||default: 1e-5|
-|dp_max_grad_norm|The maximum norm of the per-sample gradients with the `diff_privacy` trainer. Any gradient with norm higher than this will be clipped to this value.||default: 1.0|
-|num_classes|The number of classes.||Default: 10|
+```{admonition} **type**
+The type of the trainer.
+
+`type` could be set to `basic` or `diff_privacy`.
+```
+
+````{admonition} max_physical_batch_size
+The limit on the physical batch size when using `diff_privacy` trainer. The default value is 128.
+
+```{note}
+GPU memory usage of one process training the ResNet-18 model is 2817 MB
+```
+````
+
+```{admonition} **rounds**
+The maximum number of training rounds. 
+
+`round` could be any positive integer.
+```
+
+````{admonition} max_concurrency
+The maximum number of clients (of each edge server in cross-silo training) running concurrently on one available device. If this is not defined, no new processes are spawned for training.
+
+`max_concurrency` could be any positive integer.
+
+```{note}
+Plato will automatically use all available GPUs to maximize the speed of training, launching the same number of clients on every GPU.
+```
+````
+
+```{admonition} target_accuracy
+The target accuracy of the global model.
+
+```
+
+```{admonition} target_perplexity
+The target perplexity of the global NLP model.
+
+```
+
+```{admonition} **epochs**
+Number of epoches for local training in each communication round.
+
+`epochs` could be any positive integer.
+
+```
+
+```{admonition} **optimizer**
+Use `SGD`, `Adam` or `FedProx` for optimizer.
+
+```
+
+```{admonition} **batch_size**
+Any positive integer.
+
+```
+
+````{admonition} **learning_rate**
+
+```{note}
+Decrease value when using `diff_privacy` trainer.
+```
+````
+
+```{admonition} **momentum**
+```
+
+````{admonition} **weight_decay**
+
+```{note}
+When using `diff_privacy` trainer, set to 0.
+```
+````
+
+```{admonition} lr_schedule
+Learning rate scheduler. The following options are available:
+
+- `CosineAnnealingLR`
+- `LambdaLR`
+- `StepLR`
+- `ReduceLROnPlateau`
+```
+
+````{admonition} **model_name**
+The machine learning model. The following options are available:
+
+- `lenet5`
+- `resnet_x`
+- `vgg_x`
+- `wideresnet`
+- `feedback_transformer`
+- `yolov5`
+- `HuggingFace_CausalLM`
+- `inceptionv3`
+- `googlenet`
+- `unet`
+- `alexnet`
+- `squeezenet_x`
+- `shufflenet_x`
+- `dcgan`
+- `multilayer`
+
+```{note}
+For `resnet_x`, x = 18, 34, 50, 101, or 152
+
+For `vgg_x`, x = 11, 13, 16, or 19
+
+For `squeezenet_x`, x = 0 or 1
+
+For `shufflenet_x`, x = 0.5, 1.0, 1.5, or 2.0
+```
+````
+
+````{admonition} pretrained
+Use a model pretrained on ImageNet or not.
+
+The value for `pretrained ` should be `true` or `false`. Default is `false`.
+
+```{note}
+Can be used for `inceptionv3`, `alexnet`, and `squeezenet_x` models.
+```
+````
+
+```{admonition} dp_epsilon
+Total privacy budget of epsilon with the `diff_privacy` trainer.
+
+The default value is 10.0.
+
+```
+
+```{admonition} dp_delta
+Total privacy budget of delta with the `diff_privacy` trainer.
+
+The default value is 1e-5.
+
+```
+
+```{admonition} dp_max_grad_norm
+The maximum norm of the per-sample gradients with the `diff_privacy` trainer. Any gradient with norm higher than this will be clipped to this value.
+
+The default value is 1.0.
+```
+
+```{admonition} num_classes
+The number of classes.
+
+The default value is 10.
+```
+
 
 ## algorithm
 
