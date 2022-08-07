@@ -273,26 +273,92 @@ For the `TinyImageNet` dataset, the default is `./data/tiny-imagenet-200`
 ```
 ````
 
+````{admonition} train_path
+Where the training dataset is located.
 
-| Attribute | Meaning | Valid Value | Note |
-|:---------:|:-------:|:-----------:|:----:|
-||
+```{note}
+`train_path` need to be specified for datasets using `YOLO`
+```
+````
 
-|train_path|Where the training dataset is located||Need to be specified for datasets using `YOLO`|
-|test_path|Where the test dataset is located||Need to be specified for datasets using `YOLO`|
-|**sampler**|How to divide the entire dataset to the clients|`iid`||
-|||`iid_mindspore`||
-|||`noniid`|Could have *concentration* attribute to specify the concentration parameter in the Dirichlet distribution|
-|||`orthogonal`|Each insitution's clients have data of different classes. Could have *institution_class_ids* and *label_distribution* attributes|
-|||`mixed`|Some data are iid, while others are non-iid. Must have *non_iid_clients* attributes|
-|test_set_sampler|How to sample the test set when clients test locally|Could be any **sampler**|Without this parameter, every client's test set is the test set of the datasource|
-|edge_test_set_sampler|How to sample the test set when edge servers test locally|Could be any **sampler**|Without this parameter, edge servers' test sets are the test set of the datasource if they locally test their aggregated models in cross-silo FL|
-|random_seed|Use a fixed random seed to sample each client's dataset so that experiments are reproducible||
-|**partition_size**|Number of samples in each client's dataset|Any positive integer||
-|concentration| The concentration parameter of symmetric Dirichlet distribution, used by `noniid` **sampler** || default: 1|
-|*non_iid_clients*|Indexs of clients whose datasets are non-iid. Other clients' datasets are iid|e.g., 4|Must have this attribute if the **sampler** is `mixed`|
-|*institution_class_ids*|Indexs of classes of local data of each institution's clients|e.g., 0,1;2,3 (the first institution's clients only have data of class #0 and #1; the second institution's clients only have data of class #2 and #3) |Could have this attribute if the **sampler** is `orthogonal`|
-|*label_distribution*|The class distribution of every client's local data|`iid` or `noniid` |Could have this attribute if the **sampler** is `orthogonal`. Default is `iid`|
+````{admonition} test_path
+Where the test dataset is located.
+
+```{note}
+`test_path` need to be specified for datasets using `YOLO`
+```
+````
+
+```{admonition} sampler
+How to divide the entire dataset to the clients. The following options are available:
+
+- `iid`
+- `iid_mindspore`
+- `noniid`: Could have *concentration* attribute to specify the concentration parameter in the Dirichlet distribution
+- `orthogonal`: Each insitution's clients have data of different classes. Could have *institution_class_ids* and *label_distribution* attributes
+- `mixed`: Some data are iid, while others are non-iid. Must have *non_iid_clients* attributes
+```
+
+````{admonition} test_set_sampler
+How to sample the test set when clients test locally. Any **sampler** is valid. 
+
+```{note}
+Without this parameter, every client's test set is the test set of the datasource.
+```
+````
+
+````{admonition} edge_test_set_sampler
+How to sample the test set when edge servers test locally. Any **sampler** is valid.
+
+```{note}
+Without this parameter, edge servers' test sets are the test set of the datasource if they locally test their aggregated models in cross-silo FL.
+```
+````
+
+```{admonition} random_seed
+Use a fixed random seed to sample each client's dataset so that experiments are reproducible.
+```
+
+```{admonition} partition_size
+Number of samples in each client's dataset. The input value could be any positive integer.
+```
+
+```{admonition} concentration
+The concentration parameter of symmetric Dirichlet distribution, used by `noniid` **sampler**.
+
+The default value is 1.
+```
+
+````{admonition} non_iid_clients
+Indexs of clients whose datasets are non-iid. Other clients' datasets are iid.
+
+e.g., 4
+
+```{note}
+Must have this attribute if the **sampler** is `mixed`
+```
+````
+
+
+````{admonition} institution_class_ids
+Indexs of classes of local data of each institution's clients.
+
+e.g., 0,1;2,3 (the first institution's clients only have data of class #0 and #1; the second institution's clients only have data of class #2 and #3)
+
+```{note}
+Could have this attribute if the **sampler** is `orthogonal`
+```
+````
+
+````{admonition} label_distribution
+The class distribution of every client's local data.
+
+The value should be `iid` or `noniid`. Default is `iid`
+
+```{note}
+Could have this attribute if the **sampler** is `orthogonal`.
+```
+````
 
 ## trainer
 
