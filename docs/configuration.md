@@ -6,6 +6,7 @@ In Plato, all configuration settings are read from a configuration file when the
 Attributes in **bold** must be included in a configuration file, while attributes in *italic* only need to be included under certain conditions.
 ```
 
+
 ## general
 
 ```{admonition} base_path
@@ -13,6 +14,7 @@ The path prefix for datasets, models, checkpoints, and results.
 
 The default value is `./`.
 ```
+
 
 ## clients
 
@@ -113,7 +115,6 @@ A list of processors for the client to apply on the payload before receiving it 
 ```
 
 ## server
-
 
 ```{admonition} type
 The type of the server.
@@ -246,6 +247,7 @@ Bandwidth for uplink communication (clients to server) in Mbps.
 The default value is 100.
 ```
 
+
 ## data
 
 ```{admonition} **dataset**
@@ -364,6 +366,7 @@ The value should be `iid` or `noniid`. Default is `iid`
 Could have this attribute if the **sampler** is `orthogonal`.
 ```
 ````
+
 
 ## trainer
 
@@ -547,10 +550,45 @@ The number of local aggregation rounds on edge servers before sending aggregated
 
 ```
 
+
 ## results
 
-| Attribute | Meaning | Valid Value | Note |
-|:---------:|:-------:|:-----------:|:----:|
-|types|The set of columns that will be written into a .csv file|`round`, `accuracy`, `elapsed_time`, `comm_time`, `round_time`, `comm_overhead`, `local_epoch_num`, `edge_agg_num` (Use comma `,` to seperate them)|default: `round, accuracy, elapsed_time`|
-|plot|Plot results |(Format: x\_axis-y\_axis. Use hyphen `-` to seperate axis. Use comma `,` to seperate multiple plots)|default: `round-accuracy, elapsed_time-accuracy`|
-|result_path|The directory of results||default: `<base_path>/results/`|
+````{admonition} types
+The set of columns that will be written into a .csv file. 
+
+The valid values are:
+- `round`
+- `accuracy`
+- `elapsed_time`
+- `comm_time`
+- `round_time`
+- `comm_overhead`
+- `local_epoch_num`
+- `edge_agg_num`
+
+```{note}
+Use comma `,` to seperate them.
+
+The default is `round, accuracy, elapsed_time`.
+```
+````
+
+````{admonition} plot
+Plot results.
+
+The value value should follow the following formatting:
+
+x\_axis-y\_axis. Use hyphen `-` to seperate axis. Use comma `,` to seperate multiple plots
+
+```{note}
+The default is `round-accuracy, elapsed_time-accuracy`.
+```
+````
+
+````{admonition} result_path
+The directory of results.
+
+```{note}
+The default path is `<base_path>/results/`.
+```
+````
