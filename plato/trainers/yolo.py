@@ -36,8 +36,14 @@ class Trainer(basic.Trainer):
         super().__init__()
         Config().params["grid_size"] = int(self.model.stride.max())
 
+    @staticmethod
     def get_train_loader(
-        cls, batch_size, trainset, sampler, extract_features=False, cut_layer=None
+        batch_size,
+        trainset,
+        sampler,
+        extract_features=False,
+        cut_layer=None,
+        **kwargs,
     ):
         """The train loader for training YOLOv5 using the COCO dataset or other datasets for the
         YOLOv5 model.

@@ -420,8 +420,8 @@ class Trainer(base.Trainer):
 
         return self.model
 
-    @classmethod
-    def get_train_loader(cls, batch_size, trainset, sampler, **kwargs):
+    @staticmethod
+    def get_train_loader(batch_size, trainset, sampler, **kwargs):
         """
         Creates an instance of the trainloader.
 
