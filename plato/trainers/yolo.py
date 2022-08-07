@@ -268,6 +268,9 @@ class Trainer(basic.Trainer):
             correct[matches[:, 1].long()] = matches[:, 2:3] >= iouv
         return correct
 
+    async def server_test_model(self, config, testset, sampler):
+        return self.test_model(config, testset, sampler)
+
     def test_model(self, config, testset, sampler):  # pylint: disable=unused-argument
         """The testing loop for YOLOv5.
 
