@@ -34,6 +34,20 @@ def train_run_start(self, config):
 ```
 ````
 
+
+````{admonition} **train_run_end(self, config)**
+Overide this method to complete additional tasks after the training loop ends.
+
+`config` the configuration settings used in the training loop. It corresponds directly to the `trainer` section in the configuration file.
+
+**Example:**
+
+```py
+def train_run_end(self, config):
+    logging.info("[Client #%d] Completed the training loop.", self.client_id)
+```
+````
+
 ````{admonition} **train_epoch_start(self, config)**
 Overide this method to complete additional tasks at the starting point of each training epoch.
 
@@ -88,6 +102,8 @@ def train_epoch_end(self, config):
 
 For infrastructure changes, such as logging, recording metrics, and stopping the training loop early, we tend to customize the training loop using callbacks instead. The advantage of using callbacks is that one can pass a list of multiple callbacks to the trainer when it is initialized, and they will be called in their order in the provided list. This helps when it is necessary to group features into different callback classes.
 
+Within the implementation of these callback methods, one can access additional information about the training loop by using the `trainer` instance. For example, `trainer.sampler` can be used to access the sampler used by the train dataloader, `trainer.trainloader` can be used to access the current train dataloader, and `trainer.current_epoch` can be used to access the current epoch number.
+
 To use callbacks, subclass the `TrainerCallback` class in `plato.callbacks.trainer`, and override the following methods:
 
 ````{admonition} **on_train_run_start(self, trainer, config)**
@@ -101,7 +117,26 @@ Overide this method to complete additional tasks before the training loop starts
 
 ```py
 def on_train_run_start(self, trainer, config):
-    logging.info("[Client #%d] Loading the dataset.", trainer.client_id)
+    logging.info(
+        "[Client #%d] Loading the dataset with size %d.",
+        trainer.client_id,
+        len(list(trainer.sampler)),
+    )
+```
+````
+
+````{admonition} **on_train_run_end(self, trainer, config)**
+Overide this method to complete additional tasks after the training loop ends.
+
+`trainer` the trainer instance that activated this callback upon the occurrence of the corresponding event.
+
+`config` the configuration settings used in the training loop. It corresponds directly to the `trainer` section in the configuration file.
+
+**Example:**
+
+```py
+def on_train_run_end(self, trainer, config):
+    logging.info("[Client #%d] Completed the training loop.", trainer.client_id)
 ```
 ````
 
