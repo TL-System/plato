@@ -45,6 +45,7 @@ class Trainer(base.Trainer):
             self.model = model.get_model()
 
         self.train_loader = None
+        self.sampler = None
         self.current_epoch = 0
 
     def zeros(self, shape):
@@ -151,6 +152,7 @@ class Trainer(base.Trainer):
     def train_model(self, config, trainset, sampler, cut_layer):
         """The default training loop when a custom training loop is not supplied."""
         batch_size = config["batch_size"]
+        self.sampler = sampler
         tic = time.perf_counter()
 
         self.train_run_start(config)
@@ -240,6 +242,9 @@ class Trainer(base.Trainer):
 
             self.train_epoch_end(config)
             self.callback_handler.call_event("on_train_epoch_end", self, config)
+
+        self.train_run_end(config)
+        self.callback_handler.call_event("on_train_run_end", self, config)
 
     def train(self, trainset, sampler, cut_layer=None, **kwargs) -> float:
         """The main training loop in a federated learning workload.
@@ -508,6 +513,11 @@ class Trainer(base.Trainer):
     def train_run_start(self, config):
         """
         Method called at the start of training run.
+        """
+
+    def train_run_end(self, config):
+        """
+        Method called at the end of a training run.
         """
 
     def train_epoch_start(self, config):

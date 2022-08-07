@@ -21,6 +21,11 @@ class TrainerCallback(ABC):
         Event called at the start of training run.
         """
 
+    def on_train_run_end(self, trainer, config, **kwargs):
+        """
+        Event called at the end of training run.
+        """
+
     def on_train_epoch_start(self, trainer, config, **kwargs):
         """
         Event called at the beginning of a training epoch.
@@ -50,9 +55,17 @@ class PrintProgressCallback(TrainerCallback):
         Event called at the start of training run.
         """
         if trainer.client_id == 0:
-            logging.info("[Server #%s] Loading the dataset.", os.getpid())
+            logging.info(
+                "[Server #%s] Loading the dataset with size %d.",
+                os.getpid(),
+                len(list(trainer.sampler)),
+            )
         else:
-            logging.info("[Client #%d] Loading the dataset.", trainer.client_id)
+            logging.info(
+                "[Client #%d] Loading the dataset with size %d.",
+                trainer.client_id,
+                len(list(trainer.sampler)),
+            )
 
     def on_train_epoch_start(self, trainer, config, **kwargs):
         """
