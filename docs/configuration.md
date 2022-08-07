@@ -46,7 +46,6 @@ The default value is `true`.
 ```{admonition} compute_comm_time
 When client-server communication is simulated, whether or not the transmission time — the time it takes for the payload to be completely transmitted to the server — should be computed with a pre-specified server bandwidth.
 ```
-
 ````
 
 `````{admonition} speed_simulation
@@ -109,7 +108,7 @@ A list of processors for the client to apply on the payload before sending it ou
 ```
 
 ```{admonition} inbound_processors
-A list of processors for the client to apply on the payload before receiving it from the server. Multiple processors are permitted.
+A list of processors for the client to apply on the payload before receiving it from the server.
 
 - `model_decompress` Decompress model parameters. Must be placed as the first processor if `model_compress` is applied on the server side.
 ```
@@ -120,25 +119,24 @@ A list of processors for the client to apply on the payload before receiving it 
 The type of the server.
 
 - `fedavg` a Federated Averaging (FedAvg) server.
+
 - `fedavg_cross_silo` a Federated Averaging server that handles cross-silo federated learning by interacting with edge servers rather than with clients directly. When this server is used, `algorithm.type` must be `fedavg`.
+
 - `mistnet` a MistNet server.
+
 - `fedavg_gan` a Federated Averaging server that handles Generative Adversarial Networks (GANs).
 ```
 
-```{admonition} address
-The address of the central server.
-
-e.g., `127.0.0.1`
+```{admonition} **address**
+The address of the central server, such as `127.0.0.1`.
 ```
 
-```{admonition} port
-The port number of the central server.
-
-e.g., `8000`, `8005`
+```{admonition} **port**
+The port number of the central server, such as `8000`.
 ```
 
 ```{admonition} disable_clients
-If this optional setting is enabled as `true`, the server will not launched client processes on the same machine.
+If this optional setting is `true`, the server will not launched client processes on the same physical machine. This is useful when the server is deployed in the cloud and connected to by remote clients.
 ```
 
 ```{admonition} s3_endpoint_url
@@ -150,71 +148,51 @@ The bucket name for an S3-compatible storage service, used for transferring payl
 ```
 
 ```{admonition} random_seed
-Use a fixed random seed for selecting clients (and sampling testset if needed) so that experiments are reproducible.
+The random seed used for selecting clients (and sampling the test dataset on the server, if needed) so that experiments are reproducible.
 ```
 
 ```{admonition} ping_interval
-The time interval in seconds at which the server pings the client.
-
-The default value is 3600.
+The time interval in seconds at which the server pings the client. The default value is `3600`.
 ```
 
 ```{admonition} ping_timeout
-The time in seconds that the client waits for the server to respond before disconnecting.
-
-The default value is 3600.
+The time in seconds that the client waits for the server to respond before disconnecting. The default value is `3600`.
 ```
 
 ```{admonition} synchronous
-Conduct training in synchronous or asynchronous mode.
-
-The value could be `true` or `false`.
+Whether training session should operate in synchronous (`true`) or asynchronous (`false`) mode.
 ```
 
 ```{admonition} periodic_interval
-The time interval for a server operating in asynchronous mode to aggregate received updates
-
-Any positive integer could be used for `periodic_interval`. The default value is 5 seconds.
+The time interval for a server operating in asynchronous mode to aggregate received updates. Any positive integer could be used for `periodic_interval`. The default value is 5 seconds. This is only used when we are not simulating the wall-clock time using the `simulate_wall_time` setting below.
 ```
 
 ```{admonition} simulate_wall_time
-Whether the wall clock time on the server is simulated.
-
-The value could be `true` or `false`.
+Whether or not the wall clock time on the server is simulated. This is useful when clients train in batches, rather than concurrently, due to limited resources (such as a limited amount of CUDA memory on the GPUs).
 ```
 
 ```{admonition} staleness_bound
-In asynchronous mode, should we wait for stale clients who are behind the current round by more than this bound?
-
-Any positive integer could be used for `staleness_bound`. The default value is 0.
+In asynchronous mode, whether or not we should wait for clients who are behind the current round (*stale*) by more than this value. Any positive integer could be used for `staleness_bound`. The default value is `0`.
 ```
 
 ```{admonition} minimum_clients_aggregated
-The minimum number of clients that need to arrive before aggregation and processing by the server when operating in asynchronous mode. 
-
-Any positive integer could be used for `minimum_clients_aggregated`. The default value is 1.
+When operating in asynchronous mode, the minimum number of clients that need to arrive before aggregation and processing by the server. Any positive integer could be used for `minimum_clients_aggregated`. The default value is `1`.
 ```
 
 ```{admonition} do_test
-Whether the central server computes test accuracy locally.
-
-The value could be `true` or `false`.
+Whether the server tests the global model and computes the global accuracy or perplexity. The default is `true`.
 ```
 
 ```{admonition} model_path
-The directory of pretrained and trained models.
-
-The deafult path is `<base_path>/models/pretrained`.
+The path to the pretrained and trained models. The deafult path is `<base_path>/models/pretrained`, where `<base_path>` is specified in the `general` section.
 ```
 
 ```{admonition} checkpoint_path
-The directory of checkpoints.
-
-The default path is `<base_path>/checkpoints`.
+The path to temporary checkpoints used for resuming the training session. The default path is `<base_path>/checkpoints`, where `<base_path>` is specified in the `general` section.
 ```
 
 ```{admonition} outbound_processors
-A list of processors to apply on the payload before sending. Multiple processor options are available:
+A list of processors to apply on the payload before sending it out to the clients. Multiple processors are permitted.
 
 - `unstructured_pruning`: Process unstructured pruning on model weights for PyTorch. The `model_compress` processor needs to be applied after it in the configuration file or the communication overhead will not be reduced.
 
@@ -224,7 +202,7 @@ A list of processors to apply on the payload before sending. Multiple processor 
 ```
 
 ```{admonition} inbound_processors
-A list of processors to apply on the payload right after receiving. Multiple processor options are available:
+A list of processors to apply on the payload right after receiving. Multiple processors are permitted.
 
 - `model_decompress`: Decompress model parameters. Must be placed as the first processor if `model_compress` is applied on the client side.
 
@@ -236,17 +214,12 @@ A list of processors to apply on the payload right after receiving. Multiple pro
 ```
 
 ```{admonition} downlink_bandwidth
-Bandwidth for downlink communication (server to clients) in Mbps.
-
-The default value is 100.
+The server's estimated downlink capacity (server to clients) in Mbps, used for computing the transmission time (see `compute_comm_time` in the `clients` section). The default value is 100.
 ```
 
 ```{admonition} uplink_bandwidth
-Bandwidth for uplink communication (clients to server) in Mbps.
-
-The default value is 100.
+The server's estimated uplink capacity (server to clients) in Mbps, used for computing the transmission time (see `compute_comm_time` in the `clients` section). The default value is 100.
 ```
-
 
 ## data
 
@@ -269,9 +242,7 @@ The training and test datasets. The following options are available:
 ```
 
 ````{admonition} data_path
-Where the dataset is located.
-
-The default is `./data`.
+Where the dataset is located. The default is `./data`.
 
 ```{note}
 For the `CINIC10` dataset, the default is `./data/CINIC-10`
@@ -284,7 +255,7 @@ For the `TinyImageNet` dataset, the default is `./data/tiny-imagenet-200`
 Where the training dataset is located.
 
 ```{note}
-`train_path` need to be specified for datasets using `YOLO`
+`train_path` need to be specified for datasets using `YOLO`.
 ```
 ````
 
@@ -292,99 +263,90 @@ Where the training dataset is located.
 Where the test dataset is located.
 
 ```{note}
-`test_path` need to be specified for datasets using `YOLO`
+`test_path` need to be specified for datasets using `YOLO`.
 ```
 ````
 
-```{admonition} **sampler**
+````{admonition} sampler
 How to divide the entire dataset to the clients. The following options are available:
 
 - `iid`
+
 - `iid_mindspore`
+
 - `noniid`: Could have *concentration* attribute to specify the concentration parameter in the Dirichlet distribution
-- `orthogonal`: Each insitution's clients have data of different classes. Could have *institution_class_ids* and *label_distribution* attributes
-- `mixed`: Some data are iid, while others are non-iid. Must have *non_iid_clients* attributes
+
+```{admonition} concentration
+If the sampler is `noniid`, the concentration parameter for the Dirichlet distribution can be specified. The default value is `1`.
 ```
 
+- `orthogonal`: Each insitution's clients have data of different classes. Could have *institution_class_ids* and *label_distribution* attributes
+
+```{admonition} institution_class_ids
+If the sampler is `orthogonal`, the indices of classes of local data of each institution's clients can be specified. e.g., `0, 1; 2, 3` (the first institution's clients only have data of class #0 and #1; the second institution's clients only have data of class #2 and #3).
+```
+
+```{admonition} label_distribution
+If the sampler is `orthogonal`, the class distribution of every client's local data can be specified. The value should be `iid` or `noniid`. Default is `iid`.
+```
+
+- `mixed`: Some data are iid, while others are non-iid. Must have *non_iid_clients* attributes
+
+```{admonition} non_iid_clients
+If the sampler is `mixed`, the indices of clients whose datasets are non-i.i.d. need to be specified. Other clients' datasets are i.i.d.
+```
+````
+
 ````{admonition} test_set_sampler
-How to sample the test set when clients test locally. Any **sampler** is valid. 
+How the test dataset is sampled when clients test locally. Any sampler is valid. 
 
 ```{note}
-Without this parameter, every client's test set is the test set of the datasource.
+Without this parameter, each client's test dataset is the test dataset of the datasource.
 ```
 ````
 
 ````{admonition} edge_test_set_sampler
-How to sample the test set when edge servers test locally. Any **sampler** is valid.
+How the test dataset is sampled when edge servers test locally. Any sampler is valid.
 
 ```{note}
-Without this parameter, edge servers' test sets are the test set of the datasource if they locally test their aggregated models in cross-silo FL.
+Without this parameter, edge servers' test datasets are the test dataset of the datasource if they locally test their aggregated models in cross-silo FL.
 ```
 ````
 
 ```{admonition} random_seed
-Use a fixed random seed to sample each client's dataset so that experiments are reproducible.
+The random seed used to sample each client's dataset so that experiments are reproducible.
 ```
 
 ```{admonition} **partition_size**
-Number of samples in each client's dataset. The input value could be any positive integer.
+The number of samples in each client's dataset.
 ```
-
-```{admonition} concentration
-The concentration parameter of symmetric Dirichlet distribution, used by `noniid` **sampler**.
-
-The default value is 1.
-```
-
-````{admonition} *non_iid_clients*
-Indexs of clients whose datasets are non-iid. Other clients' datasets are iid.
-
-e.g., 4
-
-```{note}
-Must have this attribute if the **sampler** is `mixed`
-```
-````
-
-
-````{admonition} *institution_class_ids*
-Indexs of classes of local data of each institution's clients.
-
-e.g., 0,1;2,3 (the first institution's clients only have data of class #0 and #1; the second institution's clients only have data of class #2 and #3)
-
-```{note}
-Could have this attribute if the **sampler** is `orthogonal`
-```
-````
-
-````{admonition} *label_distribution*
-The class distribution of every client's local data.
-
-The value should be `iid` or `noniid`. Default is `iid`
-
-```{note}
-Could have this attribute if the **sampler** is `orthogonal`.
-```
-````
-
 
 ## trainer
 
-```{admonition} **type**
-The type of the trainer.
+````{admonition} **type**
+The type of the trainer. The following types are available:
+- `basic`: a basic trainer with a standard training loop.
+- `diff_privacy`: a trainer that supports local differential privacy in its training loop by adding noise to the gradients during each step of training.
 
-`type` could be set to `basic` or `diff_privacy`.
+```{admonition} max_physical_batch_size
+The limit on the physical batch size when using the `diff_privacy` trainer.  The default value is 128. The GPU memory usage of one process training the ResNet-18 model is around 2817 MB.
 ```
 
-````{admonition} max_physical_batch_size
-The limit on the physical batch size when using `diff_privacy` trainer. 
-
-The default value is 128.
-
-```{note}
-GPU memory usage of one process training the ResNet-18 model is 2817 MB
+```{admonition} dp_epsilon
+Total privacy budget of epsilon with the `diff_privacy` trainer. The default value is `10.0`.
 ```
+
+```{admonition} dp_delta
+Total privacy budget of delta with the `diff_privacy` trainer. The default value is `1e-5`.
+```
+
+```{admonition} dp_max_grad_norm
+The maximum norm of the per-sample gradients with the `diff_privacy` trainer. Any gradient with norm higher than this will be clipped to this value. The default value is `1.0`.
+```
+
+- `gan`: a trainer for Generative Adversarial Networks (GANs).
 ````
+
 
 ```{admonition} **rounds**
 The maximum number of training rounds. 
@@ -393,60 +355,54 @@ The maximum number of training rounds.
 ```
 
 ````{admonition} max_concurrency
-The maximum number of clients (of each edge server in cross-silo training) running concurrently on one available device. If this is not defined, no new processes are spawned for training.
-
-`max_concurrency` could be any positive integer.
+The maximum number of clients (of each edge server in cross-silo training) running concurrently on each available GPU. If this is not defined, no new processes are spawned for training.
 
 ```{note}
-Plato will automatically use all available GPUs to maximize the speed of training, launching the same number of clients on every GPU.
+Plato will automatically use all available GPUs to maximize the concurrency of training, launching the same number of clients on every GPU. If `max_concurrency` is 7 and 3 GPUs are available, 21 client processes will be launched for concurrent training.
 ```
 ````
 
 ```{admonition} target_accuracy
 The target accuracy of the global model.
-
 ```
 
 ```{admonition} target_perplexity
-The target perplexity of the global NLP model.
-
+The target perplexity of the global Natural Language Processing (NLP) model.
 ```
 
 ```{admonition} **epochs**
-Number of epoches for local training in each communication round.
-
-`epochs` could be any positive integer.
+The total number of epoches in local training in each communication round.
 ```
 
 ```{admonition} **optimizer**
-Use `SGD`, `Adam` or `FedProx` for optimizer.
-
+The type of the optimizer. This can be `SGD`, `Adam` or `FedProx`.
 ```
 
 ```{admonition} **batch_size**
-Any positive integer.
-
+The size of the mini-batch of data in each step (iteration) of the training loop.
 ```
 
 ````{admonition} **learning_rate**
+The learning rate used for local training.
 
 ```{note}
-Decrease value when using `diff_privacy` trainer.
+Decrease the value of the learning rate when using the `diff_privacy` trainer.
 ```
 ````
 
 ```{admonition} **momentum**
+The momentum used for local training.
 ```
 
 ````{admonition} **weight_decay**
-
+The weight decay used for local training.
 ```{note}
 When using `diff_privacy` trainer, set to 0.
 ```
 ````
 
 ```{admonition} lr_schedule
-Learning rate scheduler. The following options are available:
+The earning rate scheduler. The following options are available:
 
 - `CosineAnnealingLR`
 - `LambdaLR`
@@ -455,7 +411,7 @@ Learning rate scheduler. The following options are available:
 ```
 
 ````{admonition} **model_name**
-The machine learning model. The following options are available:
+The name of the machine learning model. The following options are available:
 
 - `lenet5`
 - `resnet_x`
@@ -485,39 +441,18 @@ For `shufflenet_x`, x = 0.5, 1.0, 1.5, or 2.0
 ````
 
 ````{admonition} pretrained
-Use a model pretrained on ImageNet or not.
-
-The value for `pretrained ` should be `true` or `false`. Default is `false`.
+Use a model pretrained on ImageNet or not. The value for `pretrained ` should be `true` or `false`. Default is `false`.
 
 ```{note}
 Can be used for `inceptionv3`, `alexnet`, and `squeezenet_x` models.
 ```
 ````
 
-```{admonition} dp_epsilon
-Total privacy budget of epsilon with the `diff_privacy` trainer.
-
-The default value is 10.0.
-```
-
-```{admonition} dp_delta
-Total privacy budget of delta with the `diff_privacy` trainer.
-
-The default value is 1e-5.
-```
-
-```{admonition} dp_max_grad_norm
-The maximum norm of the per-sample gradients with the `diff_privacy` trainer. Any gradient with norm higher than this will be clipped to this value.
-
-The default value is 1.0.
-```
-
 ```{admonition} num_classes
 The number of classes.
 
-The default value is 10.
+The default value is `10`.
 ```
-
 
 ## algorithm
 
@@ -527,29 +462,19 @@ Aggregation algorithm.
 The input should be:
 - `fedavg`:  the federated averaging algorithm
 - `mistnet`: the MistNet algorithm
-
 ```
 
-````{admonition} *cross_silo*
-Cross-silo training. 
+````{admonition} cross_silo
+Whether or not cross-silo training should be used.
 
-The possible input is `true` or `false`.
+```{admonition} **total_silos**
+The total number of silos (edge servers). The input could be any positive integer.
+```
 
-```{note}
-If `true`, must have **total_silos** and **local_rounds** attributes
+```{admonition} **local_rounds**
+The number of local aggregation rounds on edge servers before sending aggregated weights to the central server. The input could be any positive integer.
 ```
 ````
-
-```{admonition} *total_silos*
-The total number of silos (edge servers). The input could be any positive integer.
-
-```
-
-```{admonition} *local_rounds*
-The number of local aggregation rounds on edge servers before sending aggregated weights to the central server. The input could be any positive integer.
-
-```
-
 
 ## results
 
@@ -567,28 +492,10 @@ The valid values are:
 - `edge_agg_num`
 
 ```{note}
-Use comma `,` to seperate them.
-
-The default is `round, accuracy, elapsed_time`.
-```
-````
-
-````{admonition} plot
-Plot results.
-
-The value value should follow the following formatting:
-
-x\_axis-y\_axis. Use hyphen `-` to seperate axis. Use comma `,` to seperate multiple plots
-
-```{note}
-The default is `round-accuracy, elapsed_time-accuracy`.
+Use comma `,` to seperate them. The default is `round, accuracy, elapsed_time`.
 ```
 ````
 
 ````{admonition} result_path
-The directory of results.
-
-```{note}
-The default path is `<base_path>/results/`.
-```
+The path to the result `.csv` files. The default path is `<base_path>/results/`,  where `<base_path>` is specified in the `general` section.
 ````
