@@ -118,12 +118,11 @@ def perform_client_checkpoint_saving(client_id,
                                      optimizer_state_dict,
                                      lr_schedule_state_dict,
                                      config,
-                                     kwargs,
+                                     current_round,
                                      present_epoch,
                                      base_epoch,
                                      prefix=None):
 
-    current_round = kwargs['current_round']
     config['current_round'] = current_round
     # run_id = config['run_id']
     # we have to set the run_id to be None here as the client can
