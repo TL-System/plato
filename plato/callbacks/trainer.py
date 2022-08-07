@@ -80,7 +80,7 @@ class PrintProgressCallback(TrainerCallback):
         else:
             logging.info(
                 fonts.colourize(
-                    f"[Client #{trainer.client_id}] Started traing epoch {trainer.current_epoch}."
+                    f"[Client #{trainer.client_id}] Started training epoch {trainer.current_epoch}."
                 )
             )
 

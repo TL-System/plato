@@ -2,7 +2,6 @@
 The training and testing loops for PyTorch.
 """
 import logging
-import os
 import time
 
 import torch
