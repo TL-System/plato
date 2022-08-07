@@ -242,8 +242,7 @@ The default value is 100.
 
 ## data
 
-
-```{admonition} dataset
+```{admonition} **dataset**
 The training and test datasets. The following options are available:
 
 - `MNIST`
@@ -289,7 +288,7 @@ Where the test dataset is located.
 ```
 ````
 
-```{admonition} sampler
+```{admonition} **sampler**
 How to divide the entire dataset to the clients. The following options are available:
 
 - `iid`
@@ -319,7 +318,7 @@ Without this parameter, edge servers' test sets are the test set of the datasour
 Use a fixed random seed to sample each client's dataset so that experiments are reproducible.
 ```
 
-```{admonition} partition_size
+```{admonition} **partition_size**
 Number of samples in each client's dataset. The input value could be any positive integer.
 ```
 
@@ -329,7 +328,7 @@ The concentration parameter of symmetric Dirichlet distribution, used by `noniid
 The default value is 1.
 ```
 
-````{admonition} non_iid_clients
+````{admonition} *non_iid_clients*
 Indexs of clients whose datasets are non-iid. Other clients' datasets are iid.
 
 e.g., 4
@@ -340,7 +339,7 @@ Must have this attribute if the **sampler** is `mixed`
 ````
 
 
-````{admonition} institution_class_ids
+````{admonition} *institution_class_ids*
 Indexs of classes of local data of each institution's clients.
 
 e.g., 0,1;2,3 (the first institution's clients only have data of class #0 and #1; the second institution's clients only have data of class #2 and #3)
@@ -350,7 +349,7 @@ Could have this attribute if the **sampler** is `orthogonal`
 ```
 ````
 
-````{admonition} label_distribution
+````{admonition} *label_distribution*
 The class distribution of every client's local data.
 
 The value should be `iid` or `noniid`. Default is `iid`
