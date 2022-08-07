@@ -79,6 +79,16 @@ simulation_distribution: pareto
 ````
 `````
 
+````{admonition} sleep_simulation
+Should clients really go to sleep (`false`), or should we just simulate the sleep times (`true`)? The default is `false`.
+
+Simulating the sleep times — rather than letting clients go to sleep and measure the actual local training times including the sleep times — will be helpful to increase the speed of running the experiments, and to improve reproducibility, since every time the experiments run, the average training time will remain the same, and specified using the `avg_training_time` setting below.
+
+```{admonition} **avg_training_time**
+If we are simulating client training times, what is the average training time? When we are simulating the sleep times rather than letting clients go to sleep, we will not be able to use the measured wall-clock time for local training. As a result, we need to specify this value in lieu of the measured training time.
+```
+````
+
 ```{admonition} outbound_processors
 A list of processors for the client to apply on the payload before sending it out to the server. Multiple processors are permitted.
 
