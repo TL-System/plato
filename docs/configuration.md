@@ -37,7 +37,9 @@ If this setting is `true` and the configuration file has a `results` section, te
 ````
 
 ````{admonition} comm_simulation
-Whether client-server communication should be simulated with reading and writing files. This is useful when the clients and the server are launched on the same machine and share a filesystem. The default value is `true`.
+Whether client-server communication should be simulated with reading and writing files. This is useful when the clients and the server are launched on the same machine and share a filesystem. 
+
+The default value is `true`.
 
 ```{admonition} compute_comm_time
 When client-server communication is simulated, whether or not the transmission time — the time it takes for the payload to be completely transmitted to the server — should be computed with a pre-specified server bandwidth.
@@ -51,11 +53,15 @@ Whether or not the training speed of the clients are simulated. Simulating the t
 If `speed_simulation` is `true`, we need to specify the probability distribution used for generating a sleep time (in seconds per epoch) for each client, using the following setting:
 
 ```{admonition} random_seed
-This random seed is used exclusively for generating the sleep time (in seconds per epoch). The default value is `1`.
+This random seed is used exclusively for generating the sleep time (in seconds per epoch). 
+
+The default value is `1`.
 ```
 
 ```{admonition} max_sleep_time
-This is used to specify the longest possible sleep time in seconds. The default value is `60`.
+This is used to specify the longest possible sleep time in seconds. 
+
+The default value is `60`.
 ```
 
 ````{admonition} simulation_distribution
@@ -368,7 +374,9 @@ The type of the trainer.
 ```
 
 ````{admonition} max_physical_batch_size
-The limit on the physical batch size when using `diff_privacy` trainer. The default value is 128.
+The limit on the physical batch size when using `diff_privacy` trainer. 
+
+The default value is 128.
 
 ```{note}
 GPU memory usage of one process training the ResNet-18 model is 2817 MB
@@ -405,7 +413,6 @@ The target perplexity of the global NLP model.
 Number of epoches for local training in each communication round.
 
 `epochs` could be any positive integer.
-
 ```
 
 ```{admonition} **optimizer**
@@ -488,14 +495,12 @@ Can be used for `inceptionv3`, `alexnet`, and `squeezenet_x` models.
 Total privacy budget of epsilon with the `diff_privacy` trainer.
 
 The default value is 10.0.
-
 ```
 
 ```{admonition} dp_delta
 Total privacy budget of delta with the `diff_privacy` trainer.
 
 The default value is 1e-5.
-
 ```
 
 ```{admonition} dp_max_grad_norm
