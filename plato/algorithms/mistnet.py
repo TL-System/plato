@@ -13,13 +13,13 @@ import time
 import torch
 from plato.algorithms import fedavg
 from plato.datasources import feature_dataset
-from plato.config import Config
 
 
 class Algorithm(fedavg.Algorithm):
     """The PyTorch-based MistNet algorithm, used by both the client and the
     server.
     """
+
     def extract_features(self, dataset, sampler, cut_layer: str):
         """Extracting features using layers before the cut_layer.
 
@@ -28,18 +28,9 @@ class Algorithm(fedavg.Algorithm):
         """
         self.model.eval()
 
-        _train_loader = getattr(self.trainer, "train_loader", None)
-
-        if callable(_train_loader):
-            data_loader = self.trainer.train_loader(batch_size=1,
-                                                    trainset=dataset,
-                                                    sampler=sampler.get(),
-                                                    extract_features=True)
-        else:
-            data_loader = torch.utils.data.DataLoader(
-                dataset,
-                batch_size=Config().trainer.batch_size,
-                sampler=sampler.get())
+        data_loader = self.trainer.get_train_loader(
+            batch_size=1, trainset=dataset, sampler=sampler.get(), extract_features=True
+        )
 
         tic = time.perf_counter()
 
@@ -51,13 +42,12 @@ class Algorithm(fedavg.Algorithm):
             feature_dataset.append((logits, targets))
 
         toc = time.perf_counter()
-        logging.info("[Client #%s] Time used: %.2f seconds.", self.client_id,
-                     toc - tic)
+        logging.info("[Client #%s] Time used: %.2f seconds.", self.client_id, toc - tic)
 
         return feature_dataset
 
     def train(self, trainset, sampler, cut_layer=None):
-        """ Train the neural network model after the cut layer. """
+        """Train the neural network model after the cut layer."""
         self.trainer.train(
-            feature_dataset.FeatureDataset(trainset.feature_dataset), sampler,
-            cut_layer)
+            feature_dataset.FeatureDataset(trainset.feature_dataset), sampler, cut_layer
+        )

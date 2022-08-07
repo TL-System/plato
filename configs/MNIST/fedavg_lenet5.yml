@@ -45,7 +45,7 @@ trainer:
     model_name: lenet5
 
     # Number of epoches for local training in each communication round
-    epochs: 1
+    epochs: 5
     batch_size: 32
     optimizer: SGD
     learning_rate: 0.01
