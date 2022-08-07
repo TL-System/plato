@@ -518,13 +518,34 @@ The default value is 10.
 
 ## algorithm
 
-| Attribute | Meaning | Valid Value | Note |
-|:---------:|:-------:|:-----------:|:----:|
-|**type**|Aggregation algorithm|`fedavg`|the federated averaging algorithm|
-|||`mistnet`|the MistNet algorithm|
-|*cross_silo*|Cross-silo training|`true` or `false`|If `true`, must have **total_silos** and **local_rounds** attributes|
-|*total_silos*|The total number of silos (edge servers)|Any positive integer||
-|*local_rounds*|The number of local aggregation rounds on edge servers before sending aggregated weights to the central server|Any positive integer||
+```{admonition} **type**
+Aggregation algorithm. 
+
+The input should be:
+- `fedavg`:  the federated averaging algorithm
+- `mistnet`: the MistNet algorithm
+
+```
+
+````{admonition} *cross_silo*
+Cross-silo training. 
+
+The possible input is `true` or `false`.
+
+```{note}
+If `true`, must have **total_silos** and **local_rounds** attributes
+```
+````
+
+```{admonition} *total_silos*
+The total number of silos (edge servers). The input could be any positive integer.
+
+```
+
+```{admonition} *local_rounds*
+The number of local aggregation rounds on edge servers before sending aggregated weights to the central server. The input could be any positive integer.
+
+```
 
 ## results
 
