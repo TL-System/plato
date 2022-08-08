@@ -82,6 +82,8 @@ trainer:
     model_name: yolov5
     model_config: configs/yolov5/helmet_yolov5s.yaml
     train_params: configs/yolov5/data/hyps/hyp.scratch.yaml
+    # number of classes
+    num_classes: 2
 
 algorithm:
     # Aggregation algorithm
