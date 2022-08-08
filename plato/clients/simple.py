@@ -126,6 +126,8 @@ class Client(base.Client):
 
         # Perform model training
         try:
+            if hasattr(self.trainer, "current_round"):
+                self.trainer.current_round = self.current_round
             training_time = self.trainer.train(self.trainset, self.sampler)
         except ValueError as exc:
             logging.info(
