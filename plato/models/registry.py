@@ -33,6 +33,7 @@ else:
         lenet5,
         dcgan,
         multilayer,
+        yolo,
         resnet,
         vgg,
         torch_hub,
@@ -44,6 +45,7 @@ else:
             ("lenet5", lenet5.Model),
             ("dcgan", dcgan.Model),
             ("multilayer", multilayer.Model),
+            ("yolov5", yolo.Model),
         ]
     )
 
@@ -70,10 +72,7 @@ def get():
     if model_name == "yolov5":
         from plato.models import yolo
 
-        if hasattr(Config().trainer, "model_config"):
-            return yolo.Model(Config().trainer.model_config, Config().data.num_classes)
-        else:
-            return yolo.Model("yolov5s.yaml", Config().data.num_classes)
+        return yolo.Model(Config().data.num_classes)
     else:
         for name, registered_model in registered_models.items():
             if name.startswith(model_type):
