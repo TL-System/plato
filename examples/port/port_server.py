@@ -105,7 +105,11 @@ class Server(fedavg.Server):
             i / sum(aggregation_weights) for i in aggregation_weights
         ]
 
-        logging.info("[Client %s] normalized weights: %s", i, aggregation_weights)
+        logging.info(
+            "[Server #%s] normalized aggregation weights: %s",
+            os.getpid(),
+            aggregation_weights,
+        )
 
         # Perform weighted averaging
         avg_update = {

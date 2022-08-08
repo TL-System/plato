@@ -4,10 +4,8 @@ when creating new client callbacks.
 
 Defines a default callback to print local training progress.
 """
-import logging
-from abc import ABC
 
-from plato.utils import fonts
+from abc import ABC
 
 
 class ClientCallback(ABC):
