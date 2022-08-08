@@ -42,7 +42,7 @@ class Trainer(base.Trainer):
         if model is None:
             self.model = models_registry.get()
         else:
-            self.model = model.get_model()
+            self.model = model()
 
         self.train_loader = None
         self.sampler = None
@@ -124,9 +124,10 @@ class Trainer(base.Trainer):
             logging.info("[Client #%d] Woke up.", self.client_id)
 
     def train_process(self, config, trainset, sampler, cut_layer=None, **kwargs):
-        """The main training loop in a federated learning workload, run in
-          a separate process with a new CUDA context, so that CUDA memory
-          can be released after the training completes.
+        """
+        The main training loop in a federated learning workload, run in a
+        separate process with a new CUDA context, so that CUDA memory can be
+        released after the training completes.
 
         Arguments:
         self: the trainer itself.
@@ -136,7 +137,6 @@ class Trainer(base.Trainer):
         cut_layer (optional): The layer which training should start from.
         kwargs (optional): Additional keyword arguments.
         """
-
         try:
             self.train_model(config, trainset, sampler.get(), cut_layer, **kwargs)
         except Exception as training_exception:
