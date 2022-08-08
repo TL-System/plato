@@ -135,9 +135,6 @@ class Client(base.Client):
             )
             await self.sio.disconnect()
 
-        self.client_train_end()
-        self.callback_handler.call_event("on_client_train_end", self)
-
         # Extract model weights and biases
         weights = self.algorithm.extract_weights()
 

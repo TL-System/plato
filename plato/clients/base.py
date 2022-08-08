@@ -313,9 +313,10 @@ class Client:
 
             data_size = sys.getsizeof(pickle.dumps(payload))
 
-            self.client_send_with_comm_simulation_end(data_size)
-            self.callback_handler.call_event(
-                "on_client_send_with_comm_simulation_end", self, data_size
+            logging.info(
+                "[%s] Sent %.2f MB of payload data to the server (simulated).",
+                self,
+                data_size / 1024**2,
             )
 
         else:
@@ -342,9 +343,10 @@ class Client:
 
             await self.sio.emit("client_payload_done", metadata)
 
-            self.client_send_without_comm_simulation_end(data_size)
-            self.callback_handler.call_event(
-                "on_client_send_without_comm_simulation_end", self, data_size
+            logging.info(
+                "[%s] Sent %.2f MB of payload data to the server (simulated).",
+                self,
+                data_size / 1024**2,
             )
 
     def process_server_response(self, server_response) -> None:
@@ -399,19 +401,4 @@ class Client:
     def client_train_start(self, **kwargs):
         """
         Method called at the start of local training.
-        """
-
-    def client_train_end(self, **kwargs):
-        """
-        Method called at the end of local training.
-        """
-
-    def client_send_with_comm_simulation_end(self, data_size, **kwargs):
-        """
-        Method called at the end of sending payload using simulation.
-        """
-
-    def client_send_without_comm_simulation_end(self, data_size, **kwargs):
-        """
-        Method called at the end of sending payload using S3 or socket.io.
         """

@@ -32,37 +32,3 @@ def on_client_train_start(self, client)
 Overide this method to complete additional tasks after the local training ends.
 
 ````
-
-````{admonition} **on_client_send_with_comm_simulation_end(self, client, data_size)**
-Overide this method to complete additional tasks at the end of sening payload using simulation.
-
-`data_size` the size of the payload.
-
-**Example:**
-
-```py
-def on_client_send_with_comm_simulation_end(self, client, client, data_size):
-    logging.info(
-        "[%s] Sent %.2f MB of payload data to the server (simulated).",
-        client,
-        data_size / 1024**2,
-    )
-```
-````
-
-````{admonition} **client_send_without_comm_simulation_end(self, client, data_size)**
-Overide this method to complete additional tasks at the end of sening payload using S3 or socket.io.
-
-`data_size` the size of the payload.
-
-**Example:**
-
-```py
-def on_client_send_without_comm_simulation_end(self, client, data_size):
-    logging.info(
-        "[%s] Sent %.2f MB of payload data to the server (simulated).",
-        client,
-        data_size / 1024**2,
-    )
-```
-````
