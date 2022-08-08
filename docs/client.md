@@ -13,21 +13,6 @@ Within the implementation of these callback methods, one can access additional i
 
 To use callbacks, subclass the `ClientCallback` class in `plato.callbacks.client`, and override the following methods:
 
-````{admonition} **on_client_train_start(self, client)**
-Overide this method to complete additional tasks before the local training starts.
-
-**Example:**
-
-```py
-def on_client_train_start(self, client)
-    logging.info(
-        fonts.colourize(
-            f"[{client}] Started training in communication round #{client.current_round}."
-        )
-    )
-```
-````
-
 ````{admonition} **on_client_train_end(self, client)**
 Overide this method to complete additional tasks after the local training ends.
 

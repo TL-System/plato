@@ -398,7 +398,7 @@ class Client:
     async def obtain_model_update(self, wall_time):
         """Retrieving a model update corrsponding to a particular wall clock time."""
 
-    def client_train_start(self, **kwargs):
+    def client_train_end(self, **kwargs):
         """
-        Method called at the start of local training.
+        Method called at the end of local training.
         """

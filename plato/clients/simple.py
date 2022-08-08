@@ -121,8 +121,11 @@ class Client(base.Client):
 
     async def train(self):
         """The machine learning training workload on a client."""
-        self.client_train_start()
-        self.callback_handler.call_event("on_client_train_start", self)
+        logging.info(
+            fonts.colourize(
+                f"[{self}] Started training in communication round #{self.current_round}."
+            )
+        )
 
         # Perform model training
         try:
@@ -175,6 +178,9 @@ class Client(base.Client):
             self.report = Report(
                 self.sampler.trainset_size(), accuracy, training_time, comm_time, False
             )
+
+        self.client_train_end()
+        self.callback_handler.call_event("on_client_train_end", self)
 
         return self.report, weights
 

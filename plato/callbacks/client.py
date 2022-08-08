@@ -15,9 +15,9 @@ class ClientCallback(ABC):
     The abstract base class to be subclassed when creating new client callbacks.
     """
 
-    def on_client_train_start(self, client, **kwargs):
+    def on_client_train_end(self, client, **kwargs):
         """
-        Event called at the start of local training.
+        Event called at the end of local training.
         """
 
 
@@ -26,12 +26,7 @@ class PrintProgressCallback(ClientCallback):
     A callback which prints a message when needed.
     """
 
-    def on_client_train_start(self, client, **kwargs):
+    def on_client_train_end(self, client, **kwargs):
         """
-        Event called at the start of local training.
+        Event called at the end of local training.
         """
-        logging.info(
-            fonts.colourize(
-                f"[{client}] Started training in communication round #{client.current_round}."
-            )
-        )
