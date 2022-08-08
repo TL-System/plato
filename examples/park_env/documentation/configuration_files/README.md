@@ -26,6 +26,7 @@ The other parameters can be answered in the already exisiting documentation abov
 No parameters in this section are actually used in reinforcement learning. However, the reason there are parameters here that exist in the configuration file is due to the fact that Plato requires these to run otherwise there will be a compilation error
 
 ### Trainer:
+```manual_seed:``` This seed is used and set at the start to maintain reproducibility
 ```penalize_omega:``` True or False, when true.. the clients use interference avoidance, when false they do not \
 ```lamda:``` This factor is the factor used to avoid interference. Please note that lamda has a factor of 2 so if lamda is 2 then it's actually one
 **Important Note:** If running multiple jobs say on compute canada or locally at the same time, please make sure that ```max_concurrency``` is >= to the number in ```per_round``` back in the clients section.
@@ -33,8 +34,29 @@ No parameters in this section are actually used in reinforcement learning. Howev
 The other parameters can be answered in the already exisiting documentation above 
 
 ### Algorithm:
+```mode:``` Set it to train to train clients \
+```gamma:``` Reward discounted factor \
+```learning_rate:``` The learning rate used in FedADP \
+```eval_freq:``` Frequency which to evaluate the policy \
+```batch_size:``` batch size to be sampled from memory \
+``` entropy_ratio:``` \
+``` entropy_decay:``` \
+``` entropy_min:``` These and the two above are all entropy ratio hyperparameters \
+```grad_clip_val:``` grad clip hyperparamter \
+```max_round_episodes:``` The number of episodes to run each round
+```difficulty_levels:```
+```traces_per_task:``` This and the difficulty level above are used for curriculum learning **elaborate more?** \
+```save_models:``` save models or no? True for save, False for no \
+```env_name:``` The name of environment \
+```env_park_name:``` The park environment name \
+```algorithm_name:``` The name of the algorithm
 
+### Results:
+```results_dir:``` The path of the results directory \
+```file_name:``` The name of the files \
+```seed_random_path:``` The path of the seed folders
 
+The other parameters can be answered in the already exisiting documentation above
 
 ## Different parameter configurations for each respective algorithm
 
