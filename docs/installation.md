@@ -119,6 +119,6 @@ It goes without saying that the `Python` extension is required to be installed i
 If object detection using the YOLOv5 model and any of the COCO datasets is needed, it is necessary to install YOLOv5 as a Python package first:
 
 ```shell
-cd packages/yolov5
+cd configs
 pip install .
 ```

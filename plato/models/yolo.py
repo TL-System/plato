@@ -16,7 +16,7 @@ class Model(yolo.Model):
     """The YOLOV5 model with cut layer support."""
 
     def __init__(self, num_classes):
-        super().__init__(cfg="yolov5s.yaml", ch=3, nc=num_classes)
+        super().__init__(cfg=Config().trainer.model_config, ch=3, nc=num_classes)
         Config().params["grid_size"] = int(self.stride.max())
 
     def forward_to(self, x, cut_layer=4, profile=False):

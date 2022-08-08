@@ -1,24 +1,38 @@
 clients:
     # Type
-    type: simple
+    type: mistnet
 
     # The total number of clients
-    total_clients: 2
+    total_clients: 1
 
     # The number of clients selected in each round
     per_round: 1
 
     # Should the clients compute test accuracy locally?
-    do_test: true
+    do_test: false
+
+    # Processors for outbound data payloads
+    outbound_processors:
+        - feature_randomized_response
+        - feature_unbatch
+        - outbound_feature_ndarrays
+        - compress
 
 server:
+    type: mistnet
+    ping_timeout: 36000
     address: 127.0.0.1
     port: 8000
+
+    # Processors for inbound data payloads
+    inbound_processors:
+        - decompress
+        - inbound_feature_tensors
 
 data:
     # The training and testing dataset
     datasource: YOLO
-    data_params: ./packages/yolov5/yolov5/data/coco128.yaml
+    data_params: configs/yolov5/data/coco128.yaml
 
     # Where the dataset is located
     data_path: data/COCO
@@ -138,9 +152,6 @@ trainer:
     # The type of the trainer
     type: yolov5
 
-    # test function
-    testtype: map
-
     # The maximum number of training rounds
     rounds: 1
 
@@ -151,16 +162,19 @@ trainer:
     target_accuracy: 0.99
 
     # Number of epoches for local training in each communication round
-    epochs: 10
-    batch_size: 4
-    optimizer: Adam
+    epochs: 500
+    batch_size: 16
+    optimizer: SGD
     linear_lr: false
 
     # The machine learning model
     model_name: yolov5
-    model_config: packages/yolov5/yolov5/models/yolov5s.yaml
-    train_params: packages/yolov5/yolov5/data/hyps/hyp.scratch.yaml
+    model_config: configs/yolov5/models/yolov5s.yaml
+    train_params: configs/yolov5/data/hyps/hyp.scratch.yaml
 
 algorithm:
     # Aggregation algorithm
-    type: fedavg
+    type: mistnet
+
+    cut_layer: 4
+    epsilon: 100
