@@ -1,10 +1,110 @@
-# Deploying a Plato Federated Learning Server with DigitalOcean
+# Deployment Guide
 
-This is a more detailed documentation of deploying a Plato federated learning server in one of the production environments -- DigitalOcean. 
+## General notes on deploying the Plato federated learning server in the cloud
 
-## Prerequisites
+The Plato federated learning server is designed to use Socket.IO over HTTP and HTTPS, and can be easily deployed in a production server environment in the public cloud. 
 
-### Creating your droplet
+To deploy such a production federated learning server in a virtual machine from any public cloud provider, a `nginx` web server will first need to be installed to serve as a reverse proxy server. To install the `nginx` web server in Ubuntu 20.04, follow Step 1 in the guide on [How To Install Linux, Nginx, MySQL, PHP (LEMP stack) on Ubuntu 20.04](https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mysql-php-lemp-stack-on-ubuntu-20-04).
+
+Once `nginx` has been installed and tested, use the following configuration file in `/etc/nginx/sites-available/example.com` (where `example.com` is the domain name for the server):
+
+```
+server {
+    listen      80;
+    listen      443 ssl;
+    server_name example.com www.example.com;
+    root /home/username/example.com;
+    index index.html index.htm index.php;
+
+    ssl_certificate /etc/nginx/ssl/example.cer;
+    ssl_certificate_key /etc/nginx/ssl/example.key;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location /socket.io {
+        proxy_pass http://127.0.0.1:8000/socket.io;
+        proxy_redirect off;
+        proxy_buffering off;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+}
+```
+
+This configuration file assumes that the certificate and private key for establishing a HTTPS connection to the server are stored as `/etc/nginx/ssl/example.cer` and `/etc/nginx/ssl/example.key`, respectively. It also assumes that all static content for the website is stored at `/home/username/example.com`.
+
+If there is a need for using load balancing available from `nginx`, sticky sessions must be used for Socket.IO:
+
+```
+upstream example_servers {
+    ip_hash; # enabling sticky sessions for Socket.IO
+    server 127.0.0.1:8000;
+    server 127.0.0.1:8001;
+}
+
+server {
+    ...
+    location /socket.io {
+        proxy_pass http://example_servers;
+        ...
+    }
+}
+```
+
+After the configuration file is created, create a symbolic link in `/etc/nginx/sites-enabled`:
+
+```shell
+sudo ln -s /etc/nginx/sites-available/example.com /etc/nginx/sites-enabled/
+```
+
+Then test and restart the web server:
+
+```shell
+sudo nginx -t
+sudo systemctl restart nginx
+```
+
+The Plato federated learning server can be started as usual. For example:
+
+```shell
+cd examples
+python custom_server.py
+```
+
+On the clients, make sure that the configuration file contains the correct domain name of the production server deployed in the cloud:
+
+```
+server:
+    address: example.com
+    use_https: true
+```
+
+And then run the clients as usual. For example:
+```shell
+python custom_client.py -i 1
+```
+
+There is no need to specify the port number for production servers deployed in the cloud.
+
+## Deploying a Plato Federated Learning Server with DigitalOcean
+
+Here is some more detailed documentation on deploying a Plato federated learning server in one of the production environments: DigitalOcean. 
+
+### Prerequisites
+
+#### Creating your droplet
 
 First thing first, create an account on [DigitalOcean](https://www.digitalocean.com) if you haven't, and sign in.
 
@@ -24,23 +124,19 @@ $ ssh root@<IP address of your droplet>
 
 Then configure a regular user account by following [this guide](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-20-04).
 
+#### Purchasing a domain name
 
-### Purchasing a domain name
+Purchase a domain name that will be used later. A recommended place to purchase it is [Namecheap](https://namecheap.com), where you can easily search and buy affordable domain names.
 
-Purchase a domain name that will be used later. A recommended place to purchase it is [Namecheap](namecheap.com), where you can easily search and buy affordable domain names.
-
-
-
-## Installing Nginx
+### Installing Nginx
 
 To deploy a production federated learning server in a virtual machine from any public cloud provider, a `nginx` web server will first need to be installed to serve as a reverse proxy server. 
 
 To install the `nginx` web server in Ubuntu 20.04, follow the guide on [How To Install Nginx on Ubuntu 20.04](https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-20-04), including Step 5 – Setting Up Server Blocks (Recommended). It will help you set up a domain, which will be used very soon. 
 
+### Generating SSL certificates 
 
-## Generating SSL certificates 
-
-To generate SSL certificates of your domain name for free, please go to [Cloudflare](cloudflare.com). 
+To generate SSL certificates of your domain name for free, please go to [Cloudflare](https://cloudflare.com). 
 
 Click `Add Site` to add your domain name. They will give you two Cloudflare nameservers. Add these two nameservers as your `CustomDNS` on Namecheap by following [this guideline](https://www.namecheap.com/support/knowledgebase/article.aspx/767/10/how-to-change-dns-for-a-domain/).
 
@@ -62,9 +158,7 @@ Log in to your droplet and copy your `Origin Certificate` and `Private Key` to `
 
 After all of the above-mentioned steps, enter your domain name into your browser's address bar, you should see a padlock symbol at the beginning of the address bar.
 
-
-
-## Adjusting Your Nginx Server for Deploying Plato
+### Adjusting Your Nginx Server for Deploying Plato
 
 Use the following configuration file in `/etc/nginx/sites-available/example.com` (where `example.com` is the domain name for the server):
 
@@ -144,7 +238,7 @@ restart the web server:
 $ sudo systemctl restart nginx
 ```
 
-## Installing Plato with PyTorch
+### Installing Plato with PyTorch
 
 Clone the Plato repository to the desired directory on your server
 
@@ -212,7 +306,7 @@ $ source ~/.bashrc
 Next time, after you SSH into this server, just type `plato`:)
 
 
-## Starting Your Plato Server
+### Starting Your Plato Server
 
 The Plato federated learning server can be started as usual. For example:
 

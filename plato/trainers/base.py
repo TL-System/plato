@@ -16,23 +16,23 @@ class Trainer(ABC):
         self.client_id = 0
 
     def set_client_id(self, client_id):
-        """ Setting the client ID """
+        """Setting the client ID"""
         self.client_id = client_id
 
     @abstractmethod
     def save_model(self, filename=None, location=None):
-        """Saving the model to a file. """
+        """Saving the model to a file."""
         raise TypeError("save_model() not implemented.")
 
     @abstractmethod
     def load_model(self, filename=None, location=None):
-        """Loading pre-trained model weights from a file. """
+        """Loading pre-trained model weights from a file."""
         raise TypeError("load_model() not implemented.")
 
     @staticmethod
     def save_accuracy(accuracy, filename=None):
         """Saving the test accuracy to a file."""
-        model_path = Config().params['model_path']
+        model_path = Config().params["model_path"]
         model_name = Config().trainer.model_name
 
         if not os.path.exists(model_path):
@@ -41,32 +41,32 @@ class Trainer(ABC):
         if filename is not None:
             accuracy_path = f"{model_path}/{filename}"
         else:
-            accuracy_path = f'{model_path}/{model_name}.acc'
+            accuracy_path = f"{model_path}/{model_name}.acc"
 
-        with open(accuracy_path, 'w', encoding='utf-8') as file:
+        with open(accuracy_path, "w", encoding="utf-8") as file:
             file.write(str(accuracy))
 
     @staticmethod
     def load_accuracy(filename=None):
         """Loading the test accuracy from a file."""
-        model_path = Config().params['model_path']
+        model_path = Config().params["model_path"]
         model_name = Config().trainer.model_name
 
         if filename is not None:
             accuracy_path = f"{model_path}/{filename}"
         else:
-            accuracy_path = f'{model_path}/{model_name}.acc'
+            accuracy_path = f"{model_path}/{model_name}.acc"
 
-        with open(accuracy_path, 'r', encoding='utf-8') as file:
+        with open(accuracy_path, "r", encoding="utf-8") as file:
             accuracy = float(file.read())
 
         return accuracy
 
     def pause_training(self):
         """Remove files of running trainers."""
-        if hasattr(Config().trainer, 'max_concurrency'):
+        if hasattr(Config().trainer, "max_concurrency"):
             model_name = Config().trainer.model_name
-            model_path = Config().params['model_path']
+            model_path = Config().params["model_path"]
             model_file = f"{model_path}/{model_name}_{self.client_id}_{Config().params['run_id']}.pth"
             accuracy_file = f"{model_path}/{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
 

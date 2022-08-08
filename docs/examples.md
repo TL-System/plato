@@ -1,4 +1,4 @@
-## Examples of using Plato
+# Examples
 
 The git repository includes a number of examples that showcased how third-party deep learning frameworks can be used, how customized clients and servers can be built, how Plato can be run on Google Colab, and how a collection of federated learning algorithms in the research literature can be implemented using the Plato federated learning framework.
 
