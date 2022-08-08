@@ -440,15 +440,9 @@ The name of the machine learning model. The following options are available:
 - `multilayer`
 
 ```{note}
-If the `model_type` above specified a model repository, supply the name of the model, such as `gpt2` here.
+If the `model_type` above specified a model repository, supply the name of the model, such as `gpt2`, here.
 
-For `resnet_x`, x = 18, 34, 50, 101, or 152
-
-For `vgg_x`, x = 11, 13, 16, or 19
-
-For `squeezenet_x`, x = 0 or 1
-
-For `shufflenet_x`, x = 0.5, 1.0, 1.5, or 2.0
+For `resnet_x`, x = 18, 34, 50, 101, or 152; For `vgg_x`, x = 11, 13, 16, or 19.
 ```
 ````
 
