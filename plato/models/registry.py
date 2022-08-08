@@ -33,7 +33,7 @@ else:
         lenet5,
         dcgan,
         multilayer,
-        yolo,
+        yolov5,
         resnet,
         vgg,
         torch_hub,
@@ -45,7 +45,7 @@ else:
             ("lenet5", lenet5.Model),
             ("dcgan", dcgan.Model),
             ("multilayer", multilayer.Model),
-            ("yolov5", yolo.Model),
+            ("yolov5", yolov5.Model),
         ]
     )
 
