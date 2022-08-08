@@ -370,22 +370,6 @@ class Trainer(base.Trainer):
 
         return accuracy
 
-    async def server_test(self, testset, sampler=None, **kwargs):
-        """Testing the model on the server using the provided test dataset.
-
-        Arguments:
-        testset: The test dataset.
-        sampler: The sampler that extracts a partition of the test dataset.
-        **kwargs (optional): Additional keyword arguments.
-        """
-        config = Config().trainer._asdict()
-        config["run_id"] = Config().params["run_id"]
-
-        self.model.to(self.device)
-        self.model.eval()
-
-        return self.test_model(config, testset, sampler)
-
     def obtain_model_update(self, wall_time):
         """
         Obtain a saved model for a particular epoch that finishes just after the provided

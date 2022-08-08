@@ -167,18 +167,3 @@ class Trainer(base.Trainer):
             accuracy = self.model.evaluate(testset, verbose=0)[1]
 
         return accuracy
-
-    async def server_test(self, testset, sampler=None):
-        """Testing the model on the server using the provided test dataset.
-
-        Arguments:
-        testset: The test dataset.
-        """
-        if not hasattr(Config().trainer, "is_compiled"):
-            self.model.compile(
-                optimizer=tf.keras.optimizers.Adam(Config().trainer.learning_rate),
-                loss=tf.keras.losses.SparseCategoricalCrossentropy(),
-                metrics=[tf.keras.metrics.SparseCategoricalAccuracy()],
-            )
-
-        return self.test(testset, sampler)

@@ -9,6 +9,7 @@ from plato.utils import unary_encoding
 
 class Trainer(base.Trainer):
     """A trainer for NNRT."""
+
     def __init__(self, model=None):
         super().__init__()
 
@@ -27,9 +28,6 @@ class Trainer(base.Trainer):
     def test(self, testset) -> float:
         pass
 
-    async def server_test(self, testset):
-        pass
-
     def randomize(self, bit_array: np.ndarray, targets: np.ndarray, epsilon):
         """
         The object detection unary encoding method.
@@ -40,16 +38,17 @@ class Trainer(base.Trainer):
         targets_new = copy.deepcopy(targets)
         for i in range(targets_new.shape[1]):
             box = self.convert(bit_array.shape[2:], targets_new[0][i][2:])
-            img[:, :, box[0]:box[2],
-                box[1]:box[3]] = label[:, :, box[0]:box[2], box[1]:box[3]]
+            img[:, :, box[0] : box[2], box[1] : box[3]] = label[
+                :, :, box[0] : box[2], box[1] : box[3]
+            ]
         return img
 
     def convert(self, size, box):
         """The convert for YOLOv5.
-              Arguments:
-                  size: Input feature size(w,h)
-                  box:(xmin,xmax,ymin,ymax).
-              """
+        Arguments:
+            size: Input feature size(w,h)
+            box:(xmin,xmax,ymin,ymax).
+        """
         x = box[0]
         y = box[1]
         w = box[2]

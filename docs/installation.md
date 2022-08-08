@@ -113,12 +113,3 @@ When working in Visual Studio Code as your development environment, two of our c
 It goes without saying that the `Python` extension is required to be installed in Visual Studio Code, which represents Microsoft's modern language server for Python.
 
 ````
-
-## Installing YOLOv5 as a Python package
-
-If object detection using the YOLOv5 model and any of the COCO datasets is needed, it is necessary to install YOLOv5 as a Python package first:
-
-```shell
-cd configs
-pip install .
-```
