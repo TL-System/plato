@@ -110,6 +110,7 @@ class Server(fedavg.Server):
     def selecting_clients(self):
         """Selecting clients in asynchronous or synchronous mode."""
         unselectable_clients = []
+        sample_size = self.clients_per_round
 
         # In asychronous FL, avoid selecting new clients to replace those that are still
         # training at this time
