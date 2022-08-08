@@ -416,54 +416,7 @@ class Server:
             self.server_selection_start()
             self.callback_handler.call_event("on_server_selection_start", self)
 
-            # In asychronous FL, avoid selecting new clients to replace those that are still
-            # training at this time
-
-            # When simulating the wall clock time, if len(self.reported_clients) is 0, the
-            # server has aggregated all reporting clients already
-            if (
-                self.asynchronous_mode
-                and self.selected_clients is not None
-                and len(self.reported_clients) > 0
-                and len(self.reported_clients) < self.clients_per_round
-            ):
-                # If self.selected_clients is None, it implies that it is the first iteration;
-                # If len(self.reported_clients) == self.clients_per_round, it implies that
-                # all selected clients have already reported.
-
-                # Except for these two cases, we need to exclude the clients who are still
-                # training.
-                training_client_ids = [
-                    self.training_clients[client_id]["id"]
-                    for client_id in list(self.training_clients.keys())
-                ]
-
-                # If the server is simulating the wall clock time, some of the clients who
-                # reported may not have been aggregated; they should be excluded from the next
-                # round of client selection
-                reporting_client_ids = [
-                    client[2]["client_id"] for client in self.reported_clients
-                ]
-
-                selectable_clients = [
-                    client
-                    for client in self.clients_pool
-                    if client not in training_client_ids
-                    and client not in reporting_client_ids
-                ]
-
-                if self.simulate_wall_time:
-                    self.selected_clients = self.choose_clients(
-                        selectable_clients, len(self.current_processed_clients)
-                    )
-                else:
-                    self.selected_clients = self.choose_clients(
-                        selectable_clients, len(self.reported_clients)
-                    )
-            else:
-                self.selected_clients = self.choose_clients(
-                    self.clients_pool, self.clients_per_round
-                )
+            self.selecting_clients()
 
             self.server_selection_end()
             self.callback_handler.call_event("on_server_selection_end", self)
@@ -620,6 +573,57 @@ class Server:
                     )
 
                     await self.send(sid, payload, selected_client_id)
+
+    def selecting_clients(self):
+        """Selecting clients in asynchronous or synchronous mode."""
+        # In asychronous FL, avoid selecting new clients to replace those that are still
+        # training at this time
+
+        # When simulating the wall clock time, if len(self.reported_clients) is 0, the
+        # server has aggregated all reporting clients already
+        if (
+            self.asynchronous_mode
+            and self.selected_clients is not None
+            and len(self.reported_clients) > 0
+            and len(self.reported_clients) < self.clients_per_round
+        ):
+            # If self.selected_clients is None, it implies that it is the first iteration;
+            # If len(self.reported_clients) == self.clients_per_round, it implies that
+            # all selected clients have already reported.
+
+            # Except for these two cases, we need to exclude the clients who are still
+            # training.
+            training_client_ids = [
+                self.training_clients[client_id]["id"]
+                for client_id in list(self.training_clients.keys())
+            ]
+
+            # If the server is simulating the wall clock time, some of the clients who
+            # reported may not have been aggregated; they should be excluded from the next
+            # round of client selection
+            reporting_client_ids = [
+                client[2]["client_id"] for client in self.reported_clients
+            ]
+
+            selectable_clients = [
+                client
+                for client in self.clients_pool
+                if client not in training_client_ids
+                and client not in reporting_client_ids
+            ]
+
+            if self.simulate_wall_time:
+                self.selected_clients = self.choose_clients(
+                    selectable_clients, len(self.current_processed_clients)
+                )
+            else:
+                self.selected_clients = self.choose_clients(
+                    selectable_clients, len(self.reported_clients)
+                )
+        else:
+            self.selected_clients = self.choose_clients(
+                self.clients_pool, self.clients_per_round
+            )
 
     def choose_clients(self, clients_pool, clients_count):
         """Choose a subset of the clients to participate in each round."""
