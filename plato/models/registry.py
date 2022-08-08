@@ -82,7 +82,14 @@ def get():
                     if hasattr(Config().trainer, "num_classes")
                     else 10
                 )
-                model = registered_model(num_classes=num_classes)
+
+                cut_layer = None
+
+                if hasattr(Config().algorithm, "cut_layer"):
+                    # Initialize the model with the cut_layer set, so that all the training
+                    # will only use the layers after the cut_layer
+                    cut_layer = Config().algorithm.cut_layer
+                model = registered_model(num_classes=num_classes, cut_layer=cut_layer)
 
         if model is None:
             for name, registered_factory in registered_factories.items():
