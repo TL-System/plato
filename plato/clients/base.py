@@ -344,7 +344,7 @@ class Client:
             await self.sio.emit("client_payload_done", metadata)
 
             logging.info(
-                "[%s] Sent %.2f MB of payload data to the server (simulated).",
+                "[%s] Sent %.2f MB of payload data to the server.",
                 self,
                 data_size / 1024**2,
             )
