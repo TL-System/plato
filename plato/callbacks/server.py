@@ -32,7 +32,7 @@ class ServerCallback(ABC):
 
 class PrintProgressCallback(ServerCallback):
     """
-    A callback which prints a message at the start of each epoch, and at the end of each step.
+    A callback which prints a message when needed.
     """
 
     def on_server_selection_start(self, server, **kwargs):
