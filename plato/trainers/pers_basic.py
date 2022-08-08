@@ -756,7 +756,7 @@ class Trainer(basic.Trainer):
 
             # Define the training and logging information
             # default not to perform any logging
-            pers_epochs = Config().trainer.pers_epochs
+            pers_epochs = config['pers_epochs']
 
             # epoch loss tracker
             epoch_loss_meter = optimizers.AverageMeter(name='Loss')
