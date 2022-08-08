@@ -72,17 +72,13 @@ class Server(fedavg.Server):
         ]
         self.client_utilities = {num: 0 for num in range(1, self.total_clients + 1)}
 
-    async def aggregate_weights(self, updates):
-        """Aggregate the reported weight updates from the selected clients."""
-        deltas = await self.federated_averaging(updates)
-        self.update_clients(updates)
-        updated_weights = self.algorithm.update_weights(deltas)
-        self.algorithm.load_weights(updated_weights)
+    def weights_aggregated(self, updates):
+        """
+        Method called at the end of aggregating received weights.
+        Extract statistical utility, training times and adjusts desired round duration.
+        """
 
-    def update_clients(self, updates):
-        """Extract statistical utility, training times and adjusts desired round duration."""
-
-        # Extract statistical utility and local training times.
+        # Extract statistical utility and local training times
         for (client_id, report, __, __) in updates:
             self.client_utilities[client_id] = report.statistics_utility
             self.client_durations[client_id - 1] = report.training_time
@@ -102,7 +98,7 @@ class Server(fedavg.Server):
             if last_pacer_rounds > current_pacer_rounds:
                 self.desired_duration += self.pacer_step
 
-        # Blacklist clients who have been selected 10 times.
+        # Blacklist clients who have been selected self.blacklist_num times
         for (client_id, __, __, __) in updates:
             if self.times_selected[client_id] > self.blacklist_num:
                 self.blacklist.append(client_id)
