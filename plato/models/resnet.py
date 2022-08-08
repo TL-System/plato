@@ -1,15 +1,14 @@
 """
-The ResNet model.
+The ResNet model (for the CIFAR-10 dataset only).
 
 Reference:
+
 https://github.com/kuangliu/pytorch-cifar/blob/master/models/resnet.py
 """
 import collections
 
 import torch.nn as nn
 import torch.nn.functional as F
-
-from plato.config import Config
 
 
 class BasicBlock(nn.Module):
@@ -166,8 +165,9 @@ class Model(nn.Module):
 
     @staticmethod
     def get(model_name=None, num_classes=None, **kwargs):
+        """Returns a suitable ResNet model according to its type."""
         if not Model.is_valid_model_type(model_name):
-            raise ValueError("Invalid Resnet model name: {}".format(model_name))
+            raise ValueError(f"Invalid Resnet model name: {model_name}")
 
         resnet_type = int(model_name.split("_")[1])
 
@@ -184,3 +184,5 @@ class Model(nn.Module):
             return Model(Bottleneck, [3, 4, 23, 3], num_classes)
         elif resnet_type == 152:
             return Model(Bottleneck, [3, 8, 36, 3], num_classes)
+
+        return None
