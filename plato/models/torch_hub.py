@@ -6,11 +6,14 @@ import torch
 
 
 class Model:
-    """The model loaded from PyTorch Hub."""
+    """
+    The model loaded from PyTorch Hub.
+
+    We will soon be using the get_model() method for torchvision 0.14 when it is released.
+    """
 
     @staticmethod
-    def get(model_name=None, num_classes=None, pretrained=False):
-        weights = None
-        if pretrained:
-            weights = None
-        return torch.hub.load("pytorch/vision", model_name, weights=weights)
+    # pylint: disable=unused-argument
+    def get(model_name=None, **kwargs):
+        """Returns a named model from PyTorch Hub."""
+        return torch.hub.load("pytorch/vision", model_name)

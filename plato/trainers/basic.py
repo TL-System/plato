@@ -145,8 +145,8 @@ class Trainer(base.Trainer):
 
         if "max_concurrency" in config:
             self.model.cpu()
-            model_type = config["model_name"]
-            filename = f"{model_type}_{self.client_id}_{config['run_id']}.pth"
+            model_name = config["model_name"]
+            filename = f"{model_name}_{self.client_id}_{config['run_id']}.pth"
             self.save_model(filename)
 
     def train_model(self, config, trainset, sampler, cut_layer):
@@ -384,7 +384,7 @@ class Trainer(base.Trainer):
         self.model.to(self.device)
         self.model.eval()
 
-        return await self.server_test_model(config, testset, sampler)
+        return self.test_model(config, testset, sampler)
 
     def obtain_model_update(self, wall_time):
         """
@@ -469,44 +469,6 @@ class Trainer(base.Trainer):
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
-
-        return correct / total
-
-    async def server_test_model(self, config, testset, sampler):
-        """
-        Evaluates the model with the provided test dataset and test sampler. To be used on the
-        server as it yields to the other asyncio threads after each step of testing.
-
-        :param testset: the test dataset.
-        :param sampler: the test sampler.
-        """
-        batch_size = config["batch_size"]
-
-        if sampler is None:
-            test_loader = torch.utils.data.DataLoader(
-                testset, batch_size=batch_size, shuffle=False
-            )
-        else:
-            # Use a testing set following the same distribution as the training set
-            test_loader = torch.utils.data.DataLoader(
-                testset, batch_size=batch_size, shuffle=False, sampler=sampler.get()
-            )
-
-        correct = 0
-        total = 0
-
-        with torch.no_grad():
-            for examples, labels in test_loader:
-                examples, labels = examples.to(self.device), labels.to(self.device)
-
-                outputs = self.model(examples)
-
-                _, predicted = torch.max(outputs.data, 1)
-                total += labels.size(0)
-                correct += (predicted == labels).sum().item()
-
-                # Yield to other tasks in the server
-                await asyncio.sleep(0)
 
         return correct / total
 

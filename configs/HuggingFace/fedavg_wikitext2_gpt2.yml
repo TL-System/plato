@@ -55,8 +55,8 @@ trainer:
     weight_decay: 0.0
 
     # The machine learning model
-    model_name: HuggingFace_CausalLM
-    model_checkpoint: gpt2
+    model_type: huggingface
+    model_name: gpt2
 
 algorithm:
     # Aggregation algorithm
