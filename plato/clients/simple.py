@@ -7,6 +7,8 @@ import time
 from dataclasses import dataclass
 
 from plato.algorithms import registry as algorithms_registry
+from plato.callbacks.handler import CallbackHandler
+from plato.callbacks.client import PrintProgressCallback
 from plato.clients import base
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
@@ -27,7 +29,9 @@ class Report(base.Report):
 class Client(base.Client):
     """A basic federated learning client who sends simple weight updates."""
 
-    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
+    def __init__(
+        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+    ):
         super().__init__()
         self.custom_model = model
         self.model = None
@@ -47,6 +51,12 @@ class Client(base.Client):
         self.testset_sampler = None  # Sampler for the test set
 
         self.report = None
+
+        # Starting from the default client callback class, add all supplied server callbacks
+        self.callbacks = [PrintProgressCallback]
+        if callbacks is not None:
+            self.callbacks.extend(callbacks)
+        self.callback_handler = CallbackHandler(self.callbacks)
 
     def configure(self) -> None:
         """Prepare this client for training."""
@@ -121,11 +131,8 @@ class Client(base.Client):
 
     async def train(self):
         """The machine learning training workload on a client."""
-        logging.info(
-            fonts.colourize(
-                f"[{self}] Started training in communication round #{self.current_round}."
-            )
-        )
+        self.client_train_start()
+        self.callback_handler.call_event("on_client_train_start", self)
 
         # Perform model training
         try:
@@ -177,6 +184,9 @@ class Client(base.Client):
                 self.sampler.trainset_size(), accuracy, training_time, comm_time, False
             )
 
+        self.client_train_end(self.report)
+        self.callback_handler.call_event("on_client_train_end", self, self.report)
+
         return self.report, weights
 
     async def obtain_model_update(self, wall_time):
@@ -195,3 +205,13 @@ class Client(base.Client):
     def load_model(self, model_checkpoint):
         """Loading the model from a model checkpoint."""
         self.trainer.load_model(model_checkpoint)
+
+    def client_train_start(self, **kwargs):
+        """
+        Method called at the start of local training.
+        """
+
+    def client_train_end(self, report, **kwargs):
+        """
+        Method called at the end of local training.
+        """
