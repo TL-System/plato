@@ -28,21 +28,6 @@ from plato.utils import data_loaders_wrapper
 class Trainer(pers_basic.Trainer):
     """A personalized federated learning trainer using the APFL algorithm."""
 
-    def obtain_encoded_data(self, defined_model, pers_train_loader,
-                            test_loader):
-        # encoded data
-        train_encoded = list()
-        train_labels = list()
-        test_outputs = {}
-        for _, (examples, labels) in enumerate(pers_train_loader):
-            examples, labels = examples.to(self.device), labels.to(self.device)
-            features = defined_model.encoder(examples)
-            train_encoded.append(features)
-            train_labels.append(labels)
-        test_outputs = self.perform_test_op(test_loader, defined_model)
-
-        return train_encoded, train_labels, test_outputs
-
     def load_alpha(self, current_round, epoch, run_id=None):
 
         filename, cpk_oper = perform_client_checkpoint_loading(
@@ -215,7 +200,7 @@ class Trainer(pers_basic.Trainer):
         current_round = kwargs['current_round']
         run_id = config['run_id']
         epochs = config['epochs']
-
+        config['current_round'] = current_round
         # obtained the saved alpha in the previous round
         initial_alpha = config['alpha']
         is_adaptive_alpha = config['is_adaptive_alpha']
@@ -341,18 +326,16 @@ class Trainer(pers_basic.Trainer):
                 model_name=model_type,
                 model_state_dict=self.model.state_dict(),
                 config=config,
-                kwargs=kwargs,
                 optimizer_state_dict=optimizer.state_dict(),
                 lr_schedule_state_dict=lr_schedule.state_dict(),
                 present_epoch=None,
                 base_epoch=lr_schedule_base_epoch + epochs)
 
-            current_round = kwargs['current_round']
-            if current_round >= Config().trainer.rounds:
+            if current_round >= config['rounds']:
                 target_dir = Config().params['model_path']
             else:
                 target_dir = Config().params['checkpoint_path']
-            personalized_model_name = Config().trainer.personalized_model_name
+            personalized_model_name = config['personalized_model_name']
             save_location = os.path.join(target_dir,
                                          "client_" + str(self.client_id))
             filename = get_format_name(client_id=self.client_id,
@@ -365,7 +348,7 @@ class Trainer(pers_basic.Trainer):
             self.save_personalized_model(filename=filename,
                                          location=save_location)
 
-    def perform_test_op(self, test_loader, defined_model):
+    def perform_evaluation_op(self, to_eval_data_loader, defined_model):
 
         # Define the test phase of the eval stage
         acc_meter = optimizers.AverageMeter(name='Accuracy')
@@ -373,11 +356,11 @@ class Trainer(pers_basic.Trainer):
         defined_model.to(self.device)
         correct = 0
 
-        test_encoded = list()
-        test_labels = list()
+        encoded_samples = list()
+        loaded_labels = list()
 
         acc_meter.reset()
-        for _, (examples, labels) in enumerate(test_loader):
+        for _, (examples, labels) in enumerate(to_eval_data_loader):
             examples, labels = examples.to(self.device), labels.to(self.device)
             with torch.no_grad():
                 # preds = self.personalized_model(examples).argmax(dim=1)
@@ -388,18 +371,54 @@ class Trainer(pers_basic.Trainer):
                 correct = (preds == labels).sum().item()
                 acc_meter.update(correct / preds.shape[0], labels.size(0))
 
-                test_encoded.append(features)
-                test_labels.append(labels)
+                encoded_samples.append(features)
+                loaded_labels.append(labels)
 
         accuracy = acc_meter.avg
 
         test_outputs = {
             "accuracy": accuracy,
-            "test_encoded": test_encoded,
-            "test_labels": test_labels
+            "encoded_samples": encoded_samples,
+            "loaded_labels": loaded_labels
         }
 
         return test_outputs
+
+    def on_start_pers_train(
+        self,
+        defined_model,
+        model_name,
+        data_loader,
+        epoch,
+        global_epoch,
+        config,
+        optimizer,
+        lr_schedule,
+        **kwargs,
+    ):
+        """ The customize behavior before performing one epoch of personalized training.
+            By default, we need to save the encoded data, the accuracy, and the model when possible.
+        """
+        current_round = config['current_round']
+
+        eval_outputs = self.perform_evaluation_op(data_loader, defined_model)
+
+        # save the personaliation accuracy to the results dir
+        self.checkpoint_personalized_accuracy(
+            accuracy=eval_outputs["accuracy"],
+            current_round=current_round,
+            epoch=epoch,
+            run_id=None)
+
+        self.checkpoint_encoded_samples(
+            encoded_samples=eval_outputs['encoded_samples'],
+            encoded_labels=eval_outputs['loaded_labels'],
+            current_round=current_round,
+            epoch=epoch,
+            run_id=None,
+            encoded_type="testEncoded")
+
+        return eval_outputs, None
 
     def pers_train_model(
         self,
@@ -431,7 +450,8 @@ class Trainer(pers_basic.Trainer):
         # from the server when testing fails
         accuracy = -1
         current_round = kwargs['current_round']
-
+        config['current_round'] = current_round
+        personalized_model_name = config['personalized_model_name']
         try:
             assert "testset" in kwargs and "testset_sampler" in kwargs
             testset = kwargs['testset']
@@ -442,38 +462,17 @@ class Trainer(pers_basic.Trainer):
                 shuffle=False,
                 sampler=testset_sampler.get())
 
-            pers_train_loader = torch.utils.data.DataLoader(
-                trainset,
-                batch_size=config['pers_batch_size'],
-                shuffle=False,
-                sampler=sampler.get())
-            # also record the encoded data in the first epoch
-
-            train_encoded, train_labels, test_outputs = self.obtain_encoded_data(
-                self.personalized_model, pers_train_loader, test_loader)
-
-            self.checkpoint_encoded_samples(encoded_samples=train_encoded,
-                                            encoded_labels=train_labels,
-                                            current_round=current_round,
-                                            epoch=None,
-                                            run_id=None,
-                                            encoded_type="trainEncoded")
-            self.checkpoint_encoded_samples(
-                encoded_samples=test_outputs["test_encoded"],
-                encoded_labels=test_outputs["test_labels"],
-                current_round=current_round,
-                epoch=None,
-                run_id=None,
-                encoded_type="testEncoded")
-
-            accuracy = test_outputs["accuracy"]
-
-            # save the personaliation accuracy to the results dir
-            self.checkpoint_personalized_accuracy(
-                accuracy=accuracy,
-                current_round=kwargs['current_round'],
+            eval_outputs, _ = self.on_start_pers_train(
+                defined_model=self.personalized_model,
+                model_name=personalized_model_name,
+                data_loader=test_loader,
                 epoch=0,
-                run_id=None)
+                global_epoch=0,
+                config=config,
+                optimizer=None,
+                lr_schedule=None,
+            )
+            accuracy = eval_outputs["accuracy"]
 
         except Exception as testing_exception:
             logging.info("Personalization Learning on client #%d failed.",
