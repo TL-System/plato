@@ -26,13 +26,13 @@ def on_weights_aggregated(self, server, updates):
 ```
 ````
 
-````{admonition} **on_server_close_start(self, server)**
+````{admonition} **on_server_will_close(self, server)**
 Overide this method to complete additional tasks before closing the server.
 
 **Example:**
 
 ```py
-def on_server_close_start(self, server):
+def on_server_will_close(self, server):
     logging.info("[Server #%s] Closing the server.", os.getpid())
 ```
 ````

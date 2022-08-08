@@ -1219,8 +1219,8 @@ class Server:
         logging.info("[%s] Training concluded.", self)
         self.trainer.save_model()
 
-        self.server_close_start()
-        self.callback_handler.call_event("on_server_close_start", self)
+        self.server_will_close()
+        self.callback_handler.call_event("on_server_will_close", self)
 
         await self.close_connections()
         os._exit(0)
@@ -1237,12 +1237,7 @@ class Server:
     async def process_reports(self) -> None:
         """Process a client report."""
 
-    def weights_aggregated(self, updates):
-        """
-        Method called at the end of aggregating received weights.
-        """
-
-    def server_close_start(self):
+    def server_will_close(self):
         """
         Method called at the start of closing the start.
         """

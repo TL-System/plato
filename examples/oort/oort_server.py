@@ -253,7 +253,7 @@ class Server(fedavg.Server):
 
         return total
 
-    def server_close_start(self):
+    def server_will_close(self):
         """
         Method called at the start of closing the server.
         """

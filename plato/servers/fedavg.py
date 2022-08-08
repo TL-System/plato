@@ -271,3 +271,8 @@ class Server(base.Server):
     def customize_server_payload(self, payload):
         """Customize the server payload before sending to the client."""
         return payload
+
+    def weights_aggregated(self, updates):
+        """
+        Method called at the end of aggregating received weights.
+        """

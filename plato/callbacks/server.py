@@ -19,7 +19,7 @@ class ServerCallback(ABC):
         Event called at the end of aggregating received weights.
         """
 
-    def on_server_close_start(self, server, **kwargs):
+    def on_server_will_close(self, server, **kwargs):
         """
         Event called at the start of closing the server.
         """
@@ -36,7 +36,7 @@ class PrintProgressCallback(ServerCallback):
         """
         logging.info("[Server #%s] Finished aggregating weights.", os.getpid())
 
-    def on_server_close_start(self, server, **kwargs):
+    def on_server_will_close(self, server, **kwargs):
         """
         Event called at the start of closing the server.
         """
