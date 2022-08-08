@@ -14,14 +14,9 @@ class ServerCallback(ABC):
     The abstract base class to be subclassed when creating new server callbacks.
     """
 
-    def on_server_selection_start(self, server, **kwargs):
+    def on_weights_aggregated(self, server, updates, **kwargs):
         """
-        Event called at the start of selecting clients.
-        """
-
-    def on_server_selection_end(self, server, **kwargs):
-        """
-        Event called at the end of selecting clients.
+        Event called at the end of aggregating received weights.
         """
 
     def on_server_close_start(self, server, **kwargs):
@@ -35,11 +30,11 @@ class PrintProgressCallback(ServerCallback):
     A callback which prints a message when needed.
     """
 
-    def on_server_selection_start(self, server, **kwargs):
+    def on_weights_aggregated(self, server, updates, **kwargs):
         """
-        Event called at the start of selecting clients.
+        Event called at the end of aggregating received weights.
         """
-        logging.info("[Server #%s] Selecting clients.", os.getpid())
+        logging.info("[Server #%s] Finished aggregating weights.", os.getpid())
 
     def on_server_close_start(self, server, **kwargs):
         """

@@ -413,13 +413,7 @@ class Server:
             elif not Config().is_edge_server():
                 self.clients_pool = list(range(1, 1 + self.total_clients))
 
-            self.server_selection_start()
-            self.callback_handler.call_event("on_server_selection_start", self)
-
             self.selecting_clients()
-
-            self.server_selection_end()
-            self.callback_handler.call_event("on_server_selection_end", self)
 
             self.current_reported_clients = {}
             self.current_processed_clients = {}
@@ -1243,14 +1237,9 @@ class Server:
     async def process_reports(self) -> None:
         """Process a client report."""
 
-    def server_selection_start(self, **kwargs):
+    def weights_aggregated(self, updates):
         """
-        Method called at the start of selecting clients.
-        """
-
-    def server_selection_end(self, **kwargs):
-        """
-        Method called at the end of selecting clients.
+        Method called at the end of aggregating received weights.
         """
 
     def server_close_start(self):

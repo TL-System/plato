@@ -13,19 +13,17 @@ Within the implementation of these callback methods, one can access additional i
 
 To use callbacks, subclass the `ServerCallback` class in `plato.callbacks.server`, and override the following methods:
 
-````{admonition} **on_server_selection_start(self, server)**
-Overide this method to complete additional tasks before selecting clients.
+````{admonition} **on_weights_aggregated(self, server, updates)**
+Overide this method to complete additional tasks after aggregating weights.
+
+`updates` the aggregated updates.
 
 **Example:**
 
 ```py
-def on_server_selection_start(self, server):
-    logging.info("[Server #%s] Selecting clients.", os.getpid())
+def on_weights_aggregated(self, server, updates):
+    logging.info("[Server #%s] Finished aggregating weights.", os.getpid())
 ```
-````
-
-````{admonition} **on_server_selection_end(self, server)**
-Overide this method to complete additional tasks at the end of client selection.
 ````
 
 ````{admonition} **on_server_close_start(self, server)**
