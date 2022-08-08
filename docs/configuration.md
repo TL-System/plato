@@ -412,12 +412,17 @@ When using `diff_privacy` trainer, set to 0.
 ````
 
 ```{admonition} lr_schedule
-The earning rate scheduler. The following options are available:
+The learning rate scheduler. The following options are available:
 
 - `CosineAnnealingLR`
 - `LambdaLR`
 - `StepLR`
 - `ReduceLROnPlateau`
+```
+
+```{admonition} global_lr_scheduler
+Whether the learning rate should be scheduled globally (`true`) or not (`false`).
+If `true`, the learning rate of the first epoch in the next communication round is scheduled based on that of the last epoch in the previous communication round.
 ```
 
 ````{admonition} **model_name**
