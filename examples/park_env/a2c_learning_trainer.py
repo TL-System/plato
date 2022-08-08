@@ -172,7 +172,7 @@ class Trainer(basic.Trainer):
         self.seed_path = f'{Config().results.seed_random_path}_seed_{Config().server.random_seed}/{seed_file_name}'
         
         if not os.path.exists(self.seed_path):
-            #for reproduciability
+            #for reproducibility
             torch.manual_seed(Config().trainer.manual_seed)
         else:
             #Restore seeds from previous round
@@ -494,7 +494,6 @@ class Trainer(basic.Trainer):
             self.actor_old = deepcopy(self.actor)
             self.critic_old = deepcopy(self.critic)
 
-            #unsure if we need these
             self.adam_actor = torch.optim.Adam(self.actor.parameters(), lr=Config().algorithm.learning_rate)
             self.adam_critic = torch.optim.Adam(self.critic.parameters(), lr=Config().algorithm.learning_rate)
 
