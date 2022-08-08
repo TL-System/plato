@@ -4,29 +4,29 @@ from pathlib import Path
 
 import numpy as np
 import torch
-from torch import nn, optim
-from torch.optim import lr_scheduler
-from torch.cuda import amp
 import yaml
+
+from torch import nn, optim
+from torch.cuda import amp
+from torch.optim import lr_scheduler
 from tqdm import tqdm
-
-from plato.config import Config
-from plato.datasources import yolo
-from plato.trainers import basic
-from plato.utils import unary_encoding
-
 from yolov5.utils.general import (
     NCOLS,
     box_iou,
     check_dataset,
-    one_cycle,
     non_max_suppression,
+    one_cycle,
     scale_coords,
     xywh2xyxy,
 )
 from yolov5.utils.loss import ComputeLoss
 from yolov5.utils.metrics import ap_per_class
 from yolov5.utils.torch_utils import time_sync
+
+from plato.config import Config
+from plato.datasources import yolo
+from plato.trainers import basic
+from plato.utils import unary_encoding
 
 
 class Trainer(basic.Trainer):
@@ -282,7 +282,7 @@ class Trainer(basic.Trainer):
 
         # Configure
         self.model.eval()
-        with open(Config().data.data_params) as f:
+        with open(Config().data.data_params, encoding="utf-8") as f:
             data = yaml.load(f, Loader=yaml.SafeLoader)  # model dict
         check_dataset(data)  # check
         nc = Config().data.num_classes  # number of classes
