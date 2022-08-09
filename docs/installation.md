@@ -40,7 +40,7 @@ pip install plato-learn
 
 After *Plato* is installed, you can try to run any of the examples in `examples/`.
 
-### Installing Plato for development with PyTorch
+## Installing Plato for development
 
 If you wish to modify the source code in *Plato* (rather than just using it as a framework), first clone this repository to a desired directory.
 
@@ -50,11 +50,16 @@ We will need to install several packages using `pip` as well:
 pip install -r requirements.txt --upgrade
 ```
 
+We will need to install both [PyLint](https://en.wikipedia.org/wiki/Pylint) and [Black](https://github.com/psf/black) (the official Python formatter in Plato):
+
+```shell
+pip install black pylint
+```
+
 Finally, we will install the current GitHub version of *Plato* as a local pip package:
 
 ```shell
 pip install .
-pip install black pylint
 ```
 
 ````{tip}
