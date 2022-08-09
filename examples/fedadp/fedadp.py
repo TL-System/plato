@@ -12,7 +12,7 @@ import fedadp_server
 
 
 def main():
-    """ A Plato federated learning training session using the FedAdp algorithm. """
+    """A federated learning training session using the FedAdp algorithm."""
     server = fedadp_server.Server()
     server.run()
 

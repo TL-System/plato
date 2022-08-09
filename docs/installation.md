@@ -15,7 +15,7 @@ where `plato` is the preferred name of your new environment.
 The next step is to install the required Python packages. PyTorch should be installed following the advice of its [getting started website](https://pytorch.org/get-started/locally/). The typical command in Linux with CUDA GPU support, for example, would be:
 
 ```shell
-pip3 install torch torchvision --extra-index-url https://download.pytorch.org/whl/cu113
+pip3 install torch torchvision --extra-index-url https://download.pytorch.org/whl/cu116
 ```
 
 The CUDA version, used in the command above, can be obtained on Ubuntu Linux systems by using the command:
@@ -40,7 +40,7 @@ pip install plato-learn
 
 After *Plato* is installed, you can try to run any of the examples in `examples/`.
 
-### Installing Plato for development with PyTorch
+## Installing Plato for development
 
 If you wish to modify the source code in *Plato* (rather than just using it as a framework), first clone this repository to a desired directory.
 
@@ -50,11 +50,16 @@ We will need to install several packages using `pip` as well:
 pip install -r requirements.txt --upgrade
 ```
 
+We will need to install both [PyLint](https://en.wikipedia.org/wiki/Pylint) and [Black](https://github.com/psf/black) (the official Python formatter in Plato):
+
+```shell
+pip install black pylint
+```
+
 Finally, we will install the current GitHub version of *Plato* as a local pip package:
 
 ```shell
 pip install .
-pip install black pylint
 ```
 
 ````{tip}
@@ -113,12 +118,3 @@ When working in Visual Studio Code as your development environment, two of our c
 It goes without saying that the `Python` extension is required to be installed in Visual Studio Code, which represents Microsoft's modern language server for Python.
 
 ````
-
-## Installing YOLOv5 as a Python package
-
-If object detection using the YOLOv5 model and any of the COCO datasets is needed, it is necessary to install YOLOv5 as a Python package first:
-
-```shell
-cd packages/yolov5
-pip install .
-```
