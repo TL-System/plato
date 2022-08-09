@@ -1,10 +1,14 @@
 """The YOLOV5 model for PyTorch."""
 
+import logging
+
+from plato.config import Config
+
 from yolov5.models import yolo
 from yolov5.models.common import *
 from yolov5.models.experimental import *
 
-from plato.config import Config
+logging.getLogger().handlers.clear()
 
 try:
     import thop  # for FLOPS computation

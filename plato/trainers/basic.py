@@ -8,6 +8,7 @@ import re
 import time
 
 import torch
+
 from plato.config import Config
 from plato.models import registry as models_registry
 from plato.trainers import base

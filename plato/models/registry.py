@@ -5,7 +5,6 @@ Having a registry of all available classes is convenient for retrieving an insta
 based on a configuration at run-time.
 """
 from collections import OrderedDict
-
 from plato.config import Config
 
 if hasattr(Config().trainer, "use_mindspore"):

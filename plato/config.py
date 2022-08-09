@@ -115,6 +115,7 @@ class Config:
             logging.basicConfig(
                 format="[%(levelname)s][%(asctime)s]: %(message)s", datefmt="%H:%M:%S"
             )
+
             root_logger = logging.getLogger()
             root_logger.setLevel(numeric_level)
 
