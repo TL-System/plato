@@ -32,7 +32,6 @@ else:
         lenet5,
         dcgan,
         multilayer,
-        yolov5,
         resnet,
         vgg,
         torch_hub,
@@ -44,7 +43,6 @@ else:
             ("lenet5", lenet5.Model),
             ("dcgan", dcgan.Model),
             ("multilayer", multilayer.Model),
-            ("yolov5", yolov5.Model),
         ]
     )
 
@@ -96,6 +94,16 @@ def get():
                     model_name=model_name,
                     num_classes=num_classes,
                 )
+
+    if model_name == "yolov5":
+        from plato.models import yolov5
+
+        cut_layer = (
+            Config().algorithm.cut_layer
+            if hasattr(Config().algorithm, "cut_layer")
+            else None
+        )
+        model = yolov5.Model(num_classes=Config().data.num_classes, cut_layer=None)
 
     if model is None:
         raise ValueError(f"No such model: {model_name}")
