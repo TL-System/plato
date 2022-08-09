@@ -29,9 +29,8 @@ class Client(simple.Client):
         """Method called at the end of local training."""
 
         logging.info("[Client #%d] Trained with FedSCR algorithm.", self.client_id)
-
+        final_loss = self.get_loss()
         if self.trainer.use_adaptive:
-            final_loss = self.get_loss()
             divs = self.get_divs()
             self.report = FedSCRReport(
                 self.report.num_samples,
@@ -42,6 +41,17 @@ class Client(simple.Client):
                 final_loss,
                 divs["div"],
                 divs["g"],
+            )
+        else:
+            self.report = FedSCRReport(
+                self.report.num_samples,
+                self.report.accuracy,
+                self.report.training_time,
+                self.report.comm_time,
+                self.report.update_response,
+                final_loss,
+                None,
+                None,
             )
 
     def get_loss(self):

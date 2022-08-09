@@ -242,52 +242,9 @@ class Trainer(basic.Trainer):
             self.avg_update,
         )
 
-        if self.use_adaptive is True:
-            model_name = config["model_name"]
-            filename = f"{model_name}_{self.client_id}.loss"
-            Trainer._save_loss(self.train_loss.data.item(), filename)
-
-    def test_model(self, config, testset, sampler):
-        """
-        Evaluate the model with the provided test dataset and test sampler.
-        To be used on the server as it yields to the other asyncio threads
-        after each step of testing.
-
-        :param testset: the test dataset.
-        :param sampler: the test sampler.
-        """
-
-        if sampler is None:
-            test_loader = torch.utils.data.DataLoader(
-                testset, batch_size=config["batch_size"], shuffle=False
-            )
-        else:
-            test_loader = torch.utils.data.DataLoader(
-                testset, batch_size=config["batch_size"], shuffle=False, sampler=sampler
-            )
-
-        correct = 0
-        total = 0
-
-        _loss_criterion = getattr(self, "loss_criterion", None)
-        if callable(_loss_criterion):
-            loss_criterion = self.loss_criterion(self.model)
-        else:
-            loss_criterion = torch.nn.CrossEntropyLoss()
-
-        with torch.no_grad():
-            for examples, labels in test_loader:
-                examples, labels = examples.to(self.device), labels.to(self.device)
-
-                outputs = self.model(examples)
-
-                loss = loss_criterion(outputs, labels)
-
-                _, predicted = torch.max(outputs.data, 1)
-                total += labels.size(0)
-                correct += (predicted == labels).sum().item()
-
-        return correct / total, loss.data.item()
+        model_name = config["model_name"]
+        filename = f"{model_name}_{self.client_id}.loss"
+        Trainer._save_loss(self.train_loss.data.item(), filename)
 
     def weight_div(self, orig_weights):
         """Calculate the divergence of the locally trained model from the global model."""

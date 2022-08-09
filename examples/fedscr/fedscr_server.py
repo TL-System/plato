@@ -67,8 +67,8 @@ class Server(fedavg.Server):
         """Extract the model weight updates from clients."""
         # deltas_received are the total gradients for the convolutional layers
         deltas_received = [payload for (__, __, payload, __) in updates]
+        self.local_loss = [report.loss for (__, report, __, __) in updates]
         if self.trainer.use_adaptive:
-            self.local_loss = [report.loss for (__, report, __, __) in updates]
             self.divs = {
                 client_id: report.div for (client_id, report, __, __) in updates
             }
@@ -119,7 +119,7 @@ class Server(fedavg.Server):
             )
         else:
             # Testing the updated model directly at the server
-            self.accuracy, test_loss = await self.trainer.server_test_model(
+            self.accuracy = self.trainer.test_model(
                 config, self.testset, self.testset_sampler
             )
 
@@ -131,11 +131,11 @@ class Server(fedavg.Server):
             )
 
         if self.trainer.use_adaptive:
-            self.mean_variance = self.calc_loss_var(test_loss)
+            self.mean_variance = self.calc_loss_var()
 
-    def calc_loss_var(self, test_loss):
+    def calc_loss_var(self):
         """Calculates the loss variance using mean squared error."""
-        global_loss = [test_loss] * len(self.selected_clients)
+        global_loss = sum(self.local_loss) / len(self.local_loss)
         loss = torch.nn.MSELoss()
         variance = loss(
             torch.FloatTensor(self.local_loss), torch.FloatTensor(global_loss)
