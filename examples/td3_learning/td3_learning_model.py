@@ -11,15 +11,17 @@ import gym
 import pybullet_envs
 
 from plato.config import Config
+
+
 class TD3Actor(nn.Module):
     def __init__(self, state_dim, action_dim, max_action):
         super(TD3Actor, self).__init__()
         self.l1 = nn.Linear(state_dim, 400)
-        #nn.init.uniform_(self.l1.weight.data)
+        # nn.init.uniform_(self.l1.weight.data)
         self.l2 = nn.Linear(400, 300)
-        #nn.init.uniform_(self.l2.weight.data)
+        # nn.init.uniform_(self.l2.weight.data)
         self.l3 = nn.Linear(300, action_dim)
-        #nn.init.uniform_(self.l3.weight.data)
+        # nn.init.uniform_(self.l3.weight.data)
         self.max_action = max_action
 
     def forward(self, x, hidden=None):
@@ -27,8 +29,8 @@ class TD3Actor(nn.Module):
         x = F.relu(self.l2(x))
         x = self.max_action * torch.tanh(self.l3(x))
         # Normalize/Scaling aggregation weights so that the sum is 1
-        #x += 1  # [-1, 1] -> [0, 2]
-        #x /= x.sum()
+        # x += 1  # [-1, 1] -> [0, 2]
+        # x /= x.sum()
         return x
 
 
@@ -65,6 +67,7 @@ class TD3Critic(nn.Module):
         q1 = self.l3(q1)
         return q1
 
+
 env = gym.make(Config().algorithm.env_gym_name)
 
 seed = Config().server.random_seed
@@ -73,17 +76,17 @@ env.seed(seed)
 env.reset()
 torch.manual_seed(seed)
 np.random.seed(seed)
+
+
 class Model:
     """A wrapper class that holds both actor and critic models"""
-    def __init__(self):
 
+    def __init__(self):
 
         state_dim = env.observation_space.shape[0]
         action_dim = env.action_space.shape[0]
         max_action = float(env.action_space.high[0])
         max_episode_steps = env._max_episode_steps
-            
-
 
         self.state_dim = state_dim
         self.action_dim = action_dim
@@ -92,12 +95,12 @@ class Model:
 
         self.env_name = Config().algorithm.env_name
         self.rl_algo = Config().algorithm.algorithm_name
-        
+
         self.actor = TD3Actor(state_dim, action_dim, max_action)
         self.critic = TD3Critic(state_dim, action_dim)
         self.actor_target = copy.deepcopy(self.actor)
         self.critic_target = copy.deepcopy(self.critic)
-    
+
     def get_env_name(self):
         return self.env_name
 
@@ -136,5 +139,5 @@ class Model:
 
     @staticmethod
     def get_model(*args):
-        """ Obtaining an instance of this model. """
+        """Obtaining an instance of this model."""
         return Model()

@@ -10,47 +10,60 @@ class A2CActor(nn.Module):
     def __init__(self, state_dim, n_actions):
         super().__init__()
 
-        untrained_model_path = Config().general.base_path + "/" + Config().general.untrained_model_path + "/" + "untrained_actor.pth"
-        
-        self.model = nn.Sequential(
-            nn.Linear(state_dim,16),
-            nn.LeakyReLU(),
-            nn.Linear(16, 32),
-            nn.LeakyReLU(),
-            nn.Linear(32, n_actions),
-            nn.Softmax(dim = 0)
+        untrained_model_path = (
+            Config().general.base_path
+            + "/"
+            + Config().general.untrained_model_path
+            + "/"
+            + "untrained_actor.pth"
         )
-        
-        #Load initial untrained model
-        self.model.load_state_dict(torch.load(untrained_model_path), strict=True)
-    
-    def forward(self, X):
-        return self.model(X)
 
-# Critic module
-class A2CCritic(nn.Module):
-    def __init__(self, state_dim):
-        super().__init__()
-        untrained_model_path = Config().general.base_path + "/" + Config().general.untrained_model_path + "/" + "untrained_critic.pth"
-        
         self.model = nn.Sequential(
             nn.Linear(state_dim, 16),
             nn.LeakyReLU(),
             nn.Linear(16, 32),
             nn.LeakyReLU(),
-            nn.Linear(32, 1)
+            nn.Linear(32, n_actions),
+            nn.Softmax(dim=0),
         )
 
-        #Load initial unitrained model
-        self.model.load_state_dict(torch.load(untrained_model_path), strict=True)        
+        # Load initial untrained model
+        self.model.load_state_dict(torch.load(untrained_model_path), strict=True)
 
-    
+    def forward(self, X):
+        return self.model(X)
+
+
+# Critic module
+class A2CCritic(nn.Module):
+    def __init__(self, state_dim):
+        super().__init__()
+        untrained_model_path = (
+            Config().general.base_path
+            + "/"
+            + Config().general.untrained_model_path
+            + "/"
+            + "untrained_critic.pth"
+        )
+
+        self.model = nn.Sequential(
+            nn.Linear(state_dim, 16),
+            nn.LeakyReLU(),
+            nn.Linear(16, 32),
+            nn.LeakyReLU(),
+            nn.Linear(32, 1),
+        )
+
+        # Load initial unitrained model
+        self.model.load_state_dict(torch.load(untrained_model_path), strict=True)
+
     def forward(self, X):
         return self.model(X)
 
 
 class Model:
     """Wrapper class that holds both models"""
+
     def __init__(self):
 
         env = park.make(Config().algorithm.env_park_name)
@@ -84,5 +97,5 @@ class Model:
 
     @staticmethod
     def get_model(*args):
-        """ Obtaining an instance of this model. """
+        """Obtaining an instance of this model."""
         return Model()

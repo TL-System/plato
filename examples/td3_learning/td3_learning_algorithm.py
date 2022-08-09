@@ -8,7 +8,7 @@ from plato.trainers.base import Trainer
 
 
 class Algorithm(fedavg.Algorithm):
-    """ Federated averaging algorithm for Actor-Critic models, used by both the client and the server. """
+    """Federated averaging algorithm for Actor-Critic models, used by both the client and the server."""
 
     def __init__(self, trainer: Trainer):
         super().__init__(trainer)
@@ -16,15 +16,25 @@ class Algorithm(fedavg.Algorithm):
         self.critic = self.model.critic
         self.actor_target = self.model.actor_target
         self.critic_target = self.model.critic_target
-    
+
     def compute_weight_deltas(self, weights_received):
-        """ Extract the weights received from a client and compute the updates. """
-        
-        baseline_weights_actor, baseline_weights_critic, baseline_weights_actor_target, baseline_weights_critic_target = self.extract_weights()
+        """Extract the weights received from a client and compute the updates."""
+
+        (
+            baseline_weights_actor,
+            baseline_weights_critic,
+            baseline_weights_actor_target,
+            baseline_weights_critic_target,
+        ) = self.extract_weights()
 
         deltas = []
-        
-        for weight_actor, weight_critic, weight_actor_target,weight_critic_target in weights_received:
+
+        for (
+            weight_actor,
+            weight_critic,
+            weight_actor_target,
+            weight_critic_target,
+        ) in weights_received:
             delta_actor = OrderedDict()
             for name, current_weight in weight_actor.items():
                 baseline = baseline_weights_actor[name]
@@ -53,20 +63,27 @@ class Algorithm(fedavg.Algorithm):
                 delta = current_weight - baseline
                 delta_critic_target[name] = delta
 
-            deltas.append((delta_actor, delta_critic, delta_actor_target, delta_critic_target))
+            deltas.append(
+                (delta_actor, delta_critic, delta_actor_target, delta_critic_target)
+            )
 
         return deltas
 
     def update_weights(self, deltas):
-        """ Update the existing model weights. """
+        """Update the existing model weights."""
 
-        baseline_weights_actor, baseline_weights_critic, baseline_weights_actor_target, baseline_weights_critic_target = self.extract_weights()
+        (
+            baseline_weights_actor,
+            baseline_weights_critic,
+            baseline_weights_actor_target,
+            baseline_weights_critic_target,
+        ) = self.extract_weights()
         update_actor, update_critic, update_actor_target, update_critic_target = deltas
 
         updated_weights_actor = OrderedDict()
         for name, weight in baseline_weights_actor.items():
             updated_weights_actor[name] = weight + update_actor[name]
-        
+
         updated_weights_actor_target = OrderedDict()
         for name, weight in baseline_weights_actor_target.items():
             updated_weights_actor_target[name] = weight + update_actor_target[name]
@@ -79,10 +96,15 @@ class Algorithm(fedavg.Algorithm):
         for name, weight in baseline_weights_critic_target.items():
             updated_weights_critic_target[name] = weight + update_critic_target[name]
 
-        return updated_weights_actor, updated_weights_critic, updated_weights_actor_target, updated_weights_critic_target
-    
+        return (
+            updated_weights_actor,
+            updated_weights_critic,
+            updated_weights_actor_target,
+            updated_weights_critic_target,
+        )
+
     def extract_weights(self, model=None):
-        """ Extract weights from the model. """
+        """Extract weights from the model."""
         actor = self.actor
         critic = self.critic
         actor_target = self.actor_target
@@ -101,8 +123,13 @@ class Algorithm(fedavg.Algorithm):
         return actor_weight, critic_weight, actor_target_weight, critic_target_weight
 
     def load_weights(self, weights):
-        """ Load the model weights passed in as a parameter. """
-        weights_actor, weights_critic, weights_actor_target, weights_critic_target = weights
+        """Load the model weights passed in as a parameter."""
+        (
+            weights_actor,
+            weights_critic,
+            weights_actor_target,
+            weights_critic_target,
+        ) = weights
         # The client might only receive one or none of the Actor
         # and Critic model weight.
         if weights_actor is not None:

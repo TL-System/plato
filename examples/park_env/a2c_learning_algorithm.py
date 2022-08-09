@@ -6,8 +6,9 @@ from collections import OrderedDict
 from plato.algorithms import fedavg
 from plato.trainers.base import Trainer
 
+
 class Algorithm(fedavg.Algorithm):
-    """ Federated averaging algorithm for Actor-Critic models, used by both the client and the server. """
+    """Federated averaging algorithm for Actor-Critic models, used by both the client and the server."""
 
     def __init__(self, trainer: Trainer):
         super().__init__(trainer)
@@ -15,12 +16,12 @@ class Algorithm(fedavg.Algorithm):
         self.critic = self.model.critic
 
     def compute_weight_deltas(self, weights_received):
-        """ Extract the weights received from a client and compute the updates. """
+        """Extract the weights received from a client and compute the updates."""
 
         baseline_weights_actor, baseline_weights_critic = self.extract_weights()
 
         deltas = []
-        
+
         for weight_actor, weight_critic in weights_received:
             delta_actor = OrderedDict()
             for name, current_weight in weight_actor.items():
@@ -41,8 +42,8 @@ class Algorithm(fedavg.Algorithm):
         return deltas
 
     def update_weights(self, deltas):
-        """ Update the existing model weights. """
- 
+        """Update the existing model weights."""
+
         baseline_weights_actor, baseline_weights_critic = self.extract_weights()
         update_actor, update_critic = deltas
 
@@ -55,10 +56,10 @@ class Algorithm(fedavg.Algorithm):
             updated_weights_critic[name] = weight + update_critic[name]
 
         return updated_weights_actor, updated_weights_critic
-    
+
     def extract_weights(self, model=None):
-        """ Extract weights from the model. """
-      
+        """Extract weights from the model."""
+
         actor = self.actor
         critic = self.critic
         if model is not None:
@@ -71,7 +72,7 @@ class Algorithm(fedavg.Algorithm):
         return actor_weight, critic_weight
 
     def load_weights(self, weights):
-        """ Load the model weights passed in as a parameter. """
+        """Load the model weights passed in as a parameter."""
         weights_actor, weights_critic = weights
         # The client might only receive one or none of the Actor
         # and Critic model weight.
