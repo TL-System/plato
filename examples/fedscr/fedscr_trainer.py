@@ -59,13 +59,13 @@ class Trainer(basic.Trainer):
 
         # Get the update threshold
         if self.use_adaptive:
-            model_path = Config().params["checkpoint_path"]
+            checkpoint_path = Config().params["checkpoint_path"]
             model_name = Config().trainer.model_name
 
-            if not os.path.exists(model_path):
-                os.makedirs(model_path)
+            if not os.path.exists(checkpoint_path):
+                os.makedirs(checkpoint_path)
 
-            div_path = f"{model_path}/{model_name}_thresholds.pkl"
+            div_path = f"{checkpoint_path}/{model_name}_thresholds.pkl"
 
             with open(div_path, "rb") as file:
                 update_thresholds = pickle.load(file)
@@ -94,15 +94,15 @@ class Trainer(basic.Trainer):
             self.avg_update,
         )
 
-        if self.use_adaptive is True:
+        if self.use_adaptive:
             add_report = {"div": self.div, "g": self.avg_update}
-            model_path = Config().params["checkpoint_path"]
+            checkpoint_path = Config().params["checkpoint_path"]
             model_name = Config().trainer.model_name
 
-            if not os.path.exists(model_path):
-                os.makedirs(model_path)
+            if not os.path.exists(checkpoint_path):
+                os.makedirs(checkpoint_path)
 
-            report_path = f"{model_path}/{model_name}_{self.client_id}.pkl"
+            report_path = f"{checkpoint_path}/{model_name}_{self.client_id}.pkl"
 
             with open(report_path, "wb") as file:
                 pickle.dump(add_report, file)
@@ -208,24 +208,24 @@ class Trainer(basic.Trainer):
     def save_gradient(self):
         """Save the client updated gradients for the next communication round."""
         model_name = Config().trainer.model_name
-        model_path = Config().params["checkpoint_path"]
+        checkpoint_path = Config().params["checkpoint_path"]
 
-        if not os.path.exists(model_path):
-            os.makedirs(model_path)
+        if not os.path.exists(checkpoint_path):
+            os.makedirs(checkpoint_path)
 
-        allgrad_path = f"{model_path}/{model_name}_client{self.client_id}_grad.pth"
+        allgrad_path = f"{checkpoint_path}/{model_name}_client{self.client_id}_grad.pth"
         with open(allgrad_path, "wb") as payload_file:
             pickle.dump(self.all_grads, payload_file)
 
     def load_all_grads(self):
         """Load the gradients from a previous communication round."""
         model_name = Config().trainer.model_name
-        model_path = Config().params["checkpoint_path"]
+        checkpoint_path = Config().params["checkpoint_path"]
 
-        if not os.path.exists(model_path):
-            os.makedirs(model_path)
+        if not os.path.exists(checkpoint_path):
+            os.makedirs(checkpoint_path)
 
-        grad_path = f"{model_path}/{model_name}_client{self.client_id}_grad.pth"
+        grad_path = f"{checkpoint_path}/{model_name}_client{self.client_id}_grad.pth"
         if os.path.exists(grad_path):
             with open(grad_path, "rb") as payload_file:
                 self.all_grads = pickle.load(payload_file)
