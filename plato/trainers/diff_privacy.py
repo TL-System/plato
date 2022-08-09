@@ -4,7 +4,6 @@ The training and testing loops for PyTorch.
 import logging
 import time
 
-import torch
 from torch.utils.data import Subset
 
 from opacus import GradSampleModule
