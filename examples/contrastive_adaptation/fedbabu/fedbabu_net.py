@@ -1,5 +1,5 @@
 """
-The implementation of the model structure used in the FedRep method,
+The implementation of the model structure used in the FedBABU method,
 which is the combination of
     - backbone encoder
     - multiple fc layer.
@@ -9,7 +9,7 @@ is used as the personalized model.
 
 In the authors' original paper, only the model's final fc that generates the
 classification outputs is used as the personalized model. For example, in the
-vgg model, the fedrep's model structure is
+vgg model, the FedBABU's model structure is
 the global model: conv + fc1 + fc2
 the personalized model: fc3
 
@@ -17,7 +17,7 @@ the personalized model: fc3
 However, in our implementation, we remove all fc layers but build one lienar fc
 layer to combine with the convolutional layers. The target of this mechanism
 is mainly to make a fair comparsion with other methods. This does not present
-negative impact on the performance of the fedrep.
+negative impact on the performance of the FedBABU.
 
 Currently, the training model of all methods have the similar complexity.
 

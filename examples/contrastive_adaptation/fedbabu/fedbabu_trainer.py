@@ -17,7 +17,7 @@ from plato.utils import optimizers
 
 
 class Trainer(pers_basic.Trainer):
-    """A personalized federated learning trainer using the FedRep algorithm."""
+    """A personalized federated learning trainer using the FedBABU algorithm."""
 
     def freeze_model(self, model, param_prefix=None):
         for name, param in model.named_parameters():
