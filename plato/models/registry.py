@@ -5,89 +5,99 @@ Having a registry of all available classes is convenient for retrieving an insta
 based on a configuration at run-time.
 """
 from collections import OrderedDict
-
 from plato.config import Config
 
-if hasattr(Config().trainer, 'use_mindspore'):
+if hasattr(Config().trainer, "use_mindspore"):
     from plato.models.mindspore import (
-        lenet5 as lenet5_mindspore, )
+        lenet5 as lenet5_mindspore,
+    )
 
-    registered_models = OrderedDict([
-        ('lenet5', lenet5_mindspore.Model),
-    ])
-elif hasattr(Config().trainer, 'use_tensorflow'):
+    registered_models = OrderedDict(
+        [
+            ("lenet5", lenet5_mindspore.Model),
+        ]
+    )
+elif hasattr(Config().trainer, "use_tensorflow"):
     from plato.models.tensorflow import (
-        lenet5 as lenet5_tensorflow, )
+        lenet5 as lenet5_tensorflow,
+    )
 
-    registered_models = OrderedDict([
-        ('lenet5', lenet5_tensorflow.Model),
-    ])
+    registered_models = OrderedDict(
+        [
+            ("lenet5", lenet5_tensorflow.Model),
+        ]
+    )
 else:
     from plato.models import (
         lenet5,
-        resnet,
-        wideresnet,
-        inceptionv3,
-        googlenet,
-        vgg,
-        unet,
-        alexnet,
-        squeezenet,
-        shufflenet,
-        hybrid,
-        efficientnet,
-        regnet,
         dcgan,
         multilayer,
+        yolov5,
+        resnet,
+        vgg,
+        torch_hub,
+        huggingface,
     )
-    registered_models = OrderedDict([
-        ('lenet5', lenet5.Model),
-        ('resnet', resnet.Model),
-        ('wideresnet', wideresnet.Model),
-        ('inceptionv3', inceptionv3.Model),
-        ('googlenet', googlenet.Model),
-        ('vgg', vgg.Model),
-        ('unet', unet.Model),
-        ('alexnet', alexnet.Model),
-        ('squeezenet', squeezenet.Model),
-        ('shufflenet', shufflenet.Model),
-        ('hybrid', hybrid.Model),
-        ('efficientnet', efficientnet.Model),
-        ('regnet', regnet.Model),
-        ('dcgan', dcgan.Model),
-        ('multilayer', multilayer.Model),
-    ])
+
+    registered_models = OrderedDict(
+        [
+            ("lenet5", lenet5.Model),
+            ("dcgan", dcgan.Model),
+            ("multilayer", multilayer.Model),
+            ("yolov5", yolov5.Model),
+        ]
+    )
+
+    registered_factories = OrderedDict(
+        [
+            ("resnet", resnet.Model),
+            ("vgg", vgg.Model),
+            ("torch_hub", torch_hub.Model),
+            ("huggingface", huggingface.Model),
+        ]
+    )
 
 
 def get():
     """Get the model with the provided name."""
     model_name = Config().trainer.model_name
-    model_type = model_name.split('_')[0]
+    model_type = (
+        Config().trainer.model_type
+        if hasattr(Config().trainer, "model_type")
+        else model_name.split("_")[0]
+    )
     model = None
 
-    if model_name == 'yolov5':
-        from plato.models import yolo
-        return yolo.Model.get_model()
+    for name, registered_model in registered_models.items():
+        if name.startswith(model_type):
+            num_classes = (
+                Config().trainer.num_classes
+                if hasattr(Config().trainer, "num_classes")
+                else 10
+            )
 
-    if model_name == 'HuggingFace_CausalLM':
-        from transformers import AutoModelForCausalLM, AutoConfig
+            cut_layer = None
 
-        model_checkpoint = Config().trainer.model_checkpoint
-        config_kwargs = {
-            "cache_dir": None,
-            "revision": 'main',
-            "use_auth_token": None,
-        }
-        config = AutoConfig.from_pretrained(model_checkpoint, **config_kwargs)
-        return AutoModelForCausalLM.from_pretrained(
-            model_checkpoint, config=config, cache_dir='./models/huggingface')
-
-    else:
-        for name, registered_model in registered_models.items():
-            if name.startswith(model_type):
-                model = registered_model.get_model(model_name)
+            if hasattr(Config().algorithm, "cut_layer"):
+                # Initialize the model with the cut_layer set, so that all the training
+                # will only use the layers after the cut_layer
+                cut_layer = Config().algorithm.cut_layer
+            model = registered_model(num_classes=num_classes, cut_layer=cut_layer)
 
     if model is None:
-        raise ValueError(f'No such model: {model_name}')
+        for name, registered_factory in registered_factories.items():
+            if name.startswith(model_type):
+                num_classes = (
+                    Config().trainer.num_classes
+                    if hasattr(Config().trainer, "num_classes")
+                    else None
+                )
+                model = registered_factory.get(
+                    model_name=model_name,
+                    num_classes=num_classes,
+                )
+
+    if model is None:
+        raise ValueError(f"No such model: {model_name}")
 
     return model

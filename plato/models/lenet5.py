@@ -10,8 +10,6 @@ import collections
 import torch.nn as nn
 import torch.nn.functional as F
 
-from plato.config import Config
-
 
 class Model(nn.Module):
     """The LeNet-5 model.
@@ -19,31 +17,33 @@ class Model(nn.Module):
     Arguments:
         num_classes (int): The number of classes. Default: 10.
     """
-    def __init__(self, num_classes=10):
+
+    def __init__(self, num_classes=None, **kwargs):
         super().__init__()
+
+        if num_classes is None:
+            num_classes = 10
 
         # We pad the image to get an input size of 32x32 as for the
         # original network in the LeCun paper
-        self.conv1 = nn.Conv2d(in_channels=1,
-                               out_channels=6,
-                               kernel_size=5,
-                               stride=1,
-                               padding=2,
-                               bias=True)
+        self.conv1 = nn.Conv2d(
+            in_channels=1, out_channels=6, kernel_size=5, stride=1, padding=2, bias=True
+        )
         self.relu1 = nn.ReLU()
         self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
-        self.conv2 = nn.Conv2d(in_channels=6,
-                               out_channels=16,
-                               kernel_size=5,
-                               stride=1,
-                               padding=0,
-                               bias=True)
+        self.conv2 = nn.Conv2d(
+            in_channels=6,
+            out_channels=16,
+            kernel_size=5,
+            stride=1,
+            padding=0,
+            bias=True,
+        )
         self.relu2 = nn.ReLU()
         self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
-        self.conv3 = nn.Conv2d(in_channels=16,
-                               out_channels=120,
-                               kernel_size=5,
-                               bias=True)
+        self.conv3 = nn.Conv2d(
+            in_channels=16, out_channels=120, kernel_size=5, bias=True
+        )
         self.relu3 = nn.ReLU()
         self.fc4 = nn.Linear(120, 84)
         self.relu4 = nn.ReLU()
@@ -53,30 +53,30 @@ class Model(nn.Module):
         # across the client and the server
         self.layers = []
         self.layerdict = collections.OrderedDict()
-        self.layerdict['conv1'] = self.conv1
-        self.layerdict['relu1'] = self.relu1
-        self.layerdict['pool1'] = self.pool1
-        self.layerdict['conv2'] = self.conv2
-        self.layerdict['relu2'] = self.relu2
-        self.layerdict['pool2'] = self.pool2
-        self.layerdict['conv3'] = self.conv3
-        self.layerdict['relu3'] = self.relu3
-        self.layerdict['flatten'] = self.flatten
-        self.layerdict['fc4'] = self.fc4
-        self.layerdict['relu4'] = self.relu4
-        self.layerdict['fc5'] = self.fc5
-        self.layers.append('conv1')
-        self.layers.append('relu1')
-        self.layers.append('pool1')
-        self.layers.append('conv2')
-        self.layers.append('relu2')
-        self.layers.append('pool2')
-        self.layers.append('conv3')
-        self.layers.append('relu3')
-        self.layers.append('flatten')
-        self.layers.append('fc4')
-        self.layers.append('relu4')
-        self.layers.append('fc5')
+        self.layerdict["conv1"] = self.conv1
+        self.layerdict["relu1"] = self.relu1
+        self.layerdict["pool1"] = self.pool1
+        self.layerdict["conv2"] = self.conv2
+        self.layerdict["relu2"] = self.relu2
+        self.layerdict["pool2"] = self.pool2
+        self.layerdict["conv3"] = self.conv3
+        self.layerdict["relu3"] = self.relu3
+        self.layerdict["flatten"] = self.flatten
+        self.layerdict["fc4"] = self.fc4
+        self.layerdict["relu4"] = self.relu4
+        self.layerdict["fc5"] = self.fc5
+        self.layers.append("conv1")
+        self.layers.append("relu1")
+        self.layers.append("pool1")
+        self.layers.append("conv2")
+        self.layers.append("relu2")
+        self.layers.append("pool2")
+        self.layers.append("conv3")
+        self.layers.append("relu3")
+        self.layers.append("flatten")
+        self.layers.append("fc4")
+        self.layers.append("relu4")
+        self.layers.append("fc5")
 
     def flatten(self, x):
         """Flatten the tensor."""
@@ -116,10 +116,3 @@ class Model(nn.Module):
             x = self.layerdict[self.layers[i]](x)
 
         return F.log_softmax(x, dim=1)
-
-    @staticmethod
-    def get_model(*args):
-        """Obtaining an instance of this model."""
-        if hasattr(Config().trainer, 'num_classes'):
-            return Model(num_classes=Config().trainer.num_classes)
-        return Model()
