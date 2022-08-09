@@ -162,10 +162,7 @@ class Trainer(base.Trainer):
         )
 
         # Initializing the loss criterion
-        _loss_criterion = getattr(self, "loss_criterion", None)
-        if callable(_loss_criterion):
-            loss_criterion = self.loss_criterion(self.model)
-        else:
+        loss_criterion = Trainer.get_loss_criterion()
 
         # Initializing the optimizer
         get_optimizer = getattr(self, "get_optimizer", optimizers.get_optimizer)
@@ -454,28 +451,22 @@ class Trainer(base.Trainer):
 
         return correct / total
 
-    def get_loss_criterion(self):
+    @staticmethod
+    def get_loss_criterion():
+        """Returns the loss criterion."""
         return torch.nn.CrossEntropyLoss()
 
     def train_run_start(self, config):
-        """
-        Method called at the start of training run.
-        """
+        """Method called at the start of training run."""
 
     def train_run_end(self, config):
-        """
-        Method called at the end of a training run.
-        """
+        """Method called at the end of a training run."""
 
     def train_epoch_start(self, config):
-        """
-        Method called at the beginning of a training epoch.
-        """
+        """Method called at the beginning of a training epoch."""
 
     def train_epoch_end(self, config):
-        """
-        Method called at the end of a training epoch.
-        """
+        """Method called at the end of a training epoch."""
 
     def train_step_end(self, config, batch=None, loss=None):
         """
