@@ -14,9 +14,8 @@ from plato.trainers import basic
 
 
 class Trainer(basic.Trainer):
-
     def train_model(self, config, trainset, sampler, cut_layer=None):
-        batch_size = config['batch_size']
+        batch_size = config["batch_size"]
         log_interval = 10
 
         if self.client_id == 0:
@@ -32,23 +31,17 @@ class Trainer(basic.Trainer):
         self.model.to(self.device)
         self.model.train()
 
-        # Initializing the loss criterion
-        _loss_criterion = getattr(self, "loss_criterion", None)
-        if callable(_loss_criterion):
-            loss_criterion = self.loss_criterion(self.model)
-        else:
-            loss_criterion = nn.CrossEntropyLoss()
+        loss_criterion = self.get_loss_criterion()
 
         # Initializing the optimizer
-        get_optimizer = getattr(self, "get_optimizer",
-                                optimizers.get_optimizer)
+        get_optimizer = getattr(self, "get_optimizer", optimizers.get_optimizer)
         optimizer = get_optimizer(self.model)
 
         # Initializing the learning rate schedule, if necessary
-        if hasattr(Config().trainer, 'lr_schedule'):
-            lr_schedule = optimizers.get_lr_schedule(optimizer,
-                                                     iterations_per_epoch,
-                                                     train_loader)
+        if hasattr(Config().trainer, "lr_schedule"):
+            lr_schedule = optimizers.get_lr_schedule(
+                optimizer, iterations_per_epoch, train_loader
+            )
         else:
             lr_schedule = None
 
@@ -81,13 +74,21 @@ class Trainer(basic.Trainer):
 
             if batch_id % log_interval == 0:
                 if self.client_id == 0:
-                    logging.info("[Server #%d] Batch [%d/%d]\tLoss: %.6f",
-                                 os.getpid(), batch_id, len(train_loader),
-                                 loss.data.item())
+                    logging.info(
+                        "[Server #%d] Batch [%d/%d]\tLoss: %.6f",
+                        os.getpid(),
+                        batch_id,
+                        len(train_loader),
+                        loss.data.item(),
+                    )
                 else:
-                    logging.info("[Client #%d] Batch [%d/%d]\tLoss: %.6f",
-                                 self.client_id, batch_id, len(train_loader),
-                                 loss.data.item())
+                    logging.info(
+                        "[Client #%d] Batch [%d/%d]\tLoss: %.6f",
+                        self.client_id,
+                        batch_id,
+                        len(train_loader),
+                        loss.data.item(),
+                    )
 
             if lr_schedule is not None:
                 lr_schedule.step()
@@ -98,17 +99,18 @@ class Trainer(basic.Trainer):
         self.save_gradients(cut_layer_grad)
 
     def save_gradients(self, cut_layer_grad):
-        """ Saving gradients to a file. """
+        """Saving gradients to a file."""
         model_name = Config().trainer.model_name
-        model_path = Config().params['model_path']
+        model_path = Config().params["model_path"]
 
         if not os.path.exists(model_path):
             os.makedirs(model_path)
 
-        model_gradients_path = f'{model_path}/{model_name}_gradients.pth'
+        model_gradients_path = f"{model_path}/{model_name}_gradients.pth"
         if os.path.exists(model_gradients_path):
             os.remove(model_gradients_path)
         torch.save(cut_layer_grad, model_gradients_path)
 
-        logging.info("[Server #%d] Gradients saved to %s.", os.getpid(),
-                     model_gradients_path)
+        logging.info(
+            "[Server #%d] Gradients saved to %s.", os.getpid(), model_gradients_path
+        )
