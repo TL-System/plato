@@ -2,6 +2,7 @@
 
 from collections import OrderedDict
 
+import math
 import torch
 
 from plato.config import Config
@@ -31,9 +32,9 @@ class Trainer(basic.Trainer):
         """
         # Track the loss
         if self.current_epoch == 1:
-            self.loss_dict[batch] = torch.square(loss)
+            self.loss_dict[batch] = math.pow(float(loss), 2)
         else:
-            self.loss_dict[batch] += torch.square(loss)
+            self.loss_dict[batch] += math.pow(float(loss), 2)
 
     def train_run_end(self, config):
         """
