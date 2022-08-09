@@ -15,7 +15,7 @@ clients:
     update_threshold: 1.2
 
     # Is the adaptive algorithm being used?
-    adaptive: true
+    adaptive: false
 
     # Hyperparameters for the adaptive algorithm
     delta1: 1

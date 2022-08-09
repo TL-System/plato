@@ -23,11 +23,8 @@ class Trainer(basic.Trainer):
         super().__init__(model=model)
 
         # The threshold for determining whether or not an update is significant
-        self.update_threshold = (
-            Config().clients.update_threshold
-            if hasattr(Config().clients, "update_threshold")
-            else 0.3
-        )
+        self.update_threshold = (Config().clients.update_threshold if hasattr(
+            Config().clients, "update_threshold") else 0.3)
 
         # The overall weight updates applied to the model in a single round.
         self.total_grad = OrderedDict()
@@ -36,92 +33,26 @@ class Trainer(basic.Trainer):
         self.all_grads = []
 
         # Should the clients use the adaptive algorithm?
-        self.use_adaptive = (
-            True
-            if hasattr(Config().clients, "adaptive") and Config().clients.adaptive
-            else False
-        )
+        self.use_adaptive = (True if hasattr(Config().clients, "adaptive")
+                             and Config().clients.adaptive else False)
         self.train_loss = None
         self.test_loss = None
         self.avg_update = None
         self.div = None
-
-    def train(self, trainset, sampler, cut_layer=None, **kwargs) -> float:
-        """The main training loop of FedSCR."""
-        self.total_grad = OrderedDict()
-        orig_weights = copy.deepcopy(self.model)
-
-        training_time = super().train(trainset, sampler, cut_layer=None, **kwargs)
-
-        # Calculate weight divergence between local and global model
-        self.div = self.weight_div(orig_weights)
-        logging.info("[Client #%d] Weight Divergence: %.2f", self.client_id, self.div)
-
-        # Get the update threshold
-        if self.use_adaptive:
-            checkpoint_path = Config().params["checkpoint_path"]
-            model_name = Config().trainer.model_name
-
-            if not os.path.exists(checkpoint_path):
-                os.makedirs(checkpoint_path)
-
-            div_path = f"{checkpoint_path}/{model_name}_thresholds.pkl"
-
-            with open(div_path, "rb") as file:
-                update_thresholds = pickle.load(file)
-
-            self.update_threshold = update_thresholds[self.client_id - 1]
-            logging.info(
-                "[Client #%d] Update Threshold: %.2f",
-                self.client_id,
-                self.update_threshold,
-            )
-
-        # Get the overall weight updates as self.total_grad
-        logging.info("[Client #%d] Pruning weight updates.", self.client_id)
-        self.prune_updates(orig_weights)
-        logging.info(
-            "[Client #%d] SCR ratio (pruned amount): %.2f%%",
-            self.client_id,
-            self.compute_pruned_amount(),
-        )
-
-        # Calculate average local weight updates
-        self.avg_update = self.local_update_significance()
-        logging.info(
-            "[Client #%d] Average local weight updates: %.2f",
-            self.client_id,
-            self.avg_update,
-        )
-
-        if self.use_adaptive:
-            add_report = {"div": self.div, "g": self.avg_update}
-            checkpoint_path = Config().params["checkpoint_path"]
-            model_name = Config().trainer.model_name
-
-            if not os.path.exists(checkpoint_path):
-                os.makedirs(checkpoint_path)
-
-            report_path = f"{checkpoint_path}/{model_name}_{self.client_id}.pkl"
-
-            with open(report_path, "wb") as file:
-                pickle.dump(add_report, file)
-
-        return training_time
 
     def prune_updates(self, orig_weights):
         """Prune the weight updates by setting some updates to 0."""
 
         self.load_all_grads()
 
-        coupled_models = zip(orig_weights.named_modules(), self.model.named_modules())
+        coupled_models = zip(orig_weights.named_modules(),
+                             self.model.named_modules())
 
         conv_updates = OrderedDict()
         step = 0
         for (orig_name, orig_module), (__, trained_module) in coupled_models:
-            if isinstance(
-                trained_module, (torch.nn.Conv1d, torch.nn.Conv2d, torch.nn.Conv3d)
-            ):
+            if isinstance(trained_module,
+                          (torch.nn.Conv1d, torch.nn.Conv2d, torch.nn.Conv3d)):
                 orig_tensor = orig_module.weight.data.cpu().numpy()
                 trained_tensor = trained_module.weight.data.cpu().numpy()
                 delta = trained_tensor - orig_tensor + self.all_grads[step]
@@ -138,7 +69,8 @@ class Trainer(basic.Trainer):
                 conv_updates[delta_name] = delta
                 step += 1
 
-        coupled_models = zip(orig_weights.state_dict(), self.model.state_dict())
+        coupled_models = zip(orig_weights.state_dict(),
+                             self.model.state_dict())
         for orig_key, trained_key in coupled_models:
             if not orig_key in conv_updates:
                 orig_tensor = orig_weights.state_dict()[orig_key]
@@ -147,7 +79,8 @@ class Trainer(basic.Trainer):
                 self.total_grad[orig_key] = delta
 
             else:
-                self.total_grad[orig_key] = torch.from_numpy(conv_updates[orig_key])
+                self.total_grad[orig_key] = torch.from_numpy(
+                    conv_updates[orig_key])
 
         self.save_gradient()
 
@@ -233,8 +166,8 @@ class Trainer(basic.Trainer):
             count = 0
             for module in self.model.modules():
                 if isinstance(
-                    module, (torch.nn.Conv1d, torch.nn.Conv2d, torch.nn.Conv3d)
-                ):
+                        module,
+                    (torch.nn.Conv1d, torch.nn.Conv2d, torch.nn.Conv3d)):
                     count += 1
             self.all_grads = [0] * count
 
@@ -260,10 +193,60 @@ class Trainer(basic.Trainer):
         """
         self.train_loss = loss
 
+    def train_run_start(self, config):
+        """
+        Method called at the start of training run.
+        """
+        self.total_grad = OrderedDict()
+        self.orig_weights = copy.deepcopy(self.model)
+
     def train_run_end(self, config):
         """
         Method called at the end of training run.
         """
+
+        # Calculate weight divergence between local and global model
+        self.div = self.weight_div(self.orig_weights)
+        logging.info("[Client #%d] Weight Divergence: %.2f", self.client_id,
+                     self.div)
+
+        # Get the update threshold
+        if self.use_adaptive:
+            checkpoint_path = Config().params["checkpoint_path"]
+            model_name = Config().trainer.model_name
+
+            if not os.path.exists(checkpoint_path):
+                os.makedirs(checkpoint_path)
+
+            div_path = f"{checkpoint_path}/{model_name}_thresholds.pkl"
+
+            with open(div_path, "rb") as file:
+                update_thresholds = pickle.load(file)
+
+            self.update_threshold = update_thresholds[self.client_id - 1]
+            logging.info(
+                "[Client #%d] Update Threshold: %.2f",
+                self.client_id,
+                self.update_threshold,
+            )
+
+        # Get the overall weight updates as self.total_grad
+        logging.info("[Client #%d] Pruning weight updates.", self.client_id)
+        self.prune_updates(self.orig_weights)
+        logging.info(
+            "[Client #%d] SCR ratio (pruned amount): %.2f%%",
+            self.client_id,
+            self.compute_pruned_amount(),
+        )
+
+        # Calculate average local weight updates
+        self.avg_update = self.local_update_significance()
+        logging.info(
+            "[Client #%d] Average local weight updates: %.2f",
+            self.client_id,
+            self.avg_update,
+        )
+
         if self.use_adaptive is True:
             model_name = config["model_name"]
             filename = f"{model_name}_{self.client_id}.loss"
@@ -281,12 +264,13 @@ class Trainer(basic.Trainer):
 
         if sampler is None:
             test_loader = torch.utils.data.DataLoader(
-                testset, batch_size=config["batch_size"], shuffle=False
-            )
+                testset, batch_size=config["batch_size"], shuffle=False)
         else:
             test_loader = torch.utils.data.DataLoader(
-                testset, batch_size=config["batch_size"], shuffle=False, sampler=sampler
-            )
+                testset,
+                batch_size=config["batch_size"],
+                shuffle=False,
+                sampler=sampler)
 
         correct = 0
         total = 0
@@ -299,7 +283,8 @@ class Trainer(basic.Trainer):
 
         with torch.no_grad():
             for examples, labels in test_loader:
-                examples, labels = examples.to(self.device), labels.to(self.device)
+                examples, labels = examples.to(self.device), labels.to(
+                    self.device)
 
                 outputs = self.model(examples)
 
@@ -317,19 +302,17 @@ class Trainer(basic.Trainer):
     def weight_div(self, orig_weights):
         """Calculate the divergence of the locally trained model from the global model."""
 
-        coupled_models = zip(orig_weights.named_modules(), self.model.named_modules())
+        coupled_models = zip(orig_weights.named_modules(),
+                             self.model.named_modules())
 
         div = 0
         for (__, orig_module), (__, trained_module) in coupled_models:
-            if isinstance(
-                trained_module, (torch.nn.Conv1d, torch.nn.Conv2d, torch.nn.Conv3d)
-            ):
+            if isinstance(trained_module,
+                          (torch.nn.Conv1d, torch.nn.Conv2d, torch.nn.Conv3d)):
                 orig_tensor = orig_module.weight.data.cpu()
                 trained_tensor = trained_module.weight.data.cpu()
-                div += (
-                    torch.sum(torch.abs(trained_tensor - orig_tensor))
-                    / torch.sum(torch.abs(trained_tensor))
-                ).numpy()
+                div += (torch.sum(torch.abs(trained_tensor - orig_tensor)) /
+                        torch.sum(torch.abs(trained_tensor))).numpy()
 
         return np.sqrt(div)
 
@@ -344,7 +327,8 @@ class Trainer(basic.Trainer):
 
         model = self.model.named_modules()
         for (__, module) in model:
-            if isinstance(module, (torch.nn.Conv1d, torch.nn.Conv2d, torch.nn.Conv3d)):
+            if isinstance(module,
+                          (torch.nn.Conv1d, torch.nn.Conv2d, torch.nn.Conv3d)):
                 tensor = module.weight.data.cpu()
                 total += torch.sum(tensor).numpy()
 

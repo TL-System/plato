@@ -35,27 +35,20 @@ class Server(fedavg.Server):
         self.mean_variance = None
 
         self.update_threshold = [
-            Config().clients.update_threshold
-            if hasattr(Config().clients, "update_threshold")
-            else 0.3
+            Config().clients.update_threshold if hasattr(
+                Config().clients, "update_threshold") else 0.3
         ] * self.total_clients
 
-        self.orig_threshold = (
-            Config().clients.update_threshold
-            if hasattr(Config().clients, "update_threshold")
-            else 0.3
-        )
+        self.orig_threshold = (Config().clients.update_threshold if hasattr(
+            Config().clients, "update_threshold") else 0.3)
 
         # Hyperparameters used for the adaptive algorithm.
-        self.delta1 = (
-            Config().clients.delta1 if hasattr(Config().clients, "delta1") else None
-        )
-        self.delta2 = (
-            Config().clients.delta2 if hasattr(Config().clients, "delta2") else None
-        )
-        self.delta3 = (
-            Config().clients.delta3 if hasattr(Config().clients, "delta3") else None
-        )
+        self.delta1 = (Config().clients.delta1 if hasattr(
+            Config().clients, "delta1") else None)
+        self.delta2 = (Config().clients.delta2 if hasattr(
+            Config().clients, "delta2") else None)
+        self.delta3 = (Config().clients.delta3 if hasattr(
+            Config().clients, "delta3") else None)
 
     def configure(self):
         """Logs the usage of either the adaptive or normal algorithm."""
@@ -70,10 +63,12 @@ class Server(fedavg.Server):
         if self.trainer.use_adaptive:
             self.local_loss = [report.loss for (__, report, __, __) in updates]
             self.divs = {
-                client_id: report.div for (client_id, report, __, __) in updates
+                client_id: report.div
+                for (client_id, report, __, __) in updates
             }
             self.avg_update = {
-                client_id: report.avg_update for (client_id, report, __, __) in updates
+                client_id: report.avg_update
+                for (client_id, report, __, __) in updates
             }
         return deltas_received
 
@@ -83,8 +78,7 @@ class Server(fedavg.Server):
 
         # Extract the total number of samples
         self.total_samples = sum(
-            [report.num_samples for (__, report, __, __) in updates]
-        )
+            [report.num_samples for (__, report, __, __) in updates])
 
         # Perform weighted averaging
         avg_update = {
@@ -108,26 +102,25 @@ class Server(fedavg.Server):
     async def process_reports(self):
         """Process the client reports by aggregating their weights."""
         await self.aggregate_weights(self.updates)
+        config = Config().trainer._asdict()
 
         # Testing the global model accuracy
         if hasattr(Config().server, "do_test") and not Config().server.do_test:
             # Compute the average accuracy from client reports
             self.accuracy = self.accuracy_averaging(self.updates)
-            logging.info(
-                "[%s] Average client accuracy: %.2f%%.", self, 100 * self.accuracy
-            )
+            logging.info("[%s] Average client accuracy: %.2f%%.", self,
+                         100 * self.accuracy)
         else:
             # Testing the updated model directly at the server
-            self.accuracy, test_loss = await self.trainer.server_test(
-                self.testset, self.testset_sampler
-            )
+            self.accuracy, test_loss = await self.trainer.server_test_model(
+                config, self.testset, self.testset_sampler)
 
         if hasattr(Config().trainer, "target_perplexity"):
-            logging.info("[%s] Global model perplexity: %.2f\n", self, self.accuracy)
+            logging.info("[%s] Global model perplexity: %.2f\n", self,
+                         self.accuracy)
         else:
-            logging.info(
-                "[%s] Global model accuracy: %.2f%%\n", self, 100 * self.accuracy
-            )
+            logging.info("[%s] Global model accuracy: %.2f%%\n", self,
+                         100 * self.accuracy)
 
         if self.trainer.use_adaptive:
             self.mean_variance = self.calc_loss_var(test_loss)
@@ -136,9 +129,8 @@ class Server(fedavg.Server):
         """Calculates the loss variance using mean squared error."""
         global_loss = [test_loss] * len(self.selected_clients)
         loss = torch.nn.MSELoss()
-        variance = loss(
-            torch.FloatTensor(self.local_loss), torch.FloatTensor(global_loss)
-        )
+        variance = loss(torch.FloatTensor(self.local_loss),
+                        torch.FloatTensor(global_loss))
         self.variances.append(variance.data.item())
 
         mew = sum(variance for variance in self.variances)
@@ -170,14 +162,12 @@ class Server(fedavg.Server):
         if self.current_round == 1:
             return
         for client_id in self.divs:
-            sigmoid = (
-                self.delta1 * self.divs[client_id]
-                + self.delta2 * self.avg_update[client_id]
-                + self.delta3 * self.mean_variance
-            )
-            self.update_threshold[client_id - 1] = (
-                1 / (1 + (math.e**-sigmoid))
-            ) * self.orig_threshold
+            sigmoid = (self.delta1 * self.divs[client_id] +
+                       self.delta2 * self.avg_update[client_id] +
+                       self.delta3 * self.mean_variance)
+            self.update_threshold[
+                client_id -
+                1] = (1 / (1 + (math.e**-sigmoid))) * self.orig_threshold
 
     def server_will_close(self):
         """
