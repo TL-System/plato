@@ -155,13 +155,13 @@ class Server(fedavg.Server):
 
         if self.trainer.use_adaptive:
             self.calc_threshold()
-            model_path = Config().params["checkpoint_path"]
+            checkpoint_path = Config().params["checkpoint_path"]
             model_name = Config().trainer.model_name
 
-            if not os.path.exists(model_path):
-                os.makedirs(model_path)
+            if not os.path.exists(checkpoint_path):
+                os.makedirs(checkpoint_path)
 
-            loss_path = f"{model_path}/{model_name}_thresholds.pkl"
+            loss_path = f"{checkpoint_path}/{model_name}_thresholds.pkl"
 
             with open(loss_path, "wb") as file:
                 pickle.dump(self.update_threshold, file)
@@ -184,10 +184,20 @@ class Server(fedavg.Server):
         """
         Method called at the start of closing the server.
         """
-        # Delete gradient files created by the clients.
         model_name = Config().trainer.model_name
         checkpoint_path = Config().params["checkpoint_path"]
+
+        # Delete files created by the clients.
         for client_id in range(1, self.total_clients + 1):
             allgrad_path = f"{checkpoint_path}/{model_name}_client{client_id}_grad.pth"
-            if os.path.exists(allgrad_path):
-                os.remove(allgrad_path)
+            loss_path = f"{checkpoint_path}/{model_name}_{client_id}.loss"
+            report_path = f"{checkpoint_path}/{model_name}_{client_id}.pkl"
+            all_files = [allgrad_path, loss_path, report_path]
+            files_to_delete = [file for file in all_files if os.path.exists(file)]
+            for file in files_to_delete:
+                os.remove(file)
+
+        # Delete threshold file created by the server.
+        threshold_path = f"{checkpoint_path}/{model_name}_thresholds.pkl"
+        if os.path.exists(threshold_path):
+            os.remove(threshold_path)

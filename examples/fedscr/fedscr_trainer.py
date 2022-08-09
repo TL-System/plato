@@ -202,17 +202,18 @@ class Trainer(basic.Trainer):
 
     def train_run_end(self, config):
         """Method called at the end of training run."""
-        # Calculate weight divergence between local and global model
+        # Calculate weight divergence between local and global model - used for adaptive algorithm
         self.div = self.weight_div(self.orig_weights)
         logging.info("[Client #%d] Weight Divergence: %.2f", self.client_id, self.div)
 
+        checkpoint_path = Config().params["checkpoint_path"]
+        model_name = Config().trainer.model_name
+
+        if not os.path.exists(checkpoint_path):
+            os.makedirs(checkpoint_path)
+
         # Get the update threshold
         if self.use_adaptive:
-            checkpoint_path = Config().params["checkpoint_path"]
-            model_name = Config().trainer.model_name
-
-            if not os.path.exists(checkpoint_path):
-                os.makedirs(checkpoint_path)
 
             div_path = f"{checkpoint_path}/{model_name}_thresholds.pkl"
 
@@ -226,7 +227,7 @@ class Trainer(basic.Trainer):
                 self.update_threshold,
             )
 
-        # Get the overall weight updates as self.total_grad
+        # Get the overall weight updates
         logging.info("[Client #%d] Pruning weight updates.", self.client_id)
         self.prune_updates(self.orig_weights)
         logging.info(
@@ -246,13 +247,8 @@ class Trainer(basic.Trainer):
         # Add weight divergence and average update to client report
         if self.use_adaptive is True:
             add_to_report = {"div": self.div, "g": self.avg_update}
-            model_path = Config().params["checkpoint_path"]
-            model_name = Config().trainer.model_name
 
-            if not os.path.exists(model_path):
-                os.makedirs(model_path)
-
-            report_path = f"{model_path}/{model_name}_{self.client_id}.pkl"
+            report_path = f"{checkpoint_path}/{model_name}_{self.client_id}.pkl"
 
             with open(report_path, "wb") as file:
                 pickle.dump(add_to_report, file)
