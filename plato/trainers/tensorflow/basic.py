@@ -127,7 +127,7 @@ class Trainer(base.Trainer):
     def train_model(self, config, trainset, sampler, cut_layer=None):
         """Trains the model."""
         # Initializing the loss criterion
-        loss_criterion = Trainer.get_loss_criterion()
+        loss_criterion = self.get_loss_criterion()
 
         # Initializing the optimizer
         get_optimizer = getattr(self, "get_optimizer", None)
@@ -165,7 +165,7 @@ class Trainer(base.Trainer):
     def test_model(self, config, testset, sampler):
         """Tests the model. Must be compiled first."""
         logging.info("Get loss_criterion on client #%d.", self.client_id)
-        loss_criterion = Trainer.get_loss_criterion()
+        loss_criterion = self.get_loss_criterion()
 
         # Initializing the optimizer
         logging.info("Get_optimizer on client #%d.", self.client_id)
@@ -183,7 +183,6 @@ class Trainer(base.Trainer):
 
         return self.model.evaluate(testset, verbose=0)[1]
 
-    @staticmethod
-    def get_loss_criterion():
+    def get_loss_criterion(self):
         """Returns the loss criterion."""
         return tf.keras.losses.SparseCategoricalCrossentropy()

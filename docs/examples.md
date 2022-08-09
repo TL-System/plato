@@ -1,6 +1,21 @@
 # Examples
 
-The git repository includes a number of examples that showcased how third-party deep learning frameworks can be used, how customized clients and servers can be built, how Plato can be run on Google Colab, and how a collection of federated learning algorithms in the research literature can be implemented using the Plato federated learning framework.
+In `examples/`, we included a wide variety of examples that showcased how third-party deep learning frameworks, such as `Catalyst`, can be used, and how a collection of federated learning algorithms in the research literature can be implemented using Plato by customizing the `client`, `server`, `algorithm`, and `trainer`. We also included detailed tutorials on how Plato can be run on Google Colab. Here is a list of the examples we included.
+
+
+````{admonition} [FedProx](https://proceedings.mlsys.org/paper/2020/file/38af86134b65d0f10fe33d30dd76442e-Paper.pdf)
+To better handle system heterogeneity, the FedProx algorithm introduced a proximal term in the optimizer used by local training on the clients. It has been quite widely cited and compared with in the federated learning literature.
+
+```shell
+python examples/fedprox/fedprox.py -c examples/fedprox/fedprox_MNIST_lenet5.yml
+```
+
+```{note}
+Li, T., Sahu, A. K., Zaheer, M., Sanjabi, M., Talwalkar, A., & Smith, V. (2020). "Federated optimization in heterogeneous networks." Proceedings of Machine Learning and Systems, 2, 429-450.
+```
+````
+
+With the recent redesign of the Plato API, the following list is outdated and will be updated as they are tested again.
 
 |  Method  | Notes | Tested  |
 | :------: | :---------- | :-----: |

@@ -35,6 +35,12 @@ pip install tensorflow tensorflow-datasets
 ./run -c configs/MNIST/fedavg_lenet5_tensorflow.yml
 ```
 
+On macOS with M1 or M2 CPUs, install the `tensorflow-macos` package, rather than `tensorflow`:
+
+```shell
+pip install tensorflow-macos tensorflow-datasets
+```
+
 **MindSpore.** Plato currently supports the latest MindSpore release, 1.8.0. Follow the installation instructions in the [official MindSpore website](https://mindspore.cn/install/en) to install MindSpore in your conda environment. For example, on an M1 Mac, use the command:
 
 ```shell
