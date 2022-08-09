@@ -9,4 +9,5 @@ transformers
 opacus
 gym
 zstd
+yolov5
 torch-optimizer

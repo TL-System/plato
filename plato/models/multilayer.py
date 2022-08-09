@@ -39,17 +39,17 @@ class Model(nn.Module):
         # across the client and the server
         self.layers = []
         self.layerdict = collections.OrderedDict()
-        self.layerdict['fc1'] = self.fc1
-        self.layerdict['fc2'] = self.fc2
-        self.layerdict['fc3'] = self.fc3
-        self.layerdict['fc4'] = self.fc4
-        self.layerdict['fc5'] = self.fc5
+        self.layerdict["fc1"] = self.fc1
+        self.layerdict["fc2"] = self.fc2
+        self.layerdict["fc3"] = self.fc3
+        self.layerdict["fc4"] = self.fc4
+        self.layerdict["fc5"] = self.fc5
 
-        self.layers.append('fc1')
-        self.layers.append('fc2')
-        self.layers.append('fc3')
-        self.layers.append('fc4')
-        self.layers.append('fc5')
+        self.layers.append("fc1")
+        self.layers.append("fc2")
+        self.layers.append("fc3")
+        self.layers.append("fc4")
+        self.layers.append("fc5")
 
     def forward(self, x):
         """Forward pass."""
@@ -81,7 +81,9 @@ class Model(nn.Module):
     @staticmethod
     def get_model(*args):
         """Obtaining an instance of this model."""
-        if hasattr(Config().trainer, 'num_classes'):
-            return Model(input_dim=Config().trainer.input_dim,
-                         num_classes=Config().trainer.num_classes)
+        if hasattr(Config().trainer, "num_classes"):
+            return Model(
+                input_dim=Config().trainer.input_dim,
+                num_classes=Config().trainer.num_classes,
+            )
         return Model()

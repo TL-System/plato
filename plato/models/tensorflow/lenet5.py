@@ -19,46 +19,44 @@ class Model(keras.Model):
     Arguments:
         num_classes (int): The number of classes.
     """
+
     def __init__(self, num_classes=10, cut_layer=None, **kwargs):
         super().__init__(**kwargs)
         self.cut_layer = cut_layer
 
-        self.conv1 = layers.Conv2D(filters=6,
-                                   kernel_size=(3, 3),
-                                   activation='relu',
-                                   input_shape=(32, 32, 1))
+        self.conv1 = layers.Conv2D(
+            filters=6, kernel_size=(3, 3), activation="relu", input_shape=(32, 32, 1)
+        )
         self.pool1 = layers.AveragePooling2D()
-        self.conv2 = layers.Conv2D(filters=16,
-                                   kernel_size=(3, 3),
-                                   activation='relu')
+        self.conv2 = layers.Conv2D(filters=16, kernel_size=(3, 3), activation="relu")
         self.pool2 = layers.AveragePooling2D()
 
         self.flatten = layers.Flatten()
 
-        self.fc1 = layers.Dense(units=120, activation='relu')
-        self.fc2 = layers.Dense(units=84, activation='relu')
-        self.fc3 = layers.Dense(units=num_classes, activation='softmax')
+        self.fc1 = layers.Dense(units=120, activation="relu")
+        self.fc2 = layers.Dense(units=84, activation="relu")
+        self.fc3 = layers.Dense(units=num_classes, activation="softmax")
 
         # Preparing named layers so that the model can be split and straddle
         # across the client and the server
         self.model_layers = []
         self.layerdict = collections.OrderedDict()
-        self.layerdict['conv1'] = self.conv1
-        self.layerdict['pool1'] = self.pool1
-        self.layerdict['conv2'] = self.conv2
-        self.layerdict['pool2'] = self.pool2
-        self.layerdict['flatten'] = self.flatten
-        self.layerdict['fc1'] = self.fc1
-        self.layerdict['fc2'] = self.fc2
-        self.layerdict['fc3'] = self.fc3
-        self.model_layers.append('conv1')
-        self.model_layers.append('pool1')
-        self.model_layers.append('conv2')
-        self.model_layers.append('pool2')
-        self.model_layers.append('flatten')
-        self.model_layers.append('fc1')
-        self.model_layers.append('fc2')
-        self.model_layers.append('fc3')
+        self.layerdict["conv1"] = self.conv1
+        self.layerdict["pool1"] = self.pool1
+        self.layerdict["conv2"] = self.conv2
+        self.layerdict["pool2"] = self.pool2
+        self.layerdict["flatten"] = self.flatten
+        self.layerdict["fc1"] = self.fc1
+        self.layerdict["fc2"] = self.fc2
+        self.layerdict["fc3"] = self.fc3
+        self.model_layers.append("conv1")
+        self.model_layers.append("pool1")
+        self.model_layers.append("conv2")
+        self.model_layers.append("pool2")
+        self.model_layers.append("flatten")
+        self.model_layers.append("fc1")
+        self.model_layers.append("fc2")
+        self.model_layers.append("fc3")
 
     def call(self, x):
         """The forward pass."""
@@ -82,8 +80,8 @@ class Model(keras.Model):
         return x
 
     def call_to(self, x, cut_layer):
-        """ Extract features using the layers before (and including)
-            the cut_layer.
+        """Extract features using the layers before (and including)
+        the cut_layer.
         """
         layer_index = self.model_layers.index(cut_layer)
 
@@ -92,25 +90,7 @@ class Model(keras.Model):
 
         return x
 
-    @staticmethod
-    def get_model(*args):
-        """Obtaining an instance of this model provided that the name is valid."""
-        num_classes = 10
-        if hasattr(Config().trainer, 'num_classes'):
-            num_classes = Config().trainer.num_classes
-
-        cut_layer = None
-
-        if hasattr(Config().algorithm, 'cut_layer'):
-            # Initialize the model with the cut_layer set, so that all the training
-            # will only use the layers after the cut_layer
-            cut_layer = Config().algorithm.cut_layer
-
-        return Model(num_classes=num_classes,
-                     cut_layer=cut_layer,
-                     name='lenet5')
-
     def build_model(self, input_shape):
-        """ Building the model using dimensions for the datasource. """
+        """Building the model using dimensions for the datasource."""
         self.build(input_shape)
         self.summary()

@@ -19,11 +19,7 @@ from plato.utils import csv_processor
 class Server(base.Server):
     """Federated learning server using federated averaging."""
 
-    def __init__(self,
-                 model=None,
-                 datasource=None,
-                 algorithm=None,
-                 trainer=None):
+    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
         super().__init__()
 
         self.custom_model = model
@@ -47,10 +43,13 @@ class Server(base.Server):
 
         logging.info(
             "[Server #%d] Started training on %d clients with %d per round.",
-            os.getpid(), self.total_clients, self.clients_per_round)
+            os.getpid(),
+            self.total_clients,
+            self.clients_per_round,
+        )
 
-        recorded_items = Config().params['result_types']
-        self.recorded_items = [x.strip() for x in recorded_items.split(',')]
+        recorded_items = Config().params["result_types"]
+        self.recorded_items = [x.strip() for x in recorded_items.split(",")]
 
     def configure(self):
         """
@@ -64,17 +63,23 @@ class Server(base.Server):
         target_accuracy = None
         target_perplexity = None
 
-        if hasattr(Config().trainer, 'target_accuracy'):
+        if hasattr(Config().trainer, "target_accuracy"):
             target_accuracy = Config().trainer.target_accuracy
-        elif hasattr(Config().trainer, 'target_perplexity'):
+        elif hasattr(Config().trainer, "target_perplexity"):
             target_perplexity = Config().trainer.target_perplexity
 
         if target_accuracy:
-            logging.info("Training: %s rounds or accuracy above %.1f%%\n",
-                         total_rounds, 100 * target_accuracy)
+            logging.info(
+                "Training: %s rounds or accuracy above %.1f%%\n",
+                total_rounds,
+                100 * target_accuracy,
+            )
         elif target_perplexity:
-            logging.info("Training: %s rounds or perplexity below %.1f\n",
-                         total_rounds, target_perplexity)
+            logging.info(
+                "Training: %s rounds or perplexity below %.1f\n",
+                total_rounds,
+                target_perplexity,
+            )
         else:
             logging.info("Training: %s rounds\n", total_rounds)
 
@@ -83,10 +88,10 @@ class Server(base.Server):
         # Prepares this server for processors that processes outbound and inbound
         # data payloads
         self.outbound_processor, self.inbound_processor = processor_registry.get(
-            "Server", server_id=os.getpid(), trainer=self.trainer)
+            "Server", server_id=os.getpid(), trainer=self.trainer
+        )
 
-        if not (hasattr(Config().server, 'do_test')
-                and not Config().server.do_test):
+        if not (hasattr(Config().server, "do_test") and not Config().server.do_test):
             if self.datasource is None and self.custom_datasource is None:
                 self.datasource = datasources_registry.get(client_id=0)
             elif self.datasource is None and self.custom_datasource is not None:
@@ -94,7 +99,7 @@ class Server(base.Server):
 
             self.testset = self.datasource.get_test_set()
 
-            if hasattr(Config().data, 'testset_size'):
+            if hasattr(Config().data, "testset_size"):
                 # Set the sampler for testset
                 import torch
 
@@ -107,25 +112,29 @@ class Server(base.Server):
                 gen.manual_seed(random_seed)
 
                 all_inclusive = range(len(self.datasource.get_test_set()))
-                test_samples = random.sample(all_inclusive,
-                                             Config().data.testset_size)
+                test_samples = random.sample(all_inclusive, Config().data.testset_size)
                 self.testset_sampler = torch.utils.data.SubsetRandomSampler(
-                    test_samples, generator=gen)
+                    test_samples, generator=gen
+                )
 
         # Initialize the csv file which will record results
         result_csv_file = f"{Config().params['result_path']}/{os.getpid()}.csv"
-        csv_processor.initialize_csv(result_csv_file, self.recorded_items,
-                                     Config().params['result_path'])
+        csv_processor.initialize_csv(
+            result_csv_file, self.recorded_items, Config().params["result_path"]
+        )
 
         # Initialize the test accuracy csv file if clients compute locally
-        if hasattr(Config().clients, 'do_test') and Config().clients.do_test:
-            accuracy_csv_file = f"{Config().params['result_path']}/{os.getpid()}_accuracy.csv"
+        if hasattr(Config().clients, "do_test") and Config().clients.do_test:
+            accuracy_csv_file = (
+                f"{Config().params['result_path']}/{os.getpid()}_accuracy.csv"
+            )
             accuracy_headers = ["round", "client_id", "accuracy"]
-            csv_processor.initialize_csv(accuracy_csv_file, accuracy_headers,
-                                         Config().params['result_path'])
+            csv_processor.initialize_csv(
+                accuracy_csv_file, accuracy_headers, Config().params["result_path"]
+            )
 
     def init_trainer(self):
-        """ Setting up the global model, trainer, and algorithm. """
+        """Setting up the global model, trainer, and algorithm."""
         if self.model is None and self.custom_model is not None:
             self.model = self.custom_model
 
@@ -156,7 +165,8 @@ class Server(base.Server):
 
         # Extract the total number of samples
         self.total_samples = sum(
-            [report.num_samples for (__, report, __, __) in updates])
+            [report.num_samples for (__, report, __, __) in updates]
+        )
 
         # Perform weighted averaging
         avg_update = {
@@ -182,27 +192,27 @@ class Server(base.Server):
         await self.aggregate_weights(self.updates)
 
         # Testing the global model accuracy
-        if hasattr(Config().server, 'do_test') and not Config().server.do_test:
+        if hasattr(Config().server, "do_test") and not Config().server.do_test:
             # Compute the average accuracy from client reports
             self.accuracy = self.accuracy_averaging(self.updates)
-            logging.info('[%s] Average client accuracy: %.2f%%.', self,
-                         100 * self.accuracy)
+            logging.info(
+                "[%s] Average client accuracy: %.2f%%.", self, 100 * self.accuracy
+            )
         else:
             # Testing the updated model directly at the server
-            self.accuracy = await self.trainer.server_test(
-                self.testset, self.testset_sampler)
+            self.accuracy = self.trainer.test(self.testset, self.testset_sampler)
 
-        if hasattr(Config().trainer, 'target_perplexity'):
-            logging.info('[%s] Global model perplexity: %.2f\n', self,
-                         self.accuracy)
+        if hasattr(Config().trainer, "target_perplexity"):
+            logging.info("[%s] Global model perplexity: %.2f\n", self, self.accuracy)
         else:
-            logging.info('[%s] Global model accuracy: %.2f%%\n', self,
-                         100 * self.accuracy)
+            logging.info(
+                "[%s] Global model accuracy: %.2f%%\n", self, 100 * self.accuracy
+            )
 
         await self.wrap_up_processing_reports()
 
     async def wrap_up_processing_reports(self):
-        """ Wrap up processing the reports with any additional work. """
+        """Wrap up processing the reports with any additional work."""
         # Record results into a .csv file
         new_row = []
         for item in self.recorded_items:
@@ -212,9 +222,11 @@ class Server(base.Server):
         result_csv_file = f"{Config().params['result_path']}/{os.getpid()}.csv"
         csv_processor.write_csv(result_csv_file, new_row)
 
-        if hasattr(Config().clients, 'do_test') and Config().clients.do_test:
+        if hasattr(Config().clients, "do_test") and Config().clients.do_test:
             # Updates the log for client test accuracies
-            accuracy_csv_file = f"{Config().params['result_path']}/{os.getpid()}_accuracy.csv"
+            accuracy_csv_file = (
+                f"{Config().params['result_path']}/{os.getpid()}_accuracy.csv"
+            )
 
             for (client_id, report, __, __) in self.updates:
                 accuracy_row = [self.current_round, client_id, report.accuracy]
@@ -223,29 +235,26 @@ class Server(base.Server):
     def get_record_items_values(self):
         """Get values will be recorded in result csv file."""
         return {
-            'round':
-            self.current_round,
-            'accuracy':
-            self.accuracy,
-            'elapsed_time':
-            self.wall_time - self.initial_wall_time,
-            'comm_time':
-            max([report.comm_time for (__, report, __, __) in self.updates]),
-            'round_time':
-            max([
-                report.training_time + report.comm_time
-                for (__, report, __, __) in self.updates
-            ]),
-            'comm_overhead':
-            self.comm_overhead,
+            "round": self.current_round,
+            "accuracy": self.accuracy,
+            "elapsed_time": self.wall_time - self.initial_wall_time,
+            "comm_time": max(
+                [report.comm_time for (__, report, __, __) in self.updates]
+            ),
+            "round_time": max(
+                [
+                    report.training_time + report.comm_time
+                    for (__, report, __, __) in self.updates
+                ]
+            ),
+            "comm_overhead": self.comm_overhead,
         }
 
     @staticmethod
     def accuracy_averaging(updates):
         """Compute the average accuracy across clients."""
         # Get total number of samples
-        total_samples = sum(
-            [report.num_samples for (__, report, __, __) in updates])
+        total_samples = sum([report.num_samples for (__, report, __, __) in updates])
 
         # Perform weighted averaging
         accuracy = 0
@@ -255,5 +264,5 @@ class Server(base.Server):
         return accuracy
 
     def customize_server_payload(self, payload):
-        """ Customize the server payload before sending to the client. """
+        """Customize the server payload before sending to the client."""
         return payload

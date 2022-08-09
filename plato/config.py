@@ -115,6 +115,7 @@ class Config:
             logging.basicConfig(
                 format="[%(levelname)s][%(asctime)s]: %(message)s", datefmt="%H:%M:%S"
             )
+
             root_logger = logging.getLogger()
             root_logger.setLevel(numeric_level)
 
@@ -313,7 +314,7 @@ class Config:
 
         if torch.cuda.is_available():
             return torch.cuda.device_count()
-        elif torch.backends.mps.is_available():
+        elif torch.has_mps:
             return 1
         else:
             return 0
@@ -347,7 +348,7 @@ class Config:
                 else:
                     device = "cuda:0"
 
-            if torch.backends.mps.is_available():
+            if torch.has_mps:
                 device = "mps"
 
         return device

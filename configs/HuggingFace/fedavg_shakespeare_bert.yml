@@ -54,8 +54,8 @@ trainer:
     weight_decay: 0.0
 
     # The machine learning model
-    model_name: HuggingFace_CausalLM
-    model_checkpoint: bert-base-uncased
+    model_type: huggingface
+    model_name: bert-base-uncased
 
 algorithm:
     # Aggregation algorithm
