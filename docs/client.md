@@ -13,7 +13,8 @@ Within the implementation of these callback methods, one can access additional i
 
 To use callbacks, subclass the `ClientCallback` class in `plato.callbacks.client`, and override the following methods:
 
-````{admonition} **on_client_train_end(self, client)**
+````{admonition} **on_client_train_end(self, client, weights)**
 Overide this method to complete additional tasks after the local training ends.
 
+`weights` weights of client's local trained model.
 ````

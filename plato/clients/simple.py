@@ -179,8 +179,8 @@ class Client(base.Client):
                 self.sampler.trainset_size(), accuracy, training_time, comm_time, False
             )
 
-        self.client_train_end()
-        self.callback_handler.call_event("on_client_train_end", self)
+        weights = self.client_train_end(weights)
+        self.callback_handler.call_event("on_client_train_end", self, weights)
 
         return self.report, weights
 
