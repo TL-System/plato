@@ -1,9 +1,9 @@
 # Examples
 
-In `examples/`, we included a wide variety of examples that showcased how third-party deep learning frameworks, such as [*Catalyst*](https://catalyst-team.github.io/catalyst/), can be used, and how a collection of federated learning algorithms in the research literature can be implemented using Plato by customizing the `client`, `server`, `algorithm`, and `trainer`. We also included detailed tutorials on how Plato can be run on Google Colab. Here is a list of the examples we included.
+In `examples/`, we included a wide variety of examples that showcased how third-party deep learning frameworks, such as [Catalyst](https://catalyst-team.github.io/catalyst/), can be used, and how a collection of federated learning algorithms in the research literature can be implemented using Plato by customizing the `client`, `server`, `algorithm`, and `trainer`. We also included detailed tutorials on how Plato can be run on Google Colab. Here is a list of the examples we included.
 
 ````{admonition} **Catalyst**
-Plato supports the use of third-party frameworks for its training loops. This example shows how [*Catalyst*](https://catalyst-team.github.io/catalyst/) can be used with Plato for local training and testing on the clients. This example uses a very simple PyTorch model and the MNIST dataset to show how the model, the training and validation datasets, as well as the training and testing loops can be quickly customized in Plato.
+Plato supports the use of third-party frameworks for its training loops. This example shows how [Catalyst](https://catalyst-team.github.io/catalyst/) can be used with Plato for local training and testing on the clients. This example uses a very simple PyTorch model and the MNIST dataset to show how the model, the training and validation datasets, as well as the training and testing loops can be quickly customized in Plato.
 
 ```shell
 python examples/catalyst/catalyst_example.py -c examples/catalyst/catalyst_fedavg_lenet5.yml
@@ -19,6 +19,21 @@ python examples/fedprox/fedprox.py -c examples/fedprox/fedprox_MNIST_lenet5.yml
 
 ```{note}
 Li, T., Sahu, A. K., Zaheer, M., Sanjabi, M., Talwalkar, A., & Smith, V. (2020). [&ldquo;Federated optimization in heterogeneous networks,&rdquo;](https://proceedings.mlsys.org/paper/2020/file/38af86134b65d0f10fe33d30dd76442e-Paper.pdf) Proceedings of Machine Learning and Systems, 2, 429-450.
+```
+````
+
+````{admonition} **FedAsync**
+FedAsync is one of the first algorithms proposed in the literature towards operating federated learning training sessions in *asynchronous* mode, which Plato supports natively. It advocated aggregating aggressively whenever only *one* client reported its local updates to the server.
+
+In its implementation, FedAsync's server subclasses from the `FedAvg` server and overrides its `configure()` and `aggregate_weights()` functions. In `configure()`, it needs to add some custom features (of obtaining a mixing hyperparameter for later use in the aggregation process), and calls `super().configure()` first, similar to its `__init__()` function calling `super().__init__()`. When it overrides `aggregate_weights()`, however, it supplied a completely custom implementation of this function.
+
+```shell
+python examples/fedasync/fedasync.py -c examples/fedasync/fedasync_MNIST_lenet5.yml
+python examples/fedasync/fedasync.py -c examples/fedasync/fedasync_CIFAR10_resnet18.yml
+```
+
+```{note}
+Xie, C., Koyejo, S., Gupta, I. [&ldquo;Asynchronous federated optimization,&rdquo;](https://opt-ml.org/papers/2020/paper_28.pdf) in Proc. 12th Annual Workshop on Optimization for Machine Learning (OPT 2020).
 ```
 ````
 
