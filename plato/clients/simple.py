@@ -134,7 +134,7 @@ class Client(base.Client):
             training_time = self.trainer.train(self.trainset, self.sampler)
         except ValueError as exc:
             logging.info(
-                fonts.colourize(f"[{self}] Error occurred during training: {exc}.")
+                fonts.colourize(f"[{self}] Error occurred during training: {exc}")
             )
             await self.sio.disconnect()
 

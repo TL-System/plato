@@ -258,11 +258,3 @@ def get_lr_schedule(
         )
     else:
         return returned_schedules[0]
-
-
-def get_loss_criterion():
-    """Obtain the loss criterion used for training the model."""
-    if Config().trainer.loss_criterion == "BCEWithLogitsLoss":
-        return nn.BCEWithLogitsLoss()
-    else:
-        return nn.CrossEntropyLoss()
