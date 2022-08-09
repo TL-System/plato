@@ -157,3 +157,6 @@ checkpoints/
 
 # Sphinx documentation
 docs/_build/
+
+# TensorFlow datasets
+tensorflow_datasets/

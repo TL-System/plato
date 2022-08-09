@@ -61,11 +61,7 @@ class Trainer(basic.Trainer):
         )
 
         # Initializing the loss criterion
-        _loss_criterion = getattr(self, "loss_criterion", None)
-        if callable(_loss_criterion):
-            loss_criterion = self.loss_criterion(self.model)
-        else:
-            loss_criterion = torch.nn.CrossEntropyLoss()
+        loss_criterion = Trainer.get_loss_criterion()
 
         # Initializing the optimizer
         get_optimizer = getattr(self, "get_optimizer", optimizers.get_optimizer)

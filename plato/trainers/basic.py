@@ -1,7 +1,6 @@
 """
 The training and testing loops for PyTorch.
 """
-import asyncio
 import logging
 import multiprocessing as mp
 import os
@@ -167,7 +166,6 @@ class Trainer(base.Trainer):
         if callable(_loss_criterion):
             loss_criterion = self.loss_criterion(self.model)
         else:
-            loss_criterion = torch.nn.CrossEntropyLoss()
 
         # Initializing the optimizer
         get_optimizer = getattr(self, "get_optimizer", optimizers.get_optimizer)
@@ -455,6 +453,9 @@ class Trainer(base.Trainer):
                 correct += (predicted == labels).sum().item()
 
         return correct / total
+
+    def get_loss_criterion(self):
+        return torch.nn.CrossEntropyLoss()
 
     def train_run_start(self, config):
         """

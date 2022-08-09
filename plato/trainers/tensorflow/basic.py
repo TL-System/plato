@@ -91,43 +91,15 @@ class Trainer(base.Trainer):
         sampler: the sampler that extracts a partition for this client.
         cut_layer (optional): The layer which training should start from.
         """
-        custom_train = getattr(self, "train_model", None)
         try:
-            if callable(custom_train):
-                self.train_model(config, trainset, sampler.get(), cut_layer)
-            else:
-                if "is_compiled" not in config:
-                    # Initializing the loss criterion
-                    logging.info("Get loss_criterion on client #%d.", self.client_id)
-                    _loss_criterion = getattr(self, "loss_criterion", None)
-                    if callable(_loss_criterion):
-                        loss_criterion = self.loss_criterion(self.model)
-                    else:
-                        loss_criterion = tf.keras.losses.SparseCategoricalCrossentropy()
-
-                    # Initializing the optimizer
-                    logging.info("Get_optimizer on client #%d.", self.client_id)
-                    get_optimizer = getattr(self, "get_optimizer", None)
-                    if callable(get_optimizer):
-                        optimizer = self.get_optimizer(self.model)
-                    else:
-                        optimizer = tf.keras.optimizers.Adam(config["learning_rate"])
-
-                    self.model.compile(
-                        optimizer=optimizer,
-                        loss=loss_criterion,
-                        metrics=[tf.keras.metrics.SparseCategoricalAccuracy()],
-                    )
-
-                logging.info("Begining training on client #%d.", self.client_id)
-                self.model.fit(trainset, epochs=config["epochs"])
+            self.train_model(config, trainset, sampler.get(), cut_layer)
         except Exception as training_exception:
             logging.info(
                 "Training on client #%d failed: %s", self.client_id, training_exception
             )
             raise training_exception
 
-    def train(self, trainset, sampler, cut_layer=None) -> float:
+    def train(self, trainset, sampler, cut_layer=None, **kwargs) -> float:
         """The main training loop in a federated learning workload.
 
         Arguments:
@@ -152,18 +124,71 @@ class Trainer(base.Trainer):
 
         return training_time
 
-    def test(self, testset, sampler=None):
-        """Testing the model on the client using the provided test dataset.
-
-        Arguments:
-        testset: The test dataset.
-        """
-        custom_test = getattr(self, "test_model", None)
-
-        if callable(custom_test):
-            config = Config().trainer._asdict()
-            accuracy = self.test_model(config, testset, sampler)
+    def train_model(self, config, trainset, sampler, cut_layer=None):
+        """Trains the model."""
+        # Initializing the loss criterion
+        logging.info("Get loss_criterion on client #%d.", self.client_id)
+        _loss_criterion = getattr(self, "loss_criterion", None)
+        if callable(_loss_criterion):
+            loss_criterion = self.loss_criterion(self.model)
         else:
-            accuracy = self.model.evaluate(testset, verbose=0)[1]
+            loss_criterion = tf.keras.losses.SparseCategoricalCrossentropy()
+
+        # Initializing the optimizer
+        logging.info("Get_optimizer on client #%d.", self.client_id)
+        get_optimizer = getattr(self, "get_optimizer", None)
+        if callable(get_optimizer):
+            optimizer = self.get_optimizer(self.model)
+        else:
+            optimizer = tf.keras.optimizers.Adam(config["learning_rate"])
+
+        self.model.compile(
+            optimizer=optimizer,
+            loss=loss_criterion,
+            metrics=[tf.keras.metrics.SparseCategoricalAccuracy()],
+        )
+
+        logging.info("Begining training on client #%d.", self.client_id)
+        self.model.fit(trainset, epochs=config["epochs"])
+
+    def test(self, testset, sampler=None, **kwargs):
+        """Tests the model on the client using the provided test dataset.
+
+        :param testset: the test dataset.
+        :param sampler: the test dataset sampler.
+        """
+
+        config = Config().trainer._asdict()
+
+        try:
+            accuracy = self.test_model(config, testset, sampler)
+        except Exception as testing_exception:
+            logging.info("Testing on client #%d failed.", self.client_id)
+            raise testing_exception
 
         return accuracy
+
+    def test_model(self, config, testset, sampler):
+        """Tests the model. Must be compiled first."""
+        logging.info("Get loss_criterion on client #%d.", self.client_id)
+        loss_criterion = self.get_loss_criterion()
+
+        # Initializing the optimizer
+        logging.info("Get_optimizer on client #%d.", self.client_id)
+        get_optimizer = getattr(self, "get_optimizer", None)
+        if callable(get_optimizer):
+            optimizer = self.get_optimizer(self.model)
+        else:
+            optimizer = tf.keras.optimizers.Adam(config["learning_rate"])
+
+        self.model.compile(
+            optimizer=optimizer,
+            loss=loss_criterion,
+            metrics=[tf.keras.metrics.SparseCategoricalAccuracy()],
+        )
+
+        return self.model.evaluate(testset, verbose=0)[1]
+
+    def get_loss_criterion(self):
+        """Returns the loss criterion."""
+        return tf.keras.losses.SparseCategoricalCrossentropy()
