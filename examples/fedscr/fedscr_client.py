@@ -62,7 +62,7 @@ class Client(simple.Client):
         return loss
 
     def get_divs(self):
-        """Retrieve the average weight update and divergences."""
+        """Retrieve the average weight update and weight divergence."""
         model_path = Config().params["checkpoint_path"]
         model_name = Config().trainer.model_name
 

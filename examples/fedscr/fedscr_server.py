@@ -58,14 +58,14 @@ class Server(fedavg.Server):
         )
 
     def configure(self):
-        """Logs the usage of either the adaptive or normal algorithm."""
+        """Log the usage of either the adaptive or normal algorithm."""
         super().configure()
         if self.trainer.use_adaptive:
             logging.info("Using adaptive algorithm.")
 
     def extract_client_updates(self, updates):
         """Extract the model weight updates from clients."""
-        # deltas_received are the total gradients for the convolutional layers
+
         deltas_received = [payload for (__, __, payload, __) in updates]
         self.local_loss = [report.loss for (__, report, __, __) in updates]
         if self.trainer.use_adaptive:
@@ -135,7 +135,7 @@ class Server(fedavg.Server):
 
     def calc_loss_var(self):
         """Calculates the loss variance using mean squared error."""
-        global_loss = sum(self.local_loss) / len(self.local_loss)
+        global_loss = [sum(self.local_loss) / len(self.local_loss)]
         loss = torch.nn.MSELoss()
         variance = loss(
             torch.FloatTensor(self.local_loss), torch.FloatTensor(global_loss)

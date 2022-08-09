@@ -44,6 +44,7 @@ class Trainer(basic.Trainer):
         self.test_loss = None
         self.avg_update = None
         self.div = None
+        self.orig_weights = None
 
     def prune_updates(self, orig_weights):
         """Prune the weight updates by setting some updates to 0."""
@@ -242,9 +243,26 @@ class Trainer(basic.Trainer):
             self.avg_update,
         )
 
+        # Add weight divergence and average update to client report
+        if self.use_adaptive is True:
+            add_to_report = {"div": self.div, "g": self.avg_update}
+            model_path = Config().params["checkpoint_path"]
+            model_name = Config().trainer.model_name
+
+            if not os.path.exists(model_path):
+                os.makedirs(model_path)
+
+            report_path = f"{model_path}/{model_name}_{self.client_id}.pkl"
+
+            with open(report_path, "wb") as file:
+                pickle.dump(add_to_report, file)
+
+        # Save the final training loss
         model_name = config["model_name"]
         filename = f"{model_name}_{self.client_id}.loss"
         Trainer._save_loss(self.train_loss.data.item(), filename)
+
+        self.model.load_state_dict(self.total_grad, strict=True)
 
     def weight_div(self, orig_weights):
         """Calculate the divergence of the locally trained model from the global model."""
