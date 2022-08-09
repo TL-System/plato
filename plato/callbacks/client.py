@@ -13,7 +13,7 @@ class ClientCallback(ABC):
     The abstract base class to be subclassed when creating new client callbacks.
     """
 
-    def on_client_train_end(self, client, weights, **kwargs):
+    def on_client_train_end(self, client, **kwargs):
         """
         Event called at the end of local training.
         """
@@ -24,7 +24,7 @@ class PrintProgressCallback(ClientCallback):
     A callback which prints a message when needed.
     """
 
-    def on_client_train_end(self, client, weights, **kwargs):
+    def on_client_train_end(self, client, **kwargs):
         """
         Event called at the end of local training.
         """
