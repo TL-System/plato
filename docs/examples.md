@@ -18,7 +18,7 @@ python examples/fedprox/fedprox.py -c examples/fedprox/fedprox_MNIST_lenet5.yml
 ```
 
 ```{note}
-Li, T., Sahu, A. K., Zaheer, M., Sanjabi, M., Talwalkar, A., & Smith, V. (2020). [&ldquo;Federated optimization in heterogeneous networks,&rdquo;](https://proceedings.mlsys.org/paper/2020/file/38af86134b65d0f10fe33d30dd76442e-Paper.pdf) Proceedings of Machine Learning and Systems, 2, 429-450.
+Li, T., Sahu, A. K., Zaheer, M., Sanjabi, M., Talwalkar, A., & Smith, V. (2020). &ldquo;[Federated Optimization in Heterogeneous Networks](https://proceedings.mlsys.org/paper/2020/file/38af86134b65d0f10fe33d30dd76442e-Paper.pdf),&rdquo; Proceedings of Machine Learning and Systems, 2, 429-450.
 ```
 ````
 
@@ -33,7 +33,7 @@ python examples/fedasync/fedasync.py -c examples/fedasync/fedasync_CIFAR10_resne
 ```
 
 ```{note}
-Xie, C., Koyejo, S., Gupta, I. [&ldquo;Asynchronous federated optimization,&rdquo;](https://opt-ml.org/papers/2020/paper_28.pdf) in Proc. 12th Annual Workshop on Optimization for Machine Learning (OPT 2020).
+Xie, C., Koyejo, S., Gupta, I. &ldquo;[Asynchronous Federated Optimization](https://opt-ml.org/papers/2020/paper_28.pdf),&rdquo; in Proc. 12th Annual Workshop on Optimization for Machine Learning (OPT 2020).
 ```
 ````
 
