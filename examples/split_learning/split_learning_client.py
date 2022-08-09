@@ -64,8 +64,6 @@ class Client(simple.Client):
                           training_time, comm_time, False,
                           "features"), features
         else:
-            self.model_received = False
-            self.gradient_received = False
             # Perform a complete training with gradients received
             config = Config().trainer._asdict()
             training_time = self.algorithm.complete_train(
