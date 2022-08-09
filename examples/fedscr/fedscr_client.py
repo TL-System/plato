@@ -48,7 +48,7 @@ class Client(simple.Client):
         """Retrieve the loss value from the training process."""
         model_name = Config().trainer.model_name
         filename = f"{model_name}_{self.client_id}.loss"
-        loss = self.trainer.load_loss(filename)
+        loss = self.trainer._load_loss(filename)
         return loss
 
     def get_divs(self):

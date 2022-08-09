@@ -185,8 +185,8 @@ class Server(fedavg.Server):
         """
         # Delete gradient files created by the clients.
         model_name = Config().trainer.model_name
-        model_path = Config().params["checkpoint_path"]
+        checkpoint_path = Config().params["checkpoint_path"]
         for client_id in range(1, self.total_clients + 1):
-            allgrad_path = f"{model_path}/{model_name}_client{client_id}_grad.pth"
+            allgrad_path = f"{checkpoint_path}/{model_name}_client{client_id}_grad.pth"
             if os.path.exists(allgrad_path):
                 os.remove(allgrad_path)

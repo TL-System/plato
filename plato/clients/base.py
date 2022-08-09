@@ -397,9 +397,3 @@ class Client:
     @abstractmethod
     async def obtain_model_update(self, wall_time):
         """Retrieving a model update corrsponding to a particular wall clock time."""
-
-    def client_train_end(self, weights):
-        """
-        Method called at the end of local training.
-        """
-        return weights

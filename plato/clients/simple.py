@@ -179,8 +179,8 @@ class Client(base.Client):
                 self.sampler.trainset_size(), accuracy, training_time, comm_time, False
             )
 
-        self.client_train_end(weights)
-        self.callback_handler.call_event("on_client_train_end", self, weights)
+        self.client_train_end()
+        self.callback_handler.call_event("on_client_train_end", self)
 
         return self.report, weights
 
@@ -200,3 +200,8 @@ class Client(base.Client):
     def load_model(self, model_checkpoint):
         """Loading the model from a model checkpoint."""
         self.trainer.load_model(model_checkpoint)
+
+    def client_train_end(self):
+        """
+        Method called at the end of local training.
+        """

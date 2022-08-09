@@ -267,7 +267,7 @@ class Trainer(basic.Trainer):
         if self.use_adaptive is True:
             model_name = config["model_name"]
             filename = f"{model_name}_{self.client_id}.loss"
-            Trainer.save_loss(self.train_loss.data.item(), filename)
+            Trainer._save_loss(self.train_loss.data.item(), filename)
 
     async def server_test_model(self, config, testset, sampler):
         """
@@ -351,32 +351,22 @@ class Trainer(basic.Trainer):
         return np.sqrt(np.abs(delta / total))
 
     @staticmethod
-    def save_loss(loss, filename=None):
+    def _save_loss(loss, filename):
         """Save the training loss to a file."""
-        model_path = Config().params["checkpoint_path"]
-        model_name = Config().trainer.model_name
+        checkpoint_path = Config().params["checkpoint_path"]
 
-        if not os.path.exists(model_path):
-            os.makedirs(model_path)
+        if not os.path.exists(checkpoint_path):
+            os.makedirs(checkpoint_path)
 
-        if filename is not None:
-            loss_path = f"{model_path}/{filename}"
-        else:
-            loss_path = f"{model_path}/{model_name}.loss"
-
+        loss_path = f"{checkpoint_path}/{filename}"
         with open(loss_path, "w", encoding="utf-8") as file:
             file.write(str(loss))
 
     @staticmethod
-    def load_loss(filename=None):
+    def _load_loss(filename):
         """Load the training loss from a file."""
-        model_path = Config().params["checkpoint_path"]
-        model_name = Config().trainer.model_name
-
-        if filename is not None:
-            loss_path = f"{model_path}/{filename}"
-        else:
-            loss_path = f"{model_path}/{model_name}.loss"
+        checkpoint_path = Config().params["checkpoint_path"]
+        loss_path = f"{checkpoint_path}/{filename}"
 
         with open(loss_path, "r", encoding="utf-8") as file:
             loss = float(file.read())
