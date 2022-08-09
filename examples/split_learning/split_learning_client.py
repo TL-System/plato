@@ -29,30 +29,26 @@ class Client(simple.Client):
                          algorithm=algorithm,
                          trainer=trainer)
 
-        self.model_received = False
-        self.gradient_received = False
+        self.phase = 'extract_features'
 
     def load_payload(self, server_payload):
         """Loading the server model onto this client."""
-        if self.model_received and self.gradient_received:
-            self.model_received = False
-            self.gradient_received = False
+        payload, info = server_payload
 
-        if not self.model_received:
-            self.model_received = True
-            self.algorithm.load_weights(server_payload)
-        elif not self.gradient_received:
-            self.gradient_received = True
-            self.algorithm.receive_gradients(server_payload)
+        if info == 'weights':
+            self.algorithm.load_weights(payload)
+            self.phase = 'extract_features'
+        elif info == 'gradients':
+            self.algorithm.receive_gradients(payload)
+            self.phase = 'complete_train'
 
     async def train(self):
         """A split learning client only uses the first several layers in a forward pass."""
         assert not Config().clients.do_test
         accuracy = 0
         comm_time = time.time()
-        training_time = 0
 
-        if not self.gradient_received:
+        if self.phase == 'extract_features':
             # Perform a forward pass till the cut layer in the model
             logging.info(
                 "Performing a forward pass till the cut layer on client #%d",
@@ -68,6 +64,8 @@ class Client(simple.Client):
                           training_time, comm_time, False,
                           "features"), features
         else:
+            self.model_received = False
+            self.gradient_received = False
             # Perform a complete training with gradients received
             config = Config().trainer._asdict()
             training_time = self.algorithm.complete_train(

@@ -24,16 +24,9 @@ class Trainer(basic.Trainer):
         else:
             logging.info("[Client #%d] Loading the dataset.", self.client_id)
 
-        _train_loader = getattr(self, "train_loader", None)
+        train_loader = trainset
 
-        if callable(_train_loader):
-            train_loader = self.train_loader(batch_size, trainset, cut_layer)
-        else:
-            train_loader = torch.utils.data.DataLoader(dataset=trainset,
-                                                       shuffle=False,
-                                                       batch_size=batch_size)
-
-        iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
+        iterations_per_epoch = len(train_loader)
 
         # Sending the model to the device used for training
         self.model.to(self.device)

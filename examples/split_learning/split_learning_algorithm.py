@@ -70,10 +70,6 @@ class Algorithm(fedavg.Algorithm):
                 (inputs.detach().cpu(), targets.detach().cpu()))
 
         toc = time.perf_counter()
-        logging.info("[Client #%s] Time used: %.2f seconds.", self.client_id,
-                     toc - tic)
-
-        toc = time.perf_counter()
         logging.info("[Client #%d] Features extracted from %s examples.",
                      self.client_id, len(features_dataset))
         logging.info("[Client #%d] Time used: %.2f seconds.", self.client_id,
@@ -88,18 +84,7 @@ class Algorithm(fedavg.Algorithm):
 
         batch_size = config['batch_size']
 
-        _train_loader = getattr(self.trainer, "train_loader", None)
-
-        if callable(_train_loader):
-            data_loader = self.trainer.train_loader(
-                batch_size=batch_size,
-                trainset=self.input_dataset,
-                extract_features=True)
-        else:
-            data_loader = torch.utils.data.DataLoader(
-                dataset=self.input_dataset,
-                shuffle=False,
-                batch_size=batch_size)
+        data_loader = self.input_dataset
 
         tic = time.perf_counter()
 

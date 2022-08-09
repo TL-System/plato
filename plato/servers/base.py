@@ -154,6 +154,9 @@ class Server:
     def __repr__(self):
         return f'Server #{os.getpid()}'
 
+    def __str__(self):
+        return f'Server #{os.getpid()}'
+
     def configure(self):
         """ Initializing configuration settings based on the configuration file. """
         # Ping interval and timeout setup for the server
