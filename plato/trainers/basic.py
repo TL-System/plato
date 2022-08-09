@@ -1,6 +1,7 @@
 """
 The training and testing loops for PyTorch.
 """
+
 import asyncio
 import copy
 import logging
@@ -10,6 +11,7 @@ import re
 import time
 
 import torch
+
 from plato.config import Config
 from plato.models import registry as models_registry
 from plato.trainers import base
@@ -44,7 +46,7 @@ class Trainer(base.Trainer):
         if model is None:
             self.model = models_registry.get()
         else:
-            self.model = model.get_model()
+            self.model = model()
 
         self.train_loader = None
         self.sampler = None
@@ -126,9 +128,10 @@ class Trainer(base.Trainer):
             logging.info("[Client #%d] Woke up.", self.client_id)
 
     def train_process(self, config, trainset, sampler, cut_layer=None, **kwargs):
-        """The main training loop in a federated learning workload, run in
-          a separate process with a new CUDA context, so that CUDA memory
-          can be released after the training completes.
+        """
+        The main training loop in a federated learning workload, run in a
+        separate process with a new CUDA context, so that CUDA memory can be
+        released after the training completes.
 
         Arguments:
         self: the trainer itself.
@@ -138,7 +141,6 @@ class Trainer(base.Trainer):
         cut_layer (optional): The layer which training should start from.
         kwargs (optional): Additional keyword arguments.
         """
-
         try:
             self.train_model(config, trainset, sampler.get(), cut_layer, **kwargs)
         except Exception as training_exception:
@@ -147,8 +149,8 @@ class Trainer(base.Trainer):
 
         if "max_concurrency" in config:
             self.model.cpu()
-            model_type = config["model_name"]
-            filename = f"{model_type}_{self.client_id}_{config['run_id']}.pth"
+            model_name = config["model_name"]
+            filename = f"{model_name}_{self.client_id}_{config['run_id']}.pth"
             self.save_model(filename)
 
     def train_model(self, config, trainset, sampler, cut_layer):
@@ -165,11 +167,7 @@ class Trainer(base.Trainer):
         )
 
         # Initializing the loss criterion
-        _loss_criterion = getattr(self, "loss_criterion", None)
-        if callable(_loss_criterion):
-            loss_criterion = self.loss_criterion(self.model)
-        else:
-            loss_criterion = torch.nn.CrossEntropyLoss()
+        loss_criterion = Trainer.get_loss_criterion()
 
         # Initializing the optimizer
         get_optimizer = getattr(self, "get_optimizer", optimizers.get_optimizer)
@@ -387,22 +385,6 @@ class Trainer(base.Trainer):
 
         return accuracy
 
-    async def server_test(self, testset, sampler=None, **kwargs):
-        """Testing the model on the server using the provided test dataset.
-
-        Arguments:
-        testset: The test dataset.
-        sampler: The sampler that extracts a partition of the test dataset.
-        **kwargs (optional): Additional keyword arguments.
-        """
-        config = Config().trainer._asdict()
-        config["run_id"] = Config().params["run_id"]
-
-        self.model.to(self.device)
-        self.model.eval()
-
-        return await self.server_test_model(config, testset, sampler)
-
     def obtain_model_update(self, wall_time):
         """
         Obtain a saved model for a particular epoch that finishes just after the provided
@@ -489,63 +471,22 @@ class Trainer(base.Trainer):
 
         return correct / total
 
-    async def server_test_model(self, config, testset, sampler):
-        """
-        Evaluates the model with the provided test dataset and test sampler. To be used on the
-        server as it yields to the other asyncio threads after each step of testing.
-
-        :param testset: the test dataset.
-        :param sampler: the test sampler.
-        """
-        batch_size = config["batch_size"]
-
-        if sampler is None:
-            test_loader = torch.utils.data.DataLoader(
-                testset, batch_size=batch_size, shuffle=False
-            )
-        else:
-            # Use a testing set following the same distribution as the training set
-            test_loader = torch.utils.data.DataLoader(
-                testset, batch_size=batch_size, shuffle=False, sampler=sampler.get()
-            )
-
-        correct = 0
-        total = 0
-
-        with torch.no_grad():
-            for examples, labels in test_loader:
-                examples, labels = examples.to(self.device), labels.to(self.device)
-
-                outputs = self.model(examples)
-
-                _, predicted = torch.max(outputs.data, 1)
-                total += labels.size(0)
-                correct += (predicted == labels).sum().item()
-
-                # Yield to other tasks in the server
-                await asyncio.sleep(0)
-
-        return correct / total
+    @staticmethod
+    def get_loss_criterion():
+        """Returns the loss criterion."""
+        return torch.nn.CrossEntropyLoss()
 
     def train_run_start(self, config):
-        """
-        Method called at the start of training run.
-        """
+        """Method called at the start of training run."""
 
     def train_run_end(self, config):
-        """
-        Method called at the end of a training run.
-        """
+        """Method called at the end of a training run."""
 
     def train_epoch_start(self, config):
-        """
-        Method called at the beginning of a training epoch.
-        """
+        """Method called at the beginning of a training epoch."""
 
     def train_epoch_end(self, config):
-        """
-        Method called at the end of a training epoch.
-        """
+        """Method called at the end of a training epoch."""
 
     def train_step_end(self, config, batch=None, loss=None):
         """

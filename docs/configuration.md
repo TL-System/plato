@@ -425,33 +425,29 @@ Whether the learning rate should be scheduled globally (`true`) or not (`false`)
 If `true`, the learning rate of the first epoch in the next communication round is scheduled based on that of the last epoch in the previous communication round.
 ```
 
+````{admonition} **model_type**
+The repository where the machine learning model should be retrieved from. The following options are available:
+
+- `huggingface`
+- `torch_hub`
+
+The name of the model should be specified below, in `model_name`.
+````
+
 ````{admonition} **model_name**
 The name of the machine learning model. The following options are available:
 
 - `lenet5`
 - `resnet_x`
 - `vgg_x`
-- `wideresnet`
-- `feedback_transformer`
 - `yolov5`
-- `HuggingFace_CausalLM`
-- `inceptionv3`
-- `googlenet`
-- `unet`
-- `alexnet`
-- `squeezenet_x`
-- `shufflenet_x`
 - `dcgan`
 - `multilayer`
 
 ```{note}
-For `resnet_x`, x = 18, 34, 50, 101, or 152
+If the `model_type` above specified a model repository, supply the name of the model, such as `gpt2`, here.
 
-For `vgg_x`, x = 11, 13, 16, or 19
-
-For `squeezenet_x`, x = 0 or 1
-
-For `shufflenet_x`, x = 0.5, 1.0, 1.5, or 2.0
+For `resnet_x`, x = 18, 34, 50, 101, or 152; For `vgg_x`, x = 11, 13, 16, or 19.
 ```
 ````
 

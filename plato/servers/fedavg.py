@@ -203,9 +203,8 @@ class Server(base.Server):
             )
         else:
             # Testing the updated model directly at the server
-            self.accuracy = await self.trainer.server_test(
-                self.testset, self.testset_sampler
-            )
+
+            self.accuracy = self.trainer.test(self.testset, self.testset_sampler)
 
         if hasattr(Config().trainer, "target_perplexity"):
             logging.info("[%s] Global model perplexity: %.2f\n", self, self.accuracy)

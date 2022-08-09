@@ -17,7 +17,7 @@ from plato.servers import fedavg
 
 
 class Server(fedavg.Server):
-    """A federated learning server using the FedAsync algorithm. """
+    """A federated learning server using the FedAsync algorithm."""
 
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
@@ -32,19 +32,22 @@ class Server(fedavg.Server):
         other parameters from config file.
         """
         super().configure()
-        self.adaptive_mixing = hasattr(
-            Config().server,
-            'adaptive_mixing') and Config().server.adaptive_mixing
+        self.adaptive_mixing = (
+            hasattr(Config().server, "adaptive_mixing")
+            and Config().server.adaptive_mixing
+        )
 
-        if not hasattr(Config().server, 'mixing_hyperparameter'):
+        if not hasattr(Config().server, "mixing_hyperparameter"):
             logging.warning(
                 "FedAsync: Variable mixing hyperparameter is required for the FedAsync server."
             )
         else:
             self.mixing_hyperparam = Config().server.mixing_hyperparameter
             if 0 < self.mixing_hyperparam < 1:
-                logging.info("FedAsync: Mixing hyperparameter is set to %s.",
-                             self.mixing_hyperparam)
+                logging.info(
+                    "FedAsync: Mixing hyperparameter is set to %s.",
+                    self.mixing_hyperparam,
+                )
             else:
                 logging.warning(
                     "FedAsync: Invalid mixing hyperparameter. "
@@ -61,43 +64,43 @@ class Server(fedavg.Server):
 
         # Calculate updated weights from clients
         payload_received = [payload for (__, __, payload, __) in self.updates]
-        deltas_received = self.algorithm.compute_weight_deltas(
-            payload_received)
+        deltas_received = self.algorithm.compute_weight_deltas(payload_received)
 
         # Actually update the global model's weights (PyTorch only)
         baseline_weights = self.algorithm.extract_weights()
 
         updated_weights = OrderedDict()
         for name, weight in baseline_weights.items():
-            updated_weights[name] = weight * (
-                1 - self.mixing_hyperparam
-            ) + deltas_received[0][name] * self.mixing_hyperparam
+            updated_weights[name] = (
+                weight * (1 - self.mixing_hyperparam)
+                + deltas_received[0][name] * self.mixing_hyperparam
+            )
 
         self.algorithm.load_weights(updated_weights)
 
         # Testing the global model accuracy
-        if hasattr(Config().server, 'do_test') and not Config().server.do_test:
+        if hasattr(Config().server, "do_test") and not Config().server.do_test:
             # Compute the average accuracy from client reports
             self.accuracy = self.accuracy_averaging(self.updates)
-            logging.info('[%s] Average client accuracy: %.2f%%.', self,
-                         100 * self.accuracy)
+            logging.info(
+                "[%s] Average client accuracy: %.2f%%.", self, 100 * self.accuracy
+            )
         else:
             # Testing the updated model directly at the server
-            self.accuracy = await self.trainer.server_test(
-                self.testset, self.testset_sampler)
+            self.accuracy = elf.trainer.test(self.testset, self.testset_sampler)
 
-        if hasattr(Config().trainer, 'target_perplexity'):
-            logging.info('[%s] Global model perplexity: %.2f\n', self,
-                         self.accuracy)
+        if hasattr(Config().trainer, "target_perplexity"):
+            logging.info("[%s] Global model perplexity: %.2f\n", self, self.accuracy)
         else:
-            logging.info('[%s] Global model accuracy: %.2f%%\n', self,
-                         100 * self.accuracy)
+            logging.info(
+                "[%s] Global model accuracy: %.2f%%\n", self, 100 * self.accuracy
+            )
 
         await self.wrap_up_processing_reports()
 
     @staticmethod
     def staleness_function(staleness) -> float:
-        """ Staleness function used to adjust the mixing hyperparameter """
+        """Staleness function used to adjust the mixing hyperparameter"""
         if hasattr(Config().server, "staleness_weighting_function"):
             staleness_func_param = Config().server.staleness_weighting_function
             func_type = staleness_func_param.type.lower()
@@ -113,23 +116,24 @@ class Server(fedavg.Server):
             else:
                 logging.warning(
                     "FedAsync: Unknown staleness weighting function type. "
-                    "Type needs to be constant, polynomial, or hinge.")
+                    "Type needs to be constant, polynomial, or hinge."
+                )
         else:
             return Server.constant_function()
 
     @staticmethod
     def constant_function() -> float:
-        """ Constant staleness function as proposed in Sec. 5.2, Evaluation Setup. """
+        """Constant staleness function as proposed in Sec. 5.2, Evaluation Setup."""
         return 1
 
     @staticmethod
     def polynomial_function(staleness, a) -> float:
-        """ Polynomial staleness function as proposed in Sec. 5.2, Evaluation Setup. """
-        return (staleness + 1)**-a
+        """Polynomial staleness function as proposed in Sec. 5.2, Evaluation Setup."""
+        return (staleness + 1) ** -a
 
     @staticmethod
     def hinge_function(staleness, a, b) -> float:
-        """ Hinge staleness function as proposed in Sec. 5.2, Evaluation Setup. """
+        """Hinge staleness function as proposed in Sec. 5.2, Evaluation Setup."""
         if staleness <= b:
             return 1
         else:
