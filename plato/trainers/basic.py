@@ -163,7 +163,7 @@ class Trainer(base.Trainer):
         )
 
         # Initializing the loss criterion
-        loss_criterion = Trainer.get_loss_criterion()
+        loss_criterion = self.get_loss_criterion()
 
         # Initializing the optimizer
         get_optimizer = getattr(self, "get_optimizer", optimizers.get_optimizer)
@@ -452,8 +452,7 @@ class Trainer(base.Trainer):
 
         return correct / total
 
-    @staticmethod
-    def get_loss_criterion():
+    def get_loss_criterion(self):
         """Returns the loss criterion."""
         return torch.nn.CrossEntropyLoss()
 

@@ -8,25 +8,13 @@ from collections import OrderedDict
 from plato.config import Config
 
 if hasattr(Config().trainer, "use_mindspore"):
-    from plato.models.mindspore import (
-        lenet5 as lenet5_mindspore,
-    )
+    from plato.models.mindspore import lenet5 as lenet5_mindspore
 
-    registered_models = OrderedDict(
-        [
-            ("lenet5", lenet5_mindspore.Model),
-        ]
-    )
+    registered_models = OrderedDict([("lenet5", lenet5_mindspore.Model)])
 elif hasattr(Config().trainer, "use_tensorflow"):
-    from plato.models.tensorflow import (
-        lenet5 as lenet5_tensorflow,
-    )
+    from plato.models.tensorflow import lenet5 as lenet5_tensorflow
 
-    registered_models = OrderedDict(
-        [
-            ("lenet5", lenet5_tensorflow.Model),
-        ]
-    )
+    registered_models = OrderedDict([("lenet5", lenet5_tensorflow.Model)])
 else:
     from plato.models import (
         lenet5,
