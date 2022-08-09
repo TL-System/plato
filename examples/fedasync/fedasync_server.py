@@ -87,7 +87,7 @@ class Server(fedavg.Server):
             )
         else:
             # Testing the updated model directly at the server
-            self.accuracy = await self.trainer.test(self.testset, self.testset_sampler)
+            self.accuracy = elf.trainer.test(self.testset, self.testset_sampler)
 
         if hasattr(Config().trainer, "target_perplexity"):
             logging.info("[%s] Global model perplexity: %.2f\n", self, self.accuracy)
