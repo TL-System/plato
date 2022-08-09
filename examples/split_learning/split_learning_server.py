@@ -49,7 +49,8 @@ class Server(fedavg.Server):
                              os.getpid(), client_id)
                 sid = self.clients[client_id]['sid']
                 server_payload = (gradients, 'gradients')
-                await self.send(sid, server_payload, client_id)
+                if not self.comm_simulation:
+                    await self.send(sid, server_payload, client_id)
 
             elif report.phase == "weights":
                 client_weight_updates.append(self.updates[i])
