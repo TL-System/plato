@@ -4,6 +4,9 @@
 
 The common practice is to customize the client using inheritance for important features that change the state of the local training process. To customize the client using inheritance, subclass the `simple.Client` class in `plato.clients`, and override methods.
 
+```{admonition} **client_train_end(self)**
+Overide this method to complete additional tasks after the local training ends.
+```
 
 ## Customizing clients using callbacks
 
@@ -13,8 +16,6 @@ Within the implementation of these callback methods, one can access additional i
 
 To use callbacks, subclass the `ClientCallback` class in `plato.callbacks.client`, and override the following methods:
 
-````{admonition} **on_client_train_end(self, client, weights)**
+```{admonition} **on_client_train_end(self, client)**
 Overide this method to complete additional tasks after the local training ends.
-
-`weights` weights of client's local trained model.
-````
+```

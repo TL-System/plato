@@ -25,7 +25,7 @@ class Client(simple.Client):
     A federated learning client prunes its update before sending out.
     """
 
-    def client_train_end(self, weights):
+    def client_train_end(self):
         """Method called at the end of local training."""
 
         logging.info("[Client #%d] Trained with FedSCR algorithm.", self.client_id)
@@ -43,8 +43,6 @@ class Client(simple.Client):
                 divs["div"],
                 divs["g"],
             )
-
-        return self.trainer.total_grad
 
     def get_loss(self):
         """Retrieve the loss value from the training process."""
