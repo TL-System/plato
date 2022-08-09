@@ -29,7 +29,7 @@ A `Sampler` is responsible for sampling a dataset for local training or testing 
 
 ### Models
 
-A model class can be arbitrarily defined, as long as it implements a method called `get_model()`, which returns an instance of the model. Just like `datasources/registry.py`, there is also a list of provided models in Plato they can be discovered and loaded. The registry similarly contains a `get()` function that returns a `Model` instance corresponding to the name of the model in the configuration file.
+Plato directly uses models from the underlying deep learning framework, such as PyTorch. The model registry (`models/registry.py`) returns a suitable model based on the model type and model name supplied from the configuration file. The model type specifies the repository from which the model should be retrieived, such as [PyTorch Hub](https://pytorch.org/hub/) and [HuggingFace](https://huggingface.co/). The model name is used to retrieve the corresponding model from the repository. If the model type is not supplied by the configuration file, the model name is used to retrieve one of the basic models provided by Plato for benchmarking purposes. In addition to using the registry, a custom model class can be directly passed into the client and server for them to instantiate a model instance when needed.
 
 ## Extending Plato with new federated learning algorithms
 
@@ -47,7 +47,7 @@ Most federated learning algorithms can be divided into four components: a *clien
 
 - Custom training loops should be implemented as a *trainer* class. If a PyTorch-based trainer is to be implemented, one may subclass from the `basic.Trainer` class. See the **Trainers** section in API reference documentation for customizing the training loops using inheritance or callbacks.
 
-Once the custom *client*, *server*, *algorithm*, *trainer* classes have been implemented, they can be initialized using the following examples:
+Once the custom *client*, *server*, *algorithm*, *trainer* classes have been implemented, they can be initialized just like the following examples:
 
 From `examples/basic/basic.py`:
 
