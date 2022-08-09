@@ -47,9 +47,9 @@ class Server(fedavg.Server):
                 gradients = self.load_gradients()
                 logging.info("[Server #%d] Reporting gradients to client #%d.",
                              os.getpid(), client_id)
-                sid = self.clients[client_id]['sid']
                 server_payload = (gradients, 'gradients')
                 if not self.comm_simulation:
+                    sid = self.clients[client_id]['sid']
                     await self.send(sid, server_payload, client_id)
 
             elif report.phase == "weights":
