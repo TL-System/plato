@@ -31,7 +31,7 @@ class Client(simple.Client):
         model_name = Config().trainer.model_name
         model_path = Config().params["checkpoint_path"]
         filename = f"{model_path}/{model_name}_{self.client_id}_squared_batch_loss.pth"
-        sum_loss = torch.load(filename).detach().cpu().numpy()
+        sum_loss = torch.load(filename)
         self.statistical_utility = np.abs(report.num_samples) * np.sqrt(
             1.0 / report.num_samples * sum_loss
         )

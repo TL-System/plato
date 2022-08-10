@@ -103,10 +103,13 @@ class Server(fedavg.Server):
             if self.times_selected[client_id] > self.blacklist_num:
                 self.blacklist.append(client_id)
 
-    def selecting_clients(self):
-        """Selecting clients in asynchronous or synchronous mode."""
-        unselectable_clients = []
-        sample_size = self.clients_per_round
+    def customize_selected_clients(self, selected_clients, selectable_clients):
+        """Wrap up selecting clients with any additional step."""
+
+        unselectable_clients = [
+            client for client in self.clients_pool if client not in selectable_clients
+        ]
+        selected_client_num = self.clients_per_round
 
         # In asychronous FL, avoid selecting new clients to replace those that are still
         # training at this time
@@ -116,36 +119,18 @@ class Server(fedavg.Server):
             and len(self.reported_clients) > 0
             and len(self.reported_clients) < self.clients_per_round
         ):
-
-            # We need to exclude the clients who are still training.
-            training_client_ids = [
-                self.training_clients[client_id]["id"]
-                for client_id in list(self.training_clients.keys())
-            ]
-
-            # If the server is simulating the wall clock time, some of the clients who
-            # reported may not have been aggregated; they should be excluded from the next
-            # round of client selection
-            reporting_client_ids = [
-                client[2]["client_id"] for client in self.reported_clients
-            ]
-            unselectable_clients = training_client_ids + reporting_client_ids
-
             # Set the number of clients to be selected
-            if self.selected_clients is not None:
-                if self.simulate_wall_time:
-                    sample_size = len(self.current_processed_clients)
-                else:
-                    sample_size = len(self.reported_clients)
+            if self.simulate_wall_time:
+                selected_client_num = len(self.current_processed_clients)
             else:
-                sample_size = self.clients_per_round
+                selected_client_num = len(self.reported_clients)
 
         # Exploitation
-        exploit_len = math.ceil((1.0 - self.exploration_factor) * sample_size)
+        exploit_len = math.ceil((1.0 - self.exploration_factor) * selected_client_num)
 
         # If there aren't enough unexplored clients for exploration.
-        if (sample_size - exploit_len) > len(self.unexplored_clients):
-            exploit_len = sample_size - len(self.unexplored_clients)
+        if (selected_client_num - exploit_len) > len(self.unexplored_clients):
+            exploit_len = selected_client_num - len(self.unexplored_clients)
 
         # Take the top-k, sample by probability, take 95% of the cut-off loss by default
         sorted_util = sorted(
@@ -165,10 +150,9 @@ class Server(fedavg.Server):
             ):
                 exploit_clients.append(client_id)
 
-        if len(exploit_clients) != 0:
-            last_index = sorted_util.index(exploit_clients[-1])
-        else:
-            last_index = 0
+        last_index = (
+            0 if len(exploit_clients) == 0 else sorted_util.index(exploit_clients[-1])
+        )
 
         # Sample by utiliity probability.
         total_sc = max(
@@ -192,7 +176,7 @@ class Server(fedavg.Server):
             picked_clients = picked_clients.tolist()
 
         # If the result of exploitation wasn't enough to meet the required length.
-        if len(picked_clients) < exploit_len and self.current_round != 1:
+        if len(picked_clients) < exploit_len and self.current_round > 1:
             for step in range(last_index + 1, len(sorted_util)):
                 if (
                     not sorted_util[step] in (self.blacklist or unselectable_clients)
@@ -206,7 +190,7 @@ class Server(fedavg.Server):
 
         # Select unexplored clients randomly
         explore_clients = random.sample(
-            self.unexplored_clients, sample_size - len(picked_clients)
+            self.unexplored_clients, selected_client_num - len(picked_clients)
         )
 
         self.prng_state = random.getstate()
@@ -223,7 +207,7 @@ class Server(fedavg.Server):
 
         logging.info("[%s] Selected clients: %s", self, picked_clients)
 
-        self.selected_clients = picked_clients
+        return picked_clients
 
     def calc_client_util(self, client_id):
         """Calculate client utility."""
