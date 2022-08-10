@@ -18,7 +18,7 @@ class Client(simple.Client):
 
     async def send(self, payload) -> None:
         """Sending the client payload to the server using simulation, S3 or socket.io."""
-        super().send(payload)
+        await super().send(payload)
 
         if self.comm_simulation:
             # If we are using the filesystem to simulate communication over a network
@@ -36,11 +36,8 @@ class Client(simple.Client):
                 with open(mask_filename, "rb") as payload_file:
                     client_mask = pickle.load(payload_file)
                     mask_size = sys.getsizeof(pickle.dumps(client_mask)) / 1024**2
-            else:
-                mask_size = 0
-
-            logging.info(
-                "[%s] Sent %.2f MB of pruning mask to the server (simulated).",
-                self,
-                mask_size,
-            )
+                    logging.info(
+                        "[%s] Sent %.2f MB of pruning mask to the server (simulated).",
+                        self,
+                        mask_size,
+                    )

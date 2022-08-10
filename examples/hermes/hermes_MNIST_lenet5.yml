@@ -32,8 +32,8 @@ server:
 
     random_seed: 1
 
-    checkpoint_path: results/test/checkpoint
-    model_path: results/test/model
+    checkpoint_path: test/checkpoint
+    model_path: test/model
 
     inbound_processors:
         - model_decompress
@@ -87,4 +87,4 @@ results:
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time, comm_overhead
 
-    result_path: results/test
+    result_path: test/results
