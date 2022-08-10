@@ -39,13 +39,15 @@ class Server(fedavg.Server):
                 model[layer_name] = model[layer_name].numpy()
 
         step = 0
+
+        masked_layers = []
+        for name, module in self.trainer.model.named_modules():
+            if isinstance(module, (torch.nn.Conv2d, torch.nn.Linear)):
+                layer_name = f"{name}.weight"
+                masked_layers.append(layer_name)
+
         for layer_name in weights_received[0].keys():
-            if "weight" in layer_name and (
-                "conv" in layer_name
-                or "shortcut.0.weight" in layer_name
-                or "linear" in layer_name
-                or "fc" in layer_name
-            ):
+            if layer_name in masked_layers:
                 count = np.zeros_like(masks_received[0][step].reshape([-1]))
                 avg = np.zeros_like(weights_received[0][layer_name].reshape([-1]))
                 for index, __ in enumerate(masks_received):
@@ -168,8 +170,8 @@ class Server(fedavg.Server):
         """Method called at the start of closing the server."""
         # Delete pruning masks created by clients
         model_name = Config().trainer.model_name
-        model_path = Config().params["checkpoint_path"]
+        checkpoint_path = Config().params["checkpoint_path"]
         for client_id in range(1, self.total_clients + 1):
-            mask_path = f"{model_path}/{model_name}_client{client_id}_mask.pth"
+            mask_path = f"{checkpoint_path}/{model_name}_client{client_id}_mask.pth"
             if os.path.exists(mask_path):
                 os.remove(mask_path)
