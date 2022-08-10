@@ -46,6 +46,7 @@ class Algorithm(fedavg.Algorithm):
 
         return feature_dataset
 
+    # pylint: disable=protected-access
     def train(self, trainset, sampler, cut_layer=None):
         """Train the neural network model after the cut layer."""
         self.trainer._train(

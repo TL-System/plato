@@ -68,6 +68,7 @@ class Algorithm(fedavg.Algorithm):
         for logit, target in feature_dataset.trainset:
             yield logit, target
 
+    # pylint: disable=protected-access
     def train(self, trainset, *args):
         """The main training loop used in the MistNet server.
 
@@ -78,4 +79,4 @@ class Algorithm(fedavg.Algorithm):
             list(Algorithm.dataset_generator(trainset)), column_names=["image", "label"]
         )
 
-        self.trainer.train(feature_dataset)
+        self.trainer._train(feature_dataset)
