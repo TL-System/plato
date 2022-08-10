@@ -459,6 +459,7 @@ class Trainer(base.Trainer):
         correct = 0
         total = 0
 
+        self.model.to(self.device)
         with torch.no_grad():
             for examples, labels in test_loader:
                 examples, labels = examples.to(self.device), labels.to(self.device)
