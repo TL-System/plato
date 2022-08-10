@@ -88,6 +88,7 @@ data:
     # The random seed for sampling data
     random_seed: 1
 
+    num_classes: 100
 
 trainer:
     # The type of the trainer
@@ -103,7 +104,7 @@ trainer:
     max_concurrency: 3
 
     # The target accuracy
-    target_accuracy: 0.9
+    target_accuracy: 0.98
 
     # Number of epochs for local training in each communication round
     #   The user is expected to carefully choose the batch_size to avoid
@@ -113,7 +114,7 @@ trainer:
     batch_size: 64
 
     optimizer: SGD
-    learning_rate: 0.02
+    learning_rate: 0.05
     momentum: 0.9
     weight_decay: 0.000001
 
@@ -129,11 +130,11 @@ trainer:
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
     # does not utilize the
-    pers_epochs: 1
+    pers_epochs: 10
     pers_batch_size: 64
     pers_optimizer: SGD
     # lr = 0.1 * batch_size / 256, see section B.6 and B.7 of SimCLR paper.
-    pers_learning_rate: 0.1
+    pers_learning_rate: 0.05
     pers_momentum: 0.9
     pers_weight_decay: 0.0
 
@@ -152,9 +153,6 @@ trainer:
     #   but use the custom model
     model_name: resnet_18
     personalized_model_name: resnet_18
-
-    # encoder, whole
-    global_model_name: encoder
     # whether to maintain the state of the trained personalized
     # model in each round
     # In general, for the contrastive self-supervised learning
@@ -167,6 +165,8 @@ trainer:
     # Then, setting do_maintain_per_state to be True to follow this
     # rule.
     do_maintain_per_state: False
+    # encoder, whole
+    global_model_name: encoder
 
     num_classes: 100
 
