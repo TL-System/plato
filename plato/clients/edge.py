@@ -71,14 +71,14 @@ class Client(base.Client):
 
         # Generate a report for the central server
         report = Report(
-            self.server.total_samples,
-            accuracy,
-            training_time,
-            comm_time,
-            False,
-            average_accuracy,
-            self.client_id,
-            self.server.comm_overhead,
+            num_samples=self.server.total_samples,
+            accuracy=accuracy,
+            training_time=training_time,
+            comm_time=comm_time,
+            update_response=False,
+            average_accuracy=average_accuracy,
+            client_id=self.client_id,
+            edge_server_comm_overhead=self.server.comm_overhead,
         )
 
         self._report = self.customize_report(report)
