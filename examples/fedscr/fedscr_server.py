@@ -20,16 +20,16 @@ class Server(fedavg.Server):
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
 
-        # loss variances for each communication round used by the adaptive algorithm.
+        # Loss variances for each communication round used by the adaptive algorithm
         self.variances = []
 
-        # local loss received from each client
+        # Local loss received from each client
         self.local_loss = []
 
-        # model divergences received from each client
+        # Model divergences received from each client
         self.divs = {}
 
-        # average weight received updates from each client
+        # Average weight received updates from each client
         self.avg_update = {}
 
         self.mean_variance = None
@@ -46,7 +46,7 @@ class Server(fedavg.Server):
             else 0.3
         )
 
-        # Hyperparameters used for the adaptive algorithm.
+        # Hyperparameters used for the adaptive algorithm
         self.delta1 = (
             Config().clients.delta1 if hasattr(Config().clients, "delta1") else None
         )
@@ -61,16 +61,16 @@ class Server(fedavg.Server):
         """Log the usage of either the adaptive or normal algorithm."""
         super().configure()
         if self.trainer.use_adaptive:
-            logging.info("Using adaptive algorithm.")
+            logging.info("Using the adaptive algorithm.")
 
     def extract_client_updates(self, updates):
         """Extract the model weight updates from clients."""
-
         deltas_received = [payload for (__, __, payload, __) in updates]
         self.local_loss = [report.loss for (__, report, __, __) in updates]
         if self.trainer.use_adaptive:
             self.divs = {
-                client_id: report.div for (client_id, report, __, __) in updates
+                client_id: report.div_from_global
+                for (client_id, report, __, __) in updates
             }
             self.avg_update = {
                 client_id: report.avg_update for (client_id, report, __, __) in updates
@@ -134,7 +134,7 @@ class Server(fedavg.Server):
             self.mean_variance = self.calc_loss_var()
 
     def calc_loss_var(self):
-        """Calculates the loss variance using mean squared error."""
+        """Calculate the loss variance using mean squared error."""
         global_loss = [sum(self.local_loss) / len(self.local_loss)]
         loss = torch.nn.MSELoss()
         variance = loss(
@@ -150,7 +150,7 @@ class Server(fedavg.Server):
         return mew
 
     async def select_clients(self, for_next_batch=False):
-        """Sends the update_thresholds to the clients."""
+        """Send the update_thresholds to the clients."""
         await super().select_clients(for_next_batch)
 
         if self.trainer.use_adaptive:
@@ -167,7 +167,7 @@ class Server(fedavg.Server):
                 pickle.dump(self.update_threshold, file)
 
     def calc_threshold(self):
-        """Calculates new update thresholds for each client."""
+        """Calculate new update thresholds for each client."""
         if self.current_round == 1:
             return
         for client_id in self.divs:
@@ -181,9 +181,7 @@ class Server(fedavg.Server):
             ) * self.orig_threshold
 
     def server_will_close(self):
-        """
-        Method called at the start of closing the server.
-        """
+        """Method called at the start of closing the server."""
         model_name = Config().trainer.model_name
         checkpoint_path = Config().params["checkpoint_path"]
 

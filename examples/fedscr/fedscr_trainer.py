@@ -35,33 +35,30 @@ class Trainer(basic.Trainer):
         self.all_grads = []
 
         # Should the clients use the adaptive algorithm?
-        self.use_adaptive = (
-            True
-            if hasattr(Config().clients, "adaptive") and Config().clients.adaptive
-            else False
+        self.use_adaptive = bool(
+            hasattr(Config().clients, "adaptive") and Config().clients.adaptive
         )
         self.train_loss = None
         self.test_loss = None
         self.avg_update = None
-        self.div = None
+        self.div_from_global = None
         self.orig_weights = None
 
-    def prune_updates(self, orig_weights):
+    def prune_updates(self):
         """Prune the weight updates by setting some updates to 0."""
-
         self.load_all_grads()
 
-        coupled_models = zip(orig_weights.named_modules(), self.model.named_modules())
-
         conv_updates = OrderedDict()
-        step = 0
-        for (orig_name, orig_module), (__, trained_module) in coupled_models:
+        i = 0
+        for (orig_name, orig_module), (__, trained_module) in zip(
+            self.orig_weights.named_modules(), self.model.named_modules()
+        ):
             if isinstance(
                 trained_module, (torch.nn.Conv1d, torch.nn.Conv2d, torch.nn.Conv3d)
             ):
                 orig_tensor = orig_module.weight.data.cpu().numpy()
                 trained_tensor = trained_module.weight.data.cpu().numpy()
-                delta = trained_tensor - orig_tensor + self.all_grads[step]
+                delta = trained_tensor - orig_tensor + self.all_grads[i]
                 orig_delta = copy.deepcopy(delta)
 
                 aggregated_channels = self.aggregate_channels(delta)
@@ -71,18 +68,18 @@ class Trainer(basic.Trainer):
                 delta = self.prune_filter_updates(aggregated_filters, delta)
 
                 delta_name = f"{orig_name}.weight"
-                self.all_grads[step] = orig_delta - delta
+                self.all_grads[i] = orig_delta - delta
                 conv_updates[delta_name] = delta
-                step += 1
+                i += 1
 
-        coupled_models = zip(orig_weights.state_dict(), self.model.state_dict())
-        for orig_key, trained_key in coupled_models:
+        for orig_key, trained_key in zip(
+            self.orig_weights.state_dict(), self.model.state_dict()
+        ):
             if not orig_key in conv_updates:
-                orig_tensor = orig_weights.state_dict()[orig_key]
+                orig_tensor = self.orig_weights.state_dict()[orig_key]
                 trained_tensor = self.model.state_dict()[trained_key]
                 delta = trained_tensor - orig_tensor
                 self.total_grad[orig_key] = delta
-
             else:
                 self.total_grad[orig_key] = torch.from_numpy(conv_updates[orig_key])
 
@@ -94,13 +91,11 @@ class Trainer(basic.Trainer):
         num_filters = delta.shape[0]
         aggregated_channels = [None] * num_channels
 
-        step = 0
-        for channel in range(num_channels):
+        for channel_index in range(num_channels):
             tensor_sum = 0
             for filters in range(num_filters):
-                tensor_sum += np.abs(delta[filters, channel, :, :])
-            aggregated_channels[step] = tensor_sum
-            step += 1
+                tensor_sum += np.abs(delta[filters, channel_index, :, :])
+            aggregated_channels[channel_index] = tensor_sum
 
         for index, __ in enumerate(aggregated_channels):
             aggregated_channels[index] = np.sum(aggregated_channels[index])
@@ -113,13 +108,11 @@ class Trainer(basic.Trainer):
         num_filters = delta.shape[0]
         aggregated_filters = [None] * num_filters
 
-        step = 0
-        for filters in range(num_filters):
+        for filter_index in range(num_filters):
             tensor_sum = 0
             for channel in range(num_channels):
-                tensor_sum += np.abs(delta[filters, channel, :, :])
-            aggregated_filters[step] = tensor_sum
-            step += 1
+                tensor_sum += np.abs(delta[filter_index, channel, :, :])
+            aggregated_filters[filter_index] = tensor_sum
 
         for index, __ in enumerate(aggregated_filters):
             aggregated_filters[index] = np.sum(aggregated_filters[index])
@@ -128,17 +121,17 @@ class Trainer(basic.Trainer):
 
     def prune_channel_updates(self, aggregated_channels, delta):
         """Prune the channel updates that lie below the FedSCR threshold."""
-        for step, norm in enumerate(aggregated_channels):
+        for i, norm in enumerate(aggregated_channels):
             if norm < self.update_threshold:
-                delta[:, step, :, :] = 0
+                delta[:, i, :, :] = 0
 
         return delta
 
     def prune_filter_updates(self, aggregated_filters, delta):
         """Prune the filter updates that lie below the FedSCR threshold."""
-        for step, norm in enumerate(aggregated_filters):
+        for i, norm in enumerate(aggregated_filters):
             if norm < self.update_threshold:
-                delta[step, :, :, :] = 0
+                delta[i, :, :, :] = 0
 
         return delta
 
@@ -183,7 +176,7 @@ class Trainer(basic.Trainer):
         nonzero = 0
         total = 0
         for key in sorted(self.total_grad.keys()):
-            tensor = self.total_grad[key]
+            tensor = self.total_grad[key].cpu()
             nz_count = np.count_nonzero(tensor)
             total_params = np.prod(tensor.shape)
             nonzero += nz_count
@@ -202,9 +195,11 @@ class Trainer(basic.Trainer):
 
     def train_run_end(self, config):
         """Method called at the end of training run."""
-        # Calculate weight divergence between local and global model - used for adaptive algorithm
-        self.div = self.weight_div(self.orig_weights)
-        logging.info("[Client #%d] Weight Divergence: %.2f", self.client_id, self.div)
+        # Calculate weight divergence between local and global model, used for adaptive algorithm
+        self.div_from_global = self.compute_weight_divergence()
+        logging.info(
+            "[Client #%d] Weight divergence: %.2f", self.client_id, self.div_from_global
+        )
 
         checkpoint_path = Config().params["checkpoint_path"]
         model_name = Config().trainer.model_name
@@ -215,9 +210,9 @@ class Trainer(basic.Trainer):
         # Get the update threshold
         if self.use_adaptive:
 
-            div_path = f"{checkpoint_path}/{model_name}_thresholds.pkl"
+            divergence_path = f"{checkpoint_path}/{model_name}_thresholds.pkl"
 
-            with open(div_path, "rb") as file:
+            with open(divergence_path, "rb") as file:
                 update_thresholds = pickle.load(file)
 
             self.update_threshold = update_thresholds[self.client_id - 1]
@@ -229,7 +224,7 @@ class Trainer(basic.Trainer):
 
         # Get the overall weight updates
         logging.info("[Client #%d] Pruning weight updates.", self.client_id)
-        self.prune_updates(self.orig_weights)
+        self.prune_updates()
         logging.info(
             "[Client #%d] SCR ratio (pruned amount): %.2f%%",
             self.client_id,
@@ -246,7 +241,10 @@ class Trainer(basic.Trainer):
 
         # Add weight divergence and average update to client report
         if self.use_adaptive is True:
-            add_to_report = {"div": self.div, "g": self.avg_update}
+            add_to_report = {
+                "div_from_global": self.div_from_global,
+                "avg_update": self.avg_update,
+            }
 
             report_path = f"{checkpoint_path}/{model_name}_{self.client_id}.pkl"
 
@@ -260,24 +258,24 @@ class Trainer(basic.Trainer):
 
         self.model.load_state_dict(self.total_grad, strict=True)
 
-    def weight_div(self, orig_weights):
+    def compute_weight_divergence(self):
         """Calculate the divergence of the locally trained model from the global model."""
-
-        coupled_models = zip(orig_weights.named_modules(), self.model.named_modules())
-
-        div = 0
-        for (__, orig_module), (__, trained_module) in coupled_models:
+        self.orig_weights.to(self.device)
+        div_from_global = 0
+        for (__, orig_module), (__, trained_module) in zip(
+            self.orig_weights.named_modules(), self.model.named_modules()
+        ):
             if isinstance(
                 trained_module, (torch.nn.Conv1d, torch.nn.Conv2d, torch.nn.Conv3d)
             ):
                 orig_tensor = orig_module.weight.data.cpu()
                 trained_tensor = trained_module.weight.data.cpu()
-                div += (
+                div_from_global += (
                     torch.sum(torch.abs(trained_tensor - orig_tensor))
                     / torch.sum(torch.abs(trained_tensor))
                 ).numpy()
 
-        return np.sqrt(div)
+        return np.sqrt(div_from_global)
 
     def local_update_significance(self):
         """Calculate the average weight update."""
@@ -285,7 +283,7 @@ class Trainer(basic.Trainer):
         total = 0
 
         for key in sorted(self.total_grad.keys()):
-            tensor = self.total_grad[key]
+            tensor = self.total_grad[key].cpu()
             delta += torch.sum(tensor).numpy()
 
         model = self.model.named_modules()
