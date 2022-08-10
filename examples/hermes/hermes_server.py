@@ -6,8 +6,8 @@ import copy
 import logging
 import os
 import pickle
-import numpy as np
 import sys
+import numpy as np
 import torch
 
 import hermes_pruning as pruning
@@ -89,9 +89,7 @@ class Server(fedavg.Server):
         return weights_received
 
     async def process_reports(self):
-        """
-        Process the client reports by aggregating their overlapping weights.
-        """
+        """Process the client reports by aggregating their overlapping weights."""
         self.personalized_models = await self.federated_averaging(self.updates)
         self.accuracy = self.accuracy_averaging(self.updates)
         logging.info("[%s] Average client accuracy: %.2f%%.", self, 100 * self.accuracy)
@@ -119,49 +117,26 @@ class Server(fedavg.Server):
                 filename,
             )
 
-    async def client_report_arrived(self, sid, client_id, report):
-        """Upon receiving a report from a client."""
-        self.reports[sid] = pickle.loads(report)
-        self.client_payload[sid] = None
-        self.client_chunks[sid] = []
+    def process_customized_report(self, client_id, checkpoint_path, model_name):
+        """Process a customized client report with additional information."""
+        # Include the pruning mask in the communication overhead
+        mask_filename = f"{checkpoint_path}/{model_name}_client{client_id}_mask.pth"
+        if os.path.exists(mask_filename):
+            with open(mask_filename, "rb") as payload_file:
+                client_mask = pickle.load(payload_file)
+                mask_size = sys.getsizeof(pickle.dumps(client_mask)) / 1024**2
+                logging.info(
+                    "[%s] Received %.2f MB of pruning mask from client #%d (simulated).",
+                    self,
+                    mask_size,
+                    client_id,
+                )
 
-        if self.comm_simulation:
-            model_name = (
-                Config().trainer.model_name
-                if hasattr(Config().trainer, "model_name")
-                else "custom"
-            )
-            checkpoint_path = Config().params["checkpoint_path"]
-            payload_filename = f"{checkpoint_path}/{model_name}_client_{client_id}.pth"
-            with open(payload_filename, "rb") as payload_file:
-                self.client_payload[sid] = pickle.load(payload_file)
-            # Include the pruning mask in the communication overhead
-            mask_filename = f"{checkpoint_path}/{model_name}_client{client_id}_mask.pth"
-            if os.path.exists(mask_filename):
-                with open(mask_filename, "rb") as payload_file:
-                    client_mask = pickle.load(payload_file)
-                    mask_size = sys.getsizeof(pickle.dumps(client_mask)) / 1024**2
-            else:
-                mask_size = 0
+                self.comm_overhead += mask_size
 
-            payload_size = (
-                sys.getsizeof(pickle.dumps(self.client_payload[sid])) / 1024**2
-            )
-
-            logging.info(
-                "[%s] Received %.2f MB of payload data from client #%d (simulated).",
-                self,
-                payload_size + mask_size,
-                client_id,
-            )
-
-            self.comm_overhead = self.comm_overhead + payload_size + mask_size
-
-            self.uplink_comm_time[client_id] = payload_size / (
-                self.uplink_bandwidth / 8
-            )
-
-            await self.process_client_info(client_id, sid)
+                self.uplink_comm_time[client_id] += mask_size / (
+                    self.uplink_bandwidth / 8
+                )
 
     def customize_server_payload(self, payload):
         """Wrap up generating the server payload with any additional information."""
