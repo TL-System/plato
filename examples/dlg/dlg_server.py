@@ -85,7 +85,7 @@ class Server(fedavg.Server):
         self.defense_method = 'no'
         if hasattr(Config().algorithm, 'defense'):
             if Config().algorithm.defense in [
-                    'GradDefense', 'Soteria', 'GC', 'DP'
+                    'GradDefense', 'Soteria', 'GC', 'DP', 'Outpost'
             ]:
                 self.defense_method = Config().algorithm.defense
             else:
@@ -290,10 +290,37 @@ class Server(fedavg.Server):
 
             if (math.isnan(current_loss)):
                 logging.info("Not a number, ending attack")
+                # should make these lines into a function to prevent repetition, but not sure how to
+                # without having too many parameters
+                eval_dict = get_evaluation_dict(dummy_data, gt_data,
+                                                num_images)
+                mses.append(eval_dict["mses"])
+                lpipss.append(eval_dict["lpipss"])
+                psnrs.append(eval_dict["psnrs"])
+                ssims.append(eval_dict["ssims"])
+                library_ssims.append(eval_dict["library_ssims"])
+                avg_mses.append(eval_dict["avg_mses"])
+                avg_lpips.append(eval_dict["avg_lpips"])
+                avg_psnr.append(eval_dict["avg_psnr"])
+                avg_ssim.append(eval_dict["avg_ssim"])
+                avg_library_ssim.append(eval_dict["avg_library_ssim"])
+
+                new_row = [
+                    iters,
+                    round(losses[-1], 8),
+                    round(avg_mses[-1], 8),
+                    round(avg_lpips[-1], 8),
+                    round(avg_psnr[-1], 4),
+                    round(avg_ssim[-1], 3),
+                    round(avg_library_ssim[-1], 3)
+                ]
+                csv_processor.write_csv(trial_csv_file, new_row)
                 break
 
             if iters % log_interval == 0:
                 # Finding evaluation metrics
+                # should make these lines into a function to prevent repetition, but not sure how to
+                # without having too many parameters
                 eval_dict = get_evaluation_dict(dummy_data, gt_data,
                                                 num_images)
                 mses.append(eval_dict["mses"])
@@ -309,7 +336,7 @@ class Server(fedavg.Server):
 
                 logging.info(
                     "[%s Gradient Leakage Attack %d with %s defense...] Iter %d: Loss = %.10f, avg MSE = %.8f, avg LPIPS = %.8f, avg PSNR = %.4f dB, avg SSIM = %.3f, avg library SSIM = %.3f",
-                    self.attack_method, trial_number, self.defense_method,
+                    self.attack_method, (trial_number + 1), self.defense_method,
                     iters, losses[-1], avg_mses[-1], avg_lpips[-1],
                     avg_psnr[-1], avg_ssim[-1], avg_library_ssim[-1])
 
@@ -341,16 +368,6 @@ class Server(fedavg.Server):
                 ]
                 csv_processor.write_csv(trial_csv_file, new_row)
 
-        if len(history) == 1:
-            tensor_file_path = f"{trial_result_path}/tensors.pt"
-            result = {
-                i * log_interval: {j: history[i][j][0]
-                                for j in range(num_images)}
-                for i in range(len(history))
-            }
-            torch.save(result, tensor_file_path)
-            return
-
         if self.best_mse > avg_mses[-1]:
             self.best_mse = avg_mses[-1]
             self.best_trial = trial_number + 1  # the +1 is because we index from 1 and not 0
@@ -366,9 +383,6 @@ class Server(fedavg.Server):
             for i in range(len(history))
         }
         torch.save(result, tensor_file_path)
-
-        # final_result_path = f"{trial_result_path}/CIFAR2_2-{trial_number+1}.pt"
-        # torch.save(history[-1][0][0], final_result_path)
 
         logging.info("Attack %d complete", (trial_number + 1))
 
@@ -507,39 +521,36 @@ class Server(fedavg.Server):
     @staticmethod
     def plot_gt(num_images, gt_data, gt_labels):
         """ Plot ground truth data. """
-        # gt_result_path = f"{dlg_result_path}/ground_truth.png"
-        # gt_figure = plt.figure(figsize=(12, 4))
-
-        # # Make the path if it does not exist yet
-        # if not os.path.exists(dlg_result_path):
-        #     os.makedirs(dlg_result_path)
-
-        # for i in range(num_images):
-        #     current_label = torch.argmax(gt_labels[i], dim=-1).item()
-        #     logging.info("Ground truth labels: %d", current_label)
-        #     gt_figure.add_subplot(1, num_images, i + 1)
-        #     plt.imshow(gt_data[i].cpu().permute(1, 2, 0))
-        #     # torch.save(gt_data[i].cpu().permute(1, 2, 0), "gt3.pt")
-        #     plt.axis('off')
-        #     plt.title("GT image %d\nLabel: %d" % ((i + 1), current_label))
-        # plt.savefig(gt_result_path)
-
-        gt_result_path = f"{dlg_result_path}/ground_truth.pdf"
-        # gt_figure = plt.figure(figsize=(8, 8))
+        gt_result_path = f"{dlg_result_path}/ground_truth.png"
+        gt_figure = plt.figure(figsize=(12, 4))
 
         # Make the path if it does not exist yet
         if not os.path.exists(dlg_result_path):
             os.makedirs(dlg_result_path)
 
-        # for i in range(num_images):
-        #     current_label = torch.argmax(gt_labels[i], dim=-1).item()
-        #     logging.info("Ground truth labels: %d", current_label)
-        fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(8, 16))
-        for ind, title in enumerate(gt_data):
-            axes.ravel()[ind].imshow(gt_data[ind].cpu().permute(1, 2, 0))
-            axes.ravel()[ind].set_axis_off()
-        plt.tight_layout()
+        for i in range(num_images):
+            current_label = torch.argmax(gt_labels[i], dim=-1).item()
+            logging.info("Ground truth labels: %d", current_label)
+            gt_figure.add_subplot(1, num_images, i + 1)
+            plt.imshow(gt_data[i].cpu().permute(1, 2, 0))
+            # torch.save(gt_data[i].cpu().permute(1, 2, 0), "gt3.pt")
+            plt.axis('off')
+            plt.title("GT image %d\nLabel: %d" % ((i + 1), current_label))
         plt.savefig(gt_result_path)
+
+        # gt_result_path = f"{dlg_result_path}/ground_truth.pdf"
+        # gt_figure = plt.figure(figsize=(8, 8))
+
+        # Make the path if it does not exist yet
+        # if not os.path.exists(dlg_result_path):
+        #     os.makedirs(dlg_result_path)
+
+        # fig, axes = plt.subplots(nrows=3, ncols=1, figsize=(16, 16))
+        # for ind, title in enumerate(gt_data):
+        #     axes.ravel()[ind].imshow(gt_data[ind].cpu().permute(1, 2, 0))
+        #     axes.ravel()[ind].set_axis_off()
+        # plt.tight_layout()
+        # plt.savefig(gt_result_path)
 
     @staticmethod
     def plot_reconstructed(num_images, history, reconstructed_result_path):
