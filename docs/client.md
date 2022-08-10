@@ -16,6 +16,3 @@ Within the implementation of these callback methods, one can access additional i
 
 To use callbacks, subclass the `ClientCallback` class in `plato.callbacks.client`, and override the following methods:
 
-```{admonition} **on_customize_report(self, client)**
-Overide this method to customize report after the local training ends.
-```

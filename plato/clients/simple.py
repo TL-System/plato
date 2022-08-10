@@ -46,7 +46,7 @@ class Client(base.Client):
         self.sampler = None
         self.testset_sampler = None  # Sampler for the test set
 
-        self.report = None
+        self._report = None
 
     def configure(self) -> None:
         """Prepare this client for training."""
@@ -131,6 +131,7 @@ class Client(base.Client):
         try:
             if hasattr(self.trainer, "current_round"):
                 self.trainer.current_round = self.current_round
+            # pylint: disable=protected-access
             training_time = self.trainer._train(self.trainset, self.sampler)
         except ValueError as exc:
             logging.info(
@@ -167,7 +168,7 @@ class Client(base.Client):
         ):
             sleep_seconds = Config().client_sleep_times[self.client_id - 1]
             avg_training_time = Config().clients.avg_training_time
-            self.report = Report(
+            report = Report(
                 self.sampler.trainset_size(),
                 accuracy,
                 (avg_training_time + sleep_seconds) * Config().trainer.epochs,
@@ -175,23 +176,22 @@ class Client(base.Client):
                 False,
             )
         else:
-            self.report = Report(
+            report = Report(
                 self.sampler.trainset_size(), accuracy, training_time, comm_time, False
             )
 
-        self.customize_report()
-        self.callback_handler.call_event("on_customize_report", self)
+        self._report = self.customize_report(report)
 
-        return self.report, weights
+        return self._report, weights
 
     async def obtain_model_update(self, wall_time):
         """Retrieving a model update corresponding to a particular wall clock time."""
         model = self.trainer.obtain_model_update(wall_time)
         weights = self.algorithm.extract_weights(model)
-        self.report.comm_time = time.time()
-        self.report.update_response = True
+        self._report.comm_time = time.time()
+        self._report.update_response = True
 
-        return self.report, weights
+        return self._report, weights
 
     def save_model(self, model_checkpoint):
         """Saving the model to a model checkpoint."""
@@ -201,7 +201,6 @@ class Client(base.Client):
         """Loading the model from a model checkpoint."""
         self.trainer.load_model(model_checkpoint)
 
-    def customize_report(self):
-        """
-        Method called at the end of local training to customize report.
-        """
+    def customize_report(self, report):
+        """Wrap up generating the report with any additional information."""
+        return report

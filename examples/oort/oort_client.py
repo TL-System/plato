@@ -26,10 +26,8 @@ class Client(simple.Client):
         super().__init__(model, datasource, algorithm, trainer)
         self.statistical_utility = None
 
-    async def train(self):
-        """Training process on a Oort client."""
-        report, weights = await super().train()
-
+    def customize_report(self, report):
+        """Wrap up generating the report with any additional information."""
         model_name = Config().trainer.model_name
         model_path = Config().params["checkpoint_path"]
         filename = f"{model_path}/{model_name}_{self.client_id}_squared_batch_loss.pth"
@@ -37,15 +35,5 @@ class Client(simple.Client):
         self.statistical_utility = np.abs(report.num_samples) * np.sqrt(
             1.0 / report.num_samples * sum_loss
         )
-
-        return (
-            Report(
-                report.num_samples,
-                report.accuracy,
-                report.training_time,
-                report.comm_time,
-                report.update_response,
-                self.statistical_utility,
-            ),
-            weights,
-        )
+        setattr(report, "statistics_utility", self.statistical_utility)
+        return report

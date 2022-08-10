@@ -38,18 +38,20 @@ class Client(simple.Client):
                 self.trainer.update_threshold,
             )
 
-    def customize_report(self):
-        """Customize report at the end of local training."""
+    def customize_report(self, report):
+        """Wrap up generating the report with any additional information."""
         final_loss = self.get_loss()
-        setattr(self.report, "loss", final_loss)
+        setattr(report, "loss", final_loss)
 
         if self.trainer.use_adaptive:
             additional_info = self.get_additional_info()
-            setattr(self.report, "div_from_global", additional_info["div_from_global"])
-            setattr(self.report, "avg_update", additional_info["avg_update"])
+            setattr(report, "div_from_global", additional_info["div_from_global"])
+            setattr(report, "avg_update", additional_info["avg_update"])
         else:
-            setattr(self.report, "div_from_global", None)
-            setattr(self.report, "avg_update", None)
+            setattr(report, "div_from_global", None)
+            setattr(report, "avg_update", None)
+
+        return report
 
     # pylint: disable=protected-access
     def get_loss(self):
