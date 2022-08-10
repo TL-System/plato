@@ -3,7 +3,7 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 2
+    total_clients: 5
 
     # The number of clients selected in each round
     per_round: 2
@@ -28,7 +28,7 @@ clients:
 server:
     address: 127.0.0.1
     port: 8010
-    do_test: true
+    do_test: false
 
     random_seed: 1
 

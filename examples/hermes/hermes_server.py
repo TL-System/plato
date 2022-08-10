@@ -88,9 +88,10 @@ class Server(fedavg.Server):
     async def process_reports(self):
         """
         Process the client reports by aggregating their overlapping weights.
-        Hermes does not compute a global model, so its accuracy is not calculated.
         """
         self.personalized_models = await self.federated_averaging(self.updates)
+        self.accuracy = self.accuracy_averaging(self.updates)
+        logging.info("[%s] Average client accuracy: %.2f%%.", self, 100 * self.accuracy)
         self.save_personalized_models(self.personalized_models, self.updates)
         await self.wrap_up_processing_reports()
 
@@ -114,6 +115,33 @@ class Server(fedavg.Server):
                 client_id,
                 filename,
             )
+
+    def customize_server_payload(self, payload):
+        """Wrap up generating the server payload with any additional information."""
+
+        # If the client has already begun the learning of a personalized model
+        # in a previous communication round, the relevant file is loaded and
+        # sent to the client for continued training.
+        # Otherwise, if the client is selected for the first time,
+        # it receives the preinitialized model.
+        model_name = (
+            Config().trainer.model_name
+            if hasattr(Config().trainer, "model_name")
+            else "custom"
+        )
+        model_path = Config().params["model_path"]
+        if not self.clients_first_time[self.selected_client_id - 1]:
+            filename = (
+                f"{model_path}/personalized_{model_name}"
+                f"_client{self.selected_client_id}.pth"
+            )
+            with open(filename, "rb") as payload_file:
+                payload = pickle.load(payload_file)
+        else:
+            payload = self.algorithm.extract_weights()
+            self.clients_first_time[self.selected_client_id - 1] = False
+
+        return payload
 
     def extract_client_updates(self, updates):
         """Extract the model weight updates from client updates along with the masks."""
