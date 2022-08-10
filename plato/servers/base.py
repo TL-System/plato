@@ -450,17 +450,22 @@ class Server:
                 ]
 
                 if self.simulate_wall_time:
-                    self.selected_clients = self.choose_clients(
+                    selected_clients = self.choose_clients(
                         selectable_clients, len(self.current_processed_clients)
                     )
                 else:
-                    self.selected_clients = self.choose_clients(
+                    selected_clients = self.choose_clients(
                         selectable_clients, len(self.reported_clients)
                     )
             else:
-                self.selected_clients = self.choose_clients(
-                    self.clients_pool, self.clients_per_round
+                selectable_clients = self.clients_pool
+                selected_clients = self.choose_clients(
+                    selectable_clients, self.clients_per_round
                 )
+
+            self.selected_clients = self.customize_selected_clients(
+                selected_clients, selectable_clients
+            )
 
             self.current_reported_clients = {}
             self.current_processed_clients = {}
@@ -1234,6 +1239,10 @@ class Server:
     @abstractmethod
     async def process_reports(self) -> None:
         """Process a client report."""
+
+    def customize_selected_clients(self, selected_clients, selectable_clients):
+        """Wrap up selecting clients with any additional step."""
+        return selected_clients
 
     def process_customized_report(self, client_id, checkpoint_path, model_name):
         """Process a customized client report with additional information."""
