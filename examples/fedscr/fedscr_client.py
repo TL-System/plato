@@ -1,8 +1,7 @@
 """
-A federated learning client using pruning in FedSCR.
+A federated learning client of FedSCR.
 """
 
-import logging
 import pickle
 from dataclasses import dataclass
 
@@ -11,7 +10,7 @@ from plato.clients import simple
 
 
 @dataclass
-class FedSCRReport(simple.Report):
+class Report(simple.Report):
     """A client report containing the final loss, to be sent to the FedSCR server for the adaptive
     algorithm."""
 
@@ -25,34 +24,18 @@ class Client(simple.Client):
     A federated learning client prunes its update before sending out.
     """
 
-    def client_train_end(self):
-        """Method called at the end of local training."""
-        logging.info("[Client #%d] Trained with FedSCR algorithm.", self.client_id)
-
+    def customize_report(self):
+        """Customize report at the end of local training."""
         final_loss = self.get_loss()
+        setattr(self.report, "loss", final_loss)
+
         if self.trainer.use_adaptive:
             additional_info = self.get_additional_info()
-            self.report = FedSCRReport(
-                self.report.num_samples,
-                self.report.accuracy,
-                self.report.training_time,
-                self.report.comm_time,
-                self.report.update_response,
-                final_loss,
-                additional_info["div_from_global"],
-                additional_info["avg_update"],
-            )
+            setattr(self.report, "div_from_global", additional_info["div_from_global"])
+            setattr(self.report, "avg_update", additional_info["avg_update"])
         else:
-            self.report = FedSCRReport(
-                self.report.num_samples,
-                self.report.accuracy,
-                self.report.training_time,
-                self.report.comm_time,
-                self.report.update_response,
-                final_loss,
-                None,
-                None,
-            )
+            setattr(self.report, "div_from_global", None)
+            setattr(self.report, "avg_update", None)
 
     # pylint: disable=protected-access
     def get_loss(self):
