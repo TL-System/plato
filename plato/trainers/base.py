@@ -77,7 +77,7 @@ class Trainer(ABC):
                 os.remove(accuracy_file)
 
     @abstractmethod
-    def _train(self, trainset, sampler, cut_layer=None, **kwargs) -> float:
+    def train(self, trainset, sampler, cut_layer=None, **kwargs) -> float:
         """The main training loop in a federated learning workload.
 
         Arguments:
