@@ -204,7 +204,3 @@ class Client(base.Client):
     def load_model(self, model_checkpoint):
         """Loading the model from a model checkpoint."""
         self.trainer.load_model(model_checkpoint)
-
-    def customize_report(self, report):
-        """Wrap up generating the report with any additional information."""
-        return report

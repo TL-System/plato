@@ -2,7 +2,6 @@
 The training and testing loops for PyTorch.
 """
 
-import asyncio
 import copy
 import logging
 import multiprocessing as mp
