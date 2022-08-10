@@ -7,6 +7,7 @@ import logging
 import os
 import pickle
 import numpy as np
+import sys
 import torch
 
 import hermes_pruning as pruning
@@ -25,7 +26,7 @@ class Server(fedavg.Server):
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using personalized aggregating."""
 
-        # Gets the list of client models. Each index in the list is an ordered dictionary of layers.
+        # Get the list of client models and masks
         weights_received, masks_received = self.extract_client_updates(updates)
 
         # Extract the total number of samples
@@ -118,14 +119,57 @@ class Server(fedavg.Server):
                 filename,
             )
 
+    async def client_report_arrived(self, sid, client_id, report):
+        """Upon receiving a report from a client."""
+        self.reports[sid] = pickle.loads(report)
+        self.client_payload[sid] = None
+        self.client_chunks[sid] = []
+
+        if self.comm_simulation:
+            model_name = (
+                Config().trainer.model_name
+                if hasattr(Config().trainer, "model_name")
+                else "custom"
+            )
+            checkpoint_path = Config().params["checkpoint_path"]
+            payload_filename = f"{checkpoint_path}/{model_name}_client_{client_id}.pth"
+            with open(payload_filename, "rb") as payload_file:
+                self.client_payload[sid] = pickle.load(payload_file)
+            # Include the pruning mask in the communication overhead
+            mask_filename = f"{checkpoint_path}/{model_name}_client{client_id}_mask.pth"
+            if os.path.exists(mask_filename):
+                with open(mask_filename, "rb") as payload_file:
+                    client_mask = pickle.load(payload_file)
+                    mask_size = sys.getsizeof(pickle.dumps(client_mask)) / 1024**2
+            else:
+                mask_size = 0
+
+            payload_size = (
+                sys.getsizeof(pickle.dumps(self.client_payload[sid])) / 1024**2
+            )
+
+            logging.info(
+                "[%s] Received %.2f MB of payload data from client #%d (simulated).",
+                self,
+                payload_size + mask_size,
+                client_id,
+            )
+
+            self.comm_overhead = self.comm_overhead + payload_size + mask_size
+
+            self.uplink_comm_time[client_id] = payload_size / (
+                self.uplink_bandwidth / 8
+            )
+
+            await self.process_client_info(client_id, sid)
+
     def customize_server_payload(self, payload):
         """Wrap up generating the server payload with any additional information."""
 
         # If the client has already begun the learning of a personalized model
-        # in a previous communication round, the relevant file is loaded and
-        # sent to the client for continued training.
-        # Otherwise, if the client is selected for the first time,
-        # it receives the preinitialized model.
+        # in a previous communication round, the personalized file is loaded and
+        # sent to the client for continued training. Otherwise, if the client is
+        # selected for the first time, it receives the pre-initialized model.
         model_name = (
             Config().trainer.model_name
             if hasattr(Config().trainer, "model_name")

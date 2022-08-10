@@ -41,19 +41,17 @@ class Trainer(basic.Trainer):
 
     def train_run_start(self, config):
         """Method called at the start of training run."""
-        # Merge the incoming server payload data and the existing training model
+        # Merge the incoming server payload model with the mask to create the model for training
         self.original_model = copy.deepcopy(self.model)
-
         self.model = self.merge_model(self.model)
 
         # Send the model to the device used for training
         self.model.to(self.device)
         self.model.train()
 
-        # Evaluate if structured pruning should be done and conduct it if needed
+        # Evaluate if structured pruning should be conducted
         if self.original_model != self.model:
             self.original_model.to(self.device)
-
         logging.info(
             "[Client #%d] Evaluating if structured pruning should be conducted.",
             self.client_id,
@@ -92,7 +90,7 @@ class Trainer(basic.Trainer):
 
     def train_run_end(self, config):
         """Method called at the end of training run."""
-        # The pruning is made permanent if it had been conducted
+        # The pruning is made permanent if it was conducted
         if self.need_prune or self.pruned_amount > 0:
             pruning.remove(self.model)
 
