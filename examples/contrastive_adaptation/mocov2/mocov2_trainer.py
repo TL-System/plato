@@ -20,7 +20,7 @@ class Trainer(contrastive_ssl.Trainer):
     """ The federated learning trainer for the MOCO client. """
 
     @staticmethod
-    def loss_criterion(model):
+    def loss_criterion(model, config):
         """ The loss computation.
         """
 

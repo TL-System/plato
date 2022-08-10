@@ -49,8 +49,7 @@ class Client(ssl_client.Client):
         # self.perform_local_global_moving_average(server_payload)
         # print("self.local_global_ema_genrlz_scale: ",
         #       self.local_global_ema_genrlz_scale)
-        # super().load_payload(server_payload)
-        self.algorithm.load_weights(server_payload, strict=True)
+        super().load_payload(server_payload)
 
     def process_server_response(self, server_response) -> None:
         """Additional client-specific processing on the server response."""

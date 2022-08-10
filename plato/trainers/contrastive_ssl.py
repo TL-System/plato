@@ -163,7 +163,7 @@ class Trainer(pers_basic.Trainer):
         else:
             return accuracy
 
-    def perform_test_op(
+    def perform_evaluation_op(
         self,
         test_loader,
     ):
@@ -260,7 +260,7 @@ class Trainer(pers_basic.Trainer):
                 model_name=personalized_model_name,
                 model_state_dict=self.personalized_model.state_dict(),
                 config=config,
-                kwargs=kwargs,
+                current_round=current_round,
                 optimizer_state_dict=eval_optimizer.state_dict(),
                 lr_schedule_state_dict=lr_schedule.state_dict(),
                 present_epoch=0,
@@ -377,7 +377,7 @@ class Trainer(pers_basic.Trainer):
                         model_name=personalized_model_name,
                         model_state_dict=self.personalized_model.state_dict(),
                         config=config,
-                        kwargs=kwargs,
+                        current_round=current_round,
                         optimizer_state_dict=eval_optimizer.state_dict(),
                         lr_schedule_state_dict=lr_schedule.state_dict(),
                         present_epoch=epoch,
