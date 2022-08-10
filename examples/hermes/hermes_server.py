@@ -6,7 +6,6 @@ import copy
 import logging
 import os
 import pickle
-import sys
 import numpy as np
 import torch
 

@@ -14,11 +14,6 @@ class ServerCallback(ABC):
     The abstract base class to be subclassed when creating new server callbacks.
     """
 
-    def on_received_client_report(self, server, client_id, **kwargs):
-        """
-        Event called at the end of receiving a report from a client.
-        """
-
     def on_weights_aggregated(self, server, updates, **kwargs):
         """
         Event called at the end of aggregating received weights.

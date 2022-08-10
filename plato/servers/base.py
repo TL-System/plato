@@ -766,11 +766,6 @@ class Server:
                 self.uplink_bandwidth / 8
             )
 
-            self.received_client_report(client_id)
-            self.callback_handler.call_event(
-                "on_received_client_report", self, client_id
-            )
-
             await self.process_client_info(client_id, sid)
 
     async def client_chunk_arrived(self, sid, data) -> None:
@@ -1241,11 +1236,6 @@ class Server:
     @abstractmethod
     async def process_reports(self) -> None:
         """Process a client report."""
-
-    def received_client_report(self, client_id):
-        """
-        Method called at the end of receiving a report from a client.
-        """
 
     def server_will_close(self):
         """
