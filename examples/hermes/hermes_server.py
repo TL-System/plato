@@ -2,6 +2,7 @@
 A federated learning server using Hermes.
 """
 
+import copy
 import logging
 import os
 import pickle
@@ -9,6 +10,7 @@ import sys
 import numpy as np
 import torch
 
+import hermes_pruning as pruning
 from plato.servers import fedavg
 from plato.config import Config
 
@@ -23,27 +25,64 @@ class Server(fedavg.Server):
 
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using personalized aggregating."""
-        weights_received = [payload for (__, __, payload, __) in updates]
+
+        # Gets the list of client models. Each index in the list is an ordered dictionary of layers.
+        weights_received, masks_received = self.extract_client_updates(updates)
+
+        # Extract the total number of samples
+        self.total_samples = sum(
+            [report.num_samples for (__, report, __, __) in updates]
+        )
 
         # Perform averaging of overlapping parameters
-        for layer_name in sorted(weights_received[0].keys()):
+        for layer_name in weights_received[0].keys():
             for model in weights_received:
                 model[layer_name] = model[layer_name].numpy()
 
-        for layer_name in sorted(weights_received[0].keys()):
-            if "weight" in layer_name:
-                for index, __ in np.ndenumerate(weights_received[0][layer_name]):
-                    values = []
-                    for model in weights_received:
-                        values.append(model[layer_name][index])
-                    if 0 not in values:
-                        average = sum(values) / len(values)
-                        for model in weights_received:
-                            model[layer_name][index] = average
+        step = 0
+        for layer_name in weights_received[0].keys():
+            if "weight" in layer_name and (
+                "conv" in layer_name
+                or "shortcut.0.weight" in layer_name
+                or "linear" in layer_name
+                or "fc" in layer_name
+            ):
+                count = np.zeros_like(masks_received[0][step].reshape([-1]))
+                avg = np.zeros_like(weights_received[0][layer_name].reshape([-1]))
+                for index, __ in enumerate(masks_received):
+                    __, report, __, __ = updates[index]
+                    num_samples = report.num_samples
+                    count += masks_received[index][step].reshape([-1])
+                    avg += weights_received[index][layer_name].reshape([-1]) * (
+                        num_samples / self.total_samples
+                    )
 
-        for layer_name in sorted(weights_received[0].keys()):
-            for model in weights_received:
-                model[layer_name] = torch.from_numpy(model[layer_name])
+                count = np.where(count == len(masks_received), 1, 0)
+                final_avg = np.divide(avg, count)
+                ind = np.isfinite(final_avg)
+
+                for model in weights_received:
+                    model[layer_name].reshape([-1])[ind] = final_avg[ind]
+                    shape = weights_received[0][layer_name].shape
+                    model[layer_name] = torch.from_numpy(
+                        model[layer_name].reshape(shape)
+                    )
+                step = step + 1
+            else:
+                avg = np.zeros_like(weights_received[0][layer_name].reshape([-1]))
+                if "int" in str(avg.dtype):
+                    avg = avg.astype(np.float64)
+                for index, __ in enumerate(weights_received):
+                    __, report, __, __ = updates[index]
+                    num_samples = report.num_samples
+                    avg += weights_received[index][layer_name].reshape([-1]) * (
+                        num_samples / self.total_samples
+                    )
+
+                shape = weights_received[0][layer_name].shape
+                new_tensor = torch.from_numpy(avg.reshape(shape))
+                for model in weights_received:
+                    model[layer_name] = new_tensor
 
         return weights_received
 
@@ -77,33 +116,26 @@ class Server(fedavg.Server):
                 filename,
             )
 
-    def received_client_report(self, client_id):
-        """Method called at the end of receiving a report from a client."""
-        model_name = (
-            Config().trainer.model_name
-            if hasattr(Config().trainer, "model_name")
-            else "custom"
-        )
+    def extract_client_updates(self, updates):
+        """Extract the model weight updates from client updates along with the masks."""
+        model_name = Config().trainer.model_name
         checkpoint_path = Config().params["checkpoint_path"]
-        mask_filename = f"{checkpoint_path}/{model_name}_client{client_id}_mask.pth"
-        if os.path.exists(mask_filename):
-            with open(mask_filename, "rb") as payload_file:
-                client_mask = pickle.load(payload_file)
-                mask_size = sys.getsizeof(pickle.dumps(client_mask)) / 1024**2
-        else:
-            mask_size = 0
 
-        if mask_size != 0:
-            logging.info(
-                "[%s] Received %.2f MB of pruning mask from client #%d (simulated).",
-                self,
-                mask_size,
-                client_id,
-            )
+        weights_received = [payload for (__, __, payload, __) in updates]
 
-            self.comm_overhead += mask_size
+        masks_received = []
+        for (client_id, __, payload, __) in updates:
+            mask_path = f"{checkpoint_path}/{model_name}_client{client_id}_mask.pth"
+            if os.path.exists(mask_path):
+                with open(mask_path, "rb") as mask_file:
+                    masks_received.append(pickle.load(mask_file))
+            else:
+                model = copy.deepcopy(self.algorithm.model)
+                model.load_state_dict(payload, strict=True)
+                mask = pruning.make_init_mask(model)
+                masks_received.append(mask)
 
-            self.uplink_comm_time[client_id] += mask_size / (self.uplink_bandwidth / 8)
+        return weights_received, masks_received
 
     def server_will_close(self):
         """Method called at the start of closing the server."""

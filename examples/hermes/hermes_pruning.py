@@ -11,9 +11,27 @@ from torch.nn.utils import prune
 from plato.config import Config
 
 
+def make_init_mask(model):
+    """
+    Makes the initial pruning mask for the given model. For example,
+    for LeNet-5 architecture it return a list of 5 arrays, each array
+    is the same size of each layer's weights and with all 1 entries.
+    We do not prune bias
+    :param model: a pytorch model
+    :return mask: a list of pruning masks
+    """
+    mask = []
+    for __, module in model.named_modules():
+        if isinstance(module, torch.nn.Conv2d) or isinstance(module, torch.nn.Linear):
+            tensor = module.weight.detach().cpu().numpy()
+            mask.append(np.ones_like(tensor))
+
+    return mask
+
+
 def compute_pruned_amount(model, client_id):
     """
-    Compute the pruned percentage
+    This function computes the pruned percentage
     :param model: a pytorch model
     :return pruned percentage, number of remaining weights:
     """
@@ -39,7 +57,7 @@ def compute_pruned_amount(model, client_id):
 
 def structured_pruning(model, pruning_rate, adjust_rate=0.0):
     """
-    Conduct structured pruning of a model layer by layer
+    Conducts structured pruning of a model layer by layer
     model: pytorch model
     pruning_rate: the percentage of all parameters that should be pruned
     adjust_rate: a boolean parameter indicating whether the inputted
@@ -97,7 +115,7 @@ def structured_pruning(model, pruning_rate, adjust_rate=0.0):
 
 def remove(model):
     """
-    Remove the original unpruned weight tensors in the model
+    Removes the original unpruned weight tensors in the model
     """
     for __, module in model.named_modules():
         if isinstance(module, torch.nn.Conv2d) or isinstance(module, torch.nn.Linear):
@@ -105,7 +123,7 @@ def remove(model):
 
 
 def apply_mask(model, mask, device):
-    """Apply the mask onto the model."""
+    """Applies the mask onto the model."""
 
     masked_model = copy.deepcopy(model).to(device)
     if not torch.is_tensor(mask[0]):
