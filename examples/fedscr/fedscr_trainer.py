@@ -207,21 +207,6 @@ class Trainer(basic.Trainer):
         if not os.path.exists(checkpoint_path):
             os.makedirs(checkpoint_path)
 
-        # Get the update threshold
-        if self.use_adaptive:
-
-            divergence_path = f"{checkpoint_path}/{model_name}_thresholds.pkl"
-
-            with open(divergence_path, "rb") as file:
-                update_thresholds = pickle.load(file)
-
-            self.update_threshold = update_thresholds[self.client_id - 1]
-            logging.info(
-                "[Client #%d] Update Threshold: %.2f",
-                self.client_id,
-                self.update_threshold,
-            )
-
         # Get the overall weight updates
         logging.info("[Client #%d] Pruning weight updates.", self.client_id)
         self.prune_updates()

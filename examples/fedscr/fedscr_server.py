@@ -7,7 +7,6 @@ import asyncio
 import logging
 import os
 import math
-import pickle
 import torch
 
 from plato.servers import fedavg
@@ -34,11 +33,12 @@ class Server(fedavg.Server):
 
         self.mean_variance = None
 
-        self.update_threshold = [
-            Config().clients.update_threshold
+        self.update_thresholds = {
+            client_id: Config().clients.update_threshold
             if hasattr(Config().clients, "update_threshold")
             else 0.3
-        ] * self.total_clients
+            for client_id in range(1, self.total_clients + 1)
+        }
 
         self.orig_threshold = (
             Config().clients.update_threshold
@@ -62,6 +62,25 @@ class Server(fedavg.Server):
         super().configure()
         if self.trainer.use_adaptive:
             logging.info("Using the adaptive algorithm.")
+
+    async def customize_server_response(self, server_response):
+        """Wrap up generating the server response with any additional information."""
+        if self.trainer.use_adaptive and self.current_round > 1:
+            self.calc_threshold()
+            server_response["update_thresholds"] = self.update_thresholds
+        return server_response
+
+    def calc_threshold(self):
+        """Calculate new update thresholds for each client."""
+        for client_id in self.divs:
+            sigmoid = (
+                self.delta1 * self.divs[client_id]
+                + self.delta2 * self.avg_update[client_id]
+                + self.delta3 * self.mean_variance
+            )
+            self.update_thresholds[str(client_id)] = (
+                1 / (1 + (math.e**-sigmoid))
+            ) * self.orig_threshold
 
     def extract_client_updates(self, updates):
         """Extract the model weight updates from clients."""
@@ -149,37 +168,6 @@ class Server(fedavg.Server):
             mew = 0
         return mew
 
-    async def select_clients(self, for_next_batch=False):
-        """Send the update_thresholds to the clients."""
-        await super().select_clients(for_next_batch)
-
-        if self.trainer.use_adaptive:
-            self.calc_threshold()
-            checkpoint_path = Config().params["checkpoint_path"]
-            model_name = Config().trainer.model_name
-
-            if not os.path.exists(checkpoint_path):
-                os.makedirs(checkpoint_path)
-
-            loss_path = f"{checkpoint_path}/{model_name}_thresholds.pkl"
-
-            with open(loss_path, "wb") as file:
-                pickle.dump(self.update_threshold, file)
-
-    def calc_threshold(self):
-        """Calculate new update thresholds for each client."""
-        if self.current_round == 1:
-            return
-        for client_id in self.divs:
-            sigmoid = (
-                self.delta1 * self.divs[client_id]
-                + self.delta2 * self.avg_update[client_id]
-                + self.delta3 * self.mean_variance
-            )
-            self.update_threshold[client_id - 1] = (
-                1 / (1 + (math.e**-sigmoid))
-            ) * self.orig_threshold
-
     def server_will_close(self):
         """Method called at the start of closing the server."""
         model_name = Config().trainer.model_name
@@ -194,8 +182,3 @@ class Server(fedavg.Server):
             files_to_delete = [file for file in all_files if os.path.exists(file)]
             for file in files_to_delete:
                 os.remove(file)
-
-        # Delete threshold file created by the server.
-        threshold_path = f"{checkpoint_path}/{model_name}_thresholds.pkl"
-        if os.path.exists(threshold_path):
-            os.remove(threshold_path)
