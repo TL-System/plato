@@ -38,10 +38,10 @@ clients:
     # on all clients
     do_final_personalization: True
     # Minotor the self-supervised learning by knn for
-    # every 1 round
+    # every 10 round
     test_interval: 10
     # Train the personalized model based on the
-    # learned representation every 1 rounds
+    # learned representation every 10 rounds
     pers_learning_interval: 10
 
     # Whether simulate clients or not
@@ -76,15 +76,17 @@ server:
 
 data:
     # The training and testing dataset
-    datasource: CIFAR100
+    datasource: CIFAR10
 
+    partition_size: 600
+    test_partition_size: 600
 
     # IID or non-IID?
-    sampler: label_quantity_noniid
-    testset_sampler: label_quantity_noniid
+    sampler: noniid
+    testset_sampler: noniid
 
     # The concentration parameter for the Dirichlet distribution
-    per_client_classes_size: 5
+    concentration: 0.1
 
     # The random seed for sampling data
     random_seed: 1
@@ -104,7 +106,7 @@ trainer:
     max_concurrency: 3
 
     # The target accuracy
-    target_accuracy: 0.9
+    target_accuracy: 0.98
 
     # Number of epochs for local training in each communication round
     #   The user is expected to carefully choose the batch_size to avoid
@@ -114,7 +116,7 @@ trainer:
     batch_size: 64
 
     optimizer: SGD
-    learning_rate: 0.1
+    learning_rate: 0.01
     momentum: 0.9
     weight_decay: 0.000001
 
@@ -130,11 +132,11 @@ trainer:
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
     # does not utilize the
-    pers_epochs: 1
+    pers_epochs: 10
     pers_batch_size: 64
     pers_optimizer: SGD
     # lr = 0.1 * batch_size / 256, see section B.6 and B.7 of SimCLR paper.
-    pers_learning_rate: 0.1
+    pers_learning_rate: 0.05
     pers_momentum: 0.9
     pers_weight_decay: 0.0
 
@@ -153,9 +155,6 @@ trainer:
     #   but use the custom model
     model_name: resnet_18
     personalized_model_name: resnet_18
-
-    # encoder, whole
-    global_model_name: whole
     # whether to maintain the state of the trained personalized
     # model in each round
     # In general, for the contrastive self-supervised learning
@@ -167,15 +166,11 @@ trainer:
     # trained personalized model in each round.
     # Then, setting do_maintain_per_state to be True to follow this
     # rule.
-    do_maintain_per_state: True
+    do_maintain_per_state: False
+    # encoder, whole
+    global_model_name: clf_fc
 
-    # Important hyper-parameters
-    # 0 for performing Per-FedAvg(FO), others for Per-FedAvg(HF)
-    hessian_free: False
-    alpha: 0.01 # 1e-2
-    beta: 0.001
-
-    num_classes: 100
+    num_classes: 10
 
 algorithm:
     # Aggregation algorithm
