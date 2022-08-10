@@ -131,8 +131,7 @@ class Client(base.Client):
         try:
             if hasattr(self.trainer, "current_round"):
                 self.trainer.current_round = self.current_round
-            # pylint: disable=protected-access
-            training_time = self.trainer._train(self.trainset, self.sampler)
+            training_time = self.trainer.train(self.trainset, self.sampler)
         except ValueError as exc:
             logging.info(
                 fonts.colourize(f"[{self}] Error occurred during training: {exc}")

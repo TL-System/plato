@@ -99,7 +99,7 @@ class Trainer(base.Trainer):
             )
             raise training_exception
 
-    def _train(self, trainset, sampler, cut_layer=None, **kwargs) -> float:
+    def train(self, trainset, sampler, cut_layer=None, **kwargs) -> float:
         """The main training loop in a federated learning workload.
 
         Arguments:

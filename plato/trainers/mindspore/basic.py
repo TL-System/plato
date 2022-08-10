@@ -109,7 +109,7 @@ class Trainer(base.Trainer):
         param_dict = mindspore.load_checkpoint(model_path)
         mindspore.load_param_into_net(self.model, param_dict)
 
-    def _train(self, trainset, *args) -> float:
+    def train(self, trainset, *args) -> float:
         """The main training loop in a federated learning workload.
 
         Arguments:
