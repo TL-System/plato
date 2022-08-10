@@ -207,12 +207,12 @@ class Trainer(pers_basic.Trainer):
             f"With {lr_schedule}, we get lr={lr_schedule.get_lr()} under the global epoch {lr_schedule_base_epoch}"
         )
 
+        # Sending the model to the device used for training
+        self.model.to(self.device)
+
         # backup the unoptimized global model
         # this is used as the baseline ditto weights in the Ditto solver
         initial_model_params = copy.deepcopy(self.model.state_dict())
-
-        # Sending the model to the device used for training
-        self.model.to(self.device)
 
         # Define the container to hold the logging information
         epoch_loss_meter = optimizers.AverageMeter(name='Loss')
