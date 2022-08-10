@@ -136,19 +136,21 @@ class Trainer(basic.Trainer):
         return delta
 
     def save_gradient(self):
-        """Save the client updated gradients for the next communication round."""
+        """Save the accumulated client gradients for the next communication round."""
         model_name = Config().trainer.model_name
         checkpoint_path = Config().params["checkpoint_path"]
 
         if not os.path.exists(checkpoint_path):
             os.makedirs(checkpoint_path)
 
-        allgrad_path = f"{checkpoint_path}/{model_name}_client{self.client_id}_grad.pth"
-        with open(allgrad_path, "wb") as payload_file:
+        acc_grad_path = (
+            f"{checkpoint_path}/{model_name}_client{self.client_id}_grad.pth"
+        )
+        with open(acc_grad_path, "wb") as payload_file:
             pickle.dump(self.all_grads, payload_file)
 
     def load_all_grads(self):
-        """Load the gradients from a previous communication round."""
+        """Load the accumulated gradients from a previous communication round."""
         model_name = Config().trainer.model_name
         checkpoint_path = Config().params["checkpoint_path"]
 
@@ -170,8 +172,7 @@ class Trainer(basic.Trainer):
 
     def compute_pruned_amount(self):
         """
-        This function computes the pruned percentage.
-        :return pruned percentage, number of remaining weights:
+        Compute the pruned percentage of the entire model.
         """
         nonzero = 0
         total = 0
