@@ -11,7 +11,7 @@ class Trainer(contrastive_ssl.Trainer):
     """ The federated learning trainer for the BYOL client. """
 
     @staticmethod
-    def loss_criterion(model):
+    def loss_criterion(model, config):
         """ The loss computation.
         """
         criterion = ssl_losses.CrossStopGradientL2loss()

@@ -425,7 +425,7 @@ class Trainer(basic.Trainer):
         # Initializing the loss criterion
         _loss_criterion = getattr(self, "loss_criterion", None)
         if callable(_loss_criterion):
-            loss_criterion = self.loss_criterion(self.model)
+            loss_criterion = self.loss_criterion(self.model, config)
         else:
             loss_criterion = torch.nn.CrossEntropyLoss()
 

@@ -25,31 +25,35 @@ from pFLCMA_losses import pFLCMALoss
 class Trainer(contrastive_ssl.Trainer):
     """ The federated learning trainer for the BYOL client. """
 
+    def freeze_model(self, model):
+        for name, param in model.named_parameters():
+            param.requires_grad = False
+
+    def active_model(self, model):
+        for name, param in model.named_parameters():
+            param.requires_grad = True
+
     @staticmethod
-    def loss_criterion(model):
+    def loss_criterion(model, config):
         """ The loss computation. """
-        temperature = Config().trainer.temperature
-        base_temperature = Config().trainer.base_temperature
-        contrast_mode = Config().trainer.contrast_mode
+        temperature = config['temperature']
+        base_temperature = config['base_temperature']
+        contrast_mode = config['contrast_mode']
 
-        similarity_lambda = Config().trainer.similarity_lambda if hasattr(
-            Config().trainer, "similarity_lambda") else 0.0
+        similarity_lambda = config[
+            'similarity_lambda'] if 'similarity_lambda' in config else 0.0
 
-        ntx_lambda = Config().trainer.ntx_lambda if hasattr(
-            Config().trainer, "ntx_lambda") else 0.0
+        ntx_lambda = config['ntx_lambda'] if 'ntx_lambda' in config else 0.0
 
-        prototype_contrastive_repr_lambda = Config(
-        ).trainer.prototype_contrastive_repr_lambda if hasattr(
-            Config().trainer, "prototype_contrastive_repr_lambda") else 0.0
+        prototype_contrastive_repr_lambda = config[
+            'prototype_contrastive_repr_lambda'] if 'prototype_contrastive_repr_lambda' in config else 0.0
 
-        meta_lambda = Config().trainer.meta_lambda if hasattr(
-            Config().trainer, "meta_lambda") else 0.0
+        meta_lambda = config['meta_lambda'] if 'meta_lambda' in config else 0.0
 
-        meta_contrastive_lambda = Config(
-        ).trainer.meta_contrastive_lambda if hasattr(
-            Config().trainer, "meta_contrastive_lambda") else 0.0
+        meta_contrastive_lambda = config[
+            'meta_contrastive_lambda'] if 'meta_contrastive_lambda' in config else 0.0
 
-        to_compute_losses = Config().trainer.cma_losses
+        to_compute_losses = config['cma_losses']
 
         to_compute_losses = to_compute_losses.split(",")
 
@@ -94,7 +98,7 @@ class Trainer(contrastive_ssl.Trainer):
         """
         personalized_model_name = Config().trainer.personalized_model_name
         current_round = kwargs['current_round']
-
+        config['current_round'] = current_round
         # Initialize accuracy to be returned to -1, so that the client can disconnect
         # from the server when testing fails
         accuracy = -1
@@ -117,18 +121,10 @@ class Trainer(contrastive_ssl.Trainer):
             # Perform the evaluation in the downstream task
             #   i.e., the client's personal local dataset
             eval_optimizer = optimizers.get_dynamic_optimizer(
-                [self.model.encoder, self.personalized_model], prefix="pers_")
+                self.personalized_model, prefix="pers_")
             iterations_per_epoch = np.ceil(
                 len(kwargs["eval_trainset"]) /
                 Config().trainer.pers_batch_size).astype(int)
-
-            for name, param in self.model.encoder.named_parameters():
-                if param.requires_grad:
-                    print(name)
-
-            for name, param in self.personalized_model.named_parameters():
-                if param.requires_grad:
-                    print(name)
 
             # Initializing the learning rate schedule, if necessary
             assert 'pers_lr_schedule' in config
@@ -145,30 +141,32 @@ class Trainer(contrastive_ssl.Trainer):
                 model_name=personalized_model_name,
                 model_state_dict=self.personalized_model.state_dict(),
                 config=config,
-                kwargs=kwargs,
                 optimizer_state_dict=eval_optimizer.state_dict(),
                 lr_schedule_state_dict=lr_schedule.state_dict(),
                 present_epoch=0,
                 base_epoch=0,
                 prefix="personalized")
 
-            accuracy, _, _ = self.perform_test_op(test_loader)
+            accuracy, _, _ = self.perform_evaluation_op(test_loader)
             # save the personaliation accuracy to the results dir
-            self.checkpoint_personalized_accuracy(
-                accuracy=accuracy,
-                current_round=kwargs['current_round'],
-                epoch=0,
-                run_id=None)
+            self.checkpoint_personalized_accuracy(accuracy=accuracy,
+                                                  current_round=current_round,
+                                                  epoch=0,
+                                                  run_id=None)
 
             # Initializing the loss criterion
             _eval_loss_criterion = getattr(self, "pers_loss_criterion", None)
             if callable(_eval_loss_criterion):
-                eval_loss_criterion = self.pers_loss_criterion(self.model)
+                eval_loss_criterion = self.pers_loss_criterion(
+                    self.personalized_model)
             else:
                 eval_loss_criterion = torch.nn.CrossEntropyLoss()
 
             self.personalized_model.to(self.device)
-            self.model.to(self.device)
+            self.model.encoder.to(self.device)
+
+            self.freeze_model(self.model.encoder)
+            self.active_model(self.personalized_model)
 
             # Define the training and logging information
             # default not to perform any logging
@@ -212,7 +210,8 @@ class Trainer(contrastive_ssl.Trainer):
 
                     # Extract representation from the trained
                     # encoder of ssl.
-                    feature = self.model.encoder(examples)
+                    with torch.no_grad():
+                        feature = self.model.encoder(examples)
 
                     # Perfrom the training and compute the loss
                     preds = self.personalized_model(feature)
@@ -244,11 +243,11 @@ class Trainer(contrastive_ssl.Trainer):
                         self.client_id, epoch, pers_epochs,
                         epoch_loss_meter.avg)
 
-                    accuracy, _, _ = self.perform_test_op(test_loader)
+                    accuracy, _, _ = self.perform_evaluation_op(test_loader)
                     # save the personaliation accuracy to the results dir
                     self.checkpoint_personalized_accuracy(
                         accuracy=accuracy,
-                        current_round=kwargs['current_round'],
+                        current_round=current_round,
                         epoch=epoch,
                         run_id=None)
 
@@ -261,7 +260,6 @@ class Trainer(contrastive_ssl.Trainer):
                         model_name=personalized_model_name,
                         model_state_dict=self.personalized_model.state_dict(),
                         config=config,
-                        kwargs=kwargs,
                         optimizer_state_dict=eval_optimizer.state_dict(),
                         lr_schedule_state_dict=lr_schedule.state_dict(),
                         present_epoch=epoch,
@@ -270,7 +268,7 @@ class Trainer(contrastive_ssl.Trainer):
 
                 lr_schedule.step()
 
-            accuracy, test_encoded, test_labels = self.perform_test_op(
+            accuracy, test_encoded, test_labels = self.perform_evaluation_op(
                 test_loader)
 
         except Exception as testing_exception:
@@ -282,7 +280,6 @@ class Trainer(contrastive_ssl.Trainer):
         # to the model dir of this client
         if 'max_concurrency' in config:
 
-            current_round = kwargs['current_round']
             if current_round == Config().trainer.rounds:
                 target_dir = Config().params['model_path']
             else:
