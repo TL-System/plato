@@ -117,9 +117,3 @@ def get_optimizer(model) -> optim.Optimizer:
         )
 
     return optimizer
-    """for name, registered_optimizer in registered_optimizers.items():
-        if name.startswith(optimizer_name):
-            optimizer = registered_optimizer
-        # We have found our optimizer
-        if optimizer is not None:
-            break"""
