@@ -30,9 +30,24 @@ registered_optimizers_parameters = OrderedDict(
             "SGD",
             OrderedDict(
                 [
-                    ("lr", Config().trainer.learning_rate),
-                    ("momentum", Config().trainer.momentum),
-                    ("weight_decay", Config().trainer.weight_decay),
+                    (
+                        "lr",
+                        Config().trainer.learning_rate
+                        if hasattr(Config().trainer, "learning_rate")
+                        else 0.001,
+                    ),
+                    (
+                        "momentum",
+                        Config().trainer.momentum
+                        if hasattr(Config().trainer, "momentum")
+                        else 0.937,
+                    ),
+                    (
+                        "weight_decay",
+                        Config().trainer.weight_decay
+                        if hasattr(Config().trainer, "weight_decay")
+                        else 0.00058,
+                    ),
                 ]
             ),
         ),
@@ -40,8 +55,18 @@ registered_optimizers_parameters = OrderedDict(
             "Adam",
             OrderedDict(
                 [
-                    ("lr", Config().trainer.learning_rate),
-                    ("weight_decay", Config().trainer.weight_decay),
+                    (
+                        "lr",
+                        Config().trainer.learning_rate
+                        if hasattr(Config().trainer, "learning_rate")
+                        else 0.001,
+                    ),
+                    (
+                        "weight_decay",
+                        Config().trainer.weight_decay
+                        if hasattr(Config().trainer, "weight_decay")
+                        else 0.00058,
+                    ),
                 ]
             ),
         ),
@@ -49,10 +74,30 @@ registered_optimizers_parameters = OrderedDict(
             "Adadelta",
             OrderedDict(
                 [
-                    ("lr", Config().trainer.learning_rate),
-                    ("rho", Config().trainer.rho),
-                    ("eps", float(Config().trainer.eps)),
-                    ("weight_decay", Config().trainer.weight_decay),
+                    (
+                        "lr",
+                        Config().trainer.learning_rate
+                        if hasattr(Config().trainer, "learning_rate")
+                        else 0.001,
+                    ),
+                    (
+                        "rho",
+                        Config().trainer.rho
+                        if hasattr(Config().trainer, "rho")
+                        else 1.0,
+                    ),
+                    (
+                        "eps",
+                        float(Config().trainer.eps)
+                        if hasattr(Config().trainer, "eps")
+                        else 1e-3,
+                    ),
+                    (
+                        "weight_decay",
+                        Config().trainer.weight_decay
+                        if hasattr(Config().trainer, "weight_decay")
+                        else 0.00058,
+                    ),
                 ]
             ),
         ),
@@ -60,14 +105,37 @@ registered_optimizers_parameters = OrderedDict(
             "AdaHessian",
             OrderedDict(
                 [
-                    ("lr", Config().trainer.learning_rate),
+                    (
+                        "lr",
+                        Config().trainer.learning_rate
+                        if hasattr(Config().trainer, "learning_rate")
+                        else 0.001,
+                    ),
                     (
                         "betas",
-                        (Config().trainer.momentum_b1, Config().trainer.momentum_b2),
+                        (Config().trainer.momentum_b1, Config().trainer.momentum_b2)
+                        if hasattr(Config().trainer, "momentum_b1")
+                        and hasattr(Config().trainer, "momentum_b2")
+                        else (0.9, 0.999),
                     ),
-                    ("eps", float(Config().trainer.eps)),
-                    ("weight_decay", Config().trainer.weight_decay),
-                    ("hessian_power", Config().trainer.hessian_power),
+                    (
+                        "eps",
+                        float(Config().trainer.eps)
+                        if hasattr(Config().trainer, "eps")
+                        else 1e-3,
+                    ),
+                    (
+                        "weight_decay",
+                        Config().trainer.weight_decay
+                        if hasattr(Config().trainer, "weight_decay")
+                        else 0.00058,
+                    ),
+                    (
+                        "hessian_power",
+                        Config().trainer.hessian_power
+                        if hasattr(Config().trainer, "hessian_power")
+                        else 1.0,
+                    ),
                 ]
             ),
         ),
