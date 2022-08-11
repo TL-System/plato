@@ -170,9 +170,7 @@ class Server(base.Server):
         deltas_received = self.compute_weight_deltas(updates)
 
         # Extract the total number of samples
-        self.total_samples = sum(
-            [report.num_samples for (__, report, __, __) in updates]
-        )
+        self.total_samples = sum([update.report.num_samples for update in updates])
 
         # Perform weighted averaging
         avg_update = {
@@ -181,7 +179,7 @@ class Server(base.Server):
         }
 
         for i, update in enumerate(deltas_received):
-            __, report, __, __ = updates[i]
+            report = updates[i].report
             num_samples = report.num_samples
 
             for name, delta in update.items():
@@ -235,8 +233,12 @@ class Server(base.Server):
                 f"{Config().params['result_path']}/{os.getpid()}_accuracy.csv"
             )
 
-            for (client_id, report, __, __) in self.updates:
-                accuracy_row = [self.current_round, client_id, report.accuracy]
+            for update in self.updates:
+                accuracy_row = [
+                    self.current_round,
+                    update.client_id,
+                    update.report.accuracy,
+                ]
                 csv_processor.write_csv(accuracy_csv_file, accuracy_row)
 
     def get_record_items_values(self):
@@ -245,13 +247,11 @@ class Server(base.Server):
             "round": self.current_round,
             "accuracy": self.accuracy,
             "elapsed_time": self.wall_time - self.initial_wall_time,
-            "comm_time": max(
-                [report.comm_time for (__, report, __, __) in self.updates]
-            ),
+            "comm_time": max([update.report.comm_time for update in self.updates]),
             "round_time": max(
                 [
-                    report.training_time + report.comm_time
-                    for (__, report, __, __) in self.updates
+                    update.report.training_time + update.report.comm_time
+                    for update in self.updates
                 ]
             ),
             "comm_overhead": self.comm_overhead,
@@ -261,12 +261,14 @@ class Server(base.Server):
     def accuracy_averaging(updates):
         """Compute the average accuracy across clients."""
         # Get total number of samples
-        total_samples = sum([report.num_samples for (__, report, __, __) in updates])
+        total_samples = sum([update.report.num_samples for update in updates])
 
         # Perform weighted averaging
         accuracy = 0
-        for (__, report, __, __) in updates:
-            accuracy += report.accuracy * (report.num_samples / total_samples)
+        for update in updates:
+            accuracy += update.report.accuracy * (
+                update.report.num_samples / total_samples
+            )
 
         return accuracy
 
