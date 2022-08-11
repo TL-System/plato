@@ -220,7 +220,7 @@ class Server(fedavg.Server):
 
     def server_will_close(self):
         """
-        Method called at the start of closing the server.
+        Method called before closing the server.
         """
         model_name = Config().trainer.model_name
         model_path = Config().params["checkpoint_path"]

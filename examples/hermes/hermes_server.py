@@ -159,7 +159,6 @@ class Server(fedavg.Server):
             with open(filename, "rb") as payload_file:
                 payload = pickle.load(payload_file)
         else:
-            payload = self.algorithm.extract_weights()
             self.clients_first_time[self.selected_client_id - 1] = False
 
         return payload

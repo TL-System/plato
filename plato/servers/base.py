@@ -555,6 +555,8 @@ class Server:
                     "id": self.selected_client_id,
                     "current_round": self.current_round,
                 }
+                server_response = self.customize_server_response(server_response)
+
                 payload = self.algorithm.extract_weights()
                 payload = self.customize_server_payload(payload)
 
@@ -1223,13 +1225,13 @@ class Server:
         await self.close_connections()
         os._exit(0)
 
-    async def customize_server_response(self, server_response):
-        """Wrap up generating the server response with any additional information."""
+    def customize_server_response(self, server_response: dict) -> dict:
+        """Customizes the server response with any additional information."""
         return server_response
 
-    @abstractmethod
     def customize_server_payload(self, payload):
-        """Wrap up generating the server payload with any additional information."""
+        """Customizes the server payload before sending to the client."""
+        return payload
 
     @abstractmethod
     async def process_reports(self) -> None:

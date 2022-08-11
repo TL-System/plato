@@ -33,6 +33,25 @@ Override this method to complete additional tasks after aggregating weights.
 `updates` the client updates received at the server.
 ````
 
+````{admonition} **customize_server_response(self, server_response: dict)**
+Override this method to customize the server response with any additional information."""
+
+**Example:**
+
+```py
+def customize_server_response(self, server_response: dict) -> dict:
+    """
+    Customizes the server response with any additional information.
+    """
+    server_response["pruning_amount"] = self.pruning_amount_list
+    return server_response
+```
+````
+
+```{admonition} **customize_server_payload(self, payload)**
+Override this method to customize the server payload before sending it to the clients.
+```
+
 ```{admonition} **server_will_close(self)**
 Override this method to complete additional tasks before closing the server.
 ```

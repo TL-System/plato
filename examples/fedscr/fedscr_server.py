@@ -63,7 +63,7 @@ class Server(fedavg.Server):
         if self.trainer.use_adaptive:
             logging.info("Using the adaptive algorithm.")
 
-    async def customize_server_response(self, server_response):
+    def customize_server_response(self, server_response: dict) -> dict:
         """Wrap up generating the server response with any additional information."""
         if self.trainer.use_adaptive and self.current_round > 1:
             self.calc_threshold()

@@ -270,10 +270,6 @@ class Server(base.Server):
 
         return accuracy
 
-    def customize_server_payload(self, payload):
-        """Customize the server payload before sending to the client."""
-        return payload
-
     def weights_received(self, weights_received):
         """
         Event called after the updated weights have been received.
