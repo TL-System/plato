@@ -1003,11 +1003,11 @@ class Server:
 
                         client_staleness = self.current_round - client["starting_round"]
                         self.updates.append(
-                            (
-                                client["client_id"],
-                                client["report"],
-                                client["payload"],
-                                client_staleness,
+                            SimpleNamespace(
+                                client_id=client["client_id"],
+                                report=client["report"],
+                                payload=client["payload"],
+                                staleness=client_staleness,
                             )
                         )
 
@@ -1031,11 +1031,11 @@ class Server:
             client_staleness = self.current_round - client["starting_round"]
 
             self.updates.append(
-                (
-                    client["client_id"],
-                    client["report"],
-                    client["payload"],
-                    client_staleness,
+                SimpleNamespace(
+                    client_id=client["client_id"],
+                    report=client["report"],
+                    payload=client["payload"],
+                    staleness=client_staleness,
                 )
             )
 

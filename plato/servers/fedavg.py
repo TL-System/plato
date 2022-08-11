@@ -149,7 +149,7 @@ class Server(base.Server):
 
     def compute_weight_deltas(self, updates):
         """Extract the model weight updates from client updates."""
-        weights_received = [payload for (__, __, payload, __) in updates]
+        weights_received = [update.payload for update in updates]
 
         self.weights_received(weights_received)
         self.callback_handler.call_event("on_weights_received", self, weights_received)
@@ -170,7 +170,7 @@ class Server(base.Server):
         deltas_received = self.compute_weight_deltas(updates)
 
         # Extract the total number of samples
-        self.total_samples = sum([update.report.num_samples for update in updates])
+        self.total_samples = sum(update.report.num_samples for update in updates)
 
         # Perform weighted averaging
         avg_update = {
@@ -247,12 +247,10 @@ class Server(base.Server):
             "round": self.current_round,
             "accuracy": self.accuracy,
             "elapsed_time": self.wall_time - self.initial_wall_time,
-            "comm_time": max([update.report.comm_time for update in self.updates]),
+            "comm_time": max(update.report.comm_time for update in self.updates),
             "round_time": max(
-                [
-                    update.report.training_time + update.report.comm_time
-                    for update in self.updates
-                ]
+                update.report.training_time + update.report.comm_time
+                for update in self.updates
             ),
             "comm_overhead": self.comm_overhead,
         }
@@ -261,7 +259,7 @@ class Server(base.Server):
     def accuracy_averaging(updates):
         """Compute the average accuracy across clients."""
         # Get total number of samples
-        total_samples = sum([update.report.num_samples for update in updates])
+        total_samples = sum(update.report.num_samples for update in updates)
 
         # Perform weighted averaging
         accuracy = 0
