@@ -179,7 +179,6 @@ class Client(base.Client):
             )
 
         self._report = self.customize_report(report)
-        weights = self.customize_client_payload(weights)
 
         return self._report, weights
 
@@ -203,7 +202,3 @@ class Client(base.Client):
     def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
         """Customizes the report with any additional information."""
         return report
-
-    def customize_client_payload(self, payload):
-        """Customizes the client payload to be sent to the server."""
-        return payload
