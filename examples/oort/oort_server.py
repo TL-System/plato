@@ -79,14 +79,16 @@ class Server(fedavg.Server):
         """
 
         # Extract statistical utility and local training times
-        for (client_id, report, __, __) in updates:
-            self.client_utilities[client_id] = report.statistics_utility
-            self.client_durations[client_id - 1] = report.training_time
-            self.last_round[client_id - 1] = self.current_round
+        for update in updates:
+            self.client_utilities[update.client_id] = update.report.statistics_utility
+            self.client_durations[update.client_id - 1] = update.report.training_time
+            self.last_round[update.client_id - 1] = self.current_round
 
         # Calculate updated client utilities on explored clients
-        for (client_id, __, __, __) in updates:
-            self.client_utilities[client_id] = self.calc_client_util(client_id)
+        for update in updates:
+            self.client_utilities[update.client_id] = self.calc_client_util(
+                update.client_id
+            )
 
         # Adjust pacer
         self.util_history.append(self.calc_util_sum(updates))
@@ -99,9 +101,9 @@ class Server(fedavg.Server):
                 self.desired_duration += self.pacer_step
 
         # Blacklist clients who have been selected self.blacklist_num times
-        for (client_id, __, __, __) in updates:
-            if self.times_selected[client_id] > self.blacklist_num:
-                self.blacklist.append(client_id)
+        for update in updates:
+            if self.times_selected[update.client_id] > self.blacklist_num:
+                self.blacklist.append(update.client_id)
 
     def choose_clients(self, clients_pool, clients_count):
         """Choose a subset of the clients to participate in each round."""
@@ -213,8 +215,8 @@ class Server(fedavg.Server):
     def calc_util_sum(self, updates):
         """Calculate sum of statistical utilities from client reports."""
         total = 0
-        for (__, report, __, __) in updates:
-            total += report.statistics_utility
+        for update in updates:
+            total += update.report.statistics_utility
 
         return total
 
