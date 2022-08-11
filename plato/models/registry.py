@@ -54,34 +54,33 @@ def get():
     )
     model = None
 
-    for name, registered_model in registered_models.items():
-        if name.startswith(model_type):
-            num_classes = (
-                Config().trainer.num_classes
-                if hasattr(Config().trainer, "num_classes")
-                else 10
-            )
+    model = registered_models.get(model_type, None)
 
-            cut_layer = None
+    if model:
+        num_classes = (
+            Config().trainer.num_classes
+            if hasattr(Config().trainer, "num_classes")
+            else 10
+        )
 
-            if hasattr(Config().algorithm, "cut_layer"):
-                # Initialize the model with the cut_layer set, so that all the training
-                # will only use the layers after the cut_layer
-                cut_layer = Config().algorithm.cut_layer
-            model = registered_model(num_classes=num_classes, cut_layer=cut_layer)
+        cut_layer = None
 
-    if model is None:
-        for name, registered_factory in registered_factories.items():
-            if name.startswith(model_type):
-                num_classes = (
-                    Config().trainer.num_classes
-                    if hasattr(Config().trainer, "num_classes")
-                    else None
-                )
-                model = registered_factory.get(
-                    model_name=model_name,
-                    num_classes=num_classes,
-                )
+        if hasattr(Config().algorithm, "cut_layer"):
+            # Initialize the model with the cut_layer set, so that all the training
+            # will only use the layers after the cut_layer
+            cut_layer = Config().algorithm.cut_layer
+
+        model = model(num_classes=num_classes, cut_layer=cut_layer)
+    else:
+        # In the case it doesn't exist we check registered
+        model = registered_factories.get(model_type, None)
+        num_classes = (
+            Config().trainer.num_classes
+            if hasattr(Config().trainer, "num_classes")
+            else None
+        )
+        if model is not None:
+            model = model.get(model_name=model_name, num_classes=num_classes)
 
     if model_name == "yolov5":
         from plato.models import yolov5
