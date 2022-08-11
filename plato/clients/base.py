@@ -10,7 +10,6 @@ import re
 import sys
 import uuid
 from abc import abstractmethod
-from dataclasses import dataclass
 
 import socketio
 from plato.callbacks.handler import CallbackHandler
@@ -388,7 +387,3 @@ class Client:
     @abstractmethod
     async def obtain_model_update(self, wall_time):
         """Retrieving a model update corrsponding to a particular wall clock time."""
-
-    def customize_report(self, report):
-        """Wrap up generating the report with any additional information."""
-        return report

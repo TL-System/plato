@@ -2,10 +2,10 @@
 A federated learning client that sends its statistical utility
 """
 
-import numpy as np
-import torch
 from types import SimpleNamespace
 
+import numpy as np
+import torch
 from plato.clients import simple
 from plato.config import Config
 
@@ -19,7 +19,7 @@ class Client(simple.Client):
         super().__init__(model, datasource, algorithm, trainer)
         self.statistical_utility = None
 
-    def customize_report(self, report) -> SimpleNamespace:
+    def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
         """Wrap up generating the report with any additional information."""
         model_name = Config().trainer.model_name
         model_path = Config().params["checkpoint_path"]

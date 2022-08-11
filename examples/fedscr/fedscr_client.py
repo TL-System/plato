@@ -4,9 +4,10 @@ A federated learning client of FedSCR.
 
 import logging
 import pickle
+from types import SimpleNamespace
 
-from plato.config import Config
 from plato.clients import simple
+from plato.config import Config
 
 
 class Client(simple.Client):
@@ -27,7 +28,7 @@ class Client(simple.Client):
                 self.trainer.update_threshold,
             )
 
-    def customize_report(self, report):
+    def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
         """Wrap up generating the report with any additional information."""
         final_loss = self.get_loss()
         report.loss = final_loss

@@ -1,7 +1,6 @@
 """
 A federated learning client for FEI.
 """
-import logging
 import math
 from types import SimpleNamespace
 
@@ -12,7 +11,7 @@ from plato.config import Config
 class Client(simple.Client):
     """A federated learning client for FEI."""
 
-    def customize_report(self, report) -> SimpleNamespace:
+    def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
         loss = self.get_loss()
         report.valuation = self.calc_valuation(report.num_samples, loss)
         return report

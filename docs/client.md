@@ -10,7 +10,7 @@ Overide this method to customize a client's report to be sent to the server, and
 **Example:**
 
 ```py
-def customize_report(self, report) -> SimpleNamespace:
+def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
     loss = self.get_loss()
     report.valuation = self.calc_valuation(report.num_samples, loss)
     return report
