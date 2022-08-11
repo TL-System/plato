@@ -4,9 +4,15 @@
 
 The common practice is to customize the server using inheritance for important features that change the state of the server. To customize the server using inheritance, subclass the `fedavg.Server` (or `fedavg_cs.Server` for cross-silo federated learning) class in `plato.servers`, and override the following methods:
 
+```{admonition} **choose_clients(self, clients_pool, clients_count)**
+Override this method to implement a customized client selection algorithm, choosing a subset of clients from the client pool.
+
+`clients_pool` a list of available clients for selection.
+`clients_count` the number of clients that need to be selected in this round.
+```
 
 ````{admonition} **weights_received(self, weights_received)**
-Overide this method to complete additional tasks after the updated weights have been received.
+Override this method to complete additional tasks after the updated weights have been received.
 
 `weights_received` the updated weights that have been received from the clients.
 
@@ -22,7 +28,7 @@ def weights_received(self, weights_received):
 ````
 
 ````{admonition} **weights_aggregated(self, updates)**
-Overide this method to complete additional tasks after aggregating weights.
+Override this method to complete additional tasks after aggregating weights.
 
 `updates` the client updates received at the server.
 ````
@@ -35,14 +41,17 @@ Within the implementation of these callback methods, one can access additional i
 
 To use callbacks, subclass the `ServerCallback` class in `plato.callbacks.server`, and override the following methods:
 
+````{admonition} **choose_clients(self, clients_pool, clients_count)**
+Override Choose a subset of the clients to participate in each round."""
+
 ````{admonition} **on_weights_received(self, server, weights_received)**
-Overide this method to complete additional tasks after the updated weights have been received.
+Override this method to complete additional tasks after the updated weights have been received.
 
 `weights_received` the updated weights that have been received from the clients.
 ````
 
 ````{admonition} **on_weights_aggregated(self, server, updates)**
-Overide this method to complete additional tasks after aggregating weights.
+Override this method to complete additional tasks after aggregating weights.
 
 `updates` the client updates received at the server.
 
@@ -55,7 +64,7 @@ def on_weights_aggregated(self, server, updates):
 ````
 
 ````{admonition} **on_server_will_close(self, server)**
-Overide this method to complete additional tasks before closing the server.
+Override this method to complete additional tasks before closing the server.
 
 **Example:**
 

@@ -22,7 +22,7 @@ def get_train_loader(cls, batch_size, trainset, sampler, **kwargs):
 ````
 
 ````{admonition} **train_run_start(self, config)**
-Overide this method to complete additional tasks before the training loop starts.
+Override this method to complete additional tasks before the training loop starts.
 
 `config` the configuration settings used in the training loop. It corresponds directly to the `trainer` section in the configuration file.
 
@@ -36,7 +36,7 @@ def train_run_start(self, config):
 
 
 ````{admonition} **train_run_end(self, config)**
-Overide this method to complete additional tasks after the training loop ends.
+Override this method to complete additional tasks after the training loop ends.
 
 `config` the configuration settings used in the training loop. It corresponds directly to the `trainer` section in the configuration file.
 
@@ -49,7 +49,7 @@ def train_run_end(self, config):
 ````
 
 ````{admonition} **train_epoch_start(self, config)**
-Overide this method to complete additional tasks at the starting point of each training epoch.
+Override this method to complete additional tasks at the starting point of each training epoch.
 
 `config` the configuration settings used in the training loop. It corresponds directly to the `trainer` section in the configuration file.
 
@@ -62,7 +62,7 @@ def train_epoch_start(self, config):
 ````
 
 ````{admonition} **train_epoch_end(self, config)**
-Overide this method to complete additional tasks at the end of each training epoch.
+Override this method to complete additional tasks at the end of each training epoch.
 
 `config` the configuration settings used in the training loop. It corresponds directly to the `trainer` section in the configuration file.
 
@@ -75,7 +75,7 @@ def train_epoch_end(self, config):
 ````
 
 ````{admonition} **train_step_end(self, config, batch=None, loss=None)**
-Overide this method to complete additional tasks at the end of each step within a training epoch.
+Override this method to complete additional tasks at the end of each step within a training epoch.
 
 `config` the configuration settings used in the training loop. It corresponds directly to the `trainer` section in the configuration file.
 
@@ -107,7 +107,7 @@ Within the implementation of these callback methods, one can access additional i
 To use callbacks, subclass the `TrainerCallback` class in `plato.callbacks.trainer`, and override the following methods:
 
 ````{admonition} **on_train_run_start(self, trainer, config)**
-Overide this method to complete additional tasks before the training loop starts.
+Override this method to complete additional tasks before the training loop starts.
 
 `trainer` the trainer instance that activated this callback upon the occurrence of the corresponding event.
 
@@ -126,7 +126,7 @@ def on_train_run_start(self, trainer, config):
 ````
 
 ````{admonition} **on_train_run_end(self, trainer, config)**
-Overide this method to complete additional tasks after the training loop ends.
+Override this method to complete additional tasks after the training loop ends.
 
 `trainer` the trainer instance that activated this callback upon the occurrence of the corresponding event.
 
@@ -141,7 +141,7 @@ def on_train_run_end(self, trainer, config):
 ````
 
 ````{admonition} **on_train_epoch_start(self, trainer, config)**
-Overide this method to complete additional tasks at the starting point of each training epoch.
+Override this method to complete additional tasks at the starting point of each training epoch.
 
 `trainer` the trainer instance that activated this callback upon the occurrence of the corresponding event.
 
@@ -156,7 +156,7 @@ def train_epoch_start(self, trainer, config):
 ````
 
 ````{admonition} **on_train_epoch_end(self, trainer, config)**
-Overide this method to complete additional tasks at the end of each training epoch.
+Override this method to complete additional tasks at the end of each training epoch.
 
 `trainer` the trainer instance that activated this callback upon the occurrence of the corresponding event.
 
@@ -171,7 +171,7 @@ def on_train_epoch_end(self, trainer, config):
 ````
 
 ````{admonition} **on_train_step_end(self, trainer, config, batch=None, loss=None)**
-Overide this method to complete additional tasks at the end of each step within a training epoch.
+Override this method to complete additional tasks at the end of each step within a training epoch.
 
 `trainer` the trainer instance that activated this callback upon the occurrence of the corresponding event.
 

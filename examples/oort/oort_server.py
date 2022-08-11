@@ -89,7 +89,7 @@ class Server(fedavg.Server):
             self.client_utilities[client_id] = self.calc_client_util(client_id)
 
         # Adjust pacer
-        self.util_history.append(self.calc_util_sum(self.updates))
+        self.util_history.append(self.calc_util_sum(updates))
         if self.current_round >= 2 * self.step_window:
             last_pacer_rounds = sum(
                 self.util_history[-2 * self.step_window : -self.step_window]
@@ -103,34 +103,14 @@ class Server(fedavg.Server):
             if self.times_selected[client_id] > self.blacklist_num:
                 self.blacklist.append(client_id)
 
-    def customize_selected_clients(self, selected_clients, selectable_clients):
-        """Wrap up selecting clients with any additional step."""
-
-        unselectable_clients = [
-            client for client in self.clients_pool if client not in selectable_clients
-        ]
-        selected_client_num = self.clients_per_round
-
-        # In asychronous FL, avoid selecting new clients to replace those that are still
-        # training at this time
-        if (
-            self.asynchronous_mode
-            and self.selected_clients is not None
-            and len(self.reported_clients) > 0
-            and len(self.reported_clients) < self.clients_per_round
-        ):
-            # Set the number of clients to be selected
-            if self.simulate_wall_time:
-                selected_client_num = len(self.current_processed_clients)
-            else:
-                selected_client_num = len(self.reported_clients)
-
+    def choose_clients(self, clients_pool, clients_count):
+        """Choose a subset of the clients to participate in each round."""
         # Exploitation
-        exploit_len = math.ceil((1.0 - self.exploration_factor) * selected_client_num)
+        exploit_len = math.ceil((1.0 - self.exploration_factor) * clients_count)
 
         # If there aren't enough unexplored clients for exploration.
-        if (selected_client_num - exploit_len) > len(self.unexplored_clients):
-            exploit_len = selected_client_num - len(self.unexplored_clients)
+        if (clients_count - exploit_len) > len(self.unexplored_clients):
+            exploit_len = clients_count - len(self.unexplored_clients)
 
         # Take the top-k, sample by probability, take 95% of the cut-off loss by default
         sorted_util = sorted(
@@ -145,8 +125,9 @@ class Server(fedavg.Server):
         # Admit clients with utilities higher than the cut-off
         exploit_clients = []
         for client_id in sorted_util:
-            if self.client_utilities[client_id] > cut_off_util and client_id not in (
-                self.blacklist or unselectable_clients
+            if (
+                self.client_utilities[client_id] > cut_off_util
+                and client_id not in self.blacklist
             ):
                 exploit_clients.append(client_id)
 
@@ -163,26 +144,26 @@ class Server(fedavg.Server):
             self.client_utilities[key] / total_sc for key in exploit_clients
         ]
 
-        picked_clients = []
+        selected_clients = []
         if len(exploit_clients) < exploit_len:
             num = len(exploit_clients)
         else:
             num = exploit_len
 
         if len(probabilities) != 0 and exploit_len != 0:
-            picked_clients = np.random.choice(
+            selected_clients = np.random.choice(
                 exploit_clients, num, p=probabilities, replace=False
             )
-            picked_clients = picked_clients.tolist()
+            selected_clients = selected_clients.tolist()
 
-        # If the result of exploitation wasn't enough to meet the required length.
-        if len(picked_clients) < exploit_len and self.current_round > 1:
+        # If the result of exploitation wasn't enough to meet the required length
+        if len(selected_clients) < exploit_len and self.current_round > 1:
             for step in range(last_index + 1, len(sorted_util)):
                 if (
-                    not sorted_util[step] in (self.blacklist or unselectable_clients)
-                    and len(picked_clients) != exploit_len
+                    not sorted_util[step] in self.blacklist
+                    and len(selected_clients) != exploit_len
                 ):
-                    picked_clients.append(sorted_util[step])
+                    selected_clients.append(sorted_util[step])
 
         # Exploration
         explore_clients = []
@@ -190,7 +171,7 @@ class Server(fedavg.Server):
 
         # Select unexplored clients randomly
         explore_clients = random.sample(
-            self.unexplored_clients, selected_client_num - len(picked_clients)
+            self.unexplored_clients, clients_count - len(selected_clients)
         )
 
         self.prng_state = random.getstate()
@@ -200,14 +181,14 @@ class Server(fedavg.Server):
             id for id in self.unexplored_clients if id not in explore_clients
         ]
 
-        picked_clients += explore_clients
+        selected_clients += explore_clients
 
-        for client in picked_clients:
+        for client in selected_clients:
             self.times_selected[client] += 1
 
-        logging.info("[%s] Selected clients: %s", self, picked_clients)
+        logging.info("[%s] Selected clients: %s", self, selected_clients)
 
-        return picked_clients
+        return selected_clients
 
     def calc_client_util(self, client_id):
         """Calculate client utility."""

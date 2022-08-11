@@ -5,7 +5,7 @@
 The common practice is to customize the client using inheritance for important features that change internal states within a client. To customize the client using inheritance, subclass the `simple.Client` class (or `edge.Client` for cross-silo federated learning) in `plato.clients`, and override the following methods:
 
 ```{admonition} **customize_report(self, report)**
-Overide this method to customize a client's report to be sent to the server, and then returns the customized report.
+Override this method to customize a client's report to be sent to the server, and then returns the customized report.
 
 **Example:**
 

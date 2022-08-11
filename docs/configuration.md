@@ -331,8 +331,8 @@ The random seed used to sample each client's dataset so that experiments are rep
 The number of samples in each client's dataset.
 ```
 
-```{admonition} **testset_size**
-The number of samples in the server's test dataset when server-side evaluation is conducted. PyTorch only (for now).
+```{admonition} testset_size
+The number of samples in the server's test dataset when server-side evaluation is conducted; PyTorch only (for now).
 ```
 
 ## trainer
