@@ -22,17 +22,17 @@ class RLServer(rl_server.RLServer):
     def prep_state(self):
         """Wrap up the state update to RL Agent."""
         # Store client ids
-        client_ids = [report.client_id for (__, report, __, __) in self.updates]
+        client_ids = [update.report.client_id for update in self.updates]
 
         state = [0] * 4
         state[0] = self.normalize_state(
-            [report.num_samples for (__, report, __, __) in self.updates]
+            [update.report.num_samples for update in self.updates]
         )
         state[1] = self.normalize_state(
-            [report.training_time for (__, report, __, __) in self.updates]
+            [update.report.training_time for update in self.updates]
         )
         state[2] = self.normalize_state(
-            [report.valuation for (__, report, __, __) in self.updates]
+            [update.report.valuation for update in self.updates]
         )
         state[3] = self.normalize_state(self.corr)
         state = np.transpose(np.round(np.array(state), 4))

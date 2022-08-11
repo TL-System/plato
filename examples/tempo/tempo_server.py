@@ -84,9 +84,9 @@ class Server(fedavg_cs.Server):
         for i in range(Config().algorithm.total_silos):
             client_id = i + 1 + Config().clients.total_clients
             (report, weights) = [
-                (report, payload)
-                for (__, report, payload, __) in self.updates
-                if int(report.client_id) == client_id
+                (update.report, update.payload)
+                for update in self.updates
+                if int(update.client_id) == client_id
             ][0]
             num_samples = report.num_samples
 

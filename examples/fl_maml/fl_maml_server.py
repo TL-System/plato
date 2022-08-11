@@ -84,14 +84,10 @@ class Server(fedavg.Server):
 
         else:
             self.round_time = max(
-                [
-                    report.training_time + report.comm_time
-                    for (__, report, __, __) in self.updates
-                ]
+                update.report.training_time + update.report.comm_time
+                for update in self.updates
             )
-            self.comm_time = max(
-                [report.comm_time for (__, report, __, __) in self.updates]
-            )
+            self.comm_time = max(update.report.comm_time for update in self.updates)
 
     async def process_client_info(self, client_id, sid):
         """Process the received metadata information from a reporting client."""
