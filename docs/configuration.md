@@ -342,6 +342,12 @@ The type of the trainer. The following types are available:
 - `basic`: a basic trainer with a standard training loop.
 - `diff_privacy`: a trainer that supports local differential privacy in its training loop by adding noise to the gradients during each step of training.
 
+```{admonition} loss_func
+The loss criterion. Currently, the following types are available:
+- `CrossEntropyLoss`: The default cross entropy loss criterion
+- 'NLLLoss`: The negative log likelihood loss
+```
+
 ```{admonition} max_physical_batch_size
 The limit on the physical batch size when using the `diff_privacy` trainer.  The default value is 128. The GPU memory usage of one process training the ResNet-18 model is around 2817 MB.
 ```

@@ -16,6 +16,7 @@ from plato.models import registry as models_registry
 from plato.trainers import base
 from plato.trainers import optimizers
 from plato.trainers import lr_schedulers
+from plato.trainers import loss_funcs
 from plato.callbacks.handler import CallbackHandler
 from plato.callbacks.trainer import PrintProgressCallback
 
@@ -167,7 +168,9 @@ class Trainer(base.Trainer):
         )
 
         # Initializing the loss criterion
-        loss_criterion = self.get_loss_criterion()
+        loss_criterion = loss_funcs.get()
+
+        print("LOSS FUNCTION WORKING", loss_criterion)
 
         # Initializing the optimizer
         get_optimizer = getattr(self, "get_optimizer", optimizers.get_optimizer)
