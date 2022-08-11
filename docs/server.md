@@ -10,6 +10,8 @@ Overide this method to complete additional tasks after the updated weights have 
 
 `weights_received` the updated weights that have been received from the clients.
 
+**Example:**
+
 ```py
 def weights_received(self, weights_received):
     """

@@ -18,7 +18,7 @@ def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
 
 ## Customizing clients using callbacks
 
-For infrastructure changes, such as logging and recording metrics, we tend to customize the local training process using callbacks instead. The advantage of using callbacks is that one can pass a list of multiple callbacks to the client when it is initialized, and they will be called in their order in the provided list. This helps when it is necessary to group features into different callback classes.
+For infrastructure changes, such as logging and recording metrics, we tend to customize the client using callbacks instead. The advantage of using callbacks is that one can pass a list of multiple callbacks to the client when it is initialized, and they will be called in their order in the provided list. This helps when it is necessary to group features into different callback classes.
 
 Within the implementation of these callback methods, one can access additional information about the local training by using the `client` instance. 
 
