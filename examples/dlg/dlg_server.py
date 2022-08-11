@@ -336,9 +336,10 @@ class Server(fedavg.Server):
 
                 logging.info(
                     "[%s Gradient Leakage Attack %d with %s defense...] Iter %d: Loss = %.10f, avg MSE = %.8f, avg LPIPS = %.8f, avg PSNR = %.4f dB, avg SSIM = %.3f, avg library SSIM = %.3f",
-                    self.attack_method, (trial_number + 1), self.defense_method,
-                    iters, losses[-1], avg_mses[-1], avg_lpips[-1],
-                    avg_psnr[-1], avg_ssim[-1], avg_library_ssim[-1])
+                    self.attack_method, (trial_number + 1),
+                    self.defense_method, iters, losses[-1], avg_mses[-1],
+                    avg_lpips[-1], avg_psnr[-1], avg_ssim[-1],
+                    avg_library_ssim[-1])
 
                 if self.attack_method == 'DLG':
                     history.append([[
@@ -521,36 +522,56 @@ class Server(fedavg.Server):
     @staticmethod
     def plot_gt(num_images, gt_data, gt_labels):
         """ Plot ground truth data. """
-        gt_result_path = f"{dlg_result_path}/ground_truth.png"
-        gt_figure = plt.figure(figsize=(12, 4))
+        gt_result_path = f"{dlg_result_path}/ground_truth.pdf"
 
-        # Make the path if it does not exist yet
         if not os.path.exists(dlg_result_path):
             os.makedirs(dlg_result_path)
 
-        for i in range(num_images):
-            current_label = torch.argmax(gt_labels[i], dim=-1).item()
-            logging.info("Ground truth labels: %d", current_label)
-            gt_figure.add_subplot(1, num_images, i + 1)
-            plt.imshow(gt_data[i].cpu().permute(1, 2, 0))
-            # torch.save(gt_data[i].cpu().permute(1, 2, 0), "gt3.pt")
+        if hasattr(Config().results, 'rows'):
+            rows = Config().results.rows
+            if hasattr(Config().results, 'cols'):
+                cols = Config().results.cols
+            else:
+                cols = math.ceil(num_images / rows)
+        elif hasattr(Config().results, 'cols'):
+            cols = Config().results.cols
+            rows = math.ceil(num_images / cols)
+        else:
+            # make the image wider by default
+            # if you want the image to be taller by default then
+            # switch the assignment statement for rows and cols variables
+            logging.info("Using default dimensions for images")
+            cols = math.ceil(math.sqrt(num_images))
+            rows = math.ceil(num_images / cols)
+
+        if (rows * cols) < num_images:
+            logging.info(
+                "Row and column provided for plotting images is too small")
+            logging.info("Using default dimensions for images")
+            cols = math.ceil(math.sqrt(num_images))
+            rows = math.ceil(num_images / cols)
+
+        scale_factor = rows + cols
+        image_height = 16 * rows / scale_factor
+        image_width = 16 * cols / scale_factor
+        product = rows * cols
+
+        if num_images == 1:
+            gt_figure = plt.figure(figsize=(8, 8))
+            plt.imshow(gt_data[0].cpu().permute(1, 2, 0))
             plt.axis('off')
-            plt.title("GT image %d\nLabel: %d" % ((i + 1), current_label))
+        else:
+            fig, axes = plt.subplots(nrows=rows,
+                                     ncols=cols,
+                                     figsize=(image_width, image_height))
+            for i, title in enumerate(gt_data):
+                axes.ravel()[i].imshow(gt_data[i].cpu().permute(1, 2, 0))
+                axes.ravel()[i].set_axis_off()
+            for i in range(num_images, product):
+                axes.ravel()[i].set_axis_off()
+
+        plt.tight_layout()
         plt.savefig(gt_result_path)
-
-        # gt_result_path = f"{dlg_result_path}/ground_truth.pdf"
-        # gt_figure = plt.figure(figsize=(8, 8))
-
-        # Make the path if it does not exist yet
-        # if not os.path.exists(dlg_result_path):
-        #     os.makedirs(dlg_result_path)
-
-        # fig, axes = plt.subplots(nrows=3, ncols=1, figsize=(16, 16))
-        # for ind, title in enumerate(gt_data):
-        #     axes.ravel()[ind].imshow(gt_data[ind].cpu().permute(1, 2, 0))
-        #     axes.ravel()[ind].set_axis_off()
-        # plt.tight_layout()
-        # plt.savefig(gt_result_path)
 
     @staticmethod
     def plot_reconstructed(num_images, history, reconstructed_result_path):
