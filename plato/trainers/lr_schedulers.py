@@ -62,7 +62,9 @@ def get_lr_schedule(
                         int(x.split("ep")[0])
                         for x in Config().trainer.lr_milestone_steps.split(",")
                     ],
-                    gamma=Config().trainer.lr_gamma,
+                    gamma=Config().trainer.lr_gamma
+                    if hasattr(Config().trainer, "gamma")
+                    else 0.99,
                 ),
             ),
             (
@@ -148,7 +150,7 @@ def get_lr_schedule(
                 "CosineAnnealingWarmRestarts",
                 optim.lr_scheduler.CosineAnnealingWarmRestarts(
                     optimizer,
-                    num_iters=Config().trainer.num_iters
+                    T_0=Config().trainer.num_iters
                     if hasattr(Config().trainer, "num_iters")
                     else 50,
                 ),

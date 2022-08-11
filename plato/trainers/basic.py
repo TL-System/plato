@@ -14,7 +14,8 @@ import torch
 from plato.config import Config
 from plato.models import registry as models_registry
 from plato.trainers import base
-from plato.utils import optimizers
+from plato.trainers import optimizers
+from plato.trainers import lr_schedulers
 from plato.callbacks.handler import CallbackHandler
 from plato.callbacks.trainer import PrintProgressCallback
 
@@ -174,7 +175,7 @@ class Trainer(base.Trainer):
 
         # Initializing the learning rate schedule, if necessary
         if "lr_schedule" in config:
-            lr_schedule = optimizers.get_lr_schedule(
+            lr_schedule = lr_schedulers.get_lr_schedule(
                 optimizer, len(self.train_loader), self.train_loader
             )
         else:
