@@ -21,6 +21,7 @@ clients:
     accuracy_threshold: 0.6
 
     outbound_processors:
+        - send_mask
         - model_compress
 
     compute_comm_time: true

@@ -6,7 +6,6 @@ import copy
 import logging
 import os
 import pickle
-import sys
 import numpy as np
 import torch
 
@@ -22,6 +21,7 @@ class Server(fedavg.Server):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
         self.clients_first_time = [True for _ in range(Config().clients.total_clients)]
         self.personalized_models = []
+        self.masks_received = []
 
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using personalized aggregating."""
@@ -113,29 +113,8 @@ class Server(fedavg.Server):
                 filename,
             )
 
-    def process_customized_report(self, client_id, checkpoint_path, model_name):
-        """Process a customized client report with additional information."""
-        # Include the pruning mask in the communication overhead
-        mask_filename = f"{checkpoint_path}/{model_name}_client{client_id}_mask.pth"
-        if os.path.exists(mask_filename):
-            with open(mask_filename, "rb") as payload_file:
-                client_mask = pickle.load(payload_file)
-                mask_size = sys.getsizeof(pickle.dumps(client_mask)) / 1024**2
-                logging.info(
-                    "[%s] Received %.2f MB of pruning mask from client #%d (simulated).",
-                    self,
-                    mask_size,
-                    client_id,
-                )
-
-                self.comm_overhead += mask_size
-
-                self.uplink_comm_time[client_id] += mask_size / (
-                    self.uplink_bandwidth / 8
-                )
-
     def customize_server_payload(self, payload):
-        """Wrap up generating the server payload with any additional information."""
+        """Customizes the server payload before sending to the client."""
 
         # If the client has already begun the learning of a personalized model
         # in a previous communication round, the personalized file is loaded and
@@ -161,24 +140,17 @@ class Server(fedavg.Server):
 
     def extract_client_updates(self, updates):
         """Extract the model weight updates from client updates along with the masks."""
-        model_name = Config().trainer.model_name
-        checkpoint_path = Config().params["checkpoint_path"]
 
-        weights_received = [update.payload for update in updates]
+        weights_received = [update.payload[0] for update in updates]
 
-        masks_received = []
-        for update in updates:
-            mask_path = (
-                f"{checkpoint_path}/{model_name}_client{update.client_id}_mask.pth"
-            )
-            if os.path.exists(mask_path):
-                with open(mask_path, "rb") as mask_file:
-                    masks_received.append(pickle.load(mask_file))
-            else:
+        masks_received = [update.payload[1] for update in updates]
+
+        for step, mask in enumerate(masks_received):
+            if mask is None:
                 model = copy.deepcopy(self.algorithm.model)
-                model.load_state_dict(update.payload, strict=True)
+                model.load_state_dict(weights_received[step], strict=True)
                 mask = pruning.make_init_mask(model)
-                masks_received.append(mask)
+                masks_received[step] = mask
 
         return weights_received, masks_received
 

@@ -24,7 +24,6 @@ class Trainer(basic.Trainer):
         super().__init__(model=model)
         self.original_model = None
         self.mask = None
-        self.made_init_mask = False
         self.pruning_target = Config().clients.pruning_target * 100
         self.pruned_amount = 0
         self.pruning_rate = Config().clients.pruning_amount * 100
