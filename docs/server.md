@@ -34,7 +34,7 @@ Override this method to complete additional tasks after aggregating weights.
 ````
 
 ````{admonition} **customize_server_response(self, server_response: dict)**
-Override this method to customize the server response with any additional information."""
+Override this method to customize the server response with any additional information.
 
 **Example:**
 
