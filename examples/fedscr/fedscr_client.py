@@ -4,20 +4,9 @@ A federated learning client of FedSCR.
 
 import logging
 import pickle
-from dataclasses import dataclass
 
 from plato.config import Config
 from plato.clients import simple
-
-
-@dataclass
-class Report(simple.Report):
-    """A client report containing the final loss, to be sent to the FedSCR server for the adaptive
-    algorithm."""
-
-    loss: float
-    div_from_global: float
-    avg_update: float
 
 
 class Client(simple.Client):
@@ -41,15 +30,15 @@ class Client(simple.Client):
     def customize_report(self, report):
         """Wrap up generating the report with any additional information."""
         final_loss = self.get_loss()
-        setattr(report, "loss", final_loss)
+        report.loss = final_loss
 
         if self.trainer.use_adaptive:
             additional_info = self.get_additional_info()
-            setattr(report, "div_from_global", additional_info["div_from_global"])
-            setattr(report, "avg_update", additional_info["avg_update"])
+            report.div_from_global = additional_info["div_from_global"]
+            report.avg_update = additional_info["avg_update"]
         else:
-            setattr(report, "div_from_global", None)
-            setattr(report, "avg_update", None)
+            report.div_from_global = None
+            report.avg_update = None
 
         return report
 

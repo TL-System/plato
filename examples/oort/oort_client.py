@@ -2,19 +2,12 @@
 A federated learning client that sends its statistical utility
 """
 
-from dataclasses import dataclass
 import numpy as np
 import torch
+from types import SimpleNamespace
 
 from plato.clients import simple
 from plato.config import Config
-
-
-@dataclass
-class Report(simple.Report):
-    """Client report sent to the federated learning server."""
-
-    statistics_utility: float
 
 
 class Client(simple.Client):
@@ -26,7 +19,7 @@ class Client(simple.Client):
         super().__init__(model, datasource, algorithm, trainer)
         self.statistical_utility = None
 
-    def customize_report(self, report):
+    def customize_report(self, report) -> SimpleNamespace:
         """Wrap up generating the report with any additional information."""
         model_name = Config().trainer.model_name
         model_path = Config().params["checkpoint_path"]
@@ -35,5 +28,5 @@ class Client(simple.Client):
         self.statistical_utility = np.abs(report.num_samples) * np.sqrt(
             1.0 / report.num_samples * sum_loss
         )
-        setattr(report, "statistics_utility", self.statistical_utility)
+        report.statistics_utility = self.statistical_utility
         return report

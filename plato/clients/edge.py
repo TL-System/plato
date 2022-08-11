@@ -2,21 +2,11 @@
 A federated learning client at the edge server in a cross-silo training workload.
 """
 
-from dataclasses import dataclass
 import time
+from types import SimpleNamespace
 
 from plato.clients import base
-from plato.clients import simple
 from plato.processors import registry as processor_registry
-
-
-@dataclass
-class Report(simple.Report):
-    """Client report, to be sent to the federated learning server."""
-
-    average_accuracy: float
-    client_id: str
-    edge_server_comm_overhead: float
 
 
 class Client(base.Client):
@@ -70,7 +60,7 @@ class Client(base.Client):
         comm_time = time.time()
 
         # Generate a report for the central server
-        report = Report(
+        report = SimpleNamespace(
             num_samples=self.server.total_samples,
             accuracy=accuracy,
             training_time=training_time,

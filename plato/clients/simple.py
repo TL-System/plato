@@ -4,7 +4,7 @@ A basic federated learning client who sends weight updates to the server.
 
 import logging
 import time
-from dataclasses import dataclass
+from types import SimpleNamespace
 
 from plato.algorithms import registry as algorithms_registry
 from plato.clients import base
@@ -14,14 +14,6 @@ from plato.processors import registry as processor_registry
 from plato.samplers import registry as samplers_registry
 from plato.trainers import registry as trainers_registry
 from plato.utils import fonts
-
-
-@dataclass
-class Report(base.Report):
-    """Report from a simple client, to be sent to the federated learning server."""
-
-    comm_time: float
-    update_response: bool
 
 
 class Client(base.Client):
@@ -167,7 +159,8 @@ class Client(base.Client):
         ):
             sleep_seconds = Config().client_sleep_times[self.client_id - 1]
             avg_training_time = Config().clients.avg_training_time
-            report = Report(
+
+            report = SimpleNamespace(
                 num_samples=self.sampler.trainset_size(),
                 accuracy=accuracy,
                 training_time=(avg_training_time + sleep_seconds)
@@ -176,7 +169,7 @@ class Client(base.Client):
                 update_response=False,
             )
         else:
-            report = Report(
+            report = SimpleNamespace(
                 num_samples=self.sampler.trainset_size(),
                 accuracy=accuracy,
                 training_time=training_time,

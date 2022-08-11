@@ -19,15 +19,6 @@ from plato.config import Config
 from plato.utils import s3
 
 
-@dataclass
-class Report:
-    """Client report, to be sent to the federated learning server."""
-
-    num_samples: int
-    accuracy: float
-    training_time: float
-
-
 class ClientEvents(socketio.AsyncClientNamespace):
     """A custom namespace for socketio.AsyncServer."""
 
