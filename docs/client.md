@@ -2,10 +2,18 @@
 
 ## Customizing clients using inheritance
 
-The common practice is to customize the client using inheritance for important features that change the state of the local training process. To customize the client using inheritance, subclass the `simple.Client` class in `plato.clients`, and override methods.
+The common practice is to customize the client using inheritance for important features that change internal states within a client. To customize the client using inheritance, subclass the `simple.Client` class in `plato.clients`, and override the following methods.
 
-```{admonition} **customize_report(self)**
-Overide this method to customize report after the local training ends.
+```{admonition} **customize_report(self, report) -> SimpleNamespace**
+Overide this method to customize a client's report to be sent to the server.
+
+**Example:**
+
+```py
+def customize_report(self, report) -> SimpleNamespace:
+    loss = self.get_loss()
+    report.valuation = self.calc_valuation(report.num_samples, loss)
+    return report
 ```
 
 ## Customizing clients using callbacks
