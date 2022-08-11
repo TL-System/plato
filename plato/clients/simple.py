@@ -43,6 +43,7 @@ class Client(base.Client):
     def configure(self) -> None:
         """Prepares this client for training."""
         super().configure()
+
         if self.model is None and self.custom_model is not None:
             self.model = self.custom_model
 

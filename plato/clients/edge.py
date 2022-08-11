@@ -5,29 +5,30 @@ A federated learning client at the edge server in a cross-silo training workload
 import time
 from types import SimpleNamespace
 
-from plato.clients import base
+from plato.clients import simple
 from plato.processors import registry as processor_registry
 
 
-class Client(base.Client):
+class Client(simple.Client):
     """A federated learning client at the edge server in a cross-silo training workload."""
 
-    def __init__(self, server):
-        super().__init__()
+    def __init__(
+        self, server, model=None, datasource=None, algorithm=None, trainer=None
+    ):
+        super().__init__(
+            model=model, datasource=datasource, algorithm=algorithm, trainer=trainer
+        )
         self.server = server
-        self._report = None
 
-    def configure(self):
+    def configure(self) -> None:
         """Prepare this edge client for training."""
-        super().configure()
-
         # Pass inbound and outbound data payloads through processors for
         # additional data processing
         self.outbound_processor, self.inbound_processor = processor_registry.get(
             "Client", client_id=self.client_id, trainer=self.server.trainer
         )
 
-    def load_data(self):
+    def load_data(self) -> None:
         """The edge client does not need to train models using local data."""
 
     def load_payload(self, server_payload) -> None:
@@ -76,19 +77,3 @@ class Client(base.Client):
         self.server.comm_overhead = 0
 
         return self._report, weights
-
-    async def obtain_model_update(self, wall_time):
-        """Retrieving a model update corresponding to a particular wall clock time."""
-        model = self.server.trainer.obtain_model_update(wall_time)
-        weights = self.server.algorithm.extract_weights(model)
-        self._report.update_response = True
-
-        return self._report, weights
-
-    def save_model(self, model_checkpoint):
-        """Saving the current aggregated model to a model checkpoint."""
-        self.server.trainer.save_model(model_checkpoint)
-
-    def load_model(self, model_checkpoint):
-        """Loading the current aggregated model from a model checkpoint."""
-        self.server.trainer.load_model(model_checkpoint)
