@@ -19,4 +19,6 @@ misc
 :maxdepth: 2
 :caption: API Reference
 trainer
+server
+client
 ```

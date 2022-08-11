@@ -1,6 +1,8 @@
 """
 The training and testing loops for PyTorch.
 """
+
+import copy
 import logging
 import multiprocessing as mp
 import os
@@ -32,6 +34,7 @@ class Trainer(base.Trainer):
         self.training_start_time = time.time()
         self.models_per_epoch = {}
         self.model_state_dict = None
+        self.current_round = 0
 
         # Starting from the default trainer callback class, add all supplied trainer callbacks
         self.callbacks = [PrintProgressCallback]
@@ -176,6 +179,21 @@ class Trainer(base.Trainer):
             )
         else:
             lr_schedule = None
+
+        # Scheduling the learning rate globally if required
+        if (
+            hasattr(Config().trainer, "global_lr_scheduler")
+            and Config().trainer.global_lr_scheduler
+            and lr_schedule
+        ):
+            lr_schedule_copy = copy.deepcopy(lr_schedule)
+
+            for __ in range(self.current_round - 1):
+                for __ in range(Config().trainer.epochs):
+                    lr_schedule_copy.step()
+
+            initial_lr = lr_schedule_copy.get_last_lr()
+            optimizer.param_groups[0]["lr"] = initial_lr[0]
 
         self.model.to(self.device)
         self.model.train()
@@ -440,6 +458,7 @@ class Trainer(base.Trainer):
         correct = 0
         total = 0
 
+        self.model.to(self.device)
         with torch.no_grad():
             for examples, labels in test_loader:
                 examples, labels = examples.to(self.device), labels.to(self.device)

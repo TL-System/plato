@@ -331,6 +331,10 @@ The random seed used to sample each client's dataset so that experiments are rep
 The number of samples in each client's dataset.
 ```
 
+```{admonition} testset_size
+The number of samples in the server's test dataset when server-side evaluation is conducted; PyTorch only (for now).
+```
+
 ## trainer
 
 ````{admonition} **type**
@@ -412,12 +416,17 @@ When using `diff_privacy` trainer, set to 0.
 ````
 
 ```{admonition} lr_schedule
-The earning rate scheduler. The following options are available:
+The learning rate scheduler. The following options are available:
 
 - `CosineAnnealingLR`
 - `LambdaLR`
 - `StepLR`
 - `ReduceLROnPlateau`
+```
+
+```{admonition} global_lr_scheduler
+Whether the learning rate should be scheduled globally (`true`) or not (`false`).
+If `true`, the learning rate of the first epoch in the next communication round is scheduled based on that of the last epoch in the previous communication round.
 ```
 
 ````{admonition} **model_type**

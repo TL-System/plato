@@ -15,7 +15,7 @@ import oort_client
 
 
 def main():
-    """ A Plato federated learning training session using Oort for client selection. """
+    """A Plato federated learning training session using Oort for client selection."""
     trainer = oort_trainer.Trainer
     client = oort_client.Client(trainer=trainer)
     server = oort_server.Server(trainer=trainer)
