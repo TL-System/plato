@@ -17,29 +17,23 @@ class Server(fedavg.Server):
         self.server_control_variates = None
         self.control_variates_received = None
 
-    def compute_weight_deltas(self, updates):
-        """ Extract the model weights and control variates from clients updates. """
-        weights_received = [payload[0] for (__, payload, __) in updates]
-
-        self.control_variates_received = [
-            payload[1] for (__, payload, __) in updates
-        ]
-
-        return self.algorithm.compute_weight_deltas(weights_received)
+    def weights_received(self, weights_received):
+        """Extract the model weights and control variates from clients updates."""
+        self.control_variates_received = [weight[1] for weight in weights_received]
 
     async def federated_averaging(self, updates):
-        """ Aggregate weight and delta updates from client updates. """
+        """Aggregate weight and delta updates from client updates."""
         update = await super().federated_averaging(updates)
 
         # Initialize server control variates
-        self.server_control_variates = [0] * len(
-            self.control_variates_received[0])
+        self.server_control_variates = [0] * len(self.control_variates_received[0])
 
         # Update server control variates
         for control_variates in self.control_variates_received:
             for j, control_variate in enumerate(control_variates):
-                self.server_control_variates[j] += control_variate / Config(
-                ).clients.total_clients
+                self.server_control_variates[j] += (
+                    control_variate / Config().clients.total_clients
+                )
 
         return update
 
