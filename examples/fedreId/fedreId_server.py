@@ -2,23 +2,17 @@ import os
 import logging
 from torch import nn
 
-os.environ['config_file'] = 'examples/configs/server.yml'
 from plato.servers import fedavg
 
 
 class fedReIdServer(fedavg.Server):
-
     def __init__(self, model=None, trainer=None):
         super().__init__(model, trainer)
         self.clients_belive = None
 
-    def compute_weight_deltas(self, updates):
-        """ Extract the model weights and update directions from clients updates. """
-        weights_received = [payload[0] for (__, payload, __) in updates]
-
-        self.clients_belive = [payload[1] for (__, payload, __) in updates]
-
-        return self.algorithm.compute_weight_deltas(weights_received)
+    def weights_received(self, weights_received):
+        """Extract update directions from clients' weights."""
+        self.clients_belive = [weight[1] for weight in weights_received]
 
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using federated averaging."""
@@ -47,7 +41,7 @@ class fedReIdServer(fedavg.Server):
 
 
 def main():
-    """A Plato federated learning training session using a custom model. """
+    """A Plato federated learning training session using a custom model."""
     model = nn.Sequential(
         nn.Linear(28 * 28, 128),
         nn.ReLU(),
