@@ -17,6 +17,8 @@ import numpy as np
 import socketio
 from aiohttp import web
 
+from plato.callbacks.handler import CallbackHandler
+from plato.callbacks.server import PrintProgressCallback
 from plato.client import run
 from plato.config import Config
 from plato.utils import s3, fonts
@@ -68,7 +70,7 @@ class ServerEvents(socketio.AsyncNamespace):
 class Server:
     """The base class for federated learning servers."""
 
-    def __init__(self):
+    def __init__(self, callbacks=None):
         self.sio = None
         self.client = None
         self.clients = {}
@@ -96,6 +98,12 @@ class Server:
             if hasattr(Config().clients, "comm_simulation")
             else True
         )
+
+        # Starting from the default server callback class, add all supplied server callbacks
+        self.callbacks = [PrintProgressCallback]
+        if callbacks is not None:
+            self.callbacks.extend(callbacks)
+        self.callback_handler = CallbackHandler(self.callbacks)
 
         # Accumulated communication overhead (MB) throughout the FL training session
         self.comm_overhead = 0
@@ -166,6 +174,8 @@ class Server:
 
     def configure(self):
         """Initializing configuration settings based on the configuration file."""
+        logging.info("[Server #%d] Configuring the server...", os.getpid())
+
         # Ping interval and timeout setup for the server
         self.ping_interval = (
             Config().server.ping_interval
@@ -548,6 +558,8 @@ class Server:
                     "id": self.selected_client_id,
                     "current_round": self.current_round,
                 }
+                server_response = self.customize_server_response(server_response)
+
                 payload = self.algorithm.extract_weights()
                 payload = self.customize_server_payload(payload)
 
@@ -592,8 +604,6 @@ class Server:
                     self.downlink_comm_time[self.selected_client_id] = payload_size / (
                         (self.downlink_bandwidth / 8) / len(self.selected_clients)
                     )
-
-                server_response = await self.customize_server_response(server_response)
 
                 # Sending the server response as metadata to the clients (payload to follow)
                 await self.sio.emit(
@@ -756,6 +766,8 @@ class Server:
             self.uplink_comm_time[client_id] = payload_size / (
                 self.uplink_bandwidth / 8
             )
+
+            self.process_customized_report(client_id, checkpoint_path, model_name)
 
             await self.process_client_info(client_id, sid)
 
@@ -1209,17 +1221,29 @@ class Server:
         """Closing the server."""
         logging.info("[%s] Training concluded.", self)
         self.trainer.save_model()
+
+        self.server_will_close()
+        self.callback_handler.call_event("on_server_will_close", self)
+
         await self.close_connections()
         os._exit(0)
 
-    async def customize_server_response(self, server_response):
-        """Wrap up generating the server response with any additional information."""
+    def customize_server_response(self, server_response: dict) -> dict:
+        """Customizes the server response with any additional information."""
         return server_response
 
-    @abstractmethod
     def customize_server_payload(self, payload):
-        """Wrap up generating the server payload with any additional information."""
+        """Customizes the server payload before sending to the client."""
+        return payload
 
     @abstractmethod
     async def process_reports(self) -> None:
         """Process a client report."""
+
+    def process_customized_report(self, client_id, checkpoint_path, model_name):
+        """Process a customized client report with additional information."""
+
+    def server_will_close(self):
+        """
+        Method called before closing the server.
+        """

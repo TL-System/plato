@@ -21,6 +21,7 @@ class Algorithm(fedavg.Algorithm):
     """The PyTorch-based MistNet algorithm, used by both the client and the
     server.
     """
+
     def extract_features(self, dataset, sampler, cut_layer, epsilon=None):
         """Extracting features using layers before the cut_layer.
 
@@ -45,15 +46,19 @@ class Algorithm(fedavg.Algorithm):
                 logits = logits.asnumpy()
                 logits = unary_encoding.encode(logits)
                 logits = unary_encoding.randomize(logits, epsilon)
-                logits = mindspore.Tensor(logits.astype('float32'))
+                logits = mindspore.Tensor(logits.astype("float32"))
 
             feature_dataset.append((logits.asnumpy(), targets.asnumpy()))
 
         toc = time.perf_counter()
-        logging.info("[Client #%d] Features extracted from %s examples.",
-                     self.client_id, len(feature_dataset))
-        logging.info("[Client #{}] Time used: {:.2f} seconds.".format(
-            self.client_id, toc - tic))
+        logging.info(
+            "[Client #%d] Features extracted from %s examples.",
+            self.client_id,
+            len(feature_dataset),
+        )
+        logging.info(
+            "[Client #{}] Time used: {:.2f} seconds.".format(self.client_id, toc - tic)
+        )
 
         return feature_dataset
 
@@ -69,8 +74,8 @@ class Algorithm(fedavg.Algorithm):
         Arguments:
         trainset: The training dataset.
         """
-        feature_dataset = ds.GeneratorDataset(list(
-            Algorithm.dataset_generator(trainset)),
-                                              column_names=["image", "label"])
+        feature_dataset = ds.GeneratorDataset(
+            list(Algorithm.dataset_generator(trainset)), column_names=["image", "label"]
+        )
 
         self.trainer.train(feature_dataset)

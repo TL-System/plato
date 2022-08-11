@@ -4,7 +4,7 @@ A basic federated learning client who sends weight updates to the server.
 
 import logging
 import time
-from dataclasses import dataclass
+from types import SimpleNamespace
 
 from plato.algorithms import registry as algorithms_registry
 from plato.clients import base
@@ -14,14 +14,6 @@ from plato.processors import registry as processor_registry
 from plato.samplers import registry as samplers_registry
 from plato.trainers import registry as trainers_registry
 from plato.utils import fonts
-
-
-@dataclass
-class Report(base.Report):
-    """Report from a simple client, to be sent to the federated learning server."""
-
-    comm_time: float
-    update_response: bool
 
 
 class Client(base.Client):
@@ -46,11 +38,12 @@ class Client(base.Client):
         self.sampler = None
         self.testset_sampler = None  # Sampler for the test set
 
-        self.report = None
+        self._report = None
 
     def configure(self) -> None:
-        """Prepare this client for training."""
+        """Prepares this client for training."""
         super().configure()
+
         if self.model is None and self.custom_model is not None:
             self.model = self.custom_model
 
@@ -75,7 +68,7 @@ class Client(base.Client):
         )
 
     def load_data(self) -> None:
-        """Generating data and loading them onto this client."""
+        """Generates data and loads them onto this client."""
         logging.info("[%s] Loading its data source...", self)
 
         if (
@@ -116,7 +109,7 @@ class Client(base.Client):
                 )
 
     def load_payload(self, server_payload) -> None:
-        """Loading the server model onto this client."""
+        """Loads the server model onto this client."""
         self.algorithm.load_weights(server_payload)
 
     async def train(self):
@@ -129,6 +122,8 @@ class Client(base.Client):
 
         # Perform model training
         try:
+            if hasattr(self.trainer, "current_round"):
+                self.trainer.current_round = self.current_round
             training_time = self.trainer.train(self.trainset, self.sampler)
         except ValueError as exc:
             logging.info(
@@ -165,33 +160,45 @@ class Client(base.Client):
         ):
             sleep_seconds = Config().client_sleep_times[self.client_id - 1]
             avg_training_time = Config().clients.avg_training_time
-            self.report = Report(
-                self.sampler.trainset_size(),
-                accuracy,
-                (avg_training_time + sleep_seconds) * Config().trainer.epochs,
-                comm_time,
-                False,
+
+            report = SimpleNamespace(
+                num_samples=self.sampler.trainset_size(),
+                accuracy=accuracy,
+                training_time=(avg_training_time + sleep_seconds)
+                * Config().trainer.epochs,
+                comm_time=comm_time,
+                update_response=False,
             )
         else:
-            self.report = Report(
-                self.sampler.trainset_size(), accuracy, training_time, comm_time, False
+            report = SimpleNamespace(
+                num_samples=self.sampler.trainset_size(),
+                accuracy=accuracy,
+                training_time=training_time,
+                comm_time=comm_time,
+                update_response=False,
             )
 
-        return self.report, weights
+        self._report = self.customize_report(report)
+
+        return self._report, weights
 
     async def obtain_model_update(self, wall_time):
-        """Retrieving a model update corresponding to a particular wall clock time."""
+        """Retrieves a model update corresponding to a particular wall clock time."""
         model = self.trainer.obtain_model_update(wall_time)
         weights = self.algorithm.extract_weights(model)
-        self.report.comm_time = time.time()
-        self.report.update_response = True
+        self._report.comm_time = time.time()
+        self._report.update_response = True
 
-        return self.report, weights
+        return self._report, weights
 
     def save_model(self, model_checkpoint):
-        """Saving the model to a model checkpoint."""
+        """Saves the model to a model checkpoint."""
         self.trainer.save_model(model_checkpoint)
 
     def load_model(self, model_checkpoint):
-        """Loading the model from a model checkpoint."""
+        """Loads the model from a model checkpoint."""
         self.trainer.load_model(model_checkpoint)
+
+    def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
+        """Customizes the report with any additional information."""
+        return report
