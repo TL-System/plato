@@ -79,7 +79,10 @@ def get_optimizer(model) -> optim.Optimizer:
     """Obtain the optimizer used for training the model."""
     optimizer_name = Config().trainer.optimizer
 
-    optimizer = registered_optimizers[optimizer_name]
+    optimizer = registered_optimizers.get(optimizer_name, None)
+    if optimizer_name is None:
+        raise ValueError(f"No such optimizer: {optimizer_name}")
+
     optimizer_parameters = registered_optimizers_parameters[optimizer_name]
 
     if optimizer_name == "SGD":
