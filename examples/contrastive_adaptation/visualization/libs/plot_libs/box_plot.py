@@ -12,13 +12,15 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
 from .axes_set import set_ticker
+from libs.utils import positions_compute
 
 
 def plot_one_stream_boxes(ax,
                           samples,
                           color,
                           boxes_position,
-                          boxes_label=None):
+                          box_width,
+                          flier_points_type="+"):
     """ Plot one stream boxes for a sequence of samples.
 
         In general, these sequence of samples derive from
@@ -50,10 +52,10 @@ def plot_one_stream_boxes(ax,
         samples,
         #vert=True,  # vertical box alignment
         notch=True,  # notch shape
+        sym=flier_points_type,
         patch_artist=True,  # fill with color
-        widths=0.2,
-        positions=boxes_position,
-        labels=boxes_label)  # will be used to label x-ticks
+        widths=box_width,
+        positions=boxes_position)  # will be used to label x-ticks
 
     for patch_idx, patch in enumerate(bplot['boxes']):
         patch.set_facecolor(color[patch_idx])
@@ -61,73 +63,65 @@ def plot_one_stream_boxes(ax,
     return bplot
 
 
-def plot_group_boxes(groups_samples,
-                     groups_colors,
-                     groups_boxes_positions,
-                     center_pos,
-                     groups_label,
-                     xticklabels,
-                     fig_style="seaborn-paper",
-                     font_size="xx-small",
-                     yscale=0.05,
-                     xlim=[0.3, 7.5],
-                     ylim=[0.1, 1],
-                     save_file_path=None,
-                     save_file_name=None):
-    """ Plot a group of boxes while each group corresponds to one data stream.
+def plot_items_stream_boxes(whole_ax,
+                            items_samples,
+                            items_colors,
+                            plot_center_positions,
+                            items_legend_label,
+                            box_width=1,
+                            box_interval=0.5):
+    """ Plotting stream boxes for a set of items
 
-        groups_samples (list): a nested list containing multiple data streams,
-            each item is a list containing samples of the data stream.
-            The structure of the samples is consistent with that in
-            'plot_one_stream_boxes' function.
-            len(groups_samples) == N.
+        Args:
+            items_samples (list): a nested list containing multiple data streams for
+                items to be plotted,
+                each element in this list should be an array that contains one stream
+                of samples to plot as boxes.
 
-        groups_colors (list): a nested list containing colors for  multiple data streams,
-            each item is a list containing colors (aka. a list) for boxes of this
-            data stream.
-            len(groups_samples) == N.
+            items_colors (list): a list containing colors for items,
 
-        groups_boxes_positions (list): a nested list containig positions for data stream's
-            boxes.
+            plot_center_positions (list): a list containing the center positions to
+                plot these items.
+
     """
-    with plt.style.context(fig_style):
-        whole_fig, whole_axs = plt.subplots(1, 1)  # figsize=(10, 10)
-    plt.rcParams['legend.title_fontsize'] = font_size
+    num_of_items = len(items_samples)
+    plotted_groups_holder = []
+    for item_idx, item_samples in enumerate(items_samples):
+        boxes_position = positions_compute.get_item_plot_positions(
+            item_idx=item_idx,
+            num_plot_items=num_of_items,
+            center_positions=plot_center_positions,
+            plot_width=box_width + box_interval)
 
-    for group_idx, group_samples in enumerate(groups_samples):
-
-        plot_one_stream_boxes(
-            ax=whole_axs,
-            samples=group_samples,
-            color=groups_colors[group_idx],
-            boxes_position=groups_boxes_positions[group_idx],
-            boxes_label=None,
+        plot_boxes_holder = plot_one_stream_boxes(
+            ax=whole_ax,
+            samples=item_samples,
+            color=items_colors[item_idx],
+            boxes_position=boxes_position,
+            box_width=box_width,
         )
+        plotted_groups_holder.append(plot_boxes_holder)
 
-    set_ticker(whole_axs, yscale=yscale, y_grid="major", y_type="%.2f")
+    order = list(range(num_of_items))
 
-    whole_axs.set_ylabel(r"Accuracy (%)", fontsize=16, weight='bold')
-    whole_axs.set_xlabel('Communication rounds', fontsize=16, weight='bold')
+    whole_ax.legend([plotted_groups_holder[i]["boxes"][0] for i in order],
+                    [items_legend_label[i] for i in order],
+                    loc='best',
+                    prop={
+                        'size': 12,
+                        'weight': "normal"
+                    })
 
-    whole_axs.set_xticks(center_pos)
-    whole_axs.set_ylim(ylim)
-    whole_axs.set_xlim(xlim)
+    return whole_ax
 
-    plt.setp(whole_axs, xticks=center_pos, xticklabels=xticklabels)
 
-    # where some data has already been plotted to ax
-    handles, labels = whole_axs.get_legend_handles_labels()
+def plot_points(ax, samples, color, marker_type, label, vol=10):
+    X = samples[:, 0]
+    Y = samples[:, 1]
+    ax.scatter(X, Y, c=color, s=vol, alpha=1, marker=marker_type, label=label)
 
-    # manually define a new patch
-    patches = [
-        mpatches.Patch(color=groups_colors[group_idx][0],
-                       label=groups_label[group_idx])
-        for group_idx, _ in enumerate(groups_samples)
-    ]
-    handles = handles + patches
 
-    # plot the legend
-    plt.legend(handles=handles, fontsize=10)
+def group_box_fig_save(whole_fig, save_file_path=None, save_file_name=None):
 
     whole_fig.tight_layout()
 
@@ -137,9 +131,3 @@ def plot_group_boxes(groups_samples,
     plt.savefig(os.path.join(save_file_path, save_file_name + '.png'))
     plt.savefig(os.path.join(save_file_path, save_file_name + '.pdf'),
                 format='pdf')
-
-
-def plot_points(ax, samples, color, marker_type, label, vol=10):
-    X = samples[:, 0]
-    Y = samples[:, 1]
-    ax.scatter(X, Y, c=color, s=vol, alpha=1, marker=marker_type, label=label)

@@ -74,7 +74,7 @@ def obtain_data_path(data_type, exp_dir):
             base_experiment_path, text_logging_name)
         to_local_logging_dir = to_local_experiments_dir = local_experiments_dir + base_experiment_path
 
-    elif data_type == "models":
+    elif "models" in data_type:
         extract_sim_experiments_dirs = [
             sim_data_dir + os.path.join(base_experiment_path, data_type)
         ]
