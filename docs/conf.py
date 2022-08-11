@@ -42,5 +42,12 @@ html_theme_options = {
     "source_repository": "https://github.com/TL-System/plato/",
     "source_branch": "main",
     "source_directory": "docs/",
+    "light_css_variables": {
+        "font-stack--monospace": "JetBrains Mono, monospace",
+    },
 }
-# html_static_path = ['_static']
+html_css_files = [
+    'css/css-style.css',
+]
+
+html_static_path = ['_static']
