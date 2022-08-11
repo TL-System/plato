@@ -56,7 +56,6 @@ class Server(base.Server):
         Booting the federated learning server by setting up the data, model, and
         creating the clients.
         """
-        logging.info("[Server #%d] Configuring the server...", os.getpid())
         super().configure()
 
         total_rounds = Config().trainer.rounds
@@ -151,6 +150,10 @@ class Server(base.Server):
     def compute_weight_deltas(self, updates):
         """Extract the model weight updates from client updates."""
         weights_received = [payload for (__, __, payload, __) in updates]
+
+        self.weights_received(weights_received)
+        self.callback_handler.call_event("on_weights_received", self, weights_received)
+
         return self.algorithm.compute_weight_deltas(weights_received)
 
     async def aggregate_weights(self, updates):
@@ -271,7 +274,12 @@ class Server(base.Server):
         """Customize the server payload before sending to the client."""
         return payload
 
+    def weights_received(self, weights_received):
+        """
+        Event called after the updated weights have been received.
+        """
+
     def weights_aggregated(self, updates):
         """
-        Method called at the end of aggregating received weights.
+        Method called after the updated weights have been aggregated.
         """

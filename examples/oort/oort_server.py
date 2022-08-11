@@ -74,8 +74,8 @@ class Server(fedavg.Server):
 
     def weights_aggregated(self, updates):
         """
-        Method called at the end of aggregating received weights.
-        Extract statistical utility, training times and adjusts desired round duration.
+        After the updated weights have been aggregated, extracts statistical
+        utility, training times and adjusts desired round duration.
         """
 
         # Extract statistical utility and local training times

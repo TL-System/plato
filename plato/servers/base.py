@@ -171,6 +171,8 @@ class Server:
 
     def configure(self):
         """Initializing configuration settings based on the configuration file."""
+        logging.info("[Server #%d] Configuring the server...", os.getpid())
+
         # Ping interval and timeout setup for the server
         self.ping_interval = (
             Config().server.ping_interval

@@ -22,6 +22,8 @@ class Client(simple.Client):
 
     def configure(self) -> None:
         """Prepare this edge client for training."""
+        super().configure()
+
         # Pass inbound and outbound data payloads through processors for
         # additional data processing
         self.outbound_processor, self.inbound_processor = processor_registry.get(
