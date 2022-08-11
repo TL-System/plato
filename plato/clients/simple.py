@@ -41,7 +41,7 @@ class Client(base.Client):
         self._report = None
 
     def configure(self) -> None:
-        """Prepare this client for training."""
+        """Prepares this client for training."""
         super().configure()
         if self.model is None and self.custom_model is not None:
             self.model = self.custom_model
@@ -67,7 +67,7 @@ class Client(base.Client):
         )
 
     def load_data(self) -> None:
-        """Generating data and loading them onto this client."""
+        """Generates data and loads them onto this client."""
         logging.info("[%s] Loading its data source...", self)
 
         if (
@@ -108,7 +108,7 @@ class Client(base.Client):
                 )
 
     def load_payload(self, server_payload) -> None:
-        """Loading the server model onto this client."""
+        """Loads the server model onto this client."""
         self.algorithm.load_weights(server_payload)
 
     async def train(self):
@@ -182,7 +182,7 @@ class Client(base.Client):
         return self._report, weights
 
     async def obtain_model_update(self, wall_time):
-        """Retrieving a model update corresponding to a particular wall clock time."""
+        """Retrieves a model update corresponding to a particular wall clock time."""
         model = self.trainer.obtain_model_update(wall_time)
         weights = self.algorithm.extract_weights(model)
         self._report.comm_time = time.time()
@@ -191,9 +191,13 @@ class Client(base.Client):
         return self._report, weights
 
     def save_model(self, model_checkpoint):
-        """Saving the model to a model checkpoint."""
+        """Saves the model to a model checkpoint."""
         self.trainer.save_model(model_checkpoint)
 
     def load_model(self, model_checkpoint):
-        """Loading the model from a model checkpoint."""
+        """Loads the model from a model checkpoint."""
         self.trainer.load_model(model_checkpoint)
+
+    def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
+        """Customizes the report with any additional information."""
+        return report
