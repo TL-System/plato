@@ -22,7 +22,7 @@ data:
     datasource: EMNIST
 
     # Number of samples in each partition
-    partition_size: 1
+    partition_size: 6
 
     # IID or non-IID?
     sampler: iid
@@ -74,8 +74,8 @@ algorithm:
     attack_round: 1
     # One particular client, e.g., the first selected client
     victim_client: 0
-    num_iters: 300
-    log_interval: 30
+    num_iters: 3
+    log_interval: 1
 
     # Whether or not use customized initialization for model weights
     init_params: true
@@ -87,7 +87,7 @@ algorithm:
     # Matching weights (absolute) or weight updates (delta)
     use_updates: true
     # The number of times the attack will be attempted
-    trials: 5
+    trials: 1
 
     ## Defense related
     # Choose from GradDefense, Soteria, GC (model compression), DP (differential privacy), Outpost (ours)...
@@ -119,6 +119,9 @@ results:
 
     # Plot results (x_axis-y_axis)
     plot: round-accuracy, elapsed_time-accuracy
+
+    # rows: 1
+    cols: 1
 
     # DLG related parameters
     # The specific subprocess number to use with plot.py
