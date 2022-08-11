@@ -1240,5 +1240,5 @@ class Server:
 
     def server_will_close(self):
         """
-        Method called at the start of closing the start.
+        Method called before closing the server.
         """

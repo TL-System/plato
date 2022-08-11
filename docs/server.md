@@ -33,6 +33,10 @@ Override this method to complete additional tasks after aggregating weights.
 `updates` the client updates received at the server.
 ````
 
+```{admonition} **server_will_close(self)**
+Override this method to complete additional tasks before closing the server.
+```
+
 ## Customizing servers using callbacks
 
 For infrastructure changes, such as logging and recording metrics, we tend to customize the global training process using callbacks instead. The advantage of using callbacks is that one can pass a list of multiple callbacks to the client when it is initialized, and they will be called in their order in the provided list. This helps when it is necessary to group features into different callback classes.
@@ -40,9 +44,6 @@ For infrastructure changes, such as logging and recording metrics, we tend to cu
 Within the implementation of these callback methods, one can access additional information about the global training by using the `server` instance. 
 
 To use callbacks, subclass the `ServerCallback` class in `plato.callbacks.server`, and override the following methods:
-
-````{admonition} **choose_clients(self, clients_pool, clients_count)**
-Override Choose a subset of the clients to participate in each round."""
 
 ````{admonition} **on_weights_received(self, server, weights_received)**
 Override this method to complete additional tasks after the updated weights have been received.
