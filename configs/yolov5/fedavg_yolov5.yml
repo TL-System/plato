@@ -167,5 +167,6 @@ parameters:
     model:
         model_config: configs/yolov5/models/yolov5s.yaml
         num_classes: 80
+        
     trainer:
         train_params: configs/yolov5/data/hyps/hyp.scratch.yaml
