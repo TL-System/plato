@@ -43,7 +43,7 @@ class Trainer(pers_basic.Trainer):
         super().__init__(model)
 
     @staticmethod
-    def loss_criterion(model):
+    def loss_criterion(model, config):
         """ The loss computation.
             Currently, we only support the NT_Xent.
 
@@ -54,7 +54,7 @@ class Trainer(pers_basic.Trainer):
             in pytorch_metric_learning afterward.
         """
         # define the loss computation instance
-        defined_temperature = Config().trainer.temperature
+        defined_temperature = config['temperature']
 
         criterion = ssl_losses.NTXent(defined_temperature, world_size=1)
 
