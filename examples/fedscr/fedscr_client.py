@@ -17,16 +17,17 @@ class Client(simple.Client):
 
     def process_server_response(self, server_response):
         """Additional client-specific processing on the server response."""
-        if "update_thresholds" in server_response:
-            # Load its update threshold
-            self.trainer.update_threshold = server_response["update_thresholds"][
-                str(self.client_id)
-            ]
-            logging.info(
-                "[Client #%d] Received update threshold %.2f",
-                self.client_id,
-                self.trainer.update_threshold,
-            )
+        if self.trainer.use_adaptive:
+            if "update_thresholds" in server_response:
+                # Load its update threshold
+                self.trainer.update_threshold = server_response["update_thresholds"][
+                    str(self.client_id)
+                ]
+                logging.info(
+                    "[Client #%d] Received update threshold %.2f",
+                    self.client_id,
+                    self.trainer.update_threshold,
+                )
 
     def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
         """Wrap up generating the report with any additional information."""
