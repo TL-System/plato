@@ -98,9 +98,6 @@ trainer:
   log_config: *log_config
   checkpoint_config: *checkpoint_config
 
-model:
-  model_config: !include Models/kinetics_full_models.yml
-
 evaluation:
   interval: 5
   metrics:
@@ -112,9 +109,13 @@ algorithm:
   type: fedavg
 
 parameters:
-  lr: 0.000125 # this lr is used for 8 gpus
-  momentum: 0.9
-  weight_decay: 0.0001
+  model:
+    model_config: !include Models/kinetics_full_models.yml
+
+  optimizer:
+    lr: 0.000125 # this lr is used for 8 gpus
+    momentum: 0.9
+    weight_decay: 0.0001
 
 # Runtime setting
 runner_setting:
