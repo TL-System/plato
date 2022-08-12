@@ -170,8 +170,6 @@ class Trainer(base.Trainer):
         # Initializing the loss criterion
         loss_criterion = self.get_loss_criterion()
 
-        print("LOSS FUNCTION WORKING", loss_criterion)
-
         # Initializing the optimizer
         optimizer = self.get_optimizer(self.model)
 
