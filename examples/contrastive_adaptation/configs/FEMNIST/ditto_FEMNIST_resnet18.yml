@@ -37,11 +37,10 @@ clients:
     # whether perform the eval test at the final round
     # on all clients
     do_final_personalization: True
-    # Minotor the self-supervised learning by knn for
-    # every 1 round
+    # Perfrom the test every 1 round
     test_interval: 10
-    # Train the personalized model based on the
-    # learned representation every 1 rounds
+    # Perform the personalization learning every 1 round
+
     pers_learning_interval: 10
 
     # Whether simulate clients or not
@@ -76,26 +75,28 @@ server:
 
 data:
     # The training and testing dataset
-    datasource: CIFAR100
+    datasource: FEMNIST
 
     # IID or non-IID?
-    sampler: label_quantity_noniid
-    testset_sampler: label_quantity_noniid
+    sampler: all_inclusive
+    testset_sampler: all_inclusive
 
-    # The concentration parameter for the Dirichlet distribution
-    per_client_classes_size: 5
+    concurrent_download: true
+
+    reload_data: true
+
+    partition_size: 1128
 
     # The random seed for sampling data
     random_seed: 1
 
-    num_classes: 100
 
 trainer:
     # The type of the trainer
     type: basic
 
     # The maximum number of training rounds
-    rounds: 120
+    rounds: 200
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -114,14 +115,15 @@ trainer:
     batch_size: 64
 
     optimizer: SGD
-    learning_rate: 0.05
+    learning_rate: 0.01
     momentum: 0.9
     weight_decay: 0.000001
 
     # Learning rate schedule
     lr_schedule: MultiStepLR
     lr_gamma: 0.1
-    lr_milestones: 200,300
+    lr_milestones: 200,400
+
 
     epoch_log_interval: 1
     epoch_model_log_interval: 50
@@ -153,6 +155,10 @@ trainer:
     #   but use the custom model
     model_name: resnet_18
     personalized_model_name: resnet_18
+
+    # The necessary hyper-parameter lambda for Ditto method.
+    lamda: 0.75
+
     # whether to maintain the state of the trained personalized
     # model in each round
     # In general, for the contrastive self-supervised learning
@@ -164,11 +170,20 @@ trainer:
     # trained personalized model in each round.
     # Then, setting do_maintain_per_state to be True to follow this
     # rule.
-    do_maintain_per_state: False
-    # encoder, whole
-    global_model_name: encoder
+    # For the ditto method, we have to maintain the state of the
+    # personalized model trained in each communication round.
+    # The main reason is that the personalized model (v_k) needs to be
+    # trained in each round ('pers_learning_interval: 1') based on the
+    # Algorithm 1 of the paper.
+    # Therefore, the training of personalized model in one round should
+    # rely on the trained personalized model from pervious round.
+    do_maintain_per_state: True
 
-    num_classes: 100
+
+    # encoder, whole
+    global_model_name: whole
+
+    num_classes: 10
 
 algorithm:
     # Aggregation algorithm

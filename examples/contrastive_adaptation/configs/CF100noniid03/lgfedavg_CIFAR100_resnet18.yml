@@ -38,10 +38,10 @@ clients:
     # on all clients
     do_final_personalization: True
     # Minotor the self-supervised learning by knn for
-    # every 1 round
+    # every 10 round
     test_interval: 10
     # Train the personalized model based on the
-    # learned representation every 1 rounds
+    # learned representation every 10 rounds
     pers_learning_interval: 10
 
     # Whether simulate clients or not
@@ -73,22 +73,25 @@ server:
     model_path: xxx
     checkpoint_path: xxx
 
+    num_classes: 100
 
 data:
     # The training and testing dataset
     datasource: CIFAR100
 
+    partition_size: 600
+    test_partition_size: 600
+
     # IID or non-IID?
-    sampler: label_quantity_noniid
-    testset_sampler: label_quantity_noniid
+    sampler: noniid
+    testset_sampler: noniid
 
     # The concentration parameter for the Dirichlet distribution
-    per_client_classes_size: 5
+    concentration: 0.3
 
     # The random seed for sampling data
     random_seed: 1
 
-    num_classes: 100
 
 trainer:
     # The type of the trainer
@@ -166,7 +169,7 @@ trainer:
     # rule.
     do_maintain_per_state: False
     # encoder, whole
-    global_model_name: encoder
+    global_model_name: clf_fc
 
     num_classes: 100
 

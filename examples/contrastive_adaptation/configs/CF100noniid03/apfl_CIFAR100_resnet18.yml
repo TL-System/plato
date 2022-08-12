@@ -78,12 +78,15 @@ data:
     # The training and testing dataset
     datasource: CIFAR100
 
+    partition_size: 600
+    test_partition_size: 600
+
     # IID or non-IID?
-    sampler: label_quantity_noniid
-    testset_sampler: label_quantity_noniid
+    sampler: noniid
+    testset_sampler: noniid
 
     # The concentration parameter for the Dirichlet distribution
-    per_client_classes_size: 5
+    concentration: 0.3
 
     # The random seed for sampling data
     random_seed: 1
@@ -111,7 +114,7 @@ trainer:
     # the memory allocation issue as the contrastive samples occupy more
     # space as more samples will be contained within one loading.
     epochs: 3
-    batch_size: 64
+    batch_size: 32
 
     optimizer: SGD
     learning_rate: 0.05
@@ -130,6 +133,7 @@ trainer:
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
     # does not utilize the
+    # We need to note that the pers_epochs is invaild
     pers_epochs: 10
     pers_batch_size: 64
     pers_optimizer: SGD
@@ -153,6 +157,9 @@ trainer:
     #   but use the custom model
     model_name: resnet_18
     personalized_model_name: resnet_18
+
+    alpha: 0.75
+    is_adaptive_alpha: True
     # whether to maintain the state of the trained personalized
     # model in each round
     # In general, for the contrastive self-supervised learning
@@ -164,9 +171,9 @@ trainer:
     # trained personalized model in each round.
     # Then, setting do_maintain_per_state to be True to follow this
     # rule.
-    do_maintain_per_state: False
+    do_maintain_per_state: True
     # encoder, whole
-    global_model_name: encoder
+    global_model_name: whole
 
     num_classes: 100
 

@@ -76,26 +76,28 @@ server:
 
 data:
     # The training and testing dataset
-    datasource: CIFAR100
+    datasource: FEMNIST
 
     # IID or non-IID?
-    sampler: label_quantity_noniid
-    testset_sampler: label_quantity_noniid
+    sampler: all_inclusive
+    testset_sampler: all_inclusive
 
-    # The concentration parameter for the Dirichlet distribution
-    per_client_classes_size: 5
+    concurrent_download: true
+
+    reload_data: true
+
+    partition_size: 1128
 
     # The random seed for sampling data
     random_seed: 1
 
-    num_classes: 100
 
 trainer:
     # The type of the trainer
     type: basic
 
     # The maximum number of training rounds
-    rounds: 120
+    rounds: 200
 
     # Whether the training should use multiple GPUs if available
     parallelized: false
@@ -104,7 +106,7 @@ trainer:
     max_concurrency: 3
 
     # The target accuracy
-    target_accuracy: 0.98
+    target_accuracy: 0.9
 
     # Number of epochs for local training in each communication round
     #   The user is expected to carefully choose the batch_size to avoid
@@ -114,14 +116,14 @@ trainer:
     batch_size: 64
 
     optimizer: SGD
-    learning_rate: 0.05
+    learning_rate: 0.01
     momentum: 0.9
     weight_decay: 0.000001
 
     # Learning rate schedule
     lr_schedule: MultiStepLR
     lr_gamma: 0.1
-    lr_milestones: 200,300
+    lr_milestones: 200,400
 
     epoch_log_interval: 1
     epoch_model_log_interval: 50
@@ -130,11 +132,11 @@ trainer:
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
     # does not utilize the
-    pers_epochs: 10
+    pers_epochs: 3
     pers_batch_size: 64
     pers_optimizer: SGD
     # lr = 0.1 * batch_size / 256, see section B.6 and B.7 of SimCLR paper.
-    pers_learning_rate: 0.05
+    pers_learning_rate: 0.01
     pers_momentum: 0.9
     pers_weight_decay: 0.0
 
@@ -153,6 +155,9 @@ trainer:
     #   but use the custom model
     model_name: resnet_18
     personalized_model_name: resnet_18
+
+    # encoder, whole
+    global_model_name: whole
     # whether to maintain the state of the trained personalized
     # model in each round
     # In general, for the contrastive self-supervised learning
@@ -165,10 +170,14 @@ trainer:
     # Then, setting do_maintain_per_state to be True to follow this
     # rule.
     do_maintain_per_state: False
-    # encoder, whole
-    global_model_name: encoder
 
-    num_classes: 100
+    # Important hyper-parameters
+    # 0 for performing Per-FedAvg(FO), others for Per-FedAvg(HF)
+    hessian_free: False
+    alpha: 0.01 # 1e-2
+    beta: 0.001
+
+    num_classes: 10
 
 algorithm:
     # Aggregation algorithm
