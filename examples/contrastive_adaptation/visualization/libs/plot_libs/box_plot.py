@@ -109,7 +109,7 @@ def plot_items_stream_boxes(whole_ax,
                     loc='best',
                     prop={
                         'size': 12,
-                        'weight': "normal"
+                        'weight': "bold"
                     })
 
     return whole_ax
