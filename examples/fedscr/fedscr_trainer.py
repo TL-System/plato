@@ -46,7 +46,7 @@ class Trainer(basic.Trainer):
 
     def prune_updates(self):
         """Prune the weight updates by setting some updates to 0."""
-        self.load_all_grads()
+        self.load_acc_grads()
 
         conv_updates = OrderedDict()
         i = 0
@@ -83,7 +83,7 @@ class Trainer(basic.Trainer):
             else:
                 self.total_grad[orig_key] = torch.from_numpy(conv_updates[orig_key])
 
-        self.save_gradient()
+        self.save_acc_grads()
 
     def aggregate_channels(self, delta):
         """Aggregate the sum of a certain channel from all filters."""
@@ -135,7 +135,7 @@ class Trainer(basic.Trainer):
 
         return delta
 
-    def save_gradient(self):
+    def save_acc_grads(self):
         """Save the accumulated client gradients for the next communication round."""
         model_name = Config().trainer.model_name
         checkpoint_path = Config().params["checkpoint_path"]
@@ -149,7 +149,7 @@ class Trainer(basic.Trainer):
         with open(acc_grad_path, "wb") as payload_file:
             pickle.dump(self.all_grads, payload_file)
 
-    def load_all_grads(self):
+    def load_acc_grads(self):
         """Load the accumulated gradients from a previous communication round."""
         model_name = Config().trainer.model_name
         checkpoint_path = Config().params["checkpoint_path"]
@@ -230,17 +230,13 @@ class Trainer(basic.Trainer):
             add_to_report = {
                 "div_from_global": self.div_from_global,
                 "avg_update": self.avg_update,
+                "final_loss": self.train_loss.data.item(),
             }
 
             report_path = f"{checkpoint_path}/{model_name}_{self.client_id}.pkl"
 
             with open(report_path, "wb") as file:
                 pickle.dump(add_to_report, file)
-
-        # Save the final training loss
-        model_name = config["model_name"]
-        filename = f"{model_name}_{self.client_id}.loss"
-        Trainer._save_loss(self.train_loss.data.item(), filename)
 
         self.model.load_state_dict(self.total_grad, strict=True)
 
@@ -279,26 +275,3 @@ class Trainer(basic.Trainer):
                 total += torch.sum(tensor).numpy()
 
         return np.sqrt(np.abs(delta / total))
-
-    @staticmethod
-    def _save_loss(loss, filename):
-        """Save the training loss to a file."""
-        checkpoint_path = Config().params["checkpoint_path"]
-
-        if not os.path.exists(checkpoint_path):
-            os.makedirs(checkpoint_path)
-
-        loss_path = f"{checkpoint_path}/{filename}"
-        with open(loss_path, "w", encoding="utf-8") as file:
-            file.write(str(loss))
-
-    @staticmethod
-    def _load_loss(filename):
-        """Load the training loss from a file."""
-        checkpoint_path = Config().params["checkpoint_path"]
-        loss_path = f"{checkpoint_path}/{filename}"
-
-        with open(loss_path, "r", encoding="utf-8") as file:
-            loss = float(file.read())
-
-        return loss

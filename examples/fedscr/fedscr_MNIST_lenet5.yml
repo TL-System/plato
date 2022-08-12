@@ -6,7 +6,7 @@ clients:
     total_clients: 10
 
     # The number of clients selected in each round
-    per_round: 1
+    per_round: 2
 
     # Should the clients compute test accuracy locally?
     do_test: true
@@ -15,7 +15,7 @@ clients:
     update_threshold: 1.2
 
     # Is the adaptive algorithm being used?
-    adaptive: false
+    adaptive: true
 
     # Hyperparameters for the adaptive algorithm
     delta1: 1
@@ -65,7 +65,7 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 2
+    rounds: 4
 
     # The maximum number of clients running concurrently
     max_concurrency: 2

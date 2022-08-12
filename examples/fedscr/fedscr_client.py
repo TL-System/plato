@@ -30,27 +30,16 @@ class Client(simple.Client):
 
     def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
         """Wrap up generating the report with any additional information."""
-        final_loss = self.get_loss()
-        report.loss = final_loss
 
         if self.trainer.use_adaptive:
             additional_info = self.get_additional_info()
             report.div_from_global = additional_info["div_from_global"]
             report.avg_update = additional_info["avg_update"]
-        else:
-            report.div_from_global = None
-            report.avg_update = None
+            report.loss = additional_info["final_loss"]
 
         return report
 
     # pylint: disable=protected-access
-    def get_loss(self):
-        """Retrieve the loss value from the training process."""
-        model_name = Config().trainer.model_name
-        filename = f"{model_name}_{self.client_id}.loss"
-        loss = self.trainer._load_loss(filename)
-        return loss
-
     def get_additional_info(self):
         """Retrieve the average weight update and weight divergence."""
         model_path = Config().params["checkpoint_path"]

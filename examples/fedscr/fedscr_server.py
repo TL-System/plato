@@ -4,10 +4,8 @@ aggregates them and adds them to the global model from the previous round.
 """
 
 import asyncio
-import logging
 import os
 import math
-import torch
 
 from plato.servers import fedavg
 from plato.config import Config
@@ -57,12 +55,6 @@ class Server(fedavg.Server):
             Config().clients.delta3 if hasattr(Config().clients, "delta3") else None
         )
 
-    def configure(self):
-        """Log the usage of either the adaptive or normal algorithm."""
-        super().configure()
-        if self.trainer.use_adaptive:
-            logging.info("Using the adaptive algorithm.")
-
     def customize_server_response(self, server_response: dict) -> dict:
         """Wrap up generating the server response with any additional information."""
         if self.trainer.use_adaptive and self.current_round > 1:
@@ -82,22 +74,9 @@ class Server(fedavg.Server):
                 1 / (1 + (math.e**-sigmoid))
             ) * self.orig_threshold
 
-    def extract_client_updates(self, updates):
-        """Extract the model weight updates from clients."""
-        deltas_received = [update.payload for update in updates]
-        self.local_loss = [update.report.loss for update in updates]
-        if self.trainer.use_adaptive:
-            self.divs = {
-                update.client_id: update.report.div_from_global for update in updates
-            }
-            self.avg_update = {
-                update.client_id: update.report.avg_update for update in updates
-            }
-        return deltas_received
-
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using federated averaging."""
-        deltas_received = self.extract_client_updates(updates)
+        deltas_received = [update.payload for update in updates]
 
         # Extract the total number of samples
         self.total_samples = sum(update.report.num_samples for update in updates)
@@ -120,44 +99,32 @@ class Server(fedavg.Server):
 
         return avg_update
 
-    async def process_reports(self):
-        """Process the client reports by aggregating their weights."""
-        await self.aggregate_weights(self.updates)
-        config = Config().trainer._asdict()
-
-        # Testing the global model accuracy
-        if hasattr(Config().server, "do_test") and not Config().server.do_test:
-            # Compute the average accuracy from client reports
-            self.accuracy = self.accuracy_averaging(self.updates)
-            logging.info(
-                "[%s] Average client accuracy: %.2f%%.", self, 100 * self.accuracy
-            )
-        else:
-            # Testing the updated model directly at the server
-            self.accuracy = self.trainer.test_model(
-                config, self.testset, self.testset_sampler
-            )
-
-        if hasattr(Config().trainer, "target_perplexity"):
-            logging.info("[%s] Global model perplexity: %.2f\n", self, self.accuracy)
-        else:
-            logging.info(
-                "[%s] Global model accuracy: %.2f%%\n", self, 100 * self.accuracy
-            )
+    def weights_aggregated(self, updates):
+        """Extract information from client reports. Called after weights have been aggregated"""
 
         if self.trainer.use_adaptive:
+            self.local_loss = [update.report.loss for update in updates]
             self.mean_variance = self.calc_loss_var()
+            self.divs = {
+                update.client_id: update.report.div_from_global for update in updates
+            }
+            self.avg_update = {
+                update.client_id: update.report.avg_update for update in updates
+            }
 
     def calc_loss_var(self):
         """Calculate the loss variance using mean squared error."""
-        global_loss = [sum(self.local_loss) / len(self.local_loss)]
-        loss = torch.nn.MSELoss()
-        variance = loss(
-            torch.FloatTensor(self.local_loss), torch.FloatTensor(global_loss)
-        )
-        self.variances.append(variance.data.item())
+        global_loss = sum(self.local_loss) / len(self.local_loss)
 
-        mew = sum(variance for variance in self.variances)
+        # Compute the mean squared error loss
+        error = 0
+        for loss in self.local_loss:
+            error += math.pow((loss - global_loss), 2)
+        mse_loss = 1 / len(self.local_loss) * error
+
+        self.variances.append(mse_loss)
+
+        mew = sum(self.variances)
         if self.current_round > 3:
             mew = mew * (1 / (self.current_round - 2))
         else:
