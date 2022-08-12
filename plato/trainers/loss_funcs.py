@@ -1,39 +1,28 @@
-from atexit import register
-import bisect
-import sys
-from collections import OrderedDict
-
-import numpy as np
-from torch import optim
+"""
+Loss functions for training workloads.
+"""
 from torch import nn
-import torch_optimizer as torch_optim
 
 from plato.config import Config
-from plato.utils.step import Step
-
-registered_loss_functions = OrderedDict(
-    [
-        ("CrossEntropyLoss", nn.CrossEntropyLoss()),
-        #("MSELoss", nn.MSELoss()),
-        #("MAELoss", nn.L1Loss()),
-        ("NLLLoss", nn.NLLLoss()),
-        #("BCELoss", nn.BCELoss()),
-    ]
-)
 
 
 def get():
+    """Get a loss function with its name from the configuration file."""
+    registered_loss_functions = {
+        "CrossEntropyLoss": nn.CrossEntropyLoss,
+        "BCEWithLogitsLoss": nn.BCEWithLogitsLoss,
+        "NLLLoss": nn.NLLLoss,
+    }
+
     loss_function_name = (
         Config().trainer.loss_func
-        if hasattr(Config().trainer, "loss_func")
+        if hasattr(Config.trainer, "loss_func")
         else "CrossEntropyLoss"
     )
+    loss_function = registered_loss_functions.get(loss_function_name)
 
-    loss_function = None
-
-    loss_function = registered_loss_functions.get(loss_function_name, None)
-
-    if loss_function is None:
-        raise ValueError(f"No such loss function: {loss_function_name}")
-
-    return loss_function
+    if "loss_func" in Config().parameters:
+        loss_function_params = Config().parameters["loss_func"]
+        return loss_function(**loss_function_params)
+    else:
+        return loss_function()

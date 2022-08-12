@@ -168,13 +168,12 @@ class Trainer(base.Trainer):
         )
 
         # Initializing the loss criterion
-        loss_criterion = loss_funcs.get()
+        loss_criterion = self.get_loss_criterion()
 
         print("LOSS FUNCTION WORKING", loss_criterion)
 
         # Initializing the optimizer
-        get_optimizer = getattr(self, "get_optimizer", optimizers.get_optimizer)
-        optimizer = get_optimizer(self.model)
+        optimizer = self.get_optimizer(self.model)
 
         # Initializing the learning rate schedule, if necessary
         if "lr_schedule" in config:
@@ -475,9 +474,13 @@ class Trainer(base.Trainer):
 
         return correct / total
 
+    def get_optimizer(self, model):
+        """Returns the optimizer."""
+        return optimizers.get(model)
+
     def get_loss_criterion(self):
         """Returns the loss criterion."""
-        return torch.nn.CrossEntropyLoss()
+        return loss_funcs.get()
 
     def train_run_start(self, config):
         """Method called at the start of training run."""

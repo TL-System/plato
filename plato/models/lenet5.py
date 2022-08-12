@@ -7,22 +7,18 @@ document recognition." Proceedings of the IEEE, November 1998.
 """
 import collections
 
-import torch.nn as nn
+from torch import nn
 import torch.nn.functional as F
 
 
 class Model(nn.Module):
     """The LeNet-5 model.
 
-    Arguments:
-        num_classes (int): The number of classes. Default: 10.
+    :param num_classes: The number of classes. The default value is 10.
     """
 
-    def __init__(self, num_classes=None, **kwargs):
+    def __init__(self, num_classes: int = 10):
         super().__init__()
-
-        if num_classes is None:
-            num_classes = 10
 
         # We pad the image to get an input size of 32x32 as for the
         # original network in the LeCun paper
