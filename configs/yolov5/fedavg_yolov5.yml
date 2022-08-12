@@ -158,11 +158,14 @@ trainer:
 
     # The machine learning model
     model_name: yolov5
-    model_config: configs/yolov5/models/yolov5s.yaml
-    train_params: configs/yolov5/data/hyps/hyp.scratch.yaml
-    # number of classes
-    num_classes: 80
 
 algorithm:
     # Aggregation algorithm
     type: fedavg
+
+parameters:
+    model:
+        model_config: configs/yolov5/models/yolov5s.yaml
+        num_classes: 80
+    trainer:
+        train_params: configs/yolov5/data/hyps/hyp.scratch.yaml

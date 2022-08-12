@@ -21,8 +21,9 @@ def get():
     )
     loss_function = registered_loss_functions.get(loss_function_name)
 
-    if "loss_func" in Config().parameters:
-        loss_function_params = Config().parameters["loss_func"]
-        return loss_function(**loss_function_params)
+    if hasattr(Config().parameters, "loss_func"):
+        loss_function_params = Config().parameters.loss_func._asdict()
     else:
-        return loss_function()
+        loss_function_params = {}
+
+    return loss_function(**loss_function_params)

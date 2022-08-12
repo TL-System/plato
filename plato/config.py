@@ -230,11 +230,8 @@ class Config:
             else:
                 Config.params["plot_pairs"] = "round-accuracy, elapsed_time-accuracy"
 
-            if "model" in config:
-                Config.model = Config.namedtuple_from_dict(config["model"])
-
             if "parameters" in config:
-                Config.parameters = config["parameters"]
+                Config.parameters = Config.namedtuple_from_dict(config["parameters"])
 
         return cls._instance
 

@@ -47,7 +47,10 @@ def get():
         if hasattr(Config().trainer, "model_type")
         else model_name.split("_")[0]
     )
-    model_params = Config().parameters["model"]
+    if hasattr(Config().parameters, "model"):
+        model_params = Config().parameters.model._asdict()
+    else:
+        model_params = {}
 
     if model_type in registered_models:
         registered_model = registered_models[model_type]

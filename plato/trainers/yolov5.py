@@ -73,7 +73,7 @@ class Trainer(basic.Trainer):
         nc = Config().data.num_classes  # number of classes
         names = Config().data.classes  # class names
 
-        with open(Config().trainer.train_params) as f:
+        with open(Config().parameters.trainer.train_params, encoding="utf-8") as f:
             hyp = yaml.load(f, Loader=yaml.SafeLoader)  # load hyps
 
         freeze = []  # parameter names to freeze (full or partial)
