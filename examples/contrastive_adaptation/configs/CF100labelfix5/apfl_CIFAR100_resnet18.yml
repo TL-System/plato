@@ -121,7 +121,7 @@ trainer:
     # Learning rate schedule
     lr_schedule: MultiStepLR
     lr_gamma: 0.1
-    lr_milestones: 150,350
+    lr_milestones: 200,300
 
     epoch_log_interval: 1
     epoch_model_log_interval: 50
