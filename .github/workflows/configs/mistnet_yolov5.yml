@@ -164,14 +164,11 @@ trainer:
     # Number of epoches for local training in each communication round
     epochs: 5
     batch_size: 16
+    optimizer: Adam
     linear_lr: false
 
     # The machine learning model
     model_name: yolov5
-    model_config: configs/yolov5/models/yolov5s.yaml
-    train_params: configs/yolov5/data/hyps/hyp.scratch.yaml
-    # number of classes
-    num_classes: 80
 
 algorithm:
     # Aggregation algorithm
@@ -179,3 +176,11 @@ algorithm:
 
     cut_layer: 4
     epsilon: 100
+
+parameters:
+    model:
+        model_config: configs/yolov5/models/yolov5s.yaml
+        num_classes: 80
+
+    trainer:
+        train_params: configs/yolov5/data/hyps/hyp.scratch.yaml

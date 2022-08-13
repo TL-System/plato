@@ -287,7 +287,7 @@ class Trainer(basic.Trainer):
                 optimizer.step()
 
                 if lr_schedule is not None:
-                    lr_schedule.step()
+                    lr_scheduler.step()
 
                 if batch_id % log_interval == 0:
                     if self.client_id == 0:

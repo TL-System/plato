@@ -100,7 +100,7 @@ class Trainer(basic.Trainer):
                         )
 
             if lr_schedule is not None:
-                lr_schedule.step()
+                lr_scheduler.step()
 
             if hasattr(optimizer, "params_state_update"):
                 optimizer.params_state_update()

@@ -8,7 +8,7 @@ import yaml
 
 from torch import nn, optim
 from torch.cuda import amp
-from torch.optim import lr_scheduler
+from torch.optim.lr_scheduler import LambdaLR
 from tqdm import tqdm
 from yolov5.utils.general import (
     NCOLS,
@@ -130,7 +130,7 @@ class Trainer(basic.Trainer):
             )  # linear
         else:
             lf = one_cycle(1, hyp["lrf"], epochs)  # cosine 1->hyp['lrf']
-        lr_schedule = lr_scheduler.LambdaLR(optimizer, lr_lambda=lf)
+        lr_scheduler = LambdaLR(optimizer, lr_lambda=lf)
 
         # Image sizes
         nl = self.model.model[
@@ -234,7 +234,7 @@ class Trainer(basic.Trainer):
                     )
                 )
 
-            lr_schedule.step()
+            lr_scheduler.step()
 
     @staticmethod
     def process_batch(detections, labels, iouv):

@@ -121,8 +121,8 @@ class Trainer(basic.Trainer):
                         "on_train_step_end", self, config, batch=batch_id, loss=loss
                     )
 
-            if lr_schedule is not None:
-                lr_schedule.step()
+            if lr_scheduler is not None:
+                lr_scheduler.step()
 
             if hasattr(optimizer, "params_state_update"):
                 optimizer.params_state_update()

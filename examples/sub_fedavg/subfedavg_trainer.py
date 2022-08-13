@@ -140,7 +140,7 @@ class Trainer(basic.Trainer):
                         )
 
             if lr_schedule is not None:
-                lr_schedule.step()
+                lr_scheduler.step()
 
             if epoch == 1:
                 first_epoch_mask = pruning_processor.fake_prune(

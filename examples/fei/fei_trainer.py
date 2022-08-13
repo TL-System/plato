@@ -14,11 +14,11 @@ from plato.trainers import basic
 
 
 class Trainer(basic.Trainer):
-    """ A federated learning trainer for FEI. """
+    """A federated learning trainer for FEI."""
 
     def train_model(self, config, trainset, sampler, cut_layer=None):
-        """ A custom trainer reporting training loss. """
-        batch_size = config['batch_size']
+        """A custom trainer reporting training loss."""
+        batch_size = config["batch_size"]
         log_interval = 10
         tic = time.perf_counter()
 
@@ -26,15 +26,13 @@ class Trainer(basic.Trainer):
         _train_loader = getattr(self, "train_loader", None)
 
         if callable(_train_loader):
-            train_loader = self.train_loader(batch_size, trainset, sampler,
-                                             cut_layer)
+            train_loader = self.train_loader(batch_size, trainset, sampler, cut_layer)
         else:
-            train_loader = torch.utils.data.DataLoader(dataset=trainset,
-                                                       shuffle=False,
-                                                       batch_size=batch_size,
-                                                       sampler=sampler)
+            train_loader = torch.utils.data.DataLoader(
+                dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler
+            )
 
-        epochs = config['epochs']
+        epochs = config["epochs"]
 
         # Initializing the loss criterion
         _loss_criterion = getattr(self, "loss_criterion", None)
@@ -44,15 +42,14 @@ class Trainer(basic.Trainer):
             loss_criterion = torch.nn.CrossEntropyLoss()
 
         # Initializing the optimizer
-        get_optimizer = getattr(self, "get_optimizer",
-                                optimizers.get_optimizer)
+        get_optimizer = getattr(self, "get_optimizer", optimizers.get_optimizer)
         optimizer = get_optimizer(self.model)
 
         # Initializing the learning rate schedule, if necessary
-        if 'lr_schedule' in config:
-            lr_schedule = optimizers.get_lr_schedule(optimizer,
-                                                     len(train_loader),
-                                                     train_loader)
+        if "lr_schedule" in config:
+            lr_schedule = optimizers.get_lr_schedule(
+                optimizer, len(train_loader), train_loader
+            )
         else:
             lr_schedule = None
 
@@ -63,8 +60,7 @@ class Trainer(basic.Trainer):
         for epoch in range(1, epochs + 1):
             # Use a default training loop
             for batch_id, (examples, labels) in enumerate(train_loader):
-                examples, labels = examples.to(self.device), labels.to(
-                    self.device)
+                examples, labels = examples.to(self.device), labels.to(self.device)
                 optimizer.zero_grad()
 
                 if cut_layer is None:
@@ -81,33 +77,47 @@ class Trainer(basic.Trainer):
                     if self.client_id == 0:
                         logging.info(
                             "[Server #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
-                            os.getpid(), epoch, epochs, batch_id,
-                            len(train_loader), loss.data.item())
+                            os.getpid(),
+                            epoch,
+                            epochs,
+                            batch_id,
+                            len(train_loader),
+                            loss.data.item(),
+                        )
                     else:
                         logging.info(
                             "[Client #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
-                            self.client_id, epoch, epochs, batch_id,
-                            len(train_loader), loss.data.item())
+                            self.client_id,
+                            epoch,
+                            epochs,
+                            batch_id,
+                            len(train_loader),
+                            loss.data.item(),
+                        )
 
                 total_loss += loss.data.item()
 
             if lr_schedule is not None:
-                lr_schedule.step()
+                lr_scheduler.step()
 
             if hasattr(optimizer, "params_state_update"):
                 optimizer.params_state_update()
 
             # Simulate client's speed
-            if self.client_id != 0 and hasattr(
-                    Config().clients,
-                    "speed_simulation") and Config().clients.speed_simulation:
+            if (
+                self.client_id != 0
+                and hasattr(Config().clients, "speed_simulation")
+                and Config().clients.speed_simulation
+            ):
                 self.simulate_sleep_time()
 
             # Saving the model at the end of this epoch to a file so that
             # it can later be retrieved to respond to server requests
             # in asynchronous mode when the wall clock time is simulated
-            if hasattr(Config().server,
-                       'request_update') and Config().server.request_update:
+            if (
+                hasattr(Config().server, "request_update")
+                and Config().server.request_update
+            ):
                 self.model.cpu()
                 training_time = time.perf_counter() - tic
                 filename = f"{self.client_id}_{epoch}_{training_time}.pth"
@@ -115,40 +125,40 @@ class Trainer(basic.Trainer):
                 self.model.to(self.device)
 
         # Save the training loss averaged over epochs in this round
-        model_name = config['model_name']
-        filename = f'{model_name}_{self.client_id}.loss'
+        model_name = config["model_name"]
+        filename = f"{model_name}_{self.client_id}.loss"
         avg_loss = total_loss / epochs
         Trainer.save_loss(avg_loss, filename)
 
     @staticmethod
     def save_loss(loss, filename=None):
-        """ Saving the training loss to a file. """
-        model_path = Config().params['model_path']
+        """Saving the training loss to a file."""
+        model_path = Config().params["model_path"]
         model_name = Config().trainer.model_name
 
         if not os.path.exists(model_path):
             os.makedirs(model_path)
 
         if filename is not None:
-            loss_path = f'{model_path}/{filename}'
+            loss_path = f"{model_path}/{filename}"
         else:
-            loss_path = f'{model_path}/{model_name}.loss'
+            loss_path = f"{model_path}/{model_name}.loss"
 
-        with open(loss_path, 'w', encoding='utf-8') as file:
+        with open(loss_path, "w", encoding="utf-8") as file:
             file.write(str(loss))
 
     @staticmethod
     def load_loss(filename=None):
-        """ Loading the training loss from a file. """
-        model_path = Config().params['model_path']
+        """Loading the training loss from a file."""
+        model_path = Config().params["model_path"]
         model_name = Config().trainer.model_name
 
         if filename is not None:
-            loss_path = f'{model_path}/{filename}'
+            loss_path = f"{model_path}/{filename}"
         else:
-            loss_path = f'{model_path}/{model_name}.loss'
+            loss_path = f"{model_path}/{model_name}.loss"
 
-        with open(loss_path, 'r', encoding='utf-8') as file:
+        with open(loss_path, "r", encoding="utf-8") as file:
             loss = float(file.read())
 
         return loss
