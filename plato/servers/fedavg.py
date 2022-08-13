@@ -147,8 +147,9 @@ class Server(base.Server):
         elif self.algorithm is None and self.custom_algorithm is not None:
             self.algorithm = self.custom_algorithm(trainer=self.trainer)
 
-    def compute_weight_deltas(self, weights_received):
+    def compute_weight_deltas(self, updates):
         """Extract the model weight updates from client updates."""
+        weights_received = [update.payload for update in updates]
         return self.algorithm.compute_weight_deltas(weights_received)
 
     async def aggregate_weights(self, updates):
@@ -161,7 +162,7 @@ class Server(base.Server):
         if callable(custom_aggregate):
             await self.aggregate_models(updates)
         else:
-            deltas = await self.federated_averaging(weights_received)
+            deltas = await self.federated_averaging(updates)
             updated_weights = self.algorithm.update_weights(deltas)
             self.algorithm.load_weights(updated_weights)
 
