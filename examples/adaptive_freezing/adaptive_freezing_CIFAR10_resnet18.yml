@@ -39,11 +39,12 @@ trainer:
 
     # The machine learning model
     model_name: resnet_18
-    
+
     # Number of epoches for local training in each communication round
     epochs: 1
     batch_size: 128
     optimizer: SGD
+    lr_scheduler: LambdaLR
 
 algorithm:
     moving_average_alpha: 0.99
@@ -56,9 +57,6 @@ parameters:
         lr: 0.1
         momentum: 0.9
         weight_decay: 0.0001
-
-    # Learning rate schedule
     learning_rate:
-        lr_schedule: LambdaLR
-        lr_gamma: 0.1
-        lr_milestone_steps: 80ep,120ep
+        gamma: 0.1
+        milestone_steps: 80ep,120ep

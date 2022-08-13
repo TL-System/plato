@@ -172,29 +172,8 @@ class Trainer(base.Trainer):
 
         # Initializing the optimizer
         optimizer = self.get_optimizer(self.model)
-
-        # Initializing the learning rate schedule, if necessary
-        if "lr_schedule" in config:
-            lr_schedule = lr_schedulers.get_lr_schedule(
-                optimizer, len(self.train_loader), self.train_loader
-            )
-        else:
-            lr_schedule = None
-
-        # Scheduling the learning rate globally if required
-        if (
-            hasattr(Config().trainer, "global_lr_scheduler")
-            and Config().trainer.global_lr_scheduler
-            and lr_schedule
-        ):
-            lr_schedule_copy = copy.deepcopy(lr_schedule)
-
-            for __ in range(self.current_round - 1):
-                for __ in range(Config().trainer.epochs):
-                    lr_schedule_copy.step()
-
-            initial_lr = lr_schedule_copy.get_last_lr()
-            optimizer.param_groups[0]["lr"] = initial_lr[0]
+        lr_scheduler = self.get_lr_scheduler(config, optimizer)
+        optimizer = self._adjust_lr(config, lr_scheduler, optimizer)
 
         self.model.to(self.device)
         self.model.train()
@@ -228,8 +207,8 @@ class Trainer(base.Trainer):
                     "on_train_step_end", self, config, batch=batch_id, loss=loss
                 )
 
-            if lr_schedule is not None:
-                lr_schedule.step()
+            if lr_scheduler is not None:
+                lr_scheduler.step()
 
             if hasattr(optimizer, "params_state_update"):
                 optimizer.params_state_update()
@@ -475,6 +454,30 @@ class Trainer(base.Trainer):
     def get_optimizer(self, model):
         """Returns the optimizer."""
         return optimizers.get(model)
+
+    def get_lr_scheduler(self, config, optimizer):
+        """Returns the learning rate scheduler, if needed."""
+        if "lr_scheduler" not in config:
+            return None
+
+        return lr_schedulers.get(optimizer, len(self.train_loader))
+
+    def _adjust_lr(self, config, lr_scheduler, optimizer) -> torch.optim.Optimizer:
+        """Returns an optimizer with an initial learning rate that has been
+        adjusted according to the current round, so that learning rate
+        schedulers can be effective throughout the communication rounds."""
+
+        if "global_lr_scheduler" in config and config["global_lr_scheduler"]:
+            global_lr_scheduler = copy.deepcopy(lr_scheduler)
+
+            for __ in range(self.current_round - 1):
+                for __ in range(Config().trainer.epochs):
+                    global_lr_scheduler.step()
+
+            initial_lr = global_lr_scheduler.get_last_lr()
+            optimizer.param_groups[0]["lr"] = initial_lr[0]
+
+        return optimizer
 
     def get_loss_criterion(self):
         """Returns the loss criterion."""

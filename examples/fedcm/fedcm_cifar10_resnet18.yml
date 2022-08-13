@@ -47,7 +47,7 @@ trainer:
     weight_decay: 0.0
     lr_schedule: StepLR
     lr_step_size: 1
-    lr_gamma: 1
+    gamma: 1
 
     alpha: 0.1
 
@@ -58,5 +58,3 @@ algorithm:
     # The initial synchronization frequency
     global_learning_rate: 1
     lr_decay: 0.998
-
-

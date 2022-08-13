@@ -7,7 +7,6 @@ import sys
 
 import numpy as np
 from torch import optim
-from torch import nn
 import torch_optimizer as torch_optim
 
 from plato.config import Config
@@ -91,22 +90,22 @@ def get_lr_schedule(
         elif scheduler == "LambdaLR":
             lambdas = [lambda it: 1.0]
 
-            if hasattr(Config().trainer, "lr_gamma") and hasattr(
-                Config().trainer, "lr_milestone_steps"
+            if hasattr(Config().trainer, "gamma") and hasattr(
+                Config().trainer, "milestone_steps"
             ):
                 milestones = [
                     Step.from_str(x, iterations_per_epoch).iteration
-                    for x in Config().trainer.lr_milestone_steps.split(",")
+                    for x in Config().trainer.milestone_steps.split(",")
                 ]
                 lambdas.append(
-                    lambda it, milestones=milestones: Config().trainer.lr_gamma
+                    lambda it, milestones=milestones: Config().trainer.gamma
                     ** bisect.bisect(milestones, it)
                 )
 
             # Add a linear learning rate warmup if specified
-            if hasattr(Config().trainer, "lr_warmup_steps"):
+            if hasattr(Config().trainer, "warmup_steps"):
                 warmup_iters = Step.from_str(
-                    Config().trainer.lr_warmup_steps, iterations_per_epoch
+                    Config().trainer.warmup_steps, iterations_per_epoch
                 ).iteration
                 lambdas.append(
                     lambda it, warmup_iters=warmup_iters: min(1.0, it / warmup_iters)
@@ -122,9 +121,9 @@ def get_lr_schedule(
         elif scheduler == "MultiStepLR":
             milestones = [
                 int(x.split("ep")[0])
-                for x in Config().trainer.lr_milestone_steps.split(",")
+                for x in Config().trainer.milestone_steps.split(",")
             ]
-            gamma = Config().trainer.lr_gamma
+            gamma = Config().trainer.gamma
             returned_schedules.append(
                 optim.lr_scheduler.MultiStepLR(optimizer, milestones, gamma)
             )
@@ -135,9 +134,7 @@ def get_lr_schedule(
                 else 30
             )
             gamma = (
-                Config().trainer.lr_gamma
-                if hasattr(Config().trainer, "lr_gamma")
-                else 0.1
+                Config().trainer.gamma if hasattr(Config().trainer, "gamma") else 0.1
             )
             returned_schedules.append(
                 optim.lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=gamma)
@@ -194,7 +191,7 @@ def get_lr_schedule(
                 )
             )
         elif scheduler == "ExponentialLR":
-            gamma = Config().trainer.lr_gamma
+            gamma = Config().trainer.gamma
             returned_schedules.append(
                 optim.lr_scheduler.ExponentialLR(optimizer, gamma)
             )
@@ -243,6 +240,7 @@ def get_lr_schedule(
 
     if use_chained:
         return optim.lr_scheduler.ChainedScheduler(returned_schedules)
+
     if use_sequential:
         sequential_milestones = (
             Config().trainer.lr_sequential_milestones

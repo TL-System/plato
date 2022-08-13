@@ -40,7 +40,7 @@ trainer:
 
     # The machine learning model
     model_name: vgg_16
-    
+
     # Number of epoches for local training in each communication round
     epochs: 5
     batch_size: 128
@@ -53,8 +53,7 @@ algorithm:
 parameters:
     model:
         num_classes: 10
-        
+
     optimizer:
         lr: 0.01
-        momentum: 0.9
         weight_decay: 0.0

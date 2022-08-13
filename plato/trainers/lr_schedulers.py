@@ -1,19 +1,17 @@
+"""
+Returns a learning rate scheduler according to the configuration.
+"""
+
 import bisect
 import sys
-from collections import OrderedDict
 
 import numpy as np
 from torch import optim
-from torch import nn
-import torch_optimizer as torch_optim
 
 from plato.config import Config
-from plato.utils.step import Step
 
 
-def get_lr_schedule(
-    optimizer: optim.Optimizer, iterations_per_epoch: int, train_loader=None
-):
+def get(optimizer: optim.Optimizer, iterations_per_epoch: int):
     """Returns a learning rate scheduler according to the configuration."""
 
     registered_schedulers = {
@@ -29,89 +27,83 @@ def get_lr_schedule(
         "CosineAnnealingWarmRestarts": optim.lr_scheduler.CosineAnnealingWarmRestarts,
     }
 
-    lr_schedule = Config().trainer.lr_schedule
+    scheduler = Config().trainer.lr_scheduler
     lr_params = Config().parameters.learning_rate._asdict()
 
-    # The list containing the learning rate schedule that must be returned or
-    # the learning rate schedules that ChainedScheduler or SequentialLR will
+    # The list containing the learning rate schedulers that must be returned or
+    # the learning rate schedulers that ChainedScheduler or SequentialLR will
     # take as an argument.
-    returned_schedules = []
+    returned_schedulers = []
 
     use_chained = False
     use_sequential = False
-    if "ChainedScheduler" in lr_schedule:
+    if "ChainedScheduler" in scheduler:
         use_chained = True
-        lr_schedule = [
-            schedule
-            for schedule in Config().trainer.lr_schedule.split(",")
-            if schedule != ("ChainedScheduler")
+        lr_scheduler = [
+            sched for sched in scheduler.split(",") if sched != ("ChainedScheduler")
         ]
-    elif "SequentialLR" in lr_schedule:
+    elif "SequentialLR" in lr_scheduler:
         use_sequential = True
-        lr_schedule = [
-            schedule
-            for schedule in Config().trainer.lr_schedule.split(",")
-            if schedule != ("SequentialLR")
+        lr_scheduler = [
+            sched for sched in scheduler.split(",") if sched != ("SequentialLR")
         ]
     else:
-        lr_schedule = [lr_schedule]
+        lr_scheduler = [scheduler]
 
-    for scheduler in lr_schedule:
-        retrived_scheduler = registered_schedulers.get(scheduler, None)
-        if retrived_scheduler is None:
+    for scheduler in lr_scheduler:
+        retrieved_scheduler = registered_schedulers.get(scheduler)
+
+        if retrieved_scheduler is None:
             sys.exit("Error: Unknown learning rate scheduler.")
 
         if scheduler == "CosineAnnealingLR":
-            returned_schedules.append(
-                retrived_scheduler(
-                    optimizer, len(train_loader) * Config().trainer.epochs
+            returned_schedulers.append(
+                retrieved_scheduler(
+                    optimizer, iterations_per_epoch * Config().trainer.epochs
                 )
             )
         elif scheduler == "LambdaLR":
             lambdas = [lambda it: 1.0]
 
-            if hasattr(Config().parameters.learning_rate, "lr_gamma") and hasattr(
-                Config().parameters.learning_rate, "lr_milestone_steps"
-            ):
+            if "gamma" in lr_params and "milestone_steps" in lr_params:
                 milestones = [
                     Step.from_str(x, iterations_per_epoch).iteration
-                    for x in Config().trainer.lr_milestone_steps.split(",")
+                    for x in lr_params["milestone_steps"].split(",")
                 ]
                 lambdas.append(
-                    lambda it, milestones=milestones: Config().parameters.learning_rate.lr_gamma
+                    lambda it, milestones=milestones: lr_params["gamma"]
                     ** bisect.bisect(milestones, it)
                 )
 
             # Add a linear learning rate warmup if specified
-            if hasattr(Config().parameters.learning_rate, "lr_warmup_steps"):
+            if "warmup_steps" in lr_params:
                 warmup_iters = Step.from_str(
-                    Config().parameters.learning_rate.lr_warmup_steps,
-                    iterations_per_epoch,
+                    lr_params["warmup_steps"], iterations_per_epoch
                 ).iteration
                 lambdas.append(
                     lambda it, warmup_iters=warmup_iters: min(1.0, it / warmup_iters)
                 )
-            returned_schedules.append(
-                retrived_scheduler(
+            returned_schedulers.append(
+                retrieved_scheduler(
                     optimizer,
                     lambda it, lambdas=lambdas: np.product([l(it) for l in lambdas]),
                 )
             )
         elif scheduler == "MultiStepLR":
             milestones = [
-                int(x.split("ep")[0])
-                for x in lr_params["lr_milestone_steps"].split(",")
+                int(x.split("ep")[0]) for x in lr_params["milestone_steps"].split(",")
             ]
-            returned_schedules.append(
-                retrived_scheduler(
+            returned_schedulers.append(
+                retrieved_scheduler(
                     optimizer, milestones=milestones, gamma=lr_params["gamma"]
                 )
             )
         else:
-            returned_schedules.append(retrived_scheduler(optimizer, **lr_params))
+            returned_schedulers.append(retrieved_scheduler(optimizer, **lr_params))
 
     if use_chained:
-        return optim.lr_scheduler.ChainedScheduler(returned_schedules)
+        return optim.lr_scheduler.ChainedScheduler(returned_schedulers)
+
     if use_sequential:
         sequential_milestones = (
             Config().trainer.lr_sequential_milestones
@@ -123,7 +115,114 @@ def get_lr_schedule(
         ]
 
         return optim.lr_scheduler.SequentialLR(
-            optimizer, returned_schedules, sequential_milestones
+            optimizer, returned_schedulers, sequential_milestones
         )
     else:
-        return returned_schedules[0]
+        return returned_schedulers[0]
+
+
+class Step:
+    """Represents a particular step of training."""
+
+    def __init__(self, iteration: int, iterations_per_epoch: int) -> None:
+        if iteration < 0:
+            raise ValueError("iteration must >= 0.")
+        if iterations_per_epoch <= 0:
+            raise ValueError("iterations_per_epoch must be > 0.")
+        self._iteration = iteration
+        self.iterations_per_epoch = iterations_per_epoch
+
+    @staticmethod
+    def str_is_zero(s: str) -> bool:
+        return s in ["0ep", "0it", "0ep0it"]
+
+    @staticmethod
+    def from_iteration(iteration: int, iterations_per_epoch: int) -> "Step":
+        return Step(iteration, iterations_per_epoch)
+
+    @staticmethod
+    def from_epoch(epoch: int, iteration: int, iterations_per_epoch: int) -> "Step":
+        return Step(epoch * iterations_per_epoch + iteration, iterations_per_epoch)
+
+    @staticmethod
+    def from_str(s: str, iterations_per_epoch: int) -> "Step":
+        """Creates a step from a string that describes the number of epochs, iterations, or both.
+
+        Epochs: '120ep'
+        Iterations: '2000it'
+        Both: '120ep50it'"""
+
+        if "ep" in s and "it" in s:
+            ep = int(s.split("ep")[0])
+            it = int(s.split("ep")[1].split("it")[0])
+            if s != "{}ep{}it".format(ep, it):
+                raise ValueError("Malformed string step: {}".format(s))
+            return Step.from_epoch(ep, it, iterations_per_epoch)
+        elif "ep" in s:
+            ep = int(s.split("ep")[0])
+            if s != "{}ep".format(ep):
+                raise ValueError("Malformed string step: {}".format(s))
+            return Step.from_epoch(ep, 0, iterations_per_epoch)
+        elif "it" in s:
+            it = int(s.split("it")[0])
+            if s != "{}it".format(it):
+                raise ValueError("Malformed string step: {}".format(s))
+            return Step.from_iteration(it, iterations_per_epoch)
+        else:
+            raise ValueError("Malformed string step: {}".format(s))
+
+    @staticmethod
+    def zero(iterations_per_epoch: int) -> "Step":
+        return Step(0, iterations_per_epoch)
+
+    @property
+    def iteration(self):
+        """The overall number of steps of training completed so far."""
+        return self._iteration
+
+    @property
+    def ep(self):
+        """The current epoch of training."""
+        return self._iteration // self.iterations_per_epoch
+
+    @property
+    def it(self):
+        """The iteration within the current epoch of training."""
+        return self._iteration % self.iterations_per_epoch
+
+    def _check(self, other):
+        if not isinstance(other, Step):
+            raise ValueError("Invalid type for other: {}.".format(type(other)))
+        if self.iterations_per_epoch != other.iterations_per_epoch:
+            raise ValueError(
+                "Cannot compare steps when epochs are of different lengths."
+            )
+
+    def __lt__(self, other):
+        self._check(other)
+        return self._iteration < other.iteration
+
+    def __le__(self, other):
+        self._check(other)
+        return self._iteration <= other.iteration
+
+    def __eq__(self, other):
+        self._check(other)
+        return self._iteration == other.iteration
+
+    def __ne__(self, other):
+        self._check(other)
+        return self._iteration != other.iteration
+
+    def __gt__(self, other):
+        self._check(other)
+        return self._iteration > other.iteration
+
+    def __ge__(self, other):
+        self._check(other)
+        return self._iteration >= other.iteration
+
+    def __str__(self):
+        return "(Iteration {}; Iterations per Epoch: {})".format(
+            self._iteration, self.iterations_per_epoch
+        )

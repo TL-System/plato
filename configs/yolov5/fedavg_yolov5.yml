@@ -153,7 +153,6 @@ trainer:
     # Number of epoches for local training in each communication round
     epochs: 10
     batch_size: 4
-    optimizer: Adam
     linear_lr: false
 
     # The machine learning model
@@ -167,6 +166,6 @@ parameters:
     model:
         model_config: configs/yolov5/models/yolov5s.yaml
         num_classes: 80
-        
+
     trainer:
         train_params: configs/yolov5/data/hyps/hyp.scratch.yaml

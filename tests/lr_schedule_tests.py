@@ -10,36 +10,46 @@ import plato.models.registry as models_registry
 
 
 class LrSchedulerTest(unittest.TestCase):
-
     def setUp(self):
         super().setUp()
         __ = Config()
 
         fields = [
-            'optimizer', 'lr_schedule', 'learning_rate', 'momentum',
-            'weight_decay', 'lr_gamma', 'lr_milestone_steps',
-            'lr_warmup_steps', 'model_name'
+            "optimizer",
+            "lr_schedule",
+            "learning_rate",
+            "momentum",
+            "weight_decay",
+            "gamma",
+            "milestone_steps",
+            "warmup_steps",
+            "model_name",
         ]
-        params = ['SGD', 'LambdaLR', 0.1, 0.5, 0.0, 0.0, '', '', 'resnet_18']
-        Config().trainer = namedtuple('trainer', fields)(*params)
+        params = ["SGD", "LambdaLR", 0.1, 0.5, 0.0, 0.0, "", "", "resnet_18"]
+        Config().trainer = namedtuple("trainer", fields)(*params)
 
         self.model = models_registry.get()
         self.optimizer = optimizers.get_optimizer(self.model)
 
     def assert_lr_equal(self, lr):
-        self.assertEqual(np.round(self.optimizer.param_groups[0]['lr'], 10),
-                         np.round(lr, 10))
+        self.assertEqual(
+            np.round(self.optimizer.param_groups[0]["lr"], 10), np.round(lr, 10)
+        )
 
     def test_vanilla(self):
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=UserWarning)
 
             fields = [
-                'optimizer', 'lr_schedule', 'learning_rate', 'momentum',
-                'weight_decay', 'lr_gamma'
+                "optimizer",
+                "lr_schedule",
+                "learning_rate",
+                "momentum",
+                "weight_decay",
+                "gamma",
             ]
-            params = ['SGD', 'LambdaLR', 0.1, 0.5, 0.0, 0.0]
-            Config().trainer = namedtuple('trainer', fields)(*params)
+            params = ["SGD", "LambdaLR", 0.1, 0.5, 0.0, 0.0]
+            Config().trainer = namedtuple("trainer", fields)(*params)
 
             lrs = optimizers.get_lr_schedule(self.optimizer, 10)
             self.assert_lr_equal(0.1)
@@ -55,12 +65,17 @@ class LrSchedulerTest(unittest.TestCase):
             warnings.filterwarnings("ignore", category=UserWarning)
 
             fields = [
-                'optimizer', 'lr_schedule', 'learning_rate', 'momentum',
-                'weight_decay', 'lr_gamma', 'lr_milestone_steps'
+                "optimizer",
+                "lr_schedule",
+                "learning_rate",
+                "momentum",
+                "weight_decay",
+                "gamma",
+                "milestone_steps",
             ]
-            params = ['SGD', 'LambdaLR', 0.1, 0.5, 0.0, 0.1, '2ep,4ep,7ep,8ep']
+            params = ["SGD", "LambdaLR", 0.1, 0.5, 0.0, 0.1, "2ep,4ep,7ep,8ep"]
 
-            Config().trainer = namedtuple('trainer', fields)(*params)
+            Config().trainer = namedtuple("trainer", fields)(*params)
             self.assert_lr_equal(0.1)
 
             lrs = optimizers.get_lr_schedule(self.optimizer, 10)
@@ -103,12 +118,17 @@ class LrSchedulerTest(unittest.TestCase):
             warnings.filterwarnings("ignore", category=UserWarning)
 
             fields = [
-                'optimizer', 'lr_schedule', 'learning_rate', 'momentum',
-                'weight_decay', 'lr_gamma', 'lr_warmup_steps'
+                "optimizer",
+                "lr_schedule",
+                "learning_rate",
+                "momentum",
+                "weight_decay",
+                "gamma",
+                "warmup_steps",
             ]
-            params = ['SGD', 'LambdaLR', 0.1, 0.5, 0.0, 0.0, '20it']
+            params = ["SGD", "LambdaLR", 0.1, 0.5, 0.0, 0.0, "20it"]
 
-            Config().trainer = namedtuple('trainer', fields)(*params)
+            Config().trainer = namedtuple("trainer", fields)(*params)
 
             lrs = optimizers.get_lr_schedule(self.optimizer, 10)
 
@@ -121,5 +141,5 @@ class LrSchedulerTest(unittest.TestCase):
                 self.assert_lr_equal(0.1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

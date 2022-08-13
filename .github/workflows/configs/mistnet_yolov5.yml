@@ -164,7 +164,6 @@ trainer:
     # Number of epoches for local training in each communication round
     epochs: 5
     batch_size: 16
-    optimizer: SGD
     linear_lr: false
 
     # The machine learning model

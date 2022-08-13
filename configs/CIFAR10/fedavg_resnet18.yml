@@ -42,7 +42,8 @@ trainer:
     epochs: 5
     batch_size: 10
     optimizer: SGD
-    
+    lr_scheduler: LambdaLR
+
     # The machine learning model
     model_name: resnet_18
 
@@ -56,10 +57,6 @@ parameters:
         momentum: 0.9
         weight_decay: 0.0001
 
-    # Learning rate schedule
     learning_rate:
-        lr_schedule: LambdaLR
-        lr_gamma: 0.1
-        lr_milestone_steps: 80ep,120ep
-
-        
+        gamma: 0.1
+        milestone_steps: 80ep,120ep
