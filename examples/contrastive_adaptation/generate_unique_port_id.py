@@ -12,6 +12,8 @@ import os
 import json
 from typing import Any, IO
 
+import argparse
+
 import glob
 import yaml
 
@@ -117,10 +119,24 @@ def revise_str_config_file_portID(file_root_dir,
 
 if __name__ == "__main__":
 
-    configs_files_path = glob.glob(
-        os.path.join(config_files_root_dir, "*/", "*.yml"))
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '-d',
+        '--dirname',
+        type=str,
+        default='',
+        help='the dir name in which the config files to be revised.')
 
-    to_save_dir = os.path.join(config_files_root_dir, "test_revision")
+    args = parser.parse_args()
+
+    config_dir_name = args.dirname
+
+    target_config_files_root_dir = os.path.join(config_files_root_dir,
+                                                config_dir_name)
+
+    # "*/",
+    configs_files_path = glob.glob(
+        os.path.join(target_config_files_root_dir, "*.yml"))
 
     for file_path in configs_files_path:
         # obtain the full path of the existed dir of the file
