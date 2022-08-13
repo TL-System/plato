@@ -134,7 +134,7 @@ class Trainer(base.Trainer):
         if callable(get_optimizer):
             optimizer = self.get_optimizer(self.model)
         else:
-            optimizer = tf.keras.optimizers.Adam(config["learning_rate"])
+            optimizer = tf.keras.optimizers.Adam(Config().parameters.optimizer.lr)
 
         self.model.compile(
             optimizer=optimizer,
@@ -173,7 +173,7 @@ class Trainer(base.Trainer):
         if callable(get_optimizer):
             optimizer = self.get_optimizer(self.model)
         else:
-            optimizer = tf.keras.optimizers.Adam(config["learning_rate"])
+            optimizer = tf.keras.optimizers.Adam(Config().parameters.optimizer.lr)
 
         self.model.compile(
             optimizer=optimizer,
