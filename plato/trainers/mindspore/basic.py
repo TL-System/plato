@@ -53,8 +53,8 @@ class Trainer(base.Trainer):
         # Initializing the optimizer
         optimizer = nn.Momentum(
             self.model.trainable_params(),
-            Config().trainer.learning_rate,
-            Config().trainer.momentum,
+            Config().parameters.optimizer.lr,
+            Config().parameters.optimizer.momentum,
         )
 
         self.mindspore_model = mindspore.Model(

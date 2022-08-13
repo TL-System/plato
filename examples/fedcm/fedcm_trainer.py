@@ -39,7 +39,7 @@ class Trainer(basic.Trainer):
         max_norm = 10
         log_interval = 10
         alpha = config["alpha"]
-        lr = Config().trainer.learning_rate * (
+        lr = Config().parameters.optimizer.lr * (
             Config().algorithm.lr_decay ** self.current_round
         )
         # optimizer = torch.optim.Adam(self.model.parameters(), lr=1e-3)

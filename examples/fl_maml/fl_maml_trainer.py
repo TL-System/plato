@@ -76,7 +76,7 @@ class Trainer(basic.Trainer):
             # The learning rate here is the alpha in the paper
             local_optimizer = torch.optim.SGD(
                 current_model.parameters(),
-                lr=Config().trainer.learning_rate,
+                lr=Config().parameters.optimizer.lr,
                 momentum=Config().trainer.momentum,
                 weight_decay=Config().trainer.weight_decay,
             )
@@ -283,7 +283,7 @@ class Trainer(basic.Trainer):
         loss_criterion = nn.CrossEntropyLoss()
         optimizer = torch.optim.SGD(
             personalized_model.parameters(),
-            lr=Config().trainer.learning_rate,
+            lr=Config().parameters.optimizer.lr,
             momentum=Config().trainer.momentum,
             weight_decay=Config().trainer.weight_decay,
         )
