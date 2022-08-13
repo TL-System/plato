@@ -42,7 +42,7 @@ def get(optimizer: optim.Optimizer, iterations_per_epoch: int):
         lr_scheduler = [
             sched for sched in scheduler.split(",") if sched != ("ChainedScheduler")
         ]
-    elif "SequentialLR" in lr_scheduler:
+    elif "SequentialLR" in scheduler:
         use_sequential = True
         lr_scheduler = [
             sched for sched in scheduler.split(",") if sched != ("SequentialLR")
