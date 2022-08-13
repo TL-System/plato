@@ -17,7 +17,7 @@ import scipy
 from plato.config import Config
 from plato.models import registry as models_registry
 from plato.trainers import basic
-from plato.utils import optimizers
+from plato.trainers import optimizers
 
 
 class Trainer(basic.Trainer):
@@ -131,8 +131,8 @@ class Trainer(basic.Trainer):
         # self.generator.apply(self.model.weights_init)
         # self.discriminator.apply(self.model.weights_init)
 
-        optimizer_gen = optimizers.get_optimizer(self.generator)
-        optimizer_disc = optimizers.get_optimizer(self.discriminator)
+        optimizer_gen = optimizers.get(self.generator)
+        optimizer_disc = optimizers.get(self.discriminator)
 
         real_label = 1.
         fake_label = 0.

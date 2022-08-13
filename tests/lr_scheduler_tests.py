@@ -4,9 +4,9 @@ import warnings
 from collections import namedtuple
 import numpy as np
 
-from plato.utils import optimizers
 from plato.config import Config
 import plato.models.registry as models_registry
+from plato.trainers import optimizers
 
 
 class LrSchedulerTest(unittest.TestCase):
@@ -29,7 +29,7 @@ class LrSchedulerTest(unittest.TestCase):
         Config().trainer = namedtuple("trainer", fields)(*params)
 
         self.model = models_registry.get()
-        self.optimizer = optimizers.get_optimizer(self.model)
+        self.optimizer = optimizers.get(self.model)
 
     def assert_lr_equal(self, lr):
         self.assertEqual(

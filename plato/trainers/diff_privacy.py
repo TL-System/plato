@@ -13,7 +13,6 @@ from opacus.utils.batch_memory_manager import BatchMemoryManager
 
 from plato.config import Config
 from plato.trainers import basic
-from plato.utils import optimizers
 
 
 class Trainer(basic.Trainer):
@@ -60,19 +59,12 @@ class Trainer(basic.Trainer):
         )
 
         # Initializing the loss criterion
-        loss_criterion = Trainer.get_loss_criterion()
+        loss_criterion = self.get_loss_criterion()
 
         # Initializing the optimizer
-        get_optimizer = getattr(self, "get_optimizer", optimizers.get_optimizer)
-        optimizer = get_optimizer(self.model)
-
-        # Initializing the learning rate schedule, if necessary
-        if "lr_schedule" in config:
-            lr_schedule = optimizers.get_lr_schedule(
-                optimizer, len(self.train_loader), self.train_loader
-            )
-        else:
-            lr_schedule = None
+        optimizer = self.get_optimizer(self.model)
+        lr_scheduler = self.get_lr_scheduler(config, optimizer)
+        optimizer = self._adjust_lr(config, lr_scheduler, optimizer)
 
         self.model.to(self.device)
         total_epochs = config["epochs"]

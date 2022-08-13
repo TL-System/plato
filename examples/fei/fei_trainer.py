@@ -11,7 +11,6 @@ from opacus.privacy_engine import PrivacyEngine
 from plato.config import Config
 from plato.models import registry as models_registry
 from plato.trainers import basic
-from plato.utils import optimizers
 
 
 class Trainer(basic.Trainer):
