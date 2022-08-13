@@ -23,7 +23,7 @@ class Server(fedavg.Server):
         self.personalized_models = []
         self.masks_received = []
 
-    async def federated_averaging(self, updates):
+    async def personalized_fedavg(self, updates):
         """Aggregate weight updates from the clients using personalized aggregating."""
 
         # Get the list of client models and masks
@@ -84,13 +84,10 @@ class Server(fedavg.Server):
 
         return weights_received
 
-    async def process_reports(self):
-        """Process the client reports by aggregating their overlapping weights."""
-        self.personalized_models = await self.federated_averaging(self.updates)
-        self.accuracy = self.accuracy_averaging(self.updates)
-        logging.info("[%s] Average client accuracy: %.2f%%.", self, 100 * self.accuracy)
+    async def aggregate_models(self, updates):
+        """Personalized weight aggregation designed for Hermes"""
+        self.personalized_models = await self.personalized_fedavg(updates)
         self.save_personalized_models(self.personalized_models, self.updates)
-        await self.wrap_up_processing_reports()
 
     def save_personalized_models(self, personalized_models, updates):
         """Save each client's personalized model."""
