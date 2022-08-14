@@ -35,19 +35,22 @@ trainer:
     # The target accuracy
     target_accuracy: 0.95
 
+    # The machine learning model
+    model_name: lenet5
+
     # Number of epoches for local training in each communication round
     epochs: 1
     batch_size: 32
     optimizer: SGD
-    learning_rate: 0.01
-    momentum: 0.9
-    weight_decay: 0.0
-
-    # The machine learning model
-    model_name: lenet5
 
 algorithm:
     # The initial synchronization frequency
     initial_sync_frequency: 1
 
     moving_average_alpha: 0.99
+
+parameters:
+    optimizer:
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0

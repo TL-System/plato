@@ -41,22 +41,25 @@ trainer:
     # The target accuracy
     target_accuracy: 0.80
 
+    # The machine learning model
+    model_name: resnet_18
+
     # Number of epoches for local training in each communication round
     epochs: 5
     batch_size: 10
     optimizer: SGD
-    learning_rate: 0.1
-    momentum: 0.9
-    weight_decay: 0.0001
-
-    # Learning rate schedule
-    lr_schedule: LambdaLR
-    lr_gamma: 0.1
-    lr_milestone_steps: 80ep,120ep
-
-    # The machine learning model
-    model_name: resnet_18
+    lr_scheduler: LambdaLR
 
 algorithm:
     # Aggregation algorithm
     type: fedavg
+
+parameters:
+    optimizer:
+        lr: 0.1
+        momentum: 0.9
+        weight_decay: 0.0001
+
+    learning_rate:
+        gamma: 0.1
+        milestone_steps: 80ep,120ep

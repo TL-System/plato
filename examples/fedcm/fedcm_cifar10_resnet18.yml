@@ -38,25 +38,26 @@ trainer:
     # The target accuracy
     target_accuracy: 0.95
 
+    # The machine learning model
+    model_name: resnet_18
+
     # Number of epoches for local training in each communication round
     epochs: 1
     batch_size: 128
     optimizer: SGD
-    learning_rate: 0.1 # 0.01
-    momentum: 0.9
-    weight_decay: 0.0
-    lr_schedule: StepLR
-    lr_step_size: 1
-    lr_gamma: 1
-
-    alpha: 0.1
-
-    # The machine learning model
-    model_name: resnet_18
+    lr_scheduler: StepLR
 
 algorithm:
     # The initial synchronization frequency
     global_learning_rate: 1
     lr_decay: 0.998
 
+parameters:
+    optimizer:
+        lr: 0.1
+        momentum: 0.9
+        weight_decay: 0.0
 
+    learning_rate:
+        step_size: 1
+        gamma: 1

@@ -514,3 +514,24 @@ Use comma `,` to seperate them. The default is `round, accuracy, elapsed_time`.
 ````{admonition} result_path
 The path to the result `.csv` files. The default path is `<base_path>/results/`,  where `<base_path>` is specified in the `general` section.
 ````
+
+## parameters
+This would be where you load in parameters for optimizers, loss_functions, models, or learning_schedulers. \
+
+### model:
+This is where your model parameters would go
+
+### optimizer:
+This is where your optimizer's parameters would go
+
+### learning_rate:
+This is where your learning rate scheduler parameters would go
+
+### loss_func:
+This is where your loss function parameters would go
+
+**Note:** Your parameters in your configuration file MUST match the variable name in your optimizer/loss/learning scheduler/model function. For example, if you want to set base_lr in the learning scheduler "CyclicLR", Please have your parameter argument as: \ 
+
+parameter: \
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;learning_rate: \
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;base_lr: 0.01

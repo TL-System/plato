@@ -7,22 +7,19 @@ document recognition." Proceedings of the IEEE, November 1998.
 """
 import collections
 
-import torch.nn as nn
+from torch import nn
 import torch.nn.functional as F
 
 
 class Model(nn.Module):
     """The LeNet-5 model.
 
-    Arguments:
-        num_classes (int): The number of classes. Default: 10.
+    :param num_classes: The number of classes. The default value is 10.
     """
 
-    def __init__(self, num_classes=None, **kwargs):
+    def __init__(self, num_classes: int = 10, cut_layer=None):
         super().__init__()
-
-        if num_classes is None:
-            num_classes = 10
+        self.cut_layer = cut_layer
 
         # We pad the image to get an input size of 32x32 as for the
         # original network in the LeCun paper
@@ -84,35 +81,32 @@ class Model(nn.Module):
 
     def forward(self, x):
         """Forward pass."""
-        x = self.conv1(x)
-        x = self.relu1(x)
-        x = self.pool1(x)
-        x = self.conv2(x)
-        x = self.relu2(x)
-        x = self.pool2(x)
-        x = self.conv3(x)
-        x = self.relu3(x)
-        x = self.flatten(x)
-        x = self.fc4(x)
-        x = self.relu4(x)
-        x = self.fc5(x)
+        if self.cut_layer is not None and self.training:
+            layer_index = self.layers.index(self.cut_layer)
+
+            for i in range(layer_index + 1, len(self.layers)):
+                x = self.layerdict[self.layers[i]](x)
+        else:
+            x = self.conv1(x)
+            x = self.relu1(x)
+            x = self.pool1(x)
+            x = self.conv2(x)
+            x = self.relu2(x)
+            x = self.pool2(x)
+            x = self.conv3(x)
+            x = self.relu3(x)
+            x = self.flatten(x)
+            x = self.fc4(x)
+            x = self.relu4(x)
+            x = self.fc5(x)
 
         return F.log_softmax(x, dim=1)
 
-    def forward_to(self, x, cut_layer):
+    def forward_to(self, x):
         """Forward pass, but only to the layer specified by cut_layer."""
-        layer_index = self.layers.index(cut_layer)
+        layer_index = self.layers.index(self.cut_layer)
 
         for i in range(0, layer_index + 1):
             x = self.layerdict[self.layers[i]](x)
 
         return x
-
-    def forward_from(self, x, cut_layer):
-        """Forward pass, starting from the layer specified by cut_layer."""
-        layer_index = self.layers.index(cut_layer)
-
-        for i in range(layer_index + 1, len(self.layers)):
-            x = self.layerdict[self.layers[i]](x)
-
-        return F.log_softmax(x, dim=1)

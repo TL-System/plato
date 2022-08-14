@@ -43,16 +43,13 @@ trainer:
     # The target accuracy
     target_accuracy: 0.95
 
+    # The machine learning model
+    model_name: lenet5
+
     # Number of epoches for local training in each communication round
     epochs: 10
     batch_size: 32
     optimizer: SGD
-    learning_rate: 0.01
-    momentum: 0.9
-    weight_decay: 0.0
-
-    # The machine learning model
-    model_name: lenet5
 
 algorithm:
     # Aggregation algorithm
@@ -60,6 +57,14 @@ algorithm:
 
     # Split learning flag
     split_learning: true
-
-    cut_layer: relu4
     epsilon: null
+
+parameters:
+    model:
+        num_classes: 10
+        cut_layer: relu4
+
+    optimizer:
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0
