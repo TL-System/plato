@@ -24,6 +24,7 @@ data:
 
     #
     download_url: http://iqua.ece.toronto.edu/baochun/CINIC-10.tar.gz
+    
     # Number of samples in each partition
     partition_size: 20000
 
@@ -43,18 +44,23 @@ trainer:
     # The target accuracy
     target_accuracy: 0.88
 
+    # The machine learning model
+    model_name: vgg_16
+
     # Number of epoches for local training in each communication round
     epochs: 1
     batch_size: 128
     optimizer: SGD
-    learning_rate: 0.01
-    momentum: 0.5
-    weight_decay: 0.0
-
-    # The machine learning model
-    model_name: vgg_16
-    num_classes: 10
 
 algorithm:
     # Aggregation algorithm
     type: fedavg
+
+parameters:
+    model:
+        num_classes: 10
+
+    optimizer:
+        lr: 0.01
+        momentum: 0.5
+        weight_decay: 0.0

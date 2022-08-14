@@ -75,16 +75,13 @@ trainer:
     # The target accuracy
     target_accuracy: 1.0
 
+    # The machine learning model
+    model_name: lenet5
+
     # Number of epoches for local training in each communication round
     epochs: 10
     batch_size: 32
     optimizer: SGD
-    learning_rate: 0.01
-    momentum: 0.9
-    weight_decay: 0.0
-
-    # The machine learning model
-    model_name: lenet5
 
 algorithm:
     # Aggregation algorithm
@@ -96,6 +93,12 @@ algorithm:
     alpha2: 0.01
     # The proportion of clients which are selected uniformly at random
     alpha3: 0.1
+
+parameters:
+    optimizer:
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0
 
 results:
     result_path: results/FashionMNIST_lenet5/AFL

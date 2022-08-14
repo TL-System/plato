@@ -1,5 +1,6 @@
 """
 A federated learning server for MistNet.
+
 Reference:
 P. Wang, et al. "MistNet: Towards Private Neural Network Training with Local
 Differential Privacy," found in docs/papers.
@@ -41,12 +42,12 @@ class Server(fedavg.Server):
 
     async def process_reports(self):
         """Process the features extracted by the client and perform server-side training."""
-        features = [update.payload for update in self.updates]
+        features = [features for (__, __, features, __) in self.updates]
         feature_dataset = feature.DataSource(features)
 
         # Training the model using all the features received from the client
         sampler = all_inclusive.Sampler(feature_dataset)
-        self.algorithm.train(feature_dataset, sampler, Config().algorithm.cut_layer)
+        self.algorithm.train(feature_dataset, sampler)
 
         # Test the updated model
         if not hasattr(Config().server, "do_test") or Config().server.do_test:

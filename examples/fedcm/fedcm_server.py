@@ -19,7 +19,7 @@ class Server(fedavg.Server):
         )
         self.algorithm.load_weights(updated_weights)
 
-        # lr = Config().trainer.learning_rate * (Config().algorithm.lr_decay ** self.current_round)
+        # lr = Config().parameters.optimizer.lr * (Config().algorithm.lr_decay ** self.current_round)
         # for name, weight in self.trainer.delta.items():
         #     self.trainer.delta[name] = self.trainer.delta[name] / lr
 

@@ -11,7 +11,6 @@ import numpy as np
 import torch
 
 from plato.config import Config
-from plato.utils import optimizers
 from plato.trainers import basic
 
 # basic.Trainer
@@ -30,7 +29,7 @@ from plato.trainers import basic
 
 
 class Trainer(basic.Trainer):
-    """The federated learning trainer for the adaptive gradient blending client. """
+    """The federated learning trainer for the adaptive gradient blending client."""
 
     def __init__(self, model=None):
         """Initializing the trainer with the provided model.
@@ -45,7 +44,7 @@ class Trainer(basic.Trainer):
         self.init_trajectory_items()
 
     def init_trajectory_items(self):
-        """ Initialize the containers to hold the train trajectory"""
+        """Initialize the containers to hold the train trajectory"""
         # mm is the abbreviation of multimodal
         # For the Overfitting:
         # record the training losse:
@@ -63,22 +62,22 @@ class Trainer(basic.Trainer):
 
         self.losses_trajectory = {
             "train": self.mm_train_losses_trajectory,
-            "val": self.mm_val_losses_trajectory
+            "val": self.mm_val_losses_trajectory,
         }
 
         self.global_losses_trajectory = {
             "train": self.global_mm_train_losses_trajectory,
-            "val": self.global_mm_val_losses_trajectory
+            "val": self.global_mm_val_losses_trajectory,
         }
 
     def backtrack_gradient_trajectory(self, trajectory_idx):
-        """ Record the gradient """
+        """Record the gradient"""
         assert trajectory_idx < len(self.gradients_trajectory)
 
         return self.gradients_trajectory[trajectory_idx]
 
     def backtrack_loss_trajectory(self, mode, modality_name, trajectory_idx):
-        """ Record the loss for the required modality """
+        """Record the loss for the required modality"""
         assert mode in list(self.losses_trajectory.keys())
         mode_trajs = self.losses_trajectory[mode]
         assert modality_name in list(mode_trajs.keys())
@@ -87,16 +86,14 @@ class Trainer(basic.Trainer):
         assert trajectory_idx < len(mode_mdl_trajs)
         return mode_mdl_trajs[trajectory_idx]
 
-    def backtrack_loss_trajectories(self, mode, modality_name,
-                                    trajectory_idxs):
-        """ Record the modality multi-steps loss """
+    def backtrack_loss_trajectories(self, mode, modality_name, trajectory_idxs):
+        """Record the modality multi-steps loss"""
         assert mode in list(self.losses_trajectory.keys())
         mode_trajs = self.losses_trajectory[mode]
         assert modality_name in list(mode_trajs.keys())
         mode_mdl_trajs = self.losses_trajectory[mode][modality_name]
 
-        assert all(
-            [traj_idx < len(mode_mdl_trajs) for traj_idx in trajectory_idxs])
+        assert all([traj_idx < len(mode_mdl_trajs) for traj_idx in trajectory_idxs])
 
         backtracked_mode_mdl_losses = dict()
         backtracked_mode_mdl_losses[modality_name] = [
@@ -104,30 +101,29 @@ class Trainer(basic.Trainer):
         ]
         return backtracked_mode_mdl_losses
 
-    def backtrack_multimodal_loss_trajectory(self, mode, modality_names,
-                                             trajectory_idx):
-        """ Record multiple modalities' losses in the step trajectory_idx """
+    def backtrack_multimodal_loss_trajectory(
+        self, mode, modality_names, trajectory_idx
+    ):
+        """Record multiple modalities' losses in the step trajectory_idx"""
         assert mode in list(self.losses_trajectory.keys())
         mode_trajs = self.losses_trajectory[mode]
 
-        assert all([
-            mdl_name in list(mode_trajs.keys()) for mdl_name in modality_names
-        ])
-        assert all([
-            trajectory_idx < len(mode_trajs[mdl_name])
-            for mdl_name in modality_names
-        ])
+        assert all([mdl_name in list(mode_trajs.keys()) for mdl_name in modality_names])
+        assert all(
+            [trajectory_idx < len(mode_trajs[mdl_name]) for mdl_name in modality_names]
+        )
 
         backtracked_multimodal_mode_losses = dict()
         for mdl_name in modality_names:
-            backtracked_multimodal_mode_losses[mdl_name] = mode_trajs[
-                mdl_name][trajectory_idx]
+            backtracked_multimodal_mode_losses[mdl_name] = mode_trajs[mdl_name][
+                trajectory_idx
+            ]
 
         return backtracked_multimodal_mode_losses
 
     @torch.no_grad()
     def eval_step(self, eval_data_loader, num_iters=None, model=None):
-        """ Perfome the evaluation """
+        """Perfome the evaluation"""
         if model is None:
             model = self.model
 
@@ -138,9 +134,7 @@ class Trainer(basic.Trainer):
         for batch_id, (examples, labels) in enumerate(eval_data_loader):
             examples, labels = examples.to(self.device), labels.to(self.device)
 
-            losses = model(data_container=examples,
-                           label=labels,
-                           return_loss=True)
+            losses = model(data_container=examples, label=labels, return_loss=True)
             for loss_key in list(losses.keys()):
                 if loss_key in list(eval_avg_losses.keys()):
                     eval_avg_losses[loss_key].append(losses[loss_key])
@@ -157,16 +151,17 @@ class Trainer(basic.Trainer):
         return eval_avg_losses
 
     def obtain_local_global_ogr_items(self, trainset, evalset):
-        """ We can directly call the self.model in this function to get the global model
-            because the weights from the server are assigned to the client before training """
+        """We can directly call the self.model in this function to get the global model
+        because the weights from the server are assigned to the client before training"""
 
         # we can call eval directly to get the performance of the global model on the local dataset
         # prepare data loaders
-        eval_loader = torch.utils.data.DataLoader(dataset=evalset,
-                                                  shuffle=False,
-                                                  batch_size=1,
-                                                  num_workers=Config.data.get(
-                                                      'workers_per_gpu', 1))
+        eval_loader = torch.utils.data.DataLoader(
+            dataset=evalset,
+            shuffle=False,
+            batch_size=1,
+            num_workers=Config.data.get("workers_per_gpu", 1),
+        )
         # 1. obtain the eval loss of the received global model
         eval_avg_losses = self.eval_step(eval_data_loader=eval_loader)
 
@@ -175,11 +170,13 @@ class Trainer(basic.Trainer):
             dataset=trainset,
             shuffle=False,
             batch_size=1,
-            num_workers=Config.data.get('workers_per_gpu', 1))
+            num_workers=Config.data.get("workers_per_gpu", 1),
+        )
 
         # get the averaged loss on 50 batch size
         eval_subtrainset_avg_losses = self.eval_step(
-            eval_data_loader=eval_trainset_loader, num_iters=50)
+            eval_data_loader=eval_trainset_loader, num_iters=50
+        )
 
         # 2. extract the eval and train loss of the local model
         #   this part of value should be stored in the last position of the loss trajectory
@@ -187,14 +184,20 @@ class Trainer(basic.Trainer):
         local_train_avg_losses = self.backtrack_multimodal_loss_trajectory(
             mode="train",
             modality_names=["RGB", "Flow", "Audio", "Fused"],
-            trajectory_idx=-1)
+            trajectory_idx=-1,
+        )
         local_eval_avg_losses = self.backtrack_multimodal_loss_trajectory(
             mode="eval",
             modality_names=["RGB", "Flow", "Audio", "Fused"],
-            trajectory_idx=-1)
+            trajectory_idx=-1,
+        )
 
-        return eval_avg_losses, eval_subtrainset_avg_losses, \
-                local_eval_avg_losses, local_train_avg_losses
+        return (
+            eval_avg_losses,
+            eval_subtrainset_avg_losses,
+            local_eval_avg_losses,
+            local_train_avg_losses,
+        )
 
     def reweight_losses(self, blending_weights, losses):
         """[Reweight the losses to achieve the gradient blending]
@@ -208,45 +211,44 @@ class Trainer(basic.Trainer):
         modality_names = list(blending_weights.keys())
         reweighted_losses = dict()
         for modl_nm in modality_names:
-            reweighted_losses[
-                modl_nm] = blending_weights[modl_nm] * losses[modl_nm]
+            reweighted_losses[modl_nm] = blending_weights[modl_nm] * losses[modl_nm]
 
         return reweighted_losses
 
-    def train_process(self, config, trainset, evalset, sampler,
-                      blending_weights):
+    def train_process(self, config, trainset, evalset, sampler, blending_weights):
         log_interval = config.log_config["interval"]
-        batch_size = config.trainer['batch_size']
+        batch_size = config.trainer["batch_size"]
 
         logging.info("[Client #%d] Loading the dataset.", self.client_id)
 
         # prepare traindata loaders
-        train_loader = torch.utils.data.DataLoader(dataset=trainset,
-                                                   shuffle=False,
-                                                   batch_size=batch_size,
-                                                   sampler=sampler.get(),
-                                                   num_workers=config.data.get(
-                                                       'workers_per_gpu', 1))
+        train_loader = torch.utils.data.DataLoader(
+            dataset=trainset,
+            shuffle=False,
+            batch_size=batch_size,
+            sampler=sampler.get(),
+            num_workers=config.data.get("workers_per_gpu", 1),
+        )
 
-        eval_loader = torch.utils.data.DataLoader(dataset=evalset,
-                                                  shuffle=False,
-                                                  batch_size=batch_size,
-                                                  sampler=sampler.get(),
-                                                  num_workers=config.data.get(
-                                                      'workers_per_gpu', 1))
+        eval_loader = torch.utils.data.DataLoader(
+            dataset=evalset,
+            shuffle=False,
+            batch_size=batch_size,
+            sampler=sampler.get(),
+            num_workers=config.data.get("workers_per_gpu", 1),
+        )
 
-        epochs = config['epochs']
+        epochs = config["epochs"]
 
         # Initializing the optimizer
-        get_optimizer = getattr(self, "get_optimizer",
-                                optimizers.get_optimizer)
+        get_optimizer = getattr(self, "get_optimizer", optimizers.get_optimizer)
         optimizer = get_optimizer(self.model)
 
         # Initializing the learning rate schedule, if necessary
-        if 'lr_schedule' in config:
-            lr_schedule = optimizers.get_lr_schedule(optimizer,
-                                                     len(train_loader),
-                                                     train_loader)
+        if "lr_schedule" in config:
+            lr_schedule = optimizers.get_lr_schedule(
+                optimizer, len(train_loader), train_loader
+            )
         else:
             lr_schedule = None
 
@@ -258,24 +260,19 @@ class Trainer(basic.Trainer):
         # in order to blend the gradients in the server side
         #   The eval/train loss of the first and last epoches should be recorded
         for epoch in range(1, epochs + 1):
-            epoch_train_losses = {
-                modl_nm: 0.0
-                for modl_nm in supported_modalities
-            }
+            epoch_train_losses = {modl_nm: 0.0 for modl_nm in supported_modalities}
             total_batches = 0
             total_epoch_loss = 0
-            for batch_id, (multimodal_examples,
-                           labels) in enumerate(train_loader):
+            for batch_id, (multimodal_examples, labels) in enumerate(train_loader):
                 labels = labels.to(self.device)
 
                 optimizer.zero_grad()
 
-                losses = self.model.forward(data_container=multimodal_examples,
-                                            label=labels,
-                                            return_loss=True)
+                losses = self.model.forward(
+                    data_container=multimodal_examples, label=labels, return_loss=True
+                )
 
-                weighted_losses = self.reweight_losses(blending_weights,
-                                                       losses)
+                weighted_losses = self.reweight_losses(blending_weights, losses)
 
                 # added the losses
                 weighted_global_loss = 0
@@ -290,21 +287,31 @@ class Trainer(basic.Trainer):
                 optimizer.step()
 
                 if lr_schedule is not None:
-                    lr_schedule.step()
+                    lr_scheduler.step()
 
                 if batch_id % log_interval == 0:
                     if self.client_id == 0:
                         logging.info(
-                            "[Server #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}".
-                            format(os.getpid(), epoch, epochs, batch_id,
-                                   len(train_loader),
-                                   weighted_losses.data.item()))
+                            "[Server #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}".format(
+                                os.getpid(),
+                                epoch,
+                                epochs,
+                                batch_id,
+                                len(train_loader),
+                                weighted_losses.data.item(),
+                            )
+                        )
                     else:
                         logging.info(
-                            "[Client #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}".
-                            format(self.client_id, epoch, epochs, batch_id,
-                                   len(train_loader),
-                                   weighted_losses.data.item()))
+                            "[Client #{}] Epoch: [{}/{}][{}/{}]\tLoss: {:.6f}".format(
+                                self.client_id,
+                                epoch,
+                                epochs,
+                                batch_id,
+                                len(train_loader),
+                                weighted_losses.data.item(),
+                            )
+                        )
                 total_batches = batch_id
             if hasattr(optimizer, "params_state_update"):
                 optimizer.params_state_update()
@@ -315,36 +322,33 @@ class Trainer(basic.Trainer):
 
                 eval_avg_losses = self.eval_step(eval_data_loader=eval_loader)
                 weighted_eval_losses = self.reweight_losses(
-                    blending_weights, eval_avg_losses)
+                    blending_weights, eval_avg_losses
+                )
                 total_eval_loss = 0
                 for modl_nm in supported_modalities:
-                    modl_train_avg_loss = epoch_train_losses[
-                        modl_nm] / total_batches
+                    modl_train_avg_loss = epoch_train_losses[modl_nm] / total_batches
                     modl_eval_avg_loss = eval_avg_losses[modl_nm]
-                    if modl_nm not in list(
-                            self.mm_train_losses_trajectory.keys()):
-                        self.mm_train_losses_trajectory[
-                            modl_nm] = modl_train_avg_loss
+                    if modl_nm not in list(self.mm_train_losses_trajectory.keys()):
+                        self.mm_train_losses_trajectory[modl_nm] = modl_train_avg_loss
                     else:
                         self.mm_train_losses_trajectory[modl_nm].append(
-                            modl_train_avg_loss)
-                    if modl_nm not in list(
-                            self.mm_val_losses_trajectory.keys()):
-                        self.mm_val_losses_trajectory[
-                            modl_nm] = modl_eval_avg_loss
+                            modl_train_avg_loss
+                        )
+                    if modl_nm not in list(self.mm_val_losses_trajectory.keys()):
+                        self.mm_val_losses_trajectory[modl_nm] = modl_eval_avg_loss
                     else:
                         self.mm_val_losses_trajectory[modl_nm].append(
-                            modl_eval_avg_loss)
+                            modl_eval_avg_loss
+                        )
 
                     total_eval_loss += weighted_eval_losses[modl_nm]
 
                 # store the global losses
-                self.global_mm_train_losses_trajectory.append(
-                    epoch_avg_train_loss)
+                self.global_mm_train_losses_trajectory.append(epoch_avg_train_loss)
                 self.global_mm_val_losses_trajectory.append(total_eval_loss)
         self.model.cpu()
 
-        model_type = config['model_name']
+        model_type = config["model_name"]
         filename = f"{model_type}_{self.client_id}_{config['run_id']}.pth"
         self.save_model(filename)
 
@@ -359,21 +363,23 @@ class Trainer(basic.Trainer):
             Whether training was successfully completed.
         """
 
-        if mp.get_start_method(allow_none=True) != 'spawn':
-            mp.set_start_method('spawn', force=True)
+        if mp.get_start_method(allow_none=True) != "spawn":
+            mp.set_start_method("spawn", force=True)
 
         config = Config().trainer._asdict()
-        config['run_id'] = Config().params['run_id']
+        config["run_id"] = Config().params["run_id"]
 
-        train_proc = mp.Process(target=Trainer.train_process,
-                                args=(
-                                    self,
-                                    config,
-                                    trainset,
-                                    evalset,
-                                    sampler,
-                                    blending_weights,
-                                ))
+        train_proc = mp.Process(
+            target=Trainer.train_process,
+            args=(
+                self,
+                config,
+                trainset,
+                evalset,
+                sampler,
+                blending_weights,
+            ),
+        )
         train_proc.start()
         train_proc.join()
 
@@ -382,10 +388,10 @@ class Trainer(basic.Trainer):
         try:
             self.load_model(filename)
         except OSError:  # the model file is not found, training failed
-            logging.info("The training process on client #%d failed.",
-                         self.client_id)
-            self.run_sql_statement("DELETE FROM trainers WHERE run_id = (?)",
-                                   (self.client_id, ))
+            logging.info("The training process on client #%d failed.", self.client_id)
+            self.run_sql_statement(
+                "DELETE FROM trainers WHERE run_id = (?)", (self.client_id,)
+            )
             return False
 
         self.pause_training()
