@@ -80,7 +80,8 @@ class Trainer(basic.Trainer):
             model_name, config=self.config, **tokenizer_kwargs
         )
 
-    def train_model(self, config, trainset, sampler):  # pylint: disable=unused-argument
+    # pylint: disable=unused-argument
+    def train_model(self, config, trainset, sampler, **kwargs):
         """The training loop for HuggingFace models.
 
         Arguments:

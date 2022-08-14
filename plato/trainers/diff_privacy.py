@@ -38,7 +38,8 @@ class Trainer(basic.Trainer):
             errors = ModuleValidator.validate(self.model, strict=False)
             assert len(errors) == 0
 
-    def train_model(self, config, trainset, sampler):
+    # pylint: disable=unused-argument
+    def train_model(self, config, trainset, sampler, **kwargs):
         """The default training loop that supports differential privacy."""
         batch_size = config["batch_size"]
         self.sampler = sampler

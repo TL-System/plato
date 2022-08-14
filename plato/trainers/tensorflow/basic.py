@@ -122,7 +122,8 @@ class Trainer(base.Trainer):
 
         return training_time
 
-    def train_model(self, config, trainset, sampler):
+    # pylint: disable=unused-argument
+    def train_model(self, config, trainset, sampler, **kwargs):
         """Trains the model."""
         # Initializing the loss criterion
         loss_criterion = self.get_loss_criterion()
@@ -160,7 +161,8 @@ class Trainer(base.Trainer):
 
         return accuracy
 
-    def test_model(self, config, testset, sampler):
+    # pylint: disable=unused-argument
+    def test_model(self, config, testset, sampler, **kwargs):
         """Tests the model. Must be compiled first."""
         logging.info("Get loss_criterion on client #%d.", self.client_id)
         loss_criterion = self.get_loss_criterion()

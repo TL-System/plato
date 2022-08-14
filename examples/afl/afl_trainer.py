@@ -21,7 +21,7 @@ from plato.trainers import basic
 class Trainer(basic.Trainer):
     """A federated learning trainer for FEI."""
 
-    def train_model(self, config, trainset, sampler):
+    def train_model(self, config, trainset, sampler, **kwargs):
         """A custom trainer reporting training loss."""
         batch_size = config["batch_size"]
         log_interval = 10

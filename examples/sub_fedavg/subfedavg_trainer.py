@@ -41,7 +41,8 @@ class Trainer(basic.Trainer):
             else 0.5
         )
 
-    def train_model(self, config, trainset, sampler):
+    # pylint: disable=unused-argument
+    def train_model(self, config, trainset, sampler, **kwargs):
         """The custom training loop for Sub-FedAvg(Un)."""
         batch_size = config["batch_size"]
         log_interval = 10

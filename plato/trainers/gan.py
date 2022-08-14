@@ -125,7 +125,8 @@ class Trainer(basic.Trainer):
         self.generator.load_state_dict(torch.load(net_gen_path))
         self.discriminator.load_state_dict(torch.load(net_disc_path))
 
-    def train_model(self, config, trainset, sampler) -> float:
+    # pylint: disable=unused-argument
+    def train_model(self, config, trainset, sampler, **kwargs):
         """The main training loop in a federated learning workload.
 
         Arguments:

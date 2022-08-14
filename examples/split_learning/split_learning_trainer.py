@@ -19,6 +19,7 @@ class Trainer(basic.Trainer):
         # Record the gradients of the cut layer
         self.cut_layer_grad = []
 
+    # pylint: disable=unused-argument
     def train_model(self, config, trainset, sampler, **kwargs):
         batch_size = config["batch_size"]
 

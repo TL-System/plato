@@ -20,7 +20,8 @@ class Trainer(basic.Trainer):
         super().__init__(model=model)
         self.test_personalization = False
 
-    def train_model(self, config, trainset, sampler):
+    # pylint: disable=unused-argument
+    def train_model(self, config, trainset, sampler, **kwargs):
         """A custom training loop for personalized FL."""
         batch_size = config["batch_size"]
         log_interval = 10

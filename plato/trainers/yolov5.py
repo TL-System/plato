@@ -52,7 +52,8 @@ class Trainer(basic.Trainer):
             batch_size, trainset, sampler, extract_features, cut_layer
         )
 
-    def train_model(self, config, trainset, sampler):  # pylint: disable=unused-argument
+    # pylint: disable=unused-argument
+    def train_model(self, config, trainset, sampler, **kwargs):
         """The training loop for YOLOv5.
 
         Arguments:
@@ -338,7 +339,7 @@ class Trainer(basic.Trainer):
                     logits = logits.cpu().detach().numpy()
                     logits = unary_encoding.encode(logits)
                     logits = torch.from_numpy(logits.astype("float32"))
-                    out, __ = self.model.forward(logits.to(device))
+                    out, __ = self.model.forward_from(logits.to(device))
                 else:
                     out, __ = self.model(img)
 

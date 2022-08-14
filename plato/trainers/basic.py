@@ -153,7 +153,8 @@ class Trainer(base.Trainer):
             filename = f"{model_name}_{self.client_id}_{config['run_id']}.pth"
             self.save_model(filename)
 
-    def train_model(self, config, trainset, sampler):
+    # pylint: disable=unused-argument
+    def train_model(self, config, trainset, sampler, **kwargs):
         """The default training loop when a custom training loop is not supplied."""
         batch_size = config["batch_size"]
         self.sampler = sampler
@@ -304,7 +305,7 @@ class Trainer(base.Trainer):
         accuracy = -1
 
         try:
-            accuracy = self.test_model(config, testset, sampler)
+            accuracy = self.test_model(config, testset, sampler, **kwargs)
         except Exception as testing_exception:
             logging.info("Testing on client #%d failed.", self.client_id)
             raise testing_exception
@@ -396,6 +397,7 @@ class Trainer(base.Trainer):
 
         return self.model
 
+    # pylint: disable=unused-argument
     @staticmethod
     def get_train_loader(batch_size, trainset, sampler, **kwargs):
         """
@@ -409,12 +411,15 @@ class Trainer(base.Trainer):
             dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler
         )
 
-    def test_model(self, config, testset, sampler):
+    # pylint: disable=unused-argument
+    def test_model(self, config, testset, sampler, **kwargs):
         """
         Evaluates the model with the provided test dataset and test sampler.
 
         :param testset: the test dataset.
         :param sampler: the test sampler.
+        :param kwargs (optional): Additional keyword arguments.
+
         """
         batch_size = config["batch_size"]
 

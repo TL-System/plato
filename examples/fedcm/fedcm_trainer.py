@@ -32,7 +32,8 @@ class Trainer(basic.Trainer):
         # init delta
         self.delta = None
 
-    def train_model(self, config, trainset, sampler):  # pylint: disable=unused-argument
+    # pylint: disable=unused-argument
+    def train_model(self, config, trainset, sampler, **kwargs):
         """A custom training loop."""
         max_norm = 10
         log_interval = 10
