@@ -26,6 +26,7 @@ jobs:
           pip3 install torch torchvision --extra-index-url https://download.pytorch.org/whl/cpu
           pip3 install -r requirements.txt --upgrade
           pip3 install .
+          pip3 install yolov5
 
       - name: Unit tests
         shell: bash -l {0}
@@ -35,8 +36,5 @@ jobs:
       - name: Training workloads
         shell: bash -l {0}
         run: |
-          ./run --config=configs/MNIST/fedavg_lenet5.yml
-          ./run --config=configs/MNIST/fedavg_cross_silo_lenet5.yml
-          ./run --config=configs/MNIST/fedavg_async_lenet5.yml
-          ./run --config=configs/MNIST/fedavg_lenet5_noniid.yml
-          ./run --config=configs/MNIST/mistnet_lenet5.yml
+          ./run --config=.github/workflows/configs/fedavg_yolov5.yml
+          ./run --config=.github/workflows/configs/mistnet_yolov5.yml
