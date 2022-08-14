@@ -50,15 +50,18 @@ trainer:
     epochs: 10
     batch_size: 32
     optimizer: SGD
-    
+
 algorithm:
     # Aggregation algorithm
     type: mistnet
 
-    cut_layer: relu3
     epsilon: null
 
 parameters:
+    model:
+        num_classes: 10
+        cut_layer: relu3
+
     optimizer:
         lr: 0.01
         momentum: 0.9

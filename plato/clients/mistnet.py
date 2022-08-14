@@ -30,7 +30,7 @@ class Client(simple.Client):
 
         # Perform a forward pass till the cut layer in the model
         features = self.algorithm.extract_features(
-            self.trainset, self.sampler, Config().algorithm.cut_layer
+            self.trainset, self.sampler, Config().parameters.model.cut_layer
         )
 
         training_time = time.perf_counter() - tic
