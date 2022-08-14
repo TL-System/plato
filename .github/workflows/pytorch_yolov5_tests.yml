@@ -1,4 +1,4 @@
-name: PyTorch CI Tests
+name: PyTorch YOLOv5 CI Tests
 
 on:
   push:
