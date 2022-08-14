@@ -22,7 +22,7 @@ class Trainer(base.Trainer):
     def load_model(self, filename=None):
         pass
 
-    def train(self, trainset, sampler, cut_layer=None) -> Tuple[bool, float]:
+    def train(self, trainset, sampler) -> Tuple[bool, float]:
         pass
 
     def test(self, testset) -> float:

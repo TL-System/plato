@@ -52,15 +52,12 @@ class Trainer(basic.Trainer):
             batch_size, trainset, sampler, extract_features, cut_layer
         )
 
-    def train_model(
-        self, config, trainset, sampler, cut_layer=None
-    ):  # pylint: disable=unused-argument
+    def train_model(self, config, trainset, sampler):  # pylint: disable=unused-argument
         """The training loop for YOLOv5.
 
         Arguments:
         config: A dictionary of configuration parameters.
         trainset: The training dataset.
-        cut_layer (optional): The layer which training should start from.
         """
 
         logging.info("[Client #%d] Setting up training parameters.", self.client_id)
@@ -140,7 +137,7 @@ class Trainer(basic.Trainer):
         # Trainloader
         logging.info("[Client #%d] Loading the dataset.", self.client_id)
         train_loader = Trainer.get_train_loader(
-            batch_size, trainset, sampler, cut_layer=cut_layer
+            batch_size, trainset, sampler, cut_layer=self.model.cut_layer
         )
         nb = len(train_loader)
 
@@ -201,10 +198,10 @@ class Trainer(basic.Trainer):
 
                 # Forward
                 with amp.autocast(enabled=cuda):
-                    if cut_layer is None:
+                    if self.model.cut_layer is None:
                         pred = self.model(imgs)
                     else:
-                        pred = self.model.forward_from(imgs, cut_layer)
+                        pred = self.model.forward_from(imgs)
 
                     loss, loss_items = compute_loss(
                         pred, targets.to(self.device)
@@ -341,7 +338,7 @@ class Trainer(basic.Trainer):
                     logits = logits.cpu().detach().numpy()
                     logits = unary_encoding.encode(logits)
                     logits = torch.from_numpy(logits.astype("float32"))
-                    out, __ = self.model.forward_from(logits.to(device))
+                    out, __ = self.model.forward(logits.to(device))
                 else:
                     out, __ = self.model(img)
 

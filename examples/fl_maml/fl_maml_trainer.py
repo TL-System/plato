@@ -20,7 +20,7 @@ class Trainer(basic.Trainer):
         super().__init__(model=model)
         self.test_personalization = False
 
-    def train_model(self, config, trainset, sampler, cut_layer=None):
+    def train_model(self, config, trainset, sampler):
         """A custom training loop for personalized FL."""
         batch_size = config["batch_size"]
         log_interval = 10
@@ -29,7 +29,7 @@ class Trainer(basic.Trainer):
         _train_loader = getattr(self, "train_loader", None)
 
         if callable(_train_loader):
-            train_loader = self.train_loader(batch_size, trainset, sampler, cut_layer)
+            train_loader = self.train_loader(batch_size, trainset, sampler)
         else:
             train_loader = torch.utils.data.DataLoader(
                 dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler
@@ -96,7 +96,6 @@ class Trainer(basic.Trainer):
                 local_optimizer,
                 lr_schedule,
                 train_loader,
-                cut_layer,
                 current_model,
                 loss_criterion,
                 log_interval,
@@ -111,7 +110,6 @@ class Trainer(basic.Trainer):
                 optimizer,
                 meta_lr_schedule,
                 train_loader,
-                cut_layer,
                 self.model,
                 loss_criterion,
                 log_interval,
@@ -148,14 +146,8 @@ class Trainer(basic.Trainer):
                 examples, labels = examples.to(self.device), labels.to(self.device)
 
                 optimizer.zero_grad()
-
-                if cut_layer is None:
-                    outputs = training_model(examples)
-                else:
-                    outputs = training_model.forward_from(examples, cut_layer)
-
+                outputs = training_model(examples)
                 loss = loss_criterion(outputs, labels)
-
                 loss.backward()
 
                 optimizer.step()

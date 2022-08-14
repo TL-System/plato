@@ -19,14 +19,14 @@ class Trainer(basic.Trainer):
         # Record the gradients of the cut layer
         self.cut_layer_grad = []
 
-    def train_model(self, config, trainset, sampler, cut_layer=None):
+    def train_model(self, config, trainset, sampler, **kwargs):
         batch_size = config["batch_size"]
 
         logging.info("[Client #%d] Loading the dataset.", self.client_id)
         _train_loader = getattr(self, "train_loader", None)
 
         if callable(_train_loader):
-            train_loader = self.train_loader(batch_size, trainset, sampler, cut_layer)
+            train_loader = self.train_loader(batch_size, trainset, sampler)
         else:
             train_loader = torch.utils.data.DataLoader(
                 dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler
@@ -64,10 +64,7 @@ class Trainer(basic.Trainer):
 
             examples = examples.detach().requires_grad_(True)
 
-            if cut_layer is None:
-                outputs = self.model(examples)
-            else:
-                outputs = self.model.forward_from(examples, cut_layer)
+            outputs = self.model(examples)
 
             loss = loss_criterion(outputs, labels)
             logging.info(

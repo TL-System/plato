@@ -47,6 +47,7 @@ trainer:
     epochs: 1
     batch_size: 128
     optimizer: SGD
+    lr_scheduler: CosineAnnealingLR
 
 algorithm:
     # Aggregation algorithm
@@ -63,4 +64,4 @@ parameters:
 
     # Learning rate schedule
     learning_rate:
-        lr_schedule: CosineAnnealingLR
+        T_max: 3125 # len(train_loader) * Config().trainer.epochs

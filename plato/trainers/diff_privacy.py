@@ -38,7 +38,7 @@ class Trainer(basic.Trainer):
             errors = ModuleValidator.validate(self.model, strict=False)
             assert len(errors) == 0
 
-    def train_model(self, config, trainset, sampler, cut_layer):
+    def train_model(self, config, trainset, sampler):
         """The default training loop that supports differential privacy."""
         batch_size = config["batch_size"]
         self.sampler = sampler
@@ -54,9 +54,7 @@ class Trainer(basic.Trainer):
         # without the sampler. We will finally use Opacus to recreate the dataloader from the
         # simple dataloader (with poisson sampling).
         trainset = Subset(trainset, list(sampler))
-        self.train_loader = Trainer.get_train_loader(
-            batch_size, trainset, sampler=None, cut_layer=cut_layer
-        )
+        self.train_loader = Trainer.get_train_loader(batch_size, trainset, sampler=None)
 
         # Initializing the loss criterion
         loss_criterion = self.get_loss_criterion()
@@ -102,10 +100,7 @@ class Trainer(basic.Trainer):
                     examples, labels = examples.to(self.device), labels.to(self.device)
                     optimizer.zero_grad(set_to_none=True)
 
-                    if cut_layer is None:
-                        outputs = self.model(examples)
-                    else:
-                        outputs = self.model.forward_from(examples, cut_layer)
+                    outputs = self.model(examples)
 
                     loss = loss_criterion(outputs, labels)
 

@@ -41,7 +41,7 @@ class Trainer(basic.Trainer):
             else 0.5
         )
 
-    def train_model(self, config, trainset, sampler, cut_layer):
+    def train_model(self, config, trainset, sampler):
         """The custom training loop for Sub-FedAvg(Un)."""
         batch_size = config["batch_size"]
         log_interval = 10
@@ -50,7 +50,7 @@ class Trainer(basic.Trainer):
         _train_loader = getattr(self, "train_loader", None)
 
         if callable(_train_loader):
-            train_loader = self.train_loader(batch_size, trainset, sampler, cut_layer)
+            train_loader = self.train_loader(batch_size, trainset, sampler)
         else:
             train_loader = torch.utils.data.DataLoader(
                 dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler
@@ -81,7 +81,7 @@ class Trainer(basic.Trainer):
         self.model.train()
 
         # Initializing the learning rate schedule, if necessary
-        if hasattr(config, "lr_schedule"):
+        if hasattr(config, "lr_scheduler"):
             lr_schedule = optimizers.get_lr_schedule(
                 optimizer, iterations_per_epoch, train_loader
             )
@@ -95,10 +95,7 @@ class Trainer(basic.Trainer):
 
                 optimizer.zero_grad()
 
-                if cut_layer is None:
-                    outputs = self.model(examples)
-                else:
-                    outputs = self.model.forward_from(examples, cut_layer)
+                outputs = self.model(examples)
 
                 loss = loss_criterion(outputs, labels)
 

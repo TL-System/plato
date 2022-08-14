@@ -80,16 +80,13 @@ class Trainer(basic.Trainer):
             model_name, config=self.config, **tokenizer_kwargs
         )
 
-    def train_model(
-        self, config, trainset, sampler, cut_layer=None
-    ):  # pylint: disable=unused-argument
+    def train_model(self, config, trainset, sampler):  # pylint: disable=unused-argument
         """The training loop for HuggingFace models.
 
         Arguments:
         config: A dictionary of configuration parameters.
         trainset: The training dataset.
         sampler: the sampler that extracts a partition for this client.
-        cut_layer (optional): The layer which training should start from.
         """
 
         self.training_args.num_train_epoches = config["epochs"]

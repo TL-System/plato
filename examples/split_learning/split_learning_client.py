@@ -47,20 +47,16 @@ class Client(simple.Client):
 
         assert not Config().clients.do_test
 
-        if self.gradient_received == False:
+        if not self.gradient_received:
             # Perform a forward pass till the cut layer in the model
-            features = self.algorithm.extract_features(
-                self.trainset, self.sampler, Config().parameters.model.cut_layer
-            )
+            features = self.algorithm.extract_features(self.trainset, self.sampler)
 
             # Generate a report for the server, performing model testing if applicable
             return Report(self.sampler.trainset_size(), "features"), features
         else:
             # Perform a complete training with gradients received
             config = Config().trainer._asdict()
-            self.algorithm.complete_train(
-                config, self.trainset, self.sampler, Config().parameters.model.cut_layer
-            )
+            self.algorithm.complete_train(config, self.trainset, self.sampler)
             weights = self.algorithm.extract_weights()
             # Generate a report, signal the end of train
             return Report(self.sampler.trainset_size(), "weights"), weights

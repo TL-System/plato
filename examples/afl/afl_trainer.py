@@ -21,7 +21,7 @@ from plato.trainers import basic
 class Trainer(basic.Trainer):
     """A federated learning trainer for FEI."""
 
-    def train_model(self, config, trainset, sampler, cut_layer=None):
+    def train_model(self, config, trainset, sampler):
         """A custom trainer reporting training loss."""
         batch_size = config["batch_size"]
         log_interval = 10
@@ -31,7 +31,7 @@ class Trainer(basic.Trainer):
         _train_loader = getattr(self, "train_loader", None)
 
         if callable(_train_loader):
-            train_loader = self.train_loader(batch_size, trainset, sampler, cut_layer)
+            train_loader = self.train_loader(batch_size, trainset, sampler)
         else:
             train_loader = torch.utils.data.DataLoader(
                 dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler
@@ -67,10 +67,7 @@ class Trainer(basic.Trainer):
                 examples, labels = examples.to(self.device), labels.to(self.device)
                 optimizer.zero_grad()
 
-                if cut_layer is None:
-                    outputs = self.model(examples)
-                else:
-                    outputs = self.model.forward_from(examples, cut_layer)
+                outputs = self.model(examples)
 
                 loss = loss_criterion(outputs, labels)
 

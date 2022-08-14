@@ -91,9 +91,7 @@ class Server(fedavg.Server):
             features = [self.client_payload[sid]]
             feature_dataset = feature.DataSource(features)
             sampler = all_inclusive.Sampler(feature_dataset)
-            self.algorithm.train(
-                feature_dataset, sampler, Config().parameters.model.cut_layer
-            )
+            self.algorithm.train(feature_dataset, sampler)
             # Test the updated model
             self.accuracy = self.trainer.test(self.testset)
             logging.info(

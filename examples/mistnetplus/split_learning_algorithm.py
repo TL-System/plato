@@ -29,11 +29,10 @@ class Algorithm(fedavg.Algorithm):
         """
         self.gradients_list = deepcopy(gradients)
 
-    def extract_features(self, dataset, sampler, cut_layer: str):
+    def extract_features(self, dataset, sampler):
         """Extracting features using layers before the cut_layer.
 
         dataset: The training or testing dataset.
-        cut_layer: Layers before this one will be used for extracting features.
         """
         self.model.eval()
 
@@ -58,7 +57,7 @@ class Algorithm(fedavg.Algorithm):
         _randomize = getattr(self.trainer, "randomize", None)
 
         for inputs, targets, *__ in data_loader:
-            logits = self.model.forward_to(inputs, cut_layer)
+            logits = self.model.forward_to(inputs)
 
             logits = logits.clone().detach().requires_grad_(True)
 
@@ -77,7 +76,7 @@ class Algorithm(fedavg.Algorithm):
 
         return feature_dataset
 
-    def complete_train(self, config, dataset, sampler, cut_layer: str):
+    def complete_train(self, config, dataset, sampler):
 
         # Sending the model to the device used for training
         self.model.train()
@@ -119,7 +118,7 @@ class Algorithm(fedavg.Algorithm):
         for batch_id, (examples, labels) in enumerate(data_loader):
             optimizer.zero_grad()
 
-            outputs = self.model.forward_to(examples, cut_layer)
+            outputs = self.model.forward_to(examples)
 
             outputs.backward(self.gradients_list[grad_index])
 
@@ -129,5 +128,5 @@ class Algorithm(fedavg.Algorithm):
 
         toc = time.perf_counter()
 
-    def train(self, trainset, sampler, cut_layer=None):
-        self.trainer.train(feature_dataset.FeatureDataset(trainset), sampler, cut_layer)
+    def train(self, trainset, sampler):
+        self.trainer.train(feature_dataset.FeatureDataset(trainset), sampler)

@@ -47,9 +47,7 @@ class Server(fedavg.Server):
 
         # Training the model using all the features received from the client
         sampler = all_inclusive.Sampler(feature_dataset)
-        self.algorithm.train(
-            feature_dataset, sampler, Config().parameters.model.cut_layer
-        )
+        self.algorithm.train(feature_dataset, sampler)
 
         # Test the updated model
         if not hasattr(Config().server, "do_test") or Config().server.do_test:

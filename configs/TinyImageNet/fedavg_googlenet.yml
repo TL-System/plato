@@ -42,12 +42,14 @@ trainer:
     target_accuracy: 0.88
 
     # The machine learning model
+    model_type: torch_hub
     model_name: googlenet
 
     # Number of epoches for local training in each communication round
     epochs: 1
     batch_size: 128
     optimizer: SGD
+    lr_scheduler: StepLR
 
 algorithm:
     # Aggregation algorithm
@@ -60,5 +62,5 @@ parameters:
         weight_decay: 0.0001
 
     learning_rate:
-        # Learning rate schedule
-        lr_schedule: StepLR
+        step_size: 30
+        gamma: 0.1
