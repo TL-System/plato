@@ -80,9 +80,6 @@ trainer:
     epochs: 10
     batch_size: 32
     optimizer: SGD
-    learning_rate: 0.01
-    momentum: 0.9
-    weight_decay: 0.0
 
     # The machine learning model
     model_name: lenet5
@@ -136,3 +133,9 @@ results:
 
     # Plot results (x_axis-y_axis)
     plot: round-accuracy, elapsed_time-accuracy
+
+paramters:
+    optimizer:
+        learning_rate: 0.01
+        momentum: 0.9
+        weight_decay: 0.0
