@@ -43,18 +43,15 @@ trainer:
     # The target accuracy
     target_accuracy: 0.98
 
+    # The machine learning model
+    model_name: lenet5
+
     # Number of epoches for local training in each communication round
     epochs: 1
     batch_size: 10
     optimizer: SGD
-    learning_rate: 0.01
-    momentum: 0.9
-    weight_decay: 0.0
 
     meta_learning_rate: 0.01
-
-    # The machine learning model
-    model_name: lenet5
 
 algorithm:
     # Aggregation algorithm
@@ -69,6 +66,12 @@ algorithm:
     # The number of local aggregation rounds on edge servers before sending
     # aggregated weights to the central server
     local_rounds: 1
+
+parameters:
+    optimizer:
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0
 
 results:
     # Write the following parameter(s) into a CSV

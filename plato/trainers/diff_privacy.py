@@ -13,7 +13,6 @@ from opacus.utils.batch_memory_manager import BatchMemoryManager
 
 from plato.config import Config
 from plato.trainers import basic
-from plato.utils import optimizers
 
 
 class Trainer(basic.Trainer):
@@ -39,7 +38,8 @@ class Trainer(basic.Trainer):
             errors = ModuleValidator.validate(self.model, strict=False)
             assert len(errors) == 0
 
-    def train_model(self, config, trainset, sampler, cut_layer):
+    # pylint: disable=unused-argument
+    def train_model(self, config, trainset, sampler, **kwargs):
         """The default training loop that supports differential privacy."""
         batch_size = config["batch_size"]
         self.sampler = sampler
@@ -55,24 +55,15 @@ class Trainer(basic.Trainer):
         # without the sampler. We will finally use Opacus to recreate the dataloader from the
         # simple dataloader (with poisson sampling).
         trainset = Subset(trainset, list(sampler))
-        self.train_loader = Trainer.get_train_loader(
-            batch_size, trainset, sampler=None, cut_layer=cut_layer
-        )
+        self.train_loader = Trainer.get_train_loader(batch_size, trainset, sampler=None)
 
         # Initializing the loss criterion
-        loss_criterion = Trainer.get_loss_criterion()
+        loss_criterion = self.get_loss_criterion()
 
         # Initializing the optimizer
-        get_optimizer = getattr(self, "get_optimizer", optimizers.get_optimizer)
-        optimizer = get_optimizer(self.model)
-
-        # Initializing the learning rate schedule, if necessary
-        if "lr_schedule" in config:
-            lr_schedule = optimizers.get_lr_schedule(
-                optimizer, len(self.train_loader), self.train_loader
-            )
-        else:
-            lr_schedule = None
+        optimizer = self.get_optimizer(self.model)
+        lr_scheduler = self.get_lr_scheduler(config, optimizer)
+        optimizer = self._adjust_lr(config, lr_scheduler, optimizer)
 
         self.model.to(self.device)
         total_epochs = config["epochs"]
@@ -110,10 +101,7 @@ class Trainer(basic.Trainer):
                     examples, labels = examples.to(self.device), labels.to(self.device)
                     optimizer.zero_grad(set_to_none=True)
 
-                    if cut_layer is None:
-                        outputs = self.model(examples)
-                    else:
-                        outputs = self.model.forward_from(examples, cut_layer)
+                    outputs = self.model(examples)
 
                     loss = loss_criterion(outputs, labels)
 
@@ -129,8 +117,8 @@ class Trainer(basic.Trainer):
                         "on_train_step_end", self, config, batch=batch_id, loss=loss
                     )
 
-            if lr_schedule is not None:
-                lr_schedule.step()
+            if lr_scheduler is not None:
+                lr_scheduler.step()
 
             if hasattr(optimizer, "params_state_update"):
                 optimizer.params_state_update()

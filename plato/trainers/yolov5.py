@@ -8,7 +8,7 @@ import yaml
 
 from torch import nn, optim
 from torch.cuda import amp
-from torch.optim import lr_scheduler
+from torch.optim.lr_scheduler import LambdaLR
 from tqdm import tqdm
 from yolov5.utils.general import (
     NCOLS,
@@ -52,15 +52,13 @@ class Trainer(basic.Trainer):
             batch_size, trainset, sampler, extract_features, cut_layer
         )
 
-    def train_model(
-        self, config, trainset, sampler, cut_layer=None
-    ):  # pylint: disable=unused-argument
+    # pylint: disable=unused-argument
+    def train_model(self, config, trainset, sampler, **kwargs):
         """The training loop for YOLOv5.
 
         Arguments:
         config: A dictionary of configuration parameters.
         trainset: The training dataset.
-        cut_layer (optional): The layer which training should start from.
         """
 
         logging.info("[Client #%d] Setting up training parameters.", self.client_id)
@@ -73,7 +71,7 @@ class Trainer(basic.Trainer):
         nc = Config().data.num_classes  # number of classes
         names = Config().data.classes  # class names
 
-        with open(Config().trainer.train_params) as f:
+        with open(Config().parameters.trainer.train_params, encoding="utf-8") as f:
             hyp = yaml.load(f, Loader=yaml.SafeLoader)  # load hyps
 
         freeze = []  # parameter names to freeze (full or partial)
@@ -130,7 +128,7 @@ class Trainer(basic.Trainer):
             )  # linear
         else:
             lf = one_cycle(1, hyp["lrf"], epochs)  # cosine 1->hyp['lrf']
-        lr_schedule = lr_scheduler.LambdaLR(optimizer, lr_lambda=lf)
+        lr_scheduler = LambdaLR(optimizer, lr_lambda=lf)
 
         # Image sizes
         nl = self.model.model[
@@ -140,7 +138,7 @@ class Trainer(basic.Trainer):
         # Trainloader
         logging.info("[Client #%d] Loading the dataset.", self.client_id)
         train_loader = Trainer.get_train_loader(
-            batch_size, trainset, sampler, cut_layer=cut_layer
+            batch_size, trainset, sampler, cut_layer=self.model.cut_layer
         )
         nb = len(train_loader)
 
@@ -201,10 +199,10 @@ class Trainer(basic.Trainer):
 
                 # Forward
                 with amp.autocast(enabled=cuda):
-                    if cut_layer is None:
+                    if self.model.cut_layer is None:
                         pred = self.model(imgs)
                     else:
-                        pred = self.model.forward_from(imgs, cut_layer)
+                        pred = self.model.forward_from(imgs)
 
                     loss, loss_items = compute_loss(
                         pred, targets.to(self.device)
@@ -234,7 +232,7 @@ class Trainer(basic.Trainer):
                     )
                 )
 
-            lr_schedule.step()
+            lr_scheduler.step()
 
     @staticmethod
     def process_batch(detections, labels, iouv):

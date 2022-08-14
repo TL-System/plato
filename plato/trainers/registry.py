@@ -3,30 +3,18 @@ Having a registry of all available classes is convenient for retrieving an insta
 based on a configuration at run-time.
 """
 import logging
-from collections import OrderedDict
 
 from plato.config import Config
 
 if hasattr(Config().trainer, "use_mindspore"):
-    from plato.trainers.mindspore import (
-        basic as basic_mindspore,
-    )
+    from plato.trainers.mindspore import basic as basic_mindspore
 
-    registered_trainers = OrderedDict(
-        [
-            ("basic", basic_mindspore.Trainer),
-        ]
-    )
+    registered_trainers = {"basic": basic_mindspore.Trainer}
+
 elif hasattr(Config().trainer, "use_tensorflow"):
-    from plato.trainers.tensorflow import (
-        basic as basic_tensorflow,
-    )
+    from plato.trainers.tensorflow import basic as basic_tensorflow
 
-    registered_trainers = OrderedDict(
-        [
-            ("basic", basic_tensorflow.Trainer),
-        ]
-    )
+    registered_trainers = {"basic": basic_tensorflow.Trainer}
 else:
     from plato.trainers import (
         basic,
@@ -35,14 +23,12 @@ else:
         gan,
     )
 
-    registered_trainers = OrderedDict(
-        [
-            ("basic", basic.Trainer),
-            ("diff_privacy", diff_privacy.Trainer),
-            ("pascal_voc", pascal_voc.Trainer),
-            ("gan", gan.Trainer),
-        ]
-    )
+    registered_trainers = {
+        "basic": basic.Trainer,
+        "diff_privacy": diff_privacy.Trainer,
+        "pascal_voc": pascal_voc.Trainer,
+        "gan": gan.Trainer,
+    }
 
 
 def get(model=None):
@@ -59,8 +45,6 @@ def get(model=None):
 
         return huggingface.Trainer(model)
     elif trainer_name in registered_trainers:
-        registered_trainer = registered_trainers[trainer_name](model)
+        return registered_trainers[trainer_name](model)
     else:
         raise ValueError(f"No such trainer: {trainer_name}")
-
-    return registered_trainer

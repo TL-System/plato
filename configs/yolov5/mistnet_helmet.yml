@@ -80,14 +80,17 @@ trainer:
 
     # The machine learning model
     model_name: yolov5
-    model_config: configs/yolov5/helmet_yolov5s.yaml
-    train_params: configs/yolov5/data/hyps/hyp.scratch.yaml
-    # number of classes
-    num_classes: 2
 
 algorithm:
     # Aggregation algorithm
     type: mistnet
-
-    cut_layer: 4
     epsilon: 100
+
+parameters:
+    model:
+        model_config: configs/yolov5/helmet_yolov5s.yaml
+        num_classes: 2
+        cut_layer: 4
+
+    trainer:
+        train_params: configs/yolov5/data/hyps/hyp.scratch.yaml

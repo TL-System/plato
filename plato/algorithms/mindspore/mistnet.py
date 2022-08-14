@@ -22,11 +22,10 @@ class Algorithm(fedavg.Algorithm):
     server.
     """
 
-    def extract_features(self, dataset, sampler, cut_layer, epsilon=None):
+    def extract_features(self, dataset, sampler, epsilon=None):
         """Extracting features using layers before the cut_layer.
 
         dataset: The training or testing dataset.
-        cut_layer: Layers before this one will be used for extracting features.
         epsilon: If epsilon is not None, local differential privacy should be
                 applied to the features extracted.
         """
@@ -40,7 +39,7 @@ class Algorithm(fedavg.Algorithm):
             inputs = mindspore.Tensor(inputs)
             targets = mindspore.Tensor(targets)
 
-            logits = self.model.forward_to(inputs, cut_layer)
+            logits = self.model.forward_to(inputs)
 
             if epsilon is not None:
                 logits = logits.asnumpy()

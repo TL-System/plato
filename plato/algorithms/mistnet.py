@@ -20,11 +20,10 @@ class Algorithm(fedavg.Algorithm):
     server.
     """
 
-    def extract_features(self, dataset, sampler, cut_layer: str):
+    def extract_features(self, dataset, sampler):
         """Extracting features using layers before the cut_layer.
 
         dataset: The training or testing dataset.
-        cut_layer: Layers before this one will be used for extracting features.
         """
         self.model.eval()
 
@@ -34,20 +33,20 @@ class Algorithm(fedavg.Algorithm):
 
         tic = time.perf_counter()
 
-        feature_dataset = []
+        features_dataset = []
 
         for inputs, targets, *__ in data_loader:
             with torch.no_grad():
-                logits = self.model.forward_to(inputs, cut_layer)
-            feature_dataset.append((logits, targets))
+                logits = self.model.forward_to(inputs)
+            features_dataset.append((logits, targets))
 
         toc = time.perf_counter()
         logging.info("[Client #%s] Time used: %.2f seconds.", self.client_id, toc - tic)
 
-        return feature_dataset
+        return features_dataset
 
-    def train(self, trainset, sampler, cut_layer=None):
+    def train(self, trainset, sampler):
         """Train the neural network model after the cut layer."""
         self.trainer.train(
-            feature_dataset.FeatureDataset(trainset.feature_dataset), sampler, cut_layer
+            feature_dataset.FeatureDataset(trainset.feature_dataset), sampler
         )

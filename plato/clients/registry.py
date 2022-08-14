@@ -5,7 +5,6 @@ Having a registry of all available classes is convenient for retrieving an insta
 on a configuration at run-time.
 """
 import logging
-from collections import OrderedDict
 
 from plato.config import Config
 from plato.clients import (
@@ -13,12 +12,10 @@ from plato.clients import (
     mistnet,
 )
 
-registered_clients = OrderedDict(
-    [
-        ("simple", simple.Client),
-        ("mistnet", mistnet.Client),
-    ]
-)
+registered_clients = {
+    "simple": simple.Client,
+    "mistnet": mistnet.Client,
+}
 
 
 def get(model=None, datasource=None, algorithm=None, trainer=None):

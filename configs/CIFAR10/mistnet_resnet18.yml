@@ -14,7 +14,7 @@ clients:
     outbound_processors:
         - feature_randomized_response
         - feature_unbatch
-        
+
 server:
     address: 127.0.0.1
     port: 8000
@@ -42,20 +42,25 @@ trainer:
     # The target accuracy
     target_accuracy: 0.95
 
+    # The machine learning model
+    model_name: resnet_18
+
     # Number of epoches for local training in each communication round
     epochs: 10
     batch_size: 16
     optimizer: SGD
-    learning_rate: 0.01
-    momentum: 0.5
-    weight_decay: 0.0
-
-    # The machine learning model
-    model_name: resnet_18
 
 algorithm:
     # Aggregation algorithm
     type: mistnet
-
-    cut_layer: layer1
     epsilon: null
+
+parameters:
+    model:
+        num_classes: 10
+        cut_layer: layer1
+
+    optimizer:
+        lr: 0.01
+        momentum: 0.5
+        weight_decay: 0.0

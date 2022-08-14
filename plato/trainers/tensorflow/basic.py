@@ -79,7 +79,7 @@ class Trainer(base.Trainer):
 
         self.model.load_weights(model_path)
 
-    def train_process(self, config, trainset, sampler, cut_layer=None):
+    def train_process(self, config, trainset, sampler):
         """The main training loop in a federated learning workload, run in
           a separate process with a new CUDA context, so that CUDA memory
           can be released after the training completes.
@@ -89,42 +89,41 @@ class Trainer(base.Trainer):
         config: a dictionary of configuration parameters.
         trainset: The training dataset.
         sampler: the sampler that extracts a partition for this client.
-        cut_layer (optional): The layer which training should start from.
         """
         try:
-            self.train_model(config, trainset, sampler.get(), cut_layer)
+            self.train_model(config, trainset, sampler.get())
         except Exception as training_exception:
             logging.info(
                 "Training on client #%d failed: %s", self.client_id, training_exception
             )
             raise training_exception
 
-    def train(self, trainset, sampler, cut_layer=None, **kwargs) -> float:
+    def train(self, trainset, sampler, **kwargs) -> float:
         """The main training loop in a federated learning workload.
 
         Arguments:
         trainset: The training dataset.
         sampler: the sampler that extracts a partition for this client.
-        cut_layer (optional): The layer which training should start from.
         """
         config = Config().trainer._asdict()
         config["run_id"] = Config().params["run_id"]
         if hasattr(Config().trainer, "max_concurrency"):
             # reserved for mp.Process
             tic = time.perf_counter()
-            self.train_process(config, trainset, sampler, cut_layer)
+            self.train_process(config, trainset, sampler)
             toc = time.perf_counter()
             self.pause_training()
         else:
             tic = time.perf_counter()
-            self.train_process(config, trainset, sampler, cut_layer)
+            self.train_process(config, trainset, sampler)
             toc = time.perf_counter()
 
         training_time = toc - tic
 
         return training_time
 
-    def train_model(self, config, trainset, sampler, cut_layer=None):
+    # pylint: disable=unused-argument
+    def train_model(self, config, trainset, sampler, **kwargs):
         """Trains the model."""
         # Initializing the loss criterion
         loss_criterion = self.get_loss_criterion()
@@ -134,7 +133,7 @@ class Trainer(base.Trainer):
         if callable(get_optimizer):
             optimizer = self.get_optimizer(self.model)
         else:
-            optimizer = tf.keras.optimizers.Adam(config["learning_rate"])
+            optimizer = tf.keras.optimizers.Adam(Config().parameters.optimizer.lr)
 
         self.model.compile(
             optimizer=optimizer,
@@ -162,7 +161,8 @@ class Trainer(base.Trainer):
 
         return accuracy
 
-    def test_model(self, config, testset, sampler):
+    # pylint: disable=unused-argument
+    def test_model(self, config, testset, sampler, **kwargs):
         """Tests the model. Must be compiled first."""
         logging.info("Get loss_criterion on client #%d.", self.client_id)
         loss_criterion = self.get_loss_criterion()
@@ -173,7 +173,7 @@ class Trainer(base.Trainer):
         if callable(get_optimizer):
             optimizer = self.get_optimizer(self.model)
         else:
-            optimizer = tf.keras.optimizers.Adam(config["learning_rate"])
+            optimizer = tf.keras.optimizers.Adam(Config().parameters.optimizer.lr)
 
         self.model.compile(
             optimizer=optimizer,
