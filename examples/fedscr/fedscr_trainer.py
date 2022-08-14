@@ -210,12 +210,6 @@ class Trainer(basic.Trainer):
 
         # Add weight divergence and average update to client report
         if self.use_adaptive is True:
-            add_to_report = {
-                "div_from_global": self.div_from_global,
-                "avg_update": self.avg_update,
-                "final_loss": self.train_loss.data.item(),
-            }
-
             # Calculate weight divergence between local and global model
             self.div_from_global = self.compute_weight_divergence()
             logging.info(
@@ -223,14 +217,6 @@ class Trainer(basic.Trainer):
                 self.client_id,
                 self.div_from_global,
             )
-
-            checkpoint_path = Config().params["checkpoint_path"]
-            model_name = Config().trainer.model_name
-
-            report_path = f"{checkpoint_path}/{model_name}_{self.client_id}.pkl"
-
-            with open(report_path, "wb") as file:
-                pickle.dump(add_to_report, file)
 
         self.model.load_state_dict(self.total_grad, strict=True)
 

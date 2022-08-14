@@ -3,11 +3,9 @@ A federated learning client of FedSCR.
 """
 
 import logging
-import pickle
 from types import SimpleNamespace
 
 from plato.clients import simple
-from plato.config import Config
 
 
 class Client(simple.Client):
@@ -31,24 +29,9 @@ class Client(simple.Client):
 
     def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
         """Wrap up generating the report with any additional information."""
-
         if self.trainer.use_adaptive:
-            additional_info = self.get_additional_info()
-            report.div_from_global = additional_info["div_from_global"]
-            report.avg_update = additional_info["avg_update"]
-            report.loss = additional_info["final_loss"]
+            report.div_from_global = self.trainer.div_from_global
+            report.avg_update = self.trainer.avg_update
+            report.loss = self.trainer.train_loss.data.item()
 
         return report
-
-    # pylint: disable=protected-access
-    def get_additional_info(self):
-        """Retrieve the average weight update and weight divergence."""
-        model_path = Config().params["checkpoint_path"]
-        model_name = Config().trainer.model_name
-
-        report_path = f"{model_path}/{model_name}_{self.client_id}.pkl"
-
-        with open(report_path, "rb") as file:
-            additional_info = pickle.load(file)
-
-        return additional_info
