@@ -44,8 +44,8 @@ class Trainer(basic.Trainer):
         self.div_from_global = None
         self.orig_weights = None
 
-    def prune_updates(self):
-        """Prune the weight updates by setting some updates to 0."""
+    def prune_update(self):
+        """Prune the weight update by setting some parameters in update to 0."""
         self.load_acc_grads()
 
         conv_updates = OrderedDict()
@@ -64,8 +64,8 @@ class Trainer(basic.Trainer):
                 aggregated_channels = self.aggregate_channels(delta)
                 aggregated_filters = self.aggregate_filters(delta)
 
-                delta = self.prune_channel_updates(aggregated_channels, delta)
-                delta = self.prune_filter_updates(aggregated_filters, delta)
+                delta = self.prune_channels(aggregated_channels, delta)
+                delta = self.prune_filters(aggregated_filters, delta)
 
                 delta_name = f"{orig_name}.weight"
                 self.all_grads[i] = orig_delta - delta
@@ -119,16 +119,16 @@ class Trainer(basic.Trainer):
 
         return aggregated_filters
 
-    def prune_channel_updates(self, aggregated_channels, delta):
-        """Prune the channel updates that lie below the FedSCR threshold."""
+    def prune_channels(self, aggregated_channels, delta):
+        """Prune the channels in update that lie below the FedSCR threshold."""
         for i, norm in enumerate(aggregated_channels):
             if norm < self.update_threshold:
                 delta[:, i, :, :] = 0
 
         return delta
 
-    def prune_filter_updates(self, aggregated_filters, delta):
-        """Prune the filter updates that lie below the FedSCR threshold."""
+    def prune_filters(self, aggregated_filters, delta):
+        """Prune the filters in update that lie below the FedSCR threshold."""
         for i, norm in enumerate(aggregated_filters):
             if norm < self.update_threshold:
                 delta[i, :, :, :] = 0
@@ -139,9 +139,6 @@ class Trainer(basic.Trainer):
         """Save the accumulated client gradients for the next communication round."""
         model_name = Config().trainer.model_name
         checkpoint_path = Config().params["checkpoint_path"]
-
-        if not os.path.exists(checkpoint_path):
-            os.makedirs(checkpoint_path)
 
         acc_grad_path = (
             f"{checkpoint_path}/{model_name}_client{self.client_id}_grad.pth"
@@ -171,9 +168,7 @@ class Trainer(basic.Trainer):
             self.all_grads = [0] * count
 
     def compute_pruned_amount(self):
-        """
-        Compute the pruned percentage of the entire model.
-        """
+        """Compute the pruned percentage of the entire model."""
         nonzero = 0
         total = 0
         for key in sorted(self.total_grad.keys()):
@@ -196,21 +191,9 @@ class Trainer(basic.Trainer):
 
     def train_run_end(self, config):
         """Method called at the end of training run."""
-        # Calculate weight divergence between local and global model, used for adaptive algorithm
-        self.div_from_global = self.compute_weight_divergence()
-        logging.info(
-            "[Client #%d] Weight divergence: %.2f", self.client_id, self.div_from_global
-        )
-
-        checkpoint_path = Config().params["checkpoint_path"]
-        model_name = Config().trainer.model_name
-
-        if not os.path.exists(checkpoint_path):
-            os.makedirs(checkpoint_path)
-
         # Get the overall weight updates
         logging.info("[Client #%d] Pruning weight updates.", self.client_id)
-        self.prune_updates()
+        self.prune_update()
         logging.info(
             "[Client #%d] SCR ratio (pruned amount): %.2f%%",
             self.client_id,
@@ -232,6 +215,17 @@ class Trainer(basic.Trainer):
                 "avg_update": self.avg_update,
                 "final_loss": self.train_loss.data.item(),
             }
+
+            # Calculate weight divergence between local and global model
+            self.div_from_global = self.compute_weight_divergence()
+            logging.info(
+                "[Client #%d] Weight divergence: %.2f",
+                self.client_id,
+                self.div_from_global,
+            )
+
+            checkpoint_path = Config().params["checkpoint_path"]
+            model_name = Config().trainer.model_name
 
             report_path = f"{checkpoint_path}/{model_name}_{self.client_id}.pkl"
 
