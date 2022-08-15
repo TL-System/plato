@@ -1,0 +1,181 @@
+
+general:
+
+    # performing different running mode
+    # for different purposes
+    # - central_code_test
+    # - central
+    # - script
+    # - code_test
+    # - user
+
+    running_mode: user
+
+    file_logging: True
+
+clients:
+    # Type
+    type: simple
+
+    # The total number of clients
+    total_clients: 100
+
+    # The number of clients selected in each round
+    per_round: 30
+
+    do_data_tranform_logging: True
+
+    # Should the clients compute test accuracy locally?
+    do_test: True
+
+    # Should the client only perfrom the eval test without training
+    # under the contrastive ssl.
+    # only perfrom the training and test for the downstream task,
+    # i.e., personalziation in each client
+    only_personalization: False
+
+    # whether perform the eval test at the final round
+    # on all clients
+    do_final_personalization: True
+    # Minotor the self-supervised learning by knn for
+    # every 1 round
+    test_interval: 10
+    # Train the personalized model based on the
+    # learned representation every 1 rounds
+    pers_learning_interval: 10
+
+    # Whether simulate clients or not
+    simulation: true
+
+    random_seed: 1
+
+server:
+    address: 127.0.0.1
+    port: 8002
+    synchronous: true
+    do_test: false
+
+    ping_interval: 12000
+    ping_timeout: 12000
+
+    # for the paths of models; checkpoints; results,
+    # they utilize the same name, following the one defined in
+    # plato.config:
+    # {ssl_method_name}_{model_name}_{global_model_name}_{personalized_model_name}_{datasource}
+    # - ssl_method_name: data.augment_transformer_name
+    # - model_name: trainer.model_name
+    # - global_model_name: data.global_model_name
+    # - personalized_model_name: data.personalized_model_name
+    # - datasource: data.datasource
+
+    # set xxx here as the config will set the path by itself
+    # thus we do not need to repeatly reset these paths
+    model_path: xxx
+    checkpoint_path: xxx
+
+
+data:
+    # The training and testing dataset
+    datasource: STL10
+
+    partition_size: 80
+    test_partition_size: 100
+
+    # IID or non-IID?
+    sampler: noniid
+    testset_sampler: noniid
+
+    # The concentration parameter for the Dirichlet distribution
+    concentration: 0.3
+
+    # The random seed for sampling data
+    random_seed: 1
+
+
+trainer:
+    # The type of the trainer
+    type: basic
+
+    # The maximum number of training rounds
+    rounds: 120
+
+    # Whether the training should use multiple GPUs if available
+    parallelized: false
+
+    # The maximum number of clients running concurrently
+    max_concurrency: 3
+
+    # The target accuracy
+    target_accuracy: 0.98
+
+    # Number of epochs for local training in each communication round
+    #   The user is expected to carefully choose the batch_size to avoid
+    # the memory allocation issue as the contrastive samples occupy more
+    # space as more samples will be contained within one loading.
+    epochs: 3
+    batch_size: 64
+
+    optimizer: SGD
+    learning_rate: 0.01
+    momentum: 0.9
+    weight_decay: 0.000001
+
+    # Learning rate schedule
+    lr_schedule: MultiStepLR
+    lr_gamma: 0.1
+    lr_milestones: 150,300
+
+    epoch_log_interval: 1
+    epoch_model_log_interval: 50
+    batch_log_interval: 50
+
+    # Number of epochs for local training in each communication round
+    #   The batch size for the downstream task can be larger as it
+    # does not utilize the
+    pers_epochs: 10
+    pers_batch_size: 64
+    pers_optimizer: SGD
+    # lr = 0.1 * batch_size / 256, see section B.6 and B.7 of SimCLR paper.
+    pers_learning_rate: 0.01
+    pers_momentum: 0.9
+    pers_weight_decay: 0.0
+
+    # currently, we only support CosineAnnealingLR
+    pers_lr_schedule: MultiStepLR
+    pers_lr_milestones: 30,40
+    pers_lr_gamma: 0.1
+
+    pers_epoch_log_interval: 2
+    pers_epoch_model_log_interval: 10
+
+    # The machine learning model,
+    # it behaves as the encoder for the ssl method
+    # the final fc layer will be removed
+    # however, in the central test, we do not use this
+    #   but use the custom model
+    model_name: resnet_18
+    personalized_model_name: resnet_18
+    # whether to maintain the state of the trained personalized
+    # model in each round
+    # In general, for the contrastive self-supervised learning
+    # every eval test should be a new learning process to train
+    # the randomly initialized personalized model
+    # Thus, setting do_maintain_per_state to be false to follow
+    # this rule.
+    # However, in some cases, we want to maintain the state of the
+    # trained personalized model in each round.
+    # Then, setting do_maintain_per_state to be True to follow this
+    # rule.
+    do_maintain_per_state: False
+
+    # encoder, whole
+    global_model_name: encoder
+
+    num_classes: 10
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg
+
+results:
+    result_path: xxx
