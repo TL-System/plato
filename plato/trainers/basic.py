@@ -14,7 +14,9 @@ import torch
 from plato.config import Config
 from plato.models import registry as models_registry
 from plato.trainers import base
-from plato.utils import optimizers
+from plato.trainers import optimizers
+from plato.trainers import lr_schedulers
+from plato.trainers import loss_funcs
 from plato.callbacks.handler import CallbackHandler
 from plato.callbacks.trainer import PrintProgressCallback
 
@@ -126,7 +128,7 @@ class Trainer(base.Trainer):
             time.sleep(sleep_seconds)
             logging.info("[Client #%d] Woke up.", self.client_id)
 
-    def train_process(self, config, trainset, sampler, cut_layer=None, **kwargs):
+    def train_process(self, config, trainset, sampler, **kwargs):
         """
         The main training loop in a federated learning workload, run in a
         separate process with a new CUDA context, so that CUDA memory can be
@@ -137,11 +139,10 @@ class Trainer(base.Trainer):
         config: a dictionary of configuration parameters.
         trainset: The training dataset.
         sampler: The sampler that extracts a partition for this client.
-        cut_layer (optional): The layer which training should start from.
         kwargs (optional): Additional keyword arguments.
         """
         try:
-            self.train_model(config, trainset, sampler.get(), cut_layer, **kwargs)
+            self.train_model(config, trainset, sampler.get(), **kwargs)
         except Exception as training_exception:
             logging.info("Training on client #%d failed.", self.client_id)
             raise training_exception
@@ -152,7 +153,8 @@ class Trainer(base.Trainer):
             filename = f"{model_name}_{self.client_id}_{config['run_id']}.pth"
             self.save_model(filename)
 
-    def train_model(self, config, trainset, sampler, cut_layer):
+    # pylint: disable=unused-argument
+    def train_model(self, config, trainset, sampler, **kwargs):
         """The default training loop when a custom training loop is not supplied."""
         batch_size = config["batch_size"]
         self.sampler = sampler
@@ -161,39 +163,15 @@ class Trainer(base.Trainer):
         self.train_run_start(config)
         self.callback_handler.call_event("on_train_run_start", self, config)
 
-        self.train_loader = Trainer.get_train_loader(
-            batch_size, trainset, sampler, cut_layer=cut_layer
-        )
+        self.train_loader = Trainer.get_train_loader(batch_size, trainset, sampler)
 
         # Initializing the loss criterion
         loss_criterion = self.get_loss_criterion()
 
         # Initializing the optimizer
-        get_optimizer = getattr(self, "get_optimizer", optimizers.get_optimizer)
-        optimizer = get_optimizer(self.model)
-
-        # Initializing the learning rate schedule, if necessary
-        if "lr_schedule" in config:
-            lr_schedule = optimizers.get_lr_schedule(
-                optimizer, len(self.train_loader), self.train_loader
-            )
-        else:
-            lr_schedule = None
-
-        # Scheduling the learning rate globally if required
-        if (
-            hasattr(Config().trainer, "global_lr_scheduler")
-            and Config().trainer.global_lr_scheduler
-            and lr_schedule
-        ):
-            lr_schedule_copy = copy.deepcopy(lr_schedule)
-
-            for __ in range(self.current_round - 1):
-                for __ in range(Config().trainer.epochs):
-                    lr_schedule_copy.step()
-
-            initial_lr = lr_schedule_copy.get_last_lr()
-            optimizer.param_groups[0]["lr"] = initial_lr[0]
+        optimizer = self.get_optimizer(self.model)
+        lr_scheduler = self.get_lr_scheduler(config, optimizer)
+        optimizer = self._adjust_lr(config, lr_scheduler, optimizer)
 
         self.model.to(self.device)
         self.model.train()
@@ -208,10 +186,7 @@ class Trainer(base.Trainer):
                 examples, labels = examples.to(self.device), labels.to(self.device)
                 optimizer.zero_grad()
 
-                if cut_layer is None:
-                    outputs = self.model(examples)
-                else:
-                    outputs = self.model.forward_from(examples, cut_layer)
+                outputs = self.model(examples)
 
                 loss = loss_criterion(outputs, labels)
 
@@ -227,8 +202,8 @@ class Trainer(base.Trainer):
                     "on_train_step_end", self, config, batch=batch_id, loss=loss
                 )
 
-            if lr_schedule is not None:
-                lr_schedule.step()
+            if lr_scheduler is not None:
+                lr_scheduler.step()
 
             if hasattr(optimizer, "params_state_update"):
                 optimizer.params_state_update()
@@ -260,13 +235,12 @@ class Trainer(base.Trainer):
         self.train_run_end(config)
         self.callback_handler.call_event("on_train_run_end", self, config)
 
-    def train(self, trainset, sampler, cut_layer=None, **kwargs) -> float:
+    def train(self, trainset, sampler, **kwargs) -> float:
         """The main training loop in a federated learning workload.
 
         Arguments:
         trainset: The training dataset.
         sampler: the sampler that extracts a partition for this client.
-        cut_layer (optional): The layer which training should start from.
         kwargs (optional): Additional keyword arguments.
 
         Returns:
@@ -286,7 +260,7 @@ class Trainer(base.Trainer):
 
             train_proc = mp.Process(
                 target=self.train_process,
-                args=(config, trainset, sampler, cut_layer),
+                args=(config, trainset, sampler),
                 kwargs=kwargs,
             )
             train_proc.start()
@@ -306,7 +280,7 @@ class Trainer(base.Trainer):
             self.pause_training()
         else:
             tic = time.perf_counter()
-            self.train_process(config, trainset, sampler, cut_layer, **kwargs)
+            self.train_process(config, trainset, sampler, **kwargs)
             toc = time.perf_counter()
 
         training_time = toc - tic
@@ -331,7 +305,7 @@ class Trainer(base.Trainer):
         accuracy = -1
 
         try:
-            accuracy = self.test_model(config, testset, sampler)
+            accuracy = self.test_model(config, testset, sampler, **kwargs)
         except Exception as testing_exception:
             logging.info("Testing on client #%d failed.", self.client_id)
             raise testing_exception
@@ -423,6 +397,7 @@ class Trainer(base.Trainer):
 
         return self.model
 
+    # pylint: disable=unused-argument
     @staticmethod
     def get_train_loader(batch_size, trainset, sampler, **kwargs):
         """
@@ -436,12 +411,15 @@ class Trainer(base.Trainer):
             dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler
         )
 
-    def test_model(self, config, testset, sampler):
+    # pylint: disable=unused-argument
+    def test_model(self, config, testset, sampler, **kwargs):
         """
         Evaluates the model with the provided test dataset and test sampler.
 
         :param testset: the test dataset.
         :param sampler: the test sampler.
+        :param kwargs (optional): Additional keyword arguments.
+
         """
         batch_size = config["batch_size"]
 
@@ -471,9 +449,37 @@ class Trainer(base.Trainer):
 
         return correct / total
 
+    def get_optimizer(self, model):
+        """Returns the optimizer."""
+        return optimizers.get(model)
+
+    def get_lr_scheduler(self, config, optimizer):
+        """Returns the learning rate scheduler, if needed."""
+        if "lr_scheduler" not in config:
+            return None
+
+        return lr_schedulers.get(optimizer, len(self.train_loader))
+
+    def _adjust_lr(self, config, lr_scheduler, optimizer) -> torch.optim.Optimizer:
+        """Returns an optimizer with an initial learning rate that has been
+        adjusted according to the current round, so that learning rate
+        schedulers can be effective throughout the communication rounds."""
+
+        if "global_lr_scheduler" in config and config["global_lr_scheduler"]:
+            global_lr_scheduler = copy.deepcopy(lr_scheduler)
+
+            for __ in range(self.current_round - 1):
+                for __ in range(Config().trainer.epochs):
+                    global_lr_scheduler.step()
+
+            initial_lr = global_lr_scheduler.get_last_lr()
+            optimizer.param_groups[0]["lr"] = initial_lr[0]
+
+        return optimizer
+
     def get_loss_criterion(self):
         """Returns the loss criterion."""
-        return torch.nn.CrossEntropyLoss()
+        return loss_funcs.get()
 
     def train_run_start(self, config):
         """Method called at the start of training run."""

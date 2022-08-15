@@ -42,10 +42,6 @@ trainer:
     epochs: 1
     batch_size: 32
     optimizer: FedProx
-    learning_rate: 0.01
-    momentum: 0.9
-    weight_decay: 0.0
-    mu: 0.1
 
     # The machine learning model
     model_name: lenet5
@@ -59,3 +55,10 @@ algorithm:
 
     # Pattern of local epochs, either `constant` or `uniform_random`
     pattern: uniform_random
+
+parameters:
+    optimizer:
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0
+        mu: 0.1

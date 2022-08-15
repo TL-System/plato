@@ -220,18 +220,18 @@ class Config:
 
             # The set of columns in the .csv file
             if hasattr(Config, "results") and hasattr(Config.results, "types"):
-                Config().params["result_types"] = Config.results.types
+                Config.params["result_types"] = Config.results.types
             else:
-                Config().params["result_types"] = "round, accuracy, elapsed_time"
+                Config.params["result_types"] = "round, accuracy, elapsed_time"
 
             # The set of pairs to be plotted
             if hasattr(Config, "results") and hasattr(Config.results, "plot"):
-                Config().params["plot_pairs"] = Config().results.plot
+                Config.params["plot_pairs"] = Config().results.plot
             else:
-                Config().params["plot_pairs"] = "round-accuracy, elapsed_time-accuracy"
+                Config.params["plot_pairs"] = "round-accuracy, elapsed_time-accuracy"
 
-            if "model" in config:
-                Config.model = Config.namedtuple_from_dict(config["model"])
+            if "parameters" in config:
+                Config.parameters = Config.namedtuple_from_dict(config["parameters"])
 
         return cls._instance
 

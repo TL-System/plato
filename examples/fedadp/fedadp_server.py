@@ -121,6 +121,8 @@ class Server(fedavg.Server):
 
         flattened = grads[0]
         for i in range(1, len(grads)):
-            flattened = np.append(flattened, -grads[i] / Config().trainer.learning_rate)
+            flattened = np.append(
+                flattened, -grads[i] / Config().parameters.optimizer.lr
+            )
 
         return flattened

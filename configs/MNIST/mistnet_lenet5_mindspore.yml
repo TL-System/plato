@@ -35,21 +35,26 @@ trainer:
     # The target accuracy
     target_accuracy: 0.96
 
+    # The machine learning model
+    model_name: lenet5
+    pretrained_model: lenet5.ckpt
+
     # Parameters for local training in each communication round
     epochs: 6
     batch_size: 32
     optimizer: SGD
-    learning_rate: 0.01
-    momentum: 0.9
-    weight_decay: 0.0
-
-    # The machine learning model
-    model_name: lenet5
-    num_classes: 10
 
 algorithm:
     # Aggregation algorithm
     type: mistnet
-
-    cut_layer: pool1
     epsilon: null
+
+parameters:
+    model:
+        num_classes: 10
+        cut_layer: pool1
+
+    optimizer:
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0
