@@ -5,7 +5,6 @@ import numpy as np
 import torch
 from torch import nn
 
-from plato.config import Config
 from plato.trainers import basic
 
 
@@ -26,17 +25,3 @@ class Trainer(basic.Trainer):
 
         # Return the mean of leach sample's loss for backward
         return torch.mean(loss)
-
-    def train_run_end(self, config):
-        """
-        Method called at the end of training run.
-        """
-        train_squared_loss_step = self.run_history.get_metric_values(
-            "train_squared_loss_step"
-        )
-
-        self.run_history.update_metric(
-            "train_squared_loss_sum",
-            sum(train_squared_loss_step)
-            / (Config().data.partition_size * config["epochs"]),
-        )

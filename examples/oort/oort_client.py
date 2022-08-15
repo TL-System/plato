@@ -19,10 +19,12 @@ class Client(simple.Client):
 
     def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
         """Wrap up generating the report with any additional information."""
-        sum_loss = self.trainer.run_history.get_latest_metric("train_squared_loss_sum")
+        train_squared_loss_step = self.trainer.run_history.get_metric_values(
+            "train_squared_loss_step"
+        )
 
-        self.statistical_utility = np.abs(report.num_samples) * np.sqrt(
-            1.0 / report.num_samples * sum_loss
+        self.statistical_utility = report.num_samples * np.sqrt(
+            1.0 / report.num_samples * sum(train_squared_loss_step)
         )
         report.statistics_utility = self.statistical_utility
         return report
