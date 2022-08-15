@@ -6,19 +6,16 @@ import copy
 import logging
 import multiprocessing as mp
 import os
+import pickle
 import re
 import time
 
 import torch
-
-from plato.config import Config
-from plato.models import registry as models_registry
-from plato.trainers import base
-from plato.trainers import optimizers
-from plato.trainers import lr_schedulers
-from plato.trainers import loss_criterion
 from plato.callbacks.handler import CallbackHandler
 from plato.callbacks.trainer import PrintProgressCallback
+from plato.config import Config
+from plato.models import registry as models_registry
+from plato.trainers import base, loss_criterion, lr_schedulers, optimizers, tracking
 
 
 class Trainer(base.Trainer):
@@ -44,6 +41,10 @@ class Trainer(base.Trainer):
             self.callbacks.extend(callbacks)
         self.callback_handler = CallbackHandler(self.callbacks)
 
+        # The run history of performance metrics
+        self.run_history = tracking.RunHistory()
+        self._loss_tracker = tracking.LossTracker()
+
         if model is None:
             self.model = models_registry.get()
         else:
@@ -51,6 +52,7 @@ class Trainer(base.Trainer):
 
         self.train_loader = None
         self.sampler = None
+        self.lr_scheduler = None
         self.current_epoch = 0
 
     def zeros(self, shape):
@@ -79,6 +81,9 @@ class Trainer(base.Trainer):
             torch.save(self.model.state_dict(), model_path)
         else:
             torch.save(self.model_state_dict, model_path)
+
+        with open(model_path + ".pkl", "wb") as history_file:
+            pickle.dump(self.run_history, history_file)
 
         if self.client_id == 0:
             logging.info("[Server #%d] Model saved to %s.", os.getpid(), model_path)
@@ -110,6 +115,9 @@ class Trainer(base.Trainer):
         else:
             pretrained = torch.load(model_path, map_location=torch.device("cpu"))
         self.model.load_state_dict(pretrained, strict=True)
+
+        with open(model_path + ".pkl", "rb") as history_file:
+            self.run_history = pickle.load(history_file)
 
     def simulate_sleep_time(self):
         """Simulate client's speed by putting it to sleep."""
@@ -160,18 +168,20 @@ class Trainer(base.Trainer):
         self.sampler = sampler
         tic = time.perf_counter()
 
+        self.run_history.reset()
+
         self.train_run_start(config)
         self.callback_handler.call_event("on_train_run_start", self, config)
 
         self.train_loader = Trainer.get_train_loader(batch_size, trainset, sampler)
 
         # Initializing the loss criterion
-        loss_criterion = self.get_loss_criterion()
+        _loss_criterion = self.get_loss_criterion()
 
         # Initializing the optimizer
         optimizer = self.get_optimizer(self.model)
-        lr_scheduler = self.get_lr_scheduler(config, optimizer)
-        optimizer = self._adjust_lr(config, lr_scheduler, optimizer)
+        self.lr_scheduler = self.get_lr_scheduler(config, optimizer)
+        optimizer = self._adjust_lr(config, self.lr_scheduler, optimizer)
 
         self.model.to(self.device)
         self.model.train()
@@ -179,6 +189,7 @@ class Trainer(base.Trainer):
         total_epochs = config["epochs"]
 
         for self.current_epoch in range(1, total_epochs + 1):
+            self._loss_tracker.reset()
             self.train_epoch_start(config)
             self.callback_handler.call_event("on_train_epoch_start", self, config)
 
@@ -188,7 +199,8 @@ class Trainer(base.Trainer):
 
                 outputs = self.model(examples)
 
-                loss = loss_criterion(outputs, labels)
+                loss = _loss_criterion(outputs, labels)
+                self._loss_tracker.update(loss, labels.size(0))
 
                 if "create_graph" in config:
                     loss.backward(create_graph=config["create_graph"])
@@ -202,8 +214,7 @@ class Trainer(base.Trainer):
                     "on_train_step_end", self, config, batch=batch_id, loss=loss
                 )
 
-            if lr_scheduler is not None:
-                lr_scheduler.step()
+            self.lr_scheduler_step()
 
             if hasattr(optimizer, "params_state_update"):
                 optimizer.params_state_update()
@@ -229,6 +240,7 @@ class Trainer(base.Trainer):
                 self.save_model(filename)
                 self.model.to(self.device)
 
+            self.run_history.update_metric("train_loss", self._loss_tracker.average)
             self.train_epoch_end(config)
             self.callback_handler.call_event("on_train_epoch_end", self, config)
 
@@ -460,6 +472,14 @@ class Trainer(base.Trainer):
 
         return lr_schedulers.get(optimizer, len(self.train_loader))
 
+    def lr_scheduler_step(self):
+        """
+        Performs a single scheduler step if ``self.scheduler`` has been assigned.
+
+        """
+        if self.lr_scheduler is not None:
+            self.lr_scheduler.step()
+
     def _adjust_lr(self, config, lr_scheduler, optimizer) -> torch.optim.Optimizer:
         """Returns an optimizer with an initial learning rate that has been
         adjusted according to the current round, so that learning rate
@@ -500,3 +520,25 @@ class Trainer(base.Trainer):
         :param batch: the current batch of training data.
         :param loss: the loss computed in the current batch.
         """
+
+
+class TrainerWithTimmScheduler(Trainer):
+    """
+    Subclass of the :class:`Trainer` that works with `timm schedulers
+    <https://fastai.github.io/timmdocs/schedulers>` instead of standard PyTorch
+    learning rate schedulers.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.num_updates = None
+
+    def train_epoch_start(self, config):
+        """Method called at the beginning of a training epoch."""
+        super().train_epoch_start(config)
+        self.num_updates = self.current_epoch * len(self._train_loader)
+
+    def lr_scheduler_step(self):
+        self.num_updates += 1
+        if self.lr_scheduler is not None:
+            self.lr_scheduler.step_update(num_updates=self.num_updates)
