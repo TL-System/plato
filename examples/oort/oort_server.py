@@ -22,10 +22,10 @@ class Server(fedavg.Server):
         self.blacklist = []
 
         # All client utilities
-        self.client_utilities = OrderedDict()
+        self.client_utilities = {}
 
         # Client training times
-        self.client_durations = [None]
+        self.client_durations = {}
 
         # The desired duration for each communication round
         self.desired_duration = Config().server.desired_duration
@@ -33,8 +33,8 @@ class Server(fedavg.Server):
         self.explored_clients = []
         self.unexplored_clients = []
 
-        # Keep track of each client's last involved round.
-        self.last_round = [0]
+        # Keep track of each client's last participated round.
+        self.client_last_rounds = {}
 
         self.exploration_factor = Config().server.exploration_factor
         self.step_window = Config().server.step_window
@@ -63,13 +63,19 @@ class Server(fedavg.Server):
     def configure(self):
         """Initialize necessary variables."""
         super().configure()
-        self.client_durations = self.client_durations * self.total_clients
-        self.last_round = self.last_round * self.total_clients
-        self.times_selected = {num: 0 for num in range(1, self.total_clients + 1)}
-        self.unexplored_clients = [
-            client_id for client_id in range(1, self.total_clients + 1)
-        ]
-        self.client_utilities = {num: 0 for num in range(1, self.total_clients + 1)}
+        self.client_durations = {
+            client_id: 0 for client_id in range(1, self.total_clients + 1)
+        }
+        self.client_last_rounds = {
+            client_id: 0 for client_id in range(1, self.total_clients + 1)
+        }
+        self.times_selected = {
+            client_id: 0 for client_id in range(1, self.total_clients + 1)
+        }
+        self.client_utilities = {
+            client_id: 0 for client_id in range(1, self.total_clients + 1)
+        }
+        self.unexplored_clients = list(range(1, self.total_clients + 1))
 
     def weights_aggregated(self, updates):
         """
@@ -80,8 +86,8 @@ class Server(fedavg.Server):
         # Extract statistical utility and local training times
         for update in updates:
             self.client_utilities[update.client_id] = update.report.statistics_utility
-            self.client_durations[update.client_id - 1] = update.report.training_time
-            self.last_round[update.client_id - 1] = self.current_round
+            self.client_durations[update.client_id] = update.report.training_time
+            self.client_last_rounds[update.client_id] = self.current_round
 
         # Calculate updated client utilities on explored clients
         for update in updates:
@@ -90,7 +96,10 @@ class Server(fedavg.Server):
             )
 
         # Adjust pacer
-        self.util_history.append(self.calc_util_sum(updates))
+        self.util_history.append(
+            sum(update.report.statistics_utility for update in updates)
+        )
+
         if self.current_round >= 2 * self.step_window:
             last_pacer_rounds = sum(
                 self.util_history[-2 * self.step_window : -self.step_window]
@@ -109,7 +118,7 @@ class Server(fedavg.Server):
         # Exploitation
         exploit_len = math.ceil((1.0 - self.exploration_factor) * clients_count)
 
-        # If there aren't enough unexplored clients for exploration.
+        # If there aren't enough unexplored clients for exploration
         if (clients_count - exploit_len) > len(self.unexplored_clients):
             exploit_len = clients_count - len(self.unexplored_clients)
 
@@ -193,28 +202,19 @@ class Server(fedavg.Server):
 
     def calc_client_util(self, client_id):
         """Calculate client utility."""
-
         # Set temporal uncertainty
-        if self.last_round[client_id - 1] != 0:
+        if self.client_last_rounds[client_id] != 0:
             temp_uncertainty = math.sqrt(
-                0.1 * math.log(self.current_round) / self.last_round[client_id - 1]
+                0.1 * math.log(self.current_round) / self.client_last_rounds[client_id]
             )
         else:
             temp_uncertainty = 0
         client_utility = self.client_utilities[client_id] + temp_uncertainty
 
-        if self.desired_duration < self.client_durations[client_id - 1]:
+        if self.desired_duration < self.client_durations[client_id]:
             global_utility = (
-                self.desired_duration / self.client_durations[client_id - 1]
+                self.desired_duration / self.client_durations[client_id]
             ) ** self.penalty
             client_utility *= global_utility
 
         return client_utility
-
-    def calc_util_sum(self, updates):
-        """Calculate sum of statistical utilities from client reports."""
-        total = 0
-        for update in updates:
-            total += update.report.statistics_utility
-
-        return total
