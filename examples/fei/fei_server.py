@@ -1,8 +1,6 @@
 """
 A federated learning server with RL Agent FEI
 """
-import math
-
 import numpy as np
 from plato.config import Config
 from plato.utils.reinforcement_learning import rl_server
@@ -13,7 +11,6 @@ class RLServer(rl_server.RLServer):
 
     def __init__(self, agent, model=None, algorithm=None, trainer=None):
         super().__init__(agent, model, algorithm, trainer)
-        self.local_self.corr = [0] * Config().clients.per_round
         self.last_global_grads = None
         self.corr = []
         self.smart_weighting = []
@@ -22,18 +19,15 @@ class RLServer(rl_server.RLServer):
     def prep_state(self):
         """Wrap up the state update to RL Agent."""
         # Store client ids
-        client_ids = [update.report.client_id for update in self.updates]
+        client_ids = [update.client_id for update in self.updates]
 
         state = [0] * 4
         state[0] = self.normalize_state(
-            [update.report.num_samples for update in self.updates]
-        )
+            [update.report.num_samples for update in self.updates])
         state[1] = self.normalize_state(
-            [update.report.training_time for update in self.updates]
-        )
+            [update.report.training_time for update in self.updates])
         state[2] = self.normalize_state(
-            [update.report.valuation for update in self.updates]
-        )
+            [update.report.valuation for update in self.updates])
         state[3] = self.normalize_state(self.corr)
         state = np.transpose(np.round(np.array(state), 4))
 
@@ -77,7 +71,8 @@ class RLServer(rl_server.RLServer):
     @staticmethod
     def process_grad(grads):
         """Convert gradients to a flattened 1-D array."""
-        grads = list(dict(sorted(grads.items(), key=lambda x: x[0].lower())).values())
+        grads = list(
+            dict(sorted(grads.items(), key=lambda x: x[0].lower())).values())
 
         flattened = grads[0]
         for i in range(1, len(grads)):
@@ -89,5 +84,5 @@ class RLServer(rl_server.RLServer):
     def normalize_state(feature):
         """Normalize/Scaling state features."""
         norm = np.linalg.norm(feature)
-        ret = [Config().algorithm.base ** (x / norm) for x in feature]
+        ret = [Config().algorithm.base**(x / norm) for x in feature]
         return ret
