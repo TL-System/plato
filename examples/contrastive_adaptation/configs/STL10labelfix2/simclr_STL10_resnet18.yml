@@ -50,7 +50,7 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8008
+    port: 8012
     synchronous: true
     do_test: false
 
