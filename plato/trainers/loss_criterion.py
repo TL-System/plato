@@ -9,9 +9,17 @@ from plato.config import Config
 def get():
     """Get a loss function with its name from the configuration file."""
     registered_loss_criterion = {
-        "CrossEntropyLoss": nn.CrossEntropyLoss,
+        "L1Loss": nn.L1Loss,
+        "MSELoss": nn.MSELoss,
+        "BCELoss": nn.BCELoss,
         "BCEWithLogitsLoss": nn.BCEWithLogitsLoss,
         "NLLLoss": nn.NLLLoss,
+        "PoissonNLLLoss": nn.PoissonNLLLoss,
+        "CrossEntropyLoss": nn.CrossEntropyLoss,
+        "HingeEmbeddingLoss": nn.HingeEmbeddingLoss,
+        "MarginRankingLoss": nn.MarginRankingLoss,
+        "TripletMarginLoss": nn.TripletMarginLoss,
+        "KLDivLoss": nn.KLDivLoss,
     }
 
     loss_criterion_name = (

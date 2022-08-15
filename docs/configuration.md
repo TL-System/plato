@@ -388,21 +388,59 @@ The target perplexity of the global Natural Language Processing (NLP) model.
 The total number of epoches in local training in each communication round.
 ```
 
-```{admonition} **optimizer**
-The type of the optimizer. This can be `SGD`, `Adam` or `FedProx`.
-```
-
 ```{admonition} **batch_size**
 The size of the mini-batch of data in each step (iteration) of the training loop.
 ```
 
+```{admonition} **optimizer**
+The type of the optimizer. The following options are supported:
+
+- `Adam`
+- `Adadelta`
+- `Adagrad`
+- `AdaHessian` (from the `torch_optimizer` package)
+- `AdamW`
+- `SparseAdam`
+- `Adamax`
+- `ASGD`
+- `LBFGS`
+- `NAdam`
+- `RAdam`
+- `RMSprop`
+- `Rprop`
+- `SGD`
+```
+
 ```{admonition} lr_scheduler
-The learning rate scheduler. The following options are available:
+The learning rate scheduler. The following options are supported:
 
 - `CosineAnnealingLR`
 - `LambdaLR`
+- `MultiStepLR`
 - `StepLR`
 - `ReduceLROnPlateau`
+- `ConstantLR`
+- `LinearLR`
+- `ExponentialLR`
+- `CyclicLR`
+- `CosineAnnealingWarmRestarts`
+```
+
+```{admonition} loss_criterion
+The loss criterion. The following options are supported:
+
+- `L1Loss`
+- `MSELoss`
+- `BCELoss`
+- `BCEWithLogitsLoss`
+- `NLLLoss`
+- `PoissonNLLLoss`
+- `CrossEntropyLoss`
+- `HingeEmbeddingLoss`
+- `MarginRankingLoss`
+- `TripletMarginLoss`
+- `KLDivLoss`
+
 ```
 
 ```{admonition} global_lr_scheduler
