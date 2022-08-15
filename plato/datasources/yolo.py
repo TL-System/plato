@@ -11,10 +11,11 @@ import logging
 import os
 
 import torch
-from plato.config import Config
-from yolov5.utils.datasets import LoadImagesAndLabels
+
+from yolov5.utils.dataloaders import LoadImagesAndLabels
 from yolov5.utils.general import check_img_size
 
+from plato.config import Config
 from plato.datasources import base
 
 
@@ -45,24 +46,24 @@ class DataSource(base.DataSource):
 
     def __init__(self):
         super().__init__()
-        _path = Config().params['data_path']
+        _path = Config().params["data_path"]
 
         if not os.path.exists(_path):
             os.makedirs(_path)
 
-            logging.info(
-                "Downloading the YOLO dataset. This may take a while.")
+            logging.info("Downloading the YOLO dataset. This may take a while.")
 
             urls = Config().data.download_urls
             for url in urls:
-                if not os.path.exists(_path + url.split('/')[-1]):
+                if not os.path.exists(_path + url.split("/")[-1]):
                     DataSource.download(url, _path)
 
-        assert 'grid_size' in Config().params
-
-        self.grid_size = Config().params['grid_size']
-        self.image_size = check_img_size(Config().data.image_size,
-                                         self.grid_size)
+        self.grid_size = (
+            Config().parameters.grid_size
+            if hasattr(Config().parameters, "grid_size")
+            else Config().params["grid_size"]
+        )
+        self.image_size = check_img_size(Config().data.image_size, self.grid_size)
 
         self.train_set = None
         self.test_set = None
@@ -78,10 +79,9 @@ class DataSource(base.DataSource):
         return Config().data.classes
 
     def get_train_set(self):
-        single_class = (Config().data.num_classes == 1)
+        single_class = Config().data.num_classes == 1
 
-        train_path = os.path.join(Config.params['base_path'],
-                                  Config().data.train_path)
+        train_path = os.path.join(Config.params["base_path"], Config().data.train_path)
 
         if self.train_set is None:
             self.train_set = LoadImagesAndLabels(
@@ -96,15 +96,15 @@ class DataSource(base.DataSource):
                 stride=int(self.grid_size),
                 pad=0.0,
                 image_weights=False,
-                prefix='')
+                prefix="",
+            )
 
         return self.train_set
 
     def get_test_set(self):
-        single_class = (Config().data.num_classes == 1)
+        single_class = Config().data.num_classes == 1
 
-        test_path = os.path.join(Config.params['base_path'],
-                                 Config().data.test_path)
+        test_path = os.path.join(Config.params["base_path"], Config().data.test_path)
 
         if self.test_set is None:
             self.test_set = LoadImagesAndLabels(
@@ -119,36 +119,38 @@ class DataSource(base.DataSource):
                 stride=int(self.grid_size),
                 pad=0.0,
                 image_weights=False,
-                prefix='')
+                prefix="",
+            )
 
         return self.test_set
 
     @staticmethod
-    def get_train_loader(batch_size,
-                         trainset,
-                         sampler,
-                         extract_features=False,
-                         cut_layer=None):
+    def get_train_loader(
+        batch_size, trainset, sampler, extract_features=False, cut_layer=None
+    ):
         """The custom train loader for YOLOv5."""
 
         if extract_features:
             # MistNet client: feature extraction
-            return torch.utils.data.DataLoader(dataset=YOLODataset(trainset),
-                                               batch_size=batch_size,
-                                               shuffle=False)
+            return torch.utils.data.DataLoader(
+                dataset=YOLODataset(trainset), batch_size=batch_size, shuffle=False
+            )
         elif cut_layer is not None:
             # MistNet server: training from the cut layer forwards using
             # the features extracted on the client
-            return torch.utils.data.DataLoader(dataset=trainset,
-                                               batch_size=batch_size,
-                                               shuffle=True,
-                                               collate_fn=collate_fn)
+            return torch.utils.data.DataLoader(
+                dataset=trainset,
+                batch_size=batch_size,
+                shuffle=True,
+                collate_fn=collate_fn,
+            )
         else:
             return torch.utils.data.DataLoader(
                 YOLODataset(trainset),
                 batch_size=batch_size,
                 sampler=sampler,
-                collate_fn=LoadImagesAndLabels.collate_fn)
+                collate_fn=LoadImagesAndLabels.collate_fn,
+            )
 
     @staticmethod
     def get_test_loader(batch_size, testset):
@@ -157,4 +159,5 @@ class DataSource(base.DataSource):
             testset,
             batch_size=batch_size,
             shuffle=False,
-            collate_fn=LoadImagesAndLabels.collate_fn)
+            collate_fn=LoadImagesAndLabels.collate_fn,
+        )

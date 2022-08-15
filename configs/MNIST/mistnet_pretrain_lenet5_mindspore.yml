@@ -21,6 +21,9 @@ trainer:
     # Should MindSpore be used instead of PyTorch?
     use_mindspore: true
 
+    # Should MindSpore be used with CPU as its target?
+    cpuonly: true
+
     # The type of the trainer
     type: basic
 
@@ -30,17 +33,23 @@ trainer:
     # The target accuracy
     target_accuracy: 0.90
 
+    # The machine learning model
+    model_name: lenet5
+
     # Number of epoches for local training in each communication round
     epochs: 1
     batch_size: 32
     optimizer: SGD
-    learning_rate: 0.01
-    momentum: 0.9
-    weight_decay: 0.0
-
-    # The machine learning model
-    model_name: lenet5_mindspore
 
 algorithm:
     # Aggregation algorithm
     type: fedavg
+
+parameters:
+    model:
+        num_classes: 10
+
+    optimizer:
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0
