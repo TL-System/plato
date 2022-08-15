@@ -130,7 +130,7 @@ class Server(fedavg.Server):
 
         # Extract the total number of samples
         self.total_samples = sum(
-            [report.num_samples for (__, report, __, __) in updates])
+            [update.report.num_samples for update in updates])
 
         # Perform weighted averaging
         avg_update = {
@@ -140,7 +140,7 @@ class Server(fedavg.Server):
 
         _scale = 0
         for i, update in enumerate(deltas_received):
-            __, report, __, __ = updates[i]
+            report = updates[i].report
             num_samples = report.num_samples
 
             for name, delta in update.items():
@@ -168,14 +168,14 @@ class Server(fedavg.Server):
 
     def compute_weight_deltas(self, updates):
         """ Extract the model weight updates from client updates. """
-        weights_received = [payload[0] for (__, __, payload, __) in updates]
+        weights_received = [update.payload[0] for update in updates]
         return self.algorithm.compute_weight_deltas(weights_received)
 
     def deep_leakage_from_gradients(self, updates):
         """ Analyze periodic gradients from certain clients. """
         # Process data from the victim client
         deltas_received = self.compute_weight_deltas(updates)
-        __, __, payload, __ = updates[Config().algorithm.victim_client]
+        payload = updates[Config().algorithm.victim_client].payload
         # The ground truth should be used only for evaluation
         gt_data, gt_labels, target_grad = payload[1]
         target_weights = payload[0]

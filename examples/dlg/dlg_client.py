@@ -2,17 +2,9 @@ import logging
 import pickle
 import sys
 import uuid
-from dataclasses import dataclass
 
 from plato.clients import base, simple
 from plato.config import Config
-
-
-@dataclass
-class Report(base.Report):
-    """Report from a simple client, to be sent to the federated learning server."""
-    comm_time: float
-    update_response: bool
 
 
 class Client(simple.Client):
