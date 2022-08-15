@@ -10,3 +10,4 @@ opacus
 gym
 zstd
 torch-optimizer
+timm

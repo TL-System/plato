@@ -11,14 +11,12 @@ https://arxiv.org/pdf/1909.12641.pdf
 """
 import afl_client
 import afl_server
-import afl_trainer
 
 
 def main():
-    """ A Plato federated learning training session using the AFL algorithm. """
-    trainer = afl_trainer.Trainer
-    client = afl_client.Client(trainer=trainer)
-    server = afl_server.Server(trainer=trainer)
+    """A Plato federated learning training session using the AFL algorithm."""
+    client = afl_client.Client()
+    server = afl_server.Server()
     server.run(client)
 
 

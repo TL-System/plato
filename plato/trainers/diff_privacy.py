@@ -4,12 +4,12 @@ The training and testing loops for PyTorch.
 import logging
 import time
 
-from torch.utils.data import Subset
-
 from opacus import GradSampleModule
 from opacus.privacy_engine import PrivacyEngine
-from opacus.validators import ModuleValidator
 from opacus.utils.batch_memory_manager import BatchMemoryManager
+from opacus.validators import ModuleValidator
+
+from torch.utils.data import Subset
 
 from plato.config import Config
 from plato.trainers import basic
@@ -58,12 +58,12 @@ class Trainer(basic.Trainer):
         self.train_loader = Trainer.get_train_loader(batch_size, trainset, sampler=None)
 
         # Initializing the loss criterion
-        loss_criterion = self.get_loss_criterion()
+        _loss_criterion = self.get_loss_criterion()
 
         # Initializing the optimizer
         optimizer = self.get_optimizer(self.model)
-        lr_scheduler = self.get_lr_scheduler(config, optimizer)
-        optimizer = self._adjust_lr(config, lr_scheduler, optimizer)
+        self.lr_scheduler = self.get_lr_scheduler(config, optimizer)
+        optimizer = self._adjust_lr(config, self.lr_scheduler, optimizer)
 
         self.model.to(self.device)
         total_epochs = config["epochs"]
@@ -94,6 +94,7 @@ class Trainer(basic.Trainer):
                 max_physical_batch_size=self.max_physical_batch_size,
                 optimizer=optimizer,
             ) as memory_safe_train_loader:
+                self._loss_tracker.reset()
                 self.train_epoch_start(config)
                 self.callback_handler.call_event("on_train_epoch_start", self, config)
 
@@ -103,7 +104,8 @@ class Trainer(basic.Trainer):
 
                     outputs = self.model(examples)
 
-                    loss = loss_criterion(outputs, labels)
+                    loss = _loss_criterion(outputs, labels)
+                    self._loss_tracker.update(loss, labels.size(0))
 
                     if "create_graph" in config:
                         loss.backward(create_graph=config["create_graph"])
@@ -117,8 +119,7 @@ class Trainer(basic.Trainer):
                         "on_train_step_end", self, config, batch=batch_id, loss=loss
                     )
 
-            if lr_scheduler is not None:
-                lr_scheduler.step()
+            self.lr_scheduler_step()
 
             if hasattr(optimizer, "params_state_update"):
                 optimizer.params_state_update()
@@ -144,6 +145,7 @@ class Trainer(basic.Trainer):
                 self.save_model(filename)
                 self.model.to(self.device)
 
+            self.run_history.update_metric("train_loss", self._loss_tracker.average)
             self.train_epoch_end(config)
             self.callback_handler.call_event("on_train_epoch_end", self, config)
 

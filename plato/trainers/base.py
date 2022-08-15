@@ -72,6 +72,7 @@ class Trainer(ABC):
 
             if os.path.exists(model_file):
                 os.remove(model_file)
+                os.remove(model_file + ".pkl")
 
             if os.path.exists(accuracy_file):
                 os.remove(accuracy_file)

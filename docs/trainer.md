@@ -21,6 +21,22 @@ def get_train_loader(cls, batch_size, trainset, sampler, **kwargs):
 ```
 ````
 
+```{admonition} **get_optimizer(self, model)**
+Returns a custom optimizer.
+```
+
+```{admonition} **get_lr_scheduler(self, config, optimizer)**
+Returns a custom learning rate scheduler.
+```
+
+```{admonition} **get_loss_criterion(self)**
+Returns a custom loss criterion.
+```
+
+```{admonition} **lr_scheduler_step(self)**
+Performs a single learning rate scheduler step if ``self.lr_scheduler`` has been assigned.
+```
+
 ````{admonition} **train_run_start(self, config)**
 Override this method to complete additional tasks before the training loop starts.
 
@@ -33,7 +49,6 @@ def train_run_start(self, config):
     logging.info("[Client #%d] Loading the dataset.", self.client_id)
 ```
 ````
-
 
 ````{admonition} **train_run_end(self, config)**
 Override this method to complete additional tasks after the training loop ends.
@@ -195,3 +210,36 @@ def on_train_epoch_end(self, trainer, config):
         loss.data.item(),
     )
 ````
+
+## Accessing and customizing the run history during training
+
+An instance of the `plato.trainers.tracking.RunHistory` class, called `self.run_history`, is used to store any number of performance metrics during the training process, one iterable list of values for each performance metric. By default, it stores the average loss values in each epoch.
+
+The run history in the trainer can be accessed by the client as well, using `self.trainer.run_history`.  It can also be read, updated, or reset in the hooks or callback methods. For example, in the implementation of some algorithms such as Oort, a per-step loss value needs to be stored by calling `update_metric()` in `train_step_end()`:
+
+```py
+def train_step_end(self, config, batch=None, loss=None):
+    self.run_history.update_metric("train_loss_step", loss.cpu().detach().numpy())
+```
+
+Here is a list of all the methods available in the `RunHistory` class:
+
+```{admonition} **get_metric_names(self)**
+Returns an iterable set containing of all unique metric names which are being tracked.
+```
+
+```{admonition} **get_metric_values(self, metric_name)**
+Returns an ordered iterable list of values that has been stored since the last reset corresponding to the provided metric name.
+```
+
+```{admonition} **get_latest_metric(self, metric_name)**
+Returns the most recent value that has been recorded for the given metric.
+```
+
+```{admonition} **update_metric(self, metric_name, metric_value)**
+Records a new value for the given metric.
+```
+
+```{admonition} **reset(self)**
+Resets the run history.
+```
