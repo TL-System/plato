@@ -411,8 +411,8 @@ The type of the optimizer. The following options are supported:
 - `SGD`
 ```
 
-```{admonition} lr_scheduler
-The learning rate scheduler. The following options are supported:
+````{admonition} lr_scheduler
+The learning rate scheduler. The following learning rate schedulers from PyTorch are supported:
 
 - `CosineAnnealingLR`
 - `LambdaLR`
@@ -424,7 +424,23 @@ The learning rate scheduler. The following options are supported:
 - `ExponentialLR`
 - `CyclicLR`
 - `CosineAnnealingWarmRestarts`
+
+Alternatively, all four schedulers from [timm](https://timm.fast.ai/schedulers) are supported if `lr_scheduler` is specified as `timm` and `trainer -> type` is specified as `timm_basic`. For example, to use the `SGDR` scheduler, we specify `cosine` as `sched` in its arguments (`parameters -> learning_rate`):
+
 ```
+trainer:
+    type: timm_basic
+
+parameters:
+    learning_rate:
+        sched: cosine
+        min_lr: 1.e-6
+        warmup_lr: 0.0001
+        warmup_epochs: 3
+        cooldown_epochs: 10
+```
+
+````
 
 ```{admonition} loss_criterion
 The loss criterion. The following options are supported:
