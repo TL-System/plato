@@ -35,7 +35,7 @@ class Server(fedavg.Server):
 
         # Update the local valuations from the updates
         for i, update in enumerate(deltas_received):
-            __, report, __, __ = updates[i]
+            report = updates[i].report
             client_id = self.selected_clients[i]
             self.local_values[client_id]["valuation"] = report.valuation
 

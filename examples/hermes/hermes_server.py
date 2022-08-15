@@ -30,9 +30,7 @@ class Server(fedavg.Server):
         weights_received, masks_received = self.extract_client_updates(updates)
 
         # Extract the total number of samples
-        self.total_samples = sum(
-            [report.num_samples for (__, report, __, __) in updates]
-        )
+        self.total_samples = sum(update.report.num_samples for update in updates)
 
         # Perform averaging of overlapping parameters
         for layer_name in weights_received[0].keys():
@@ -52,8 +50,7 @@ class Server(fedavg.Server):
                 count = np.zeros_like(masks_received[0][step].reshape([-1]))
                 avg = np.zeros_like(weights_received[0][layer_name].reshape([-1]))
                 for index, __ in enumerate(masks_received):
-                    __, report, __, __ = updates[index]
-                    num_samples = report.num_samples
+                    num_samples = updates[index].report.num_samples
                     count += masks_received[index][step].reshape([-1])
                     avg += weights_received[index][layer_name].reshape([-1]) * (
                         num_samples / self.total_samples
@@ -75,8 +72,7 @@ class Server(fedavg.Server):
                 if "int" in str(avg.dtype):
                     avg = avg.astype(np.float64)
                 for index, __ in enumerate(weights_received):
-                    __, report, __, __ = updates[index]
-                    num_samples = report.num_samples
+                    num_samples = updates[index].report.num_samples
                     avg += weights_received[index][layer_name].reshape([-1]) * (
                         num_samples / self.total_samples
                     )
@@ -98,22 +94,22 @@ class Server(fedavg.Server):
 
     def save_personalized_models(self, personalized_models, updates):
         """Save each client's personalized model."""
-        for (personalized_model, (client_id, __, __, __)) in zip(
-            personalized_models, updates
-        ):
+        for (personalized_model, update) in zip(personalized_models, updates):
             model_name = (
                 Config().trainer.model_name
                 if hasattr(Config().trainer, "model_name")
                 else "custom"
             )
             model_path = Config().params["model_path"]
-            filename = f"{model_path}/personalized_{model_name}_client{client_id}.pth"
+            filename = (
+                f"{model_path}/personalized_{model_name}_client{update.client_id}.pth"
+            )
             with open(filename, "wb") as payload_file:
                 pickle.dump(personalized_model, payload_file)
             logging.info(
                 "[%s] Saved client #%d's personalized model in: %s",
                 self,
-                client_id,
+                update.client_id,
                 filename,
             )
 
@@ -168,17 +164,19 @@ class Server(fedavg.Server):
         model_name = Config().trainer.model_name
         checkpoint_path = Config().params["checkpoint_path"]
 
-        weights_received = [payload for (__, __, payload, __) in updates]
+        weights_received = [update.payload for update in updates]
 
         masks_received = []
-        for (client_id, __, payload, __) in updates:
-            mask_path = f"{checkpoint_path}/{model_name}_client{client_id}_mask.pth"
+        for update in updates:
+            mask_path = (
+                f"{checkpoint_path}/{model_name}_client{update.client_id}_mask.pth"
+            )
             if os.path.exists(mask_path):
                 with open(mask_path, "rb") as mask_file:
                     masks_received.append(pickle.load(mask_file))
             else:
                 model = copy.deepcopy(self.algorithm.model)
-                model.load_state_dict(payload, strict=True)
+                model.load_state_dict(update.payload, strict=True)
                 mask = pruning.make_init_mask(model)
                 masks_received.append(mask)
 

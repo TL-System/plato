@@ -35,7 +35,7 @@ class RLServer(fedavg.Server):
         self.update_state()
 
         # Extract the total number of samples
-        num_samples = [report.num_samples for (__, report, __, __) in updates]
+        num_samples = [update.report.num_samples for update in updates]
         self.total_samples = sum(num_samples)
 
         # Perform weighted averaging

@@ -261,14 +261,14 @@ class Server(fedavg.Server):
     def client_accuracy_averaging(self):
         """Compute the average accuracy across clients."""
         # Get total number of samples
-        total_samples = sum(
-            [report.num_samples for (__, report, __, __) in self.updates]
-        )
+        total_samples = sum(update.report.num_samples for update in self.updates)
 
         # Perform weighted averaging
         accuracy = 0
-        for (__, report, __, __) in self.updates:
-            accuracy += report.average_accuracy * (report.num_samples / total_samples)
+        for update in self.updates:
+            accuracy += update.report.average_accuracy * (
+                update.report.num_samples / total_samples
+            )
 
         return accuracy
 
@@ -293,8 +293,12 @@ class Server(fedavg.Server):
                     f"{Config().params['result_path']}/edge_{os.getpid()}_accuracy.csv"
                 )
 
-                for (client_id, report, __, __) in self.updates:
-                    accuracy_row = [self.current_round, client_id, report.accuracy]
+                for update in self.updates:
+                    accuracy_row = [
+                        self.current_round,
+                        update.client_id,
+                        update.report.accuracy,
+                    ]
                     csv_processor.write_csv(accuracy_csv_file, accuracy_row)
 
             # When a certain number of aggregations are completed, an edge client
