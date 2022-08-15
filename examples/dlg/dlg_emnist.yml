@@ -47,9 +47,6 @@ trainer:
     epochs: 1
     batch_size: 1
     optimizer: SGD
-    learning_rate: 0.01
-    momentum: 0.0
-    weight_decay: 0.0
 
     # The machine learning model
     model_name: dlg
@@ -110,6 +107,10 @@ algorithm:
 
     # The random seed for dummy data and label
     random_seed: 1
+
+parameters:
+    optimizer:
+        lr: 0.01
 
 results:
     result_path: results/EMNIST/DLG
