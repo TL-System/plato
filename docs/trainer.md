@@ -33,6 +33,10 @@ Returns a custom learning rate scheduler.
 Returns a custom loss criterion.
 ```
 
+```{admonition} **process_loss(self, loss)**
+Returns the processed training loss.
+```
+
 ```{admonition} **lr_scheduler_step(self)**
 Performs a single learning rate scheduler step if ``self.lr_scheduler`` has been assigned.
 ```

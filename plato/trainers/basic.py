@@ -202,6 +202,8 @@ class Trainer(base.Trainer):
                 loss = _loss_criterion(outputs, labels)
                 self._loss_tracker.update(loss, labels.size(0))
 
+                loss = self.process_loss(loss)
+
                 if "create_graph" in config:
                     loss.backward(create_graph=config["create_graph"])
                 else:
@@ -499,6 +501,10 @@ class Trainer(base.Trainer):
     def get_loss_criterion(self):
         """Returns the loss criterion."""
         return loss_criterion.get()
+
+    def process_loss(self, loss):
+        """Processes training loss with any additional steps."""
+        return loss
 
     def train_run_start(self, config):
         """Method called at the start of training run."""

@@ -4,7 +4,6 @@ A federated learning server using oort client selection.
 
 import logging
 import math
-import os
 import random
 from collections import OrderedDict
 import numpy as np
@@ -219,14 +218,3 @@ class Server(fedavg.Server):
             total += update.report.statistics_utility
 
         return total
-
-    def server_will_close(self):
-        """
-        Method called before closing the server.
-        """
-        model_name = Config().trainer.model_name
-        model_path = Config().params["checkpoint_path"]
-        for client_id in range(1, self.total_clients + 1):
-            loss_path = f"{model_path}/{model_name}_{client_id}_squared_batch_loss.pth"
-            if os.path.exists(loss_path):
-                os.remove(loss_path)

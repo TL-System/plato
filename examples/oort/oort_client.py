@@ -5,9 +5,7 @@ A federated learning client that sends its statistical utility
 from types import SimpleNamespace
 
 import numpy as np
-import torch
 from plato.clients import simple
-from plato.config import Config
 
 
 class Client(simple.Client):
@@ -21,10 +19,8 @@ class Client(simple.Client):
 
     def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
         """Wrap up generating the report with any additional information."""
-        model_name = Config().trainer.model_name
-        model_path = Config().params["checkpoint_path"]
-        filename = f"{model_path}/{model_name}_{self.client_id}_squared_batch_loss.pth"
-        sum_loss = torch.load(filename)
+        sum_loss = self.trainer.run_history.get_latest_metric("train_squared_loss_sum")
+
         self.statistical_utility = np.abs(report.num_samples) * np.sqrt(
             1.0 / report.num_samples * sum_loss
         )
