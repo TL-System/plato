@@ -200,18 +200,19 @@ class Trainer(basic.Trainer):
             self.compute_pruned_amount(),
         )
 
-        # Calculate average local weight updates
-        self.avg_update = self.local_update_significance()
-        logging.info(
-            "[Client #%d] Average local weight updates: %.2f",
-            self.client_id,
-            self.avg_update,
-        )
-
         # Add weight divergence and average update to client report
         if self.use_adaptive is True:
             # Calculate weight divergence between local and global model
             self.div_from_global = self.compute_weight_divergence()
+
+            # Calculate average local weight updates
+            self.avg_update = self.local_update_significance()
+
+            logging.info(
+                "[Client #%d] Average local weight updates: %.2f",
+                self.client_id,
+                self.avg_update,
+            )
             logging.info(
                 "[Client #%d] Weight divergence: %.2f",
                 self.client_id,

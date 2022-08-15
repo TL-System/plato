@@ -78,7 +78,7 @@ trainer:
     optimizer: SGD
 
     # The machine learning model
-    model_name: lenet_5
+    model_name: lenet5
 
 algorithm:
     # Aggregation algorithm
