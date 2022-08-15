@@ -25,36 +25,25 @@ tt = transforms.ToPILImage()
 class Trainer(basic.Trainer):
     """ The federated learning trainer for the gradient leakage attack. """
 
-    def train_loop(self, config, trainset, sampler, cut_layer):
+    def train_model(self, config, trainset, sampler, **kwargs):
         """ The default training loop when a custom training loop is not supplied. """
         partition_size = Config().data.partition_size
         batch_size = config['batch_size']
-        log_interval = 10
         tic = time.perf_counter()
 
-        logging.info("[Client #%d] Loading the dataset.", self.client_id)
-        _train_loader = getattr(self, "train_loader", None)
+        self.run_history.reset()
+        
+        self.train_run_start(config)
 
-        if callable(_train_loader):
-            train_loader = self.train_loader(batch_size, trainset, sampler,
-                                             cut_layer)
-        else:
-            train_loader = torch.utils.data.DataLoader(dataset=trainset,
-                                                       shuffle=False,
-                                                       batch_size=batch_size,
-                                                       sampler=sampler)
-
-        epochs = config['epochs']
+        self.train_loader = Trainer.get_train_loader(batch_size, trainset, sampler)
 
         # Initializing the loss criterion
-        _loss_criterion = getattr(self, "loss_criterion", None)
-        if callable(_loss_criterion):
-            loss_criterion = self.loss_criterion(self.model)
-        else:
-            loss_criterion = torch.nn.CrossEntropyLoss()
+        _loss_criterion = self.get_loss_criterion()
 
         self.model.to(self.device)
         self.model.train()
+    
+        total_epochs = config["epochs"]
 
         if hasattr(Config().algorithm, 'defense'):
             if Config().algorithm.defense == 'GradDefense':
@@ -64,18 +53,19 @@ class Trainer(basic.Trainer):
                                            device=Config().device())
 
         target_grad = None
-        total_local_steps = epochs * math.ceil(partition_size / batch_size)
+        total_local_steps = total_epochs * math.ceil(partition_size / batch_size)
 
-        for epoch in range(1, epochs + 1):
-            # Use a default training loop
-            for batch_id, (examples, labels) in enumerate(train_loader):
-                examples, labels = examples.to(self.device), labels.to(
-                    self.device)
+        for self.current_epoch in range(1, total_epochs + 1):
+            self._loss_tracker.reset()
+            self.train_epoch_start(config)
+
+            for batch_id, (examples, labels) in enumerate(self.train_loader):
+                examples, labels = examples.to(self.device), labels.to(self.device)
                 examples.requires_grad = True
                 self.model.zero_grad()
 
                 # Store data in the first epoch (later epochs will still have the same partitioned data)
-                if epoch == 1:
+                if self.current_epoch == 1:
                     try:
                         full_examples = torch.cat((examples, full_examples),
                                                   dim=0)
@@ -95,7 +85,7 @@ class Trainer(basic.Trainer):
                         outputs, _ = self.model(
                             torch.unsqueeze(examples[index], dim=0))
 
-                        loss = loss_criterion(
+                        loss = _loss_criterion(
                             outputs, torch.unsqueeze(labels[index], dim=0))
                         grad = torch.autograd.grad(loss,
                                                    self.model.parameters(),
@@ -108,7 +98,7 @@ class Trainer(basic.Trainer):
                     outputs, feature_fc1_graph = self.model(examples)
 
                     # Save the ground truth and gradients
-                    loss = loss_criterion(outputs, labels)
+                    loss = _loss_criterion(outputs, labels)
                     grad = torch.autograd.grad(loss,
                                                self.model.parameters(),
                                                retain_graph=True,
@@ -186,7 +176,7 @@ class Trainer(basic.Trainer):
                                 self.device)
 
                     elif Config().algorithm.defense == 'Outpost':
-                        iteration = epoch * (batch_id + 1)
+                        iteration = self.current_epoch * (batch_id + 1)
                         # Probability decay
                         if random.random() < 1 / (
                                 1 + Config().algorithm.beta * iteration):
@@ -202,7 +192,7 @@ class Trainer(basic.Trainer):
                 # Update model weights with gradients and learning rate
                 for (param, grad_part) in zip(self.model.parameters(), grad):
                     param.data = param.data - Config(
-                    ).trainer.learning_rate * grad_part
+                    ).parameters.optimizer.lr * grad_part
 
                 # Sum up the gradients for each local update
                 try:
@@ -214,37 +204,35 @@ class Trainer(basic.Trainer):
                 except:
                     target_grad = list((_.detach().clone() for _ in grad))
 
-                if batch_id % log_interval == 0:
-                    if self.client_id == 0:
-                        logging.info(
-                            "[Server #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
-                            os.getpid(), epoch, epochs, batch_id,
-                            len(train_loader), loss.data.item())
-                    else:
-                        logging.info(
-                            "[Client #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
-                            self.client_id, epoch, epochs, batch_id,
-                            len(train_loader), loss.data.item())
+                self.train_step_end(config, batch=batch_id, loss=loss)
 
             full_onehot_labels = label_to_onehot(
                 full_labels, num_classes=Config().trainer.num_classes)
 
             # Simulate client's speed
-            if self.client_id != 0 and hasattr(
-                    Config().clients,
-                    "speed_simulation") and Config().clients.speed_simulation:
+            if (
+                self.client_id != 0
+                and hasattr(Config().clients, "speed_simulation")
+                and Config().clients.speed_simulation
+            ):
                 self.simulate_sleep_time()
 
             # Saving the model at the end of this epoch to a file so that
             # it can later be retrieved to respond to server requests
             # in asynchronous mode when the wall clock time is simulated
-            if hasattr(Config().server,
-                       'request_update') and Config().server.request_update:
+            if (
+                hasattr(Config().server, "request_update")
+                and Config().server.request_update
+            ):
                 self.model.cpu()
                 training_time = time.perf_counter() - tic
-                filename = f"{self.client_id}_{epoch}_{training_time}.pth"
+                filename = f"{self.client_id}_{self.current_epoch}_{training_time}.pth"
                 self.save_model(filename)
                 self.model.to(self.device)
+            
+            
+            self.run_history.update_metric("train_loss", self._loss_tracker.average)
+            self.train_epoch_end(config)
 
         if hasattr(Config().algorithm,
                    'share_gradients') and Config().algorithm.share_gradients:
@@ -258,6 +246,9 @@ class Trainer(basic.Trainer):
         with open(file_path, 'wb') as handle:
             pickle.dump([full_examples, full_onehot_labels, target_grad],
                         handle)
+        
+        self.train_run_end(config)
+        self.callback_handler.call_event("on_train_run_end", self, config)
 
     async def server_test(self, testset, sampler=None, **kwargs):
         """Testing the model on the server using the provided test dataset.
