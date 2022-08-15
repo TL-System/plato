@@ -45,9 +45,6 @@ trainer:
     epochs: 1
     batch_size: 10
     optimizer: SGD
-    learning_rate: 0.01
-    momentum: 0.9
-    weight_decay: 0.0
 
     meta_learning_rate: 0.01
 
@@ -62,3 +59,9 @@ results:
     # Write the following parameter(s) into a CSV
     types: round, accuracy, personalization_accuracy, elapsed_time, comm_time, round_time
     result_path: results/test
+
+parameters:
+    optimizer:
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0

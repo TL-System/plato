@@ -56,8 +56,6 @@ trainer:
     epochs: 1
     batch_size: 128
     optimizer: AdaHessian
-    momentum_b1: 0.9
-    momentum_b2: 0.999
     create_graph: true
 
     # The machine learning model
@@ -69,6 +67,7 @@ parameters:
         eps: 1e-8
         weight_decay: 0.0
         hessian_power: 1.0
+        betas: [0.9, 0.999] #the two momentums for betas
 
 algorithm:
     # Aggregation algorithm
