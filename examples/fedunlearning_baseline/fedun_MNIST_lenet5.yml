@@ -51,31 +51,23 @@ trainer:
 
     # The target accuracy
     target_accuracy: 0.97
+
     # Number of epoches for local training in each communication round
     epochs: 1
     batch_size: 128
     optimizer: AdaHessian
-    learning_rate: 0.001
-    momentum_b1: 0.9
-    momentum_b2: 0.999
     create_graph: true
-    eps: 1e-8
-    weight_decay: 0.0
-    hessian_power: 1.0
-
-    # epochs: 1
-    # batch_size: 128
-    # optimizer: SGD
-    # learning_rate: 0.001
-    # momentum: 0.9
-    # weight_decay: 0.0
-    # # Learning rate schedule
-    # lr_schedule: LambdaLR
-    # lr_gamma: 0.1
-    # lr_milestone_steps: 80ep,120ep
 
     # The machine learning model
     model_name: lenet5
+
+parameters:
+    optimizer:
+        lr: 0.001
+        eps: 1e-8
+        weight_decay: 0.0
+        hessian_power: 1.0
+        betas: [0.9, 0.999] #the two momentums for betas
 
 algorithm:
     # Aggregation algorithm

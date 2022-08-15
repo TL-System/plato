@@ -1,1 +1,0 @@
-YOLOv5 Object Detector as a Python package

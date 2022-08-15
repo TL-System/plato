@@ -5,27 +5,24 @@ Having a registry of all available classes is convenient for retrieving an insta
 based on a configuration at run-time.
 """
 import logging
-from collections import OrderedDict
 
 from plato.config import Config
 
-if hasattr(Config().trainer, 'use_mindspore'):
+if hasattr(Config().trainer, "use_mindspore"):
     from plato.algorithms.mindspore import (
         fedavg as fedavg_mindspore,
         mistnet as mistnet_mindspore,
     )
 
-    registered_algorithms = OrderedDict([
-        ('fedavg', fedavg_mindspore.Algorithm),
-        ('mistnet', mistnet_mindspore.Algorithm),
-    ])
-elif hasattr(Config().trainer, 'use_tensorflow'):
-    from plato.algorithms.tensorflow import (
-        fedavg as fedavg_tensorflow, )
+    registered_algorithms = {
+        "fedavg": fedavg_mindspore.Algorithm,
+        "mistnet": mistnet_mindspore.Algorithm,
+    }
 
-    registered_algorithms = OrderedDict([
-        ('fedavg', fedavg_tensorflow.Algorithm),
-    ])
+elif hasattr(Config().trainer, "use_tensorflow"):
+    from plato.algorithms.tensorflow import fedavg as fedavg_tensorflow
+
+    registered_algorithms = {"fedavg": fedavg_tensorflow.Algorithm}
 else:
     from plato.algorithms import (
         fedavg,
@@ -33,11 +30,11 @@ else:
         fedavg_gan,
     )
 
-    registered_algorithms = OrderedDict([
-        ('fedavg', fedavg.Algorithm),
-        ('mistnet', mistnet.Algorithm),
-        ('fedavg_gan', fedavg_gan.Algorithm),
-    ])
+    registered_algorithms = {
+        "fedavg": fedavg.Algorithm,
+        "mistnet": mistnet.Algorithm,
+        "fedavg_gan": fedavg_gan.Algorithm,
+    }
 
 
 def get(trainer=None):
@@ -49,4 +46,4 @@ def get(trainer=None):
         registered_alg = registered_algorithms[algorithm_type](trainer)
         return registered_alg
     else:
-        raise ValueError('No such model: {}'.format(algorithm_type))
+        raise ValueError(f"No such algorithm: {algorithm_type}")

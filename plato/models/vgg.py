@@ -1,7 +1,9 @@
-"""A VGG-style neural network model for image classification."""
+"""
+A VGG-style neural network model for image classification.
+"""
+
 import torch.nn as nn
 import torch.nn.functional as F
-from plato.config import Config
 
 
 class Model(nn.Module):
@@ -12,10 +14,7 @@ class Model(nn.Module):
 
         def __init__(self, in_filters, out_filters):
             super().__init__()
-            self.conv = nn.Conv2d(in_filters,
-                                  out_filters,
-                                  kernel_size=3,
-                                  padding=1)
+            self.conv = nn.Conv2d(in_filters, out_filters, kernel_size=3, padding=1)
             self.bn = nn.BatchNorm2d(out_filters)
 
         def forward(self, x):
@@ -28,7 +27,7 @@ class Model(nn.Module):
         filters = 3
 
         for spec in plan:
-            if spec == 'M':
+            if spec == "M":
                 layers.append(nn.MaxPool2d(kernel_size=2, stride=2))
             else:
                 layers.append(Model.ConvModule(filters, spec))
@@ -45,37 +44,70 @@ class Model(nn.Module):
         return x
 
     @staticmethod
-    def is_valid_model_type(model_type):
-        return (model_type.startswith('vgg')
-                and len(model_type.split('_')) == 2
-                and model_type.split('_')[1].isdigit()
-                and int(model_type.split('_')[1]) in [11, 13, 16, 19])
+    def is_valid_model_name(model_name):
+        return (
+            model_name.startswith("vgg")
+            and len(model_name.split("_")) == 2
+            and model_name.split("_")[1].isdigit()
+            and int(model_name.split("_")[1]) in [11, 13, 16, 19]
+        )
 
     @staticmethod
-    def get_model(model_type):
-        if not Model.is_valid_model_type(model_type):
-            raise ValueError('Invalid VGG model type: {}'.format(model_type))
+    def get(model_name, num_classes=10):
+        """Returns a suitable VGG model corresponding to the provided name."""
+        if not Model.is_valid_model_name(model_name):
+            raise ValueError(f"Invalid VGG model name: {model_name}")
 
-        outputs = Config().trainer.num_classes if hasattr(
-            Config().trainer, 'num_classes') else 1.0
+        outputs = num_classes
 
-        num = int(model_type.split('_')[1])
+        num = int(model_name.split("_")[1])
+
         if num == 11:
-            plan = [64, 'M', 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512]
+            plan = [64, "M", 128, "M", 256, 256, "M", 512, 512, "M", 512, 512]
         elif num == 13:
-            plan = [
-                64, 64, 'M', 128, 128, 'M', 256, 256, 'M', 512, 512, 'M', 512,
-                512
-            ]
+            plan = [64, 64, "M", 128, 128, "M", 256, 256, "M", 512, 512, "M", 512, 512]
         elif num == 16:
             plan = [
-                64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'M', 512, 512, 512,
-                'M', 512, 512, 512
+                64,
+                64,
+                "M",
+                128,
+                128,
+                "M",
+                256,
+                256,
+                256,
+                "M",
+                512,
+                512,
+                512,
+                "M",
+                512,
+                512,
+                512,
             ]
         elif num == 19:
             plan = [
-                64, 64, 'M', 128, 128, 'M', 256, 256, 256, 256, 'M', 512, 512,
-                512, 512, 'M', 512, 512, 512, 512
+                64,
+                64,
+                "M",
+                128,
+                128,
+                "M",
+                256,
+                256,
+                256,
+                256,
+                "M",
+                512,
+                512,
+                512,
+                512,
+                "M",
+                512,
+                512,
+                512,
+                512,
             ]
 
         return Model(plan, outputs)

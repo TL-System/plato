@@ -19,8 +19,10 @@ from plato.servers import fedavg
 class Server(fedavg.Server):
     """A personalized federated learning server using the FedRep algorithm."""
 
-    def __init__(self, model=None, algorithm=None, trainer=None):
-        super().__init__(model, algorithm, trainer)
+    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
+        super().__init__(
+            model=model, datasource=datasource, algorithm=algorithm, trainer=trainer
+        )
 
         # parameter names of the representation
         #   As mentioned by Eq. 1 and Fig. 2 of the paper, the representation
@@ -28,10 +30,9 @@ class Server(fedavg.Server):
         self.representation_param_names = []
 
     def extract_representation_param_names(self):
-        """ Obtain the weights responsible for representation. """
+        """Obtain the weights responsible for representation."""
 
-        model_full_parameter_names = list(
-            self.trainer.model.state_dict().keys())
+        model_full_parameter_names = list(self.trainer.model.state_dict().keys())
 
         # in general, the weights before the final layer are regarded as
         #   the representation.
@@ -46,11 +47,10 @@ class Server(fedavg.Server):
         #  'conv3.weight', 'conv3.bias', 'fc4.weight', 'fc4.bias']
         self.representation_param_names = model_full_parameter_names[:-2]
 
-        logging.info("Representation_weights: %s",
-                     self.representation_param_names)
+        logging.info("Representation_weights: %s", self.representation_param_names)
 
     def init_trainer(self):
-        """ Extract representation parameter names after initializing the trainer. """
+        """Extract representation parameter names after initializing the trainer."""
         super().init_trainer()
 
         self.extract_representation_param_names()
@@ -62,20 +62,21 @@ class Server(fedavg.Server):
         # representation is optimized in the 'Server Update', as mentioned
         # in Section 3 of the FedRep paper.
         self.trainer.set_representation_and_head(
-            representation_param_names=self.representation_param_names)
+            representation_param_names=self.representation_param_names
+        )
 
         # The algorithm only operates on the representation without
         # considering the head as the head is solely known by each client
         # because of personalization.
         self.algorithm.set_representation_param_names(
-            representation_param_names=self.representation_param_names)
+            representation_param_names=self.representation_param_names
+        )
 
-    async def customize_server_response(self, server_response):
+    def customize_server_response(self, server_response: dict) -> dict:
         """
-            The FedRep server sends parameter names belonging to the representation
-            layers back to the clients.
+        The FedRep server sends parameter names belonging to the representation
+        layers back to the clients.
         """
         # server sends the required representaion to the client
-        server_response[
-            "representation_param_names"] = self.representation_param_names
+        server_response["representation_param_names"] = self.representation_param_names
         return server_response

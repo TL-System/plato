@@ -154,3 +154,9 @@ checkpoints/
 
 # Plain text files in the root working directory are most likely temporary
 /*.txt
+
+# Sphinx documentation
+docs/_build/
+
+# TensorFlow datasets
+tensorflow_datasets/

@@ -60,16 +60,19 @@ trainer:
     # The target Frechet Distance
     target_perplexity: 0
 
+    # The machine learning model
+    model_name: dcgan
+
     # Number of epoches for local training in each communication round
     epochs: 5
     batch_size: 128
     optimizer: Adam
-    learning_rate: 0.0002
-    weight_decay: 0.0
-
-    # The machine learning model
-    model_name: dcgan
 
 algorithm:
     # Aggregation algorithm
     type: fedavg_gan
+
+parameters:
+    optimizer:
+        lr: 0.0002
+        weight_decay: 0.0
