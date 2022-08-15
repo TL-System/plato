@@ -474,8 +474,7 @@ class Trainer(base.Trainer):
 
     def lr_scheduler_step(self):
         """
-        Performs a single scheduler step if ``self.scheduler`` has been assigned.
-
+        Performs a single scheduler step if ``self.lr_scheduler`` has been assigned.
         """
         if self.lr_scheduler is not None:
             self.lr_scheduler.step()

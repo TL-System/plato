@@ -15,7 +15,8 @@ class RunHistory:
 
     def get_metric_names(self) -> Iterable:
         """
-        Return a set containing of all unique metric names which are being tracked.
+        Returns an iterable set containing of all unique metric names which are
+        being tracked.
 
         :return: an iterable of the unique metric names.
         """
@@ -23,7 +24,8 @@ class RunHistory:
 
     def get_metric_values(self, metric_name) -> Iterable:
         """
-        Return all of the values that have been recorded for the given metric.
+        Returns an ordered iterable list of values that has been stored since
+        the last reset corresponding to the provided metric name.
 
         :param metric_name: the name of the metric being tracked.
         :return: an ordered iterable of values that have been recorded for that metric.
@@ -32,7 +34,7 @@ class RunHistory:
 
     def get_latest_metric(self, metric_name):
         """
-        Return the most recent value that has been recorded for the given metric.
+        Returns the most recent value that has been recorded for the given metric.
 
         :param metric_name: the name of the metric being tracked.
         :return: the last recorded value.
@@ -46,7 +48,7 @@ class RunHistory:
 
     def update_metric(self, metric_name, metric_value):
         """
-        Record the value for the given metric.
+        Records a new value for the given metric.
 
         :param metric_name: the name of the metric being tracked.
         :param metric_value: the value to record.
@@ -55,7 +57,8 @@ class RunHistory:
 
     def reset(self):
         """
-        Reset the state of the :class:`RunHistory`.
+        Resets the state of the :class:`RunHistory`.
+
         """
         self._metrics = defaultdict(list)
 
@@ -70,14 +73,16 @@ class LossTracker:
         self.running_count = 0
 
     def reset(self):
-        """Resetting this loss tracker."""
+        """Resets this loss tracker."""
+
         self.loss_value = 0
         self._average = 0
         self.total_loss = 0
         self.running_count = 0
 
     def update(self, loss_batch_value, batch_size=1):
-        """Updating the loss tracker with another loss value from a batch."""
+        """Updates the loss tracker with another loss value from a batch."""
+
         self.loss_value = loss_batch_value
         self.total_loss += loss_batch_value * batch_size
         self.running_count += batch_size
@@ -85,5 +90,6 @@ class LossTracker:
 
     @property
     def average(self):
-        """Returning the computed average of loss values tracked."""
+        """Returns the computed average of loss values tracked."""
+
         return self._average.cpu().detach().mean().item()
