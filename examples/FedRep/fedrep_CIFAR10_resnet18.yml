@@ -68,9 +68,9 @@ trainer:
 algorithm:
     # Aggregation algorithm
     type: fedavg
-    
+
 parameters:
     optimizer:
-        learning_rate: 0.03
+        lr: 0.03
         momentum: 0.0 # learning rate is fixed as in Appendix C.2
         weight_decay: 0.0

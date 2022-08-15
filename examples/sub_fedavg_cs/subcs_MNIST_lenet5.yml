@@ -97,8 +97,8 @@ results:
 
     result_path: ./results/test
 
-paramters:
+parameters:
     optimizer:
-        learning_rate: 0.01
+        lr: 0.01
         momentum: 0.9
         weight_decay: 0.0

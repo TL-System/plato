@@ -64,8 +64,8 @@ algorithm:
     # aggregated weights to the central server
     local_rounds: 4
 
-paramters:
+parameters:
     optimizer:
-        learning_rate: 0.01
+        lr: 0.01
         momentum: 0.9
         weight_decay: 0.0

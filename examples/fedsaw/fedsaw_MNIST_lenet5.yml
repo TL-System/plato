@@ -96,9 +96,9 @@ results:
     types: round, accuracy, elapsed_time, comm_time, round_time, comm_overhead
 
     result_path: ./results/test
-   
+
 parameters:
     optimizer:
-        learning_rate: 0.01
+        lr: 0.01
         momentum: 0.9
         weight_decay: 0.0
