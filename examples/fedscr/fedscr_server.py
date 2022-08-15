@@ -139,4 +139,5 @@ class Server(fedavg.Server):
         # Delete files created by the clients.
         for client_id in range(1, self.total_clients + 1):
             acc_grad_file = f"{checkpoint_path}/{model_name}_client{client_id}_grad.pth"
-            os.remove(acc_grad_file)
+            if os.path.exists(acc_grad_file):
+                os.remove(acc_grad_file)
