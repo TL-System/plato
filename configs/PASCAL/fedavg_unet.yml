@@ -48,7 +48,7 @@ trainer:
     epochs: 1
     batch_size: 32
     optimizer: SGD
-    loss_func: BCEWithLogitsLoss
+    loss_criterion: BCEWithLogitsLoss
 
 algorithm:
     # Aggregation algorithm
