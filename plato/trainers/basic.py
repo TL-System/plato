@@ -16,7 +16,7 @@ from plato.models import registry as models_registry
 from plato.trainers import base
 from plato.trainers import optimizers
 from plato.trainers import lr_schedulers
-from plato.trainers import loss_funcs
+from plato.trainers import loss_criterion
 from plato.callbacks.handler import CallbackHandler
 from plato.callbacks.trainer import PrintProgressCallback
 
@@ -479,7 +479,7 @@ class Trainer(base.Trainer):
 
     def get_loss_criterion(self):
         """Returns the loss criterion."""
-        return loss_funcs.get()
+        return loss_criterion.get()
 
     def train_run_start(self, config):
         """Method called at the start of training run."""
