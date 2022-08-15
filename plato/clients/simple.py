@@ -202,4 +202,3 @@ class Client(base.Client):
     def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
         """Customizes the report with any additional information."""
         return report
-

@@ -530,7 +530,7 @@ This is where your learning rate scheduler parameters would go
 ### loss_func:
 This is where your loss function parameters would go
 
-**Note:** Your parameters in your configuration file MUST match the variable name in your optimizer/loss/learning scheduler/model function. For example, if you want to set base_lr in the learning scheduler "CyclicLR", Please have your parameter argument as: \ 
+**Note:** Your parameters in your configuration file MUST match the variable name in your optimizer/loss/learning scheduler/model function. For example, if you want to set `base_lr` in the learning scheduler `CyclicLR`, Please have your parameter argument as: \ 
 
 parameter: \
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;learning_rate: \
