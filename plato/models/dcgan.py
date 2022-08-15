@@ -14,7 +14,7 @@ ndf = 64
 
 
 class Generator(nn.Module):
-    """ Generator network of DCGAN """
+    """Generator network of DCGAN"""
 
     def __init__(self):
         super().__init__()
@@ -43,12 +43,12 @@ class Generator(nn.Module):
         )
 
     def forward(self, input_data):
-        """ Forward pass. """
+        """Forward pass."""
         return self.main(input_data)
 
 
 class Discriminator(nn.Module):
-    """ Discriminator network of DCGAN. """
+    """Discriminator network of DCGAN."""
 
     def __init__(self):
         super().__init__()
@@ -71,14 +71,15 @@ class Discriminator(nn.Module):
             nn.LeakyReLU(0.2, inplace=True),
             # state size. (ndf*8) x 4 x 4
             nn.Conv2d(ndf * 8, 1, 4, 1, 0, bias=False),
-            nn.Sigmoid())
+            nn.Sigmoid(),
+        )
 
     def forward(self, input_data):
         return self.main(input_data)
 
 
 class Model:
-    """ A wrapper class to hold the Generator and Discriminator models of DCGAN. """
+    """A wrapper class to hold the Generator and Discriminator models of DCGAN."""
 
     def __init__(self) -> None:
         self.generator = Generator()
@@ -92,9 +93,9 @@ class Model:
 
     def weights_init(self, model):
         classname = model.__class__.__name__
-        if classname.find('Conv') != -1:
+        if classname.find("Conv") != -1:
             nn.init.normal_(model.weight.data, 0.0, 0.02)
-        elif classname.find('BatchNorm') != -1:
+        elif classname.find("BatchNorm") != -1:
             nn.init.normal_(model.weight.data, 1.0, 0.02)
             nn.init.constant_(model.bias.data, 0)
 
@@ -113,8 +114,3 @@ class Model:
     def eval(self):
         self.generator.eval()
         self.discriminator.eval()
-
-    @staticmethod
-    def get_model(*args):
-        """ Obtaining an instance of this model. """
-        return Model()

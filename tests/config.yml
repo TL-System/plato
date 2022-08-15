@@ -45,9 +45,6 @@ trainer:
     epochs: 5
     batch_size: 32
     optimizer: SGD
-    learning_rate: 0.01
-    momentum: 0.9
-    weight_decay: 0.0
 
     # The machine learning model
     model_name: lenet5
@@ -55,3 +52,9 @@ trainer:
 algorithm:
     # Aggregation algorithm
     type: fedavg
+
+parameters:
+    optimizer:
+        lr: 0.01
+        momentum: 0.9
+        weight_delay: 0.0

@@ -33,32 +33,33 @@ class Trainer(base.Trainer):
         """
         super().__init__()
 
-        if hasattr(Config().trainer, 'cpuonly') and Config().trainer.cpuonly:
-            mindspore.context.set_context(mode=mindspore.context.PYNATIVE_MODE,
-                                          device_target='CPU')
+        if hasattr(Config().trainer, "cpuonly") and Config().trainer.cpuonly:
+            mindspore.context.set_context(
+                mode=mindspore.context.PYNATIVE_MODE, device_target="CPU"
+            )
         else:
-            mindspore.context.set_context(mode=mindspore.context.PYNATIVE_MODE,
-                                          device_target='GPU')
+            mindspore.context.set_context(
+                mode=mindspore.context.PYNATIVE_MODE, device_target="GPU"
+            )
 
         if model is None:
             self.model = models_registry.get()
         else:
-            self.model = model.get_model()
+            self.model = model()
 
         # Initializing the loss criterion
-        loss_criterion = SoftmaxCrossEntropyWithLogits(sparse=True,
-                                                       reduction='mean')
+        loss_criterion = SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
 
         # Initializing the optimizer
-        optimizer = nn.Momentum(self.model.trainable_params(),
-                                Config().trainer.learning_rate,
-                                Config().trainer.momentum)
+        optimizer = nn.Momentum(
+            self.model.trainable_params(),
+            Config().parameters.optimizer.lr,
+            Config().parameters.optimizer.momentum,
+        )
 
         self.mindspore_model = mindspore.Model(
-            self.model,
-            loss_criterion,
-            optimizer,
-            metrics={"Accuracy": Accuracy()})
+            self.model, loss_criterion, optimizer, metrics={"Accuracy": Accuracy()}
+        )
 
     def zeros(self, shape):
         """Returns a zero numpy array with the given shape."""
@@ -68,44 +69,42 @@ class Trainer(base.Trainer):
 
     def save_model(self, filename=None, location=None):
         """Saving the model to a file."""
-        model_path = Config(
-        ).params['model_path'] if location is None else location
+        model_path = Config().params["model_path"] if location is None else location
         model_name = Config().trainer.model_name
 
         if not os.path.exists(model_path):
             os.makedirs(model_path)
 
         if filename is not None:
-            model_path = f'{model_path}/{filename}'
+            model_path = f"{model_path}/{filename}"
         else:
-            model_path = f'{model_path}/{model_name}.ckpt'
+            model_path = f"{model_path}/{model_name}.ckpt"
 
         mindspore.save_checkpoint(self.model, model_path)
 
         if self.client_id == 0:
-            logging.info("[Server #%d] Model saved to %s.", os.getpid(),
-                         model_path)
+            logging.info("[Server #%d] Model saved to %s.", os.getpid(), model_path)
         else:
-            logging.info("[Client #%d] Model saved to %s.", self.client_id,
-                         model_path)
+            logging.info("[Client #%d] Model saved to %s.", self.client_id, model_path)
 
     def load_model(self, filename=None, location=None):
         """Loading pre-trained model weights from a file."""
-        model_path = Config(
-        ).params['model_path'] if location is None else location
+        model_path = Config().params["model_path"] if location is None else location
         model_name = Config().trainer.model_name
 
         if filename is not None:
-            model_path = f'{model_path}/{filename}'
+            model_path = f"{model_path}/{filename}"
         else:
-            model_path = f'{model_path}/{model_name}.ckpt'
+            model_path = f"{model_path}/{model_name}.ckpt"
 
         if self.client_id == 0:
-            logging.info("[Server #%d] Loading a model from %s.", os.getpid(),
-                         model_path)
+            logging.info(
+                "[Server #%d] Loading a model from %s.", os.getpid(), model_path
+            )
         else:
-            logging.info("[Client #%d] Loading a model from %s.",
-                         self.client_id, model_path)
+            logging.info(
+                "[Client #%d] Loading a model from %s.", self.client_id, model_path
+            )
 
         param_dict = mindspore.load_checkpoint(model_path)
         mindspore.load_param_into_net(self.model, param_dict)
@@ -122,7 +121,8 @@ class Trainer(base.Trainer):
             Config().trainer.epochs,
             trainset,
             callbacks=[LossMonitor(per_print_times=300)],
-            dataset_sink_mode=False)
+            dataset_sink_mode=False,
+        )
 
         toc = time.perf_counter()
         self.pause_training()
@@ -143,12 +143,4 @@ class Trainer(base.Trainer):
         accuracy = self.mindspore_model.eval(testset)
 
         self.pause_training()
-        return accuracy['Accuracy']
-
-    async def server_test(self, testset, sampler=None):
-        """Testing the model on the server using the provided test dataset.
-
-        Arguments:
-        testset: The test dataset.
-        """
-        return self.test(testset, sampler)
+        return accuracy["Accuracy"]

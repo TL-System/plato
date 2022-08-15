@@ -8,11 +8,12 @@ in IEEE Transactions on Cognitive Communications and Networking (TCCN'21).
 
 https://ieeexplore.ieee.org/abstract/document/9442814
 """
+
 import fedadp_server
 
 
 def main():
-    """ A Plato federated learning training session using the FedAdp algorithm. """
+    """A federated learning training session using the FedAdp algorithm."""
     server = fedadp_server.Server()
     server.run()
 

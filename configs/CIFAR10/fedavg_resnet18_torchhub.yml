@@ -1,0 +1,62 @@
+clients:
+    # Type
+    type: simple
+
+    # The total number of clients
+    total_clients: 1000
+
+    # The number of clients selected in each round
+    per_round: 200
+
+    # Should the clients compute test accuracy locally?
+    do_test: false
+
+server:
+    address: 127.0.0.1
+    port: 8020
+
+data:
+    # The training and testing dataset
+    datasource: CIFAR10
+
+    # Number of samples in each partition
+    partition_size: 1000
+
+    # IID or non-IID?
+    sampler: iid
+
+trainer:
+    # The type of the trainer
+    type: basic
+
+    # The maximum number of training rounds
+    rounds: 20
+
+    # The maximum number of clients running concurrently
+    max_concurrency: 7
+
+    # The target accuracy
+    target_accuracy: 0.80
+
+    # The machine learning model
+    model_type: torch_hub
+    model_name: resnet18
+
+    # Number of epoches for local training in each communication round
+    epochs: 5
+    batch_size: 10
+    optimizer: SGD
+    lr_scheduler: LambdaLR
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg
+
+parameters:
+    optimizer:
+        lr: 0.1
+        momentum: 0.9
+        weight_decay: 0.0001
+    learning_rate:
+        gamma: 0.1
+        milestone_steps: 80ep,120ep
