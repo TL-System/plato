@@ -388,40 +388,75 @@ The target perplexity of the global Natural Language Processing (NLP) model.
 The total number of epoches in local training in each communication round.
 ```
 
-```{admonition} **optimizer**
-The type of the optimizer. This can be `SGD`, `Adam` or `FedProx`.
-```
-
 ```{admonition} **batch_size**
 The size of the mini-batch of data in each step (iteration) of the training loop.
 ```
 
-````{admonition} **learning_rate**
-The learning rate used for local training.
+```{admonition} **optimizer**
+The type of the optimizer. The following options are supported:
 
-```{note}
-Decrease the value of the learning rate when using the `diff_privacy` trainer.
+- `Adam`
+- `Adadelta`
+- `Adagrad`
+- `AdaHessian` (from the `torch_optimizer` package)
+- `AdamW`
+- `SparseAdam`
+- `Adamax`
+- `ASGD`
+- `LBFGS`
+- `NAdam`
+- `RAdam`
+- `RMSprop`
+- `Rprop`
+- `SGD`
 ```
-````
 
-```{admonition} **momentum**
-The momentum used for local training.
-```
-
-````{admonition} **weight_decay**
-The weight decay used for local training.
-```{note}
-When using `diff_privacy` trainer, set to 0.
-```
-````
-
-```{admonition} lr_schedule
-The learning rate scheduler. The following options are available:
+````{admonition} lr_scheduler
+The learning rate scheduler. The following learning rate schedulers from PyTorch are supported:
 
 - `CosineAnnealingLR`
 - `LambdaLR`
+- `MultiStepLR`
 - `StepLR`
 - `ReduceLROnPlateau`
+- `ConstantLR`
+- `LinearLR`
+- `ExponentialLR`
+- `CyclicLR`
+- `CosineAnnealingWarmRestarts`
+
+Alternatively, all four schedulers from [timm](https://timm.fast.ai/schedulers) are supported if `lr_scheduler` is specified as `timm` and `trainer -> type` is specified as `timm_basic`. For example, to use the `SGDR` scheduler, we specify `cosine` as `sched` in its arguments (`parameters -> learning_rate`):
+
+```
+trainer:
+    type: timm_basic
+
+parameters:
+    learning_rate:
+        sched: cosine
+        min_lr: 1.e-6
+        warmup_lr: 0.0001
+        warmup_epochs: 3
+        cooldown_epochs: 10
+```
+
+````
+
+```{admonition} loss_criterion
+The loss criterion. The following options are supported:
+
+- `L1Loss`
+- `MSELoss`
+- `BCELoss`
+- `BCEWithLogitsLoss`
+- `NLLLoss`
+- `PoissonNLLLoss`
+- `CrossEntropyLoss`
+- `HingeEmbeddingLoss`
+- `MarginRankingLoss`
+- `TripletMarginLoss`
+- `KLDivLoss`
+
 ```
 
 ```{admonition} global_lr_scheduler
@@ -454,20 +489,6 @@ If the `model_type` above specified a model repository, supply the name of the m
 For `resnet_x`, x = 18, 34, 50, 101, or 152; For `vgg_x`, x = 11, 13, 16, or 19.
 ```
 ````
-
-````{admonition} pretrained
-Use a model pretrained on ImageNet or not. The value for `pretrained ` should be `true` or `false`. Default is `false`.
-
-```{note}
-Can be used for `inceptionv3`, `alexnet`, and `squeezenet_x` models.
-```
-````
-
-```{admonition} num_classes
-The number of classes.
-
-The default value is `10`.
-```
 
 ## algorithm
 
@@ -516,22 +537,29 @@ The path to the result `.csv` files. The default path is `<base_path>/results/`,
 ````
 
 ## parameters
-This would be where you load in parameters for optimizers, loss_functions, models, or learning_schedulers. \
 
-### model:
-This is where your model parameters would go
+````{note}
+Your parameters in your configuration file must match the keywords in `__init__` of your model, optimizer, learning rate scheduler, or loss criterion. For example, if you want to set `base_lr` in the learning scheduler `CyclicLR`, you will need:
 
-### optimizer:
-This is where your optimizer's parameters would go
+```
+parameters:
+    learning_rate:
+        base_lr: 0.01
+```
+````
 
-### learning_rate:
-This is where your learning rate scheduler parameters would go
+```{admonition} model
+All the parameter settings that need to be passed as keyword parameters when initializing the model, such as `num_classes` or `cut_layer`. The set of parameters permitted or needed depends on the model.
+```
 
-### loss_func:
-This is where your loss function parameters would go
+```{admonition} optimizer
+All the parameter settings that need to be passed as keyword parameters when initializing the optimizer, such as `lr`, `momentum`, or `weight_decay`. The set of parameters permitted or needed depends on the optimizer.
+```
 
-**Note:** Your parameters in your configuration file MUST match the variable name in your optimizer/loss/learning scheduler/model function. For example, if you want to set `base_lr` in the learning scheduler `CyclicLR`, Please have your parameter argument as: \ 
+```{admonition} learning_rate
+All the parameter settings that need to be passed as keyword parameters when initializing the learning rate scheduler, such as `gamma`. The set of parameters permitted or needed depends on the learning rate scheduler.
+```
 
-parameter: \
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;learning_rate: \
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;base_lr: 0.01
+```{admonition} loss_criterion
+All the parameter settings that need to be passed as keyword parameters when initializing the loss criterion, such as `size_average`. The set of parameters permitted or needed depends on the loss criterion.
+```

@@ -25,6 +25,7 @@ else:
 
     registered_trainers = {
         "basic": basic.Trainer,
+        "timm_basic": basic.TrainerWithTimmScheduler,
         "diff_privacy": diff_privacy.Trainer,
         "pascal_voc": pascal_voc.Trainer,
         "gan": gan.Trainer,

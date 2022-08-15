@@ -32,7 +32,7 @@ class Server(fedavg.Server):
         # Extract weights udpates from the client updates
         deltas_received = self.compute_weight_deltas(updates)
 
-        num_samples = [report.num_samples for (__, report, __, __) in updates]
+        num_samples = [update.report.num_samples for update in updates]
         total_samples = sum(num_samples)
 
         self.global_grads = {

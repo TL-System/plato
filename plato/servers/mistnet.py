@@ -42,7 +42,7 @@ class Server(fedavg.Server):
 
     async def process_reports(self):
         """Process the features extracted by the client and perform server-side training."""
-        features = [features for (__, __, features, __) in self.updates]
+        features = [update.payload for update in self.updates]
         feature_dataset = feature.DataSource(features)
 
         # Training the model using all the features received from the client
