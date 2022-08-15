@@ -30,8 +30,10 @@ class Client(simple.Client):
     def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
         """Wrap up generating the report with any additional information."""
         if self.trainer.use_adaptive:
-            report.div_from_global = self.trainer.div_from_global
-            report.avg_update = self.trainer.avg_update
-            report.loss = self.trainer.train_loss.data.item()
+            report.div_from_global = self.trainer.run_history.get_latest_metric(
+                "div_from_global"
+            )
+            report.avg_update = self.trainer.run_history.get_latest_metric("avg_update")
+            report.loss = self.trainer.run_history.get_latest_metric("train_loss")
 
         return report

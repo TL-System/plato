@@ -84,7 +84,7 @@ class Server(fedavg.Server):
 
         return weights_received
 
-    async def aggregate_models(self, updates):
+    async def aggregate_weights(self, updates):
         """Personalized weight aggregation designed for Hermes"""
         self.personalized_models = await self.personalized_fedavg(updates)
         self.save_personalized_models(self.personalized_models, self.updates)

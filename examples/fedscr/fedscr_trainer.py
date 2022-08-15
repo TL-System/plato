@@ -219,6 +219,9 @@ class Trainer(basic.Trainer):
                 self.div_from_global,
             )
 
+            self.run_history.update_metric("div_from_global", self.div_from_global)
+            self.run_history.update_metric("avg_update", self.avg_update)
+
         self.model.load_state_dict(self.total_grad, strict=True)
 
     def compute_weight_divergence(self):
