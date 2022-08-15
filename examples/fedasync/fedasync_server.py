@@ -61,13 +61,13 @@ class Server(fedavg.Server):
     async def aggregate_weights(self, updates):
         """Process the client reports by aggregating their weights."""
         # Calculate the new mixing hyperparameter with client's staleness
-        __, __, __, client_staleness = updates[0]
+        client_staleness = updates[0].staleness
 
         if self.adaptive_mixing:
             self.mixing_hyperparam *= self._staleness_function(client_staleness)
 
         # Calculate updated weights from clients
-        payload_received = [payload for (__, __, payload, __) in updates]
+        payload_received = [update.payload for update in updates]
         deltas_received = self.algorithm.compute_weight_deltas(payload_received)
 
         # Actually update the global model's weights (PyTorch only)

@@ -84,15 +84,14 @@ class Server(fedavg.Server):
 
     def extract_client_updates(self, updates):
         """Extract the model weight updates from clients."""
-        deltas_received = [payload for (__, __, payload, __) in updates]
-        self.local_loss = [report.loss for (__, report, __, __) in updates]
+        deltas_received = [update.payload for update in updates]
+        self.local_loss = [update.report.loss for update in updates]
         if self.trainer.use_adaptive:
             self.divs = {
-                client_id: report.div_from_global
-                for (client_id, report, __, __) in updates
+                update.client_id: update.report.div_from_global for update in updates
             }
             self.avg_update = {
-                client_id: report.avg_update for (client_id, report, __, __) in updates
+                update.client_id: update.report.avg_update for update in updates
             }
         return deltas_received
 
@@ -101,9 +100,7 @@ class Server(fedavg.Server):
         deltas_received = self.extract_client_updates(updates)
 
         # Extract the total number of samples
-        self.total_samples = sum(
-            [report.num_samples for (__, report, __, __) in updates]
-        )
+        self.total_samples = sum(update.report.num_samples for update in updates)
 
         # Perform weighted averaging
         avg_update = {
@@ -112,8 +109,7 @@ class Server(fedavg.Server):
         }
 
         for i, update in enumerate(deltas_received):
-            __, report, __, __ = updates[i]
-            num_samples = report.num_samples
+            num_samples = updates[i].report.num_samples
 
             for name, delta in update.items():
                 # Use weighted average by the number of samples
