@@ -46,9 +46,6 @@ trainer:
     epochs: 6
     batch_size: 10
     optimizer: SGD
-    learning_rate: 0.01
-    momentum: 0.9
-    weight_decay: 0.0
 
     # The machine learning model
     model_name: lenet5
@@ -66,3 +63,9 @@ algorithm:
     # The number of local aggregation rounds on edge servers before sending
     # aggregated weights to the central server
     local_rounds: 4
+
+parameters:
+    optimizer:
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0

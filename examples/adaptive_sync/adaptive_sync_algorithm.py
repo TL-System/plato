@@ -19,7 +19,7 @@ from plato.algorithms import fedavg
 
 class Algorithm(fedavg.Algorithm):
     """The federated learning trainer for Adaptive Synchronization Frequency,
-       used by the server.
+    used by the server.
     """
 
     def __init__(self, trainer: Trainer = None):
@@ -28,12 +28,10 @@ class Algorithm(fedavg.Algorithm):
         self.sync_frequency = Config().algorithm.initial_sync_frequency
         weights = self.model.cpu().state_dict()
         self.average_positive_deltas = {
-            name: torch.zeros(param.data.shape)
-            for name, param in weights.items()
+            name: torch.zeros(param.data.shape) for name, param in weights.items()
         }
         self.average_negative_deltas = {
-            name: torch.zeros(param.data.shape)
-            for name, param in weights.items()
+            name: torch.zeros(param.data.shape) for name, param in weights.items()
         }
 
         self.sliding_window_size = 5
@@ -88,30 +86,40 @@ class Algorithm(fedavg.Algorithm):
 
                         # Calculate both positive and negative updates
                         _delta = torch.where(
-                            delta > 0.0, delta, torch.zeros(delta.shape, dtype=delta.dtype))
+                            delta > 0.0,
+                            delta,
+                            torch.zeros(delta.shape, dtype=delta.dtype),
+                        )
                         positive_deltas += _delta
-                        
+
                         _delta = torch.where(
-                            delta < 0.0, delta, torch.zeros(delta.shape, dtype=delta.dtype))
+                            delta < 0.0,
+                            delta,
+                            torch.zeros(delta.shape, dtype=delta.dtype),
+                        )
                         negative_deltas += _delta
 
-                        self.average_positive_deltas[
-                            name] = self.moving_average(
-                                self.average_positive_deltas[name],
-                                positive_deltas)
+                        self.average_positive_deltas[name] = self.moving_average(
+                            self.average_positive_deltas[name], positive_deltas
+                        )
 
-                        self.average_negative_deltas[
-                            name] = self.moving_average(
-                                self.average_negative_deltas[name],
-                                negative_deltas)
-            divide_base = self.average_positive_deltas[
-                previous_name] - self.average_negative_deltas[previous_name]
-            divide_base = torch.where(divide_base == 0,
-                                      torch.ones(previous_weight.shape),
-                                      divide_base)
-            layer_consistency_rate = torch.abs(
-                self.average_positive_deltas[previous_name] +
-                self.average_negative_deltas[previous_name]) / divide_base
+                        self.average_negative_deltas[name] = self.moving_average(
+                            self.average_negative_deltas[name], negative_deltas
+                        )
+            divide_base = (
+                self.average_positive_deltas[previous_name]
+                - self.average_negative_deltas[previous_name]
+            )
+            divide_base = torch.where(
+                divide_base == 0, torch.ones(previous_weight.shape), divide_base
+            )
+            layer_consistency_rate = (
+                torch.abs(
+                    self.average_positive_deltas[previous_name]
+                    + self.average_negative_deltas[previous_name]
+                )
+                / divide_base
+            )
             consistency_count += torch.sum(layer_consistency_rate)
         consistency_rate = consistency_count / model_size
         logging.info("Consistent_rate: %s", consistency_rate)
@@ -125,14 +133,18 @@ class Algorithm(fedavg.Algorithm):
             self.history.append(1)
         else:
             self.history.append(0)
-            if self.round_id - self.min_consistency_rate_at_round > self.sliding_window_size:
+            if (
+                self.round_id - self.min_consistency_rate_at_round
+                > self.sliding_window_size
+            ):
                 logging.info("Gradient bifurcation detected.")
                 if self.sync_frequency > 1 and self.round_id > 50:
-                    self.sync_frequency = (self.sync_frequency +
-                                           self.frequency_increase_ratio -
-                                           1) / self.frequency_increase_ratio
-                    logging.info("Adjusted synchronization frequency to %s",
-                                 self.sync_frequency)
+                    self.sync_frequency = (
+                        self.sync_frequency + self.frequency_increase_ratio - 1
+                    ) / self.frequency_increase_ratio
+                    logging.info(
+                        "Adjusted synchronization frequency to %s", self.sync_frequency
+                    )
                     self.min_consistency_rate = 1.1
                     self.min_consistency_rate_at_round = self.round_id
                     self.sliding_window_size *= self.frequency_increase_ratio
@@ -148,7 +160,7 @@ class Algorithm(fedavg.Algorithm):
 
         self.round_id += 1
 
-    async def customize_server_response(self, server_response):
+    def customize_server_response(self, server_response: dict) -> dict:
         """Customizing the server response with any additional information."""
-        server_response['sync_frequency'] = self.algorithm.sync_frequency
+        server_response["sync_frequency"] = self.algorithm.sync_frequency
         return server_response

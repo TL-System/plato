@@ -1,0 +1,71 @@
+clients:
+    # Type
+    type: simple
+
+    # The total number of clients
+    total_clients: 10
+
+    # The number of clients selected in each round
+    per_round: 2
+
+    # Should the clients compute test accuracy locally?
+    do_test: false
+
+    # Processors for outbound data payloads
+    outbound_processors:
+        - unstructured_pruning
+        - model_compress
+
+server:
+    address: 127.0.0.1
+    port: 8000
+    random_seed: 1
+    simulate_wall_time: true
+
+    # Processors for inbound data payloads
+    inbound_processors:
+        - model_decompress
+
+data: !include mnist_iid.yml
+
+trainer:
+    # The type of the trainer
+    type: timm_basic
+
+    # The maximum number of training rounds
+    rounds: 5
+
+    # The maximum number of clients running concurrently
+    max_concurrency: 1
+
+    # The target accuracy
+    target_accuracy: 0.97
+
+    # The machine learning model
+    model_name: lenet5
+
+    # Number of epoches for local training in each communication round
+    epochs: 5
+    batch_size: 32
+    optimizer: SGD
+    lr_scheduler: timm
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg
+
+parameters:
+    model:
+        num_classes: 10
+
+    optimizer:
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0
+
+    learning_rate:
+        sched: cosine
+        min_lr: 1.e-6
+        warmup_lr: 0.0001
+        warmup_epochs: 3
+        cooldown_epochs: 10

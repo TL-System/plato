@@ -6,7 +6,7 @@ clients:
     total_clients: 500
 
     # The number of clients selected in each round
-    per_round: 20
+    per_round: 2
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -54,7 +54,6 @@ data:
     sampler: noniid
 
     #testset_size: 1000
-    concentration: 0.1
 
     # The random seed for sampling data
     random_seed: 1
@@ -65,7 +64,7 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 100
+    rounds: 2
 
     # The maximum number of clients running concurrently
     max_concurrency: 3
@@ -74,12 +73,9 @@ trainer:
     target_accuracy: 0.99
 
     # Number of epoches for local training in each communication round
-    epochs: 5
+    epochs: 2
     batch_size: 10
     optimizer: SGD
-    learning_rate: 0.01
-    momentum: 0.9
-    weight_decay: 0.0
 
     # The machine learning model
     model_name: lenet5
@@ -92,4 +88,10 @@ results:
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time
 
-    result_path: /data/ykang/plato/results/MNIST/oort
+    result_path: results/test
+
+parameters:
+    optimizer:
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0

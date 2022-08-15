@@ -1,0 +1,40 @@
+name: PyTorch YOLOv5 CI Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    branches: [main]
+
+jobs:
+  PyTorch-Tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      # Runs a set of commands using the runners shell
+      - name: Install dependencies
+        shell: bash -l {0}
+        run: |
+          sudo apt-get update
+          sudo apt install -y python3-pip python3-dev
+          pip3 install torch torchvision --extra-index-url https://download.pytorch.org/whl/cpu
+          pip3 install -r requirements.txt --upgrade
+          pip3 install .
+          pip3 install yolov5
+
+      - name: Unit tests
+        shell: bash -l {0}
+        run: |
+          find tests -name '*.py' -exec python {} \;
+
+      - name: Training workloads
+        shell: bash -l {0}
+        run: |
+          ./run --config=.github/workflows/configs/fedavg_yolov5.yml
+          ./run --config=.github/workflows/configs/mistnet_yolov5.yml

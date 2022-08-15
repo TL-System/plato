@@ -1,6 +1,10 @@
 """
 A federated learning training session using FedProx.
 
+To better handle system heterogeneity, the FedProx algorithm introduced a
+proximal term in the optimizer used by local training on the clients. It has
+been quite widely cited and compared with in the federated learning literature.
+
 Reference:
 Li, T., Sahu, A. K., Zaheer, M., Sanjabi, M., Talwalkar, A., & Smith, V. (2020).
 "Federated optimization in heterogeneous networks." Proceedings of Machine
@@ -15,7 +19,7 @@ from plato.clients import simple
 
 
 def main():
-    """ A Plato federated learning training session using FedProx. """
+    """A Plato federated learning training session using FedProx."""
     trainer = fedprox_trainer.Trainer
     client = simple.Client(trainer=trainer)
     server = fedavg.Server(trainer=trainer)

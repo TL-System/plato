@@ -31,7 +31,7 @@ data: !include mnist_iid.yml
 trainer:
     # Using the differential privacy trainer
     type: diff_privacy 
-    dp_epsilon: 1
+    dp_epsilon: 50 
     dp_delta: 0.00001
     dp_max_grad_norm: 1 
 
@@ -51,10 +51,13 @@ trainer:
     epochs: 1
     batch_size: 32
     optimizer: SGD
-    learning_rate: 0.01
-    momentum: 0.9
-    weight_decay: 0.0
 
 algorithm:
     # Aggregation algorithm
     type: fedavg
+
+parameters:
+    optimizer:
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0

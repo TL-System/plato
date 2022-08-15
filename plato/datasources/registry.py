@@ -4,49 +4,63 @@ based on a configuration at run-time.
 """
 
 import logging
-from collections import OrderedDict
 
 from plato.config import Config
 
-if hasattr(Config().trainer, 'use_mindspore'):
-    from plato.datasources.mindspore import (
-        mnist as mnist_mindspore, )
+if hasattr(Config().trainer, "use_mindspore"):
+    from plato.datasources.mindspore import mnist as mnist_mindspore
 
-    registered_datasources = OrderedDict([
-        ('MNIST', mnist_mindspore),
-    ])
-    registered_partitioned_datasources = OrderedDict()
+    registered_datasources = {"MNIST": mnist_mindspore}
+    registered_partitioned_datasources = {}
 
-elif hasattr(Config().trainer, 'use_tensorflow'):
+elif hasattr(Config().trainer, "use_tensorflow"):
     from plato.datasources.tensorflow import (
         mnist as mnist_tensorflow,
         fashion_mnist as fashion_mnist_tensorflow,
     )
 
-    registered_datasources = OrderedDict([('MNIST', mnist_tensorflow),
-                                          ('FashionMNIST',
-                                           fashion_mnist_tensorflow)])
+    registered_datasources = {
+        "MNIST": mnist_tensorflow,
+        "FashionMNIST": fashion_mnist_tensorflow,
+    }
+
 else:
-    from plato.datasources import (mnist, fashion_mnist, emnist, cifar10,
-                                   cinic10, huggingface, pascal_voc,
-                                   tiny_imagenet, femnist, feature, qoenflx,
-                                   celeba)
+    from plato.datasources import (
+        mnist,
+        fashion_mnist,
+        emnist,
+        cifar10,
+        cifar100,
+        cinic10,
+        purchase,
+        texas,
+        huggingface,
+        pascal_voc,
+        tiny_imagenet,
+        femnist,
+        feature,
+        qoenflx,
+        celeba,
+    )
 
-    registered_datasources = OrderedDict([
-        ('MNIST', mnist),
-        ('FashionMNIST', fashion_mnist),
-        ('EMNIST', emnist),
-        ('CIFAR10', cifar10),
-        ('CINIC10', cinic10),
-        ('HuggingFace', huggingface),
-        ('PASCAL_VOC', pascal_voc),
-        ('TinyImageNet', tiny_imagenet),
-        ('Feature', feature),
-        ('QoENFLX', qoenflx),
-        ('CelebA', celeba),
-    ])
+    registered_datasources = {
+        "MNIST": mnist,
+        "FashionMNIST": fashion_mnist,
+        "EMNIST": emnist,
+        "CIFAR10": cifar10,
+        "CIFAR100": cifar100,
+        "CINIC10": cinic10,
+        "Purchase": purchase,
+        "Texas": texas,
+        "HuggingFace": huggingface,
+        "PASCAL_VOC": pascal_voc,
+        "TinyImageNet": tiny_imagenet,
+        "Feature": feature,
+        "QoENFLX": qoenflx,
+        "CelebA": celeba,
+    }
 
-    registered_partitioned_datasources = OrderedDict([('FEMNIST', femnist)])
+    registered_partitioned_datasources = {"FEMNIST": femnist}
 
 
 def get(client_id=0):
@@ -54,49 +68,43 @@ def get(client_id=0):
     datasource_name = Config().data.datasource
 
     logging.info("Data source: %s", Config().data.datasource)
-
-    if datasource_name == 'kinetics700':
+    if datasource_name == "kinetics700":
         from plato.datasources import kinetics
+
         return kinetics.DataSource()
 
-    if datasource_name == 'Purchase':
-        from plato.datasources import purchase
-        return purchase.DataSource()
-
-    if datasource_name == 'Texas':
-        from plato.datasources import texas
-        return texas.DataSource()
-
-    if datasource_name == 'CIFAR100':
-        from plato.datasources import cifar100
-        return cifar100.DataSource()
-
-    if datasource_name == 'Gym':
+    if datasource_name == "Gym":
         from plato.datasources import gym
+
         return gym.DataSource()
 
-    if datasource_name == 'Flickr30KE':
+    if datasource_name == "Flickr30KE":
         from plato.datasources import flickr30k_entities
+
         return flickr30k_entities.DataSource()
 
-    if datasource_name == 'ReferItGame':
+    if datasource_name == "ReferItGame":
         from plato.datasources import referitgame
+
         return referitgame.DataSource()
 
-    if datasource_name == 'COCO':
+    if datasource_name == "COCO":
         from plato.datasources import coco
+
         return coco.DataSource()
 
-    if datasource_name == 'YOLO':
+    if datasource_name == "YOLO":
         from plato.datasources import yolo
+
         return yolo.DataSource()
     elif datasource_name in registered_datasources:
         dataset = registered_datasources[datasource_name].DataSource()
     elif datasource_name in registered_partitioned_datasources:
-        dataset = registered_partitioned_datasources[
-            datasource_name].DataSource(client_id)
+        dataset = registered_partitioned_datasources[datasource_name].DataSource(
+            client_id
+        )
     else:
-        raise ValueError(f'No such data source: {datasource_name}')
+        raise ValueError(f"No such data source: {datasource_name}")
 
     return dataset
 
@@ -106,17 +114,17 @@ def get_input_shape():
     datasource_name = Config().data.datasource
 
     logging.info("Data source: %s", Config().data.datasource)
-
-    if Config().data.datasource == 'YOLO':
+    if Config().data.datasource == "YOLO":
         from plato.datasources import yolo
+
         return yolo.DataSource.input_shape()
     elif datasource_name in registered_datasources:
-        input_shape = registered_datasources[
-            datasource_name].DataSource.input_shape()
+        input_shape = registered_datasources[datasource_name].DataSource.input_shape()
     elif datasource_name in registered_partitioned_datasources:
         input_shape = registered_partitioned_datasources[
-            datasource_name].DataSource.input_shape()
+            datasource_name
+        ].DataSource.input_shape()
     else:
-        raise ValueError(f'No such data source: {datasource_name}')
+        raise ValueError(f"No such data source: {datasource_name}")
 
     return input_shape

@@ -20,8 +20,9 @@ def check_img_size(img_size, s=32):
     new_size = make_divisible(img_size, int(s))  # ceil gs-multiple
     if new_size != img_size:
         print(
-            'WARNING: --img-size %g must be multiple of max stride %g, updating to %g'
-            % (img_size, s, new_size))
+            "WARNING: --img-size %g must be multiple of max stride %g, updating to %g"
+            % (img_size, s, new_size)
+        )
     return new_size
 
 
@@ -30,24 +31,25 @@ class DataSource(base.DataSource):
 
     def __init__(self):
         super().__init__()
-        _path = Config().params['data_path']
+        _path = Config().params["data_path"]
 
         if not os.path.exists(_path):
             os.makedirs(_path)
 
-            logging.info(
-                "Downloading the YOLO dataset. This may take a while.")
+            logging.info("Downloading the YOLO dataset. This may take a while.")
 
             urls = Config().data.download_urls
             for url in urls:
-                if not os.path.exists(_path + url.split('/')[-1]):
+                if not os.path.exists(_path + url.split("/")[-1]):
                     DataSource.download(url, _path)
 
-        assert 'grid_size' in Config().params
+        self.grid_size = (
+            Config().parameters.grid_size
+            if hasattr(Config().parameters, "grid_size")
+            else Config().params["grid_size"]
+        )
 
-        self.grid_size = Config().params['grid_size']
-        self.image_size = check_img_size(Config().data.image_size,
-                                         self.grid_size)
+        self.image_size = check_img_size(Config().data.image_size, self.grid_size)
 
         self.train_set = None
         self.test_set = None
@@ -63,7 +65,7 @@ class DataSource(base.DataSource):
         return Config().data.classes
 
     def get_train_set(self):
-        single_class = (Config().data.num_classes == 1)
+        single_class = Config().data.num_classes == 1
 
         if self.train_set is None:
             self.train_set = LoadImagesAndLabels(
@@ -78,12 +80,13 @@ class DataSource(base.DataSource):
                 stride=int(self.grid_size),
                 pad=0.0,
                 image_weights=False,
-                prefix='')
+                prefix="",
+            )
 
         return self.train_set
 
     def get_test_set(self):
-        single_class = (Config().data.num_classes == 1)
+        single_class = Config().data.num_classes == 1
 
         if self.test_set is None:
             self.test_set = LoadImagesAndLabels(
@@ -98,6 +101,7 @@ class DataSource(base.DataSource):
                 stride=int(self.grid_size),
                 pad=0.0,
                 image_weights=False,
-                prefix='')
+                prefix="",
+            )
 
         return self.test_set
