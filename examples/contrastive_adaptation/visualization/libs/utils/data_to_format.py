@@ -50,6 +50,7 @@ def decode_clients_per_data(data_df):
 
     rounds_id = data_df["round"].unique().tolist()
     epochs_id = data_df["epoch"].unique().tolist()
+    epochs_id.sort()
 
     rounds_epochs_clients_acc = []
     rounds_epochs_clients_id = []
@@ -57,6 +58,7 @@ def decode_clients_per_data(data_df):
         epochs_clients_acc = []
         epochs_clients_id = []
         for epoch_id in epochs_id:
+
             round_epoch_df = data_df.loc[(data_df['round'] == round_id)
                                          & (data_df['epoch'] == epoch_id)]
 
@@ -203,6 +205,7 @@ def merge_clients_personalized_acc_to_format(clients_file_path):
 
     # sort the clients' accuracy rows based on the round
     merged_df.sort_values('round', inplace=True)
+
     return merged_df
 
 
