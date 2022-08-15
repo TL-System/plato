@@ -37,8 +37,8 @@ class Trainer(basic.Trainer):
         optimizer = scaffold_optimizer.ScaffoldOptimizer(
             model.parameters(),
             lr=Config().parameters.optimizer.lr,
-            momentum=Config().trainer.momentum,
-            weight_decay=Config().trainer.weight_decay,
+            momentum=Config().parameters.optimizer.momentum,
+            weight_decay=Config().parameters.optimizer.weight_decay,
         )
 
         optimizer.server_control_variate = self.server_control_variate
