@@ -11,10 +11,20 @@ from plato.config import Config
 def get(model) -> optim.Optimizer:
     """Get an optimizer with its name and parameters obtained from the configuration file."""
     registered_optimizers = {
-        "SGD": optim.SGD,
         "Adam": optim.Adam,
         "Adadelta": optim.Adadelta,
+        "Adagrad": optim.Adagrad,
         "AdaHessian": torch_optim.Adahessian,
+        "AdamW": optim.AdamW,
+        "SparseAdam": optim.SparseAdam,
+        "Adamax": optim.Adamax,
+        "ASGD": optim.ASGD,
+        "LBFGS": optim.LBFGS,
+        "NAdam": optim.NAdam,
+        "RAdam": optim.RAdam,
+        "RMSprop": optim.RMSprop,
+        "Rprop": optim.Rprop,
+        "SGD": optim.SGD,
     }
 
     optimizer_name = Config().trainer.optimizer
