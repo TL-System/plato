@@ -7,7 +7,7 @@ from plato.config import Config
 def compute_risk(model: nn.Module):
     var = []
     for param in model.parameters():
-        var.append(torch.var(param).detach().numpy())
+        var.append(torch.var(param).cpu().detach().numpy())
     var = [min(v, 1) for v in var]
     return var
 
@@ -38,7 +38,6 @@ def noise(dy_dx: list, risk: list):
                                   dy_dx[i].shape)
         noise_mask = np.where(fim[i] < fim_thresh, 0, 1)
         gauss_noise = noise_base * noise_mask
-        dy_dx[i] = (torch.Tensor(grad_tensor).to(Config().device()) +
-                    gauss_noise.to(Config().device())).float()
+        dy_dx[i] = (torch.Tensor(grad_tensor) + gauss_noise).to(dtype=torch.float32).to(Config().device())
 
     return dy_dx
