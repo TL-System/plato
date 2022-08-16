@@ -16,12 +16,14 @@ class Trainer(basic.Trainer):
         # For getting the training loss of each sample
         return nn.CrossEntropyLoss(reduction="none")
 
-    def process_loss(self, loss):
+    def backward(self, config, loss):
         """Process loss with any additional steps."""
         sample_loss = loss.cpu().detach().numpy()
         self.run_history.update_metric(
             "train_squared_loss_step", sum(np.power(sample_loss, 2))
         )
 
-        # Return the mean of leach sample's loss for backward
-        return torch.mean(loss)
+        if "create_graph" in config:
+            loss.backward(create_graph=config["create_graph"])
+        else:
+            loss.backward()
