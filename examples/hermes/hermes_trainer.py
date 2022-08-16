@@ -5,7 +5,6 @@ The training loop that takes place on clients.
 import logging
 import os
 
-import copy
 import pickle
 
 import hermes_pruning as pruning
@@ -20,14 +19,12 @@ class Trainer(basic.Trainer):
     def __init__(self, model=None):
         """Initializes the global model."""
         super().__init__(model=model)
-        self.original_model = None
         self.mask = None
         self.pruning_target = Config().clients.pruning_target * 100
         self.pruned_amount = 0
         self.pruning_rate = Config().clients.pruning_amount * 100
         self.datasource = None
         self.testset = None
-        self.testset_sampler = None
         self.need_prune = False
         self.accuracy_threshold = (
             Config().clients.accuracy_threshold
@@ -36,14 +33,15 @@ class Trainer(basic.Trainer):
         )
 
     def train_run_start(self, config):
-        """Method called at the start of training run."""
+        """Conduct pruning if needed before training."""
+
         # Evaluate if structured pruning should be conducted
         self.datasource = datasources_registry.get(client_id=self.client_id)
         self.testset = self.datasource.get_test_set()
         accuracy = self.test_model(config, self.testset, None)
+        self.pruned_amount = pruning.compute_pruned_amount(self.model, self.client_id)
 
         # Merge the incoming server payload model with the mask to create the model for training
-        self.original_model = copy.deepcopy(self.model)
         self.model = self.merge_model(self.model)
 
         # Send the model to the device used for training
@@ -51,7 +49,7 @@ class Trainer(basic.Trainer):
         self.model.train()
 
         logging.info(
-            "[Client #%d] Evaluated Accuracy: %.2f.", self.client_id, accuracy * 100
+            "[Client #%d] Evaluated Accuracy: %.2f%%", self.client_id, accuracy * 100
         )
 
         if (
@@ -88,7 +86,7 @@ class Trainer(basic.Trainer):
                 self.model, self.client_id
             )
             logging.info(
-                "[Client #%d] Pruned Amount: %.2f.", self.client_id, self.pruned_amount
+                "[Client #%d] Pruned Amount: %.2f%%", self.client_id, self.pruned_amount
             )
 
     def merge_model(self, model):
