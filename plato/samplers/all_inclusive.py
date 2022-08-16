@@ -23,6 +23,8 @@ class Sampler(base.Sampler):
                 self.data_samples = random.sample(
                     all_inclusive, Config().data.testset_size
                 )
+            else:
+                self.data_samples = all_inclusive
         else:
             self.data_samples = range(len(datasource.get_train_set()))
 

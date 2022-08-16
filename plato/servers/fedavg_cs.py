@@ -143,9 +143,10 @@ class Server(fedavg.Server):
                         self.datasource, Config().args.id, testing=True
                     )
                 else:
-                    self.testset_sampler = all_inclusive.Sampler(
-                        self.datasource, testing=True
-                    )
+                    if hasattr(Config().data, "testset_size"):
+                        self.testset_sampler = all_inclusive.Sampler(
+                            self.datasource, testing=True
+                        )
 
             # Initialize path of the result .csv file
             result_path = Config().params["result_path"]
