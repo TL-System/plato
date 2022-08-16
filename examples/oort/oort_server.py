@@ -23,7 +23,7 @@ class Server(fedavg.Server):
         # All clients' utilities
         self.client_utilities = {}
 
-        # All client's training times
+        # All clients‘ training times
         self.client_durations = {}
 
         # Keep track of each client's last participated round.
@@ -52,7 +52,7 @@ class Server(fedavg.Server):
             Config().server.cut_off if hasattr(Config().server, "cut_off") else 0.95
         )
 
-        # Times should can a client be selected before being blacklisted?
+        # Times a client is selected before being blacklisted
         self.blacklist_num = (
             Config().server.blacklist_num
             if hasattr(Config().server, "blacklist_num")
@@ -79,19 +79,14 @@ class Server(fedavg.Server):
         self.unexplored_clients = list(range(1, self.total_clients + 1))
 
     def weights_aggregated(self, updates):
-        """
-        After the updated weights have been aggregated, extracts statistical
-        utility, training times and adjusts desired round duration.
-        """
-
-        # Extract statistical utility and local training times
+        """Method called at the end of aggregating received weights."""
         for update in updates:
+            # Extract statistical utility and local training times
             self.client_utilities[update.client_id] = update.report.statistics_utility
             self.client_durations[update.client_id] = update.report.training_time
             self.client_last_rounds[update.client_id] = self.current_round
 
-        # Calculate updated client utilities on explored clients
-        for update in updates:
+            # Calculate client utilities of explored clients
             self.client_utilities[update.client_id] = self.calc_client_util(
                 update.client_id
             )
@@ -120,20 +115,16 @@ class Server(fedavg.Server):
 
         if self.current_round > 1:
             # Exploitation
-            exploit_client_num = math.ceil(
-                (1.0 - self.exploration_factor) * clients_count
+            exploit_client_num = max(
+                math.ceil((1.0 - self.exploration_factor) * clients_count),
+                clients_count - len(self.unexplored_clients),
             )
 
-            # If there aren't enough unexplored clients for exploration
-            if (clients_count - exploit_client_num) > len(self.unexplored_clients):
-                exploit_client_num = clients_count - len(self.unexplored_clients)
-
-            # Take the top-k, sample by probability, take 95% of the cut-off loss by default
             sorted_util = sorted(
                 self.client_utilities, key=self.client_utilities.get, reverse=True
             )
 
-            # Take cut-off utility
+            # Calculate cut-off utility
             cut_off_util = (
                 self.client_utilities[sorted_util[exploit_client_num - 1]]
                 * self.cut_off
@@ -176,7 +167,7 @@ class Server(fedavg.Server):
                 for index in range(last_index + 1, len(sorted_util)):
                     if (
                         not sorted_util[index] in self.blacklist
-                        and len(selected_clients) != exploit_client_num
+                        and len(selected_clients) < exploit_client_num
                     ):
                         selected_clients.append(sorted_util[index])
 
@@ -205,14 +196,9 @@ class Server(fedavg.Server):
 
     def calc_client_util(self, client_id):
         """Calculate client utility."""
-        # Set temporal uncertainty
-        if self.client_last_rounds[client_id] != 0:
-            temp_uncertainty = math.sqrt(
-                0.1 * math.log(self.current_round) / self.client_last_rounds[client_id]
-            )
-        else:
-            temp_uncertainty = 0
-        client_utility = self.client_utilities[client_id] + temp_uncertainty
+        client_utility = self.client_utilities[client_id] + math.sqrt(
+            0.1 * math.log(self.current_round) / self.client_last_rounds[client_id]
+        )
 
         if self.desired_duration < self.client_durations[client_id]:
             global_utility = (
