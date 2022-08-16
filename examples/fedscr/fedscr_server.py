@@ -3,7 +3,6 @@ A federated learning server using FedSCR. The server extracts the model updates 
 aggregates them and adds them to the global model from the previous round.
 """
 
-import asyncio
 import os
 import numpy as np
 
@@ -42,13 +41,13 @@ class Server(fedavg.Server):
 
         # Hyperparameters used for the adaptive algorithm
         self.delta1 = (
-            Config().clients.delta1 if hasattr(Config().clients, "delta1") else None
+            Config().clients.delta1 if hasattr(Config().clients, "delta1") else 1
         )
         self.delta2 = (
-            Config().clients.delta2 if hasattr(Config().clients, "delta2") else None
+            Config().clients.delta2 if hasattr(Config().clients, "delta2") else 1
         )
         self.delta3 = (
-            Config().clients.delta3 if hasattr(Config().clients, "delta3") else None
+            Config().clients.delta3 if hasattr(Config().clients, "delta3") else 1
         )
 
     def customize_server_response(self, server_response: dict) -> dict:
@@ -70,30 +69,9 @@ class Server(fedavg.Server):
                 1 / (1 + (np.exp(-sigmoid)))
             ) * self.orig_threshold
 
-    async def federated_averaging(self, updates):
+    def compute_weight_deltas(self, updates):
         """Aggregate weight updates from the clients using federated averaging."""
-        deltas_received = [update.payload for update in updates]
-
-        # Extract the total number of samples
-        self.total_samples = sum(update.report.num_samples for update in updates)
-
-        # Perform weighted averaging
-        avg_update = {
-            name: self.trainer.zeros(weights.shape)
-            for name, weights in deltas_received[0].items()
-        }
-
-        for i, update in enumerate(deltas_received):
-            num_samples = updates[i].report.num_samples
-
-            for name, delta in update.items():
-                # Use weighted average by the number of samples
-                avg_update[name] += delta * (num_samples / self.total_samples)
-
-            # Yield to other tasks in the server
-            await asyncio.sleep(0)
-
-        return avg_update
+        return [update.payload for update in updates]
 
     def weights_aggregated(self, updates):
         """Extract required information from client reports after aggregating weights."""

@@ -32,7 +32,7 @@ class Trainer(basic.Trainer):
         self.total_grad = OrderedDict()
 
         # The accumulated gradients for a client throughout the FL session
-        self.all_grads = []
+        self.acc_grads = []
 
         # Should the clients use the adaptive algorithm?
         self.use_adaptive = bool(
@@ -56,7 +56,7 @@ class Trainer(basic.Trainer):
             ):
                 orig_tensor = orig_module.weight.data.cpu().numpy()
                 trained_tensor = trained_module.weight.data.cpu().numpy()
-                delta = trained_tensor - orig_tensor + self.all_grads[i]
+                delta = trained_tensor - orig_tensor + self.acc_grads[i]
                 orig_delta = copy.deepcopy(delta)
 
                 aggregated_channels = self.aggregate_channels(delta)
@@ -66,7 +66,7 @@ class Trainer(basic.Trainer):
                 delta = self.prune_filters(aggregated_filters, delta)
 
                 delta_name = f"{orig_name}.weight"
-                self.all_grads[i] = orig_delta - delta
+                self.acc_grads[i] = orig_delta - delta
                 conv_updates[delta_name] = delta
                 i += 1
 
@@ -142,7 +142,7 @@ class Trainer(basic.Trainer):
             f"{checkpoint_path}/{model_name}_client{self.client_id}_grad.pth"
         )
         with open(acc_grad_path, "wb") as payload_file:
-            pickle.dump(self.all_grads, payload_file)
+            pickle.dump(self.acc_grads, payload_file)
 
     def load_acc_grads(self):
         """Load the accumulated gradients from a previous communication round."""
@@ -155,7 +155,7 @@ class Trainer(basic.Trainer):
         grad_path = f"{checkpoint_path}/{model_name}_client{self.client_id}_grad.pth"
         if os.path.exists(grad_path):
             with open(grad_path, "rb") as payload_file:
-                self.all_grads = pickle.load(payload_file)
+                self.acc_grads = pickle.load(payload_file)
         else:
             count = 0
             for module in self.model.modules():
@@ -163,7 +163,7 @@ class Trainer(basic.Trainer):
                     module, (torch.nn.Conv1d, torch.nn.Conv2d, torch.nn.Conv3d)
                 ):
                     count += 1
-            self.all_grads = [0] * count
+            self.acc_grads = [0] * count
 
     def compute_pruned_amount(self):
         """Compute the pruned percentage of the entire model."""

@@ -137,9 +137,6 @@ class Server(base.Server):
         """Extract the model weight updates from client updates."""
         weights_received = [update.payload for update in updates]
 
-        self.weights_received(weights_received)
-        self.callback_handler.call_event("on_weights_received", self, weights_received)
-
         return self.algorithm.compute_weight_deltas(weights_received)
 
     async def aggregate_weights(self, updates):
@@ -147,9 +144,6 @@ class Server(base.Server):
         deltas = await self.federated_averaging(updates)
         updated_weights = self.algorithm.update_weights(deltas)
         self.algorithm.load_weights(updated_weights)
-
-        self.weights_aggregated(updates)
-        self.callback_handler.call_event("on_weights_aggregated", self, updates)
 
     async def federated_averaging(self, updates):
         """Aggregate weight updates from the clients using federated averaging."""
@@ -179,7 +173,14 @@ class Server(base.Server):
 
     async def process_reports(self):
         """Process the client reports by aggregating their weights."""
+        weights_received = [update.payload for update in self.updates]
+        self.weights_received(weights_received)
+        self.callback_handler.call_event("on_weights_received", self, weights_received)
+
         await self.aggregate_weights(self.updates)
+
+        self.weights_aggregated(self.updates)
+        self.callback_handler.call_event("on_weights_aggregated", self, self.updates)
 
         # Testing the global model accuracy
         if hasattr(Config().server, "do_test") and not Config().server.do_test:
