@@ -155,12 +155,6 @@ class Server(fedavg.Server):
             )
         else:
             super().configure()
-            if hasattr(Config().server, "do_test") and Config().server.do_test:
-                self.datasource = datasources_registry.get(client_id=0)
-                self.testset = self.datasource.get_test_set()
-                self.testset_sampler = all_inclusive.Sampler(
-                    self.datasource, testing=True
-                )
 
     async def select_clients(self, for_next_batch=False):
         if Config().is_edge_server() and not for_next_batch:
@@ -183,7 +177,9 @@ class Server(fedavg.Server):
         """Process the client reports by aggregating their weights."""
         # To pass the client_id == 0 assertion during aggregation
         self.trainer.set_client_id(0)
+
         await self.aggregate_weights(self.updates)
+
         if Config().is_edge_server():
             self.trainer.set_client_id(Config().args.id)
 
@@ -202,7 +198,15 @@ class Server(fedavg.Server):
             )
         elif Config().is_central_server() and Config().clients.do_test:
             # Compute the average accuracy from client reports
-            self.average_accuracy = self.client_accuracy_averaging()
+            total_samples = sum(update.report.num_samples for update in self.updates)
+            self.average_accuracy = (
+                sum(
+                    update.report.average_accuracy * update.report.num_samples
+                    for update in self.updates
+                )
+                / total_samples
+            )
+
             logging.info(
                 "[%s] Average client accuracy: %.2f%%.",
                 self,
@@ -245,20 +249,6 @@ class Server(fedavg.Server):
             self.accuracy = self.average_accuracy
 
         await self.wrap_up_processing_reports()
-
-    def client_accuracy_averaging(self):
-        """Compute the average accuracy across clients."""
-        # Get total number of samples
-        total_samples = sum(update.report.num_samples for update in self.updates)
-
-        # Perform weighted averaging
-        accuracy = 0
-        for update in self.updates:
-            accuracy += update.report.average_accuracy * (
-                update.report.num_samples / total_samples
-            )
-
-        return accuracy
 
     async def wrap_up_processing_reports(self):
         """Wrap up processing the reports with any additional work."""
@@ -307,7 +297,7 @@ class Server(fedavg.Server):
         record_items_values = super().get_record_items_values()
 
         record_items_values["global_round"] = self.current_global_round
-        record_items_values["average_accuracy"] = self.average_accuracy * 100
+        record_items_values["average_accuracy"] = self.average_accuracy
         record_items_values["edge_agg_num"] = Config().algorithm.local_rounds
         record_items_values["local_epoch_num"] = Config().trainer.epochs
 
