@@ -5,13 +5,13 @@ A cross-silo federated learning server using federated averaging, as either edge
 import asyncio
 import logging
 import os
-import random
 import numpy as np
 
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
 from plato.processors import registry as processor_registry
 from plato.samplers import registry as samplers_registry
+from plato.samplers import all_inclusive
 from plato.servers import fedavg
 from plato.utils import csv_processor
 
@@ -137,31 +137,14 @@ class Server(fedavg.Server):
                 self.datasource = datasources_registry.get(client_id=Config().args.id)
                 self.testset = self.datasource.get_test_set()
 
-                if hasattr(Config().data, "edge_testset_sampler"):
+                if hasattr(Config().data, "testset_sampler"):
                     # Set the sampler for test set
                     self.testset_sampler = samplers_registry.get(
-                        self.datasource, Config().args.id, testing="edge"
+                        self.datasource, Config().args.id, testing=True
                     )
-                elif hasattr(Config().data, "testset_size"):
-                    # Set the sampler for testset
-                    import torch
-
-                    if hasattr(Config().server, "edge_random_seed"):
-                        random_seed = (
-                            Config().server.edge_random_seed * Config().args.id
-                        )
-                    else:
-                        random_seed = Config().args.id
-
-                    gen = torch.Generator()
-                    gen.manual_seed(random_seed)
-
-                    all_inclusive = range(len(self.datasource.get_test_set()))
-                    test_samples = random.sample(
-                        all_inclusive, Config().data.testset_size
-                    )
-                    self.testset_sampler = torch.utils.data.SubsetRandomSampler(
-                        test_samples, generator=gen
+                else:
+                    self.testset_sampler = all_inclusive.Sampler(
+                        self.datasource, testing=True
                     )
 
             # Initialize path of the result .csv file
@@ -192,7 +175,13 @@ class Server(fedavg.Server):
 
     async def process_reports(self):
         """Process the client reports by aggregating their weights."""
+        # To pass the client_id == 0 assertion during aggregation
+        self.trainer.set_client_id(0)
+
         await self.aggregate_weights(self.updates)
+
+        if Config().is_edge_server():
+            self.trainer.set_client_id(Config().args.id)
 
         # Testing the model accuracy
         if (Config().is_edge_server() and Config().clients.do_test) or (
@@ -209,7 +198,15 @@ class Server(fedavg.Server):
             )
         elif Config().is_central_server() and Config().clients.do_test:
             # Compute the average accuracy from client reports
-            self.average_accuracy = self.client_accuracy_averaging()
+            total_samples = sum(update.report.num_samples for update in self.updates)
+            self.average_accuracy = (
+                sum(
+                    update.report.average_accuracy * update.report.num_samples
+                    for update in self.updates
+                )
+                / total_samples
+            )
+
             logging.info(
                 "[%s] Average client accuracy: %.2f%%.",
                 self,
@@ -252,20 +249,6 @@ class Server(fedavg.Server):
             self.accuracy = self.average_accuracy
 
         await self.wrap_up_processing_reports()
-
-    def client_accuracy_averaging(self):
-        """Compute the average accuracy across clients."""
-        # Get total number of samples
-        total_samples = sum(update.report.num_samples for update in self.updates)
-
-        # Perform weighted averaging
-        accuracy = 0
-        for update in self.updates:
-            accuracy += update.report.average_accuracy * (
-                update.report.num_samples / total_samples
-            )
-
-        return accuracy
 
     async def wrap_up_processing_reports(self):
         """Wrap up processing the reports with any additional work."""
@@ -314,7 +297,7 @@ class Server(fedavg.Server):
         record_items_values = super().get_record_items_values()
 
         record_items_values["global_round"] = self.current_global_round
-        record_items_values["average_accuracy"] = self.average_accuracy * 100
+        record_items_values["average_accuracy"] = self.average_accuracy
         record_items_values["edge_agg_num"] = Config().algorithm.local_rounds
         record_items_values["local_epoch_num"] = Config().trainer.epochs
 
