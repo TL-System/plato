@@ -97,7 +97,10 @@ class Server(base.Server):
                 self.datasource = self.custom_datasource()
 
             self.testset = self.datasource.get_test_set()
-            self.testset_sampler = all_inclusive.Sampler(self.datasource, testing=True)
+            if hasattr(Config().data, "testset_size"):
+                self.testset_sampler = all_inclusive.Sampler(
+                    self.datasource, testing=True
+                )
 
         # Initialize the csv file which will record results
         result_csv_file = f"{Config().params['result_path']}/{os.getpid()}.csv"
