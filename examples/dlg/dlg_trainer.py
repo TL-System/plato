@@ -32,17 +32,18 @@ class Trainer(basic.Trainer):
         tic = time.perf_counter()
 
         self.run_history.reset()
-        
+
         self.train_run_start(config)
 
-        self.train_loader = Trainer.get_train_loader(batch_size, trainset, sampler)
+        self.train_loader = Trainer.get_train_loader(batch_size, trainset,
+                                                     sampler)
 
         # Initializing the loss criterion
         _loss_criterion = self.get_loss_criterion()
 
         self.model.to(self.device)
         self.model.train()
-    
+
         total_epochs = config["epochs"]
 
         if hasattr(Config().algorithm, 'defense'):
@@ -53,14 +54,16 @@ class Trainer(basic.Trainer):
                                            device=Config().device())
 
         target_grad = None
-        total_local_steps = total_epochs * math.ceil(partition_size / batch_size)
+        total_local_steps = total_epochs * math.ceil(
+            partition_size / batch_size)
 
         for self.current_epoch in range(1, total_epochs + 1):
             self._loss_tracker.reset()
             self.train_epoch_start(config)
 
             for batch_id, (examples, labels) in enumerate(self.train_loader):
-                examples, labels = examples.to(self.device), labels.to(self.device)
+                examples, labels = examples.to(self.device), labels.to(
+                    self.device)
                 examples.requires_grad = True
                 self.model.zero_grad()
 
@@ -105,6 +108,8 @@ class Trainer(basic.Trainer):
                                                create_graph=True,
                                                only_inputs=True)
                     list_grad = list((_.detach().clone() for _ in grad))
+
+                self._loss_tracker.update(loss, labels.size(0))
 
                 # Apply defense if needed
                 if hasattr(Config().algorithm, 'defense'):
@@ -210,28 +215,24 @@ class Trainer(basic.Trainer):
                 full_labels, num_classes=Config().trainer.num_classes)
 
             # Simulate client's speed
-            if (
-                self.client_id != 0
-                and hasattr(Config().clients, "speed_simulation")
-                and Config().clients.speed_simulation
-            ):
+            if (self.client_id != 0
+                    and hasattr(Config().clients, "speed_simulation")
+                    and Config().clients.speed_simulation):
                 self.simulate_sleep_time()
 
             # Saving the model at the end of this epoch to a file so that
             # it can later be retrieved to respond to server requests
             # in asynchronous mode when the wall clock time is simulated
-            if (
-                hasattr(Config().server, "request_update")
-                and Config().server.request_update
-            ):
+            if (hasattr(Config().server, "request_update")
+                    and Config().server.request_update):
                 self.model.cpu()
                 training_time = time.perf_counter() - tic
                 filename = f"{self.client_id}_{self.current_epoch}_{training_time}.pth"
                 self.save_model(filename)
                 self.model.to(self.device)
-            
-            
-            self.run_history.update_metric("train_loss", self._loss_tracker.average)
+
+            self.run_history.update_metric("train_loss",
+                                           self._loss_tracker.average)
             self.train_epoch_end(config)
 
         if hasattr(Config().algorithm,
@@ -246,57 +247,45 @@ class Trainer(basic.Trainer):
         with open(file_path, 'wb') as handle:
             pickle.dump([full_examples, full_onehot_labels, target_grad],
                         handle)
-        
+
         self.train_run_end(config)
         self.callback_handler.call_event("on_train_run_end", self, config)
 
-    async def server_test(self, testset, sampler=None, **kwargs):
-        """Testing the model on the server using the provided test dataset.
-
-        Arguments:
-        testset: The test dataset.
-        sampler: The sampler that extracts a partition of the test dataset.
-        **kwargs (optional): Additional keyword arguments.
+    def test_model(self, config, testset, sampler, **kwargs):
         """
-        config = Config().trainer._asdict()
-        config['run_id'] = Config().params['run_id']
+        Evaluates the model with the provided test dataset and test sampler.
 
-        self.model.to(self.device)
-        self.model.eval()
+        :param testset: the test dataset.
+        :param sampler: the test sampler.
+        :param kwargs (optional): Additional keyword arguments.
 
-        custom_test = getattr(self, "test_model", None)
-
-        if callable(custom_test):
-            return self.test_model(config, testset)
+        """
+        batch_size = config["batch_size"]
 
         if sampler is None:
-            test_loader = torch.utils.data.DataLoader(
-                testset, batch_size=config['batch_size'], shuffle=False)
+            test_loader = torch.utils.data.DataLoader(testset,
+                                                      batch_size=batch_size,
+                                                      shuffle=False)
         else:
-            test_loader = torch.utils.data.DataLoader(
-                testset,
-                batch_size=config['batch_size'],
-                shuffle=False,
-                sampler=sampler)
+            # Use a testing set following the same distribution as the training set
+            test_loader = torch.utils.data.DataLoader(testset,
+                                                      batch_size=batch_size,
+                                                      shuffle=False,
+                                                      sampler=sampler.get())
 
         correct = 0
         total = 0
 
+        self.model.to(self.device)
         with torch.no_grad():
             for examples, labels in test_loader:
                 examples, labels = examples.to(self.device), labels.to(
                     self.device)
 
-                try:
-                    outputs, _ = self.model(examples)
-                except:
-                    outputs = self.model(examples)
+                outputs, _ = self.model(examples)
 
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
-
-                # Yield to other tasks in the server
-                await asyncio.sleep(0)
 
         return correct / total

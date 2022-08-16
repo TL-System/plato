@@ -112,8 +112,9 @@ class Server(fedavg.Server):
                          100 * self.accuracy)
         else:
             # Testing the updated model directly at the server
-            self.accuracy = await self.trainer.server_test(
-                self.testset, self.testset_sampler)
+
+            self.accuracy = self.trainer.test(self.testset,
+                                              self.testset_sampler)
 
         if hasattr(Config().trainer, 'target_perplexity'):
             logging.info('[%s] Global model perplexity: %.2f\n', self,
@@ -529,7 +530,6 @@ class Server(fedavg.Server):
     @staticmethod
     def make_plot(num_images, image_data, image_labels, path):
         """ Plot ground truth data. """
-        
 
         if not os.path.exists(dlg_result_path):
             os.makedirs(dlg_result_path)
