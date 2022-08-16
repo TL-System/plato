@@ -23,7 +23,4 @@ class Trainer(basic.Trainer):
             "train_squared_loss_step", sum(np.power(sample_loss, 2))
         )
 
-        if "create_graph" in config:
-            loss.backward(create_graph=config["create_graph"])
-        else:
-            loss.backward()
+        return super().backward(config, torch.mean(loss))
