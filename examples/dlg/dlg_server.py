@@ -187,7 +187,10 @@ class Server(fedavg.Server):
         data_size = [
             num_images, gt_data.shape[1], gt_data.shape[2], gt_data.shape[3]
         ]
-        self.plot_gt(num_images, gt_data, gt_labels)
+        gt_data_plot = gt_data.detach().clone()
+        gt_data_plot = gt_data_plot.permute(0, 2, 3, 1)
+        gt_result_path = f"{dlg_result_path}/ground_truth.pdf"
+        self.make_plot(num_images, gt_data_plot, gt_labels, gt_result_path)
 
         # The number of restarts
         trials = 1
@@ -373,8 +376,12 @@ class Server(fedavg.Server):
             self.best_mse = avg_mses[-1]
             self.best_trial = trial_number + 1  # the +1 is because we index from 1 and not 0
 
-        reconstructed_path = f"{trial_result_path}/reconstructed.png"
+        reconstructed_path = f"{trial_result_path}/reconstruction_iterations.png"
         self.plot_reconstructed(num_images, history, reconstructed_path)
+        final_tensor = torch.stack(
+            [history[-1][i][0] for i in range(num_images)])
+        final_result_path = f"{trial_result_path}/final_attack_result.pdf"
+        self.make_plot(num_images, final_tensor, None, final_result_path)
 
         # Save the tensors into a .pt file
         tensor_file_path = f"{trial_result_path}/tensors.pt"
@@ -520,9 +527,9 @@ class Server(fedavg.Server):
         return total_costs / len(dummy)
 
     @staticmethod
-    def plot_gt(num_images, gt_data, gt_labels):
+    def make_plot(num_images, image_data, image_labels, path):
         """ Plot ground truth data. """
-        gt_result_path = f"{dlg_result_path}/ground_truth.pdf"
+        
 
         if not os.path.exists(dlg_result_path):
             os.makedirs(dlg_result_path)
@@ -558,20 +565,20 @@ class Server(fedavg.Server):
 
         if num_images == 1:
             gt_figure = plt.figure(figsize=(8, 8))
-            plt.imshow(gt_data[0].cpu().permute(1, 2, 0))
+            plt.imshow(image_data[0])
             plt.axis('off')
         else:
             fig, axes = plt.subplots(nrows=rows,
                                      ncols=cols,
                                      figsize=(image_width, image_height))
-            for i, title in enumerate(gt_data):
-                axes.ravel()[i].imshow(gt_data[i].cpu().permute(1, 2, 0))
+            for i, title in enumerate(image_data):
+                axes.ravel()[i].imshow(image_data[i].cpu())
                 axes.ravel()[i].set_axis_off()
             for i in range(num_images, product):
                 axes.ravel()[i].set_axis_off()
 
         plt.tight_layout()
-        plt.savefig(gt_result_path)
+        plt.savefig(path)
 
     @staticmethod
     def plot_reconstructed(num_images, history, reconstructed_result_path):
