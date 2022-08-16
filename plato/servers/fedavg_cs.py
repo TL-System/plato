@@ -143,14 +143,26 @@ class Server(fedavg.Server):
                         self.datasource, Config().args.id, testing="edge"
                     )
                 elif hasattr(Config().data, "testset_size"):
-                    # Set the Random Sampler for test set
-                    from torch.utils.data import SubsetRandomSampler
+                    # Set the sampler for testset
+                    import torch
+
+                    if hasattr(Config().server, "edge_random_seed"):
+                        random_seed = (
+                            Config().server.edge_random_seed * Config().args.id
+                        )
+                    else:
+                        random_seed = Config().args.id
+
+                    gen = torch.Generator()
+                    gen.manual_seed(random_seed)
 
                     all_inclusive = range(len(self.datasource.get_test_set()))
                     test_samples = random.sample(
                         all_inclusive, Config().data.testset_size
                     )
-                    self.testset_sampler = SubsetRandomSampler(test_samples)
+                    self.testset_sampler = torch.utils.data.SubsetRandomSampler(
+                        test_samples, generator=gen
+                    )
 
             # Initialize path of the result .csv file
             result_path = Config().params["result_path"]
@@ -160,19 +172,6 @@ class Server(fedavg.Server):
             )
         else:
             super().configure()
-            if hasattr(Config().server, "do_test") and Config().server.do_test:
-                self.datasource = datasources_registry.get(client_id=0)
-                self.testset = self.datasource.get_test_set()
-
-                if hasattr(Config().data, "testset_size"):
-                    from torch.utils.data import SubsetRandomSampler
-
-                    # Set the sampler for testset
-                    all_inclusive = range(len(self.datasource.get_test_set()))
-                    test_samples = random.sample(
-                        all_inclusive, Config().data.testset_size
-                    )
-                    self.testset_sampler = SubsetRandomSampler(test_samples)
 
     async def select_clients(self, for_next_batch=False):
         if Config().is_edge_server() and not for_next_batch:
@@ -193,11 +192,7 @@ class Server(fedavg.Server):
 
     async def process_reports(self):
         """Process the client reports by aggregating their weights."""
-        # To pass the client_id == 0 assertion during aggregation
-        self.trainer.set_client_id(0)
         await self.aggregate_weights(self.updates)
-        if Config().is_edge_server():
-            self.trainer.set_client_id(Config().args.id)
 
         # Testing the model accuracy
         if (Config().is_edge_server() and Config().clients.do_test) or (
