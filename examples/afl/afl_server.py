@@ -26,20 +26,10 @@ class Server(fedavg.Server):
 
         self.local_values = {}
 
-    async def federated_averaging(self, updates, deltas_received):
-        """Aggregate weight updates and deltas updates from the clients."""
-        update = await super().federated_averaging(updates, deltas_received)
-
-        # Extracting weights from the updates
-        deltas_received = self.compute_weight_deltas(updates)
-
-        # Update the local valuations from the updates
-        for i, update in enumerate(deltas_received):
-            report = updates[i].report
-            client_id = self.selected_clients[i]
-            self.local_values[client_id]["valuation"] = report.valuation
-
-        return update
+    def weights_aggregated(self, updates):
+        """Extract required information from client reports after aggregating weights."""
+        for update in updates:
+            self.local_values[update.client_id]["valuation"] = update.report.valuation
 
     def calc_sample_distribution(self, clients_pool):
         """Calculate the sampling probability of each client for the next round."""

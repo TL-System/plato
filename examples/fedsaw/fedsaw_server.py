@@ -44,10 +44,9 @@ class Server(fedavg_cs.Server):
 
         return server_response
 
-    def compute_weight_deltas(self, updates):
+    def compute_weight_deltas(self, weights_received):
         """Extract the model weight updates from client updates."""
-        deltas_received = [update.payload for update in updates]
-        return deltas_received
+        return weights_received
 
     def update_pruning_amount_list(self):
         """Update the list of each institution's clients' pruning_amount."""
