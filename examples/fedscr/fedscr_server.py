@@ -70,7 +70,7 @@ class Server(fedavg.Server):
             ) * self.orig_threshold
 
     def compute_weight_deltas(self, updates):
-        """Aggregate weight updates from the clients using federated averaging."""
+        """Extract weight updates."""
         return [update.payload for update in updates]
 
     def weights_aggregated(self, updates):

@@ -22,12 +22,11 @@ class Server(fedavg.Server):
         self.personalized_models = []
         self.masks_received = []
 
-    async def personalized_fedavg(self, updates):
+    async def personalized_fedavg(self, updates, deltas_received):
         """Aggregate weight updates from the clients using personalized aggregating."""
 
         # Get the list of client models and masks
-        weights_received, masks_received = self.extract_client_updates(updates)
-
+        weights_received, masks_received = deltas_received
         # Extract the total number of samples
         self.total_samples = sum(update.report.num_samples for update in updates)
 
@@ -83,9 +82,11 @@ class Server(fedavg.Server):
 
         return weights_received
 
-    async def aggregate_weights(self, updates):
+    async def aggregate_weights(self, updates, deltas_received):
         """Personalized weight aggregation designed for Hermes"""
-        self.personalized_models = await self.personalized_fedavg(updates)
+        self.personalized_models = await self.personalized_fedavg(
+            updates, deltas_received
+        )
         self.save_personalized_models(self.personalized_models, self.updates)
 
     def save_personalized_models(self, personalized_models, updates):
@@ -139,7 +140,7 @@ class Server(fedavg.Server):
 
         return payload
 
-    def extract_client_updates(self, updates):
+    def compute_weight_deltas(self, updates):
         """Extract the model weight updates from client updates along with the masks."""
 
         weights_received = [update.payload[0] for update in updates]

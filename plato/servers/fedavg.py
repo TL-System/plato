@@ -139,16 +139,14 @@ class Server(base.Server):
 
         return self.algorithm.compute_weight_deltas(weights_received)
 
-    async def aggregate_weights(self, updates):
+    async def aggregate_weights(self, updates, deltas_received):
         """Aggregate the reported weight updates from the selected clients."""
-        deltas = await self.federated_averaging(updates)
+        deltas = await self.federated_averaging(updates, deltas_received)
         updated_weights = self.algorithm.update_weights(deltas)
         self.algorithm.load_weights(updated_weights)
 
-    async def federated_averaging(self, updates):
+    async def federated_averaging(self, updates, deltas_received):
         """Aggregate weight updates from the clients using federated averaging."""
-        deltas_received = self.compute_weight_deltas(updates)
-
         # Extract the total number of samples
         self.total_samples = sum(update.report.num_samples for update in updates)
 
@@ -177,7 +175,8 @@ class Server(base.Server):
         self.weights_received(weights_received)
         self.callback_handler.call_event("on_weights_received", self, weights_received)
 
-        await self.aggregate_weights(self.updates)
+        deltas_received = self.compute_weight_deltas(self.updates)
+        await self.aggregate_weights(self.updates, deltas_received)
 
         self.weights_aggregated(self.updates)
         self.callback_handler.call_event("on_weights_aggregated", self, self.updates)
