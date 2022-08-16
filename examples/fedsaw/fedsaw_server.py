@@ -46,7 +46,7 @@ class Server(fedavg_cs.Server):
 
     def compute_weight_deltas(self, updates):
         """Extract the model weight updates from client updates."""
-        deltas_received = [payload for (__, __, payload, __) in updates]
+        deltas_received = [update.payload for update in updates]
         return deltas_received
 
     def update_pruning_amount_list(self):
@@ -77,14 +77,12 @@ class Server(fedavg_cs.Server):
         """
         weights_diff_list = []
         for i in range(Config().algorithm.total_silos):
-            if hasattr(Config().clients, "simulation") and Config().clients.simulation:
-                client_id = i + 1 + Config().clients.per_round
-            else:
-                client_id = i + 1 + Config().clients.total_clients
+            client_id = i + 1 + Config().clients.total_clients
+
             (report, received_updates) = [
-                (report, payload)
-                for (__, report, payload, __) in self.updates
-                if int(report.client_id) == client_id
+                (update.report, update.payload)
+                for update in self.updates
+                if int(update.report.client_id) == client_id
             ][0]
             num_samples = report.num_samples
 

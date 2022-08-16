@@ -18,19 +18,19 @@ class Client(simple.Client):
     """
 
     async def train(self):
-        """ The training process on a FedSaw client. """
+        """The training process on a FedSaw client."""
         previous_weights = copy.deepcopy(self.algorithm.extract_weights())
 
         # Perform model training
-        self.report, _ = await super().train()
+        self._report, _ = await super().train()
 
         weight_updates = self.prune_updates(previous_weights)
         logging.info("[Client #%d] Pruned its weight updates.", self.client_id)
 
-        return self.report, weight_updates
+        return self._report, weight_updates
 
     def prune_updates(self, previous_weights):
-        """ Prune locally trained updates. """
+        """Prune locally trained updates."""
 
         updates = self.compute_weight_deltas(previous_weights)
         self.algorithm.load_weights(updates)
@@ -39,11 +39,14 @@ class Client(simple.Client):
         parameters_to_prune = []
         for _, module in updates_model.named_modules():
             if isinstance(module, torch.nn.Conv2d) or isinstance(
-                    module, torch.nn.Linear):
-                parameters_to_prune.append((module, 'weight'))
+                module, torch.nn.Linear
+            ):
+                parameters_to_prune.append((module, "weight"))
 
-        if hasattr(Config().clients, 'pruning_method') and Config(
-        ).clients.pruning_method == 'random':
+        if (
+            hasattr(Config().clients, "pruning_method")
+            and Config().clients.pruning_method == "random"
+        ):
             pruning_method = prune.RandomUnstructured
         else:
             pruning_method = prune.L1Unstructured
@@ -60,7 +63,7 @@ class Client(simple.Client):
         return updates_model.cpu().state_dict()
 
     def compute_weight_deltas(self, previous_weights):
-        """ Compute the weight deltas. """
+        """Compute the weight deltas."""
         # Extract trained model weights
         new_weights = self.algorithm.extract_weights()
 
@@ -77,7 +80,8 @@ class Client(simple.Client):
 
     def process_server_response(self, server_response):
         """Additional client-specific processing on the server response."""
-        if 'pruning_amount' in server_response:
+        if "pruning_amount" in server_response:
             # Update pruning amount
             Config().clients = Config().clients._replace(
-                pruning_amount=server_response['pruning_amount'])
+                pruning_amount=server_response["pruning_amount"]
+            )

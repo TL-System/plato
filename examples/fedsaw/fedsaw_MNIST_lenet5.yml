@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 1
+    total_clients: 4
 
     # The number of clients selected in each round
-    per_round: 1
+    per_round: 2
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -26,7 +26,6 @@ server:
     address: 127.0.0.1
     port: 8000
     do_test: true
-    edge_do_test: true
 
     inbound_processors:
         - model_decompress
@@ -47,7 +46,8 @@ data:
     # IID or non-IID?
     sampler: iid
 
-    edge_testset_sampler: iid
+    #edge_testset_sampler: iid
+
     testset_size: 1000
 
     # The random seed for sampling data
@@ -85,7 +85,7 @@ algorithm:
     cross_silo: true
 
     # The total number of silos (edge servers)
-    total_silos: 1
+    total_silos: 2
 
     # The number of local aggregation rounds on edge servers before sending
     # aggregated weights to the central server
