@@ -5,13 +5,13 @@ A cross-silo federated learning server using federated averaging, as either edge
 import asyncio
 import logging
 import os
-import random
 import numpy as np
 
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
 from plato.processors import registry as processor_registry
 from plato.samplers import registry as samplers_registry
+from plato.samplers import all_inclusive
 from plato.servers import fedavg
 from plato.utils import csv_processor
 
@@ -137,20 +137,15 @@ class Server(fedavg.Server):
                 self.datasource = datasources_registry.get(client_id=Config().args.id)
                 self.testset = self.datasource.get_test_set()
 
-                if hasattr(Config().data, "edge_testset_sampler"):
+                if hasattr(Config().data, "testset_sampler"):
                     # Set the sampler for test set
                     self.testset_sampler = samplers_registry.get(
-                        self.datasource, Config().args.id, testing="edge"
+                        self.datasource, Config().args.id, testing=True
                     )
-                elif hasattr(Config().data, "testset_size"):
-                    # Set the Random Sampler for test set
-                    from torch.utils.data import SubsetRandomSampler
-
-                    all_inclusive = range(len(self.datasource.get_test_set()))
-                    test_samples = random.sample(
-                        all_inclusive, Config().data.testset_size
+                else:
+                    self.testset_sampler = all_inclusive.Sampler(
+                        self.datasource, testing=True
                     )
-                    self.testset_sampler = SubsetRandomSampler(test_samples)
 
             # Initialize path of the result .csv file
             result_path = Config().params["result_path"]
@@ -163,16 +158,9 @@ class Server(fedavg.Server):
             if hasattr(Config().server, "do_test") and Config().server.do_test:
                 self.datasource = datasources_registry.get(client_id=0)
                 self.testset = self.datasource.get_test_set()
-
-                if hasattr(Config().data, "testset_size"):
-                    from torch.utils.data import SubsetRandomSampler
-
-                    # Set the sampler for testset
-                    all_inclusive = range(len(self.datasource.get_test_set()))
-                    test_samples = random.sample(
-                        all_inclusive, Config().data.testset_size
-                    )
-                    self.testset_sampler = SubsetRandomSampler(test_samples)
+                self.testset_sampler = all_inclusive.Sampler(
+                    self.datasource, testing=True
+                )
 
     async def select_clients(self, for_next_batch=False):
         if Config().is_edge_server() and not for_next_batch:

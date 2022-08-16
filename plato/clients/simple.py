@@ -162,7 +162,7 @@ class Client(base.Client):
             avg_training_time = Config().clients.avg_training_time
 
             report = SimpleNamespace(
-                num_samples=self.sampler.trainset_size(),
+                num_samples=self.sampler.num_samples(),
                 accuracy=accuracy,
                 training_time=(avg_training_time + sleep_seconds)
                 * Config().trainer.epochs,
@@ -171,7 +171,7 @@ class Client(base.Client):
             )
         else:
             report = SimpleNamespace(
-                num_samples=self.sampler.trainset_size(),
+                num_samples=self.sampler.num_samples(),
                 accuracy=accuracy,
                 training_time=training_time,
                 comm_time=comm_time,
