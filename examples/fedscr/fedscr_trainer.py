@@ -28,18 +28,16 @@ class Trainer(basic.Trainer):
             else 0.3
         )
 
-        # The overall weight updates applied to the model in a single round.
+        # The overall weight updates applied to the model in a single round
         self.total_grad = OrderedDict()
 
-        # The accumulated gradients for a client throughout the FL session.
+        # The accumulated gradients for a client throughout the FL session
         self.all_grads = []
 
         # Should the clients use the adaptive algorithm?
         self.use_adaptive = bool(
             hasattr(Config().clients, "adaptive") and Config().clients.adaptive
         )
-        self.train_loss = None
-        self.test_loss = None
         self.avg_update = None
         self.div_from_global = None
         self.orig_weights = None
@@ -180,14 +178,11 @@ class Trainer(basic.Trainer):
 
         return 100 * (total - nonzero) / total
 
-    def train_step_end(self, config, batch=None, loss=None):
-        """Method called at the end of a training step."""
-        self.train_loss = loss
-
     def train_run_start(self, config):
         """Method called at the start of training run."""
         self.total_grad = OrderedDict()
         self.orig_weights = copy.deepcopy(self.model)
+        self.orig_weights.to(self.device)
 
     def train_run_end(self, config):
         """Method called at the end of training run."""
@@ -226,7 +221,6 @@ class Trainer(basic.Trainer):
 
     def compute_weight_divergence(self):
         """Calculate the divergence of the locally trained model from the global model."""
-        self.orig_weights.to(self.device)
         div_from_global = 0
         for (__, orig_module), (__, trained_module) in zip(
             self.orig_weights.named_modules(), self.model.named_modules()

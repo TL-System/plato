@@ -5,7 +5,7 @@ aggregates them and adds them to the global model from the previous round.
 
 import asyncio
 import os
-import math
+import numpy as np
 
 from plato.servers import fedavg
 from plato.config import Config
@@ -18,18 +18,14 @@ class Server(fedavg.Server):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
 
         # Loss variances for each communication round used by the adaptive algorithm
-        self.variances = []
-
-        # Local loss received from each client
-        self.local_loss = []
+        self.loss_variances = []
+        self.mean_variance = None
 
         # Model divergences received from each client
         self.divs = {}
 
         # Average weight received updates from each client
         self.avg_update = {}
-
-        self.mean_variance = None
 
         self.update_thresholds = {
             str(client_id): Config().clients.update_threshold
@@ -71,7 +67,7 @@ class Server(fedavg.Server):
                 + self.delta3 * self.mean_variance
             )
             self.update_thresholds[str(client_id)] = (
-                1 / (1 + (math.e**-sigmoid))
+                1 / (1 + (np.exp(-sigmoid)))
             ) * self.orig_threshold
 
     async def federated_averaging(self, updates):
@@ -100,36 +96,24 @@ class Server(fedavg.Server):
         return avg_update
 
     def weights_aggregated(self, updates):
-        """Extract information from client reports. Called after weights have been aggregated"""
-
+        """Extract required information from client reports after aggregating weights."""
         if self.trainer.use_adaptive:
-            self.local_loss = [update.report.loss for update in updates]
-            self.mean_variance = self.calc_loss_var()
+            # Compute mean of loss variances
+            self.loss_variances.append(
+                np.var([update.report.loss for update in updates])
+            )
+            self.mean_variance = (
+                sum(self.loss_variances) * (1 / (self.current_round - 2))
+                if self.current_round > 3
+                else 0
+            )
+
             self.divs = {
                 update.client_id: update.report.div_from_global for update in updates
             }
             self.avg_update = {
                 update.client_id: update.report.avg_update for update in updates
             }
-
-    def calc_loss_var(self):
-        """Calculate the loss variance using mean squared error."""
-        global_loss = sum(self.local_loss) / len(self.local_loss)
-
-        # Compute the mean squared error loss
-        error = 0
-        for loss in self.local_loss:
-            error += math.pow((loss - global_loss), 2)
-        mse_loss = 1 / len(self.local_loss) * error
-
-        self.variances.append(mse_loss)
-
-        mew = sum(self.variances)
-        if self.current_round > 3:
-            mew = mew * (1 / (self.current_round - 2))
-        else:
-            mew = 0
-        return mew
 
     def server_will_close(self):
         """Method called at the start of closing the server."""
