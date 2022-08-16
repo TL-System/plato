@@ -7,12 +7,10 @@ import os
 
 import copy
 import pickle
-import torch
 
 import hermes_pruning as pruning
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
-from plato.samplers import registry as samplers_registry
 from plato.trainers import basic
 
 
@@ -30,7 +28,6 @@ class Trainer(basic.Trainer):
         self.datasource = None
         self.testset = None
         self.testset_sampler = None
-        self.testset_loaded = False
         self.need_prune = False
         self.accuracy_threshold = (
             Config().clients.accuracy_threshold
@@ -40,6 +37,11 @@ class Trainer(basic.Trainer):
 
     def train_run_start(self, config):
         """Method called at the start of training run."""
+        # Evaluate if structured pruning should be conducted
+        self.datasource = datasources_registry.get(client_id=self.client_id)
+        self.testset = self.datasource.get_test_set()
+        accuracy = self.test_model(config, self.testset, None)
+
         # Merge the incoming server payload model with the mask to create the model for training
         self.original_model = copy.deepcopy(self.model)
         self.model = self.merge_model(self.model)
@@ -48,17 +50,6 @@ class Trainer(basic.Trainer):
         self.model.to(self.device)
         self.model.train()
 
-        # Evaluate if structured pruning should be conducted
-        if self.original_model != self.model:
-            self.original_model.to(self.device)
-        logging.info(
-            "[Client #%d] Evaluating if structured pruning should be conducted.",
-            self.client_id,
-        )
-        self.pruned_amount = pruning.compute_pruned_amount(
-            self.original_model, self.client_id
-        )
-        accuracy = self.eval_test(self.original_model)
         logging.info(
             "[Client #%d] Evaluated Accuracy: %.2f.", self.client_id, accuracy * 100
         )
@@ -99,55 +90,6 @@ class Trainer(basic.Trainer):
             logging.info(
                 "[Client #%d] Pruned Amount: %.2f.", self.client_id, self.pruned_amount
             )
-
-    def eval_test(self, model):
-        """Test if pruning needs to be conducted."""
-        if not self.testset_loaded:
-            self.datasource = datasources_registry.get(client_id=self.client_id)
-            self.testset = self.datasource.get_test_set()
-            if hasattr(Config().data, "testset_sampler"):
-                # Set the sampler for test set
-                self.testset_sampler = samplers_registry.get(
-                    self.datasource, self.client_id, testing=True
-                )
-            self.testset_loaded = True
-
-        model.eval()
-        accuracy = -1
-
-        try:
-            if self.testset_sampler is None:
-                test_loader = torch.utils.data.DataLoader(
-                    self.testset, batch_size=Config().trainer.batch_size, shuffle=False
-                )
-            # Use a testing set following the same distribution as the training set
-            else:
-                test_loader = torch.utils.data.DataLoader(
-                    self.testset,
-                    batch_size=Config().trainer.batch_size,
-                    shuffle=False,
-                    sampler=self.testset_sampler.get(),
-                )
-
-            correct = 0
-            total = 0
-
-            with torch.no_grad():
-                for examples, labels in test_loader:
-                    examples, labels = examples.to(self.device), labels.to(self.device)
-                    outputs = self.model(examples)
-
-                    _, predicted = torch.max(outputs.data, 1)
-                    total += labels.size(0)
-                    correct += (predicted == labels).sum().item()
-
-            accuracy = correct / total
-
-        except Exception as testing_exception:
-            logging.info("Testing on client #%d failed.", self.client_id)
-            raise testing_exception
-
-        return accuracy
 
     def merge_model(self, model):
         """Apply the mask onto the incoming personalized model."""

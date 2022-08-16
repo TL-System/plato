@@ -2,7 +2,6 @@
 A federated learning server using Hermes.
 """
 
-import copy
 import logging
 import os
 import pickle
@@ -130,6 +129,11 @@ class Server(fedavg.Server):
             )
             with open(filename, "rb") as payload_file:
                 payload = pickle.load(payload_file)
+            logging.info(
+                "[%s] Loaded client #%d's personalized model",
+                self,
+                self.selected_client_id,
+            )
         else:
             self.clients_first_time[self.selected_client_id - 1] = False
 
@@ -144,9 +148,7 @@ class Server(fedavg.Server):
 
         for step, mask in enumerate(masks_received):
             if mask is None:
-                model = copy.deepcopy(self.algorithm.model)
-                model.load_state_dict(weights_received[step], strict=True)
-                mask = pruning.make_init_mask(model)
+                mask = pruning.make_init_mask(self.trainer.model)
                 masks_received[step] = mask
 
         return weights_received, masks_received
