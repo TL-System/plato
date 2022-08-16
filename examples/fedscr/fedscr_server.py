@@ -69,9 +69,9 @@ class Server(fedavg.Server):
                 1 / (1 + (np.exp(-sigmoid)))
             ) * self.orig_threshold
 
-    def compute_weight_deltas(self, updates):
+    def compute_weight_deltas(self, weights_received):
         """Extract weight updates."""
-        return [update.payload for update in updates]
+        return weights_received
 
     def weights_aggregated(self, updates):
         """Extract required information from client reports after aggregating weights."""

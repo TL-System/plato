@@ -15,11 +15,8 @@ from plato.servers import fedavg
 class Server(fedavg.Server):
     """A federated learning server using the FedNova algorithm."""
 
-    async def federated_averaging(self, updates):
+    async def federated_averaging(self, updates, deltas_received):
         """Aggregate weight updates from the clients using FedNova."""
-        # Extracting weights from the updates
-        deltas_received = self.compute_weight_deltas(updates)
-
         # Extracting the total number of samples
         self.total_samples = sum(update.report.num_samples for update in updates)
 

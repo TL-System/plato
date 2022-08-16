@@ -17,16 +17,13 @@ from plato.servers import fedavg
 
 
 class Server(fedavg.Server):
-    """ A federated learning server using the FedAtt algorithm. """
+    """A federated learning server using the FedAtt algorithm."""
 
     def __init__(self):
         super().__init__()
 
-    async def federated_averaging(self, updates):
-        """ Aggregate weight updates from the clients using FedAtt. """
-        # Extract weights from the updates
-        deltas_received = self.compute_weight_deltas(updates)
-
+    async def federated_averaging(self, updates, deltas_received):
+        """Aggregate weight updates from the clients using FedAtt."""
         # Extract baseline model weights
         baseline_weights = self.algorithm.extract_weights()
 
@@ -36,7 +33,7 @@ class Server(fedavg.Server):
         return update
 
     def avg_att(self, baseline_weights, deltas_received):
-        """ Perform attentive aggregation with the attention mechanism. """
+        """Perform attentive aggregation with the attention mechanism."""
         att_update = {
             name: self.trainer.zeros(weights.shape)
             for name, weights in deltas_received[0].items()
@@ -61,14 +58,21 @@ class Server(fedavg.Server):
                 att_weight += torch.mul(-delta, atts[name][i])
 
             # Step size for aggregation used in FedAtt
-            epsilon = Config().algorithm.epsilon if hasattr(
-                Config().algorithm, 'epsilon') else 1.2
+            epsilon = (
+                Config().algorithm.epsilon
+                if hasattr(Config().algorithm, "epsilon")
+                else 1.2
+            )
 
             # The magnitude of normal noise in the randomization mechanism
-            magnitude = Config().algorithm.magnitude if hasattr(
-                Config().algorithm, 'magnitude') else 0.001
+            magnitude = (
+                Config().algorithm.magnitude
+                if hasattr(Config().algorithm, "magnitude")
+                else 0.001
+            )
 
             att_update[name] = -torch.mul(att_weight, epsilon) + torch.mul(
-                torch.randn(weight.shape), magnitude)
+                torch.randn(weight.shape), magnitude
+            )
 
         return att_update

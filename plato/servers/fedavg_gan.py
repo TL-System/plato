@@ -10,7 +10,7 @@ from plato.config import Config
 class Server(fedavg.Server):
     """Federated learning server using federated averaging to train GAN models."""
 
-    async def federated_averaging(self, updates):
+    async def federated_averaging(self, updates, deltas_received):
         """Aggregate weight updates from the clients using federated averaging."""
         weights_received = self.compute_weight_deltas(updates)
 

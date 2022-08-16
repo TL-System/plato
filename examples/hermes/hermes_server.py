@@ -140,19 +140,16 @@ class Server(fedavg.Server):
 
         return payload
 
-    def compute_weight_deltas(self, updates):
-        """Extract the model weight updates from client updates along with the masks."""
-
-        weights_received = [update.payload[0] for update in updates]
-
-        masks_received = [update.payload[1] for update in updates]
-
+    def weights_received(self, weights_received):
+        """Event called after the updated weights have been received."""
+        # Extract the model weight updates from client updates along with the masks
+        masks_received = [update.payload[1] for update in self.updates]
         for step, mask in enumerate(masks_received):
             if mask is None:
                 mask = pruning.make_init_mask(self.trainer.model)
                 masks_received[step] = mask
 
-        return weights_received, masks_received
+        return weights_received
 
     def server_will_close(self):
         """Method called at the start of closing the server."""

@@ -133,10 +133,8 @@ class Server(base.Server):
         elif self.algorithm is None and self.custom_algorithm is not None:
             self.algorithm = self.custom_algorithm(trainer=self.trainer)
 
-    def compute_weight_deltas(self, updates):
+    def compute_weight_deltas(self, weights_received):
         """Extract the model weight updates from client updates."""
-        weights_received = [update.payload for update in updates]
-
         return self.algorithm.compute_weight_deltas(weights_received)
 
     async def aggregate_weights(self, updates, deltas_received):
@@ -172,10 +170,10 @@ class Server(base.Server):
     async def process_reports(self):
         """Process the client reports by aggregating their weights."""
         weights_received = [update.payload for update in self.updates]
-        self.weights_received(weights_received)
+        weights_received = self.weights_received(weights_received)
         self.callback_handler.call_event("on_weights_received", self, weights_received)
 
-        deltas_received = self.compute_weight_deltas(self.updates)
+        deltas_received = self.compute_weight_deltas(weights_received)
         await self.aggregate_weights(self.updates, deltas_received)
 
         self.weights_aggregated(self.updates)
@@ -260,6 +258,7 @@ class Server(base.Server):
         """
         Event called after the updated weights have been received.
         """
+        return weights_received
 
     def weights_aggregated(self, updates):
         """

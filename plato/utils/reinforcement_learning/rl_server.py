@@ -28,10 +28,8 @@ class RLServer(fedavg.Server):
 
         self.current_round = 0
 
-    async def federated_averaging(self, updates):
+    async def federated_averaging(self, updates, deltas_received):
         """Aggregate weight updates from the clients using smart weighting."""
-        # Extract weights udpates from the client updates
-        deltas_received = self.compute_weight_deltas(updates)
         self.update_state()
 
         # Extract the total number of samples

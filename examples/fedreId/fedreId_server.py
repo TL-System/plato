@@ -1,4 +1,3 @@
-import os
 import logging
 from torch import nn
 
@@ -9,16 +8,15 @@ class fedReIdServer(fedavg.Server):
     def __init__(self, model=None, trainer=None):
         super().__init__(model, trainer)
         self.clients_belive = None
+        self.total_belive = None
 
     def weights_received(self, weights_received):
         """Extract update directions from clients' weights."""
         self.clients_belive = [weight[1] for weight in weights_received]
+        return [weight[0] for weight in weights_received]
 
-    async def federated_averaging(self, updates):
+    async def federated_averaging(self, updates, deltas_received):
         """Aggregate weight updates from the clients using federated averaging."""
-        # Extract weights from the updates
-        deltas_received = self.compute_weight_deltas(updates)
-
         self.total_belive = sum(self.clients_belive)
         if self.total_belive == 0.0:
             self.total_belive = 1.0
@@ -30,7 +28,6 @@ class fedReIdServer(fedavg.Server):
         }
 
         for i, update in enumerate(deltas_received):
-            report, __ = deltas_received[i]
             belive = self.clients_belive[i]
             logging.info("%d -> %f", i, belive)
             for name, delta in update.items():

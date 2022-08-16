@@ -26,9 +26,9 @@ class Server(fedavg.Server):
 
         self.local_values = {}
 
-    async def federated_averaging(self, updates):
+    async def federated_averaging(self, updates, deltas_received):
         """Aggregate weight updates and deltas updates from the clients."""
-        update = await super().federated_averaging(updates)
+        update = await super().federated_averaging(updates, deltas_received)
 
         # Extracting weights from the updates
         deltas_received = self.compute_weight_deltas(updates)

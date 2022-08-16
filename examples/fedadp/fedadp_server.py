@@ -27,11 +27,8 @@ class Server(fedavg.Server):
         self.adaptive_weighting = None
         self.global_grads = None
 
-    async def federated_averaging(self, updates):
+    async def federated_averaging(self, updates, deltas_received):
         """Aggregate weight updates and deltas updates from the clients."""
-        # Extract weights udpates from the client updates
-        deltas_received = self.compute_weight_deltas(updates)
-
         num_samples = [update.report.num_samples for update in updates]
         total_samples = sum(num_samples)
 
@@ -97,7 +94,7 @@ class Server(fedavg.Server):
             client_id = self.selected_clients[i]
 
             # Update the smoothed angle for all clients
-            if client_id not in self.local_angles.keys():
+            if client_id not in self.local_angles:
                 self.local_angles[client_id] = angle
             self.local_angles[client_id] = (
                 (self.current_round - 1) / self.current_round

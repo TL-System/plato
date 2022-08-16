@@ -24,6 +24,7 @@ def weights_received(self, weights_received):
     Event called after the updated weights have been received.
     """
     self.control_variates_received = [weight[1] for weight in weights_received]
+    return [weight[0] for weight in weights_received]
 ```
 ````
 

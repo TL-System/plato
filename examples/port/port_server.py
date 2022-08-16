@@ -51,10 +51,8 @@ class Server(fedavg.Server):
 
         return similarity
 
-    async def federated_averaging(self, updates):
+    async def federated_averaging(self, updates, deltas_received):
         """Aggregate weight updates from the clients using federated averaging."""
-        deltas_received = self.compute_weight_deltas(updates)
-
         # Extract the total number of samples
         self.total_samples = sum(update.report.num_samples for update in updates)
 
