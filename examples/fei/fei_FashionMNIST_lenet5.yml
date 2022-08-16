@@ -67,6 +67,9 @@ data:
     random_seed: 1
 
 trainer:
+    # The type of the trainer
+    type: basic
+
     # The maximum number of training rounds
     rounds: 100
 
