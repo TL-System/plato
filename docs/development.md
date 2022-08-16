@@ -73,23 +73,22 @@ server.run(client)
 
 ## Implementing custom models and data sources
 
-To define a custom model, one does not need to subclass from any base class in Plato, as Plato uses standard model classes in each machine learning framework. Only `get_model()` needs to be implemented in the `Model` class. For example (excerpt from `examples/basic/basic.py`), one can define a simple model in PyTorch as follows:
+To define a custom model, one does not need to subclass from any base class in Plato. Instead, Plato uses standard model classes in the underlying machine learning framework, such as PyTorch. For example (as shown in `examples/basic/basic.py`), one can define a simple model in PyTorch as follows:
 
 ```python
-class Model():
-    """ A custom model. """
+from functools import partial
 
-    @staticmethod
-    def get_model():
-        """Obtaining an instance of this model."""
-        return nn.Sequential(
-            nn.Linear(28 * 28, 128),
-            nn.ReLU(),
-            nn.Linear(128, 128),
-            nn.ReLU(),
-            nn.Linear(128, 10),
-        )
+model = partial(
+        nn.Sequential,
+        nn.Linear(28 * 28, 128),
+        nn.ReLU(),
+        nn.Linear(128, 128),
+        nn.ReLU(),
+        nn.Linear(128, 10),
+    )
 ```
+
+Since the model will need to be instantiated within Plato itself with `model()`, it should be provided as a partial function using `functools.partial`.
 
 If a custom `DataSource` is also needed for a custom training session, one can subclass from the `base.DataSource` class (assuming PyTorch is used as the framework), as in the following example (excerpt from `examples/custom_model.py`):
 
