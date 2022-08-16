@@ -1,5 +1,5 @@
 """
-A federated learning server with RL Agent FEI
+A federated learning server with RL Agent FEI.
 """
 import numpy as np
 from plato.config import Config
@@ -23,11 +23,14 @@ class RLServer(rl_server.RLServer):
 
         state = [0] * 4
         state[0] = self.normalize_state(
-            [update.report.num_samples for update in self.updates])
+            [update.report.num_samples for update in self.updates]
+        )
         state[1] = self.normalize_state(
-            [update.report.training_time for update in self.updates])
+            [update.report.training_time for update in self.updates]
+        )
         state[2] = self.normalize_state(
-            [update.report.valuation for update in self.updates])
+            [update.report.valuation for update in self.updates]
+        )
         state[3] = self.normalize_state(self.corr)
         state = np.transpose(np.round(np.array(state), 4))
 
@@ -41,7 +44,7 @@ class RLServer(rl_server.RLServer):
 
     def update_state(self):
         """Wrap up the state update to RL Agent."""
-        # Pass new state to RL Agent
+        # Passes the new state to the RL Agent
         self.agent.new_state, self.agent.client_ids = self.prep_state()
         self.agent.process_env_update()
 
@@ -56,8 +59,10 @@ class RLServer(rl_server.RLServer):
 
         # Update the baseline model weights
         curr_global_grads = self.process_grad(self.algorithm.extract_weights())
+
         if self.last_global_grads is None:
             self.last_global_grads = np.zeros(len(curr_global_grads))
+
         global_grads = np.subtract(curr_global_grads, self.last_global_grads)
         self.last_global_grads = curr_global_grads
 
@@ -71,8 +76,7 @@ class RLServer(rl_server.RLServer):
     @staticmethod
     def process_grad(grads):
         """Convert gradients to a flattened 1-D array."""
-        grads = list(
-            dict(sorted(grads.items(), key=lambda x: x[0].lower())).values())
+        grads = list(dict(sorted(grads.items(), key=lambda x: x[0].lower())).values())
 
         flattened = grads[0]
         for i in range(1, len(grads)):
@@ -84,5 +88,5 @@ class RLServer(rl_server.RLServer):
     def normalize_state(feature):
         """Normalize/Scaling state features."""
         norm = np.linalg.norm(feature)
-        ret = [Config().algorithm.base**(x / norm) for x in feature]
+        ret = [Config().algorithm.base ** (x / norm) for x in feature]
         return ret

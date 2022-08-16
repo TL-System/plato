@@ -14,16 +14,15 @@ class Client(simple.Client):
 
     def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
         loss = self.trainer.run_history.get_latest_metric("train_loss")
-        logging.info(
-            fonts.colourize(f"[Client #{self.client_id}] Loss value: {loss}"))
+        logging.info(fonts.colourize(f"[Client #{self.client_id}] Loss value: {loss}"))
         report.valuation = self.calc_valuation(report.num_samples, loss)
         return report
 
     def process_server_response(self, server_response):
         """Additional client-specific processing on the server response."""
-        # Reset workload capacity at the initial step (for the new episode)
+        # Resets the workload capacity at the initial step (for the new episode)
         if server_response["current_round"] == 1:
-            # Reset dataset
+            # Resets the dataset
             self.datasource = None
             self.load_data()
 
