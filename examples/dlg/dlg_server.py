@@ -205,7 +205,7 @@ class Server(fedavg.Server):
             target_grad = []
             for delta in deltas_received[
                     Config().algorithm.victim_client].values():
-                target_grad.append(-delta / Config().trainer.learning_rate)
+                target_grad.append(-delta / Config().parameters.optimizer.lr)
 
             total_local_steps = epochs * math.ceil(partition_size / batch_size)
             target_grad = [x / total_local_steps for x in target_grad]
@@ -280,7 +280,7 @@ class Server(fedavg.Server):
 
         # Conduct gradients/weights/updates matching
         if not self.share_gradients and self.match_weights:
-            model = deepcopy(self.trainer.model)
+            model = deepcopy(self.trainer.model.to(Config().device()))
             closure = self.weight_closure(match_optimizer, dummy_data, labels_,
                                           target_weights, model)
         else:
@@ -401,6 +401,7 @@ class Server(fedavg.Server):
 
         def closure():
             match_optimizer.zero_grad()
+            self.trainer.model.to(Config().device())
             try:
                 dummy_pred, _ = self.trainer.model(dummy_data)
             except:
@@ -472,7 +473,7 @@ class Server(fedavg.Server):
                                        only_inputs=True)
 
             patched_model.parameters = OrderedDict(
-                (name, param - Config().trainer.learning_rate * grad_part)
+                (name, param - Config().parameters.optimizer.lr * grad_part)
                 for ((name, param),
                      grad_part) in zip(patched_model.parameters.items(), grad))
         if self.use_updates:

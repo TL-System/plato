@@ -6,7 +6,7 @@ from plato.config import Config
 
 
 class Model(nn.Module):
-    def __init__(self, num_classes=10):
+    def __init__(self, num_classes=Config().trainer.num_classes):
         super().__init__()
         act = nn.Sigmoid
         if Config().data.datasource == 'EMNIST':
@@ -35,9 +35,3 @@ class Model(nn.Module):
         out = self.fc(feature)
         return out, feature
 
-    @staticmethod
-    def get_model(*args):
-        """Obtaining an instance of this model."""
-        if hasattr(Config().trainer, 'num_classes'):
-            return Model(num_classes=Config().trainer.num_classes)
-        return Model()
