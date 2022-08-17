@@ -202,7 +202,10 @@ class Trainer(base.Trainer):
                 loss = _loss_criterion(outputs, labels)
                 self._loss_tracker.update(loss, labels.size(0))
 
-                self.backward(config, loss)
+                if "create_graph" in config:
+                    loss.backward(create_graph=config["create_graph"])
+                else:
+                    loss.backward()
 
                 optimizer.step()
 
@@ -499,10 +502,6 @@ class Trainer(base.Trainer):
 
     def backward(self, config, loss):
         """Perform the backpropagation pass."""
-        if "create_graph" in config:
-            loss.backward(create_graph=config["create_graph"])
-        else:
-            loss.backward()
 
     def train_run_start(self, config):
         """Method called at the start of training run."""

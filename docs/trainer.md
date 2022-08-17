@@ -33,10 +33,6 @@ Returns a custom learning rate scheduler.
 Returns a custom loss criterion.
 ```
 
-```{admonition} **backward(self, config, loss)**
-Performs the backward pass with the provided loss value.
-```
-
 ```{admonition} **lr_scheduler_step(self)**
 Performs a single learning rate scheduler step if ``self.lr_scheduler`` has been assigned.
 ```
