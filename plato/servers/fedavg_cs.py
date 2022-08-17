@@ -178,13 +178,48 @@ class Server(fedavg.Server):
         """Process the client reports by aggregating their weights."""
         # To pass the client_id == 0 assertion during aggregation
         self.trainer.set_client_id(0)
-
         weights_received = [update.payload for update in self.updates]
+
         weights_received = self.weights_received(weights_received)
         self.callback_handler.call_event("on_weights_received", self, weights_received)
 
-        deltas_received = self.compute_weight_deltas(weights_received)
-        await self.aggregate_weights(self.updates, deltas_received)
+        # Extract the current model weights as the baseline
+        baseline_weights = self.algorithm.extract_weights()
+
+        if hasattr(self, "aggregate_weights"):
+            # Runs a server aggregation algorithm using weights rather than deltas
+            logging.info(
+                "[Server #%d] Aggregating model weights directly rather than weight deltas.",
+                os.getpid(),
+            )
+            updated_weights = self.aggregate_weights(
+                self.updates, baseline_weights, weights_received
+            )
+
+            # Loads the new model weights
+            self.algorithm.load_weights(updated_weights)
+        else:
+            # Computes the weight deltas by comparing the weights received with
+            # the current global model weights
+            deltas_received = self.algorithm.compute_weight_deltas(
+                baseline_weights, weights_received
+            )
+
+            # Runs a framework-agnostic server aggregation algorithm, such as
+            # the federated averaging algorithm
+            logging.info("[Server #%d] Aggregating model weight deltas.", os.getpid())
+            deltas = await self.aggregate_deltas(self.updates, deltas_received)
+
+            # Updates the existing model weights from the provided deltas
+            updated_weights = self.algorithm.update_weights(deltas)
+
+            # Loads the new model weights
+            self.algorithm.load_weights(updated_weights)
+
+        # The model weights have already been aggregated, now calls the
+        # corresponding hook and callback
+        self.weights_aggregated(self.updates)
+        self.callback_handler.call_event("on_weights_aggregated", self, self.updates)
 
         if Config().is_edge_server():
             self.trainer.set_client_id(Config().args.id)
