@@ -20,6 +20,7 @@ class Trainer(basic.Trainer):
         """Initializes the global model."""
         super().__init__(model=model)
         self.mask = None
+        self.mask_for_merging = None
         self.pruning_target = Config().clients.pruning_target * 100
         self.pruned_amount = 0
         self.pruning_rate = Config().clients.pruning_amount * 100
@@ -60,17 +61,17 @@ class Trainer(basic.Trainer):
 
             if self.pruning_target - self.pruned_amount < self.pruning_rate:
                 self.pruning_rate = (self.pruning_target - self.pruned_amount) / 100
-                self.mask = pruning.structured_pruning(
+                self.mask, self.mask_for_merging = pruning.structured_pruning(
                     self.model, self.pruning_rate, adjust_rate=self.pruned_amount
                 )
             else:
                 self.pruning_rate = (self.pruning_rate) / (100 - self.pruned_amount)
-                self.mask = pruning.structured_pruning(
+                self.mask, self.mask_for_merging = pruning.structured_pruning(
                     self.model,
                     self.pruning_rate,
                 )
 
-            self.save_mask(self.mask)
+            self.save_mask([self.mask, self.mask_for_merging])
             self.need_prune = True
         else:
             logging.info("[Client #%d] No need to prune.", self.client_id)
@@ -101,7 +102,7 @@ class Trainer(basic.Trainer):
             with open(mask_path, "rb") as mask_file:
                 mask = pickle.load(mask_file)
 
-        return pruning.apply_mask(model, mask, self.device)
+        return pruning.apply_mask(model, mask[1], self.device)
 
     def save_mask(self, mask):
         """If pruning has occured, the mask is saved for merging in future rounds."""

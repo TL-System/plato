@@ -33,50 +33,24 @@ class Server(fedavg.Server):
             for model in weights_received:
                 model[layer_name] = model[layer_name].numpy()
 
-        step = 0
-
-        masked_layers = []
-        for name, module in self.trainer.model.named_modules():
-            if isinstance(module, (torch.nn.Conv2d, torch.nn.Linear)):
-                layer_name = f"{name}.weight"
-                masked_layers.append(layer_name)
-
         for layer_name in weights_received[0].keys():
-            if layer_name in masked_layers:
-                count = np.zeros_like(self.masks_received[0][step].reshape([-1]))
-                avg = np.zeros_like(weights_received[0][layer_name].reshape([-1]))
-                for index, __ in enumerate(self.masks_received):
-                    num_samples = updates[index].report.num_samples
-                    count += self.masks_received[index][step].reshape([-1])
-                    avg += weights_received[index][layer_name].reshape([-1]) * (
-                        num_samples / self.total_samples
-                    )
+            count = np.zeros_like(self.masks_received[0][layer_name].reshape([-1]))
+            avg = np.zeros_like(weights_received[0][layer_name].reshape([-1]))
+            for index, __ in enumerate(self.masks_received):
+                num_samples = updates[index].report.num_samples
+                count += self.masks_received[index][layer_name].reshape([-1])
+                avg += weights_received[index][layer_name].reshape([-1]) * (
+                    num_samples / self.total_samples
+                )
 
-                count = np.where(count == len(self.masks_received), 1, 0)
-                final_avg = np.divide(avg, count)
-                ind = np.isfinite(final_avg)
+            count = np.where(count == len(self.masks_received), 1, 0)
+            final_avg = np.divide(avg, count)
+            ind = np.isfinite(final_avg)
 
-                for model in weights_received:
-                    model[layer_name].reshape([-1])[ind] = final_avg[ind]
-                    shape = weights_received[0][layer_name].shape
-                    model[layer_name] = torch.from_numpy(
-                        model[layer_name].reshape(shape)
-                    )
-                step = step + 1
-            else:
-                avg = np.zeros_like(weights_received[0][layer_name].reshape([-1]))
-                if "int" in str(avg.dtype):
-                    avg = avg.astype(np.float64)
-                for index, __ in enumerate(weights_received):
-                    num_samples = updates[index].report.num_samples
-                    avg += weights_received[index][layer_name].reshape([-1]) * (
-                        num_samples / self.total_samples
-                    )
-
+            for model in weights_received:
+                model[layer_name].reshape([-1])[ind] = final_avg[ind]
                 shape = weights_received[0][layer_name].shape
-                new_tensor = torch.from_numpy(avg.reshape(shape))
-                for model in weights_received:
-                    model[layer_name] = new_tensor
+                model[layer_name] = torch.from_numpy(model[layer_name].reshape(shape))
 
         step = 0
         for update in updates:

@@ -20,11 +20,10 @@ def make_init_mask(model):
     :param model: a pytorch model
     :return mask: a list of pruning masks
     """
-    mask = []
-    for __, module in model.named_modules():
-        if isinstance(module, torch.nn.Conv2d) or isinstance(module, torch.nn.Linear):
-            tensor = module.weight.detach().cpu().numpy()
-            mask.append(np.ones_like(tensor))
+    mask = {}
+    for name, layer in model.state_dict().items():
+        tensor = layer.detach().cpu().numpy()
+        mask[name] = np.ones_like(tensor)
 
     return mask
 
@@ -67,7 +66,12 @@ def structured_pruning(model, pruning_rate, adjust_rate=0.0):
     norm = 1
     dim = 0
     pruning_rates = []
-    mask = []
+
+    # The binary masks for all layers
+    mask = {}
+
+    # The binary masks for the layers that have been pruned
+    mask_for_merging = []
 
     if adjust_rate == 0:
         for __, module in model.named_modules():
@@ -107,11 +111,21 @@ def structured_pruning(model, pruning_rate, adjust_rate=0.0):
             prune.ln_structured(module, "weight", amount, norm, dim)
             step += 1
 
-    for name, buffer in model.named_buffers():
-        if "mask" in name:
-            mask.append(buffer.cpu().numpy())
+    # Create the mask to be sent to the server
+    for name, layer in model.state_dict().items():
+        # Any binary masks will have names ending in "_mask" while their masked layers
+        # will have names ending with "_orig" according to the pytorch documentation
+        # for pruning
+        if name.endswith("_mask"):
+            mask[name[0 : name.rindex("_mask")]] = layer.cpu().numpy()
+        elif not name.endswith("_orig"):
+            tensor = layer.detach().cpu().numpy()
+            mask[name] = np.ones_like(tensor)
 
-    return mask
+    for buffer in model.buffers():
+        mask_for_merging.append(buffer)
+
+    return mask, mask_for_merging
 
 
 def remove(model):
