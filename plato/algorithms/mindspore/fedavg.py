@@ -42,7 +42,7 @@ class Algorithm(base.Algorithm):
 
     def update_weights(self, deltas):
         """Updates the existing model weights from the provided deltas."""
-        baseline_weights = self.algorithm.extract_weights()
+        baseline_weights = self.extract_weights()
 
         updated_weights = OrderedDict()
         for name, weight in baseline_weights.items():
