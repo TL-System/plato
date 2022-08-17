@@ -44,7 +44,7 @@ pip install tensorflow-macos tensorflow-datasets
 **MindSpore.** Plato currently supports the latest MindSpore release, 1.8.0. Follow the installation instructions in the [official MindSpore website](https://mindspore.cn/install/en) to install MindSpore in your conda environment. For example, on an M1 Mac, use the command:
 
 ```shell
-conda install mindspore-cpu=1.8.0 -c mindspore -c conda-forge
+conda install mindspore-cpu -c mindspore -c conda-forge
 ```
 
 To use trainers and servers based on MindSpore, assign `true` to `use_mindspore` in the `trainer` section of the configuration file. If GPU is not available when MindSpore is used, assign `true` to `cpuonly` in the `trainer` section as well. These variables are unassigned by default, and *Plato* would use PyTorch as its default framework. As examples of using MindSpore as its underlying deep learning framework, two configuration files have been provided: `configs/MNIST/fedavg_lenet5_mindspore.yml` and `configs/MNIST/mistnet_lenet5_mindspore.yml`. For example:

@@ -1,4 +1,4 @@
-'''
+"""
 Samples data from a dataset, biased across quantity size of clients.
 
 This sampler implements one type of sample distribution skew called:
@@ -19,7 +19,7 @@ This sampler implements one type of sample distribution skew called:
                 ...
                 clientN 6       7      11      10     7
 
-'''
+"""
 
 import numpy as np
 import torch
@@ -33,6 +33,7 @@ from plato.samplers import sampler_utils
 class Sampler(base.Sampler):
     """Create a data sampler for each client to use a divided partition of the
     dataset, biased across partition size."""
+
     def __init__(self, datasource, client_id, testing):
         super().__init__()
 
@@ -56,8 +57,11 @@ class Sampler(base.Sampler):
         np.random.shuffle(indices)
 
         # Concentration parameter to be used in the Dirichlet distribution
-        concentration = Config().data.client_quantity_concentration if hasattr(
-            Config().data, 'client_quantity_concentration') else 1.0
+        concentration = (
+            Config().data.client_quantity_concentration
+            if hasattr(Config().data, "client_quantity_concentration")
+            else 1.0
+        )
 
         min_partition_size = Config().data.min_partition_size
         total_clients = Config().clients.total_clients
@@ -67,45 +71,51 @@ class Sampler(base.Sampler):
             dataset_size=self.dataset_size,
             min_partition_size=min_partition_size,
             concentration=concentration,
-            num_clients=total_clients)[client_id]
+            num_clients=total_clients,
+        )[client_id]
 
-    def sample_quantity_skew(self, dataset_indices, dataset_size,
-                             min_partition_size, concentration, num_clients):
-        """ Create the quantity-based sample skewness """
+    def sample_quantity_skew(
+        self,
+        dataset_indices,
+        dataset_size,
+        min_partition_size,
+        concentration,
+        num_clients,
+    ):
+        """Create the quantity-based sample skewness"""
         proportions = sampler_utils.create_dirichlet_skew(
             total_size=dataset_size,
             concentration=concentration,
             min_partition_size=min_partition_size,
             number_partitions=num_clients,
-            is_extend_total_size=True)
+            is_extend_total_size=True,
+        )
 
-        proportions_range = (np.cumsum(proportions) *
-                             dataset_size).astype(int)[:-1]
+        proportions_range = (np.cumsum(proportions) * dataset_size).astype(int)[:-1]
 
         required_total_size = proportions_range[-1]
         extended_dataset_indices = sampler_utils.extend_indices(
-            indices=dataset_indices, required_total_size=required_total_size)
+            indices=dataset_indices, required_total_size=required_total_size
+        )
 
         # obtain the assigned subdataset indices for current client
-        clients_assigned_idxs = np.split(extended_dataset_indices,
-                                         proportions_range)
+        clients_assigned_idxs = np.split(extended_dataset_indices, proportions_range)
 
         return clients_assigned_idxs
 
     def get(self):
-        """Obtains an instance of the sampler. """
+        """Obtains an instance of the sampler."""
         gen = torch.Generator()
         gen.manual_seed(self.random_seed)
         return SubsetRandomSampler(self.subset_indices, generator=gen)
 
-    def trainset_size(self):
-        """Returns the length of the dataset after sampling. """
+    def num_samples(self):
+        """Returns the length of the dataset after sampling."""
         return len(self.subset_indices)
 
     def get_sampled_data_condition(self):
-        """ Get the detailed info of the trainset """
+        """Get the detailed info of the trainset"""
         targets_array = np.array(self.targets_list)
         client_sampled_subset_labels = targets_array[self.subset_indices]
-        unique, counts = np.unique(client_sampled_subset_labels,
-                                   return_counts=True)
+        unique, counts = np.unique(client_sampled_subset_labels, return_counts=True)
         return np.asarray((unique, counts)).T

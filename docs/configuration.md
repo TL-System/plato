@@ -277,7 +277,7 @@ Where the test dataset is located.
 ```
 ````
 
-````{admonition} sampler
+````{admonition} **sampler**
 How to divide the entire dataset to the clients. The following options are available:
 
 - `iid`
@@ -308,18 +308,10 @@ If the sampler is `mixed`, the indices of clients whose datasets are non-i.i.d. 
 ````
 
 ````{admonition} test_set_sampler
-How the test dataset is sampled when clients test locally. Any sampler is valid. 
+How the test dataset is sampled when clients test locally. Any sampler type is valid. 
 
 ```{note}
-Without this parameter, each client's test dataset is the test dataset of the datasource.
-```
-````
-
-````{admonition} edge_test_set_sampler
-How the test dataset is sampled when edge servers test locally. Any sampler is valid.
-
-```{note}
-Without this parameter, edge servers' test datasets are the test dataset of the datasource if they locally test their aggregated models in cross-silo FL.
+Without this parameter, the test dataset on either the client or the server is the entire test dataset of the datasource.
 ```
 ````
 

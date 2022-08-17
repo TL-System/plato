@@ -28,20 +28,16 @@ from plato.samplers import registry as samplers_registry
 @dataclass
 class Report(base.Report):
     """Report from a simple client, to be sent to the federated learning server."""
+
     training_time: float
     delta_o: float
     delta_g: float
 
 
 class Client(simple.Client):
-    """A federated learning client with support for Adaptive gradient blending.
-    """
+    """A federated learning client with support for Adaptive gradient blending."""
 
-    def __init__(self,
-                 model=None,
-                 datasource=None,
-                 algorithm=None,
-                 trainer=None):
+    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
         super().__init__()
         self.model = model
         self.datasource = datasource
@@ -56,8 +52,7 @@ class Client(simple.Client):
         model_name = Config().trainer.model_name
         filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.pth"
 
-        save_dir = os.path.join("learningModels",
-                                "client_" + str(self.client_id))
+        save_dir = os.path.join("learningModels", "client_" + str(self.client_id))
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
 
@@ -68,43 +63,49 @@ class Client(simple.Client):
         #   {"RGB": 0.24, "Flow": 0.48, "Audio": 0.11, "Fused"; 17}
 
     def record_model(self):
-        """ Save the client's model to the memory """
+        """Save the client's model to the memory"""
         self.trainer.save_model(filename=self.recored_model_path)
 
     def load_recorded_model(self):
-        """ Loaded the saved model """
+        """Loaded the saved model"""
         self.trainer.load_model(filename=self.recored_model_path)
 
     def load_data(self) -> None:
         """Generating data and loading them onto this client."""
         logging.info("[Client #%d] Loading its data source...", self.client_id)
 
-        logging.info("[Client #%d] Dataset size: %s", self.client_id,
-                     self.datasource.num_train_examples())
+        logging.info(
+            "[Client #%d] Dataset size: %s",
+            self.client_id,
+            self.datasource.num_train_examples(),
+        )
 
         # Setting up the data sampler
         self.sampler = samplers_registry.get(self.datasource, self.client_id)
 
         # Setting up the modality sampler
         self.modality_sampler = samplers_registry.multimodal_get(
-            datasource=self.datasource, client_id=self.client_id)
+            datasource=self.datasource, client_id=self.client_id
+        )
 
         # PyTorch uses samplers when loading data with a data loader
-        self.trainset = self.datasource.get_train_set(
-            self.modality_sampler.get())
+        self.trainset = self.datasource.get_train_set(self.modality_sampler.get())
 
         self.valset = self.datasource.get_val_set()
 
-        if hasattr(Config().clients, 'do_test') and Config().clients.do_test:
+        if hasattr(Config().clients, "do_test") and Config().clients.do_test:
             # Set the testset if local testing is needed
             self.testset = self.datasource.get_test_set()
 
-    def local_global_gradient_blending(self, local_model,
-                                       global_eval_avg_loses,
-                                       global_eval_subtrain_avg_losses,
-                                       local_eval_avg_losses,
-                                       local_eval_subtrain_avg_losses):
-        """ Blend the gradients for the received global model and the local model """
+    def local_global_gradient_blending(
+        self,
+        local_model,
+        global_eval_avg_loses,
+        global_eval_subtrain_avg_losses,
+        local_eval_avg_losses,
+        local_eval_subtrain_avg_losses,
+    ):
+        """Blend the gradients for the received global model and the local model"""
         # eval_avg_losses, eval_subtrainset_avg_losses,
         #   local_train_avg_losses, local_eval_avg_losses
         # obtain the global model directly as the global_model is actually the self.model
@@ -115,29 +116,27 @@ class Client(simple.Client):
 
         for module_nm in existing_modules_names:
             md_global_eval_loss = global_eval_avg_loses[module_nm]
-            md_global_eval_trainset_loss = global_eval_subtrain_avg_losses[
-                module_nm]
+            md_global_eval_trainset_loss = global_eval_subtrain_avg_losses[module_nm]
             md_local_eval_loss = local_eval_avg_losses[module_nm]
-            md_local_eval_trainset_loss = local_eval_subtrain_avg_losses[
-                module_nm]
+            md_local_eval_trainset_loss = local_eval_subtrain_avg_losses[module_nm]
             local_global_ogr = blending.OGR_n2N(
                 n_eval_avg_loss=md_local_eval_loss,
                 n_train_avg_loss=md_local_eval_trainset_loss,
                 N_eval_avg_loss=md_global_eval_loss,
-                N_train_avg_loss=md_global_eval_trainset_loss)
+                N_train_avg_loss=md_global_eval_trainset_loss,
+            )
 
             # merge the corresponding local module, global module
-            global_module_wt = self.model.module_name_net_mapper[
-                module_nm].weight.data
-            local_module_wt = local_model.module_name_net_mapper[
-                module_nm].weight.data
-            merged_module_wt = local_global_ogr * local_module_wt + (
-                1 - local_global_ogr) * global_module_wt
+            global_module_wt = self.model.module_name_net_mapper[module_nm].weight.data
+            local_module_wt = local_model.module_name_net_mapper[module_nm].weight.data
+            merged_module_wt = (
+                local_global_ogr * local_module_wt
+                + (1 - local_global_ogr) * global_module_wt
+            )
 
             # the reason why we set the global directly is because
             #   we want to save the space
-            self.model.assing_weights(module_name=module_nm,
-                                      weights=merged_module_wt)
+            self.model.assing_weights(module_name=module_nm, weights=merged_module_wt)
 
     def load_payload(self, server_payload) -> None:
         """Loading the server model onto this client."""
@@ -154,44 +153,51 @@ class Client(simple.Client):
         self.algorithm.load_weights(server_payload)
 
         # using ogr merge
-        eval_avg_losses, eval_subtrainset_avg_losses, \
-            local_eval_avg_losses, \
-                local_train_avg_losses = self.trainer.obtain_local_global_ogr_items(
-            trainset=self.trainset, evalset=self.evalset)
+        (
+            eval_avg_losses,
+            eval_subtrainset_avg_losses,
+            local_eval_avg_losses,
+            local_train_avg_losses,
+        ) = self.trainer.obtain_local_global_ogr_items(
+            trainset=self.trainset, evalset=self.evalset
+        )
 
         self.local_global_gradient_blending(
             local_model=local_model,
             global_eval_avg_loses=eval_avg_losses,
             global_eval_subtrain_avg_losses=eval_subtrainset_avg_losses,
             local_eval_avg_losses=local_eval_avg_losses,
-            local_eval_subtrain_avg_losses=local_train_avg_losses)
+            local_eval_subtrain_avg_losses=local_train_avg_losses,
+        )
 
         self.optimal_blending_weights = self.adaptive_gradient_blending_weights(
             eval_avg_losses=eval_avg_losses,
             eval_train_avg_losses=eval_subtrainset_avg_losses,
             local_eval_avg_losses=local_eval_avg_losses,
-            local_train_avg_losses=local_train_avg_losses)
+            local_train_avg_losses=local_train_avg_losses,
+        )
 
-    def adaptive_gradient_blending_weights(self, eval_avg_losses,
-                                           eval_train_avg_losses,
-                                           local_eval_avg_losses,
-                                           local_train_avg_losses):
-        """ Obtain the gradient blending weights """
+    def adaptive_gradient_blending_weights(
+        self,
+        eval_avg_losses,
+        eval_train_avg_losses,
+        local_eval_avg_losses,
+        local_train_avg_losses,
+    ):
+        """Obtain the gradient blending weights"""
         modalities_losses_n = {
             "eval": local_eval_avg_losses,
-            "train": local_train_avg_losses
+            "train": local_train_avg_losses,
         }
-        modalities_losses_N = {
-            "eval": eval_avg_losses,
-            "train": eval_train_avg_losses
-        }
+        modalities_losses_N = {"eval": eval_avg_losses, "train": eval_train_avg_losses}
         optimal_weights = blending.get_optimal_gradient_blend_weights(
-            modalities_losses_n, modalities_losses_N)
+            modalities_losses_n, modalities_losses_N
+        )
 
         return optimal_weights
 
     def obtain_delta_og(self):
-        """ Compute the overfitting-generalization-ratio """
+        """Compute the overfitting-generalization-ratio"""
         start_eval_loss = self.trainer.global_losses_trajectory["eval"][0]
         start_train_loss = self.trainer.global_losses_trajectory["train"][0]
         end_eval_loss = self.trainer.global_losses_trajectory["eval"][-1]
@@ -201,9 +207,11 @@ class Client(simple.Client):
             n_eval_avg_loss=start_eval_loss,
             n_train_avg_loss=start_train_loss,
             N_eval_avg_loss=end_eval_loss,
-            N_train_avg_loss=end_train_loss)
+            N_train_avg_loss=end_train_loss,
+        )
         delta_g = blending.compute_delta_generalization(
-            eval_avg_loss_n=start_eval_loss, eval_avg_loss_N=end_eval_loss)
+            eval_avg_loss_n=start_eval_loss, eval_avg_loss_N=end_eval_loss
+        )
 
         return delta_o, delta_g
 
@@ -213,8 +221,9 @@ class Client(simple.Client):
         logging.info("[Client #%d] Started training.", self.client_id)
 
         # Perform model training
-        if not self.trainer.train(self.trainset, self.evalset, self.sampler,
-                                  self.optimal_blending_weights):
+        if not self.trainer.train(
+            self.trainset, self.evalset, self.sampler, self.optimal_blending_weights
+        ):
             # Training failed
             await self.sio.disconnect()
 
@@ -225,19 +234,24 @@ class Client(simple.Client):
         delta_o, delta_g = self.obtain_delta_og()
 
         # Generate a report for the server, performing model testing if applicable
-        if hasattr(Config().clients, 'do_test') and Config().clients.do_test:
+        if hasattr(Config().clients, "do_test") and Config().clients.do_test:
             accuracy = self.trainer.test(self.testset)
 
             if accuracy == 0:
                 # The testing process failed, disconnect from the server
                 await self.sio.disconnect()
 
-            logging.info('[Client #%d] Test accuracy: %.2f%%.', self.client_id,
-                         100 * accuracy)
+            logging.info(
+                "[Client #%d] Test accuracy: %.2f%%.", self.client_id, 100 * accuracy
+            )
         else:
             accuracy = 0
 
         training_time = time.time() - training_start_time
 
-        return Report(self.sampler.trainset_size(), accuracy, training_time,
-                      delta_o, delta_g), weights
+        return (
+            Report(
+                self.sampler.num_samples(), accuracy, training_time, delta_o, delta_g
+            ),
+            weights,
+        )
