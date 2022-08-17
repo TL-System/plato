@@ -19,9 +19,10 @@ class Server(fedavg.Server):
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
         self.clients_first_time = [True for _ in range(Config().clients.total_clients)]
-        self.personalized_models = []
+        self.personalized_models = [None] * Config().clients.total_clients
         self.masks_received = []
 
+    # pylint: disable=unused-argument
     def aggregate_weights(self, updates, baseline_weights, weights_received):
         """Aggregate weight updates from the clients using personalized aggregating."""
         # Extract the total number of samples
@@ -77,11 +78,16 @@ class Server(fedavg.Server):
                 for model in weights_received:
                     model[layer_name] = new_tensor
 
-        self.save_personalized_models(self.personalized_models, updates)
-        return weights_received
+        step = 0
+        for update in updates:
+            self.personalized_models[update.client_id - 1] = weights_received[step]
+            step += 1
+
+        self.save_personalized_models(weights_received, updates)
+        return self.algorithm.model.state_dict()
 
     def save_personalized_models(self, personalized_models, updates):
-        """Save each client's personalized model."""
+        """Save each client's personalized model at the end of aggregation."""
         for (personalized_model, update) in zip(personalized_models, updates):
             model_name = (
                 Config().trainer.model_name
@@ -108,19 +114,9 @@ class Server(fedavg.Server):
         # in a previous communication round, the personalized file is loaded and
         # sent to the client for continued training. Otherwise, if the client is
         # selected for the first time, it receives the pre-initialized model.
-        model_name = (
-            Config().trainer.model_name
-            if hasattr(Config().trainer, "model_name")
-            else "custom"
-        )
-        model_path = Config().params["model_path"]
+
         if not self.clients_first_time[self.selected_client_id - 1]:
-            filename = (
-                f"{model_path}/personalized_{model_name}"
-                f"_client{self.selected_client_id}.pth"
-            )
-            with open(filename, "rb") as payload_file:
-                payload = pickle.load(payload_file)
+            payload = self.personalized_models[self.selected_client_id - 1]
             logging.info(
                 "[%s] Loaded client #%d's personalized model",
                 self,
