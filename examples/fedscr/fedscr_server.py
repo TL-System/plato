@@ -4,6 +4,7 @@ aggregates them and adds them to the global model from the previous round.
 """
 
 import os
+from collections import OrderedDict
 import numpy as np
 
 from plato.servers import fedavg
@@ -69,9 +70,31 @@ class Server(fedavg.Server):
                 1 / (1 + (np.exp(-sigmoid)))
             ) * self.orig_threshold
 
-    def compute_weight_deltas(self, weights_received):
-        """Extract weight updates."""
-        return weights_received
+    def aggregate_weights(self, updates, baseline_weights, weights_received):
+        """Aggregates the model updates using the deltas directly received by FedSCR clients."""
+        # Extract the total number of samples
+        self.total_samples = sum(update.report.num_samples for update in updates)
+
+        # Perform weighted averaging
+        avg_update = {
+            name: self.trainer.zeros(delta.shape)
+            for name, delta in weights_received[0].items()
+        }
+
+        for i, update in enumerate(weights_received):
+            report = updates[i].report
+            num_samples = report.num_samples
+
+            for name, delta in update.items():
+                # Use weighted average by the number of samples
+                avg_update[name] += delta * (num_samples / self.total_samples)
+
+        # Update weights by adding the deltas to the baseline
+        updated_weights = OrderedDict()
+        for name, weight in baseline_weights.items():
+            updated_weights[name] = weight + avg_update[name]
+
+        return updated_weights
 
     def weights_aggregated(self, updates):
         """Extract required information from client reports after aggregating weights."""
