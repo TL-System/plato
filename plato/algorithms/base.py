@@ -27,14 +27,6 @@ class Algorithm(ABC):
         self.client_id = client_id
 
     @abstractmethod
-    def compute_weight_deltas(self, baseline_weights, weights_received):
-        """Compute the deltas between baseline weights and weights received."""
-
-    @abstractmethod
-    def update_weights(self, deltas):
-        """Updates the existing model weights from the provided deltas."""
-
-    @abstractmethod
     def extract_weights(self, model=None):
         """Extracts weights from a model passed in as a parameter."""
 

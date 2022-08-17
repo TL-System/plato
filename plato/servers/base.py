@@ -1235,6 +1235,14 @@ class Server:
         return payload
 
     @abstractmethod
+    def _compute_weight_deltas(self, baseline_weights, weights_received):
+        """Compute the deltas between baseline weights and weights received."""
+
+    @abstractmethod
+    def _update_weights(self, deltas):
+        """Updates the existing model weights from the provided deltas."""
+
+    @abstractmethod
     async def _process_reports(self) -> None:
         """Process a client report."""
 
