@@ -22,7 +22,7 @@ from plato.algorithms import fedavg
 
 class Algorithm(fedavg.Algorithm):
     """The federated learning trainer for Adaptive Parameter Freezing,
-       used by both the client and the server.
+    used by both the client and the server.
     """
 
     def __init__(self, trainer: Trainer = None):
@@ -37,9 +37,9 @@ class Algorithm(fedavg.Algorithm):
 
         # Layers in ResNet models with the following suffixes in their names need to be skipped
         self.skipped_layers = [
-            'running_var',
-            'running_mean',
-            'num_batches_tracked',
+            "running_var",
+            "running_mean",
+            "num_batches_tracked",
         ]
 
         # Initialize the synchronization mask
@@ -52,16 +52,16 @@ class Algorithm(fedavg.Algorithm):
 
     def compress_weights(self):
         """Extract weights from the model, and apply the sync mask
-           to make sure that frozen parameters will not be transmitted.
+        to make sure that frozen parameters will not be transmitted.
         """
         weights = {}
         for name, weight in self.model.cpu().state_dict().items():
             # Rolling back model parameters that should be frozen
-            weight.data = torch.where(self.sync_mask[name], weight.data,
-                                      self.previous_weights[name].data)
+            weight.data = torch.where(
+                self.sync_mask[name], weight.data, self.previous_weights[name].data
+            )
             # Removing model weights that should not be synced with ther server
-            weights_to_sync = torch.masked_select(weight.data,
-                                                  self.sync_mask[name])
+            weights_to_sync = torch.masked_select(weight.data, self.sync_mask[name])
             weights[name] = weights_to_sync
         return weights
 
@@ -119,42 +119,47 @@ class Algorithm(fedavg.Algorithm):
             self.wake_up_round[name] = torch.zeros(weights.shape).int()
 
         self.moving_average_deltas[name][indices] = self.moving_average(
-            self.moving_average_deltas[name][indices], deltas[indices])
+            self.moving_average_deltas[name][indices], deltas[indices]
+        )
 
         self.moving_average_abs_deltas[name][indices] = self.moving_average(
-            self.moving_average_abs_deltas[name][indices],
-            torch.abs(deltas[indices]))
+            self.moving_average_abs_deltas[name][indices], torch.abs(deltas[indices])
+        )
 
-        effective_perturbation = torch.abs(
-            self.moving_average_deltas[name]
-            [indices]) / self.moving_average_abs_deltas[name][indices]
+        effective_perturbation = (
+            torch.abs(self.moving_average_deltas[name][indices])
+            / self.moving_average_abs_deltas[name][indices]
+        )
 
         # Additive increase, multiplicative decrease for the frozen durations
         self.frozen_durations[name][indices] = torch.where(
             effective_perturbation < self.stability_threshold,
             self.frozen_durations[name][indices] + 1,
-            self.frozen_durations[name][indices] // 2)
+            self.frozen_durations[name][indices] // 2,
+        )
 
-        self.wake_up_round[name][
-            indices] = self.current_round + self.frozen_durations[name][
-                indices] + 1
+        self.wake_up_round[name][indices] = (
+            self.current_round + self.frozen_durations[name][indices] + 1
+        )
 
         if Config().algorithm.random_freezing:
             rand = torch.rand(self.wake_up_round[name][indices].shape) * 100
-            rand_frozen = torch.where(rand < self.current_round / 20.0,
-                                      rand.int(),
-                                      torch.zeros(rand.shape).int())
+            rand_frozen = torch.where(
+                rand < self.current_round / 20.0,
+                rand.int(),
+                torch.zeros(rand.shape).int(),
+            )
 
-            self.wake_up_round[name][
-                indices] = self.wake_up_round[name][indices] + rand_frozen
+            self.wake_up_round[name][indices] = (
+                self.wake_up_round[name][indices] + rand_frozen
+            )
 
         # Updating the synchronization mask
-        self.sync_mask[name] = (self.wake_up_round[name] >= self.current_round)
+        self.sync_mask[name] = self.wake_up_round[name] >= self.current_round
 
     def update_stability_threshold(self, inactive_ratio):
         """Tune the stability threshold adaptively if necessary."""
-        logging.info('Current ratio of stable parameters: {:.2f}'.format(
-            inactive_ratio))
+        logging.info("Current ratio of stable parameters: %.2f", inactive_ratio)
 
         if inactive_ratio > Config().algorithm.tight_threshold:
             self.stability_threshold /= 2.0
@@ -172,8 +177,10 @@ class Algorithm(fedavg.Algorithm):
             # Expanding the compressed weights using the sync mask
             weight.data[self.sync_mask[name]] = weight.data.clone().view(-1)
 
-            if self.previous_weights is not None and name.split(
-                    '.')[-1] not in self.skipped_layers:
+            if (
+                self.previous_weights is not None
+                and name.split(".")[-1] not in self.skipped_layers
+            ):
                 self.update_sync_mask(name, weight.data)
 
             total_active_weights += self.sync_mask[name].sum()

@@ -60,8 +60,9 @@ def structured_pruning(model, pruning_rate, adjust_rate=0.0):
     Conduct structured pruning of a model layer by layer
     model: pytorch model
     pruning_rate: the percentage of all parameters that should be pruned
-    adjust_rate: a boolean parameter indicating whether the inputted
-    pruning_rate needs to be adjusted for each individual layer
+    adjust_rate: a parameter indicating whether the inputted
+    pruning_rate needs to be adjusted for each individual layer to meet
+    the total model pruning amount
     """
     norm = 1
     dim = 0
