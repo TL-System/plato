@@ -22,7 +22,7 @@ class Server(fedavg.Server):
     def __init__(self):
         super().__init__()
 
-    async def federated_averaging(self, updates, deltas_received):
+    async def aggregate_deltas(self, updates, deltas_received):
         """Aggregate weight updates from the clients using FedAtt."""
         # Extract baseline model weights
         baseline_weights = self.algorithm.extract_weights()

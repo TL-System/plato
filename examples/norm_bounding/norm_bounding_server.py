@@ -27,7 +27,7 @@ def compute_weights_norm(model_weight_dict):
 class Server(fedavg.Server):
     """FedAvg server with norm bounding defense"""
 
-    async def federated_averaging(self, updates, deltas_received):
+    async def aggregate_deltas(self, updates, deltas_received):
         """Aggregate weight updates from the clients using federated averaging."""
         norm_bound = (
             Config().server.norm_bounding_threshold

@@ -98,7 +98,7 @@ class MistnetplusServer(fedavg.Server):
 
     async def aggregate_weights(self, updates, deltas_received):
         model = self.algorithm.extract_weights()
-        deltas = await self.federated_averaging(updates, deltas_received)
+        deltas = await self.aggregate_deltas(updates, deltas_received)
         updated_features = self.algorithm.update_weights(deltas)
 
         for name, __ in model.items():

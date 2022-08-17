@@ -15,7 +15,7 @@ class fedReIdServer(fedavg.Server):
         self.clients_belive = [weight[1] for weight in weights_received]
         return [weight[0] for weight in weights_received]
 
-    async def federated_averaging(self, updates, deltas_received):
+    async def aggregate_deltas(self, updates, deltas_received):
         """Aggregate weight updates from the clients using federated averaging."""
         self.total_belive = sum(self.clients_belive)
         if self.total_belive == 0.0:

@@ -27,7 +27,7 @@ class Server(fedavg.Server):
         self.adaptive_weighting = None
         self.global_grads = None
 
-    async def federated_averaging(self, updates, deltas_received):
+    async def aggregate_deltas(self, updates, deltas_received):
         """Aggregate weight updates and deltas updates from the clients."""
         num_samples = [update.report.num_samples for update in updates]
         total_samples = sum(num_samples)

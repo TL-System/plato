@@ -135,15 +135,12 @@ class Server(base.Server):
 
     def compute_weight_deltas(self, weights_received):
         """Extract the model weight updates from client updates."""
-        return self.algorithm.compute_weight_deltas(weights_received)
+        return
 
     async def aggregate_weights(self, updates, deltas_received):
         """Aggregate the reported weight updates from the selected clients."""
-        deltas = await self.federated_averaging(updates, deltas_received)
-        updated_weights = self.algorithm.update_weights(deltas)
-        self.algorithm.load_weights(updated_weights)
 
-    async def federated_averaging(self, updates, deltas_received):
+    async def aggregate_deltas(self, updates, deltas_received):
         """Aggregate weight updates from the clients using federated averaging."""
         # Extract the total number of samples
         self.total_samples = sum(update.report.num_samples for update in updates)
@@ -170,12 +167,23 @@ class Server(base.Server):
     async def process_reports(self):
         """Process the client reports by aggregating their weights."""
         weights_received = [update.payload for update in self.updates]
+
         weights_received = self.weights_received(weights_received)
         self.callback_handler.call_event("on_weights_received", self, weights_received)
 
-        deltas_received = self.compute_weight_deltas(weights_received)
-        await self.aggregate_weights(self.updates, deltas_received)
+        # Computes the weight deltas by comparing the weights received with the current global model weights
+        deltas_received = self.algorithm.compute_weight_deltas(weights_received)
 
+        # Runs a server aggregation algorithm, such as the federated averaging algorithm
+        deltas = await self.aggregate_deltas(self.updates, deltas_received)
+
+        # Updates the existing model weights from the provided deltas
+        updated_weights = self.algorithm.update_weights(deltas)
+
+        # Loads the model weights
+        self.algorithm.load_weights(updated_weights)
+
+        # The model weights have already been aggregated, now calls the corresponding hook and callback
         self.weights_aggregated(self.updates)
         self.callback_handler.call_event("on_weights_aggregated", self, self.updates)
 

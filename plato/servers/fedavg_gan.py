@@ -10,24 +10,22 @@ from plato.config import Config
 class Server(fedavg.Server):
     """Federated learning server using federated averaging to train GAN models."""
 
-    async def federated_averaging(self, updates, deltas_received):
+    async def aggregate_deltas(self, updates, deltas_received):
         """Aggregate weight updates from the clients using federated averaging."""
-        weights_received = self.compute_weight_deltas(updates)
-
         # Total sample is the same for both Generator and Discriminator
         self.total_samples = sum(update.report.num_samples for update in updates)
 
         # Perform weighted averaging for both Generator and Discriminator
         gen_avg_update = {
             name: self.trainer.zeros(weights.shape)
-            for name, weights in weights_received[0][0].items()
+            for name, weights in deltas_received[0][0].items()
         }
         disc_avg_update = {
             name: self.trainer.zeros(weights.shape)
-            for name, weights in weights_received[0][1].items()
+            for name, weights in deltas_received[0][1].items()
         }
 
-        for i, update in enumerate(weights_received):
+        for i, update in enumerate(deltas_received):
             num_samples = updates[i].report.num_samples
 
             update_from_gen, update_from_disc = update

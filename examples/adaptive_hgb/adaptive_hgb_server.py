@@ -11,7 +11,7 @@ from plato.servers import fedavg
 class Server(fedavg.Server):
     """Federated server for adaptive gradient blending."""
 
-    async def federated_averaging(self, updates, deltas_received):
+    async def aggregate_deltas(self, updates, deltas_received):
         """Aggregate weight updates from the clients using federated averaging."""
         # Extract the total number of samples
         self.total_samples = sum(update.report.num_samples for update in updates)

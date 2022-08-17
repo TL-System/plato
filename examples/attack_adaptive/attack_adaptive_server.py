@@ -21,7 +21,7 @@ from plato.servers import fedavg
 class Server(fedavg.Server):
     """A federated learning server using the fed_attack_adapt algorithm."""
 
-    async def federated_averaging(self, updates, deltas_received):
+    async def aggregate_deltas(self, updates, deltas_received):
         """Aggregate weight updates from the clients using attack-adaptive aggregation."""
         # Performing attack-adaptive aggregation
         att_update = {
