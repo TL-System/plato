@@ -186,7 +186,8 @@ class Server(base.Server):
                 baseline_weights, weights_received
             )
 
-            # Runs a server aggregation algorithm, such as the federated averaging algorithm
+            # Runs a framework-agnostic server aggregation algorithm, such as
+            # the federated averaging algorithm
             logging.info("[Server #%d] Aggregating model weight deltas.", os.getpid())
             deltas = await self.aggregate_deltas(self.updates, deltas_received)
 
