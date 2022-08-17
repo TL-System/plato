@@ -136,9 +136,9 @@ def apply_mask(model, mask, device, pruned_layer_names):
     """Apply the mask onto the model."""
 
     masked_model = copy.deepcopy(model).to(device)
-    if not torch.is_tensor(mask[0]):
-        for step, __ in enumerate(mask):
-            mask[step] = torch.from_numpy(mask[step])
+    if not torch.is_tensor(mask[pruned_layer_names[0]]):
+        for layer, __ in mask.items():
+            mask[layer] = torch.from_numpy(mask[layer])
 
     step = 0
     for module in masked_model.modules():

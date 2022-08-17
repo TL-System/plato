@@ -73,17 +73,17 @@ class Trainer(basic.Trainer):
 
             if self.pruning_target - self.pruned_amount < self.pruning_rate:
                 self.pruning_rate = (self.pruning_target - self.pruned_amount) / 100
-                self.mask, self.mask_for_merging = pruning.structured_pruning(
+                self.mask = pruning.structured_pruning(
                     self.model, self.pruning_rate, adjust_rate=self.pruned_amount
                 )
             else:
                 self.pruning_rate = (self.pruning_rate) / (100 - self.pruned_amount)
-                self.mask, self.mask_for_merging = pruning.structured_pruning(
+                self.mask = pruning.structured_pruning(
                     self.model,
                     self.pruning_rate,
                 )
 
-            self.save_mask([self.mask, self.mask_for_merging])
+            self.save_mask()
             self.need_prune = True
         else:
             logging.info("[Client #%d] No need to prune.", self.client_id)
@@ -116,7 +116,7 @@ class Trainer(basic.Trainer):
 
         return pruning.apply_mask(model, mask, self.device, pruned_layer_names)
 
-    def save_mask(self, mask):
+    def save_mask(self):
         """If pruning has occured, the mask is saved for merging in future rounds."""
 
         model_name = Config().trainer.model_name
@@ -128,4 +128,4 @@ class Trainer(basic.Trainer):
         mask_path = f"{checkpoint_path}/{model_name}_client{self.client_id}_mask.pth"
 
         with open(mask_path, "wb") as payload_file:
-            pickle.dump(mask, payload_file)
+            pickle.dump(self.mask, payload_file)

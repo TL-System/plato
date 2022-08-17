@@ -18,7 +18,7 @@ clients:
     pruning_target: 0.5
 
     # Target accuracy of each client's personalized model
-    accuracy_threshold: 0.6
+    accuracy_threshold: 0.05
 
     outbound_processors:
         - send_mask
