@@ -32,7 +32,9 @@ class Processor(model.Processor):
         if os.path.exists(mask_filename):
             with open(mask_filename, "rb") as payload_file:
                 client_mask = pickle.load(payload_file)
-                data = [data, client_mask[0]]
+                if isinstance(client_mask, list):
+                    client_mask = client_mask[0]
+                data = [data, client_mask]
         else:
             data = [data, None]
 

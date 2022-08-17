@@ -42,13 +42,25 @@ class Trainer(basic.Trainer):
         self.div_from_global = None
         self.orig_weights = None
 
+        # Get the names of the convolutional layers
+        self.conv_layer_names = []
+        for module in self.model.modules():
+            if isinstance(module, (torch.nn.Conv1d, torch.nn.Conv2d, torch.nn.Conv3d)):
+                tensor = module.weight.data
+                conv_layer_name = [
+                    name
+                    for name in self.model.state_dict()
+                    if torch.equal(tensor, self.model.state_dict()[name])
+                ]
+                self.conv_layer_names.append(conv_layer_name[0])
+
     def prune_update(self):
         """Prune the weight update by setting some parameters in update to 0."""
         self.load_acc_grads()
 
         conv_updates = OrderedDict()
         i = 0
-        for (orig_name, orig_module), (__, trained_module) in zip(
+        for (__, orig_module), (__, trained_module) in zip(
             self.orig_weights.named_modules(), self.model.named_modules()
         ):
             if isinstance(
@@ -65,9 +77,8 @@ class Trainer(basic.Trainer):
                 delta = self.prune_channels(aggregated_channels, delta)
                 delta = self.prune_filters(aggregated_filters, delta)
 
-                delta_name = f"{orig_name}.weight"
                 self.acc_grads[i] = orig_delta - delta
-                conv_updates[delta_name] = delta
+                conv_updates[self.conv_layer_names[i]] = delta
                 i += 1
 
         for orig_key, trained_key in zip(
