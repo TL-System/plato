@@ -475,7 +475,6 @@ class Trainer(base.Trainer):
     def lr_scheduler_step(self):
         """
         Performs a single scheduler step if ``self.lr_scheduler`` has been assigned.
-
         """
         if self.lr_scheduler is not None:
             self.lr_scheduler.step()
@@ -500,6 +499,9 @@ class Trainer(base.Trainer):
     def get_loss_criterion(self):
         """Returns the loss criterion."""
         return loss_criterion.get()
+
+    def backward(self, config, loss):
+        """Perform the backpropagation pass."""
 
     def train_run_start(self, config):
         """Method called at the start of training run."""

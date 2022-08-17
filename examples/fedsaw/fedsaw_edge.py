@@ -4,9 +4,7 @@ A federated learning client at the edge server in a cross-silo training workload
 
 import copy
 import logging
-import time
 from collections import OrderedDict
-from types import SimpleNamespace
 
 import torch
 from torch.nn.utils import prune
@@ -23,43 +21,15 @@ class Client(edge.Client):
         """The training process on a FedSaw edge client."""
         previous_weights = copy.deepcopy(self.server.algorithm.extract_weights())
 
-        training_start_time = time.perf_counter()
-        # Signal edge server to select clients to start a new round of local aggregation
-        self.server.new_global_round_begins.set()
+        self._report, _ = await super().train()
 
-        # Wait for the edge server to finish model aggregation
-        await self.server.model_aggregated.wait()
-        self.server.model_aggregated.clear()
-
-        average_accuracy = self.server.average_accuracy
-        accuracy = self.server.accuracy
-
-        training_time = time.perf_counter() - training_start_time
-
-        comm_time = time.time()
-
-        # Generate a report for the central server
-        self._report = SimpleNamespace(
-            num_samples=self.server.total_samples,
-            accuracy=accuracy,
-            training_time=training_time,
-            comm_time=comm_time,
-            update_response=False,
-            average_accuracy=average_accuracy,
-            client_id=self.client_id,
-            comm_overhead=self.server.comm_overhead,
-        )
-
-        self.server.comm_overhead = 0
         weight_updates = self.prune_updates(previous_weights)
-
         logging.info("[Edge Server #%d] Pruned its aggregated updates.", self.client_id)
 
-        return self.report, weight_updates
+        return self._report, weight_updates
 
     def prune_updates(self, previous_weights):
         """Prune aggregated updates."""
-
         deltas = self.compute_weight_deltas(previous_weights)
         updates_model = models_registry.get()
         updates_model.load_state_dict(deltas, strict=True)
@@ -112,11 +82,8 @@ class Client(edge.Client):
 
         if "pruning_amount" in server_response:
             pruning_amount_list = server_response["pruning_amount"]
-            if hasattr(Config().clients, "simulation") and Config().clients.simulation:
-                index = self.client_id - Config().clients.per_round - 1
-            else:
-                index = self.client_id - Config().clients.total_clients - 1
-
-            pruning_amount = pruning_amount_list[index]
+            pruning_amount = pruning_amount_list[
+                self.client_id - Config().clients.total_clients - 1
+            ]
             # Update pruning amount
             Config().clients = Config().clients._replace(pruning_amount=pruning_amount)

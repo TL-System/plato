@@ -9,13 +9,17 @@ in Proc. 12th Annual Workshop on Optimization for Machine Learning (OPT 2020).
 https://opt-ml.org/papers/2020/paper_28.pdf
 """
 
+from plato.clients import simple
+import fedasync_algorithm
 import fedasync_server
 
 
 def main():
     """A Plato federated learning training session using FedAsync."""
-    server = fedasync_server.Server()
-    server.run()
+    algorithm = fedasync_algorithm.Algorithm
+    client = simple.Client(algorithm=algorithm)
+    server = fedasync_server.Server(algorithm=algorithm)
+    server.run(client)
 
 
 if __name__ == "__main__":
