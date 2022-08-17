@@ -174,7 +174,7 @@ class Server(fedavg.Server):
             server_response["current_global_round"] = self.current_round
         return server_response
 
-    async def process_reports(self):
+    async def _process_reports(self):
         """Process the client reports by aggregating their weights."""
         # To pass the client_id == 0 assertion during aggregation
         self.trainer.set_client_id(0)

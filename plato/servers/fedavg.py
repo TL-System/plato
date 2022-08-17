@@ -133,13 +133,6 @@ class Server(base.Server):
         elif self.algorithm is None and self.custom_algorithm is not None:
             self.algorithm = self.custom_algorithm(trainer=self.trainer)
 
-    def compute_weight_deltas(self, weights_received):
-        """Extract the model weight updates from client updates."""
-        return
-
-    async def aggregate_weights(self, updates, deltas_received):
-        """Aggregate the reported weight updates from the selected clients."""
-
     async def aggregate_deltas(self, updates, deltas_received):
         """Aggregate weight updates from the clients using federated averaging."""
         # Extract the total number of samples
@@ -147,8 +140,8 @@ class Server(base.Server):
 
         # Perform weighted averaging
         avg_update = {
-            name: self.trainer.zeros(weights.shape)
-            for name, weights in deltas_received[0].items()
+            name: self.trainer.zeros(delta.shape)
+            for name, delta in deltas_received[0].items()
         }
 
         for i, update in enumerate(deltas_received):
@@ -164,26 +157,47 @@ class Server(base.Server):
 
         return avg_update
 
-    async def process_reports(self):
+    async def _process_reports(self):
         """Process the client reports by aggregating their weights."""
         weights_received = [update.payload for update in self.updates]
 
         weights_received = self.weights_received(weights_received)
         self.callback_handler.call_event("on_weights_received", self, weights_received)
 
-        # Computes the weight deltas by comparing the weights received with the current global model weights
-        deltas_received = self.algorithm.compute_weight_deltas(weights_received)
+        # Extract the current model weights as the baseline
+        baseline_weights = self.algorithm.extract_weights()
 
-        # Runs a server aggregation algorithm, such as the federated averaging algorithm
-        deltas = await self.aggregate_deltas(self.updates, deltas_received)
+        if hasattr(self, "aggregate_weights"):
+            # Runs a server aggregation algorithm using weights rather than deltas
+            logging.info(
+                "[Server #%d] Aggregating model weights directly rather than weight deltas.",
+                os.getpid(),
+            )
+            updated_weights = self.aggregate_weights(
+                self.updates, baseline_weights, weights_received
+            )
 
-        # Updates the existing model weights from the provided deltas
-        updated_weights = self.algorithm.update_weights(deltas)
+            # Loads the new model weights
+            self.algorithm.load_weights(updated_weights)
+        else:
+            # Computes the weight deltas by comparing the weights received with
+            # the current global model weights
+            deltas_received = self.algorithm.compute_weight_deltas(
+                baseline_weights, weights_received
+            )
 
-        # Loads the model weights
-        self.algorithm.load_weights(updated_weights)
+            # Runs a server aggregation algorithm, such as the federated averaging algorithm
+            logging.info("[Server #%d] Aggregating model weight deltas.", os.getpid())
+            deltas = await self.aggregate_deltas(self.updates, deltas_received)
 
-        # The model weights have already been aggregated, now calls the corresponding hook and callback
+            # Updates the existing model weights from the provided deltas
+            updated_weights = self.algorithm.update_weights(deltas)
+
+            # Loads the new model weights
+            self.algorithm.load_weights(updated_weights)
+
+        # The model weights have already been aggregated, now calls the
+        # corresponding hook and callback
         self.weights_aggregated(self.updates)
         self.callback_handler.call_event("on_weights_aggregated", self, self.updates)
 

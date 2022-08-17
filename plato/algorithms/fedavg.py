@@ -9,11 +9,8 @@ from plato.algorithms import base
 class Algorithm(base.Algorithm):
     """PyTorch-based federated averaging algorithm, used by both the client and the server."""
 
-    def compute_weight_deltas(self, weights_received):
-        """Extracts the weights received from a client and compute the deltas."""
-        # Extract baseline model weights
-        baseline_weights = self.extract_weights()
-
+    def compute_weight_deltas(self, baseline_weights, weights_received):
+        """Compute the deltas between baseline weights and weights received."""
         # Calculate updates from the received weights
         deltas = []
         for weight in weights_received:

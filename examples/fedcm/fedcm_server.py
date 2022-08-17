@@ -8,7 +8,7 @@ from plato.servers import fedavg
 class Server(fedavg.Server):
     """A federated learning server using the FedAsync algorithm."""
 
-    async def process_reports(self):
+    async def _process_reports(self):
         """Process the client reports by aggregating their weights."""
         deltas = await self.aggregate_deltas(self.updates)
         self.trainer.delta = deltas.copy()
