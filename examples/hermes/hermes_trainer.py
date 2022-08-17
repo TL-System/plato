@@ -6,6 +6,7 @@ import logging
 import os
 
 import pickle
+import torch
 
 import hermes_pruning as pruning
 from plato.config import Config
@@ -32,6 +33,17 @@ class Trainer(basic.Trainer):
             if hasattr(Config().clients, "accuracy_threshold")
             else 0.5
         )
+        # Get the names of the layers to be pruned - torch.nn.Conv2d and torch.nn.Linear
+        self.pruned_layer_names = []
+        for module in self.model.modules():
+            if isinstance(module, (torch.nn.Conv2d, torch.nn.Linear)):
+                tensor = module.weight.data
+                conv_layer_name = [
+                    name
+                    for name in self.model.state_dict()
+                    if torch.equal(tensor, self.model.state_dict()[name])
+                ]
+                self.pruned_layer_names.append(conv_layer_name[0])
 
     def train_run_start(self, config):
         """Conduct pruning if needed before training."""
@@ -43,7 +55,7 @@ class Trainer(basic.Trainer):
         self.pruned_amount = pruning.compute_pruned_amount(self.model, self.client_id)
 
         # Merge the incoming server payload model with the mask to create the model for training
-        self.model = self.merge_model(self.model)
+        self.model = self.merge_model(self.model, self.pruned_layer_names)
 
         # Send the model to the device used for training
         self.model.to(self.device)
@@ -90,7 +102,7 @@ class Trainer(basic.Trainer):
                 "[Client #%d] Pruned Amount: %.2f%%", self.client_id, self.pruned_amount
             )
 
-    def merge_model(self, model):
+    def merge_model(self, model, pruned_layer_names):
         """Apply the mask onto the incoming personalized model."""
         model_name = Config().trainer.model_name
         checkpoint_path = Config().params["checkpoint_path"]
@@ -102,7 +114,7 @@ class Trainer(basic.Trainer):
             with open(mask_path, "rb") as mask_file:
                 mask = pickle.load(mask_file)
 
-        return pruning.apply_mask(model, mask[1], self.device)
+        return pruning.apply_mask(model, mask, self.device, pruned_layer_names)
 
     def save_mask(self, mask):
         """If pruning has occured, the mask is saved for merging in future rounds."""

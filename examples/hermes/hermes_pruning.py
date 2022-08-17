@@ -3,6 +3,7 @@ Utility functions for pruning.
 """
 
 import copy
+from collections import OrderedDict
 from math import floor
 import os
 import numpy as np
@@ -20,7 +21,7 @@ def make_init_mask(model):
     :param model: a pytorch model
     :return mask: a list of pruning masks
     """
-    mask = {}
+    mask = OrderedDict()
     for name, layer in model.state_dict().items():
         tensor = layer.detach().cpu().numpy()
         mask[name] = np.ones_like(tensor)
@@ -68,10 +69,7 @@ def structured_pruning(model, pruning_rate, adjust_rate=0.0):
     pruning_rates = []
 
     # The binary masks for all layers
-    mask = {}
-
-    # The binary masks for the layers that have been pruned
-    mask_for_merging = []
+    mask = OrderedDict()
 
     if adjust_rate == 0:
         for __, module in model.named_modules():
@@ -122,10 +120,7 @@ def structured_pruning(model, pruning_rate, adjust_rate=0.0):
             tensor = layer.detach().cpu().numpy()
             mask[name] = np.ones_like(tensor)
 
-    for buffer in model.buffers():
-        mask_for_merging.append(buffer)
-
-    return mask, mask_for_merging
+    return mask
 
 
 def remove(model):
@@ -137,7 +132,7 @@ def remove(model):
             prune.remove(module, "weight")
 
 
-def apply_mask(model, mask, device):
+def apply_mask(model, mask, device, pruned_layer_names):
     """Apply the mask onto the model."""
 
     masked_model = copy.deepcopy(model).to(device)
@@ -149,7 +144,9 @@ def apply_mask(model, mask, device):
     for module in masked_model.modules():
         if isinstance(module, torch.nn.Conv2d) or isinstance(module, torch.nn.Linear):
             device = module.weight.device
-            prune.custom_from_mask(module, "weight", mask[step].to(device))
+            prune.custom_from_mask(
+                module, "weight", mask[pruned_layer_names[step]].to(device)
+            )
             step += 1
 
     return masked_model
