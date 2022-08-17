@@ -5,7 +5,6 @@ A simple federated learning server using federated averaging.
 import asyncio
 import logging
 import os
-from collections import OrderedDict
 
 from plato.algorithms import registry as algorithms_registry
 from plato.config import Config
@@ -134,22 +133,6 @@ class Server(base.Server):
         elif self.algorithm is None and self.custom_algorithm is not None:
             self.algorithm = self.custom_algorithm(trainer=self.trainer)
 
-    def _compute_weight_deltas(self, baseline_weights, weights_received):
-        """Compute the deltas between baseline weights and weights received."""
-        # Calculate updates from the received weights
-        deltas = []
-        for weight in weights_received:
-            delta = OrderedDict()
-            for name, current_weight in weight.items():
-                baseline = baseline_weights[name]
-
-                # Calculate update
-                _delta = current_weight - baseline
-                delta[name] = _delta
-            deltas.append(delta)
-
-        return deltas
-
     async def aggregate_deltas(self, updates, deltas_received):
         """Aggregate weight updates from the clients using federated averaging."""
         # Extract the total number of samples
@@ -173,16 +156,6 @@ class Server(base.Server):
             await asyncio.sleep(0)
 
         return avg_update
-
-    def _update_weights(self, deltas):
-        """Updates the existing model weights from the provided deltas."""
-        baseline_weights = self.algorithm.extract_weights()
-
-        updated_weights = OrderedDict()
-        for name, weight in baseline_weights.items():
-            updated_weights[name] = weight + deltas[name]
-
-        return updated_weights
 
     async def _process_reports(self):
         """Process the client reports by aggregating their weights."""
@@ -209,7 +182,7 @@ class Server(base.Server):
         else:
             # Computes the weight deltas by comparing the weights received with
             # the current global model weights
-            deltas_received = self._compute_weight_deltas(
+            deltas_received = self.algorithm.compute_weight_deltas(
                 baseline_weights, weights_received
             )
 
@@ -219,7 +192,7 @@ class Server(base.Server):
             deltas = await self.aggregate_deltas(self.updates, deltas_received)
 
             # Updates the existing model weights from the provided deltas
-            updated_weights = self._update_weights(deltas)
+            updated_weights = self.algorithm.update_weights(deltas)
 
             # Loads the new model weights
             self.algorithm.load_weights(updated_weights)
