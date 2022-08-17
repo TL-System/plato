@@ -1,8 +1,6 @@
 """The training loop that takes place on clients of Oort."""
 
 
-from functools import partial
-
 import numpy as np
 import torch
 from torch import nn
@@ -28,4 +26,4 @@ class Trainer(basic.Trainer):
 
     def get_loss_criterion(self):
         """Returns the loss criterion."""
-        return partial(self.process_loss)
+        return self.process_loss
