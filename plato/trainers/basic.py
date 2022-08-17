@@ -202,7 +202,7 @@ class Trainer(base.Trainer):
                 loss = _loss_criterion(outputs, labels)
                 self._loss_tracker.update(loss, labels.size(0))
 
-                loss = self.backward(config, loss)
+                self.backward(config, loss)
 
                 optimizer.step()
 
@@ -503,8 +503,6 @@ class Trainer(base.Trainer):
             loss.backward(create_graph=config["create_graph"])
         else:
             loss.backward()
-
-        return loss
 
     def train_run_start(self, config):
         """Method called at the start of training run."""

@@ -23,4 +23,4 @@ class Trainer(basic.Trainer):
             "train_squared_loss_step", sum(np.power(sample_loss, 2))
         )
 
-        return super().backward(config, torch.mean(loss))
+        super().backward(config, torch.mean(loss))
