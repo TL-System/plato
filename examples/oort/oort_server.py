@@ -114,7 +114,7 @@ class Server(fedavg.Server):
         selected_clients = []
 
         if self.current_round > 1:
-            # Exploitation
+            # Exploitation of explored clients
             exploit_client_num = max(
                 math.ceil((1.0 - self.exploration_factor) * clients_count),
                 clients_count - len(self.unexplored_clients),
@@ -130,12 +130,14 @@ class Server(fedavg.Server):
                 * self.cut_off
             )
 
-            # Include clients with utilities higher than the cut-off
+            # Include clients with utilities higher than the cut-off and that
+            # are available for selection
             exploit_clients = []
             for client_id in sorted_util:
                 if (
                     self.client_utilities[client_id] > cut_off_util
                     and client_id not in self.blacklist
+                    and client_id in clients_pool
                 ):
                     exploit_clients.append(client_id)
 
@@ -162,7 +164,7 @@ class Server(fedavg.Server):
                 sorted_util.index(exploit_clients[-1]) if exploit_clients else 0
             )
 
-            # If the result of exploitation wasn't enough to meet the required length
+            # If the result of exploitation wasn't enough to meet the required number
             if len(selected_clients) < exploit_client_num:
                 for index in range(last_index + 1, len(sorted_util)):
                     if (
