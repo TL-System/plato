@@ -3,7 +3,6 @@ A federated learning server using Hermes.
 """
 
 import logging
-import os
 import pickle
 import numpy as np
 import torch
@@ -113,13 +112,3 @@ class Server(fedavg.Server):
                 self.masks_received[step] = mask
 
         return weights
-
-    def server_will_close(self):
-        """Method called at the start of closing the server."""
-        # Delete pruning masks created by clients
-        model_name = Config().trainer.model_name
-        checkpoint_path = Config().params["checkpoint_path"]
-        for client_id in range(1, self.total_clients + 1):
-            mask_path = f"{checkpoint_path}/{model_name}_client{client_id}_mask.pth"
-            if os.path.exists(mask_path):
-                os.remove(mask_path)

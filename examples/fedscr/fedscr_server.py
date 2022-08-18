@@ -3,9 +3,9 @@ A federated learning server using FedSCR. The server extracts the model updates 
 aggregates them and adds them to the global model from the previous round.
 """
 
-import os
 from collections import OrderedDict
 import numpy as np
+import torch
 
 from plato.servers import fedavg
 from plato.config import Config
@@ -77,7 +77,7 @@ class Server(fedavg.Server):
 
         # Perform weighted averaging
         avg_update = {
-            name: self.trainer.zeros(delta.shape)
+            name: torch.zeros(delta.shape)
             for name, delta in weights_received[0].items()
         }
 
@@ -115,14 +115,3 @@ class Server(fedavg.Server):
             self.avg_update = {
                 update.client_id: update.report.avg_update for update in updates
             }
-
-    def server_will_close(self):
-        """Method called at the start of closing the server."""
-        model_name = Config().trainer.model_name
-        checkpoint_path = Config().params["checkpoint_path"]
-
-        # Delete files created by the clients.
-        for client_id in range(1, self.total_clients + 1):
-            acc_grad_file = f"{checkpoint_path}/{model_name}_client{client_id}_grad.pth"
-            if os.path.exists(acc_grad_file):
-                os.remove(acc_grad_file)
