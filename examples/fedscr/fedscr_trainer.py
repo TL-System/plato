@@ -60,8 +60,8 @@ class Trainer(basic.Trainer):
 
         conv_updates = OrderedDict()
         i = 0
-        for (__, orig_module), (__, trained_module) in zip(
-            self.orig_weights.named_modules(), self.model.named_modules()
+        for orig_module, trained_module in zip(
+            self.orig_weights.modules(), self.model.modules()
         ):
             if isinstance(
                 trained_module, (torch.nn.Conv1d, torch.nn.Conv2d, torch.nn.Conv3d)
@@ -197,7 +197,7 @@ class Trainer(basic.Trainer):
 
     def train_run_end(self, config):
         """Method called at the end of training run."""
-        # Get the overall weight updates
+        # Get the overall weight updates and prune them
         logging.info("[Client #%d] Pruning weight updates.", self.client_id)
         self.prune_update()
         logging.info(
@@ -233,34 +233,29 @@ class Trainer(basic.Trainer):
     def compute_weight_divergence(self):
         """Calculate the divergence of the locally trained model from the global model."""
         div_from_global = 0
-        for (__, orig_module), (__, trained_module) in zip(
-            self.orig_weights.named_modules(), self.model.named_modules()
+        for orig_layer, trained_layer in zip(
+            self.orig_weights.state_dict().values(), self.model.state_dict().values()
         ):
-            if isinstance(
-                trained_module, (torch.nn.Conv1d, torch.nn.Conv2d, torch.nn.Conv3d)
-            ):
-                orig_tensor = orig_module.weight.data.cpu()
-                trained_tensor = trained_module.weight.data.cpu()
-                div_from_global += (
-                    torch.sum(torch.abs(trained_tensor - orig_tensor))
-                    / torch.sum(torch.abs(trained_tensor))
-                ).numpy()
+            orig_tensor = orig_layer.cpu()
+            trained_tensor = trained_layer.cpu()
+            div_from_global += (
+                torch.abs(torch.sum(trained_tensor - orig_tensor))
+                / torch.abs(torch.sum(orig_tensor))
+            ).numpy()
 
-        return np.sqrt(div_from_global)
+        return div_from_global
 
     def local_update_significance(self):
         """Calculate the average weight update."""
         delta = 0
         total = 0
 
-        for key in sorted(self.total_grad.keys()):
-            tensor = self.total_grad[key].cpu()
+        for layer in self.total_grad.values():
+            tensor = layer.cpu()
             delta += torch.sum(tensor).numpy()
 
-        model = self.model.named_modules()
-        for (__, module) in model:
-            if isinstance(module, (torch.nn.Conv1d, torch.nn.Conv2d, torch.nn.Conv3d)):
-                tensor = module.weight.data.cpu()
-                total += torch.sum(tensor).numpy()
+        for layer in self.model.state_dict().values():
+            tensor = layer.cpu()
+            total += torch.sum(tensor).numpy()
 
-        return np.sqrt(np.abs(delta / total))
+        return np.abs(delta / total)

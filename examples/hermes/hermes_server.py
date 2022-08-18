@@ -57,7 +57,7 @@ class Server(fedavg.Server):
             step += 1
 
         self.save_personalized_models(weights_received, updates)
-        return self.algorithm.model.state_dict()
+        return baseline_weights
 
     def save_personalized_models(self, personalized_models, updates):
         """Save each client's personalized model at the end of aggregation."""

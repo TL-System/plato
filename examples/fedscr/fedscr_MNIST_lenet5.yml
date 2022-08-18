@@ -12,7 +12,7 @@ clients:
     do_test: true
 
     # Threshold at which updates will be pruned
-    update_threshold: 1.2
+    update_threshold: 0.1
 
     # Is the adaptive algorithm being used?
     adaptive: true
