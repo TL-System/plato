@@ -21,22 +21,29 @@ class Server(fedavg.Server):
         self.blacklist = []
 
         # All clients' utilities
-        self.client_utilities = {}
+        self.client_utilities = {
+            client_id: 0 for client_id in range(1, self.total_clients + 1)
+        }
 
         # All clients‘ training times
-        self.client_durations = {}
+        self.client_durations = {
+            client_id: 0 for client_id in range(1, self.total_clients + 1)
+        }
 
         # Keep track of each client's last participated round.
-        self.client_last_rounds = {}
+        self.client_last_rounds = {
+            client_id: 0 for client_id in range(1, self.total_clients + 1)
+        }
 
         # Number of times that each client has been selected
-        self.client_selected_times = {}
-
+        self.client_selected_times = {
+            client_id: 0 for client_id in range(1, self.total_clients + 1)
+        }
         # The desired duration for each communication round
         self.desired_duration = Config().server.desired_duration
 
         self.explored_clients = []
-        self.unexplored_clients = []
+        self.unexplored_clients = list(range(1, self.total_clients + 1))
 
         self.exploration_factor = Config().server.exploration_factor
         self.step_window = Config().server.step_window
@@ -59,29 +66,11 @@ class Server(fedavg.Server):
             else 10
         )
 
-    def configure(self):
-        """Initialize necessary variables."""
-        super().configure()
-
-        self.client_utilities = {
-            client_id: 0 for client_id in range(1, self.total_clients + 1)
-        }
-        self.client_durations = {
-            client_id: 0 for client_id in range(1, self.total_clients + 1)
-        }
-        self.client_last_rounds = {
-            client_id: 0 for client_id in range(1, self.total_clients + 1)
-        }
-        self.client_selected_times = {
-            client_id: 0 for client_id in range(1, self.total_clients + 1)
-        }
-
-        self.unexplored_clients = list(range(1, self.total_clients + 1))
-
     def weights_aggregated(self, updates):
         """Method called at the end of aggregating received weights."""
         for update in updates:
-            # Extract statistical utility and local training times
+            # Extract statistical utility, local training times and update
+            # last participated rounds
             self.client_utilities[update.client_id] = update.report.statistics_utility
             self.client_durations[update.client_id] = update.report.training_time
             self.client_last_rounds[update.client_id] = self.current_round

@@ -12,7 +12,7 @@ class Trainer(basic.Trainer):
 
     def process_loss(self, outputs, labels) -> torch.Tensor:
         """Returns the loss from CrossEntropyLoss, and records the sum of
-        squaures over per_sample loss values."""
+        squares over per_sample loss values."""
         loss_func = nn.CrossEntropyLoss(reduction="none")
         per_sample_loss = loss_func(outputs, labels)
 
