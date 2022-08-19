@@ -5,7 +5,6 @@ aggregates them and adds them to the global model from the previous round.
 
 from collections import OrderedDict
 import numpy as np
-import torch
 
 from plato.servers import fedavg
 from plato.config import Config
@@ -77,7 +76,7 @@ class Server(fedavg.Server):
 
         # Perform weighted averaging
         avg_update = {
-            name: torch.zeros(delta.shape)
+            name: self.trainer.zeros(delta.shape)
             for name, delta in weights_received[0].items()
         }
 
