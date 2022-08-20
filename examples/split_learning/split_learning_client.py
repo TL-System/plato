@@ -4,16 +4,10 @@ A split learning client.
 
 import logging
 import time
-from dataclasses import dataclass
+from types import SimpleNamespace
 
 from plato.clients import simple
 from plato.config import Config
-
-
-@dataclass
-class Report(simple.Report):
-    """Client report sent to the split learning server."""
-    phase: str
 
 
 class Client(simple.Client):
@@ -60,9 +54,13 @@ class Client(simple.Client):
 
             logging.info("Finished extracting features.")
             # Generate a report for the server, performing model testing if applicable
-            return Report(self.sampler.trainset_size(), accuracy,
-                          training_time, comm_time, False,
-                          "features"), features
+            report = SimpleNamespace(num_samples=self.sampler.trainset_size(),
+                                     accuracy=accuracy,
+                                     training_time=training_time,
+                                     comm_time=comm_time,
+                                     update_response=False,
+                                     phase="features")
+            return report, features
         else:
             # Perform a complete training with gradients received
             config = Config().trainer._asdict()
@@ -71,5 +69,10 @@ class Client(simple.Client):
                 Config().algorithm.cut_layer)
             weights = self.algorithm.extract_weights()
             # Generate a report, signal the end of train
-            return Report(self.sampler.trainset_size(), accuracy,
-                          training_time, comm_time, False, "weights"), weights
+            report = SimpleNamespace(num_samples=self.sampler.trainset_size(),
+                                     accuracy=accuracy,
+                                     training_time=training_time,
+                                     comm_time=comm_time,
+                                     update_response=False,
+                                     phase="weights")
+            return report, weights
