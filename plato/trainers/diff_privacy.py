@@ -4,16 +4,15 @@ The training and testing loops for PyTorch.
 import logging
 import time
 
-from torch.utils.data import Subset
-
 from opacus import GradSampleModule
 from opacus.privacy_engine import PrivacyEngine
-from opacus.validators import ModuleValidator
 from opacus.utils.batch_memory_manager import BatchMemoryManager
+from opacus.validators import ModuleValidator
+
+from torch.utils.data import Subset
 
 from plato.config import Config
 from plato.trainers import basic
-from plato.utils import optimizers
 
 
 class Trainer(basic.Trainer):
@@ -39,7 +38,8 @@ class Trainer(basic.Trainer):
             errors = ModuleValidator.validate(self.model, strict=False)
             assert len(errors) == 0
 
-    def train_model(self, config, trainset, sampler, cut_layer):
+    # pylint: disable=unused-argument
+    def train_model(self, config, trainset, sampler, **kwargs):
         """The default training loop that supports differential privacy."""
         batch_size = config["batch_size"]
         self.sampler = sampler
@@ -55,24 +55,15 @@ class Trainer(basic.Trainer):
         # without the sampler. We will finally use Opacus to recreate the dataloader from the
         # simple dataloader (with poisson sampling).
         trainset = Subset(trainset, list(sampler))
-        self.train_loader = Trainer.get_train_loader(
-            batch_size, trainset, sampler=None, cut_layer=cut_layer
-        )
+        self.train_loader = Trainer.get_train_loader(batch_size, trainset, sampler=None)
 
         # Initializing the loss criterion
-        loss_criterion = Trainer.get_loss_criterion()
+        _loss_criterion = self.get_loss_criterion()
 
         # Initializing the optimizer
-        get_optimizer = getattr(self, "get_optimizer", optimizers.get_optimizer)
-        optimizer = get_optimizer(self.model)
-
-        # Initializing the learning rate schedule, if necessary
-        if "lr_schedule" in config:
-            lr_schedule = optimizers.get_lr_schedule(
-                optimizer, len(self.train_loader), self.train_loader
-            )
-        else:
-            lr_schedule = None
+        optimizer = self.get_optimizer(self.model)
+        self.lr_scheduler = self.get_lr_scheduler(config, optimizer)
+        optimizer = self._adjust_lr(config, self.lr_scheduler, optimizer)
 
         self.model.to(self.device)
         total_epochs = config["epochs"]
@@ -103,6 +94,7 @@ class Trainer(basic.Trainer):
                 max_physical_batch_size=self.max_physical_batch_size,
                 optimizer=optimizer,
             ) as memory_safe_train_loader:
+                self._loss_tracker.reset()
                 self.train_epoch_start(config)
                 self.callback_handler.call_event("on_train_epoch_start", self, config)
 
@@ -110,12 +102,10 @@ class Trainer(basic.Trainer):
                     examples, labels = examples.to(self.device), labels.to(self.device)
                     optimizer.zero_grad(set_to_none=True)
 
-                    if cut_layer is None:
-                        outputs = self.model(examples)
-                    else:
-                        outputs = self.model.forward_from(examples, cut_layer)
+                    outputs = self.model(examples)
 
-                    loss = loss_criterion(outputs, labels)
+                    loss = _loss_criterion(outputs, labels)
+                    self._loss_tracker.update(loss, labels.size(0))
 
                     if "create_graph" in config:
                         loss.backward(create_graph=config["create_graph"])
@@ -129,8 +119,7 @@ class Trainer(basic.Trainer):
                         "on_train_step_end", self, config, batch=batch_id, loss=loss
                     )
 
-            if lr_schedule is not None:
-                lr_schedule.step()
+            self.lr_scheduler_step()
 
             if hasattr(optimizer, "params_state_update"):
                 optimizer.params_state_update()
@@ -156,6 +145,7 @@ class Trainer(basic.Trainer):
                 self.save_model(filename)
                 self.model.to(self.device)
 
+            self.run_history.update_metric("train_loss", self._loss_tracker.average)
             self.train_epoch_end(config)
             self.callback_handler.call_event("on_train_epoch_end", self, config)
 

@@ -64,6 +64,9 @@ data:
     random_seed: 1
 
 trainer:
+    # The type of the trainer
+    type: basic
+
     # The maximum number of training rounds
     rounds: 200
 
@@ -77,14 +80,7 @@ trainer:
     epochs: 1
     batch_size: 128
     optimizer: SGD
-    learning_rate: 0.1
-    momentum: 0.9
-    weight_decay: 0.0001
-
-    # Learning rate schedule
-    lr_schedule: LambdaLR
-    lr_gamma: 0.1
-    lr_milestone_steps: 80ep,120ep
+    lr_scheduler: LambdaLR
 
     # The machine learning model
     model_name: resnet_18
@@ -132,9 +128,16 @@ algorithm:
     # whether use LSTM or FC nets
     recurrent_actor: true
 
+parameters:
+    optimizer:
+        lr: 0.1
+        momentum: 0.9
+        weight_decay: 0.0001
+
+    learning_rate:
+        gamma: 0.1
+        milestone_steps: 80ep,120ep
+
 results:
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time
-
-    # Plot results (x_axis-y_axis)
-    plot: round-accuracy, elapsed_time-accuracy

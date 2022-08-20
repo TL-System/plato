@@ -1,5 +1,5 @@
 """
-Defines the TrainerCallback class, which is the abstract base class to be subclassed
+Defines the ServerCallback class, which is the abstract base class to be subclassed
 when creating new server callbacks.
 
 Defines a default callback to print training progress.

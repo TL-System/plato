@@ -81,16 +81,13 @@ trainer:
     # The target accuracy
     target_accuracy: 1.0
 
+    # The machine learning model
+    model_name: lenet5
+
     # Number of epoches for local training in each communication round
     epochs: 10
     batch_size: 32
     optimizer: SGD
-    learning_rate: 0.01
-    momentum: 0.9
-    weight_decay: 0.0
-
-    # The machine learning model
-    model_name: lenet5
 
 algorithm:
     # Aggregation algorithm
@@ -99,11 +96,14 @@ algorithm:
     # Decreasing rate of the mapping function used in FedAdp
     alpha: 5
 
+parameters:
+    optimizer:
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0
+
 results:
     result_path: results/FashionMNIST_lenet5/FedAdp
 
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time
-
-    # Plot results (x_axis-y_axis)
-    plot: round-accuracy, elapsed_time-accuracy

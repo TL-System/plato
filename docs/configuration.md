@@ -277,7 +277,7 @@ Where the test dataset is located.
 ```
 ````
 
-````{admonition} sampler
+````{admonition} **sampler**
 How to divide the entire dataset to the clients. The following options are available:
 
 - `iid`
@@ -308,18 +308,10 @@ If the sampler is `mixed`, the indices of clients whose datasets are non-i.i.d. 
 ````
 
 ````{admonition} test_set_sampler
-How the test dataset is sampled when clients test locally. Any sampler is valid. 
+How the test dataset is sampled when clients test locally. Any sampler type is valid. 
 
 ```{note}
-Without this parameter, each client's test dataset is the test dataset of the datasource.
-```
-````
-
-````{admonition} edge_test_set_sampler
-How the test dataset is sampled when edge servers test locally. Any sampler is valid.
-
-```{note}
-Without this parameter, edge servers' test datasets are the test dataset of the datasource if they locally test their aggregated models in cross-silo FL.
+Without this parameter, the test dataset on either the client or the server is the entire test dataset of the datasource.
 ```
 ````
 
@@ -388,40 +380,75 @@ The target perplexity of the global Natural Language Processing (NLP) model.
 The total number of epoches in local training in each communication round.
 ```
 
-```{admonition} **optimizer**
-The type of the optimizer. This can be `SGD`, `Adam` or `FedProx`.
-```
-
 ```{admonition} **batch_size**
 The size of the mini-batch of data in each step (iteration) of the training loop.
 ```
 
-````{admonition} **learning_rate**
-The learning rate used for local training.
+```{admonition} **optimizer**
+The type of the optimizer. The following options are supported:
 
-```{note}
-Decrease the value of the learning rate when using the `diff_privacy` trainer.
+- `Adam`
+- `Adadelta`
+- `Adagrad`
+- `AdaHessian` (from the `torch_optimizer` package)
+- `AdamW`
+- `SparseAdam`
+- `Adamax`
+- `ASGD`
+- `LBFGS`
+- `NAdam`
+- `RAdam`
+- `RMSprop`
+- `Rprop`
+- `SGD`
 ```
-````
 
-```{admonition} **momentum**
-The momentum used for local training.
-```
-
-````{admonition} **weight_decay**
-The weight decay used for local training.
-```{note}
-When using `diff_privacy` trainer, set to 0.
-```
-````
-
-```{admonition} lr_schedule
-The learning rate scheduler. The following options are available:
+````{admonition} lr_scheduler
+The learning rate scheduler. The following learning rate schedulers from PyTorch are supported:
 
 - `CosineAnnealingLR`
 - `LambdaLR`
+- `MultiStepLR`
 - `StepLR`
 - `ReduceLROnPlateau`
+- `ConstantLR`
+- `LinearLR`
+- `ExponentialLR`
+- `CyclicLR`
+- `CosineAnnealingWarmRestarts`
+
+Alternatively, all four schedulers from [timm](https://timm.fast.ai/schedulers) are supported if `lr_scheduler` is specified as `timm` and `trainer -> type` is specified as `timm_basic`. For example, to use the `SGDR` scheduler, we specify `cosine` as `sched` in its arguments (`parameters -> learning_rate`):
+
+```
+trainer:
+    type: timm_basic
+
+parameters:
+    learning_rate:
+        sched: cosine
+        min_lr: 1.e-6
+        warmup_lr: 0.0001
+        warmup_epochs: 3
+        cooldown_epochs: 10
+```
+
+````
+
+```{admonition} loss_criterion
+The loss criterion. The following options are supported:
+
+- `L1Loss`
+- `MSELoss`
+- `BCELoss`
+- `BCEWithLogitsLoss`
+- `NLLLoss`
+- `PoissonNLLLoss`
+- `CrossEntropyLoss`
+- `HingeEmbeddingLoss`
+- `MarginRankingLoss`
+- `TripletMarginLoss`
+- `KLDivLoss`
+
 ```
 
 ```{admonition} global_lr_scheduler
@@ -454,20 +481,6 @@ If the `model_type` above specified a model repository, supply the name of the m
 For `resnet_x`, x = 18, 34, 50, 101, or 152; For `vgg_x`, x = 11, 13, 16, or 19.
 ```
 ````
-
-````{admonition} pretrained
-Use a model pretrained on ImageNet or not. The value for `pretrained ` should be `true` or `false`. Default is `false`.
-
-```{note}
-Can be used for `inceptionv3`, `alexnet`, and `squeezenet_x` models.
-```
-````
-
-```{admonition} num_classes
-The number of classes.
-
-The default value is `10`.
-```
 
 ## algorithm
 
@@ -514,3 +527,31 @@ Use comma `,` to seperate them. The default is `round, accuracy, elapsed_time`.
 ````{admonition} result_path
 The path to the result `.csv` files. The default path is `<base_path>/results/`,  where `<base_path>` is specified in the `general` section.
 ````
+
+## parameters
+
+````{note}
+Your parameters in your configuration file must match the keywords in `__init__` of your model, optimizer, learning rate scheduler, or loss criterion. For example, if you want to set `base_lr` in the learning scheduler `CyclicLR`, you will need:
+
+```
+parameters:
+    learning_rate:
+        base_lr: 0.01
+```
+````
+
+```{admonition} model
+All the parameter settings that need to be passed as keyword parameters when initializing the model, such as `num_classes` or `cut_layer`. The set of parameters permitted or needed depends on the model.
+```
+
+```{admonition} optimizer
+All the parameter settings that need to be passed as keyword parameters when initializing the optimizer, such as `lr`, `momentum`, or `weight_decay`. The set of parameters permitted or needed depends on the optimizer.
+```
+
+```{admonition} learning_rate
+All the parameter settings that need to be passed as keyword parameters when initializing the learning rate scheduler, such as `gamma`. The set of parameters permitted or needed depends on the learning rate scheduler.
+```
+
+```{admonition} loss_criterion
+All the parameter settings that need to be passed as keyword parameters when initializing the loss criterion, such as `size_average`. The set of parameters permitted or needed depends on the loss criterion.
+```

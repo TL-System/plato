@@ -39,20 +39,29 @@ trainer:
     target_accuracy: 0.80
 
     num_layers: 40
-    num_classes: 10
+
+    # The machine learning model
+    model_name: wideresnet
 
     # Number of epoches for local training in each communication round
     epochs: 1
     batch_size: 128
     optimizer: SGD
-    lr_schedule: CosineAnnealingLR
-    learning_rate: 0.1
-    momentum: 0.9
-    weight_decay: 5e-4
-
-    # The machine learning model
-    model_name: wideresnet
+    lr_scheduler: CosineAnnealingLR
 
 algorithm:
     # Aggregation algorithm
     type: fedavg
+
+parameters:
+    model:
+        num_classes: 10
+
+    optimizer:
+        lr: 0.1
+        momentum: 0.9
+        weight_decay: 5e-4
+
+    # Learning rate schedule
+    learning_rate:
+        T_max: 3125 # len(train_loader) * Config().trainer.epochs

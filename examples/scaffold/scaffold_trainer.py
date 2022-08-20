@@ -11,14 +11,15 @@ https://arxiv.org/pdf/1910.06378.pdf
 import logging
 import os
 import torch
-import scaffold_optimizer
 
 from plato.config import Config
 from plato.trainers import basic
 
+import scaffold_optimizer
+
 
 class Trainer(basic.Trainer):
-    """The federated learning trainer for the SCAFFOLD client. """
+    """The federated learning trainer for the SCAFFOLD client."""
 
     def __init__(self, model=None):
         """Initializing the trainer with the provided model.
@@ -36,9 +37,10 @@ class Trainer(basic.Trainer):
         """Initialize the SCAFFOLD optimizer."""
         optimizer = scaffold_optimizer.ScaffoldOptimizer(
             model.parameters(),
-            lr=Config().trainer.learning_rate,
-            momentum=Config().trainer.momentum,
-            weight_decay=Config().trainer.weight_decay)
+            lr=Config().parameters.optimizer.lr,
+            momentum=Config().parameters.optimizer.momentum,
+            weight_decay=Config().parameters.optimizer.weight_decay,
+        )
 
         optimizer.server_control_variate = self.server_control_variate
         optimizer.client_control_variate = self.client_control_variate
@@ -52,21 +54,27 @@ class Trainer(basic.Trainer):
 
         if self.client_id == 0:
             # Also save the control variate
-            model_path = Config(
-            ).params['model_path'] if location is None else location
+            model_path = Config().params["model_path"] if location is None else location
 
             if filename is not None:
-                control_variate_path = f'{model_path}/{filename}'.replace(
-                    ".pth", "_control_variate.pth")
+                control_variate_path = f"{model_path}/{filename}".replace(
+                    ".pth", "_control_variate.pth"
+                )
             else:
                 model_name = Config().trainer.model_name
-                control_variate_path = f'{model_path}/{model_name}_control_variate.pth'
+                control_variate_path = f"{model_path}/{model_name}_control_variate.pth"
 
-            logging.info("[Server #%d] Saving the control variate to %s.",
-                         os.getpid(), control_variate_path)
+            logging.info(
+                "[Server #%d] Saving the control variate to %s.",
+                os.getpid(),
+                control_variate_path,
+            )
             torch.save(self.server_control_variate, control_variate_path)
-            logging.info("[Server #%d] Control variate saved to %s.",
-                         os.getpid(), control_variate_path)
+            logging.info(
+                "[Server #%d] Control variate saved to %s.",
+                os.getpid(),
+                control_variate_path,
+            )
 
     def load_model(self, filename=None, location=None):
         """Loading pre-trained model weights from a file."""
@@ -74,20 +82,25 @@ class Trainer(basic.Trainer):
 
         # The server loads its control variate
         if self.client_id == 0:
-            model_path = Config(
-            ).params['model_path'] if location is None else location
+            model_path = Config().params["model_path"] if location is None else location
 
             if filename is not None:
-                control_variate_path = f'{model_path}/{filename}'.replace(
-                    ".pth", "_control_variate.pth")
+                control_variate_path = f"{model_path}/{filename}".replace(
+                    ".pth", "_control_variate.pth"
+                )
             else:
                 model_name = Config().trainer.model_name
-                control_variate_path = f'{model_path}/{model_name}_control_variate.pth'
+                control_variate_path = f"{model_path}/{model_name}_control_variate.pth"
 
             if os.path.exists(control_variate_path):
-                logging.info("[Server #%d] Loading a control variate from %s.",
-                             os.getpid(), control_variate_path)
+                logging.info(
+                    "[Server #%d] Loading a control variate from %s.",
+                    os.getpid(),
+                    control_variate_path,
+                )
                 self.server_control_variate = torch.load(control_variate_path)
                 logging.info(
                     "[Server #%d] Loaded its control variate from %s.",
-                    os.getpid(), control_variate_path)
+                    os.getpid(),
+                    control_variate_path,
+                )

@@ -8,9 +8,9 @@ from plato.servers import fedavg
 class Server(fedavg.Server):
     """A federated learning server using the FedAsync algorithm."""
 
-    async def process_reports(self):
+    async def _process_reports(self):
         """Process the client reports by aggregating their weights."""
-        deltas = await self.federated_averaging(self.updates)
+        deltas = await self.aggregate_deltas(self.updates)
         self.trainer.delta = deltas.copy()
         updated_weights = self.algorithm.update_weights(
             deltas,
@@ -19,7 +19,7 @@ class Server(fedavg.Server):
         )
         self.algorithm.load_weights(updated_weights)
 
-        # lr = Config().trainer.learning_rate * (Config().algorithm.lr_decay ** self.current_round)
+        # lr = Config().parameters.optimizer.lr * (Config().algorithm.lr_decay ** self.current_round)
         # for name, weight in self.trainer.delta.items():
         #     self.trainer.delta[name] = self.trainer.delta[name] / lr
 

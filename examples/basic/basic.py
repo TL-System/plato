@@ -31,9 +31,8 @@ class DataSource(base.DataSource):
 class Trainer(basic.Trainer):
     """A custom trainer with custom training and testing loops."""
 
-    def train_model(
-        self, config, trainset, sampler, cut_layer=None
-    ):  # pylint: disable=unused-argument
+    # pylint: disable=unused-argument
+    def train_model(self, config, trainset, sampler, **kwargs):
         """A custom training loop."""
         optimizer = torch.optim.Adam(self.model.parameters(), lr=1e-3)
         criterion = nn.CrossEntropyLoss()
@@ -58,7 +57,7 @@ class Trainer(basic.Trainer):
                 optimizer.step()
                 optimizer.zero_grad()
 
-    def test_model(self, config, testset):  # pylint: disable=unused-argument
+    def test_model(self, config, testset, **kwargs):  # pylint: disable=unused-argument
         """A custom testing loop."""
         test_loader = torch.utils.data.DataLoader(
             testset, batch_size=config["batch_size"], shuffle=False

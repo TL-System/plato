@@ -51,20 +51,17 @@ class Server(fedavg.Server):
 
         return similarity
 
-    async def federated_averaging(self, updates):
+    async def aggregate_deltas(self, updates, deltas_received):
         """Aggregate weight updates from the clients using federated averaging."""
-        deltas_received = self.compute_weight_deltas(updates)
-
         # Extract the total number of samples
-        self.total_samples = sum(
-            [report.num_samples for (__, report, __, __) in updates]
-        )
+        self.total_samples = sum(update.report.num_samples for update in updates)
 
         # Constructing the aggregation weights to be used
         aggregation_weights = []
 
         for i, update in enumerate(deltas_received):
-            __, report, __, staleness = updates[i]
+            report = updates[i].report
+            staleness = updates[i].staleness
             num_samples = report.num_samples
 
             similarity = await self.cosine_similarity(update, staleness)
@@ -118,11 +115,7 @@ class Server(fedavg.Server):
         }
 
         for i, update in enumerate(deltas_received):
-            __, report, __, staleness = updates[i]
-            num_samples = report.num_samples
-
             for name, delta in update.items():
-                # Use weighted average by the number of samples
                 avg_update[name] += delta * aggregation_weights[i]
 
             # Yield to other tasks in the server

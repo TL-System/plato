@@ -72,18 +72,18 @@ class Trainer(ABC):
 
             if os.path.exists(model_file):
                 os.remove(model_file)
+                os.remove(model_file + ".pkl")
 
             if os.path.exists(accuracy_file):
                 os.remove(accuracy_file)
 
     @abstractmethod
-    def train(self, trainset, sampler, cut_layer=None, **kwargs) -> float:
+    def train(self, trainset, sampler, **kwargs) -> float:
         """The main training loop in a federated learning workload.
 
         Arguments:
         trainset: The training dataset.
         sampler: the sampler that extracts a partition for this client.
-        cut_layer (optional): The layer which training should start from.
 
         Returns:
         float: The training time.

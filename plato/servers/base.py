@@ -12,6 +12,7 @@ import random
 import sys
 import time
 from abc import abstractmethod
+from types import SimpleNamespace
 
 import numpy as np
 import socketio
@@ -676,7 +677,7 @@ class Server:
                     self,
                     len(self.updates),
                 )
-                await self.process_reports()
+                await self._process_reports()
                 await self.wrap_up()
                 await self.select_clients()
             else:
@@ -961,11 +962,11 @@ class Server:
 
                 client_staleness = self.current_round - client["starting_round"]
                 self.updates.append(
-                    (
-                        client["client_id"],
-                        client["report"],
-                        client["payload"],
-                        client_staleness,
+                    SimpleNamespace(
+                        client_id=client["client_id"],
+                        report=client["report"],
+                        payload=client["payload"],
+                        staleness=client_staleness,
                     )
                 )
 
@@ -1005,11 +1006,11 @@ class Server:
 
                         client_staleness = self.current_round - client["starting_round"]
                         self.updates.append(
-                            (
-                                client["client_id"],
-                                client["report"],
-                                client["payload"],
-                                client_staleness,
+                            SimpleNamespace(
+                                client_id=client["client_id"],
+                                report=client["report"],
+                                payload=client["payload"],
+                                staleness=client_staleness,
                             )
                         )
 
@@ -1020,7 +1021,7 @@ class Server:
                 len(self.updates),
             )
 
-            await self.process_reports()
+            await self._process_reports()
             await self.wrap_up()
             await self.select_clients()
             return
@@ -1033,11 +1034,11 @@ class Server:
             client_staleness = self.current_round - client["starting_round"]
 
             self.updates.append(
-                (
-                    client["client_id"],
-                    client["report"],
-                    client["payload"],
-                    client_staleness,
+                SimpleNamespace(
+                    client_id=client["client_id"],
+                    report=client["report"],
+                    payload=client["payload"],
+                    staleness=client_staleness,
                 )
             )
 
@@ -1067,7 +1068,7 @@ class Server:
                 self,
                 len(self.updates),
             )
-            await self.process_reports()
+            await self._process_reports()
             await self.wrap_up()
             await self.select_clients()
 
@@ -1109,7 +1110,7 @@ class Server:
                             self,
                             len(self.updates),
                         )
-                        await self.process_reports()
+                        await self._process_reports()
                         await self.wrap_up()
                         await self.select_clients()
 
@@ -1237,7 +1238,7 @@ class Server:
         return payload
 
     @abstractmethod
-    async def process_reports(self) -> None:
+    async def _process_reports(self) -> None:
         """Process a client report."""
 
     def process_customized_report(self, client_id, checkpoint_path, model_name):

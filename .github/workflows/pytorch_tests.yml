@@ -25,7 +25,6 @@ jobs:
           sudo apt install -y python3-pip python3-dev
           pip3 install torch torchvision --extra-index-url https://download.pytorch.org/whl/cpu
           pip3 install -r requirements.txt --upgrade
-          pip3 install yolov5
           pip3 install .
 
       - name: Unit tests
@@ -41,5 +40,3 @@ jobs:
           ./run --config=configs/MNIST/fedavg_async_lenet5.yml
           ./run --config=configs/MNIST/fedavg_lenet5_noniid.yml
           ./run --config=configs/MNIST/mistnet_lenet5.yml
-          ./run --config=.github/workflows/configs/fedavg_yolov5.yml
-          ./run --config=.github/workflows/configs/mistnet_yolov5.yml

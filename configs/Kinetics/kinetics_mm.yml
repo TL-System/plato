@@ -1,14 +1,16 @@
-# include basic settings for the models and the learning process
-
-# clients settings
 clients:
-  type: simple # type
-  total_clients: 50 # total number of clients
-  per_round: 30 # number of clients selected in each round
+  # Type
+  type: simple
+   
+  # The total number of clients
+  total_clients: 50
 
-  do_test: False # Should clients compute test accuracy locally?
+  # The number of clients selected in each round
+  per_round: 30 
 
-# server settings
+  # Should clients compute test accuracy locally?
+  do_test: False
+
 server:
   address: 127.0.0.1
   port: 8000
@@ -46,14 +48,6 @@ data:
     audio: !include Pipeline/kinetics_audio_feature.yml
 
 # Train settings
-
-# optimizer
-optimizer: &optimizer
-  type: SGD
-  lr: 0.000125 # this lr is used for 8 gpus
-  momentum: 0.9
-  weight_decay: 0.0001
-
 optimizer_config: &optimizer_config
   grad_clip:
     max_norm: 40
@@ -71,8 +65,6 @@ lr_configs: &lr_config
   warmup_by_epoch: True
   warmup_iters: 16
 
-total_epochs: &total_epochs 1000
-
 log_config: &log_config
   interval: 20
   hooks:
@@ -83,21 +75,28 @@ checkpoint_config: &checkpoint_config
   interval: 2
 
 trainer:
+  # The type of the trainer
   type: basic
-  batch_size: 24
-  optimizer: *optimizer
-  optimizer_config: *optimizer_config
-  learning_rate_config: *lr_config
-  rounds: *total_epochs
+
+  # The maximum number of training rounds
+  rounds: 1000
+
+  # The maximum number of clients running concurrently
   max_accuracy: 3
+  
+  # The target accuracy
   target_accuracy: 0.67
 
+  # The machine learning model
+  model_name: rgb_flow_audio_model
+
+  batch_size: 24
+  optimizer: SGD
+
+  optimizer_config: *optimizer_config
+  learning_rate_config: *lr_config
   log_config: *log_config
   checkpoint_config: *checkpoint_config
-
-model:
-  model_name: rgb_flow_audio_model
-  model_config: !include Models/kinetics_full_models.yml
 
 evaluation:
   interval: 5
@@ -106,13 +105,19 @@ evaluation:
     - mean_class_accuracy
 
 algorithm:
+  # Aggregation algorithm
   type: fedavg
 
-# Aggregation algorithm
-# The number of local aggregation rounds on edge servers before sending
-# aggreagted weights to the central server
+parameters:
+  model:
+    model_config: !include Models/kinetics_full_models.yml
 
-# runtime setting
+  optimizer:
+    lr: 0.000125 # this lr is used for 8 gpus
+    momentum: 0.9
+    weight_decay: 0.0001
+
+# Runtime setting
 runner_setting:
   dist_params:
     backend: nccl

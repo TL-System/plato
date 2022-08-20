@@ -90,11 +90,11 @@ class Model(nn.Cell):
 
         return x
 
-    def forward_to(self, x, cut_layer):
+    def forward_to(self, x):
         """Extract features using the layers before (and including)
         the cut_layer.
         """
-        layer_index = self.layers.index(cut_layer)
+        layer_index = self.layers.index(self.cut_layer)
 
         for i in range(0, layer_index + 1):
             x = self.layerdict[self.layers[i]](x)

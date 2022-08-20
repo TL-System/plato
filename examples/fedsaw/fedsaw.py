@@ -9,7 +9,7 @@ import fedsaw_edge
 
 
 def main():
-    """ A Plato federated learning training session using the FedSaw algorithm. """
+    """A Plato federated learning training session using the FedSaw algorithm."""
     client = fedsaw_client.Client()
     server = fedsaw_server.Server()
     edge_server = fedsaw_server.Server

@@ -63,24 +63,23 @@ trainer:
     # The target accuracy
     target_accuracy: 0.97
 
+    # The machine learning model
+    model_name: resnet_18
+
     # Number of epoches for local training in each communication round
     epochs: 5
     batch_size: 50
     optimizer: SGD
-    learning_rate: 0.1
-    momentum: 0.9
-    weight_decay: 0.005
-
-    # The machine learning model
-    model_name: resnet_18
 
 algorithm:
     # Aggregation algorithm
     type: fedavg
 
+parameters:
+    optimizer:
+        lr: 0.1
+        momentum: 0.9
+        weight_decay: 0.005
 results:
     # Write the following parameter(s) into a CSV
     types: round, elapsed_time, accuracy
-
-    # Plot results (x_axis-y_axis)
-    plot: round-accuracy, elapsed_time-accuracy

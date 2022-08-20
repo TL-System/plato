@@ -5,13 +5,13 @@ A cross-silo federated learning server using federated averaging, as either edge
 import asyncio
 import logging
 import os
-import random
 import numpy as np
 
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
 from plato.processors import registry as processor_registry
 from plato.samplers import registry as samplers_registry
+from plato.samplers import all_inclusive
 from plato.servers import fedavg
 from plato.utils import csv_processor
 
@@ -137,20 +137,16 @@ class Server(fedavg.Server):
                 self.datasource = datasources_registry.get(client_id=Config().args.id)
                 self.testset = self.datasource.get_test_set()
 
-                if hasattr(Config().data, "edge_testset_sampler"):
+                if hasattr(Config().data, "testset_sampler"):
                     # Set the sampler for test set
                     self.testset_sampler = samplers_registry.get(
-                        self.datasource, Config().args.id, testing="edge"
+                        self.datasource, Config().args.id, testing=True
                     )
-                elif hasattr(Config().data, "testset_size"):
-                    # Set the Random Sampler for test set
-                    from torch.utils.data import SubsetRandomSampler
-
-                    all_inclusive = range(len(self.datasource.get_test_set()))
-                    test_samples = random.sample(
-                        all_inclusive, Config().data.testset_size
-                    )
-                    self.testset_sampler = SubsetRandomSampler(test_samples)
+                else:
+                    if hasattr(Config().data, "testset_size"):
+                        self.testset_sampler = all_inclusive.Sampler(
+                            self.datasource, testing=True
+                        )
 
             # Initialize path of the result .csv file
             result_path = Config().params["result_path"]
@@ -160,19 +156,6 @@ class Server(fedavg.Server):
             )
         else:
             super().configure()
-            if hasattr(Config().server, "do_test") and Config().server.do_test:
-                self.datasource = datasources_registry.get(client_id=0)
-                self.testset = self.datasource.get_test_set()
-
-                if hasattr(Config().data, "testset_size"):
-                    from torch.utils.data import SubsetRandomSampler
-
-                    # Set the sampler for testset
-                    all_inclusive = range(len(self.datasource.get_test_set()))
-                    test_samples = random.sample(
-                        all_inclusive, Config().data.testset_size
-                    )
-                    self.testset_sampler = SubsetRandomSampler(test_samples)
 
     async def select_clients(self, for_next_batch=False):
         if Config().is_edge_server() and not for_next_batch:
@@ -191,11 +174,53 @@ class Server(fedavg.Server):
             server_response["current_global_round"] = self.current_round
         return server_response
 
-    async def process_reports(self):
+    async def _process_reports(self):
         """Process the client reports by aggregating their weights."""
         # To pass the client_id == 0 assertion during aggregation
         self.trainer.set_client_id(0)
-        await self.aggregate_weights(self.updates)
+        weights_received = [update.payload for update in self.updates]
+
+        weights_received = self.weights_received(weights_received)
+        self.callback_handler.call_event("on_weights_received", self, weights_received)
+
+        # Extract the current model weights as the baseline
+        baseline_weights = self.algorithm.extract_weights()
+
+        if hasattr(self, "aggregate_weights"):
+            # Runs a server aggregation algorithm using weights rather than deltas
+            logging.info(
+                "[Server #%d] Aggregating model weights directly rather than weight deltas.",
+                os.getpid(),
+            )
+            updated_weights = self.aggregate_weights(
+                self.updates, baseline_weights, weights_received
+            )
+
+            # Loads the new model weights
+            self.algorithm.load_weights(updated_weights)
+        else:
+            # Computes the weight deltas by comparing the weights received with
+            # the current global model weights
+            deltas_received = self.algorithm.compute_weight_deltas(
+                baseline_weights, weights_received
+            )
+
+            # Runs a framework-agnostic server aggregation algorithm, such as
+            # the federated averaging algorithm
+            logging.info("[Server #%d] Aggregating model weight deltas.", os.getpid())
+            deltas = await self.aggregate_deltas(self.updates, deltas_received)
+
+            # Updates the existing model weights from the provided deltas
+            updated_weights = self.algorithm.update_weights(deltas)
+
+            # Loads the new model weights
+            self.algorithm.load_weights(updated_weights)
+
+        # The model weights have already been aggregated, now calls the
+        # corresponding hook and callback
+        self.weights_aggregated(self.updates)
+        self.callback_handler.call_event("on_weights_aggregated", self, self.updates)
+
         if Config().is_edge_server():
             self.trainer.set_client_id(Config().args.id)
 
@@ -214,7 +239,15 @@ class Server(fedavg.Server):
             )
         elif Config().is_central_server() and Config().clients.do_test:
             # Compute the average accuracy from client reports
-            self.average_accuracy = self.client_accuracy_averaging()
+            total_samples = sum(update.report.num_samples for update in self.updates)
+            self.average_accuracy = (
+                sum(
+                    update.report.average_accuracy * update.report.num_samples
+                    for update in self.updates
+                )
+                / total_samples
+            )
+
             logging.info(
                 "[%s] Average client accuracy: %.2f%%.",
                 self,
@@ -258,20 +291,6 @@ class Server(fedavg.Server):
 
         await self.wrap_up_processing_reports()
 
-    def client_accuracy_averaging(self):
-        """Compute the average accuracy across clients."""
-        # Get total number of samples
-        total_samples = sum(
-            [report.num_samples for (__, report, __, __) in self.updates]
-        )
-
-        # Perform weighted averaging
-        accuracy = 0
-        for (__, report, __, __) in self.updates:
-            accuracy += report.average_accuracy * (report.num_samples / total_samples)
-
-        return accuracy
-
     async def wrap_up_processing_reports(self):
         """Wrap up processing the reports with any additional work."""
         # Record results into a .csv file
@@ -293,8 +312,12 @@ class Server(fedavg.Server):
                     f"{Config().params['result_path']}/edge_{os.getpid()}_accuracy.csv"
                 )
 
-                for (client_id, report, __, __) in self.updates:
-                    accuracy_row = [self.current_round, client_id, report.accuracy]
+                for update in self.updates:
+                    accuracy_row = [
+                        self.current_round,
+                        update.client_id,
+                        update.report.accuracy,
+                    ]
                     csv_processor.write_csv(accuracy_csv_file, accuracy_row)
 
             # When a certain number of aggregations are completed, an edge client
@@ -315,7 +338,7 @@ class Server(fedavg.Server):
         record_items_values = super().get_record_items_values()
 
         record_items_values["global_round"] = self.current_global_round
-        record_items_values["average_accuracy"] = self.average_accuracy * 100
+        record_items_values["average_accuracy"] = self.average_accuracy
         record_items_values["edge_agg_num"] = Config().algorithm.local_rounds
         record_items_values["local_epoch_num"] = Config().trainer.epochs
 

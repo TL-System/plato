@@ -58,29 +58,17 @@ class Server(fedavg.Server):
                     "The hyperparameter needs to be between 0 and 1 (exclusive)."
                 )
 
-    async def aggregate_weights(self, updates):
+    def aggregate_weights(self, updates, baseline_weights, weights_received):
         """Process the client reports by aggregating their weights."""
         # Calculate the new mixing hyperparameter with client's staleness
-        __, __, __, client_staleness = updates[0]
+        client_staleness = updates[0].staleness
 
         if self.adaptive_mixing:
             self.mixing_hyperparam *= self._staleness_function(client_staleness)
 
-        # Calculate updated weights from clients
-        payload_received = [payload for (__, __, payload, __) in updates]
-        deltas_received = self.algorithm.compute_weight_deltas(payload_received)
-
-        # Actually update the global model's weights (PyTorch only)
-        baseline_weights = self.algorithm.extract_weights()
-
-        updated_weights = OrderedDict()
-        for name, weight in baseline_weights.items():
-            updated_weights[name] = (
-                weight * (1 - self.mixing_hyperparam)
-                + deltas_received[0][name] * self.mixing_hyperparam
-            )
-
-        self.algorithm.load_weights(updated_weights)
+        return self.algorithm.aggregate_weights(
+            baseline_weights, weights_received, mixing=self.mixing_hyperparam
+        )
 
     @staticmethod
     def _staleness_function(staleness) -> float:

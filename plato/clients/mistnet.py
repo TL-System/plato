@@ -29,9 +29,7 @@ class Client(simple.Client):
         tic = time.perf_counter()
 
         # Perform a forward pass till the cut layer in the model
-        features = self.algorithm.extract_features(
-            self.trainset, self.sampler, Config().algorithm.cut_layer
-        )
+        features = self.algorithm.extract_features(self.trainset, self.sampler)
 
         training_time = time.perf_counter() - tic
 
@@ -39,7 +37,7 @@ class Client(simple.Client):
         comm_time = time.time()
         return (
             SimpleNamespace(
-                num_samples=self.sampler.trainset_size(),
+                num_samples=self.sampler.num_samples(),
                 accuracy=0,
                 training_time=training_time,
                 comm_time=comm_time,
