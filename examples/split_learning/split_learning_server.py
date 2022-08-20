@@ -28,39 +28,26 @@ class Server(fedavg.Server):
 
     def customize_server_payload(self, payload):
         """ Wrap up generating the server payload with any additional information. """
+        # sending global model to the clients
         return (payload, 'weights')
 
-    async def process_reports(self):
-        """Process the features extracted by the client and perform server-side training."""
-        client_weight_updates = []
-        for i, (client_id, report, payload,
-                staleness) in enumerate(self.updates):
-            if report.phase == "features":
-                feature_dataset = feature.DataSource(payload)
+    async def process_client_info(self, client_id, sid):
+        """Process the received metadata information from a reporting client."""
+        if self.reports[sid].phase == "features":
+            payload = self.client_payload[sid]
+            feature_dataset = feature.DataSource(payload)
 
-                # Training the model using all the features received from the client
-                sampler = all_inclusive.Sampler(feature_dataset)
-                self.algorithm.train(feature_dataset, sampler,
-                                     Config().algorithm.cut_layer)
+            # Training the model using all the features received from the client
+            sampler = all_inclusive.Sampler(feature_dataset)
+            self.algorithm.train(feature_dataset, sampler,
+                                 Config().algorithm.cut_layer)
 
-                # Sending the server payload to the clients
-                gradients = self.load_gradients()
-                logging.info("[Server #%d] Reporting gradients to client #%d.",
-                             os.getpid(), client_id)
-                server_payload = (gradients, 'gradients')
-                if not self.comm_simulation:
-                    sid = self.clients[client_id]['sid']
-                    await self.send(sid, server_payload, client_id)
+            # Sending the gradients calculated by the server to the clients
+            gradients = self.load_gradients()
+            logging.info("[Server #%d] Reporting gradients to client #%d.",
+                         os.getpid(), client_id)
+            server_payload = (gradients, 'gradients')
+            await self.send(sid, server_payload, client_id)
 
-            elif report.phase == "weights":
-                client_weight_updates.append(self.updates[i])
-
-        if len(client_weight_updates) != 0:
-            await self.aggregate_weights(client_weight_updates)
-
-        # Test the updated model
-        if not hasattr(Config().server, 'do_test') or Config().server.do_test:
-            self.accuracy = self.trainer.test(self.testset)
-            logging.info('[%s] Global model accuracy: %.2f%%\n', self,
-                         100 * self.accuracy)
-        await self.wrap_up_processing_reports()
+        elif self.reports[sid].phase == "weights":
+            await super().process_client_info(client_id, sid)
