@@ -26,9 +26,7 @@ class Algorithm(fedavg.Algorithm):
         self.input_dataset = []
 
     def receive_gradients(self, gradients):
-        """
-        Receive gradients from the server.
-        """
+        """Receive gradients from the server."""
         self.gradients_list = deepcopy(gradients)
 
     def extract_features(self, dataset, sampler, cut_layer: str):
@@ -78,7 +76,9 @@ class Algorithm(fedavg.Algorithm):
         return features_dataset, toc - tic
 
     def complete_train(self, config, dataset, sampler, cut_layer: str):
-        """ Sending the model to the device used for training. """
+        """ Update the model on the client/device with the gradients received
+        from the server.
+        """
         self.model.to(self.trainer.device)
         self.model.train()
 
@@ -115,7 +115,9 @@ class Algorithm(fedavg.Algorithm):
         return toc - tic
 
     def compute_weight_deltas(self, weights_received):
-        """Extract the weights received from a client and compute the deltas."""
+        """Extract the weights received from a client and compute the deltas
+        that will be used to update the global model on the server.
+        """
         # Extract baseline model weights
         baseline_weights = self.extract_weights()
 

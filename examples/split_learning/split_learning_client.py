@@ -30,9 +30,11 @@ class Client(simple.Client):
         payload, info = server_payload
 
         if info == 'weights':
+            # server sends the global model
             self.algorithm.load_weights(payload)
             self.phase = 'extract_features'
         elif info == 'gradients':
+            # server sends the gradients of the features
             self.algorithm.receive_gradients(payload)
             self.phase = 'complete_train'
 

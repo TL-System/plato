@@ -14,7 +14,12 @@ from plato.trainers import basic
 
 
 class Trainer(basic.Trainer):
+
     def train_model(self, config, trainset, sampler, cut_layer=None):
+        """
+        Update the global model on the server with the features received 
+        from the client and calculate the gradients.
+        """
         batch_size = config["batch_size"]
         log_interval = 10
 
@@ -34,14 +39,15 @@ class Trainer(basic.Trainer):
         loss_criterion = self.get_loss_criterion()
 
         # Initializing the optimizer
-        get_optimizer = getattr(self, "get_optimizer", optimizers.get_optimizer)
+        get_optimizer = getattr(self, "get_optimizer",
+                                optimizers.get_optimizer)
         optimizer = get_optimizer(self.model)
 
         # Initializing the learning rate schedule, if necessary
         if hasattr(Config().trainer, "lr_schedule"):
-            lr_schedule = optimizers.get_lr_schedule(
-                optimizer, iterations_per_epoch, train_loader
-            )
+            lr_schedule = optimizers.get_lr_schedule(optimizer,
+                                                     iterations_per_epoch,
+                                                     train_loader)
         else:
             lr_schedule = None
 
@@ -111,6 +117,5 @@ class Trainer(basic.Trainer):
             os.remove(model_gradients_path)
         torch.save(cut_layer_grad, model_gradients_path)
 
-        logging.info(
-            "[Server #%d] Gradients saved to %s.", os.getpid(), model_gradients_path
-        )
+        logging.info("[Server #%d] Gradients saved to %s.", os.getpid(),
+                     model_gradients_path)
