@@ -80,7 +80,7 @@ trainer:
 
     # The target accuracy
     target_accuracy: 1.0
-    
+
     # The machine learning model
     model_name: lenet5
 
@@ -107,6 +107,3 @@ results:
 
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time
-
-    # Plot results (x_axis-y_axis)
-    plot: round-accuracy, elapsed_time-accuracy
