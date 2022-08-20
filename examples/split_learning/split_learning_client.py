@@ -22,7 +22,6 @@ class Client(simple.Client):
                          datasource=datasource,
                          algorithm=algorithm,
                          trainer=trainer)
-
         self.phase = 'extract_features'
 
     def load_payload(self, server_payload):
@@ -51,12 +50,10 @@ class Client(simple.Client):
                 self.client_id)
 
             features, training_time = self.algorithm.extract_features(
-                self.trainset, self.sampler,
-                Config().algorithm.cut_layer)
-
+                self.trainset, self.sampler)
             logging.info("Finished extracting features.")
             # Generate a report for the server, performing model testing if applicable
-            report = SimpleNamespace(num_samples=self.sampler.trainset_size(),
+            report = SimpleNamespace(num_samples=self.sampler.num_samples(),
                                      accuracy=accuracy,
                                      training_time=training_time,
                                      comm_time=comm_time,
@@ -67,11 +64,10 @@ class Client(simple.Client):
             # Perform a complete training with gradients received
             config = Config().trainer._asdict()
             training_time = self.algorithm.complete_train(
-                config, self.trainset, self.sampler,
-                Config().algorithm.cut_layer)
+                config, self.trainset, self.sampler)
             weights = self.algorithm.extract_weights()
             # Generate a report, signal the end of train
-            report = SimpleNamespace(num_samples=self.sampler.trainset_size(),
+            report = SimpleNamespace(num_samples=self.sampler.num_samples(),
                                      accuracy=accuracy,
                                      training_time=training_time,
                                      comm_time=comm_time,

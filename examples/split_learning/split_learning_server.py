@@ -16,11 +16,11 @@ class Server(fedavg.Server):
     """The split learning server."""
 
     def load_gradients(self):
-        """ Loading gradients from a file. """
-        model_path = Config().params['model_path']
+        """Loading gradients from a file."""
+        model_path = Config().params["model_path"]
         model_name = Config().trainer.model_name
 
-        model_gradients_path = f'{model_path}/{model_name}_gradients.pth'
+        model_gradients_path = f"{model_path}/{model_name}_gradients.pth"
         logging.info("[Server #%d] Loading gradients from %s.", os.getpid(),
                      model_gradients_path)
 
@@ -39,8 +39,7 @@ class Server(fedavg.Server):
 
             # Training the model using all the features received from the client
             sampler = all_inclusive.Sampler(feature_dataset)
-            self.algorithm.train(feature_dataset, sampler,
-                                 Config().algorithm.cut_layer)
+            self.algorithm.train(feature_dataset, sampler)
 
             # Sending the gradients calculated by the server to the clients
             gradients = self.load_gradients()

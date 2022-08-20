@@ -12,7 +12,6 @@ import torch
 from plato.algorithms import fedavg
 from plato.config import Config
 from plato.datasources import feature_dataset
-from plato.utils import optimizers
 
 
 class Algorithm(fedavg.Algorithm):
@@ -29,11 +28,10 @@ class Algorithm(fedavg.Algorithm):
         """Receive gradients from the server."""
         self.gradients_list = deepcopy(gradients)
 
-    def extract_features(self, dataset, sampler, cut_layer: str):
+    def extract_features(self, dataset, sampler):
         """Extracting features using layers before the cut_layer.
 
         dataset: The training or testing dataset.
-        cut_layer: Layers before this one will be used for extracting features.
         """
         self.model.to(self.trainer.device)
         self.model.eval()
@@ -41,10 +39,12 @@ class Algorithm(fedavg.Algorithm):
         _train_loader = getattr(self.trainer, "train_loader", None)
 
         if callable(_train_loader):
-            data_loader = self.trainer.train_loader(batch_size=1,
-                                                    trainset=dataset,
-                                                    sampler=sampler.get(),
-                                                    extract_features=True)
+            data_loader = self.trainer.train_loader(
+                batch_size=1,
+                trainset=dataset,
+                sampler=sampler.get(),
+                extract_features=True,
+            )
         else:
             data_loader = torch.utils.data.DataLoader(
                 dataset,
@@ -60,7 +60,7 @@ class Algorithm(fedavg.Algorithm):
             with torch.no_grad():
                 inputs, targets = inputs.to(self.trainer.device), targets.to(
                     self.trainer.device)
-                logits = self.model.forward_to(inputs, cut_layer)
+                logits = self.model.forward_to(inputs)
 
             features_dataset.append(
                 (logits.detach().cpu(), targets.detach().cpu()))
@@ -68,6 +68,7 @@ class Algorithm(fedavg.Algorithm):
                 (inputs.detach().cpu(), targets.detach().cpu()))
 
         toc = time.perf_counter()
+
         logging.info("[Client #%d] Features extracted from %s examples.",
                      self.client_id, len(features_dataset))
         logging.info("[Client #%d] Time used: %.2f seconds.", self.client_id,
@@ -75,23 +76,21 @@ class Algorithm(fedavg.Algorithm):
 
         return features_dataset, toc - tic
 
-    def complete_train(self, config, dataset, sampler, cut_layer: str):
+    def complete_train(self, config, dataset, sampler):
         """ Update the model on the client/device with the gradients received
         from the server.
         """
         self.model.to(self.trainer.device)
         self.model.train()
 
-        batch_size = config['batch_size']
+        batch_size = config["batch_size"]
 
         data_loader = self.input_dataset
 
         tic = time.perf_counter()
 
         # Initializing the optimizer
-        get_optimizer = getattr(self, "get_optimizer",
-                                optimizers.get_optimizer)
-        optimizer = get_optimizer(self.model)
+        optimizer = self.trainer.get_optimizer(self.model)
 
         grad_index = 0
 
@@ -100,7 +99,7 @@ class Algorithm(fedavg.Algorithm):
                 self.trainer.device)
 
             optimizer.zero_grad()
-            outputs = self.model.forward_to(examples, cut_layer)
+            outputs = self.model.forward_to(examples)
             outputs.backward(self.gradients_list[grad_index].to(
                 self.trainer.device))
             grad_index = grad_index + 1
@@ -114,15 +113,12 @@ class Algorithm(fedavg.Algorithm):
 
         return toc - tic
 
-    def compute_weight_deltas(self, weights_received):
+    def compute_weight_deltas(self, baseline_weights, weights_received):
         """Extract the weights received from a client and compute the deltas
         that will be used to update the global model on the server.
         """
-        # Extract baseline model weights
-        baseline_weights = self.extract_weights()
-
         ignored_layers = []
-        cut_layer_idx = self.model.layers.index(Config().algorithm.cut_layer)
+        cut_layer_idx = self.model.layers.index(self.model.cut_layer)
         # These layers are trained on the server, so we should ignore the weights
         # of these layers reported by the client
         for i in range(cut_layer_idx + 1, len(self.model.layers)):
@@ -145,8 +141,7 @@ class Algorithm(fedavg.Algorithm):
             deltas.append(delta)
         return deltas
 
-    def train(self, trainset, sampler, cut_layer=None):
+    def train(self, trainset, sampler):
         """ Train the neural network model after the cut layer. """
         self.trainer.train(
-            feature_dataset.FeatureDataset(trainset.feature_dataset), sampler,
-            cut_layer)
+            feature_dataset.FeatureDataset(trainset.feature_dataset), sampler)

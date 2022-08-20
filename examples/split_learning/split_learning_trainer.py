@@ -8,7 +8,6 @@ import numpy as np
 import torch
 import torch.nn as nn
 from plato.config import Config
-from plato.utils import optimizers
 
 from plato.trainers import basic
 
@@ -39,15 +38,11 @@ class Trainer(basic.Trainer):
         loss_criterion = self.get_loss_criterion()
 
         # Initializing the optimizer
-        get_optimizer = getattr(self, "get_optimizer",
-                                optimizers.get_optimizer)
-        optimizer = get_optimizer(self.model)
+        optimizer = self.get_optimizer(self.model)
 
         # Initializing the learning rate schedule, if necessary
         if hasattr(Config().trainer, "lr_schedule"):
-            lr_schedule = optimizers.get_lr_schedule(optimizer,
-                                                     iterations_per_epoch,
-                                                     train_loader)
+            lr_schedule = self.get_lr_schedule(config, optimizer)
         else:
             lr_schedule = None
 
@@ -65,10 +60,7 @@ class Trainer(basic.Trainer):
 
             examples = examples.detach().requires_grad_(True)
 
-            if cut_layer is None:
-                outputs = self.model(examples)
-            else:
-                outputs = self.model.forward_from(examples, cut_layer)
+            outputs = self.model(examples)
 
             loss = loss_criterion(outputs, labels)
             loss.backward()
@@ -97,7 +89,7 @@ class Trainer(basic.Trainer):
                     )
 
             if lr_schedule is not None:
-                lr_schedule.step()
+                lr_scheduler.step()
 
         if hasattr(optimizer, "params_state_update"):
             optimizer.params_state_update()
