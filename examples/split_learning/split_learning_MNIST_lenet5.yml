@@ -3,7 +3,7 @@ clients:
     type: split_learning
 
     # The total number of clients
-    total_clients: 1
+    total_clients: 500
 
     # The number of clients selected in each round
     per_round: 1
@@ -22,7 +22,7 @@ data:
     datasource: MNIST
 
     # Number of samples in each partition
-    partition_size: 20000
+    partition_size: 100
 
     # Fixed random seed
     random_seed: 1
@@ -35,7 +35,7 @@ trainer:
     type: split_learning
 
     # The maximum number of training rounds
-    rounds: 6
+    rounds: 200
 
     # The maximum number of clients running concurrently
     max_concurrency: 3
@@ -47,8 +47,8 @@ trainer:
     epochs: 1
     batch_size: 32
     optimizer: SGD
-    learning_rate: 0.001
-    momentum: 0.0
+    learning_rate: 0.01
+    momentum: 0.9
     weight_decay: 0.0
 
     # The machine learning model
@@ -56,3 +56,5 @@ trainer:
 
 algorithm:
     cut_layer: relu4
+
+results: round, accuracy
