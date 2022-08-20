@@ -7,26 +7,16 @@ Using Stochastic Recursive Gradient." (https://arxiv.org/pdf/1703.00102.pdf)
 """
 import os
 import time
-from dataclasses import dataclass
+from types import SimpleNamespace
 
 from plato.clients import simple
 
 
-@dataclass
-class Report(simple.Report):
-    """Client report sent to the FedSarah federated learning server."""
-    payload_length: int
-
-
 class Client(simple.Client):
-    """ A FedSarah federated learning client who sends weight updates
-    and client control variates. """
+    """A FedSarah federated learning client who sends weight updates
+    and client control variates."""
 
-    def __init__(self,
-                 model=None,
-                 datasource=None,
-                 algorithm=None,
-                 trainer=None):
+    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
         super().__init__(model, datasource, algorithm, trainer)
         self.client_control_variates = None
         self.server_control_variates = None
@@ -34,7 +24,7 @@ class Client(simple.Client):
         self.fl_round_counter = 0
 
     async def train(self):
-        """ Initialize the server control variates and client control variates for the trainer. """
+        """Initialize the server control variates and client control variates for the trainer."""
         if self.server_control_variates is not None:
             self.trainer.client_control_variates = self.client_control_variates
             self.trainer.server_control_variates = self.server_control_variates
@@ -51,11 +41,16 @@ class Client(simple.Client):
         os.remove(fn)
 
         comm_time = time.time()
-        return Report(report.num_samples, report.accuracy,
-                      report.training_time, comm_time, report.update_response,
-                      2), [weights, self.client_control_variates]
+        return SimpleNamespace(
+            num_samples=report.num_samples,
+            accuracy=report.accuracy,
+            training_time=report.training_time,
+            comm_time=comm_time,
+            update_response=report.update_response,
+            payload_length=2,
+        ), [weights, self.client_control_variates]
 
     def load_payload(self, server_payload):
-        """ Load model weights and server control vairates from server payload onto this client. """
+        """Load model weights and server control vairates from server payload onto this client."""
         self.algorithm.load_weights(server_payload[0])
         self.server_control_variates = server_payload[1]

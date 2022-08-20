@@ -6,24 +6,39 @@ clients:
     total_clients: 10
 
     # The number of clients selected in each round
-    per_round: 2
+    per_round: 1
 
     # Should the clients compute test accuracy locally?
-    do_test: false
+    do_test: true
+
+    # Threshold at which updates will be pruned
+    update_threshold: 1.2
+
+    # Is the adaptive algorithm being used?
+    adaptive: false
+
+    # Hyperparameters for the adaptive algorithm
+    delta1: 1
+    delta2: 1
+    delta3: 1
+
+    outbound_processors:
+        - model_compress
+
+    compute_comm_time: true
 
 server:
     address: 127.0.0.1
-    port: 8000
+    port: 8020
     do_test: true
-    random_seed: 1
 
-    step_window: 2
-    penalty: 2
-    exploration_factor: 0.9
-    desired_duration: 50
+    random_seed: 1
 
     checkpoint_path: results/test/checkpoint
     model_path: results/test/model
+
+    inbound_processors:
+        - model_decompress
 
 data:
     # The training and testing dataset
@@ -36,9 +51,11 @@ data:
     partition_size: 100
 
     # IID or non-IID?
-    sampler: iid
+    sampler: noniid
 
-    #testset_size: 1000
+    concentration: 5
+
+    testset_sampler: noniid
 
     # The random seed for sampling data
     random_seed: 1
@@ -53,19 +70,16 @@ trainer:
     # The maximum number of clients running concurrently
     max_concurrency: 2
 
-    # The target accuracy
-    target_accuracy: 0.99
-
     # Number of epoches for local training in each communication round
     epochs: 2
-    batch_size: 10
+    batch_size: 20
     optimizer: SGD
     learning_rate: 0.01
     momentum: 0.9
     weight_decay: 0.0
 
     # The machine learning model
-    model_name: lenet5
+    model_name: lenet_5
 
 algorithm:
     # Aggregation algorithm
@@ -73,6 +87,6 @@ algorithm:
 
 results:
     # Write the following parameter(s) into a CSV
-    types: round, accuracy, elapsed_time, comm_time, round_time
+    types: round, accuracy, elapsed_time, comm_time, round_time, comm_overhead
 
     result_path: results/test
