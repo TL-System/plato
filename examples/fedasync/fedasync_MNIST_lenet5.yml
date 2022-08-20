@@ -72,8 +72,8 @@ trainer:
     target_accuracy: 0.98
 
     # The machine learning model
-    model_name: lenet5    
-    
+    model_name: lenet5
+
     # Number of epoches for local training in each communication round
     epochs: 5
     batch_size: 32
@@ -86,7 +86,7 @@ algorithm:
 parameters:
     model:
         num_classes: 47
-        
+
     optimizer:
         lr: 0.01
         momentum: 0.9
@@ -96,6 +96,3 @@ results:
     result_path: results/fedasync/mnist
     # Write the following parameter(s) into a CSV
     types: round, elapsed_time, accuracy
-
-    # Plot results (x_axis-y_axis)
-    plot: round-accuracy, elapsed_time-accuracy
