@@ -9,7 +9,6 @@ in Proceedings of the 37th International Conference on Machine Learning (ICML), 
 https://arxiv.org/pdf/1910.06378.pdf
 """
 from collections import OrderedDict
-import torch
 
 from plato.config import Config
 from plato.servers import fedavg
@@ -45,6 +44,6 @@ class Server(fedavg.Server):
         if self.server_control_variate is None:
             self.server_control_variate = OrderedDict()
             for name, weight in self.algorithm.extract_weights().items():
-                self.server_control_variate[name] = torch.zeros(weight.shape)
+                self.server_control_variate[name] = self.trainer.zeros(weight.shape)
 
         return [payload, self.server_control_variate]
