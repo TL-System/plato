@@ -9,7 +9,6 @@ import os
 import numpy as np
 import torch
 from torch.nn.utils import prune
-from plato.config import Config
 
 
 def make_init_mask(model):
@@ -29,17 +28,12 @@ def make_init_mask(model):
     return mask
 
 
-def compute_pruned_amount(model, client_id):
+def compute_pruned_amount(model, mask_path):
     """
     Compute the pruned percentage
     :param model: a pytorch model
     :return pruned percentage, number of remaining weights:
     """
-    model_name = Config().trainer.model_name
-    checkpoint_path = Config().params["checkpoint_path"]
-
-    mask_path = f"{checkpoint_path}/{model_name}_client{client_id}_mask.pth"
-
     if not os.path.exists(mask_path):
         return 0
 

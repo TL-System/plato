@@ -28,6 +28,7 @@ class Trainer(basic.Trainer):
         self.datasource = None
         self.testset = None
         self.need_prune = False
+        self.extra_payload_path = None
         self.accuracy_threshold = (
             Config().clients.accuracy_threshold
             if hasattr(Config().clients, "accuracy_threshold")
@@ -52,7 +53,9 @@ class Trainer(basic.Trainer):
         self.datasource = datasources_registry.get(client_id=self.client_id)
         self.testset = self.datasource.get_test_set()
         accuracy = self.test_model(config, self.testset, None)
-        self.pruned_amount = pruning.compute_pruned_amount(self.model, self.client_id)
+        self.pruned_amount = pruning.compute_pruned_amount(
+            self.model, self.extra_payload_path
+        )
 
         # Merge the incoming server payload model with the mask to create the model for training
         self.model = self.merge_model(self.model, self.pruned_layer_names)
@@ -96,7 +99,7 @@ class Trainer(basic.Trainer):
             pruning.remove(self.model)
 
             self.pruned_amount = pruning.compute_pruned_amount(
-                self.model, self.client_id
+                self.model, self.extra_payload_path
             )
             logging.info(
                 "[Client #%d] Pruned Amount: %.2f%%", self.client_id, self.pruned_amount
@@ -104,14 +107,10 @@ class Trainer(basic.Trainer):
 
     def merge_model(self, model, pruned_layer_names):
         """Apply the mask onto the incoming personalized model."""
-        model_name = Config().trainer.model_name
-        checkpoint_path = Config().params["checkpoint_path"]
-
-        mask_path = f"{checkpoint_path}/{model_name}_client{self.client_id}_mask.pth"
-        if not os.path.exists(mask_path):
+        if not os.path.exists(self.extra_payload_path):
             return self.model
         else:
-            with open(mask_path, "rb") as mask_file:
+            with open(self.extra_payload_path, "rb") as mask_file:
                 mask = pickle.load(mask_file)
 
         return pruning.apply_mask(model, mask, self.device, pruned_layer_names)
@@ -119,13 +118,10 @@ class Trainer(basic.Trainer):
     def save_mask(self):
         """If pruning has occured, the mask is saved for merging in future rounds."""
 
-        model_name = Config().trainer.model_name
         checkpoint_path = Config().params["checkpoint_path"]
 
         if not os.path.exists(checkpoint_path):
             os.makedirs(checkpoint_path)
 
-        mask_path = f"{checkpoint_path}/{model_name}_client{self.client_id}_mask.pth"
-
-        with open(mask_path, "wb") as payload_file:
+        with open(self.extra_payload_path, "wb") as payload_file:
             pickle.dump(self.mask, payload_file)
