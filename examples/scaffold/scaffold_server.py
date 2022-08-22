@@ -24,23 +24,21 @@ class Server(fedavg.Server):
         self.received_client_control_variates = None
 
     def weights_received(self, weights_received):
-        """ Compute control variates from clients' updated weights. """
+        """Compute control variates from clients' updated weights."""
         self.received_client_control_variates = [
             weight[1] for weight in weights_received
         ]
 
-    async def federated_averaging(self, updates):
-        """ Aggregate weight updates and also update server control variate. """
+        return [weight[0] for weight in weights_received]
 
-        update = await super().federated_averaging(updates)
-
+    def weights_aggregated(self, updates):
+        """Method called after the updated weights have been aggregated."""
         # Update server control variate
         for client_control_variate_delta in self.received_client_control_variates:
             for name, param in client_control_variate_delta.items():
                 self.server_control_variate[name].add_(
-                    param, alpha=1 / Config().clients.total_clients)
-
-        return update
+                    param, alpha=1 / Config().clients.total_clients
+                )
 
     def customize_server_payload(self, payload):
         "Add the server control variate into the server payload."

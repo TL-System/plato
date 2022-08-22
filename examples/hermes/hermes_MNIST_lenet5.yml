@@ -21,9 +21,12 @@ clients:
     accuracy_threshold: 0.6
 
     outbound_processors:
+        - send_mask
         - model_compress
 
     compute_comm_time: true
+
+    comm_simulation: false
 
 server:
     address: 127.0.0.1
@@ -32,8 +35,8 @@ server:
 
     random_seed: 1
 
-    checkpoint_path: test/checkpoint
-    model_path: test/model
+    checkpoint_path: results/test/checkpoint
+    model_path: results/test/model
 
     inbound_processors:
         - model_decompress

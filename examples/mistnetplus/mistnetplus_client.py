@@ -53,7 +53,7 @@ class MistnetplusClient(simple.Client):
 
             # Generate a report for the server, performing model testing if applicable
             return (
-                Report(self.sampler.trainset_size(), len(features), "features"),
+                Report(self.sampler.num_samples(), len(features), "features"),
                 features,
             )
         else:
@@ -62,7 +62,7 @@ class MistnetplusClient(simple.Client):
             self.algorithm.complete_train(config, self.trainset, self.sampler)
             weights = self.algorithm.extract_weights()
             # Generate a report, signal the end of train
-            return Report(self.sampler.trainset_size(), 0, "weights"), weights
+            return Report(self.sampler.num_samples(), 0, "weights"), weights
 
 
 def main():

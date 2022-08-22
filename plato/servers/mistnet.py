@@ -40,7 +40,7 @@ class Server(fedavg.Server):
             logging.info("[Server #%d] Loading a pre-trained model.", os.getpid())
             self.trainer.load_model(filename=model_file_name)
 
-    async def process_reports(self):
+    async def _process_reports(self):
         """Process the features extracted by the client and perform server-side training."""
         features = [update.payload for update in self.updates]
         feature_dataset = feature.DataSource(features)

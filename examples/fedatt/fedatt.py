@@ -8,12 +8,14 @@ in the Proceedings of the 2019 International Joint Conference on Neural Networks
 
 https://arxiv.org/abs/1812.07108
 """
+import fedatt_algorithm
 import fedatt_server
 
 
 def main():
-    """ A Plato federated learning training session using the FedAtt algorithm. """
-    server = fedatt_server.Server()
+    """A Plato federated learning training session using the FedAtt algorithm."""
+    algorithm = fedatt_algorithm.Algorithm
+    server = fedatt_server.Server(algorithm=algorithm)
     server.run()
 
 

@@ -674,7 +674,7 @@ class Server:
                     self,
                     len(self.updates),
                 )
-                await self.process_reports()
+                await self._process_reports()
                 await self.wrap_up()
                 await self.select_clients()
             else:
@@ -1018,7 +1018,7 @@ class Server:
                 len(self.updates),
             )
 
-            await self.process_reports()
+            await self._process_reports()
             await self.wrap_up()
             await self.select_clients()
             return
@@ -1065,7 +1065,7 @@ class Server:
                 self,
                 len(self.updates),
             )
-            await self.process_reports()
+            await self._process_reports()
             await self.wrap_up()
             await self.select_clients()
 
@@ -1107,7 +1107,7 @@ class Server:
                             self,
                             len(self.updates),
                         )
-                        await self.process_reports()
+                        await self._process_reports()
                         await self.wrap_up()
                         await self.select_clients()
 
@@ -1235,7 +1235,7 @@ class Server:
         return payload
 
     @abstractmethod
-    async def process_reports(self) -> None:
+    async def _process_reports(self) -> None:
         """Process a client report."""
 
     def process_customized_report(self, client_id, checkpoint_path, model_name):

@@ -121,6 +121,6 @@ class Server(fedavg.Server):
                 os.getpid(),
                 len(self.updates),
             )
-            await self.process_reports()
+            await self._process_reports()
             await self.wrap_up()
             await self.select_clients()
