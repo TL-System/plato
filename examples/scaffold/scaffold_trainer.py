@@ -10,6 +10,7 @@ https://arxiv.org/pdf/1910.06378.pdf
 """
 from collections import OrderedDict
 
+import copy
 import logging
 import pickle
 import torch
@@ -27,6 +28,9 @@ class Trainer(basic.Trainer):
 
         self.server_control_variate = None
         self.client_control_variate = None
+
+        # Save the global model weights for computing new control variate
+        # using the Option 2 in the paper
         self.global_model_weights = None
 
         # Path to the client control variate
@@ -50,6 +54,7 @@ class Trainer(basic.Trainer):
                 self.client_control_variate[variate] = torch.zeros(
                     self.server_control_variate[variate].shape
                 )
+        self.global_model_weights = copy.deepcopy(self.model.state_dict())
 
     def train_step_end(self, config, batch=None, loss=None):
         """Modifies the weights based on the server and client control variates."""
@@ -125,6 +130,10 @@ class Trainer(basic.Trainer):
         # Compute weight deltas
         weight_deltas = {}
         for layer in self.global_model_weights:
-            weight_deltas[layer] = self.model[layer] - self.global_model_weights[layer]
+            weight_deltas[layer] = torch.sub(
+                self.model.state_dict()[layer],
+                self.global_model_weights[layer],
+                alpha=1,
+            )
 
         self.model.load_state_dict(weight_deltas, strict=True)

@@ -9,7 +9,6 @@ in Proceedings of the 37th International Conference on Machine Learning (ICML), 
 https://arxiv.org/pdf/1910.06378.pdf
 """
 
-from collections import OrderedDict
 import logging
 import os
 
@@ -27,10 +26,6 @@ class Client(simple.Client):
         super().__init__(model, datasource, algorithm, trainer)
 
         self.client_control_variate = None
-
-        # Save the global model weights for computing new control variate
-        # using the Option 2 in the paper
-        self.global_model_weights = OrderedDict()
 
     def process_server_response(self, server_response):
         """Initialize the server control variate and client control variate for trainer"""
@@ -51,12 +46,7 @@ class Client(simple.Client):
                 self.client_control_variate = pickle.load(path)
             self.trainer.client_control_variate = self.client_control_variate
             logging.info("[Client #%d] Loaded the control variate.", self.client_id)
-            self.trainer.extra_payload_path = client_control_variate_path
-
-        # Create a copy of the global model weights prior to training
-        for name, weight in self.trainer.model.cpu().state_dict().items():
-            self.global_model_weights[name] = weight
-        self.trainer.global_model_weights = self.global_model_weights
+        self.trainer.extra_payload_path = client_control_variate_path
 
     def load_payload(self, server_payload):
         """Load model weights and server control variate from server payload onto this client."""

@@ -6,7 +6,7 @@ clients:
     per_round: 3
 
     # Should the clients compute test accuracy locally?
-    do_test: true
+    do_test: false
 
     outbound_processors:
         - send_extra_payload
@@ -14,6 +14,7 @@ clients:
 server:
     address: 127.0.0.1
     port: 8000
+    do_test: true
 
     checkpoint_path: results/test/checkpoint
     model_path: results/test/model
@@ -23,7 +24,7 @@ data:
     datasource: MNIST
 
     # Number of samples in each partition
-    partition_size: 20000
+    partition_size: 1000
 
     # IID or non-IID?
     sampler: iid
@@ -39,8 +40,8 @@ trainer:
     target_accuracy: 0.98
 
     # Number of epoches for local training in each communication round
-    epochs: 1
-    batch_size: 32
+    epochs: 3
+    batch_size: 10
     optimizer: SGD
 
     # The machine learning model
