@@ -73,6 +73,8 @@ class RLServer(rl_server.RLServer):
             norms = np.linalg.norm(global_grads) * np.linalg.norm(local_grads)
             self.corr[i] = np.clip(inner / norms, -1.0, 1.0)
 
+        return weights_received
+
     @staticmethod
     def process_grad(grads):
         """Convert gradients to a flattened 1-D array."""

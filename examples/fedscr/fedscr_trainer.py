@@ -28,25 +28,23 @@ class Trainer(basic.Trainer):
             else 0.3
         )
 
-        # The overall weight updates applied to the model in a single round.
+        # The overall weight updates applied to the model in a single round
         self.total_grad = OrderedDict()
 
-        # The accumulated gradients for a client throughout the FL session.
-        self.all_grads = []
+        # The accumulated gradients for a client throughout the FL session
+        self.acc_grads = []
 
         # Should the clients use the adaptive algorithm?
         self.use_adaptive = bool(
             hasattr(Config().clients, "adaptive") and Config().clients.adaptive
         )
-        self.train_loss = None
-        self.test_loss = None
         self.avg_update = None
         self.div_from_global = None
         self.orig_weights = None
 
-    def prune_updates(self):
-        """Prune the weight updates by setting some updates to 0."""
-        self.load_all_grads()
+    def prune_update(self):
+        """Prune the weight update by setting some parameters in update to 0."""
+        self.load_acc_grads()
 
         conv_updates = OrderedDict()
         i = 0
@@ -58,17 +56,17 @@ class Trainer(basic.Trainer):
             ):
                 orig_tensor = orig_module.weight.data.cpu().numpy()
                 trained_tensor = trained_module.weight.data.cpu().numpy()
-                delta = trained_tensor - orig_tensor + self.all_grads[i]
+                delta = trained_tensor - orig_tensor + self.acc_grads[i]
                 orig_delta = copy.deepcopy(delta)
 
                 aggregated_channels = self.aggregate_channels(delta)
                 aggregated_filters = self.aggregate_filters(delta)
 
-                delta = self.prune_channel_updates(aggregated_channels, delta)
-                delta = self.prune_filter_updates(aggregated_filters, delta)
+                delta = self.prune_channels(aggregated_channels, delta)
+                delta = self.prune_filters(aggregated_filters, delta)
 
                 delta_name = f"{orig_name}.weight"
-                self.all_grads[i] = orig_delta - delta
+                self.acc_grads[i] = orig_delta - delta
                 conv_updates[delta_name] = delta
                 i += 1
 
@@ -83,7 +81,7 @@ class Trainer(basic.Trainer):
             else:
                 self.total_grad[orig_key] = torch.from_numpy(conv_updates[orig_key])
 
-        self.save_gradient()
+        self.save_acc_grads()
 
     def aggregate_channels(self, delta):
         """Aggregate the sum of a certain channel from all filters."""
@@ -119,37 +117,34 @@ class Trainer(basic.Trainer):
 
         return aggregated_filters
 
-    def prune_channel_updates(self, aggregated_channels, delta):
-        """Prune the channel updates that lie below the FedSCR threshold."""
+    def prune_channels(self, aggregated_channels, delta):
+        """Prune the channels in update that lie below the FedSCR threshold."""
         for i, norm in enumerate(aggregated_channels):
             if norm < self.update_threshold:
                 delta[:, i, :, :] = 0
 
         return delta
 
-    def prune_filter_updates(self, aggregated_filters, delta):
-        """Prune the filter updates that lie below the FedSCR threshold."""
+    def prune_filters(self, aggregated_filters, delta):
+        """Prune the filters in update that lie below the FedSCR threshold."""
         for i, norm in enumerate(aggregated_filters):
             if norm < self.update_threshold:
                 delta[i, :, :, :] = 0
 
         return delta
 
-    def save_gradient(self):
+    def save_acc_grads(self):
         """Save the accumulated client gradients for the next communication round."""
         model_name = Config().trainer.model_name
         checkpoint_path = Config().params["checkpoint_path"]
-
-        if not os.path.exists(checkpoint_path):
-            os.makedirs(checkpoint_path)
 
         acc_grad_path = (
             f"{checkpoint_path}/{model_name}_client{self.client_id}_grad.pth"
         )
         with open(acc_grad_path, "wb") as payload_file:
-            pickle.dump(self.all_grads, payload_file)
+            pickle.dump(self.acc_grads, payload_file)
 
-    def load_all_grads(self):
+    def load_acc_grads(self):
         """Load the accumulated gradients from a previous communication round."""
         model_name = Config().trainer.model_name
         checkpoint_path = Config().params["checkpoint_path"]
@@ -160,7 +155,7 @@ class Trainer(basic.Trainer):
         grad_path = f"{checkpoint_path}/{model_name}_client{self.client_id}_grad.pth"
         if os.path.exists(grad_path):
             with open(grad_path, "rb") as payload_file:
-                self.all_grads = pickle.load(payload_file)
+                self.acc_grads = pickle.load(payload_file)
         else:
             count = 0
             for module in self.model.modules():
@@ -168,12 +163,10 @@ class Trainer(basic.Trainer):
                     module, (torch.nn.Conv1d, torch.nn.Conv2d, torch.nn.Conv3d)
                 ):
                     count += 1
-            self.all_grads = [0] * count
+            self.acc_grads = [0] * count
 
     def compute_pruned_amount(self):
-        """
-        Compute the pruned percentage of the entire model.
-        """
+        """Compute the pruned percentage of the entire model."""
         nonzero = 0
         total = 0
         for key in sorted(self.total_grad.keys()):
@@ -185,68 +178,49 @@ class Trainer(basic.Trainer):
 
         return 100 * (total - nonzero) / total
 
-    def train_step_end(self, config, batch=None, loss=None):
-        """Method called at the end of a training step."""
-        self.train_loss = loss
-
     def train_run_start(self, config):
         """Method called at the start of training run."""
         self.total_grad = OrderedDict()
         self.orig_weights = copy.deepcopy(self.model)
+        self.orig_weights.to(self.device)
 
     def train_run_end(self, config):
         """Method called at the end of training run."""
-        # Calculate weight divergence between local and global model, used for adaptive algorithm
-        self.div_from_global = self.compute_weight_divergence()
-        logging.info(
-            "[Client #%d] Weight divergence: %.2f", self.client_id, self.div_from_global
-        )
-
-        checkpoint_path = Config().params["checkpoint_path"]
-        model_name = Config().trainer.model_name
-
-        if not os.path.exists(checkpoint_path):
-            os.makedirs(checkpoint_path)
-
         # Get the overall weight updates
         logging.info("[Client #%d] Pruning weight updates.", self.client_id)
-        self.prune_updates()
+        self.prune_update()
         logging.info(
             "[Client #%d] SCR ratio (pruned amount): %.2f%%",
             self.client_id,
             self.compute_pruned_amount(),
         )
 
-        # Calculate average local weight updates
-        self.avg_update = self.local_update_significance()
-        logging.info(
-            "[Client #%d] Average local weight updates: %.2f",
-            self.client_id,
-            self.avg_update,
-        )
-
         # Add weight divergence and average update to client report
         if self.use_adaptive is True:
-            add_to_report = {
-                "div_from_global": self.div_from_global,
-                "avg_update": self.avg_update,
-            }
+            # Calculate weight divergence between local and global model
+            self.div_from_global = self.compute_weight_divergence()
 
-            report_path = f"{checkpoint_path}/{model_name}_{self.client_id}.pkl"
+            # Calculate average local weight updates
+            self.avg_update = self.local_update_significance()
 
-            with open(report_path, "wb") as file:
-                pickle.dump(add_to_report, file)
+            logging.info(
+                "[Client #%d] Average local weight updates: %.2f",
+                self.client_id,
+                self.avg_update,
+            )
+            logging.info(
+                "[Client #%d] Weight divergence: %.2f",
+                self.client_id,
+                self.div_from_global,
+            )
 
-        # Save the final training loss
-        model_name = config["model_name"]
-        filename = f"{model_name}_{self.client_id}.loss"
-        Trainer._save_loss(self.train_loss.data.item(), filename)
+            self.run_history.update_metric("div_from_global", self.div_from_global)
+            self.run_history.update_metric("avg_update", self.avg_update)
 
         self.model.load_state_dict(self.total_grad, strict=True)
 
     def compute_weight_divergence(self):
         """Calculate the divergence of the locally trained model from the global model."""
-        self.orig_weights.to(self.device)
         div_from_global = 0
         for (__, orig_module), (__, trained_module) in zip(
             self.orig_weights.named_modules(), self.model.named_modules()
@@ -279,26 +253,3 @@ class Trainer(basic.Trainer):
                 total += torch.sum(tensor).numpy()
 
         return np.sqrt(np.abs(delta / total))
-
-    @staticmethod
-    def _save_loss(loss, filename):
-        """Save the training loss to a file."""
-        checkpoint_path = Config().params["checkpoint_path"]
-
-        if not os.path.exists(checkpoint_path):
-            os.makedirs(checkpoint_path)
-
-        loss_path = f"{checkpoint_path}/{filename}"
-        with open(loss_path, "w", encoding="utf-8") as file:
-            file.write(str(loss))
-
-    @staticmethod
-    def _load_loss(filename):
-        """Load the training loss from a file."""
-        checkpoint_path = Config().params["checkpoint_path"]
-        loss_path = f"{checkpoint_path}/{filename}"
-
-        with open(loss_path, "r", encoding="utf-8") as file:
-            loss = float(file.read())
-
-        return loss

@@ -1,5 +1,3 @@
-import os
-
 import torch
 from torch import nn
 from torchvision.datasets import MNIST
@@ -79,8 +77,6 @@ class Trainer(basic.Trainer):
             testset, batch_size=config["batch_size"], shuffle=False
         )
 
-        correct = 0
-        total = 0
         result = []
         with torch.no_grad():
             for examples, labels in test_loader:

@@ -23,11 +23,7 @@ class Client(simple.Client):
     """A SCAFFOLD federated learning client who sends weight updates
     and client control variate."""
 
-    def __init__(self,
-                 model=None,
-                 datasource=None,
-                 algorithm=None,
-                 trainer=None):
+    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
         super().__init__(model, datasource, algorithm, trainer)
 
         self.client_control_variate = None
@@ -39,20 +35,22 @@ class Client(simple.Client):
         self.global_model_weights = OrderedDict()
 
     async def train(self):
-        """ Initialize the server control variate and client control variate for trainer. """
+        """Initialize the server control variate and client control variate for trainer."""
         # Load the client's control variate if it has participated before
-        model_path = Config().params['model_path']
+        model_path = Config().params["model_path"]
         model_name = Config().trainer.model_name
         filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}_control_variate.pth"
         self.control_variate_path = f"{model_path}/{filename}"
 
         if os.path.exists(self.control_variate_path):
-            logging.info("[Client #%d] Loading the control variate from %s.",
-                         self.client_id, self.control_variate_path)
+            logging.info(
+                "[Client #%d] Loading the control variate from %s.",
+                self.client_id,
+                self.control_variate_path,
+            )
             self.client_control_variate = torch.load(self.control_variate_path)
             self.trainer.client_control_variate = self.client_control_variate
-            logging.info("[Client #%d] Loaded the control variate.",
-                         self.client_id)
+            logging.info("[Client #%d] Loaded the control variate.", self.client_id)
 
         self.trainer.server_control_variate = self.server_control_variate
 
@@ -67,24 +65,23 @@ class Client(simple.Client):
         if self.client_control_variate:
             for name, previous_weight in self.global_model_weights.items():
                 new_client_control_variate[name] = torch.sub(
-                    self.client_control_variate[name],
-                    self.server_control_variate[name])
+                    self.client_control_variate[name], self.server_control_variate[name]
+                )
                 new_client_control_variate[name].add_(
-                    torch.sub(previous_weight,
-                              self.algorithm.extract_weights()[name]),
-                    alpha=1 / Config().trainer.epochs)
+                    torch.sub(previous_weight, self.algorithm.extract_weights()[name]),
+                    alpha=1 / Config().trainer.epochs,
+                )
 
                 control_variate_deltas[name] = torch.sub(
-                    new_client_control_variate[name],
-                    self.client_control_variate[name])
+                    new_client_control_variate[name], self.client_control_variate[name]
+                )
         else:
             for name, previous_weight in self.global_model_weights.items():
-                new_client_control_variate[
-                    name] = -self.server_control_variate[name]
+                new_client_control_variate[name] = -self.server_control_variate[name]
                 new_client_control_variate[name].add_(
-                    torch.sub(previous_weight,
-                              self.algorithm.extract_weights()[name]),
-                    alpha=1 / Config().trainer.epochs)
+                    torch.sub(previous_weight, self.algorithm.extract_weights()[name]),
+                    alpha=1 / Config().trainer.epochs,
+                )
 
                 control_variate_deltas[name] = new_client_control_variate[name]
 
@@ -92,11 +89,17 @@ class Client(simple.Client):
         self.client_control_variate = new_client_control_variate
 
         # Save client control variate
-        logging.info("[Client #%d] Saving the control variate to %s.",
-                     self.client_id, self.control_variate_path)
+        logging.info(
+            "[Client #%d] Saving the control variate to %s.",
+            self.client_id,
+            self.control_variate_path,
+        )
         torch.save(self.client_control_variate, self.control_variate_path)
-        logging.info("[Client #%d] Control variate saved to %s.",
-                     self.client_id, self.control_variate_path)
+        logging.info(
+            "[Client #%d] Control variate saved to %s.",
+            self.client_id,
+            self.control_variate_path,
+        )
 
         return report, [weights, control_variate_deltas]
 

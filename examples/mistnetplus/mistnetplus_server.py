@@ -13,7 +13,7 @@ from plato.datasources import feature
 from plato.samplers import all_inclusive
 from plato.servers import fedavg
 
-import split_learning_algorithm
+import mistnetplus_algorithm
 import split_learning_trainer
 
 
@@ -92,22 +92,9 @@ class MistnetplusServer(fedavg.Server):
                 os.getpid(),
                 len(self.updates),
             )
-            await self.process_reports()
+            await self._process_reports()
             await self.wrap_up()
             await self.select_clients()
-
-    async def aggregate_weights(self, updates):
-        model = self.algorithm.extract_weights()
-        deltas = await self.federated_averaging(updates)
-        updated_features = self.algorithm.update_weights(deltas)
-
-        for name, __ in model.items():
-            if name == Config().parameters.model.cut_layer:
-                logging.info("[Server #%d] %s cut", os.getpid(), name)
-                break
-            model[name] = model[name] + updated_features[name]
-
-        self.algorithm.load_weights(model)
 
     def load_gradients(self):
         """Loading gradients from a file."""
@@ -124,8 +111,8 @@ class MistnetplusServer(fedavg.Server):
 
 def main():
     """A Plato federated learning training session using a custom model."""
-    trainer = split_learning_trainer.Trainer()
-    algorithm = split_learning_algorithm.Algorithm(trainer=trainer)
+    trainer = split_learning_trainer.Trainer
+    algorithm = mistnetplus_algorithm.Algorithm
     server = MistnetplusServer(algorithm=algorithm, trainer=trainer)
     server.run()
 

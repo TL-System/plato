@@ -5,7 +5,6 @@ A simple federated learning server using federated averaging.
 import asyncio
 import logging
 import os
-import random
 
 from plato.algorithms import registry as algorithms_registry
 from plato.config import Config
@@ -14,6 +13,7 @@ from plato.processors import registry as processor_registry
 from plato.servers import base
 from plato.trainers import registry as trainers_registry
 from plato.utils import csv_processor
+from plato.samplers import all_inclusive
 
 
 class Server(base.Server):
@@ -97,23 +97,9 @@ class Server(base.Server):
                 self.datasource = self.custom_datasource()
 
             self.testset = self.datasource.get_test_set()
-
             if hasattr(Config().data, "testset_size"):
-                # Set the sampler for testset
-                import torch
-
-                if hasattr(Config().server, "random_seed"):
-                    random_seed = Config().server.random_seed
-                else:
-                    random_seed = 1
-
-                gen = torch.Generator()
-                gen.manual_seed(random_seed)
-
-                all_inclusive = range(len(self.datasource.get_test_set()))
-                test_samples = random.sample(all_inclusive, Config().data.testset_size)
-                self.testset_sampler = torch.utils.data.SubsetRandomSampler(
-                    test_samples, generator=gen
+                self.testset_sampler = all_inclusive.Sampler(
+                    self.datasource, testing=True
                 )
 
         # Initialize the csv file which will record results
@@ -147,35 +133,15 @@ class Server(base.Server):
         elif self.algorithm is None and self.custom_algorithm is not None:
             self.algorithm = self.custom_algorithm(trainer=self.trainer)
 
-    def compute_weight_deltas(self, updates):
-        """Extract the model weight updates from client updates."""
-        weights_received = [update.payload for update in updates]
-
-        self.weights_received(weights_received)
-        self.callback_handler.call_event("on_weights_received", self, weights_received)
-
-        return self.algorithm.compute_weight_deltas(weights_received)
-
-    async def aggregate_weights(self, updates):
-        """Aggregate the reported weight updates from the selected clients."""
-        deltas = await self.federated_averaging(updates)
-        updated_weights = self.algorithm.update_weights(deltas)
-        self.algorithm.load_weights(updated_weights)
-
-        self.weights_aggregated(updates)
-        self.callback_handler.call_event("on_weights_aggregated", self, updates)
-
-    async def federated_averaging(self, updates):
+    async def aggregate_deltas(self, updates, deltas_received):
         """Aggregate weight updates from the clients using federated averaging."""
-        deltas_received = self.compute_weight_deltas(updates)
-
         # Extract the total number of samples
         self.total_samples = sum(update.report.num_samples for update in updates)
 
         # Perform weighted averaging
         avg_update = {
-            name: self.trainer.zeros(weights.shape)
-            for name, weights in deltas_received[0].items()
+            name: self.trainer.zeros(delta.shape)
+            for name, delta in deltas_received[0].items()
         }
 
         for i, update in enumerate(deltas_received):
@@ -191,9 +157,50 @@ class Server(base.Server):
 
         return avg_update
 
-    async def process_reports(self):
+    async def _process_reports(self):
         """Process the client reports by aggregating their weights."""
-        await self.aggregate_weights(self.updates)
+        weights_received = [update.payload for update in self.updates]
+
+        weights_received = self.weights_received(weights_received)
+        self.callback_handler.call_event("on_weights_received", self, weights_received)
+
+        # Extract the current model weights as the baseline
+        baseline_weights = self.algorithm.extract_weights()
+
+        if hasattr(self, "aggregate_weights"):
+            # Runs a server aggregation algorithm using weights rather than deltas
+            logging.info(
+                "[Server #%d] Aggregating model weights directly rather than weight deltas.",
+                os.getpid(),
+            )
+            updated_weights = self.aggregate_weights(
+                self.updates, baseline_weights, weights_received
+            )
+
+            # Loads the new model weights
+            self.algorithm.load_weights(updated_weights)
+        else:
+            # Computes the weight deltas by comparing the weights received with
+            # the current global model weights
+            deltas_received = self.algorithm.compute_weight_deltas(
+                baseline_weights, weights_received
+            )
+
+            # Runs a framework-agnostic server aggregation algorithm, such as
+            # the federated averaging algorithm
+            logging.info("[Server #%d] Aggregating model weight deltas.", os.getpid())
+            deltas = await self.aggregate_deltas(self.updates, deltas_received)
+
+            # Updates the existing model weights from the provided deltas
+            updated_weights = self.algorithm.update_weights(deltas)
+
+            # Loads the new model weights
+            self.algorithm.load_weights(updated_weights)
+
+        # The model weights have already been aggregated, now calls the
+        # corresponding hook and callback
+        self.weights_aggregated(self.updates)
+        self.callback_handler.call_event("on_weights_aggregated", self, self.updates)
 
         # Testing the global model accuracy
         if hasattr(Config().server, "do_test") and not Config().server.do_test:
@@ -274,6 +281,7 @@ class Server(base.Server):
         """
         Event called after the updated weights have been received.
         """
+        return weights_received
 
     def weights_aggregated(self, updates):
         """

@@ -33,24 +33,20 @@ class Sampler(base.Sampler):
         # add extra samples to make it evenly divisible, if needed
         if len(indices) < total_size:
             while len(indices) < total_size:
-                indices += indices[:(total_size - len(indices))]
+                indices += indices[: (total_size - len(indices))]
         else:
             indices = indices[:total_size]
         assert len(indices) == total_size
 
         # Compute the indices of data in the subset for this client
-        self.subset_indices = indices[(int(client_id) -
-                                       1):total_size:total_clients]
+        self.subset_indices = indices[(int(client_id) - 1) : total_size : total_clients]
 
     def get(self):
-        """Obtains an instance of the sampler. """
+        """Obtains an instance of the sampler."""
         gen = torch.Generator()
         gen.manual_seed(self.random_seed)
-        version = torch.__version__.split(".")
-        if int(version[0]) <= 1 and int(version[1]) <= 5:
-            return SubsetRandomSampler(self.subset_indices)
         return SubsetRandomSampler(self.subset_indices, generator=gen)
 
-    def trainset_size(self):
-        """Returns the length of the dataset after sampling. """
+    def num_samples(self):
+        """Returns the length of the dataset after sampling."""
         return len(self.subset_indices)

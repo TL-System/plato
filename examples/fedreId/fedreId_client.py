@@ -26,7 +26,7 @@ class fedReIdClient(simple.Client):
     def cos_feature_distance(self, old_weights, new_weights):
         if old_weights == None:
             logging.info("old_weights is None")
-            return self.sampler.trainset_size()
+            return self.sampler.num_samples()
         dis = []
         # option II
         # self.load_payload(old_weights)
