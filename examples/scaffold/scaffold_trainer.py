@@ -28,8 +28,10 @@ class Trainer(basic.Trainer):
         self.server_control_variate = None
         self.client_control_variate = None
         self.global_model_weights = None
-        self.client_control_variate_path = None
+
+        # Path to the client control variate
         self.extra_payload_path = None
+
         self.param_groups = None
 
     def get_optimizer(self, model):
@@ -73,8 +75,10 @@ class Trainer(basic.Trainer):
                     counter += 1
 
     def train_run_end(self, config):
-        """Compute deltas of this client's control variate"""
+        """Compute deltas of this client's control variate and deltas of the model"""
 
+        # Compute deltas of control variate to be used for the next time that
+        # the client is selected
         new_client_control_variate = OrderedDict()
         control_variate_deltas = OrderedDict()
         if self.client_control_variate:
@@ -107,13 +111,20 @@ class Trainer(basic.Trainer):
         logging.info(
             "[Client #%d] Saving the control variate to %s.",
             self.client_id,
-            self.client_control_variate_path,
+            self.extra_payload_path,
         )
-        with open(self.client_control_variate_path, "wb") as path:
+        with open(self.extra_payload_path, "wb") as path:
             pickle.dump(self.client_control_variate, path)
 
         logging.info(
             "[Client #%d] Control variate saved to %s.",
             self.client_id,
-            self.client_control_variate_path,
+            self.extra_payload_path,
         )
+
+        # Compute weight deltas
+        weight_deltas = {}
+        for layer in self.global_model_weights:
+            weight_deltas[layer] = self.model[layer] - self.global_model_weights[layer]
+
+        self.model.load_state_dict(weight_deltas, strict=True)

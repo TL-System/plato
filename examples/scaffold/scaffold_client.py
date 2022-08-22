@@ -51,9 +51,7 @@ class Client(simple.Client):
                 self.client_control_variate = pickle.load(path)
             self.trainer.client_control_variate = self.client_control_variate
             logging.info("[Client #%d] Loaded the control variate.", self.client_id)
-        self.trainer.client_control_variate_path = (
-            self.trainer.extra_payload_path
-        ) = client_control_variate_path
+            self.trainer.extra_payload_path = client_control_variate_path
 
         # Create a copy of the global model weights prior to training
         for name, weight in self.trainer.model.cpu().state_dict().items():
