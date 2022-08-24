@@ -115,6 +115,10 @@ class Trainer(basic.Trainer):
 
         return pruning.apply_mask(model, mask, self.device, pruned_layer_names)
 
+    def from_numpy(self, tensor):
+        """Converts a numpy array to a pytorch tensor"""
+        return torch.from_numpy(tensor)
+
     def save_mask(self):
         """If pruning has occured, the mask is saved for merging in future rounds."""
 

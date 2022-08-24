@@ -5,7 +5,6 @@ A federated learning server using Hermes.
 import logging
 import pickle
 import numpy as np
-import torch
 
 import hermes_pruning as pruning
 from plato.servers import fedavg
@@ -49,7 +48,9 @@ class Server(fedavg.Server):
             for model in weights_received:
                 model[layer_name].reshape([-1])[ind] = final_avg[ind]
                 shape = weights_received[0][layer_name].shape
-                model[layer_name] = torch.from_numpy(model[layer_name].reshape(shape))
+                model[layer_name] = self.trainer.from_numpy(
+                    model[layer_name].reshape(shape)
+                )
 
         step = 0
         for update in updates:
