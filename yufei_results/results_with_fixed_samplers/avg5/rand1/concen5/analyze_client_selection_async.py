@@ -1,15 +1,14 @@
 from http import client
 import numpy as np
 import matplotlib.pyplot as plt
+
 #my_file = Path("/path/to/file")
 """
 Read .out file and draw clients distribution figure
 """
 new_outfile = open("async_selected_clients.txt", "w")
 new_outfile.close()
-with open(
-        'async_selection_FEMNIST_lenet5_avg9_rand1_round250_multiplyPi_print.out'
-) as f:
+with open('async_CIFAR_concen5_rand1_avgtimePerRound5.out') as f:
     for line in f.readlines():
 
         if 'Selected clients' in line:
@@ -25,7 +24,7 @@ with open(
 with open("async_selected_clients.txt") as f:
     client_set = []
     for line in f.readlines():
-        print(line.split())
+        print(len(line.split()))
         fig, ax = plt.subplots()
         ax.hist(line.split(), 500)
         #ax.xlabel('clinet_id')

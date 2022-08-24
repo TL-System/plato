@@ -142,8 +142,7 @@ Files already downloaded and verified
 [INFO][16:23:05]: [Server #1716833] Starting training.
 [INFO][16:23:05]: [93m[1m
 [Server #1716833] Starting round 1/150.[0m
-[INFO][16:23:05]: [Server #1716833] Selected clients: [357, 40, 112, 217, 13, 479, 210, 229, 460, 15]
-[INFO][16:23:05]: [Server #1716833] Selected clients: [273, 279, 6, 218, 500, 380, 196, 163, 433, 343]
+[INFO][16:23:05]: [Server #1716833] Selected clients: [357, 40, 112, 217, 13, 479, 210, 229, 460, 15, 273, 279, 6, 218, 500, 380, 196, 163, 433, 343]
 [INFO][16:23:05]: [Server #1716833] Selecting client #357 for training.
 [INFO][16:23:05]: [Server #1716833] Sending the current model to client #357 (simulated).
 [INFO][16:23:05]: [Server #1716833] Sending 42.70 MB of payload data to client #357 (simulated).
@@ -18010,8 +18009,7 @@ sleep seconds is:  0.5786393607029401
 [INFO][17:02:16]: [Server #1716833] Model saved to /data/ykang/plato/checkpoints/checkpoint_resnet_18_24.pth.
 [INFO][17:02:16]: [93m[1m
 [Server #1716833] Starting round 25/150.[0m
-[INFO][17:02:16]: [Server #1716833] Selected clients: [217, 279, 146, 345, 199, 35, 374, 124, 25, 145]
-[INFO][17:02:16]: [Server #1716833] Selected clients: [349, 487, 52, 435, 450, 313, 252, 1, 234, 11]
+[INFO][17:02:16]: [Server #1716833] Selected clients: [217, 279, 146, 345, 199, 35, 374, 124, 25, 145, 349, 487, 52, 435, 450, 313, 252, 1, 234, 11]
 [INFO][17:02:16]: [Server #1716833] Selecting client #217 for training.
 [INFO][17:02:16]: [Server #1716833] Sending the current model to client #217 (simulated).
 [INFO][17:02:16]: [Server #1716833] Sending 42.70 MB of payload data to client #217 (simulated).
@@ -28067,8 +28065,7 @@ sleep seconds is:  0.05698108065377361
 [INFO][17:23:59]: [Server #1716833] Model saved to /data/ykang/plato/checkpoints/checkpoint_resnet_18_37.pth.
 [INFO][17:23:59]: [93m[1m
 [Server #1716833] Starting round 38/150.[0m
-[INFO][17:23:59]: [Server #1716833] Selected clients: [221, 40, 205, 357, 460, 17, 346, 163, 500, 100]
-[INFO][17:23:59]: [Server #1716833] Selected clients: [433, 13, 321, 227, 229, 469, 106, 92, 269, 43]
+[INFO][17:23:59]: [Server #1716833] Selected clients: [221, 40, 205, 357, 460, 17, 346, 163, 500, 100, 433, 13, 321, 227, 229, 469, 106, 92, 269, 43]
 [INFO][17:23:59]: [Server #1716833] Selecting client #221 for training.
 [INFO][17:23:59]: [Server #1716833] Sending the current model to client #221 (simulated).
 [INFO][17:23:59]: [Server #1716833] Sending 42.70 MB of payload data to client #221 (simulated).
@@ -62392,8 +62389,7 @@ sleep seconds is:  0.5274112155273383
 [INFO][18:38:50]: [Server #1716833] Model saved to /data/ykang/plato/checkpoints/checkpoint_resnet_18_84.pth.
 [INFO][18:38:50]: [93m[1m
 [Server #1716833] Starting round 85/150.[0m
-[INFO][18:38:50]: [Server #1716833] Selected clients: [471, 152, 137, 201, 64, 275, 446, 126, 97, 335]
-[INFO][18:38:50]: [Server #1716833] Selected clients: [18, 169, 108, 115, 386, 165, 315, 142, 318, 463]
+[INFO][18:38:50]: [Server #1716833] Selected clients: [471, 152, 137, 201, 64, 275, 446, 126, 97, 335, 18, 169, 108, 115, 386, 165, 315, 142, 318, 463]
 [INFO][18:38:50]: [Server #1716833] Selecting client #471 for training.
 [INFO][18:38:50]: [Server #1716833] Sending the current model to client #471 (simulated).
 [INFO][18:38:50]: [Server #1716833] Sending 42.70 MB of payload data to client #471 (simulated).
@@ -106877,8 +106873,7 @@ sleep seconds is:  1.339118456961283
 [INFO][20:15:57]: [Server #1716833] Model saved to /data/ykang/plato/checkpoints/checkpoint_resnet_18_145.pth.
 [INFO][20:15:57]: [93m[1m
 [Server #1716833] Starting round 146/150.[0m
-[INFO][20:15:57]: [Server #1716833] Selected clients: [79, 389, 367, 457, 343, 254, 325, 345, 175, 268]
-[INFO][20:15:57]: [Server #1716833] Selected clients: [234, 301, 350, 324, 497, 215, 319, 364, 230, 187]
+[INFO][20:15:57]: [Server #1716833] Selected clients: [79, 389, 367, 457, 343, 254, 325, 345, 175, 268, 234, 301, 350, 324, 497, 215, 319, 364, 230, 187]
 [INFO][20:15:57]: [Server #1716833] Selecting client #79 for training.
 [INFO][20:15:57]: [Server #1716833] Sending the current model to client #79 (simulated).
 [INFO][20:15:57]: [Server #1716833] Sending 42.70 MB of payload data to client #79 (simulated).
