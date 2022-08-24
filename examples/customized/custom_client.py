@@ -3,8 +3,7 @@ An example for running Plato with custom clients.
 
 To run this example:
 
-python examples/customized/custom_client.py -c examples/customized/client.yml
-
+python examples/customized/custom_client.py -c examples/customized/client.yml -i <client_id>
 """
 
 import asyncio
@@ -60,10 +59,15 @@ class Trainer(basic.Trainer):
                 optimizer.step()
                 optimizer.zero_grad()
 
-    def test_model(self, config, testset):  # pylint: disable=unused-argument
+    def test_model(
+        self, config, testset, sampler=None, **kwargs
+    ):  # pylint: disable=unused-argument
         """A custom testing loop."""
         test_loader = torch.utils.data.DataLoader(
-            testset, batch_size=config["batch_size"], shuffle=False
+            testset,
+            batch_size=config["batch_size"],
+            sampler=sampler,
+            shuffle=False,
         )
 
         correct = 0
@@ -96,7 +100,7 @@ def main():
     A Plato federated learning training session using a custom client.
 
     To run this example:
-    python custom_client.py -i <client_id>
+    python examples/customized/custom_client.py -c examples/customized/client.yml -i <client_id>
     """
     model = partial(
         nn.Sequential,

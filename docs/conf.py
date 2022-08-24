@@ -9,7 +9,7 @@
 project = "Plato"
 copyright = "The Plato developers"
 author = "Baochun Li"
-release = "0.4.3"
+release = "0.4.4"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
