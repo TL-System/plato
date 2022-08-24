@@ -47,8 +47,3 @@ class Client(simple.Client):
             self.trainer.client_control_variate = self.client_control_variate
             logging.info("[Client #%d] Loaded the control variate.", self.client_id)
         self.trainer.extra_payload_path = client_control_variate_path
-
-    def load_payload(self, server_payload):
-        """Load model weights and server control variate from server payload onto this client."""
-        self.algorithm.load_weights(server_payload[0])
-        self.trainer.server_control_variate = server_payload[1]

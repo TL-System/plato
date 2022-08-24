@@ -36,6 +36,7 @@ class Trainer(basic.Trainer):
         # Path to the client control variate
         self.extra_payload_path = None
 
+        self.additional_data = None
         self.param_groups = None
 
     def get_optimizer(self, model):
@@ -48,6 +49,7 @@ class Trainer(basic.Trainer):
         """Initializes the client control variate to 0 if the client
         is participating for the first time.
         """
+        self.server_control_variate = self.additional_data
         if self.client_control_variate is None:
             self.client_control_variate = {}
             for variate in self.server_control_variate:
