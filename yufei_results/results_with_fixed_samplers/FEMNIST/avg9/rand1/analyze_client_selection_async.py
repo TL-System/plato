@@ -5,8 +5,9 @@ import matplotlib.pyplot as plt
 """
 Read .out file and draw clients distribution figure
 """
-with open('async_selection_FEMNIST_lenet5_avg9_rand1_round250_multiplyPi.out'
-          ) as f:
+with open(
+        'async_selection_FEMNIST_lenet5_avg9_rand1_round250_multiplyPi_print.out'
+) as f:
     for line in f.readlines():
 
         if 'Selected clients' in line:
@@ -16,6 +17,7 @@ with open('async_selection_FEMNIST_lenet5_avg9_rand1_round250_multiplyPi.out'
             # output file saves selected clients set
             outf = open("async_selected_clients.txt", "a")
             outf.write(clients[0:loc_end])
+            outf.write(' ')
             outf.close()
 
 with open("async_selected_clients.txt") as f:
