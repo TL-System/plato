@@ -33,7 +33,7 @@ class Client(simple.Client):
         # Load the client control variate if the client has participated before
         model_path = Config().params["model_path"]
         model_name = Config().trainer.model_name
-        filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}_control_variate.pth"
+        filename = f"{model_name}_{self.client_id}_control_variate.pth"
         client_control_variate_path = f"{model_path}/{filename}"
 
         if os.path.exists(client_control_variate_path):
