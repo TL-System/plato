@@ -15,6 +15,7 @@ with open('oort_FEMNIST_lenet5_avg9_round250.out') as f:
             # output file saves selected clients set
             outf = open("oort_selected_clients.txt", "a")
             outf.write(clients[0:loc_end])
+            outf.write(', ')
             outf.close()
 
 with open("oort_selected_clients.txt") as f:
@@ -22,7 +23,8 @@ with open("oort_selected_clients.txt") as f:
     for line in f.readlines():
         print(line.split())
         fig, ax = plt.subplots()
-        ax.hist(line.split(), 500)
+        ax.hist(line.split(','), 1000)
+        plt.xticks(rotation='vertical')
         #ax.xlabel('clinet_id')
         #ax.ylabel('# of being selected')
         #ax.title('async_selected_clients_distribution_rand1_round250')
