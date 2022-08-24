@@ -101,7 +101,7 @@ def main():
     result_csv_file1 = './fedavg_rand1.csv'
     result_dict1 = read_csv_to_dict(result_csv_file1, x_item, y_item)
 
-    result_csv_file2 = './oort_rand1_long.csv'
+    result_csv_file2 = './oort_rand1_real500.csv'
     result_dict2 = read_csv_to_dict(result_csv_file2, x_item, y_item)
 
     result_csv_file3 = './fedbuff_rand1_long.csv'
