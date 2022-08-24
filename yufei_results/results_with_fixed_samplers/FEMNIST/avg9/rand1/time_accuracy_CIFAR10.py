@@ -107,7 +107,7 @@ def main():
     result_csv_file3 = './fedbuff_rand1_long.csv'
     result_dict3 = read_csv_to_dict(result_csv_file3, x_item, y_item)
 
-    result_csv_file4 = './async_selection_rand1_long.csv'
+    result_csv_file4 = './async_multiPi_rand1_2.csv'
     result_dict4 = read_csv_to_dict(result_csv_file4, x_item, y_item)
     #x_item = 'round'
     x_label = 'Elapsed Time'
@@ -123,7 +123,7 @@ def main():
     y_value3 = result_dict3[y_item]
     y_value4 = result_dict4[y_item]
 
-    figure_file_name = './avg9_FEMNIST_rand1.pdf'
+    figure_file_name = './avg9_FEMNIST_multiPi_rand1_2.pdf'
 
     plot(x_label, x_value1, x_value2, x_value3, x_value4, y_label, y_value1,
          y_value2, y_value3, y_value4, figure_file_name)
