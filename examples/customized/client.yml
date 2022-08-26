@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 3
+    total_clients: 1
 
     # The number of clients selected in each round
-    per_round: 3
+    per_round: 1
 
     # Should the clients compute test accuracy locally?
     do_test: true
@@ -40,7 +40,7 @@ trainer:
 
     # The target accuracy
     target_accuracy: 0.94
-    
+
     # The machine learning model
     model_name: lenet5
 
