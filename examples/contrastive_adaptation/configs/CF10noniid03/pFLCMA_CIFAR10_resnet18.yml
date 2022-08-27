@@ -1,0 +1,267 @@
+
+general:
+
+    # performing different running mode
+    # for different purposes
+    # - central_code_test
+    # - central
+    # - code_test
+    # - user
+
+    running_mode: user
+
+    file_logging: True
+
+clients:
+    # Type
+    type: simple
+
+    # The total number of clients
+    total_clients: 100
+
+    # The number of clients selected in each round
+    per_round: 30
+
+    do_data_tranform_logging: True
+
+    # Should the clients compute test accuracy locally?
+    do_test: True
+
+    # Should the client only perfrom the eval test without training
+    # under the contrastive ssl.
+    # only perfrom the training and test for the downstream task,
+    # i.e., personalziation in each client
+    only_personalization: False
+
+    # whether perform the eval test at the final round
+    # on all clients
+    do_final_personalization: True
+    # Minotor the self-supervised learning by knn for
+    # every 1 round
+    test_interval: 10
+    # Train the personalized model based on the
+    # learned representation every 1 rounds
+    pers_learning_interval: 10
+
+    # Whether simulate clients or not
+    simulation: true
+
+    random_seed: 1
+
+server:
+    address: 127.0.0.1
+    port: 8048
+    synchronous: true
+    do_test: false
+
+    # the controller for opening or
+    # closing the generalization divergence scale
+    # computation
+    # if True: to compute based on the subsequence settings
+    # if False: not to perform the computation.
+    do_generalization_scale: False
+    # whether to compute the generalization_scale adaptively
+    # If False: use the same default generalization scale for all
+    # clients
+    # If True: compute the generalization scale
+    adaptive_generalization_scale: True
+
+    # Based on the generalization of the model, there are two methods
+    # to set the decay rate for the moving average update for
+    # globale online_network and the local online_network
+    # 1. set the generalization_scale, then, we will use
+    #   the consistant lambda for all clients
+    default_generalization_scale: 0.8
+
+    # 2. set the autoscaler_tau, then each client's lambda_k
+    #   will be computed based on the generalization between its
+    #   updated online_network and the aggregated global online_network
+    generalization_autoscaler_anchor: 0.7
+
+    # whether to compute the generalization_scale in every
+    # generalization_autoscaler_round_interval rounds
+    # - 0, compute the scale for the client only when
+    #     its scale has not been computed.
+    # - 1, compute the scale in each round
+    # - N >= 1, compute it every N rounds
+    generalization_autoscaler_round_interval: 1
+
+
+    # for the paths of models; checkpoints; results,
+    # they utilize the same name, following the one defined in
+    # plato.config:
+    # {ssl_method_name}_{model_name}_{global_model_name}_{personalized_model_name}_{datasource}
+    # - ssl_method_name: data.augment_transformer_name
+    # - model_name: trainer.model_name
+    # - global_model_name: data.global_model_name
+    # - personalized_model_name: data.personalized_model_name
+    # - datasource: data.datasource
+
+    # set xxx here as the config will set the path by itself
+    # thus we do not need to repeatly reset these paths
+    model_path: xxx
+    checkpoint_path: xxx
+
+
+data:
+    # The training and testing dataset
+    datasource: CIFAR10
+
+    partition_size: 600
+    test_partition_size: 600
+
+    # IID or non-IID?
+    sampler: noniid
+    testset_sampler: noniid
+
+    # The concentration parameter for the Dirichlet distribution
+    concentration: 0.3
+
+    # The random seed for sampling data
+    random_seed: 1
+
+    # set the data wrapper to further process the data
+    #   for the specific usage, such as constrastive learning
+    # data_wrapper: Null
+    data_wrapper: ContrastiveAugmentWrapper
+
+    # set the data augmentation
+    #   options: simsiam, byol, simclr
+    augment_transformer_name: simclr
+    # some methods apply the normalization to samples
+    #   while others do not
+    is_norm: True
+
+trainer:
+    # The type of the trainer
+    type: basic
+    # The maximum number of training rounds
+    rounds: 200
+
+    # Whether the training should use multiple GPUs if available
+    parallelized: false
+
+    # The maximum number of clients running concurrently
+    max_concurrency: 1
+
+    # The target accuracy
+    target_accuracy: 0.98
+
+    # Number of epochs for local training in each communication round
+    #   The user is expected to carefully choose the batch_size to avoid
+    # the memory allocation issue as the contrastive samples occupy more
+    # space as more samples will be contained within one loading.
+    epochs: 3
+    batch_size: 256
+
+    optimizer: Lars
+    learning_rate: 0.4
+    eta_lars: 0.02
+    momentum: 0.9
+    grad_clip_lars: True
+    exclude_bias_n_norm: True
+    weight_decay: 0.00001
+
+    # Learning rate schedule
+    lr_schedule: WarmupCosine
+    warmup_epochs: 6
+    max_epochs: 450 # should be epochs * rounds
+    warmup_start_lr: 0.00003
+    min_lr: 0.0
+
+    epoch_log_interval: 1
+    epoch_model_log_interval: 1
+    batch_log_interval: 1
+
+    # Number of epochs for local training in each communication round
+    #   The batch size for the downstream task can be larger as it
+    # does not utilize the
+    pers_epochs: 10
+    pers_batch_size: 64
+    pers_optimizer: SGD
+    # lr = 0.1 * batch_size / 256, see section B.6 and B.7 of SimCLR paper.
+    pers_learning_rate: 0.05
+    pers_momentum: 0.9
+    pers_weight_decay: 0.0
+
+    # currently, we only support CosineAnnealingLR
+    pers_lr_schedule: MultiStepLR
+    pers_lr_milestones: 30,40
+    pers_lr_gamma: 0.1
+
+    pers_epoch_log_interval: 1
+    pers_epoch_model_log_interval: 1
+
+    # temperature
+    temperature: 0.2
+
+    contrast_mode: all
+    base_temperature: 0.7
+
+    # image_size
+    #  - CIFAR10 (Image size=32)
+    #  - MNIST (Image size=28)
+    image_size: 28
+
+    # The machine learning model,
+    # it behaves as the encoder for the ssl method
+    # the final fc layer will be removed
+    # however, in the central test, we do not use this
+    #   but use the custom model
+    model_name: resnet_18
+    # in general, the projection_dim = prediction_dim
+    projection_dim: 256
+    projection_hidden_dim: 2048
+
+    # whether to perform the moving average update
+    # for the local model and the received global model
+    # on the clients
+    local_model_generalization_ema_update: True
+
+    # here are two ways to determine this decay
+    # - constant value: 0.99
+    # - adaptive computed with traing epochs.
+    #   such as the one in "three-method" implementation
+    onlient_target_moving_average_decay: 0.99
+
+    # set which part of the model is used as the global model
+    # - whole: the whole model
+    # - online_network: the online_network is exchanged
+    # - target_network: the target_network is exchanged
+    global_model_name: whole
+
+    # global_model_name: whole
+    personalized_model_name: pure_one_layer_mlp
+
+    cma_losses: ntx_contrastive_loss
+    ntx_lambda: 1.0
+    # whether to maintain the state of the trained personalized
+    # model in each round
+    # In general, for the contrastive self-supervised learning
+    # every eval test should be a new learning process to train
+    # the randomly initialized personalized model
+    # Thus, setting do_maintain_per_state to be false to follow
+    # this rule.
+    # However, in some cases, we want to maintain the state of the
+    # trained personalized model in each round.
+    # Then, setting do_maintain_per_state to be True to follow this
+    # rule.
+    do_maintain_per_state: False
+
+    # whether to perform the meta training
+    do_meta_training: false
+    meta_epochs: 1
+
+    monitor_name: knn
+    knn_k: 20
+    knn_t: 0.1
+    hide_monitor_progress: False
+
+    num_classes: 10
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg
+
+results:
+    result_path: xxx
