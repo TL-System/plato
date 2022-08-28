@@ -86,6 +86,7 @@ class VectorDataset(data.Dataset):
         self.targets = torch.stack([torch.LongTensor([i]) for i in labels])[:, 0]
         self.classes = [f"Style #{i}" for i in range(100)]
 
+
     def __getitem__(self, index):
         return self.data[index], self.targets[index]
 

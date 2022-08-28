@@ -149,8 +149,15 @@ logs/
 checkpoints/
 *.pth
 
+# Numpy files
+*.npz
+
 # macOS
 .DS_Store
+
+# csv and pkl files
+*.csv
+*.pkl
 
 # Plain text files in the root working directory are most likely temporary
 /*.txt

@@ -1,0 +1,96 @@
+*Danny Bankman
+*Push Pull Current Mirror CMOS TIA
+
+.include ./ee214.hspice
+
+*.param W1 = 1.02u
+*.param W3 = 0.90u
+*.param W5 = 24.70u
+*.param W6 = 5.75u
+*.param RF = 0.42k
+*.param R6 = 3.0k
+
+.param W1 = $(params:W1)
+.param W3 = $(params:W3)
+.param W5 = $(params:W5)
+.param W6 = $(params:W6)
+
+.param L1 = $(params:L1)
+.param L3 = $(params:L3)
+.param L5 = $(params:L5)
+.param L6 = $(params:L6)
+
+.param RF = $(params:RF)
+.param R6 = $(params:R6)
+
+
+*Mirror ratio
+*.param A=50
+.param A=$(params:A)
+
+*Channel length
+*.param L=0.18u
+
+vdd vdd 0 1.8
+
+cdiode in 0 200f
+
+m1 in in 0 0 nmos214 w=W1 l=L1
+m3 in in vdd vdd pmos214 w=W3 l=L3
+m2 out1 in 0 0 nmos214 w=A*W1 l=L1
+m4 out1 in vdd vdd pmos214 w=A*W3 l=L3
+
+m5 out2 out1 0 0 nmos214 w=W5 l=L5
+m6 vdd g6 out2 0 nmos214 W=W6 l=L6
+
+r6 vdd g6 R6
+
+cload out2 0 20f
+
+vx out1 x 0
+rf x in RF
+
+is in 0 ac 1 dc 0 sin (0 150u 1e9)
+
+.op
+.ac dec 1000 10e6 100e9
+.tran 1p 10n
+.noise v(out2) is
+.option ITLPZ=1000 FMAX=2E12
+*.pz v(out2) is
+*.lstb mode=single vsource=vx
+*.probe ac lstb(db) lstb(p)
+.probe noise inoise
+
+**Loop transmission parameters
+*.measure ac T0 max lstb(db)
+*.measure ac FU when lstb(db)=0
+*.measure ac PM find lstb(p) when lstb(db)=0
+
+*Closed-loop transimpedance
+.measure ac CL0 find vdb(out2) at = 10e6
+
+*Peak closed-loop transimpedance
+.measure ac CLpeak max vdb(out2)
+
+*Magnitude peaking
+.measure ac peaking param='CLpeak - CL0'
+
+*Closed-loop f3dB frequency
+.measure ac CLf3dB when vdb(out2)='CL0-3'
+
+*First stage transimpedance
+*.measure ac RCM0 find vdb(out1) at = 10e6
+
+*Second stage voltage gain
+*.measure ac ACS0 param='CL0 - RCM0'
+
+*Noise at midband
+*.measure ac noise0 find inoise at = 10e6
+
+*Noise at closed-loop f3dB frequency
+.measure ac noisef3dB find inoise at = CLf3dB
+
+.print ac PAR('v(out2)/1') vp(out2)
+.option post brief accurate
+.end

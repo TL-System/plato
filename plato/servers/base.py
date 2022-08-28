@@ -622,7 +622,7 @@ class Server:
         """Choose a subset of the clients to participate in each round."""
         assert clients_count <= len(clients_pool)
         random.setstate(self.prng_state)
-
+        
         # Select clients randomly
         selected_clients = random.sample(clients_pool, clients_count)
 

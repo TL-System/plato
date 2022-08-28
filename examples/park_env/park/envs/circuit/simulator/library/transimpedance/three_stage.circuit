@@ -1,0 +1,130 @@
+* Design Problem, ee114/214A- 2012
+* Please fill in the specification achieved by your circuit 
+* before your submit the netlist.
+**************************************************************
+* The specifications that this script achieves are:
+* 
+* Power  =  1.3694 mW 
+* Gain   =  20.24 K
+* BandWidth = 90.107 MHz
+***************************************************************
+
+
+** Including the model file
+.include ./ee114.hspice
+
+* Defining Top level circuit parameters
+.param Cin = 100f
+.param CL  = 500f
+.param RL  = 10K
+
+* defining the supply voltages
+
+vdd vdd 0 2.5
+vss vss 0 -2.5
+
+* Defining the input current source
+
+** For ac simulation uncomment the following 2 lines**
+ Iina		iina	vdd	ac	0.5	
+ Iinb		vdd	iinb	ac	0.5	
+
+** For transient simulation uncomment the following 2 lines**
+*Iina		iina	vdd	sin(0 0.5u 1e6)
+*Iinb		vdd	iinb	sin(0 0.5u 1e6)
+
+* Defining Input capacitance
+
+Cina	vdd	iina 'Cin'
+Cinb	vdd	iinb 'Cin'
+
+* Defining the differential load 
+
+RL	vouta		voutb		'RL'
+CL	vouta		voutb		'CL'
+
+*** Your Trans-impedance Amplifier here ***
+*.param W1 = 12.0u
+*.param WL1 = 2.0u
+*.param WB1 = 3.2u
+
+*.param W2 = 4.0u
+*.param WL2 = 2.8u
+*.param WB2 = 5.8u
+
+*.param W3 = 44.4u
+*.param WB3 = 10.2u
+
+.param W1  = $(params:W1)
+.param WL1 = $(params:WL1)
+.param WB1 = $(params:WB1)
+
+.param W2  = $(params:W2)
+.param WL2 = $(params:WL2)
+.param WB2 = $(params:WB2)
+
+.param W3  = $(params:W3)
+.param WB3 = $(params:WB3)
+
+.param Len1  = $(params:L1)
+.param LenL1 = $(params:LL1)
+.param LenB1 = $(params:LB1)
+
+.param Len2  = $(params:L2)
+.param LenL2 = $(params:LL2)
+.param LenB2 = $(params:LB2)
+
+.param Len3  = $(params:L3)
+.param LenB3 = $(params:LB3)
+
+
+*Using resistor (RB) in series with diode-connected MB to set VovB
+*.param WB = 2.0u
+*.param RB = 291k
+
+.param WB = $(params:WB)
+.param RB = $(params:RB)
+.param LenB = $(params:LB)
+
+m1a vo1a 0 iina vss nmos114 w='W1' l='Len1'
+m1La vo1a vo1a vdd vdd pmos114 w='WL1' l='LenL1'
+mB1a iina nbias vss vss nmos114 w='WB1' l='LenB1'
+m1b vo1b 0 iinb vss nmos114 w='W1' l='Len1'
+m1Lb vo1b vo1b vdd vdd pmos114 w='WL1' l='LenL1'
+mB1b iinb nbias vss vss nmos114 w='WB1' l='LenB1'
+
+m2a vo2a vo1a v0d vss nmos114 w='W2' l='Len2'
+m2La vo2a vo2a vdd vdd pmos114 w='WL2' l='LenL2'
+mB2a v0d nbias vss vss nmos114 w='WB2' l='LenB2'
+m2b vo2b vo1b v0d vss nmos114 w='W2' l='Len2'
+m2Lb vo2b vo2b vdd vdd pmos114 w='WL2' l='LenL2'
+mB2b v0d nbias vss vss nmos114 w='WB2' l='LenB2'
+
+m3a vdd vo2a vouta vss nmos114 w='W3' l='Len3'
+mB3a vouta nbias vss vss nmos114 w='WB3' l='LenB3'
+m3b vdd vo2b voutb vss nmos114 w='W3' l='Len3'
+mB3b voutb nbias vss vss nmos114 w='WB3' l='LenB3'
+
+*** Your Bias Circuitry here ***
+
+** For students enrolled in ee214A, you need to design your bias ciruit. You cannpt use Vbias_n as ideal voltage source.
+mB nbias nbias vss vss nmos114 w='WB' l='LenB'
+rB vdd nbias 'RB'
+
+
+* defining the analysis
+
+.op
+.option post brief nomod
+
+** For ac simulation uncomment the following line** 
+*.ac dec 10 100 1g
+.ac dec 1000 1 100meg
+.measure ac gainmax max vdb(vouta)
+.measure ac f3db when vdb(vouta)='gainmax-3'
+.print ac PAR('v(vouta)/1') vp(vouta)
+
+** For transient simulation uncomment the following line **
+*.tran 0.01u 4u 
+
+.end

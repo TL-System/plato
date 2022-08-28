@@ -22,7 +22,7 @@ class Trainer(basic.Trainer):
     # pylint: disable=unused-argument
     def train_model(self, config, trainset, sampler, **kwargs):
         batch_size = config["batch_size"]
-
+        
         logging.info("[Client #%d] Loading the dataset.", self.client_id)
         _train_loader = getattr(self, "train_loader", None)
 

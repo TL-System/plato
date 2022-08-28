@@ -1,0 +1,1 @@
+from park.envs.region_assignment.region_assignment import RegionAssignmentEnv

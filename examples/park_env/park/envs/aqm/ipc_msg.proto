@@ -1,0 +1,47 @@
+// For interprocess calls
+
+// auto-generate code for Cpp:
+// protoc -I=./ --cpp_out=./mahimahi/src/packet/ ./ipc_msg.proto
+
+// auto-generate code for Python:
+// protoc -I=./ --python_out=./ ./ipc_msg.proto
+
+syntax = "proto3";
+
+package rl;
+
+// scala -> python request message
+message IPCMessage {
+
+    // message
+    // ('get_prob')
+    string msg = 1;
+
+    // number of enqueued packets counter
+    uint64 eqc = 2;
+
+    // number of dequeued packets counter
+    uint64 dqc = 3;
+
+    // number of enqueued bytes counter
+    uint64 eqb = 4;
+
+    // queue delay
+    uint64 qdelay = 5;
+
+    // current drop probability
+    float current_prob = 6;
+
+}
+
+// python -> scala reply message
+message IPCReply {
+
+    // message
+    // ('set_prob')
+    string msg = 1;
+
+    // next drop rate
+    float prob = 2;
+
+}

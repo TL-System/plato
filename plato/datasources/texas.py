@@ -82,9 +82,9 @@ class VectorDataset(data.Dataset):
         Create a Texas100 dataset based on features and labels
     """
     def __init__(self, features, labels):
-        self.data = torch.stack([torch.FloatTensor(i)
+        self.data = torch.stack([torch.FloatTensor(i) 
                             for i in features])
-        self.targets = torch.stack([torch.LongTensor([i])
+        self.targets = torch.stack([torch.LongTensor([i]) 
                             for i in labels])[:, 0]
         self.classes = [f'Procedure #{i}' for i in range(100)]
 
