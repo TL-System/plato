@@ -21,7 +21,7 @@ server:
 data:
     # The training and testing dataset
     datasource: HuggingFace
-    dataset_name: reddit
+    dataset_name: c17hawke/stackoverflow-dataset
 
     # Number of samples in each partition
     partition_size: 1009
