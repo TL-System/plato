@@ -103,7 +103,7 @@ class Trainer(basic.Trainer):
 
         self.trainer.train()
 
-    def test_model(self, config, testset, sampler):  # pylint: disable=unused-argument
+    def test_model(self, config, testset, sampler=None):  # pylint: disable=unused-argument
         """The testing loop for HuggingFace models.
 
         Arguments:
