@@ -9,7 +9,7 @@ from torch.utils.data import RandomSampler, Sampler
 
 from transformers import AutoConfig, AutoTokenizer, HfArgumentParser
 from transformers import Trainer as HuggingFaceTrainer
-from transformers import TrainingArguments, default_data_collator
+from transformers import TrainingArguments, default_data_collator, DataCollatorForWholeWordMask
 
 from plato.config import Config
 from plato.trainers import basic
@@ -20,7 +20,6 @@ class SampledHuggingFaceTrainer(HuggingFaceTrainer):
     Training and testing loops for HuggingFace's transformer models for natural
     language processing.
     """
-
     def __init__(
         self,
         model,
@@ -50,7 +49,6 @@ class SampledHuggingFaceTrainer(HuggingFaceTrainer):
 
 class Trainer(basic.Trainer):
     """The trainer for HuggingFace transformer models for natural language processing."""
-
     def __init__(self, model=None):
         super().__init__(model)
 
@@ -58,9 +56,8 @@ class Trainer(basic.Trainer):
         self.model.train()
 
         parser = HfArgumentParser(TrainingArguments)
-        (self.training_args,) = parser.parse_args_into_dataclasses(
-            args=["--output_dir=/tmp", "--report_to=none"]
-        )
+        (self.training_args, ) = parser.parse_args_into_dataclasses(
+            args=["--output_dir=/tmp", "--report_to=none"])
 
         model_name = Config().trainer.model_name
         config_kwargs = {
@@ -76,9 +73,10 @@ class Trainer(basic.Trainer):
             "revision": "main",
             "use_auth_token": None,
         }
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            model_name, config=self.config, **tokenizer_kwargs
-        )
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name,
+                                                       config=self.config,
+                                                       **tokenizer_kwargs)
+        self.collator = DataCollatorForWholeWordMask(self.tokenizer)
 
     # pylint: disable=unused-argument
     def train_model(self, config, trainset, sampler, **kwargs):
@@ -99,7 +97,7 @@ class Trainer(basic.Trainer):
             train_dataset=trainset,
             eval_dataset=None,
             tokenizer=self.tokenizer,
-            data_collator=default_data_collator,
+            data_collator=self.collator,
             sampler=sampler,
         )
 
@@ -118,7 +116,7 @@ class Trainer(basic.Trainer):
             train_dataset=None,
             eval_dataset=testset,
             tokenizer=self.tokenizer,
-            data_collator=default_data_collator,
+            data_collator=self.collator,
         )
 
         metrics = self.trainer.evaluate()

@@ -19,7 +19,6 @@ from plato.datasources import base
 
 class DataSource(base.DataSource):
     """A data source for the HuggingFace datasets."""
-
     def __init__(self):
         super().__init__()
 
@@ -32,8 +31,7 @@ class DataSource(base.DataSource):
             dataset_config = None
 
         saved_data_path = (
-            f"{Config().params['data_path']}/{dataset_name}_{dataset_config}"
-        )
+            f"{Config().params['data_path']}/{dataset_name}_{dataset_config}")
 
         if os.path.exists(saved_data_path):
             # If the dataset has already been downloaded and saved
@@ -44,9 +42,8 @@ class DataSource(base.DataSource):
             self.dataset.save_to_disk(saved_data_path)
 
         parser = HfArgumentParser(TrainingArguments)
-        (self.training_args,) = parser.parse_args_into_dataclasses(
-            args=["--output_dir=/tmp", "--report_to=none"]
-        )
+        (self.training_args, ) = parser.parse_args_into_dataclasses(
+            args=["--output_dir=/tmp", "--report_to=none"])
 
         model_name = Config().trainer.model_name
         config_kwargs = {
@@ -63,16 +60,15 @@ class DataSource(base.DataSource):
 
         self.config = AutoConfig.from_pretrained(model_name, **config_kwargs)
 
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            model_name, config=self.config, **tokenizer_kwargs
-        )
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name,
+                                                       config=self.config,
+                                                       **tokenizer_kwargs)
         self.tok_logger = utils.logging.get_logger(
-            "transformers.tokenization_utils_base"
-        )
+            "transformers.tokenization_utils_base")
 
         self.block_size = 128
 
-        self.column_names = ["text"]
+        self.column_names = self.dataset["train"].column_names
         self.text_column_name = "text"
         self.trainset = self.preprocess_data(self.dataset["train"])
         self.testset = self.preprocess_data(self.dataset["validation"])
@@ -103,13 +99,15 @@ class DataSource(base.DataSource):
         if "Token indices sequence length is longer than the" in cl.out:
             self.tok_logger.warning(
                 "^^^^^^^^^^^^^^^^ Please ignore the warning above - this long input will be "
-                "chunked into smaller bits before being passed to the model."
-            )
+                "chunked into smaller bits before being passed to the model.")
         return output
 
     def group_texts(self, examples):
         """Concatenate all texts."""
-        concatenated_examples = {k: sum(examples[k], []) for k in examples.keys()}
+        concatenated_examples = {
+            k: sum(examples[k], [])
+            for k in examples.keys()
+        }
 
         total_length = len(concatenated_examples[list(examples.keys())[0]])
 
@@ -120,7 +118,7 @@ class DataSource(base.DataSource):
         # Split by chunks of max_len.
         result = {
             k: [
-                t[i : i + self.block_size]
+                t[i:i + self.block_size]
                 for i in range(0, total_length, self.block_size)
             ]
             for k, t in concatenated_examples.items()
@@ -131,7 +129,8 @@ class DataSource(base.DataSource):
 
     def preprocess_data(self, datasets):
         """Tokenizing and grouping the raw dataset."""
-        with self.training_args.main_process_first(desc="dataset map tokenization"):
+        with self.training_args.main_process_first(
+                desc="dataset map tokenization"):
             tokenized_datasets = datasets.map(
                 self.tokenize_function,
                 batched=True,
@@ -150,7 +149,8 @@ class DataSource(base.DataSource):
             )
             block_size = 1024
 
-        with self.training_args.main_process_first(desc="grouping texts together"):
+        with self.training_args.main_process_first(
+                desc="grouping texts together"):
             lm_datasets = tokenized_datasets.map(
                 self.group_texts,
                 batched=True,
