@@ -56,8 +56,11 @@ def fit_mixgaussian_density(xlsx_data,
     return generated_points
 
 
-def fit_mixgaussian_2D_density(xlsx_data, fit_data_name, n_components):
-    D_points = xlsx_data[[fit_data_name + "_X", fit_data_name + "_Y"]]
+def fit_mixgaussian_2D_density(xlsx_data, fit_data_name=None, n_components=2):
+    if fit_data_name is not None:
+        D_points = xlsx_data[[fit_data_name[0], fit_data_name[1]]]
+    else:
+        D_points = xlsx_data[["X", "Y"]]
 
     D_points = D_points.dropna()
 
