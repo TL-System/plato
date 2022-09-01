@@ -111,6 +111,8 @@ class Server(fedavg.Server):
         Booting the federated learning server by setting up the data, model, and
         creating the clients.
         """
+        super().configure()
+
         if Config().is_edge_server():
             logging.info(
                 "Configuring edge server #%d as a %s server.",
@@ -157,8 +159,8 @@ class Server(fedavg.Server):
             csv_processor.initialize_csv(
                 result_csv_file, self.recorded_items, result_path
             )
-        else:
-            super().configure()
+            # Delete the csv file created by inherited method
+            os.remove(f"{result_path}/{os.getpid()}.csv")
 
     async def select_clients(self, for_next_batch=False):
         if Config().is_edge_server() and not for_next_batch:
