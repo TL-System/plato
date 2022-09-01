@@ -10,6 +10,7 @@ import os
 
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+import numpy as np
 
 from .axes_set import set_ticker
 from libs.utils import positions_compute
@@ -67,7 +68,7 @@ def plot_items_stream_boxes(whole_ax,
                             items_samples,
                             items_colors,
                             plot_center_positions,
-                            items_legend_label,
+                            items_legend_label=None,
                             box_width=1,
                             box_interval=0.5):
     """ Plotting stream boxes for a set of items
@@ -93,6 +94,8 @@ def plot_items_stream_boxes(whole_ax,
             center_positions=plot_center_positions,
             plot_width=box_width + box_interval)
 
+        # item_samples = np.array(item_samples).flatten()
+
         plot_boxes_holder = plot_one_stream_boxes(
             ax=whole_ax,
             samples=item_samples,
@@ -104,13 +107,14 @@ def plot_items_stream_boxes(whole_ax,
 
     order = list(range(num_of_items))
 
-    whole_ax.legend([plotted_groups_holder[i]["boxes"][0] for i in order],
-                    [items_legend_label[i] for i in order],
-                    loc='best',
-                    prop={
-                        'size': 12,
-                        'weight': "bold"
-                    })
+    if items_legend_label is not None:
+        whole_ax.legend([plotted_groups_holder[i]["boxes"][0] for i in order],
+                        [items_legend_label[i] for i in order],
+                        loc='best',
+                        prop={
+                            'size': 12,
+                            'weight': "bold"
+                        })
 
     return whole_ax
 

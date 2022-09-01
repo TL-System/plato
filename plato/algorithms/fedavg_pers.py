@@ -96,8 +96,8 @@ class Algorithm(fedavg.Algorithm):
                 model, i.e., the self.model of this algo. Currenty, the
                 'global_model_name' defined in the config file will be used
                 to extract the desired sub-module from the self.model
-
         """
+
         if hasattr(Config().trainer, "global_model_name"):
             self.global_model_name = Config().trainer.global_model_name
             prefix_names = self.global_model_name.split("__")
