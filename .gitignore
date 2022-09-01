@@ -13,7 +13,7 @@ examples/contrastive_adaptation/pfl_maml/third-part
 examples/contrastive_adaptation/contrasAdap/third-part
 examples/contrastive_adaptation/perfedavg/third-part
 examples/contrastive_adaptation/configs/tests
-
+examples/contrastive_adaptation/visualization/exps_plot_code
 
 # C extensions
 *.so
