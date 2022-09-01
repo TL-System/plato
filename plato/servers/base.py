@@ -111,28 +111,21 @@ class Server:
 
         # Downlink and uplink bandwidth (Mbps)
         # for computing communication time in communication simulation mode
-        if not Config().is_edge_server:
-            self.downlink_bandwidth = (
-                Config().server.downlink_bandwidth
-                if hasattr(Config().server, "downlink_bandwidth")
-                else 100
-            )
-            self.uplink_bandwidth = (
-                Config().server.uplink_bandwidth
-                if hasattr(Config().server, "uplink_bandwidth")
-                else 100
-            )
-        else:
-            self.downlink_bandwidth = (
-                Config().server.edge_downlink_bandwidth
-                if hasattr(Config().server, "edge_downlink_bandwidth")
-                else 100
-            )
-            self.uplink_bandwidth = (
-                Config().server.edge_uplink_bandwidth
-                if hasattr(Config().server, "edge_uplink_bandwidth")
-                else 100
-            )
+        self.downlink_bandwidth = (
+            Config().server.downlink_bandwidth
+            if hasattr(Config().server, "downlink_bandwidth")
+            else 100
+        )
+        self.uplink_bandwidth = (
+            Config().server.uplink_bandwidth
+            if hasattr(Config().server, "uplink_bandwidth")
+            else 100
+        )
+        if Config().is_edge_server():
+            if hasattr(Config().server, "edge_downlink_bandwidth"):
+                self.downlink_bandwidth = Config().server.edge_downlink_bandwidth
+            if hasattr(Config().server, "edge_uplink_bandwidth"):
+                self.uplink_bandwidth = Config().server.edge_uplink_bandwidth
 
         # Use dictionaries to record downlink/uplink communication time of each client
         self.downlink_comm_time = {}
