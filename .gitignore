@@ -13,9 +13,7 @@ examples/contrastive_adaptation/pfl_maml/third-part
 examples/contrastive_adaptation/contrasAdap/third-part
 examples/contrastive_adaptation/perfedavg/third-part
 examples/contrastive_adaptation/configs/tests
-examples/contrastive_adaptation/visualization
 
-examples/contrastive_adaptation/visualization/*
 
 # C extensions
 *.so
@@ -167,6 +165,4 @@ checkpoints/
 
 # Plain text files in the root working directory are most likely temporary
 /*.txt
-examples/contrastive_adaptation/visualization/libs
-examples/contrastive_adaptation/visualization
 .DS_Store
