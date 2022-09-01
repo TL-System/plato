@@ -6,6 +6,7 @@ import time
 from types import SimpleNamespace
 
 from plato.clients import simple
+from plato.config import Config
 from plato.processors import registry as processor_registry
 
 
@@ -58,7 +59,14 @@ class Client(simple.Client):
         average_accuracy = self.server.average_accuracy
         accuracy = self.server.accuracy
 
-        training_time = time.perf_counter() - training_start_time
+        if (
+            hasattr(Config().clients, "sleep_simulation")
+            and Config().clients.sleep_simulation
+        ):
+            training_time = self.server.edge_training_time
+            self.server.edge_training_time = 0
+        else:
+            training_time = time.perf_counter() - training_start_time
 
         comm_time = time.time()
 
