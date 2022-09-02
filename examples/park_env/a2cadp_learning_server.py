@@ -39,37 +39,36 @@ class A2CServer(fedavg.Server):
 
         logging.info("A custom server has been initialized.")
 
-    async def federated_averaging(self, updates):
+    async def aggregate_deltas(self, updates, deltas_received):
         """Aggregate weight updates from the clients using federated averaging."""
 
-        weights_received = self.compute_weight_deltas(updates)
-        num_samples = [report.num_samples for (__, report, __, __) in updates]
+        num_samples = [update.report.num_samples for update in updates]
         total_samples = sum(num_samples)
 
         self.global_actor_grads = {
             name: self.trainer.zeros(weights.shape)
-            for name, weights in weights_received[0][0].items()
+            for name, weights in deltas_received[0][0].items()
         }
 
         self.global_critic_grads = {
             name: self.trainer.zeros(weights.shape)
-            for name, weights in weights_received[0][1].items()
+            for name, weights in deltas_received[0][1].items()
         }
 
         # Perform weighted averaging for both Actor and Critic
         actor_avg_update = {
             name: self.trainer.zeros(weights.shape)
-            for name, weights in weights_received[0][0].items()
+            for name, weights in deltas_received[0][0].items()
         }
         critic_avg_update = {
             name: self.trainer.zeros(weights.shape)
-            for name, weights in weights_received[0][1].items()
+            for name, weights in deltas_received[0][1].items()
         }
         client_list = []
         client_path = f"{Config().results.results_dir}_seed_{Config().server.random_seed}/{Config().results.file_name}_client_saved"
 
-        for i, update in enumerate(weights_received):
-            _, report, _, _ = updates[i]
+        for i, update in enumerate(deltas_received):
+            #_, report, _, _ = updates[i]
             update_from_actor, update_from_critic = update
 
             for name, delta in update_from_actor.items():
@@ -85,12 +84,12 @@ class A2CServer(fedavg.Server):
         (
             self.actor_adaptive_weighting,
             self.critic_adaptive_weighting,
-        ) = self.calc_adaptive_weighting(weights_received, num_samples)
+        ) = self.calc_adaptive_weighting(deltas_received, num_samples)
 
         # self.adaptive_weighting
-        for i, update in enumerate(weights_received):
-            __, report, __, __ = updates[i]
-            client_id = report.client_id
+        for i, update in enumerate(deltas_received):
+            #__, report, __, __ = updates[i]
+            client_id = updates[i].report.client_id
 
             update_from_actor, update_from_critic = update
 
@@ -313,19 +312,19 @@ class A2CServer(fedavg.Server):
     def create_loss_lists(self, updates):
         """Creates the lost lists"""
         loss_list = []
-        for (_, report, _, _) in updates:
+        for update in updates:
             if Config().server.percentile_aggregate == "actor_loss":
-                loss_list.append(report.actor_loss)
+                loss_list.append(update.report.actor_loss)
             elif Config().server.percentile_aggregate == "critic_loss":
-                loss_list.append(report.critic_loss)
+                loss_list.append(update.report.critic_loss)
             elif Config().server.percentile_aggregate == "actor_grad":
-                loss_list.append(report.actor_grad)
+                loss_list.append(update.report.actor_grad)
             elif Config().server.percentile_aggregate == "critic_grad":
-                loss_list.append(report.critic_grad)
+                loss_list.append(update.report.critic_grad)
             elif Config().server.percentile_aggregate == "sum_actor_fisher":
-                loss_list.append(report.sum_actor_fisher)
+                loss_list.append(update.report.sum_actor_fisher)
             elif Config().server.percentile_aggregate == "sum_critic_fisher":
-                loss_list.append(report.sum_critic_fisher)
+                loss_list.append(update.report.sum_critic_fisher)
             # elif
 
         return loss_list
