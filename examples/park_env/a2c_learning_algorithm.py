@@ -15,10 +15,10 @@ class Algorithm(fedavg.Algorithm):
         self.actor = self.model.actor
         self.critic = self.model.critic
 
-    def compute_weight_deltas(self, weights_received):
+    def compute_weight_deltas(self, baseline_weights, weights_received):
         """Extract the weights received from a client and compute the updates."""
 
-        baseline_weights_actor, baseline_weights_critic = self.extract_weights()
+        baseline_weights_actor, baseline_weights_critic = baseline_weights
 
         deltas = []
 

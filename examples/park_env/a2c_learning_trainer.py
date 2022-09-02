@@ -164,7 +164,7 @@ class Trainer(basic.Trainer):
     def t(self, x):
         return torch.from_numpy(x).float()
 
-    def train_model(self, config, trainset, sampler, cut_layer):
+    def train_model(self, config, trainset, sampler, **kwargs):
         """Main Training"""
 
         # Fisher information matrix load from previous rounds of training
@@ -748,7 +748,7 @@ class Trainer(basic.Trainer):
             writer = csv.writer(filehandle)
             writer.writerow([self.avg_entropy_loss])
 
-    async def server_test(self, testset, sampler=None, **kwargs):
+    def test(self, testset, sampler=None, **kwargs):
         """We will return the average reward of the server here"""
 
         avg_reward = self.evaluate_policy()

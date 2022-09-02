@@ -28,10 +28,9 @@ class A2CServer(fedavg.Server):
         self.env_name = env_name
         logging.info("A custom server has been initialized.")
 
-    async def federated_averaging(self, updates):
+    async def aggregate_deltas(self, updates, deltas_received):
         """Aggregate weight updates from the clients using federated averaging."""
 
-        weights_received = self.compute_weight_deltas(updates)
         # Calculate metric percentile
         if Config().server.percentile_aggregate:
             percentile = min(
@@ -55,19 +54,19 @@ class A2CServer(fedavg.Server):
         # Perform weighted averaging for both Actor and Critic
         actor_avg_update = {
             name: self.trainer.zeros(weights.shape)
-            for name, weights in weights_received[0][0].items()
+            for name, weights in deltas_received[0][0].items()
         }
         critic_avg_update = {
             name: self.trainer.zeros(weights.shape)
-            for name, weights in weights_received[0][1].items()
+            for name, weights in deltas_received[0][1].items()
         }
 
         client_list = []
         client_path = f"{Config().results.results_dir}_seed_{Config().server.random_seed}/{Config().results.file_name}_client_saved"
 
-        for i, update in enumerate(weights_received):
-            __, report, __, __ = updates[i]
-            client_id = report.client_id
+        for i, update in enumerate(deltas_received):
+            # __, report, __, __ = updates[i]
+            client_id = updates[i].report.client_id
 
             update_from_actor, update_from_critic = update
 
@@ -80,7 +79,7 @@ class A2CServer(fedavg.Server):
                 for name, delta in update_from_critic.items():
                     critic_avg_update[name] += delta * 1.0 / Config().clients.per_round
             else:
-                metric = self.select_metric(report)
+                metric = self.select_metric(updates[i].report)
                 # For preset curriculum
                 # if (client_id == 1 and self.current_round >= 1 and self.current_round <= 3) \
                 # or ((client_id == 1 or client_id == 2) and self.current_round > 3 and self.current_round <= 6) \
@@ -92,7 +91,7 @@ class A2CServer(fedavg.Server):
                     client_list.append(client_id)
 
                     norm_fisher_actor, norm_fisher_critic = self.standardize_fisher(
-                        report
+                        updates[i].report
                     )
 
                     for name, delta in update_from_actor.items():
@@ -128,9 +127,9 @@ class A2CServer(fedavg.Server):
         for id in range(0, Config().clients.total_clients):
             omega_actor = deepcopy(actor_avg_update)
             omega_critic = deepcopy(critic_avg_update)
-            for i, update in enumerate(weights_received):
-                __, report, __, __ = updates[i]
-                client_id = report.client_id
+            for i, update in enumerate(deltas_received):
+                # __, report, __, __ = updates[i]
+                client_id = updates[i].report.client_id
                 update_from_actor, update_from_critic = update
                 if client_id == id + 1 and client_list.count(client_id):
                     # Calculate omega
@@ -229,20 +228,20 @@ class A2CServer(fedavg.Server):
     def create_loss_lists(self, updates):
         """Creates the lost lists"""
         loss_list = []
-        for (_, report, _, _) in updates:
+        for update in updates:
             if Config().server.percentile_aggregate == "actor_loss":
-                loss_list.append(report.actor_loss)
+                loss_list.append(update.report.actor_loss)
             elif Config().server.percentile_aggregate == "critic_loss":
-                loss_list.append(report.critic_loss)
+                loss_list.append(update.report.critic_loss)
             elif Config().server.percentile_aggregate == "actor_grad":
-                loss_list.append(report.actor_grad)
+                loss_list.append(update.report.actor_grad)
             elif Config().server.percentile_aggregate == "critic_grad":
-                loss_list.append(report.critic_grad)
+                loss_list.append(update.report.critic_grad)
             elif Config().server.percentile_aggregate == "sum_actor_fisher":
-                loss_list.append(report.sum_actor_fisher)
+                loss_list.append(update.report.sum_actor_fisher)
             elif Config().server.percentile_aggregate == "sum_critic_fisher":
-                loss_list.append(report.sum_critic_fisher)
-
+                loss_list.append(update.report.sum_critic_fisher)
+        print(loss_list)
         return loss_list
 
     def save_to_checkpoint(self):

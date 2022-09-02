@@ -7,9 +7,15 @@ from plato.clients import simple
 
 
 @dataclass
-class Report(simple.Report):
+class Report:
     """A client report to be sent to the federated learning server."""
 
+    """Report from a simple client, to be sent to the federated learning server."""
+    num_samples: int
+    accuracy: float
+    training_time: float
+    comm_time: float
+    update_response: bool
     client_id: int
     actor_loss: float
     critic_loss: float
