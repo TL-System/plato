@@ -1,6 +1,15 @@
 --- plato/servers/base.py       2022-09-01 16:57:42.000000000 -0400
-+++ plato/servers/base_cc.py    2022-09-03 18:03:32.000000000 -0400
-@@ -311,9 +311,7 @@
++++ plato/servers/base_cc.py    2022-09-03 21:50:29.000000000 -0400
+@@ -275,6 +275,8 @@
+ 
+             # Allowing some time for the edge servers to start
+             time.sleep(5)
++            if Config().data.datasource == "FEMNIST":
++                time.sleep(5)
+ 
+         if self.disable_clients:
+             logging.info("No clients are launched (server:disable_clients = true)")
+@@ -311,9 +313,7 @@
  
          app = web.Application()
          self.sio.attach(app)
