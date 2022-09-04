@@ -7,19 +7,14 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
-os.environ['config_file'] = 'examples/configs/client.yml'
+os.environ["config_file"] = "examples/configs/client.yml"
 from fedreId import DataSource, Trainer
 from plato.clients import simple
 from plato.config import Config
 
 
 class fedReIdClient(simple.Client):
-
-    def __init__(self,
-                 model=None,
-                 datasource=None,
-                 algorithm=None,
-                 trainer=None):
+    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
         super().__init__(model=model, datasource=datasource, trainer=trainer)
 
     async def train(self):
@@ -31,7 +26,7 @@ class fedReIdClient(simple.Client):
     def cos_feature_distance(self, old_weights, new_weights):
         if old_weights == None:
             logging.info("old_weights is None")
-            return self.sampler.trainset_size()
+            return self.sampler.num_samples()
         dis = []
         # option II
         # self.load_payload(old_weights)
@@ -45,32 +40,24 @@ class fedReIdClient(simple.Client):
         #     dis.append(distance)
 
         for i in old_weights:
-            distance = 1.0 - F.cosine_similarity(old_weights[i].float(),
-                                                 new_weights[i].float(), 0)
+            distance = 1.0 - F.cosine_similarity(
+                old_weights[i].float(), new_weights[i].float(), 0
+            )
             dis.append(torch.mean(distance))
 
         print(dis)
         return sum(dis) / len(dis)
 
 
-class Model():
-    """ A custom model. """
-
-    @staticmethod
-    def get_model():
-        """Obtaining an instance of this model."""
-        return nn.Sequential(
-            nn.Linear(28 * 28, 128),
-            nn.ReLU(),
-            nn.Linear(128, 128),
-            nn.ReLU(),
-            nn.Linear(128, 10),
-        )
-
-
 def main():
-    """A Plato federated learning training session using a custom client. """
-    model = Model
+    """A Plato federated learning training session using a custom client."""
+    model = nn.Sequential(
+        nn.Linear(28 * 28, 128),
+        nn.ReLU(),
+        nn.Linear(128, 128),
+        nn.ReLU(),
+        nn.Linear(128, 10),
+    )
     datasource = DataSource
     trainer = Trainer
 

@@ -5,13 +5,13 @@ A cross-silo federated learning server using federated averaging, as either edge
 import asyncio
 import logging
 import os
-import random
 import numpy as np
 
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
 from plato.processors import registry as processor_registry
 from plato.samplers import registry as samplers_registry
+from plato.samplers import all_inclusive
 from plato.servers import fedavg
 from plato.utils import csv_processor
 
@@ -38,50 +38,60 @@ class Server(fedavg.Server):
 
             # Compute the number of clients in each silo for edge servers
             edges_total_clients = [
-                len(i) for i in np.array_split(
+                len(i)
+                for i in np.array_split(
                     np.arange(Config().clients.total_clients),
-                    Config().algorithm.total_silos)
+                    Config().algorithm.total_silos,
+                )
             ]
             self.total_clients = edges_total_clients[edge_server_id - 1]
 
             self.clients_per_round = [
                 len(i)
-                for i in np.array_split(np.arange(Config().clients.per_round),
-                                        Config().algorithm.total_silos)
+                for i in np.array_split(
+                    np.arange(Config().clients.per_round),
+                    Config().algorithm.total_silos,
+                )
             ][edge_server_id - 1]
 
-            if hasattr(Config().trainer, 'max_concurrency'):
+            if hasattr(Config().trainer, "max_concurrency"):
                 launched_total_clients = min(
-                    Config().trainer.max_concurrency *
-                    max(1,
-                        Config().gpu_count()) * Config().algorithm.total_silos,
-                    Config().clients.per_round)
+                    Config().trainer.max_concurrency
+                    * max(1, Config().gpu_count())
+                    * Config().algorithm.total_silos,
+                    Config().clients.per_round,
+                )
             else:
                 launched_total_clients = Config().clients.per_round
 
             edges_launched_clients = [
                 len(i)
-                for i in np.array_split(np.arange(launched_total_clients),
-                                        Config().algorithm.total_silos)
+                for i in np.array_split(
+                    np.arange(launched_total_clients), Config().algorithm.total_silos
+                )
             ]
-            starting_client_id = sum(edges_launched_clients[:edge_server_id -
-                                                            1])
+            starting_client_id = sum(edges_launched_clients[: edge_server_id - 1])
             launched_clients = edges_launched_clients[edge_server_id - 1]
             self.launched_clients = list(
-                range(starting_client_id + 1,
-                      starting_client_id + 1 + launched_clients))
+                range(starting_client_id + 1, starting_client_id + 1 + launched_clients)
+            )
 
-            starting_client_id = sum(edges_total_clients[:edge_server_id - 1])
+            starting_client_id = sum(edges_total_clients[: edge_server_id - 1])
             self.clients_pool = list(
-                range(starting_client_id + 1,
-                      starting_client_id + 1 + self.total_clients))
+                range(
+                    starting_client_id + 1, starting_client_id + 1 + self.total_clients
+                )
+            )
 
             logging.info(
                 "[Edge server #%d (#%d)] Started training on %d clients with %d per round.",
-                Config().args.id, os.getpid(), self.total_clients,
-                self.clients_per_round)
+                Config().args.id,
+                os.getpid(),
+                self.total_clients,
+                self.clients_per_round,
+            )
 
-            self.recorded_items = ['global_round'] + self.recorded_items
+            self.recorded_items = ["global_round"] + self.recorded_items
 
         # Compute the number of clients for the central server
         if Config().is_central_server():
@@ -90,7 +100,8 @@ class Server(fedavg.Server):
 
             logging.info(
                 "The central server starts training with %s edge servers.",
-                self.total_clients)
+                self.total_clients,
+            )
 
     def configure(self):
         """
@@ -98,13 +109,17 @@ class Server(fedavg.Server):
         creating the clients.
         """
         if Config().is_edge_server():
-            logging.info("Configuring edge server #%d as a %s server.",
-                         Config().args.id,
-                         Config().algorithm.type)
+            logging.info(
+                "Configuring edge server #%d as a %s server.",
+                Config().args.id,
+                Config().algorithm.type,
+            )
             logging.info(
                 "[Edge server #%d (#%d)] Training with %s local aggregation rounds.",
-                Config().args.id, os.getpid(),
-                Config().algorithm.local_rounds)
+                Config().args.id,
+                os.getpid(),
+                Config().algorithm.local_rounds,
+            )
 
             self.init_trainer()
             self.trainer.set_client_id(Config().args.id)
@@ -112,46 +127,35 @@ class Server(fedavg.Server):
             # Prepares this server for processors that processes outbound and inbound
             # data payloads
             self.outbound_processor, self.inbound_processor = processor_registry.get(
-                "Server", server_id=os.getpid(), trainer=self.trainer)
+                "Server", server_id=os.getpid(), trainer=self.trainer
+            )
 
-            if hasattr(Config().server,
-                       'edge_do_test') and Config().server.edge_do_test:
-                self.datasource = datasources_registry.get(
-                    client_id=Config().args.id)
+            if (
+                hasattr(Config().server, "edge_do_test")
+                and Config().server.edge_do_test
+            ):
+                self.datasource = datasources_registry.get(client_id=Config().args.id)
                 self.testset = self.datasource.get_test_set()
 
-                if hasattr(Config().data, 'edge_testset_sampler'):
+                if hasattr(Config().data, "testset_sampler"):
                     # Set the sampler for test set
                     self.testset_sampler = samplers_registry.get(
-                        self.datasource, Config().args.id, testing='edge')
-                elif hasattr(Config().data, 'testset_size'):
-                    # Set the Random Sampler for test set
-                    from torch.utils.data import SubsetRandomSampler
-
-                    all_inclusive = range(len(self.datasource.get_test_set()))
-                    test_samples = random.sample(all_inclusive,
-                                                 Config().data.testset_size)
-                    self.testset_sampler = SubsetRandomSampler(test_samples)
+                        self.datasource, Config().args.id, testing=True
+                    )
+                else:
+                    if hasattr(Config().data, "testset_size"):
+                        self.testset_sampler = all_inclusive.Sampler(
+                            self.datasource, testing=True
+                        )
 
             # Initialize path of the result .csv file
-            result_path = Config().params['result_path']
-            result_csv_file = f'{result_path}/edge_{os.getpid()}.csv'
-            csv_processor.initialize_csv(result_csv_file, self.recorded_items,
-                                         result_path)
+            result_path = Config().params["result_path"]
+            result_csv_file = f"{result_path}/edge_{os.getpid()}.csv"
+            csv_processor.initialize_csv(
+                result_csv_file, self.recorded_items, result_path
+            )
         else:
             super().configure()
-            if hasattr(Config().server, 'do_test') and Config().server.do_test:
-                self.datasource = datasources_registry.get(client_id=0)
-                self.testset = self.datasource.get_test_set()
-
-                if hasattr(Config().data, 'testset_size'):
-                    from torch.utils.data import SubsetRandomSampler
-
-                    # Set the sampler for testset
-                    all_inclusive = range(len(self.datasource.get_test_set()))
-                    test_samples = random.sample(all_inclusive,
-                                                 Config().data.testset_size)
-                    self.testset_sampler = SubsetRandomSampler(test_samples)
 
     async def select_clients(self, for_next_batch=False):
         if Config().is_edge_server() and not for_next_batch:
@@ -164,76 +168,128 @@ class Server(fedavg.Server):
 
         await super().select_clients(for_next_batch=for_next_batch)
 
-    async def customize_server_response(self, server_response):
+    def customize_server_response(self, server_response: dict) -> dict:
         """Wrap up generating the server response with any additional information."""
         if Config().is_central_server():
-            server_response['current_global_round'] = self.current_round
+            server_response["current_global_round"] = self.current_round
         return server_response
 
-    async def process_reports(self):
+    async def _process_reports(self):
         """Process the client reports by aggregating their weights."""
         # To pass the client_id == 0 assertion during aggregation
         self.trainer.set_client_id(0)
-        await self.aggregate_weights(self.updates)
+        weights_received = [update.payload for update in self.updates]
+
+        weights_received = self.weights_received(weights_received)
+        self.callback_handler.call_event("on_weights_received", self, weights_received)
+
+        # Extract the current model weights as the baseline
+        baseline_weights = self.algorithm.extract_weights()
+
+        if hasattr(self, "aggregate_weights"):
+            # Runs a server aggregation algorithm using weights rather than deltas
+            logging.info(
+                "[Server #%d] Aggregating model weights directly rather than weight deltas.",
+                os.getpid(),
+            )
+            updated_weights = self.aggregate_weights(
+                self.updates, baseline_weights, weights_received
+            )
+
+            # Loads the new model weights
+            self.algorithm.load_weights(updated_weights)
+        else:
+            # Computes the weight deltas by comparing the weights received with
+            # the current global model weights
+            deltas_received = self.algorithm.compute_weight_deltas(
+                baseline_weights, weights_received
+            )
+
+            # Runs a framework-agnostic server aggregation algorithm, such as
+            # the federated averaging algorithm
+            logging.info("[Server #%d] Aggregating model weight deltas.", os.getpid())
+            deltas = await self.aggregate_deltas(self.updates, deltas_received)
+
+            # Updates the existing model weights from the provided deltas
+            updated_weights = self.algorithm.update_weights(deltas)
+
+            # Loads the new model weights
+            self.algorithm.load_weights(updated_weights)
+
+        # The model weights have already been aggregated, now calls the
+        # corresponding hook and callback
+        self.weights_aggregated(self.updates)
+        self.callback_handler.call_event("on_weights_aggregated", self, self.updates)
+
         if Config().is_edge_server():
             self.trainer.set_client_id(Config().args.id)
 
         # Testing the model accuracy
         if (Config().is_edge_server() and Config().clients.do_test) or (
-                Config().is_central_server()
-                and hasattr(Config().server, 'edge_do_test')
-                and Config().server.edge_do_test):
+            Config().is_central_server()
+            and hasattr(Config().server, "edge_do_test")
+            and Config().server.edge_do_test
+        ):
             # Compute the average accuracy from client reports
             self.average_accuracy = self.accuracy_averaging(self.updates)
-            logging.info('[%s] Average client accuracy: %.2f%%.', self,
-                         100 * self.average_accuracy)
+            logging.info(
+                "[%s] Average client accuracy: %.2f%%.",
+                self,
+                100 * self.average_accuracy,
+            )
         elif Config().is_central_server() and Config().clients.do_test:
             # Compute the average accuracy from client reports
-            self.average_accuracy = self.client_accuracy_averaging()
-            logging.info('[%s] Average client accuracy: %.2f%%.', self,
-                         100 * self.average_accuracy)
+            total_samples = sum(update.report.num_samples for update in self.updates)
+            self.average_accuracy = (
+                sum(
+                    update.report.average_accuracy * update.report.num_samples
+                    for update in self.updates
+                )
+                / total_samples
+            )
 
-        if Config().is_central_server() and hasattr(
-                Config().server, 'do_test') and Config().server.do_test:
+            logging.info(
+                "[%s] Average client accuracy: %.2f%%.",
+                self,
+                100 * self.average_accuracy,
+            )
+
+        if (
+            Config().is_central_server()
+            and hasattr(Config().server, "do_test")
+            and Config().server.do_test
+        ):
             # Test the updated model directly at the central server
-            self.accuracy = await self.trainer.server_test(
-                self.testset, self.testset_sampler)
-            if hasattr(Config().trainer, 'target_perplexity'):
-                logging.info('[%s] Global model perplexity: %.2f\n', self,
-                             self.accuracy)
+            self.accuracy = self.trainer.test(self.testset, self.testset_sampler)
+            if hasattr(Config().trainer, "target_perplexity"):
+                logging.info(
+                    "[%s] Global model perplexity: %.2f\n", self, self.accuracy
+                )
             else:
-                logging.info('[%s] Global model accuracy: %.2f%%\n', self,
-                             100 * self.accuracy)
-        elif Config().is_edge_server() and hasattr(
-                Config().server,
-                'edge_do_test') and Config().server.edge_do_test:
+                logging.info(
+                    "[%s] Global model accuracy: %.2f%%\n", self, 100 * self.accuracy
+                )
+        elif (
+            Config().is_edge_server()
+            and hasattr(Config().server, "edge_do_test")
+            and Config().server.edge_do_test
+        ):
             # Test the aggregated model directly at the edge server
-            self.accuracy = self.trainer.test(self.testset,
-                                              self.testset_sampler)
-            if hasattr(Config().trainer, 'target_perplexity'):
-                logging.info('[%s] Aggregated model perplexity: %.2f\n', self,
-                             self.accuracy)
+            self.accuracy = self.trainer.test(self.testset, self.testset_sampler)
+            if hasattr(Config().trainer, "target_perplexity"):
+                logging.info(
+                    "[%s] Aggregated model perplexity: %.2f\n", self, self.accuracy
+                )
             else:
-                logging.info('[%s] Aggregated model accuracy: %.2f%%\n', self,
-                             100 * self.accuracy)
+                logging.info(
+                    "[%s] Aggregated model accuracy: %.2f%%\n",
+                    self,
+                    100 * self.accuracy,
+                )
         else:
             self.accuracy = self.average_accuracy
 
         await self.wrap_up_processing_reports()
-
-    def client_accuracy_averaging(self):
-        """Compute the average accuracy across clients."""
-        # Get total number of samples
-        total_samples = sum(
-            [report.num_samples for (__, report, __, __) in self.updates])
-
-        # Perform weighted averaging
-        accuracy = 0
-        for (__, report, __, __) in self.updates:
-            accuracy += report.average_accuracy * (report.num_samples /
-                                                   total_samples)
-
-        return accuracy
 
     async def wrap_up_processing_reports(self):
         """Wrap up processing the reports with any additional work."""
@@ -250,14 +306,17 @@ class Server(fedavg.Server):
             result_csv_file = f"{Config().params['result_path']}/edge_{os.getpid()}.csv"
             csv_processor.write_csv(result_csv_file, new_row)
 
-            if hasattr(Config().clients,
-                       'do_test') and Config().clients.do_test:
+            if hasattr(Config().clients, "do_test") and Config().clients.do_test:
                 # Updates the log for client test accuracies
-                accuracy_csv_file = f"{Config().params['result_path']}/edge_{os.getpid()}_accuracy.csv"
+                accuracy_csv_file = (
+                    f"{Config().params['result_path']}/edge_{os.getpid()}_accuracy.csv"
+                )
 
-                for (client_id, report, __, __) in self.updates:
+                for update in self.updates:
                     accuracy_row = [
-                        self.current_round, client_id, report.accuracy
+                        self.current_round,
+                        update.client_id,
+                        update.report.accuracy,
                     ]
                     csv_processor.write_csv(accuracy_csv_file, accuracy_row)
 
@@ -265,9 +324,10 @@ class Server(fedavg.Server):
             # needs to be signaled to send a report to the central server
             if self.current_round == Config().algorithm.local_rounds:
                 logging.info(
-                    '[Server #%d] Completed %s rounds of local aggregation.',
+                    "[Server #%d] Completed %s rounds of local aggregation.",
                     os.getpid(),
-                    Config().algorithm.local_rounds)
+                    Config().algorithm.local_rounds,
+                )
                 self.model_aggregated.set()
 
                 self.current_round = 0
@@ -277,10 +337,10 @@ class Server(fedavg.Server):
         """Get values will be recorded in result csv file."""
         record_items_values = super().get_record_items_values()
 
-        record_items_values['global_round'] = self.current_global_round
-        record_items_values['average_accuracy'] = self.average_accuracy * 100
-        record_items_values['edge_agg_num'] = Config().algorithm.local_rounds
-        record_items_values['local_epoch_num'] = Config().trainer.epochs
+        record_items_values["global_round"] = self.current_global_round
+        record_items_values["average_accuracy"] = self.average_accuracy
+        record_items_values["edge_agg_num"] = Config().algorithm.local_rounds
+        record_items_values["local_epoch_num"] = Config().trainer.epochs
 
         return record_items_values
 

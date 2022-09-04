@@ -1,5 +1,3 @@
-import os
-
 import torch
 from torch import nn
 from torchvision.datasets import MNIST
@@ -8,35 +6,35 @@ from torchvision.transforms import ToTensor
 from plato.datasources import base
 from plato.trainers import basic
 
+
 class DataSource(base.DataSource):
     """A custom datasource with custom training and validation
-       datasets.
+    datasets.
     """
+
     def __init__(self):
         super().__init__()
 
-        self.trainset = MNIST("./data",
-                              train=True,
-                              download=True,
-                              transform=ToTensor())
-        self.testset = MNIST("./data",
-                             train=False,
-                             download=True,
-                             transform=ToTensor())
+        self.trainset = MNIST("./data", train=True, download=True, transform=ToTensor())
+        self.testset = MNIST("./data", train=False, download=True, transform=ToTensor())
+
 
 class Trainer(basic.Trainer):
     # pylint: disable=unused-argument
-    """A custom trainer with custom training and testing loops. """
-    def train_model(self, config, trainset, sampler, cut_layer=None):
-        """A custom training loop. """
+    """A custom trainer with custom training and testing loops."""
+
+    # pylint: disable=unused-argument
+    def train_model(self, config, trainset, sampler, **kwargs):
+        """A custom training loop."""
         optimizer = torch.optim.Adam(self.model.parameters(), lr=1e-3)
         criterion = nn.CrossEntropyLoss()
 
         train_loader = torch.utils.data.DataLoader(
             dataset=trainset,
             shuffle=False,
-            batch_size=config['batch_size'],
-            sampler=sampler)
+            batch_size=config["batch_size"],
+            sampler=sampler,
+        )
 
         num_epochs = 1
         for __ in range(num_epochs):
@@ -52,17 +50,17 @@ class Trainer(basic.Trainer):
                 optimizer.zero_grad()
 
     def test_model(self, config, testset):  # pylint: disable=unused-argument
-        """A custom testing loop. """
+        """A custom testing loop."""
         test_loader = torch.utils.data.DataLoader(
-            testset, batch_size=config['batch_size'], shuffle=False)
+            testset, batch_size=config["batch_size"], shuffle=False
+        )
 
         correct = 0
         total = 0
 
         with torch.no_grad():
             for examples, labels in test_loader:
-                examples, labels = examples.to(self.device), labels.to(
-                    self.device)
+                examples, labels = examples.to(self.device), labels.to(self.device)
 
                 examples = examples.view(len(examples), -1)
                 outputs = self.model(examples)
@@ -72,23 +70,21 @@ class Trainer(basic.Trainer):
 
         accuracy = correct / total
         return accuracy
-    
-    def test_output(self, config, testset):  # pylint: disable=unused-argument
-        """A custom testing loop. """
-        test_loader = torch.utils.data.DataLoader(
-            testset, batch_size=config['batch_size'], shuffle=False)
 
-        correct = 0
-        total = 0
+    def test_output(self, config, testset):  # pylint: disable=unused-argument
+        """A custom testing loop."""
+        test_loader = torch.utils.data.DataLoader(
+            testset, batch_size=config["batch_size"], shuffle=False
+        )
+
         result = []
         with torch.no_grad():
             for examples, labels in test_loader:
-                examples, labels = examples.to(self.device), labels.to(
-                    self.device)
+                examples, labels = examples.to(self.device), labels.to(self.device)
 
                 examples = examples.view(len(examples), -1)
                 outputs = self.model(examples)
                 _, predicted = torch.max(outputs.data, 1)
                 result.append(predicted)
-                
+
         return result

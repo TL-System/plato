@@ -48,7 +48,7 @@ data:
     datasource: FashionMNIST
 
     # Number of samples in each partition
-    partition_size: 200
+    partition_size: 600
 
     # Client's partition size distribution
     partition_distribution:
@@ -66,25 +66,25 @@ data:
     random_seed: 1
 
 trainer:
+    # The type of the trainer
+    type: basic
+
     # The maximum number of training rounds
     rounds: 100
 
     # The maximum number of clients running concurrently
-    max_concurrency: 4
+    max_concurrency: 2
 
     # The target accuracy
-    target_accuracy: 1.0
+    target_accuracy: 0.70
+
+    # The machine learning model
+    model_name: lenet5
 
     # Number of epoches for local training in each communication round
     epochs: 10
     batch_size: 32
     optimizer: SGD
-    learning_rate: 0.01
-    momentum: 0.9
-    weight_decay: 0.0
-
-    # The machine learning model
-    model_name: lenet5
 
 algorithm:
     # Aggregation algorithm
@@ -97,11 +97,14 @@ algorithm:
     # The proportion of clients which are selected uniformly at random
     alpha3: 0.1
 
+parameters:
+    optimizer:
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0
+
 results:
     result_path: results/FashionMNIST_lenet5/AFL
 
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time
-
-    # Plot results (x_axis-y_axis)
-    plot: round-accuracy, elapsed_time-accuracy

@@ -48,25 +48,27 @@ trainer:
     # The target accuracy
     target_accuracy: 0.95
 
+    # The machine learning model
+    model_name: lenet5
+
     # Number of epoches for local training in each communication round
     epochs: 5
     batch_size: 32
     optimizer: SGD
-    learning_rate: 0.01
-    momentum: 0.9
-    weight_decay: 0.0
-
-    # The machine learning model
-    model_name: lenet5
-    num_classes: 47
 
 algorithm:
     # Aggregation algorithm
     type: fedavg
 
+parameters:
+    model:
+        num_classes: 47
+
+    optimizer:
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0
+
 results:
     # Write the following parameter(s) into a CSV
     types: round, elapsed_time, accuracy
-
-    # Plot results (x_axis-y_axis)
-    plot: round-accuracy, elapsed_time-accuracy

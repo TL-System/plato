@@ -8,39 +8,33 @@ from plato.config import Config
 
 
 class Server(fedavg.Server):
-    """ Federated learning server using federated averaging to train GAN models. """
+    """Federated learning server using federated averaging to train GAN models."""
 
-    async def federated_averaging(self, updates):
+    async def aggregate_deltas(self, updates, deltas_received):
         """Aggregate weight updates from the clients using federated averaging."""
-        weights_received = self.compute_weight_deltas(updates)
-
         # Total sample is the same for both Generator and Discriminator
-        self.total_samples = sum(
-            [report.num_samples for (__, report, __, __) in updates])
+        self.total_samples = sum(update.report.num_samples for update in updates)
 
         # Perform weighted averaging for both Generator and Discriminator
         gen_avg_update = {
             name: self.trainer.zeros(weights.shape)
-            for name, weights in weights_received[0][0].items()
+            for name, weights in deltas_received[0][0].items()
         }
         disc_avg_update = {
             name: self.trainer.zeros(weights.shape)
-            for name, weights in weights_received[0][1].items()
+            for name, weights in deltas_received[0][1].items()
         }
 
-        for i, update in enumerate(weights_received):
-            __, report, __, __ = updates[i]
-            num_samples = report.num_samples
+        for i, update in enumerate(deltas_received):
+            num_samples = updates[i].report.num_samples
 
             update_from_gen, update_from_disc = update
 
             for name, delta in update_from_gen.items():
-                gen_avg_update[name] += delta * (num_samples /
-                                                 self.total_samples)
+                gen_avg_update[name] += delta * (num_samples / self.total_samples)
 
             for name, delta in update_from_disc.items():
-                disc_avg_update[name] += delta * (num_samples /
-                                                  self.total_samples)
+                disc_avg_update[name] += delta * (num_samples / self.total_samples)
 
             # Yield to other tasks in the server
             await asyncio.sleep(0)
@@ -59,22 +53,21 @@ class Server(fedavg.Server):
 
         By default, both model will be sent to the clients.
         """
-        if hasattr(Config().server, 'network_to_sync'):
+        if hasattr(Config().server, "network_to_sync"):
             network = Config().server.network_to_sync.lower()
         else:
-            network = 'both'
+            network = "both"
 
         weights_gen, weights_disc = payload
-        if network == 'none':
+        if network == "none":
             server_payload = None, None
-        elif network == 'generator':
+        elif network == "generator":
             server_payload = weights_gen, None
-        elif network == 'discriminator':
+        elif network == "discriminator":
             server_payload = None, weights_disc
-        elif network == 'both':
+        elif network == "both":
             server_payload = payload
         else:
-            raise ValueError(
-                f'Unknown value to attribute network_to_sync: {network}')
+            raise ValueError(f"Unknown value to attribute network_to_sync: {network}")
 
         return server_payload

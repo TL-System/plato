@@ -20,7 +20,7 @@ server:
 data:
     # The training and testing dataset
     datasource: YOLO
-    data_params: packages/yolov5/yolov5/data/coco128.yaml
+    data_params: configs/yolov5/data/coco128.yaml
 
     # Where the dataset is located
     data_path: data/COCO
@@ -163,8 +163,6 @@ trainer:
 
     # The machine learning model
     model_name: yolov5
-    model_config: packages/yolov5/yolov5/models/yolov5s.yaml
-    train_params: packages/yolov5/yolov5/data/hyp.scratch.yaml
 
     # OM file path
     om_path: ./models/yolov5_cutlayer4.om
@@ -182,5 +180,12 @@ algorithm:
     cut_layer: 4
     epsilon: 100
 
-params:
+parameters:
     grid_size: 32
+
+    model:
+        model_config: configs/yolov5/models/yolov5s.yaml
+        num_classes: 80
+
+    trainer:
+        train_params: configs/yolov5/data/hyps/hyp.scratch.yaml

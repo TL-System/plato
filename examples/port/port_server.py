@@ -19,15 +19,15 @@ from plato.servers import fedavg
 
 
 class Server(fedavg.Server):
-    """A federated learning server using the FedAsync algorithm. """
+    """A federated learning server using the FedAsync algorithm."""
 
     async def cosine_similarity(self, update, staleness):
-        """ Compute the cosine similarity of the received updates and the difference
-            between the current and a previous model according to client staleness. """
+        """Compute the cosine similarity of the received updates and the difference
+        between the current and a previous model according to client staleness."""
         # Loading the global model from a previous round according to staleness
         filename = f"model_{self.current_round - 2}.pth"
-        model_path = Config().params['model_path']
-        model_path = f'{model_path}/{filename}'
+        model_path = Config().params["model_path"]
+        model_path = f"{model_path}/{filename}"
 
         similarity = 1.0
 
@@ -51,36 +51,49 @@ class Server(fedavg.Server):
 
         return similarity
 
-    async def federated_averaging(self, updates):
+    async def aggregate_deltas(self, updates, deltas_received):
         """Aggregate weight updates from the clients using federated averaging."""
-        deltas_received = self.compute_weight_deltas(updates)
-
         # Extract the total number of samples
-        self.total_samples = sum(
-            [report.num_samples for (__, report, __, __) in updates])
+        self.total_samples = sum(update.report.num_samples for update in updates)
 
         # Constructing the aggregation weights to be used
         aggregation_weights = []
 
         for i, update in enumerate(deltas_received):
-            __, report, __, staleness = updates[i]
+            report = updates[i].report
+            staleness = updates[i].staleness
             num_samples = report.num_samples
 
             similarity = await self.cosine_similarity(update, staleness)
             staleness_factor = Server.staleness_function(staleness)
 
-            similarity_weight = Config().server.similarity_weight if hasattr(
-                Config().server, 'similarity_weight') else 1
-            staleness_weight = Config().server.staleness_weight if hasattr(
-                Config().server, 'staleness_weight') else 1
+            similarity_weight = (
+                Config().server.similarity_weight
+                if hasattr(Config().server, "similarity_weight")
+                else 1
+            )
+            staleness_weight = (
+                Config().server.staleness_weight
+                if hasattr(Config().server, "staleness_weight")
+                else 1
+            )
 
-            logging.info('[Client %s] similarity: %s', i, (similarity + 1) / 2)
-            logging.info('[Client %s] staleness: %s, staleness factor: %s', i,
-                         staleness, staleness_factor)
-            raw_weight = num_samples / self.total_samples * (
-                (similarity + 1) / 2 * similarity_weight +
-                staleness_factor * staleness_weight)
-            logging.info('[Client %s] raw weight = %s', i, raw_weight)
+            logging.info("[Client %s] similarity: %s", i, (similarity + 1) / 2)
+            logging.info(
+                "[Client %s] staleness: %s, staleness factor: %s",
+                i,
+                staleness,
+                staleness_factor,
+            )
+            raw_weight = (
+                num_samples
+                / self.total_samples
+                * (
+                    (similarity + 1) / 2 * similarity_weight
+                    + staleness_factor * staleness_weight
+                )
+            )
+            logging.info("[Client %s] raw weight = %s", i, raw_weight)
 
             aggregation_weights.append(raw_weight)
 
@@ -89,8 +102,11 @@ class Server(fedavg.Server):
             i / sum(aggregation_weights) for i in aggregation_weights
         ]
 
-        logging.info('[Client %s] normalized weights: %s', i,
-                     aggregation_weights)
+        logging.info(
+            "[Server #%s] normalized aggregation weights: %s",
+            os.getpid(),
+            aggregation_weights,
+        )
 
         # Perform weighted averaging
         avg_update = {
@@ -99,11 +115,7 @@ class Server(fedavg.Server):
         }
 
         for i, update in enumerate(deltas_received):
-            __, report, __, staleness = updates[i]
-            num_samples = report.num_samples
-
             for name, delta in update.items():
-                # Use weighted average by the number of samples
                 avg_update[name] += delta * aggregation_weights[i]
 
             # Yield to other tasks in the server
@@ -111,19 +123,17 @@ class Server(fedavg.Server):
 
         return avg_update
 
-    async def aggregate_weights(self, updates):
-        """Aggregate the reported weight updates from the selected clients."""
-        deltas = await self.federated_averaging(updates)
-        updated_weights = self.algorithm.update_weights(deltas)
-        self.algorithm.load_weights(updated_weights)
-
+    def weights_aggregated(self, updates):
+        """
+        Method called at the end of aggregating received weights.
+        """
         # Save the current model for later retrieval when cosine similarity needs to be computed
         filename = f"model_{self.current_round}.pth"
         self.trainer.save_model(filename)
 
     @staticmethod
     def staleness_function(staleness):
-        """ The staleness_function. """
+        """The staleness_function."""
         staleness_bound = 10
 
         if hasattr(Config().server, "staleness_bound"):

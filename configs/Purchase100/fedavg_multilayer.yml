@@ -46,26 +46,28 @@ trainer:
     # The target accuracy
     target_accuracy: 0.80
 
+    # The machine learning model
+    model_name: multilayer
+
     # Number of epoches for local training in each communication round
     epochs: 5
     batch_size: 32
     optimizer: SGD
-    learning_rate: 0.01
-    momentum: 0.9
-    weight_decay: 0.0
-
-    # The machine learning model
-    model_name: multilayer
-    input_dim: 600
-    num_classes: 100
 
 algorithm:
     # Aggregation algorithm
     type: fedavg
 
+parameters:
+    model:
+        input_dim: 600
+        num_classes: 100
+
+    optimizer:
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0
+
 results:
     # Write the following parameter(s) into a CSV
     types: round, elapsed_time, accuracy
-
-    # Plot results (x_axis-y_axis)
-    plot: round-accuracy, elapsed_time-accuracy

@@ -12,8 +12,10 @@ from typing import Tuple
 from plato.config import Config
 from plato.processors import pipeline
 
-if not (hasattr(Config().trainer, 'use_tensorflow')
-        or hasattr(Config().trainer, 'use_mindspore')):
+if not (
+    hasattr(Config().trainer, "use_tensorflow")
+    or hasattr(Config().trainer, "use_mindspore")
+):
     from plato.processors import (
         base,
         compress,
@@ -32,37 +34,41 @@ if not (hasattr(Config().trainer, 'use_tensorflow')
         model_compress,
         model_decompress,
         model_randomized_response,
+        send_mask,
         structured_pruning,
         unstructured_pruning,
     )
 
-    registered_processors = OrderedDict([
-        ('base', base.Processor),
-        ('compress', compress.Processor),
-        ('decompress', decompress.Processor),
-        ('feature_randomized_response', feature_randomized_response.Processor),
-        ('feature_gaussian', feature_gaussian.Processor),
-        ('feature_laplace', feature_laplace.Processor),
-        ('feature_quantize', feature_quantize.Processor),
-        ('feature_dequantize', feature_dequantize.Processor),
-        ('feature_unbatch', feature_unbatch.Processor),
-        ('inbound_feature_tensors', inbound_feature_tensors.Processor),
-        ('outbound_feature_ndarrays', outbound_feature_ndarrays.Processor),
-        ('model_deepcopy', model_deepcopy.Processor),
-        ('model_quantize', model_quantize.Processor),
-        ('model_dequantize', model_dequantize.Processor),
-        ('model_compress', model_compress.Processor),
-        ('model_decompress', model_decompress.Processor),
-        ('model_randomized_response', model_randomized_response.Processor),
-        ('structured_pruning', structured_pruning.Processor),
-        ('unstructured_pruning', unstructured_pruning.Processor),
-    ])
+    registered_processors = OrderedDict(
+        [
+            ("base", base.Processor),
+            ("compress", compress.Processor),
+            ("decompress", decompress.Processor),
+            ("feature_randomized_response", feature_randomized_response.Processor),
+            ("feature_gaussian", feature_gaussian.Processor),
+            ("feature_laplace", feature_laplace.Processor),
+            ("feature_quantize", feature_quantize.Processor),
+            ("feature_dequantize", feature_dequantize.Processor),
+            ("feature_unbatch", feature_unbatch.Processor),
+            ("inbound_feature_tensors", inbound_feature_tensors.Processor),
+            ("outbound_feature_ndarrays", outbound_feature_ndarrays.Processor),
+            ("model_deepcopy", model_deepcopy.Processor),
+            ("model_quantize", model_quantize.Processor),
+            ("model_dequantize", model_dequantize.Processor),
+            ("model_compress", model_compress.Processor),
+            ("model_decompress", model_decompress.Processor),
+            ("model_randomized_response", model_randomized_response.Processor),
+            ("send_mask", send_mask.Processor),
+            ("structured_pruning", structured_pruning.Processor),
+            ("unstructured_pruning", unstructured_pruning.Processor),
+        ]
+    )
 
 
-def get(user: str,
-        processor_kwargs={},
-        **kwargs) -> Tuple[pipeline.Processor, pipeline.Processor]:
-    """ Get an instance of the processor. """
+def get(
+    user: str, processor_kwargs={}, **kwargs
+) -> Tuple[pipeline.Processor, pipeline.Processor]:
+    """Get an instance of the processor."""
     outbound_processors = []
     inbound_processors = []
 
@@ -73,20 +79,20 @@ def get(user: str,
     else:
         config = Config().clients
 
-    if hasattr(config, 'outbound_processors') and isinstance(
-            config.outbound_processors, list):
+    if hasattr(config, "outbound_processors") and isinstance(
+        config.outbound_processors, list
+    ):
         outbound_processors = config.outbound_processors
 
-    if hasattr(config, 'inbound_processors') and isinstance(
-            config.inbound_processors, list):
+    if hasattr(config, "inbound_processors") and isinstance(
+        config.inbound_processors, list
+    ):
         inbound_processors = config.inbound_processors
 
     for processor in outbound_processors:
-        logging.info("%s: Using Processor for sending payload: %s", user,
-                     processor)
+        logging.info("%s: Using Processor for sending payload: %s", user, processor)
     for processor in inbound_processors:
-        logging.info("%s: Using Processor for receiving payload: %s", user,
-                     processor)
+        logging.info("%s: Using Processor for receiving payload: %s", user, processor)
 
     def map_f(name):
         if name in processor_kwargs:
@@ -100,4 +106,5 @@ def get(user: str,
     inbound_processors = list(map(map_f, inbound_processors))
 
     return pipeline.Processor(outbound_processors), pipeline.Processor(
-        inbound_processors)
+        inbound_processors
+    )

@@ -6,7 +6,7 @@ clients:
     total_clients: 10
 
     # The number of clients selected in each round
-    per_round: 4
+    per_round: 2
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -38,7 +38,7 @@ data:
     # IID or non-IID?
     sampler: iid
 
-    testset_size: 1000
+    #testset_size: 1000
 
     # The random seed for sampling data
     random_seed: 1
@@ -48,7 +48,7 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 10
+    rounds: 2
 
     # The maximum number of clients running concurrently
     max_concurrency: 2
@@ -57,12 +57,9 @@ trainer:
     target_accuracy: 0.99
 
     # Number of epoches for local training in each communication round
-    epochs: 3
+    epochs: 2
     batch_size: 10
     optimizer: SGD
-    learning_rate: 0.01
-    momentum: 0.9
-    weight_decay: 0.0
 
     # The machine learning model
     model_name: lenet5
@@ -76,3 +73,9 @@ results:
     types: round, accuracy, elapsed_time, comm_time, round_time
 
     result_path: results/test
+
+parameters:
+    optimizer:
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0

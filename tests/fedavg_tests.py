@@ -11,7 +11,6 @@ from plato.trainers import basic
 
 
 class InnerProductModel(torch.nn.Module):
-
     def __init__(self, n):
         super().__init__()
         self.layer = torch.nn.Linear(n, 1, bias=False)
@@ -40,9 +39,7 @@ async def test_fedavg_aggregation(self):
 
     trainer = basic.Trainer
     algorithm = fedavg_alg.Algorithm
-    server = fedavg_server.Server(model=model,
-                                  algorithm=algorithm,
-                                  trainer=trainer)
+    server = fedavg_server.Server(model=model, algorithm=algorithm, trainer=trainer)
     server.init_trainer()
 
     weights = copy.deepcopy(self.algorithm.extract_weights())
@@ -75,21 +72,17 @@ async def test_fedavg_aggregation(self):
     print(f"Report 4 Weights: {weights}")
     updates.append((0, simple.Report(1, 100, 0, 0, 0), weights, 0))
 
-    print(
-        f"Weights before federated averaging: {server.model.layer.weight.data}"
-    )
+    print(f"Weights before federated averaging: {server.model.layer.weight.data}")
 
-    deltas = await server.federated_averaging(updates)
+    deltas = await server.aggregate_deltas(updates)
     updated_weights = server.algorithm.update_weights(deltas)
     server.algorithm.load_weights(updated_weights)
 
-    print(
-        f"Weights after federated averaging: {server.model.layer.weight.data}")
+    print(f"Weights after federated averaging: {server.model.layer.weight.data}")
     self.assertEqual(42.56, np.round(self.model(self.example).item(), 4))
 
 
 class FedAvgTest(unittest.TestCase):
-
     def setUp(self):
         super().setUp()
         self.model = InnerProductModel(10)
@@ -111,24 +104,21 @@ class FedAvgTest(unittest.TestCase):
         self.model.train()
 
         self.optimizer.zero_grad()
-        self.model.loss_criterion(self.model(self.example),
-                                  self.label).backward()
+        self.model.loss_criterion(self.model(self.example), self.label).backward()
         self.optimizer.step()
         self.assertEqual(44.0, self.model(self.example).item())
         weights = self.algorithm.extract_weights()
         print(f"Weights: {weights}")
 
         self.optimizer.zero_grad()
-        self.model.loss_criterion(self.model(self.example),
-                                  self.label).backward()
+        self.model.loss_criterion(self.model(self.example), self.label).backward()
         self.optimizer.step()
         self.assertEqual(43.2, np.round(self.model(self.example).item(), 4))
         weights = self.algorithm.extract_weights()
         print(f"Weights: {weights}")
 
         self.optimizer.zero_grad()
-        self.model.loss_criterion(self.model(self.example),
-                                  self.label).backward()
+        self.model.loss_criterion(self.model(self.example), self.label).backward()
         self.optimizer.step()
         self.assertEqual(42.56, np.round(self.model(self.example).item(), 4))
         weights = self.algorithm.extract_weights()
@@ -138,5 +128,5 @@ class FedAvgTest(unittest.TestCase):
         asyncio.run(test_fedavg_aggregation(self))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

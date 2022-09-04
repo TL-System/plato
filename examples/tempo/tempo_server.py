@@ -24,25 +24,22 @@ class Server(fedavg_cs.Server):
         self.local_epoch_list = None
         if Config().is_central_server():
             self.local_epoch_list = [
-                Config().trainer.epochs
-                for i in range(Config().algorithm.total_silos)
+                Config().trainer.epochs for i in range(Config().algorithm.total_silos)
             ]
 
         if Config().is_edge_server():
-            if 'local_epoch_num' not in self.recorded_items:
-                self.recorded_items = self.recorded_items + ['local_epoch_num']
+            if "local_epoch_num" not in self.recorded_items:
+                self.recorded_items = self.recorded_items + ["local_epoch_num"]
 
-    async def customize_server_response(self, server_response):
+    def customize_server_response(self, server_response: dict) -> dict:
         """Wrap up generating the server response with any additional information."""
         if Config().is_central_server():
-            server_response = await super().customize_server_response(
-                server_response)
-            server_response['local_epoch_num'] = self.local_epoch_list
+            server_response["local_epoch_num"] = self.local_epoch_list
         if Config().is_edge_server():
             # At this point, an edge server already updated Config().trainer.epochs
             # to the number received from the central server.
             # Now it passes the new local epochs number to its clients.
-            server_response['local_epoch_num'] = Config().trainer.epochs
+            server_response["local_epoch_num"] = Config().trainer.epochs
         return server_response
 
     async def wrap_up_processing_reports(self):
@@ -69,15 +66,13 @@ class Server(fedavg_cs.Server):
 
         if min_log == max_log:
             self.local_epoch_list = [
-                Config().trainer.epochs
-                for i in range(Config().algorithm.total_silos)
+                Config().trainer.epochs for i in range(Config().algorithm.total_silos)
             ]
         else:
             a_value = Config().algorithm.total_silos / 2 / (min_log - max_log)
             b_value = min_log - 4 * max_log
             self.local_epoch_list = [
-                max(1, math.ceil(a_value * (3 * i + b_value)))
-                for i in log_list
+                max(1, math.ceil(a_value * (3 * i + b_value))) for i in log_list
             ]
 
     def get_weights_differences(self):
@@ -88,13 +83,14 @@ class Server(fedavg_cs.Server):
         weights_diff_list = []
         for i in range(Config().algorithm.total_silos):
             client_id = i + 1 + Config().clients.total_clients
-            (report, weights) = [(report, payload)
-                                 for (__, report, payload, __) in self.updates
-                                 if int(report.client_id) == client_id][0]
+            (report, weights) = [
+                (update.report, update.payload)
+                for update in self.updates
+                if int(update.client_id) == client_id
+            ][0]
             num_samples = report.num_samples
 
-            weights_diff = self.compute_weights_difference(
-                weights, num_samples)
+            weights_diff = self.compute_weights_difference(weights, num_samples)
 
             weights_diff_list.append(weights_diff)
 

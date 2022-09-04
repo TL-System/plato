@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 3
+    total_clients: 1
 
     # The number of clients selected in each round
-    per_round: 3
+    per_round: 1
 
     # Should the clients compute test accuracy locally?
     do_test: true
@@ -41,17 +41,20 @@ trainer:
     # The target accuracy
     target_accuracy: 0.94
 
+    # The machine learning model
+    model_name: lenet5
+
     # Number of epoches for local training in each communication round
     epochs: 5
     batch_size: 32
     optimizer: SGD
-    learning_rate: 0.01
-    momentum: 0.9
-    weight_decay: 0.0
-
-    # The machine learning model
-    model_name: lenet5
 
 algorithm:
     # Aggregation algorithm
     type: fedavg
+
+parameters:
+    optimizer:
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0

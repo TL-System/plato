@@ -67,6 +67,9 @@ data:
     random_seed: 1
 
 trainer:
+    # The type of the trainer
+    type: basic
+
     # The maximum number of training rounds
     rounds: 100
 
@@ -80,9 +83,6 @@ trainer:
     epochs: 10
     batch_size: 32
     optimizer: SGD
-    learning_rate: 0.01
-    momentum: 0.9
-    weight_decay: 0.0
 
     # The machine learning model
     model_name: lenet5
@@ -134,5 +134,8 @@ results:
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time
 
-    # Plot results (x_axis-y_axis)
-    plot: round-accuracy, elapsed_time-accuracy
+parameters:
+    optimizer:
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0

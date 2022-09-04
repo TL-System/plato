@@ -1,0 +1,96 @@
+clients:
+    # Type
+    type: simple
+
+    # The total number of clients
+    total_clients: 5
+
+    # The number of clients selected in each round
+    per_round: 2
+
+    # Should the clients compute test accuracy locally?
+    do_test: true
+
+    # Amount to prune (%)
+    pruning_amount: 0.2
+
+    # Maximum pruning amount of the entire model (%)
+    pruning_target: 0.5
+
+    # Target accuracy of each client's personalized model
+    accuracy_threshold: 0.6
+
+    outbound_processors:
+        - send_mask
+        - model_compress
+
+    compute_comm_time: true
+
+    comm_simulation: false
+
+server:
+    address: 127.0.0.1
+    port: 8010
+    do_test: false
+
+    random_seed: 1
+
+    checkpoint_path: results/test/checkpoint
+    model_path: results/test/model
+
+    inbound_processors:
+        - model_decompress
+
+data:
+    # The training and testing dataset
+    datasource: MNIST
+
+    # Where the dataset is located
+    data_path: ../../data
+
+    # Number of samples in each partition
+    partition_size: 100
+
+    # IID or non-IID?
+    sampler: noniid
+
+    concentration: 5
+
+    testset_sampler: noniid
+
+    # The random seed for sampling data
+    random_seed: 1
+
+trainer:
+    # The type of the trainer
+    type: basic
+
+    # The maximum number of training rounds
+    rounds: 5
+
+    # The maximum number of clients running concurrently
+    max_concurrency: 2
+
+    # Number of epoches for local training in each communication round
+    epochs: 5
+    batch_size: 10
+    optimizer: SGD
+
+    # The machine learning model
+    model_name: lenet5
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg
+
+results:
+    # Write the following parameter(s) into a CSV
+    types: round, accuracy, elapsed_time, comm_time, round_time, comm_overhead
+
+    result_path: test/results
+
+parameters:
+    optimizer:
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0

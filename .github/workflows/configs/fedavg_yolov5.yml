@@ -18,7 +18,7 @@ server:
 data:
     # The training and testing dataset
     datasource: YOLO
-    data_params: ./packages/yolov5/yolov5/data/coco128.yaml
+    data_params: configs/yolov5/data/coco128.yaml
 
     # Where the dataset is located
     data_path: data/COCO
@@ -158,9 +158,15 @@ trainer:
 
     # The machine learning model
     model_name: yolov5
-    model_config: packages/yolov5/yolov5/models/yolov5s.yaml
-    train_params: packages/yolov5/yolov5/data/hyps/hyp.scratch.yaml
 
 algorithm:
     # Aggregation algorithm
     type: fedavg
+
+parameters:
+    model:
+        model_config: configs/yolov5/models/yolov5s.yaml
+        num_classes: 80
+
+    trainer:
+        train_params: configs/yolov5/data/hyps/hyp.scratch.yaml

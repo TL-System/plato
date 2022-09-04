@@ -67,64 +67,65 @@ class Sampler(base.Sampler):
         total_data_size = len(target_list)
 
         # obtain the configuration
-        min_partition_size = Config().data.min_partition_size if hasattr(
-            Config().data, 'min_partition_size') else 100
+        min_partition_size = (
+            Config().data.min_partition_size
+            if hasattr(Config().data, "min_partition_size")
+            else 100
+        )
         total_clients = Config().clients.total_clients
 
-        client_quantity_concentration = Config(
-        ).data.client_quantity_concentration if hasattr(
-            Config().data, 'client_quantity_concentration') else 1.0
+        client_quantity_concentration = (
+            Config().data.client_quantity_concentration
+            if hasattr(Config().data, "client_quantity_concentration")
+            else 1.0
+        )
 
-        label_concentration = Config().data.label_concentration if hasattr(
-            Config().data, 'label_concentration') else 1.0
+        label_concentration = (
+            Config().data.label_concentration
+            if hasattr(Config().data, "label_concentration")
+            else 1.0
+        )
 
         self.client_partition = sampler_utils.create_dirichlet_skew(
             total_size=total_data_size,
             concentration=client_quantity_concentration,
             min_partition_size=None,
-            number_partitions=total_clients)[client_id]
+            number_partitions=total_clients,
+        )[client_id]
 
-        self.client_partition_size = int(total_data_size *
-                                         self.client_partition)
-        if self.client_partition_size < min_partition_size:
-            self.client_partition_size = min_partition_size
+        self.client_partition_size = int(total_data_size * self.client_partition)
+        self.client_partition_size = max(self.client_partition_size, min_partition_size)
 
         self.client_label_proportions = sampler_utils.create_dirichlet_skew(
             total_size=len(class_list),
             concentration=label_concentration,
             min_partition_size=None,
-            number_partitions=len(class_list))
+            number_partitions=len(class_list),
+        )
 
         self.sample_weights = self.client_label_proportions[target_list]
 
     def get(self):
-        """Obtains an instance of the sampler. """
+        """Obtains an instance of the sampler."""
         gen = torch.Generator()
         gen.manual_seed(self.random_seed)
 
         # Samples without replacement using the sample weights
         subset_indices = list(
-            WeightedRandomSampler(weights=self.sample_weights,
-                                  num_samples=self.client_partition_size,
-                                  replacement=False,
-                                  generator=gen))
+            WeightedRandomSampler(
+                weights=self.sample_weights,
+                num_samples=self.client_partition_size,
+                replacement=False,
+                generator=gen,
+            )
+        )
 
         return SubsetRandomSampler(subset_indices, generator=gen)
 
-        # Samples without replacement using the sample weights
-        return WeightedRandomSampler(weights=self.sample_weights,
-                                     num_samples=self.client_partition_size,
-                                     replacement=False,
-                                     generator=gen)
-
-    def data_size(self):
-        """Returns the length of the dataset after sampling. """
+    def num_samples(self):
+        """Returns the length of the dataset after sampling."""
         return self.client_partition_size
 
-    def trainset_size(self):
-        """ Returns the length of the train dataset """
-        return self.data_size()
-
     def get_sampler_condition(self):
-        """ Obtain the label ratio and the sampler configuration """
+        """Obtain the label ratio and the sampler configuration"""
         return self.client_partition, self.client_label_proportions

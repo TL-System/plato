@@ -9,16 +9,17 @@ from plato.servers import fedavg
 
 
 class RLServer(fedavg.Server):
-    """ A federated learning server with an RL Agent. """
+    """A federated learning server with an RL Agent."""
 
     def __init__(self, agent, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
         self.agent = agent
 
     def reset(self):
-        """ Resetting the model, trainer, and algorithm on the server. """
-        logging.info("Reconfiguring the server for episode %d",
-                     self.agent.current_episode)
+        """Resetting the model, trainer, and algorithm on the server."""
+        logging.info(
+            "Reconfiguring the server for episode %d", self.agent.current_episode
+        )
 
         self.model = None
         self.trainer = None
@@ -27,14 +28,12 @@ class RLServer(fedavg.Server):
 
         self.current_round = 0
 
-    async def federated_averaging(self, updates):
+    async def aggregate_deltas(self, updates, deltas_received):
         """Aggregate weight updates from the clients using smart weighting."""
-        # Extract weights udpates from the client updates
-        deltas_received = self.compute_weight_deltas(updates)
         self.update_state()
 
         # Extract the total number of samples
-        num_samples = [report.num_samples for (__, report, __, __) in updates]
+        num_samples = [update.report.num_samples for update in updates]
         self.total_samples = sum(num_samples)
 
         # Perform weighted averaging
@@ -52,7 +51,7 @@ class RLServer(fedavg.Server):
         # Use adaptive weighted average
         for i, update in enumerate(deltas_received):
             for name, delta in update.items():
-                if delta.type() == 'torch.LongTensor':
+                if delta.type() == "torch.LongTensor":
                     avg_update[name] += delta * self.smart_weighting[i][0]
                 else:
                     avg_update[name] += delta * self.smart_weighting[i]
@@ -62,13 +61,8 @@ class RLServer(fedavg.Server):
 
         return avg_update
 
-    async def customize_server_response(self, server_response):
-        """ Wrap up generating the server response with any additional information. """
-        server_response['current_round'] = self.current_round
-        return server_response
-
     async def update_action(self):
-        """ Updating the RL agent's actions. """
+        """Updating the RL agent's actions."""
         if self.agent.current_step == 0:
             logging.info("[RL Agent] Preparing initial action...")
             self.agent.prep_action()
@@ -79,13 +73,13 @@ class RLServer(fedavg.Server):
         self.apply_action()
 
     def update_state(self):
-        """ Wrap up the state update to RL Agent. """
+        """Wrap up the state update to RL Agent."""
         # Pass new state to RL Agent
         self.agent.new_state = self.prep_state()
         self.agent.process_env_update()
 
     async def wrap_up(self):
-        """ Wrapping up when each round of training is done. """
+        """Wrapping up when each round of training is done."""
         self.save_to_checkpoint()
 
         if self.agent.reset_env:
@@ -96,9 +90,9 @@ class RLServer(fedavg.Server):
 
     @abstractmethod
     def prep_state(self):
-        """ Wrap up the state update to RL Agent. """
+        """Wrap up the state update to RL Agent."""
         return
 
     @abstractmethod
     def apply_action(self):
-        """ Apply action update from RL Agent to FL Env. """
+        """Apply action update from RL Agent to FL Env."""

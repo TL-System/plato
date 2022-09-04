@@ -12,21 +12,18 @@ from plato.config import Config
 @dataclass
 class Report:
     """Client report sent to the split learning server."""
+
     num_samples: int
     phase: str
 
 
 class Client(simple.Client):
-    """ A split learning client. """
-    def __init__(self,
-                 model=None,
-                 datasource=None,
-                 algorithm=None,
-                 trainer=None):
-        super().__init__(model=model,
-                         datasource=datasource,
-                         algorithm=algorithm,
-                         trainer=trainer)
+    """A split learning client."""
+
+    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
+        super().__init__(
+            model=model, datasource=datasource, algorithm=algorithm, trainer=trainer
+        )
 
         self.model_received = False
         self.gradient_received = False
@@ -50,19 +47,16 @@ class Client(simple.Client):
 
         assert not Config().clients.do_test
 
-        if self.gradient_received == False:
+        if not self.gradient_received:
             # Perform a forward pass till the cut layer in the model
-            features = self.algorithm.extract_features(
-                self.trainset, self.sampler,
-                Config().algorithm.cut_layer)
+            features = self.algorithm.extract_features(self.trainset, self.sampler)
 
             # Generate a report for the server, performing model testing if applicable
-            return Report(self.sampler.trainset_size(), "features"), features
+            return Report(self.sampler.num_samples(), "features"), features
         else:
             # Perform a complete training with gradients received
             config = Config().trainer._asdict()
-            self.algorithm.complete_train(config, self.trainset, self.sampler,
-                                          Config().algorithm.cut_layer)
+            self.algorithm.complete_train(config, self.trainset, self.sampler)
             weights = self.algorithm.extract_weights()
             # Generate a report, signal the end of train
-            return Report(self.sampler.trainset_size(), "weights"), weights
+            return Report(self.sampler.num_samples(), "weights"), weights

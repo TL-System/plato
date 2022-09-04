@@ -13,19 +13,15 @@ from plato.servers import fedavg
 
 
 class Server(fedavg.Server):
-    """A federated learning server using the FedNova algorithm. """
+    """A federated learning server using the FedNova algorithm."""
 
-    async def federated_averaging(self, updates):
+    async def aggregate_deltas(self, updates, deltas_received):
         """Aggregate weight updates from the clients using FedNova."""
-        # Extracting weights from the updates
-        deltas_received = self.compute_weight_deltas(updates)
-
         # Extracting the total number of samples
-        self.total_samples = sum(
-            [report.num_samples for (__, report, __, __) in updates])
+        self.total_samples = sum(update.report.num_samples for update in updates)
 
         # Extracting the number of local epoches, tau_i, from the updates
-        local_epochs = [report.epochs for (__, report, __, __) in updates]
+        local_epochs = [update.report.epochs for update in updates]
 
         # Performing weighted averaging
         avg_update = {
@@ -35,18 +31,20 @@ class Server(fedavg.Server):
 
         tau_eff = 0
         for i, update in enumerate(deltas_received):
-            __, report, __, __ = updates[i]
-            num_samples = report.num_samples
+            num_samples = updates[i].report.num_samples
             tau_eff_ = local_epochs[i] * num_samples / self.total_samples
             tau_eff += tau_eff_
 
         for i, update in enumerate(deltas_received):
-            __, report, __, __ = updates[i]
-            num_samples = report.num_samples
+            num_samples = updates[i].report.num_samples
 
             for name, delta in update.items():
                 # Use weighted average by the number of samples
-                avg_update[name] += delta * (num_samples / self.total_samples
-                                             ) * tau_eff / local_epochs[i]
+                avg_update[name] += (
+                    delta
+                    * (num_samples / self.total_samples)
+                    * tau_eff
+                    / local_epochs[i]
+                )
 
         return avg_update

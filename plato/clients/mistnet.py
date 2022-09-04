@@ -9,16 +9,10 @@ Differential Privacy," found in docs/papers.
 
 import logging
 import time
-from dataclasses import dataclass
+from types import SimpleNamespace
 
 from plato.config import Config
 from plato.clients import simple
-
-
-@dataclass
-class Report(simple.Report):
-    """Client report sent to the MistNet federated learning server."""
-    payload_length: int
 
 
 class Client(simple.Client):
@@ -35,13 +29,20 @@ class Client(simple.Client):
         tic = time.perf_counter()
 
         # Perform a forward pass till the cut layer in the model
-        features = self.algorithm.extract_features(
-            self.trainset, self.sampler,
-            Config().algorithm.cut_layer)
+        features = self.algorithm.extract_features(self.trainset, self.sampler)
 
         training_time = time.perf_counter() - tic
 
         # Generate a report for the server, performing model testing if applicable
         comm_time = time.time()
-        return Report(self.sampler.trainset_size(), 0, training_time,
-                      comm_time, False, len(features)), features
+        return (
+            SimpleNamespace(
+                num_samples=self.sampler.num_samples(),
+                accuracy=0,
+                training_time=training_time,
+                comm_time=comm_time,
+                update_response=False,
+                payload_length=len(features),
+            ),
+            features,
+        )

@@ -28,50 +28,46 @@ class Server(fedavg_cs.Server):
                 for i in range(Config().algorithm.total_silos)
             ]
 
-        if Config().is_edge_server() and hasattr(Config(), 'results'):
-            if 'pruning_amount' not in self.recorded_items:
-                self.recorded_items = self.recorded_items + ['pruning_amount']
+        if Config().is_edge_server() and hasattr(Config(), "results"):
+            if "pruning_amount" not in self.recorded_items:
+                self.recorded_items = self.recorded_items + ["pruning_amount"]
 
-    async def customize_server_response(self, server_response):
-        """ Wrap up generating the server response with any additional information. """
-        server_response = await super().customize_server_response(
-            server_response)
-
+    def customize_server_response(self, server_response: dict) -> dict:
+        """Wrap up generating the server response with any additional information."""
         if Config().is_central_server():
-            server_response['pruning_amount'] = self.pruning_amount_list
+            server_response["pruning_amount"] = self.pruning_amount_list
         if Config().is_edge_server():
             # At this point, an edge server already updated Config().clients.pruning_amount
             # to the number received from the central server.
             # Now it could pass the new pruning amount to its clients.
-            server_response['pruning_amount'] = Config().clients.pruning_amount
+            server_response["pruning_amount"] = Config().clients.pruning_amount
 
         return server_response
 
-    def compute_weight_deltas(self, updates):
-        """ Extract the model weight updates from client updates. """
-        deltas_received = [payload for (__, __, payload, __) in updates]
-        return deltas_received
+    def compute_weight_deltas(self, weights_received):
+        """Extract the model weight updates from client updates."""
+        return weights_received
 
     def update_pruning_amount_list(self):
-        """ Update the list of each institution's clients' pruning_amount. """
+        """Update the list of each institution's clients' pruning_amount."""
         weights_diff_list = self.get_weights_differences()
 
         self.compute_pruning_amount(weights_diff_list)
 
     def compute_pruning_amount(self, weights_diff_list):
-        """ A method to compute pruning amount. """
+        """A method to compute pruning amount."""
 
         median = statistics.median(weights_diff_list)
 
         for i, weight_diff in enumerate(weights_diff_list):
             if weight_diff >= median:
-                self.pruning_amount_list[i] = Config(
-                ).clients.pruning_amount * (
-                    1 + math.tanh(weight_diff / sum(weights_diff_list)))
+                self.pruning_amount_list[i] = Config().clients.pruning_amount * (
+                    1 + math.tanh(weight_diff / sum(weights_diff_list))
+                )
             else:
-                self.pruning_amount_list[i] = Config(
-                ).clients.pruning_amount * (
-                    1 - math.tanh(weight_diff / sum(weights_diff_list)))
+                self.pruning_amount_list[i] = Config().clients.pruning_amount * (
+                    1 - math.tanh(weight_diff / sum(weights_diff_list))
+                )
 
     def get_weights_differences(self):
         """
@@ -80,19 +76,18 @@ class Server(fedavg_cs.Server):
         """
         weights_diff_list = []
         for i in range(Config().algorithm.total_silos):
-            if hasattr(Config().clients,
-                       'simulation') and Config().clients.simulation:
-                client_id = i + 1 + Config().clients.per_round
-            else:
-                client_id = i + 1 + Config().clients.total_clients
+            client_id = i + 1 + Config().clients.total_clients
+
             (report, received_updates) = [
-                (report, payload) for (__, report, payload, __) in self.updates
-                if int(report.client_id) == client_id
+                (update.report, update.payload)
+                for update in self.updates
+                if int(update.report.client_id) == client_id
             ][0]
             num_samples = report.num_samples
 
             weights_diff = self.compute_weights_difference(
-                received_updates, num_samples)
+                received_updates, num_samples
+            )
 
             weights_diff_list.append(weights_diff)
 
@@ -116,7 +111,7 @@ class Server(fedavg_cs.Server):
     def get_record_items_values(self):
         """Get values will be recorded in result csv file."""
         record_items_values = super().get_record_items_values()
-        record_items_values['pruning_amount'] = Config().clients.pruning_amount
+        record_items_values["pruning_amount"] = Config().clients.pruning_amount
 
         return record_items_values
 
