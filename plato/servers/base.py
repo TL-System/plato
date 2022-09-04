@@ -121,6 +121,11 @@ class Server:
             if hasattr(Config().server, "uplink_bandwidth")
             else 100
         )
+        if Config().is_edge_server():
+            if hasattr(Config().server, "edge_downlink_bandwidth"):
+                self.downlink_bandwidth = Config().server.edge_downlink_bandwidth
+            if hasattr(Config().server, "edge_uplink_bandwidth"):
+                self.uplink_bandwidth = Config().server.edge_uplink_bandwidth
 
         # Use dictionaries to record downlink/uplink communication time of each client
         self.downlink_comm_time = {}
@@ -207,13 +212,22 @@ class Server:
             else 0
         )
 
-        # What is the minimum number of clients that must have reported before aggregation
-        # takes place?
-        self.minimum_clients = (
-            Config().server.minimum_clients_aggregated
-            if hasattr(Config().server, "minimum_clients_aggregated")
-            else 1
-        )
+        if not Config().is_central_server():
+            # What is the minimum number of clients that must have reported before aggregation
+            # takes place?
+            self.minimum_clients = (
+                Config().server.minimum_clients_aggregated
+                if hasattr(Config().server, "minimum_clients_aggregated")
+                else 1
+            )
+        else:
+            # In cross-silo FL, what is the minimum number of edge servers that must have reported
+            # before the central server conduct aggregation?
+            self.minimum_clients = (
+                Config().server.minimum_edges_aggregated
+                if hasattr(Config().server, "minimum_edges_aggregated")
+                else Config().algorithm.total_silos
+            )
 
         # Are we simulating the wall clock time on the server? This is useful when the clients
         # are training in batches due to a lack of memory on the GPUs
