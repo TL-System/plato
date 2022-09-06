@@ -93,6 +93,9 @@ class Server(fedavg.Server):
 
             self.recorded_items = ["global_round"] + self.recorded_items
 
+            # The training time of a edge server in one global round
+            self.edge_training_time = 0
+
         # Compute the number of clients for the central server
         if Config().is_central_server():
             self.clients_per_round = Config().algorithm.total_silos
@@ -108,6 +111,8 @@ class Server(fedavg.Server):
         Booting the federated learning server by setting up the data, model, and
         creating the clients.
         """
+        super().configure()
+
         if Config().is_edge_server():
             logging.info(
                 "Configuring edge server #%d as a %s server.",
@@ -154,8 +159,8 @@ class Server(fedavg.Server):
             csv_processor.initialize_csv(
                 result_csv_file, self.recorded_items, result_path
             )
-        else:
-            super().configure()
+            # Delete the csv file created by inherited method
+            os.remove(f"{result_path}/{os.getpid()}.csv")
 
     async def select_clients(self, for_next_batch=False):
         if Config().is_edge_server() and not for_next_batch:
@@ -298,6 +303,8 @@ class Server(fedavg.Server):
             await super().wrap_up_processing_reports()
 
         if Config().is_edge_server():
+            self.edge_training_time += self.get_record_items_values()["round_time"]
+
             new_row = []
             for item in self.recorded_items:
                 item_value = self.get_record_items_values()[item]
