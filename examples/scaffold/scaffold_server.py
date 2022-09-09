@@ -33,7 +33,8 @@ class Server(fedavg.Server):
     def aggregate_weights(self, updates, baseline_weights, weights_received):
         """Aggregates the model updates using the deltas directly received by SCAFFOLD clients."""
         # Extract the total number of samples
-        self.total_samples = sum(update.report.num_samples for update in updates)
+        self.total_samples = sum(update.report.num_samples
+                                 for update in updates)
 
         # Perform weighted averaging
         avg_update = {
@@ -61,15 +62,15 @@ class Server(fedavg.Server):
         # Update server control variate
         for client_control_variate_delta in self.received_client_control_variates:
             for name, param in client_control_variate_delta.items():
-                self.server_control_variate[name] += param * (
-                    1 / Config().clients.total_clients
-                )
+                self.server_control_variate[name] += param.to(device=Config(
+                ).device()) * (1 / Config().clients.total_clients)
 
     def customize_server_payload(self, payload):
         "Add the server control variate into the server payload."
         if self.server_control_variate is None:
             self.server_control_variate = OrderedDict()
             for name, weight in self.algorithm.extract_weights().items():
-                self.server_control_variate[name] = self.trainer.zeros(weight.shape)
+                self.server_control_variate[name] = self.trainer.zeros(
+                    weight.shape).to(device=Config().device())
 
         return [payload, self.server_control_variate]
