@@ -132,14 +132,3 @@ class Trainer(basic.Trainer):
             self.client_id,
             self.extra_payload_path,
         )
-
-        # Compute weight deltas
-        weight_deltas = {}
-        for layer in self.global_model_weights:
-            weight_deltas[layer] = torch.sub(
-                self.model.state_dict()[layer],
-                self.global_model_weights[layer].to(device=self.device),
-                alpha=1,
-            )
-
-        self.model.load_state_dict(weight_deltas, strict=True)
