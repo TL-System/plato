@@ -22,7 +22,7 @@ class Client(simple.Client):
     """A SCAFFOLD federated learning client who sends weight updates
     and client control variate."""
 
-    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
+    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None, inbound_processor=None, outbound_processor=None):
         super().__init__(model, datasource, algorithm, trainer)
 
         self.client_control_variate = None
