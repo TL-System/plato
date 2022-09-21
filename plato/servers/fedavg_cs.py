@@ -96,6 +96,9 @@ class Server(fedavg.Server):
             # The training time of a edge server in one global round
             self.edge_training_time = 0
 
+            # The training time of a edge server with its clients in one global round
+            self.edge_comm_time = 0
+
         # Compute the number of clients for the central server
         if Config().is_central_server():
             self.clients_per_round = Config().algorithm.total_silos
@@ -304,6 +307,7 @@ class Server(fedavg.Server):
 
         if Config().is_edge_server():
             self.edge_training_time += self.get_record_items_values()["round_time"]
+            self.edge_comm_time += self.get_record_items_values()["comm_time"]
 
             new_row = []
             for item in self.recorded_items:
@@ -348,6 +352,11 @@ class Server(fedavg.Server):
         record_items_values["average_accuracy"] = self.average_accuracy
         record_items_values["edge_agg_num"] = Config().algorithm.local_rounds
         record_items_values["local_epoch_num"] = Config().trainer.epochs
+
+        if Config().is_central_server():
+            record_items_values["comm_time"] += max(
+                update.report.edge_server_comm_time for update in self.updates
+            )
 
         return record_items_values
 

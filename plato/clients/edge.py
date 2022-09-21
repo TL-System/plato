@@ -70,6 +70,9 @@ class Client(simple.Client):
 
         comm_time = time.time()
 
+        edge_server_comm_time = self.server.edge_comm_time
+        self.server.edge_comm_time = 0
+
         # Generate a report for the central server
         report = SimpleNamespace(
             num_samples=self.server.total_samples,
@@ -80,6 +83,7 @@ class Client(simple.Client):
             average_accuracy=average_accuracy,
             client_id=self.client_id,
             edge_server_comm_overhead=self.server.comm_overhead,
+            edge_server_comm_time=edge_server_comm_time,
         )
 
         self._report = self.customize_report(report)
