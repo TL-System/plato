@@ -5,10 +5,10 @@ Processors for data payloads.
 Having a registry of all available classes is convenient for retrieving an instance
 based on a configuration at run-time.
 """
+from concurrent.futures import process
 import logging
 from collections import OrderedDict
 from typing import Tuple
-from . import extract_server_payload, send_extra_payload
 
 from plato.config import Config
 from plato.processors import pipeline
@@ -59,7 +59,7 @@ if not (hasattr(Config().trainer, "use_tensorflow")
         ("unstructured_pruning", unstructured_pruning.Processor),
     ])
 
-
+print("the original address when first imported: ", id(registered_processors))
 def get(user: str,
         processor_kwargs={},
         **kwargs) -> Tuple[pipeline.Processor, pipeline.Processor]:
@@ -97,8 +97,14 @@ def get(user: str,
 
         return registered_processors[name](**this_kwargs)
 
-    outbound_processors = list(map(map_f, outbound_processors))
+    outbound_processors = list(map(map_f, outbound_processors)) 
     inbound_processors = list(map(map_f, inbound_processors))
-
+   
     return pipeline.Processor(outbound_processors), pipeline.Processor(
-        inbound_processors)
+        inbound_processors) # what if not find in registered ones?
+    
+def register_processors(custom_processors_list):
+    for name, processor in custom_processors_list.items():
+        registered_processors.update({name:processor})
+
+        

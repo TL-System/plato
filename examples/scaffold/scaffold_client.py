@@ -16,7 +16,7 @@ import pickle
 
 from plato.clients import simple
 from plato.config import Config
-
+import extract_server_payload, send_extra_payload
 
 class Client(simple.Client):
     """A SCAFFOLD federated learning client who sends weight updates
@@ -24,8 +24,9 @@ class Client(simple.Client):
 
     def __init__(self, model=None, datasource=None, algorithm=None, trainer=None, inbound_processor=None, outbound_processor=None):
         super().__init__(model, datasource, algorithm, trainer)
-
         self.client_control_variate = None
+        self.customized_processors = {'extract_server_payload': extract_server_payload.Processor, 'send_extra_payload':send_extra_payload.Processor}
+
 
     def process_server_response(self, server_response):
         """Initialize the server control variate and client control variate for trainer"""

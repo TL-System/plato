@@ -44,6 +44,7 @@ class Client(base.Client):
 
         self._report = None
 
+        self.customized_processors = {}
     def configure(self) -> None:
         """Prepares this client for training."""
         super().configure()
@@ -67,14 +68,14 @@ class Client(base.Client):
 
         # Pass inbound and outbound data payloads through processors for
         # additional data processing
+        processor_registry.register_processors(self.customized_processors)
         self.outbound_processor, self.inbound_processor = processor_registry.get(
             "Client", client_id=self.client_id, trainer=self.trainer)
-
-        self.outbound_processor, self.inbound_processor = self.customized_processors(
-            self.outbound_processor, self.inbound_processor)
-
-    def customized_processors(outbound_processor, inbound_processor):
+    """
+    def customized_processors(outbound_processor, inbound_processor):# change attributes in pipeline.processor: add some and change order
+        print("customizing pipeline processors: ") 
         return outbound_processor, inbound_processor
+    """
 
     def load_data(self) -> None:
         """Generates data and loads them onto this client."""
