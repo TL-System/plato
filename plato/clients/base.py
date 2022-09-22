@@ -4,6 +4,7 @@ The base class for all federated learning clients on edge devices or edge server
 
 import asyncio
 import logging
+import math
 import os
 import pickle
 import re
@@ -107,12 +108,21 @@ class Client:
         """Startup function for a client."""
 
         if hasattr(Config().algorithm, "cross_silo") and not Config().is_edge_server():
-            # Contact one of the edge servers
-            self.edge_server_id = (
-                Config().clients.total_clients
-                + (self.client_id - 1) % Config().algorithm.total_silos
-                + 1
+            launched_client_num = (
+                min(
+                    Config().trainer.max_concurrency
+                    * max(1, Config().gpu_count())
+                    * Config().algorithm.total_silos,
+                    Config().clients.per_round,
+                )
+                if hasattr(Config().trainer, "max_concurrency")
+                else Config().clients.per_round
             )
+            # Contact one of the edge servers
+            self.edge_server_id = Config().clients.total_clients + math.ceil(
+                self.client_id / (launched_client_num / Config().algorithm.total_silos)
+            )
+
             logging.info(
                 "[Client #%d] Contacting Edge Server #%d.",
                 self.client_id,
