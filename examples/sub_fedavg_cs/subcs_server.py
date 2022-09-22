@@ -18,8 +18,6 @@ class Server(fedavg_cs.Server):
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
 
-        self.comm_overhead = 0
-
         if Config().is_edge_server() and hasattr(Config(), "results"):
             if "pruning_amount" not in self.recorded_items:
                 self.recorded_items = self.recorded_items + ["pruning_amount"]

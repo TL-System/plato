@@ -173,7 +173,7 @@ class Server(base.Server):
                 "[Server #%d] Aggregating model weights directly rather than weight deltas.",
                 os.getpid(),
             )
-            updated_weights = self.aggregate_weights(
+            updated_weights = await self.aggregate_weights(
                 self.updates, baseline_weights, weights_received
             )
 
