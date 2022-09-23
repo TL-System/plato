@@ -28,10 +28,8 @@ class Client(simple.Client):
         self.customized_processors = {'extract_server_payload': extract_server_payload.Processor, 'send_extra_payload':send_extra_payload.Processor}
 
     def configure(self):
+        """Initialize the server control variate and client control variate for trainer"""        
         super().configure()
-
-    #def process_server_response(self, server_response):
-        """Initialize the server control variate and client control variate for trainer"""
 
         # Load the client control variate if the client has participated before
         model_path = Config().params["model_path"]
