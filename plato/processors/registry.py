@@ -5,7 +5,6 @@ Processors for data payloads.
 Having a registry of all available classes is convenient for retrieving an instance
 based on a configuration at run-time.
 """
-from concurrent.futures import process
 import logging
 from collections import OrderedDict
 from typing import Tuple
@@ -59,7 +58,6 @@ if not (hasattr(Config().trainer, "use_tensorflow")
         ("unstructured_pruning", unstructured_pruning.Processor),
     ])
 
-print("the original address when first imported: ", id(registered_processors))
 def get(user: str,
         processor_kwargs={},
         **kwargs) -> Tuple[pipeline.Processor, pipeline.Processor]:
