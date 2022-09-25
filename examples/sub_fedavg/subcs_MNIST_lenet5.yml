@@ -1,3 +1,6 @@
+general:
+    base_path: ./test
+
 clients:
     # Type
     type: simple
@@ -26,20 +29,16 @@ server:
     address: 127.0.0.1
     port: 8000
     do_test: true
-    edge_do_test: true
 
     inbound_processors:
         - model_decompress
-
-    checkpoint_path: ./results/test/checkpoint
-    model_path: ./results/test/model
 
 data:
     # The training and testing dataset
     datasource: MNIST
 
     # Where the dataset is located
-    data_path: ../../data
+    data_path: ../../../data
 
     # Number of samples in each partition
     partition_size: 100
@@ -47,7 +46,6 @@ data:
     # IID or non-IID?
     sampler: iid
 
-    testset_sampler: iid
     testset_size: 1000
 
     # The random seed for sampling data
@@ -91,14 +89,12 @@ algorithm:
     # aggregated weights to the central server
     local_rounds: 2
 
-results:
-    # Write the following parameter(s) into a CSV
-    types: round, accuracy, average_accuracy, elapsed_time, comm_time, round_time, comm_overhead
-
-    result_path: ./results/test
-
 parameters:
     optimizer:
         lr: 0.01
         momentum: 0.9
         weight_decay: 0.0
+
+results:
+    # Write the following parameter(s) into a CSV
+    types: round, accuracy, elapsed_time, comm_time, round_time, comm_overhead

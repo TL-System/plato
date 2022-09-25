@@ -3,7 +3,7 @@ The training and testing loops for PyTorch.
 """
 import copy
 import logging
-import os
+import time
 
 import torch
 
@@ -30,6 +30,8 @@ class Trainer(basic.Trainer):
             if hasattr(Config().clients, "mask_distance_threshold")
             else 0.0001
         )
+        self.first_epoch_mask = None
+        self.last_epoch_mask = None
 
         self.datasource = None
         self.testset = None
@@ -43,64 +45,49 @@ class Trainer(basic.Trainer):
 
     # pylint: disable=unused-argument
     def train_model(self, config, trainset, sampler, **kwargs):
-        """The custom training loop for Sub-FedAvg(Un)."""
+        """The default training loop when a custom training loop is not supplied."""
         batch_size = config["batch_size"]
-        log_interval = 10
+        self.sampler = sampler
+        tic = time.perf_counter()
 
-        logging.info("[Client #%d] Loading the dataset.", self.client_id)
-        _train_loader = getattr(self, "train_loader", None)
+        self.run_history.reset()
 
-        if callable(_train_loader):
-            train_loader = self.train_loader(batch_size, trainset, sampler)
-        else:
-            train_loader = torch.utils.data.DataLoader(
-                dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler
-            )
+        self.train_run_start(config)
+        self.callback_handler.call_event("on_train_run_start", self, config)
 
-        epochs = config["epochs"]
+        self.train_loader = Trainer.get_train_loader(batch_size, trainset, sampler)
 
         # Initializing the loss criterion
-        _loss_criterion = getattr(self, "loss_criterion", None)
-        if callable(_loss_criterion):
-            loss_criterion = self.loss_criterion(self.model)
-        else:
-            loss_criterion = torch.nn.CrossEntropyLoss()
+        _loss_criterion = self.get_loss_criterion()
 
         # Initializing the optimizer
-        get_optimizer = getattr(self, "get_optimizer", optimizers.get_optimizer)
-        optimizer = get_optimizer(self.model)
-
-        # Initializing the learning rate schedule, if necessary
-        if "lr_schedule" in config:
-            lr_schedule = optimizers.get_lr_schedule(
-                optimizer, len(train_loader), train_loader
-            )
-        else:
-            lr_schedule = None
+        optimizer = self.get_optimizer(self.model)
+        self.lr_scheduler = self.get_lr_scheduler(config, optimizer)
+        optimizer = self._adjust_lr(config, self.lr_scheduler, optimizer)
 
         self.model.to(self.device)
         self.model.train()
 
-        # Initializing the learning rate schedule, if necessary
-        if hasattr(config, "lr_scheduler"):
-            lr_schedule = optimizers.get_lr_schedule(
-                optimizer, iterations_per_epoch, train_loader
-            )
-        else:
-            lr_schedule = None
+        total_epochs = config["epochs"]
 
-        for epoch in range(1, epochs + 1):
-            # Use a default training loop
-            for batch_id, (examples, labels) in enumerate(train_loader):
+        for self.current_epoch in range(1, total_epochs + 1):
+            self._loss_tracker.reset()
+            self.train_epoch_start(config)
+            self.callback_handler.call_event("on_train_epoch_start", self, config)
+
+            for batch_id, (examples, labels) in enumerate(self.train_loader):
                 examples, labels = examples.to(self.device), labels.to(self.device)
-
                 optimizer.zero_grad()
 
                 outputs = self.model(examples)
 
-                loss = loss_criterion(outputs, labels)
+                loss = _loss_criterion(outputs, labels)
+                self._loss_tracker.update(loss, labels.size(0))
 
-                loss.backward()
+                if "create_graph" in config:
+                    loss.backward(create_graph=config["create_graph"])
+                else:
+                    loss.backward()
 
                 # Freezing Pruned weights by making their gradients Zero
                 step = 0
@@ -115,45 +102,69 @@ class Trainer(basic.Trainer):
 
                 optimizer.step()
 
-                if batch_id % log_interval == 0:
-                    if self.client_id == 0:
-                        logging.info(
-                            "[Server #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
-                            os.getpid(),
-                            epoch,
-                            epochs,
-                            batch_id,
-                            len(train_loader),
-                            loss.data.item(),
-                        )
-                    else:
-                        logging.info(
-                            "[Client #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
-                            self.client_id,
-                            epoch,
-                            epochs,
-                            batch_id,
-                            len(train_loader),
-                            loss.data.item(),
-                        )
-
-            if lr_schedule is not None:
-                lr_scheduler.step()
-
-            if epoch == 1:
-                first_epoch_mask = pruning_processor.fake_prune(
-                    self.pruning_amount,
-                    copy.deepcopy(self.model),
-                    copy.deepcopy(self.mask),
-                )
-            if epoch == epochs:
-                last_epoch_mask = pruning_processor.fake_prune(
-                    self.pruning_amount,
-                    copy.deepcopy(self.model),
-                    copy.deepcopy(self.mask),
+                self.train_step_end(config, batch=batch_id, loss=loss)
+                self.callback_handler.call_event(
+                    "on_train_step_end", self, config, batch=batch_id, loss=loss
                 )
 
-        self.process_pruning(first_epoch_mask, last_epoch_mask)
+            self.lr_scheduler_step()
+
+            if hasattr(optimizer, "params_state_update"):
+                optimizer.params_state_update()
+
+            # Simulate client's speed
+            if (
+                self.client_id != 0
+                and hasattr(Config().clients, "speed_simulation")
+                and Config().clients.speed_simulation
+            ):
+                self.simulate_sleep_time()
+
+            # Saving the model at the end of this epoch to a file so that
+            # it can later be retrieved to respond to server requests
+            # in asynchronous mode when the wall clock time is simulated
+            if (
+                hasattr(Config().server, "request_update")
+                and Config().server.request_update
+            ):
+                self.model.cpu()
+                training_time = time.perf_counter() - tic
+                filename = f"{self.client_id}_{self.current_epoch}_{training_time}.pth"
+                self.save_model(filename)
+                self.model.to(self.device)
+
+            self.run_history.update_metric("train_loss", self._loss_tracker.average)
+            self.train_epoch_end(config)
+            self.callback_handler.call_event("on_train_epoch_end", self, config)
+
+        self.train_run_end(config)
+        self.callback_handler.call_event("on_train_run_end", self, config)
+
+    # pylint: disable=unused-argument
+    def train_run_start(self, config):
+        """Method called at the start of training run."""
+        self.mask = pruning_processor.make_init_mask(self.model)
+
+    def train_epoch_end(self, config):
+        """Method called at the end of a training epoch."""
+        if self.current_epoch == 1:
+            self.first_epoch_mask = pruning_processor.fake_prune(
+                self.pruning_amount,
+                copy.deepcopy(self.model),
+                copy.deepcopy(self.mask),
+            )
+        if self.current_epoch == config["epochs"]:
+            self.last_epoch_mask = pruning_processor.fake_prune(
+                self.pruning_amount,
+                copy.deepcopy(self.model),
+                copy.deepcopy(self.mask),
+            )
+        super().train_epoch_end(config)
+
+    # pylint: disable=unused-argument
+    def train_run_end(self, config):
+        """Method called at the end of a training run."""
+        self.process_pruning(self.first_epoch_mask, self.last_epoch_mask)
 
     def process_pruning(self, first_epoch_mask, last_epoch_mask):
         """Process unstructed pruning."""
