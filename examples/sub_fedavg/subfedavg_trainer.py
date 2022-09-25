@@ -21,8 +21,16 @@ class Trainer(basic.Trainer):
         """Initializing the trainer with the provided model."""
         super().__init__(model=model)
         self.mask = None
-        self.pruning_target = Config().clients.pruning_amount * 100
-        self.pruning_amount = Config().clients.pruning_amount * 100
+        self.pruning_target = (
+            Config().clients.pruning_amount * 100
+            if hasattr(Config().clients, "pruning_amount")
+            else 40
+        )
+        self.pruning_amount = (
+            Config().clients.pruning_amount * 100
+            if hasattr(Config().clients, "pruning_amount")
+            else 40
+        )
         self.pruned = 0
         self.made_init_mask = False
         self.mask_distance_threshold = (
