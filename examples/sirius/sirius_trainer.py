@@ -8,9 +8,30 @@ import torch
 
 from plato.config import Config
 from plato.trainers import basic
+import numpy as np
 
-import scaffold_optimizer
+from plato.trainers import  tracking
 
+class LossTracker(tracking.LossTracker):
+    def __init__(self):
+        super().__init__()
+        self.loss_decay = 1e-2
+
+    def reset(self):
+
+        """do not reset this loss tracker."""
+
+    def update(self, loss_batch_value, batch_size=1):
+        """Updates the loss tracker with another loss value from a batch."""
+        self.total_loss = (1. - self.loss_decay) * self.total_loss \
+                                                   + self.loss_decay * loss_batch_value
+        
+
+    def average(self):
+        """"Recording for each epoch"""
+        """But we only need the last epoch's for each local training"""
+
+        return np.sqrt(self.total_loss)
 
 class Trainer(basic.Trainer):
     """The federated learning trainer for the SCAFFOLD client."""
@@ -23,3 +44,5 @@ class Trainer(basic.Trainer):
         client_id: The ID of the client using this trainer (optional).
         """
         super().__init__(model)
+        self._loss_tracker = LossTracker()
+
