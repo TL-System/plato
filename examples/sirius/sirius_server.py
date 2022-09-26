@@ -2,7 +2,9 @@
 An asynchronous federated learning server using Sirius.
 """
 
-import torch
+
+import random
+import logging
 import asyncio
 from plato.config import Config
 from plato.servers import fedavg
@@ -57,5 +59,36 @@ class Server(fedavg.Server):
         """Calculate client utility here and update the record on the server"""
         for update in updates:
             self.client_utilities[update.client_id] = update.report.statistics_utility * self.staleness_function(update.staleness)
-            
+
+    def choose_clients(self, clients_pool, clients_count):
+        """Choose a subset of the clients to participate in each round."""
+        selected_clients = []
+
+        if self.current_round > 1:
+            # Exploitation
+
+
+
+        # Exploration
+        random.setstate(self.prng_state)
+
+        # Select unexplored clients randomly
+        selected_unexplore_clients = random.sample(
+            self.unexplored_clients, clients_count - len(selected_clients)
+        )
+
+        self.prng_state = random.getstate()
+        self.explored_clients += selected_unexplore_clients
+
+        for client_id in selected_unexplore_clients:
+            self.unexplored_clients.remove(client_id)
+
+        selected_clients += selected_unexplore_clients
+
+        for client in selected_clients:
+            self.client_selected_times[client] += 1
+
+        logging.info("[%s] Selected clients: %s", self, selected_clients)
+
+        return selected_clients
            
