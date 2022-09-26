@@ -8,10 +8,19 @@ from plato.config import Config
 from plato.servers import fedavg
 
 class Server(fedavg.Server):
-    """A federated learning server using the SCAFFOLD algorithm."""
+    """A federated learning server using the sirius algorithm."""
 
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
+        self.staleness_factor = 0.5
+
+    def configure(self):
+        """Initialize necessary variables."""
+        super().configure()
+
+        self.client_utilities = {
+            client_id: 0 for client_id in range(1, self.total_clients + 1)
+        }
 
     async def aggregate_deltas(self, updates, deltas_received):
         """Aggregate weight updates from the clients using federated averaging with calcuated staleness factor."""
@@ -41,4 +50,12 @@ class Server(fedavg.Server):
         return avg_update
 
     def staleness_function(self, stalenss):
-        return 1.0 / pow(stalenss + 1, 0.5) # formula obtained from Zhifeng's code. (clients_manager/base/staleness_factor_calculator)
+        return 1.0 / pow(stalenss + 1, self.staleness_factor) # formula obtained from Zhifeng's code. (clients_manager/sirius/staleness_factor_calculator)
+
+    def weights_aggregated(self, updates):
+        """Method called at the end of aggregating received weights."""
+        """Calculate client utility here and update the record on the server"""
+        for update in updates:
+            self.client_utilities[update.client_id] = update.report.statistics_utility * self.staleness_function(update.staleness)
+            
+           
