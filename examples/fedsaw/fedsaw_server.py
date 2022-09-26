@@ -62,14 +62,9 @@ class Server(fedavg_cs.Server):
         median = statistics.median(weights_diff_list)
 
         for i, weight_diff in enumerate(weights_diff_list):
-            if weight_diff >= median:
-                self.pruning_amount_list[i] = self.init_pruning_amount * (
-                    1 + math.tanh(weight_diff / sum(weights_diff_list))
-                )
-            else:
-                self.pruning_amount_list[i] = self.init_pruning_amount * (
-                    1 - math.tanh(weight_diff / sum(weights_diff_list))
-                )
+            self.pruning_amount_list[i] = 1 / (
+                1 + math.exp((median - weight_diff) / median)
+            )
 
     def get_weights_differences(self):
         """
