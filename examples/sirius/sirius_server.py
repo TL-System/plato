@@ -2,7 +2,7 @@
 An asynchronous federated learning server using Sirius.
 """
 
-
+import math
 import random
 import logging
 import asyncio
@@ -15,6 +15,9 @@ class Server(fedavg.Server):
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
         self.staleness_factor = 0.5
+        self.exploration_factor = Config().server.exploration_factor
+        self.explored_clients = []
+        self.unexplored_clients = []
 
     def configure(self):
         """Initialize necessary variables."""
@@ -23,6 +26,7 @@ class Server(fedavg.Server):
         self.client_utilities = {
             client_id: 0 for client_id in range(1, self.total_clients + 1)
         }
+        self.unexplored_clients = list(range(1, self.total_clients + 1))
 
     async def aggregate_deltas(self, updates, deltas_received):
         """Aggregate weight updates from the clients using federated averaging with calcuated staleness factor."""
@@ -66,8 +70,15 @@ class Server(fedavg.Server):
 
         if self.current_round > 1:
             # Exploitation
+            exploit_client_num = max(
+                math.ceil((1.0 - self.exploration_factor) * clients_count),
+                clients_count - len(self.unexplored_clients),
+            )
 
-
+            sorted_util = sorted(
+                self.client_utilities, key=self.client_utilities.get, reverse=True
+            )
+            selected_clients = sorted_util[:exploit_client_num]
 
         # Exploration
         random.setstate(self.prng_state)
@@ -85,8 +96,8 @@ class Server(fedavg.Server):
 
         selected_clients += selected_unexplore_clients
 
-        for client in selected_clients:
-            self.client_selected_times[client] += 1
+        #for client in selected_clients:
+        #    self.client_selected_times[client] += 1
 
         logging.info("[%s] Selected clients: %s", self, selected_clients)
 
