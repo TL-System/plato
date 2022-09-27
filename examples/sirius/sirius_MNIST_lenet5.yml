@@ -6,7 +6,7 @@ clients:
     total_clients: 10
 
     # The number of clients selected in each round
-    per_round: 2
+    per_round: 5
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -16,7 +16,7 @@ server:
     port: 8000
     do_test: true
     random_seed: 1
-
+    simulate_wall_time: true
     step_window: 2
     penalty: 2
     exploration_factor: 0.9
@@ -33,7 +33,7 @@ data:
     data_path: ../../data
 
     # Number of samples in each partition
-    partition_size: 100
+    partition_size: 20000
 
     # IID or non-IID?
     sampler: iid
@@ -48,7 +48,7 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 2
+    rounds: 5
 
     # The maximum number of clients running concurrently
     max_concurrency: 2
@@ -57,8 +57,8 @@ trainer:
     target_accuracy: 0.99
 
     # Number of epoches for local training in each communication round
-    epochs: 2
-    batch_size: 10
+    epochs: 5
+    batch_size: 32
     optimizer: SGD
 
     # The machine learning model
