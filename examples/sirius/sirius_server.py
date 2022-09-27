@@ -9,6 +9,12 @@ import asyncio
 from plato.config import Config
 from plato.servers import fedavg
 
+from inspect import currentframe
+
+def get_linenumber():
+    cf = currentframe()
+    return cf.f_back.f_lineno
+
 class Server(fedavg.Server):
     """A federated learning server using the sirius algorithm."""
 
@@ -18,6 +24,7 @@ class Server(fedavg.Server):
         self.exploration_factor = Config().server.exploration_factor
         self.explored_clients = []
         self.unexplored_clients = []
+        print("Server finished line_", get_linenumber())
 
     def configure(self):
         """Initialize necessary variables."""
@@ -27,9 +34,11 @@ class Server(fedavg.Server):
             client_id: 0 for client_id in range(1, self.total_clients + 1)
         }
         self.unexplored_clients = list(range(1, self.total_clients + 1))
+        print("Server finished line_", get_linenumber())
 
     async def aggregate_deltas(self, updates, deltas_received):
         """Aggregate weight updates from the clients using federated averaging with calcuated staleness factor."""
+        print("Server finished line_", get_linenumber()) 
         
         # Extract the total number of samples
         self.total_samples = sum(update.report.num_samples for update in updates)
@@ -52,10 +61,11 @@ class Server(fedavg.Server):
 
             # Yield to other tasks in the server
             await asyncio.sleep(0)
-
+        print("Server finished line_", get_linenumber())
         return avg_update
 
     def staleness_function(self, stalenss):
+        print("Server finished line_", get_linenumber())
         return 1.0 / pow(stalenss + 1, self.staleness_factor) # formula obtained from Zhifeng's code. (clients_manager/sirius/staleness_factor_calculator)
 
     def weights_aggregated(self, updates):
@@ -63,11 +73,12 @@ class Server(fedavg.Server):
         """Calculate client utility here and update the record on the server"""
         for update in updates:
             self.client_utilities[update.client_id] = update.report.statistics_utility * self.staleness_function(update.staleness)
+        print("Server finished line_", get_linenumber())
 
     def choose_clients(self, clients_pool, clients_count):
         """Choose a subset of the clients to participate in each round."""
         selected_clients = []
-
+        print("Server finished line_", get_linenumber())
         if self.current_round > 1:
             # Exploitation
             exploit_client_num = max(
@@ -79,7 +90,7 @@ class Server(fedavg.Server):
                 self.client_utilities, key=self.client_utilities.get, reverse=True
             )
             selected_clients = sorted_util[:exploit_client_num]
-
+        print("Server finished line_", get_linenumber())
         # Exploration
         random.setstate(self.prng_state)
 
@@ -93,7 +104,7 @@ class Server(fedavg.Server):
 
         for client_id in selected_unexplore_clients:
             self.unexplored_clients.remove(client_id)
-
+        print("Server finished line_", get_linenumber())
         selected_clients += selected_unexplore_clients
 
         #for client in selected_clients:

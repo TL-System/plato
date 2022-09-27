@@ -12,6 +12,13 @@ import numpy as np
 
 from plato.trainers import  tracking
 
+from inspect import currentframe
+
+
+def get_linenumber():
+    cf = currentframe()
+    return cf.f_back.f_lineno
+
 class LossTracker(tracking.LossTracker):
     def __init__(self):
         super().__init__()
@@ -25,12 +32,13 @@ class LossTracker(tracking.LossTracker):
         """Updates the loss tracker with another loss value from a batch."""
         self.total_loss = (1. - self.loss_decay) * self.total_loss \
                                                    + self.loss_decay * loss_batch_value
+        print("Trainer finished line_", get_linenumber())
         
 
     def average(self):
         """"Recording for each epoch"""
         """But we only need the last epoch's for each local training"""
-
+        print("Trainer finished line_", get_linenumber())
         return np.sqrt(self.total_loss)
 
 class Trainer(basic.Trainer):
@@ -44,5 +52,6 @@ class Trainer(basic.Trainer):
         client_id: The ID of the client using this trainer (optional).
         """
         super().__init__(model)
+        print("Trainer finished line_", get_linenumber())
         self._loss_tracker = LossTracker()
 
