@@ -12,7 +12,7 @@ import sirius_trainer
 
 
 def main():
-    """A Plato federated learning training session using the SCAFFOLD algorithm."""
+    """A Plato federated learning training session using the Sirius algorithm."""
     trainer = sirius_trainer.Trainer
     client = sirius_client.Client(trainer=trainer)
     server = sirius_server.Server(trainer=trainer)
