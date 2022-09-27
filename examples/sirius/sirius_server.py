@@ -6,6 +6,7 @@ import math
 import random
 import logging
 import asyncio
+import numpy as np
 from plato.config import Config
 from plato.servers import fedavg
 
@@ -20,8 +21,10 @@ class Server(fedavg.Server):
 
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
-        self.staleness_factor = 0.5
+        self.staleness_factor = Config().server.staleness_factor
         self.exploration_factor = Config().server.exploration_factor
+        self.exploration_decaying_factor = Config().server.exploration_decaying_factor
+        self.min_explore_factor = Config().server.min_explore_factor
         self.explored_clients = []
         self.unexplored_clients = []
         print("Server finished line_", get_linenumber())
@@ -81,24 +84,37 @@ class Server(fedavg.Server):
         print("Server finished line_", get_linenumber())
         if self.current_round > 1:
             # Exploitation
-            exploit_client_num = max(
-                math.ceil((1.0 - self.exploration_factor) * clients_count),
-                clients_count - len(self.unexplored_clients),
-            )
+            num_to_explore = min(
+                len(self.unexplored_clients),
+                np.random.binomial(clients_count, self.exploration_factor, 1)[0]) # ??
 
+            self.exploration_factor = max(
+                self.exploration_factor * self.exploration_decaying_factor,
+                self.min_explore_factor)
+            
+            real_exploit_num = min(len(self.explored_clients),
+                                     clients_count - num_to_explore)
+
+            print("self.exploration_factor: ", self.exploration_factor)    
+
+            
+            print("exploit_client count: ", real_exploit_num)
             sorted_util = sorted(
                 self.client_utilities, key=self.client_utilities.get, reverse=True
             )
-            selected_clients = sorted_util[:exploit_client_num]
+           
+            print("Client utilities are: ", sorted_util)
+            selected_clients = sorted_util[:real_exploit_num]
+            print("Exploited clients are: ", selected_clients)
         print("Server finished line_", get_linenumber())
         # Exploration
         random.setstate(self.prng_state)
 
         # Select unexplored clients randomly
         selected_unexplore_clients = random.sample(
-            self.unexplored_clients, clients_count - len(selected_clients)
-        )
+            self.unexplored_clients, clients_count - len(selected_clients))
 
+        print("Randomly selected clients are: ", selected_unexplore_clients)
         self.prng_state = random.getstate()
         self.explored_clients += selected_unexplore_clients
 
