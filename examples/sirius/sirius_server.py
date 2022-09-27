@@ -3,12 +3,14 @@ An asynchronous federated learning server using Sirius.
 """
 
 import math
+import time
 import random
 import logging
 import asyncio
 import numpy as np
 from plato.config import Config
 from plato.servers import fedavg
+from sklearn.cluster import DBSCAN
 
 from inspect import currentframe
 
@@ -76,7 +78,54 @@ class Server(fedavg.Server):
         """Calculate client utility here and update the record on the server"""
         for update in updates:
             self.client_utilities[update.client_id] = update.report.statistics_utility * self.staleness_function(update.staleness)
-        print("Server finished line_", get_linenumber())
+        # Start to do pooling
+        if len(tuples) >= threshold_factor * self.client_per_round: #凑够了就开始detect。
+            logging.info(f"Starting anomaly detection with {len(tuples)} recent records.")
+            self.detect_outliers(tuples)
+        else:
+            logging.info(f"Records collected for anomaly detection are not enough: {len(tuples)}.")
+
+    def detect_outliers(self, tuples):
+        start_time = time.perf_counter()
+
+        client_id_list = [tu[0] for tu in tuples]
+        loss_list = [tu[1] for tu in tuples]
+        loss_list = np.array(loss_list).reshape(-1, 1)
+        min_samples = self.client_per_round // 2  # TODO: avoid hard-coding
+        eps = 0.5
+        clustering = DBSCAN(eps=eps, min_samples=min_samples).fit(loss_list)
+        result = clustering.labels_.tolist()
+        outliers = [client_id_list[idx]
+                    for idx, e in enumerate(result) if e == -1]
+        debug_dict = {
+            'client_id_list': client_id_list,
+            'loss_list': loss_list.squeeze(-1),  # for ease of reading
+            'DBSCAN_res': result
+        }
+        logging.info(f"[Debug] debug_dict for DBSCAN: {debug_dict}.")
+        logging.info(f"[Debug] Note actual outliers: {self.expected_corrupted_clients}.")
+
+        end_time = time.perf_counter()
+        duration = round(end_time - start_time, 2)
+        logging.info(f"Outliers detected by DBSCAN "
+                     f"in {duration} sec: {outliers}.")
+
+        newly_detected_outliers = []
+        for client_id in outliers:
+            self.reliability_credit_record[client_id] -= 1
+            if client_id not in self.detected_corrupted_clients:
+                current_credit = self.reliability_credit_record[client_id]
+                if current_credit == 0:
+                    self.detected_corrupted_clients.append(client_id)
+                    newly_detected_outliers.append(client_id)
+
+        if len(newly_detected_outliers) == 0:
+            logging.info(f"No new outliers.")
+        else:
+            newly_detected_outliers = sorted(newly_detected_outliers )
+            logging.info(f"{len(newly_detected_outliers)} clients "
+                         f"are newly taken as outliers"
+                         f": {newly_detected_outliers}.")
 
     def choose_clients(self, clients_pool, clients_count):
         """Choose a subset of the clients to participate in each round."""
