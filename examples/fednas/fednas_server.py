@@ -29,6 +29,7 @@ class Server(fedavg.Server):
         weights_received = [update.payload for update in self.updates]
         mask_normals=[update.report.mask_normal for update in self.updates]
         mask_reduces = [update.report.mask_reduce for update in self.updates]
+        accuracy_list=[update.report.accuracy for update in self.updates]
         self.callback_handler.call_event("on_weights_received", self, weights_received)
 
         # NAS aggregation
@@ -60,9 +61,9 @@ class Server(fedavg.Server):
             )
         else:
             # Testing the updated model directly at the server
-
             self.accuracy = self.trainer.test(self.testset, self.testset_sampler)
-        self.trainer.model.step([self.accuracy],epoch_index_normal, epoch_index_reduce)
+
+        self.trainer.model.step(accuracy_list,epoch_index_normal, epoch_index_reduce)
 
         if hasattr(Config().trainer, "target_perplexity"):
             logging.info("[%s] Global model perplexity: %.2f\n", self, self.accuracy)

@@ -6,7 +6,7 @@ clients:
     total_clients: 10
 
     # The number of clients selected in each round
-    per_round: 10
+    per_round: 2
 
     # Should the clients compute test accuracy locally?
     do_test: true
@@ -19,14 +19,14 @@ server:
     do_test: false
     random_seed: 1
 
-    checkpoint_path: models/fednas/mnist
-    model_path: models/fednas/mnist
+    checkpoint_path: /data/dixi/plato/models/fednas/mnist
+    model_path: /data/dixi/plato/models/fednas/mnist
 
 data:
     # The training and testing dataset
     datasource: MNIST
 
-    data_path: /home/dixi/data
+    data_path: /data/dixi
 
     # Number of samples in each partition
     partition_size: 600
@@ -64,6 +64,9 @@ trainer:
     lr_scheduler: CosineAnnealingLR
     
     model_name: darts
+
+results:
+    result_path: /data/dixi/plato/results/fednas/mnist
 
 algorithm:
     # Aggregation algorithm
