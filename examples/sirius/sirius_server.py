@@ -2,8 +2,6 @@
 An asynchronous federated learning server using Sirius.
 """
 
-import math
-import time
 import random
 import logging
 import asyncio
@@ -107,7 +105,7 @@ class Server(fedavg.Server):
                             continue
                         already_existing_clients.add(client_id)
                         tmp.append((client_id, loss_norm))
-                    tuples += tmp#
+                    tuples += tmp
             
                 if len(tuples) >= self.threshold_factor * self.per_round: 
                     logging.info(f"Starting anomaly detection with {len(tuples)} recent records.")
@@ -138,7 +136,7 @@ class Server(fedavg.Server):
                     newly_detected_outliers.append(client_id)
 
         if len(newly_detected_outliers) == 0:
-            #logging.info(f"No new outliers.")
+            logging.info(f"No new outliers.")
         else:
             newly_detected_outliers = sorted(newly_detected_outliers)
             #logging.info(f"{len(newly_detected_outliers)} clients "
