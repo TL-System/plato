@@ -4,13 +4,6 @@ An asynchronous federated learning client using Sirius.
 from types import SimpleNamespace
 import numpy as np
 from plato.clients import simple
-from plato.config import Config
-
-from inspect import currentframe
-
-def get_linenumber():
-    cf = currentframe()
-    return cf.f_back.f_lineno
 
 class Client(simple.Client):
 
@@ -24,7 +17,7 @@ class Client(simple.Client):
 		
 		report.statistics_utility = report.num_samples * np.sqrt(
             1.0 / report.num_samples * train_squared_loss_step
-        ) # zhifeng's original implementation return moving averaging norm of loss and calculate the stats utility on server side (clients_manager)
+        ) 
 		report.start_round = self.current_round
 		return report
 	
