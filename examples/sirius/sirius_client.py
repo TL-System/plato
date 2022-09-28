@@ -19,11 +19,12 @@ class Client(simple.Client):
 	
 	def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
 		"""Wrap up generating the report with any additional information."""
-		print("Client finished line_", get_linenumber())
+		
 		train_squared_loss_step = self.trainer.run_history.get_latest_metric("train_loss")
+		
 		report.statistics_utility = report.num_samples * np.sqrt(
             1.0 / report.num_samples * train_squared_loss_step
         ) # zhifeng's original implementation return moving averaging norm of loss and calculate the stats utility on server side (clients_manager)
-		print("Client finished line_", get_linenumber())
+		report.start_round = self.current_round
 		return report
 	
