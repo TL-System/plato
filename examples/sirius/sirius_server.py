@@ -140,7 +140,7 @@ class Server(fedavg.Server):
         if len(newly_detected_outliers) == 0:
             #logging.info(f"No new outliers.")
         else:
-            newly_detected_outliers = sorted(newly_detected_outliers )
+            newly_detected_outliers = sorted(newly_detected_outliers)
             #logging.info(f"{len(newly_detected_outliers)} clients "
             #             f"are newly taken as outliers"
             #             f": {newly_detected_outliers}.")
