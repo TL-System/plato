@@ -29,6 +29,17 @@ class Server(fedavg.Server):
         self.min_explore_factor = Config().server.min_explore_factor
         self.explored_clients = []
         self.unexplored_clients = []
+        # below for robustness
+        self.robustness = False
+        self.augmented_factor = 5
+        self.threshold_factor = 1
+        self.model_versions_clients_dict = {}
+        self.per_round = Config().clients.per_round
+        self.reliability_credit_record = {
+            client_id: 5 # TODO: avoid hard-coding
+            for client_id in range(1, self.total_clients + 1)
+        }
+        self.detected_corrupted_clients = []
         print("Server finished line_", get_linenumber())
 
     def configure(self):
@@ -78,37 +89,56 @@ class Server(fedavg.Server):
         """Calculate client utility here and update the record on the server"""
         for update in updates:
             self.client_utilities[update.client_id] = update.report.statistics_utility * self.staleness_function(update.staleness)
-        # Start to do pooling
-        if len(tuples) >= threshold_factor * self.client_per_round: #凑够了就开始detect。
-            logging.info(f"Starting anomaly detection with {len(tuples)} recent records.")
-            self.detect_outliers(tuples)
-        else:
-            logging.info(f"Records collected for anomaly detection are not enough: {len(tuples)}.")
+            
+            if self.robustness: 
+                # Start to do pooling
+                #print("Start to do pooling")
+                start_version = update.report.start_round
+                if start_version not in self.model_versions_clients_dict:#根据不同start version来分类存的
+                    self.model_versions_clients_dict[start_version] = [(update.client_id, update.report.statistics_utility)]
+                else:
+                    self.model_versions_clients_dict[start_version].append((update.client_id, update.report.statistics_utility))
+                
+                tuples = []
+                already_existing_clients = set()
+                for i in range(self.augmented_factor): #跳过前augmented_factor轮？
+                    print("start version: ",start_version)
+                    print("i: ", i)
+                    if start_version - i <= 0:# <0 originally
+                        print("should break here")
+                        break
+                    
+                    print("model_versions_clients_dict: ", self.model_versions_clients_dict[start_version-i])
 
+                    tmp = []  # avoid cybil attacks, i.e., outliers repeat deliberately
+                    for client_id, loss_norm in self.model_versions_clients_dict[start_version - i]:
+                        if client_id in already_existing_clients:
+                            continue
+                        already_existing_clients.add(client_id)
+                        tmp.append((client_id, loss_norm))
+                    tuples += tmp#
+            #print("get value by key client_id: ", self.training_clients[update.client_id]["starting_round"])
+            # read start version from server. if condition fit, put the loss into the pool (together with client_id)
+            
+                if len(tuples) >= self.threshold_factor * self.per_round: #凑够了就开始detect。
+                    logging.info(f"Starting anomaly detection with {len(tuples)} recent records.")
+                    self.detect_outliers(tuples)
+                else:
+                    logging.info(f"Records collected for anomaly detection are not enough: {len(tuples)}.")
+        
     def detect_outliers(self, tuples):
-        start_time = time.perf_counter()
-
+        #start_time = time.perf_counter()
+        print("Server finished line_", get_linenumber())
         client_id_list = [tu[0] for tu in tuples]
         loss_list = [tu[1] for tu in tuples]
         loss_list = np.array(loss_list).reshape(-1, 1)
-        min_samples = self.client_per_round // 2  # TODO: avoid hard-coding
+        min_samples = self.per_round // 2  # TODO: avoid hard-coding
         eps = 0.5
         clustering = DBSCAN(eps=eps, min_samples=min_samples).fit(loss_list)
         result = clustering.labels_.tolist()
         outliers = [client_id_list[idx]
                     for idx, e in enumerate(result) if e == -1]
-        debug_dict = {
-            'client_id_list': client_id_list,
-            'loss_list': loss_list.squeeze(-1),  # for ease of reading
-            'DBSCAN_res': result
-        }
-        logging.info(f"[Debug] debug_dict for DBSCAN: {debug_dict}.")
-        logging.info(f"[Debug] Note actual outliers: {self.expected_corrupted_clients}.")
-
-        end_time = time.perf_counter()
-        duration = round(end_time - start_time, 2)
-        logging.info(f"Outliers detected by DBSCAN "
-                     f"in {duration} sec: {outliers}.")
+        print("Server finished line_", get_linenumber())
 
         newly_detected_outliers = []
         for client_id in outliers:
@@ -119,6 +149,7 @@ class Server(fedavg.Server):
                     self.detected_corrupted_clients.append(client_id)
                     newly_detected_outliers.append(client_id)
 
+        print("Server finished line_", get_linenumber())
         if len(newly_detected_outliers) == 0:
             logging.info(f"No new outliers.")
         else:
@@ -131,6 +162,15 @@ class Server(fedavg.Server):
         """Choose a subset of the clients to participate in each round."""
         selected_clients = []
         print("Server finished line_", get_linenumber())
+
+        if self.robustness:
+            outliers = [client_id for client_id in available_clients
+                        if client_id in self.detected_corrupted_clients]
+            available_clients = [client_id for client_id in available_clients
+                                 if client_id not in self.detected_corrupted_clients]
+            logging.info(f"These clients are detected as outliers "
+                         f"and precluded from selection: {outliers}.")
+
         if self.current_round > 1:
             # Exploitation
             num_to_explore = min(
@@ -176,6 +216,8 @@ class Server(fedavg.Server):
         #    self.client_selected_times[client] += 1
 
         logging.info("[%s] Selected clients: %s", self, selected_clients)
+
+
 
         return selected_clients
            
