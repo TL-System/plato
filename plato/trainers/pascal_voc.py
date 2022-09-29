@@ -50,7 +50,7 @@ class Trainer(basic.Trainer):
         self.loss_criterion = nn.BCEWithLogitsLoss()
         self.num_class = 20
 
-    def test_model(self, config, testset):
+    def test_model(self, config, testset, sampler=None, **kwargs):
         test_loader = torch.utils.data.DataLoader(
             testset, batch_size=config['batch_size'], shuffle=False)
 
