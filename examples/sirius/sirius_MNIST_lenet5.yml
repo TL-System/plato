@@ -104,7 +104,7 @@ results:
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time
 
-    result_path: results/test
+    result_path: results/Sirius/MNIST/test
 
 parameters:
     optimizer:
