@@ -59,7 +59,7 @@ server:
 
 data:
     # The training and testing dataset
-    datasource: MNIST
+    datasource: FEMNIST
 
     # Where the dataset is located
     data_path: ../../data
@@ -68,7 +68,7 @@ data:
     partition_size: 500
 
     # IID or non-IID?
-    sampler: noniid
+    sampler: all_inclusive
 
     #testset_size: 1000
 
@@ -95,7 +95,7 @@ trainer:
 
     # The machine learning model
     model_name: lenet5
-
+    num_classes: 62
 algorithm:
     # Aggregation algorithm
     type: fedavg
@@ -104,7 +104,7 @@ results:
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time
 
-    result_path: results/test
+    result_path: results/FEMNIST/test
 
 parameters:
     optimizer:
