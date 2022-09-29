@@ -238,7 +238,7 @@ class Trainer(basic.Trainer):
                             err_disc_total.data.item(),
                         )
 
-    def test_model(self, config, testset):
+    def test_model(self, config, testset, sampler=None, **kwargs):
         """Test the Generator model with the Frechet Inception Distance metric."""
 
         self.model.to(self.device)
