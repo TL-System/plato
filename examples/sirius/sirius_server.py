@@ -171,7 +171,7 @@ class Server(fedavg.Server):
             sorted_util = sorted(
                 self.client_utilities, key=self.client_utilities.get, reverse=True
             )
-            sorted_util = [client for client in sorted_util if client in self.explored_clients]
+            sorted_util = [client for client in sorted_util if client in clients_pool]
         
             selected_clients = sorted_util[:real_exploit_num]
         # Exploration
