@@ -5,12 +5,12 @@ import matplotlib.pyplot as plt
 """
 Read .out file and draw clients distribution figure
 """
-new_outfile = open("async_selected_clients.txt", "w")
+new_outfile = open("sirius_selected_clients.txt", "w")#open("async_selected_clients.txt", "w")
 new_outfile.close()
 #with open(
 #        'async_selection_FEMNIST_lenet5_avg9_rand1_round250_multiplyPi_print.out'
 #) as f:
-with open('Sirius_FEMNSIT_lenet5_rand1.out') as f:
+with open('Sirius_CIFAR_resnet18_rand1_concen5.out') as f:
     for line in f.readlines():
 
         if 'Selected clients' in line:

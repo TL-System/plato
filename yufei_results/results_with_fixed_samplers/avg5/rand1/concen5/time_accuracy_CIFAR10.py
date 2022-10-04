@@ -60,7 +60,7 @@ def plot(x_label, x_value1, x_value2, x_value3, x_value4, y_label, y_value1,
         linewidth=1.5,
         linestyle='--',
         #marker='o',
-        label='FedAvg')
+        label='Fedavg')
     ax.plot(
         x_value2,
         y_value2,
@@ -76,7 +76,7 @@ def plot(x_label, x_value1, x_value2, x_value3, x_value4, y_label, y_value1,
         linewidth=1.5,
         linestyle=':',
         #marker='s',
-        label='FedBuff')
+        label='Fedbuff')
     ax.plot(
         x_value4,
         y_value4,
@@ -84,7 +84,7 @@ def plot(x_label, x_value1, x_value2, x_value3, x_value4, y_label, y_value1,
         linewidth=1.5,
         linestyle=':',
         #marker='s',
-        label='Async_selection')
+        label='Sirius')
     ax.legend(loc='lower right')
     ax.set(xlabel=x_label, ylabel=y_label)
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
@@ -107,7 +107,7 @@ def main():
     result_csv_file3 = './fedbuff_round150.csv'
     result_dict3 = read_csv_to_dict(result_csv_file3, x_item, y_item)
 
-    result_csv_file4 = './async_concen5_rand1.csv'
+    result_csv_file4 = './Sirius_cifar10_concen5_rand1.csv' #'./async_concen5_rand1.csv'
     result_dict4 = read_csv_to_dict(result_csv_file4, x_item, y_item)
     #x_item = 'round'
     x_label = 'Elapsed Time'
