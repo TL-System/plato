@@ -60,7 +60,7 @@ def plot(x_label, x_value1, x_value2, x_value3, x_value4, y_label, y_value1,
         linewidth=1.5,
         linestyle='--',
         #marker='o',
-        label='FedAvg')
+        label='Sirius')
     ax.plot(
         x_value2,
         y_value2,
@@ -98,7 +98,7 @@ def main():
     x_item = 'elapsed_time'
     y_item = 'accuracy'
 
-    result_csv_file1 = './fedavg_concen1_rand1.csv'
+    result_csv_file1 = './sirius_cifar_concen1_rand1.csv'
     result_dict1 = read_csv_to_dict(result_csv_file1, x_item, y_item)
 
     result_csv_file2 = './oort_concen1_rand1.csv'
