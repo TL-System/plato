@@ -107,7 +107,7 @@ def main():
     result_csv_file3 = './fedbuff_round150.csv'
     result_dict3 = read_csv_to_dict(result_csv_file3, x_item, y_item)
 
-    result_csv_file4 = './Sirius_cifar10_concen5_rand1.csv' #'./async_concen5_rand1.csv'
+    result_csv_file4 = './Sirius_cifar_concen5_rand2.csv' #'./async_concen5_rand1.csv'
     result_dict4 = read_csv_to_dict(result_csv_file4, x_item, y_item)
     #x_item = 'round'
     x_label = 'Elapsed Time'
@@ -123,7 +123,7 @@ def main():
     y_value3 = result_dict3[y_item]
     y_value4 = result_dict4[y_item]
 
-    figure_file_name = './avg5_concen5_rand150.pdf'
+    figure_file_name = './avg5_concen5_rand150_rand2.pdf'
 
     plot(x_label, x_value1, x_value2, x_value3, x_value4, y_label, y_value1,
          y_value2, y_value3, y_value4, figure_file_name)
