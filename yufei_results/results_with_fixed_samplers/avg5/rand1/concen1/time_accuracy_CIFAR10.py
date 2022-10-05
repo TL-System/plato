@@ -98,7 +98,7 @@ def main():
     x_item = 'elapsed_time'
     y_item = 'accuracy'
 
-    result_csv_file1 = './sirius_cifar_concen1_rand1.csv'
+    result_csv_file1 = './sirius_cifar_concen1_rand2.csv'
     result_dict1 = read_csv_to_dict(result_csv_file1, x_item, y_item)
 
     result_csv_file2 = './oort_concen1_rand1.csv'
@@ -123,7 +123,7 @@ def main():
     y_value3 = result_dict3[y_item]
     y_value4 = result_dict4[y_item]
 
-    figure_file_name = './avg5_concen1_rand1.pdf'
+    figure_file_name = './avg5_concen1_rand2.pdf'
 
     plot(x_label, x_value1, x_value2, x_value3, x_value4, y_label, y_value1,
          y_value2, y_value3, y_value4, figure_file_name)
