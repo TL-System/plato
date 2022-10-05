@@ -45,13 +45,13 @@ class Architect(nn.Module):
 
   def _compute_reward(self,accuracy_list):
     # scale accuracy to 0-1
-    avg_acc = torch.mean(torch.Tensor(accuracy_list)) / 100
+    avg_acc = torch.mean(torch.Tensor(accuracy_list))
     if self.baseline is None:
       self.baseline = avg_acc
     else:
       self.baseline += self.baseline_decay * (avg_acc - self.baseline)
     # reward = accuracy - baseline
-    return [accuracy_list[i]/100 - self.baseline for i in range(len(accuracy_list))]
+    return [accuracy_list[i] - self.baseline for i in range(len(accuracy_list))]
 
   def stale_step(self, epoch_acc, epoch_index_normal, epoch_index_reduce, stale_alphas_normal, stale_alphas_reduce, stale_acc, stale_index_normal, stale_index_reduce):
     self._compute_stale_grad(self.model.alphas_normal, epoch_acc, epoch_index_normal, stale_alphas_normal, stale_acc, stale_index_normal)
