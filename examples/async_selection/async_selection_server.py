@@ -43,8 +43,8 @@ class Server(fedavg.Server):
         # Select clients based on calculated probability (within clients_pool)
 
         p = self.calculate_selection_probability(clients_pool)
-        print("The calculated probability is: ", p)
-        print("current clients pool: ", clients_pool)
+        logging.info(f"The calculated probability is: ", p)
+        logging.info(f"current clients pool: ", clients_pool)
 
         selected_clients = np.random.choice(clients_pool,
                                             clients_count,
@@ -52,73 +52,60 @@ class Server(fedavg.Server):
                                             p=p)
 
         logging.info("[%s] Selected clients: %s", self, selected_clients)
-        print("type of selected clients: ", type(selected_clients))
+        logging.info(f"type of selected clients: ", type(selected_clients))
         return selected_clients.tolist()
 
-    def compute_weight_deltas(self, updates):
-        """Extract the model weight updates from client updates and compute local update bounds with respect to each clients id."""
-        weights_deltas = super().compute_weight_deltas(updates)
+    async def aggregate_deltas(self, updates, deltas_received):
+        avg_update = await super().aggregate_deltas(updates, deltas_received)
 
-        #weights_received = [payload for (__, __, payload, __) in updates]
-        # used as update list
         self.squared_deltas_current_round = np.zeros(self.number_of_client)
         # the order of id should be same as weights_delts above
-        id_received = [client_id for (client_id, __, __, __) in updates]
+        id_received = [update.client_id for update in self.updates]
+       
         # find delat bound for each client.
-        for client_id, delta in zip(id_received, weights_deltas):
-            #print("what's an orderdict of deltas like: ", delta)
-            #self.squared_deltas_current_round[client_id - 1]  #
+        for client_id, delta in zip(id_received, deltas_received):
             # calculate the largest value in each layer and sum them up for the bound
             for layer, value in delta.items():
                 if 'conv' in layer: 
                     temp_max = torch.max(value).detach().cpu().numpy()
                     temp_max_abs = np.absolute(temp_max)
-                    #print(value)
-                    #print("max_abs: ", temp_max_abs)
+                
                     if temp_max_abs > self.squared_deltas_current_round[client_id -
                                                     1]:
                     
                         self.squared_deltas_current_round[client_id -
                                                     1] = temp_max_abs
 
-            #self.squared_deltas_current_round[client_id - 1] = np.square(
-            #torch.max(delta).detach().cpu().numpy())
-        print("!!!!!!The squared deltas bound of this round are: ",
+        logging.info("!!!!!!The squared deltas bound of this round are: ",
               self.squared_deltas_current_round)
-        return weights_deltas  #, squared_deltas
-
-    async def aggregate_weights(self, updates):
-        """Aggregate the reported weight updates from the selected clients."""
-        print("start aggregating weights")
-        deltas = await self.federated_averaging(updates)
-        updated_weights = self.algorithm.update_weights(deltas)
-        self.algorithm.load_weights(updated_weights)
-        print("start updating records...")
-        self.update_records(updates)
-
-    def update_records(self, updates):
+        return avg_update
+    
+    def weights_aggregated(self, updates):
         """"Update clients record on the server"""
         # Extract the local staleness and update the record of client staleness.
-        for (client_id, __, __, client_staleness) in updates:
-            self.local_stalenesses[client_id - 1] = client_staleness
-        print("!!!The staleness of this round are: ", self.local_stalenesses)
+        for update in updates: 
+            self.local_stalenesses[update.client_id - 1] = update.staleness
+
+        logging.info("!!!The staleness of this round are: ", self.local_stalenesses)
         # Update local gradient bounds
-        self.local_gradient_bounds = self.squared_deltas_current_round
-        print("local_gradient_bounds: ", self.local_gradient_bounds)
+        for client_id, bound in enumerate(self.squared_deltas_current_round):
+            if bound != 0:
+                self.local_gradient_bounds[client_id] = bound
+        
+        logging.info("local_gradient_bounds: ", self.local_gradient_bounds)
         self.extract_aggregation_weights(updates)
 
     def extract_aggregation_weights(self, updates):
         """Extract aggregation weights"""
-
         # below is for fedavg only; complex ones would be added later
         # Extract the total number of samples
         self.total_samples = sum(
-            [report.num_samples for (__, report, __, __) in updates])
+            [update.report.num_samples for update in updates])
 
-        for client_id, report, __, __ in updates:
+        for update in updates:
             self.aggregation_weights[
-                client_id - 1] = report.num_samples / self.total_samples
-        print("!!!!!!The aggregation weights of this round are: ",
+                update.client_id - 1] = update.report.num_samples / self.total_samples
+        logging.info(f"!!!!!!The aggregation weights of this round are: ",
               self.aggregation_weights)
 
     def calculate_selection_probability(self, clients_pool):
@@ -129,9 +116,9 @@ class Server(fedavg.Server):
             Probability Variables are q_i
 
         """
-        print("Calculating selection probabitliy ... ")
+        logging.info("Calculating selection probabitliy ... ")
         alpha = 1
-        BigA = 1
+        BigA = 10
         # extract info for clients in the pool
         clients_pool = [
             index - 1 for index in clients_pool
@@ -140,7 +127,7 @@ class Server(fedavg.Server):
 
         aggregation_weights_inpool = self.aggregation_weights[clients_pool]
         local_gradient_bounds_inpool = self.local_gradient_bounds[clients_pool]
-        local_staleness_inpool = self.local_stalenesses[clients_pool]
+        local_staleness_inpool = np.square(self.local_stalenesses[clients_pool])
 
         # read aggre_weight from somewhere
         aggre_weight_square = np.square(aggregation_weights_inpool)  # p_i^2
