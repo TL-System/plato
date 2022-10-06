@@ -29,6 +29,7 @@ def get(model) -> optim.Optimizer:
 
     optimizer_name = Config().trainer.optimizer
     optim_params = Config().parameters.optimizer._asdict()
+    optim_params["eps"] = float(optim_params["eps"])
     optimizer = registered_optimizers.get(optimizer_name)
     if optimizer is not None:
         return optimizer(model.parameters(), **optim_params)
