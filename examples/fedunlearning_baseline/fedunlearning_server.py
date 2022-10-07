@@ -70,6 +70,27 @@ class Server(fedavg.Server):
             self.save_to_checkpoint()
             await self.select_clients()
 
+    async def aggregate_weights(self, updates):
+        """Aggregate the reported weight updates from the selected clients.
+        If in retraing phase, staleness clients should not be aggregated.
+        Otherwise the stale clients updates contains old model's info, 
+        will be aggregated after data_deletion_round.
+        """   
+        if self.retraining == False:
+            await super().aggregate_weights(updates)
+            
+        elif self.retraining == True:
+            clients_updates = []
+            for client_update in updates:
+                __, __, __, staleness = client_update
+                if abs(staleness) <= self.current_round:
+                    clients_updates.append(client_update)                   
+            
+            if len(clients_updates) != 0:
+                deltas = await self.federated_averaging(clients_updates)
+                updated_weights = self.algorithm.update_weights(deltas)
+                self.algorithm.load_weights(updated_weights)
+
     async def wrap_up_processing_reports(self):
         """ Enters the retraining phase if a specific set of conditions are satisfied. """
         await super().wrap_up_processing_reports()
