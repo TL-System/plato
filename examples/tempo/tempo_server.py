@@ -40,6 +40,7 @@ class Server(fedavg_cs.Server):
             # to the number received from the central server.
             # Now it passes the new local epochs number to its clients.
             server_response["local_epoch_num"] = Config().trainer.epochs
+
         return server_response
 
     async def wrap_up_processing_reports(self):

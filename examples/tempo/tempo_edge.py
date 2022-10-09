@@ -14,11 +14,10 @@ class Client(edge.Client):
         """Additional client-specific processing on the server response."""
         super().process_server_response(server_response)
 
-        if 'local_epoch_num' in server_response:
-            local_epoch_list = server_response['local_epoch_num']
+        if "local_epoch_num" in server_response:
+            local_epoch_list = server_response["local_epoch_num"]
             index = self.client_id - Config().clients.total_clients - 1
-
             local_epoch_num = local_epoch_list[index]
+
             # Update the number of local epochs
-            Config().trainer = Config().trainer._replace(
-                epochs=local_epoch_num)
+            Config().trainer = Config().trainer._replace(epochs=local_epoch_num)
