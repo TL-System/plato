@@ -15,15 +15,16 @@ import torchvision.datasets as dset
 import torch.backends.cudnn as cudnn
 import copy
 import random
+from collections import OrderedDict
 
 from torch.autograd import Variable
 from Darts.model_search import Network
 from Darts.model_search_local import MaskedNetwork
 from Darts.architect import Architect
+from Darts.genotypes import PRIMITIVES
 
 num_edges = 14
-num_ops = 8
-grad_clip = 5
+num_ops = len(PRIMITIVES)
 
 def extract_index(mask):
     result = []
@@ -55,7 +56,7 @@ def _extract_pos(name):
 
 
 # todo: ? None operation
-def sample_mask(alphas):
+def sample_mask(alphas, epsilon):
     mask_pool = []
     for i in range(num_ops):
         mask = np.zeros(num_ops)
@@ -66,6 +67,7 @@ def sample_mask(alphas):
         prob = F.softmax(alphas[i],dim=0)
         prob = prob.tolist()
         prob[0] += (1-sum(prob)) # add precision loss, make sum = 1
+        prob=[ p*(1-epsilon)+ 1.0/len(prob)*epsilon for p in prob]
         mask_idx = np.random.choice([i for i in range(num_ops)],1,replace=False,p=prob)
         result.append(mask_pool[mask_idx[0]])
     result = np.vstack(result)
@@ -84,200 +86,72 @@ def uniform_sample_mask(alphas):
     result = np.vstack(result)
     return torch.Tensor(result)
 
-def _assign_client_param(global_param,client_params):
-    for i in range(len(client_params)):
-        client_params[i].data = global_param.data
+def client_weight_param(global_model, client_model):
+    # expand client model as the same as global model
+    real_ops=[]
+    for cell_idx, cell in enumerate(client_model.cells):
+        for edge_idx in range(len(cell._ops)):
+            if cell.reduction:
+                op_mask = client_model.mask_reduce[edge_idx]
+            else:
+                op_mask = client_model.mask_normal[edge_idx]
+            primitive_idx=op_mask.tolist().index(1)
+            real_ops.append(copy.deepcopy(client_model.cells[cell_idx]._ops[edge_idx]._ops))
+            client_model.cells[cell_idx]._ops[edge_idx]._ops = copy.deepcopy(global_model.cells[cell_idx]._ops[edge_idx]._ops)
 
-def _assign_client(global_iter,client_iters):
-    global_name, global_param = next(global_iter)
-    for i in range(len(client_iters)):
-        client_name,client_param = next(client_iters[i])
-        client_param.data = global_param.data
+    # copy parameters
+    client_model.load_state_dict(global_model.state_dict())
 
-def client_weight_param(global_model, client_models):
-    mask_normal = torch.zeros(num_edges, num_ops)
-    mask_reduce = torch.zeros(num_edges, num_ops)
-    index_normal = []
-    index_reduce = []
-    client_iters = []
-    model=client_models
-    mask_normal = mask_normal + model.mask_normal
-    mask_reduce = mask_reduce + model.mask_reduce
-    index_normal.append(extract_index(model.mask_normal))
-    index_reduce.append(extract_index(model.mask_reduce))
-    client_iters.append(model.named_parameters())
-    global_iter = global_model.named_parameters()
-    # num of paramsa
-    # fuse gradient of stem
-    for k in range(3):
-        _assign_client(global_iter, client_iters)
+    real_ops_idx=0
+    # only keep selected op
+    for cell_idx, cell in enumerate(client_model.cells):
+        for edge_idx in range(len(cell._ops)):
+            if cell.reduction:
+                op_mask = client_model.mask_reduce[edge_idx]
+            else:
+                op_mask = client_model.mask_normal[edge_idx]
+            primitive_idx=op_mask.tolist().index(1)
+            real_ops[real_ops_idx][0].load_state_dict(client_model.cells[cell_idx]._ops[edge_idx]._ops[primitive_idx].state_dict())
+            client_model.cells[cell_idx]._ops[edge_idx]._ops = copy.deepcopy(real_ops[real_ops_idx])
+            real_ops_idx+=1
 
-    # fuse gradient of preprocess
-    for k in range(2):
-        _assign_client(global_iter, client_iters)
-
-    # fuse gradient of cells
-    client_positions = [None]
-    client_params = [None]
-
-    client_name, client_param = next(client_iters[0])
-    client_pos = _extract_pos(client_name)
-    client_positions[0] = client_pos
-    client_params[0] = client_param
-
-    last_cell_idx = 0
-    while True:
-        global_name, global_param = next(global_iter)
-        # print("global name", global_name, 'param shape', global_param.size())
-        if 'classifier' in global_name:
-            break
-        global_pos = _extract_pos(global_name)
-        cell_idx, edge_idx, op_idx = global_pos
-        # fuse gradient of preprocess for each cell
-        if cell_idx != last_cell_idx:
-            last_cell_idx = cell_idx
-            _assign_client_param(global_param, client_params)
-            _assign_client(global_iter, client_iters)
-            if cell_idx in [3, 6]:  # extra preprocess after reduction
-                _assign_client(global_iter, client_iters)
-            for i in range(len([client_models])):
-                client_name, client_param = next(client_iters[i])
-                client_pos = _extract_pos(client_name)
-                client_positions[i] = client_pos
-                client_params[i] = client_param
+def _average_fuse(global_iter, client_iters,num_samples):
+    total_samples=sum(num_samples)
+    try:
+        while True:
             global_name, global_param = next(global_iter)
-            # print("global name", global_name, 'param shape', global_param.size())
-            global_pos = _extract_pos(global_name)
-            cell_idx, edge_idx, op_idx = global_pos
-        if cell_idx in [0, 1, 3, 4, 6, 7]:  # normal cell
-            index = index_normal
-            mask = mask_normal
-        else:  # reduce cell
-            index = index_reduce
-            mask = mask_reduce
-        num_client = int(mask[edge_idx][op_idx])
-        if num_client != 0:
-            # sum gradients
-            for client_idx in range(len([client_models])):
-                client_pos = client_positions[client_idx]
-                if index[client_idx][edge_idx] == global_pos[2] and client_pos[0] == global_pos[0] and client_pos[1] == \
-                        client_pos[1]:
-                    # print("client pos", client_pos,'gate idx', index[client_idx][edge_idx], 'param shape', client_params[client_idx].size())
-                    client_params[client_idx].data = global_param.data
-                    # next iter of client model
-                    client_name, client_param = next(client_iters[client_idx])
-                    client_pos = _extract_pos(client_name)
-                    client_positions[client_idx] = client_pos
-                    client_params[client_idx] = client_param
-
-    # fuse gradient of classifier
-    _assign_client_param(global_param, client_params)
-    _assign_client(global_iter, client_iters)
-    return
-
-def _average_fuse(global_iter,client_iters):
-    global_name, global_param = next(global_iter)
-    baseline=global_param.data
-    deltas=baseline-global_param.data
-    for i in range(len(client_iters)):
-        client_name, client_param = next(client_iters[i])
-        deltas+=client_param.data-baseline
-    global_param.data = baseline+deltas/len(client_iters)
-
-def _average_fuse_param(global_param,client_params):
-    baseline = global_param.data
-    deltas = baseline - global_param.data
-    for i in range(len(client_params)):
-        client_param = client_params[i]
-        deltas+=client_param.data-baseline
-    global_param.data = baseline+deltas/len(client_params)
-
-
-def fuse_weight_gradient(global_model, client_models):
-    mask_normal = torch.zeros(num_edges,num_ops)
-    mask_reduce = torch.zeros(num_edges, num_ops)
-    index_normal = []
-    index_reduce = []
-    client_iters = []
-    for model in client_models:
-        mask_normal = mask_normal + model.mask_normal
-        mask_reduce = mask_reduce + model.mask_reduce
-        index_normal.append(extract_index(model.mask_normal))
-        index_reduce.append(extract_index(model.mask_reduce))
-        client_iters.append(model.named_parameters())
-    global_iter = global_model.named_parameters()
-    # num of params
-    # stem: 3, normal cell: 170, reduce cell: 186, classifier: 2
-
-    # fuse gradient of stem
-    for k in range(3):
-        _average_fuse(global_iter,client_iters)
-
-    # fuse gradient of preprocess
-    for k in range(2):
-        _average_fuse(global_iter, client_iters)
-
-    # fuse gradient of cells
-    client_positions = [None for _ in range(len(client_models))]
-    client_params = [None for _ in range(len(client_models))]
-    for i in range(len(client_models)):
-        client_name, client_param = next(client_iters[i])
-        client_pos = _extract_pos(client_name)
-        client_positions[i] = client_pos
-        client_params[i] = client_param
-
-    last_cell_idx = 0
-    while True:
-        global_name, global_param = next(global_iter)
-        # print("global name", global_name, 'param shape', global_param.size())
-        if 'classifier' in global_name:
-            break
-        global_pos = _extract_pos(global_name)
-        cell_idx, edge_idx, op_idx = global_pos
-        # fuse gradient of preprocess for each cell
-        if cell_idx != last_cell_idx:
-            last_cell_idx = cell_idx
-            _average_fuse_param(global_param,client_params)
-            _average_fuse(global_iter, client_iters)
-            if cell_idx in [3,6]: # extra preprocess after reduction
-                _average_fuse(global_iter, client_iters)
-            for i in range(len(client_models)):
-                client_name, client_param = next(client_iters[i])
-                client_pos = _extract_pos(client_name)
-                client_positions[i] = client_pos
-                client_params[i] = client_param
-            global_name, global_param = next(global_iter)
-            # print("global name", global_name, 'param shape', global_param.size())
-            global_pos = _extract_pos(global_name)
-            cell_idx, edge_idx, op_idx = global_pos
-        if cell_idx in [0,1,3,4,6,7]: # normal cell
-            index = index_normal
-            mask = mask_normal
-        else: # reduce cell
-            index = index_reduce
-            mask = mask_reduce
-        num_client = int(mask[edge_idx][op_idx])
-        if num_client != 0:
-            # sum gradients
             baseline=global_param.data
             deltas=baseline-global_param.data
-            for client_idx in range(len(client_models)):
-                client_pos = client_positions[client_idx]
-                if index[client_idx][edge_idx] == global_pos[2] and client_pos[0] == global_pos[0] and client_pos[1] == client_pos[1]:
-                    # print("client pos", client_pos,'gate idx', index[client_idx][edge_idx], 'param shape', client_params[client_idx].size())
-                    deltas+=client_params[client_idx].data-baseline
-                    # next iter of client model
-                    client_name, client_param = next(client_iters[client_idx])
-                    client_pos = _extract_pos(client_name)
-                    client_positions[client_idx] = client_pos
-                    client_params[client_idx] = client_param
-            # average gradients
-            global_param.data = baseline+deltas / num_client
+            is_update=torch.zeros(deltas.size())
+            for i in range(len(client_iters)):
+                client_name, client_param = next(client_iters[i])
+                delta=client_param.data-baseline
+                is_update=torch.ones(is_update.size())-torch.tensor(delta==0,dtype=is_update.dtype)
+                deltas+=delta*num_samples[i]/total_samples*is_update
+            global_param.data = baseline+deltas
+    except StopIteration:
+        pass
 
-    # fuse gradient of classifier
-    _average_fuse_param(global_param, client_params)
-    _average_fuse(global_iter, client_iters)
-    return
+def fuse_weight_gradient(global_model, client_models,num_samples):
+    proxy_client_models=[]
+    for client_idx in range(len(client_models)):
+        proxy_client=copy.deepcopy(client_models[client_idx])
+        for cell_idx, cell in enumerate(client_models[client_idx].cells):
+            for edge_idx in range(len(cell._ops)):
+                if cell.reduction:
+                    op_mask = client_models[client_idx].mask_reduce[edge_idx]
+                else:
+                    op_mask = client_models[client_idx].mask_normal[edge_idx]
+                primitive_idx = op_mask.tolist().index(1)
+                proxy_client.cells[cell_idx]._ops[edge_idx]=copy.deepcopy(global_model.cells[cell_idx]._ops[edge_idx])
+                proxy_client.cells[cell_idx]._ops[edge_idx]._ops[primitive_idx].load_state_dict(client_models[client_idx].cells[cell_idx]._ops[edge_idx]._ops[0].state_dict())
+        proxy_client_models.append(proxy_client)
+
+    proxy_iters = []
+    for proxy_supernet in proxy_client_models:
+        proxy_iters.append(proxy_supernet.named_parameters())
+    global_iter = global_model.named_parameters()
+    _average_fuse(global_iter, proxy_iters,num_samples)
 
 def stale_generate(num,stale):
     array=[]
@@ -296,9 +170,9 @@ def stale_generate(num,stale):
             array.append(stale+1)
     return np.array(array)
 
-def init_gradient(model):
-    print("initializing gradient")
-    data = Variable(torch.Tensor(1,3,32,32),requires_grad=False)
+def init_gradient(model,C):
+    #print("initializing gradient")
+    data = Variable(torch.Tensor(C,3,32,32),requires_grad=False)
     logits = model(data)
     loss = torch.mean(logits)
     loss.backward()

@@ -49,7 +49,7 @@ class Server(fedavg.Server):
             index_reduce = extract_index(mask_reduce)
             epoch_index_normal.append(index_normal)
             epoch_index_reduce.append(index_reduce)
-        fuse_weight_gradient(self.trainer.model.model,client_models)
+        fuse_weight_gradient(self.trainer.model.model,client_models,[update.report.num_samples for update in self.updates])
 
 
         # Testing the global model accuracy
@@ -63,7 +63,7 @@ class Server(fedavg.Server):
             # Testing the updated model directly at the server
             self.accuracy = self.trainer.test(self.testset, self.testset_sampler)
 
-        self.trainer.model.step(accuracy_list,epoch_index_normal, epoch_index_reduce)
+        #self.trainer.model.step(accuracy_list,epoch_index_normal, epoch_index_reduce)
 
         if hasattr(Config().trainer, "target_perplexity"):
             logging.info("[%s] Global model perplexity: %.2f\n", self, self.accuracy)
