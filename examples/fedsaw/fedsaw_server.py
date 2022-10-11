@@ -19,16 +19,14 @@ class Server(fedavg_cs.Server):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
 
         # The central server uses a list to store each institution's clients' pruning amount
-        self.pruning_amount_list = None
-
         if Config().is_central_server():
-            self.init_pruning_amount = (
+            init_pruning_amount = (
                 Config().clients.pruning_amount
                 if hasattr(Config().clients, "pruning_amount")
                 else 0.4
             )
             self.pruning_amount_list = [
-                self.init_pruning_amount for i in range(Config().algorithm.total_silos)
+                init_pruning_amount for i in range(Config().algorithm.total_silos)
             ]
 
         if Config().is_edge_server():

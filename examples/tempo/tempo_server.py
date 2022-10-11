@@ -21,7 +21,6 @@ class Server(fedavg_cs.Server):
         super().__init__()
 
         # The central server uses a list to store each institution's clients' local epoch numbers
-        self.local_epoch_list = None
         if Config().is_central_server():
             self.local_epoch_list = [
                 Config().trainer.epochs for i in range(Config().algorithm.total_silos)
@@ -57,10 +56,6 @@ class Server(fedavg_cs.Server):
         """
         weights_diff_list = self.get_weights_differences()
 
-        self.compute_local_epoch(weights_diff_list)
-
-    def compute_local_epoch(self, weights_diff_list):
-        """A method to compute local epochs."""
         log_list = [math.log(i) for i in weights_diff_list]
         min_log = min(log_list)
         max_log = max(log_list)
