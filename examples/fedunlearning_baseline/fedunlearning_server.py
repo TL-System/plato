@@ -76,19 +76,17 @@ class Server(fedavg.Server):
         Otherwise the stale clients updates contains old model's info, 
         will be aggregated after data_deletion_round.
         """   
-        if self.retraining == False:
-            print("#####################")
-            await super().aggregate_deltas(updates, deltas_received)
+        if not self.retraining:
+            return await super().aggregate_deltas(updates, deltas_received)
 
-        elif self.retraining == True:
-            clients_updates = []
-            for client_update in updates:
-                __, __, __, staleness = client_update
-                if abs(staleness) <= self.current_round:
-                    clients_updates.append(client_update) 
-            
-            if len(clients_updates) != 0:
-                await self.aggregate_deltas(updates, deltas_received)         
+        clients_updates = []
+        for client_update in updates:
+            __, __, __, staleness = client_update
+            if abs(staleness) <= self.current_round:
+                clients_updates.append(client_update) 
+        
+        if len(clients_updates) != 0:
+            return await self.aggregate_deltas(updates, deltas_received)         
 
     async def wrap_up_processing_reports(self):
         """ Enters the retraining phase if a specific set of conditions are satisfied. """
