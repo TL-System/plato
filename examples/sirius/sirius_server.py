@@ -23,6 +23,7 @@ class Server(fedavg.Server):
         self.min_explore_factor = Config().server.min_explore_factor
         self.explored_clients = []
         self.unexplored_clients = []
+        self.prng_state = random.getstate()
 
         # below are for robustness
         self.robustness = False
@@ -31,11 +32,9 @@ class Server(fedavg.Server):
         self.model_versions_clients_dict = {}
         self.per_round = Config().clients.per_round
         self.reliability_credit_record = {
-            client_id: 5 
-            for client_id in range(1, self.total_clients + 1)
+            client_id: 5 for client_id in range(1, self.total_clients + 1)
         }
         self.detected_corrupted_clients = []
-
 
     def configure(self):
         """Initialize necessary variables."""
@@ -47,7 +46,7 @@ class Server(fedavg.Server):
         self.unexplored_clients = list(range(1, self.total_clients + 1))
 
     async def aggregate_deltas(self, updates, deltas_received):
-        """Aggregate weight updates from the clients using federated averaging with calcuated staleness factor."""        
+        """Aggregate weight updates from the clients using federated averaging with calcuated staleness factor."""
         # Extract the total number of samples
         self.total_samples = sum(update.report.num_samples for update in updates)
 
@@ -65,66 +64,84 @@ class Server(fedavg.Server):
 
             for name, delta in update.items():
                 # Use weighted average by the number of samples
-                avg_update[name] += delta * (num_samples / self.total_samples) * staleness_factor
+                avg_update[name] += (
+                    delta * (num_samples / self.total_samples) * staleness_factor
+                )
 
             # Yield to other tasks in the server
             await asyncio.sleep(0)
         return avg_update
 
     def staleness_function(self, stalenss):
-        return 1.0 / pow(stalenss + 1, self.staleness_factor) 
+        return 1.0 / pow(stalenss + 1, self.staleness_factor)
 
     def weights_aggregated(self, updates):
         """Method called at the end of aggregating received weights."""
         """Calculate client utility here and update the record on the server"""
         for update in updates:
-            self.client_utilities[update.client_id] = update.report.statistics_utility * self.staleness_function(update.staleness)
-            
-            if self.robustness: 
+            self.client_utilities[
+                update.client_id
+            ] = update.report.statistics_utility * self.staleness_function(
+                update.staleness
+            )
+
+            if self.robustness:
                 # Start to do pooling
                 start_version = update.report.start_round
                 if start_version not in self.model_versions_clients_dict:
-                    self.model_versions_clients_dict[start_version] = [(update.client_id, update.report.statistics_utility)]
+                    self.model_versions_clients_dict[start_version] = [
+                        (update.client_id, update.report.statistics_utility)
+                    ]
                 else:
-                    self.model_versions_clients_dict[start_version].append((update.client_id, update.report.statistics_utility))
-                
+                    self.model_versions_clients_dict[start_version].append(
+                        (update.client_id, update.report.statistics_utility)
+                    )
+
                 tuples = []
                 already_existing_clients = set()
-                for i in range(self.augmented_factor): 
-                    print("start version: ",start_version)
+                for i in range(self.augmented_factor):
+                    print("start version: ", start_version)
                     print("i: ", i)
-                    if start_version - i <= 0:# <0 originally
+                    if start_version - i <= 0:  # <0 originally
                         print("should break here")
                         break
-                    
-                    print("model_versions_clients_dict: ", self.model_versions_clients_dict[start_version-i])
+
+                    print(
+                        "model_versions_clients_dict: ",
+                        self.model_versions_clients_dict[start_version - i],
+                    )
 
                     tmp = []  # avoid cybil attacks, i.e., outliers repeat deliberately
-                    for client_id, loss_norm in self.model_versions_clients_dict[start_version - i]:
+                    for client_id, loss_norm in self.model_versions_clients_dict[
+                        start_version - i
+                    ]:
                         if client_id in already_existing_clients:
                             continue
                         already_existing_clients.add(client_id)
                         tmp.append((client_id, loss_norm))
                     tuples += tmp
-            
-                if len(tuples) >= self.threshold_factor * self.per_round: 
-                    logging.info(f"Starting anomaly detection with {len(tuples)} recent records.")
+
+                if len(tuples) >= self.threshold_factor * self.per_round:
+                    logging.info(
+                        f"Starting anomaly detection with {len(tuples)} recent records."
+                    )
                     self.detect_outliers(tuples)
                 else:
-                    logging.info(f"Records collected for anomaly detection are not enough: {len(tuples)}.")
-        
+                    logging.info(
+                        f"Records collected for anomaly detection are not enough: {len(tuples)}."
+                    )
+
     def detect_outliers(self, tuples):
-     
+
         client_id_list = [tu[0] for tu in tuples]
         loss_list = [tu[1] for tu in tuples]
         loss_list = np.array(loss_list).reshape(-1, 1)
-        min_samples = self.per_round // 2  
+        min_samples = self.per_round // 2
         eps = 0.5
-        
+
         clustering = DBSCAN(eps=eps, min_samples=min_samples).fit(loss_list)
         result = clustering.labels_.tolist()
-        outliers = [client_id_list[idx]
-                    for idx, e in enumerate(result) if e == -1]
+        outliers = [client_id_list[idx] for idx, e in enumerate(result) if e == -1]
 
         newly_detected_outliers = []
         for client_id in outliers:
@@ -139,7 +156,7 @@ class Server(fedavg.Server):
             logging.info(f"No new outliers.")
         else:
             newly_detected_outliers = sorted(newly_detected_outliers)
-            #logging.info(f"{len(newly_detected_outliers)} clients "
+            # logging.info(f"{len(newly_detected_outliers)} clients "
             #             f"are newly taken as outliers"
             #             f": {newly_detected_outliers}.")
 
@@ -148,38 +165,48 @@ class Server(fedavg.Server):
         selected_clients = []
 
         if self.robustness:
-            outliers = [client_id for client_id in available_clients
-                        if client_id in self.detected_corrupted_clients]
-            available_clients = [client_id for client_id in available_clients
-                                 if client_id not in self.detected_corrupted_clients]
-            #logging.info(f"These clients are detected as outliers "
-                         #f"and precluded from selection: {outliers}.")
+            outliers = [
+                client_id
+                for client_id in available_clients
+                if client_id in self.detected_corrupted_clients
+            ]
+            available_clients = [
+                client_id
+                for client_id in available_clients
+                if client_id not in self.detected_corrupted_clients
+            ]
+            # logging.info(f"These clients are detected as outliers "
+            # f"and precluded from selection: {outliers}.")
 
         if self.current_round > 1:
             # Exploitation
             num_to_explore = min(
                 len(self.unexplored_clients),
-                np.random.binomial(clients_count, self.exploration_factor, 1)[0]) # ??
+                np.random.binomial(clients_count, self.exploration_factor, 1)[0],
+            )  # ??
 
             self.exploration_factor = max(
                 self.exploration_factor * self.exploration_decaying_factor,
-                self.min_explore_factor)
-            
-            real_exploit_num = min(len(self.explored_clients),
-                                     clients_count - num_to_explore) 
+                self.min_explore_factor,
+            )
+
+            real_exploit_num = min(
+                len(self.explored_clients), clients_count - num_to_explore
+            )
 
             sorted_util = sorted(
                 self.client_utilities, key=self.client_utilities.get, reverse=True
             )
             sorted_util = [client for client in sorted_util if client in clients_pool]
-        
+
             selected_clients = sorted_util[:real_exploit_num]
         # Exploration
         random.setstate(self.prng_state)
 
         # Select unexplored clients randomly
         selected_unexplore_clients = random.sample(
-            self.unexplored_clients, clients_count - len(selected_clients))
+            self.unexplored_clients, clients_count - len(selected_clients)
+        )
 
         self.prng_state = random.getstate()
         self.explored_clients += selected_unexplore_clients
@@ -192,4 +219,3 @@ class Server(fedavg.Server):
         logging.info("[%s] Selected clients: %s", self, selected_clients)
 
         return selected_clients
-           
