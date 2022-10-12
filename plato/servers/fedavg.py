@@ -161,6 +161,8 @@ class Server(base.Server):
         """Process the client reports by aggregating their weights."""
         weights_received = [update.payload for update in self.updates]
 
+        print("The length of weights_received are: ", len(weights_received))
+
         weights_received = self.weights_received(weights_received)
         self.callback_handler.call_event("on_weights_received", self, weights_received)
 
@@ -173,6 +175,7 @@ class Server(base.Server):
                 "[Server #%d] Aggregating model weights directly rather than weight deltas.",
                 os.getpid(),
             )
+
             updated_weights = self.aggregate_weights(
                 self.updates, baseline_weights, weights_received
             )
@@ -185,15 +188,14 @@ class Server(base.Server):
             deltas_received = self.algorithm.compute_weight_deltas(
                 baseline_weights, weights_received
             )
-
+            print("The length of deltas_received are: ", len(deltas_received))
             # Runs a framework-agnostic server aggregation algorithm, such as
             # the federated averaging algorithm
             logging.info("[Server #%d] Aggregating model weight deltas.", os.getpid())
             deltas = await self.aggregate_deltas(self.updates, deltas_received)
-
+            print("The length of deltas are: ", len(deltas))
             # Updates the existing model weights from the provided deltas
             updated_weights = self.algorithm.update_weights(deltas)
-
             # Loads the new model weights
             self.algorithm.load_weights(updated_weights)
 
