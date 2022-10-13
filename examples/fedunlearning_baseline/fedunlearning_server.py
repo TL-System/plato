@@ -79,14 +79,12 @@ class Server(fedavg.Server):
         if not self.retraining:
             return await super().aggregate_deltas(updates, deltas_received)
 
-        clients_updates = []
-        for client_update in updates:
-            __, __, __, staleness = client_update
-            if abs(staleness) <= self.current_round:
-                clients_updates.append(client_update) 
-        
-        if len(clients_updates) != 0:
-            return await self.aggregate_deltas(updates, deltas_received)         
+        recent_mask = list(map(lambda update: update.staleness <= self.current_round, updates))
+        recent_updates = list(filter(lambda update: update.staleness <= self.current_round, updates))
+        print("length of recent_updates: ", len(recent_updates))
+        recent_deltas_received = [delta for delta, fresh in zip(deltas_received, recent_mask) if fresh]
+        print("length of recent_deltas_received: ", len(recent_deltas_received))
+        return await self.aggregate_deltas(recent_updates, recent_deltas_received)  
 
     async def wrap_up_processing_reports(self):
         """ Enters the retraining phase if a specific set of conditions are satisfied. """
