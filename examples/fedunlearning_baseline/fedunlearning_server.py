@@ -84,7 +84,7 @@ class Server(fedavg.Server):
         print("length of recent_updates: ", len(recent_updates))
         recent_deltas_received = [delta for delta, fresh in zip(deltas_received, recent_mask) if fresh]
         print("length of recent_deltas_received: ", len(recent_deltas_received))
-        return await self.aggregate_deltas(recent_updates, recent_deltas_received)  
+        return await super().aggregate_deltas(recent_updates, recent_deltas_received)  
 
     async def wrap_up_processing_reports(self):
         """ Enters the retraining phase if a specific set of conditions are satisfied. """
