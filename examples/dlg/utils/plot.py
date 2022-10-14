@@ -1,10 +1,10 @@
-import torch
-import os
 import math
+import os
 
-from plato.config import Config
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
+import torch
+from plato.config import Config
 from torchvision import transforms
 
 tt = transforms.ToPILImage()
@@ -16,13 +16,15 @@ def main():
     try:
         # Gets all the directories for each individual run
         subprocesses = [
-            file for file in os.listdir(result_path)
+            file
+            for file in os.listdir(result_path)
             if (os.path.isdir(os.path.join(result_path, file)))
         ]
         if hasattr(Config().results, "subprocess"):
             if str(Config().results.subprocess) in subprocesses:
                 subprocess_path = os.path.join(
-                    result_path, str(Config().results.subprocess))
+                    result_path, str(Config().results.subprocess)
+                )
             else:
                 print("Subprocess not found")
                 exit()
@@ -31,7 +33,8 @@ def main():
             subprocess_path = os.path.join(result_path, subprocesses[0])
 
         trials = [
-            file for file in os.listdir(subprocess_path)
+            file
+            for file in os.listdir(subprocess_path)
             if (os.path.isdir(os.path.join(subprocess_path, file)))
         ]
 
@@ -41,8 +44,7 @@ def main():
                 print("Trial not found")
                 exit()
         else:
-            trial = [file_name for file_name in trials
-                     if "best" in file_name][0]
+            trial = [file_name for file_name in trials if "best" in file_name][0]
 
         final_path = os.path.join(subprocess_path, trial)
         tensor_file = f"{final_path}/tensors.pt"
@@ -61,18 +63,18 @@ def main():
     for count, item in enumerate(history_dict.items()):
         # item[0] holds the iteration number
         # item[1] holds a dictionary of PIL Images for each reconstructed image
-        inner = gridspec.GridSpecFromSubplotSpec(1,
-                                                 num_images,
-                                                 subplot_spec=outer[count])
+        inner = gridspec.GridSpecFromSubplotSpec(
+            1, num_images, subplot_spec=outer[count]
+        )
         outerplot = plt.Subplot(fig, outer[count])
         outerplot.set_title("Iter=%d" % item[0])
-        outerplot.axis('off')
+        outerplot.axis("off")
         fig.add_subplot(outerplot)
 
         for img_num in range(num_images):
             innerplot = plt.Subplot(fig, inner[img_num])
             innerplot.imshow(item[1][img_num])
-            innerplot.axis('off')
+            innerplot.axis("off")
             fig.add_subplot(innerplot)
     fig.savefig(result_file)
     print("file saved to", result_file)
