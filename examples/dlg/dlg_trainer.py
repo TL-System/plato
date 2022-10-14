@@ -194,7 +194,7 @@ class Trainer(basic.Trainer):
                         for i in range(len(list_grad)):
                             grad_tensor = list_grad[i].cpu().numpy()
                             noise = np.random.laplace(0,
-                                                      1e-1,
+                                                      Config().algorithm.epsilon,
                                                       size=grad_tensor.shape)
                             grad_tensor = grad_tensor + noise
                             list_grad[i] = torch.Tensor(grad_tensor).to(
