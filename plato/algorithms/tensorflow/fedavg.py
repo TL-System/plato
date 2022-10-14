@@ -9,8 +9,8 @@ from plato.trainers.base import Trainer
 
 
 class Algorithm(base.Algorithm):
-    """ Framework-specific algorithms for federated Averaging with TensorFlow, used
-    by both the client and the server. """
+    """Framework-specific algorithms for federated Averaging with TensorFlow, used
+    by both the client and the server."""
 
     def __init__(self, trainer: Trainer):
         """Initializing the algorithm with the provided model and trainer.
@@ -20,23 +20,20 @@ class Algorithm(base.Algorithm):
         model: The model to train.
         """
         super().__init__(trainer)
-        if hasattr(self.model, 'build_model'):
+        if hasattr(self.model, "build_model"):
             self.model.build_model(datasources_registry.get_input_shape())
         else:
             self.model = trainer.model
 
     def extract_weights(self, model=None):
-        """ Extract weights from the model. """
+        """Extract weights from the model."""
         if model is None:
             return self.model.get_weights()
 
         return model.get_weights()
 
-    def compute_weight_deltas(self, weights_received):
-        """ Extract the weights received from a client and compute the deltas. """
-        # Extract baseline model weights
-        baseline_weights = self.extract_weights()
-
+    def compute_weight_deltas(self, baseline_weights, weights_received):
+        """Compute the deltas between baseline weights and weights received."""
         # Calculate deltas from the received weights
         deltas = []
         for weight in weights_received:
@@ -52,7 +49,7 @@ class Algorithm(base.Algorithm):
         return deltas
 
     def update_weights(self, deltas):
-        """ Update the existing model weights. """
+        """Update the existing model weights."""
         baseline_weights = self.extract_weights()
 
         updated_weights = OrderedDict()

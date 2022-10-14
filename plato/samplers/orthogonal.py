@@ -35,28 +35,34 @@ class Sampler(base.Sampler):
             # This client is an edge server
             institution_id = client_id - 1 - max_client_id
         else:
-            institution_id = (client_id - 1) % int(
-                Config().algorithm.total_silos)
+            institution_id = (client_id - 1) % int(Config().algorithm.total_silos)
 
-        if hasattr(Config().data, 'institution_class_ids'):
+        if hasattr(Config().data, "institution_class_ids"):
             institution_class_ids = Config().data.institution_class_ids
-            class_ids = [x.strip() for x in institution_class_ids.split(';')
-                         ][institution_id]
-            class_id_list = [int(x.strip()) for x in class_ids.split(',')]
+            class_ids = [x.strip() for x in institution_class_ids.split(";")][
+                institution_id
+            ]
+            class_id_list = [int(x.strip()) for x in class_ids.split(",")]
         else:
             class_ids = np.array_split(
-                [i for i in range(len(class_list))],
-                Config().algorithm.total_silos)[institution_id]
+                [i for i in range(len(class_list))], Config().algorithm.total_silos
+            )[institution_id]
             class_id_list = class_ids.tolist()
 
-        if hasattr(Config().data, 'label_distribution') and Config(
-        ).data.label_distribution == 'noniid':
+        if (
+            hasattr(Config().data, "label_distribution")
+            and Config().data.label_distribution == "noniid"
+        ):
             # Concentration parameter to be used in the Dirichlet distribution
-            concentration = Config().data.concentration if hasattr(
-                Config().data, 'concentration') else 1.0
+            concentration = (
+                Config().data.concentration
+                if hasattr(Config().data, "concentration")
+                else 1.0
+            )
 
             class_proportions = np.random.dirichlet(
-                np.repeat(concentration, len(class_id_list)))
+                np.repeat(concentration, len(class_id_list))
+            )
 
         else:
             class_proportions = [
@@ -71,19 +77,22 @@ class Sampler(base.Sampler):
         self.sample_weights = target_proportions[target_list]
 
     def get(self):
-        """Obtains an instance of the sampler. """
+        """Obtains an instance of the sampler."""
         gen = torch.Generator()
         gen.manual_seed(self.random_seed)
 
         # Samples without replacement using the sample weights
         subset_indices = list(
-            WeightedRandomSampler(weights=self.sample_weights,
-                                  num_samples=self.partition_size,
-                                  replacement=False,
-                                  generator=gen))
+            WeightedRandomSampler(
+                weights=self.sample_weights,
+                num_samples=self.partition_size,
+                replacement=False,
+                generator=gen,
+            )
+        )
 
         return SubsetRandomSampler(subset_indices, generator=gen)
 
-    def trainset_size(self):
-        """Returns the length of the dataset after sampling. """
+    def num_samples(self):
+        """Returns the length of the dataset after sampling."""
         return self.partition_size

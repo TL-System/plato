@@ -55,7 +55,7 @@ algorithm:
     type: fedavg
 
 parameters:
-    model: 
+    model:
         num_classes: 47
 
     optimizer:
@@ -66,6 +66,3 @@ parameters:
 results:
     # Write the following parameter(s) into a CSV
     types: round, elapsed_time, accuracy
-
-    # Plot results (x_axis-y_axis)
-    plot: round-accuracy, elapsed_time-accuracy

@@ -58,6 +58,7 @@ class RunHistory:
     def reset(self):
         """
         Resets the state of the :class:`RunHistory`.
+
         """
         self._metrics = defaultdict(list)
 
@@ -73,6 +74,7 @@ class LossTracker:
 
     def reset(self):
         """Resets this loss tracker."""
+
         self.loss_value = 0
         self._average = 0
         self.total_loss = 0
@@ -80,6 +82,7 @@ class LossTracker:
 
     def update(self, loss_batch_value, batch_size=1):
         """Updates the loss tracker with another loss value from a batch."""
+
         self.loss_value = loss_batch_value
         self.total_loss += loss_batch_value * batch_size
         self.running_count += batch_size
@@ -88,4 +91,5 @@ class LossTracker:
     @property
     def average(self):
         """Returns the computed average of loss values tracked."""
+
         return self._average.cpu().detach().mean().item()

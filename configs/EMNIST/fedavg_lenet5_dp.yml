@@ -37,7 +37,7 @@ data:
 
 trainer:
     # Using the differential privacy trainer
-    type: diff_privacy 
+    type: diff_privacy
     dp_epsilon: 10
     dp_delta: 0.0001
     dp_max_grad_norm: 1
@@ -52,9 +52,10 @@ trainer:
     max_concurrency: 10
 
     # The target accuracy
-    target_accuracy: 0.95
+    target_accuracy:
+        0.95
 
-     # The machine learning model
+        # The machine learning model
     model_name: lenet5
 
     # Number of epoches for local training in each communication round
@@ -78,6 +79,3 @@ parameters:
 results:
     # Write the following parameter(s) into a CSV
     types: round, elapsed_time, accuracy
-
-    # Plot results (x_axis-y_axis)
-    plot: round-accuracy, elapsed_time-accuracy

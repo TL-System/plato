@@ -3,12 +3,12 @@ An example for running Plato with custom clients.
 
 To run this example:
 
-python examples/customized/custom_client.py -c examples/customized/client.yml
-
+python examples/customized/custom_client.py -c examples/customized/client.yml -i <client_id>
 """
 
 import asyncio
 import logging
+from functools import partial
 
 import torch
 from torch import nn
@@ -59,10 +59,13 @@ class Trainer(basic.Trainer):
                 optimizer.step()
                 optimizer.zero_grad()
 
-    def test_model(self, config, testset):  # pylint: disable=unused-argument
+    def test_model(self, config, testset, sampler=None, **kwargs):  # pylint: disable=unused-argument
         """A custom testing loop."""
         test_loader = torch.utils.data.DataLoader(
-            testset, batch_size=config["batch_size"], shuffle=False
+            testset,
+            batch_size=config["batch_size"],
+            sampler=sampler,
+            shuffle=False,
         )
 
         correct = 0
@@ -90,29 +93,21 @@ class CustomClient(simple.Client):
         logging.info("A customized client has been initialized.")
 
 
-class Model:
-    """A custom model."""
-
-    @staticmethod
-    def get_model():
-        """Obtaining an instance of this model."""
-        return nn.Sequential(
-            nn.Linear(28 * 28, 128),
-            nn.ReLU(),
-            nn.Linear(128, 128),
-            nn.ReLU(),
-            nn.Linear(128, 10),
-        )
-
-
 def main():
     """
     A Plato federated learning training session using a custom client.
 
     To run this example:
-    python custom_client.py -i <client_id>
+    python examples/customized/custom_client.py -c examples/customized/client.yml -i <client_id>
     """
-    model = Model
+    model = partial(
+        nn.Sequential,
+        nn.Linear(28 * 28, 128),
+        nn.ReLU(),
+        nn.Linear(128, 128),
+        nn.ReLU(),
+        nn.Linear(128, 10),
+    )
     datasource = DataSource
     trainer = Trainer
 

@@ -11,10 +11,6 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    # Whether simulate clients or not
-    simulation: true
-    comm_simulation: true
-
     pruning_amount: 0.4
 
     # Processors for outbound data payloads
@@ -47,7 +43,7 @@ data:
     # IID or non-IID?
     sampler: iid
 
-    edge_testset_sampler: iid
+    testset_sampler: iid
     testset_size: 1000
 
     # The random seed for sampling data
@@ -70,7 +66,7 @@ trainer:
     target_accuracy: 0.99
 
     # Number of epoches for local training in each communication round
-    epochs: 1
+    epochs: 5
     batch_size: 10
     optimizer: SGD
 

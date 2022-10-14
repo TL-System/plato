@@ -189,6 +189,10 @@ In asynchronous mode, whether or not we should wait for clients who are behind t
 When operating in asynchronous mode, the minimum number of clients that need to arrive before aggregation and processing by the server. Any positive integer could be used for `minimum_clients_aggregated`. The default value is `1`.
 ```
 
+```{admonition} minimum_edges_aggregated
+When operating in asynchronous cross-silo federated learning, the minimum number of edge servers that need to arrive before aggregation and processing by the central server. Any positive integer could be used for `minimum_edges_aggregated`. The default value is `algorithm.total_silos`.
+```
+
 ```{admonition} do_test
 Whether the server tests the global model and computes the global accuracy or perplexity. The default is `true`.
 ```
@@ -224,11 +228,19 @@ A list of processors to apply on the payload right after receiving. Multiple pro
 ```
 
 ```{admonition} downlink_bandwidth
-The server's estimated downlink capacity (server to clients) in Mbps, used for computing the transmission time (see `compute_comm_time` in the `clients` section). The default value is 100.
+The server's estimated downlink capacity (server to clients or central server to edge servers in cross-silo training) in Mbps, used for computing the transmission time (see `compute_comm_time` in the `clients` section). The default value is 100.
 ```
 
 ```{admonition} uplink_bandwidth
-The server's estimated uplink capacity (server to clients) in Mbps, used for computing the transmission time (see `compute_comm_time` in the `clients` section). The default value is 100.
+The server's estimated uplink capacity (server to clients or central server to edge servers in cross-silo training) in Mbps, used for computing the transmission time (see `compute_comm_time` in the `clients` section). The default value is 100.
+```
+
+```{admonition} edge_downlink_bandwidth
+The edge server's estimated downlink capacity (an edge server to its clients) in Mbps, used for computing the transmission time (see `compute_comm_time` in the `clients` section). The default value is same as `downlink_bandwidth`.
+```
+
+```{admonition} edge_uplink_bandwidth
+The edge server's estimated uplink capacity (an edge server to its clients) in Mbps, used for computing the transmission time (see `compute_comm_time` in the `clients` section). The default value is same as `uplink_bandwidth`.
 ```
 
 ## data
@@ -277,7 +289,7 @@ Where the test dataset is located.
 ```
 ````
 
-````{admonition} sampler
+````{admonition} **sampler**
 How to divide the entire dataset to the clients. The following options are available:
 
 - `iid`
@@ -308,18 +320,10 @@ If the sampler is `mixed`, the indices of clients whose datasets are non-i.i.d. 
 ````
 
 ````{admonition} test_set_sampler
-How the test dataset is sampled when clients test locally. Any sampler is valid. 
+How the test dataset is sampled when clients test locally. Any sampler type is valid. 
 
 ```{note}
-Without this parameter, each client's test dataset is the test dataset of the datasource.
-```
-````
-
-````{admonition} edge_test_set_sampler
-How the test dataset is sampled when edge servers test locally. Any sampler is valid.
-
-```{note}
-Without this parameter, edge servers' test datasets are the test dataset of the datasource if they locally test their aggregated models in cross-silo FL.
+Without this parameter, the test dataset on either the client or the server is the entire test dataset of the datasource.
 ```
 ````
 
