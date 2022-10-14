@@ -84,7 +84,7 @@ algorithm:
 
     ## Defense related
     # Choose from GradDefense, Soteria, GC (model compression), DP (differential privacy), Outpost (ours)...
-    defense: Outpost
+    defense: no
     # for Outpost
     beta: 0.125 # controls iteration decay speed
     phi: 40 # the amount (%) of perturbation

@@ -22,7 +22,7 @@ data:
     datasource: EMNIST
 
     # Number of samples in each partition
-    partition_size: 6
+    partition_size: 2
 
     # IID or non-IID?
     sampler: iid
@@ -45,7 +45,7 @@ trainer:
 
     # Number of epoches for local training in each communication round
     epochs: 1
-    batch_size: 1
+    batch_size: 2
     optimizer: SGD
 
     # The machine learning model
@@ -71,7 +71,7 @@ algorithm:
     attack_round: 1
     # One particular client, e.g., the first selected client
     victim_client: 0
-    num_iters: 3
+    num_iters: 100
     log_interval: 1
 
     # Whether or not use customized initialization for model weights
@@ -88,7 +88,7 @@ algorithm:
 
     ## Defense related
     # Choose from GradDefense, Soteria, GC (model compression), DP (differential privacy), Outpost (ours)...
-    defense: Outpost
+    defense: no
     # for Outpost
     beta: 0.125 # controls iteration decay speed
     phi: 40 # the amount (%) of perturbation
