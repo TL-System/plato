@@ -1,16 +1,16 @@
-import asyncio
-import logging
 import math
-import os
 import pickle
 import random
 import time
 
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import numpy as np
 import torch
+from plato.callbacks.handler import CallbackHandler
+from plato.callbacks.trainer import PrintProgressCallback
 from plato.config import Config
-from plato.trainers import basic
+from plato.models import registry as models_registry
+from plato.trainers import basic, tracking
 from torchvision import transforms
 
 from defense.GradDefense.dataloader import get_root_set_loader
@@ -22,8 +22,28 @@ criterion = cross_entropy_for_onehot
 tt = transforms.ToPILImage()
 
 
+def weights_init(m):
+    if hasattr(m, "weight"):
+        m.weight.data.uniform_(-0.5, 0.5)
+    if hasattr(m, "bias"):
+        m.bias.data.uniform_(-0.5, 0.5)
+
 class Trainer(basic.Trainer):
     """ The federated learning trainer for the gradient leakage attack. """
+
+    def __init__(self, model=None, callbacks=None):
+        """Initializing the trainer with the provided model.
+
+        Arguments:
+        model: The model to train.
+        client_id: The ID of the client using this trainer (optional).
+        """
+        super().__init__(model=model, callbacks=callbacks)
+
+        # DLG explicit weights initialziation
+        if hasattr(Config().algorithm,
+                   'init_params') and Config().algorithm.init_params:
+            self.model.apply(weights_init)
 
     def train_model(self, config, trainset, sampler, **kwargs):
         """ The default training loop when a custom training loop is not supplied. """
