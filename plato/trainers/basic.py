@@ -18,19 +18,11 @@ from plato.models import registry as models_registry
 from plato.trainers import base, loss_criterion, lr_schedulers, optimizers, tracking
 
 
-def weights_init(m):
-    if hasattr(m, "weight"):
-        m.weight.data.uniform_(-0.5, 0.5)
-    if hasattr(m, "bias"):
-        m.bias.data.uniform_(-0.5, 0.5)
-
-
 class Trainer(base.Trainer):
     """A basic federated learning trainer, used by both the client and the server."""
 
     def __init__(self, model=None, callbacks=None):
         """Initializing the trainer with the provided model.
-
         Arguments:
         model: The model to train.
         client_id: The ID of the client using this trainer (optional).
@@ -61,10 +53,6 @@ class Trainer(base.Trainer):
         self.sampler = None
         self.lr_scheduler = None
         self.current_epoch = 0
-
-        if hasattr(Config().algorithm,
-                   'init_params') and Config().algorithm.init_params:
-            self.model.apply(weights_init)
 
     def zeros(self, shape):
         """Returns a PyTorch zero tensor with the given shape."""
@@ -152,7 +140,6 @@ class Trainer(base.Trainer):
         The main training loop in a federated learning workload, run in a
         separate process with a new CUDA context, so that CUDA memory can be
         released after the training completes.
-
         Arguments:
         self: the trainer itself.
         config: a dictionary of configuration parameters.
@@ -260,12 +247,10 @@ class Trainer(base.Trainer):
 
     def train(self, trainset, sampler, **kwargs) -> float:
         """The main training loop in a federated learning workload.
-
         Arguments:
         trainset: The training dataset.
         sampler: the sampler that extracts a partition for this client.
         kwargs (optional): Additional keyword arguments.
-
         Returns:
         float: Elapsed time during training.
         """
@@ -313,7 +298,6 @@ class Trainer(base.Trainer):
     def test_process(self, config, testset, sampler=None, **kwargs):
         """The testing loop, run in a separate process with a new CUDA context,
         so that CUDA memory can be released after the training completes.
-
         Arguments:
         config: a dictionary of configuration parameters.
         testset: The test dataset.
@@ -348,7 +332,6 @@ class Trainer(base.Trainer):
 
     def test(self, testset, sampler=None, **kwargs) -> float:
         """Testing the model using the provided test dataset.
-
         Arguments:
         testset: The test dataset.
         sampler: The sampler that extracts a partition of the test dataset.
@@ -429,7 +412,6 @@ class Trainer(base.Trainer):
     def get_train_loader(batch_size, trainset, sampler, **kwargs):
         """
         Creates an instance of the trainloader.
-
         :param batch_size: the batch size.
         :param trainset: the training dataset.
         :param sampler: the sampler for the trainloader to use.
@@ -442,11 +424,9 @@ class Trainer(base.Trainer):
     def test_model(self, config, testset, sampler=None, **kwargs):
         """
         Evaluates the model with the provided test dataset and test sampler.
-
         :param testset: the test dataset.
         :param sampler: the test sampler.
         :param kwargs (optional): Additional keyword arguments.
-
         """
         batch_size = config["batch_size"]
 
@@ -527,7 +507,6 @@ class Trainer(base.Trainer):
     def train_step_end(self, config, batch=None, loss=None):
         """
         Method called at the end of a training step.
-
         :param batch: the current batch of training data.
         :param loss: the loss computed in the current batch.
         """
