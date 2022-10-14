@@ -23,7 +23,7 @@ import math
 import os
 import sys
 import shutil
-from evaluations import get_evaluation_dict
+from utils.evaluations import get_evaluation_dict
 from collections import OrderedDict
 from copy import deepcopy
 from statistics import mean

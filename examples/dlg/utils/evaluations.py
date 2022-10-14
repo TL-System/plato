@@ -5,7 +5,7 @@ import lpips
 import torch
 from torchmetrics import StructuralSimilarityIndexMeasure
 
-loss_fn = lpips.LPIPS(net='vgg')
+loss_fn = lpips.LPIPS(net="vgg")
 
 
 def find_ssim(dummy_data, ground_truth):
@@ -30,18 +30,23 @@ def find_ssim(dummy_data, ground_truth):
     term3 = dummy_mean_square + gt_mean_square + c1
     term4 = dummy_data_var + ground_truth_var + c2
 
-    return ((term1 * term2) / (term3 * term4))
+    return (term1 * term2) / (term3 * term4)
 
 
 def find_ssim_library(dummy_data, ground_truth):
     ssim = StructuralSimilarityIndexMeasure()
-    return (ssim(dummy_data, ground_truth).item())
+    return ssim(dummy_data, ground_truth).item()
 
 
 def get_evaluation_dict(dummy_data, ground_truth, num_images):
     eval_dict = {}
-    eval_dict["mses"], eval_dict["lpipss"], eval_dict["psnrs"], eval_dict[
-        "ssims"], eval_dict["library_ssims"] = [], [], [], [], []
+    (
+        eval_dict["mses"],
+        eval_dict["lpipss"],
+        eval_dict["psnrs"],
+        eval_dict["ssims"],
+        eval_dict["library_ssims"],
+    ) = ([], [], [], [], [])
     for i in range(num_images):
         # Initialize MSE and LPIPS values to be infinite
         eval_dict["mses"].append(math.inf)
@@ -55,17 +60,22 @@ def get_evaluation_dict(dummy_data, ground_truth, num_images):
             # where the ith entry is for the ith dummy data
             eval_dict["mses"][i] = min(
                 eval_dict["mses"][i],
-                torch.mean((dummy_data[i] - ground_truth[j])**2).item())
+                torch.mean((dummy_data[i] - ground_truth[j]) ** 2).item(),
+            )
             eval_dict["lpipss"][i] = min(
                 eval_dict["lpipss"][i],
-                loss_fn.forward(dummy_data[i], ground_truth[j]).item())
+                loss_fn.forward(dummy_data[i], ground_truth[j]).item(),
+            )
             eval_dict["ssims"][i] = max(
-                eval_dict["ssims"][i], find_ssim(dummy_data[i],
-                                                 ground_truth[j]))
+                eval_dict["ssims"][i], find_ssim(dummy_data[i], ground_truth[j])
+            )
             eval_dict["library_ssims"][i] = max(
                 eval_dict["library_ssims"][i],
-                find_ssim_library(torch.unsqueeze(dummy_data[i], dim=0),
-                                  torch.unsqueeze(ground_truth[j], dim=0)))
+                find_ssim_library(
+                    torch.unsqueeze(dummy_data[i], dim=0),
+                    torch.unsqueeze(ground_truth[j], dim=0),
+                ),
+            )
         eval_dict["psnrs"].append(-10 * math.log10(eval_dict["mses"][i]))
         # Find the mean for the MSE, LPIPS and PSNR
         eval_dict["avg_mses"] = mean(eval_dict["mses"])
@@ -83,4 +93,4 @@ def covar(a, b):
     cov = 0
     for i in range(len(a)):
         cov += (a[i].item() - a_bar) * (b[i].item() - b_bar)
-    return (cov / (len(a) - 1))
+    return cov / (len(a) - 1)

@@ -90,10 +90,10 @@ algorithm:
     # Choose from GradDefense, Soteria, GC (model compression), DP (differential privacy), Outpost (ours)...
     defense: Outpost
     # for Outpost
-    beta: 0.125  # controls iteration decay speed
-    phi: 40  # the amount (%) of perturbation
-    prune_base: 80  # for pruning
-    noise_base: 0.8  # controls scale for gaussian noise
+    beta: 0.125 # controls iteration decay speed
+    phi: 40 # the amount (%) of perturbation
+    prune_base: 80 # for pruning
+    noise_base: 0.8 # controls scale for gaussian noise
     # for GradDefense
     clip: true
     slices_num: 10
