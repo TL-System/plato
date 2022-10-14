@@ -104,6 +104,8 @@ algorithm:
     threshold: 50
     # for GC
     prune_pct: 80
+    # for DP
+    epsilon: 0.1
 
     # The random seed for dummy data and label
     random_seed: 1

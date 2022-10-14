@@ -106,6 +106,8 @@ algorithm:
     threshold: 50
     # for GC
     prune_pct: 80
+    # for DP
+    epsilon: 0.1
 
 parameters:
     optimizer:
