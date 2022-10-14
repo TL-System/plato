@@ -11,10 +11,11 @@ https://arxiv.org/pdf/1910.06378.pdf
 import logging
 import os
 import torch
-import scaffold_optimizer
 
 from plato.config import Config
 from plato.trainers import basic
+
+import scaffold_optimizer
 
 
 class Trainer(basic.Trainer):

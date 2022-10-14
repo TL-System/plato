@@ -15,7 +15,7 @@ import scaffold_trainer
 
 
 def main():
-    """ A Plato federated learning training session using the SCAFFOLD algorithm. """
+    """A Plato federated learning training session using the SCAFFOLD algorithm."""
     trainer = scaffold_trainer.Trainer
     client = scaffold_client.Client(trainer=trainer)
     server = scaffold_server.Server(trainer=trainer)

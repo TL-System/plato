@@ -24,30 +24,37 @@ class Sampler(base.Sampler):
         self.partition_size = Config().data.partition_size
 
         # Concentration parameter to be used in the Dirichlet distribution
-        concentration = Config().data.concentration if hasattr(
-            Config().data, 'concentration') else 1.0
+        concentration = (
+            Config().data.concentration
+            if hasattr(Config().data, "concentration")
+            else 1.0
+        )
 
         # The list of labels (targets) for all the examples
         target_list = datasource.targets()
         class_list = datasource.classes()
 
         target_proportions = np.random.dirichlet(
-            np.repeat(concentration, len(class_list)))
+            np.repeat(concentration, len(class_list))
+        )
 
         self.sample_weights = target_proportions[target_list]
 
     def get(self):
-        """Obtains an instance of the sampler. """
+        """Obtains an instance of the sampler."""
         ds.config.set_seed(self.random_seed)
 
         # Samples without replacement using the sample weights
         subset_indices = list(
-            WeightedRandomSampler(weights=self.sample_weights,
-                                  num_samples=self.partition_size,
-                                  replacement=False))
+            WeightedRandomSampler(
+                weights=self.sample_weights,
+                num_samples=self.partition_size,
+                replacement=False,
+            )
+        )
 
         return SubsetRandomSampler(subset_indices)
 
-    def trainset_size(self):
-        """Returns the length of the dataset after sampling. """
+    def num_samples(self):
+        """Returns the length of the dataset after sampling."""
         return self.partition_size

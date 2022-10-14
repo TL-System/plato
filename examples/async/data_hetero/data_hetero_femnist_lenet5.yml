@@ -68,4 +68,3 @@ parameters:
 
 results:
     types: accuracy, elapsed_time, round_time
-    plot: elapsed_time & accuracy

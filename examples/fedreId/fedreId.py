@@ -1,5 +1,3 @@
-import os
-
 import torch
 from torch import nn
 from torchvision.datasets import MNIST
@@ -51,7 +49,7 @@ class Trainer(basic.Trainer):
                 optimizer.step()
                 optimizer.zero_grad()
 
-    def test_model(self, config, testset):  # pylint: disable=unused-argument
+    def test_model(self, config, testset, sampler=None, **kwargs):  # pylint: disable=unused-argument
         """A custom testing loop."""
         test_loader = torch.utils.data.DataLoader(
             testset, batch_size=config["batch_size"], shuffle=False
@@ -79,8 +77,6 @@ class Trainer(basic.Trainer):
             testset, batch_size=config["batch_size"], shuffle=False
         )
 
-        correct = 0
-        total = 0
         result = []
         with torch.no_grad():
             for examples, labels in test_loader:

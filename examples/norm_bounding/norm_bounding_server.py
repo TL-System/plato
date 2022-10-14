@@ -19,7 +19,7 @@ def compute_weights_norm(model_weight_dict):
     """Compute the norm of the model update from a client."""
     weights_norm = 0
     for weight in model_weight_dict.values():
-        weights_norm += np.sum(np.array(weight)**2)
+        weights_norm += np.sum(np.array(weight) ** 2)
     weights_norm = np.sqrt(weights_norm)
     return weights_norm
 
@@ -27,12 +27,13 @@ def compute_weights_norm(model_weight_dict):
 class Server(fedavg.Server):
     """FedAvg server with norm bounding defense"""
 
-    async def federated_averaging(self, updates):
+    async def aggregate_deltas(self, updates, deltas_received):
         """Aggregate weight updates from the clients using federated averaging."""
-        deltas_received = self.compute_weight_deltas(updates)
-
-        norm_bound = Config().server.norm_bounding_threshold if hasattr(
-            Config().server, 'norm_bounding_threshold') else None
+        norm_bound = (
+            Config().server.norm_bounding_threshold
+            if hasattr(Config().server, "norm_bounding_threshold")
+            else None
+        )
 
         # Perform weighted averaging
         avg_update = {
@@ -40,7 +41,7 @@ class Server(fedavg.Server):
             for name, weights in deltas_received[0].items()
         }
 
-        for i, update in enumerate(deltas_received):
+        for _, update in enumerate(deltas_received):
             weight_norm = compute_weights_norm(update)
 
             for name, delta in update.items():

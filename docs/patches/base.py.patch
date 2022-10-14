@@ -1,14 +1,22 @@
---- base.py	2022-02-05 11:37:18.000000000 -0500
-+++ base_cc.py	2022-02-05 11:35:10.000000000 -0500
-@@ -234,10 +234,7 @@
+--- plato/servers/base.py       2022-09-01 16:57:42.000000000 -0400
++++ plato/servers/base_cc.py    2022-09-03 21:50:29.000000000 -0400
+@@ -275,6 +275,8 @@
+ 
+             # Allowing some time for the edge servers to start
+             time.sleep(5)
++            if Config().data.datasource == "FEMNIST":
++                time.sleep(5)
+ 
+         if self.disable_clients:
+             logging.info("No clients are launched (server:disable_clients = true)")
+@@ -311,9 +313,7 @@
  
          app = web.Application()
          self.sio.attach(app)
--        web.run_app(app,
--                    host=Config().server.address,
--                    port=port,
--                    loop=asyncio.get_event_loop())
+-        web.run_app(
+-            app, host=Config().server.address, port=port, loop=asyncio.get_event_loop()
+-        )
 +        web.run_app(app, host=Config().server.address, port=port)
  
      async def register_client(self, sid, client_id):
-         """ Adding a newly arrived client to the list of clients. """
+         """Adding a newly arrived client to the list of clients."""

@@ -49,7 +49,7 @@ trainer:
     # The machine learning model
     model_type: huggingface
     model_name: gpt2
-    
+
     # Number of epoches for local training in each communication round
     epochs: 1
     batch_size: 32
@@ -68,6 +68,3 @@ parameters:
 results:
     # Write the following parameter(s) into a CSV
     types: round, elapsed_time, accuracy
-
-    # Plot results (x_axis-y_axis)
-    plot: round-accuracy, elapsed_time-accuracy

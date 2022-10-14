@@ -328,7 +328,11 @@ class Trainer(base.Trainer):
         accuracy = -1
 
         try:
-            accuracy = self.test_model(config, testset, sampler, **kwargs)
+            if sampler is None:
+                accuracy = self.test_model(config, testset, **kwargs)
+            else:
+                accuracy = self.test_model(config, testset, sampler.get(), **kwargs)
+
         except Exception as testing_exception:
             logging.info("Testing on client #%d failed.", self.client_id)
             raise testing_exception
@@ -435,7 +439,7 @@ class Trainer(base.Trainer):
         )
 
     # pylint: disable=unused-argument
-    def test_model(self, config, testset, sampler, **kwargs):
+    def test_model(self, config, testset, sampler=None, **kwargs):
         """
         Evaluates the model with the provided test dataset and test sampler.
 
@@ -446,15 +450,9 @@ class Trainer(base.Trainer):
         """
         batch_size = config["batch_size"]
 
-        if sampler is None:
-            test_loader = torch.utils.data.DataLoader(
-                testset, batch_size=batch_size, shuffle=False
-            )
-        else:
-            # Use a testing set following the same distribution as the training set
-            test_loader = torch.utils.data.DataLoader(
-                testset, batch_size=batch_size, shuffle=False, sampler=sampler.get()
-            )
+        test_loader = torch.utils.data.DataLoader(
+            testset, batch_size=batch_size, shuffle=False, sampler=sampler
+        )
 
         correct = 0
         total = 0
@@ -486,7 +484,6 @@ class Trainer(base.Trainer):
     def lr_scheduler_step(self):
         """
         Performs a single scheduler step if ``self.lr_scheduler`` has been assigned.
-
         """
         if self.lr_scheduler is not None:
             self.lr_scheduler.step()
@@ -511,6 +508,9 @@ class Trainer(base.Trainer):
     def get_loss_criterion(self):
         """Returns the loss criterion."""
         return loss_criterion.get()
+
+    def backward(self, config, loss):
+        """Perform the backpropagation pass."""
 
     def train_run_start(self, config):
         """Method called at the start of training run."""

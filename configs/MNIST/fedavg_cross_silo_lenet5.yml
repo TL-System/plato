@@ -74,6 +74,3 @@ parameters:
 results:
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, round_time
-
-    # Plot results (x_axis-y_axis)
-    plot: global_round-accuracy, global_round-elapsed_time

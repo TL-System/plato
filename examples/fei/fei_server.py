@@ -1,8 +1,6 @@
 """
-A federated learning server with RL Agent FEI
+A federated learning server with RL Agent FEI.
 """
-import math
-
 import numpy as np
 from plato.config import Config
 from plato.utils.reinforcement_learning import rl_server
@@ -13,7 +11,6 @@ class RLServer(rl_server.RLServer):
 
     def __init__(self, agent, model=None, algorithm=None, trainer=None):
         super().__init__(agent, model, algorithm, trainer)
-        self.local_self.corr = [0] * Config().clients.per_round
         self.last_global_grads = None
         self.corr = []
         self.smart_weighting = []
@@ -22,7 +19,7 @@ class RLServer(rl_server.RLServer):
     def prep_state(self):
         """Wrap up the state update to RL Agent."""
         # Store client ids
-        client_ids = [update.report.client_id for update in self.updates]
+        client_ids = [update.client_id for update in self.updates]
 
         state = [0] * 4
         state[0] = self.normalize_state(
@@ -47,7 +44,7 @@ class RLServer(rl_server.RLServer):
 
     def update_state(self):
         """Wrap up the state update to RL Agent."""
-        # Pass new state to RL Agent
+        # Passes the new state to the RL Agent
         self.agent.new_state, self.agent.client_ids = self.prep_state()
         self.agent.process_env_update()
 
@@ -62,8 +59,10 @@ class RLServer(rl_server.RLServer):
 
         # Update the baseline model weights
         curr_global_grads = self.process_grad(self.algorithm.extract_weights())
+
         if self.last_global_grads is None:
             self.last_global_grads = np.zeros(len(curr_global_grads))
+
         global_grads = np.subtract(curr_global_grads, self.last_global_grads)
         self.last_global_grads = curr_global_grads
 
@@ -73,6 +72,8 @@ class RLServer(rl_server.RLServer):
             inner = np.inner(global_grads, local_grads)
             norms = np.linalg.norm(global_grads) * np.linalg.norm(local_grads)
             self.corr[i] = np.clip(inner / norms, -1.0, 1.0)
+
+        return weights_received
 
     @staticmethod
     def process_grad(grads):

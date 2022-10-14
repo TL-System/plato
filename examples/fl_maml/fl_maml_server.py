@@ -43,13 +43,13 @@ class Server(fedavg.Server):
             server_response["personalization_test"] = True
         return server_response
 
-    async def process_reports(self):
+    async def _process_reports(self):
         """Process the client reports by aggregating their weights."""
         if self.do_personalization_test:
             self.compute_personalization_accuracy()
             await self.wrap_up_processing_reports()
         else:
-            await super().process_reports()
+            await super()._process_reports()
 
     def compute_personalization_accuracy(self):
         """ "Average accuracy of clients' personalized models."""
@@ -126,7 +126,7 @@ class Server(fedavg.Server):
                     len(self.updates),
                 )
                 self.do_personalization_test = False
-                await self.process_reports()
+                await self._process_reports()
 
                 # Start testing the global meta model w.r.t. personalization
                 await self.select_testing_clients()
@@ -140,7 +140,7 @@ class Server(fedavg.Server):
                 len(self.personalization_test_updates),
             )
 
-            await self.process_reports()
+            await self._process_reports()
 
             await self.wrap_up()
             self.personalization_test_updates = []
