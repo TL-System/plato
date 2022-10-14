@@ -10,7 +10,6 @@ def getGause(scale: float, e: float = 0):
 
 
 class ReservoirSample(object):
-
     def __init__(self, size):
         self._size = size
         self._counter = 0
@@ -28,7 +27,6 @@ class ReservoirSample(object):
 
 
 class TestMain(unittest.TestCase):
-
     def test_reservoir_sample(self):
         samples = []
         for i in range(10000):
@@ -41,5 +39,5 @@ class TestMain(unittest.TestCase):
         print(r)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

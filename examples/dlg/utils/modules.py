@@ -8,11 +8,12 @@ in Advances in Neural Information Processing Systems 2020.
 
 https://proceedings.neurips.cc/paper/2020/file/c4ede56bbd98819ae6112b20ac6bf145-Paper.pdf
 """
-import torch
-import torch.nn.functional as F
+import warnings
 from collections import OrderedDict
 from functools import partial
-import warnings
+
+import torch
+import torch.nn.functional as F
 
 torch.backends.cudnn.benchmark = True
 
