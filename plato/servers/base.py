@@ -884,7 +884,6 @@ class Server:
     async def process_clients(self, client_info):
         """Determine whether it is time to process the client reports and
         proceed with the aggregation process.
-
         When in asynchronous mode, additional processing is needed to simulate
         the wall clock time.
         """
