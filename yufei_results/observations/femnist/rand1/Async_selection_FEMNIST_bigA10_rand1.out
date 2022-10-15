@@ -1,0 +1,209 @@
+The configuration filename is: async_femnist_lenet5.yml
+ 
+clients:
+# Type
+type: simple
+
+# The total number of clients
+total_clients: 500
+
+# The number of clients selected in each round
+per_round: 20
+
+# Should the clients compute test accuracy locally?
+do_test: false
+
+# Whether client heterogeneity should be simulated
+speed_simulation: true
+sleep_simulation: true
+avg_training_time: 10
+# The simulation distribution
+simulation_distribution:
+distribution: pareto
+alpha: 1
+
+server:
+address: 127.0.0.1
+port: 6300
+random_seed: 1
+synchronous: false
+simulate_wall_time: true
+minimum_clients_aggregated: 10
+step_window: 2
+penalty: 2
+exploration_factor: 0.9
+desired_duration: 50
+# What is the staleness bound, beyond which the server should wait for stale clients?
+staleness_bound: 10
+
+checkpoint_path: results/FEMNIST/test/checkpoint
+model_path: results/FEMNIST/test/model
+
+data:
+# The training and testing dataset
+datasource: FEMNIST
+
+# Whether data needs to be reloaded in client simulation mode
+reload_data: true
+
+# Should concurrent client-side dataset download be allowed?
+concurrent_download: true
+
+# IID or non-IID?
+sampler: all_inclusive
+
+# The random seed for sampling data
+random_seed: 1
+trainer:
+# The type of the trainer
+type: basic
+
+# The maximum number of training rounds
+rounds: 250
+
+# The maximum number of clients running concurrently
+max_concurrency: 4
+
+# The target accuracy
+target_accuracy: 0.98
+
+# Number of epoches for local training in each communication round
+epochs: 5
+batch_size: 10
+optimizer: SGD
+
+# The machine learning model
+model_name: lenet5
+
+#num_classes: 62
+
+algorithm:
+# Aggregation algorithm
+type: fedavg
+
+results:
+# Write the following parameter(s) into a CSV
+types: round, accuracy, elapsed_time, comm_time, round_time
+
+result_path: results/async_BigA10/rand1/500clients/
+
+parameters:
+optimizer:
+lr: 0.01
+momentum: 0.9
+weight_decay: 0.0
+model:
+num_classes: 62
+
+[INFO][15:55:34]: [Server #976322] Started training on 500 clients with 20 per round.
+[INFO][15:55:34]: [Server #976322] Configuring the server...
+[INFO][15:55:34]: Training: 250 rounds or accuracy above 98.0%
+
+[INFO][15:55:34]: Trainer: basic
+[INFO][15:55:34]: Algorithm: fedavg
+[INFO][15:55:34]: Data source: FEMNIST
+[INFO][15:55:44]: Starting client #1's process.
+[INFO][15:55:44]: Starting client #2's process.
+[INFO][15:55:44]: Starting client #3's process.
+[INFO][15:55:45]: Starting client #4's process.
+[INFO][15:55:45]: Setting the random seed for selecting clients: 1
+[INFO][15:55:45]: Starting a server at address 127.0.0.1 and port 6300.
+[INFO][15:55:51]: Client: simple
+[INFO][15:55:51]: Starting a simple client #1.
+[INFO][15:55:51]: Trainer: basic
+[INFO][15:55:51]: Algorithm: fedavg
+[INFO][15:55:51]: Client: simple
+[INFO][15:55:51]: Starting a simple client #2.
+[INFO][15:55:51]: Trainer: basic
+[INFO][15:55:51]: Algorithm: fedavg
+[INFO][15:55:51]: Client: simple
+[INFO][15:55:51]: Starting a simple client #3.
+[INFO][15:55:51]: Trainer: basic
+[INFO][15:55:51]: Algorithm: fedavg
+[INFO][15:55:51]: Client: simple
+[INFO][15:55:51]: Starting a simple client #4.
+[INFO][15:55:51]: Trainer: basic
+[INFO][15:55:51]: Algorithm: fedavg
+[INFO][15:55:56]: [Client #1] Contacting the server.
+[INFO][15:55:56]: [Client #1] Connecting to the server at http://127.0.0.1:6300.
+[INFO][15:55:56]: 127.0.0.1 [06/Oct/2022:19:55:56 +0000] "GET /socket.io/?transport=polling&EIO=4&t=1665086156.152456 HTTP/1.1" 200 293 "-" "Python/3.9 aiohttp/3.8.3"
+[INFO][15:55:56]: [Server #976322] A new client just connected.
+[INFO][15:55:56]: [Client #1] Connected to the server.
+[INFO][15:55:56]: [Client #1] Waiting to be selected.
+[INFO][15:55:56]: [Server #976322] New client with id #1 arrived.
+[INFO][15:55:56]: [Client #2] Contacting the server.
+[INFO][15:55:56]: [Client #2] Connecting to the server at http://127.0.0.1:6300.
+[INFO][15:55:56]: 127.0.0.1 [06/Oct/2022:19:55:56 +0000] "GET /socket.io/?transport=polling&EIO=4&t=1665086156.4940815 HTTP/1.1" 200 293 "-" "Python/3.9 aiohttp/3.8.3"
+[INFO][15:55:56]: [Server #976322] A new client just connected.
+[INFO][15:55:56]: [Client #2] Connected to the server.
+[INFO][15:55:56]: [Client #2] Waiting to be selected.
+[INFO][15:55:56]: [Server #976322] New client with id #2 arrived.
+[INFO][15:55:56]: [Client #3] Contacting the server.
+[INFO][15:55:56]: [Client #3] Connecting to the server at http://127.0.0.1:6300.
+[INFO][15:55:56]: 127.0.0.1 [06/Oct/2022:19:55:56 +0000] "GET /socket.io/?transport=polling&EIO=4&t=1665086156.5533834 HTTP/1.1" 200 293 "-" "Python/3.9 aiohttp/3.8.3"
+[INFO][15:55:56]: [Server #976322] A new client just connected.
+[INFO][15:55:56]: [Client #3] Connected to the server.
+[INFO][15:55:56]: [Client #3] Waiting to be selected.
+[INFO][15:55:56]: [Server #976322] New client with id #3 arrived.
+[INFO][15:55:56]: [Client #4] Contacting the server.
+[INFO][15:55:56]: [Client #4] Connecting to the server at http://127.0.0.1:6300.
+[INFO][15:55:56]: 127.0.0.1 [06/Oct/2022:19:55:56 +0000] "GET /socket.io/?transport=polling&EIO=4&t=1665086156.7176156 HTTP/1.1" 200 293 "-" "Python/3.9 aiohttp/3.8.3"
+[INFO][15:55:56]: [Server #976322] A new client just connected.
+[INFO][15:55:56]: [Client #4] Connected to the server.
+[INFO][15:55:56]: [Client #4] Waiting to be selected.
+[INFO][15:55:56]: [Server #976322] New client with id #4 arrived.
+[INFO][15:55:56]: [Server #976322] Starting training.
+[INFO][15:55:56]: [93m[1m
+[Server #976322] Starting round 1/250.[0m
+[INFO][15:55:56]: Calculating selection probabitliy ... 
+[INFO][15:55:57]: [Server #976322] Selected clients: [ 44 114 158  88 304 207 409  93 351 121 288 175  29 115 333 249 260 286
+ 499 411]
+[INFO][15:55:57]: [Server #976322] Selecting client #44 for training.
+[INFO][15:55:57]: [Server #976322] Sending the current model to client #44 (simulated).
+[INFO][15:55:57]: [Server #976322] Sending 0.26 MB of payload data to client #44 (simulated).
+[INFO][15:55:57]: [Server #976322] Selecting client #114 for training.
+[INFO][15:55:57]: [Server #976322] Sending the current model to client #114 (simulated).
+[INFO][15:55:57]: [Server #976322] Sending 0.26 MB of payload data to client #114 (simulated).
+[INFO][15:55:57]: [Client #44] Selected by the server.
+[INFO][15:55:57]: [Client #44] Loading its data source...
+[INFO][15:55:57]: Data source: FEMNIST
+[INFO][15:55:57]: [Server #976322] Selecting client #158 for training.
+[INFO][15:55:57]: [Server #976322] Sending the current model to client #158 (simulated).
+[INFO][15:55:57]: [Server #976322] Sending 0.26 MB of payload data to client #158 (simulated).
+[INFO][15:55:57]: [Client #114] Selected by the server.
+[INFO][15:55:57]: [Client #114] Loading its data source...
+[INFO][15:55:57]: Data source: FEMNIST
+[INFO][15:55:57]: [Server #976322] Selecting client #88 for training.
+[INFO][15:55:57]: [Server #976322] Sending the current model to client #88 (simulated).
+[INFO][15:55:57]: [Server #976322] Sending 0.26 MB of payload data to client #88 (simulated).
+[INFO][15:55:57]: [Client #158] Selected by the server.
+[INFO][15:55:57]: [Client #158] Loading its data source...
+[INFO][15:55:57]: Data source: FEMNIST
+[INFO][15:55:57]: [Client #88] Selected by the server.
+[INFO][15:55:57]: [Client #88] Loading its data source...
+[INFO][15:55:57]: [Client #44] Dataset size: 166
+[INFO][15:55:57]: Data source: FEMNIST
+[INFO][15:55:57]: [Client #44] Sampler: all_inclusive
+[INFO][15:55:57]: [Client #44] Received 0.26 MB of payload data from the server (simulated).
+[INFO][15:55:57]: [Client #158] Dataset size: 162
+[INFO][15:55:57]: [Client #158] Sampler: all_inclusive
+[INFO][15:55:57]: [Client #158] Received 0.26 MB of payload data from the server (simulated).
+[INFO][15:55:57]: [Client #114] Dataset size: 153
+[INFO][15:55:57]: [Client #114] Sampler: all_inclusive
+[INFO][15:55:57]: [93m[1m[Client #158] Started training in communication round #1.[0m
+[INFO][15:55:57]: [93m[1m[Client #44] Started training in communication round #1.[0m
+[INFO][15:55:57]: [Client #114] Received 0.26 MB of payload data from the server (simulated).
+[INFO][15:55:57]: [93m[1m[Client #114] Started training in communication round #1.[0m
+[INFO][15:55:57]: [Client #88] Dataset size: 162
+[INFO][15:55:57]: [Client #88] Sampler: all_inclusive
+[INFO][15:55:57]: [Client #88] Received 0.26 MB of payload data from the server (simulated).
+[INFO][15:55:57]: [93m[1m[Client #88] Started training in communication round #1.[0m
+[INFO][15:56:03]: [Client #88] Loading the dataset with size 162.
+[INFO][15:56:03]: [Client #44] Loading the dataset with size 166.
+[INFO][15:56:03]: [Client #114] Loading the dataset with size 153.
+[INFO][15:56:03]: [Client #158] Loading the dataset with size 162.
+[INFO][15:56:07]: [93m[1m[Client #88] Started training epoch 1.[0m
+[INFO][15:56:08]: [93m[1m[Client #44] Started training epoch 1.[0m
+[INFO][15:56:08]: [93m[1m[Client #114] Started training epoch 1.[0m
+[INFO][15:56:08]: [93m[1m[Client #158] Started training epoch 1.[0m
+slurmstepd-sim: error: *** JOB 4415 ON sim CANCELLED AT 2022-10-06T15:56:09 ***
