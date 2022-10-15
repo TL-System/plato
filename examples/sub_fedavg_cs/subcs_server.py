@@ -43,7 +43,7 @@ class Server(fedavg_cs.Server):
 
     def clients_processed(self):
         """Additional work to be performed after client reports have been processed."""
-        await super().clients_processed()
+        super().clients_processed()
 
         if Config().is_central_server():
             self.comm_overhead = 0

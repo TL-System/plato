@@ -78,7 +78,7 @@ class Server(fedavg.Server):
 
     def clients_processed(self):
         """Enters the retraining phase if a specific set of conditions are satisfied."""
-        await super().clients_processed()
+        super().clients_processed()
 
         clients_to_delete = Config().clients.clients_requesting_deletion
 

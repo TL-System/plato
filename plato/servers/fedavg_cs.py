@@ -303,7 +303,7 @@ class Server(fedavg.Server):
         """Additional work to be performed after client reports have been processed."""
         # Record results into a .csv file
         if Config().is_central_server():
-            await super().clients_processed()
+            super().clients_processed()
 
         if Config().is_edge_server():
             self.edge_training_time += self.get_record_items_values()["round_time"]
