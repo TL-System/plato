@@ -1,4 +1,7 @@
 from http import client
+from pydoc import cli
+
+from idna import check_initial_combiner
 import numpy as np
 import matplotlib.pyplot as plt
 #my_file = Path("/path/to/file")
@@ -27,7 +30,7 @@ with open('Sirius_CIFAR_resnet18_rand1_concen1.out') as f:
 with open("sirius_selected_clients.txt") as f:
     client_set = []
     for line in f.readlines():
-        print(line.split())
+        #print(line.split())
         fig, ax = plt.subplots()
         ax.hist(line.split(), 500)
         #ax.xlabel('clinet_id')
@@ -35,3 +38,19 @@ with open("sirius_selected_clients.txt") as f:
         #ax.title('async_selected_clients_distribution_rand1_round250')
         figure_file_name ='sirius_selected_clients_distribution.pdf' #'async_selected_clients_distribution.pdf'
         plt.savefig(figure_file_name)
+
+with open("sirius_selected_clients.txt") as f:
+    client_set = {}
+    for line in f.readlines():
+        for num in line.split():
+            if num in client_set:
+                client_set[num] += 1
+                #if client_set[num] >= 10:
+                #    print("client id: ", num)
+            else:
+                client_set[num] = 1
+    for client_id, frequency in client_set.items():
+        if frequency >= 10:
+            print("client_id: ", client_id)
+            
+

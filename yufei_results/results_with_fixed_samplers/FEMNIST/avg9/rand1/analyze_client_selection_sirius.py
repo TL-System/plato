@@ -10,7 +10,7 @@ new_outfile.close()
 #with open(
 #        'async_selection_FEMNIST_lenet5_avg9_rand1_round250_multiplyPi_print.out'
 #) as f:
-with open('Sirius_FEMNSIT_lenet5_rand1_2000clients.out') as f:
+with open('Sirius_FEMNSIT_lenet5_rand1.out') as f:
     for line in f.readlines():
 
         if 'Selected clients' in line:
@@ -33,5 +33,5 @@ with open("sirius_selected_clients.txt") as f:
         #ax.xlabel('clinet_id')
         #ax.ylabel('# of being selected')
         #ax.title('async_selected_clients_distribution_rand1_round250')
-        figure_file_name ='sirius_selected_clients_distribution_2000.pdf' #'async_selected_clients_distribution.pdf'
+        figure_file_name ='sirius_selected_clients_distribution.pdf' #'async_selected_clients_distribution.pdf'
         plt.savefig(figure_file_name)
