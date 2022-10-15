@@ -1,6 +1,11 @@
 """
 A customized server for federated unlearning.
 
+Federated unlearning allows clients to proactively erase their data from a trained model. The model
+will be retrained from scratch during the unlearning process.
+
+If the AdaHessian optimizer is used, it will reflect what the following paper proposed:
+
 Liu et al., "The Right to be Forgotten in Federated Learning: An Efficient Realization with Rapid
 Retraining," in Proc. INFOCOM, 2022.
 
@@ -8,7 +13,6 @@ Reference: https://arxiv.org/abs/2203.07320
 """
 import logging
 import os
-import time
 
 from plato.config import Config
 from plato.servers import fedavg

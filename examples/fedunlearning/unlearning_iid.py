@@ -1,5 +1,10 @@
 """
-A customized iid sampler for federated unlearning.
+A customized i.i.d. sampler for federated unlearning.
+
+Federated unlearning allows clients to proactively erase their data from a trained model. The model
+will be retrained from scratch during the unlearning process.
+
+If the AdaHessian optimizer is used, it will reflect what the following paper proposed:
 
 Liu et al., "The Right to be Forgotten in Federated Learning: An Efficient Realization with Rapid
 Retraining," in Proc. INFOCOM, 2022.
