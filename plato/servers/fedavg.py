@@ -190,10 +190,10 @@ class Server(base.Server):
             # the federated averaging algorithm
             logging.info("[Server #%d] Aggregating model weight deltas.", os.getpid())
             deltas = await self.aggregate_deltas(self.updates, deltas_received)
-            
+
             # Updates the existing model weights from the provided deltas
             updated_weights = self.algorithm.update_weights(deltas)
-            
+
             # Loads the new model weights
             self.algorithm.load_weights(updated_weights)
 
