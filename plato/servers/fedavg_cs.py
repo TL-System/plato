@@ -299,7 +299,7 @@ class Server(fedavg.Server):
 
         await self.clients_processed()
 
-    async def clients_processed(self):
+    def clients_processed(self):
         """Additional work to be performed after client reports have been processed."""
         # Record results into a .csv file
         if Config().is_central_server():

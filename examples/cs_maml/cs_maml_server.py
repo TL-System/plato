@@ -85,7 +85,7 @@ class Server(fedavg_cs.Server):
             "personalization_accuracy": self.personalization_accuracy * 100,
         }
 
-    async def clients_processed(self):
+    def clients_processed(self):
         """Additional work to be performed after client reports have been processed."""
         if self.do_personalization_test or Config().is_edge_server():
             # Record results

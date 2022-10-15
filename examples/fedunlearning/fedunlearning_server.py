@@ -76,7 +76,7 @@ class Server(fedavg.Server):
 
         return await super().aggregate_deltas(recent_updates, recent_deltas_received)
 
-    async def clients_processed(self):
+    def clients_processed(self):
         """Enters the retraining phase if a specific set of conditions are satisfied."""
         await super().clients_processed()
 

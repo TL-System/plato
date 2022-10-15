@@ -41,7 +41,7 @@ class Server(fedavg_cs.Server):
 
         return record_items_values
 
-    async def clients_processed(self):
+    def clients_processed(self):
         """Additional work to be performed after client reports have been processed."""
         await super().clients_processed()
 

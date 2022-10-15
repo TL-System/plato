@@ -224,7 +224,7 @@ class Server(base.Server):
         self.clients_processed()
         self.callback_handler.call_event("on_clients_processed", self)
 
-    async def clients_processed(self):
+    def clients_processed(self):
         """Additional work to be performed after client reports have been processed."""
         # Record results into a .csv file
         new_row = []

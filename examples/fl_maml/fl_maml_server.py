@@ -60,7 +60,7 @@ class Server(fedavg.Server):
             self.personalization_test_updates
         )
 
-    async def clients_processed(self):
+    def clients_processed(self):
         """Additional work to be performed after client reports have been processed."""
         if self.do_personalization_test:
             # Record results into a .csv file

@@ -42,7 +42,7 @@ class Server(fedavg_cs.Server):
             server_response["local_epoch_num"] = Config().trainer.epochs
         return server_response
 
-    async def clients_processed(self):
+    def clients_processed(self):
         """Additional work to be performed after client reports have been processed."""
         await super().clients_processed()
 
