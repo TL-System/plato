@@ -81,9 +81,9 @@ class Server(fedavg.Server):
 
         recent_mask = list(map(lambda update: update.staleness <= self.current_round, updates))
         recent_updates = list(filter(lambda update: update.staleness <= self.current_round, updates))
-        print("length of recent_updates: ", len(recent_updates))
+     
         recent_deltas_received = [delta for delta, fresh in zip(deltas_received, recent_mask) if fresh]
-        print("length of recent_deltas_received: ", len(recent_deltas_received))
+       
         return await super().aggregate_deltas(recent_updates, recent_deltas_received)  
 
     async def wrap_up_processing_reports(self):
