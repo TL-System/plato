@@ -478,6 +478,9 @@ class Trainer(base.Trainer):
 
                 outputs = self.model(examples)
 
+                outputs = self.outputs_generated(outputs)
+                self.callback_handler.call_event("on_outputs_generated", self, outputs)
+
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
@@ -548,6 +551,13 @@ class Trainer(base.Trainer):
         :param batch: the current batch of training data.
         :param loss: the loss computed in the current batch.
         """
+
+    @staticmethod
+    def outputs_generated(outputs):
+        """
+        Method called after the model updates have been generated.
+        """
+        return outputs
 
 
 class TrainerWithTimmScheduler(Trainer):
