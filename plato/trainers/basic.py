@@ -162,6 +162,15 @@ class Trainer(base.Trainer):
             self.save_model(filename)
 
     def perform_forward_and_backward_passes(self, config, examples, labels):
+        """Perform the forward and backward passes of the training loop
+
+        Arguments:
+        config: the configuration.
+        examples: data samples in the current batch.
+        labels: labels in the current batch.
+
+        Returns: loss values after the current batch has been processed.
+        """
         outputs = self.model(examples)
 
         loss = self._loss_criterion(outputs, labels)
@@ -428,9 +437,10 @@ class Trainer(base.Trainer):
         """
         Creates an instance of the trainloader.
 
-        :param batch_size: the batch size.
-        :param trainset: the training dataset.
-        :param sampler: the sampler for the trainloader to use.
+        Arguments:
+        batch_size: the batch size.
+        trainset: the training dataset.
+        sampler: the sampler for the trainloader to use.
         """
         return torch.utils.data.DataLoader(
             dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler
@@ -441,10 +451,10 @@ class Trainer(base.Trainer):
         """
         Evaluates the model with the provided test dataset and test sampler.
 
-        :param testset: the test dataset.
-        :param sampler: the test sampler.
-        :param kwargs (optional): Additional keyword arguments.
-
+        Auguments:
+        testset: the test dataset.
+        sampler: the test sampler. The default is None.
+        kwargs (optional): Additional keyword arguments.
         """
         batch_size = config["batch_size"]
 
