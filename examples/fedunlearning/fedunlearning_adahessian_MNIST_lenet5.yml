@@ -64,7 +64,7 @@ trainer:
 parameters:
     optimizer:
         lr: 0.001
-        eps: 1e-8
+        eps: 0.00000001
         weight_decay: 0.0
         hessian_power: 1.0
         betas: [0.9, 0.999] #the two momentums for betas

@@ -42,9 +42,9 @@ class Server(fedavg_cs.Server):
             server_response["local_epoch_num"] = Config().trainer.epochs
         return server_response
 
-    async def wrap_up_processing_reports(self):
-        """Wrap up processing the reports with any additional work."""
-        await super().wrap_up_processing_reports()
+    def clients_processed(self):
+        """Additional work to be performed after client reports have been processed."""
+        super().clients_processed()
 
         if Config().is_central_server():
             self.update_local_epoch_list()

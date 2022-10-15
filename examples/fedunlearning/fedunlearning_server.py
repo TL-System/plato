@@ -1,6 +1,11 @@
 """
 A customized server for federated unlearning.
 
+Federated unlearning allows clients to proactively erase their data from a trained model. The model
+will be retrained from scratch during the unlearning process.
+
+If the AdaHessian optimizer is used, it will reflect what the following paper proposed:
+
 Liu et al., "The Right to be Forgotten in Federated Learning: An Efficient Realization with Rapid
 Retraining," in Proc. INFOCOM, 2022.
 
@@ -8,14 +13,13 @@ Reference: https://arxiv.org/abs/2203.07320
 """
 import logging
 import os
-import time
 
 from plato.config import Config
 from plato.servers import fedavg
 
 
 class Server(fedavg.Server):
-    """ A federated unlearning server that implements the federated unlearning baseline algorithm.
+    """A federated unlearning server that implements the federated unlearning baseline algorithm.
 
     When 'data_deletion_round' specified in the configuration, the server will enter a retraining
     phase after this round is reached, during which it will roll back to the minimum round number
@@ -38,46 +42,53 @@ class Server(fedavg.Server):
         self.round_first_selected = {}
 
     async def select_clients(self, for_next_batch=False):
-        """ Remembers the first round that a particular client ID was selected. """
+        """Remembers the first round that a particular client ID was selected."""
         await super().select_clients(for_next_batch)
 
         for client_id in self.selected_clients:
             if not client_id in self.round_first_selected:
                 self.round_first_selected[client_id] = self.current_round
 
-    async def register_client(self, sid, client_id):
-        """ Adding a newly arrived client to the list of clients. """
-        if not client_id in self.clients:
-            # The last contact time is stored for each client
-            self.clients[client_id] = {
-                'sid': sid,
-                'last_contacted': time.perf_counter()
-            }
-            logging.info("[%s] New client with id #%d arrived.", self,
-                         client_id)
-        else:
-            self.clients[client_id]['last_contacted'] = time.perf_counter()
-            logging.info("[%s] New contact from Client #%d received.", self,
-                         client_id)
+    def training_will_start(self):
+        """Additional tasks before selecting clients for the first round of training."""
+        super().training_will_start()
 
-        if (self.current_round == 0 or self.resumed_session) and len(
-                self.clients) >= self.clients_per_round:
-            logging.info("[%s] Starting training.", self)
-            self.resumed_session = False
-            # Saving a checkpoint for round #0 before any training starts,
-            # useful if we need to roll back to the very beginning, such as
-            # in the federated unlearning process
-            self.save_to_checkpoint()
-            await self.select_clients()
+        # Saving a checkpoint for round #0 before any training starts,
+        # useful if we need to roll back to the very beginning, such as
+        # in the federated unlearning process
+        self.save_to_checkpoint()
 
-    async def wrap_up_processing_reports(self):
-        """ Enters the retraining phase if a specific set of conditions are satisfied. """
-        await super().wrap_up_processing_reports()
+    async def aggregate_deltas(self, updates, deltas_received):
+        """Aggregate the reported weight updates from the selected clients.
+        If in retraing phase, staleness clients should not be aggregated.
+        Otherwise the stale clients updates contains old model's info,
+        will be aggregated after data_deletion_round.
+        """
+        if not self.retraining:
+            return await super().aggregate_deltas(updates, deltas_received)
+
+        recent_mask = list(
+            map(lambda update: update.staleness <= self.current_round, updates)
+        )
+        recent_updates = list(
+            filter(lambda update: update.staleness <= self.current_round, updates)
+        )
+
+        recent_deltas_received = [
+            delta for delta, fresh in zip(deltas_received, recent_mask) if fresh
+        ]
+
+        return await super().aggregate_deltas(recent_updates, recent_deltas_received)
+
+    def clients_processed(self):
+        """Enters the retraining phase if a specific set of conditions are satisfied."""
+        super().clients_processed()
 
         clients_to_delete = Config().clients.clients_requesting_deletion
 
-        if (self.current_round == Config().clients.data_deletion_round
-            ) and not self.retraining:
+        if (
+            self.current_round == Config().clients.data_deletion_round
+        ) and not self.retraining:
             # If data_deletion_round equals to the current round at server for the first time,
             # and the clients requesting retraining has been selected before, the retraining
             # phase starts
@@ -95,25 +106,35 @@ class Server(fedavg.Server):
 
                 logging.info(
                     "[%s] Data deleted. Retraining from the states after round #%s.",
-                    self, self.current_round)
+                    self,
+                    self.current_round,
+                )
 
                 # Loading the saved model on the server for starting the retraining phase
-                checkpoint_path = Config.params['checkpoint_path']
+                checkpoint_path = Config.params["checkpoint_path"]
 
-                model_name = Config().trainer.model_name if hasattr(
-                    Config().trainer, 'model_name') else 'custom'
+                model_name = (
+                    Config().trainer.model_name
+                    if hasattr(Config().trainer, "model_name")
+                    else "custom"
+                )
                 filename = f"checkpoint_{model_name}_{self.current_round}.pth"
                 self.trainer.load_model(filename, checkpoint_path)
 
                 logging.info(
                     "[Server #%d] Model used for the retraining phase loaded from %s.",
-                    os.getpid(), checkpoint_path)
+                    os.getpid(),
+                    checkpoint_path,
+                )
 
-                if hasattr(Config().clients,
-                           'exact_retrain') and Config().clients.exact_retrain:
+                if (
+                    hasattr(Config().clients, "exact_retrain")
+                    and Config().clients.exact_retrain
+                ):
                     # Loading the PRNG states on the server in preparation for the retraining phase
                     logging.info(
                         "[Server #%d] Random states after round #%s restored for exact retraining.",
-                        os.getpid(), self.current_round)
-                    self.restore_random_states(self.current_round,
-                                               checkpoint_path)
+                        os.getpid(),
+                        self.current_round,
+                    )
+                    self.restore_random_states(self.current_round, checkpoint_path)
