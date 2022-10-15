@@ -98,16 +98,16 @@ def main():
     x_item = 'elapsed_time'
     y_item = 'accuracy'
 
-    result_csv_file1 ='./sirius_femnist_2000clients.csv' #'./fedavg_rand1.csv'
+    result_csv_file1 ='./sirius_femnist_avg9.csv' #'./fedavg_rand1.csv'
     result_dict1 = read_csv_to_dict(result_csv_file1, x_item, y_item)
 
-    result_csv_file2 = './oort_femnsit_2000clients.csv'
+    result_csv_file2 = './oort_rand1_real500.csv'
     result_dict2 = read_csv_to_dict(result_csv_file2, x_item, y_item)
 
     result_csv_file3 = './fedbuff_rand1_long.csv'
     result_dict3 = read_csv_to_dict(result_csv_file3, x_item, y_item)
 
-    result_csv_file4 = './async_multiPi_rand1_2.csv'
+    result_csv_file4 = './async_simplified.csv'
     result_dict4 = read_csv_to_dict(result_csv_file4, x_item, y_item)
     #x_item = 'round'
     x_label = 'Elapsed Time'
