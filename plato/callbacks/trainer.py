@@ -30,10 +30,12 @@ class TrainerCallback(ABC):
         """
         Event called at the beginning of a training epoch.
         """
-    
+
     def on_train_step_start(self, trainer, config, batch, **kwargs):
         """
         Event called at the beginning of a training step.
+
+        :param batch: the current batch of training data.
         """
 
     def on_train_step_start(self, trainer, config, batch, **kwargs):
@@ -54,6 +56,11 @@ class TrainerCallback(ABC):
     def on_train_epoch_end(self, trainer, config, **kwargs):
         """
         Event called at the end of a training epoch.
+        """
+
+    def on_outputs_generated(self, outputs, **kwargs):
+        """
+        Event called after the model updates have been generated.
         """
 
 
