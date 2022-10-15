@@ -68,7 +68,7 @@ algorithm:
     lr: 1
 
     # in a particular communication round (starting from 1)
-    attack_round: 1
+    attack_round: 3
     # One particular client, e.g., the first selected client
     victim_client: 0
     num_iters: 100
