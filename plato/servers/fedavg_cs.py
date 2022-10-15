@@ -297,7 +297,7 @@ class Server(fedavg.Server):
         else:
             self.accuracy = self.average_accuracy
 
-        await self.clients_processed()
+        self.clients_processed()
 
     def clients_processed(self):
         """Additional work to be performed after client reports have been processed."""

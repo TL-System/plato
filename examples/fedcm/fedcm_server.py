@@ -41,7 +41,7 @@ class Server(fedavg.Server):
                 "[%s] Global model accuracy: %.2f%%\n", self, 100 * self.accuracy
             )
 
-        await self.clients_processed()
+        self.clients_processed()
 
     def customize_server_payload(self, payload):
         return [payload, self.trainer.delta, self.current_round]

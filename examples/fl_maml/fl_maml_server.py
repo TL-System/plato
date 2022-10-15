@@ -47,7 +47,7 @@ class Server(fedavg.Server):
         """Process the client reports by aggregating their weights."""
         if self.do_personalization_test:
             self.compute_personalization_accuracy()
-            await self.clients_processed()
+            self.clients_processed()
         else:
             await super()._process_reports()
 
