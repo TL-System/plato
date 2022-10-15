@@ -52,6 +52,8 @@ class Trainer(base.Trainer):
 
         self.train_loader = None
         self.sampler = None
+        self._loss_criterion = None
+        self.optimizer = None
         self.lr_scheduler = None
         self.current_epoch = 0
 
@@ -171,6 +173,8 @@ class Trainer(base.Trainer):
 
         Returns: loss values after the current batch has been processed.
         """
+        self.optimizer.zero_grad()
+
         outputs = self.model(examples)
 
         loss = self._loss_criterion(outputs, labels)
@@ -200,12 +204,12 @@ class Trainer(base.Trainer):
         self.train_loader = Trainer.get_train_loader(batch_size, trainset, sampler)
 
         # Initializing the loss criterion
-        _loss_criterion = self.get_loss_criterion()
+        self._loss_criterion = self.get_loss_criterion()
 
         # Initializing the optimizer
-        optimizer = self.get_optimizer(self.model)
-        self.lr_scheduler = self.get_lr_scheduler(config, optimizer)
-        optimizer = self._adjust_lr(config, self.lr_scheduler, optimizer)
+        self.optimizer = self.get_optimizer(self.model)
+        self.lr_scheduler = self.get_lr_scheduler(config, self.optimizer)
+        self.optimizer = self._adjust_lr(config, self.lr_scheduler, self.optimizer)
 
         self.model.to(self.device)
         self.model.train()
@@ -220,12 +224,14 @@ class Trainer(base.Trainer):
             for batch_id, (examples, labels) in enumerate(self.train_loader):
                 self.train_step_start(config, batch=batch_id)
                 self.callback_handler.call_event(
-                    "on_train_step_start", self, config, batch=batch_id)
+                    "on_train_step_start", self, config, batch=batch_id
+                )
 
                 examples, labels = examples.to(self.device), labels.to(self.device)
-                optimizer.zero_grad()
 
-                loss = self.perform_forward_and_backward_passes(config, examples, labels)
+                loss = self.perform_forward_and_backward_passes(
+                    config, examples, labels
+                )
 
                 self.train_step_end(config, batch=batch_id, loss=loss)
                 self.callback_handler.call_event(
@@ -234,8 +240,8 @@ class Trainer(base.Trainer):
 
             self.lr_scheduler_step()
 
-            if hasattr(optimizer, "params_state_update"):
-                optimizer.params_state_update()
+            if hasattr(self.optimizer, "params_state_update"):
+                self.optimizer.params_state_update()
 
             # Simulate client's speed
             if (
@@ -531,6 +537,9 @@ class Trainer(base.Trainer):
 
     def train_epoch_end(self, config):
         """Method called at the end of a training epoch."""
+
+    def train_step_start(self, config, batch=None):
+        """Method called at the beginning of a training step."""
 
     def train_step_end(self, config, batch=None, loss=None):
         """
