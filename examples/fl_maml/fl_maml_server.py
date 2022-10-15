@@ -47,7 +47,7 @@ class Server(fedavg.Server):
         """Process the client reports by aggregating their weights."""
         if self.do_personalization_test:
             self.compute_personalization_accuracy()
-            await self.wrap_up_processing_reports()
+            await self.clients_processed()
         else:
             await super()._process_reports()
 
@@ -60,8 +60,8 @@ class Server(fedavg.Server):
             self.personalization_test_updates
         )
 
-    async def wrap_up_processing_reports(self):
-        """Wrap up processing the reports with any additional work."""
+    async def clients_processed(self):
+        """Additional work to be performed after client reports have been processed."""
         if self.do_personalization_test:
             # Record results into a .csv file
             new_row = []

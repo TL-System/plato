@@ -297,13 +297,13 @@ class Server(fedavg.Server):
         else:
             self.accuracy = self.average_accuracy
 
-        await self.wrap_up_processing_reports()
+        await self.clients_processed()
 
-    async def wrap_up_processing_reports(self):
-        """Wrap up processing the reports with any additional work."""
+    async def clients_processed(self):
+        """Additional work to be performed after client reports have been processed."""
         # Record results into a .csv file
         if Config().is_central_server():
-            await super().wrap_up_processing_reports()
+            await super().clients_processed()
 
         if Config().is_edge_server():
             self.edge_training_time += self.get_record_items_values()["round_time"]

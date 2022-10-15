@@ -76,9 +76,9 @@ class Server(fedavg.Server):
 
         return await super().aggregate_deltas(recent_updates, recent_deltas_received)
 
-    async def wrap_up_processing_reports(self):
+    async def clients_processed(self):
         """Enters the retraining phase if a specific set of conditions are satisfied."""
-        await super().wrap_up_processing_reports()
+        await super().clients_processed()
 
         clients_to_delete = Config().clients.clients_requesting_deletion
 

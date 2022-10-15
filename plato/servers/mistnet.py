@@ -56,4 +56,4 @@ class Server(fedavg.Server):
                 "[%s] Global model accuracy: %.2f%%\n", self, 100 * self.accuracy
             )
 
-        await self.wrap_up_processing_reports()
+        await self.clients_processed()

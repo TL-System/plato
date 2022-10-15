@@ -115,9 +115,9 @@ class Server(fedavg_cs.Server):
 
         return record_items_values
 
-    async def wrap_up_processing_reports(self):
-        """Wrap up processing the reports with any additional work."""
-        await super().wrap_up_processing_reports()
+    async def clients_processed(self):
+        """Additional work to be performed after client reports have been processed."""
+        await super().clients_processed()
 
         if Config().is_central_server():
             self.update_pruning_amount_list()

@@ -44,13 +44,19 @@ class PrintProgressCallback(ServerCallback):
         """
         Event called after the updated weights have been received.
         """
-        logging.info("[Server #%s] Updated weights have been received.", os.getpid())
+        logging.info("[%s] Updated weights have been received.", server)
 
     def on_weights_aggregated(self, server, updates):
         """
         Event called after the updated weights have been aggregated.
         """
-        logging.info("[Server #%s] Finished aggregating updated weights.", os.getpid())
+        logging.info("[%s] Finished aggregating updated weights.", server)
+
+    def on_clients_processed(self, server, **kwargs):
+        """
+        Event called after all client reports have been processed..
+        """
+        logging.info("[%s] All client reports have been processed.", server)
 
     def on_training_will_start(self, server, **kwargs):
         """
@@ -62,4 +68,4 @@ class PrintProgressCallback(ServerCallback):
         """
         Event called at the start of closing the server.
         """
-        logging.info("[Server #%s] Closing the server.", os.getpid())
+        logging.info("[%s] Closing the server.", server)
