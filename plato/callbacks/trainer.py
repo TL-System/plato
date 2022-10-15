@@ -30,6 +30,11 @@ class TrainerCallback(ABC):
         """
         Event called at the beginning of a training epoch.
         """
+    
+    def on_train_step_start(self, trainer, config, batch, **kwargs):
+        """
+        Event called at the beginning of a training step.
+        """
 
     def on_train_step_end(self, trainer, config, batch, loss, **kwargs):
         """
