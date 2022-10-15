@@ -7,20 +7,13 @@ Retraining," in Proc. INFOCOM, 2022.
 Reference: https://arxiv.org/abs/2203.07320
 """
 
-import os
-import warnings
-warnings.filterwarnings("ignore")
-
-os.environ[
-    'config_file'] = 'examples/fedunlearning_baseline/fedun_MNIST_lenet5.yml'
-
 import fedunlearning_client
 import fedunlearning_server
 
 
 def main():
     """
-    A naive retrain example used as fed unlearning baseline
+    Federated unlearning with retraining from scratch.
     """
     client = fedunlearning_client.Client()
     server = fedunlearning_server.Server()
