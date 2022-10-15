@@ -9,7 +9,7 @@ from plato.clients import simple
 
 
 def main():
-    """A Plato federated learning training session using FedProx."""
+    """A Plato federated learning training session using CustomizeProcessorCallback."""
     client = simple.Client(callbacks=[CustomizeProcessorCallback])
     server = fedavg.Server()
     server.run(client)
