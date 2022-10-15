@@ -161,6 +161,21 @@ class Trainer(base.Trainer):
             filename = f"{model_name}_{self.client_id}_{config['run_id']}.pth"
             self.save_model(filename)
 
+    def perform_forward_and_backward_passes(self, config, examples, labels):
+        outputs = self.model(examples)
+
+        loss = self._loss_criterion(outputs, labels)
+        self._loss_tracker.update(loss, labels.size(0))
+
+        if "create_graph" in config:
+            loss.backward(create_graph=config["create_graph"])
+        else:
+            loss.backward()
+
+        self.optimizer.step()
+
+        return loss
+
     # pylint: disable=unused-argument
     def train_model(self, config, trainset, sampler, **kwargs):
         """The default training loop when a custom training loop is not supplied."""
@@ -194,20 +209,14 @@ class Trainer(base.Trainer):
             self.callback_handler.call_event("on_train_epoch_start", self, config)
 
             for batch_id, (examples, labels) in enumerate(self.train_loader):
+                self.train_step_start(config, batch=batch_id)
+                self.callback_handler.call_event(
+                    "on_train_step_start", self, config, batch=batch_id)
+
                 examples, labels = examples.to(self.device), labels.to(self.device)
                 optimizer.zero_grad()
 
-                outputs = self.model(examples)
-
-                loss = _loss_criterion(outputs, labels)
-                self._loss_tracker.update(loss, labels.size(0))
-
-                if "create_graph" in config:
-                    loss.backward(create_graph=config["create_graph"])
-                else:
-                    loss.backward()
-
-                optimizer.step()
+                loss = self.perform_forward_and_backward_passes(config, examples, labels)
 
                 self.train_step_end(config, batch=batch_id, loss=loss)
                 self.callback_handler.call_event(
