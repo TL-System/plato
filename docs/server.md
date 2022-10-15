@@ -72,6 +72,10 @@ def customize_server_response(self, server_response: dict) -> dict:
 Override this method to customize the server payload before sending it to the clients.
 ```
 
+```{admonition} **training_will_start(self)**
+Override this method to complete additional tasks before selecting clients for the first round of training.
+```
+
 ```{admonition} **server_will_close(self)**
 Override this method to complete additional tasks before closing the server.
 ```

@@ -24,6 +24,11 @@ class ServerCallback(ABC):
         Event called after the updated weights have been aggregated.
         """
 
+    def on_client_arrived(self, server, **kwargs):
+        """
+        Event called after a new client arrived.
+        """
+
     def on_server_will_close(self, server, **kwargs):
         """
         Event called at the start of closing the server.
@@ -46,6 +51,12 @@ class PrintProgressCallback(ServerCallback):
         Event called after the updated weights have been aggregated.
         """
         logging.info("[Server #%s] Finished aggregating updated weights.", os.getpid())
+
+    def on_training_will_start(self, server, **kwargs):
+        """
+        Event called before selecting clients for the first round of training.
+        """
+        logging.info("[%s] Starting training.", server)
 
     def on_server_will_close(self, server, **kwargs):
         """

@@ -45,29 +45,14 @@ class Server(fedavg.Server):
             if not client_id in self.round_first_selected:
                 self.round_first_selected[client_id] = self.current_round
 
-    async def register_client(self, sid, client_id):
-        """Adding a newly arrived client to the list of clients."""
-        if not client_id in self.clients:
-            # The last contact time is stored for each client
-            self.clients[client_id] = {
-                "sid": sid,
-                "last_contacted": time.perf_counter(),
-            }
-            logging.info("[%s] New client with id #%d arrived.", self, client_id)
-        else:
-            self.clients[client_id]["last_contacted"] = time.perf_counter()
-            logging.info("[%s] New contact from Client #%d received.", self, client_id)
+    def training_will_start(self):
+        """Additional tasks before selecting clients for the first round of training."""
+        super().training_will_start()
 
-        if (self.current_round == 0 or self.resumed_session) and len(
-            self.clients
-        ) >= self.clients_per_round:
-            logging.info("[%s] Starting training.", self)
-            self.resumed_session = False
-            # Saving a checkpoint for round #0 before any training starts,
-            # useful if we need to roll back to the very beginning, such as
-            # in the federated unlearning process
-            self.save_to_checkpoint()
-            await self.select_clients()
+        # Saving a checkpoint for round #0 before any training starts,
+        # useful if we need to roll back to the very beginning, such as
+        # in the federated unlearning process
+        self.save_to_checkpoint()
 
     async def aggregate_deltas(self, updates, deltas_received):
         """Aggregate the reported weight updates from the selected clients.
