@@ -54,7 +54,7 @@ class PrintProgressCallback(ServerCallback):
 
     def on_clients_processed(self, server, **kwargs):
         """
-        Event called after all client reports have been processed..
+        Event called after all client reports have been processed.
         """
         logging.info("[%s] All client reports have been processed.", server)
 
