@@ -271,7 +271,7 @@ class Trainer(basic.Trainer):
         self.train_run_end(config)
         self.callback_handler.call_event("on_train_run_end", self, config)
 
-    def test_model(self, config, testset, sampler, **kwargs):
+    def test_model(self, config, testset, sampler=None, **kwargs):
         """
         Evaluates the model with the provided test dataset and test sampler.
 
