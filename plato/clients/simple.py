@@ -19,8 +19,10 @@ from plato.utils import fonts
 class Client(base.Client):
     """A basic federated learning client who sends simple weight updates."""
 
-    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
-        super().__init__()
+    def __init__(
+        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+    ):
+        super().__init__(callbacks)
         self.custom_model = model
         self.model = None
 
