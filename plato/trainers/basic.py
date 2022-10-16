@@ -201,7 +201,7 @@ class Trainer(base.Trainer):
         self.train_run_start(config)
         self.callback_handler.call_event("on_train_run_start", self, config)
 
-        self.train_loader = Trainer.get_train_loader(batch_size, trainset, sampler)
+        self.train_loader = self.get_train_loader(batch_size, trainset, sampler)
 
         # Initializing the loss criterion
         self._loss_criterion = self.get_loss_criterion()
@@ -438,8 +438,7 @@ class Trainer(base.Trainer):
         return self.model
 
     # pylint: disable=unused-argument
-    @staticmethod
-    def get_train_loader(batch_size, trainset, sampler, **kwargs):
+    def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
         """
         Creates an instance of the trainloader.
 
@@ -479,7 +478,6 @@ class Trainer(base.Trainer):
                 outputs = self.model(examples)
 
                 outputs = self.outputs_generated(outputs)
-                self.callback_handler.call_event("on_outputs_generated", self, outputs)
 
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
