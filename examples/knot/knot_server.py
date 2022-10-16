@@ -244,9 +244,6 @@ class Server(fedunlearning_server.Server):
                 self.clusters[update.client_id] for update in self.updates
             }
 
-            print(self.algorithm.models)
-            print(updated_cluster_ids)
-
             test_accuracy_per_cluster = self.trainer.server_clustered_test(
                 self.testset,
                 self.testset_sampler,
