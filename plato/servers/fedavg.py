@@ -144,9 +144,7 @@ class Server(base.Server):
             for name, delta in deltas_received[0].items()
         }
 
-        print(f"len(deltas_received) = {len(deltas_received)}")
         for i, update in enumerate(deltas_received):
-            print(f"i = {i}")
             report = updates[i].report
             num_samples = report.num_samples
 
