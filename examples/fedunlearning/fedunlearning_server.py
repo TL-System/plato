@@ -43,11 +43,9 @@ class Server(fedavg.Server):
         # A dictionary that maps client IDs to the first round when the server selected it
         self.round_first_selected = {}
 
-    async def select_clients(self, for_next_batch=False):
+    def clients_selected(self, selected_clients):
         """Remembers the first round that a particular client ID was selected."""
-        await super().select_clients(for_next_batch)
-
-        for client_id in self.selected_clients:
+        for client_id in selected_clients:
             if not client_id in self.round_first_selected:
                 self.round_first_selected[client_id] = self.current_round
 
