@@ -14,8 +14,8 @@ from plato.trainers import basic
 class Trainer(basic.Trainer):
     """A federated learning trainer using the Knot algorithm."""
 
-    async def server_clustered_test(self, testset, sampler=None, **kwargs):
-        """ Separately perfrom the model test for all clutsers. """
+    def server_clustered_test(self, testset, sampler=None, **kwargs):
+        """Separately perform the model test for all clusters."""
         # The models within each cluster should be provided in the argument,
         # and it should be a dictionary in which the keys are cluster IDs,
         # and the values are the corresponding models
@@ -34,13 +34,12 @@ class Trainer(basic.Trainer):
         # Preparing the test data loader
         if sampler is None:
             test_loader = torch.utils.data.DataLoader(
-                testset, batch_size=config['batch_size'], shuffle=False)
+                testset, batch_size=config["batch_size"], shuffle=False
+            )
         else:
             test_loader = torch.utils.data.DataLoader(
-                testset,
-                batch_size=config['batch_size'],
-                shuffle=False,
-                sampler=sampler)
+                testset, batch_size=config["batch_size"], shuffle=False, sampler=sampler
+            )
 
         for cluster_id in updated_cluster_ids:
             cluster_model = clustered_models[cluster_id]
@@ -52,8 +51,7 @@ class Trainer(basic.Trainer):
             total = 0
             with torch.no_grad():
                 for examples, labels in test_loader:
-                    examples, labels = examples.to(self.device), labels.to(
-                        self.device)
+                    examples, labels = examples.to(self.device), labels.to(self.device)
 
                     outputs = cluster_model(examples)
 

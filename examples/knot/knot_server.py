@@ -194,6 +194,9 @@ class Server(fedunlearning_server.Server):
                         filename,
                     )
 
+        if self.current_round >= 2:
+            self.initialize_optimization = False
+
     def load_model(self, cluster_id, filename=None, location=None):
         """Loading pre-trained model weights before retraining from a file."""
         model_path = Config().params["model_path"] if location is None else location
@@ -557,22 +560,8 @@ class Server(fedunlearning_server.Server):
 
         return avg_update
 
-    async def process_reports(self):
-        """
-        Process the client reports by taking the highest per-cluster accuracy as the global
-        accuracy, and taking the model from the cluster with the highest accuracy at the
-        end of the training.
-        """
-
-        if hasattr(Config().server, "do_test") and not Config().server.do_test:
-            # Compute the average accuracy from client reports
-            self.accuracy = self.accuracy_averaging(self.updates)
-            logging.info(
-                "[%s] Average client accuracy: %.2f%%.", self, 100 * self.accuracy
-            )
-
-        await self.aggregate_weights(self.updates)
-
+    def weights_received(self, weights_received):
+        """Method called after the updated weights have been received."""
         if (
             hasattr(Config().server, "do_clustered_test")
             and Config().server.do_clustered_test
@@ -585,7 +574,7 @@ class Server(fedunlearning_server.Server):
                 self.clusters[client_id] for (client_id, __, __, __) in self.updates
             }
 
-            test_accuracy_per_cluster = await self.trainer.server_clustered_test(
+            test_accuracy_per_cluster = self.trainer.server_clustered_test(
                 self.testset,
                 self.testset_sampler,
                 clustered_models=self.algorithm.models,
@@ -595,28 +584,11 @@ class Server(fedunlearning_server.Server):
             # Second, update the test accuracy for clusters that have just been tested
             self.clustered_test_accuracy.update(test_accuracy_per_cluster)
 
-        # Calculate the global accuracy by taking the model from the cluster with
-        # the highest accuracy
+    def weights_aggregated(self, updates):
+        """Method called after the updated weights have been aggregated."""
         if hasattr(Config().server, "do_test") and Config().server.do_test:
             # Retrieve the model from the cluster with the highest accuracy
             self.trainer.model.load_state_dict(self.aggregate_models(), strict=True)
-
-            # Testing the aggregated model
-            self.accuracy = await self.trainer.server_test(
-                self.testset, self.testset_sampler
-            )
-
-        if hasattr(Config().trainer, "target_perplexity"):
-            logging.info("[%s] Global model perplexity: %.2f\n", self, self.accuracy)
-        else:
-            logging.info(
-                "[%s] Global model accuracy: %.2f%%\n", self, 100 * self.accuracy
-            )
-
-        self.clients_processed()
-
-        if self.current_round >= 2:
-            self.initialize_optimization = False
 
     async def wrap_up(self):
         """Wrapping up when each round of training is done."""
