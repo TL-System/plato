@@ -58,11 +58,6 @@ class TrainerCallback(ABC):
         Event called at the end of a training epoch.
         """
 
-    def on_outputs_generated(self, outputs, **kwargs):
-        """
-        Event called after the model updates have been generated.
-        """
-
 
 class LogProgressCallback(TrainerCallback):
     """

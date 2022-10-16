@@ -68,10 +68,10 @@ algorithm:
     lr: 1
 
     # in a particular communication round (starting from 1)
-    attack_round: 3
+    attack_round: 1
     # One particular client, e.g., the first selected client
     victim_client: 0
-    num_iters: 100
+    num_iters: 30
     log_interval: 1
 
     # Whether or not use customized initialization for model weights
