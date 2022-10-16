@@ -92,365 +92,52 @@ class Server(fedunlearning_server.Server):
         # Initialize the function that clustering clients by solver or randomly
         self._clustering_clients()
 
-    def clients_processed(self):
-        """Determining the rollback round and roll back to that round, if retraining is needed
-        for each of the clusters."""
-        super().clients_processed()
+    def init_trainer(self):
+        """Load the trainer and initialize the dictionary that maps cluster IDs to client IDs."""
+        super().init_trainer()
 
-        # If data_deletion_round equals to the current round at server for the first time,
-        # and the clients requesting retraining has been selected before, the retraining
-        # phase starts.
+        self.algorithm.init_clusters(self.clusters)
 
-        # Make sure that the model at round 0 is loaded at round 3, if we
-        # have activated the optimized clustering algorithm
-        if (
-            hasattr(Config().server, "do_optimized_clustering")
-            and Config().server.do_optimized_clustering
-            and self.current_round == 2
-        ):
-            for cluster_id in range(self.num_clusters):
-                # Loading the saved model on the server for starting the retraining phase
-                checkpoint_path = Config.params["checkpoint_path"]
-
-                model_name = (
-                    Config().trainer.model_name
-                    if hasattr(Config().trainer, "model_name")
-                    else "custom"
-                )
-
-                # Loading the model from round 0
-                rollback_round = 0
-                filename = f"checkpoint_{model_name}_{rollback_round}_{cluster_id}.pth"
-
-                self.load_model(cluster_id, filename, checkpoint_path)
-
-                logging.info(
-                    fonts.colourize(
-                        f"[Server #{os.getpid()}] Cluster #{cluster_id}: Round #0 "
-                        f"model reloaded from {filename}.",
-                        colour="green",
-                    )
-                )
-
-        if not self.initialize_optimization:
-            self.earliest_round = {
-                cluster_id: self.current_round
-                for cluster_id in range(self.num_clusters)
-            }
-
-        data_deletion_round = Config().clients.data_deletion_round
-        clients_to_delete = Config().clients.clients_requesting_deletion
-
-        for cluster_id in range(self.num_clusters):
-            if (
-                (self.current_round == data_deletion_round)
-                and not self.clustered_retraining[cluster_id]
-                and not self.initialize_optimization
-            ):
-                for client_id, init_round in self.round_first_selected.items():
-                    if (
-                        client_id in clients_to_delete
-                        and self.clusters[client_id] == cluster_id
-                    ):
-                        self.clustered_retraining[cluster_id] = True
-
-                        if self.earliest_round[cluster_id] > init_round:
-                            self.earliest_round[cluster_id] = init_round
-
-                        self.rollback_round[cluster_id] = (
-                            self.earliest_round[cluster_id] - 1
-                        )
-                        logging.info(
-                            fonts.colourize(
-                                f"[{self}] Data deleted. Retraining cluster #{cluster_id} "
-                                f"from the states after round #{self.rollback_round[cluster_id]}.",
-                                colour="green",
-                            )
-                        )
-
-                if cluster_id in self.rollback_round:
-                    # Loading the saved model on the server for starting the retraining phase
-                    checkpoint_path = Config.params["checkpoint_path"]
-
-                    model_name = (
-                        Config().trainer.model_name
-                        if hasattr(Config().trainer, "model_name")
-                        else "custom"
-                    )
-
-                    # When the current_round matches the data deletion round, load the model from
-                    # `rollback_round`.
-                    rollback_round = self.rollback_round[cluster_id]
-                    filename = (
-                        f"checkpoint_{model_name}_{rollback_round}_{cluster_id}.pth"
-                    )
-
-                    self.load_model(cluster_id, filename, checkpoint_path)
-
-                    logging.info(
-                        "[Server #%d] Model in cluster #%s's retraining phase loaded from %s.",
-                        os.getpid(),
-                        cluster_id,
-                        filename,
-                    )
-
-        if self.current_round >= 2:
-            self.initialize_optimization = False
-
-    def load_model(self, cluster_id, filename=None, location=None):
-        """Loading pre-trained model weights before retraining from a file."""
-        model_path = Config().params["model_path"] if location is None else location
-        model_name = Config().trainer.model_name
-
-        if filename is not None:
-            model_path = f"{model_path}/{filename}"
-        else:
-            model_path = f"{model_path}/{model_name}.pth"
-
-        logging.info("[Server #%d] Loading a model from %s.", os.getpid(), model_path)
-
-        if cluster_id in self.algorithm.models:
-            model = self.algorithm.models[cluster_id]
-        else:
-            model = self.trainer.model
-
-        model.load_state_dict(torch.load(model_path), strict=True)
-
-    def customize_server_response(self, server_response: dict, client_id) -> dict:
-        """Returns a customrized server response with any additional information."""
-        server_response = super().customize_server_response(
-            server_response, client_id=client_id
-        )
-
-        cluster_id = self.clusters[client_id]
-
-        if (
-            cluster_id in self.clustered_retraining
-            and self.clustered_retraining[cluster_id]
-        ):
-            # Each cluster has its own round number that it needs to roll back to during the
-            # retraining phase, which is the earliest round among clients in this cluster, minus 1
-            server_response["rollback_round"] = self.rollback_round[cluster_id]
-
-        return server_response
-
-    def save_to_checkpoint(self):
-        """Save a checkpoint for resuming the training session."""
-        checkpoint_path = Config.params["checkpoint_path"]
-
-        model_name = (
-            Config().trainer.model_name
-            if hasattr(Config().trainer, "model_name")
-            else "custom"
-        )
-
-        filename = f"checkpoint_{model_name}_{self.current_round}.pth"
-
-        logging.info(
-            "[%s] Saving the checkpoint to %s/%s.", self, checkpoint_path, filename
-        )
-        self.trainer.save_model(filename, checkpoint_path)
-        self.save_random_states(self.current_round, checkpoint_path)
-
-        # Saving the current round in the server for resuming its session later on
-        with open(f"{checkpoint_path}/current_round.pkl", "wb") as checkpoint_file:
-            pickle.dump(self.current_round, checkpoint_file)
-
-        for cluster_id in range(self.num_clusters):
-            checkpoint_path = Config.params["checkpoint_path"]
-
-            model_name = (
-                Config().trainer.model_name
-                if hasattr(Config().trainer, "model_name")
-                else "custom"
-            )
-            filename = f"checkpoint_{model_name}_{self.current_round}_{cluster_id}.pth"
-            logging.info(
-                "[%s] Saving the checkpoint for cluster #%s to %s/%s.",
-                self,
-                cluster_id,
-                checkpoint_path,
-                filename,
-            )
-            self.save_model(cluster_id, filename, checkpoint_path)
-
-    def save_model(self, cluster_id, filename=None, location=None):
-        """Saving the model to a file."""
-        model_path = Config().params["model_path"] if location is None else location
-        model_name = Config().trainer.model_name
-
-        try:
-            if not os.path.exists(model_path):
-                os.makedirs(model_path)
-        except FileExistsError:
-            pass
-
-        if filename is not None:
-            model_path = f"{model_path}/{filename}"
-        else:
-            model_path = f"{model_path}/{model_name}.pth"
-
-        if cluster_id in self.algorithm.models:
-            model = self.algorithm.models[cluster_id]
-        else:
-            model = self.trainer.model
-        torch.save(model.state_dict(), model_path)
-
-        logging.info("[Server #%d] Model saved to %s.", os.getpid(), model_path)
-
-    def _init_cluster_states(self):
-        """Initialize the basic dictionaries of the clusters and clients."""
-        self.num_clusters = Config().server.clusters
-
-        if hasattr(Config().server, "do_optimized_clustering"):
-            self.initialize_optimization = Config().server.do_optimized_clustering
-        else:
-            self.initialize_optimization = False
-
-        # Initializing the dictionary of boolean values, one per cluster, to record whether
-        # we have already entered the retraining phase
-        self.clustered_retraining = {
-            cluster_id: False for cluster_id in range(self.num_clusters)
-        }
-
-        # Initializing the dictionary of float numbers, one per cluster, to record the
-        # test accuracy of each cluster
-        self.clustered_test_accuracy = {
-            cluster_id: 0 for cluster_id in range(self.num_clusters)
-        }
-
-        # Initializing the dictionary of cos similarity between pre-trained model and
-        # clients' first time updates
-        self.clients_similarity = {
-            client_id: None for client_id in range(1, self.total_clients + 1)
-        }
-
-        # recent_history_size denotes the length of accuracy recording
-        # Default: each cluster only records latest 5 test accuracy
-        if hasattr(Config().server, "window_size"):
-            self.recent_history_size = Config().server.window_size
-        else:
-            self.recent_history_size = 5
-
-        # Initializing a record of global test accuracies
-        self.recent_global_accuracies = deque([], maxlen=self.recent_history_size)
-
-    def _clustering_clients(self):
+    def choose_clients(self, clients_pool, clients_count):
         """
-        Randomly divide clients by their client ids into several clusters, and aggregation
-        in clusters. As the baseline of optimization clustering.
+        Choose a subset of clients to participate in each round.
+        When do_optimized_clustering is true, the first and second round is to
+        extract training time and cos similarity for all clients;
+        after and at second round, training process resume.
         """
-
-        total_clients = Config().clients.total_clients
-        self.num_clusters = Config().server.clusters
-
-        # The client IDs range from 1 to total_clients, and they are to be distributed to
-        # the clusters, ranging from 0 to (num_clusters - 1)
         random.seed(1)
+        assert clients_count <= len(clients_pool)
+        random.setstate(self.prng_state)
+
         if (
             hasattr(Config().server, "do_optimized_clustering")
             and Config().server.do_optimized_clustering
         ):
-            # initial self.clusters dictionaty
-            for client_id in range(1, total_clients + 1):
-                self.clusters[client_id] = None
-        else:
-            # randomly cluster
-            for client_id in range(1, total_clients + 1):
-                cluster_id = int(random.random() * self.num_clusters)
-                self.clusters[client_id] = cluster_id
-            print("clusters: ", self.clusters)
+            if self.current_round <= 2 and self.initialize_optimization:
+                clients_count = len(clients_pool)
+                self.minimum_clients = clients_count
+            elif self.current_round == 3:
+                self.minimum_clients = Config.server.minimum_clients_aggregated
+                self.clients_per_round = Config().clients.per_round
+                clients_count = self.clients_per_round
 
-    def aggregate_models(self):
-        """Aggregate the models from the clusters by using the one with the
-        highest test accuracy.
-        """
-        avg_model = {
-            name: self.trainer.zeros(weights.shape).to(Config().device())
-            for name, weights in self.trainer.model.state_dict().items()
-        }
+        # Select clients randomly
+        selected_clients = random.sample(clients_pool, clients_count)
 
-        if hasattr(Config().trainer, "target_perplexity"):
-            best_cluster_acc = 1000
-        else:
-            best_cluster_acc = 0
+        self.prng_state = random.getstate()
+        logging.info("[%s] Selected clients: %s", self, selected_clients)
+        return selected_clients
 
-        best_cluster_id = 0
-
-        for cluster_id, cluster_acc in self.clustered_test_accuracy.items():
-            if hasattr(Config().trainer, "target_accuracy"):
-                if cluster_acc > best_cluster_acc:
-                    best_cluster_acc = cluster_acc
-                    best_cluster_id = cluster_id
-
-            elif hasattr(Config().trainer, "target_perplexity"):
-                if 0 < cluster_acc < best_cluster_acc:
-                    best_cluster_acc = cluster_acc
-                    best_cluster_id = cluster_id
-
-        for cluster_id, clustered_model in self.algorithm.models.items():
-            if cluster_id == best_cluster_id:
-                for name, weights in clustered_model.state_dict().items():
-                    avg_model[name] = weights
-
-        return avg_model
-
-    def _did_stablize(self):
-        """
-        Whether the training process should be terminated based on:
-            - The global accuracy corresponds to the highest per-cluster test accuracy.
-            - The standard deviation of highest per-cluster test accuracies has
-              reached a particular target.
-        """
-
-        # We first need to exceed the target accuracy for all the clusters
-        if hasattr(Config().trainer, "target_accuracy"):
-            target_accuracy = Config().trainer.target_accuracy
-
-            # Update the histories of recent global test accuracies
-            global_acc = max(self.clustered_test_accuracy.values())
-            self.recent_global_accuracies.append(global_acc)
-
-            # We then need to compute the standard deviation of latest
-            # self.recent_history_size global accuracies, and make sure that it
-            # is lower than the target_accuracy_std
-            standard_deviation = numpy.std(list(self.recent_global_accuracies))
-            target_accuracy_std = Config().trainer.target_accuracy_std
-            logging.info(
-                "[%s] Standard deviation of recent global accuracies: %.2f.",
-                self,
-                standard_deviation,
-            )
-
-            if len(self.recent_global_accuracies) >= self.recent_history_size:
-                return (
-                    global_acc > target_accuracy
-                    and standard_deviation < target_accuracy_std
-                )
-            else:
-                return False
-
-        if hasattr(Config().trainer, "target_perplexity"):
-            target_perplexity = Config().trainer.target_perplexity
-
-            global_acc = min(self.clustered_test_accuracy.values())
-            # Update the histories of recent global test accuracies
-            self.recent_global_accuracies.append(global_acc)
-
-            # We then need to compute the standard deviation of latest
-            # self.recent_history_size global accuracies, and make sure that it
-            # is lower than the target_accuracy_std
-            standard_deviation = numpy.std(list(self.recent_global_accuracies))
-
-            target_perplexity_std = Config().trainer.target_perplexity_std
-
-            if len(self.recent_global_accuracies) >= self.recent_history_size:
-                return (
-                    0 < global_acc < target_perplexity
-                    and standard_deviation < target_perplexity_std
-                )
-            else:
-                return False
+    def clients_selected(self, selected_clients):
+        """Remembers the first round that a particular client ID was selected."""
+        if (
+            hasattr(Config().server, "do_optimized_clustering")
+            and Config().server.do_optimized_clustering
+            and not self.initialize_optimization
+        ):
+            for client_id in selected_clients:
+                if not client_id in self.round_first_selected:
+                    self.round_first_selected[client_id] = self.current_round
 
     async def aggregate_weights(self, updates, baseline_weights, weights_received):
         """
@@ -563,7 +250,178 @@ class Server(fedunlearning_server.Server):
         """Method called after the updated weights have been aggregated."""
         if hasattr(Config().server, "do_test") and Config().server.do_test:
             # Retrieve the model from the cluster with the highest accuracy
-            self.trainer.model.load_state_dict(self.aggregate_models(), strict=True)
+            self.trainer.model.load_state_dict(self._aggregate_models(), strict=True)
+
+    def clients_processed(self):
+        """Determining the rollback round and roll back to that round, if retraining is needed
+        for each of the clusters."""
+        super().clients_processed()
+
+        # If data_deletion_round equals to the current round at server for the first time,
+        # and the clients requesting retraining has been selected before, the retraining
+        # phase starts.
+
+        # Make sure that the model at round 0 is loaded at round 3, if we
+        # have activated the optimized clustering algorithm
+        if (
+            hasattr(Config().server, "do_optimized_clustering")
+            and Config().server.do_optimized_clustering
+            and self.current_round == 2
+        ):
+            for cluster_id in range(self.num_clusters):
+                # Loading the saved model on the server for starting the retraining phase
+                checkpoint_path = Config.params["checkpoint_path"]
+
+                model_name = (
+                    Config().trainer.model_name
+                    if hasattr(Config().trainer, "model_name")
+                    else "custom"
+                )
+
+                # Loading the model from round 0
+                rollback_round = 0
+                filename = f"checkpoint_{model_name}_{rollback_round}_{cluster_id}.pth"
+
+                self._load_model(cluster_id, filename, checkpoint_path)
+
+                logging.info(
+                    fonts.colourize(
+                        f"[Server #{os.getpid()}] Cluster #{cluster_id}: Round #0 "
+                        f"model reloaded from {filename}.",
+                        colour="green",
+                    )
+                )
+
+        if not self.initialize_optimization:
+            self.earliest_round = {
+                cluster_id: self.current_round
+                for cluster_id in range(self.num_clusters)
+            }
+
+        data_deletion_round = Config().clients.data_deletion_round
+        clients_to_delete = Config().clients.clients_requesting_deletion
+
+        for cluster_id in range(self.num_clusters):
+            if (
+                (self.current_round == data_deletion_round)
+                and not self.clustered_retraining[cluster_id]
+                and not self.initialize_optimization
+            ):
+                for client_id, init_round in self.round_first_selected.items():
+                    if (
+                        client_id in clients_to_delete
+                        and self.clusters[client_id] == cluster_id
+                    ):
+                        self.clustered_retraining[cluster_id] = True
+
+                        if self.earliest_round[cluster_id] > init_round:
+                            self.earliest_round[cluster_id] = init_round
+
+                        self.rollback_round[cluster_id] = (
+                            self.earliest_round[cluster_id] - 1
+                        )
+                        logging.info(
+                            fonts.colourize(
+                                f"[{self}] Data deleted. Retraining cluster #{cluster_id} "
+                                f"from the states after round #{self.rollback_round[cluster_id]}.",
+                                colour="green",
+                            )
+                        )
+
+                if cluster_id in self.rollback_round:
+                    # Loading the saved model on the server for starting the retraining phase
+                    checkpoint_path = Config.params["checkpoint_path"]
+
+                    model_name = (
+                        Config().trainer.model_name
+                        if hasattr(Config().trainer, "model_name")
+                        else "custom"
+                    )
+
+                    # When the current_round matches the data deletion round, load the model from
+                    # `rollback_round`.
+                    rollback_round = self.rollback_round[cluster_id]
+                    filename = (
+                        f"checkpoint_{model_name}_{rollback_round}_{cluster_id}.pth"
+                    )
+
+                    self.load_model(cluster_id, filename, checkpoint_path)
+
+                    logging.info(
+                        "[Server #%d] Model in cluster #%s's retraining phase loaded from %s.",
+                        os.getpid(),
+                        cluster_id,
+                        filename,
+                    )
+
+        if self.current_round >= 2:
+            self.initialize_optimization = False
+
+    def customize_server_response(self, server_response: dict, client_id) -> dict:
+        """Returns a customrized server response with any additional information."""
+        server_response = super().customize_server_response(
+            server_response, client_id=client_id
+        )
+
+        cluster_id = self.clusters[client_id]
+
+        if (
+            cluster_id in self.clustered_retraining
+            and self.clustered_retraining[cluster_id]
+        ):
+            # Each cluster has its own round number that it needs to roll back to during the
+            # retraining phase, which is the earliest round among clients in this cluster, minus 1
+            server_response["rollback_round"] = self.rollback_round[cluster_id]
+
+        return server_response
+
+    def get_record_items_values(self):
+        """Get values will be recorded in result csv file."""
+        # The value under "accuracy" is correct (global accuracy) only
+        # at the last row
+        clusters_accuracy = [
+            self.clustered_test_accuracy[cluster_id]
+            for cluster_id in range(self.num_clusters)
+        ]
+
+        clusters_accuracy = "; ".join([str(acc) for acc in clusters_accuracy])
+
+        return {
+            "round": self.current_round,
+            "accuracy": self.accuracy,
+            "clusters_accuracy": clusters_accuracy,
+            "elapsed_time": self.wall_time - self.initial_wall_time,
+            "comm_time": max([update.report.comm_time for update in self.updates]),
+            "round_time": max(
+                [
+                    update.report.training_time + update.report.comm_time
+                    for update in self.updates
+                ]
+            ),
+            "comm_overhead": self.comm_overhead,
+        }
+
+    def save_to_checkpoint(self):
+        """Save a checkpoint for resuming the training session."""
+        super().save_to_checkpoint()
+
+        for cluster_id in range(self.num_clusters):
+            checkpoint_path = Config.params["checkpoint_path"]
+
+            model_name = (
+                Config().trainer.model_name
+                if hasattr(Config().trainer, "model_name")
+                else "custom"
+            )
+            filename = f"checkpoint_{model_name}_{self.current_round}_{cluster_id}.pth"
+            logging.info(
+                "[%s] Saving the checkpoint for cluster #%s to %s/%s.",
+                self,
+                cluster_id,
+                checkpoint_path,
+                filename,
+            )
+            self._save_model(cluster_id, filename, checkpoint_path)
 
     async def wrap_up(self):
         """Wrapping up when each round of training is done."""
@@ -607,61 +465,204 @@ class Server(fedunlearning_server.Server):
                 )
                 await self.close()
 
-    # --------------------- Optimization ---------------------
+    def _load_model(self, cluster_id, filename=None, location=None):
+        """Loading pre-trained model weights before retraining from a file."""
+        model_path = Config().params["model_path"] if location is None else location
+        model_name = Config().trainer.model_name
 
-    def init_trainer(self):
-        """Load the trainer and initialize the dictionary that maps cluster IDs to client IDs."""
-        super().init_trainer()
-
-        self.algorithm.init_clusters(self.clusters)
-
-    def choose_clients(self, clients_pool, clients_count):
-        """
-        Choose a subset of clients to participate in each round.
-        When do_optimized_clustering is true, the first and second round is to
-        extract training time and cos similarity for all clients;
-        after and at second round, training process resume.
-        """
-        random.seed(1)
-        assert clients_count <= len(clients_pool)
-        random.setstate(self.prng_state)
-
-        if (
-            hasattr(Config().server, "do_optimized_clustering")
-            and Config().server.do_optimized_clustering
-        ):
-            if self.current_round <= 2 and self.initialize_optimization:
-                clients_count = len(clients_pool)
-                self.minimum_clients = clients_count
-            elif self.current_round == 3:
-                self.minimum_clients = Config.server.minimum_clients_aggregated
-                self.clients_per_round = Config().clients.per_round
-                clients_count = self.clients_per_round
-
-        # Select clients randomly
-        selected_clients = random.sample(clients_pool, clients_count)
-
-        self.prng_state = random.getstate()
-        logging.info("[%s] Selected clients: %s", self, selected_clients)
-        return selected_clients
-
-    async def select_clients(self, for_next_batch=False):
-        """Remembers the third round that a particular client ID was selected."""
-        await super().select_clients(for_next_batch)
-
-        if (
-            hasattr(Config().server, "do_optimized_clustering")
-            and Config().server.do_optimized_clustering
-            and not self.initialize_optimization
-        ):
-            for client_id in self.selected_clients:
-                if not client_id in self.round_first_selected:
-                    self.round_first_selected[client_id] = self.current_round
+        if filename is not None:
+            model_path = f"{model_path}/{filename}"
         else:
-            pass
-        print(self.round_first_selected)
+            model_path = f"{model_path}/{model_name}.pth"
 
-    def extract_training_times(self, updates):
+        logging.info("[Server #%d] Loading a model from %s.", os.getpid(), model_path)
+
+        if cluster_id in self.algorithm.models:
+            model = self.algorithm.models[cluster_id]
+        else:
+            model = self.trainer.model
+
+        model.load_state_dict(torch.load(model_path), strict=True)
+
+    def _save_model(self, cluster_id, filename=None, location=None):
+        """Saving the model to a file."""
+        model_path = Config().params["model_path"] if location is None else location
+        model_name = Config().trainer.model_name
+
+        try:
+            if not os.path.exists(model_path):
+                os.makedirs(model_path)
+        except FileExistsError:
+            pass
+
+        if filename is not None:
+            model_path = f"{model_path}/{filename}"
+        else:
+            model_path = f"{model_path}/{model_name}.pth"
+
+        if cluster_id in self.algorithm.models:
+            model = self.algorithm.models[cluster_id]
+        else:
+            model = self.trainer.model
+        torch.save(model.state_dict(), model_path)
+
+        logging.info("[Server #%d] Model saved to %s.", os.getpid(), model_path)
+
+    def _init_cluster_states(self):
+        """Initialize the basic dictionaries of the clusters and clients."""
+        self.num_clusters = Config().server.clusters
+
+        if hasattr(Config().server, "do_optimized_clustering"):
+            self.initialize_optimization = Config().server.do_optimized_clustering
+        else:
+            self.initialize_optimization = False
+
+        # Initializing the dictionary of boolean values, one per cluster, to record whether
+        # we have already entered the retraining phase
+        self.clustered_retraining = {
+            cluster_id: False for cluster_id in range(self.num_clusters)
+        }
+
+        # Initializing the dictionary of float numbers, one per cluster, to record the
+        # test accuracy of each cluster
+        self.clustered_test_accuracy = {
+            cluster_id: 0 for cluster_id in range(self.num_clusters)
+        }
+
+        # Initializing the dictionary of cos similarity between pre-trained model and
+        # clients' first time updates
+        self.clients_similarity = {
+            client_id: None for client_id in range(1, self.total_clients + 1)
+        }
+
+        # recent_history_size denotes the length of accuracy recording
+        # Default: each cluster only records latest 5 test accuracy
+        if hasattr(Config().server, "window_size"):
+            self.recent_history_size = Config().server.window_size
+        else:
+            self.recent_history_size = 5
+
+        # Initializing a record of global test accuracies
+        self.recent_global_accuracies = deque([], maxlen=self.recent_history_size)
+
+    def _clustering_clients(self):
+        """
+        Randomly divide clients by their client ids into several clusters, and aggregation
+        in clusters. As the baseline of optimization clustering.
+        """
+
+        total_clients = Config().clients.total_clients
+        self.num_clusters = Config().server.clusters
+
+        # The client IDs range from 1 to total_clients, and they are to be distributed to
+        # the clusters, ranging from 0 to (num_clusters - 1)
+        random.seed(1)
+        if (
+            hasattr(Config().server, "do_optimized_clustering")
+            and Config().server.do_optimized_clustering
+        ):
+            # initial self.clusters dictionaty
+            for client_id in range(1, total_clients + 1):
+                self.clusters[client_id] = None
+        else:
+            # randomly cluster
+            for client_id in range(1, total_clients + 1):
+                cluster_id = int(random.random() * self.num_clusters)
+                self.clusters[client_id] = cluster_id
+            print("clusters: ", self.clusters)
+
+    def _aggregate_models(self):
+        """Aggregate the models from the clusters by using the one with the
+        highest test accuracy.
+        """
+        avg_model = {
+            name: self.trainer.zeros(weights.shape).to(Config().device())
+            for name, weights in self.trainer.model.state_dict().items()
+        }
+
+        if hasattr(Config().trainer, "target_perplexity"):
+            best_cluster_acc = 1000
+        else:
+            best_cluster_acc = 0
+
+        best_cluster_id = 0
+
+        for cluster_id, cluster_acc in self.clustered_test_accuracy.items():
+            if hasattr(Config().trainer, "target_accuracy"):
+                if cluster_acc > best_cluster_acc:
+                    best_cluster_acc = cluster_acc
+                    best_cluster_id = cluster_id
+
+            elif hasattr(Config().trainer, "target_perplexity"):
+                if 0 < cluster_acc < best_cluster_acc:
+                    best_cluster_acc = cluster_acc
+                    best_cluster_id = cluster_id
+
+        for cluster_id, clustered_model in self.algorithm.models.items():
+            if cluster_id == best_cluster_id:
+                for name, weights in clustered_model.state_dict().items():
+                    avg_model[name] = weights
+
+        return avg_model
+
+    def _did_stablize(self):
+        """
+        Whether the training process should be terminated based on:
+            - The global accuracy corresponds to the highest per-cluster test accuracy.
+            - The standard deviation of highest per-cluster test accuracies has
+              reached a particular target.
+        """
+
+        # We first need to exceed the target accuracy for all the clusters
+        if hasattr(Config().trainer, "target_accuracy"):
+            target_accuracy = Config().trainer.target_accuracy
+
+            # Update the histories of recent global test accuracies
+            global_acc = max(self.clustered_test_accuracy.values())
+            self.recent_global_accuracies.append(global_acc)
+
+            # We then need to compute the standard deviation of latest
+            # self.recent_history_size global accuracies, and make sure that it
+            # is lower than the target_accuracy_std
+            standard_deviation = numpy.std(list(self.recent_global_accuracies))
+            target_accuracy_std = Config().trainer.target_accuracy_std
+            logging.info(
+                "[%s] Standard deviation of recent global accuracies: %.2f.",
+                self,
+                standard_deviation,
+            )
+
+            if len(self.recent_global_accuracies) >= self.recent_history_size:
+                return (
+                    global_acc > target_accuracy
+                    and standard_deviation < target_accuracy_std
+                )
+            else:
+                return False
+
+        if hasattr(Config().trainer, "target_perplexity"):
+            target_perplexity = Config().trainer.target_perplexity
+
+            global_acc = min(self.clustered_test_accuracy.values())
+            # Update the histories of recent global test accuracies
+            self.recent_global_accuracies.append(global_acc)
+
+            # We then need to compute the standard deviation of latest
+            # self.recent_history_size global accuracies, and make sure that it
+            # is lower than the target_accuracy_std
+            standard_deviation = numpy.std(list(self.recent_global_accuracies))
+
+            target_perplexity_std = Config().trainer.target_perplexity_std
+
+            if len(self.recent_global_accuracies) >= self.recent_history_size:
+                return (
+                    0 < global_acc < target_perplexity
+                    and standard_deviation < target_perplexity_std
+                )
+            else:
+                return False
+
+    def _extract_training_times(self, updates):
         """Extract the training time from the report in client updates."""
         # Initialize a dictionary that maps client_ids to its training times
         client_training_times = {
@@ -676,7 +677,7 @@ class Server(fedunlearning_server.Server):
 
         return client_training_times
 
-    def cosine_similarity(self, updates):
+    def _cosine_similarity(self, updates):
         """Compute the cosine similarity of the received updates and the difference
         between the first round model - initial model and clients' updates."""
 
@@ -717,7 +718,7 @@ class Server(fedunlearning_server.Server):
             similarity = (F.cosine_similarity(current - initial, deltas, dim=0) + 1) / 2
             self.clients_similarity[client_id] = similarity.item()
 
-    def convert_to_solver(self, client_training_times):
+    def _convert_to_solver(self, client_training_times):
         """Transform useful dictionaries to solvable matrix."""
         # Transfer the values of dic to list.
         training_time_list = list(client_training_times.values())
@@ -810,8 +811,8 @@ class Server(fedunlearning_server.Server):
             )
         )
 
-        client_training_times = self.extract_training_times(updates)
-        self.cosine_similarity(updates)
+        client_training_times = self._extract_training_times(updates)
+        self._cosine_similarity(updates)
 
         assignment_list = solver.solve(
             # workload_max
@@ -825,12 +826,12 @@ class Server(fedunlearning_server.Server):
             1,
             self.num_clusters,
             len(self.clusters),
-            self.convert_to_solver(client_training_times),
+            self._convert_to_solver(client_training_times),
         )
 
-        self.convert_from_solver(assignment_list)
+        self._convert_from_solver(assignment_list)
 
-    def convert_from_solver(self, assignment_list):
+    def _convert_from_solver(self, assignment_list):
         """Convert the assignment that generate from solver to clients_clusters dictionary."""
         assignment_array = numpy.array(assignment_list)
 
@@ -844,31 +845,3 @@ class Server(fedunlearning_server.Server):
                 f"\n[{self}] Cluster assignments: {self.clusters}", colour="green"
             )
         )
-
-    # --------------------- Results ---------------------
-
-    def get_record_items_values(self):
-        """Get values will be recorded in result csv file."""
-        # The value under "accuracy" is correct (global accuracy) only
-        # at the last row
-        clusters_accuracy = [
-            self.clustered_test_accuracy[cluster_id]
-            for cluster_id in range(self.num_clusters)
-        ]
-
-        clusters_accuracy = "; ".join([str(acc) for acc in clusters_accuracy])
-
-        return {
-            "round": self.current_round,
-            "accuracy": self.accuracy,
-            "clusters_accuracy": clusters_accuracy,
-            "elapsed_time": self.wall_time - self.initial_wall_time,
-            "comm_time": max([update.report.comm_time for update in self.updates]),
-            "round_time": max(
-                [
-                    update.report.training_time + update.report.comm_time
-                    for update in self.updates
-                ]
-            ),
-            "comm_overhead": self.comm_overhead,
-        }
