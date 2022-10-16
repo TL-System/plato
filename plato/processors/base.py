@@ -12,9 +12,9 @@ class Processor:
     The base Processor class does nothing on the data payload.
     """
 
-    def __init__(self, processor_name=None, trainer=None, **kwargs) -> None:
+    def __init__(self, name=None, trainer=None, **kwargs) -> None:
         """Constructor for Processor."""
-        self.processor_name = processor_name
+        self.name = name
         self.trainer = trainer
 
     @abstractmethod
@@ -31,4 +31,4 @@ class Processor:
         return map(self.process, data)
 
     def __repr__(self) -> str:
-        return self.processor_name
+        return self.name

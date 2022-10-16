@@ -18,41 +18,41 @@ class CustomizeProcessorCallback(ClientCallback):
         Insert a dummy processor to the inbound processor list.
         """
         logging.info(
-            "[%s] Current inbound processor list: %s.",
+            "[%s] Current list of inbound processors: %s.",
             client,
             inbound_processor.processors,
         )
         customized_processor = DummyProcessor(
             client_id=client.client_id,
             current_round=client.current_round,
-            processor_name="DummyProcessor",
+            name="DummyProcessor",
         )
         inbound_processor.processors.insert(0, customized_processor)
 
         logging.info(
-            "[%s] Inbound processor list after modification: %s.",
+            "[%s] List of inbound processors after modification: %s.",
             client,
             inbound_processor.processors,
         )
 
     def on_outbound_process(self, client, outbound_processor):
         """
-        Insert a dummy processor to the outbound processor list.
+        Insert a dummy processor to the list of outbound processors.
         """
         logging.info(
-            "[%s] Current outbound processor list: %s.",
+            "[%s] Current list of outbound processors: %s.",
             client,
             outbound_processor.processors,
         )
         customized_processor = DummyProcessor(
             client_id=client.client_id,
             current_round=client.current_round,
-            processor_name="DummyProcessor",
+            name="DummyProcessor",
         )
         outbound_processor.processors.insert(0, customized_processor)
 
         logging.info(
-            "[%s] Outbound processor list after modification: %s.",
+            "[%s] List of outbound processors after modification: %s.",
             client,
             outbound_processor.processors,
         )

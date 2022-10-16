@@ -39,13 +39,19 @@ To use callbacks, subclass the `ClientCallback` class in `plato.callbacks.client
 ````{admonition} **on_inbound_process(self, client, inbound_processor)**
 Override this method to complete additional tasks before the inbound processors start to process the data received from the server.
 
-`inbound_processor` the pipeline of inbound processors, where each of them can be accessed through list `inbound_processor.processors`.
+`inbound_processor` the pipeline of inbound processors. The list of inbound processor instances can be accessed through its attribute 'processors', as in the following example.
 
 **Example:**
 
 ```py
-def on_inbound_process(self, client, inbound_processor):
-    # insert a customized processor to the inbound processor list
+def on_inbound_process(self, client, inbound_processor: list):
+    # insert a customized processor to the list of inbound processors
+    customized_processor = DummyProcessor(
+            client_id=client.client_id,
+            current_round=client.current_round,
+            name="DummyProcessor",
+        )
+
     inbound_processor.processors.insert(0, customized_processor) 
 ```
 ````
@@ -53,13 +59,13 @@ def on_inbound_process(self, client, inbound_processor):
 ````{admonition} **on_outbound_process(self, client, outbound_processor)**
 Override this method to complete additional tasks before the outbound processors start to process the data to be sent to the server.
 
-`outbound_processor` the pipeline of outbound processors, where each of them can be accessed through list `outbound_processor.processors`.
+`outbound_processor` the pipeline of outbound processors. The list of inbound processor instances can be accessed through its attribute 'processors', as in the following example.
 
 **Example:**
 
 ```py
 def on_outbound_process(self, client, outbound_processor):
-    # remove the first processor from the outbound processor list
+    # remove the first processor from the list of outbound processors
     outbound_processor.processors.pop() 
 ```
 ````
