@@ -37,8 +37,21 @@ class Report(base.Report):
 class Client(simple.Client):
     """A federated learning client with support for Adaptive gradient blending."""
 
-    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
-        super().__init__()
+    def __init__(
+        self,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
+    ):
+        super().__init__(
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
+        )
         self.model = model
         self.datasource = datasource
         self.algorithm = algorithm
