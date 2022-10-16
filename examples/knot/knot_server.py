@@ -84,7 +84,7 @@ class Server(fedunlearning_server.Server):
         self.clients_similarity = {}
 
         # Whether we are using random clustering or optimized clustering
-        self.initialize_optimization = None
+        self.initialize_optimization = False
 
         # Initialize basic metrics required by clusters, such as accuracites
         self._init_cluster_states()
@@ -215,6 +215,11 @@ class Server(fedunlearning_server.Server):
                     updated_weights = self.algorithm.update_weights(
                         deltas, cluster_id=cluster_id
                     )
+                    self.algorithm.load_weights(updated_weights, cluster_id=cluster_id)
+
+                    print("self.algorithms.models = ")
+                    print(self.algorithm.models)
+
                     return updated_weights
 
     async def aggregate_deltas(self, updates, deltas_received, cluster_id=None):
@@ -226,33 +231,27 @@ class Server(fedunlearning_server.Server):
             baseline_weights, weights_received, cluster_id=cluster_id
         )
 
-        return await super().aggregate_deltas(updates, deltas_received)
+        # Extract the total number of samples
+        self.total_samples = sum(update.report.num_samples for update in updates)
 
-    def weights_received(self, weights_received):
-        """Method called after the updated weights have been received."""
-        if (
-            hasattr(Config().server, "do_clustered_test")
-            and Config().server.do_clustered_test
-            and not self.initialize_optimization
-        ):
-            # Testing the updated clustered model directly at the server
+        # Perform weighted averaging
+        avg_update = {
+            name: self.trainer.zeros(weights.shape)
+            for name, weights in deltas_received[0].items()
+        }
 
-            # First, obtain the set of cluster IDs that have been aggregated
-            updated_cluster_ids = {
-                self.clusters[update.client_id] for update in self.updates
-            }
+        for i, update in enumerate(deltas_received):
+            report = updates[i].report
+            num_samples = report.num_samples
 
-            test_accuracy_per_cluster = self.trainer.server_clustered_test(
-                self.testset,
-                self.testset_sampler,
-                clustered_models=self.algorithm.models,
-                updated_cluster_ids=updated_cluster_ids,
-            )
+            for name, delta in update.items():
+                # Use weighted average by the number of samples
+                avg_update[name] += delta * (num_samples / self.total_samples)
 
-            # Second, update the test accuracy for clusters that have just been tested
-            self.clustered_test_accuracy.update(test_accuracy_per_cluster)
+            # Yield to other tasks in the server
+            await asyncio.sleep(0)
 
-        return weights_received
+        return avg_update
 
     def weights_aggregated(self, updates):
         """Method called after the updated weights have been aggregated."""
@@ -264,6 +263,28 @@ class Server(fedunlearning_server.Server):
         """Determining the rollback round and roll back to that round, if retraining is needed
         for each of the clusters."""
         super().clients_processed()
+
+        # Testing the updated clustered model directly at the server
+        if (
+            hasattr(Config().server, "do_clustered_test")
+            and Config().server.do_clustered_test
+            and not self.initialize_optimization
+        ):
+            # First, obtain the set of cluster IDs that have been aggregated
+            updated_cluster_ids = {
+                self.clusters[update.client_id] for update in self.updates
+            }
+
+            print(self.algorithm.models)
+            test_accuracy_per_cluster = self.trainer.server_clustered_test(
+                self.testset,
+                self.testset_sampler,
+                clustered_models=self.algorithm.models,
+                updated_cluster_ids=updated_cluster_ids,
+            )
+
+            # Second, update the test accuracy for clusters that have just been tested
+            self.clustered_test_accuracy.update(test_accuracy_per_cluster)
 
         # If data_deletion_round equals to the current round at server for the first time,
         # and the clients requesting retraining has been selected before, the retraining
