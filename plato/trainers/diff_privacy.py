@@ -55,7 +55,7 @@ class Trainer(basic.Trainer):
         # without the sampler. We will finally use Opacus to recreate the dataloader from the
         # simple dataloader (with poisson sampling).
         trainset = Subset(trainset, list(sampler))
-        self.train_loader = Trainer.get_train_loader(batch_size, trainset, sampler=None)
+        self.train_loader = self.get_train_loader(batch_size, trainset, sampler=None)
 
         # Initializing the loss criterion
         _loss_criterion = self.get_loss_criterion()

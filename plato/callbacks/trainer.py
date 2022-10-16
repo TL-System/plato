@@ -51,11 +51,6 @@ class TrainerCallback(ABC):
         Event called at the end of a training epoch.
         """
 
-    def on_outputs_generated(self, outputs, **kwargs):
-        """
-        Event called after the model updates have been generated.
-        """
-
 
 class PrintProgressCallback(TrainerCallback):
     """
@@ -98,7 +93,7 @@ class PrintProgressCallback(TrainerCallback):
 
     def on_train_step_end(self, trainer, config, batch=None, loss=None, **kwargs):
         """
-        Method called at the end of a training step.
+        Event called at the end of a training step.
 
         :param batch: the current batch of training data.
         :param loss: the loss computed in the current batch.
