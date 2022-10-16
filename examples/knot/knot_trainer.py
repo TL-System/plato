@@ -59,9 +59,6 @@ class Trainer(basic.Trainer):
                     total += labels.size(0)
                     correct += (predicted == labels).sum().item()
 
-                    # Yield to other tasks in the server
-                    await asyncio.sleep(0)
-
             cluster_acc = correct / total
             clustered_test_accuracy[cluster_id] = cluster_acc
 

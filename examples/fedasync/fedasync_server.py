@@ -58,7 +58,7 @@ class Server(fedavg.Server):
                     "The hyperparameter needs to be between 0 and 1 (exclusive)."
                 )
 
-    def aggregate_weights(self, updates, baseline_weights, weights_received):
+    async def aggregate_weights(self, updates, baseline_weights, weights_received):
         """Process the client reports by aggregating their weights."""
         # Calculate the new mixing hyperparameter with client's staleness
         client_staleness = updates[0].staleness

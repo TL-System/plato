@@ -104,9 +104,6 @@ trainer:
     epochs: 1
     batch_size: 32
     optimizer: SGD
-    learning_rate: 0.01
-    momentum: 0.9
-    weight_decay: 0.0
 
     # The machine learning model
     model_name: lenet5
@@ -124,12 +121,15 @@ trainer:
     target_accuracy: 0.80
     target_accuracy_std: 0.005
 
+parameters:
+    model:
+        num_classes: 10
+
+    optimizer:
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0
+
 algorithm:
     # Aggregation algorithm
     type: fedavg
-
-results:
-    #------------------- Need modification -------------------
-    types: round, accuracy, clusters_accuracy, elapsed_time
-    #types: round, accuracy, elapsed_time
-    result_path: results/knot/mnist

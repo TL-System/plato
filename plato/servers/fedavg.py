@@ -174,7 +174,7 @@ class Server(base.Server):
                 os.getpid(),
             )
 
-            updated_weights = self.aggregate_weights(
+            updated_weights = await self.aggregate_weights(
                 self.updates, baseline_weights, weights_received
             )
 

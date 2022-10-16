@@ -219,7 +219,13 @@ class Server(fedunlearning_server.Server):
 
     async def aggregate_deltas(self, updates, deltas_received, cluster_id=None):
         """Aggregate weight updates from the clients using federated averaging."""
-        deltas_received = self.compute_weight_deltas(updates, cluster_id=cluster_id)
+        weights_received = [update.payload for update in self.updates]
+        baseline_weights = self.algorithm.extract_weights()
+
+        deltas_received = self.algorithm.compute_weight_deltas(
+            baseline_weights, weights_received, cluster_id=cluster_id
+        )
+
         return await super().aggregate_deltas(updates, deltas_received)
 
     def weights_received(self, weights_received):
@@ -245,6 +251,8 @@ class Server(fedunlearning_server.Server):
 
             # Second, update the test accuracy for clusters that have just been tested
             self.clustered_test_accuracy.update(test_accuracy_per_cluster)
+
+        return weights_received
 
     def weights_aggregated(self, updates):
         """Method called after the updated weights have been aggregated."""
