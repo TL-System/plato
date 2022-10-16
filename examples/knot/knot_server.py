@@ -218,8 +218,6 @@ class Server(fedunlearning_server.Server):
 
                     self.algorithm.load_weights(updated_weights, cluster_id=cluster_id)
 
-                    print(self.algorithm.models)
-
         return baseline_weights
 
     def weights_aggregated(self, updates):
