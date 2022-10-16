@@ -26,7 +26,7 @@ Research on gradient leakage attack and defense using Plato framework.
 # Running Plato with DLG attack
 Try replacing `rec_emnist.yml` below with custom config files:
 ```
-python examples/dlg.py -c examples/dlg/rec_emnist.yml
+python examples/dlg.py -c examples/dlg/reconstruction_emnist.yml
 ```
 
 ## DLG Related Configurations
