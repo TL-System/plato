@@ -4,7 +4,7 @@
 
 The common practice is to customize the training loop using inheritance for important features that change the state of the training process. To customize the training loop using inheritance, subclass the `basic.Trainer` class in `plato.trainers`, and override the following methods:
 
-````{admonition} **get_train_loader(cls, batch_size, trainset, sampler, \*\*kwargs)**
+````{admonition} **get_train_loader(self, batch_size, trainset, sampler, \*\*kwargs)**
 This is a class method that is called to create an instance of the trainloader to be used in the training loop.
 
 `batch_size` the batch size.
@@ -14,7 +14,7 @@ This is a class method that is called to create an instance of the trainloader t
 `sampler` the sampler for the trainloader to use.
 
 ```py
-def get_train_loader(cls, batch_size, trainset, sampler, **kwargs):
+def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
     return torch.utils.data.DataLoader(
         dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler
     )
@@ -89,19 +89,33 @@ def train_epoch_end(self, config):
 ```
 ````
 
+````{admonition} **train_step_start(self, config, batch=None)**
+Override this method to complete additional tasks at the beginning of each step within a training epoch.
+
+`config` the configuration settings used in the training loop. It corresponds directly to the `trainer` section in the configuration file.
+
+`batch` the index of the current batch of data just processed in the current step.
+
+**Example:**
+
+```py
+def train_step_start(self, config, batch):
+    logging.info("[Client #%d] Started training epoch %d batch %d.", self.client_id, self.current_epoch, batch)
+````
+
 ````{admonition} **train_step_end(self, config, batch=None, loss=None)**
 Override this method to complete additional tasks at the end of each step within a training epoch.
 
 `config` the configuration settings used in the training loop. It corresponds directly to the `trainer` section in the configuration file.
 
-`batch` the index of the current batch of data just processed in the currents step.
+`batch` the index of the current batch of data just processed in the current step.
 
 `loss` the loss value computed using the current batch of data after training.
 
 **Example:**
 
 ```py
-def train_epoch_end(self, config):
+def train_step_end(self, config, batch, loss):
     logging.info(
         "[Client #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
         self.client_id,
@@ -111,6 +125,48 @@ def train_epoch_end(self, config):
         len(self.train_loader),
         loss.data.item(),
     )
+````
+
+````{admonition} **perform_forward_and_backward_passes(self, config, examples, labels)**
+Override this method to perform custom forward and backward passes within each training step.
+
+`config` the configuration settings used in the training loop. It corresponds directly to the `trainer` section in the configuration file.
+
+`examples` the training examples in the current training step.
+
+`labels` the corresponding training labels in the current training step.
+
+**Example:**
+
+```py
+def perform_forward_and_backward_passes(self, config, examples, labels):
+    self.optimizer.zero_grad()
+
+    outputs = self.model(examples)
+
+    loss = self._loss_criterion(outputs, labels)
+    self._loss_tracker.update(loss, labels.size(0))
+
+    if "create_graph" in config:
+        loss.backward(create_graph=config["create_graph"])
+    else:
+        loss.backward()
+
+    self.optimizer.step()
+
+    return loss
+````
+
+````{admonition} **process_outputs(outputs)**
+Override this method to further process model outputs in `test_model()` .
+
+`outputs` the model outputs, which may contain features or other information depending on the custom model.
+
+**Example:**
+
+```py
+def process_outputs(outputs):
+    return outputs
 ````
 
 ## Customizing trainers using callbacks
@@ -185,6 +241,22 @@ def on_train_epoch_end(self, trainer, config):
 ```
 ````
 
+````{admonition} **on_train_step_start(self, trainer, config, batch=None)**
+Override this method to complete additional tasks at the beginning of each step within a training epoch.
+
+`trainer` the trainer instance that activated this callback upon the occurrence of the corresponding event.
+
+`config` the configuration settings used in the training loop. It corresponds directly to the `trainer` section in the configuration file.
+
+`batch` the index of the current batch of data that has just been processed in the current step.
+
+**Example:**
+
+```py
+def on_train_step_start(self, trainer, config, batch):
+    logging.info("[Client #%d] Started training epoch %d batch %d.", trainer.client_id, trainer.current_epoch, batch)
+````
+
 ````{admonition} **on_train_step_end(self, trainer, config, batch=None, loss=None)**
 Override this method to complete additional tasks at the end of each step within a training epoch.
 
@@ -199,7 +271,7 @@ Override this method to complete additional tasks at the end of each step within
 **Example:**
 
 ```py
-def on_train_epoch_end(self, trainer, config):
+def on_train_step_end(self, trainer, config, batch, loss):
     logging.info(
         "[Client #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
         trainer.client_id,

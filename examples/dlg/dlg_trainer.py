@@ -249,7 +249,7 @@ class Trainer(basic.Trainer):
             )
 
     @staticmethod
-    def outputs_generated(outputs):
+    def process_outputs(outputs):
         """
         Method called after the model updates have been generated.
         """

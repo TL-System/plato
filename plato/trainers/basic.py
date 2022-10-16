@@ -477,7 +477,7 @@ class Trainer(base.Trainer):
 
                 outputs = self.model(examples)
 
-                outputs = self.outputs_generated(outputs)
+                outputs = self.process_outputs(outputs)
 
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
@@ -551,7 +551,7 @@ class Trainer(base.Trainer):
         """
 
     @staticmethod
-    def outputs_generated(outputs):
+    def process_outputs(outputs):
         """
         Method called after the model updates have been generated.
         """
