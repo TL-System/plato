@@ -5,7 +5,7 @@
 The common practice is to customize the training loop using inheritance for important features that change the state of the training process. To customize the training loop using inheritance, subclass the `basic.Trainer` class in `plato.trainers`, and override the following methods:
 
 ````{admonition} **get_train_loader(self, batch_size, trainset, sampler, \*\*kwargs)**
-This is a class method that is called to create an instance of the trainloader to be used in the training loop.
+Returns an instance of the trainloader to be used in the training loop.
 
 `batch_size` the batch size.
 
@@ -158,9 +158,11 @@ def perform_forward_and_backward_passes(self, config, examples, labels):
 ````
 
 ````{admonition} **process_outputs(outputs)**
-Override this method to further process model outputs in `test_model()` .
+Override this method to further process outputs, produced after the model is applied to test data samples in `test_model()`.
 
-`outputs` the model outputs, which may contain features or other information depending on the custom model.
+The method returns the processed outputs.
+
+`outputs` the outputs after the model is applied to test data samples, which may contain features or other information depending on the model.
 
 **Example:**
 
