@@ -229,7 +229,6 @@ class Server(fedunlearning_server.Server):
     def clients_processed(self):
         """Determining the rollback round and roll back to that round, if retraining is needed
         for each of the clusters."""
-        super().clients_processed()
 
         # Testing the updated clustered model directly at the server
         if (
@@ -351,6 +350,8 @@ class Server(fedunlearning_server.Server):
 
         if self.current_round >= 2:
             self.initialize_optimization = False
+        
+        super().clients_processed()
 
     def customize_server_response(self, server_response: dict, client_id) -> dict:
         """Returns a customrized server response with any additional information."""
