@@ -340,7 +340,7 @@ class Server(fedunlearning_server.Server):
                         f"checkpoint_{model_name}_{rollback_round}_{cluster_id}.pth"
                     )
 
-                    self.load_model(cluster_id, filename, checkpoint_path)
+                    self._load_model(cluster_id, filename, checkpoint_path)
 
                     logging.info(
                         "[Server #%d] Model in cluster #%s's retraining phase loaded from %s.",
