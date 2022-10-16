@@ -64,10 +64,7 @@ class Server(fedavg.Server):
         Otherwise the stale clients updates contains old model's info,
         will be aggregated after data_deletion_round.
         """
-        print(f"len(deltas_received) in fedunlearning = {len(deltas_received)}")
-
         if not self.retraining:
-            print(f"len(deltas_received) in fedunlearning = {len(deltas_received)}")
             return await super().aggregate_deltas(updates, deltas_received)
 
         recent_mask = list(
