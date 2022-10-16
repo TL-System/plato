@@ -87,10 +87,10 @@ class Server(fedunlearning_server.Server):
         self.initialize_optimization = None
 
         # Initialize basic metrics required by clusters, such as accuracites
-        self.init_cluster_states()
+        self._init_cluster_states()
 
         # Initialize the function that clustering clients by solver or randomly
-        self.clustering_clients()
+        self._clustering_clients()
 
     def clients_processed(self):
         """Determining the rollback round and roll back to that round, if retraining is needed
@@ -298,7 +298,7 @@ class Server(fedunlearning_server.Server):
 
         logging.info("[Server #%d] Model saved to %s.", os.getpid(), model_path)
 
-    def init_cluster_states(self):
+    def _init_cluster_states(self):
         """Initialize the basic dictionaries of the clusters and clients."""
         self.num_clusters = Config().server.clusters
 
@@ -335,7 +335,7 @@ class Server(fedunlearning_server.Server):
         # Initializing a record of global test accuracies
         self.recent_global_accuracies = deque([], maxlen=self.recent_history_size)
 
-    def clustering_clients(self):
+    def _clustering_clients(self):
         """
         Randomly divide clients by their client ids into several clusters, and aggregation
         in clusters. As the baseline of optimization clustering.
@@ -395,7 +395,7 @@ class Server(fedunlearning_server.Server):
 
         return avg_model
 
-    def did_stablize(self):
+    def _did_stablize(self):
         """
         Whether the training process should be terminated based on:
             - The global accuracy corresponds to the highest per-cluster test accuracy.
@@ -487,7 +487,7 @@ class Server(fedunlearning_server.Server):
             and self.initialize_optimization
         ):
             # Compute client clustering using optimization
-            self.optimize_clustering(updates)
+            self._optimize_clustering(updates)
             return baseline_weights
 
         self.clustered_updates = {}
@@ -546,7 +546,7 @@ class Server(fedunlearning_server.Server):
 
             # First, obtain the set of cluster IDs that have been aggregated
             updated_cluster_ids = {
-                self.clusters[client_id] for (client_id, __, __, __) in self.updates
+                self.clusters[update.client_id] for update in self.updates
             }
 
             test_accuracy_per_cluster = self.trainer.server_clustered_test(
@@ -574,7 +574,7 @@ class Server(fedunlearning_server.Server):
         target_perplexity = None
 
         if (
-            self.did_stablize()
+            self._did_stablize()
             or self.current_round >= Config().trainer.rounds
             and max(self.clustered_retraining.values())
         ):
@@ -796,7 +796,7 @@ class Server(fedunlearning_server.Server):
 
         return l2_matrix
 
-    def optimize_clustering(self, updates):
+    def _optimize_clustering(self, updates):
         """
         Computing optimized clustering with an optimization solver,
         based on both per-client training times and the cosine similarity,
@@ -863,13 +863,11 @@ class Server(fedunlearning_server.Server):
             "accuracy": self.accuracy,
             "clusters_accuracy": clusters_accuracy,
             "elapsed_time": self.wall_time - self.initial_wall_time,
-            "comm_time": max(
-                [report.comm_time for (__, report, __, __) in self.updates]
-            ),
+            "comm_time": max([update.report.comm_time for update in self.updates]),
             "round_time": max(
                 [
-                    report.training_time + report.comm_time
-                    for (__, report, __, __) in self.updates
+                    update.report.training_time + update.report.comm_time
+                    for update in self.updates
                 ]
             ),
             "comm_overhead": self.comm_overhead,
