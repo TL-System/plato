@@ -468,38 +468,37 @@ class Server(fedunlearning_server.Server):
             )
             and self.initialize_optimization
         ):
-            await self.algorithm.aggregate_weights(baseline_weights, weights_received)
-
-        elif (
-            self.current_round == 2
-            and (
-                hasattr(Config().server, "do_optimized_clustering")
-                and Config().server.do_optimized_clustering
+            # Perform normal server aggregation by first computing weight deltas
+            deltas_received = self.algorithm.compute_weight_deltas(
+                baseline_weights, weights_received, cluster_id=None
             )
+            # and then run a framework-agnostic server aggregation algorithm, such as
+            # the federated averaging algorithm
+            logging.info("[%s] Aggregating model weight deltas.", self)
+            deltas = await self.aggregate_deltas(self.updates, deltas_received)
+            # Updates the existing model weights from the provided deltas
+            updated_weights = self.algorithm.update_weights(deltas)
+            return updated_weights
+
+        if (
+            self.current_round == 2
+            and hasattr(Config().server, "do_optimized_clustering")
+            and Config().server.do_optimized_clustering
             and self.initialize_optimization
         ):
+            # Compute client clustering using optimization
             self.optimize_clustering(updates)
+            return baseline_weights
 
-        else:
-            self.clustered_updates = {}
-            for client_update in updates:
-                client_id = client_update.client_id
+        self.clustered_updates = {}
+        for client_update in updates:
+            client_id = client_update.client_id
 
-                if self.clustered_retraining[self.clusters[client_id]] is True:
-                    if (
-                        abs(client_update.staleness)
-                        <= self.current_round - Config().clients.data_deletion_round - 1
-                    ):
-                        if self.clusters[client_id] in self.clustered_updates:
-                            self.clustered_updates[self.clusters[client_id]].append(
-                                client_update
-                            )
-                        else:
-                            self.clustered_updates[self.clusters[client_id]] = [
-                                client_update
-                            ]
-
-                else:
+            if self.clustered_retraining[self.clusters[client_id]] is True:
+                if (
+                    abs(client_update.staleness)
+                    <= self.current_round - Config().clients.data_deletion_round - 1
+                ):
                     if self.clusters[client_id] in self.clustered_updates:
                         self.clustered_updates[self.clusters[client_id]].append(
                             client_update
@@ -509,56 +508,32 @@ class Server(fedunlearning_server.Server):
                             client_update
                         ]
 
-                for cluster_id, update in self.clustered_updates.items():
-                    if len(update) != 0:
-                        deltas = await self.federated_averaging(
-                            update, cluster_id=cluster_id
-                        )
-                        updated_weights = self.algorithm.update_weights(
-                            deltas, cluster_id=cluster_id
-                        )
+            else:
+                if self.clusters[client_id] in self.clustered_updates:
+                    self.clustered_updates[self.clusters[client_id]].append(
+                        client_update
+                    )
+                else:
+                    self.clustered_updates[self.clusters[client_id]] = [client_update]
 
-                        self.algorithm.load_weights(
-                            updated_weights, cluster_id=cluster_id
-                        )
+            for cluster_id, update in self.clustered_updates.items():
+                if len(update) != 0:
+                    # Perform server aggregation within a cluster (with cluster_id)
+                    deltas_received = self.algorithm.compute_weight_deltas(
+                        baseline_weights, weights_received, cluster_id=cluster_id
+                    )
+                    deltas = await self.aggregate_deltas(
+                        update, deltas_received, cluster_id=cluster_id
+                    )
+                    updated_weights = self.algorithm.update_weights(
+                        deltas, cluster_id=cluster_id
+                    )
+                    return updated_weights
 
-    def compute_weight_deltas(self, updates, cluster_id=None):
-        """Extract the model weight updates from client updates."""
-        weights_received = [payload for (__, __, payload, __) in updates]
-        return self.algorithm.compute_weight_deltas(
-            weights_received, cluster_id=cluster_id
-        )
-
-    async def federated_averaging(self, updates, cluster_id=None):
+    async def aggregate_deltas(self, updates, deltas_received, cluster_id=None):
         """Aggregate weight updates from the clients using federated averaging."""
-        if cluster_id is None:
-            return await super().federated_averaging(updates)
-
         deltas_received = self.compute_weight_deltas(updates, cluster_id=cluster_id)
-
-        # Extract the total number of samples
-        self.total_samples = sum(
-            [report.num_samples for (__, report, __, __) in updates]
-        )
-
-        # Perform weighted averaging
-        avg_update = {
-            name: self.trainer.zeros(weights.shape)
-            for name, weights in deltas_received[0].items()
-        }
-
-        for i, update in enumerate(deltas_received):
-            __, report, __, __ = updates[i]
-            num_samples = report.num_samples
-
-            for name, delta in update.items():
-                # Use weighted average by the number of samples
-                avg_update[name] += delta * (num_samples / self.total_samples)
-
-            # Yield to other tasks in the server
-            await asyncio.sleep(0)
-
-        return avg_update
+        return await super().aggregate_deltas(updates, deltas_received)
 
     def weights_received(self, weights_received):
         """Method called after the updated weights have been received."""
@@ -693,11 +668,11 @@ class Server(fedunlearning_server.Server):
             client_id: 0 for client_id in range(1, Config().clients.total_clients + 1)
         }
 
-        for client_id, report, _, _ in updates:
-            if client_training_times[client_id] != 0:
+        for update in updates:
+            if client_training_times[update.client_id] != 0:
                 continue
 
-            client_training_times[client_id] = report.training_time
+            client_training_times[update.client_id] = update.report.training_time
 
         return client_training_times
 
@@ -725,9 +700,14 @@ class Server(fedunlearning_server.Server):
         for __, weight in self.trainer.model.cpu().state_dict().items():
             current = torch.cat((current, weight.view(-1)))
 
-        deltas_received = self.compute_weight_deltas(updates)
+        weights_received = [update.payload for update in self.updates]
+        baseline_weights = self.algorithm.extract_weights()
+        deltas_received = self.algorithm.compute_weight_deltas(
+            baseline_weights, weights_received, cluster_id=None
+        )
+
         for i, update in enumerate(deltas_received):
-            client_id, __, __, __ = updates[i]
+            client_id = updates[i].client_id
             if self.clients_similarity[client_id] is not None:
                 continue
             deltas = torch.zeros(0)

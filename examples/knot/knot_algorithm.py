@@ -76,6 +76,10 @@ class Algorithm(fedavg.Algorithm):
         if cluster_id is None:
             return super().compute_weight_deltas(baseline_weights, weights_received)
         else:
+            baseline_weights = self.extract_weights(
+                client_id=self.get_client_id(cluster_id)
+            )
+
             # Calculate updates from the received weights
             deltas = []
             for weight in weights_received:
