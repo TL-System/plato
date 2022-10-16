@@ -20,9 +20,20 @@ class Report:
 class Client(simple.Client):
     """A split learning client."""
 
-    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
+    def __init__(
+        self,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
+    ):
         super().__init__(
-            model=model, datasource=datasource, algorithm=algorithm, trainer=trainer
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
         )
 
         self.model_received = False
