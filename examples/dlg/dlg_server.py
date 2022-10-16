@@ -109,7 +109,7 @@ class Server(fedavg.Server):
             and Config().algorithm.attack_method in ["DLG", "iDLG", "csDLG"]
         ):
             self.attack_method = Config().algorithm.attack_method
-            self.deep_leakage_from_gradients(weights_received)
+            self._deep_leakage_from_gradients(weights_received)
         
         return weights_received
 
@@ -159,7 +159,7 @@ class Server(fedavg.Server):
 
         return avg_update
 
-    def deep_leakage_from_gradients(self, weights_received):
+    def _deep_leakage_from_gradients(self, weights_received):
         """Analyze periodic gradients from certain clients."""
         # Process data from the victim client
         # The ground truth should be used only for evaluation
@@ -183,7 +183,7 @@ class Server(fedavg.Server):
         gt_data_plot = gt_data.detach().clone()
         gt_data_plot = gt_data_plot.permute(0, 2, 3, 1)
         gt_result_path = f"{dlg_result_path}/ground_truth.pdf"
-        self.make_plot(num_images, gt_data_plot, gt_labels, gt_result_path)
+        self._make_plot(num_images, gt_data_plot, gt_labels, gt_result_path)
 
         # The number of restarts
         trials = 1
@@ -215,7 +215,7 @@ class Server(fedavg.Server):
                 gt_labels,
             )
 
-        self.save_best()
+        self._save_best()
 
     def run_trial(
         self,
@@ -314,11 +314,11 @@ class Server(fedavg.Server):
         # Conduct gradients/weights/updates matching
         if not self.share_gradients and self.match_weights:
             model = deepcopy(self.trainer.model.to(Config().device()))
-            closure = self.weight_closure(
+            closure = self._weight_closure(
                 match_optimizer, dummy_data, labels_, target_weights, model
             )
         else:
-            closure = self.gradient_closure(
+            closure = self._gradient_closure(
                 match_optimizer, dummy_data, labels_, target_grad
             )
 
@@ -437,10 +437,10 @@ class Server(fedavg.Server):
             )  # the +1 is because we index from 1 and not 0
 
         reconstructed_path = f"{trial_result_path}/reconstruction_iterations.png"
-        self.plot_reconstructed(num_images, history, reconstructed_path)
+        self._plot_reconstructed(num_images, history, reconstructed_path)
         final_tensor = torch.stack([history[-1][i][0] for i in range(num_images)])
         final_result_path = f"{trial_result_path}/final_attack_result.pdf"
-        self.make_plot(num_images, final_tensor, None, final_result_path)
+        self._make_plot(num_images, final_tensor, None, final_result_path)
 
         # Save the tensors into a .pt file
         tensor_file_path = f"{trial_result_path}/tensors.pt"
@@ -452,7 +452,7 @@ class Server(fedavg.Server):
 
         logging.info("Attack %d complete", (trial_number + 1))
 
-    def gradient_closure(self, match_optimizer, dummy_data, labels, target_grad):
+    def _gradient_closure(self, match_optimizer, dummy_data, labels, target_grad):
         """Take a step to match the gradients."""
 
         def closure():
@@ -473,7 +473,7 @@ class Server(fedavg.Server):
                 dummy_loss, self.trainer.model.parameters(), create_graph=True
             )
 
-            rec_loss = self.reconstruction_costs([dummy_grad], target_grad)
+            rec_loss = self._reconstruction_costs([dummy_grad], target_grad)
             if (
                 hasattr(Config().algorithm, "total_variation")
                 and Config().algorithm.total_variation > 0
@@ -484,16 +484,16 @@ class Server(fedavg.Server):
 
         return closure
 
-    def weight_closure(
+    def _weight_closure(
         self, match_optimizer, dummy_data, labels, target_weights, model
     ):
         """Take a step to match the weights."""
 
         def closure():
             match_optimizer.zero_grad()
-            dummy_weight = self.loss_steps(dummy_data, labels, model)
+            dummy_weight = self._loss_steps(dummy_data, labels, model)
 
-            rec_loss = self.reconstruction_costs(
+            rec_loss = self._reconstruction_costs(
                 [dummy_weight], list(target_weights.values())
             )
             if (
@@ -506,7 +506,7 @@ class Server(fedavg.Server):
 
         return closure
 
-    def loss_steps(self, dummy_data, labels, model):
+    def _loss_steps(self, dummy_data, labels, model):
         """Take a few gradient descent steps to fit the model to the given input."""
         patched_model = PatchedModule(model)
         if self.use_updates:
@@ -551,7 +551,7 @@ class Server(fedavg.Server):
             )
         return list(patched_model.parameters.values())
 
-    def save_best(self):
+    def _save_best(self):
         src_folder = f"{dlg_result_path}/t{self.best_trial}"
         dst_folder = f"{dlg_result_path}/best(t{self.best_trial})"
 
@@ -565,7 +565,7 @@ class Server(fedavg.Server):
                 shutil.copy(src, dst)
 
     @staticmethod
-    def reconstruction_costs(dummy, target):
+    def _reconstruction_costs(dummy, target):
         indices = torch.arange(len(target))
         cost_fn = Config().algorithm.cost_fn
 
@@ -597,7 +597,7 @@ class Server(fedavg.Server):
         return total_costs / len(dummy)
 
     @staticmethod
-    def make_plot(num_images, image_data, image_labels, path):
+    def _make_plot(num_images, image_data, image_labels, path):
         """Plot ground truth data."""
 
         if not os.path.exists(dlg_result_path):
@@ -649,7 +649,7 @@ class Server(fedavg.Server):
         plt.savefig(path)
 
     @staticmethod
-    def plot_reconstructed(num_images, history, reconstructed_result_path):
+    def _plot_reconstructed(num_images, history, reconstructed_result_path):
         """Plot the reconstructed data."""
         for i in range(num_images):
             logging.info("Reconstructed label is %d.", history[-1][i][1])

@@ -45,7 +45,7 @@ class Trainer(basic.Trainer):
         self.target_grad = None
         self.feature_fc1_graph = None
         self.sensitivity = None
-    
+
     def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
         """Creates an instance of the trainloader."""
         # Calculate sensitivity with the trainset
