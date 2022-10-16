@@ -27,6 +27,14 @@ class Trainer(basic.Trainer):
         model: The model to train.
         client_id: The ID of the client using this trainer (optional).
         """
+
+        def weights_init(m):
+            """Initializing the weights and biases in the model."""
+            if hasattr(m, "weight"):
+                m.weight.data.uniform_(-0.5, 0.5)
+            if hasattr(m, "bias"):
+                m.bias.data.uniform_(-0.5, 0.5)
+
         super().__init__(model=model, callbacks=callbacks)
 
         # DLG explicit weights initialziation
@@ -93,12 +101,10 @@ class Trainer(basic.Trainer):
             and Config().algorithm.clip is True
         ):
             self.list_grad = []
-            for index in range(len(examples)):
-                outputs, _ = self.model(torch.unsqueeze(examples[index], dim=0))
+            for example, label in zip(examples, labels):
+                outputs, _ = self.model(torch.unsqueeze(example, dim=0))
 
-                loss = self._loss_criterion(
-                    outputs, torch.unsqueeze(labels[index], dim=0)
-                )
+                loss = self._loss_criterion(outputs, torch.unsqueeze(label, dim=0))
                 grad = torch.autograd.grad(
                     loss,
                     self.model.parameters(),
@@ -125,7 +131,7 @@ class Trainer(basic.Trainer):
 
         return loss
 
-    def train_step_end(self, config, batch, loss):
+    def train_step_end(self, config, batch=None, loss=None):
         """Method called at the end of a training step."""
         # Apply defense if needed
         if hasattr(Config().algorithm, "defense"):
@@ -175,8 +181,8 @@ class Trainer(basic.Trainer):
                 )
 
             elif Config().algorithm.defense == "GC":
-                for i in range(len(self.list_grad)):
-                    grad_tensor = self.list_grad[i].cpu().numpy()
+                for i, grad in enumerate(self.list_grad):
+                    grad_tensor = grad.cpu().numpy()
                     flattened_weights = np.abs(grad_tensor.flatten())
                     # Generate the pruning threshold according to 'prune by percentage'
                     thresh = np.percentile(
@@ -186,8 +192,8 @@ class Trainer(basic.Trainer):
                     self.list_grad[i] = torch.Tensor(grad_tensor).to(self.device)
 
             elif Config().algorithm.defense == "DP":
-                for i in range(len(self.list_grad)):
-                    grad_tensor = self.list_grad[i].cpu().numpy()
+                for i, grad in enumerate(self.list_grad):
+                    grad_tensor = grad.cpu().numpy()
                     noise = np.random.laplace(
                         0, Config().algorithm.epsilon, size=grad_tensor.shape
                     )
@@ -248,10 +254,3 @@ class Trainer(basic.Trainer):
         Method called after the model updates have been generated.
         """
         return outputs[0]
-
-
-def weights_init(m):
-    if hasattr(m, "weight"):
-        m.weight.data.uniform_(-0.5, 0.5)
-    if hasattr(m, "bias"):
-        m.bias.data.uniform_(-0.5, 0.5)
