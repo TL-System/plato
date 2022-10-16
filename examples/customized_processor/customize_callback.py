@@ -3,12 +3,13 @@ Customize the inbound and outbound processor list through callbacks.
 """
 
 from plato.callbacks.client import ClientCallback
+
 from dummy_processor import DummyProcessor
 
 
 class CustomizeProcessorCallback(ClientCallback):
     """
-    A client callback that dynamically inserts a dummy processor to the existing processor list .
+    A client callback that dynamically inserts a dummy processor to the existing processor list.
     """
 
     def on_inbound_process(self, client, inbound_processor):
