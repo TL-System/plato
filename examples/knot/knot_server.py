@@ -206,52 +206,21 @@ class Server(fedunlearning_server.Server):
             for cluster_id, update in self.clustered_updates.items():
                 if len(update) != 0:
                     # Perform server aggregation within a cluster (with cluster_id)
+                    weights_received = [_update.payload for _update in update]
+
                     deltas_received = self.algorithm.compute_weight_deltas(
                         baseline_weights, weights_received, cluster_id=cluster_id
                     )
-                    deltas = await self.aggregate_deltas(
-                        update, deltas_received, cluster_id=cluster_id
-                    )
+                    deltas = await self.aggregate_deltas(update, deltas_received)
                     updated_weights = self.algorithm.update_weights(
                         deltas, cluster_id=cluster_id
                     )
+
                     self.algorithm.load_weights(updated_weights, cluster_id=cluster_id)
 
-                    print("self.algorithms.models = ")
                     print(self.algorithm.models)
 
-                    return updated_weights
-
-    async def aggregate_deltas(self, updates, deltas_received, cluster_id=None):
-        """Aggregate weight updates from the clients using federated averaging."""
-        weights_received = [update.payload for update in self.updates]
-        baseline_weights = self.algorithm.extract_weights()
-
-        deltas_received = self.algorithm.compute_weight_deltas(
-            baseline_weights, weights_received, cluster_id=cluster_id
-        )
-
-        # Extract the total number of samples
-        self.total_samples = sum(update.report.num_samples for update in updates)
-
-        # Perform weighted averaging
-        avg_update = {
-            name: self.trainer.zeros(weights.shape)
-            for name, weights in deltas_received[0].items()
-        }
-
-        for i, update in enumerate(deltas_received):
-            report = updates[i].report
-            num_samples = report.num_samples
-
-            for name, delta in update.items():
-                # Use weighted average by the number of samples
-                avg_update[name] += delta * (num_samples / self.total_samples)
-
-            # Yield to other tasks in the server
-            await asyncio.sleep(0)
-
-        return avg_update
+        return baseline_weights
 
     def weights_aggregated(self, updates):
         """Method called after the updated weights have been aggregated."""
@@ -276,6 +245,8 @@ class Server(fedunlearning_server.Server):
             }
 
             print(self.algorithm.models)
+            print(updated_cluster_ids)
+
             test_accuracy_per_cluster = self.trainer.server_clustered_test(
                 self.testset,
                 self.testset_sampler,

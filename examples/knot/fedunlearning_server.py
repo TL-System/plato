@@ -43,11 +43,9 @@ class Server(fedavg.Server):
         # A dictionary that maps client IDs to the first round when the server selected it
         self.round_first_selected = {}
 
-    async def select_clients(self, for_next_batch=False):
+    def clients_selected(self, selected_clients):
         """Remembers the first round that a particular client ID was selected."""
-        await super().select_clients(for_next_batch)
-
-        for client_id in self.selected_clients:
+        for client_id in selected_clients:
             if not client_id in self.round_first_selected:
                 self.round_first_selected[client_id] = self.current_round
 
@@ -66,7 +64,10 @@ class Server(fedavg.Server):
         Otherwise the stale clients updates contains old model's info,
         will be aggregated after data_deletion_round.
         """
+        print(f"len(deltas_received) in fedunlearning = {len(deltas_received)}")
+
         if not self.retraining:
+            print(f"len(deltas_received) in fedunlearning = {len(deltas_received)}")
             return await super().aggregate_deltas(updates, deltas_received)
 
         recent_mask = list(
