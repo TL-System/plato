@@ -573,7 +573,9 @@ class Server:
                     "id": self.selected_client_id,
                     "current_round": self.current_round,
                 }
-                server_response = self.customize_server_response(server_response)
+                server_response = self.customize_server_response(
+                    server_response, client_id=self.selected_client_id
+                )
 
                 payload = self.algorithm.extract_weights()
                 payload = self.customize_server_payload(payload)
@@ -1241,7 +1243,7 @@ class Server:
         await self.close_connections()
         os._exit(0)
 
-    def customize_server_response(self, server_response: dict) -> dict:
+    def customize_server_response(self, server_response: dict, client_id) -> dict:
         """Customizes the server response with any additional information."""
         return server_response
 

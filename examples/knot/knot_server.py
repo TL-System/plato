@@ -213,9 +213,9 @@ class Server(fedunlearning_server.Server):
 
         model.load_state_dict(torch.load(model_path), strict=True)
 
-    async def customize_server_response(self, server_response, client_id=None):
-        """Wrap up generating the server response with any additional information."""
-        server_response = await super().customize_server_response(
+    def customize_server_response(self, server_response: dict, client_id) -> dict:
+        """Returns a customrized server response with any additional information."""
+        server_response = super().customize_server_response(
             server_response, client_id=client_id
         )
 
@@ -449,7 +449,7 @@ class Server(fedunlearning_server.Server):
             else:
                 return False
 
-    async def aggregate_weights(self, updates):
+    async def aggregate_weights(self, updates, baseline_weights, weights_received):
         """
         Aggregate the reported weight updates from the selected clients,
         according to each client's clustering assignment, using the
@@ -465,7 +465,7 @@ class Server(fedunlearning_server.Server):
             )
             and self.initialize_optimization
         ):
-            await super().aggregate_weights(updates)
+            await self.algorithm.aggregate_weights(baseline_weights, weights_received)
 
         elif (
             self.current_round == 2
@@ -480,12 +480,11 @@ class Server(fedunlearning_server.Server):
         else:
             self.clustered_updates = {}
             for client_update in updates:
-                client_id, __, __, __ = client_update
-                __, __, __, staleness = client_update
+                client_id = client_update.client_id
 
                 if self.clustered_retraining[self.clusters[client_id]] is True:
                     if (
-                        abs(staleness)
+                        abs(client_update.staleness)
                         <= self.current_round - Config().clients.data_deletion_round - 1
                     ):
                         if self.clusters[client_id] in self.clustered_updates:

@@ -32,7 +32,7 @@ class Server(fedavg_cs.Server):
             if "pruning_amount" not in self.recorded_items:
                 self.recorded_items = self.recorded_items + ["pruning_amount"]
 
-    def customize_server_response(self, server_response: dict) -> dict:
+    def customize_server_response(self, server_response: dict, client_id) -> dict:
         """Wrap up generating the server response with any additional information."""
         if Config().is_central_server():
             server_response["pruning_amount"] = self.pruning_amount_list

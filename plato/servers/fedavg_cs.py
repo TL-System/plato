@@ -176,7 +176,7 @@ class Server(fedavg.Server):
 
         await super().select_clients(for_next_batch=for_next_batch)
 
-    def customize_server_response(self, server_response: dict) -> dict:
+    def customize_server_response(self, server_response: dict, client_id) -> dict:
         """Wrap up generating the server response with any additional information."""
         if Config().is_central_server():
             server_response["current_global_round"] = self.current_round

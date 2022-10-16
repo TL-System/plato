@@ -50,7 +50,7 @@ class Server(fedavg.Server):
             Config().clients.delta3 if hasattr(Config().clients, "delta3") else 1
         )
 
-    def customize_server_response(self, server_response: dict) -> dict:
+    def customize_server_response(self, server_response: dict, client_id) -> dict:
         """Wrap up generating the server response with any additional information."""
         if self.trainer.use_adaptive and self.current_round > 1:
             self.calc_threshold()
