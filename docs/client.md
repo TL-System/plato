@@ -35,3 +35,31 @@ Within the implementation of these callback methods, one can access additional i
 
 To use callbacks, subclass the `ClientCallback` class in `plato.callbacks.client`, and override the following methods:
 
+
+````{admonition} **on_inbound_process(self, client, inbound_processor)**
+Override this method to complete additional tasks before the inbound processors start to process the data received from the server.
+
+`inbound_processor` the pipeline of inbound processors, where each of them can be accessed through list `inbound_processor.processors`.
+
+**Example:**
+
+```py
+def on_inbound_process(self, client, inbound_processor):
+    # insert a customized processor to the inbound processor list
+    inbound_processor.processors.insert(0, customized_processor) 
+```
+````
+
+````{admonition} **on_outbound_process(self, client, outbound_processor)**
+Override this method to complete additional tasks before the outbound processors start to process the data to be sent to the server.
+
+`outbound_processor` the pipeline of outbound processors, where each of them can be accessed through list `outbound_processor.processors`.
+
+**Example:**
+
+```py
+def on_outbound_process(self, client, outbound_processor):
+    # remove the first processor from the outbound processor list
+    outbound_processor.processors.pop() 
+```
+````
