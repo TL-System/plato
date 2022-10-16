@@ -635,6 +635,11 @@ class Server:
 
                     await self.send(sid, payload, selected_client_id)
 
+            self.clients_selected(self.selected_clients)
+            self.callback_handler.call_event(
+                "on_clients_selected", self, self.selected_clients
+            )
+
     def choose_clients(self, clients_pool, clients_count):
         """Choose a subset of the clients to participate in each round."""
         assert clients_count <= len(clients_pool)
@@ -1252,6 +1257,10 @@ class Server:
     @abstractmethod
     async def _process_reports(self) -> None:
         """Process a client report."""
+
+    def clients_selected(self, selected_clients) -> None:
+        """
+        Method called after clients have been selected in each round."""
 
     def training_will_start(self):
         """
