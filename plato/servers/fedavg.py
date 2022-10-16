@@ -280,7 +280,7 @@ class Server(base.Server):
 
     def weights_received(self, weights_received):
         """
-        Event called after the updated weights have been received.
+        Method called after the updated weights have been received.
         """
         return weights_received
 
