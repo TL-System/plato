@@ -34,7 +34,7 @@ class Trainer(basic.Trainer):
         self.global_model_weights = None
 
         # Path to the client control variate
-        self.extra_payload_path = None
+        self.client_control_variate_path = None
 
         self.additional_data = None
         self.param_groups = None
@@ -54,7 +54,8 @@ class Trainer(basic.Trainer):
             self.client_control_variate = {}
             for variate in self.server_control_variate:
                 self.client_control_variate[variate] = torch.zeros(
-                    self.server_control_variate[variate].shape)
+                    self.server_control_variate[variate].shape
+                )
         self.global_model_weights = copy.deepcopy(self.model.state_dict())
 
     def train_step_end(self, config, batch=None, loss=None):
@@ -64,21 +65,20 @@ class Trainer(basic.Trainer):
             counter = 0
             for name in self.server_control_variate:
                 if "weight" in name or "bias" in name:
-                    server_control_variate = self.server_control_variate[
-                        name].to(self.device)
+                    server_control_variate = self.server_control_variate[name].to(
+                        self.device
+                    )
                     param = group["params"][counter]
                     if self.client_control_variate:
                         param.data.add_(
                             torch.sub(
                                 server_control_variate,
-                                self.client_control_variate[name].to(
-                                    self.device),
+                                self.client_control_variate[name].to(self.device),
                             ),
                             alpha=learning_rate,
                         )
                     else:
-                        param.data.add_(server_control_variate,
-                                        alpha=learning_rate)
+                        param.data.add_(server_control_variate, alpha=learning_rate)
                     counter += 1
 
     def train_run_end(self, config):
@@ -92,24 +92,25 @@ class Trainer(basic.Trainer):
             for name, previous_weight in self.global_model_weights.items():
                 new_client_control_variate[name] = torch.sub(
                     self.client_control_variate[name].to(device=self.device),
-                    self.server_control_variate[name].to(
-                        device=self.device)).to(device=self.device)
+                    self.server_control_variate[name].to(device=self.device),
+                ).to(device=self.device)
                 new_client_control_variate[name].add_(
-                    torch.sub(previous_weight.to(device=self.device),
-                              self.model.state_dict()[name]),
+                    torch.sub(
+                        previous_weight.to(device=self.device),
+                        self.model.state_dict()[name],
+                    ),
                     alpha=1 / Config().trainer.epochs,
                 )
 
                 control_variate_deltas[name] = torch.sub(
                     new_client_control_variate[name],
-                    self.client_control_variate[name].to(self.device))
+                    self.client_control_variate[name].to(self.device),
+                )
         else:
             for name, previous_weight in self.global_model_weights.items():
-                new_client_control_variate[
-                    name] = -self.server_control_variate[name]
+                new_client_control_variate[name] = -self.server_control_variate[name]
                 new_client_control_variate[name].add_(
-                    torch.sub(previous_weight,
-                              self.model.state_dict()[name]),
+                    torch.sub(previous_weight, self.model.state_dict()[name]),
                     alpha=1 / Config().trainer.epochs,
                 )
 
@@ -122,13 +123,13 @@ class Trainer(basic.Trainer):
         logging.info(
             "[Client #%d] Saving the control variate to %s.",
             self.client_id,
-            self.extra_payload_path,
+            self.client_control_variate_path,
         )
-        with open(self.extra_payload_path, "wb") as path:
+        with open(self.client_control_variate_path, "wb") as path:
             pickle.dump(self.client_control_variate, path)
 
         logging.info(
             "[Client #%d] Control variate saved to %s.",
             self.client_id,
-            self.extra_payload_path,
+            self.client_control_variate_path,
         )

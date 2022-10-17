@@ -23,11 +23,11 @@ class SendPayloadProcessor(base.Processor):
 
     def process(self, data: Any) -> List:
 
-        extra_payload_filename = self.trainer.extra_payload_path
-        if os.path.exists(extra_payload_filename):
-            with open(extra_payload_filename, "rb") as payload_file:
-                extra_payload = pickle.load(payload_file)
-                data = [data, extra_payload]
+        client_control_variate_filename = self.trainer.client_control_variate_path
+        if os.path.exists(client_control_variate_filename):
+            with open(client_control_variate_filename, "rb") as payload_file:
+                client_control_variate = pickle.load(payload_file)
+                data = [data, client_control_variate]
         else:
             data = [data, None]
 
