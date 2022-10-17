@@ -1,7 +1,7 @@
 """
- Processor for attaching a pruning mask to the payload if pruning
- had been conducted
- """
+Processor for attaching a pruning mask to the payload if pruning
+had been conducted
+"""
 
 import os
 import pickle
@@ -47,7 +47,7 @@ class Processor(model.Processor):
                 )
         return data
 
-     def _process_layer(self, layer: torch.Tensor) -> torch.Tensor:
-         """
-         Process individual layer of the model
-         """
+    def _process_layer(self, layer: torch.Tensor) -> torch.Tensor:
+        """
+        Process individual layer of the model
+        """
