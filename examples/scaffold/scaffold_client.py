@@ -14,7 +14,6 @@ import os
 
 import pickle
 
-# import extract_payload_processor, send_payload_processor
 from plato.clients import simple
 from plato.config import Config
 
@@ -40,10 +39,6 @@ class Client(simple.Client):
         )
 
         self.client_control_variate = None
-        # self.customized_processors = {
-        #    "extract_server_payload": extract_payload_processor.Processor,
-        #    "send_extra_payload": send_payload_processor.Processor,
-        # }
 
     def configure(self):
         """Initialize the server control variate and client control variate for trainer"""

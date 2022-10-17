@@ -42,7 +42,6 @@ class Client(base.Client):
 
         self._report = None
 
-        self.customized_processors = {}
     def configure(self) -> None:
         """Prepares this client for training."""
         super().configure()
@@ -66,33 +65,30 @@ class Client(base.Client):
 
         # Pass inbound and outbound data payloads through processors for
         # additional data processing
-        processor_registry.register_processors(self.customized_processors)
         self.outbound_processor, self.inbound_processor = processor_registry.get(
-            "Client", client_id=self.client_id, trainer=self.trainer)
-    """
-    def customized_processors(outbound_processor, inbound_processor):# change attributes in pipeline.processor: add some and change order
-        print("customizing pipeline processors: ")
-        return outbound_processor, inbound_processor
-    """
+            "Client", client_id=self.client_id, trainer=self.trainer
+        )
 
     def load_data(self) -> None:
         """Generates data and loads them onto this client."""
         logging.info("[%s] Loading its data source...", self)
 
-        if (self.datasource is None and self.custom_datasource is None
-                or (hasattr(Config().data, "reload_data")
-                    and Config().data.reload_data)):
+        if (
+            self.datasource is None
+            and self.custom_datasource is None
+            or (hasattr(Config().data, "reload_data") and Config().data.reload_data)
+        ):
             # The only case where Config().data.reload_data is set to true is
             # when clients with different client IDs need to load from different datasets,
             # such as in the pre-partitioned Federated EMNIST dataset. We do not support
             # reloading data from a custom datasource at this time.
-            self.datasource = datasources_registry.get(
-                client_id=self.client_id)
+            self.datasource = datasources_registry.get(client_id=self.client_id)
         elif self.datasource is None and self.custom_datasource is not None:
             self.datasource = self.custom_datasource()
 
-        logging.info("[%s] Dataset size: %s", self,
-                     self.datasource.num_train_examples())
+        logging.info(
+            "[%s] Dataset size: %s", self, self.datasource.num_train_examples()
+        )
 
         # Setting up the data sampler
         self.sampler = samplers_registry.get(self.datasource, self.client_id)
@@ -110,9 +106,9 @@ class Client(base.Client):
             self.testset = self.datasource.get_test_set()
             if hasattr(Config().data, "testset_sampler"):
                 # Set the sampler for test set
-                self.testset_sampler = samplers_registry.get(self.datasource,
-                                                             self.client_id,
-                                                             testing=True)
+                self.testset_sampler = samplers_registry.get(
+                    self.datasource, self.client_id, testing=True
+                )
 
     def load_payload(self, server_payload) -> None:
         """Loads the server model onto this client."""
@@ -123,7 +119,8 @@ class Client(base.Client):
         logging.info(
             fonts.colourize(
                 f"[{self}] Started training in communication round #{self.current_round}."
-            ))
+            )
+        )
 
         # Perform model training
         try:
@@ -132,17 +129,18 @@ class Client(base.Client):
             training_time = self.trainer.train(self.trainset, self.sampler)
         except ValueError as exc:
             logging.info(
-                fonts.colourize(
-                    f"[{self}] Error occurred during training: {exc}"))
+                fonts.colourize(f"[{self}] Error occurred during training: {exc}")
+            )
             await self.sio.disconnect()
 
         # Extract model weights and biases
         weights = self.algorithm.extract_weights()
 
         # Generate a report for the server, performing model testing if applicable
-        if (hasattr(Config().clients, "do_test") and Config().clients.do_test
-            ) and (not hasattr(Config().clients, "test_interval") or
-                   self.current_round % Config().clients.test_interval == 0):
+        if (hasattr(Config().clients, "do_test") and Config().clients.do_test) and (
+            not hasattr(Config().clients, "test_interval")
+            or self.current_round % Config().clients.test_interval == 0
+        ):
             accuracy = self.trainer.test(self.testset, self.testset_sampler)
 
             if accuracy == -1:
@@ -152,15 +150,16 @@ class Client(base.Client):
             if hasattr(Config().trainer, "target_perplexity"):
                 logging.info("[%s] Test perplexity: %.2f", self, accuracy)
             else:
-                logging.info("[%s] Test accuracy: %.2f%%", self,
-                             100 * accuracy)
+                logging.info("[%s] Test accuracy: %.2f%%", self, 100 * accuracy)
         else:
             accuracy = 0
 
         comm_time = time.time()
 
-        if (hasattr(Config().clients, "sleep_simulation")
-                and Config().clients.sleep_simulation):
+        if (
+            hasattr(Config().clients, "sleep_simulation")
+            and Config().clients.sleep_simulation
+        ):
             sleep_seconds = Config().client_sleep_times[self.client_id - 1]
             avg_training_time = Config().clients.avg_training_time
 
