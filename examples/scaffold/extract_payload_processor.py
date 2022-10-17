@@ -6,11 +6,17 @@ from typing import List
 from plato.processors import base
 
 
-class Processor(base.Processor):
+class ExtractPayloadProcessor(base.Processor):
     """
-    Implements a processor for clients to extract additional information attached to the
-    received server payload
+    A processor for clients to extract additional information attached to the
+    received server payload.
     """
+
+    def __init__(self, client_id, current_round, **kwargs) -> None:
+        super().__init__(**kwargs)
+
+        self.client_id = client_id
+        self.current_round = current_round
 
     def process(self, data: List) -> List:
 

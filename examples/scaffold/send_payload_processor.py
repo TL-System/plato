@@ -10,10 +10,16 @@ from typing import Any, List
 from plato.processors import base
 
 
-class Processor(base.Processor):
+class SendPayloadProcessor(base.Processor):
     """
-    Implements a processor for attaching additional items to the client payload.
+    A processor for clients to attach additional items to the client payload.
     """
+
+    def __init__(self, client_id, current_round, **kwargs) -> None:
+        super().__init__(**kwargs)
+
+        self.client_id = client_id
+        self.current_round = current_round
 
     def process(self, data: Any) -> List:
 
