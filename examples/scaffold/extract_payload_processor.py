@@ -12,11 +12,11 @@ class ExtractPayloadProcessor(base.Processor):
     received server payload.
     """
 
-    def __init__(self, client_id, current_round, **kwargs) -> None:
+    def __init__(self, client_id, trainer, **kwargs) -> None:
         super().__init__(**kwargs)
 
         self.client_id = client_id
-        self.current_round = current_round
+        self.trainer = trainer
 
     def process(self, data: List) -> List:
 
@@ -25,6 +25,6 @@ class ExtractPayloadProcessor(base.Processor):
         if data[1] is not None:
             logging.info(
                 "[Client #%d] Extracted information attached to payload.",
-                self.trainer.client_id,
+                self.client_id,
             )
         return data[0]

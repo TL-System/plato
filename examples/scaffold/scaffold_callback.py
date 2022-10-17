@@ -25,7 +25,7 @@ class CustomizeProcessorCallback(ClientCallback):
         )
         customized_processor = ExtractPayloadProcessor(
             client_id=client.client_id,
-            current_round=client.current_round,
+            trainer=client.trainer,
             name="ExtractPayloadProcessor",
         )
         inbound_processor.processors.insert(0, customized_processor)
@@ -37,7 +37,7 @@ class CustomizeProcessorCallback(ClientCallback):
         )
 
     def on_outbound_process(self, client, outbound_processor):
-        """ "
+        """
         Insert a SendPayloadProcessor to the outbound processor list.
         """
         logging.info(
@@ -47,13 +47,13 @@ class CustomizeProcessorCallback(ClientCallback):
         )
         customized_processor = SendPayloadProcessor(
             client_id=client.client_id,
-            current_round=client.current_round,
+            trainer=client.trainer,
             name="SendPayloadProcessor",
         )
         outbound_processor.processors.insert(0, customized_processor)
 
         logging.info(
-            "[%s] List of inbound processors after modification: %s.",
+            "[%s] List of outbound processors after modification: %s.",
             client,
             outbound_processor.processors,
         )
