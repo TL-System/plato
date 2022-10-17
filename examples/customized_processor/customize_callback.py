@@ -1,5 +1,5 @@
-""" 
-Customize the inbound and outbound processor list through callbacks. 
+"""
+Customize the list of inbound and outbound processors through callbacks.
 """
 
 import logging
@@ -10,12 +10,12 @@ from dummy_processor import DummyProcessor
 
 class CustomizeProcessorCallback(ClientCallback):
     """
-    A client callback that dynamically inserts a dummy processor to the existing processor list.
+    A client callback that dynamically inserts a dummy processor to the list of inbound processors.
     """
 
     def on_inbound_process(self, client, inbound_processor):
         """
-        Insert a dummy processor to the inbound processor list.
+        Insert a dummy processor to the list of inbound processors.
         """
         logging.info(
             "[%s] Current list of inbound processors: %s.",
