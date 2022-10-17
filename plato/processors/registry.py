@@ -105,9 +105,4 @@ def get(
 
     return pipeline.Processor(outbound_processors), pipeline.Processor(
         inbound_processors
-    )  # what if not find in registered ones?
-
-
-def register_processors(custom_processors_list):
-    for name, processor in custom_processors_list.items():
-        registered_processors.update({name: processor})
+    )
