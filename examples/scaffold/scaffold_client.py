@@ -22,13 +22,27 @@ class Client(simple.Client):
     """A SCAFFOLD federated learning client who sends weight updates
     and client control variate."""
 
-    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None, inbound_processor=None, outbound_processor=None):
-        super().__init__(model, datasource, algorithm, trainer)
+    def __init__(
+        self,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
+    ):
+        super().__init__(
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
+        )
+
         self.client_control_variate = None
         self.customized_processors = {'extract_server_payload': extract_server_payload.Processor, 'send_extra_payload':send_extra_payload.Processor}
 
     def configure(self):
-        """Initialize the server control variate and client control variate for trainer"""        
+        """Initialize the server control variate and client control variate for trainer"""
         super().configure()
 
         # Load the client control variate if the client has participated before

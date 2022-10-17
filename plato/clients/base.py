@@ -189,6 +189,9 @@ class Client:
                 payload_size / 1024**2,
             )
 
+            self.callback_handler.call_event(
+                "on_inbound_process", self, self.inbound_processor
+            )
             self.server_payload = self.inbound_processor.process(self.server_payload)
 
             await self.start_training()
@@ -295,6 +298,9 @@ class Client:
     async def send(self, payload) -> None:
         """Sending the client payload to the server using simulation, S3 or socket.io."""
         # First apply outbound processors, if any
+        self.callback_handler.call_event(
+            "on_outbound_process", self, self.outbound_processor
+        )
         payload = self.outbound_processor.process(payload)
 
         if self.comm_simulation:

@@ -24,6 +24,11 @@ class ServerCallback(ABC):
         Event called after the updated weights have been aggregated.
         """
 
+    def on_client_arrived(self, server, **kwargs):
+        """
+        Event called after a new client arrived.
+        """
+
     def on_server_will_close(self, server, **kwargs):
         """
         Event called at the start of closing the server.
@@ -39,16 +44,33 @@ class PrintProgressCallback(ServerCallback):
         """
         Event called after the updated weights have been received.
         """
-        logging.info("[Server #%s] Updated weights have been received.", os.getpid())
+        logging.info("[%s] Updated weights have been received.", server)
 
     def on_weights_aggregated(self, server, updates):
         """
         Event called after the updated weights have been aggregated.
         """
-        logging.info("[Server #%s] Finished aggregating updated weights.", os.getpid())
+        logging.info("[%s] Finished aggregating updated weights.", server)
 
-    def on_server_will_close(self, server, **kwargs):
+    def on_clients_selected(self, server, selected_clients):
+        """
+        Event called after clients have been selected in each round.
+        """
+
+    def on_clients_processed(self, server):
+        """
+        Event called after all client reports have been processed.
+        """
+        logging.info("[%s] All client reports have been processed.", server)
+
+    def on_training_will_start(self, server):
+        """
+        Event called before selecting clients for the first round of training.
+        """
+        logging.info("[%s] Starting training.", server)
+
+    def on_server_will_close(self, server):
         """
         Event called at the start of closing the server.
         """
-        logging.info("[Server #%s] Closing the server.", os.getpid())
+        logging.info("[%s] Closing the server.", server)

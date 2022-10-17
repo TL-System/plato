@@ -72,6 +72,14 @@ def customize_server_response(self, server_response: dict) -> dict:
 Override this method to customize the server payload before sending it to the clients.
 ```
 
+```{admonition} **clients_processed(self)**
+Override this method to complete additional tasks after all client reports have been processed.
+```
+
+```{admonition} **training_will_start(self)**
+Override this method to complete additional tasks before selecting clients for the first round of training.
+```
+
 ```{admonition} **server_will_close(self)**
 Override this method to complete additional tasks before closing the server.
 ```
@@ -102,6 +110,14 @@ def on_weights_aggregated(self, server, updates):
     logging.info("[Server #%s] Finished aggregating weights.", os.getpid())
 ```
 ````
+
+```{admonition} **on_clients_processed(self, server)**
+Override this method to complete additional tasks after all client reports have been processed.
+```
+
+```{admonition} **on_training_will_start(self, server)**
+Override this method to complete additional tasks before selecting clients for the first round of training.
+```
 
 ````{admonition} **on_server_will_close(self, server)**
 Override this method to complete additional tasks before closing the server.

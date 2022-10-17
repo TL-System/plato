@@ -221,10 +221,11 @@ class Server(base.Server):
                 "[%s] Global model accuracy: %.2f%%\n", self, 100 * self.accuracy
             )
 
-        await self.wrap_up_processing_reports()
+        self.clients_processed()
+        self.callback_handler.call_event("on_clients_processed", self)
 
-    async def wrap_up_processing_reports(self):
-        """Wrap up processing the reports with any additional work."""
+    def clients_processed(self):
+        """Additional work to be performed after client reports have been processed."""
         # Record results into a .csv file
         new_row = []
         for item in self.recorded_items:
@@ -279,7 +280,7 @@ class Server(base.Server):
 
     def weights_received(self, weights_received):
         """
-        Event called after the updated weights have been received.
+        Method called after the updated weights have been received.
         """
         return weights_received
 
