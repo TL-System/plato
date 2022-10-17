@@ -8,7 +8,7 @@ in Proceedings of the 37th International Conference on Machine Learning (ICML), 
 
 https://arxiv.org/pdf/1910.06378.pdf
 """
-from scaffold_callback import CustomizeProcessorCallback
+from scaffold_callback import ScaffoldProcessorCallback
 
 import scaffold_client
 import scaffold_server
@@ -19,7 +19,7 @@ def main():
     """A Plato federated learning training session using the SCAFFOLD algorithm."""
     trainer = scaffold_trainer.Trainer
     client = scaffold_client.Client(
-        trainer=trainer, callbacks=[CustomizeProcessorCallback]
+        trainer=trainer, callbacks=[ScaffoldProcessorCallback]
     )
     server = scaffold_server.Server(trainer=trainer)
 

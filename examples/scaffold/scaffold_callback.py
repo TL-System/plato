@@ -9,7 +9,7 @@ from extract_payload_processor import ExtractPayloadProcessor
 from send_payload_processor import SendPayloadProcessor
 
 
-class CustomizeProcessorCallback(ClientCallback):
+class ScaffoldProcessorCallback(ClientCallback):
     """
     A client callback that dynamically inserts a dummy processor to the existing processor list.
     """
