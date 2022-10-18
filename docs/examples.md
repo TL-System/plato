@@ -99,13 +99,14 @@ python examples/dlg/dlg.py -c examples/dlg/reconstruction_emnist.yml --cpu
 ````
 
 ````{admonition} **SCAFFOLD**
-SCAFFOLD is a synchronized federated learning algorithm that performs server aggregation with control variates to to better handle statistical heterogeneity. It has been quite widely cited and compared with in the federated learning literature.
+SCAFFOLD is a synchronous federated learning algorithm that performs server aggregation with control variates to better handle statistical heterogeneity. It has been quite widely cited and compared with in the federated learning literature. In this example, two processors, called `ExtractControlVariatesProcessor` and `SendControlVariateProcessor`, have been introduced to the client using a callback class, called `ScaffoldCallback`. They are used for sending control variates between the clients and the server. Each client also tries to maintain its own control variates for local optimization using files.
 
 ```shell
 python examples/scaffold/scaffold.py -c examples/scaffold/scaffold_MNIST_lenet5.yml
 ```
+
 ```{note}
-Karimireddy et al., &ldquo;[Scaffold: Stochastic controlled averaging for federated learning](http://proceedings.mlr.press/v119/karimireddy20a.html), &rdquo; in Proc. ICML, 2020.
+Karimireddy et al., &ldquo;[SCAFFOLD: Stochastic Controlled Averaging for Federated Learning](http://proceedings.mlr.press/v119/karimireddy20a.html), &rdquo; in Proc. ICML, 2020.
 ```
 ````
 With the recent redesign of the Plato API, the following list is outdated and will be updated as they are tested again.
