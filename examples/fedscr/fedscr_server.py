@@ -13,9 +13,15 @@ from plato.config import Config
 class Server(fedavg.Server):
     """A federated learning server using the FedSCR algorithm."""
 
-    def __init__(self, model=None, algorithm=None, trainer=None, callbacks=None):
+    def __init__(
+        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+    ):
         super().__init__(
-            model=model, algorithm=algorithm, trainer=trainer, callbacks=callbacks
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
         )
 
         # Loss variances for each communication round used by the adaptive algorithm

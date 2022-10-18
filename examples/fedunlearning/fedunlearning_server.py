@@ -41,7 +41,7 @@ class Server(fedavg.Server):
             datasource=datasource,
             algorithm=algorithm,
             trainer=trainer,
-            callback=callbacks,
+            callbacks=callbacks,
         )
 
         self.retraining = False

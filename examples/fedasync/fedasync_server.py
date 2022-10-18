@@ -23,7 +23,7 @@ class Server(fedavg.Server):
     ):
         super().__init__(
             model=model,
-            datasource=None,
+            datasource=datasource,
             algorithm=algorithm,
             trainer=trainer,
             callbacks=callbacks,
