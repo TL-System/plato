@@ -17,8 +17,10 @@ from plato.servers import fedavg
 class Server(fedavg.Server):
     """The split learning server."""
 
-    def __init__(self, model=None, algorithm=None, trainer=None):
-        super().__init__(model=model, algorithm=algorithm, trainer=trainer)
+    def __init__(self, model=None, algorithm=None, trainer=None, callbacks=None):
+        super().__init__(
+            model=model, algorithm=algorithm, trainer=trainer, callbacks=callbacks
+        )
 
         # a FIFO queue(list) for choosing the running client
         self.clients_running_queue = []

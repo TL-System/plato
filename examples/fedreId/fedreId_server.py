@@ -5,8 +5,8 @@ from plato.servers import fedavg
 
 
 class fedReIdServer(fedavg.Server):
-    def __init__(self, model=None, trainer=None):
-        super().__init__(model, trainer)
+    def __init__(self, model=None, trainer=None, callbacks=None):
+        super().__init__(model=model, trainer=trainer, callbacks=callbacks)
         self.clients_belive = None
         self.total_belive = None
 

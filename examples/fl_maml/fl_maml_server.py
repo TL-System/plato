@@ -11,8 +11,10 @@ from plato.utils import csv_processor
 class Server(fedavg.Server):
     """A federated learning server for personalized FL."""
 
-    def __init__(self, model=None, algorithm=None, trainer=None):
-        super().__init__(model=model, algorithm=algorithm, trainer=trainer)
+    def __init__(self, model=None, algorithm=None, trainer=None, callbacks=None):
+        super().__init__(
+            model=model, algorithm=algorithm, trainer=trainer, callbacks=callbacks
+        )
         self.do_personalization_test = False
 
         # A list to store accuracy of clients' personalized models

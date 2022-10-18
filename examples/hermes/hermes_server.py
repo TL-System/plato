@@ -16,8 +16,10 @@ from plato.config import Config
 class Server(fedavg.Server):
     """A federated learning server using the Hermes algorithm."""
 
-    def __init__(self, model=None, algorithm=None, trainer=None):
-        super().__init__(model=model, algorithm=algorithm, trainer=trainer)
+    def __init__(self, model=None, algorithm=None, trainer=None, callbacks=None):
+        super().__init__(
+            model=model, algorithm=algorithm, trainer=trainer, callbacks=callbacks
+        )
         self.clients_first_time = [True for _ in range(Config().clients.total_clients)]
         self.personalized_models = []
         self.masks_received = []

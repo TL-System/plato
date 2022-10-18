@@ -19,8 +19,8 @@ from plato.servers import fedavg
 class Server(fedavg.Server):
     """A federated learning server using the FedAdp algorithm."""
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, callbacks=None):
+        super().__init__(callbacks=callbacks)
 
         self.local_angles = {}
         self.last_global_grads = None
