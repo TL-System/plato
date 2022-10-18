@@ -1,5 +1,5 @@
 """
-An asynchronous federated learning client using Sirius.
+An asynchronous federated learning client using Pisces.
 """
 from types import SimpleNamespace
 import numpy as np
@@ -7,6 +7,9 @@ from plato.clients import simple
 
 
 class Client(simple.Client):
+    """A Pisces federated learning client who sends weight updates
+    and client statistics utility."""
+
     def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
         super().__init__(model, datasource, algorithm, trainer)
 

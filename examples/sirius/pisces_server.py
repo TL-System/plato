@@ -1,5 +1,5 @@
 """
-An asynchronous federated learning server using Sirius.
+An asynchronous federated learning server using Pisces.
 """
 
 import random
@@ -12,12 +12,13 @@ from sklearn.cluster import DBSCAN
 
 
 class Server(fedavg.Server):
-    """A federated learning server using the Sirius algorithm."""
+    """A federated learning server using the Pisces algorithm."""
 
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
         self.staleness_factor = Config().server.staleness_factor
-
+        self.client_utilities = {}
+        # Exploration vs exploitation
         self.exploration_factor = Config().server.exploration_factor
         self.exploration_decaying_factor = Config().server.exploration_decaying_factor
         self.min_explore_factor = Config().server.min_explore_factor
@@ -25,7 +26,7 @@ class Server(fedavg.Server):
         self.unexplored_clients = []
         self.prng_state = random.getstate()
 
-        # below are for robustness
+        # Below are for robustness
         self.robustness = False
         self.augmented_factor = 5
         self.threshold_factor = 1
@@ -63,7 +64,7 @@ class Server(fedavg.Server):
             staleness_factor = self.staleness_function(staleness)
 
             for name, delta in update.items():
-                # Use weighted average by the number of samples
+                # Use weighted average by the number of samples and staleness factor
                 avg_update[name] += (
                     delta * (num_samples / self.total_samples) * staleness_factor
                 )
@@ -76,8 +77,7 @@ class Server(fedavg.Server):
         return 1.0 / pow(stalenss + 1, self.staleness_factor)
 
     def weights_aggregated(self, updates):
-        """Method called at the end of aggregating received weights."""
-        """Calculate client utility here and update the record on the server"""
+        """Calculate client utility and update the record on the server"""
         for update in updates:
             self.client_utilities[
                 update.client_id
@@ -100,16 +100,8 @@ class Server(fedavg.Server):
                 tuples = []
                 already_existing_clients = set()
                 for i in range(self.augmented_factor):
-                    print("start version: ", start_version)
-                    print("i: ", i)
-                    if start_version - i <= 0:  # <0 originally
-                        print("should break here")
+                    if start_version - i <= 0:
                         break
-
-                    print(
-                        "model_versions_clients_dict: ",
-                        self.model_versions_clients_dict[start_version - i],
-                    )
 
                     tmp = []  # avoid cybil attacks, i.e., outliers repeat deliberately
                     for client_id, loss_norm in self.model_versions_clients_dict[
@@ -123,15 +115,16 @@ class Server(fedavg.Server):
 
                 if len(tuples) >= self.threshold_factor * self.per_round:
                     logging.info(
-                        f"Starting anomaly detection with {len(tuples)} recent records."
+                        "Starting anomaly detection with %s recent records.", len(tuples)
                     )
                     self.detect_outliers(tuples)
                 else:
                     logging.info(
-                        f"Records collected for anomaly detection are not enough: {len(tuples)}."
+                        "Records collected for anomaly detection are not enough: %s.", len(tuples)"
                     )
 
     def detect_outliers(self, tuples):
+        """Detect outliers from clients updates by DBSCAN"""
 
         client_id_list = [tu[0] for tu in tuples]
         loss_list = [tu[1] for tu in tuples]
@@ -153,12 +146,9 @@ class Server(fedavg.Server):
                     newly_detected_outliers.append(client_id)
 
         if len(newly_detected_outliers) == 0:
-            logging.info(f"No new outliers.")
+            logging.info("No new outliers.")
         else:
             newly_detected_outliers = sorted(newly_detected_outliers)
-            # logging.info(f"{len(newly_detected_outliers)} clients "
-            #             f"are newly taken as outliers"
-            #             f": {newly_detected_outliers}.")
 
     def choose_clients(self, clients_pool, clients_count):
         """Choose a subset of the clients to participate in each round."""
@@ -175,15 +165,17 @@ class Server(fedavg.Server):
                 for client_id in available_clients
                 if client_id not in self.detected_corrupted_clients
             ]
-            # logging.info(f"These clients are detected as outliers "
-            # f"and precluded from selection: {outliers}.")
+            logging.info(
+                "These clients are detected as outliers and precluded from selection: %s",
+                {outliers},
+            )
 
         if self.current_round > 1:
             # Exploitation
             num_to_explore = min(
                 len(self.unexplored_clients),
                 np.random.binomial(clients_count, self.exploration_factor, 1)[0],
-            )  # ??
+            )
 
             self.exploration_factor = max(
                 self.exploration_factor * self.exploration_decaying_factor,
