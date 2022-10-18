@@ -18,9 +18,15 @@ from plato.servers import fedavg
 class Server(fedavg.Server):
     """A federated learning server using the FedAsync algorithm."""
 
-    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
+    def __init__(
+        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+    ):
         super().__init__(
-            model=model, datasource=None, algorithm=algorithm, trainer=trainer
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
         )
 
         # The hyperparameter of FedAsync with a range of (0, 1)
