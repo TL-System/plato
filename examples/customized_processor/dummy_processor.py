@@ -8,7 +8,7 @@ from plato.processors import base
 
 
 class DummyProcessor(base.Processor):
-    """A dummy processor to be instantiated and inserted to the processor list in the runtime."""
+    """A dummy processor to be instantiated and inserted to the list of processors at runtime."""
 
     def __init__(self, client_id, current_round, **kwargs) -> None:
         super().__init__(**kwargs)
