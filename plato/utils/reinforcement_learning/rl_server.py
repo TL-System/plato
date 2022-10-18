@@ -11,8 +11,22 @@ from plato.servers import fedavg
 class RLServer(fedavg.Server):
     """A federated learning server with an RL Agent."""
 
-    def __init__(self, agent, model=None, algorithm=None, trainer=None):
-        super().__init__(model=model, algorithm=algorithm, trainer=trainer)
+    def __init__(
+        self,
+        agent,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
+    ):
+        super().__init__(
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
+        )
         self.agent = agent
 
     def reset(self):
