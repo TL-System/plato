@@ -342,8 +342,11 @@ class Server:
         if (self.current_round == 0 or self.resumed_session) and len(
             self.clients
         ) >= required_launched_clients:
-            logging.info("[%s] Starting training.", self)
             self.resumed_session = False
+
+            self.training_will_start()
+            self.callback_handler.call_event("on_training_will_start", self)
+
             await self.select_clients()
 
     @staticmethod
@@ -632,6 +635,11 @@ class Server:
 
                     await self.send(sid, payload, selected_client_id)
 
+            self.clients_selected(self.selected_clients)
+            self.callback_handler.call_event(
+                "on_clients_selected", self, self.selected_clients
+            )
+
     def choose_clients(self, clients_pool, clients_count):
         """Choose a subset of the clients to participate in each round."""
         assert clients_count <= len(clients_pool)
@@ -778,8 +786,6 @@ class Server:
             self.uplink_comm_time[client_id] = payload_size / (
                 self.uplink_bandwidth / 8
             )
-
-            self.process_customized_report(client_id, checkpoint_path, model_name)
 
             await self.process_client_info(client_id, sid)
 
@@ -1252,8 +1258,14 @@ class Server:
     async def _process_reports(self) -> None:
         """Process a client report."""
 
-    def process_customized_report(self, client_id, checkpoint_path, model_name):
-        """Process a customized client report with additional information."""
+    def clients_selected(self, selected_clients) -> None:
+        """
+        Method called after clients have been selected in each round."""
+
+    def training_will_start(self):
+        """
+        Method called before selecting clients for the first round of training.
+        """
 
     def server_will_close(self):
         """
