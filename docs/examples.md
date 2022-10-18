@@ -98,6 +98,16 @@ python examples/dlg/dlg.py -c examples/dlg/reconstruction_emnist.yml --cpu
 ```
 ````
 
+````{admonition} **SCAFFOLD**
+SCAFFOLD is a synchronized federated learning algorithm that performs server aggregation with control variates to to better handle statistical heterogeneity. It has been quite widely cited and compared with in the federated learning literature.
+
+```shell
+python examples/scaffold/scaffold.py -c examples/scaffold/scaffold_MNIST_lenet5.yml
+```
+```{note}
+Karimireddy et al., &ldquo;[Scaffold: Stochastic controlled averaging for federated learning](http://proceedings.mlr.press/v119/karimireddy20a.html), &rdquo; in Proc. ICML, 2020.
+```
+````
 With the recent redesign of the Plato API, the following list is outdated and will be updated as they are tested again.
 
 |  Method  | Notes | Tested  |
@@ -110,4 +120,3 @@ With the recent redesign of the Plato API, the following list is outdated and wi
 |[MistNet](https://github.com/TL-System/plato/blob/main/docs/papers/MistNet.pdf) with separate client and server implementations | Change directory to `examples/dist_mistnet` and run `python custom_server.py -c ./mistnet_lenet5_server.yml`, then run `python custom_client.py -c ./mistnet_lenet5_client.yml -i 1`. | Yes |
 |[FedNova](https://proceedings.neurips.cc/paper/2020/hash/564127c03caab942e503ee6f810f54fd-Abstract.html) | Change directory to `examples/fednova` and run `python fednova.py -c <configuration file>`. | Yes |
 |[FedSarah](https://arxiv.org/pdf/1703.00102.pdf)                             | Change directory to `examples/fedsarah` and run `python fedsarah.py -c <configuration file>`. | Yes |
-|[SCAFFOLD](https://arxiv.org/pdf/1910.06378.pdf)                             | Change directory to `examples/scaffold` and run `python scaffold.py -c <configuration file>`. | Not yet |
