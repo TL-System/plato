@@ -100,7 +100,7 @@ def get(
         else:
             this_kwargs = kwargs
 
-        return registered_processors[name](**this_kwargs)
+        return registered_processors[name](name=name, **this_kwargs)
 
     outbound_processors = list(map(map_f, outbound_processors))
     inbound_processors = list(map(map_f, inbound_processors))
