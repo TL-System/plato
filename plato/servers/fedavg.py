@@ -211,7 +211,7 @@ class Server(base.Server):
             )
         else:
             # Testing the updated model directly at the server
-
+            logging.info("[%s] Started model testing.\n", self)
             self.accuracy = self.trainer.test(self.testset, self.testset_sampler)
 
         if hasattr(Config().trainer, "target_perplexity"):
