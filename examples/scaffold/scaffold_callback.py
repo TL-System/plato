@@ -46,7 +46,6 @@ class SendControlVariateProcessor(base.Processor):
         self.trainer = trainer
 
     def process(self, data: Any) -> List:
-
         client_control_variate_filename = self.trainer.client_control_variate_path
         if os.path.exists(client_control_variate_filename):
             with open(client_control_variate_filename, "rb") as payload_file:

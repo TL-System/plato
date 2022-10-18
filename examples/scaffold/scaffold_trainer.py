@@ -69,7 +69,7 @@ class Trainer(basic.Trainer):
                         self.device
                     )
                     param = group["params"][counter]
-                    if self.client_control_variate:
+                    if self.client_control_variate is not None:
                         param.data.add_(
                             torch.sub(
                                 server_control_variate,
@@ -88,7 +88,7 @@ class Trainer(basic.Trainer):
         # the client is selected
         new_client_control_variate = OrderedDict()
         control_variate_deltas = OrderedDict()
-        if self.client_control_variate:
+        if self.client_control_variate is not None:
             for name, previous_weight in self.global_model_weights.items():
                 new_client_control_variate[name] = torch.sub(
                     self.client_control_variate[name].to(device=self.device),

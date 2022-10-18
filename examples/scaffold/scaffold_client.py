@@ -41,7 +41,7 @@ class Client(simple.Client):
         self.client_control_variate = None
 
     def configure(self):
-        """Initialize the server control variate and client control variate for trainer"""
+        """Initialize the server control variate and client control variate for the trainer."""
         super().configure()
 
         # Load the client control variate if the client has participated before
@@ -59,6 +59,5 @@ class Client(simple.Client):
             with open(client_control_variate_path, "rb") as path:
                 self.client_control_variate = pickle.load(path)
             self.trainer.client_control_variate = self.client_control_variate
-            logging.info("[Client #%d] Loaded the control variate.", self.client_id)
 
         self.trainer.client_control_variate_path = client_control_variate_path
