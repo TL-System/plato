@@ -223,7 +223,7 @@ class Server(base.Server):
         else:
             logging.info(
                 fonts.colourize(
-                    f"[{self}] Global model accuracy: {100 * self.accuracy:.2f}%%\n"
+                    f"[{self}] Global model accuracy: {100 * self.accuracy:.2f}%\n"
                 )
             )
 
