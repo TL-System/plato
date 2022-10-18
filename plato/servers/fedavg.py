@@ -19,8 +19,10 @@ from plato.utils import csv_processor, fonts
 class Server(base.Server):
     """Federated learning server using federated averaging."""
 
-    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
-        super().__init__()
+    def __init__(
+        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+    ):
+        super().__init__(callbacks=callbacks)
 
         self.custom_model = model
         self.model = None

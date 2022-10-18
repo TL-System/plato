@@ -19,8 +19,16 @@ from plato.utils import csv_processor
 class Server(fedavg.Server):
     """Cross-silo federated learning server using federated averaging."""
 
-    def __init__(self, model=None, algorithm=None, trainer=None):
-        super().__init__(model=model, algorithm=algorithm, trainer=trainer)
+    def __init__(
+        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+    ):
+        super().__init__(
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
+        )
 
         self.current_global_round = 0
         self.average_accuracy = 0
