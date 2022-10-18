@@ -10,10 +10,10 @@ from plato.algorithms import registry as algorithms_registry
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
 from plato.processors import registry as processor_registry
+from plato.samplers import all_inclusive
 from plato.servers import base
 from plato.trainers import registry as trainers_registry
-from plato.utils import csv_processor
-from plato.samplers import all_inclusive
+from plato.utils import csv_processor, fonts
 
 
 class Server(base.Server):
@@ -211,14 +211,20 @@ class Server(base.Server):
             )
         else:
             # Testing the updated model directly at the server
-            logging.info("[%s] Started model testing.\n", self)
+            logging.info("[%s] Started model testing.", self)
             self.accuracy = self.trainer.test(self.testset, self.testset_sampler)
 
         if hasattr(Config().trainer, "target_perplexity"):
-            logging.info("[%s] Global model perplexity: %.2f\n", self, self.accuracy)
+            logging.info(
+                fonts.colourize(
+                    f"[{self}] Global model perplexity: {self.accuracy:.2f}\n"
+                )
+            )
         else:
             logging.info(
-                "[%s] Global model accuracy: %.2f%%\n", self, 100 * self.accuracy
+                fonts.colourize(
+                    f"[{self}] Global model accuracy: {100 * self.accuracy:.2f}%%\n"
+                )
             )
 
         self.clients_processed()
