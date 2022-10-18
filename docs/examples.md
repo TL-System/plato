@@ -109,6 +109,19 @@ python examples/scaffold/scaffold.py -c examples/scaffold/scaffold_MNIST_lenet5.
 Karimireddy et al., &ldquo;[SCAFFOLD: Stochastic Controlled Averaging for Federated Learning](http://proceedings.mlr.press/v119/karimireddy20a.html), &rdquo; in Proc. ICML, 2020.
 ```
 ````
+
+````{admonition} **Pisces**
+Pisces is an asynchronous federated learning algorithm that performs biased client selection based on overall utilities and weighted server aggregation based on staleness. In this example, Pisces client calculates its statistical utility and report it together with model updates to Pisces server. The server then evaluates the overall utility for each client based on the reported statistical utility and client staleness, and selects clients for next communication round. Also, it enables to detect outliers via DBSCAN for robustness.
+
+```shell
+python examples/pisces/pisces.py -c examples/pisces/pisces_MNIST_lenet5.yml
+```
+
+```{note}
+Jiang et al., &ldquo; [Sirius: Efficient Federated Learning via Guided Asynchronous Training.](https://arxiv.org/pdf/2206.09264.pdf) 
+&rdquo; in Proc.SoCC, 2022.
+```
+````
 With the recent redesign of the Plato API, the following list is outdated and will be updated as they are tested again.
 
 |  Method  | Notes | Tested  |

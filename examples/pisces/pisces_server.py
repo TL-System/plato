@@ -115,12 +115,14 @@ class Server(fedavg.Server):
 
                 if len(tuples) >= self.threshold_factor * self.per_round:
                     logging.info(
-                        "Starting anomaly detection with %s recent records.", len(tuples)
+                        "Starting anomaly detection with %s recent records.",
+                        len(tuples),
                     )
                     self.detect_outliers(tuples)
                 else:
                     logging.info(
-                        "Records collected for anomaly detection are not enough: %s.", len(tuples)"
+                        "Records collected for anomaly detection are not enough: %s.",
+                        len(tuples),
                     )
 
     def detect_outliers(self, tuples):
