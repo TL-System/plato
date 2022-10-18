@@ -1,8 +1,14 @@
 """
-A federated learning trainer used by Sirius client.
+Pisces: an asynchronous client selection and server aggregation algorithm.
+
+Reference:
+
+Z. Jiang, B. Wang, B. Li, B. Li. "Pisces: Efficient Federated Learning via Guided Asynchronous Training,"
+in Proceedings of ACM Symposium on Cloud Computing (SoCC), 2022.
+
+URL: https://arxiv.org/abs/2206.09264
 """
 import numpy as np
-from plato.config import Config
 from plato.trainers import basic
 from plato.trainers import tracking
 

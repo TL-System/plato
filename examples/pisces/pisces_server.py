@@ -1,5 +1,12 @@
 """
-An asynchronous federated learning server using Pisces.
+Pisces: an asynchronous client selection and server aggregation algorithm.
+
+Reference:
+
+Z. Jiang, B. Wang, B. Li, B. Li. "Pisces: Efficient Federated Learning via Guided Asynchronous Training,"
+in Proceedings of ACM Symposium on Cloud Computing (SoCC), 2022.
+
+URL: https://arxiv.org/abs/2206.09264
 """
 
 import random
@@ -126,7 +133,7 @@ class Server(fedavg.Server):
                     )
 
     def detect_outliers(self, tuples):
-        """Detect outliers from clients updates by DBSCAN"""
+        """Detect outliers from client updates by DBSCAN."""
 
         client_id_list = [tu[0] for tu in tuples]
         loss_list = [tu[1] for tu in tuples]
