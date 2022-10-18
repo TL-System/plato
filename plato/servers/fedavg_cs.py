@@ -314,12 +314,12 @@ class Server(fedavg.Server):
             super().clients_processed()
 
         if Config().is_edge_server():
-            self.edge_training_time += self.get_record_items_values()["round_time"]
-            self.edge_comm_time += self.get_record_items_values()["comm_time"]
+            self.edge_training_time += self.get_logged_items()["round_time"]
+            self.edge_comm_time += self.get_logged_items()["comm_time"]
 
             new_row = []
             for item in self.recorded_items:
-                item_value = self.get_record_items_values()[item]
+                item_value = self.get_logged_items()[item]
                 new_row.append(item_value)
 
             result_csv_file = f"{Config().params['result_path']}/edge_{os.getpid()}.csv"
@@ -352,21 +352,21 @@ class Server(fedavg.Server):
                 self.current_round = 0
                 self.current_global_round += 1
 
-    def get_record_items_values(self):
-        """Get values will be recorded in result csv file."""
-        record_items_values = super().get_record_items_values()
+    def get_logged_items(self):
+        """Get items to be logged by the LogProgressCallback class in a .csv file."""
+        logged_items = super().get_logged_items()
 
-        record_items_values["global_round"] = self.current_global_round
-        record_items_values["average_accuracy"] = self.average_accuracy
-        record_items_values["edge_agg_num"] = Config().algorithm.local_rounds
-        record_items_values["local_epoch_num"] = Config().trainer.epochs
+        logged_items["global_round"] = self.current_global_round
+        logged_items["average_accuracy"] = self.average_accuracy
+        logged_items["edge_agg_num"] = Config().algorithm.local_rounds
+        logged_items["local_epoch_num"] = Config().trainer.epochs
 
         if Config().is_central_server():
-            record_items_values["comm_time"] += max(
+            logged_items["comm_time"] += max(
                 update.report.edge_server_comm_time for update in self.updates
             )
 
-        return record_items_values
+        return logged_items
 
     async def wrap_up(self):
         """Wrapping up when each round of training is done."""

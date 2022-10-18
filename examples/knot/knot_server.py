@@ -350,8 +350,6 @@ class Server(fedunlearning_server.Server):
 
         if self.current_round >= 2:
             self.initialize_optimization = False
-        
-        super().clients_processed()
 
     def customize_server_response(self, server_response: dict, client_id) -> dict:
         """Returns a customrized server response with any additional information."""
@@ -371,10 +369,10 @@ class Server(fedunlearning_server.Server):
 
         return server_response
 
-    def get_record_items_values(self):
-        """Get values will be recorded in result csv file."""
-        # The value under "accuracy" is correct (global accuracy) only
-        # at the last row
+    def get_logged_items(self):
+        """Get items to be logged by the LogProgressCallback class in a .csv file."""
+        logged_items = super().get_logged_items()
+
         clusters_accuracy = [
             self.clustered_test_accuracy[cluster_id]
             for cluster_id in range(self.num_clusters)
@@ -382,20 +380,9 @@ class Server(fedunlearning_server.Server):
 
         clusters_accuracy = "; ".join([str(acc) for acc in clusters_accuracy])
 
-        return {
-            "round": self.current_round,
-            "accuracy": self.accuracy,
-            "clusters_accuracy": clusters_accuracy,
-            "elapsed_time": self.wall_time - self.initial_wall_time,
-            "comm_time": max([update.report.comm_time for update in self.updates]),
-            "round_time": max(
-                [
-                    update.report.training_time + update.report.comm_time
-                    for update in self.updates
-                ]
-            ),
-            "comm_overhead": self.comm_overhead,
-        }
+        logged_items["clusters_accuracy"] = clusters_accuracy
+
+        return logged_items
 
     def save_to_checkpoint(self):
         """Save a checkpoint for resuming the training session."""

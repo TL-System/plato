@@ -19,7 +19,7 @@ import socketio
 from aiohttp import web
 
 from plato.callbacks.handler import CallbackHandler
-from plato.callbacks.server import PrintProgressCallback
+from plato.callbacks.server import LogProgressCallback
 from plato.client import run
 from plato.config import Config
 from plato.utils import s3, fonts
@@ -101,7 +101,7 @@ class Server:
         )
 
         # Starting from the default server callback class, add all supplied server callbacks
-        self.callbacks = [PrintProgressCallback]
+        self.callbacks = [LogProgressCallback]
         if callbacks is not None:
             self.callbacks.extend(callbacks)
         self.callback_handler = CallbackHandler(self.callbacks)

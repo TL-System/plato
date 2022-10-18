@@ -70,8 +70,8 @@ class Server(fedavg_cs.Server):
             self.personalization_test_updates
         )
 
-    def get_record_items_values(self):
-        """Get values will be recorded in result csv file."""
+    def get_logged_items(self):
+        """Get items to be logged by the LogProgressCallback class in a .csv file."""
         return {
             "global_round": self.current_global_round,
             "round": self.current_round,
@@ -91,7 +91,7 @@ class Server(fedavg_cs.Server):
             # Record results
             new_row = []
             for item in self.recorded_items:
-                item_value = self.get_record_items_values()[item]
+                item_value = self.get_logged_items()[item]
                 new_row.append(item_value)
 
             if Config().is_edge_server():

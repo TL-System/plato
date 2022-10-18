@@ -50,9 +50,6 @@ class Server(base.Server):
             self.clients_per_round,
         )
 
-        recorded_items = Config().params["result_types"]
-        self.recorded_items = [x.strip() for x in recorded_items.split(",")]
-
     def configure(self):
         """
         Booting the federated learning server by setting up the data, model, and
@@ -103,12 +100,6 @@ class Server(base.Server):
                 self.testset_sampler = all_inclusive.Sampler(
                     self.datasource, testing=True
                 )
-
-        # Initialize the csv file which will record results
-        result_csv_file = f"{Config().params['result_path']}/{os.getpid()}.csv"
-        csv_processor.initialize_csv(
-            result_csv_file, self.recorded_items, Config().params["result_path"]
-        )
 
         # Initialize the test accuracy csv file if clients compute locally
         if hasattr(Config().clients, "do_test") and Config().clients.do_test:
@@ -232,31 +223,9 @@ class Server(base.Server):
 
     def clients_processed(self):
         """Additional work to be performed after client reports have been processed."""
-        # Record results into a .csv file
-        new_row = []
-        for item in self.recorded_items:
-            item_value = self.get_record_items_values()[item]
-            new_row.append(item_value)
 
-        result_csv_file = f"{Config().params['result_path']}/{os.getpid()}.csv"
-        csv_processor.write_csv(result_csv_file, new_row)
-
-        if hasattr(Config().clients, "do_test") and Config().clients.do_test:
-            # Updates the log for client test accuracies
-            accuracy_csv_file = (
-                f"{Config().params['result_path']}/{os.getpid()}_accuracy.csv"
-            )
-
-            for update in self.updates:
-                accuracy_row = [
-                    self.current_round,
-                    update.client_id,
-                    update.report.accuracy,
-                ]
-                csv_processor.write_csv(accuracy_csv_file, accuracy_row)
-
-    def get_record_items_values(self):
-        """Get values will be recorded in result csv file."""
+    def get_logged_items(self):
+        """Get items to be logged by the LogProgressCallback class in a .csv file."""
         return {
             "round": self.current_round,
             "accuracy": self.accuracy,
