@@ -111,17 +111,18 @@ Karimireddy et al., &ldquo;[SCAFFOLD: Stochastic Controlled Averaging for Federa
 ````
 
 ````{admonition} **Pisces**
-Pisces is an asynchronous federated learning algorithm that performs biased client selection based on overall utilities and weighted server aggregation based on staleness. In this example, Pisces client calculates its statistical utility and report it together with model updates to Pisces server. The server then evaluates the overall utility for each client based on the reported statistical utility and client staleness, and selects clients for next communication round. Also, it enables to detect outliers via DBSCAN for robustness.
+Pisces is an asynchronous federated learning algorithm that performs biased client selection based on overall utilities and weighted server aggregation based on staleness. In this example, a client running the Pisces algorithm calculates its statistical utility and report it together with model updates to Pisces server. The server then evaluates the overall utility for each client based on the reported statistical utility and client staleness, and selects clients for the next communication round. The algorithm also attempts to detect outliers via DBSCAN for better robustness.
 
 ```shell
 python examples/pisces/pisces.py -c examples/pisces/pisces_MNIST_lenet5.yml
 ```
 
 ```{note}
-Jiang et al., &ldquo; [Sirius: Efficient Federated Learning via Guided Asynchronous Training.](https://arxiv.org/pdf/2206.09264.pdf) 
-&rdquo; in Proc.SoCC, 2022.
+Jiang et al., &ldquo; [Pisces: Efficient Federated Learning via Guided Asynchronous Training](https://arxiv.org/pdf/2206.09264.pdf),
+&rdquo; in Proc. ACM Symposium on Cloud Computing (SoCC), 2022.
 ```
 ````
+
 With the recent redesign of the Plato API, the following list is outdated and will be updated as they are tested again.
 
 |  Method  | Notes | Tested  |

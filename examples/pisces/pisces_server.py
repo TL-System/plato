@@ -9,13 +9,15 @@ Training," in Proceedings of ACM Symposium on Cloud Computing (SoCC), 2022.
 URL: https://arxiv.org/abs/2206.09264
 """
 
-import random
-import logging
 import asyncio
+import logging
+import random
+
 import numpy as np
+from sklearn.cluster import DBSCAN
+
 from plato.config import Config
 from plato.servers import fedavg
-from sklearn.cluster import DBSCAN
 
 
 class Server(fedavg.Server):
