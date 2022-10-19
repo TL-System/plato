@@ -3,8 +3,8 @@ Pisces: an asynchronous client selection and server aggregation algorithm.
 
 Reference:
 
-Z. Jiang, B. Wang, B. Li, B. Li. "Pisces: Efficient Federated Learning via Guided Asynchronous Training,"
-in Proceedings of ACM Symposium on Cloud Computing (SoCC), 2022.
+Z. Jiang, B. Wang, B. Li, B. Li. "Pisces: Efficient Federated Learning via Guided Asynchronous
+Training," in Proceedings of ACM Symposium on Cloud Computing (SoCC), 2022.
 
 URL: https://arxiv.org/abs/2206.09264
 """
@@ -99,7 +99,7 @@ class Server(fedavg.Server):
         for update in updates:
             self.client_utilities[
                 update.client_id
-            ] = update.report.statistics_utility * self.calculate_staleness_factor(
+            ] = update.report.statistical_utility * self.calculate_staleness_factor(
                 update.client_id
             )
 
@@ -108,11 +108,11 @@ class Server(fedavg.Server):
                 start_version = update.report.start_round
                 if start_version not in self.model_versions_clients_dict:
                     self.model_versions_clients_dict[start_version] = [
-                        (update.client_id, update.report.statistics_utility)
+                        (update.client_id, update.report.statistical_utility)
                     ]
                 else:
                     self.model_versions_clients_dict[start_version].append(
-                        (update.client_id, update.report.statistics_utility)
+                        (update.client_id, update.report.statistical_utility)
                     )
 
                 tuples = []
