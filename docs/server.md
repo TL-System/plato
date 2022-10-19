@@ -53,13 +53,17 @@ Override this method to complete additional tasks after aggregating weights.
 `updates` the client updates received at the server.
 ````
 
-````{admonition} **customize_server_response(self, server_response: dict)**
-Override this method to customize the server response with any additional information.
+````{admonition} **customize_server_response(self, server_response: dict, client_id)**
+Override this method to return a customize server response with any additional information.
+
+`server_response` key-value pairs (from a string to an instance) for the server response before customization.
+
+`client_id` the client ID.
 
 **Example:**
 
 ```py
-def customize_server_response(self, server_response: dict) -> dict:
+def customize_server_response(self, server_response: dict, client_id) -> dict:
     """
     Customizes the server response with any additional information.
     """
@@ -70,6 +74,14 @@ def customize_server_response(self, server_response: dict) -> dict:
 
 ```{admonition} **customize_server_payload(self, payload)**
 Override this method to customize the server payload before sending it to the clients.
+```
+
+```{admonition} **clients_processed(self)**
+Override this method to complete additional tasks after all client reports have been processed.
+```
+
+```{admonition} **training_will_start(self)**
+Override this method to complete additional tasks before selecting clients for the first round of training.
 ```
 
 ```{admonition} **server_will_close(self)**
@@ -102,6 +114,14 @@ def on_weights_aggregated(self, server, updates):
     logging.info("[Server #%s] Finished aggregating weights.", os.getpid())
 ```
 ````
+
+```{admonition} **on_clients_processed(self, server)**
+Override this method to complete additional tasks after all client reports have been processed.
+```
+
+```{admonition} **on_training_will_start(self, server)**
+Override this method to complete additional tasks before selecting clients for the first round of training.
+```
 
 ````{admonition} **on_server_will_close(self, server)**
 Override this method to complete additional tasks before closing the server.

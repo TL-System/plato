@@ -32,7 +32,7 @@ class Server(fedavg_cs.Server):
             if "pruning_amount" not in self.recorded_items:
                 self.recorded_items = self.recorded_items + ["pruning_amount"]
 
-    def customize_server_response(self, server_response: dict) -> dict:
+    def customize_server_response(self, server_response: dict, client_id) -> dict:
         """Wrap up generating the server response with any additional information."""
         if Config().is_central_server():
             server_response["pruning_amount"] = self.pruning_amount_list
@@ -108,16 +108,16 @@ class Server(fedavg_cs.Server):
 
         return weights_diff
 
-    def get_record_items_values(self):
-        """Get values will be recorded in result csv file."""
-        record_items_values = super().get_record_items_values()
-        record_items_values["pruning_amount"] = Config().clients.pruning_amount
+    def get_logged_items(self):
+        """Get items to be logged by the LogProgressCallback class in a .csv file."""
+        logged_items = super().get_logged_items()
+        logged_items["pruning_amount"] = Config().clients.pruning_amount
 
-        return record_items_values
+        return logged_items
 
-    async def wrap_up_processing_reports(self):
-        """Wrap up processing the reports with any additional work."""
-        await super().wrap_up_processing_reports()
+    def clients_processed(self):
+        """Additional work to be performed after client reports have been processed."""
+        super().clients_processed()
 
         if Config().is_central_server():
             self.update_pruning_amount_list()

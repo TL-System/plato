@@ -20,7 +20,7 @@ from plato.config import Config
 class Algorithm(fedavg.Algorithm):
     """The federated learning algorithm for FedAtt, used by the server."""
 
-    def aggregate_weights(self, baseline_weights, weights_received, **kwargs):
+    async def aggregate_weights(self, baseline_weights, weights_received, **kwargs):
         """Perform attentive aggregation with the attention mechanism."""
         deltas_received = self.compute_weight_deltas(baseline_weights, weights_received)
 

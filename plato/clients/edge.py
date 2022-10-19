@@ -6,6 +6,7 @@ import time
 from types import SimpleNamespace
 
 from plato.clients import simple
+from plato.config import Config
 from plato.processors import registry as processor_registry
 
 
@@ -13,10 +14,20 @@ class Client(simple.Client):
     """A federated learning client at the edge server in a cross-silo training workload."""
 
     def __init__(
-        self, server, model=None, datasource=None, algorithm=None, trainer=None
+        self,
+        server,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
     ):
         super().__init__(
-            model=model, datasource=datasource, algorithm=algorithm, trainer=trainer
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
         )
         self.server = server
 
@@ -58,9 +69,19 @@ class Client(simple.Client):
         average_accuracy = self.server.average_accuracy
         accuracy = self.server.accuracy
 
-        training_time = time.perf_counter() - training_start_time
+        if (
+            hasattr(Config().clients, "sleep_simulation")
+            and Config().clients.sleep_simulation
+        ):
+            training_time = self.server.edge_training_time
+            self.server.edge_training_time = 0
+        else:
+            training_time = time.perf_counter() - training_start_time
 
         comm_time = time.time()
+
+        edge_server_comm_time = self.server.edge_comm_time
+        self.server.edge_comm_time = 0
 
         # Generate a report for the central server
         report = SimpleNamespace(
@@ -72,6 +93,7 @@ class Client(simple.Client):
             average_accuracy=average_accuracy,
             client_id=self.client_id,
             edge_server_comm_overhead=self.server.comm_overhead,
+            edge_server_comm_time=edge_server_comm_time,
         )
 
         self._report = self.customize_report(report)

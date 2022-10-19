@@ -189,6 +189,10 @@ In asynchronous mode, whether or not we should wait for clients who are behind t
 When operating in asynchronous mode, the minimum number of clients that need to arrive before aggregation and processing by the server. Any positive integer could be used for `minimum_clients_aggregated`. The default value is `1`.
 ```
 
+```{admonition} minimum_edges_aggregated
+When operating in asynchronous cross-silo federated learning, the minimum number of edge servers that need to arrive before aggregation and processing by the central server. Any positive integer could be used for `minimum_edges_aggregated`. The default value is `algorithm.total_silos`.
+```
+
 ```{admonition} do_test
 Whether the server tests the global model and computes the global accuracy or perplexity. The default is `true`.
 ```
@@ -224,11 +228,19 @@ A list of processors to apply on the payload right after receiving. Multiple pro
 ```
 
 ```{admonition} downlink_bandwidth
-The server's estimated downlink capacity (server to clients) in Mbps, used for computing the transmission time (see `compute_comm_time` in the `clients` section). The default value is 100.
+The server's estimated downlink capacity (server to clients or central server to edge servers in cross-silo training) in Mbps, used for computing the transmission time (see `compute_comm_time` in the `clients` section). The default value is 100.
 ```
 
 ```{admonition} uplink_bandwidth
-The server's estimated uplink capacity (server to clients) in Mbps, used for computing the transmission time (see `compute_comm_time` in the `clients` section). The default value is 100.
+The server's estimated uplink capacity (server to clients or central server to edge servers in cross-silo training) in Mbps, used for computing the transmission time (see `compute_comm_time` in the `clients` section). The default value is 100.
+```
+
+```{admonition} edge_downlink_bandwidth
+The edge server's estimated downlink capacity (an edge server to its clients) in Mbps, used for computing the transmission time (see `compute_comm_time` in the `clients` section). The default value is same as `downlink_bandwidth`.
+```
+
+```{admonition} edge_uplink_bandwidth
+The edge server's estimated uplink capacity (an edge server to its clients) in Mbps, used for computing the transmission time (see `compute_comm_time` in the `clients` section). The default value is same as `uplink_bandwidth`.
 ```
 
 ## data

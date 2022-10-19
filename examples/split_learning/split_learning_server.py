@@ -21,15 +21,16 @@ class Server(fedavg.Server):
         model_name = Config().trainer.model_name
 
         model_gradients_path = f"{model_path}/{model_name}_gradients.pth"
-        logging.info("[Server #%d] Loading gradients from %s.", os.getpid(),
-                     model_gradients_path)
+        logging.info(
+            "[Server #%d] Loading gradients from %s.", os.getpid(), model_gradients_path
+        )
 
         return torch.load(model_gradients_path)
 
     def customize_server_payload(self, payload):
-        """ Wrap up generating the server payload with any additional information. """
+        """Wrap up generating the server payload with any additional information."""
         # sending global model to the clients
-        return (payload, 'weights')
+        return (payload, "weights")
 
     async def process_client_info(self, client_id, sid):
         """Process the received metadata information from a reporting client."""
@@ -43,9 +44,12 @@ class Server(fedavg.Server):
 
             # Sending the gradients calculated by the server to the clients
             gradients = self.load_gradients()
-            logging.info("[Server #%d] Reporting gradients to client #%d.",
-                         os.getpid(), client_id)
-            server_payload = (gradients, 'gradients')
+            logging.info(
+                "[Server #%d] Reporting gradients to client #%d.",
+                os.getpid(),
+                client_id,
+            )
+            server_payload = (gradients, "gradients")
             await self.send(sid, server_payload, client_id)
 
         elif self.reports[sid].phase == "weights":

@@ -24,26 +24,24 @@ class Server(fedavg_cs.Server):
             if "pruning_amount" not in self.recorded_items:
                 self.recorded_items = self.recorded_items + ["pruning_amount"]
 
-    def get_record_items_values(self):
-        """Get values will be recorded in result csv file."""
-        record_items_values = super().get_record_items_values()
-        record_items_values["pruning_amount"] = Config().clients.pruning_amount
+    def get_logged_items(self):
+        """Get items to be logged by the LogProgressCallback class in a .csv file."""
+        logged_items = super().get_logged_items()
+        logged_items["pruning_amount"] = Config().clients.pruning_amount
 
         if Config().is_central_server():
             edge_comm_overhead = sum(
                 update.report.comm_overhead for update in self.updates
             )
-            record_items_values["comm_overhead"] = (
-                edge_comm_overhead + self.comm_overhead
-            )
+            logged_items["comm_overhead"] = edge_comm_overhead + self.comm_overhead
         else:
-            record_items_values["comm_overhead"] = self.comm_overhead
+            logged_items["comm_overhead"] = self.comm_overhead
 
-        return record_items_values
+        return logged_items
 
-    async def wrap_up_processing_reports(self):
-        """Wrap up processing the reports with any additional work."""
-        await super().wrap_up_processing_reports()
+    def clients_processed(self):
+        """Additional work to be performed after client reports have been processed."""
+        super().clients_processed()
 
         if Config().is_central_server():
             self.comm_overhead = 0

@@ -1,6 +1,11 @@
 """
 A customized client for federated unlearning.
 
+Federated unlearning allows clients to proactively erase their data from a trained model. The model
+will be retrained from scratch during the unlearning process.
+
+If the AdaHessian optimizer is used, it will reflect what the following paper proposed:
+
 Liu et al., "The Right to be Forgotten in Federated Learning: An Efficient Realization with Rapid
 Retraining," in Proc. INFOCOM, 2022.
 
@@ -16,15 +21,16 @@ from plato.config import Config
 class Client(simple.Client):
     """A federated learning client of federated unlearning."""
 
-    def __init__(self,
-                 model=None,
-                 datasource=None,
-                 algorithm=None,
-                 trainer=None):
-        super().__init__(model=model,
-                         datasource=datasource,
-                         algorithm=algorithm,
-                         trainer=trainer)
+    def __init__(
+        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+    ):
+        super().__init__(
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=None,
+        )
 
         self.previous_round = {}
 
@@ -44,9 +50,11 @@ class Client(simple.Client):
             logging.info(
                 "[%s] Unlearning sampler deployed: %s%% of the samples were deleted.",
                 self,
-                Config().clients.deleted_data_ratio * 100)
+                Config().clients.deleted_data_ratio * 100,
+            )
 
-            self.sampler = unlearning_iid.Sampler(self.datasource,
-                                                  self.client_id, False)
+            self.sampler = unlearning_iid.Sampler(
+                self.datasource, self.client_id, False
+            )
 
         self.previous_round[self.client_id] = self.current_round

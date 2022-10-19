@@ -12,8 +12,16 @@ from plato.servers import fedavg
 class Server(fedavg.Server):
     """A federated learning server using the FedSarah algorithm."""
 
-    def __init__(self, model=None, algorithm=None, trainer=None):
-        super().__init__(model, algorithm, trainer)
+    def __init__(
+        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+    ):
+        super().__init__(
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
+        )
         self.server_control_variates = None
         self.control_variates_received = None
 

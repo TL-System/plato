@@ -162,7 +162,7 @@ class Trainer(base.Trainer):
         return accuracy
 
     # pylint: disable=unused-argument
-    def test_model(self, config, testset, sampler, **kwargs):
+    def test_model(self, config, testset, sampler=None, **kwargs):
         """Tests the model. Must be compiled first."""
         logging.info("Get loss_criterion on client #%d.", self.client_id)
         loss_criterion = self.get_loss_criterion()

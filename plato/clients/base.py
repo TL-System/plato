@@ -4,6 +4,7 @@ The base class for all federated learning clients on edge devices or edge server
 
 import asyncio
 import logging
+import math
 import os
 import pickle
 import re
@@ -13,7 +14,7 @@ from abc import abstractmethod
 
 import socketio
 from plato.callbacks.handler import CallbackHandler
-from plato.callbacks.client import PrintProgressCallback
+from plato.callbacks.client import LogProgressCallback
 from plato.config import Config
 from plato.utils import s3
 
@@ -95,7 +96,7 @@ class Client:
             assert hasattr(Config().algorithm, "total_silos")
 
         # Starting from the default client callback class, add all supplied server callbacks
-        self.callbacks = [PrintProgressCallback]
+        self.callbacks = [LogProgressCallback]
         if callbacks is not None:
             self.callbacks.extend(callbacks)
         self.callback_handler = CallbackHandler(self.callbacks)
@@ -107,12 +108,21 @@ class Client:
         """Startup function for a client."""
 
         if hasattr(Config().algorithm, "cross_silo") and not Config().is_edge_server():
-            # Contact one of the edge servers
-            self.edge_server_id = (
-                Config().clients.total_clients
-                + (self.client_id - 1) % Config().algorithm.total_silos
-                + 1
+            launched_client_num = (
+                min(
+                    Config().trainer.max_concurrency
+                    * max(1, Config().gpu_count())
+                    * Config().algorithm.total_silos,
+                    Config().clients.per_round,
+                )
+                if hasattr(Config().trainer, "max_concurrency")
+                else Config().clients.per_round
             )
+            # Contact one of the edge servers
+            self.edge_server_id = Config().clients.total_clients + math.ceil(
+                self.client_id / (launched_client_num / Config().algorithm.total_silos)
+            )
+
             logging.info(
                 "[Client #%d] Contacting Edge Server #%d.",
                 self.client_id,
@@ -179,6 +189,9 @@ class Client:
                 payload_size / 1024**2,
             )
 
+            self.callback_handler.call_event(
+                "on_inbound_process", self, self.inbound_processor
+            )
             self.server_payload = self.inbound_processor.process(self.server_payload)
 
             await self.start_training()
@@ -285,6 +298,9 @@ class Client:
     async def send(self, payload) -> None:
         """Sending the client payload to the server using simulation, S3 or socket.io."""
         # First apply outbound processors, if any
+        self.callback_handler.call_event(
+            "on_outbound_process", self, self.outbound_processor
+        )
         payload = self.outbound_processor.process(payload)
 
         if self.comm_simulation:

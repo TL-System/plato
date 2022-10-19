@@ -19,7 +19,7 @@ import socketio
 from aiohttp import web
 
 from plato.callbacks.handler import CallbackHandler
-from plato.callbacks.server import PrintProgressCallback
+from plato.callbacks.server import LogProgressCallback
 from plato.client import run
 from plato.config import Config
 from plato.utils import s3, fonts
@@ -101,7 +101,7 @@ class Server:
         )
 
         # Starting from the default server callback class, add all supplied server callbacks
-        self.callbacks = [PrintProgressCallback]
+        self.callbacks = [LogProgressCallback]
         if callbacks is not None:
             self.callbacks.extend(callbacks)
         self.callback_handler = CallbackHandler(self.callbacks)
@@ -121,6 +121,11 @@ class Server:
             if hasattr(Config().server, "uplink_bandwidth")
             else 100
         )
+        if Config().is_edge_server():
+            if hasattr(Config().server, "edge_downlink_bandwidth"):
+                self.downlink_bandwidth = Config().server.edge_downlink_bandwidth
+            if hasattr(Config().server, "edge_uplink_bandwidth"):
+                self.uplink_bandwidth = Config().server.edge_uplink_bandwidth
 
         # Use dictionaries to record downlink/uplink communication time of each client
         self.downlink_comm_time = {}
@@ -210,13 +215,22 @@ class Server:
             else 0
         )
 
-        # What is the minimum number of clients that must have reported before aggregation
-        # takes place?
-        self.minimum_clients = (
-            Config().server.minimum_clients_aggregated
-            if hasattr(Config().server, "minimum_clients_aggregated")
-            else 1
-        )
+        if not Config().is_central_server():
+            # What is the minimum number of clients that must have reported before aggregation
+            # takes place?
+            self.minimum_clients = (
+                Config().server.minimum_clients_aggregated
+                if hasattr(Config().server, "minimum_clients_aggregated")
+                else 1
+            )
+        else:
+            # In cross-silo FL, what is the minimum number of edge servers that must have reported
+            # before the central server conduct aggregation?
+            self.minimum_clients = (
+                Config().server.minimum_edges_aggregated
+                if hasattr(Config().server, "minimum_edges_aggregated")
+                else Config().algorithm.total_silos
+            )
 
         # Are we simulating the wall clock time on the server? This is useful when the clients
         # are training in batches due to a lack of memory on the GPUs
@@ -331,8 +345,11 @@ class Server:
         if (self.current_round == 0 or self.resumed_session) and len(
             self.clients
         ) >= required_launched_clients:
-            logging.info("[%s] Starting training.", self)
             self.resumed_session = False
+
+            self.training_will_start()
+            self.callback_handler.call_event("on_training_will_start", self)
+
             await self.select_clients()
 
     @staticmethod
@@ -559,7 +576,9 @@ class Server:
                     "id": self.selected_client_id,
                     "current_round": self.current_round,
                 }
-                server_response = self.customize_server_response(server_response)
+                server_response = self.customize_server_response(
+                    server_response, client_id=self.selected_client_id
+                )
 
                 payload = self.algorithm.extract_weights()
                 payload = self.customize_server_payload(payload)
@@ -620,6 +639,11 @@ class Server:
                     )
 
                     await self.send(sid, payload, selected_client_id)
+
+            self.clients_selected(self.selected_clients)
+            self.callback_handler.call_event(
+                "on_clients_selected", self, self.selected_clients
+            )
 
     def choose_clients(self, clients_pool, clients_count):
         """Choose a subset of the clients to participate in each round."""
@@ -767,8 +791,6 @@ class Server:
             self.uplink_comm_time[client_id] = payload_size / (
                 self.uplink_bandwidth / 8
             )
-
-            self.process_customized_report(client_id, checkpoint_path, model_name)
 
             await self.process_client_info(client_id, sid)
 
@@ -1229,7 +1251,7 @@ class Server:
         await self.close_connections()
         os._exit(0)
 
-    def customize_server_response(self, server_response: dict) -> dict:
+    def customize_server_response(self, server_response: dict, client_id) -> dict:
         """Customizes the server response with any additional information."""
         return server_response
 
@@ -1241,8 +1263,14 @@ class Server:
     async def _process_reports(self) -> None:
         """Process a client report."""
 
-    def process_customized_report(self, client_id, checkpoint_path, model_name):
-        """Process a customized client report with additional information."""
+    def clients_selected(self, selected_clients) -> None:
+        """
+        Method called after clients have been selected in each round."""
+
+    def training_will_start(self):
+        """
+        Method called before selecting clients for the first round of training.
+        """
 
     def server_will_close(self):
         """
