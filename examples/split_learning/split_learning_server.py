@@ -1,5 +1,12 @@
 """
-A split learning server.
+A federated learning server using split learning.
+
+Reference:
+
+Vepakomma, et al., "Split learning for health: Distributed deep learning without sharing
+raw patient data," in Proc. AI for Social Good Workshop, affiliated with ICLR 2018.
+
+https://arxiv.org/pdf/1812.00564.pdf
 """
 
 import logging

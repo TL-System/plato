@@ -1,5 +1,12 @@
 """
-The PyTorch-based split-learning algorithm, used by both the client and the server.
+A federated learning algorithm using split learning.
+
+Reference:
+
+Vepakomma, et al., "Split learning for health: Distributed deep learning without sharing
+raw patient data," in Proc. AI for Social Good Workshop, affiliated with ICLR 2018.
+
+https://arxiv.org/pdf/1812.00564.pdf
 """
 
 import logging
@@ -7,7 +14,6 @@ import time
 from copy import deepcopy
 from collections import OrderedDict
 
-import numpy as np
 import torch
 from plato.algorithms import fedavg
 from plato.config import Config
@@ -47,9 +53,8 @@ class Algorithm(fedavg.Algorithm):
             )
         else:
             data_loader = torch.utils.data.DataLoader(
-                dataset,
-                batch_size=Config().trainer.batch_size,
-                sampler=sampler.get())
+                dataset, batch_size=Config().trainer.batch_size, sampler=sampler.get()
+            )
 
         tic = time.perf_counter()
 
@@ -59,25 +64,26 @@ class Algorithm(fedavg.Algorithm):
         for inputs, targets, *__ in data_loader:
             with torch.no_grad():
                 inputs, targets = inputs.to(self.trainer.device), targets.to(
-                    self.trainer.device)
+                    self.trainer.device
+                )
                 logits = self.model.forward_to(inputs)
 
-            features_dataset.append(
-                (logits.detach().cpu(), targets.detach().cpu()))
-            self.input_dataset.append(
-                (inputs.detach().cpu(), targets.detach().cpu()))
+            features_dataset.append((logits.detach().cpu(), targets.detach().cpu()))
+            self.input_dataset.append((inputs.detach().cpu(), targets.detach().cpu()))
 
         toc = time.perf_counter()
 
-        logging.info("[Client #%d] Features extracted from %s examples.",
-                     self.client_id, len(features_dataset))
-        logging.info("[Client #%d] Time used: %.2f seconds.", self.client_id,
-                     toc - tic)
+        logging.info(
+            "[Client #%d] Features extracted from %s examples.",
+            self.client_id,
+            len(features_dataset),
+        )
+        logging.info("[Client #%d] Time used: %.2f seconds.", self.client_id, toc - tic)
 
         return features_dataset, toc - tic
 
     def complete_train(self, config, dataset, sampler):
-        """ Update the model on the client/device with the gradients received
+        """Update the model on the client/device with the gradients received
         from the server.
         """
         self.model.to(self.trainer.device)
@@ -96,20 +102,19 @@ class Algorithm(fedavg.Algorithm):
 
         for batch_id, (examples, labels) in enumerate(data_loader):
             examples, labels = examples.to(self.trainer.device), labels.to(
-                self.trainer.device)
+                self.trainer.device
+            )
 
             optimizer.zero_grad()
             outputs = self.model.forward_to(examples)
-            outputs.backward(self.gradients_list[grad_index].to(
-                self.trainer.device))
+            outputs.backward(self.gradients_list[grad_index].to(self.trainer.device))
             grad_index = grad_index + 1
             optimizer.step()
 
         toc = time.perf_counter()
 
         logging.info("[Client #%d] Training completed.", self.client_id)
-        logging.info("[Client #%d] Time used: %.2f seconds.", self.client_id,
-                     toc - tic)
+        logging.info("[Client #%d] Time used: %.2f seconds.", self.client_id, toc - tic)
 
         return toc - tic
 
@@ -142,6 +147,7 @@ class Algorithm(fedavg.Algorithm):
         return deltas
 
     def train(self, trainset, sampler):
-        """ Train the neural network model after the cut layer. """
+        """Train the neural network model after the cut layer."""
         self.trainer.train(
-            feature_dataset.FeatureDataset(trainset.feature_dataset), sampler)
+            feature_dataset.FeatureDataset(trainset.feature_dataset), sampler
+        )

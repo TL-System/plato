@@ -1,22 +1,26 @@
 """
-The training loop for split learning.
+A federated learning trainer using split learning.
+
+Reference:
+
+Vepakomma, et al., "Split learning for health: Distributed deep learning without sharing
+raw patient data," in Proc. AI for Social Good Workshop, affiliated with ICLR 2018.
+
+https://arxiv.org/pdf/1812.00564.pdf
 """
 import logging
 import os
 
-import numpy as np
 import torch
-import torch.nn as nn
 from plato.config import Config
 
 from plato.trainers import basic
 
 
 class Trainer(basic.Trainer):
-
     def train_model(self, config, trainset, sampler, cut_layer=None):
         """
-        Update the global model on the server with the features received 
+        Update the global model on the server with the features received
         from the client and calculate the gradients.
         """
         batch_size = config["batch_size"]
@@ -109,5 +113,6 @@ class Trainer(basic.Trainer):
             os.remove(model_gradients_path)
         torch.save(cut_layer_grad, model_gradients_path)
 
-        logging.info("[Server #%d] Gradients saved to %s.", os.getpid(),
-                     model_gradients_path)
+        logging.info(
+            "[Server #%d] Gradients saved to %s.", os.getpid(), model_gradients_path
+        )
