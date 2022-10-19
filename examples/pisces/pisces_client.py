@@ -23,7 +23,7 @@ class Client(simple.Client):
 
     def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
         """Wrap up generating the report with any additional information."""
-        # get all losses for all local steps here and compute the moving average of it here.(use a for loop)
+        # Compute the moving averages of batch loss for statistical utility
         train_batch_loss = self.trainer.run_history.get_metric_values(
             "train_batch_loss"
         )
