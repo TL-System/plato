@@ -9,9 +9,10 @@ clients:
     per_round: 20
 
     # Should the clients compute test accuracy locally?
-    do_test: false
+    do_test:
+        false
 
-     # Whether client heterogeneity should be simulated
+        # Whether client heterogeneity should be simulated
     speed_simulation: true
 
     # The distribution of client speeds
@@ -61,9 +62,6 @@ data:
     # The training and testing dataset
     datasource: MNIST
 
-    # Where the dataset is located
-    data_path: ../../data
-
     # Number of samples in each partition
     partition_size: 500
 
@@ -103,8 +101,6 @@ algorithm:
 results:
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time
-
-    result_path: results/Sirius/MNIST/test
 
 parameters:
     optimizer:
