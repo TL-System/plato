@@ -222,14 +222,6 @@ class Server(fedunlearning_server.Server):
 
     def weights_aggregated(self, updates):
         """Method called after the updated weights have been aggregated."""
-        if hasattr(Config().server, "do_test") and Config().server.do_test:
-            # Retrieve the model from the cluster with the highest accuracy
-            self.trainer.model.load_state_dict(self._aggregate_models(), strict=True)
-
-    def clients_processed(self):
-        """Determining the rollback round and roll back to that round, if retraining is needed
-        for each of the clusters."""
-
         # Testing the updated clustered model directly at the server
         if (
             hasattr(Config().server, "do_clustered_test")
@@ -251,6 +243,13 @@ class Server(fedunlearning_server.Server):
             # Second, update the test accuracy for clusters that have just been tested
             self.clustered_test_accuracy.update(test_accuracy_per_cluster)
 
+        if hasattr(Config().server, "do_test") and Config().server.do_test:
+            # Retrieve the model from the cluster with the highest accuracy
+            self.trainer.model.load_state_dict(self._aggregate_models(), strict=True)
+
+    def clients_processed(self):
+        """Determining the rollback round and roll back to that round, if retraining is needed
+        for each of the clusters."""
         # If data_deletion_round equals to the current round at server for the first time,
         # and the clients requesting retraining has been selected before, the retraining
         # phase starts.
