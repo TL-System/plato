@@ -78,7 +78,7 @@ class Server(fedavg.Server):
             representation_param_names=self.representation_param_names
         )
 
-    def customize_server_response(self, server_response: dict) -> dict:
+    def customize_server_response(self, server_response: dict, client_id) -> dict:
         """
         The FedRep server sends parameter names belonging to the representation
         layers back to the clients.

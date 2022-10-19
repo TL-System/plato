@@ -31,7 +31,7 @@ class Server(fedavg_cs.Server):
             if "local_epoch_num" not in self.recorded_items:
                 self.recorded_items = self.recorded_items + ["local_epoch_num"]
 
-    def customize_server_response(self, server_response: dict) -> dict:
+    def customize_server_response(self, server_response: dict, client_id) -> dict:
         """Wrap up generating the server response with any additional information."""
         if Config().is_central_server():
             server_response["local_epoch_num"] = self.local_epoch_list
