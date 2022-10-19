@@ -314,30 +314,9 @@ class Server(fedavg.Server):
             super().clients_processed()
 
         if Config().is_edge_server():
-            self.edge_training_time += self.get_logged_items()["round_time"]
-            self.edge_comm_time += self.get_logged_items()["comm_time"]
-
-            new_row = []
-            for item in self.recorded_items:
-                item_value = self.get_logged_items()[item]
-                new_row.append(item_value)
-
-            result_csv_file = f"{Config().params['result_path']}/edge_{os.getpid()}.csv"
-            csv_processor.write_csv(result_csv_file, new_row)
-
-            if hasattr(Config().clients, "do_test") and Config().clients.do_test:
-                # Updates the log for client test accuracies
-                accuracy_csv_file = (
-                    f"{Config().params['result_path']}/edge_{os.getpid()}_accuracy.csv"
-                )
-
-                for update in self.updates:
-                    accuracy_row = [
-                        self.current_round,
-                        update.client_id,
-                        update.report.accuracy,
-                    ]
-                    csv_processor.write_csv(accuracy_csv_file, accuracy_row)
+            logged_items = self.get_logged_items()
+            self.edge_training_time += logged_items["round_time"]
+            self.edge_comm_time += logged_items["comm_time"]
 
             # When a certain number of aggregations are completed, an edge client
             # needs to be signaled to send a report to the central server
