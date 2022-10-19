@@ -21,7 +21,9 @@ class Trainer(basic.Trainer):
         per_batch_loss = loss_func(outputs, labels)
 
         # Stores the per_batch loss value
-        self.run_history.update_metric("train_batch_loss", per_batch_loss)
+        self.run_history.update_metric(
+            "train_batch_loss", per_batch_loss.cpu().detach().numpy()
+        )
 
         return per_batch_loss
 
