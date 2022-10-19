@@ -25,6 +25,9 @@ class Server(fedavg.Server):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
         self.staleness_factor = Config().server.staleness_factor
         self.client_utilities = {}
+        self.client_staleness_list = {}
+        self.total_samples = 0
+
         # Exploration vs exploitation
         self.exploration_factor = Config().server.exploration_factor
         self.exploration_decaying_factor = Config().server.exploration_decaying_factor
@@ -51,6 +54,9 @@ class Server(fedavg.Server):
         self.client_utilities = {
             client_id: 0 for client_id in range(1, self.total_clients + 1)
         }
+        self.client_staleness_list = {
+            client_id: [] for client_id in range(1, self.total_clients + 1)
+        }
         self.unexplored_clients = list(range(1, self.total_clients + 1))
 
     async def aggregate_deltas(self, updates, deltas_received):
@@ -67,8 +73,11 @@ class Server(fedavg.Server):
         for i, update in enumerate(deltas_received):
             report = updates[i].report
             num_samples = report.num_samples
-            staleness = updates[i].staleness
-            staleness_factor = self.staleness_function(staleness)
+            self.client_staleness_list[updates[i].client_id].append(
+                updates[i].staleness
+            )
+
+            staleness_factor = self.calculate_staleness_factor(updates[i].client_id)
 
             for name, delta in update.items():
                 # Use weighted average by the number of samples and staleness factor
@@ -80,7 +89,9 @@ class Server(fedavg.Server):
             await asyncio.sleep(0)
         return avg_update
 
-    def staleness_function(self, stalenss):
+    def calculate_staleness_factor(self, client_id):
+        """Calculate client staleness factor"""
+        stalenss = np.mean(self.client_staleness_list[client_id][-5:])
         return 1.0 / pow(stalenss + 1, self.staleness_factor)
 
     def weights_aggregated(self, updates):
@@ -88,8 +99,8 @@ class Server(fedavg.Server):
         for update in updates:
             self.client_utilities[
                 update.client_id
-            ] = update.report.statistics_utility * self.staleness_function(
-                update.staleness
+            ] = update.report.statistics_utility * self.calculate_staleness_factor(
+                update.client_id
             )
 
             if self.robustness:
@@ -110,7 +121,8 @@ class Server(fedavg.Server):
                     if start_version - i <= 0:
                         break
 
-                    tmp = []  # avoid cybil attacks, i.e., outliers repeat deliberately
+                    # avoid cybil attacks, i.e., outliers repeat deliberately
+                    tmp = []
                     for client_id, loss_norm in self.model_versions_clients_dict[
                         start_version - i
                     ]:

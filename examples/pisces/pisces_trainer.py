@@ -15,7 +15,7 @@ from plato.trainers import basic, loss_criterion
 class Trainer(basic.Trainer):
     """The federated learning trainer for the Pisces client."""
 
-    def process_loss(self, outputs, labels) -> torch.Tensor:
+    def process_loss(self, outputs, labels):
         """Returns the loss and records per_batch loss values."""
         loss_func = loss_criterion.get()
         per_batch_loss = loss_func(outputs, labels)

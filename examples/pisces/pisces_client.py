@@ -24,7 +24,7 @@ class Client(simple.Client):
     def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
         """Wrap up generating the report with any additional information."""
         # get all losses for all local steps here and compute the moving average of it here.(use a for loop)
-        train_batch_loss = self.trainer.run_history.get_latest_metric(
+        train_batch_loss = self.trainer.run_history.get_metric_values(
             "train_batch_loss"
         )
         moving_average_loss = 0
@@ -32,8 +32,6 @@ class Client(simple.Client):
             moving_average_loss = (
                 1 - self.loss_decay
             ) * moving_average_loss + self.loss_decay * batch_loss
-            print("batch_loss here is: ", batch_loss)
-            print("current moving_average_loss is :", moving_average_loss)
 
         train_squared_loss = np.sqrt(self.moving_average_loss.cpu().detach().item())
 
