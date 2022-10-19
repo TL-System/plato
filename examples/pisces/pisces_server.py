@@ -21,11 +21,20 @@ from sklearn.cluster import DBSCAN
 class Server(fedavg.Server):
     """A federated learning server using the Pisces algorithm."""
 
-    def __init__(self, model=None, algorithm=None, trainer=None):
-        super().__init__(model=model, algorithm=algorithm, trainer=trainer)
+    def __init__(
+        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+    ):
+        super().__init__(
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
+        )
+
         self.staleness_factor = Config().server.staleness_factor
         self.client_utilities = {}
-        self.client_staleness_list = {}
+        self.client_staleness = {}
         self.total_samples = 0
 
         # Exploration vs exploitation
@@ -54,7 +63,7 @@ class Server(fedavg.Server):
         self.client_utilities = {
             client_id: 0 for client_id in range(1, self.total_clients + 1)
         }
-        self.client_staleness_list = {
+        self.client_staleness = {
             client_id: [] for client_id in range(1, self.total_clients + 1)
         }
         self.unexplored_clients = list(range(1, self.total_clients + 1))
@@ -73,11 +82,9 @@ class Server(fedavg.Server):
         for i, update in enumerate(deltas_received):
             report = updates[i].report
             num_samples = report.num_samples
-            self.client_staleness_list[updates[i].client_id].append(
-                updates[i].staleness
-            )
+            self.client_staleness[updates[i].client_id].append(updates[i].staleness)
 
-            staleness_factor = self.calculate_staleness_factor(updates[i].client_id)
+            staleness_factor = self._calculate_staleness_factor(updates[i].client_id)
 
             for name, delta in update.items():
                 # Use weighted average by the number of samples and staleness factor
@@ -89,9 +96,9 @@ class Server(fedavg.Server):
             await asyncio.sleep(0)
         return avg_update
 
-    def calculate_staleness_factor(self, client_id):
-        """Calculate client staleness factor"""
-        stalenss = np.mean(self.client_staleness_list[client_id][-5:])
+    def _calculate_staleness_factor(self, client_id):
+        """Calculate the client staleness factor."""
+        stalenss = np.mean(self.client_staleness[client_id][-5:])
         return 1.0 / pow(stalenss + 1, self.staleness_factor)
 
     def weights_aggregated(self, updates):
@@ -99,7 +106,7 @@ class Server(fedavg.Server):
         for update in updates:
             self.client_utilities[
                 update.client_id
-            ] = update.report.statistical_utility * self.calculate_staleness_factor(
+            ] = update.report.statistical_utility * self._calculate_staleness_factor(
                 update.client_id
             )
 
@@ -137,14 +144,14 @@ class Server(fedavg.Server):
                         "Starting anomaly detection with %s recent records.",
                         len(tuples),
                     )
-                    self.detect_outliers(tuples)
+                    self._detect_outliers(tuples)
                 else:
                     logging.info(
                         "Records collected for anomaly detection are not enough: %s.",
                         len(tuples),
                     )
 
-    def detect_outliers(self, tuples):
+    def _detect_outliers(self, tuples):
         """Detect outliers from client updates by DBSCAN."""
 
         client_id_list = [tu[0] for tu in tuples]
