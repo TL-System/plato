@@ -4,13 +4,9 @@ A processor that computes the encryption mask.
 
 import pickle
 import random
-from turtle import st
-import logging
-import time
 from typing import Any
 
 import torch
-import tenseal as ts
 from plato.config import Config
 
 from plato.processors import base
@@ -21,6 +17,9 @@ class Processor(base.Processor):
     def __init__(self, client, **kwargs) -> None:
         super().__init__(**kwargs)
         self.gradient = client.trainer.gradient
+
+        self.checkpoint_path = Config().params["checkpoint_path"]
+        self.attack_prep_dir = f"{Config().data.datasource}_{Config().trainer.model_name}_{self.encrypt_ratio}"
 
     def process(self, data: Any) -> Any:
         selected_mask = self.compute_mask(data)
@@ -53,8 +52,8 @@ class Processor(base.Processor):
             )
             return torch.tensor(rand_mask)
         gradient_list = [
-            torch.flatten(gradients[name]).to(device)
-            for _, name in enumerate(gradients)
+            torch.flatten(self.gradients[name]).to(device)
+            for _, name in enumerate(self.gradients)
         ]
         grad_flat = torch.cat(gradient_list)
 
