@@ -14,7 +14,7 @@ from abc import abstractmethod
 
 import socketio
 from plato.callbacks.handler import CallbackHandler
-from plato.callbacks.client import PrintProgressCallback
+from plato.callbacks.client import LogProgressCallback
 from plato.config import Config
 from plato.utils import s3
 
@@ -96,7 +96,7 @@ class Client:
             assert hasattr(Config().algorithm, "total_silos")
 
         # Starting from the default client callback class, add all supplied server callbacks
-        self.callbacks = [PrintProgressCallback]
+        self.callbacks = [LogProgressCallback]
         if callbacks is not None:
             self.callbacks.extend(callbacks)
         self.callback_handler = CallbackHandler(self.callbacks)

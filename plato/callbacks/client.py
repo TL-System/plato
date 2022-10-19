@@ -25,7 +25,7 @@ class ClientCallback(ABC):
         """
 
 
-class PrintProgressCallback(ClientCallback):
+class LogProgressCallback(ClientCallback):
     """
     A callback which prints a message when needed.
     """
