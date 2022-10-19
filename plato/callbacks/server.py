@@ -107,9 +107,9 @@ class LogProgressCallback(ServerCallback):
                 f"{Config().params['result_path']}/{os.getpid()}_accuracy.csv"
             )
 
-            for update in self.updates:
+            for update in server.updates:
                 accuracy_row = [
-                    self.current_round,
+                    server.current_round,
                     update.client_id,
                     update.report.accuracy,
                 ]
