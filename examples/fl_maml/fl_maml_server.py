@@ -45,7 +45,7 @@ class Server(fedavg.Server):
                 len(self.selected_clients),
             )
 
-    def customize_server_response(self, server_response: dict) -> dict:
+    def customize_server_response(self, server_response: dict, client_id) -> dict:
         """Wrap up generating the server response with any additional information."""
         if self.do_personalization_test:
             server_response["personalization_test"] = True
