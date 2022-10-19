@@ -99,8 +99,6 @@ class Server(fedavg.Server):
                 self.clients_per_round,
             )
 
-            self.recorded_items = ["global_round"] + self.recorded_items
-
             # The training time of a edge server in one global round
             self.edge_training_time = 0
 
@@ -163,15 +161,6 @@ class Server(fedavg.Server):
                         self.testset_sampler = all_inclusive.Sampler(
                             self.datasource, testing=True
                         )
-
-            # Initialize path of the result .csv file
-            result_path = Config().params["result_path"]
-            result_csv_file = f"{result_path}/edge_{os.getpid()}.csv"
-            csv_processor.initialize_csv(
-                result_csv_file, self.recorded_items, result_path
-            )
-            # Delete the csv file created by inherited method
-            os.remove(f"{result_path}/{os.getpid()}.csv")
 
     async def select_clients(self, for_next_batch=False):
         if Config().is_edge_server() and not for_next_batch:
