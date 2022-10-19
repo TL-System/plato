@@ -1,5 +1,11 @@
 """
-A federated learning client that sends its statistical utility
+A federated learning client using Oort.
+
+Reference:
+
+F. Lai, X. Zhu, H. V. Madhyastha and M. Chowdhury, "Oort: Efficient Federated Learning via
+Guided Participant Selection," in USENIX Symposium on Operating Systems Design and Implementation
+(OSDI 2021), July 2021.
 """
 
 from types import SimpleNamespace
@@ -19,7 +25,7 @@ class Client(simple.Client):
             "train_squared_loss_step"
         )
 
-        report.statistics_utility = report.num_samples * np.sqrt(
+        report.statistical_utility = report.num_samples * np.sqrt(
             1.0 / report.num_samples * sum(train_squared_loss_step)
         )
 
