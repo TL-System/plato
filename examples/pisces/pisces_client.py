@@ -35,7 +35,7 @@ class Client(simple.Client):
                 1 - self.loss_decay
             ) * moving_average_loss + self.loss_decay * batch_loss
 
-        train_squared_loss = np.sqrt(self.moving_average_loss.cpu().detach().item())
+        train_squared_loss = np.sqrt(self.moving_average_loss.detach().item())
 
         report.statistical_utility = report.num_samples * np.sqrt(
             1.0 / report.num_samples * train_squared_loss
