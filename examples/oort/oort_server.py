@@ -1,5 +1,11 @@
 """
-A federated learning server using oort client selection.
+A federated learning server using Oort.
+
+Reference:
+
+F. Lai, X. Zhu, H. V. Madhyastha and M. Chowdhury, "Oort: Efficient Federated Learning via
+Guided Participant Selection," in USENIX Symposium on Operating Systems Design and Implementation
+(OSDI 2021), July 2021.
 """
 
 import logging
@@ -90,7 +96,7 @@ class Server(fedavg.Server):
         """Method called at the end of aggregating received weights."""
         for update in updates:
             # Extract statistical utility and local training times
-            self.client_utilities[update.client_id] = update.report.statistics_utility
+            self.client_utilities[update.client_id] = update.report.statistical_utility
             self.client_durations[update.client_id] = update.report.training_time
             self.client_last_rounds[update.client_id] = self.current_round
 
@@ -101,7 +107,7 @@ class Server(fedavg.Server):
 
         # Adjust pacer
         self.util_history.append(
-            sum(update.report.statistics_utility for update in updates)
+            sum(update.report.statistical_utility for update in updates)
         )
 
         if self.current_round >= 2 * self.step_window:
