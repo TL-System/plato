@@ -14,7 +14,7 @@ class ClientCallback(ABC):
     The abstract base class to be subclassed when creating new client callbacks.
     """
 
-    def on_inbound_process(self, client, inbound_processor):
+    def on_inbound_payload_received(self, client, inbound_processor):
         """
         Event called before inbound processors start to process data.
         """
@@ -30,7 +30,7 @@ class LogProgressCallback(ClientCallback):
     A callback which prints a message when needed.
     """
 
-    def on_inbound_process(self, client, inbound_processor):
+    def on_inbound_payload_received(self, client, inbound_processor):
         """
         Event called before inbound processors start to process data.
         """

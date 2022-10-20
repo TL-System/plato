@@ -190,7 +190,7 @@ class Client:
             )
 
             self.callback_handler.call_event(
-                "on_inbound_process", self, self.inbound_processor
+                "on_inbound_payload_received", self, self.inbound_processor
             )
             self.server_payload = self.inbound_processor.process(self.server_payload)
 
