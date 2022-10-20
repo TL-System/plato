@@ -189,12 +189,24 @@ class Client:
                 payload_size / 1024**2,
             )
 
+            # Inbound payload received
             self.callback_handler.call_event(
                 "on_inbound_payload_received", self, self.inbound_processor
             )
             self.server_payload = self.inbound_processor.process(self.server_payload)
 
-            await self.start_training()
+            # Inbound payload Processed
+            self.callback_handler.call_event(
+                "on_inbound_payload_processed", self, self.server_payload
+            )
+            await self.inbound_payload_processed()
+
+    async def inbound_payload_processed(self):
+        """
+        Overwrite this function to define actions after the inbound payload has been processed.
+        Start the training by default.
+        """
+        await self.start_training()
 
     async def chunk_arrived(self, data) -> None:
         """Upon receiving a chunk of data from the server."""
