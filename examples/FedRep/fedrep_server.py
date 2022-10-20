@@ -19,9 +19,15 @@ from plato.servers import fedavg
 class Server(fedavg.Server):
     """A personalized federated learning server using the FedRep algorithm."""
 
-    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
+    def __init__(
+        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+    ):
         super().__init__(
-            model=model, datasource=datasource, algorithm=algorithm, trainer=trainer
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
         )
 
         # parameter names of the representation
@@ -72,7 +78,7 @@ class Server(fedavg.Server):
             representation_param_names=self.representation_param_names
         )
 
-    def customize_server_response(self, server_response: dict) -> dict:
+    def customize_server_response(self, server_response: dict, client_id) -> dict:
         """
         The FedRep server sends parameter names belonging to the representation
         layers back to the clients.

@@ -27,8 +27,16 @@ class Report:
 
 
 class MistnetplusServer(fedavg.Server):
-    def __init__(self, model=None, algorithm=None, trainer=None):
-        super().__init__(model=model, algorithm=algorithm, trainer=trainer)
+    def __init__(
+        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+    ):
+        super().__init__(
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
+        )
 
     async def client_payload_done(self, sid, client_id, s3_key=None):
         if s3_key is None:

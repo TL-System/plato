@@ -13,8 +13,16 @@ from plato.config import Config
 class Server(fedavg.Server):
     """A federated learning server using the FedSCR algorithm."""
 
-    def __init__(self, model=None, algorithm=None, trainer=None):
-        super().__init__(model=model, algorithm=algorithm, trainer=trainer)
+    def __init__(
+        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+    ):
+        super().__init__(
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
+        )
 
         # Loss variances for each communication round used by the adaptive algorithm
         self.loss_variances = []
@@ -50,7 +58,7 @@ class Server(fedavg.Server):
             Config().clients.delta3 if hasattr(Config().clients, "delta3") else 1
         )
 
-    def customize_server_response(self, server_response: dict) -> dict:
+    def customize_server_response(self, server_response: dict, client_id) -> dict:
         """Wrap up generating the server response with any additional information."""
         if self.trainer.use_adaptive and self.current_round > 1:
             self.calc_threshold()

@@ -160,7 +160,7 @@ class Algorithm(fedavg.Algorithm):
 
         self.round_id += 1
 
-    def customize_server_response(self, server_response: dict) -> dict:
+    def customize_server_response(self, server_response: dict, client_id) -> dict:
         """Customizing the server response with any additional information."""
         server_response["sync_frequency"] = self.algorithm.sync_frequency
         return server_response

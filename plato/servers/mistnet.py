@@ -18,8 +18,16 @@ from plato.servers import fedavg
 class Server(fedavg.Server):
     """The MistNet server for federated learning."""
 
-    def __init__(self, model=None, algorithm=None, trainer=None):
-        super().__init__(model=model, algorithm=algorithm, trainer=trainer)
+    def __init__(
+        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+    ):
+        super().__init__(
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
+        )
 
         # MistNet requires one round of client-server communication
         assert Config().trainer.rounds == 1
