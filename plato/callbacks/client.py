@@ -24,7 +24,7 @@ class ClientCallback(ABC):
         Event called when payload was processed by inbound processors.
         """
 
-    def on_outbound_process(self, client, outbound_processor):
+    def on_outbound_payload_ready(self, client, outbound_processor):
         """
         Event called before outbound processors start to process data.
         """
@@ -47,7 +47,7 @@ class LogProgressCallback(ClientCallback):
         """
         logging.info("[%s] Inbound data has been processed.", client)
 
-    def on_outbound_process(self, client, outbound_processor):
+    def on_outbound_payload_ready(self, client, outbound_processor):
         """
         Event called before outbound processors start to process data.
         """

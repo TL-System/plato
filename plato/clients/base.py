@@ -83,6 +83,8 @@ class Client:
         self.s3_client = None
         self.outbound_processor = None
         self.inbound_processor = None
+        self.payload = None
+        self.report = None
 
         self.comm_simulation = (
             Config().clients.comm_simulation
@@ -201,12 +203,34 @@ class Client:
             )
             await self.inbound_payload_processed()
 
+            # Outbound payload ready
+            self.callback_handler.call_event(
+                "on_outbound_payload_ready", self, self.outbound_processor
+            )
+            await self.outbound_payload_ready()
+
     async def inbound_payload_processed(self):
         """
         Overwrite this function to define actions after the inbound payload has been processed.
         Start the training by default.
         """
         await self.start_training()
+
+    async def outbound_payload_ready(self):
+        """Outbound payload is ready to be sent after being processed."""
+        # First apply outbound processors, if any
+        self.callback_handler.call_event(
+            "on_outbound_payload_ready", self, self.outbound_processor
+        )
+        self.payload = self.outbound_processor.process(self.payload)
+
+        # Sending the client report as metadata to the server (payload to follow)
+        await self.sio.emit(
+            "client_report", {"id": self.client_id, "report": pickle.dumps(self.report)}
+        )
+
+        # Sending the client training payload to the server
+        await self.send(self.payload)
 
     async def chunk_arrived(self, data) -> None:
         """Upon receiving a chunk of data from the server."""
@@ -280,7 +304,7 @@ class Client:
         self.load_payload(self.server_payload)
         self.server_payload = None
 
-        report, payload = await self.train()
+        self.report, self.payload = await self.train()
 
         if Config().is_edge_server():
             logging.info(
@@ -288,14 +312,6 @@ class Client:
             )
         else:
             logging.info("[%s] Model trained.", self)
-
-        # Sending the client report as metadata to the server (payload to follow)
-        await self.sio.emit(
-            "client_report", {"id": self.client_id, "report": pickle.dumps(report)}
-        )
-
-        # Sending the client training payload to the server
-        await self.send(payload)
 
     async def send_in_chunks(self, data) -> None:
         """Sending a bytes object in fixed-sized chunks to the client."""
@@ -309,12 +325,6 @@ class Client:
 
     async def send(self, payload) -> None:
         """Sending the client payload to the server using simulation, S3 or socket.io."""
-        # First apply outbound processors, if any
-        self.callback_handler.call_event(
-            "on_outbound_process", self, self.outbound_processor
-        )
-        payload = self.outbound_processor.process(payload)
-
         if self.comm_simulation:
             # If we are using the filesystem to simulate communication over a network
             model_name = (
