@@ -16,13 +16,21 @@ from plato.config import Config
 class Server(fedavg.Server):
     """A federated learning server using the Hermes algorithm."""
 
-    def __init__(self, model=None, algorithm=None, trainer=None):
-        super().__init__(model=model, algorithm=algorithm, trainer=trainer)
+    def __init__(
+        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+    ):
+        super().__init__(
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
+        )
         self.clients_first_time = [True for _ in range(Config().clients.total_clients)]
         self.personalized_models = []
         self.masks_received = []
 
-    def aggregate_weights(self, updates, baseline_weights, weights_received):
+    async def aggregate_weights(self, updates, baseline_weights, weights_received):
         """Aggregate weight updates from the clients using personalized aggregating."""
         # Extract the total number of samples
         self.total_samples = sum(update.report.num_samples for update in updates)

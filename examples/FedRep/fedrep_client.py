@@ -17,12 +17,16 @@ from plato.clients import simple
 class Client(simple.Client):
     """A personalized federated learning client using the FedRep algorithm."""
 
-    def __init__(self,
-                 model=None,
-                 datasource=None,
-                 algorithm=None,
-                 trainer=None):
-        super().__init__(model, datasource, algorithm, trainer)
+    def __init__(
+        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+    ):
+        super().__init__(
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
+        )
 
         # parameter names of the representation
         #   As mentioned by Eq. 1 and Fig. 2 of the paper, the representation
@@ -34,8 +38,7 @@ class Client(simple.Client):
         super().process_server_response(server_response)
 
         # obtain the representation sent by the server
-        self.representation_param_names = server_response[
-            "representation_param_names"]
+        self.representation_param_names = server_response["representation_param_names"]
 
         # The trainer responsible for optimizing the model should know
         # which part parameters behave as the representation and which
@@ -44,10 +47,12 @@ class Client(simple.Client):
         # representation is optimized in the 'Server Update', as mentioned
         # in Section 3 of the FedRep paper.
         self.trainer.set_representation_and_head(
-            representation_param_names=self.representation_param_names)
+            representation_param_names=self.representation_param_names
+        )
 
         # The algorithm only operates on the representation without
         # considering the head as the head is solely known by each client
         # because of personalization.
         self.algorithm.set_representation_param_names(
-            representation_param_names=self.representation_param_names)
+            representation_param_names=self.representation_param_names
+        )

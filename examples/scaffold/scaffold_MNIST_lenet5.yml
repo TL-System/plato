@@ -1,41 +1,45 @@
 clients:
     # The total number of clients
-    total_clients: 1
+    total_clients: 5
 
     # The number of clients selected in each round
-    per_round: 1
+    per_round: 2
 
     # Should the clients compute test accuracy locally?
-    do_test: true
+    do_test: false
 
 server:
     address: 127.0.0.1
     port: 8000
+    do_test: true
+
+    checkpoint_path: results/test/checkpoint
+    model_path: results/test/model
 
 data:
     # The training and testing dataset
     datasource: MNIST
 
     # Number of samples in each partition
-    partition_size: 20000
+    partition_size: 1000
 
     # IID or non-IID?
     sampler: iid
 
 trainer:
     # The maximum number of training rounds
-    rounds: 100
+    rounds: 5
 
     # The maximum number of clients running concurrently
-    max_concurrency: 3
+    max_concurrency: 2
 
     # The target accuracy
     target_accuracy: 0.98
 
     # Number of epoches for local training in each communication round
-    epochs: 1
-    batch_size: 32
-    optimizer: Scaffold
+    epochs: 3
+    batch_size: 10
+    optimizer: SGD
 
     # The machine learning model
     model_name: lenet5

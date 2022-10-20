@@ -19,7 +19,7 @@ import socketio
 from aiohttp import web
 
 from plato.callbacks.handler import CallbackHandler
-from plato.callbacks.server import PrintProgressCallback
+from plato.callbacks.server import LogProgressCallback
 from plato.client import run
 from plato.config import Config
 from plato.utils import s3, fonts
@@ -101,7 +101,7 @@ class Server:
         )
 
         # Starting from the default server callback class, add all supplied server callbacks
-        self.callbacks = [PrintProgressCallback]
+        self.callbacks = [LogProgressCallback]
         if callbacks is not None:
             self.callbacks.extend(callbacks)
         self.callback_handler = CallbackHandler(self.callbacks)
@@ -573,7 +573,9 @@ class Server:
                     "id": self.selected_client_id,
                     "current_round": self.current_round,
                 }
-                server_response = self.customize_server_response(server_response)
+                server_response = self.customize_server_response(
+                    server_response, client_id=self.selected_client_id
+                )
 
                 payload = self.algorithm.extract_weights()
                 payload = self.customize_server_payload(payload)
@@ -634,6 +636,11 @@ class Server:
                     )
 
                     await self.send(sid, payload, selected_client_id)
+
+            self.clients_selected(self.selected_clients)
+            self.callback_handler.call_event(
+                "on_clients_selected", self, self.selected_clients
+            )
 
     def choose_clients(self, clients_pool, clients_count):
         """Choose a subset of the clients to participate in each round."""
@@ -1241,7 +1248,7 @@ class Server:
         await self.close_connections()
         os._exit(0)
 
-    def customize_server_response(self, server_response: dict) -> dict:
+    def customize_server_response(self, server_response: dict, client_id) -> dict:
         """Customizes the server response with any additional information."""
         return server_response
 
@@ -1252,6 +1259,10 @@ class Server:
     @abstractmethod
     async def _process_reports(self) -> None:
         """Process a client report."""
+
+    def clients_selected(self, selected_clients) -> None:
+        """
+        Method called after clients have been selected in each round."""
 
     def training_will_start(self):
         """

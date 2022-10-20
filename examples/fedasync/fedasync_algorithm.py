@@ -6,7 +6,7 @@ from plato.algorithms import fedavg
 class Algorithm(fedavg.Algorithm):
     """The federated learning algorithm for FedAsync, used by the server."""
 
-    def aggregate_weights(
+    async def aggregate_weights(
         self, baseline_weights, weights_received, mixing=0.9, **kwargs
     ):
         """Aggregates the weights received into baseline weights."""
