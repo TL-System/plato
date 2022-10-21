@@ -15,18 +15,58 @@ def process_server_response(self, server_response):
         self.server.current_global_round = server_response["current_global_round"]
 ```
 
-```{admonition} **inbound_payload_processed(self,)**
-Override this method to conduct customized operations when inbound data from server has been processed. Default training function will be called if left undefined.
+```{admonition} **inbound_received(self, inbound_processor)**
+Override this method to complete additional tasks before the inbound processors start to process the data received from the server.
+
+`inbound_processor` the pipeline of inbound processors. The list of inbound processor instances can be accessed through its attribute 'processors', as in the following example.
 
 **Example:**
 
 ```py
-async def inbound_payload_processed(self,):
-    do_something_else()
-    await self.start_training()
+def inbound_received(self, inbound_processor):
+    # insert a customized processor to the list of inbound processors
+    customized_processor = DummyProcessor(
+            client_id=client.client_id,
+            current_round=client.current_round,
+            name="DummyProcessor",
+        )
+
+    inbound_processor.processors.insert(0, customized_processor) 
 ```
 
-```{admonition} **customize_report(self, report)**
+```{admonition} **inbound_processed(self, data)**
+Override this method to conduct customized operations to generate client's response to server when inbound data from server has been processed. Default training function will be called if left undefined.
+
+`data` the inbound data after being processed by inbound processors, e.g., model weights before loaded to the trainer.
+
+**Example:**
+
+```py
+async def inbound_processed(self, data: Any) -> (SimpleNamespace, Any):
+    report, payload = await self.customized_train(data)
+    return report, payload
+```
+
+```{admonition} **outbound_ready(self, report, outbound_processor)**
+Override this method to complete additional tasks before the outbound processors start to process the data to be sent to the server.
+
+`report` the metadata sent back to the server, e.g., training time, accuracy, etc.
+
+`outbound_processor` the pipeline of outbound processors. The list of inbound processor instances can be accessed through its attribute 'processors', as in the following example.
+
+**Example:**
+
+```py
+def outbound_ready(self, report, outbound_processor):
+    # customize report 
+    loss = self.get_loss()
+    report.valuation = self.calc_valuation(report.num_samples, loss)
+    
+    # remove the first processor from the list of outbound processors
+    outbound_processor.processors.pop() 
+```
+
+<!-- ```{admonition} **customize_report(self, report)**
 Override this method to customize a client's report with additional information.
 
 **Example:**
@@ -36,7 +76,7 @@ def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
     loss = self.get_loss()
     report.valuation = self.calc_valuation(report.num_samples, loss)
     return report
-```
+``` -->
 
 ## Customizing clients using callbacks
 
@@ -47,15 +87,16 @@ Within the implementation of these callback methods, one can access additional i
 To use callbacks, subclass the `ClientCallback` class in `plato.callbacks.client`, and override the following methods:
 
 
-````{admonition} **on_inbound_payload_received(self, client, inbound_processor)**
+````{admonition} **on_inbound_received(self, client, inbound_processor)**
 Override this method to complete additional tasks before the inbound processors start to process the data received from the server.
 
-`inbound_processor` the pipeline of inbound processors. The list of inbound processor instances can be accessed through its attribute 'processors', as in the following example.
+`inbound_processor` the pipeline of inbound processors. The list of inbound processor instances can be accessed through its attribute 'processors'.
 
+<!-- 
 **Example:**
 
 ```py
-def on_inbound_payload_received(self, client, inbound_processor: list):
+def on_inbound_received(self, client, inbound_processor):
     # insert a customized processor to the list of inbound processors
     customized_processor = DummyProcessor(
             client_id=client.client_id,
@@ -64,34 +105,35 @@ def on_inbound_payload_received(self, client, inbound_processor: list):
         )
 
     inbound_processor.processors.insert(0, customized_processor) 
-```
+``` -->
 ````
 
 
-````{admonition} **on_inbound_payload_processed(self, client, processed_payload)**
+````{admonition} **on_inbound_processed(self, client, data)**
 Override this method to complete additional tasks when the inbound data has been processed by inbound processors.
 
-`processed_payload` the inbound data after being processed by inbound processors, e.g., model weights before loaded to the trainer.
+`data` the inbound data after being processed by inbound processors, e.g., model weights before loaded to the trainer.
 
 **Example:**
 
 ```py
-def on_inbound_payload_processed(self, client, processed_payload):
-    # remove the first processor from the list of outbound processors
-    foo(processed_payload)
+def on_inbound_processed(self, client, data):
+    # print the layer names of the model weights before further operations
+    for name, weights in data:
+        print(name)
 ```
 ````
 
-````{admonition} **on_outbound_payload_ready(self, client, outbound_processor)**
+````{admonition} **on_outbound_ready(self, client, outbound_processor)**
 Override this method to complete additional tasks before the outbound processors start to process the data to be sent to the server.
 
-`outbound_processor` the pipeline of outbound processors. The list of inbound processor instances can be accessed through its attribute 'processors', as in the following example.
-
+`outbound_processor` the pipeline of outbound processors. The list of inbound processor instances can be accessed through its attribute 'processors'.
+<!-- 
 **Example:**
 
 ```py
-def on_outbound_payload_ready(self, client, outbound_processor):
+def on_outbound_ready(self, client, outbound_processor):
     # remove the first processor from the list of outbound processors
     outbound_processor.processors.pop() 
-```
+``` -->
 ````
