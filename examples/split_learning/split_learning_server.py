@@ -43,7 +43,7 @@ class Server(fedavg.Server):
         """Process the received metadata information from a reporting client."""
         if self.reports[sid].phase == "features":
             payload = self.client_payload[sid]
-            feature_dataset = feature.DataSource(payload)
+            feature_dataset = feature.DataSource([payload])
 
             # Training the model using all the features received from the client
             sampler = all_inclusive.Sampler(feature_dataset)
