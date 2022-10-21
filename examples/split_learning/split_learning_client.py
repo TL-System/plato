@@ -35,65 +35,68 @@ class Client(simple.Client):
             trainer=trainer,
             callbacks=callbacks,
         )
+        assert not Config().clients.do_test
 
-        self.phase = "extract_features"
         self.model_received = False
         self.gradient_received = False
 
-    def load_payload(self, server_payload):
-        """Loading the server model onto this client."""
-        payload, info = server_payload
+    async def inbound_processed(self, data):
+        """"""
+        server_payload, info = data
+
+        # Preparing the client response
+        report, payload = None, None
 
         if info == "weights":
-            # server sends the global model
-            self.algorithm.load_weights(payload)
-            self.phase = "extract_features"
+            # server sends the global model, i.e., feature extraction
+            report, payload = self.feature_extract(server_payload)
         elif info == "gradients":
-            # server sends the gradients of the features
-            self.algorithm.receive_gradients(payload)
-            self.phase = "complete_train"
+            # server sends the gradients of the features, i.e., complete training
+            report, payload = self.complete_training(server_payload)
 
-    async def train(self):
-        """A split learning client only uses the first several layers in a forward pass."""
-        assert not Config().clients.do_test
-        accuracy = 0
-        comm_time = time.time()
+        return report, payload
 
-        if self.phase == "extract_features":
-            # Perform a forward pass till the cut layer in the model
-            logging.info(
-                "Performing a forward pass till the cut layer on client #%d",
-                self.client_id,
-            )
+    def feature_extract(self, payload):
+        """Extract the feature till the cut layer."""
+        self.algorithm.load_weights(payload)
+        # Perform a forward pass till the cut layer in the model
+        logging.info(
+            "Performing a forward pass till the cut layer on client #%d",
+            self.client_id,
+        )
 
-            features, training_time = self.algorithm.extract_features(
-                self.trainset, self.sampler
-            )
-            logging.info("Finished extracting features.")
-            # Generate a report for the server, performing model testing if applicable
-            report = SimpleNamespace(
-                num_samples=self.sampler.num_samples(),
-                accuracy=accuracy,
-                training_time=training_time,
-                comm_time=comm_time,
-                update_response=False,
-                phase="features",
-            )
-            return report, features
-        else:
-            # Perform a complete training with gradients received
-            config = Config().trainer._asdict()
-            training_time = self.algorithm.complete_train(
-                config, self.trainset, self.sampler
-            )
-            weights = self.algorithm.extract_weights()
-            # Generate a report, signal the end of train
-            report = SimpleNamespace(
-                num_samples=self.sampler.num_samples(),
-                accuracy=accuracy,
-                training_time=training_time,
-                comm_time=comm_time,
-                update_response=False,
-                phase="weights",
-            )
-            return report, weights
+        features, training_time = self.algorithm.extract_features(
+            self.trainset, self.sampler
+        )
+        logging.info("Finished extracting features.")
+        # Generate a report for the server, performing model testing if applicable
+        report = SimpleNamespace(
+            num_samples=self.sampler.num_samples(),
+            accuracy=0,
+            training_time=training_time,
+            comm_time=time.time(),
+            update_response=False,
+            phase="features",
+        )
+        return report, features
+    
+    def complete_training(self, payload):
+        """Complete the training based on the gradients from server."""
+        self.algorithm.receive_gradients(payload)
+         # Perform a complete training with gradients received
+        config = Config().trainer._asdict()
+        training_time = self.algorithm.complete_train(
+            config, self.trainset, self.sampler
+        )
+        weights = self.algorithm.extract_weights()
+        # Generate a report, signal the end of train
+        report = SimpleNamespace(
+            num_samples=self.sampler.num_samples(),
+            accuracy=0,
+            training_time=training_time,
+            comm_time=time.time(),
+            update_response=False,
+            phase="weights",
+        )
+        return report, weights
+        
