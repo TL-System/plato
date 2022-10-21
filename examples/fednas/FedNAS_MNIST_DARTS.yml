@@ -83,6 +83,6 @@ parameters:
     architect:
         momentum: 0.9
         weight_decay: 0.0003
-        arch_learning_rate: 0.003
-        arch_weight_decay: 0.001
-        arch_baseline_decay: 0.99
+        learning_rate: 0.003
+        weight_decay: 0.001
+        baseline_decay: 0.99

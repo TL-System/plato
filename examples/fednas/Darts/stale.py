@@ -21,8 +21,8 @@ from .model_search_local import MaskedNetwork
 
 
 def compute_stale_grad_weight(old_model, new_model):
-    #old_model=old_model.cuda()
-    #new_model=new_model.cuda()
+    # old_model=old_model.cuda()
+    # new_model=new_model.cuda()
     old_weight_iter = old_model.parameters()
     new_weight_iter = new_model.parameters()
     try:
@@ -39,12 +39,13 @@ def compute_stale_grad_weight(old_model, new_model):
             new_weight.cpu()
     except StopIteration:
         pass
-    #old_model=old_model.cpu()
-    #new_model=new_model.cpu()
+    # old_model=old_model.cpu()
+    # new_model=new_model.cpu()
     return
 
+
 def compute_stale_grad_alpha(index_list, old_alphas, new_alphas):
-    old_prob = F.softmax(old_alphas,-1)
+    old_prob = F.softmax(old_alphas, -1)
     # multiplier lambda = 1
     result_grad = old_prob + old_prob * old_prob * (new_alphas - old_alphas)
     for edge_idx in range(old_alphas.shape[0]):
@@ -52,11 +53,15 @@ def compute_stale_grad_alpha(index_list, old_alphas, new_alphas):
         i_prob = old_prob[edge_idx][op_idx] - 1
         i_new_alpha = new_alphas[edge_idx][op_idx]
         i_old_alpha = old_alphas[edge_idx][op_idx]
-        result_grad[edge_idx][op_idx] = i_prob + i_prob * i_prob * (i_new_alpha - i_old_alpha)
+        result_grad[edge_idx][op_idx] = i_prob + i_prob * i_prob * (
+            i_new_alpha - i_old_alpha
+        )
     return result_grad
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     from torchvision import models
+
     # old_model = models.vgg11()
     # data = torch.ones(1,3,32,32)
     # output = old_model(data)
@@ -73,11 +78,11 @@ if __name__ == '__main__':
     # else:
     #     print("pass")
 
-    old_alphas = torch.rand(14,8)
+    old_alphas = torch.rand(14, 8)
     index_list = []
     for i in range(14):
-        index_list.append(i//2)
-    new_alphas = torch.rand(14,8)
-    old_alphas.grad = torch.zeros(14,8)
-    result = compute_stale_grad_alpha(index_list,old_alphas,new_alphas)
+        index_list.append(i // 2)
+    new_alphas = torch.rand(14, 8)
+    old_alphas.grad = torch.zeros(14, 8)
+    result = compute_stale_grad_alpha(index_list, old_alphas, new_alphas)
     print(result)

@@ -5,14 +5,11 @@ from Darts.model_search_local import MaskedNetwork
 from plato.config import Config
 import torch.nn as nn
 
+
 class Client(simple.Client):
     """A personalized federated learning client using the FedRep algorithm."""
 
-    def __init__(self,
-                 model=None,
-                 datasource=None,
-                 algorithm=None,
-                 trainer=None):
+    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
         super().__init__(model, datasource, algorithm, trainer)
 
         # parameter names of the representation
@@ -21,15 +18,20 @@ class Client(simple.Client):
         self.representation_param_names = []
 
     def process_server_response(self, server_response) -> None:
-        self.algorithm.mask_normal=torch.tensor(server_response['mask_normal'])
-        self.algorithm.mask_reduce = torch.tensor(server_response['mask_reduce'])
-        self.algorithm.model = MaskedNetwork(Config().parameters.model.C, Config().parameters.model.num_classes,
-                                     Config().parameters.model.layers, nn.CrossEntropyLoss(), self.algorithm.mask_normal,
-                                     self.algorithm.mask_reduce)
-        self.trainer.model=self.algorithm.model
+        self.algorithm.mask_normal = torch.tensor(server_response["mask_normal"])
+        self.algorithm.mask_reduce = torch.tensor(server_response["mask_reduce"])
+        self.algorithm.model = MaskedNetwork(
+            Config().parameters.model.C,
+            Config().parameters.model.num_classes,
+            Config().parameters.model.layers,
+            nn.CrossEntropyLoss(),
+            self.algorithm.mask_normal,
+            self.algorithm.mask_reduce,
+        )
+        self.trainer.model = self.algorithm.model
 
     def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
         """Customizes the report with any additional information."""
-        report.mask_normal=self.algorithm.mask_normal.numpy().tolist()
-        report.mask_reduce=self.algorithm.mask_reduce.numpy().tolist()
+        report.mask_normal = self.algorithm.mask_normal.numpy().tolist()
+        report.mask_reduce = self.algorithm.mask_reduce.numpy().tolist()
         return report
