@@ -8,11 +8,11 @@ from plato.datasources import base
 
 class DataSource(base.DataSource):
     """ The feature dataset. """
-
     def __init__(self, features):
         super().__init__()
 
-        self.feature_dataset = list(features)
+        # Faster way to deep flatten a list of lists compared to list comprehension
+        self.feature_dataset = list(chain.from_iterable(features))
         self.trainset = self.feature_dataset
         self.testset = []
 
