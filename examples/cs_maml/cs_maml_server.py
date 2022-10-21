@@ -47,7 +47,7 @@ class Server(fedavg_cs.Server):
                 len(self.selected_clients),
             )
 
-    def customize_server_response(self, server_response: dict) -> dict:
+    def customize_server_response(self, server_response: dict, client_id) -> dict:
         """Wrap up generating the server response with any additional information."""
         if self.do_personalization_test:
             server_response["personalization_test"] = True
@@ -57,7 +57,7 @@ class Server(fedavg_cs.Server):
         """Process the client reports by aggregating their weights."""
         if self.do_personalization_test:
             self.compute_personalization_accuracy()
-            await self.wrap_up_processing_reports()
+            self.clients_processed()
         else:
             await super()._process_reports()
 
@@ -70,8 +70,8 @@ class Server(fedavg_cs.Server):
             self.personalization_test_updates
         )
 
-    def get_record_items_values(self):
-        """Get values will be recorded in result csv file."""
+    def get_logged_items(self):
+        """Get items to be logged by the LogProgressCallback class in a .csv file."""
         return {
             "global_round": self.current_global_round,
             "round": self.current_round,
@@ -85,13 +85,13 @@ class Server(fedavg_cs.Server):
             "personalization_accuracy": self.personalization_accuracy * 100,
         }
 
-    async def wrap_up_processing_reports(self):
-        """Wrap up processing the reports with any additional work."""
+    def clients_processed(self):
+        """Additional work to be performed after client reports have been processed."""
         if self.do_personalization_test or Config().is_edge_server():
             # Record results
             new_row = []
             for item in self.recorded_items:
-                item_value = self.get_record_items_values()[item]
+                item_value = self.get_logged_items()[item]
                 new_row.append(item_value)
 
             if Config().is_edge_server():

@@ -75,6 +75,54 @@ H. Wu, P. Wang. &ldquo;[Fast-Convergent Federated Learning with Adaptive Weighti
 ```
 ````
 
+````{admonition} **Federated Unlearning**
+Federated unlearning is a concept proposed in the recent research literature that uses an unlearning algorithm, such as retraining from scratch, to guarantee that a client is able to remove all the effects of its local private data samples from the trained model.  In its implementation in `examples/fedunlearning/fedunlearning_server.py` and `examples/fedunlearning/fedunlearning_client.py`, a framework-agnostic implementation of federated unlearning overrides several methods in the client and server APIs, such as the server's `aggregate_deltas()` to implement federated unlearning.
+
+```shell
+python examples/fedunlearning/fedunlearning.py -c examples/fedunlearning/fedunlearning_adahessian_MNIST_lenet5.yml
+```
+
+```{note}
+If the AdaHessian optimizer is used as in the example configuration file, it will reflect what the following paper proposed:
+
+Liu et al., &ldquo;[The Right to be Forgotten in Federated Learning: An Efficient Realization with Rapid Retraining](https://arxiv.org/abs/2203.07320),&rdquo; in Proc. INFOCOM, 2022.
+```
+````
+
+
+````{admonition} **Gradient leakage attacks and defenses**
+Gradient leakage attacks and their defenses have been extensively studied in the research literature on federated learning.  In `examples/dlg/`, several attacks, including `DLG`, `iDLG`, and `csDLG`, have been implemented, as well as several defense mechanisms, including `Soteria`, `GradDefense`, `Differential Privacy`, `Gradient Compression`, and `Outpost`. A variety of methods in the trainer API has been used in their implementations.
+
+```shell
+python examples/dlg/dlg.py -c examples/dlg/reconstruction_emnist.yml --cpu
+```
+````
+
+````{admonition} **SCAFFOLD**
+SCAFFOLD is a synchronous federated learning algorithm that performs server aggregation with control variates to better handle statistical heterogeneity. It has been quite widely cited and compared with in the federated learning literature. In this example, two processors, called `ExtractControlVariatesProcessor` and `SendControlVariateProcessor`, have been introduced to the client using a callback class, called `ScaffoldCallback`. They are used for sending control variates between the clients and the server. Each client also tries to maintain its own control variates for local optimization using files.
+
+```shell
+python examples/scaffold/scaffold.py -c examples/scaffold/scaffold_MNIST_lenet5.yml
+```
+
+```{note}
+Karimireddy et al., &ldquo;[SCAFFOLD: Stochastic Controlled Averaging for Federated Learning](http://proceedings.mlr.press/v119/karimireddy20a.html), &rdquo; in Proc. ICML, 2020.
+```
+````
+
+````{admonition} **Pisces**
+Pisces is an asynchronous federated learning algorithm that performs biased client selection based on overall utilities and weighted server aggregation based on staleness. In this example, a client running the Pisces algorithm calculates its statistical utility and report it together with model updates to Pisces server. The server then evaluates the overall utility for each client based on the reported statistical utility and client staleness, and selects clients for the next communication round. The algorithm also attempts to detect outliers via DBSCAN for better robustness.
+
+```shell
+python examples/pisces/pisces.py -c examples/pisces/pisces_MNIST_lenet5.yml
+```
+
+```{note}
+Jiang et al., &ldquo; [Pisces: Efficient Federated Learning via Guided Asynchronous Training](https://arxiv.org/pdf/2206.09264.pdf),
+&rdquo; in Proc. ACM Symposium on Cloud Computing (SoCC), 2022.
+```
+````
+
 With the recent redesign of the Plato API, the following list is outdated and will be updated as they are tested again.
 
 |  Method  | Notes | Tested  |
@@ -87,4 +135,3 @@ With the recent redesign of the Plato API, the following list is outdated and wi
 |[MistNet](https://github.com/TL-System/plato/blob/main/docs/papers/MistNet.pdf) with separate client and server implementations | Change directory to `examples/dist_mistnet` and run `python custom_server.py -c ./mistnet_lenet5_server.yml`, then run `python custom_client.py -c ./mistnet_lenet5_client.yml -i 1`. | Yes |
 |[FedNova](https://proceedings.neurips.cc/paper/2020/hash/564127c03caab942e503ee6f810f54fd-Abstract.html) | Change directory to `examples/fednova` and run `python fednova.py -c <configuration file>`. | Yes |
 |[FedSarah](https://arxiv.org/pdf/1703.00102.pdf)                             | Change directory to `examples/fedsarah` and run `python fedsarah.py -c <configuration file>`. | Yes |
-|[SCAFFOLD](https://arxiv.org/pdf/1910.06378.pdf)                             | Change directory to `examples/scaffold` and run `python scaffold.py -c <configuration file>`. | Not yet |

@@ -11,24 +11,31 @@ from plato.config import Config
 
 class Client(simple.Client):
     """A federated learning client."""
-    def __init__(self,
-                 model=None,
-                 datasource=None,
-                 algorithm=None,
-                 trainer=None):
-        super().__init__(model=model,
-                         datasource=datasource,
-                         algorithm=algorithm,
-                         trainer=trainer)
+
+    def __init__(
+        self,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
+    ):
+        super().__init__(
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=None,
+        )
         self.do_personalization_test = False
 
     def process_server_response(self, server_response):
         """Additional client-specific processing on the server response."""
-        if 'personalization_test' in server_response:
+        if "personalization_test" in server_response:
             self.do_personalization_test = True
 
     async def start_training(self):
-        """ Complete one round of training on this client. """
+        """Complete one round of training on this client."""
         self.load_payload(self.server_payload)
         self.server_payload = None
 
@@ -36,7 +43,7 @@ class Client(simple.Client):
             # Train a personalized model based on the current meta model and test it
             # This report only contains accuracy of its personalized model
             report = await self.test_personalized_model()
-            payload = 'personalization_accuracy'
+            payload = "personalization_accuracy"
             self.do_personalization_test = False
         else:
             # Regular local training of FL
@@ -44,15 +51,16 @@ class Client(simple.Client):
             if Config().is_edge_server():
                 logging.info(
                     "[Server #%d] Model aggregated on edge server (%s).",
-                    os.getpid(), self)
+                    os.getpid(),
+                    self,
+                )
             else:
                 logging.info("[%s] Model trained.", self)
 
         # Sending the client report as metadata to the server (payload to follow)
-        await self.sio.emit('client_report', {
-            'id': self.client_id,
-            'report': pickle.dumps(report)
-        })
+        await self.sio.emit(
+            "client_report", {"id": self.client_id, "report": pickle.dumps(report)}
+        )
 
         # Sending the client training payload to the server
         await self.send(payload)
@@ -72,7 +80,8 @@ class Client(simple.Client):
             # The testing process failed, disconnect from the server
             await self.sio.disconnect()
 
-        logging.info("[%s] Personlization accuracy: %.2f%%", self,
-                     100 * personalization_accuracy)
+        logging.info(
+            "[%s] Personlization accuracy: %.2f%%", self, 100 * personalization_accuracy
+        )
 
         return personalization_accuracy

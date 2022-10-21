@@ -8,7 +8,7 @@ from typing import List
 
 
 def initialize_csv(
-    result_csv_file: str, recorded_items: List, result_path: str
+    result_csv_file: str, logged_items: List, result_path: str
 ) -> None:
     """Create a CSV file and writer the first row."""
     # Create a new directory if it does not exist
@@ -17,7 +17,7 @@ def initialize_csv(
 
     with open(result_csv_file, "w", encoding="utf-8") as result_file:
         result_writer = csv.writer(result_file)
-        header_row = recorded_items
+        header_row = logged_items
         result_writer.writerow(header_row)
 
 

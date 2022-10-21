@@ -27,11 +27,7 @@ class Server(fedavg_cs.Server):
                 Config().trainer.epochs for i in range(Config().algorithm.total_silos)
             ]
 
-        if Config().is_edge_server():
-            if "local_epoch_num" not in self.recorded_items:
-                self.recorded_items = self.recorded_items + ["local_epoch_num"]
-
-    def customize_server_response(self, server_response: dict) -> dict:
+    def customize_server_response(self, server_response: dict, client_id) -> dict:
         """Wrap up generating the server response with any additional information."""
         if Config().is_central_server():
             server_response["local_epoch_num"] = self.local_epoch_list
@@ -42,23 +38,23 @@ class Server(fedavg_cs.Server):
             server_response["local_epoch_num"] = Config().trainer.epochs
         return server_response
 
-    async def wrap_up_processing_reports(self):
-        """Wrap up processing the reports with any additional work."""
-        await super().wrap_up_processing_reports()
+    def clients_processed(self):
+        """Additional work to be performed after client reports have been processed."""
+        super().clients_processed()
 
         if Config().is_central_server():
-            self.update_local_epoch_list()
+            self._update_local_epoch_list()
 
-    def update_local_epoch_list(self):
+    def _update_local_epoch_list(self):
         """
         Update the local epoch list:
         decide clients' local epoch numbers of each institution.
         """
         weights_diff_list = self.get_weights_differences()
 
-        self.compute_local_epoch(weights_diff_list)
+        self._compute_local_epoch(weights_diff_list)
 
-    def compute_local_epoch(self, weights_diff_list):
+    def _compute_local_epoch(self, weights_diff_list):
         """A method to compute local epochs."""
         log_list = [math.log(i) for i in weights_diff_list]
         min_log = min(log_list)

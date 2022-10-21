@@ -19,8 +19,16 @@ from plato.utils import csv_processor
 class Server(fedavg.Server):
     """Cross-silo federated learning server using federated averaging."""
 
-    def __init__(self, model=None, algorithm=None, trainer=None):
-        super().__init__(model=model, algorithm=algorithm, trainer=trainer)
+    def __init__(
+        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+    ):
+        super().__init__(
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
+        )
 
         self.current_global_round = 0
         self.average_accuracy = 0
@@ -91,8 +99,6 @@ class Server(fedavg.Server):
                 self.clients_per_round,
             )
 
-            self.recorded_items = ["global_round"] + self.recorded_items
-
             # The training time of a edge server in one global round
             self.edge_training_time = 0
 
@@ -156,15 +162,6 @@ class Server(fedavg.Server):
                             self.datasource, testing=True
                         )
 
-            # Initialize path of the result .csv file
-            result_path = Config().params["result_path"]
-            result_csv_file = f"{result_path}/edge_{os.getpid()}.csv"
-            csv_processor.initialize_csv(
-                result_csv_file, self.recorded_items, result_path
-            )
-            # Delete the csv file created by inherited method
-            os.remove(f"{result_path}/{os.getpid()}.csv")
-
     async def select_clients(self, for_next_batch=False):
         if Config().is_edge_server() and not for_next_batch:
             if self.current_round == 0:
@@ -176,7 +173,7 @@ class Server(fedavg.Server):
 
         await super().select_clients(for_next_batch=for_next_batch)
 
-    def customize_server_response(self, server_response: dict) -> dict:
+    def customize_server_response(self, server_response: dict, client_id) -> dict:
         """Wrap up generating the server response with any additional information."""
         if Config().is_central_server():
             server_response["current_global_round"] = self.current_round
@@ -297,39 +294,18 @@ class Server(fedavg.Server):
         else:
             self.accuracy = self.average_accuracy
 
-        await self.wrap_up_processing_reports()
+        self.clients_processed()
 
-    async def wrap_up_processing_reports(self):
-        """Wrap up processing the reports with any additional work."""
+    def clients_processed(self):
+        """Additional work to be performed after client reports have been processed."""
         # Record results into a .csv file
         if Config().is_central_server():
-            await super().wrap_up_processing_reports()
+            super().clients_processed()
 
         if Config().is_edge_server():
-            self.edge_training_time += self.get_record_items_values()["round_time"]
-            self.edge_comm_time += self.get_record_items_values()["comm_time"]
-
-            new_row = []
-            for item in self.recorded_items:
-                item_value = self.get_record_items_values()[item]
-                new_row.append(item_value)
-
-            result_csv_file = f"{Config().params['result_path']}/edge_{os.getpid()}.csv"
-            csv_processor.write_csv(result_csv_file, new_row)
-
-            if hasattr(Config().clients, "do_test") and Config().clients.do_test:
-                # Updates the log for client test accuracies
-                accuracy_csv_file = (
-                    f"{Config().params['result_path']}/edge_{os.getpid()}_accuracy.csv"
-                )
-
-                for update in self.updates:
-                    accuracy_row = [
-                        self.current_round,
-                        update.client_id,
-                        update.report.accuracy,
-                    ]
-                    csv_processor.write_csv(accuracy_csv_file, accuracy_row)
+            logged_items = self.get_logged_items()
+            self.edge_training_time += logged_items["round_time"]
+            self.edge_comm_time += logged_items["comm_time"]
 
             # When a certain number of aggregations are completed, an edge client
             # needs to be signaled to send a report to the central server
@@ -344,21 +320,21 @@ class Server(fedavg.Server):
                 self.current_round = 0
                 self.current_global_round += 1
 
-    def get_record_items_values(self):
-        """Get values will be recorded in result csv file."""
-        record_items_values = super().get_record_items_values()
+    def get_logged_items(self):
+        """Get items to be logged by the LogProgressCallback class in a .csv file."""
+        logged_items = super().get_logged_items()
 
-        record_items_values["global_round"] = self.current_global_round
-        record_items_values["average_accuracy"] = self.average_accuracy
-        record_items_values["edge_agg_num"] = Config().algorithm.local_rounds
-        record_items_values["local_epoch_num"] = Config().trainer.epochs
+        logged_items["global_round"] = self.current_global_round
+        logged_items["average_accuracy"] = self.average_accuracy
+        logged_items["edge_agg_num"] = Config().algorithm.local_rounds
+        logged_items["local_epoch_num"] = Config().trainer.epochs
 
         if Config().is_central_server():
-            record_items_values["comm_time"] += max(
+            logged_items["comm_time"] += max(
                 update.report.edge_server_comm_time for update in self.updates
             )
 
-        return record_items_values
+        return logged_items
 
     async def wrap_up(self):
         """Wrapping up when each round of training is done."""
