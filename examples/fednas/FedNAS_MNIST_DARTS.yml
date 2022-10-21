@@ -19,9 +19,6 @@ server:
     do_test: false
     random_seed: 1
 
-    checkpoint_path: /data/dixi/plato/models/fednas/mnist
-    model_path: /data/dixi/plato/models/fednas/mnist
-
 data:
     # The training and testing dataset
     datasource: MNIST
@@ -64,9 +61,6 @@ trainer:
     lr_scheduler: CosineAnnealingLR
     
     model_name: darts
-
-results:
-    result_path: /data/dixi/plato/results/fednas/mnist
 
 algorithm:
     # Aggregation algorithm
