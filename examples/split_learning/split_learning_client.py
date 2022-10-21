@@ -41,7 +41,7 @@ class Client(simple.Client):
         self.gradient_received = False
 
     async def inbound_processed(self, data):
-        """"""
+        """Extract features or complete the training using split learning."""
         server_payload, info = data
 
         # Preparing the client response
@@ -49,14 +49,14 @@ class Client(simple.Client):
 
         if info == "weights":
             # server sends the global model, i.e., feature extraction
-            report, payload = self.feature_extract(server_payload)
+            report, payload = self._extract_features(server_payload)
         elif info == "gradients":
             # server sends the gradients of the features, i.e., complete training
-            report, payload = self.complete_training(server_payload)
+            report, payload = self._complete_training(server_payload)
 
         return report, payload
 
-    def feature_extract(self, payload):
+    def _extract_features(self, payload):
         """Extract the feature till the cut layer."""
         self.algorithm.load_weights(payload)
         # Perform a forward pass till the cut layer in the model
@@ -68,7 +68,7 @@ class Client(simple.Client):
         features, training_time = self.algorithm.extract_features(
             self.trainset, self.sampler
         )
-        logging.info("Finished extracting features.")
+        logging.info("[%s] Finished extracting features.", self)
         # Generate a report for the server, performing model testing if applicable
         report = SimpleNamespace(
             num_samples=self.sampler.num_samples(),
@@ -80,7 +80,7 @@ class Client(simple.Client):
         )
         return report, features
     
-    def complete_training(self, payload):
+    def _complete_training(self, payload):
         """Complete the training based on the gradients from server."""
         self.algorithm.receive_gradients(payload)
          # Perform a complete training with gradients received
