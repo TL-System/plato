@@ -25,9 +25,13 @@ class Server(fedavg_cs.Server):
                 if hasattr(Config().clients, "pruning_amount")
                 else 0.4
             )
-            self.pruning_amount_list = [
-                init_pruning_amount for i in range(Config().algorithm.total_silos)
-            ]
+            self.pruning_amount_list = {
+                client_id: init_pruning_amount
+                for client_id in range(
+                    1 + Config().clients.total_clients,
+                    Config().algorithm.total_silos + 1 + Config().clients.total_clients,
+                )
+            }
 
         if Config().is_edge_server():
             self.edge_pruning_amount = 0
@@ -55,38 +59,44 @@ class Server(fedavg_cs.Server):
 
     def update_pruning_amount_list(self):
         """Update the list of each institution's clients' pruning_amount."""
-        weights_diff_list = self.get_weights_differences()
+        weights_diff_dict, weights_diff_list = self.get_weights_differences()
 
         median = statistics.median(weights_diff_list)
 
-        for i, weight_diff in enumerate(weights_diff_list):
-            self.pruning_amount_list[i] = 1 / (
-                1 + math.exp((median - weight_diff) / median)
-            )
+        for client_id in weights_diff_dict:
+            if weights_diff_dict[client_id]:
+                self.pruning_amount_list[client_id] = 1 / (
+                    1 + math.exp((median - weights_diff_dict[client_id]) / median)
+                )
 
     def get_weights_differences(self):
         """
         Get the weights differences of each edge server's aggregated model
         and the global model.
         """
-        weights_diff_list = []
-        for i in range(Config().algorithm.total_silos):
-            client_id = i + 1 + Config().clients.total_clients
+        weights_diff_dict = {
+            client_id: None
+            for client_id in range(
+                1 + Config().clients.total_clients,
+                Config().algorithm.total_silos + 1 + Config().clients.total_clients,
+            )
+        }
 
-            (report, received_updates) = [
-                (update.report, update.payload)
-                for update in self.updates
-                if int(update.report.client_id) == client_id
-            ][0]
-            num_samples = report.num_samples
+        weights_diff_list = []
+
+        for update in self.updates:
+            client_id = update.report.client_id
+            num_samples = update.report.num_samples
+            received_updates = update.payload
 
             weights_diff = self.compute_weights_difference(
                 received_updates, num_samples
             )
 
+            weights_diff_dict[client_id] = weights_diff
             weights_diff_list.append(weights_diff)
 
-        return weights_diff_list
+        return weights_diff_dict, weights_diff_list
 
     def compute_weights_difference(self, received_updates, num_samples):
         """

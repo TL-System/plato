@@ -78,8 +78,6 @@ class Client(edge.Client):
 
         if "pruning_amount" in server_response:
             pruning_amount_list = server_response["pruning_amount"]
-            pruning_amount = pruning_amount_list[
-                self.client_id - Config().clients.total_clients - 1
-            ]
+            pruning_amount = pruning_amount_list[str(self.client_id)]
             # Update pruning amount
             self.server.edge_pruning_amount = pruning_amount
