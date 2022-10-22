@@ -10,7 +10,7 @@ import torch.nn as nn
 
 
 class Server(fedavg.Server):
-    def customize_server_response(self, server_response: dict) -> dict:
+    def customize_server_response(self, server_response: dict, client_id) -> dict:
         if (
             hasattr(Config().parameters.architect, "e_greedy")
             and Config().parameters.architect.e_greedy.epsilon > 0
