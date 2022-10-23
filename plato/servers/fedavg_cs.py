@@ -354,8 +354,9 @@ class Server(fedavg.Server):
         record_items_values["local_epoch_num"] = Config().trainer.epochs
 
         if Config().is_central_server():
-            record_items_values["comm_time"] += max(
-                update.report.edge_server_comm_time for update in self.updates
+            record_items_values["comm_time"] = max(
+                update.report.comm_time + update.report.edge_server_comm_time
+                for update in self.updates
             )
 
         return record_items_values
