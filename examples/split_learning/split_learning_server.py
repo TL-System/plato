@@ -22,7 +22,70 @@ from plato.servers import fedavg
 class Server(fedavg.Server):
     """The split learning server."""
 
-    def load_gradients(self):
+    def __init__(
+        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+    ):
+        super().__init__(model, datasource, algorithm, trainer, callbacks)
+
+        self.phase = "weights"
+        self.clients_selected_last = None
+        self.gradients_to_send = {}
+
+    def choose_clients(self, clients_pool, clients_count):
+        """Choose the same clients every two rounds."""
+        if self.phase == "weights":
+            self.clients_selected_last = super().choose_clients(
+                clients_pool, clients_count
+            )
+
+        return self.clients_selected_last
+
+    def customize_server_payload(self, payload):
+        """Wrap up generating the server payload with any additional information."""
+        if self.phase == "weights":
+            # Send global model weights to the clients
+            return (payload, "weights")
+        else:
+            # Send gradients back to client to complete the training
+            return (self.gradients_to_send.pop(self.selected_client_id), "gradients")
+
+    async def aggregate_weights(self, updates, baseline_weights, weights_received):
+        """Compute gradients and aggregate weights in different rounds."""
+        if self.phase == "weights":
+            for update in updates:
+                feature_dataset = feature.DataSource([update.payload])
+
+                # Training the model using all the features received from the client
+                sampler = all_inclusive.Sampler(feature_dataset)
+                self.algorithm.train(feature_dataset, sampler)
+
+                # Compute the gradients and get ready to be sent
+                self.gradients_to_send[update.client_id] = self._load_gradients()
+
+            self.phase = "gradients"
+            # No weights update in this round
+            return baseline_weights
+
+        elif self.phase == "gradients":
+            # Perform federated averaging algorithm (copied from fedavg.Server for convenience)
+            self.total_samples = sum(update.report.num_samples for update in updates)
+            updated_weights = {
+                name: self.trainer.zeros(weight.shape)
+                for name, weight in weights_received[0].items()
+            }
+
+            for i, update in enumerate(weights_received):
+                report = updates[i].report
+                num_samples = report.num_samples
+
+                for name, weight in update.items():
+                    # Use weighted average by the number of samples
+                    updated_weights[name] += weight * (num_samples / self.total_samples)
+
+            self.phase = "weights"
+            return updated_weights
+
+    def _load_gradients(self):
         """Loading gradients from a file."""
         model_path = Config().params["model_path"]
         model_name = Config().trainer.model_name
@@ -33,31 +96,3 @@ class Server(fedavg.Server):
         )
 
         return torch.load(model_gradients_path)
-
-    def customize_server_payload(self, payload):
-        """Wrap up generating the server payload with any additional information."""
-        # sending global model to the clients
-        return (payload, "weights")
-
-    async def process_client_info(self, client_id, sid):
-        """Process the received metadata information from a reporting client."""
-        if self.reports[sid].phase == "features":
-            payload = self.client_payload[sid]
-            feature_dataset = feature.DataSource([payload])
-
-            # Training the model using all the features received from the client
-            sampler = all_inclusive.Sampler(feature_dataset)
-            self.algorithm.train(feature_dataset, sampler)
-
-            # Sending the gradients calculated by the server to the clients
-            gradients = self.load_gradients()
-            logging.info(
-                "[Server #%d] Reporting gradients to client #%d.",
-                os.getpid(),
-                client_id,
-            )
-            server_payload = (gradients, "gradients")
-            await self.send(sid, server_payload, client_id)
-
-        elif self.reports[sid].phase == "weights":
-            await super().process_client_info(client_id, sid)

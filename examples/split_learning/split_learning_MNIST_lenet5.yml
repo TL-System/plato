@@ -13,7 +13,7 @@ clients:
 
 server:
     type: split_learning
-
+    random_seed: 1
     address: 127.0.0.1
     port: 8000
 

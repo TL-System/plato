@@ -39,6 +39,7 @@ class Client(simple.Client):
 
         self.model_received = False
         self.gradient_received = False
+        self.contexts = {}
 
     async def inbound_processed(self, data):
         """Extract features or complete the training using split learning."""
@@ -50,8 +51,10 @@ class Client(simple.Client):
         if info == "weights":
             # server sends the global model, i.e., feature extraction
             report, payload = self._extract_features(server_payload)
+            self._save_context()
         elif info == "gradients":
             # server sends the gradients of the features, i.e., complete training
+            self._load_context()
             report, payload = self._complete_training(server_payload)
 
         return report, payload
@@ -76,11 +79,11 @@ class Client(simple.Client):
             phase="features",
         )
         return report, features
-    
+
     def _complete_training(self, payload):
         """Complete the training based on the gradients from server."""
         self.algorithm.receive_gradients(payload)
-         # Perform a complete training with gradients received
+        # Perform a complete training with gradients received
         config = Config().trainer._asdict()
         training_time = self.algorithm.complete_train(
             config, self.trainset, self.sampler
@@ -96,4 +99,11 @@ class Client(simple.Client):
             phase="weights",
         )
         return report, weights
-        
+
+    def _save_context(self):
+        """Save the context of current client to accomodate simulated clients."""
+        self.contexts[self.client_id] = self.algorithm.extract_weights()
+
+    def _load_context(self):
+        """Load context to complete the training."""
+        self.algorithm.load_weights(self.contexts.pop(self.client_id))
