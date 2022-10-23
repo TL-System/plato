@@ -1,3 +1,5 @@
+from torch import nn
+
 from plato.algorithms import fedavg
 from plato.config import Config
 
@@ -37,7 +39,6 @@ class ServerAlgorithm(fedavg.Algorithm):
 
     def load_weights(self, weights):
         """Load the model weights passed in as a parameter."""
-        pass
 
 
 class ClientAlgorithm(fedavg.Algorithm):

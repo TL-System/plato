@@ -1,6 +1,6 @@
 import logging
-
 import torch
+
 from plato.config import Config
 from plato.servers import fedavg
 
@@ -33,6 +33,7 @@ class Server(fedavg.Server):
     async def aggregate_weights(self, updates, baseline_weights, weights_received):
         mask_normals = [update.report.mask_normal for update in updates]
         mask_reduces = [update.report.mask_reduce for update in updates]
+
         # NAS aggregation
         client_models = []
 
