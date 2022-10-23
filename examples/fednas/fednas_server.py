@@ -1,3 +1,12 @@
+"""
+Federared Model Search via Reinforcement Learning
+
+Reference:
+
+Yao et al., "Federated Model Search via Reinforcement Learning", in the Proceedings of ICDCS 2021
+
+https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9546522
+"""
 import logging
 
 from plato.config import Config
@@ -8,6 +17,8 @@ from fednas_tools import extract_index, fuse_weight_gradient, sample_mask
 
 
 class Server(fedavg.Server):
+    """FedNAS server, assign and aggregate model with diff arch"""
+
     def customize_server_response(self, server_response: dict, client_id) -> dict:
         if (
             hasattr(Config().parameters.architect, "e_greedy")
@@ -30,6 +41,7 @@ class Server(fedavg.Server):
         logging.info("[%s] geneotypes: %s\n", self, self.trainer.model.model.genotype())
 
     async def aggregate_weights(self, updates, baseline_weights, weights_received):
+        """fuse weight of models with different arch"""
         masks_normal = [update.report.mask_normal for update in updates]
         masks_reduce = [update.report.mask_reduce for update in updates]
 
@@ -55,6 +67,7 @@ class Server(fedavg.Server):
         )
 
     def weights_aggregated(self, updates):
+        """after weight aggregation, update the arch parameter alpha"""
         accuracy_list = [update.report.accuracy for update in updates]
         mask_normals = [update.report.mask_normal for update in updates]
         mask_reduces = [update.report.mask_reduce for update in updates]
