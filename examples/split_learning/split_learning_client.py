@@ -60,10 +60,7 @@ class Client(simple.Client):
         """Extract the feature till the cut layer."""
         self.algorithm.load_weights(payload)
         # Perform a forward pass till the cut layer in the model
-        logging.info(
-            "Performing a forward pass till the cut layer on client #%d",
-            self.client_id,
-        )
+        logging.info("[%s] Performing a forward pass till the cut layer.", self)
 
         features, training_time = self.algorithm.extract_features(
             self.trainset, self.sampler

@@ -18,100 +18,58 @@ from plato.trainers import basic
 
 
 class Trainer(basic.Trainer):
-    def train_model(self, config, trainset, sampler, cut_layer=None):
+    """The split learning trainer."""
+
+    def __init__(self, model=None, callbacks=None):
+        """Initializing the trainer with the provided model.
+
+        Arguments:
+        model: The model to train.
+        callbacks: The callbacks that this trainer uses.
         """
-        Update the global model on the server with the features received
-        from the client and calculate the gradients.
+        super().__init__(model=model, callbacks=callbacks)
+        self.cut_layer_grad = []
+
+    def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
         """
-        batch_size = config["batch_size"]
-        log_interval = 10
+        Creates an instance of the trainloader.
 
-        if self.client_id == 0:
-            logging.info("[Server #%d] Loading the dataset.", os.getpid())
-        else:
-            logging.info("[Client #%d] Loading the dataset.", self.client_id)
+        Arguments:
+        batch_size: the batch size.
+        trainset: the training dataset.
+        sampler: the sampler for the trainloader to use.
+        """
+        return trainset
 
-        train_loader = trainset
+    def perform_forward_and_backward_passes(self, config, examples, labels):
+        """Perform the forward and backward passes of the training loop.
 
-        iterations_per_epoch = len(train_loader)
+        Arguments:
+        config: the configuration.
+        examples: data samples in the current batch.
+        labels: labels in the current batch.
 
-        # Sending the model to the device used for training
-        self.model.to(self.device)
-        self.model.train()
+        Returns: loss values after the current batch has been processed.
+        """
+        examples = examples.detach().requires_grad_(True)
 
-        loss_criterion = self.get_loss_criterion()
+        loss = super().perform_forward_and_backward_passes(config, examples, labels)
 
-        # Initializing the optimizer
-        optimizer = self.get_optimizer(self.model)
+        # Record gradients within the cut layer
+        self.cut_layer_grad.append(examples.grad.clone().detach())
 
-        # Initializing the learning rate schedule, if necessary
-        if hasattr(Config().trainer, "lr_schedule"):
-            lr_schedule = self.get_lr_schedule(config, optimizer)
-        else:
-            lr_schedule = None
+        return loss
 
-        if self.client_id == 0:
-            logging.info("[Server #%d] Beginning to train.", os.getpid())
-        else:
-            logging.info("[Client #%d] Beginning to train.", self.client_id)
-
-        # Record the gradients of the cut layer
-        cut_layer_grad = []
-
-        for batch_id, (examples, labels) in enumerate(train_loader):
-            examples, labels = examples.to(self.device), labels.to(self.device)
-            optimizer.zero_grad()
-
-            examples = examples.detach().requires_grad_(True)
-
-            outputs = self.model(examples)
-
-            loss = loss_criterion(outputs, labels)
-            loss.backward()
-
-            # Record gradients within the cut layer
-            cut_layer_grad.append(examples.grad.clone().detach())
-
-            optimizer.step()
-
-            if batch_id % log_interval == 0:
-                if self.client_id == 0:
-                    logging.info(
-                        "[Server #%d] Batch [%d/%d]\tLoss: %.6f",
-                        os.getpid(),
-                        batch_id,
-                        len(train_loader),
-                        loss.data.item(),
-                    )
-                else:
-                    logging.info(
-                        "[Client #%d] Batch [%d/%d]\tLoss: %.6f",
-                        self.client_id,
-                        batch_id,
-                        len(train_loader),
-                        loss.data.item(),
-                    )
-
-            if lr_schedule is not None:
-                lr_scheduler.step()
-
-        if hasattr(optimizer, "params_state_update"):
-            optimizer.params_state_update()
-
-        self.save_gradients(cut_layer_grad)
-
-    def save_gradients(self, cut_layer_grad):
-        """Saving gradients to a file."""
-        model_name = Config().trainer.model_name
+    def train_run_end(self, config):
+        """Saving recorded gradients to a file."""
+        model_name = config["model_name"]
         model_path = Config().params["model_path"]
 
         if not os.path.exists(model_path):
             os.makedirs(model_path)
 
         model_gradients_path = f"{model_path}/{model_name}_gradients.pth"
-        if os.path.exists(model_gradients_path):
-            os.remove(model_gradients_path)
-        torch.save(cut_layer_grad, model_gradients_path)
+        torch.save(self.cut_layer_grad, model_gradients_path)
 
         logging.info(
             "[Server #%d] Gradients saved to %s.", os.getpid(), model_gradients_path
