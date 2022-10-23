@@ -14,7 +14,22 @@ from Darts.model_search_local import MaskedNetwork
 from fednas_tools import client_weight_param
 
 
-class ServerAlgorithm(fedavg.Algorithm):
+class FedNASAlgorithm(fedavg.Algorithm):
+    """basic algorithm for FedNAS"""
+
+    def generate_client_model(self, mask_normal, mask_reduce):
+        """generated the structure of client model"""
+        client_model = MaskedNetwork(
+            Config().parameters.model.C,
+            Config().parameters.model.num_classes,
+            Config().parameters.model.layers,
+            mask_normal,
+            mask_reduce,
+        )
+        return client_model
+
+
+class ServerAlgorithm(FedNASAlgorithm):
     """The federated learning algorithm for FedNAS, used by the server, who holds supernet."""
 
     def __init__(self, trainer=None):
@@ -30,32 +45,15 @@ class ServerAlgorithm(fedavg.Algorithm):
 
         mask_normal = self.mask_normal
         mask_reduce = self.mask_reduce
-        client_model = MaskedNetwork(
-            Config().parameters.model.C,
-            Config().parameters.model.num_classes,
-            Config().parameters.model.layers,
-            mask_normal,
-            mask_reduce,
-        )
+        client_model = self.generate_client_model(mask_normal, mask_reduce)
         client_weight_param(model.model, client_model)
         return client_model.cpu().state_dict()
 
     def load_weights(self, weights):
         """Load the model weights passed in as a parameter."""
 
-    def generate_client_model(self, mask_normal, mask_reduce):
-        """generated the structure of client model"""
-        client_model = MaskedNetwork(
-            Config().parameters.model.C,
-            Config().parameters.model.num_classes,
-            Config().parameters.model.layers,
-            mask_normal,
-            mask_reduce,
-        )
-        return client_model
 
-
-class ClientAlgorithm(fedavg.Algorithm):
+class ClientAlgorithm(FedNASAlgorithm):
     """The federated learning algorithm for FedNAS, used by the client, who holds subnets."""
 
     def __init__(self, trainer=None):
