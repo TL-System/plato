@@ -12,7 +12,6 @@ import logging
 from plato.config import Config
 from plato.servers import fedavg
 
-from Darts.model_search_local import MaskedNetwork
 from fednas_tools import extract_index, fuse_weight_gradient, sample_mask
 
 
@@ -51,12 +50,8 @@ class Server(fedavg.Server):
         for i, payload in enumerate(weights_received):
             mask_normal = masks_normal[i]
             mask_reduce = masks_reduce[i]
-            client_model = MaskedNetwork(
-                Config().parameters.model.C,
-                Config().parameters.model.num_classes,
-                Config().parameters.model.layers,
-                mask_normal,
-                mask_reduce,
+            client_model = self.algorithm.generate_client_model(
+                mask_normal, mask_reduce
             )
             client_model.load_state_dict(payload, strict=True)
             client_models.append(client_model)

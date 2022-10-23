@@ -43,6 +43,17 @@ class ServerAlgorithm(fedavg.Algorithm):
     def load_weights(self, weights):
         """Load the model weights passed in as a parameter."""
 
+    def generate_client_model(self, mask_normal, mask_reduce):
+        """generated the structure of client model"""
+        client_model = MaskedNetwork(
+            Config().parameters.model.C,
+            Config().parameters.model.num_classes,
+            Config().parameters.model.layers,
+            mask_normal,
+            mask_reduce,
+        )
+        return client_model
+
 
 class ClientAlgorithm(fedavg.Algorithm):
     """The federated learning algorithm for FedNAS, used by the client, who holds subnets."""
