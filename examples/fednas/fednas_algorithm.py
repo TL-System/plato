@@ -11,7 +11,12 @@ from plato.algorithms import fedavg
 from plato.config import Config
 
 from Darts.model_search_local import MaskedNetwork
-from fednas_tools import client_weight_param
+from fednas_tools import (
+    client_weight_param,
+    sample_mask,
+    fuse_weight_gradient,
+    extract_index,
+)
 
 
 class FedNASAlgorithm(fedavg.Algorithm):
@@ -51,6 +56,37 @@ class ServerAlgorithm(FedNASAlgorithm):
 
     def load_weights(self, weights):
         """Load the model weights passed in as a parameter."""
+
+    def sample_mask(self, epsilon):
+        """sample mask to generate a subnet"""
+        mask_normal = sample_mask(self.model.alphas_normal, epsilon)
+        mask_reduce = sample_mask(self.model.alphas_reduce, epsilon)
+        self.mask_normal = mask_normal
+        self.mask_reduce = mask_reduce
+        return mask_normal, mask_reduce
+
+    def nas_aggregation(
+        self, masks_normal, masks_reduce, weights_received, num_samples
+    ):
+        """weight aggregation in NAS"""
+        # NAS aggregation
+        client_models = []
+
+        for i, payload in enumerate(weights_received):
+            mask_normal = masks_normal[i]
+            mask_reduce = masks_reduce[i]
+            client_model = self.generate_client_model(mask_normal, mask_reduce)
+            client_model.load_state_dict(payload, strict=True)
+            client_models.append(client_model)
+        fuse_weight_gradient(
+            self.model.model,
+            client_models,
+            num_samples,
+        )
+
+    def extract_index(self, mask):
+        """extract edge index according to the mask"""
+        return extract_index(mask)
 
 
 class ClientAlgorithm(FedNASAlgorithm):

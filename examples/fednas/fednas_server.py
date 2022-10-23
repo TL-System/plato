@@ -12,8 +12,6 @@ import logging
 from plato.config import Config
 from plato.servers import fedavg
 
-from fednas_tools import extract_index, fuse_weight_gradient, sample_mask
-
 
 class Server(fedavg.Server):
     """FedNAS server, assign and aggregate model with diff arch"""
@@ -27,10 +25,7 @@ class Server(fedavg.Server):
             epsilon = Config().parameters.architect.e_greedy.epsilon
         else:
             epsilon = 0
-        mask_normal = sample_mask(self.algorithm.model.alphas_normal, epsilon)
-        mask_reduce = sample_mask(self.algorithm.model.alphas_reduce, epsilon)
-        self.algorithm.mask_normal = mask_normal
-        self.algorithm.mask_reduce = mask_reduce
+        mask_normal, mask_reduce = self.algorithm.sample_mask(epsilon)
         server_response["mask_normal"] = mask_normal
         server_response["mask_reduce"] = mask_reduce
         return server_response
@@ -43,22 +38,9 @@ class Server(fedavg.Server):
         """fuse weight of models with different arch"""
         masks_normal = [update.report.mask_normal for update in updates]
         masks_reduce = [update.report.mask_reduce for update in updates]
-
-        # NAS aggregation
-        client_models = []
-
-        for i, payload in enumerate(weights_received):
-            mask_normal = masks_normal[i]
-            mask_reduce = masks_reduce[i]
-            client_model = self.algorithm.generate_client_model(
-                mask_normal, mask_reduce
-            )
-            client_model.load_state_dict(payload, strict=True)
-            client_models.append(client_model)
-        fuse_weight_gradient(
-            self.trainer.model.model,
-            client_models,
-            [update.report.num_samples for update in updates],
+        num_samples = [update.report.num_samples for update in updates]
+        self.algorithm.nas_aggregation(
+            masks_normal, masks_reduce, weights_received, num_samples
         )
 
     def weights_aggregated(self, updates):
@@ -66,16 +48,17 @@ class Server(fedavg.Server):
         accuracy_list = [update.report.accuracy for update in updates]
         mask_normals = [update.report.mask_normal for update in updates]
         mask_reduces = [update.report.mask_reduce for update in updates]
+
         epoch_index_normal = []
         epoch_index_reduce = []
 
         for i in range(len(updates)):
             mask_normal = mask_normals[i]
             mask_reduce = mask_reduces[i]
-            index_normal = extract_index(mask_normal)
-            index_reduce = extract_index(mask_reduce)
+            index_normal = self.algorithm.extract_index(mask_normal)
+            index_reduce = self.algorithm.extract_index(mask_reduce)
             epoch_index_normal.append(index_normal)
             epoch_index_reduce.append(index_reduce)
 
-        self.trainer.model.step(accuracy_list, epoch_index_normal, epoch_index_reduce)
-        self.algorithm.model = self.trainer.model
+        self.algorithm.model.step(accuracy_list, epoch_index_normal, epoch_index_reduce)
+        self.trainer.model = self.algorithm.model
