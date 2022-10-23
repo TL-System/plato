@@ -1,5 +1,6 @@
 import logging
 import torch
+from torch import nn
 
 from plato.config import Config
 from plato.servers import fedavg
