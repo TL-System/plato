@@ -23,8 +23,6 @@ data:
     # The training and testing dataset
     datasource: MNIST
 
-    data_path: /data/dixi
-
     # Number of samples in each partition
     partition_size: 600
 
