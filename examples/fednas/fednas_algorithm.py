@@ -1,19 +1,17 @@
+"""The federated NAS algorithm, assigning different models to clients"""
 from plato.algorithms import fedavg
 from plato.config import Config
 
 from Darts.model_search_local import MaskedNetwork
-from fednas_tools import *
+from fednas_tools import client_weight_param
 
 
 class ServerAlgorithm(fedavg.Algorithm):
-    """The federated learning algorithm for FedRep, used by the server."""
+    """The federated learning algorithm for FedNAS, used by the server, who holds supernet"""
 
     def __init__(self, trainer=None):
         super().__init__(trainer)
 
-        # parameter names of the representation
-        # As mentioned by Eq. 1 and Fig. 2 of the paper, the representation
-        # behaves as the global model.
         self.mask_normal = None
         self.mask_reduce = None
 
@@ -39,7 +37,7 @@ class ServerAlgorithm(fedavg.Algorithm):
 
 
 class ClientAlgorithm(fedavg.Algorithm):
-    """The federated learning algorithm for FedRep, used by the server."""
+    """The federated learning algorithm for FedNAS, used by the client, who holds subnets"""
 
     def __init__(self, trainer=None):
         super().__init__(trainer)
