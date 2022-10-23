@@ -1,26 +1,10 @@
-import torch
-import numpy as np
-import torch.nn.functional as F
-import os
-import sys
-import time
-import glob
-import torch
-import Darts.utils as utils
-import logging
-import argparse
-import torch.nn as nn
-import torch.utils
-import torchvision.datasets as dset
-import torch.backends.cudnn as cudnn
 import copy
 import random
-from collections import OrderedDict
 
+import numpy as np
+import torch
 from torch.autograd import Variable
-from Darts.model_search import Network
-from Darts.model_search_local import MaskedNetwork
-from Darts.architect import Architect
+
 from Darts.genotypes import PRIMITIVES
 
 num_edges = 14

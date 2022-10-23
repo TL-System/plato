@@ -1,9 +1,11 @@
-from plato.clients import simple
 from types import SimpleNamespace
+
 import torch
+
 from Darts.model_search_local import MaskedNetwork
+
+from plato.clients import simple
 from plato.config import Config
-import torch.nn as nn
 
 
 class Client(simple.Client):

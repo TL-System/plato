@@ -10,12 +10,14 @@ https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9546522
 NAS Search Space: Darts https://github.com/quark0/darts
 """
 
+
+import fednas_algorithm
 import fednas_client
 import fednas_server
-from plato.trainers.basic import Trainer
-import fednas_algorithm
-from Darts.model_search import Network
 from Darts.architect import Architect
+from Darts.model_search import Network
+
+from plato.trainers.basic import Trainer
 
 
 def main():

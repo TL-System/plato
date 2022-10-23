@@ -1,12 +1,11 @@
 import logging
-import torch
 
-from fednas_tools import fuse_weight_gradient, extract_index, sample_mask
-from Darts.model_search_local import MaskedNetwork
+import torch
 from plato.config import Config
 from plato.servers import fedavg
 
-import torch.nn as nn
+from Darts.model_search_local import MaskedNetwork
+from fednas_tools import extract_index, fuse_weight_gradient, sample_mask
 
 
 class Server(fedavg.Server):

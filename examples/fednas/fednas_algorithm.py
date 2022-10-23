@@ -1,10 +1,8 @@
-from collections import OrderedDict
-
 from plato.algorithms import fedavg
-from fednas_tools import *
-from Darts.model_search_local import MaskedNetwork
 from plato.config import Config
-import torch.nn as nn
+
+from Darts.model_search_local import MaskedNetwork
+from fednas_tools import *
 
 
 class ServerAlgorithm(fedavg.Algorithm):
