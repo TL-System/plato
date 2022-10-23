@@ -1,4 +1,12 @@
-"""The federated NAS algorithm, assigning different models to clients"""
+"""
+Federared Model Search via Reinforcement Learning
+
+Reference:
+
+Yao et al., "Federated Model Search via Reinforcement Learning", in the Proceedings of ICDCS 2021
+
+https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9546522
+"""
 from plato.algorithms import fedavg
 from plato.config import Config
 
@@ -7,7 +15,7 @@ from fednas_tools import client_weight_param
 
 
 class ServerAlgorithm(fedavg.Algorithm):
-    """The federated learning algorithm for FedNAS, used by the server, who holds supernet"""
+    """The federated learning algorithm for FedNAS, used by the server, who holds supernet."""
 
     def __init__(self, trainer=None):
         super().__init__(trainer)
@@ -16,7 +24,7 @@ class ServerAlgorithm(fedavg.Algorithm):
         self.mask_reduce = None
 
     def extract_weights(self, model=None):
-        """Extract weights from the model."""
+        """Extract weights from the supernet and assign different models to clients."""
         if model is None:
             model = self.model
 
@@ -37,7 +45,7 @@ class ServerAlgorithm(fedavg.Algorithm):
 
 
 class ClientAlgorithm(fedavg.Algorithm):
-    """The federated learning algorithm for FedNAS, used by the client, who holds subnets"""
+    """The federated learning algorithm for FedNAS, used by the client, who holds subnets."""
 
     def __init__(self, trainer=None):
         super().__init__(trainer)

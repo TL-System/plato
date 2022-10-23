@@ -1,3 +1,12 @@
+"""
+Federared Model Search via Reinforcement Learning
+
+Reference:
+
+Yao et al., "Federated Model Search via Reinforcement Learning", in the Proceedings of ICDCS 2021
+
+https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9546522
+"""
 from types import SimpleNamespace
 
 from Darts.model_search_local import MaskedNetwork
@@ -7,7 +16,7 @@ from plato.config import Config
 
 
 class Client(simple.Client):
-    """A personalized federated learning client using the FedRep algorithm."""
+    """FedNAS client, each client holds different models"""
 
     def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
         super().__init__(model, datasource, algorithm, trainer)
@@ -30,7 +39,7 @@ class Client(simple.Client):
         self.trainer.model = self.algorithm.model
 
     def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
-        """Customizes the report with any additional information."""
+        """Mask information is necessary for supernet aggregation"""
         report.mask_normal = self.algorithm.mask_normal
         report.mask_reduce = self.algorithm.mask_reduce
         return report
