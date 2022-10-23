@@ -1,6 +1,7 @@
 from types import SimpleNamespace
 
 import torch
+from torch import nn
 
 from Darts.model_search_local import MaskedNetwork
 
