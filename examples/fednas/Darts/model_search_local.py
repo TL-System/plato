@@ -86,12 +86,12 @@ class MaskedNetwork(nn.Module):
         C,
         num_classes,
         layers,
-        criterion,
         mask_normal,
         mask_reduce,
         steps=4,
         multiplier=4,
         stem_multiplier=3,
+        criterion=nn.CrossEntropyLoss(),
     ):
         super(MaskedNetwork, self).__init__()
         self._C = C  # number of input channels
@@ -102,8 +102,8 @@ class MaskedNetwork(nn.Module):
         self._multiplier = multiplier
 
         # input mask for training
-        self.mask_normal = copy.deepcopy(mask_normal)
-        self.mask_reduce = copy.deepcopy(mask_reduce)
+        self.mask_normal = copy.deepcopy(torch.tensor(mask_normal))
+        self.mask_reduce = copy.deepcopy(torch.tensor(mask_reduce))
 
         self.num_op = 0
         for element in mask_normal[0]:

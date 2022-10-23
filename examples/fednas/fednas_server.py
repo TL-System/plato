@@ -1,6 +1,4 @@
 import logging
-import torch
-from torch import nn
 
 from plato.config import Config
 from plato.servers import fedavg
@@ -23,8 +21,8 @@ class Server(fedavg.Server):
         mask_reduce = sample_mask(self.algorithm.model.alphas_reduce, epsilon)
         self.algorithm.mask_normal = mask_normal
         self.algorithm.mask_reduce = mask_reduce
-        server_response["mask_normal"] = mask_normal.numpy().tolist()
-        server_response["mask_reduce"] = mask_reduce.numpy().tolist()
+        server_response["mask_normal"] = mask_normal
+        server_response["mask_reduce"] = mask_reduce
         return server_response
 
     async def wrap_up(self):
@@ -32,20 +30,19 @@ class Server(fedavg.Server):
         logging.info("[%s] geneotypes: %s\n", self, self.trainer.model.model.genotype())
 
     async def aggregate_weights(self, updates, baseline_weights, weights_received):
-        mask_normals = [update.report.mask_normal for update in updates]
-        mask_reduces = [update.report.mask_reduce for update in updates]
+        masks_normal = [update.report.mask_normal for update in updates]
+        masks_reduce = [update.report.mask_reduce for update in updates]
 
         # NAS aggregation
         client_models = []
 
         for i, payload in enumerate(weights_received):
-            mask_normal = torch.tensor(mask_normals[i])
-            mask_reduce = torch.tensor(mask_reduces[i])
+            mask_normal = masks_normal[i]
+            mask_reduce = masks_reduce[i]
             client_model = MaskedNetwork(
                 Config().parameters.model.C,
                 Config().parameters.model.num_classes,
                 Config().parameters.model.layers,
-                nn.CrossEntropyLoss(),
                 mask_normal,
                 mask_reduce,
             )
@@ -65,8 +62,8 @@ class Server(fedavg.Server):
         epoch_index_reduce = []
 
         for i in range(len(updates)):
-            mask_normal = torch.tensor(mask_normals[i])
-            mask_reduce = torch.tensor(mask_reduces[i])
+            mask_normal = mask_normals[i]
+            mask_reduce = mask_reduces[i]
             index_normal = extract_index(mask_normal)
             index_reduce = extract_index(mask_reduce)
             epoch_index_normal.append(index_normal)

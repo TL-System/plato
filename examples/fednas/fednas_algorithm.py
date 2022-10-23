@@ -1,5 +1,3 @@
-from torch import nn
-
 from plato.algorithms import fedavg
 from plato.config import Config
 
@@ -30,7 +28,6 @@ class ServerAlgorithm(fedavg.Algorithm):
             Config().parameters.model.C,
             Config().parameters.model.num_classes,
             Config().parameters.model.layers,
-            nn.CrossEntropyLoss(),
             mask_normal,
             mask_reduce,
         )

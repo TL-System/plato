@@ -15,7 +15,7 @@ num_ops = len(PRIMITIVES)
 def extract_index(mask):
     result = []
     for i in range(num_edges):
-        edge = mask[i].tolist()
+        edge = mask[i]
         idx = edge.index(1)
         result.append(idx)
     return result
@@ -60,7 +60,7 @@ def sample_mask(alphas, epsilon):
         )
         result.append(mask_pool[mask_idx[0]])
     result = np.vstack(result)
-    return torch.Tensor(result)
+    return result.tolist()
 
 
 def uniform_sample_mask(alphas):
