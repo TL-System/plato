@@ -123,6 +123,19 @@ Jiang et al., &ldquo; [Pisces: Efficient Federated Learning via Guided Asynchron
 ```
 ````
 
+````{admonition} **Split Learning**
+Split learning also aims to collaboratively train deep learning models without sharing sensitive raw data. In this example, the training process is separated into two phases, clients firstly send the extracted feature at a specific cut lyaer to server, then the server continues the forward pass and compute gradients, which will be sent back to clients to complete the training.
+
+```shell
+python examples/split_learning/split_learning.py -c examples/split_learning/split_learning_MNIST_lenet5.yml
+```
+
+```{note}
+Vepakomma, et al., "Split learning for health: Distributed deep learning without sharing
+raw patient data," in Proc. AI for Social Good Workshop, affiliated with ICLR 2018.
+```
+````
+
 With the recent redesign of the Plato API, the following list is outdated and will be updated as they are tested again.
 
 |  Method  | Notes | Tested  |
