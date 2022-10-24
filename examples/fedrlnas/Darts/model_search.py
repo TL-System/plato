@@ -36,12 +36,12 @@ class Cell(nn.Module):
         reduction, reduction_prev = reduction_flag
         self.reduction = reduction
 
-        c_prev_prev, c_prev, c = c
+        c_prev_prev, c_prev, c_curr = c
         if reduction_prev:
-            self.preprocess0 = FactorizedReduce(c_prev_prev, c, affine=False)
+            self.preprocess0 = FactorizedReduce(c_prev_prev, c_curr, affine=False)
         else:
-            self.preprocess0 = ReLUConvBN(c_prev_prev, c, 1, 1, 0, affine=False)
-        self.preprocess1 = ReLUConvBN(c_prev, c, 1, 1, 0, affine=False)
+            self.preprocess0 = ReLUConvBN(c_prev_prev, c_curr, 1, 1, 0, affine=False)
+        self.preprocess1 = ReLUConvBN(c_prev, c_curr, 1, 1, 0, affine=False)
         self._steps = steps
         self.multiplier = multiplier
 
@@ -50,7 +50,7 @@ class Cell(nn.Module):
         for i in range(self._steps):
             for j in range(2 + i):
                 stride = 2 if reduction and j < 2 else 1
-                op_ = MixedOp(c, stride)
+                op_ = MixedOp(c_curr, stride)
                 self.ops.append(op_)
 
     def forward(self, s_0, s_1, weights):
@@ -80,18 +80,19 @@ class Network(nn.Module):
 
     def __init__(
         self,
-        C=3,
+        C=16,
         num_classes=10,
         layers=8,
         criterion=nn.CrossEntropyLoss(),
         steps=4,
         multiplier=4,
         stem_multiplier=3,
+        channel=3,
     ):
         super().__init__()
         if Config().parameters.model.C:
-            C = Config().parameters.model.C
-        self.channel = C
+            channel = Config().parameters.model.C
+        self.channel = channel
         if Config().parameters.model.num_classes:
             num_classes = Config().parameters.model.num_classes
         self._num_classes = num_classes
