@@ -72,7 +72,7 @@ class Server(fedavg.Server):
         if self.adaptive_mixing:
             self.mixing_hyperparam *= self._staleness_function(client_staleness)
 
-        return self.algorithm.aggregate_weights(
+        return await self.algorithm.aggregate_weights(
             baseline_weights, weights_received, mixing=self.mixing_hyperparam
         )
 

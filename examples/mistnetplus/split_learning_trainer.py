@@ -1,88 +1,68 @@
 """
-The training loop for split learning.
+A federated learning trainer using split learning.
+
+Reference:
+
+Vepakomma, et al., "Split learning for health: Distributed deep learning without sharing
+raw patient data," in Proc. AI for Social Good Workshop, affiliated with ICLR 2018.
+
+https://arxiv.org/pdf/1812.00564.pdf
 """
 import logging
 import os
 
 import torch
-
 from plato.config import Config
+
 from plato.trainers import basic
 
 
 class Trainer(basic.Trainer):
-    def __init__(self, model=None):
-        super().__init__(model)
+    """The split learning trainer."""
 
-        # Record the gradients of the cut layer
+    def __init__(self, model=None, callbacks=None):
+        """Initializing the trainer with the provided model.
+
+        Arguments:
+        model: The model to train.
+        callbacks: The callbacks that this trainer uses.
+        """
+        super().__init__(model=model, callbacks=callbacks)
         self.cut_layer_grad = []
 
-    # pylint: disable=unused-argument
-    def train_model(self, config, trainset, sampler, **kwargs):
-        batch_size = config["batch_size"]
+    def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
+        """
+        Creates an instance of the trainloader.
 
-        logging.info("[Client #%d] Loading the dataset.", self.client_id)
-        _train_loader = getattr(self, "train_loader", None)
+        Arguments:
+        batch_size: the batch size.
+        trainset: the training dataset.
+        sampler: the sampler for the trainloader to use.
+        """
+        return trainset
 
-        if callable(_train_loader):
-            train_loader = self.train_loader(batch_size, trainset, sampler)
-        else:
-            train_loader = torch.utils.data.DataLoader(
-                dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler
-            )
+    def perform_forward_and_backward_passes(self, config, examples, labels):
+        """Perform the forward and backward passes of the training loop.
 
-        epochs = config["epochs"]
+        Arguments:
+        config: the configuration.
+        examples: data samples in the current batch.
+        labels: labels in the current batch.
 
-        # Initializing the loss criterion
-        _loss_criterion = getattr(self, "loss_criterion", None)
-        if callable(_loss_criterion):
-            loss_criterion = self.loss_criterion(self.model)
-        else:
-            loss_criterion = torch.nn.CrossEntropyLoss()
+        Returns: loss values after the current batch has been processed.
+        """
+        examples = examples.detach().requires_grad_(True)
 
-        # Initializing the optimizer
-        get_optimizer = getattr(self, "get_optimizer", optimizers.get_optimizer)
-        optimizer = get_optimizer(self.model)
+        loss = super().perform_forward_and_backward_passes(config, examples, labels)
 
-        # Initializing the learning rate schedule, if necessary
-        if "lr_schedule" in config:
-            lr_schedule = optimizers.get_lr_schedule(
-                optimizer, len(train_loader), train_loader
-            )
-        else:
-            lr_schedule = None
+        # Record gradients within the cut layer
+        self.cut_layer_grad.append(examples.grad.clone().detach())
 
-        self.model.to(self.device)
-        self.model.train()
+        return loss
 
-        for __, (examples, labels) in enumerate(train_loader):
-            examples, labels = examples.to(self.device), labels.to(self.device)
-            optimizer.zero_grad()
-
-            examples = examples.detach().requires_grad_(True)
-
-            outputs = self.model(examples)
-
-            loss = loss_criterion(outputs, labels)
-
-            loss.backward()
-
-            # Record gradients within the cut layer
-            self.cut_layer_grad.append(examples.grad.clone().detach())
-
-            optimizer.step()
-
-            if lr_schedule is not None:
-                lr_scheduler.step()
-
-        if hasattr(optimizer, "params_state_update"):
-            optimizer.params_state_update()
-
-        self.save_gradients()
-
-    def save_gradients(self):
-        """Saving gradients to a file."""
-        model_name = Config().trainer.model_name
+    def train_run_end(self, config):
+        """Saving recorded gradients to a file."""
+        model_name = config["model_name"]
         model_path = Config().params["model_path"]
 
         if not os.path.exists(model_path):
