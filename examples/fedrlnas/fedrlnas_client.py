@@ -1,5 +1,5 @@
 """
-Implementation of Search Phase in Federared Model Search via Reinforcement Learning.
+Implementation of Search Phase in Federared Model Search via Reinforcement Learning (FedRLNAS).
 
 Reference:
 
@@ -14,10 +14,6 @@ from plato.clients import simple
 
 class Client(simple.Client):
     """A FedRLNAS client. Different clients hold different models."""
-
-    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
-        super().__init__(model, datasource, algorithm, trainer)
-        self.representation_param_names = []
 
     def process_server_response(self, server_response) -> None:
         self.algorithm.mask_normal = server_response["mask_normal"]

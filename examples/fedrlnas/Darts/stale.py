@@ -14,6 +14,7 @@ def compute_stale_grad_weight(old_model, new_model):
     """Use Async SGD + Talor Compensation to aggregate stale weights"""
     old_weight_iter = old_model.parameters()
     new_weight_iter = new_model.parameters()
+
     try:
         while True:
             old_weight = next(old_weight_iter)
@@ -33,6 +34,7 @@ def compute_stale_grad_alpha(index_list, old_alphas, new_alphas):
     """Use Async SGD + Talor Compensation to update stale alphas (structure parameter)."""
     old_prob = F.softmax(old_alphas, -1)
     result_grad = old_prob + old_prob * old_prob * (new_alphas - old_alphas)
+
     for edge_idx in range(old_alphas.shape[0]):
         op_idx = index_list[edge_idx]
         i_prob = old_prob[edge_idx][op_idx] - 1
@@ -41,4 +43,5 @@ def compute_stale_grad_alpha(index_list, old_alphas, new_alphas):
         result_grad[edge_idx][op_idx] = i_prob + i_prob * i_prob * (
             i_new_alpha - i_old_alpha
         )
+
     return result_grad

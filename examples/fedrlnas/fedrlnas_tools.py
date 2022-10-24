@@ -1,5 +1,5 @@
 """
-Implementation  of Search Phase in Federared Model Search via Reinforcement Learning.
+Implementation  of Search Phase in Federared Model Search via Reinforcement Learning (FedRLNAS).
 
 Reference:
 
@@ -31,13 +31,15 @@ def extract_index(mask):
 
 
 def sample_mask(alphas, epsilon):
-    """Sample a mask for generating subnet, with given alpha."""
+    """Sample a mask for generating the subnet, with a given alpha."""
     mask_pool = []
+
     for i in range(NUM_OPS):
         mask = np.zeros(NUM_OPS)
         mask[i] = 1
         mask_pool.append(mask)
     result = []
+
     for alpha in alphas:
         prob = F.softmax(alpha, dim=0)
         prob = prob.detach().numpy()
@@ -45,28 +47,36 @@ def sample_mask(alphas, epsilon):
         prob /= prob.sum()  # make sum = 1
         mask_idx = np.random.choice(range(NUM_OPS), 1, replace=False, p=prob)
         result.append(mask_pool[mask_idx[0]])
+
     result = np.vstack(result)
+
     return result.tolist()
 
 
 def uniform_sample_mask(alphas):
     """Sample a mask, but the probability is uniformed."""
     mask_pool = []
+
     for i in range(NUM_OPS):
         mask = np.zeros(NUM_OPS)
         mask[i] = 1
         mask_pool.append(mask)
+
     result = []
+
     for i in range(len(alphas)):
         mask_idx = np.random.choice(range(NUM_OPS), 1, replace=False)
         result.append(mask_pool[mask_idx[0]])
+
     result = np.vstack(result)
+
     return torch.Tensor(result)
 
 
 def client_weight_param(global_model, client_model):
     """Assign the weights from supernet to subnet."""
     real_ops = []
+
     for cell_idx, cell in enumerate(client_model.cells):
         for edge_idx, cell_op in enumerate(cell.ops):
             real_ops.append(copy.deepcopy(cell_op.ops))
@@ -76,6 +86,7 @@ def client_weight_param(global_model, client_model):
     client_model.load_state_dict(global_model.state_dict())
 
     real_ops_idx = 0
+
     # only keep selected op
     for cell_idx, cell in enumerate(client_model.cells):
         for edge_idx, cell_op in enumerate(cell.ops):
@@ -83,16 +94,19 @@ def client_weight_param(global_model, client_model):
                 op_mask = client_model.mask_reduce[edge_idx]
             else:
                 op_mask = client_model.mask_normal[edge_idx]
+
             primitive_idx = op_mask.tolist().index(1)
             real_ops[real_ops_idx][0].load_state_dict(
                 cell_op.ops[primitive_idx].state_dict()
             )
+
             cell_op.ops = copy.deepcopy(real_ops[real_ops_idx])
             real_ops_idx += 1
 
 
 def _average_fuse(global_iter, client_iters, num_samples):
     total_samples = sum(num_samples)
+
     try:
         while True:
             _, global_param = next(global_iter)
@@ -114,6 +128,7 @@ def _average_fuse(global_iter, client_iters, num_samples):
 def fuse_weight_gradient(global_model, client_models, num_samples):
     """Fuse weights of subnets with different structure into supernet"""
     proxy_client_models = []
+
     for client_model in client_models:
         proxy_client = copy.deepcopy(client_model)
         for cell_idx, cell in enumerate(client_model.cells):
@@ -132,7 +147,9 @@ def fuse_weight_gradient(global_model, client_models, num_samples):
         proxy_client_models.append(proxy_client)
 
     proxy_iters = []
+
     for proxy_supernet in proxy_client_models:
         proxy_iters.append(proxy_supernet.named_parameters())
+
     global_iter = global_model.named_parameters()
     _average_fuse(global_iter, proxy_iters, num_samples)

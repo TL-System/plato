@@ -1,5 +1,5 @@
 """
-Implementation of Search Phase in Federared Model Search via Reinforcement Learning.
+Implementation of Search Phase in Federared Model Search via Reinforcement Learning (FedRLNAS).
 
 Reference:
 
@@ -11,9 +11,10 @@ The Search Space of NAS is based on: Darts https://github.com/quark0/darts .
 """
 
 
-import fedrlnas_algorithm
 import fedrlnas_client
 import fedrlnas_server
+from fedrlnas_algorithm import ClientAlgorithm, ServerAlgorithm
+
 from Darts.architect import Architect
 from Darts.model_search import Network
 
@@ -23,10 +24,10 @@ from plato.trainers.basic import Trainer
 def main():
     """A Plato federated learning training session using the FedRLNAS algorithm."""
     client = fedrlnas_client.Client(
-        model=Network, algorithm=fedrlnas_algorithm.ClientAlgorithm, trainer=Trainer
+        model=Network, algorithm=ClientAlgorithm, trainer=Trainer
     )
     server = fedrlnas_server.Server(
-        model=Architect, algorithm=fedrlnas_algorithm.ServerAlgorithm, trainer=Trainer
+        model=Architect, algorithm=ServerAlgorithm, trainer=Trainer
     )
 
     server.run(client)

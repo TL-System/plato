@@ -1,5 +1,5 @@
 """
-Implementation of Search Phase in Federared Model Search via Reinforcement Learning.
+Implementation of the Search Phase in Federared Model Search via Reinforcement Learning (FedRLNAS).
 
 Reference:
 
@@ -9,9 +9,6 @@ https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9546522
 """
 from Darts.model_search_local import MaskedNetwork
 
-from plato.algorithms import fedavg
-from plato.config import Config
-
 from fedrlnas_tools import (
     client_weight_param,
     sample_mask,
@@ -19,12 +16,15 @@ from fedrlnas_tools import (
     extract_index,
 )
 
+from plato.algorithms import fedavg
+from plato.config import Config
+
 
 class FedNASAlgorithm(fedavg.Algorithm):
     """Basic algorithm for FedRLNAS."""
 
     def generate_client_model(self, mask_normal, mask_reduce):
-        """Generated the structure of client model."""
+        """Generates the structure of the client model."""
         client_model = MaskedNetwork(
             Config().parameters.model.C,
             Config().parameters.model.num_classes,
@@ -32,11 +32,12 @@ class FedNASAlgorithm(fedavg.Algorithm):
             mask_normal,
             mask_reduce,
         )
+
         return client_model
 
 
 class ServerAlgorithm(FedNASAlgorithm):
-    """The federated learning algorithm for FedRLNAS, used by the server, who holds supernet."""
+    """The federated learning algorithm for FedRLNAS, used by the server."""
 
     def __init__(self, trainer=None):
         super().__init__(trainer)
@@ -90,14 +91,13 @@ class ServerAlgorithm(FedNASAlgorithm):
 
 
 class ClientAlgorithm(FedNASAlgorithm):
-    """The federated learning algorithm for FedRLNAS, used by the client, who holds subnets."""
+    """The federated learning algorithm for FedRLNAS, used by the client."""
 
     def __init__(self, trainer=None):
         super().__init__(trainer)
 
         self.mask_normal = None
         self.mask_reduce = None
-        self.representation_param_names = []
 
     def extract_weights(self, model=None):
         if model is None:
