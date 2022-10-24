@@ -1,5 +1,11 @@
 """
-A federated learning server using oort client selection.
+A federated learning server using Oort.
+
+Reference:
+
+F. Lai, X. Zhu, H. V. Madhyastha and M. Chowdhury, "Oort: Efficient Federated Learning via
+Guided Participant Selection," in USENIX Symposium on Operating Systems Design and Implementation
+(OSDI 2021), July 2021.
 """
 
 import logging
@@ -14,8 +20,16 @@ from plato.config import Config
 class Server(fedavg.Server):
     """A federated learning server using oort client selection."""
 
-    def __init__(self, model=None, algorithm=None, trainer=None):
-        super().__init__(model=model, algorithm=algorithm, trainer=trainer)
+    def __init__(
+        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+    ):
+        super().__init__(
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
+        )
 
         # Clients that will no longer be selected for future rounds.
         self.blacklist = []
@@ -82,7 +96,7 @@ class Server(fedavg.Server):
         """Method called at the end of aggregating received weights."""
         for update in updates:
             # Extract statistical utility and local training times
-            self.client_utilities[update.client_id] = update.report.statistics_utility
+            self.client_utilities[update.client_id] = update.report.statistical_utility
             self.client_durations[update.client_id] = update.report.training_time
             self.client_last_rounds[update.client_id] = self.current_round
 
@@ -93,7 +107,7 @@ class Server(fedavg.Server):
 
         # Adjust pacer
         self.util_history.append(
-            sum(update.report.statistics_utility for update in updates)
+            sum(update.report.statistical_utility for update in updates)
         )
 
         if self.current_round >= 2 * self.step_window:
@@ -136,12 +150,13 @@ class Server(fedavg.Server):
                 if (
                     self.client_utilities[client_id] > cut_off_util
                     and client_id not in self.blacklist
+                    and client_id in clients_pool
                 ):
                     exploit_clients.append(client_id)
 
             # Sample clients with their utilities
             utility_sum = float(
-                sum([self.client_utilities[client_id] for client_id in exploit_clients])
+                sum(self.client_utilities[client_id] for client_id in exploit_clients)
             )
 
             probabilities = [
@@ -195,7 +210,7 @@ class Server(fedavg.Server):
         return selected_clients
 
     def calc_client_util(self, client_id):
-        """Calculate client utility."""
+        """Calculate the client utility."""
         client_utility = self.client_utilities[client_id] + math.sqrt(
             0.1 * math.log(self.current_round) / self.client_last_rounds[client_id]
         )

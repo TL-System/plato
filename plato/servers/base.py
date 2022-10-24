@@ -19,7 +19,7 @@ import socketio
 from aiohttp import web
 
 from plato.callbacks.handler import CallbackHandler
-from plato.callbacks.server import PrintProgressCallback
+from plato.callbacks.server import LogProgressCallback
 from plato.client import run
 from plato.config import Config
 from plato.utils import s3, fonts
@@ -101,7 +101,7 @@ class Server:
         )
 
         # Starting from the default server callback class, add all supplied server callbacks
-        self.callbacks = [PrintProgressCallback]
+        self.callbacks = [LogProgressCallback]
         if callbacks is not None:
             self.callbacks.extend(callbacks)
         self.callback_handler = CallbackHandler(self.callbacks)
@@ -173,6 +173,9 @@ class Server:
             self.trained_clients = []
 
     def __repr__(self):
+        return f"Server #{os.getpid()}"
+
+    def __str__(self):
         return f"Server #{os.getpid()}"
 
     def configure(self):
@@ -573,7 +576,9 @@ class Server:
                     "id": self.selected_client_id,
                     "current_round": self.current_round,
                 }
-                server_response = self.customize_server_response(server_response)
+                server_response = self.customize_server_response(
+                    server_response, client_id=self.selected_client_id
+                )
 
                 payload = self.algorithm.extract_weights()
                 payload = self.customize_server_payload(payload)
@@ -867,7 +872,7 @@ class Server:
 
         client_info = (
             finish_time,  # sorted by the client's finish time
-            random.random(),  # in case two or more clients have the same finish time
+            client_id,  # in case two or more clients have the same finish time
             {
                 "client_id": client_id,
                 "sid": sid,
@@ -1246,7 +1251,7 @@ class Server:
         await self.close_connections()
         os._exit(0)
 
-    def customize_server_response(self, server_response: dict) -> dict:
+    def customize_server_response(self, server_response: dict, client_id) -> dict:
         """Customizes the server response with any additional information."""
         return server_response
 

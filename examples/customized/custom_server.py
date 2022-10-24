@@ -22,9 +22,15 @@ from plato.trainers import basic
 class CustomServer(fedavg.Server):
     """A custom federated learning server."""
 
-    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
+    def __init__(
+        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+    ):
         super().__init__(
-            model=model, datasource=datasource, algorithm=algorithm, trainer=trainer
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
         )
         logging.info("A custom server has been initialized.")
 
@@ -68,7 +74,9 @@ class Trainer(basic.Trainer):
                 optimizer.step()
                 optimizer.zero_grad()
 
-    def test_model(self, config, testset, sampler=None, **kwargs):  # pylint: disable=unused-argument
+    def test_model(
+        self, config, testset, sampler=None, **kwargs
+    ):  # pylint: disable=unused-argument
         """A custom testing loop."""
         test_loader = torch.utils.data.DataLoader(
             testset,

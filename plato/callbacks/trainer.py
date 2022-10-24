@@ -52,7 +52,7 @@ class TrainerCallback(ABC):
         """
 
 
-class PrintProgressCallback(TrainerCallback):
+class LogProgressCallback(TrainerCallback):
     """
     A callback which prints a message at the start of each epoch, and at the end of each step.
     """
