@@ -176,7 +176,7 @@ class Server:
         return f"Server #{os.getpid()}"
 
     def __str__(self):
-        return f'Server #{os.getpid()}'
+        return f"Server #{os.getpid()}"
 
     def configure(self):
         """Initializing configuration settings based on the configuration file."""
@@ -872,7 +872,7 @@ class Server:
 
         client_info = (
             finish_time,  # sorted by the client's finish time
-            random.random(),  # in case two or more clients have the same finish time
+            client_id,  # in case two or more clients have the same finish time
             {
                 "client_id": client_id,
                 "sid": sid,
