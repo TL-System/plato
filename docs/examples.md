@@ -135,6 +135,18 @@ Vepakomma, et al., &ldquo;[Split Learning for Health: Distributed Deep Learning 
 ```
 ````
 
+````{admonition} **FedRLNAS**
+FedRLNAS is an algorithm to conduct Federated Neural Architecture Search without sending the whole supernet to clients. Instead, clients still do conventional model training as in FedAvg and the server will search for the best model architecture. In this example, the server overrides ```aggregate_weights()``` to aggregate updates from subnets of different architectures into the supernet, and implements updating of architecture parameters in ```weights_aggregated()```. In its implementation, only DARTS search space is supported.
+
+```shell
+python examples/fedrlnas/fedrlnas.py -c examples/fedrlnas/FedRLNAS_MNIST_DARTS.yml
+```
+
+```{note}
+Yao, et al., &ldquo;[Federated Model Search via Reinforcement Learning](https://ieeexplore.ieee.org/document/9546522),&rdquo; in Proc. ICDCS, 2021.
+```
+````
+
 With the recent redesign of the Plato API, the following list is outdated and will be updated as they are tested again.
 
 |  Method  | Notes | Tested  |
