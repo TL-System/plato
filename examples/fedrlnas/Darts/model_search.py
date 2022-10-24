@@ -1,13 +1,13 @@
 """
-Modify based on cnn/model_search.py in https://github.com/quark0/darts .
+Modify based on cnn/model_search.py in https://github.com/quark0/darts.
 to support the algorithms in FedRLNAS.
 """
 
 import torch
 from torch import nn
 import torch.nn.functional as F
-from .operations import FactorizedReduce, ReLUConvBN, OPS
-from .genotypes import PRIMITIVES
+from Darts.operations import FactorizedReduce, ReLUConvBN, OPS
+from Darts.genotypes import PRIMITIVES
 from plato.config import Config
 
 
@@ -43,7 +43,7 @@ class Cell(nn.Module):
             self.preprocess0 = ReLUConvBN(c_prev_prev, c, 1, 1, 0, affine=False)
         self.preprocess1 = ReLUConvBN(c_prev, c, 1, 1, 0, affine=False)
         self._steps = steps
-        self._multiplier = multiplier
+        self.multiplier = multiplier
 
         self.ops = nn.ModuleList()
         self._bns = nn.ModuleList()
@@ -68,11 +68,15 @@ class Cell(nn.Module):
             offset += len(states)
             states.append(result)
 
-        return torch.cat(states[-self._multiplier :], dim=1)
+        return torch.cat(states[-self.multiplier :], dim=1)
 
 
 class Network(nn.Module):
     """The supernet."""
+
+    # pylint: disable=too-many-instance-attributes
+    # pylint: disable=too-many-locals
+    # pylint: disable=too-many-arguments
 
     def __init__(
         self,
@@ -96,7 +100,7 @@ class Network(nn.Module):
         self._layers = layers
         self._criterion = criterion
         self._steps = steps
-        self._multiplier = multiplier
+        self.multiplier = multiplier
 
         c_curr = stem_multiplier * C
         self.stem = nn.Sequential(
