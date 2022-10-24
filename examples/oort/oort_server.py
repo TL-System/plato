@@ -150,6 +150,7 @@ class Server(fedavg.Server):
                 if (
                     self.client_utilities[client_id] > cut_off_util
                     and client_id not in self.blacklist
+                    and client_id in clients_pool
                 ):
                     exploit_clients.append(client_id)
 
