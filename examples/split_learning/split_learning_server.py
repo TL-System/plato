@@ -1,11 +1,16 @@
 """
-A split learning server.
+A federated learning server using split learning.
+
+Reference:
+
+Vepakomma, et al., "Split learning for health: Distributed deep learning without sharing
+raw patient data," in Proc. AI for Social Good Workshop, affiliated with ICLR 2018.
+
+https://arxiv.org/pdf/1812.00564.pdf
 """
 
 import logging
 import os
-import pickle
-import sys
 
 import torch
 from plato.config import Config
@@ -20,43 +25,67 @@ class Server(fedavg.Server):
     def __init__(
         self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
     ):
-        super().__init__(
-            model=model,
-            datasource=datasource,
-            algorithm=algorithm,
-            trainer=trainer,
-            callbacks=callbacks,
-        )
+        super().__init__(model, datasource, algorithm, trainer, callbacks)
 
-        # a FIFO queue(list) for choosing the running client
-        self.clients_running_queue = []
+        self.phase = "weights"
+        self.clients_selected_last = None
+        self.gradients_to_send = {}
 
     def choose_clients(self, clients_pool, clients_count):
-        assert len(clients_pool) > 0 and clients_count == 1
+        """Choose the same clients every two rounds."""
+        if self.phase == "weights":
+            self.clients_selected_last = super().choose_clients(
+                clients_pool, clients_count
+            )
 
-        # fist step: make sure that the sl running queue sync with the clients pool
-        new_client_id_set = set(clients_pool)
-        old_client_id_set = set(self.clients_running_queue)
-        # delete the disconnected clients
-        remove_clients = old_client_id_set - new_client_id_set
-        for i in remove_clients:
-            self.clients_running_queue.remove(i)
-        # add the new registered clients
-        add_clients = new_client_id_set - old_client_id_set
-        for i in add_clients:
-            insert_index = len(self.clients_running_queue) - 1
-            self.clients_running_queue.insert(insert_index, i)
+        return self.clients_selected_last
 
-        # second step: use FIFO strategy to choose one client
-        res_list = []
-        if len(self.clients_running_queue) > 0:
-            queue_head = self.clients_running_queue.pop(0)
-            res_list.append(queue_head)
-            self.clients_running_queue.append(queue_head)
+    def customize_server_payload(self, payload):
+        """Wrap up generating the server payload with any additional information."""
+        if self.phase == "weights":
+            # Send global model weights to the clients
+            return (payload, "weights")
+        else:
+            # Send gradients back to client to complete the training
+            return (self.gradients_to_send.pop(self.selected_client_id), "gradients")
 
-        return res_list
+    async def aggregate_weights(self, updates, baseline_weights, weights_received):
+        """Compute gradients and aggregate weights in different rounds."""
+        if self.phase == "weights":
+            for update in updates:
+                feature_dataset = feature.DataSource([update.payload])
 
-    def load_gradients(self):
+                # Training the model using all the features received from the client
+                sampler = all_inclusive.Sampler(feature_dataset)
+                self.algorithm.train(feature_dataset, sampler)
+
+                # Compute the gradients and get ready to be sent
+                self.gradients_to_send[update.client_id] = self._load_gradients()
+
+            self.phase = "gradients"
+            # No weights update in this round
+            return baseline_weights
+
+        elif self.phase == "gradients":
+            # Perform federated averaging algorithm (copied from fedavg.Server for convenience)
+            self.total_samples = sum(update.report.num_samples for update in updates)
+            updated_weights = {
+                name: self.trainer.zeros(weight.shape)
+                for name, weight in weights_received[0].items()
+            }
+
+            for i, update in enumerate(weights_received):
+                report = updates[i].report
+                num_samples = report.num_samples
+
+                for name, weight in update.items():
+                    # Use weighted average by the number of samples
+                    updated_weights[name] += weight * (num_samples / self.total_samples)
+
+            self.phase = "weights"
+            return updated_weights
+
+    def _load_gradients(self):
         """Loading gradients from a file."""
         model_path = Config().params["model_path"]
         model_name = Config().trainer.model_name
@@ -67,68 +96,3 @@ class Server(fedavg.Server):
         )
 
         return torch.load(model_gradients_path)
-
-    async def client_payload_done(self, sid, client_id, s3_key=None):
-        if s3_key is None:
-            assert self.client_payload[sid] is not None
-
-            payload_size = 0
-            if isinstance(self.client_payload[sid], list):
-                for _data in self.client_payload[sid]:
-                    payload_size += sys.getsizeof(pickle.dumps(_data))
-            else:
-                payload_size = sys.getsizeof(pickle.dumps(self.client_payload[sid]))
-        else:
-            self.client_payload[sid] = self.s3_client.receive_from_s3(s3_key)
-            payload_size = sys.getsizeof(pickle.dumps(self.client_payload[sid]))
-
-        logging.info(
-            "[Server #%d] Received %s MB of payload data from client #%d.",
-            os.getpid(),
-            round(payload_size / 1024**2, 2),
-            client_id,
-        )
-
-        # if clients send features, train it and return gradient
-        if self.reports[sid].phase == "features":
-            logging.info(
-                "[Server #%d] client #%d features received. Processing.",
-                os.getpid(),
-                client_id,
-            )
-            features = [self.client_payload[sid]]
-            feature_dataset = feature.DataSource(features)
-            sampler = all_inclusive.Sampler(feature_dataset)
-            self.algorithm.train(feature_dataset, sampler)
-            # Test the updated model
-            self.accuracy = self.trainer.test(self.testset)
-            logging.info(
-                "[Server #{:d}] Global model accuracy: {:.2f}%\n".format(
-                    os.getpid(), 100 * self.accuracy
-                )
-            )
-
-            payload = self.load_gradients()
-            logging.info(
-                "[Server #%d] Reporting gradients to client #%d.",
-                os.getpid(),
-                client_id,
-            )
-
-            sid = self.clients[client_id]["sid"]
-            # Sending the server payload to the clients
-            payload = self.load_gradients()
-            await self.send(sid, payload, client_id)
-            return
-
-        self.updates.append((self.reports[sid], self.client_payload[sid]))
-
-        if len(self.updates) > 0 and len(self.updates) >= len(self.selected_clients):
-            logging.info(
-                "[Server #%d] All %d client reports received. Processing.",
-                os.getpid(),
-                len(self.updates),
-            )
-            await self._process_reports()
-            await self.wrap_up()
-            await self.select_clients()
