@@ -12,7 +12,7 @@ import time
 
 import torch
 from plato.callbacks.handler import CallbackHandler
-from plato.callbacks.trainer import PrintProgressCallback
+from plato.callbacks.trainer import LogProgressCallback
 from plato.config import Config
 from plato.models import registry as models_registry
 from plato.trainers import base, loss_criterion, lr_schedulers, optimizers, tracking
@@ -26,7 +26,7 @@ class Trainer(base.Trainer):
 
         Arguments:
         model: The model to train.
-        client_id: The ID of the client using this trainer (optional).
+        callbacks: The callbacks that this trainer uses.
         """
         super().__init__()
 
@@ -36,7 +36,7 @@ class Trainer(base.Trainer):
         self.current_round = 0
 
         # Starting from the default trainer callback class, add all supplied trainer callbacks
-        self.callbacks = [PrintProgressCallback]
+        self.callbacks = [LogProgressCallback]
         if callbacks is not None:
             self.callbacks.extend(callbacks)
         self.callback_handler = CallbackHandler(self.callbacks)

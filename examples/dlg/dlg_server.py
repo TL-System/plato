@@ -63,8 +63,16 @@ dlg_result_headers = [
 class Server(fedavg.Server):
     """An honest-but-curious federated learning server with gradient leakage attack."""
 
-    def __init__(self, model, trainer):
-        super().__init__(model=model, trainer=trainer)
+    def __init__(
+        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+    ):
+        super().__init__(
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
+        )
         self.attack_method = None
         self.share_gradients = True
         if (
@@ -110,7 +118,7 @@ class Server(fedavg.Server):
         ):
             self.attack_method = Config().algorithm.attack_method
             self._deep_leakage_from_gradients(weights_received)
-        
+
         return weights_received
 
     async def aggregate_deltas(self, updates, deltas_received):

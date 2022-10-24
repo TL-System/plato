@@ -11,8 +11,16 @@ from plato.utils import csv_processor
 class Server(fedavg.Server):
     """A federated learning server for personalized FL."""
 
-    def __init__(self, model=None, algorithm=None, trainer=None):
-        super().__init__(model=model, algorithm=algorithm, trainer=trainer)
+    def __init__(
+        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+    ):
+        super().__init__(
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
+        )
         self.do_personalization_test = False
 
         # A list to store accuracy of clients' personalized models
@@ -37,7 +45,7 @@ class Server(fedavg.Server):
                 len(self.selected_clients),
             )
 
-    def customize_server_response(self, server_response: dict) -> dict:
+    def customize_server_response(self, server_response: dict, client_id) -> dict:
         """Wrap up generating the server response with any additional information."""
         if self.do_personalization_test:
             server_response["personalization_test"] = True

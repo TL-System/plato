@@ -16,7 +16,7 @@ class Trainer(ABC):
         self.client_id = 0
 
     def set_client_id(self, client_id):
-        """Setting the client ID"""
+        """Setting the client ID."""
         self.client_id = client_id
 
     @abstractmethod

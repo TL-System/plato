@@ -14,7 +14,7 @@ from abc import abstractmethod
 
 import socketio
 from plato.callbacks.handler import CallbackHandler
-from plato.callbacks.client import PrintProgressCallback
+from plato.callbacks.client import LogProgressCallback
 from plato.config import Config
 from plato.utils import s3
 
@@ -83,6 +83,8 @@ class Client:
         self.s3_client = None
         self.outbound_processor = None
         self.inbound_processor = None
+        self.payload = None
+        self.report = None
 
         self.comm_simulation = (
             Config().clients.comm_simulation
@@ -96,7 +98,7 @@ class Client:
             assert hasattr(Config().algorithm, "total_silos")
 
         # Starting from the default client callback class, add all supplied server callbacks
-        self.callbacks = [PrintProgressCallback]
+        self.callbacks = [LogProgressCallback]
         if callbacks is not None:
             self.callbacks.extend(callbacks)
         self.callback_handler = CallbackHandler(self.callbacks)
@@ -189,12 +191,59 @@ class Client:
                 payload_size / 1024**2,
             )
 
-            self.callback_handler.call_event(
-                "on_inbound_process", self, self.inbound_processor
-            )
-            self.server_payload = self.inbound_processor.process(self.server_payload)
+            await self.handle_payload(self.server_payload)
 
-            await self.start_training()
+    async def handle_payload(self, inbound_payload):
+        """Handles the inbound payload upon receiving it from the server."""
+        self.inbound_received(self.inbound_processor)
+        self.callback_handler.call_event(
+            "on_inbound_received", self, self.inbound_processor
+        )
+
+        processed_inbound_payload = self.inbound_processor.process(inbound_payload)
+
+        # Inbound data is processed, computing outbound response
+        report, outbound_payload = await self.inbound_processed(
+            processed_inbound_payload
+        )
+        self.callback_handler.call_event(
+            "on_inbound_processed", self, processed_inbound_payload
+        )
+
+        # Outbound data is ready to be processed
+        self.outbound_ready(report, self.outbound_processor)
+        self.callback_handler.call_event(
+            "on_outbound_ready", self, report, self.outbound_processor
+        )
+        processed_outbound_payload = self.outbound_processor.process(outbound_payload)
+
+        # Sending the client report as metadata to the server (payload to follow)
+        await self.sio.emit(
+            "client_report", {"id": self.client_id, "report": pickle.dumps(report)}
+        )
+
+        # Sending the client training payload to the server
+        await self.send(processed_outbound_payload)
+
+    def inbound_received(self, inbound_processor):
+        """
+        Override this method to complete additional tasks before the inbound processors start to
+        process the data received from the server.
+        """
+
+    async def inbound_processed(self, processed_inbound_payload):
+        """
+        Override this method to conduct customized operations to generate a client's response to
+        the server when inbound payload from the server has been processed.
+        """
+        report, outbound_payload = await self.start_training(processed_inbound_payload)
+        return report, outbound_payload
+
+    def outbound_ready(self, report, outbound_processor):
+        """
+        Override this method to complete additional tasks before the outbound processors start
+        to process the data to be sent to the server.
+        """
 
     async def chunk_arrived(self, data) -> None:
         """Upon receiving a chunk of data from the server."""
@@ -209,6 +258,13 @@ class Client:
         )
 
         report, payload = await self.obtain_model_update(data["time"])
+
+        # Process outbound data when necessary
+        self.callback_handler.call_event(
+            "on_outbound_ready", self, report, self.outbound_processor
+        )
+        self.outbound_ready(report, self.outbound_processor)
+        payload = self.outbound_processor.process(payload)
 
         # Sending the client report as metadata to the server (payload to follow)
         await self.sio.emit(
@@ -259,16 +315,13 @@ class Client:
             payload_size / 1024**2,
         )
 
-        self.server_payload = self.inbound_processor.process(self.server_payload)
+        await self.handle_payload(self.server_payload)
 
-        await self.start_training()
-
-    async def start_training(self):
+    async def start_training(self, inbound_payload):
         """Complete one round of training on this client."""
-        self.load_payload(self.server_payload)
-        self.server_payload = None
+        self.load_payload(inbound_payload)
 
-        report, payload = await self.train()
+        report, outbound_payload = await self.train()
 
         if Config().is_edge_server():
             logging.info(
@@ -277,13 +330,7 @@ class Client:
         else:
             logging.info("[%s] Model trained.", self)
 
-        # Sending the client report as metadata to the server (payload to follow)
-        await self.sio.emit(
-            "client_report", {"id": self.client_id, "report": pickle.dumps(report)}
-        )
-
-        # Sending the client training payload to the server
-        await self.send(payload)
+        return report, outbound_payload
 
     async def send_in_chunks(self, data) -> None:
         """Sending a bytes object in fixed-sized chunks to the client."""
@@ -297,12 +344,6 @@ class Client:
 
     async def send(self, payload) -> None:
         """Sending the client payload to the server using simulation, S3 or socket.io."""
-        # First apply outbound processors, if any
-        self.callback_handler.call_event(
-            "on_outbound_process", self, self.outbound_processor
-        )
-        payload = self.outbound_processor.process(payload)
-
         if self.comm_simulation:
             # If we are using the filesystem to simulate communication over a network
             model_name = (
