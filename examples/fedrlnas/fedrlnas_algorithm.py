@@ -12,7 +12,7 @@ from Darts.model_search_local import MaskedNetwork
 from plato.algorithms import fedavg
 from plato.config import Config
 
-from fednas_tools import (
+from fedrlnas_tools import (
     client_weight_param,
     sample_mask,
     fuse_weight_gradient,

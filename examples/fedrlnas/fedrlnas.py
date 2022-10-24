@@ -11,9 +11,9 @@ The Search Space of NAS is based on: Darts https://github.com/quark0/darts
 """
 
 
-import fednas_algorithm
-import fednas_client
-import fednas_server
+import fedrlnas_algorithm
+import fedrlnas_client
+import fedrlnas_server
 from Darts.architect import Architect
 from Darts.model_search import Network
 
@@ -22,11 +22,11 @@ from plato.trainers.basic import Trainer
 
 def main():
     """A Plato federated learning training session using the FedRLNAS algorithm."""
-    client = fednas_client.Client(
-        model=Network, algorithm=fednas_algorithm.ClientAlgorithm, trainer=Trainer
+    client = fedrlnas_client.Client(
+        model=Network, algorithm=fedrlnas_algorithm.ClientAlgorithm, trainer=Trainer
     )
-    server = fednas_server.Server(
-        model=Architect, algorithm=fednas_algorithm.ServerAlgorithm, trainer=Trainer
+    server = fedrlnas_server.Server(
+        model=Architect, algorithm=fedrlnas_algorithm.ServerAlgorithm, trainer=Trainer
     )
 
     server.run(client)
