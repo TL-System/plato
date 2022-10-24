@@ -1,5 +1,5 @@
 """
-Federared Model Search via Reinforcement Learning
+Implementation  of Search Phase in Federared Model Search via Reinforcement Learning
 
 Reference:
 
@@ -14,7 +14,7 @@ from plato.servers import fedavg
 
 
 class Server(fedavg.Server):
-    """The FedNAS server assigns and aggregates global models with different architectures."""
+    """The FedRLNAS server assigns and aggregates global models with different architectures."""
 
     def customize_server_response(self, server_response: dict, client_id) -> dict:
         if (

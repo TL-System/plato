@@ -1,5 +1,5 @@
 """
-Federared Model Search via Reinforcement Learning
+Implementation of Search Phase in Federared Model Search via Reinforcement Learning
 
 Reference:
 
@@ -13,7 +13,7 @@ from plato.clients import simple
 
 
 class Client(simple.Client):
-    """A FedNAS client. Different clients hold different models."""
+    """A FedRLNAS client. Different clients hold different models."""
 
     def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
         super().__init__(model, datasource, algorithm, trainer)

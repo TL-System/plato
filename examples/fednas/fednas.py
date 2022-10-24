@@ -1,5 +1,5 @@
 """
-Federared Model Search via Reinforcement Learning
+Implementation of Search Phase in Federared Model Search via Reinforcement Learning
 
 Reference:
 
@@ -7,7 +7,7 @@ Yao et al., "Federated Model Search via Reinforcement Learning", in the Proceedi
 
 https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9546522
 
-NAS Search Space: Darts https://github.com/quark0/darts
+The Search Space of NAS is based on: Darts https://github.com/quark0/darts
 """
 
 
@@ -21,7 +21,7 @@ from plato.trainers.basic import Trainer
 
 
 def main():
-    """A Plato federated learning training session using the FedNAS algorithm."""
+    """A Plato federated learning training session using the FedRLNAS algorithm."""
     client = fednas_client.Client(
         model=Network, algorithm=fednas_algorithm.ClientAlgorithm, trainer=Trainer
     )

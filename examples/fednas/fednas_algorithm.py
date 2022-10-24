@@ -1,5 +1,5 @@
 """
-Federared Model Search via Reinforcement Learning
+Implementation of Search Phase in Federared Model Search via Reinforcement Learning
 
 Reference:
 
@@ -21,10 +21,10 @@ from fednas_tools import (
 
 
 class FedNASAlgorithm(fedavg.Algorithm):
-    """basic algorithm for FedNAS"""
+    """Basic algorithm for FedRLNAS."""
 
     def generate_client_model(self, mask_normal, mask_reduce):
-        """generated the structure of client model"""
+        """Generated the structure of client model."""
         client_model = MaskedNetwork(
             Config().parameters.model.C,
             Config().parameters.model.num_classes,
@@ -36,7 +36,7 @@ class FedNASAlgorithm(fedavg.Algorithm):
 
 
 class ServerAlgorithm(FedNASAlgorithm):
-    """The federated learning algorithm for FedNAS, used by the server, who holds supernet."""
+    """The federated learning algorithm for FedRLNAS, used by the server, who holds supernet."""
 
     def __init__(self, trainer=None):
         super().__init__(trainer)
@@ -59,7 +59,7 @@ class ServerAlgorithm(FedNASAlgorithm):
         """Load the model weights passed in as a parameter."""
 
     def sample_mask(self, epsilon):
-        """sample mask to generate a subnet"""
+        """Sample mask to generate a subnet."""
         mask_normal = sample_mask(self.model.alphas_normal, epsilon)
         mask_reduce = sample_mask(self.model.alphas_reduce, epsilon)
         self.mask_normal = mask_normal
@@ -69,8 +69,7 @@ class ServerAlgorithm(FedNASAlgorithm):
     def nas_aggregation(
         self, masks_normal, masks_reduce, weights_received, num_samples
     ):
-        """weight aggregation in NAS"""
-        # NAS aggregation
+        """Weight aggregation in NAS."""
         client_models = []
 
         for i, payload in enumerate(weights_received):
@@ -86,12 +85,12 @@ class ServerAlgorithm(FedNASAlgorithm):
         )
 
     def extract_index(self, mask):
-        """extract edge index according to the mask"""
+        """Extract edge index according to the mask."""
         return extract_index(mask)
 
 
 class ClientAlgorithm(FedNASAlgorithm):
-    """The federated learning algorithm for FedNAS, used by the client, who holds subnets."""
+    """The federated learning algorithm for FedRLNAS, used by the client, who holds subnets."""
 
     def __init__(self, trainer=None):
         super().__init__(trainer)
