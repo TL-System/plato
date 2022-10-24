@@ -20,4 +20,6 @@ class Server(fedavg.Server):
         """Aggregate weight updates from the clients using FedAtt."""
 
         # Update server weights in a framework-specific algorithm for PyTorch only
-        return self.algorithm.aggregate_weights(baseline_weights, weights_received)
+        return await self.algorithm.aggregate_weights(
+            baseline_weights, weights_received
+        )
