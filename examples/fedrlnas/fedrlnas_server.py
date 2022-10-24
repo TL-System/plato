@@ -1,5 +1,5 @@
 """
-Implementation  of Search Phase in Federared Model Search via Reinforcement Learning.
+Implementation  of Search Phase in Federared Model Search via Reinforcement Learning (FedRLNAS).
 
 Reference:
 
@@ -36,7 +36,9 @@ class Server(fedavg.Server):
         await super().wrap_up()
         logging.info("[%s] geneotypes: %s\n", self, self.trainer.model.genotype())
 
-    async def aggregate_weights(self, updates, baseline_weights, weights_received):
+    async def aggregate_weights(
+        self, updates, baseline_weights, weights_received
+    ):  # pylint: disable=unused-argument
         """Aggregates weights of models with different architectures."""
         masks_normal = [update.report.mask_normal for update in updates]
         masks_reduce = [update.report.mask_reduce for update in updates]
