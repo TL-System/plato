@@ -137,6 +137,7 @@ class Server(fedavg.Server):
             sorted_util = sorted(
                 self.client_utilities, key=self.client_utilities.get, reverse=True
             )
+            sorted_util = [client for client in sorted_util if client in clients_pool]
 
             # Calculate cut-off utility
             cut_off_util = (
@@ -150,7 +151,6 @@ class Server(fedavg.Server):
                 if (
                     self.client_utilities[client_id] > cut_off_util
                     and client_id not in self.blacklist
-                    and client_id in clients_pool
                 ):
                     exploit_clients.append(client_id)
 
