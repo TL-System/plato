@@ -11,7 +11,7 @@ import copy
 class MixedOp(nn.Module):
     def __init__(self, C, stride, edge_mask=None):
         super(MixedOp, self).__init__()
-        self._ops = nn.ModuleList()
+        self.ops = nn.ModuleList()
         for primitive_idx in range(len(PRIMITIVES)):
             if (not edge_mask is None) and (edge_mask[primitive_idx] != 1):
                 continue
@@ -19,10 +19,10 @@ class MixedOp(nn.Module):
             op = OPS[primitive](C, stride, False)
             if "pool" in primitive:
                 op = nn.Sequential(op, nn.BatchNorm2d(C, affine=False))
-            self._ops.append(op)
+            self.ops.append(op)
 
     def forward(self, x, weights):
-        return sum(w * op(x) for w, op in zip(weights, self._ops))
+        return sum(w * op(x) for w, op in zip(weights, self.ops))
 
 
 class Cell(nn.Module):
@@ -48,7 +48,7 @@ class Cell(nn.Module):
         self._steps = steps  # number of nodes per cell
         self._multiplier = multiplier
 
-        self._ops = nn.ModuleList()
+        self.ops = nn.ModuleList()
         self._bns = nn.ModuleList()  # no use
         op_idx = 0
         for i in range(self._steps):  # all operations in a cell
@@ -59,7 +59,7 @@ class Cell(nn.Module):
                 else:
                     op = MixedOp(C, stride, mask[op_idx])
                     op_idx += 1
-                self._ops.append(op)
+                self.ops.append(op)
 
     def forward(self, s0, s1, weights):
         s0 = self.preprocess0(s0)
@@ -69,7 +69,7 @@ class Cell(nn.Module):
         offset = 0
         for i in range(self._steps):
             s = sum(
-                self._ops[offset + j](h, weights[offset + j])
+                self.ops[offset + j](h, weights[offset + j])
                 for j, h in enumerate(states)
             )
             offset += len(states)
