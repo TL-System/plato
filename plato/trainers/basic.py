@@ -26,7 +26,7 @@ class Trainer(base.Trainer):
 
         Arguments:
         model: The model to train.
-        client_id: The ID of the client using this trainer (optional).
+        callbacks: The callbacks that this trainer uses.
         """
         super().__init__()
 
