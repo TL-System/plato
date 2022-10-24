@@ -1,3 +1,6 @@
+"""
+Replicated from cnn/operations.py in https://github.com/quark0/darts .
+"""
 import os
 import numpy as np
 import torch
