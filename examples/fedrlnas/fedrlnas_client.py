@@ -1,9 +1,9 @@
 """
-Implementation of Search Phase in Federared Model Search via Reinforcement Learning
+Implementation of Search Phase in Federared Model Search via Reinforcement Learning.
 
 Reference:
 
-Yao et al., "Federated Model Search via Reinforcement Learning", in the Proceedings of ICDCS 2021
+Yao et al., "Federated Model Search via Reinforcement Learning", in the Proceedings of ICDCS 2021.
 
 https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9546522
 """
