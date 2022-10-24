@@ -101,7 +101,7 @@ class Client(simple.Client):
         return report, weights
 
     def _save_context(self):
-        """Save the context of current client to accomodate simulated clients."""
+        """Save the context of current client to accommodate simulated clients."""
         self.contexts[self.client_id] = self.algorithm.extract_weights()
 
     def _load_context(self):
