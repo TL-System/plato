@@ -14,7 +14,7 @@ from plato.servers import fedavg
 
 
 class Server(fedavg.Server):
-    """FedNAS server, assign and aggregate model with diff arch"""
+    """The FedNAS server assigns and aggregates global models with different architectures."""
 
     def customize_server_response(self, server_response: dict, client_id) -> dict:
         if (
@@ -25,9 +25,11 @@ class Server(fedavg.Server):
             epsilon = Config().parameters.architect.e_greedy.epsilon
         else:
             epsilon = 0
+
         mask_normal, mask_reduce = self.algorithm.sample_mask(epsilon)
         server_response["mask_normal"] = mask_normal
         server_response["mask_reduce"] = mask_reduce
+
         return server_response
 
     async def wrap_up(self):
@@ -35,16 +37,17 @@ class Server(fedavg.Server):
         logging.info("[%s] geneotypes: %s\n", self, self.trainer.model.model.genotype())
 
     async def aggregate_weights(self, updates, baseline_weights, weights_received):
-        """fuse weight of models with different arch"""
+        """Aggregates weights of models with different architectures."""
         masks_normal = [update.report.mask_normal for update in updates]
         masks_reduce = [update.report.mask_reduce for update in updates]
         num_samples = [update.report.num_samples for update in updates]
+
         self.algorithm.nas_aggregation(
             masks_normal, masks_reduce, weights_received, num_samples
         )
 
     def weights_aggregated(self, updates):
-        """after weight aggregation, update the arch parameter alpha"""
+        """After weight aggregation, update the architecture parameter alpha."""
         accuracy_list = [update.report.accuracy for update in updates]
         mask_normals = [update.report.mask_normal for update in updates]
         mask_reduces = [update.report.mask_reduce for update in updates]

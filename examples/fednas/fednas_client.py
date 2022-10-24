@@ -13,7 +13,7 @@ from plato.clients import simple
 
 
 class Client(simple.Client):
-    """FedNAS client, each client holds different models"""
+    """A FedNAS client. Different clients hold different models."""
 
     def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
         super().__init__(model, datasource, algorithm, trainer)
@@ -22,13 +22,15 @@ class Client(simple.Client):
     def process_server_response(self, server_response) -> None:
         self.algorithm.mask_normal = server_response["mask_normal"]
         self.algorithm.mask_reduce = server_response["mask_reduce"]
+
         self.algorithm.model = self.algorithm.generate_client_model(
             self.algorithm.mask_normal, self.algorithm.mask_reduce
         )
         self.trainer.model = self.algorithm.model
 
     def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
-        """Mask information is necessary for supernet aggregation"""
+        """Mask information should be sent to the server for supernet aggregation."""
         report.mask_normal = self.algorithm.mask_normal
         report.mask_reduce = self.algorithm.mask_reduce
+
         return report

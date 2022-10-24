@@ -27,16 +27,6 @@ data:
     partition_size: 600
 
     sampler: iid
-#    # IID or non-IID?
-#    sampler: noniid
-#
-#    # The concentration parameter for the Dirichlet distribution
-#    concentration: 5
-#
-#    testset_sampler: noniid
-#
-#    # The random seed for sampling data
-#    random_seed: 1
 
 trainer:
     # The type of the trainer
@@ -57,7 +47,7 @@ trainer:
     optimizer: SGD
     loss_criterion: CrossEntropyLoss
     lr_scheduler: CosineAnnealingLR
-    
+
     model_name: darts
 
 algorithm:
@@ -82,5 +72,4 @@ parameters:
         momentum: 0.9
         weight_decay: 0.0003
         learning_rate: 0.003
-        weight_decay: 0.001
         baseline_decay: 0.99
