@@ -113,7 +113,7 @@ def main():
     x_item = "elapsed_time"
     y_item = "accuracy"
 
-    result_csv_file1 = "./async_cifar10_bigA100_client500_rand1.csv"
+    result_csv_file1 = "./async_bigAincreaseBy1.csv"
     result_dict1 = read_csv_to_dict(result_csv_file1, x_item, y_item)
 
     result_csv_file2 = "./async_bigA10_500clients_concen5_rand1.csv"
