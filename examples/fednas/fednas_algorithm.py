@@ -7,10 +7,10 @@ Yao et al., "Federated Model Search via Reinforcement Learning", in the Proceedi
 
 https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9546522
 """
+from Darts.model_search_local import MaskedNetwork
+
 from plato.algorithms import fedavg
 from plato.config import Config
-
-from Darts.model_search_local import MaskedNetwork
 
 from fednas_tools import (
     client_weight_param,

@@ -72,4 +72,5 @@ parameters:
         momentum: 0.9
         weight_decay: 0.0003
         learning_rate: 0.003
+        arch_weight_decay: 0.001
         baseline_decay: 0.99
