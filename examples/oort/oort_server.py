@@ -156,7 +156,7 @@ class Server(fedavg.Server):
 
             # Sample clients with their utilities
             utility_sum = float(
-                sum([self.client_utilities[client_id] for client_id in exploit_clients])
+                sum(self.client_utilities[client_id] for client_id in exploit_clients)
             )
 
             probabilities = [
@@ -210,7 +210,7 @@ class Server(fedavg.Server):
         return selected_clients
 
     def calc_client_util(self, client_id):
-        """Calculate client utility."""
+        """Calculate the client utility."""
         client_utility = self.client_utilities[client_id] + math.sqrt(
             0.1 * math.log(self.current_round) / self.client_last_rounds[client_id]
         )
