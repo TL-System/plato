@@ -124,9 +124,9 @@ def _average_fuse(global_iter, client_iters, num_samples):
             for i in range(len(client_iters)):
                 client_name, client_param = next(client_iters[i])
                 delta = client_param.data - baseline
-                is_update = torch.ones(is_update.size()) - torch.tensor(
-                    torch.abs(delta) < 1e-8, dtype=is_update.dtype
-                )
+                is_update = torch.ones(is_update.size()) - (
+                    torch.abs(delta) < 1e-8
+                ).type(dtype=is_update.dtype)
                 deltas += delta * num_samples[i] / total_samples * is_update
             global_param.data += deltas
     except StopIteration:
