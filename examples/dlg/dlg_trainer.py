@@ -25,7 +25,7 @@ class Trainer(basic.Trainer):
 
         Arguments:
         model: The model to train.
-        client_id: The ID of the client using this trainer (optional).
+        callbacks: The callbacks that this trainer uses.
         """
 
         def weights_init(m):

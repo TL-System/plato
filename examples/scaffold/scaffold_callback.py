@@ -68,7 +68,7 @@ class ScaffoldCallback(ClientCallback):
     processors.
     """
 
-    def on_inbound_process(self, client, inbound_processor):
+    def on_inbound_received(self, client, inbound_processor):
         """
         Insert an ExtractPayloadProcessor to the list of inbound processors.
         """
@@ -83,7 +83,7 @@ class ScaffoldCallback(ClientCallback):
             "[%s] List of inbound processors: %s.", client, inbound_processor.processors
         )
 
-    def on_outbound_process(self, client, outbound_processor):
+    def on_outbound_ready(self, client, report, outbound_processor):
         """
         Insert a SendControlVariateProcessor to the list of outbound processors.
         """

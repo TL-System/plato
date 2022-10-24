@@ -118,8 +118,20 @@ python examples/pisces/pisces.py -c examples/pisces/pisces_MNIST_lenet5.yml
 ```
 
 ```{note}
-Jiang et al., &ldquo; [Pisces: Efficient Federated Learning via Guided Asynchronous Training](https://arxiv.org/pdf/2206.09264.pdf),
+Jiang et al., &ldquo;[Pisces: Efficient Federated Learning via Guided Asynchronous Training](https://arxiv.org/pdf/2206.09264.pdf),
 &rdquo; in Proc. ACM Symposium on Cloud Computing (SoCC), 2022.
+```
+````
+
+````{admonition} **Split Learning**
+Split learning aims to collaboratively train deep learning models with the server performing a portion of the training process. In this example, the training process is separated into two phases: the clients first send extracted features at a specific cut layer to the server, and then the server continues the forward pass and computes gradients, which will be sent back to the clients to complete the backward pass of the training. This example uses client processors extensively for applying different processing mechanisms on inbound payload received from the server in different phases.
+
+```shell
+python examples/split_learning/split_learning.py -c examples/split_learning/split_learning_MNIST_lenet5.yml
+```
+
+```{note}
+Vepakomma, et al., &ldquo;[Split Learning for Health: Distributed Deep Learning without Sharing Raw Patient Data](https://arxiv.org/abs/1812.00564),&rdquo; in Proc. AI for Social Good Workshop, affiliated with ICLR 2018.
 ```
 ````
 
