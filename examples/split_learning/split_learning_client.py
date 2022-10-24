@@ -41,9 +41,9 @@ class Client(simple.Client):
         self.gradient_received = False
         self.contexts = {}
 
-    async def inbound_processed(self, data):
+    async def inbound_processed(self, processed_inbound_payload):
         """Extract features or complete the training using split learning."""
-        server_payload, info = data
+        server_payload, info = processed_inbound_payload
 
         # Preparing the client response
         report, payload = None, None

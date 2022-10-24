@@ -34,17 +34,17 @@ def inbound_received(self, inbound_processor):
     inbound_processor.processors.insert(0, customized_processor) 
 ```
 
-```{admonition} **inbound_processed(self, data)**
-Override this method to conduct customized operations to generate client's response to server when inbound data from server has been processed. Default training function will be called if left undefined.
+```{admonition} **inbound_processed(self, processed_inbound_payload)**
+Override this method to conduct customized operations to generate a client's response to the server when inbound data from the server has been processed.
 
-`data` the inbound data after being processed by inbound processors, e.g., model weights before loaded to the trainer.
+`processed_inbound_payload` the inbound payload after being processed by inbound processors, e.g., model weights before loaded to the trainer.
 
 **Example:**
 
 ```py
-async def inbound_processed(self, data: Any) -> (SimpleNamespace, Any):
-    report, payload = await self.customized_train(data)
-    return report, payload
+async def inbound_processed(self, processed_inbound_payload: Any) -> (SimpleNamespace, Any):
+    report, outbound_payload = await self.customized_train(processed_inbound_payload)
+    return report, outbound_payload
 ```
 
 ```{admonition} **outbound_ready(self, report, outbound_processor)**
@@ -58,25 +58,13 @@ Override this method to complete additional tasks before the outbound processors
 
 ```py
 def outbound_ready(self, report, outbound_processor):
-    # customize report 
+    # customize the report 
     loss = self.get_loss()
     report.valuation = self.calc_valuation(report.num_samples, loss)
     
     # remove the first processor from the list of outbound processors
     outbound_processor.processors.pop() 
 ```
-
-<!-- ```{admonition} **customize_report(self, report)**
-Override this method to customize a client's report with additional information.
-
-**Example:**
-
-```py
-def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
-    loss = self.get_loss()
-    report.valuation = self.calc_valuation(report.num_samples, loss)
-    return report
-``` -->
 
 ## Customizing clients using callbacks
 

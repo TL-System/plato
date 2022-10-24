@@ -191,29 +191,31 @@ class Client:
                 payload_size / 1024**2,
             )
 
-            await self.handle_payload()
+            await self.handle_payload(self.server_payload)
 
-    async def handle_payload(self):
-        # Inbound payload received
+    async def handle_payload(self, inbound_payload):
+        """Handles the inbound payload upon receiving it from the server."""
+        self.inbound_received(self.inbound_processor)
         self.callback_handler.call_event(
             "on_inbound_received", self, self.inbound_processor
         )
-        self.inbound_received(self.inbound_processor)
-        self.server_payload = self.inbound_processor.process(self.server_payload)
+
+        processed_inbound_payload = self.inbound_processor.process(inbound_payload)
 
         # Inbound data is processed, computing outbound response
-        self.callback_handler.call_event(
-            "on_inbound_processed", self, self.server_payload
+        report, outbound_payload = await self.inbound_processed(
+            processed_inbound_payload
         )
-        report, payload = await self.inbound_processed(self.server_payload)
-        self.server_payload = None
+        self.callback_handler.call_event(
+            "on_inbound_processed", self, processed_inbound_payload
+        )
 
         # Outbound data is ready to be processed
+        self.outbound_ready(report, self.outbound_processor)
         self.callback_handler.call_event(
             "on_outbound_ready", self, report, self.outbound_processor
         )
-        self.outbound_ready(report, self.outbound_processor)
-        payload = self.outbound_processor.process(payload)
+        processed_outbound_payload = self.outbound_processor.process(outbound_payload)
 
         # Sending the client report as metadata to the server (payload to follow)
         await self.sio.emit(
@@ -221,21 +223,27 @@ class Client:
         )
 
         # Sending the client training payload to the server
-        await self.send(payload)
+        await self.send(processed_outbound_payload)
 
     def inbound_received(self, inbound_processor):
-        """Inbound received"""
+        """
+        Override this method to complete additional tasks before the inbound processors start to
+        process the data received from the server.
+        """
 
-    async def inbound_processed(self, data):
+    async def inbound_processed(self, processed_inbound_payload):
         """
-        Overwrite this function to define actions after the inbound payload has been processed.
-        Start the training by default.
+        Override this method to conduct customized operations to generate a client's response to
+        the server when inbound payload from the server has been processed.
         """
-        report, payload = await self.start_training()
-        return report, payload
+        report, outbound_payload = await self.start_training(processed_inbound_payload)
+        return report, outbound_payload
 
     def outbound_ready(self, report, outbound_processor):
-        """Outbound payload is ready to be sent after being processed."""
+        """
+        Override this method to complete additional tasks before the outbound processors start
+        to process the data to be sent to the server.
+        """
 
     async def chunk_arrived(self, data) -> None:
         """Upon receiving a chunk of data from the server."""
@@ -307,14 +315,13 @@ class Client:
             payload_size / 1024**2,
         )
 
-        await self.handle_payload()
+        await self.handle_payload(self.server_payload)
 
-    async def start_training(self):
+    async def start_training(self, inbound_payload):
         """Complete one round of training on this client."""
-        self.load_payload(self.server_payload)
-        self.server_payload = None
+        self.load_payload(inbound_payload)
 
-        report, payload = await self.train()
+        report, outbound_payload = await self.train()
 
         if Config().is_edge_server():
             logging.info(
@@ -323,7 +330,7 @@ class Client:
         else:
             logging.info("[%s] Model trained.", self)
 
-        return report, payload
+        return report, outbound_payload
 
     async def send_in_chunks(self, data) -> None:
         """Sending a bytes object in fixed-sized chunks to the client."""
