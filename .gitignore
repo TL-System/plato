@@ -103,6 +103,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
+.env
 .venv
 env/
 venv/
@@ -138,16 +139,15 @@ dmypy.json
 data/
 tests/data/
 
-# Result files
-results/
-result.csv
-
-# Models
+# Models and checkpoints
 pretrained/
 models/
 logs/
 checkpoints/
 *.pth
+
+# Result files
+results/
 
 # macOS
 .DS_Store

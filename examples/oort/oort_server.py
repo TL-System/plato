@@ -129,61 +129,66 @@ class Server(fedavg.Server):
 
         if self.current_round > 1:
             # Exploitation
-            exploit_client_num = max(
+            exploited_clients_count = max(
                 math.ceil((1.0 - self.exploration_factor) * clients_count),
                 clients_count - len(self.unexplored_clients),
             )
 
-            sorted_util = sorted(
+            sorted_by_utility = sorted(
                 self.client_utilities, key=self.client_utilities.get, reverse=True
             )
+            sorted_by_utility = [
+                client for client in sorted_by_utility if client in clients_pool
+            ]
 
             # Calculate cut-off utility
             cut_off_util = (
-                self.client_utilities[sorted_util[exploit_client_num - 1]]
+                self.client_utilities[sorted_by_utility[exploited_clients_count - 1]]
                 * self.cut_off
             )
 
             # Include clients with utilities higher than the cut-off
-            exploit_clients = []
-            for client_id in sorted_util:
+            exploited_clients = []
+            for client_id in sorted_by_utility:
                 if (
                     self.client_utilities[client_id] > cut_off_util
                     and client_id not in self.blacklist
                 ):
-                    exploit_clients.append(client_id)
+                    exploited_clients.append(client_id)
 
             # Sample clients with their utilities
-            utility_sum = float(
-                sum([self.client_utilities[client_id] for client_id in exploit_clients])
+            total_utility = float(
+                sum(self.client_utilities[client_id] for client_id in exploited_clients)
             )
 
             probabilities = [
-                self.client_utilities[client_id] / utility_sum
-                for client_id in exploit_clients
+                self.client_utilities[client_id] / total_utility
+                for client_id in exploited_clients
             ]
 
-            if len(probabilities) > 0 and exploit_client_num > 0:
+            if len(probabilities) > 0 and exploited_clients_count > 0:
                 selected_clients = np.random.choice(
-                    exploit_clients,
-                    min(len(exploit_clients), exploit_client_num),
+                    exploited_clients,
+                    min(len(exploited_clients), exploited_clients_count),
                     p=probabilities,
                     replace=False,
                 )
                 selected_clients = selected_clients.tolist()
 
             last_index = (
-                sorted_util.index(exploit_clients[-1]) if exploit_clients else 0
+                sorted_by_utility.index(exploited_clients[-1])
+                if exploited_clients
+                else 0
             )
 
             # If the result of exploitation wasn't enough to meet the required length
-            if len(selected_clients) < exploit_client_num:
-                for index in range(last_index + 1, len(sorted_util)):
+            if len(selected_clients) < exploited_clients_count:
+                for index in range(last_index + 1, len(sorted_by_utility)):
                     if (
-                        not sorted_util[index] in self.blacklist
-                        and len(selected_clients) < exploit_client_num
+                        not sorted_by_utility[index] in self.blacklist
+                        and len(selected_clients) < exploited_clients_count
                     ):
-                        selected_clients.append(sorted_util[index])
+                        selected_clients.append(sorted_by_utility[index])
 
         # Exploration
         random.setstate(self.prng_state)
@@ -209,7 +214,7 @@ class Server(fedavg.Server):
         return selected_clients
 
     def calc_client_util(self, client_id):
-        """Calculate client utility."""
+        """Calculate the client utility."""
         client_utility = self.client_utilities[client_id] + math.sqrt(
             0.1 * math.log(self.current_round) / self.client_last_rounds[client_id]
         )
