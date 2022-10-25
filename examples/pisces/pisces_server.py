@@ -202,7 +202,7 @@ class Server(fedavg.Server):
 
         if self.current_round > 1:
             # Exploitation
-            num_to_explore = min(
+            explored_clients_count = min(
                 len(self.unexplored_clients),
                 np.random.binomial(clients_count, self.exploration_factor, 1)[0],
             )
@@ -212,32 +212,34 @@ class Server(fedavg.Server):
                 self.min_explore_factor,
             )
 
-            real_exploit_num = min(
-                len(self.explored_clients), clients_count - num_to_explore
+            exploited_clients_count = min(
+                len(self.explored_clients), clients_count - explored_clients_count
             )
 
-            sorted_util = sorted(
+            sorted_by_utility = sorted(
                 self.client_utilities, key=self.client_utilities.get, reverse=True
             )
-            sorted_util = [client for client in sorted_util if client in clients_pool]
+            sorted_by_utility = [
+                client for client in sorted_by_utility if client in clients_pool
+            ]
 
-            selected_clients = sorted_util[:real_exploit_num]
+            selected_clients = sorted_by_utility[:exploited_clients_count]
 
         # Exploration
         random.setstate(self.prng_state)
 
         # Select unexplored clients randomly
-        selected_unexplore_clients = random.sample(
+        selected_unexplored_clients = random.sample(
             self.unexplored_clients, clients_count - len(selected_clients)
         )
 
         self.prng_state = random.getstate()
-        self.explored_clients += selected_unexplore_clients
+        self.explored_clients += selected_unexplored_clients
 
-        for client_id in selected_unexplore_clients:
+        for client_id in selected_unexplored_clients:
             self.unexplored_clients.remove(client_id)
 
-        selected_clients += selected_unexplore_clients
+        selected_clients += selected_unexplored_clients
 
         logging.info("[%s] Selected clients: %s", self, selected_clients)
 

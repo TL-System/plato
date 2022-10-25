@@ -105,7 +105,6 @@ class Server(fedunlearning_server.Server):
         extract training time and cos similarity for all clients;
         after and at second round, training process resume.
         """
-        random.seed(1)
         assert clients_count <= len(clients_pool)
         random.setstate(self.prng_state)
 
