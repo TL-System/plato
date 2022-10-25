@@ -1,0 +1,76 @@
+clients:
+    # Type
+    type: simple
+
+    # The total number of clients
+    total_clients: 10
+
+    # The number of clients selected in each round
+    per_round: 2
+
+    # Should the clients compute test accuracy locally?
+    do_test: true
+
+    random_seed: 1
+
+server:
+    address: 127.0.0.1
+    port: 8011
+    do_test: false
+    random_seed: 1
+
+data:
+    # The training and testing dataset
+    datasource: MNIST
+
+    # Number of samples in each partition
+    partition_size: 600
+
+    sampler: iid
+
+trainer:
+    # The type of the trainer
+    type: basic
+
+    # The maximum number of training rounds
+    rounds: 100
+
+    # The maximum number of clients running concurrently
+    max_concurrency: 10
+
+    # The target accuracy
+    target_accuracy: 0.98
+
+    # Number of epochs for local training in each communication round
+    epochs: 10
+    batch_size: 10
+    optimizer: SGD
+    loss_criterion: CrossEntropyLoss
+    lr_scheduler: CosineAnnealingLR
+
+    model_name: darts
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg
+
+parameters:
+    learning_rate:
+        base_lr: 0.025
+    lr_scheduler:
+        eta_min: 0.001
+        T_max: 100
+    optimizer:
+        lr: 0.025
+        momentum: 0.9 # learning rate is fixed as in Appendix C.2
+        weight_decay: 0.0003
+    model:
+        C: 1
+        num_classes: 10
+        layers: 8
+    architect:
+        momentum: 0.9
+        weight_decay: 0.0003
+        learning_rate: 0.003
+        arch_weight_decay: 0.001
+        baseline_decay: 0.99
