@@ -89,7 +89,6 @@ Liu et al., &ldquo;[The Right to be Forgotten in Federated Learning: An Efficien
 ```
 ````
 
-
 ````{admonition} **Gradient leakage attacks and defenses**
 Gradient leakage attacks and their defenses have been extensively studied in the research literature on federated learning.  In `examples/dlg/`, several attacks, including `DLG`, `iDLG`, and `csDLG`, have been implemented, as well as several defense mechanisms, including `Soteria`, `GradDefense`, `Differential Privacy`, `Gradient Compression`, and `Outpost`. A variety of methods in the trainer API has been used in their implementations.
 
@@ -106,7 +105,7 @@ python examples/scaffold/scaffold.py -c examples/scaffold/scaffold_MNIST_lenet5.
 ```
 
 ```{note}
-Karimireddy et al., &ldquo;[SCAFFOLD: Stochastic Controlled Averaging for Federated Learning](http://proceedings.mlr.press/v119/karimireddy20a.html), &rdquo; in Proc. ICML, 2020.
+Karimireddy et al., &ldquo;[SCAFFOLD: Stochastic Controlled Averaging for Federated Learning](http://proceedings.mlr.press/v119/karimireddy20a.html), &rdquo; in Proc. International Conference on Machine Learning (ICML), 2020.
 ```
 ````
 
@@ -131,19 +130,19 @@ python examples/split_learning/split_learning.py -c examples/split_learning/spli
 ```
 
 ```{note}
-Vepakomma, et al., &ldquo;[Split Learning for Health: Distributed Deep Learning without Sharing Raw Patient Data](https://arxiv.org/abs/1812.00564),&rdquo; in Proc. AI for Social Good Workshop, affiliated with ICLR 2018.
+Vepakomma, et al., &ldquo;[Split Learning for Health: Distributed Deep Learning without Sharing Raw Patient Data](https://arxiv.org/abs/1812.00564),&rdquo; in Proc. AI for Social Good Workshop, affiliated with the International Conference on Learning Representations (ICLR), 2018.
 ```
 ````
 
 ````{admonition} **FedRLNAS**
-FedRLNAS is an algorithm to conduct Federated Neural Architecture Search without sending the whole supernet to clients. Instead, clients still do conventional model training as in FedAvg and the server will search for the best model architecture. In this example, the server overrides ```aggregate_weights()``` to aggregate updates from subnets of different architectures into the supernet, and implements updating of architecture parameters in ```weights_aggregated()```. In its implementation, only DARTS search space is supported.
+FedRLNAS is an algorithm designed to conduct Federated Neural Architecture Search without sending the entire supernet to the clients. Instead, clients still perform conventional model training as in Federated Averaging, and the server will search for the best model architecture. In this example, the server overrides ```aggregate_weights()``` to aggregate updates from subnets of different architectures into the supernet, and implements architecture parameter updates in ```weights_aggregated()```. In its implementation, only only DARTS search space is supported.
 
 ```shell
 python examples/fedrlnas/fedrlnas.py -c examples/fedrlnas/FedRLNAS_MNIST_DARTS.yml
 ```
 
 ```{note}
-Yao, et al., &ldquo;[Federated Model Search via Reinforcement Learning](https://ieeexplore.ieee.org/document/9546522),&rdquo; in Proc. ICDCS, 2021.
+Yao, et al., &ldquo;[Federated Model Search via Reinforcement Learning](https://ieeexplore.ieee.org/document/9546522),&rdquo; in Proc. International Conference on Distributed Computing Systems (ICDCS), 2021.
 ```
 ````
 
