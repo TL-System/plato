@@ -1,5 +1,5 @@
 """
-A tool for Soft Syncronization in FedRLNAS.
+A tool for Soft Synchronization in FedRLNAS.
 
 Reference:
 
