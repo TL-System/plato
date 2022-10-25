@@ -87,8 +87,10 @@ class Server(fedavg.Server):
         # 2. Sample a subset of the remaining clients uniformly at random
         num2 = clients_count - num1
         remaining = clients_pool.copy()
+
         for client_id in subset1:
             remaining.remove(client_id)
+
         subset2 = random.sample(remaining, num2)
 
         # 3. Selected clients are the union of these two subsets
