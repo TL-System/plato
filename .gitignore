@@ -160,3 +160,4 @@ docs/_build/
 
 # TensorFlow datasets
 tensorflow_datasets/
+.Rproj.user
