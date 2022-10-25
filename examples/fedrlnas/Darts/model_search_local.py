@@ -1,5 +1,5 @@
 """
-Modify based on cnn/model_search.py in https://github.com/quark0/darts.
+Modify based on cnn/model_search.py in https://github.com/quark0/darts,
 to support the algorithms in FedRLNAS.
 """
 
