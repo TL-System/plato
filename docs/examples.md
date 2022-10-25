@@ -136,7 +136,7 @@ Vepakomma, et al., &ldquo;[Split Learning for Health: Distributed Deep Learning 
 ````
 
 ````{admonition} **Oort**
-Oort is a federated learning algorithm that performs biased client selection based on both statistical utility and system utility. Originally, Oort is proposed for synchronous federated learning. In this example, we adopt it to both synchronous and asynchronous federated learning. Notably, Oort server maintains a blacklist for clients that have been selected too many times (10 by defualt). If `per_round` / `total_clients` is large, e.g. 2/5, the Oort server may not work because most clients are in the blacklist and no sufficient clients can be selected.
+Oort is a federated learning algorithm that performs biased client selection based on both statistical utility and system utility. Originally, Oort is proposed for synchronous federated learning. In this example, it was adapted to support both synchronous and asynchronous federated learning. Notably, the Oort server maintains a blacklist for clients that have been selected too many times (10 by defualt). If `per_round` / `total_clients` is large, e.g. 2/5, the Oort server may not work correctly because most clients are in the blacklist and there will not be a sufficient number of clients that can be selected.
 
 ```shell
 python examples/oort/oort.py -c examples/oort/oort_MNIST_lenet5.yml
