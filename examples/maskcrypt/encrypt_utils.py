@@ -11,7 +11,7 @@ from typing import OrderedDict
 
 
 def get_ckks_context():
-    """Obtain a Tenseal context for encryption and decryption."""
+    """Obtain a TenSEAL context for encryption and decryption."""
     context_dir = ".ckks_context/"
     context_name = "context"
     try:
@@ -42,7 +42,7 @@ def encrypt_weights(
     context=None,
     encrypt_indices=None,
 ):
-    """Flatten the model weights and encrypt the selected one."""
+    """Flatten the model weights and encrypt the selected ones."""
     assert not encrypt_indices is None
     if context == None:
         context = get_ckks_context()
@@ -98,7 +98,7 @@ def deserialize_weights(serialized_weights, context):
 
 
 def decrypt_weights(encrypted_weights, weight_shapes=None, para_nums=None):
-    """Decrypt the vector and restore model weights according the shapes."""
+    """Decrypt the vector and restore model weights according to the shapes."""
     decrypted_weights = OrderedDict()
     vector_length = []
     for para_num in para_nums.values():
@@ -157,6 +157,7 @@ def update_est(config, client_id, data):
 
 
 def get_est(filename):
+    """Load the estimated model, return None if not exists."""
     try:
         with open(filename, "rb") as est_file:
             return pickle.load(est_file)
