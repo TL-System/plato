@@ -16,6 +16,7 @@ import torch
 
 class Server(fedavg.Server):
     """A federated learning server."""
+
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model, algorithm, trainer)
 
@@ -26,18 +27,19 @@ class Server(fedavg.Server):
         self.squared_deltas_current_round = None
 
     def configure(self):
-        """ Initializes necessary variables. """
+        """Initializes necessary variables."""
         super().configure()
 
         self.local_gradient_bounds = 0.01 * np.ones(
             self.number_of_client
         )  # 0.01 is a hyperparameter that's used as a starting point.
         self.local_stalenesses = np.zeros(self.number_of_client)
-        self.aggregation_weights = np.ones(
-            self.number_of_client) * (1.0 / self.number_of_client)
+        self.aggregation_weights = np.ones(self.number_of_client) * (
+            1.0 / self.number_of_client
+        )
 
     def choose_clients(self, clients_pool, clients_count):
-        """ Choose a subset of the clients to participate in each round. """
+        """Choose a subset of the clients to participate in each round."""
         assert clients_count <= len(clients_pool)
 
         # Select clients based on calculated probability (within clients_pool)
@@ -46,10 +48,9 @@ class Server(fedavg.Server):
         logging.info(f"The calculated probability is: ", p)
         logging.info(f"current clients pool: ", clients_pool)
 
-        selected_clients = np.random.choice(clients_pool,
-                                            clients_count,
-                                            replace=False,
-                                            p=p)
+        selected_clients = np.random.choice(
+            clients_pool, clients_count, replace=False, p=p
+        )
 
         logging.info("[%s] Selected clients: %s", self, selected_clients)
         logging.info(f"type of selected clients: ", type(selected_clients))
@@ -61,29 +62,31 @@ class Server(fedavg.Server):
         self.squared_deltas_current_round = np.zeros(self.number_of_client)
         # the order of id should be same as weights_delts above
         id_received = [update.client_id for update in self.updates]
-       
+
         # find delat bound for each client.
         for client_id, delta in zip(id_received, deltas_received):
             # calculate the largest value in each layer and sum them up for the bound
             for layer, value in delta.items():
-                if 'conv' in layer: 
-                    temp_max = torch.max(value).detach().cpu().numpy()
-                    temp_max_abs = np.absolute(temp_max)
-                
-                    if temp_max_abs > self.squared_deltas_current_round[client_id -
-                                                    1]:
-                    
-                        self.squared_deltas_current_round[client_id -
-                                                    1] = temp_max_abs
+                if "conv" in layer:
+                    squared_value = np.sum(np.square(value.item()))
+                    squared_delta += squared_value
+                    # use squared loss instead of abs
+                    # temp_max = torch.max(value).detach().cpu().numpy()
+                    # temp_max_abs = np.absolute(temp_max)
+            self.squared_deltas_current_round[client_id - 1] = np.sqrt(
+                squared_delta.item()
+            )
 
-        logging.info("!!!!!!The squared deltas bound of this round are: ",
-              self.squared_deltas_current_round)
+        logging.info(
+            "!!!!!!The squared deltas bound of this round are: ",
+            self.squared_deltas_current_round,
+        )
         return avg_update
-    
+
     def weights_aggregated(self, updates):
-        """"Update clients record on the server"""
+        """ "Update clients record on the server"""
         # Extract the local staleness and update the record of client staleness.
-        for update in updates: 
+        for update in updates:
             self.local_stalenesses[update.client_id - 1] = update.staleness
 
         logging.info("!!!The staleness of this round are: ", self.local_stalenesses)
@@ -91,7 +94,7 @@ class Server(fedavg.Server):
         for client_id, bound in enumerate(self.squared_deltas_current_round):
             if bound != 0:
                 self.local_gradient_bounds[client_id] = bound
-        
+
         logging.info("local_gradient_bounds: ", self.local_gradient_bounds)
         self.extract_aggregation_weights(updates)
 
@@ -99,21 +102,23 @@ class Server(fedavg.Server):
         """Extract aggregation weights"""
         # below is for fedavg only; complex ones would be added later
         # Extract the total number of samples
-        self.total_samples = sum(
-            [update.report.num_samples for update in updates])
+        self.total_samples = sum([update.report.num_samples for update in updates])
 
         for update in updates:
-            self.aggregation_weights[
-                update.client_id - 1] = update.report.num_samples / self.total_samples
-        logging.info(f"!!!!!!The aggregation weights of this round are: ",
-              self.aggregation_weights)
+            self.aggregation_weights[update.client_id - 1] = (
+                update.report.num_samples / self.total_samples
+            )
+        logging.info(
+            f"!!!!!!The aggregation weights of this round are: ",
+            self.aggregation_weights,
+        )
 
     def calculate_selection_probability(self, clients_pool):
         """Calculte selection probability based on the formulated geometric optimization problem
-            Minimize \alpha \sum_{i=1}^N \frac{p_i^2 * G_i^2}{q_i} + A \sum_{i=1}^N q_i * \tau_i * G_i
-            Subject to \sum_{i=1}{N} q_i = 1
-                    q_i > 0 
-            Probability Variables are q_i
+        Minimize \alpha \sum_{i=1}^N \frac{p_i^2 * G_i^2}{q_i} + A \sum_{i=1}^N q_i * \tau_i * G_i
+        Subject to \sum_{i=1}{N} q_i = 1
+                q_i > 0
+        Probability Variables are q_i
 
         """
         logging.info("Calculating selection probabitliy ... ")
@@ -131,16 +136,16 @@ class Server(fedavg.Server):
 
         # read aggre_weight from somewhere
         aggre_weight_square = np.square(aggregation_weights_inpool)  # p_i^2
-        local_gradient_bound_square = np.square(
-            local_gradient_bounds_inpool)  # G_i^2
+        local_gradient_bound_square = np.square(local_gradient_bounds_inpool)  # G_i^2
 
         f1_params = alpha * np.multiply(
-            aggre_weight_square, local_gradient_bound_square)  # p_i^2 * G_i^2
+            aggre_weight_square, local_gradient_bound_square
+        )  # p_i^2 * G_i^2
         f1 = matrix(np.eye(num_of_clients_inpool) * f1_params)
 
         f2_params = BigA * np.multiply(
-            local_staleness_inpool,
-            local_gradient_bounds_inpool)  # \tau_i * G_i
+            local_staleness_inpool, local_gradient_bounds_inpool
+        )  # \tau_i * G_i
         f2 = matrix(-1 * np.eye(num_of_clients_inpool) * f2_params)
 
         F = sparse([[f1, f2]])
@@ -148,18 +153,18 @@ class Server(fedavg.Server):
         g = log(matrix(np.ones(2 * num_of_clients_inpool)))
 
         K = [2 * num_of_clients_inpool]
-        G = matrix(-1 * np.eye(num_of_clients_inpool))  #None
-        h = matrix(np.zeros((num_of_clients_inpool, 1)))  #None
+        G = matrix(-1 * np.eye(num_of_clients_inpool))  # None
+        h = matrix(np.zeros((num_of_clients_inpool, 1)))  # None
 
-        A1 = matrix([[1.]])
-        A = matrix([[1.]])
+        A1 = matrix([[1.0]])
+        A = matrix([[1.0]])
         for i in range(num_of_clients_inpool - 1):
             A = sparse([[A], [A1]])
 
-        b = matrix([1.])
-        solvers.options['maxiters']=500
-        sol = solvers.gp(
-            K, F, g, G, h, A, b,
-            solver='mosek')['x']  # solve out the probabitliy of each client
+        b = matrix([1.0])
+        solvers.options["maxiters"] = 500
+        sol = solvers.gp(K, F, g, G, h, A, b, solver="mosek")[
+            "x"
+        ]  # solve out the probabitliy of each client
 
         return np.array(sol).reshape(-1)
