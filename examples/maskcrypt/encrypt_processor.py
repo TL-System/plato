@@ -14,17 +14,16 @@ import encrypt_utils
 
 
 class Processor(model.Processor):
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, mask=None, **kwargs) -> None:
         super().__init__(**kwargs)
         self.context = encrypt_utils.get_ckks_context()
+        self.mask = mask
 
         para_nums = {}
         extract_model = self.trainer.model.cpu().state_dict()
         for key in extract_model.keys():
             para_nums[key] = torch.numel(extract_model[key])
         self.para_nums = para_nums
-
-        self.encrypt_mask = None
 
     def process(self, data: Any) -> Any:
         logging.info(
@@ -35,9 +34,7 @@ class Processor(model.Processor):
             data,
             serialize=True,
             context=self.context,
-            para_nums=self.para_nums,
-            encrypt_ratio=0.05,
-            enc_mask=self.encrypt_mask,
+            encrypt_indices=self.mask,
         )
 
         logging.info(f"Encryption Time: {time.time() - start_time}")

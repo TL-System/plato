@@ -3,19 +3,22 @@ A simple federated learning server using federated averaging with homomorphic en
 """
 import os
 import pickle
-from typing import OrderedDict
 import torch
-from plato.config import Config
 
+from typing import OrderedDict
+from plato.config import Config
 from plato.servers import fedavg
+
 import encrypt_utils as homo_enc
 
 
 class Server(fedavg.Server):
     """Federated learning server using federated averaging with homomorphic encryption support."""
 
-    def __init__(self, model=None, algorithm=None, trainer=None):
-        super().__init__(model=model, algorithm=algorithm, trainer=trainer)
+    def __init__(
+        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+    ):
+        super().__init__(model, datasource, algorithm, trainer, callbacks)
         self.encrypted_model = None
         self.weight_shapes = {}
         self.para_nums = {}
@@ -33,42 +36,40 @@ class Server(fedavg.Server):
         if not os.path.exists(f"{self.checkpoint_path}/{self.attack_prep_dir}/"):
             os.mkdir(f"{self.checkpoint_path}/{self.attack_prep_dir}/")
 
-    # Override API functions
     def choose_clients(self, clients_pool, clients_count):
+        """Choose the same clients every two rounds."""
         if self.current_round % 2 != 0:
             self.last_selected_clients = super().choose_clients(
                 clients_pool, clients_count
             )
-            return self.last_selected_clients
-        else:
-            return self.last_selected_clients
+        return self.last_selected_clients
 
-    def customize_server_payload(self, server_response):
+    def customize_server_payload(self, payload):
         """Customize the server payload before sending to the client."""
         if not self.param_inited:
-            self.init_model_params()
+            self._init_model_params()
 
         if self.current_round % 2 != 0:
             return self.encrypted_model
         else:
             return self.final_mask
 
-    def aggregate_weights(self, updates, baseline_weights, weights_received):
+    async def aggregate_weights(self, updates, baseline_weights, weights_received):
         if self.current_round % 2 != 0:
             self.mask_consensus(updates)
             return baseline_weights
         else:
-            return self.aggregate_he(updates)
+            return self._aggregate(updates)
 
-    # Self-defined functions
-    def init_model_params(self):
+    def _init_model_params(self):
+        """Initialize and save the model in the begining."""
         extract_model = self.trainer.model.cpu().state_dict()
         for key in extract_model.keys():
             self.weight_shapes[key] = extract_model[key].size()
             self.para_nums[key] = torch.numel(extract_model[key])
 
         self.encrypted_model = homo_enc.encrypt_weights(
-            extract_model, True, self.ckks_context, self.para_nums, encrypt_ratio=0
+            extract_model, True, self.ckks_context, []
         )
 
         # Store the initial model
@@ -79,6 +80,7 @@ class Server(fedavg.Server):
         self.param_inited = True
 
     def mask_consensus(self, updates):
+        """Conduct mask consensus on the reported mask proposals."""
         proposals = [update.payload for update in updates]
         mask_size = len(proposals[0])
         if mask_size == 0:
@@ -95,14 +97,16 @@ class Server(fedavg.Server):
             )
             self.final_mask = self.final_mask.int().long()
 
-    def aggregate_he(self, updates):
-        self.encrypted_model = self.federated_averaging_he(updates)
+    def _aggregate(self, updates):
+        """Aggregate the model updates in the hybrid form of encrypted and unencrypted weights."""
+        self.encrypted_model = self._fedavg_hybrid(updates)
 
         # Decrypt model weights for test accuracy
         decrypted_weights = homo_enc.decrypt_weights(
             self.encrypted_model, self.weight_shapes, self.para_nums
         )
 
+        # Save the latest global model weights for evaluation
         latest_model_filename = (
             f"{self.checkpoint_path}/{self.attack_prep_dir}/latest.pth"
         )
@@ -114,8 +118,8 @@ class Server(fedavg.Server):
         ].serialize()
         return decrypted_weights
 
-    def federated_averaging_he(self, updates):
-        """Aggregate weight updates from the clients using federated averaging."""
+    def _fedavg_hybrid(self, updates):
+        """Aggregate the model updates in the hybrid form of encrypted and unencrypted weights."""
         weights_received = [
             homo_enc.deserialize_weights(update.payload, self.ckks_context)
             for update in updates
@@ -140,6 +144,7 @@ class Server(fedavg.Server):
             unencrypted_avg_update += unenc_w * (num_samples / self.total_samples)
             encrypted_avg_update += enc_w * (num_samples / self.total_samples)
 
+        # Wrap up the aggregation result
         avg_result = OrderedDict()
         avg_result["unencrypted_weights"] = unencrypted_avg_update
         avg_result["encrypted_weights"] = encrypted_avg_update

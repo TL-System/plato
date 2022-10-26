@@ -43,35 +43,20 @@ def encrypt_weights(
     plain_weights,
     serialize=True,
     context=None,
-    para_nums=None,
-    encrypt_ratio=0.05,
-    enc_mask=None,
+    encrypt_indices=None,
 ):
+    assert not encrypt_indices is None
     if context == None:
         context = get_ckks_context()
 
     output = OrderedDict()
-    encrypt_indices = []
-    total_para_num = 0
-    sample_size = 0
-
-    # Create a list of indices with length of sample_size which is computed based on
-    # the number of parameters of the model and the encrypt_ratio
-    if enc_mask is None:
-        for value in para_nums.values():
-            total_para_num += value
-        sample_size = int(total_para_num * encrypt_ratio)
-        encrypt_indices = random.sample(range(0, total_para_num), sample_size)
-    else:
-        encrypt_indices = enc_mask.long()
-
     # Flatten all weight tensors to a vector
     flattened_weight_arr = np.array([])
     for weight in plain_weights.values():
         flattened_weight_arr = np.append(flattened_weight_arr, weight)
     weights_vector = torch.from_numpy(flattened_weight_arr)
 
-    if encrypt_ratio == 0:
+    if len(encrypt_indices) == 0:
         output["unencrypted_weights"] = weights_vector
         output["encrypt_indices"] = None
         output["encrypted_weights"] = None

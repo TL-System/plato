@@ -5,6 +5,7 @@ A basic federated learning client with homomorphic encryption support
 import logging
 import random
 import sys
+import time
 import torch
 import pickle
 
@@ -29,13 +30,14 @@ class Client(simple.Client):
 
         self.encrypt_ratio = Config().clients.encrypt_ratio
         self.random_mask = Config().clients.random_mask
+        self.final_mask = None
 
         self.attack_prep_dir = f"{Config().data.datasource}_{Config().trainer.model_name}_{self.encrypt_ratio}"
         if self.random_mask:
             self.attack_prep_dir += "_random"
 
         self.checkpoint_path = Config().params["checkpoint_path"]
-        self.model_buffer = []
+        self.model_buffer = {}
 
     def get_exposed_weights(self):
         model_name = Config().trainer.model_name
@@ -132,18 +134,32 @@ class Client(simple.Client):
     #                 processor.encrypt_mask = mask
     #         await self.send(payload, process=True)
 
-    def process_server_response(self, server_response):
-        if "current_global_round" in server_response:
-            self.server.current_global_round = server_response["current_global_round"]
+    # async def train(self):
+    #     """Overwrite training function."""
+    #     report, weights = None, None
+    #     if self.current_round % 2 != 0:
+    #         report, weights = await super().train()
+    #     else:
+    #         client_id, report, weights = self.model_buffer.pop(0)
+    #         assert client_id == self.client_id
+    #         report.training_time = 0
 
-    async def train(self):
-        """Overwrite training function."""
-        report, weights = None, None
+    #     return report, weights
+
+    async def inbound_processed(self, processed_inbound_payload):
         if self.current_round % 2 != 0:
-            report, weights = await super().train()
+            report, model_weights = await super().inbound_processed(
+                processed_inbound_payload
+            )
+            mask_proposal = self.compute_mask(
+                self.algorithm.extract_weights(), self.trainer.gradient
+            )
+            self.model_buffer[self.client_id] = (report, model_weights)
+            return report, mask_proposal
         else:
-            client_id, report, weights = self.model_buffer.pop(0)
-            assert client_id == self.client_id
+            # Set
+            self.final_mask = processed_inbound_payload
+            report, weights = self.model_buffer.pop(self.client_id)
             report.training_time = 0
-
-        return report, weights
+            report.comm_time = time.time()
+            return report, weights
