@@ -1,22 +1,22 @@
-"""The trainer for MaskCrpyt."""
+"""The customized trainer designed for MaskCrpyt."""
 import logging
 import os
-from typing import OrderedDict
 import torch
 
+from typing import OrderedDict
 from plato.config import Config
 from plato.trainers import basic
 
 
 class Trainer(basic.Trainer):
-    """The trainer with gradient computation when local training finished.."""
+    """The trainer with gradient computation when local training is finished."""
 
     def __init__(self, model=None):
         super().__init__(model=model)
         self.gradient = OrderedDict()
 
-    # Override API functions
     def train_run_end(self, config):
+        """Compute gradients on local data when training is finished."""
         logging.info(
             "[Client #%d] Training completed, computing gradient.", self.client_id
         )
@@ -41,18 +41,16 @@ class Trainer(basic.Trainer):
 
         model_type = config["model_name"]
         filename = f"{model_type}_gradient_{self.client_id}_{config['run_id']}.pth"
-        self.save_gradient(filename)
+        self._save_gradient(filename)
 
-    # Illegal function override
     def load_model(self, filename=None, location=None):
         super().load_model(filename, location)
         model_type = Config().trainer.model_name
         run_id = Config().params["run_id"]
         filename = f"{model_type}_gradient_{self.client_id}_{run_id}.pth"
-        self.load_gradient(filename)
+        self._load_gradient(filename)
 
-    # Self-defined functions
-    def save_gradient(self, filename=None, location=None):
+    def _save_gradient(self, filename=None, location=None):
         """Saving the gradients to a file."""
         model_path = Config().params["model_path"] if location is None else location
         model_name = Config().trainer.model_name
@@ -70,7 +68,7 @@ class Trainer(basic.Trainer):
 
         torch.save(self.gradient, model_path)
 
-    def load_gradient(self, filename=None, location=None):
+    def _load_gradient(self, filename=None, location=None):
         """Load gradients from a file."""
         model_path = Config().params["model_path"] if location is None else location
         model_name = Config().trainer.model_name
