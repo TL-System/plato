@@ -1,3 +1,6 @@
+"""
+Customize the inbound and outbound processors for MaskCrypt clients through callbacks.
+"""
 import encrypt_processor
 import decrypt_processor
 
@@ -6,8 +9,7 @@ from plato.callbacks.client import ClientCallback
 
 class MaskCryptCallback(ClientCallback):
     """
-    A client callback that dynamically inserts processors into the current list of inbound
-    processors.
+    A client callback that dynamically inserts encrypt and decrypt processors.
     """
 
     def on_inbound_received(self, client, inbound_processor):

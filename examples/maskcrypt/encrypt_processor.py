@@ -1,19 +1,20 @@
 """
-A processor that encrypts model weights tensors.
+A processor that encrypts model weights in MaskCrypt.
 """
-
 import logging
-import time
 import torch
+import encrypt_utils
 
 from typing import Any
 from plato.config import Config
 from plato.processors import model
 
-import encrypt_utils
-
 
 class Processor(model.Processor):
+    """
+    A processor that encrypts model weights with given encryption mask.
+    """
+
     def __init__(self, mask=None, **kwargs) -> None:
         super().__init__(**kwargs)
         self.context = encrypt_utils.get_ckks_context()
@@ -27,17 +28,15 @@ class Processor(model.Processor):
 
     def process(self, data: Any) -> Any:
         logging.info(
-            "[Client #%d] Applying a processor that encrypts the model.", self.client_id
+            "[Client #%d] Encrypt the model weights with given encryption mask.",
+            self.client_id,
         )
-        start_time = time.time()
         encrypted_weights = encrypt_utils.encrypt_weights(
             data,
             serialize=True,
             context=self.context,
             encrypt_indices=self.mask,
         )
-
-        logging.info(f"Encryption Time: {time.time() - start_time}")
 
         encrypt_utils.update_est(Config(), self.client_id, encrypted_weights)
         return encrypted_weights
