@@ -98,7 +98,7 @@ class Server(fedavg.Server):
             self.final_mask = self.final_mask.int().long()
 
     def _aggregate(self, updates):
-        """Aggregate the model updates in the hybrid form of encrypted and unencrypted weights."""
+        """Aggregate the model updates and decrypt the result for evaluation purpose."""
         self.encrypted_model = self._fedavg_hybrid(updates)
 
         # Decrypt model weights for test accuracy
