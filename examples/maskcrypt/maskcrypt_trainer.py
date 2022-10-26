@@ -43,12 +43,12 @@ class Trainer(basic.Trainer):
         filename = f"{model_type}_gradient_{self.client_id}_{config['run_id']}.pth"
         self._save_gradient(filename)
 
-    def load_model(self, filename=None, location=None):
-        super().load_model(filename, location)
+    def get_gradient(self):
+        """Read gradients from file and return to client."""
         model_type = Config().trainer.model_name
         run_id = Config().params["run_id"]
         filename = f"{model_type}_gradient_{self.client_id}_{run_id}.pth"
-        self._load_gradient(filename)
+        return self._load_gradient(filename)
 
     def _save_gradient(self, filename=None, location=None):
         """Saving the gradients to a file."""
@@ -78,4 +78,4 @@ class Trainer(basic.Trainer):
         else:
             model_path = f"{model_path}/{model_name}.pth"
 
-        self.gradient = torch.load(model_path)
+        return torch.load(model_path)

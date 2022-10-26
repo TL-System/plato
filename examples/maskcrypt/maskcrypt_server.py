@@ -1,19 +1,18 @@
 """
-A simple federated learning server using federated averaging with homomorphic encryption support.
+A MaskCrypt server with selective homomorphic encryption support.
 """
 import os
 import pickle
 import torch
+import encrypt_utils
 
 from typing import OrderedDict
 from plato.config import Config
 from plato.servers import fedavg
 
-import encrypt_utils as homo_enc
-
 
 class Server(fedavg.Server):
-    """Federated learning server using federated averaging with homomorphic encryption support."""
+    """A MaskCrypt server with selective homomorphic encryption support."""
 
     def __init__(
         self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
@@ -22,11 +21,10 @@ class Server(fedavg.Server):
         self.encrypted_model = None
         self.weight_shapes = {}
         self.para_nums = {}
-        self.ckks_context = homo_enc.get_ckks_context()
+        self.ckks_context = encrypt_utils.get_ckks_context()
 
         self.final_mask = None
         self.last_selected_clients = []
-
         self.param_inited = False
 
         self.checkpoint_path = Config().params["checkpoint_path"]
@@ -56,9 +54,11 @@ class Server(fedavg.Server):
 
     async def aggregate_weights(self, updates, baseline_weights, weights_received):
         if self.current_round % 2 != 0:
-            self.mask_consensus(updates)
+            # Clients send mask proposals in odd rounds, conduct mask consensus
+            self._mask_consensus(updates)
             return baseline_weights
         else:
+            # Clients send model updates in even rounds, conduct aggregation
             return self._aggregate(updates)
 
     def _init_model_params(self):
@@ -68,7 +68,7 @@ class Server(fedavg.Server):
             self.weight_shapes[key] = extract_model[key].size()
             self.para_nums[key] = torch.numel(extract_model[key])
 
-        self.encrypted_model = homo_enc.encrypt_weights(
+        self.encrypted_model = encrypt_utils.encrypt_weights(
             extract_model, True, self.ckks_context, []
         )
 
@@ -79,7 +79,7 @@ class Server(fedavg.Server):
 
         self.param_inited = True
 
-    def mask_consensus(self, updates):
+    def _mask_consensus(self, updates):
         """Conduct mask consensus on the reported mask proposals."""
         proposals = [update.payload for update in updates]
         mask_size = len(proposals[0])
@@ -102,7 +102,7 @@ class Server(fedavg.Server):
         self.encrypted_model = self._fedavg_hybrid(updates)
 
         # Decrypt model weights for test accuracy
-        decrypted_weights = homo_enc.decrypt_weights(
+        decrypted_weights = encrypt_utils.decrypt_weights(
             self.encrypted_model, self.weight_shapes, self.para_nums
         )
 
@@ -121,7 +121,7 @@ class Server(fedavg.Server):
     def _fedavg_hybrid(self, updates):
         """Aggregate the model updates in the hybrid form of encrypted and unencrypted weights."""
         weights_received = [
-            homo_enc.deserialize_weights(update.payload, self.ckks_context)
+            encrypt_utils.deserialize_weights(update.payload, self.ckks_context)
             for update in updates
         ]
 
