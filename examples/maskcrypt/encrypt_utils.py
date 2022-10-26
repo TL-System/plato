@@ -1,13 +1,11 @@
 """
-Utility functions for homomorphic encryption.
+Utility functions for MaskCrypt.
 """
-
 import os
 import pickle
 import torch
 import tenseal as ts
 import numpy as np
-import random
 
 from typing import OrderedDict
 
@@ -29,7 +27,6 @@ def get_ckks_context():
             poly_modulus_degree=8192,
             coeff_mod_bit_sizes=[60, 40, 40, 60],
         )
-        # context.generate_galois_keys()
         context.global_scale = 2**40
 
         with open(os.path.join(context_dir, context_name), "wb") as f:
@@ -45,6 +42,7 @@ def encrypt_weights(
     context=None,
     encrypt_indices=None,
 ):
+    """Flatten the model weights and encrypt the selected one."""
     assert not encrypt_indices is None
     if context == None:
         context = get_ckks_context()
@@ -84,6 +82,7 @@ def encrypt_weights(
 
 
 def deserialize_weights(serialized_weights, context):
+    """Deserialize the encrypted weights (not decrypted yet)."""
     if context == None:
         context = get_ckks_context()
     deserialized_weights = OrderedDict()
@@ -99,6 +98,7 @@ def deserialize_weights(serialized_weights, context):
 
 
 def decrypt_weights(encrypted_weights, weight_shapes=None, para_nums=None):
+    """Decrypt the vector and restore model weights according the shapes."""
     decrypted_weights = OrderedDict()
     vector_length = []
     for para_num in para_nums.values():
@@ -131,7 +131,7 @@ def decrypt_weights(encrypted_weights, weight_shapes=None, para_nums=None):
 
 
 def update_est(config, client_id, data):
-
+    """Update the exposed model weights that can be estimated by adversaries."""
     unencrypted_weights = data["unencrypted_weights"]
     encrypted_indices = data["encrypt_indices"]
 
@@ -162,21 +162,3 @@ def get_est(filename):
             return pickle.load(est_file)
     except:
         return None
-
-
-def check_accuracy(dataloader, model):
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model.to(device)
-    correct = 0
-    total = 0
-    model.eval()
-    with torch.no_grad():
-        for examples, labels in dataloader:
-            examples, labels = examples.to(device), labels.to(device)
-
-            outputs = model(examples)
-            _, predicted = outputs.max(1)
-            total += predicted.size(0)
-            correct += (predicted == labels).sum().item()
-
-    return correct / total
