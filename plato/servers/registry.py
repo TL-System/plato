@@ -14,6 +14,7 @@ from plato.servers import (
     fedavg_cs,
     mistnet,
     fedavg_gan,
+    fedavg_he
 )
 
 registered_servers = {
@@ -21,6 +22,7 @@ registered_servers = {
     "fedavg_cross_silo": fedavg_cs.Server,
     "mistnet": mistnet.Server,
     "fedavg_gan": fedavg_gan.Server,
+    "fedavg_he": fedavg_he.Server
 }
 
 

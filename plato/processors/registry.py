@@ -37,6 +37,8 @@ if not (
         send_mask,
         structured_pruning,
         unstructured_pruning,
+        model_encrypt,
+        model_decrypt,
     )
 
     registered_processors = OrderedDict(
@@ -61,6 +63,8 @@ if not (
             ("send_mask", send_mask.Processor),
             ("structured_pruning", structured_pruning.Processor),
             ("unstructured_pruning", unstructured_pruning.Processor),
+            ("model_encrypt", model_encrypt.Processor),
+            ("model_decrypt", model_decrypt.Processor),
         ]
     )
 
