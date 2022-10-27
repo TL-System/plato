@@ -40,21 +40,24 @@ class Server(fedavg.Server):
 
     def choose_clients(self, clients_pool, clients_count):
         """Choose a subset of the clients to participate in each round."""
-        assert clients_count <= len(clients_pool)
+        if self.current_round == 1:
+            return clients_pool.tolist()
+        else:
+            assert clients_count <= len(clients_pool)
 
-        # Select clients based on calculated probability (within clients_pool)
+            # Select clients based on calculated probability (within clients_pool)
 
-        p = self.calculate_selection_probability(clients_pool)
-        logging.info(f"The calculated probability is: ", p)
-        logging.info(f"current clients pool: ", clients_pool)
+            p = self.calculate_selection_probability(clients_pool)
+            logging.info(f"The calculated probability is: ", p)
+            # logging.info(f"current clients pool: ", clients_pool)
 
-        selected_clients = np.random.choice(
-            clients_pool, clients_count, replace=False, p=p
-        )
+            selected_clients = np.random.choice(
+                clients_pool, clients_count, replace=False, p=p
+            )
 
-        logging.info("[%s] Selected clients: %s", self, selected_clients)
-        logging.info(f"type of selected clients: ", type(selected_clients))
-        return selected_clients.tolist()
+            logging.info("[%s] Selected clients: %s", self, selected_clients)
+            # logging.info(f"type of selected clients: ", type(selected_clients))
+            return selected_clients.tolist()
 
     async def aggregate_deltas(self, updates, deltas_received):
         avg_update = await super().aggregate_deltas(updates, deltas_received)
@@ -87,7 +90,9 @@ class Server(fedavg.Server):
         """ "Update clients record on the server"""
         # Extract the local staleness and update the record of client staleness.
         for update in updates:
-            self.local_stalenesses[update.client_id - 1] = update.staleness
+            self.local_stalenesses[
+                update.client_id - 1
+            ] = update.report.training_time  # update.staleness
 
         logging.info("!!!The staleness of this round are: ", self.local_stalenesses)
         # Update local gradient bounds
