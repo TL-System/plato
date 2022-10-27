@@ -16,7 +16,7 @@ from yolov5.utils.general import (
     check_dataset,
     non_max_suppression,
     one_cycle,
-    scale_coords,
+    scale_boxes,
     xywh2xyxy,
 )
 from yolov5.utils.loss import ComputeLoss
@@ -376,14 +376,14 @@ class Trainer(basic.Trainer):
 
                 # Predictions
                 predn = pred.clone()
-                scale_coords(
+                scale_boxes(
                     img[si].shape[1:], predn[:, :4], shape, shapes[si][1]
                 )  # native-space pred
 
                 # Evaluate
                 if nl:
                     tbox = xywh2xyxy(labels[:, 1:5])  # target boxes
-                    scale_coords(
+                    scale_boxes(
                         img[si].shape[1:], tbox, shape, shapes[si][1]
                     )  # native-space labels
                     labelsn = torch.cat(
