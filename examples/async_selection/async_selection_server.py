@@ -41,7 +41,9 @@ class Server(fedavg.Server):
     def choose_clients(self, clients_pool, clients_count):
         """Choose a subset of the clients to participate in each round."""
         if self.current_round == 1:
-            return clients_pool.tolist()
+            logging.info("[%s] Selected clients: %s", self, clients_pool)
+            self.minimum_clients = len(clients_pool)
+            return clients_pool
         else:
             assert clients_count <= len(clients_pool)
 
@@ -68,10 +70,11 @@ class Server(fedavg.Server):
 
         # find delat bound for each client.
         for client_id, delta in zip(id_received, deltas_received):
+            squared_delta = 0
             # calculate the largest value in each layer and sum them up for the bound
             for layer, value in delta.items():
                 if "conv" in layer:
-                    squared_value = np.sum(np.square(value.item()))
+                    squared_value = np.sum(np.square(value.detach().cpu().numpy()))
                     squared_delta += squared_value
                     # use squared loss instead of abs
                     # temp_max = torch.max(value).detach().cpu().numpy()
@@ -89,6 +92,11 @@ class Server(fedavg.Server):
     def weights_aggregated(self, updates):
         """ "Update clients record on the server"""
         # Extract the local staleness and update the record of client staleness.
+        self.minimum_clients = (
+            Config().server.minimum_clients_aggregated
+            if hasattr(Config().server, "minimum_clients_aggregated")
+            else 1
+        )
         for update in updates:
             self.local_stalenesses[
                 update.client_id - 1
