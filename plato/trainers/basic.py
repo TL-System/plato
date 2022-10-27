@@ -574,17 +574,20 @@ class TrainerWithTimmScheduler(Trainer):
         """Method called at the beginning of a training epoch."""
         super().train_epoch_start(config)
         self.num_updates = self.current_epoch * len(self.train_loader)
+
         if "global_lr_scheduler" in config and config["global_lr_scheduler"]:
             self.num_updates += self.past_epochs * len(self.train_loader)
 
     def lr_scheduler_step(self):
         self.num_updates += 1
+
         if self.lr_scheduler is not None:
             self.lr_scheduler.step_update(num_updates=self.num_updates)
 
     def train_epoch_end(self, config):
         """Method called at the end of a training epoch."""
         super().train_epoch_end(config)
+
         if self.lr_scheduler is not None:
             if "global_lr_scheduler" in config and config["global_lr_scheduler"]:
                 self.lr_scheduler.step(self.past_epochs + self.current_epoch + 1)
