@@ -573,6 +573,7 @@ class TrainerWithTimmScheduler(Trainer):
     def train_epoch_start(self, config):
         """Method called at the beginning of a training epoch."""
         super().train_epoch_start(config)
+
         self.num_updates = self.current_epoch * len(self.train_loader)
 
         if "global_lr_scheduler" in config and config["global_lr_scheduler"]:
