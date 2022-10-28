@@ -1,5 +1,5 @@
 """
-Obtaining a ViT model for ImageClassification from the PyTorch Hub.
+Obtaining a ViT model for image classification from HuggingFace.
 """
 
 from torch import nn
@@ -7,9 +7,9 @@ from transformers import AutoModelForImageClassification, AutoConfig
 from plato.config import Config
 
 
-class ModelChangeResolution(nn.Module):
+class ResolutionAdjustedModel(nn.Module):
     """
-    Ttansform image resolution to assigned resolution of loaded pretrain model.
+    Transforms the image resolution to the assigned resolution of a pretrained model.
     """
 
     def __init__(self, model_name, config) -> nn.Module:
@@ -23,7 +23,7 @@ class ModelChangeResolution(nn.Module):
 
     def forward(self, image):
         """
-        Forward function will first fit image resolution and finally output the logits.
+        Adjusts the image resolution and outputs the logits.
         """
         if image.size(-1) != self.resolution:
             image = nn.functional.interpolate(
@@ -52,4 +52,4 @@ class Model:
         model_name = model_name.replace("@", "/")
         config = AutoConfig.from_pretrained(model_name, **config_kwargs)
 
-        return ModelChangeResolution(model_name, config)
+        return ResolutionAdjustedModel(model_name, config)
