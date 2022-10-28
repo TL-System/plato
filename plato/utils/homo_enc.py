@@ -3,6 +3,7 @@ Utility functions for homomorphric encryption with TenSEAL.
 """
 import os
 import pickle
+import zlib
 import torch
 import tenseal as ts
 import numpy as np
@@ -40,45 +41,37 @@ def encrypt_weights(
     plain_weights,
     serialize=True,
     context=None,
-    encrypt_indices=None,
+    indices=None,
 ):
     """Flatten the model weights and encrypt the selected ones."""
     assert not context is None
 
-    output = OrderedDict()
-    # Flatten all weight tensors to a vector
+    # Step 1: flatten all weight tensors to a vector
     weights_vector = np.array([])
     for weight in plain_weights.values():
         weights_vector = np.append(weights_vector, weight)
 
-    # Encrypt indices is None, full encryption
-    if encrypt_indices is None:
-        output["unencrypted_weights"] = None
-        output["encrypt_indices"] = None
-        output["encrypted_weights"] = _encrypt(weights_vector, context, True)
-        return output
+    # Step 2: set up the indices for encrypted weights
+    encrypt_indices = None
+    if indices == None:
+        encrypt_indices = np.arange(len(weights_vector)).tolist()
+    else:
+        encrypt_indices = indices
+    encrypt_indices.sort()
 
-    # Encrypt indices is an empty list, no encryption
-    if len(encrypt_indices) == 0:
-        output["unencrypted_weights"] = weights_vector
-        output["encrypt_indices"] = []
-        output["encrypted_weights"] = None
-        return output
-
-    # Encrypt indices is a non-empty list, masked encryption
-    weights_to_enc = weights_vector[encrypt_indices]
+    # Step 3: separate weights into encrypted and unencrypted ones
     unencrypted_weights = np.delete(weights_vector, encrypt_indices)
+    weights_to_enc = weights_vector[encrypt_indices]
 
-    # Encrypt selected weight vector
-    encrypted_weights = ts.ckks_vector(context, weights_to_enc)
+    if len(weights_to_enc) == 0:
+        encrypted_weights = None
+    else:
+        encrypted_weights = _encrypt(weights_to_enc, context, serialize)
 
-    # Serialize the encrypted weight vector if indicated
-    if serialize:
-        encrypted_weights = encrypted_weights.serialize()
-
-    output["unencrypted_weights"] = unencrypted_weights
-    output["encrypted_weights"] = encrypted_weights
-    output["encrypt_indices"] = encrypt_indices
+    # Finish by wrapping up the information
+    output = wrap_encrypted_model(
+        unencrypted_weights, encrypted_weights, encrypt_indices
+    )
 
     return output
 
@@ -110,29 +103,22 @@ def decrypt_weights(data, weight_shapes=None, para_nums=None):
     for para_num in para_nums.values():
         vector_length.append(para_num)
 
-    # # Step 1: decrypt the weights
+    # Step 1: decrypt the encrypted weights
     plaintext_weights_vector = None
-    encrypt_indices = data["encrypt_indices"]
-    unencrypted_weights = data["unencrypted_weights"]
-    if data["encrypted_weights"] != None:
-        decrypted_vector = np.array(data["encrypted_weights"].decrypt())
+    unencrypted_weights, encrypted_weights, indices = extract_encrypted_model(data)
+    if len(indices) != 0:
+        decrypted_vector = np.array(encrypted_weights.decrypt())
 
-    if encrypt_indices is None:
-        # All the weights are encrypted
-        plaintext_weights_vector = decrypted_vector
-    elif len(encrypt_indices) == 0:
-        # No weights encrypted
-        plaintext_weights_vector = unencrypted_weights
-    else:
-        # Some encrypted and some not, put them in the right position
-        vector_size = len(unencrypted_weights) + len(encrypt_indices)
+        vector_size = len(unencrypted_weights) + len(indices)
         plaintext_weights_vector = np.zeros(vector_size)
-        plaintext_weights_vector[encrypt_indices] = decrypted_vector
+        plaintext_weights_vector[indices] = decrypted_vector
 
-        unencrypted_indices = np.delete(range(vector_size), encrypt_indices)
+        unencrypted_indices = np.delete(range(vector_size), indices)
         plaintext_weights_vector[unencrypted_indices] = unencrypted_weights
+    else:
+        plaintext_weights_vector = unencrypted_weights
 
-    # Step 2: rebuild the original weight vector by returning selected values
+    # Step 2: rebuild the original weight vector 
     decrypted_weights = OrderedDict()
     plaintext_weights_vector = np.split(
         plaintext_weights_vector, np.cumsum(vector_length)
@@ -146,36 +132,44 @@ def decrypt_weights(data, weight_shapes=None, para_nums=None):
     return decrypted_weights
 
 
-def update_est(config, client_id, data):
-    """Update the exposed model weights that can be estimated by adversaries."""
+def wrap_encrypted_model(unencrypted_weights, encrypted_weights, indices):
+    """Wrap up the encrypted model in a dict as the message between server and client."""
+    message = {
+        "unencrypted_weights": unencrypted_weights,
+        "encrypted_weights": encrypted_weights,
+        "indices": indices,
+    }
+    return message
+
+
+def extract_encrypted_model(data):
+    """Extract infromation from the message of encrytped model"""
     unencrypted_weights = data["unencrypted_weights"]
-    encrypted_indices = data["encrypt_indices"]
-
-    model_name = config.trainer.model_name
-    run_id = config.params["run_id"]
-    checkpoint_path = config.params["checkpoint_path"]
-    attack_prep_dir = f"{config.data.datasource}_{config.trainer.model_name}_{config.clients.encrypt_ratio}"
-    if config.clients.random_mask:
-        attack_prep_dir += "_random"
-    if not os.path.exists(f"{checkpoint_path}/{attack_prep_dir}/"):
-        os.mkdir(f"{checkpoint_path}/{attack_prep_dir}/")
-
-    est_filename = (
-        f"{checkpoint_path}/{attack_prep_dir}/{model_name}_est_{client_id}.pth"
-    )
-    old_est = get_est(est_filename)
-    new_est = unencrypted_weights.clone().detach().double()
-    if not old_est is None:
-        new_est[encrypted_indices] = old_est[encrypted_indices].double()
-
-    with open(est_filename, "wb") as est_file:
-        pickle.dump(new_est, est_file)
+    encrypted_weights = data["encrypted_weights"]
+    indices = data["indices"]
+    return unencrypted_weights, encrypted_weights, indices
 
 
-def get_est(filename):
-    """Load the estimated model, return None if not exists."""
-    try:
-        with open(filename, "rb") as est_file:
-            return pickle.load(est_file)
-    except:
-        return None
+def indices_to_bitmap(indices):
+    """Turn a list of indices into a bitmap."""
+    if indices == []:
+        # In case of empty list
+        return indices
+    bit_array = np.zeros(np.max(indices) + 1, dtype=np.int8)
+    bit_array[indices] = 1
+    bitmap = np.packbits(bit_array)
+
+    # Compress the bitmap before sending it out
+    compressed_bitmap = zlib.compress(pickle.dumps(bitmap))
+    return compressed_bitmap
+
+
+def bitmap_to_indices(bitmap):
+    """Translate a bitmap back to a list of indices."""
+    if bitmap == []:
+        # In case of empty list
+        return bitmap
+    decompressed_bitmap = pickle.loads(zlib.decompress(bitmap))
+    bit_array = np.unpackbits(decompressed_bitmap)
+    indices = np.where(bit_array == 1)[0].tolist()
+    return indices

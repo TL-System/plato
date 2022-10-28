@@ -17,7 +17,7 @@ class Processor(model.Processor):
     def __init__(self, mask=None, **kwargs) -> None:
         super().__init__(**kwargs)
         self.context = homo_enc.get_ckks_context()
-        self.mask = mask
+        self.mask = list(range(10))
 
         para_nums = {}
         extract_model = self.trainer.model.cpu().state_dict()
@@ -34,6 +34,6 @@ class Processor(model.Processor):
             data,
             serialize=True,
             context=self.context,
-            encrypt_indices=self.mask,
+            indices=self.mask,
         )
         return encrypted_weights

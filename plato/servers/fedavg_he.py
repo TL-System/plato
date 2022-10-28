@@ -26,7 +26,7 @@ class Server(fedavg.Server):
         self.para_nums = {}
 
     def configure(self):
-        """Configure"""
+        """Configure the model information like weight shapes and parameter numbers."""
         super().configure()
         extract_model = self.trainer.model.cpu().state_dict()
         for key in extract_model.keys():
@@ -42,41 +42,58 @@ class Server(fedavg.Server):
         return self.encrypted_model
 
     async def aggregate_weights(self, updates, baseline_weights, weights_received):
-        # Extract the
+        """Aggregate the model updates and decrypt the result for evaluation purpose."""
+        self.encrypted_model = self._fedavg_hybrid(updates)
+
+        # Decrypt model weights for test accuracy
+        decrypted_weights = homo_enc.decrypt_weights(
+            self.encrypted_model, self.weight_shapes, self.para_nums
+        )
+        # Serialize the encrypted weights after decryption
+        self.encrypted_model["encrypted_weights"] = self.encrypted_model[
+            "encrypted_weights"
+        ].serialize()
+
+        return decrypted_weights
+
+    def _fedavg_hybrid(self, updates):
+        """Aggregate the model updates in the hybrid form of encrypted and unencrypted weights."""
         weights_received = [
             homo_enc.deserialize_weights(update.payload, self.context)
             for update in updates
         ]
-        # Check if all the weights are encrypted
-        encrypt_indices = [weights["encrypt_indices"] for weights in weights_received]
-        for indices in encrypt_indices:
-            assert indices is None
-
-        # Aggregate the encrypted weights
-        encrypted_weights = [
-            weights["encrypted_weights"] for weights in weights_received
+        unencrypted_weights = [
+            homo_enc.extract_encrypted_model(x)[0] for x in weights_received
         ]
+        encrypted_weights = [
+            homo_enc.extract_encrypted_model(x)[1] for x in weights_received
+        ]
+        # Assert the encrypted weights from all clients are aligned
+        indices = [homo_enc.extract_encrypted_model(x)[2] for x in weights_received]
+        for i in range(1, len(indices)):
+            assert indices[i] == indices[0]
+        encrypt_indices = indices[0]
 
         # Extract the total number of samples
         self.total_samples = sum(update.report.num_samples for update in updates)
 
-        # Perform weighted averaging
+        # Perform weighted averaging on unencrypted weights
+        unencrypted_avg_update = self.trainer.zeros(unencrypted_weights[0].size)
         encrypted_avg_update = self.trainer.zeros(encrypted_weights[0].size())
 
-        for i, weights in enumerate(encrypted_weights):
+        for i, (unenc_w, enc_w) in enumerate(
+            zip(unencrypted_weights, encrypted_weights)
+        ):
             report = updates[i].report
             num_samples = report.num_samples
-            encrypted_avg_update += weights * (num_samples / self.total_samples)
 
-        # Wrap up the aggregation result
-        self.encrypted_model = {}
-        self.encrypted_model["encrypted_weights"] = encrypted_avg_update
-        self.encrypted_model["encrypt_indices"] = None
-        self.encrypted_model["unencrypted_weights"] = None
+            unencrypted_avg_update += unenc_w * (num_samples / self.total_samples)
+            encrypted_avg_update += enc_w * (num_samples / self.total_samples)
 
-        # Decrypt the model weights to evaluate accuracy
-        decrypted_weights = homo_enc.decrypt_weights(
-            self.encrypted_model, self.weight_shapes, self.para_nums
+        if len(encrypt_indices) == 0:
+            # No weights are encrypted, set to None
+            encrypted_avg_update = None
+
+        return homo_enc.wrap_encrypted_model(
+            unencrypted_avg_update, encrypted_avg_update, encrypt_indices
         )
-        self.encrypted_model["encrypted_weights"] = encrypted_avg_update.serialize()
-        return decrypted_weights
