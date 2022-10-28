@@ -9,21 +9,21 @@ import logging
 
 from plato.config import Config
 
-from plato.servers import (
-    fedavg,
-    fedavg_cs,
-    mistnet,
-    fedavg_gan,
-    fedavg_he
-)
+from plato.servers import fedavg, fedavg_cs, mistnet, fedavg_gan
 
-registered_servers = {
-    "fedavg": fedavg.Server,
-    "fedavg_cross_silo": fedavg_cs.Server,
-    "mistnet": mistnet.Server,
-    "fedavg_gan": fedavg_gan.Server,
-    "fedavg_he": fedavg_he.Server
-}
+if hasattr(Config().server, "type") and Config().server.type == "fedavg_he":
+    # FedAvg server with homomorphic encryption supports PyTorch only
+    from plato.servers import fedavg_he
+
+    registered_servers = {"fedavg_he": fedavg_he.Trainer}
+
+else:
+    registered_servers = {
+        "fedavg": fedavg.Server,
+        "fedavg_cross_silo": fedavg_cs.Server,
+        "mistnet": mistnet.Server,
+        "fedavg_gan": fedavg_gan.Server,
+    }
 
 
 def get(model=None, algorithm=None, trainer=None):

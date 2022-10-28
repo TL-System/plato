@@ -7,7 +7,10 @@ from plato.utils import homo_enc
 
 
 class Server(fedavg.Server):
-    """Federated learning server using federated averaging to aggregate updates after homomorphic encryption."""
+    """
+    Federated learning server using federated averaging to aggregate updates after homomorphic
+    encryption.
+    """
 
     def __init__(
         self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None

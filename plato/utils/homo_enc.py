@@ -4,15 +4,11 @@ Utility functions for homomorphric encryption with TenSEAL.
 import os
 import pickle
 import zlib
-import tenseal as ts
-import numpy as np
-import importlib
-
 from typing import OrderedDict
 
-# In case torch not exists, e.g., MindSpore case
-if importlib.find_loader("torch"):
-    import torch
+import numpy as np
+import tenseal as ts
+import torch
 
 
 def get_ckks_context():
@@ -23,7 +19,7 @@ def get_ckks_context():
         with open(os.path.join(context_dir, context_name), "rb") as f:
             return ts.context_from(f.read())
     except:
-        # Create a new context if not exists
+        # Create a new context if it does not exist
         if not os.path.exists(context_dir):
             os.mkdir(context_dir)
 
@@ -57,7 +53,7 @@ def encrypt_weights(
 
     # Step 2: set up the indices for encrypted weights
     encrypt_indices = None
-    if indices == None:
+    if indices is None:
         encrypt_indices = np.arange(len(weights_vector)).tolist()
     else:
         encrypt_indices = indices
@@ -91,7 +87,7 @@ def deserialize_weights(serialized_weights, context):
     """Deserialize the encrypted weights (not decrypted yet)."""
     deserialized_weights = OrderedDict()
     for name, weight in serialized_weights.items():
-        if name == "encrypted_weights" and weight != None:
+        if name == "encrypted_weights" and weight is not None:
             deser_weights_vector = ts.lazy_ckks_vector_from(weight)
             deser_weights_vector.link_context(context)
             deserialized_weights[name] = deser_weights_vector
@@ -110,6 +106,7 @@ def decrypt_weights(data, weight_shapes=None, para_nums=None):
     # Step 1: decrypt the encrypted weights
     plaintext_weights_vector = None
     unencrypted_weights, encrypted_weights, indices = extract_encrypted_model(data)
+
     if len(indices) != 0:
         decrypted_vector = np.array(encrypted_weights.decrypt())
 
@@ -133,7 +130,7 @@ def decrypt_weights(data, weight_shapes=None, para_nums=None):
         try:
             decrypted_weights[name] = torch.from_numpy(decrypted_weights[name])
         except:
-            # Torch not exists, just return numpy array and handle it somewhere else.
+            # PyTorch does not exist, just return numpy array and handle it somewhere else.
             decrypted_weights[name] = decrypted_weights[name]
         weight_index = weight_index + 1
 
@@ -147,6 +144,7 @@ def wrap_encrypted_model(unencrypted_weights, encrypted_weights, indices):
         "encrypted_weights": encrypted_weights,
         "indices": indices,
     }
+
     return message
 
 
@@ -177,6 +175,7 @@ def bitmap_to_indices(bitmap):
     if bitmap == []:
         # In case of empty list
         return bitmap
+
     decompressed_bitmap = pickle.loads(zlib.decompress(bitmap))
     bit_array = np.unpackbits(decompressed_bitmap)
     indices = np.where(bit_array == 1)[0].tolist()
