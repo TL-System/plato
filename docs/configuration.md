@@ -135,6 +135,10 @@ The type of the server.
 - `mistnet` a MistNet server.
 
 - `fedavg_gan` a Federated Averaging server that handles Generative Adversarial Networks (GANs).
+
+- `fedavg_he` a Federated Averaging server that handles model updates after homomorphic encryption. When this server is used, the clients need to enable inbound processor `model_decrypt` to decrypt the global model from server, and outbound processor `model_encrypt` to encrypt the model updates. 
+
+the original model updates need to be processed by `model_encrypt` and s before using this server.
 ```
 
 ```{admonition} **address**
