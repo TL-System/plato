@@ -115,12 +115,17 @@ A list of processors for the client to apply on the payload before sending it ou
 - `structured_pruning` Process structured pruning on model weights for PyTorch. The `model_compress` processor needs to be applied after it in the configuration file or the communication overhead will not be reduced.
 
 - `model_compress` Compress model parameters with `Zstandard` compression algorithm. Must be placed as the last processor if applied.
+
+- `model_encrypt` Encrypts the model parameters using homomorphic encyrption.
 ```
 
 ```{admonition} inbound_processors
 A list of processors for the client to apply on the payload before receiving it from the server.
 
 - `model_decompress` Decompress model parameters. Must be placed as the first processor if `model_compress` is applied on the server side.
+
+- `model_decrypt` Decrypts the model parameters using homomorphic encyrption.
+
 ```
 
 ## server
@@ -136,9 +141,7 @@ The type of the server.
 
 - `fedavg_gan` a Federated Averaging server that handles Generative Adversarial Networks (GANs).
 
-- `fedavg_he` a Federated Averaging server that handles model updates after homomorphic encryption. When this server is used, the clients need to enable inbound processor `model_decrypt` to decrypt the global model from server, and outbound processor `model_encrypt` to encrypt the model updates. 
-
-the original model updates need to be processed by `model_encrypt` and s before using this server.
+- `fedavg_he` a Federated Averaging server that handles model updates after homomorphic encryption. When this server is used, the clients need to enable inbound processor `model_decrypt` to decrypt the global model from server, and outbound processor `model_encrypt` to encrypt the model updates.
 ```
 
 ```{admonition} **address**
