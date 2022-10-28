@@ -4,11 +4,15 @@ Utility functions for homomorphric encryption with TenSEAL.
 import os
 import pickle
 import zlib
-import torch
 import tenseal as ts
 import numpy as np
+import importlib
 
 from typing import OrderedDict
+
+# In case torch not exists, e.g., MindSpore case
+if importlib.find_loader("torch"):
+    import torch
 
 
 def get_ckks_context():
@@ -118,7 +122,7 @@ def decrypt_weights(data, weight_shapes=None, para_nums=None):
     else:
         plaintext_weights_vector = unencrypted_weights
 
-    # Step 2: rebuild the original weight vector 
+    # Step 2: rebuild the original weight vector
     decrypted_weights = OrderedDict()
     plaintext_weights_vector = np.split(
         plaintext_weights_vector, np.cumsum(vector_length)
@@ -126,7 +130,11 @@ def decrypt_weights(data, weight_shapes=None, para_nums=None):
     weight_index = 0
     for name, shape in weight_shapes.items():
         decrypted_weights[name] = plaintext_weights_vector[weight_index].reshape(shape)
-        decrypted_weights[name] = torch.from_numpy(decrypted_weights[name])
+        try:
+            decrypted_weights[name] = torch.from_numpy(decrypted_weights[name])
+        except:
+            # Torch not exists, just return numpy array and handle it somewhere else.
+            decrypted_weights[name] = decrypted_weights[name]
         weight_index = weight_index + 1
 
     return decrypted_weights
