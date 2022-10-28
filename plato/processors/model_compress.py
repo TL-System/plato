@@ -31,6 +31,3 @@ class Processor(model.Processor):
                          self.client_id)
 
         return output
-
-    def _process_layer(self, layer: Any) -> Any:
-        """ No need to process individual layer of the model """
