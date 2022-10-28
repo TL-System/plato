@@ -31,6 +31,6 @@ def get(model=None, datasource=None, algorithm=None, trainer=None):
             model=model, datasource=datasource, algorithm=algorithm, trainer=trainer
         )
     else:
-        raise ValueError("No such client: {}".format(client_type))
+        raise ValueError(f"No such client: {client_type}")
 
     return registered_client

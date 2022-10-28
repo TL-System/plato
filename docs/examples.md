@@ -158,6 +158,14 @@ Lai, et al., &ldquo;[Oort: Efficient Federated Learning via Guided Participant S
 ```
 ````
 
+````{admonition} **MaskCrypt**
+MaskCrypt is a secure federated learning system based on homomorphic encryption. Instead of encrypting all the model updates, MaskCrypt encrypts only part of them to balance the tradeoff between security and efficiency. In this example, clients only select 5% of the model updates to encrypt during the learning process. The number of encrypted weights is determined by `encrypt_ratio`, which can be adjusted in the configuration file. A random mask will be adopted if `random_mask` is set to true.
+
+```shell
+python examples/maskcrypt/maskcrypt.py -c examples/maskcrypt/maskcrypt_MNIST_lenet5.yml
+```
+````
+
 
 With the recent redesign of the Plato API, the following list is outdated and will be updated as they are tested again.
 
