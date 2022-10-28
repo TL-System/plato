@@ -8,7 +8,7 @@ import pickle
 
 from plato.clients import simple
 from plato.config import Config
-import encrypt_utils
+import maskcrypt_utils
 
 
 class Client(simple.Client):
@@ -54,7 +54,8 @@ class Client(simple.Client):
             # Set final encryption mask and send model updates to server
             self.final_mask = processed_inbound_payload
             report, weights = self.model_buffer.pop(self.client_id)
-            report.training_time = 0.0
+            # Set training_time to a non-zero value to avoid heapq.heappush error in base.Server Line 886
+            report.training_time = 0.001
             report.comm_time = time.time()
             return report, weights
 
@@ -65,7 +66,7 @@ class Client(simple.Client):
             self.checkpoint_path
             + f"/{self.attack_prep_dir}/{model_name}_est_{self.client_id}.pth"
         )
-        return encrypt_utils.get_est(est_filename)
+        return maskcrypt_utils.get_est(est_filename)
 
     def _compute_mask(self, latest_weights, gradients):
         """Compute the encryption mask for current client."""
