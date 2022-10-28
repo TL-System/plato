@@ -79,7 +79,7 @@ if not (
 
 
 def get(
-    user: str, processor_kwargs=dict, **kwargs
+    user: str, processor_kwargs=None, **kwargs
 ) -> Tuple[pipeline.Processor, pipeline.Processor]:
     """Get an instance of the processor."""
     outbound_processors = []
