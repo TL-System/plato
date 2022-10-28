@@ -480,8 +480,14 @@ The repository where the machine learning model should be retrieved from. The fo
 
 - `huggingface`
 - `torch_hub`
+- `vit`
 
 The name of the model should be specified below, in `model_name`.
+
+```{note}
+For `vit`, please replace the `/` in model name from https://huggingface.co/models with `@`. For example, use `google@vit-base-patch16-224-in21k` instead of `google/vit-base-patch16-224-in21k`.
+```
+
 ````
 
 ````{admonition} **model_name**
