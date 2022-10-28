@@ -108,7 +108,7 @@ def get(
         logging.info("%s: Using Processor for receiving payload: %s", user, processor)
 
     def map_f(name):
-        if name in processor_kwargs:
+        if processor_kwargs is not None and name in processor_kwargs:
             this_kwargs = {**kwargs, **(processor_kwargs[name])}
         else:
             this_kwargs = kwargs
