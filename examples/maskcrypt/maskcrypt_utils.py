@@ -17,9 +17,7 @@ def update_est(config, client_id, data):
     unencrypted_indices = np.delete(range(vector_size), indices)
     weights_vector[unencrypted_indices] = unencrypted_weights
 
-    #
     model_name = config.trainer.model_name
-    run_id = config.params["run_id"]
     checkpoint_path = config.params["checkpoint_path"]
     attack_prep_dir = f"{config.data.datasource}_{config.trainer.model_name}_{config.clients.encrypt_ratio}"
     if config.clients.random_mask:
@@ -32,7 +30,7 @@ def update_est(config, client_id, data):
     )
     old_est = get_est(est_filename)
     new_est = weights_vector
-    if not old_est is None:
+    if old_est is not None:
         weights_vector[indices] = old_est[indices]
 
     with open(est_filename, "wb") as est_file:
