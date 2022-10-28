@@ -71,6 +71,7 @@ class Client(simple.Client):
     def _compute_mask(self, latest_weights, gradients):
         """Compute the encryption mask for current client."""
         exposed_flat = self._get_exposed_weights()
+        exposed_flat = torch.tensor(exposed_flat)
         device = exposed_flat.device
 
         latest_flat = torch.cat(
