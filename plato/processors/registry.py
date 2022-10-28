@@ -6,24 +6,10 @@ Having a registry of all available classes is convenient for retrieving an insta
 based on a configuration at run-time.
 """
 import logging
-from collections import OrderedDict
 from typing import Tuple
 
 from plato.config import Config
 from plato.processors import pipeline
-
-
-if hasattr(Config().server, "type") and Config().server.type == "fedavg_he":
-    # FedAvg server with homomorphic encryption needs to import tenseal, which is not available on
-    # all platforms such as macOS
-    from plato.processors import model_encrypt, model_decrypt
-
-    registered_processors = OrderedDict(
-        [
-            ("model_encrypt", model_encrypt.Processor),
-            ("model_decrypt", model_decrypt.Processor),
-        ]
-    )
 
 if not (
     hasattr(Config().trainer, "use_tensorflow")
@@ -52,29 +38,40 @@ if not (
         unstructured_pruning,
     )
 
-    registered_processors = OrderedDict(
-        [
-            ("base", base.Processor),
-            ("compress", compress.Processor),
-            ("decompress", decompress.Processor),
-            ("feature_randomized_response", feature_randomized_response.Processor),
-            ("feature_gaussian", feature_gaussian.Processor),
-            ("feature_laplace", feature_laplace.Processor),
-            ("feature_quantize", feature_quantize.Processor),
-            ("feature_dequantize", feature_dequantize.Processor),
-            ("feature_unbatch", feature_unbatch.Processor),
-            ("inbound_feature_tensors", inbound_feature_tensors.Processor),
-            ("outbound_feature_ndarrays", outbound_feature_ndarrays.Processor),
-            ("model_deepcopy", model_deepcopy.Processor),
-            ("model_quantize", model_quantize.Processor),
-            ("model_dequantize", model_dequantize.Processor),
-            ("model_compress", model_compress.Processor),
-            ("model_decompress", model_decompress.Processor),
-            ("model_randomized_response", model_randomized_response.Processor),
-            ("send_mask", send_mask.Processor),
-            ("structured_pruning", structured_pruning.Processor),
-            ("unstructured_pruning", unstructured_pruning.Processor),
-        ]
+    registered_processors = {
+        "base": base.Processor,
+        "compress": compress.Processor,
+        "decompress": decompress.Processor,
+        "feature_randomized_response": feature_randomized_response.Processor,
+        "feature_gaussian": feature_gaussian.Processor,
+        "feature_laplace": feature_laplace.Processor,
+        "feature_quantize": feature_quantize.Processor,
+        "feature_dequantize": feature_dequantize.Processor,
+        "feature_unbatch": feature_unbatch.Processor,
+        "inbound_feature_tensors": inbound_feature_tensors.Processor,
+        "outbound_feature_ndarrays": outbound_feature_ndarrays.Processor,
+        "model_deepcopy": model_deepcopy.Processor,
+        "model_quantize": model_quantize.Processor,
+        "model_dequantize": model_dequantize.Processor,
+        "model_compress": model_compress.Processor,
+        "model_decompress": model_decompress.Processor,
+        "model_randomized_response": model_randomized_response.Processor,
+        "send_mask": send_mask.Processor,
+        "structured_pruning": structured_pruning.Processor,
+        "unstructured_pruning": unstructured_pruning.Processor,
+    }
+
+
+if hasattr(Config().server, "type") and Config().server.type == "fedavg_he":
+    # FedAvg server with homomorphic encryption needs to import tenseal, which is not available on
+    # all platforms such as macOS
+    from plato.processors import model_encrypt, model_decrypt
+
+    registered_processors.update(
+        {
+            "model_encrypt": model_encrypt.Processor,
+            "model_decrypt": model_decrypt.Processor,
+        }
     )
 
 
