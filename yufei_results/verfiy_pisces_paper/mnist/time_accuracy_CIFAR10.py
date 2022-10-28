@@ -122,7 +122,7 @@ def main():
     result_csv_file3 = "./fedbuff_mnist.csv"
     result_dict3 = read_csv_to_dict(result_csv_file3, x_item, y_item)
 
-    result_csv_file4 = "./async_mnist.csv"
+    result_csv_file4 = "./async_pro_mnist_zipf.csv"
     result_dict4 = read_csv_to_dict(result_csv_file4, x_item, y_item)
     # x_item = 'round'
     x_label = "Elapsed Time"
