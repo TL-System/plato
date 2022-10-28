@@ -21,7 +21,7 @@ server:
 data:
     # The training and testing dataset
     datasource: TinyImageNet
-    data_path: /data/dixi/tiny-imagenet-200
+    data_path: data/tiny-imagenet-200
 
     # Number of samples in each partition
     partition_size: 10000
