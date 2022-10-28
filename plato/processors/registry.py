@@ -12,6 +12,19 @@ from typing import Tuple
 from plato.config import Config
 from plato.processors import pipeline
 
+
+if hasattr(Config().server, "type") and Config().server.type == "fedavg_he":
+    # FedAvg server with homomorphic encryption needs to import tenseal, which is not available on
+    # all platforms such as macOS
+    from plato.processors import model_encrypt, model_decrypt
+
+    registered_processors = OrderedDict(
+        [
+            ("model_encrypt", model_encrypt.Processor),
+            ("model_decrypt", model_decrypt.Processor),
+        ]
+    )
+
 if not (
     hasattr(Config().trainer, "use_tensorflow")
     or hasattr(Config().trainer, "use_mindspore")
@@ -37,8 +50,6 @@ if not (
         send_mask,
         structured_pruning,
         unstructured_pruning,
-        model_encrypt,
-        model_decrypt,
     )
 
     registered_processors = OrderedDict(
@@ -63,14 +74,12 @@ if not (
             ("send_mask", send_mask.Processor),
             ("structured_pruning", structured_pruning.Processor),
             ("unstructured_pruning", unstructured_pruning.Processor),
-            ("model_encrypt", model_encrypt.Processor),
-            ("model_decrypt", model_decrypt.Processor),
         ]
     )
 
 
 def get(
-    user: str, processor_kwargs={}, **kwargs
+    user: str, processor_kwargs=dict, **kwargs
 ) -> Tuple[pipeline.Processor, pipeline.Processor]:
     """Get an instance of the processor."""
     outbound_processors = []

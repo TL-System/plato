@@ -2,9 +2,9 @@
 A processor that encrypts model weights in MaskCrypt.
 """
 import logging
-import torch
-
 from typing import Any
+
+import torch
 from plato.processors import model
 from plato.utils import homo_enc
 
@@ -30,10 +30,12 @@ class Processor(model.Processor):
             "[Client #%d] Encrypt the model weights with given encryption mask.",
             self.client_id,
         )
+
         encrypted_weights = homo_enc.encrypt_weights(
             data,
             serialize=True,
             context=self.context,
             indices=self.mask,
         )
+
         return encrypted_weights
