@@ -15,7 +15,7 @@ if hasattr(Config().server, "type") and Config().server.type == "fedavg_he":
     # FedAvg server with homomorphic encryption supports PyTorch only
     from plato.servers import fedavg_he
 
-    registered_servers = {"fedavg_he": fedavg_he.Trainer}
+    registered_servers = {"fedavg_he": fedavg_he.Server}
 
 else:
     registered_servers = {
