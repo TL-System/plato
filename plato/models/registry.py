@@ -23,6 +23,7 @@ else:
         vgg,
         torch_hub,
         huggingface,
+        vit,
     )
 
     registered_models = {
@@ -36,6 +37,7 @@ else:
         "vgg": vgg.Model,
         "torch_hub": torch_hub.Model,
         "huggingface": huggingface.Model,
+        "vit": vit.Model,
     }
 
 
