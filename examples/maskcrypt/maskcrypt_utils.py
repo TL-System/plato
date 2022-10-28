@@ -31,7 +31,7 @@ def update_est(config, client_id, data):
         f"{checkpoint_path}/{attack_prep_dir}/{model_name}_est_{client_id}.pth"
     )
     old_est = get_est(est_filename)
-    new_est = unencrypted_weights
+    new_est = weights_vector
     if not old_est is None:
         weights_vector[indices] = old_est[indices]
 

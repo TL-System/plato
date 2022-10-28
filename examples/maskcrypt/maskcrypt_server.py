@@ -2,6 +2,7 @@
 A MaskCrypt server with selective homomorphic encryption support.
 """
 import torch
+import numpy as np
 
 from plato.servers import fedavg_he
 
@@ -49,13 +50,13 @@ class Server(fedavg_he.Server):
         if mask_size == 0:
             self.final_mask = torch.tensor([])
         else:
-            interleaved_indices = torch.zeros((sum([len(x) for x in proposals])))
+            interleaved_indices = torch.zeros(
+                (sum([len(x) for x in proposals])), dtype=int
+            )
             for i in range(len(proposals)):
                 interleaved_indices[i :: len(proposals)] = proposals[i]
 
-            _, indices = interleaved_indices.unique(sorted=False, return_inverse=True)
-
-            self.final_mask = (
-                interleaved_indices[indices.unique()[:mask_size]].clone().detach()
-            )
+            _, indices = np.unique(interleaved_indices, return_index=True)
+            indices.sort()
+            self.final_mask = interleaved_indices[indices]
             self.final_mask = self.final_mask.int().tolist()

@@ -17,7 +17,7 @@ class Processor(model.Processor):
     def __init__(self, mask=None, **kwargs) -> None:
         super().__init__(**kwargs)
         self.context = homo_enc.get_ckks_context()
-        self.mask = list(range(10))
+        self.mask = mask
 
         para_nums = {}
         extract_model = self.trainer.model.cpu().state_dict()
