@@ -42,7 +42,7 @@ class MistnetplusClient(simple.Client):
             self.gradient_received = True
             self.algorithm.receive_gradients(server_payload)
 
-    async def train(self):
+    async def _train(self):
         """A split learning client only uses the first several layers in a forward pass."""
         logging.info("Training on client #%d", self.client_id)
         assert not Config().clients.do_test

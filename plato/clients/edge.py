@@ -53,7 +53,7 @@ class Client(simple.Client):
         if "current_global_round" in server_response:
             self.server.current_global_round = server_response["current_global_round"]
 
-    async def train(self):
+    async def _train(self):
         """The aggregation workload on an edge client."""
         training_start_time = time.perf_counter()
         # Signal edge server to select clients to start a new round of local aggregation

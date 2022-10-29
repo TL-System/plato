@@ -16,7 +16,7 @@ from plato.clients import simple
 class Client(simple.Client):
     """A federated learning client with Adaptive Parameter Freezing."""
 
-    async def train(self):
+    async def _train(self):
         """Adaptive Parameter Freezing will be applied after training the model."""
 
         # Perform model training

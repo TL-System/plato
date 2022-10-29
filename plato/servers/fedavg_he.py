@@ -44,6 +44,7 @@ class Server(fedavg.Server):
         """Server can only send the encrypted aggreagtion result to clients."""
         return self.encrypted_model
 
+    # pylint: disable=unused-argument
     async def aggregate_weights(self, updates, baseline_weights, weights_received):
         """Aggregate the model updates and decrypt the result for evaluation purpose."""
         self.encrypted_model = self._fedavg_hybrid(updates)

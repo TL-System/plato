@@ -31,7 +31,7 @@ class Client(simple.Client):
         self.new_client_control_variates = None
         self.fl_round_counter = 0
 
-    async def train(self):
+    async def _train(self):
         """Initialize the server control variates and client control variates for the trainer."""
         if self.server_control_variates is not None:
             self.trainer.client_control_variates = self.client_control_variates

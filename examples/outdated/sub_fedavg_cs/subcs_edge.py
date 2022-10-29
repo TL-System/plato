@@ -11,7 +11,7 @@ from plato.clients import edge
 class Client(edge.Client):
     """A federated learning client at the edge server in a cross-silo training workload."""
 
-    async def train(self):
+    async def _train(self):
         """The training process on a FedSaw edge client."""
         training_start_time = time.perf_counter()
         # Signal edge server to select clients to start a new round of local aggregation

@@ -16,13 +16,14 @@ class Report(edge.Report):
 
 class Client(edge.Client):
     """A federated learning client at the edge server in a cross-silo training workload."""
+
     def __init__(self, server):
         super().__init__(server)
         self.do_personalization_test = False
 
     def process_server_response(self, server_response):
         """Additional client-specific processing on the server response."""
-        if 'personalization_test' in server_response:
+        if "personalization_test" in server_response:
             self.do_personalization_test = True
         else:
             super().process_server_response(server_response)
@@ -32,7 +33,8 @@ class Client(edge.Client):
         and let them train their personlized models and test accuracy."""
         logging.info(
             "[Edge Server #%d] Passing the global meta model to its clients.",
-            self.client_id)
+            self.client_id,
+        )
 
         # Edge server select clients to conduct personalization test
         await self.server.select_testing_clients()
@@ -42,12 +44,12 @@ class Client(edge.Client):
         self.server.per_accuracy_aggregated.clear()
 
         report = self.server.personalization_accuracy
-        payload = 'personalization_accuracy'
+        payload = "personalization_accuracy"
 
         return report, payload
 
-    async def start_training(self):
-        """ Complete one round of training on this client. """
+    async def _start_training(self):
+        """Complete one round of training on this client."""
         self.load_payload(self.server_payload)
         self.server_payload = None
 
@@ -59,10 +61,9 @@ class Client(edge.Client):
             logging.info("[%s] Model aggregated on edge server.", self)
 
         # Sending the client report as metadata to the server (payload to follow)
-        await self.sio.emit('client_report', {
-            'id': self.client_id,
-            'report': pickle.dumps(report)
-        })
+        await self.sio.emit(
+            "client_report", {"id": self.client_id, "report": pickle.dumps(report)}
+        )
 
         # Sending the client training payload to the server
         await self.send(payload)

@@ -17,7 +17,7 @@ class fedReIdClient(simple.Client):
     def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
         super().__init__(model=model, datasource=datasource, trainer=trainer)
 
-    async def train(self):
+    async def _train(self):
         old_weights = self.algorithm.extract_weights()
         report, weights = await super().train()
         belive = self.cos_feature_distance(old_weights, weights)

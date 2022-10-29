@@ -228,7 +228,7 @@ class Client(simple.Client):
 
         return delta_o, delta_g
 
-    async def train(self):
+    async def _train(self):
         """The machine learning training workload on a client."""
         training_start_time = time.time()
         logging.info("[Client #%d] Started training.", self.client_id)

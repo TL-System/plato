@@ -38,7 +38,7 @@ class ClientEvents(socketio.AsyncClientNamespace):
         logging.info(
             "[Client #%d] The server disconnected the connection.", self.client_id
         )
-        self.plato_client.clear_checkpoint_files()
+        self.plato_client._clear_checkpoint_files()
         os._exit(0)
 
     async def on_connect_error(self, data):
@@ -171,12 +171,12 @@ class Client:
 
         self.process_server_response(response)
 
-        self.configure()
+        self._configure()
 
         logging.info("[Client #%d] Selected by the server.", self.client_id)
 
         if not hasattr(Config().data, "reload_data") or Config().data.reload_data:
-            self.load_data()
+            self._load_data()
 
         if self.comm_simulation:
             payload_filename = response["payload_filename"]
@@ -191,9 +191,9 @@ class Client:
                 payload_size / 1024**2,
             )
 
-            await self.handle_payload(self.server_payload)
+            await self._handle_payload(self.server_payload)
 
-    async def handle_payload(self, inbound_payload):
+    async def _handle_payload(self, inbound_payload):
         """Handles the inbound payload upon receiving it from the server."""
         self.inbound_received(self.inbound_processor)
         self.callback_handler.call_event(
@@ -236,7 +236,7 @@ class Client:
         Override this method to conduct customized operations to generate a client's response to
         the server when inbound payload from the server has been processed.
         """
-        report, outbound_payload = await self.start_training(processed_inbound_payload)
+        report, outbound_payload = await self._start_training(processed_inbound_payload)
         return report, outbound_payload
 
     def outbound_ready(self, report, outbound_processor):
@@ -318,13 +318,13 @@ class Client:
             payload_size / 1024**2,
         )
 
-        await self.handle_payload(self.server_payload)
+        await self._handle_payload(self.server_payload)
 
-    async def start_training(self, inbound_payload):
+    async def _start_training(self, inbound_payload):
         """Complete one round of training on this client."""
         self.load_payload(inbound_payload)
 
-        report, outbound_payload = await self.train()
+        report, outbound_payload = await self._train()
 
         if Config().is_edge_server():
             logging.info(
@@ -399,33 +399,28 @@ class Client:
                 data_size / 1024**2,
             )
 
-    def process_server_response(self, server_response) -> None:
-        """Additional client-specific processing on the server response."""
-
-    def clear_checkpoint_files(self):
+    def _clear_checkpoint_files(self):
         """Delete all the temporary checkpoint files created by the client."""
-        if (
-            hasattr(Config().server, "request_update")
-            and Config().server.request_update
-        ):
-            model_path = Config().params["model_path"]
-            for filename in os.listdir(model_path):
-                split = re.match(
-                    r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+).pth",
-                    filename,
-                )
-                if split is not None and self.client_id == int(
-                    split.group("client_id")
-                ):
-                    file_path = f"{model_path}/{filename}"
-                    os.remove(file_path)
+        model_path = Config().params["model_path"]
+        for filename in os.listdir(model_path):
+            split = re.match(
+                r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+).pth",
+                filename,
+            )
+            if split is not None:
+                file_path = f"{model_path}/{filename}"
+                os.remove(file_path)
 
     @abstractmethod
-    def configure(self) -> None:
+    async def _train(self):
+        """The machine learning training workload on a client."""
+
+    @abstractmethod
+    def _configure(self) -> None:
         """Prepare this client for training."""
 
     @abstractmethod
-    def load_data(self) -> None:
+    def _load_data(self) -> None:
         """Generating data and loading them onto this client."""
 
     @abstractmethod
@@ -440,9 +435,8 @@ class Client:
     def load_payload(self, server_payload) -> None:
         """Loading the payload onto this client."""
 
-    @abstractmethod
-    async def train(self):
-        """The machine learning training workload on a client."""
+    def process_server_response(self, server_response) -> None:
+        """Additional client-specific processing on the server response."""
 
     @abstractmethod
     async def obtain_model_update(self, client_id, requested_time):

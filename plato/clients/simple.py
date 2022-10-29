@@ -42,9 +42,9 @@ class Client(base.Client):
 
         self._report = None
 
-    def configure(self) -> None:
+    def _configure(self) -> None:
         """Prepares this client for training."""
-        super().configure()
+        super()._configure()
 
         if self.model is None and self.custom_model is not None:
             self.model = self.custom_model
@@ -69,7 +69,7 @@ class Client(base.Client):
             "Client", client_id=self.client_id, trainer=self.trainer
         )
 
-    def load_data(self) -> None:
+    def _load_data(self) -> None:
         """Generates data and loads them onto this client."""
         logging.info("[%s] Loading its data source...", self)
 
@@ -114,7 +114,7 @@ class Client(base.Client):
         """Loads the server model onto this client."""
         self.algorithm.load_weights(server_payload)
 
-    async def train(self):
+    async def _train(self):
         """The machine learning training workload on a client."""
         logging.info(
             fonts.colourize(

@@ -17,7 +17,7 @@ class Client(simple.Client):
     A federated learning client prunes its update before sending out.
     """
 
-    async def train(self):
+    async def _train(self):
         """The training process on a FedSaw client."""
         previous_weights = copy.deepcopy(self.algorithm.extract_weights())
 
