@@ -90,7 +90,7 @@ class Server(fedunlearning_server.Server):
         # Initialize the function that clustering clients by solver or randomly
         self._clustering_clients()
 
-    def init_trainer(self):
+    def init_trainer(self) -> None:
         """Load the trainer and initialize the dictionary that maps cluster IDs to client IDs."""
         super().init_trainer()
 

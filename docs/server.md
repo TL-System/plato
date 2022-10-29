@@ -24,7 +24,7 @@ Override this method to implement additional tasks for initializing and configur
 **Example** (from `examples/knot/knot_server.py`):
 
 ```py
-def init_trainer(self):
+def init_trainer(self) -> None:
     """Load the trainer and initialize the dictionary that maps cluster IDs to client IDs."""
     super().init_trainer()
 

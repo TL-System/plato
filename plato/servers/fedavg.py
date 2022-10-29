@@ -111,7 +111,7 @@ class Server(base.Server):
                 accuracy_csv_file, accuracy_headers, Config().params["result_path"]
             )
 
-    def init_trainer(self):
+    def init_trainer(self) -> None:
         """Setting up the global model, trainer, and algorithm."""
         if self.model is None and self.custom_model is not None:
             self.model = self.custom_model

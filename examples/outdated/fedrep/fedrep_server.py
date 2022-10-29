@@ -55,7 +55,7 @@ class Server(fedavg.Server):
 
         logging.info("Representation_weights: %s", self.representation_param_names)
 
-    def init_trainer(self):
+    def init_trainer(self) -> None:
         """Extract representation parameter names after initializing the trainer."""
         super().init_trainer()
 
