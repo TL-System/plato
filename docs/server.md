@@ -4,7 +4,9 @@
 
 The common practice is to customize the server using inheritance for important features that change the state of the server. To customize the server using inheritance, subclass the `fedavg.Server` (or `fedavg_cs.Server` for cross-silo federated learning) class in `plato.servers`, and override the following methods:
 
-````{admonition} **configure(self)**
+````{admonition} **configure()**
+**`def configure(self) -> None`**
+
 Override this method to implement additional tasks for initializing and configuring the server. Make sure that `super().configure()` is called first.
 
 **Example:**
@@ -18,7 +20,9 @@ def configure(self) -> None:
 ```
 ````
 
-````{admonition} **init_trainer(self)**
+````{admonition} **init_trainer()**
+**`def init_trainer(self) -> None`**
+
 Override this method to implement additional tasks for initializing and configuring the trainer. Make sure that `super().init_trainer()` is called first.
 
 **Example** (from `examples/knot/knot_server.py`):
@@ -32,15 +36,21 @@ def init_trainer(self) -> None:
 ```
 ````
 
-```{admonition} **choose_clients(self, clients_pool, clients_count)**
+```{admonition} **choose_clients()**
+**`def choose_clients(self, clients_pool, clients_count)`**
+
 Override this method to implement a customized client selection algorithm, choosing a subset of clients from the client pool.
 
 `clients_pool` a list of available clients for selection.
 
 `clients_count` the number of clients that need to be selected in this round.
+
+**Returns:** a list of selected client IDs.
 ```
 
-````{admonition} **weights_received(self, weights_received)**
+````{admonition} **weights_received()**
+**`def weights_received(self, weights_received)`**
+
 Override this method to complete additional tasks after the updated weights have been received.
 
 `weights_received` the updated weights that have been received from the clients.
@@ -57,7 +67,9 @@ def weights_received(self, weights_received):
 ```
 ````
 
-```{admonition} **aggregate_deltas(self, updates, deltas_received)**
+```{admonition} **aggregate_deltas()**
+**`async def aggregate_deltas(self, updates, deltas_received)`**
+
 In most cases, it is more convenient to aggregate the model deltas from the clients, because this can be performed in a framework-agnostic fashion. Override this method to aggregate the deltas received. This method is needed if `aggregate_weights()` (below) is not defined.
 
 `updates` the client updates received at the server.
@@ -65,7 +77,9 @@ In most cases, it is more convenient to aggregate the model deltas from the clie
 `deltas_received` the weight deltas received from the clients.
 ```
 
-```{admonition} **aggregate_weights(self, updates, baseline_weights, weights_received)**
+```{admonition} **aggregate_weights()**
+**`async def aggregate_weights(self, updates, baseline_weights, weights_received)`**
+
 Sometimes it is more convenient to aggregate the received model weights directly to the global model. In this case, override this method to aggregate the weights received directly to baseline weights. This method is optional, and the server will call this method rather than `aggregate_deltas` when it is defined. Refer to `examples/fedasync/fedasync_server.py` for an example.
 
 `updates` the client updates received at the server.
@@ -75,13 +89,17 @@ Sometimes it is more convenient to aggregate the received model weights directly
 `weights_received` the weights received from the clients.
 ```
 
-````{admonition} **weights_aggregated(self, updates)**
+````{admonition} **weights_aggregated()**
+**`def weights_aggregated(self, updates)`**
+
 Override this method to complete additional tasks after aggregating weights.
 
 `updates` the client updates received at the server.
 ````
 
-````{admonition} **customize_server_response(self, server_response: dict, client_id) -> dict**
+````{admonition} **customize_server_response()**
+**`def customize_server_response(self, server_response: dict, client_id) -> dict`**
+
 Override this method to return a customize server response with any additional information.
 
 `server_response` key-value pairs (from a string to an instance) for the server response before customization.
@@ -100,37 +118,82 @@ def customize_server_response(self, server_response: dict, client_id) -> dict:
 ```
 ````
 
-```{admonition} **customize_server_payload(self, payload)**
+```{admonition} **customize_server_payload()**
+**`def customize_server_payload(self, payload)`**
+
 Override this method to customize the server payload before sending it to the clients.
+
+**Returns:** Customized server payload to be sent to the clients.
 ```
 
-```{admonition} **clients_selected(self, selected_clients) -> None**
+```{admonition} **clients_selected()**
+**`def clients_selected(self, selected_clients) -> None`**
+
 Override this method to complete additional tasks after clients have been selected in each round.
 
 `selected_clients` a list of client IDs that have just been selected by the server.
 ```
 
-```{admonition} **clients_processed(self)**
+```{admonition} **clients_processed()**
+**`def clients_processed(self) -> None`**
+
 Override this method to complete additional tasks after all client reports have been processed.
 ```
 
-```{admonition} **save_to_checkpoint(self)**
+````{admonition} **get_logged_items()**
+**`def get_logged_items(self) -> dict`**
+
+Override this method to return items to be logged by the `LogProgressCallback` class in a .csv file.
+
+**Returns:** a dictionary of items to be logged.
+
+**Example:** (from `examples/knot/knot_server`)
+
+```py
+def get_logged_items(self):
+    """Get items to be logged by the LogProgressCallback class in a .csv file."""
+    logged_items = super().get_logged_items()
+
+    clusters_accuracy = [
+        self.clustered_test_accuracy[cluster_id]
+        for cluster_id in range(self.num_clusters)
+    ]
+
+    clusters_accuracy = "; ".join([str(acc) for acc in clusters_accuracy])
+
+    logged_items["clusters_accuracy"] = clusters_accuracy
+
+    return logged_items
+```
+````
+
+```{admonition} **save_to_checkpoint()**
+**`def save_to_checkpoint(self) -> None`**
+
 Override this method to save additional information when the server saves checkpoints at the end of each around.
 ```
 
-```{admonition} **training_will_start(self)**
+```{admonition} **training_will_start()**
+**`def training_will_start(self) -> None`**
+
 Override this method to complete additional tasks before selecting clients for the first round of training.
 ```
 
-```{admonition} **periodic_task(self) -> None**
+```{admonition} **periodic_task()**
+**`periodic_task(self) -> None`**
+
 Override this async method to perform periodic tasks in asynchronous mode, where this method will be called periodically.
 ```
 
-```{admonition} **wrap_up(self)**
+```{admonition} **wrap_up()**
+**`async def wrap_up(self) -> None`**
+
 Override this method to complete additional tasks at the end of each round.
 ```
 
-```{admonition} **server_will_close(self)**
+```{admonition} **server_will_close()**
+**`def server_will_close(self) -> None:`**
+
 Override this method to complete additional tasks before closing the server.
 ```
 
@@ -142,13 +205,17 @@ Within the implementation of these callback methods, one can access additional i
 
 To use callbacks, subclass the `ServerCallback` class in `plato.callbacks.server`, and override the following methods:
 
-````{admonition} **on_weights_received(self, server, weights_received)**
+````{admonition} **on_weights_received()**
+**`def on_weights_received(self, server, weights_received)`**
+
 Override this method to complete additional tasks after the updated weights have been received.
 
 `weights_received` the updated weights that have been received from the clients.
 ````
 
-````{admonition} **on_weights_aggregated(self, server, updates)**
+````{admonition} **on_weights_aggregated()**
+**`def on_weights_aggregated(self, server, updates)`**
+
 Override this method to complete additional tasks after aggregating weights.
 
 `updates` the client updates received at the server.
@@ -161,21 +228,29 @@ def on_weights_aggregated(self, server, updates):
 ```
 ````
 
-```{admonition} **on_clients_selected(self, server, selected_clients)**
+```{admonition} **on_clients_selected()**
+**`def on_clients_selected(self, server, selected_clients)`**
+
 Override this method to complete additional tasks after clients have been selected in each round.
 
 `selected_clients` a list of client IDs that have just been selected by the server.
 ```
 
-```{admonition} **on_clients_processed(self, server)**
+```{admonition} **on_clients_processed()**
+**`def on_clients_processed(self, server)`**
+
 Override this method to complete additional tasks after all client reports have been processed.
 ```
 
-```{admonition} **on_training_will_start(self, server)**
+```{admonition} **on_training_will_start()**
+**`def on_training_will_start(self, server)`**
+
 Override this method to complete additional tasks before selecting clients for the first round of training.
 ```
 
-````{admonition} **on_server_will_close(self, server)**
+````{admonition} **on_server_will_close()**
+**`def on_server_will_close(self, server)`**
+
 Override this method to complete additional tasks before closing the server.
 
 **Example:**
