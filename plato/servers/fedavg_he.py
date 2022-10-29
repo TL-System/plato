@@ -28,7 +28,7 @@ class Server(fedavg.Server):
         self.weight_shapes = {}
         self.para_nums = {}
 
-    def configure(self):
+    def configure(self) -> None:
         """Configure the model information like weight shapes and parameter numbers."""
         super().configure()
 

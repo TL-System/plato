@@ -30,7 +30,7 @@ class Client(simple.Client):
     """A fednova federated learning client who sends weight updates
     and the number of local epochs."""
 
-    def configure(self):
+    def configure(self) -> None:
         super().configure()
         np.random.seed(3000 + self.client_id)
 

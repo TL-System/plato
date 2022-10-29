@@ -177,7 +177,7 @@ class Server:
     def __str__(self):
         return f"Server #{os.getpid()}"
 
-    def configure(self):
+    def configure(self) -> None:
         """Initializing configuration settings based on the configuration file."""
         logging.info("[Server #%d] Configuring the server...", os.getpid())
 

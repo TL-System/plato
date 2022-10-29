@@ -50,7 +50,7 @@ class Server(base.Server):
             self.clients_per_round,
         )
 
-    def configure(self):
+    def configure(self) -> None:
         """
         Booting the federated learning server by setting up the data, model, and
         creating the clients.

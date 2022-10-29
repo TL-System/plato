@@ -115,7 +115,7 @@ class Server(fedavg.Server):
                 self.total_clients,
             )
 
-    def configure(self):
+    def configure(self) -> None:
         """
         Booting the federated learning server by setting up the data, model, and
         creating the clients.

@@ -10,7 +10,7 @@ Override this method to implement additional tasks for initializing and configur
 **Example:**
 
 ```py
-def configure(self):
+def configure(self) -> None:
     """Configure the model information like weight shapes and parameter numbers."""
     super().configure()
 
