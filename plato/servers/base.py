@@ -892,6 +892,13 @@ class Server:
 
         await self.process_clients(client_info)
 
+    # pylint: disable=unused-argument
+    def should_request_update(
+        self, client_id, start_time, finish_time, client_staleness, report
+    ):
+        """Determines if an explicit request for model update should be sent to the client."""
+        return client_staleness > self.staleness_bound
+
     async def process_clients(self, client_info):
         """Determine whether it is time to process the client reports and
         proceed with the aggregation process.
@@ -923,10 +930,15 @@ class Server:
                     client_staleness = self.current_round - client["starting_round"]
 
                     if (
-                        client_staleness > self.staleness_bound
+                        self.should_request_update(
+                            client_id=client["client_id"],
+                            start_time=client["start_time"],
+                            finish_time=client_info[0],
+                            client_staleness=client_staleness,
+                            report=client["report"],
+                        )
                         and not client["report"].update_response
                     ):
-
                         # Sending an urgent request to the client for a model update at the
                         # currently simulated wall clock time
                         client_id = client["client_id"]
