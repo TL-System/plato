@@ -397,7 +397,7 @@ class Trainer(base.Trainer):
 
         return accuracy
 
-    def obtain_model_update(self, client_id, training_time):
+    def obtain_model_update(self, client_id, requested_time):
         """
         Obtain a saved model for a particular epoch that finishes just after the provided
         wall clock time is reached.
@@ -424,7 +424,7 @@ class Trainer(base.Trainer):
             model_training_time = models_per_epoch[epoch]["training_time"]
             model_checkpoint = models_per_epoch[epoch]["model_checkpoint"]
 
-            if model_training_time > training_time:
+            if model_training_time > requested_time:
                 model_path = f"{model_path}/{model_checkpoint}"
 
                 pretrained = None

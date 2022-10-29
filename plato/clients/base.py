@@ -259,7 +259,7 @@ class Client:
 
         report, payload = await self.obtain_model_update(
             client_id=data["client_id"],
-            training_time=data["time"],
+            requested_time=data["time"],
         )
 
         # Process outbound data when necessary
@@ -445,5 +445,5 @@ class Client:
         """The machine learning training workload on a client."""
 
     @abstractmethod
-    async def obtain_model_update(self, client_id, training_time):
+    async def obtain_model_update(self, client_id, requested_time):
         """Retrieving a model update corrsponding to a particular wall clock time."""

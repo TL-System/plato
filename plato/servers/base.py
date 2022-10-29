@@ -897,8 +897,6 @@ class Server:
         self, client_id, start_time, finish_time, client_staleness, report
     ):
         """Determines if an explicit request for model update should be sent to the client."""
-        print(finish_time)
-        print(self.wall_time)
         return client_staleness > self.staleness_bound and finish_time > self.wall_time
 
     async def process_clients(self, client_info):
