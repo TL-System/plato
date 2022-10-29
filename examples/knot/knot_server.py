@@ -3,11 +3,9 @@ A customized server for Knot, a clustered aggregation mechanism designed for
 federated unlearning.
 """
 
-import asyncio
 import copy
 import logging
 import os
-import pickle
 import random
 from collections import deque
 
@@ -427,7 +425,7 @@ class Server(fedunlearning_server.Server):
 
             if self.current_round >= Config().trainer.rounds:
                 logging.info("Target number of training rounds reached.")
-                await self.close()
+                await self._close()
 
             if hasattr(Config().trainer, "target_accuracy"):
                 target_accuracy = Config().trainer.target_accuracy
@@ -438,13 +436,13 @@ class Server(fedunlearning_server.Server):
                 logging.info(
                     "[%s] Target accuracy and standard deviation reached.", self
                 )
-                await self.close()
+                await self._close()
 
             if target_perplexity and self.accuracy <= target_perplexity:
                 logging.info(
                     "[%s] Target perplexity and standard deviation reached.", self
                 )
-                await self.close()
+                await self._close()
 
     def _load_model(self, cluster_id, filename=None, location=None):
         """Loading pre-trained model weights before retraining from a file."""

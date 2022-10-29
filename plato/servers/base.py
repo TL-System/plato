@@ -24,7 +24,7 @@ from plato.client import run
 from plato.config import Config
 from plato.utils import s3, fonts
 
-
+# pylint: disable=unused-argument, protected-access
 class ServerEvents(socketio.AsyncNamespace):
     """A custom namespace for socketio.AsyncServer."""
 
@@ -32,7 +32,6 @@ class ServerEvents(socketio.AsyncNamespace):
         super().__init__(namespace)
         self.plato_server = plato_server
 
-    # pylint: disable=unused-argument
     async def on_connect(self, sid, environ):
         """Upon a new connection from a client."""
         logging.info("[Server #%d] A new client just connected.", os.getpid())
@@ -40,7 +39,7 @@ class ServerEvents(socketio.AsyncNamespace):
     async def on_disconnect(self, sid):
         """Upon a disconnection event."""
         logging.info("[Server #%d] An existing client just disconnected.", os.getpid())
-        await self.plato_server.client_disconnected(sid)
+        await self.plato_server._client_disconnected(sid)
 
     async def on_client_alive(self, sid, data):
         """A new client arrived or an existing client sends a heartbeat."""
@@ -48,24 +47,24 @@ class ServerEvents(socketio.AsyncNamespace):
 
     async def on_client_report(self, sid, data):
         """An existing client sends a new report from local training."""
-        await self.plato_server.client_report_arrived(sid, data["id"], data["report"])
+        await self.plato_server._client_report_arrived(sid, data["id"], data["report"])
 
     async def on_chunk(self, sid, data):
         """A chunk of data from the server arrived."""
-        await self.plato_server.client_chunk_arrived(sid, data["data"])
+        await self.plato_server._client_chunk_arrived(sid, data["data"])
 
     async def on_client_payload(self, sid, data):
         """An existing client sends a new payload from local training."""
-        await self.plato_server.client_payload_arrived(sid, data["id"])
+        await self.plato_server._client_payload_arrived(sid, data["id"])
 
     async def on_client_payload_done(self, sid, data):
         """An existing client finished sending its payloads from local training."""
         if "s3_key" in data:
-            await self.plato_server.client_payload_done(
+            await self.plato_server._client_payload_done(
                 sid, data["id"], s3_key=data["s3_key"]
             )
         else:
-            await self.plato_server.client_payload_done(sid, data["id"])
+            await self.plato_server._client_payload_done(sid, data["id"])
 
 
 class Server:
@@ -263,12 +262,12 @@ class Server:
         self.configure()
 
         if Config().args.resume:
-            self.resume_from_checkpoint()
+            self._resume_from_checkpoint()
 
         if Config().is_central_server():
             # In cross-silo FL, the central server lets edge servers start first
             # Then starts their clients
-            Server.start_clients(
+            Server._start_clients(
                 as_server=True,
                 client=self.client,
                 edge_server=edge_server,
@@ -282,7 +281,7 @@ class Server:
         if self.disable_clients:
             logging.info("No clients are launched (server:disable_clients = true)")
         else:
-            Server.start_clients(client=self.client)
+            Server._start_clients(client=self.client)
 
         asyncio.get_event_loop().create_task(self._periodic(self.periodic_interval))
 
@@ -353,7 +352,7 @@ class Server:
             await self._select_clients()
 
     @staticmethod
-    def start_clients(
+    def _start_clients(
         client=None, as_server=False, edge_server=None, edge_client=None, trainer=None
     ):
         """Starting all the clients as separate processes."""
@@ -756,7 +755,7 @@ class Server:
 
         self.comm_overhead += data_size / 1024**2
 
-    async def client_report_arrived(self, sid, client_id, report):
+    async def _client_report_arrived(self, sid, client_id, report):
         """Upon receiving a report from a client."""
         self.reports[sid] = pickle.loads(report)
         self.client_payload[sid] = None
@@ -792,11 +791,11 @@ class Server:
 
             await self.process_client_info(client_id, sid)
 
-    async def client_chunk_arrived(self, sid, data) -> None:
+    async def _client_chunk_arrived(self, sid, data) -> None:
         """Upon receiving a chunk of data from a client."""
         self.client_chunks[sid].append(data)
 
-    async def client_payload_arrived(self, sid, client_id):
+    async def _client_payload_arrived(self, sid, client_id):
         """Upon receiving a portion of the payload from a client."""
         assert len(self.client_chunks[sid]) > 0 and client_id in self.training_clients
 
@@ -812,7 +811,7 @@ class Server:
             self.client_payload[sid] = [self.client_payload[sid]]
             self.client_payload[sid].append(_data)
 
-    async def client_payload_done(self, sid, client_id, s3_key=None):
+    async def _client_payload_done(self, sid, client_id, s3_key=None):
         """Upon receiving all the payload from a client, either via S3 or socket.io."""
         if s3_key is None:
             assert self.client_payload[sid] is not None
@@ -1128,7 +1127,7 @@ class Server:
             ) >= len(self.trained_clients):
                 await self._select_clients(for_next_batch=True)
 
-    async def client_disconnected(self, sid):
+    async def _client_disconnected(self, sid):
         """When a client disconnected it should be removed from its internal states."""
         for client_id, client in dict(self.clients).items():
             if client["sid"] == sid:
@@ -1173,13 +1172,13 @@ class Server:
             "[%s] Saving the checkpoint to %s/%s.", self, checkpoint_path, filename
         )
         self.trainer.save_model(filename, checkpoint_path)
-        self.save_random_states(self.current_round, checkpoint_path)
+        self._save_random_states(self.current_round, checkpoint_path)
 
         # Saving the current round in the server for resuming its session later on
         with open(f"{checkpoint_path}/current_round.pkl", "wb") as checkpoint_file:
             pickle.dump(self.current_round, checkpoint_file)
 
-    def resume_from_checkpoint(self):
+    def _resume_from_checkpoint(self):
         """Resume a training session from a previously saved checkpoint."""
         logging.info(
             "[%s] Resume a training session from a previously saved checkpoint.", self
@@ -1191,7 +1190,7 @@ class Server:
         with open(f"{checkpoint_path}/current_round.pkl", "rb") as checkpoint_file:
             self.current_round = pickle.load(checkpoint_file)
 
-        self.restore_random_states(self.current_round, checkpoint_path)
+        self._restore_random_states(self.current_round, checkpoint_path)
         self.resumed_session = True
 
         model_name = (
@@ -1202,7 +1201,7 @@ class Server:
         filename = f"checkpoint_{model_name}_{self.current_round}.pth"
         self.trainer.load_model(filename, checkpoint_path)
 
-    def save_random_states(self, round_to_save, checkpoint_path):
+    def _save_random_states(self, round_to_save, checkpoint_path):
         """Saving the random states in the server for resuming its session later on."""
         states_to_save = [
             f"numpy_prng_state_{round_to_save}",
@@ -1218,7 +1217,7 @@ class Server:
             with open(f"{checkpoint_path}/{state}.pkl", "wb") as checkpoint_file:
                 pickle.dump(variables_to_save[i], checkpoint_file)
 
-    def restore_random_states(self, round_to_restore, checkpoint_path):
+    def _restore_random_states(self, round_to_restore, checkpoint_path):
         """Restoring the numpy.random and random states from previously saved checkpoints
         for a particular round.
         """
@@ -1252,18 +1251,17 @@ class Server:
 
         if target_accuracy and self.accuracy >= target_accuracy:
             logging.info("[%s] Target accuracy reached.", self)
-            await self.close()
+            await self._close()
 
         if target_perplexity and self.accuracy <= target_perplexity:
             logging.info("[%s] Target perplexity reached.", self)
-            await self.close()
+            await self._close()
 
         if self.current_round >= Config().trainer.rounds:
             logging.info("Target number of training rounds reached.")
-            await self.close()
+            await self._close()
 
-    # pylint: disable=protected-access
-    async def close(self):
+    async def _close(self):
         """Closing the server."""
         logging.info("[%s] Training concluded.", self)
         self.trainer.save_model()

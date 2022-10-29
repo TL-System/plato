@@ -38,7 +38,7 @@ class MistnetplusServer(fedavg.Server):
             callbacks=callbacks,
         )
 
-    async def client_payload_done(self, sid, client_id, s3_key=None):
+    async def _client_payload_done(self, sid, client_id, s3_key=None):
         if s3_key is None:
             assert self.client_payload[sid] is not None
 

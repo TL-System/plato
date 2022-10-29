@@ -82,7 +82,7 @@ class Server(fedavg_cs.Server):
         )
         self.comm_overhead += data_size / 1024**2
 
-    async def client_report_arrived(self, sid, client_id, report):
+    async def _client_report_arrived(self, sid, client_id, report):
         """Upon receiving a report from a client."""
         self.reports[sid] = pickle.loads(report)
         self.client_payload[sid] = None
@@ -111,7 +111,7 @@ class Server(fedavg_cs.Server):
 
             await self.process_client_info(client_id, sid)
 
-    async def client_payload_done(self, sid, client_id, s3_key=None):
+    async def _client_payload_done(self, sid, client_id, s3_key=None):
         """Upon receiving all the payload from a client, either via S3 or socket.io."""
         if s3_key is None:
             assert self.client_payload[sid] is not None

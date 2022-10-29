@@ -100,7 +100,7 @@ class RLServer(fedavg.Server):
             self.agent.reset_env = False
             self.reset()
         if self.agent.finished:
-            await self.close()
+            await self._close()
 
     @abstractmethod
     def prep_state(self):

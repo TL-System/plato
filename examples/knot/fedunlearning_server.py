@@ -137,4 +137,5 @@ class Server(fedavg.Server):
                         os.getpid(),
                         self.current_round,
                     )
-                    self.restore_random_states(self.current_round, checkpoint_path)
+
+                    self._restore_random_states(self.current_round, checkpoint_path)
