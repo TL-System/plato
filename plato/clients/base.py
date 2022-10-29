@@ -18,7 +18,7 @@ from plato.callbacks.client import LogProgressCallback
 from plato.config import Config
 from plato.utils import s3
 
-
+# pylint: disable=unused-argument, protected-access
 class ClientEvents(socketio.AsyncClientNamespace):
     """A custom namespace for socketio.AsyncServer."""
 
@@ -27,12 +27,10 @@ class ClientEvents(socketio.AsyncClientNamespace):
         self.plato_client = plato_client
         self.client_id = plato_client.client_id
 
-    # pylint: disable=unused-argument
     async def on_connect(self):
         """Upon a new connection to the server."""
         logging.info("[Client #%d] Connected to the server.", self.client_id)
 
-    # pylint: disable=protected-access
     async def on_disconnect(self):
         """Upon a disconnection event."""
         logging.info(
@@ -49,26 +47,26 @@ class ClientEvents(socketio.AsyncClientNamespace):
 
     async def on_payload_to_arrive(self, data):
         """New payload is about to arrive from the server."""
-        await self.plato_client.payload_to_arrive(data["response"])
+        await self.plato_client._payload_to_arrive(data["response"])
 
     async def on_request_update(self, data):
         """The server is requesting an urgent model update."""
-        await self.plato_client.request_update(data)
+        await self.plato_client._request_update(data)
 
     async def on_chunk(self, data):
         """A chunk of data from the server arrived."""
-        await self.plato_client.chunk_arrived(data["data"])
+        await self.plato_client._chunk_arrived(data["data"])
 
     async def on_payload(self, data):
         """A portion of the new payload from the server arrived."""
-        await self.plato_client.payload_arrived(data["id"])
+        await self.plato_client._payload_arrived(data["id"])
 
     async def on_payload_done(self, data):
         """All of the new payload sent from the server arrived."""
         if "s3_key" in data:
-            await self.plato_client.payload_done(data["id"], s3_key=data["s3_key"])
+            await self.plato_client._payload_done(data["id"], s3_key=data["s3_key"])
         else:
-            await self.plato_client.payload_done(data["id"])
+            await self.plato_client._payload_done(data["id"])
 
 
 class Client:
@@ -162,7 +160,7 @@ class Client:
         logging.info("[Client #%d] Waiting to be selected.", self.client_id)
         await self.sio.wait()
 
-    async def payload_to_arrive(self, response) -> None:
+    async def _payload_to_arrive(self, response) -> None:
         """Upon receiving a response from the server."""
         self.current_round = response["current_round"]
 
@@ -245,11 +243,11 @@ class Client:
         to process the data to be sent to the server.
         """
 
-    async def chunk_arrived(self, data) -> None:
+    async def _chunk_arrived(self, data) -> None:
         """Upon receiving a chunk of data from the server."""
         self.chunks.append(data)
 
-    async def request_update(self, data) -> None:
+    async def _request_update(self, data) -> None:
         """Upon receiving a request for an urgent model update."""
         logging.info(
             "[Client #%s] Urgent request received for model update at time %s.",
@@ -257,7 +255,7 @@ class Client:
             data["time"],
         )
 
-        report, payload = await self.obtain_model_update(
+        report, payload = await self._obtain_model_update(
             client_id=data["client_id"],
             requested_time=data["time"],
         )
@@ -277,7 +275,7 @@ class Client:
         # Sending the client training payload to the server
         await self.send(payload)
 
-    async def payload_arrived(self, client_id) -> None:
+    async def _payload_arrived(self, client_id) -> None:
         """Upon receiving a portion of the new payload from the server."""
         assert client_id == self.client_id
 
@@ -293,7 +291,7 @@ class Client:
             self.server_payload = [self.server_payload]
             self.server_payload.append(_data)
 
-    async def payload_done(self, client_id, s3_key=None) -> None:
+    async def _payload_done(self, client_id, s3_key=None) -> None:
         """Upon receiving all the new payload from the server."""
         payload_size = 0
 
@@ -424,14 +422,6 @@ class Client:
         """Generating data and loading them onto this client."""
 
     @abstractmethod
-    def save_model(self, model_checkpoint) -> None:
-        """Saving the model to a model checkpoint."""
-
-    @abstractmethod
-    def load_model(self, model_checkpoint) -> None:
-        """Loading the model from a model checkpoint."""
-
-    @abstractmethod
     def load_payload(self, server_payload) -> None:
         """Loading the payload onto this client."""
 
@@ -439,5 +429,5 @@ class Client:
         """Additional client-specific processing on the server response."""
 
     @abstractmethod
-    async def obtain_model_update(self, client_id, requested_time):
+    async def _obtain_model_update(self, client_id, requested_time):
         """Retrieving a model update corrsponding to a particular wall clock time."""

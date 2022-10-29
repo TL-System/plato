@@ -179,7 +179,7 @@ class Client(base.Client):
 
         return self._report, weights
 
-    async def obtain_model_update(self, client_id, requested_time):
+    async def _obtain_model_update(self, client_id, requested_time):
         """Retrieves a model update corresponding to a particular wall clock time."""
         model = self.trainer.obtain_model_update(client_id, requested_time)
         weights = self.algorithm.extract_weights(model)
@@ -188,14 +188,6 @@ class Client(base.Client):
         self._report.update_response = True
 
         return self._report, weights
-
-    def save_model(self, model_checkpoint):
-        """Saves the model to a model checkpoint."""
-        self.trainer.save_model(model_checkpoint)
-
-    def load_model(self, model_checkpoint):
-        """Loads the model from a model checkpoint."""
-        self.trainer.load_model(model_checkpoint)
 
     def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
         """Customizes the report with any additional information."""
