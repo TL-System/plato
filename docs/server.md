@@ -167,6 +167,33 @@ def get_logged_items(self):
 ```
 ````
 
+````{admonition} **should_request_update()**
+**`def should_request_update(self, client_id, start_time, finish_time, client_staleness, report):`**
+
+Override this method to save additional information when the server saves checkpoints at the end of each around.
+
+`client_id` The client ID for the client to be considered.
+
+`start_time` The wall-clock time when the client started training.
+
+`finish_time` The wall-clock time when the client finished training.
+
+`client_staleness` The number of rounds that elapsed since this client started training.
+
+`report` The report sent by the client.
+
+**Returns:** `True` if the server should explicitly request an update from the client `client_id`; `False` otherwise.
+
+**Example:** (from `servers/base.py`)
+```py
+    def should_request_update(
+        self, client_id, start_time, finish_time, client_staleness, report
+    ):
+        """Determines if an explicit request for model update should be sent to the client."""
+        return client_staleness > self.staleness_bound and finish_time > self.wall_time
+```
+````
+
 ```{admonition} **save_to_checkpoint()**
 **`def save_to_checkpoint(self) -> None`**
 
