@@ -420,11 +420,12 @@ class Trainer(base.Trainer):
                         "model_checkpoint": filename,
                     }
         # Locate the model at a specific wall clock time
+        count = 1
         for epoch in sorted(models_per_epoch):
             model_training_time = models_per_epoch[epoch]["training_time"]
             model_checkpoint = models_per_epoch[epoch]["model_checkpoint"]
 
-            if model_training_time > requested_time:
+            if model_training_time > requested_time or count >= Config().trainer.epochs:
                 model_path = f"{Config().params['model_path']}/{model_checkpoint}"
 
                 print(model_path)
@@ -444,9 +445,12 @@ class Trainer(base.Trainer):
                     "epoch %s finished, at time %s.",
                     client_id,
                     epoch,
-                    training_time,
+                    model_training_time,
                 )
+
                 return model
+
+            count += 1
 
         raise ValueError(
             f"[Client #{client_id}] Cannot find an epoch that matches the wall-clock time provided."
