@@ -171,7 +171,7 @@ class Client:
 
         self.process_server_response(response)
 
-        self._configure()
+        self.configure()
 
         logging.info("[Client #%d] Selected by the server.", self.client_id)
 
@@ -416,7 +416,7 @@ class Client:
         """The machine learning training workload on a client."""
 
     @abstractmethod
-    def _configure(self) -> None:
+    def configure(self) -> None:
         """Prepare this client for training."""
 
     @abstractmethod

@@ -42,9 +42,9 @@ class Client(base.Client):
 
         self._report = None
 
-    def _configure(self) -> None:
+    def configure(self) -> None:
         """Prepares this client for training."""
-        super()._configure()
+        super().configure()
 
         if self.model is None and self.custom_model is not None:
             self.model = self.custom_model

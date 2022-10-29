@@ -81,7 +81,10 @@ class Config:
                 help="The server hostname and port number.",
             )
             parser.add_argument(
-                "-u", "--cpu", action="store_true", help="Use the CPU as the device."
+                "-u", "--cpu", action="store_true", help="Use CPU as the device."
+            )
+            parser.add_argument(
+                "-m", "--mps", action="store_true", help="Use MPS as the device."
             )
             parser.add_argument(
                 "-d",
@@ -314,7 +317,7 @@ class Config:
 
         if torch.cuda.is_available():
             return torch.cuda.device_count()
-        elif torch.has_mps:
+        elif Config.args.mps and torch.has_mps:
             return 1
         else:
             return 0
@@ -348,7 +351,7 @@ class Config:
                 else:
                     device = "cuda:0"
 
-            if torch.has_mps:
+            if Config.args.mps and torch.has_mps:
                 device = "mps"
 
         return device
