@@ -425,7 +425,7 @@ class Trainer(base.Trainer):
             model_checkpoint = models_per_epoch[epoch]["model_checkpoint"]
 
             if model_training_time > requested_time:
-                model_path = f"{model_path}/{model_checkpoint}"
+                model_path = f"{Config().params['model_path']}/{model_checkpoint}"
 
                 pretrained = None
                 if torch.cuda.is_available():
