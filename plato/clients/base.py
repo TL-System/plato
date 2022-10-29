@@ -253,11 +253,14 @@ class Client:
         """Upon receiving a request for an urgent model update."""
         logging.info(
             "[Client #%s] Urgent request received for model update at time %s.",
-            self.client_id,
+            data["client_id"],
             data["time"],
         )
 
-        report, payload = await self.obtain_model_update(data["time"])
+        report, payload = await self.obtain_model_update(
+            client_id=data["client_id"],
+            training_time=data["time"],
+        )
 
         # Process outbound data when necessary
         self.callback_handler.call_event(
@@ -442,5 +445,5 @@ class Client:
         """The machine learning training workload on a client."""
 
     @abstractmethod
-    async def obtain_model_update(self, wall_time):
+    async def obtain_model_update(self, client_id, training_time):
         """Retrieving a model update corrsponding to a particular wall clock time."""

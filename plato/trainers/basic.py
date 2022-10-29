@@ -31,7 +31,6 @@ class Trainer(base.Trainer):
         super().__init__()
 
         self.training_start_time = time.time()
-        self.models_per_epoch = {}
         self.model_state_dict = None
         self.current_round = 0
 
@@ -398,13 +397,13 @@ class Trainer(base.Trainer):
 
         return accuracy
 
-    def obtain_model_update(self, wall_time):
+    def obtain_model_update(self, client_id, training_time):
         """
         Obtain a saved model for a particular epoch that finishes just after the provided
         wall clock time is reached.
         """
         # Constructing a list of epochs and training times
-        self.models_per_epoch = {}
+        models_per_epoch = {}
 
         for filename in os.listdir(Config().params["model_path"]):
             split = re.match(
@@ -415,27 +414,42 @@ class Trainer(base.Trainer):
             if split is not None:
                 epoch = split.group("epoch")
                 training_time = split.group("training_time")
-                if self.client_id == int(split.group("client_id")):
-                    self.models_per_epoch[epoch] = {
+                if client_id == int(split.group("client_id")):
+                    models_per_epoch[epoch] = {
                         "training_time": float(training_time),
                         "model_checkpoint": filename,
                     }
         # Locate the model at a specific wall clock time
-        for epoch in sorted(self.models_per_epoch):
-            training_time = self.models_per_epoch[epoch]["training_time"]
-            model_checkpoint = self.models_per_epoch[epoch]["model_checkpoint"]
-            if training_time + self.training_start_time > wall_time:
-                self.load_model(model_checkpoint)
+        for epoch in sorted(models_per_epoch):
+            model_training_time = models_per_epoch[epoch]["training_time"]
+            model_checkpoint = models_per_epoch[epoch]["model_checkpoint"]
+
+            if model_training_time > training_time:
+                model_path = f"{model_path}/{model_checkpoint}"
+
+                pretrained = None
+                if torch.cuda.is_available():
+                    pretrained = torch.load(model_path)
+                else:
+                    pretrained = torch.load(
+                        model_path, map_location=torch.device("cpu")
+                    )
+
+                model = models_registry.get()
+                model.load_state_dict(pretrained, strict=True)
+
                 logging.info(
                     "[Client #%s] Responding to the server with the model after "
                     "epoch %s finished, at time %s.",
-                    self.client_id,
+                    client_id,
                     epoch,
-                    training_time + self.training_start_time,
+                    training_time,
                 )
-                return self.model
+                return model
 
-        return self.model
+        raise ValueError(
+            f"[Client #{client_id}] Cannot find an epoch that matches the wall-clock time provided."
+        )
 
     # pylint: disable=unused-argument
     def get_train_loader(self, batch_size, trainset, sampler, **kwargs):

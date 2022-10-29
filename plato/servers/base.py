@@ -897,7 +897,9 @@ class Server:
         self, client_id, start_time, finish_time, client_staleness, report
     ):
         """Determines if an explicit request for model update should be sent to the client."""
-        return client_staleness > self.staleness_bound
+        print(finish_time)
+        print(self.wall_time)
+        return client_staleness > self.staleness_bound and finish_time > self.wall_time
 
     async def process_clients(self, client_info):
         """Determine whether it is time to process the client reports and
@@ -963,8 +965,16 @@ class Server:
 
                         sid = client["sid"]
 
+                        if self.asynchronous_mode and self.simulate_wall_time:
+                            self.training_sids.append(sid)
+
                         await self.sio.emit(
-                            "request_update", {"time": self.wall_time}, room=sid
+                            "request_update",
+                            {
+                                "client_id": client_id,
+                                "time": self.wall_time - client["start_time"],
+                            },
+                            room=sid,
                         )
                         request_sent = True
 
